@@ -276,7 +276,7 @@ class Chit extends JPanel
                 biContext.drawImage(image, 0, 0, null);
                 double theta = Math.PI;
                 AffineTransform at = AffineTransform.getRotateInstance(theta,
-                    width / 2, height / 2);
+                    width / 2.0, height / 2.0);
                 AffineTransformOp ato = new AffineTransformOp(at,
                     AffineTransformOp.TYPE_BILINEAR);
                 BufferedImage bi2 = ato.createCompatibleDestImage(bi, null);

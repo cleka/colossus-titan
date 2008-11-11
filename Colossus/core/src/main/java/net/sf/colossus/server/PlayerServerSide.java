@@ -393,8 +393,7 @@ public final class PlayerServerSide extends Player implements
      */
     void undoRecruit(Legion legion)
     {
-        assert legion != null : "Player.undoRecruit: legion for markerId "
-            + legion + " is null";
+        assert legion != null : "Player.undoRecruit: legion must not be null";
 
         // This is now permanently fixed in Player.java, so this should
         // never happen again. Still, leaving this in place, just to be sure...
@@ -402,8 +401,8 @@ public final class PlayerServerSide extends Player implements
         if (recruitName == null)
         {
             LOGGER.log(Level.SEVERE,
-                "Player.undoRecruit: Nothing to unrecruit for marker "
-                    + legion);
+                "Player.undoRecruit: Nothing to unrecruit for legion "
+                    + legion.getMarkerId());
             return;
         }
         ((LegionServerSide)legion).undoRecruit();

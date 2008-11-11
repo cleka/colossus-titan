@@ -2207,8 +2207,8 @@ public class RationalAI extends SimpleAI
 
         double expectedValue;
 
-        expectedValue = defenderKilled / numOtherPlayers - attackerKilled
-            + attackerMuster - defenderMuster / numOtherPlayers;
+        expectedValue = defenderKilled / (double)numOtherPlayers - attackerKilled
+            + attackerMuster - defenderMuster / (double)numOtherPlayers;
 
         if (attackerCreatures.size() > 1)
         {

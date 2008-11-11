@@ -102,7 +102,7 @@ public class DummyFrameWithMenu extends KFrame
 
     static public void swingCleanup()
     {
-        SwingReferenceCleanupHacks.CleanupJPopupMenuGlobals(true);
+        SwingReferenceCleanupHacks.cleanupJPopupMenuGlobals(true);
         SwingReferenceCleanupHacks.cleanupJMenuBarGlobals();
     }
 

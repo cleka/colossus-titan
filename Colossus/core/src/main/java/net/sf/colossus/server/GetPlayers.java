@@ -705,7 +705,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
 
     private String makeUniqueName(String baseName, int i)
     {
-        String tryName = baseName;
+        StringBuffer tryName = new StringBuffer(baseName);
         boolean duplicate = true;
         while (duplicate)
         {
@@ -716,7 +716,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
                 {
                     String otherBoxName = (String)playerNames[j]
                         .getSelectedItem();
-                    if (tryName.equals(otherBoxName))
+                    if (tryName.toString().equals(otherBoxName))
                     {
                         duplicate = true;
                     }
@@ -724,19 +724,26 @@ public final class GetPlayers extends KFrame implements WindowListener,
             }
             if (duplicate)
             {
+                int nr;
+                
                 // on first attempt, take row number
-                if (tryName.equals(Constants.username))
+                if (tryName.toString().equals(Constants.username))
                 {
-                    tryName = tryName + i;
+                    nr = i;
                 }
                 // if that does not help, random until unique
                 else
                 {
-                    tryName = tryName + Dice.rollDie();
+                    nr = Dice.rollDie();
                 }
+                tryName.append(String.valueOf(nr));
             }
         }
-        return tryName;
+        
+        // perhaps .toString() would be ok, but there is arguing whether
+        // then you get simply ref to the value of original StringBuffer 
+        // object and heaven knows what then... so, just to be sure. 
+        return tryName.substring(0);
     }
 
     public synchronized void actionPerformed(ActionEvent e)

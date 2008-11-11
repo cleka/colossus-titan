@@ -78,9 +78,7 @@ final class BattleDice extends Box
         numDice = this.rolls.size();
 
         // for average miss number, let's assume 6-sided roll :-)
-        float floatAM = (numDice * (targetNumber - 1)) / 6;
-
-        averageMiss = Math.round(floatAM);
+        averageMiss = Math.round((numDice * (targetNumber - 1) / 6.0f));
     }
 
     private String getDieImageName(String rollString)

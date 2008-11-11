@@ -755,8 +755,8 @@ public final class MasterBoard extends JPanel
             public void actionPerformed(ActionEvent e)
             {
                 String dirSep = File.separator;
-                String colossusHome = new String(
-                    System.getProperty("user.home") + dirSep + ".colossus");
+                String colossusHome = System.getProperty("user.home")
+                    + dirSep + ".colossus";
                 String logDirectory = System.getProperty("java.io.tmpdir");
                 // Resolve "DOCUME~1" stuff to real names on windows:
                 File logDir = new File(logDirectory);

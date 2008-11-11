@@ -159,7 +159,13 @@ public class DevRandom extends Random
         byte[] bytes = new byte[size];
         try
         {
-            randStream.read(bytes);
+            int got = randStream.read(bytes);
+            if (got != size)
+            {
+                LOGGER.log(Level.WARNING, "Reading from random source "
+                    + source + ", got only " + got + " bytes (but expected "
+                    + size + ")");
+            }
         }
         catch (IOException ex)
         {

@@ -271,9 +271,9 @@ public final class Constants
     public static final String[] colorNames = { "Black", "Blue", "Brown",
         "Gold", "Green", "Red", "Orange", "Purple", "Silver", "Sky", "Pine",
         "Indigo" };
-    public static final String[] shortColorNames = { "Bk", "Bu", "Br", "Gd",
+    private static final String[] shortColorNames = { "Bk", "Bu", "Br", "Gd",
         "Gr", "Rd", "Or", "Pu", "Si", "Sk", "Pi", "In" };
-    public static final int[] colorMnemonics = { KeyEvent.VK_B, KeyEvent.VK_L,
+    private static final int[] colorMnemonics = { KeyEvent.VK_B, KeyEvent.VK_L,
         KeyEvent.VK_O, KeyEvent.VK_G, KeyEvent.VK_E, KeyEvent.VK_R,
         KeyEvent.VK_A, KeyEvent.VK_P, KeyEvent.VK_S, KeyEvent.VK_K,
         KeyEvent.VK_N, KeyEvent.VK_I };
@@ -581,5 +581,10 @@ public final class Constants
         {
             return noShortName;
         }
+    }
+    
+    public static int getColorMnemonic(int i)
+    {
+        return colorMnemonics[i];
     }
 }

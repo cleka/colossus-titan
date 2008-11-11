@@ -72,7 +72,7 @@ final class PickColor extends KDialog implements WindowListener,
                 int scale = Scale.get();
                 button.setPreferredSize(new Dimension(7 * scale, 3 * scale));
                 button.setText(Constants.colorNames[i]);
-                button.setMnemonic(Constants.colorMnemonics[i]);
+                button.setMnemonic(Constants.getColorMnemonic(i));
                 button.setBackground(background[i]);
                 button.setForeground(foreground[i]);
                 button.addActionListener(this);

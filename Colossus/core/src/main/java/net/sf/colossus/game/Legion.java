@@ -309,7 +309,7 @@ public abstract class Legion
      */
     List<AcquirableDecision> calculateAcquirableDecisions(int score, int points)
     {
-        ArrayList<AcquirableDecision> AcquirablesDecisions = new ArrayList<AcquirableDecision>();
+        ArrayList<AcquirableDecision> acquirablesDecisions = new ArrayList<AcquirableDecision>();
 
         // Example: Start with (score) 375, earn (points) 150 => 525
 
@@ -346,12 +346,12 @@ public abstract class Legion
                     tmpScore, recruits);
                 // {legion, 400, [Angel]}   {legion, 500, [Angel, Archangel]}
 
-                AcquirablesDecisions.add(decision); //  [d1]       [d1, d2]
+                acquirablesDecisions.add(decision); //  [d1]       [d1, d2]
                 angelsToAcquire++; // 1       2
             }
         }
 
-        return AcquirablesDecisions; // 2 decisions
+        return acquirablesDecisions; // 2 decisions
     }
 
     /**
@@ -374,9 +374,9 @@ public abstract class Legion
      */
     public class AcquirableDecision
     {
-        Legion legion;
-        int points;
-        List<String> acquirableNames;
+        private final Legion legion;
+        private final int points;
+        private final List<String> acquirableNames;
 
         public AcquirableDecision(Legion legion, int points, List<String> names)
         {
@@ -388,6 +388,18 @@ public abstract class Legion
         public List<String> getNames()
         {
             return acquirableNames;
+        }
+        
+        // so far not used anywhere
+        public int getPoints()
+        {
+            return points;
+        }
+        
+        // so far not used anywhere
+        public Legion getLegion()
+        {
+            return legion;
         }
     }
 }

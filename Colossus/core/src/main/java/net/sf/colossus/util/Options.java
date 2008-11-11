@@ -277,15 +277,29 @@ public final class Options implements IOptions
             }
         }
 
+        FileOutputStream out = null;
         try
         {
-            FileOutputStream out = new FileOutputStream(optionsFile);
+            out = new FileOutputStream(optionsFile);
             props.store(out, Constants.configVersion);
-            out.close();
         }
         catch (IOException e)
         {
             LOGGER.log(Level.SEVERE, "Couldn't write options to "
+                + optionsFile, e);
+        }
+
+        try
+        {
+            if (out != null)
+            {
+                out.close();
+            }
+        }
+        catch (IOException e)
+        {
+            LOGGER.log(Level.SEVERE, 
+                "Couldn't close outputstream after options written to "
                 + optionsFile, e);
         }
     }

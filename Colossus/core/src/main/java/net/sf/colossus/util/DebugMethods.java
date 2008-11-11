@@ -106,9 +106,14 @@ public class DebugMethods
                     System.in));
                 line = in.readLine();
 
+                if (line == null)
+                {
+                    line = "x";
+                }
+
                 if (line.equals("h"))
                 {
-                    SwingReferenceCleanupHacks.CleanupJPopupMenuGlobals(true);
+                    SwingReferenceCleanupHacks.cleanupJPopupMenuGlobals(true);
                     SwingReferenceCleanupHacks.cleanupJMenuBarGlobals();
                 }
 

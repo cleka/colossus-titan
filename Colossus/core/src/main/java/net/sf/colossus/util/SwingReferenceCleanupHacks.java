@@ -16,7 +16,7 @@ import java.lang.reflect.Field;
 
 public class SwingReferenceCleanupHacks
 {
-    public static void CleanupJPopupMenuGlobals(
+    public static void cleanupJPopupMenuGlobals(
         boolean removeOnlyMenuKeyboardHelpers)
     {
         try

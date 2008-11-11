@@ -572,13 +572,13 @@ public class RevealEvent
                 solidMarker = new Chit(scale, getTitanBasename(info));
             }
         }
-
-        // TODO this assignment overrides whatever was assigned before without
-        //      ever having used it
-        // NOTE: this assumes that this event is for the player in whose 
-        //       turn this happens:
-        solidMarker = new Chit(scale, mulliganTitanBaseName);
-        solidMarker.setAlignmentX(Component.LEFT_ALIGNMENT);
+        else
+        {
+            // NOTE: this assumes that this event is for the player in whose 
+            //       turn this happens:
+            solidMarker = new Chit(scale, mulliganTitanBaseName);
+            solidMarker.setAlignmentX(Component.LEFT_ALIGNMENT);
+        }
 
         return solidMarker;
     }

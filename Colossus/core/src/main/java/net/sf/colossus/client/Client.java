@@ -5304,8 +5304,17 @@ public final class Client implements IClient, IOracle
             InputStream is = cl.getResourceAsStream("version");
             if (is != null)
             {
-                is.read(bytes);
-                version = new String(bytes, 0, bytes.length);
+                int got = is.read(bytes);
+                if (got == 8)
+                {
+                    version = new String(bytes, 0, bytes.length);
+                }
+                else
+                {
+                    LOGGER.log(Level.WARNING,
+                        "Did not get 8 byte from version file");
+                    version = "UNKNOWN";
+                }
             }
             else
             {

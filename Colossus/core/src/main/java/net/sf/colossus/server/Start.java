@@ -358,6 +358,11 @@ public final class Start
             {
                 filename = "--latest";
             }
+            else
+            {
+                LOGGER.severe("Unreacheable else block reached??");
+                filename = "--latest";
+            }
             startOptions.setOption(Options.loadGameFileName, filename);
         }
 
@@ -859,14 +864,16 @@ public final class Start
         private static final Logger LOGGER = Logger.getLogger(Start.class
             .getName());
         
-        private final String name = "TimedJvmQuit thread";
+        private static final String defaultName = "TimedJvmQuit thread";
+        private final String name;
+        
         private long timeOutInSecs = 10;
         
         public TimedJvmQuit()
         {
             super();
             this.setDaemon(true);
-            this.setName(this.name);
+            this.name = defaultName;
         }
 
         @Override

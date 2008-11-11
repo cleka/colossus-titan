@@ -2100,7 +2100,7 @@ public class WebClient extends KFrame implements WindowListener,
             GameInfo gi = data.get(row);
             if (gi == null)
             {
-                return new String("-");
+                return "-";
             }
             Object o = null;
             switch (col)
@@ -2392,7 +2392,7 @@ public class WebClient extends KFrame implements WindowListener,
 
     public class ChatHandler
     {
-        private final int textAreaHeight = 20;
+        private final static int textAreaHeight = 20;
         private final String id;
         private final String title;
         private final JPanel chatTab;

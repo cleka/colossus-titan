@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.BattleChit;
@@ -1604,7 +1605,7 @@ public class SimpleAI implements AI
                 }
                 else
                 {
-                    risk = -legion.getPointValue() / 2 * chanceToAttack;
+                    risk = -legion.getPointValue() / 2.0 * chanceToAttack;
                 }
 
                 value += risk;
@@ -2265,10 +2266,10 @@ public class SimpleAI implements AI
         // Create a map containing each target and the likely number
         // of hits it would take if all possible creatures attacked it.
         Map<BattleChit, Double> map = generateDamageMap();
-
-        for (BattleChit target : map.keySet())
+        for (Entry<BattleChit, Double> entry : map.entrySet())
         {
-            double h = map.get(target).doubleValue();
+            BattleChit target = entry.getKey();
+            double h = entry.getValue().doubleValue();
 
             if (h + target.getHits() >= target.getPower())
             {
