@@ -719,6 +719,7 @@ public final class ResourceLoader
                     }
                 }
                 txtdoc.putProperty(keyContentType, "text/plain");
+                textISR.close();
                 return txtdoc;
             }
             catch (Exception e)

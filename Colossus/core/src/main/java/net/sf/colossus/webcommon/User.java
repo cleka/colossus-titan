@@ -319,6 +319,7 @@ public class User
                     parseUserLine(line);
                 }
             }
+            users.close();
         }
         catch (FileNotFoundException e)
         {
