@@ -83,7 +83,7 @@ class CreatureInfo implements Cloneable
     @Override
     public String toString()
     {
-        StringBuffer sb = new StringBuffer(name);
+        StringBuilder sb = new StringBuilder(name);
         if (!certain)
         {
             sb.append('?');

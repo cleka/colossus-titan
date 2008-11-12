@@ -88,14 +88,14 @@ public final class LegionInfoPanel extends JPanel
             String ucString = "";
             if (numUC > 0)
             {
-                StringBuffer uncertainIndicator = new StringBuffer(8);
+                StringBuilder uncertainIndicator = new StringBuilder(8);
                 uncertainIndicator.append("+");
                 while (numUC > 0)
                 {
                     uncertainIndicator.append("?");
                     numUC--;
                 }
-                // substring so that StringBuffer gets released.
+                // substring so that StringBuilder gets released.
                 ucString = uncertainIndicator.substring(0);
             }
 

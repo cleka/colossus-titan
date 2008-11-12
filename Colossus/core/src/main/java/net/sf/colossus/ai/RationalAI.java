@@ -256,7 +256,7 @@ public class RationalAI extends SimpleAI
             return true;
         }
 
-        StringBuffer results = new StringBuffer();
+        StringBuilder results = new StringBuilder();
         boolean hasMustered = false;
 
         MusteredCreatures mc = chooseCreaturesToSplitOut(legion, at_risk);

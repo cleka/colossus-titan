@@ -471,7 +471,7 @@ public class RevealEvent
 
         else
         {
-            StringBuffer msgBuf = new StringBuffer(1000);
+            StringBuilder msgBuf = new StringBuilder(1000);
 
             msgBuf.append("Revealing event: \"" + getEventTypeText()
                 + "\" for marker " + markerId + "\n");

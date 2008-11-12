@@ -27,7 +27,7 @@ final class StrikeDie extends Chit
 
     static String getDieImageName(String type, int roll)
     {
-        StringBuffer basename = new StringBuffer(type);
+        StringBuilder basename = new StringBuilder(type);
         basename.append(roll);
         return basename.toString();
     }

@@ -154,7 +154,7 @@ public final class PlayerServerSide extends Player implements
         else
         {
             initMarkersAvailable();
-            StringBuffer allVictims = new StringBuffer(getPlayersElim());
+            StringBuilder allVictims = new StringBuilder(getPlayersElim());
             for (int i = 0; i < allVictims.length(); i += 2)
             {
                 String shortColor = allVictims.substring(i, i + 2);

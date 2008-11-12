@@ -500,7 +500,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
         int numPlayers = 0;
         List<String> names = new ArrayList<String>();
         List<String> types = new ArrayList<String>();
-        StringBuffer sb = new StringBuffer("");
+        StringBuilder sb = new StringBuilder("");
 
         for (int i = 0; i < Constants.MAX_MAX_PLAYERS; i++)
         {
@@ -705,7 +705,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
 
     private String makeUniqueName(String baseName, int i)
     {
-        StringBuffer tryName = new StringBuffer(baseName);
+        StringBuilder tryName = new StringBuilder(baseName);
         boolean duplicate = true;
         while (duplicate)
         {

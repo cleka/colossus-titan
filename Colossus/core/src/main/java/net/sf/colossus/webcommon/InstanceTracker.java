@@ -139,7 +139,7 @@ public class InstanceTracker
 
     private static synchronized String getPrintStatistics()
     {
-        StringBuffer stat = new StringBuffer();
+        StringBuilder stat = new StringBuilder();
         stat.append("==========\nObject instances statistics:");
 
         Iterator<String> it = instanceGroups.keySet().iterator();

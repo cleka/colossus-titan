@@ -274,7 +274,7 @@ public class GameInfo extends Thread
 
     public String getPlayerListAsString()
     {
-        StringBuffer playerList = new StringBuffer("");
+        StringBuilder playerList = new StringBuilder("");
         Iterator<User> it = players.iterator();
         while (it.hasNext())
         {
@@ -373,7 +373,7 @@ public class GameInfo extends Thread
 
     public String toString(String sep)
     {
-        StringBuffer playerList = new StringBuffer();
+        StringBuilder playerList = new StringBuilder();
         Iterator<User> it = players.iterator();
         while (it.hasNext())
         {

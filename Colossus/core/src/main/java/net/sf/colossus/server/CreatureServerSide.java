@@ -790,7 +790,7 @@ public class CreatureServerSide extends Creature
         boolean randomized = !game.getOption(Options.nonRandomBattleDice);
 
         List<String> rolls = new ArrayList<String>();
-        StringBuffer rollString = new StringBuffer(36);
+        StringBuilder rollString = new StringBuilder(36);
 
         for (int i = 0; i < dice; i++)
         {

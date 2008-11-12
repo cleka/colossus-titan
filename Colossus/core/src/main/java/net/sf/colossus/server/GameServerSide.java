@@ -1884,7 +1884,7 @@ public final class GameServerSide extends Game
     /** Extract and return the numeric part of a filename. */
     private long numberValue(String filename)
     {
-        StringBuffer numberPart = new StringBuffer();
+        StringBuilder numberPart = new StringBuilder();
 
         for (int i = 0; i < filename.length(); i++)
         {
@@ -3203,7 +3203,7 @@ public final class GameServerSide extends Game
                 loser = defender;
             }
 
-            StringBuffer log = new StringBuffer("Winning legion ");
+            StringBuilder log = new StringBuilder("Winning legion ");
 
             log.append(((LegionServerSide)winner).getLongMarkerName());
             log.append(" loses creatures ");

@@ -138,7 +138,7 @@ final class PenaltyOption implements Comparable<PenaltyOption>
     @Override
     public String toString()
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(striker.getDescription());
         sb.append(" strikes ");
         sb.append(target.getDescription());

@@ -220,7 +220,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                  }
                  towerStatusMap.put(terrain, new Boolean(brl.isTower()));
                  subtitleMap.put(terrain, null);
-                 StringBuffer buf = new StringBuffer();
+                 StringBuilder buf = new StringBuilder();
                  for (int i = 0; i < 6; i++)
                  {
                  for (int j = 0; j < 6; j++)

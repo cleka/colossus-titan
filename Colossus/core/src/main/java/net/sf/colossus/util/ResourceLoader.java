@@ -760,7 +760,7 @@ public final class ResourceLoader
     private static String getMapKey(String[] filenames,
         List<String> directories)
     {
-        StringBuffer buf = new StringBuffer(filenames[0]);
+        StringBuilder buf = new StringBuilder(filenames[0]);
         for (int i = 1; i < filenames.length; i++)
         {
             buf.append(",");

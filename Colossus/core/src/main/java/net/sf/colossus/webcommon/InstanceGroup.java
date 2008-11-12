@@ -52,7 +52,7 @@ public class InstanceGroup
 
     public synchronized String getPrintStatistics()
     {
-        StringBuffer gstat = new StringBuffer("");
+        StringBuilder gstat = new StringBuilder("");
 
         int count = instances.size();
         if (count == 0)

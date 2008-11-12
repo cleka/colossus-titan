@@ -427,7 +427,7 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
 
     public String dumpAsString()
     {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         String terrain;
         char s;
         int e;

@@ -126,7 +126,7 @@ public final class Proposal
     @Override
     public String toString()
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(fight);
         sb.append(sep);
         sb.append(mutual);

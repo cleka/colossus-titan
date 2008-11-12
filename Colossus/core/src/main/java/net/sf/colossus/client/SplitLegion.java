@@ -246,7 +246,7 @@ final class SplitLegion extends KDialog implements MouseListener,
 
     private void returnSplitResults()
     {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         Iterator<Chit> it = newChits.iterator();
         while (it.hasNext())
         {

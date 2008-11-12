@@ -24,7 +24,7 @@ public class VerySimpleFormatter extends Formatter
     @Override
     public String format(LogRecord record)
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         String message = formatMessage(record);
         if ((record.getLevel() == Level.SEVERE)
             || (record.getLevel() == Level.WARNING))

@@ -92,7 +92,7 @@ final class BattleDice extends Box
         {
             return null;
         }
-        StringBuffer basename = new StringBuffer();
+        StringBuilder basename = new StringBuilder();
         if (roll >= targetNumber)
         {
             basename.append("Hit");

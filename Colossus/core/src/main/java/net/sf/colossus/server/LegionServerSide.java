@@ -224,7 +224,7 @@ public final class LegionServerSide extends Legion implements
 
     public static String getLongMarkerName(String markerId)
     {
-        StringBuffer sb = new StringBuffer(markerId);
+        StringBuilder sb = new StringBuilder(markerId);
         sb.append(" (");
         sb.append(getMarkerName(markerId));
         sb.append(")");

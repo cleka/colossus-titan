@@ -112,7 +112,7 @@ public final class ShowCreatureDetails extends KDialog implements
         JEditorPane pane = new JEditorPane();
         pane.setEditable(false);
         // define the content
-        StringBuffer s = new StringBuffer();
+        StringBuilder s = new StringBuilder();
         _head(s, creature);
         //
         // general
@@ -133,7 +133,7 @@ public final class ShowCreatureDetails extends KDialog implements
         _trSpan(s, _low("Lord"), creature.isLordOrDemiLord() ? (creature
             .isLord() ? "<u><b>Lord</b></u>" : "<b>Demi-Lord</b>")
             : _low("no"));
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         String sp = "&nbsp;";
         String separator = "";
         for (HazardTerrain terrain : HazardTerrain.getAllHazardTerrains())
@@ -163,7 +163,7 @@ public final class ShowCreatureDetails extends KDialog implements
         //   in
         for (MasterBoardTerrain terrain : TerrainRecruitLoader.getTerrains())
         {
-            buf = new StringBuffer();
+            buf = new StringBuilder();
             List<CreatureType> recruiters = VariantSupport.getCurrentVariant()
                 .getCreatureTypes();
             separator = "";
@@ -211,7 +211,7 @@ public final class ShowCreatureDetails extends KDialog implements
         //   out
         for (MasterBoardTerrain terrain : TerrainRecruitLoader.getTerrains())
         {
-            buf = new StringBuffer();
+            buf = new StringBuilder();
             List<CreatureType> recruits = VariantSupport.getCurrentVariant()
                 .getCreatureTypes();
             separator = "";
@@ -362,7 +362,7 @@ public final class ShowCreatureDetails extends KDialog implements
         "cliff", "slope", "wall", "river" };
 
     /** html header and start of page. */
-    private static void _head(StringBuffer s, final CreatureType cr)
+    private static void _head(StringBuilder s, final CreatureType cr)
     {
         s.append("<html><head></head><body bgcolor="
             + HTMLColor.colorToCode(Color.LIGHT_GRAY) + ">");
@@ -373,7 +373,7 @@ public final class ShowCreatureDetails extends KDialog implements
     /** start of a named section.
      * @param s in/out
      */
-    private static void _section(StringBuffer s, final String name)
+    private static void _section(StringBuilder s, final String name)
     {
         s.append("<tr bgcolor=gray><td colspan="
             + (HazardTerrain.getAllHazardTerrains().size() + 1) + ">");
@@ -384,7 +384,7 @@ public final class ShowCreatureDetails extends KDialog implements
     /** a headered table row, the data column spans.
      * @param s in/out
      */
-    private static void _trSpan(StringBuffer s, final String name,
+    private static void _trSpan(StringBuilder s, final String name,
         final String value)
     {
         s.append(MessageFormat.format(

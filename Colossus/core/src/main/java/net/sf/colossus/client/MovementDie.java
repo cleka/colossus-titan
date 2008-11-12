@@ -18,7 +18,7 @@ final class MovementDie extends Chit
 
     static String getDieImageName(int roll)
     {
-        StringBuffer basename = new StringBuffer("Hit");
+        StringBuilder basename = new StringBuilder("Hit");
         basename.append(roll);
 
         return basename.toString();

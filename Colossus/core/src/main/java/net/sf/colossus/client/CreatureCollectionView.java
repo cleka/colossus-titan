@@ -272,7 +272,7 @@ class CreatureCollectionView extends KDialog
 
     private static String htmlColorizeOnly(String input, String color)
     {
-        StringBuffer sb = new StringBuffer("<font color=");
+        StringBuilder sb = new StringBuilder("<font color=");
         sb.append(color);
         sb.append(">");
         sb.append(input);
@@ -282,7 +282,7 @@ class CreatureCollectionView extends KDialog
 
     private static String htmlizeOnly(String input)
     {
-        StringBuffer sb = new StringBuffer("<html>");
+        StringBuilder sb = new StringBuilder("<html>");
         sb.append(input);
         sb.append("</html>");
         return sb.toString();

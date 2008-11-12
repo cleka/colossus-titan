@@ -91,7 +91,7 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
     @Override
     public String toString()
     {
-        StringBuffer sb = new StringBuffer(getFullName() + ":");
+        StringBuilder sb = new StringBuilder(getFullName() + ":");
         for (CreatureInfo ci : getCreatures())
         {
             sb.append(" " + ci.toString());
