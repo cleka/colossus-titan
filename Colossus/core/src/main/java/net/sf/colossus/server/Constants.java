@@ -394,6 +394,7 @@ public final class Constants
     public static final String saveGame = "Save game";
     public static final String quitGame = "Quit Game";
     public static final String closeBoard = "Close MasterBoard";
+    public static final String checkConnection = "Check connection";
 
     public static final String runClient = "Run network client";
     public static final String runWebClient = "Run web client";
@@ -472,6 +473,7 @@ public final class Constants
     //public static final String saveGame = "saveGame";
     public static final String processedCtr = "processedCtr";
     public static final String catchupConfirmation = "catchupConfirmation";
+    public static final String serverConnectionOK = "serverConnectionOK";
 
     public static final String reasonSplit = "Split";
     public static final String reasonSummon = "Summon";

@@ -478,6 +478,12 @@ final class ClientHandler implements IClient
             String filename = args.remove(0);
             server.saveGame(filename);
         }
+
+        else if (method.equals(Constants.checkConnection))
+        {
+            server.checkServerConnection();
+        }
+
         else if (method.equals(Constants.catchupConfirmation))
         {
             server.clientConfirmedCatchup();
@@ -922,5 +928,12 @@ final class ClientHandler implements IClient
         LOGGER.info("Sending request to confirm catchup to client "
             + playerName);
         sendToClient(Constants.askConfirmCatchUp);
+    }
+
+    public void serverConfirmsConnection()
+    {
+        LOGGER.info("Sending server connection confirmation to client "
+            + playerName);
+        sendToClient(Constants.serverConnectionOK);
     }
 }

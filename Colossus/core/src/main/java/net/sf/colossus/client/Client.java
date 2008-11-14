@@ -5,6 +5,8 @@ import java.awt.Cursor;
 import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
 import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -29,6 +31,7 @@ import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.undo.UndoManager;
@@ -227,6 +230,13 @@ public final class Client implements IClient, IOracle
     // "directly" instead of sending a message via Socket.
     private Server localServer;
     private SocketClientThread sct;
+    private Timer connectionCheckTimer;
+    
+    /* This is a number of seconds to wait for connection check 
+     * confirmation message before assuming connection is broken and
+     * displaying a message telling so.
+     */
+    private final static int CONN_CHECK_TIMEOUT = 5;
 
     // For negotiation.  (And AI battle.)
     private Negotiate negotiate;
@@ -4744,6 +4754,90 @@ public final class Client implements IClient, IOracle
     void menuSaveGame(String filename)
     {
         server.saveGame(filename);
+    }
+
+    /** When user requests it from File menu, this method here
+     *  requests the server to send us a confirmation package,
+     *  to confirm that connection is still alive and ok.
+     */
+    synchronized void checkServerConnection()
+    {
+        if (sct.isAlreadyDown())
+        {
+            JOptionPane.showMessageDialog(getMapOrBoardFrame(), 
+                "No point to send check message - we know already that "
+                + " the socket connection is in 'down' state!", 
+                "Useless attempt to check connection",
+                JOptionPane.INFORMATION_MESSAGE);
+
+            return;
+        }
+        connectionCheckTimer = new Timer(1000*CONN_CHECK_TIMEOUT, 
+            new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                timeoutAbortsConnectionCheck();
+            }
+        });
+        connectionCheckTimer.start();
+
+        LOGGER.info("Client for player " + getOwningPlayer().getName() + 
+        " checking server connection (sending request)");
+        
+        server.checkServerConnection();
+    }
+
+    /** Upon request with checkServerConnection, server sends a confirmation.
+     *  This method here processes the confirmation.
+     */
+    public synchronized void serverConfirmsConnection()
+    {
+        LOGGER.info("Client for player " + getOwningPlayer().getName() + 
+            " received confirmation that connection is OK.");
+        finishServerConnectionCheck(true);
+    }
+
+    /** Timeout reached. Cancel timer and show error message
+     */ 
+    public synchronized void timeoutAbortsConnectionCheck()
+    {
+        finishServerConnectionCheck(false);
+    }
+
+    /** Cleanup everything related to the serverConnectionCheck timer,
+     *  and show a message telling whether it went ok or not.
+     */
+    private void finishServerConnectionCheck(boolean success)
+    {
+        if (connectionCheckTimer == null)
+        {
+            // race - the other one came nearly same time, and comes now
+            // after the first one left this synchronized method.
+            return;
+        }
+        if (connectionCheckTimer.isRunning())
+        {
+            connectionCheckTimer.stop();
+        }
+        connectionCheckTimer = null;
+        if (success)
+        {
+            JOptionPane.showMessageDialog(getMapOrBoardFrame(), 
+                "Received confirmation from server - connection to "
+                + "server is ok!", "Connection check succeeded.",
+                JOptionPane.INFORMATION_MESSAGE);
+        }
+        else
+        {
+            JOptionPane.showMessageDialog(getMapOrBoardFrame(), 
+                "Did not receive confirmation message from server within "
+                + CONN_CHECK_TIMEOUT + " seconds - connection to "
+                + "server is probably broken, or something hangs.",
+                "Connection check failed!",
+                JOptionPane.ERROR_MESSAGE);
+            
+        }
     }
 
     void undoLastSplit()

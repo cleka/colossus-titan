@@ -2385,6 +2385,13 @@ public final class Server extends Thread implements IServer
         game.saveGame(filename);
     }
 
+    public void checkServerConnection()
+    {
+        LOGGER.info("Server received checkServerConnection request from "
+            + "client " + getPlayerName() + " - sending confirmation.");
+        getClient(getPlayer()).serverConfirmsConnection();
+    }
+
     private HashSet<IClient> waitingToCatchup = new HashSet<IClient>();
     
     public void clientConfirmedCatchup()

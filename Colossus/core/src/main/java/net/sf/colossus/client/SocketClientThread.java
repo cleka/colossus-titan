@@ -937,6 +937,14 @@ final class SocketClientThread extends Thread implements IServer
         {
             client.confirmWhenCaughtUp();
         }
+
+        else if (method.equals(Constants.serverConnectionOK))
+        {
+            LOGGER.info("Received server connection OK message from server "
+                + "for player " + client.getOwningPlayer().getName());
+            client.serverConfirmsConnection();
+        }
+
         else
         {
             LOGGER.log(Level.SEVERE, "Bogus packet (Client, method: " + method
@@ -993,10 +1001,9 @@ final class SocketClientThread extends Thread implements IServer
         }
         else
         {
-            LOGGER.log(Level.SEVERE, "SCT of player "
-                + client.getOwningPlayer().getName()
+            LOGGER.log(Level.SEVERE, "SCT (" + getName() + ")"
                 + ": Attempt to send message '" + message
-                + "' but the socket is closed??");
+                + "' but the socket is closed and/or client alresady null??");
         }
     }
 
@@ -1206,6 +1213,11 @@ final class SocketClientThread extends Thread implements IServer
     public void saveGame(String filename)
     {
         sendToServer(Constants.saveGame + sep + filename);
+    }
+
+    public void checkServerConnection()
+    {
+        sendToServer(Constants.checkConnection);
     }
 
     public void clientConfirmedCatchup()

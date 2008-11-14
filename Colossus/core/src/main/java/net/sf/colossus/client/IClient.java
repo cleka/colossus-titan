@@ -61,6 +61,8 @@ public interface IClient
     
     public void confirmWhenCaughtUp();
 
+    public void serverConfirmsConnection();
+
     public void setPlayerName(String newPlayerName);
 
     public void createSummonAngel(Legion legion);

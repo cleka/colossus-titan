@@ -158,6 +158,7 @@ public final class MasterBoard extends JPanel
     private AbstractAction saveGameAsAction;
     private AbstractAction closeBoardAction;
     private AbstractAction quitGameAction;
+    private AbstractAction checkConnectionAction;
 
     private AbstractAction clearRecruitChitsAction;
 
@@ -734,6 +735,14 @@ public final class MasterBoard extends JPanel
             }
         };
 
+        checkConnectionAction = new AbstractAction(Constants.checkConnection)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                client.checkServerConnection();
+            }
+        };
+
         chooseScreenAction = new AbstractAction(chooseScreen)
         {
             public void actionPerformed(ActionEvent e)
@@ -870,6 +879,12 @@ public final class MasterBoard extends JPanel
             mi = fileMenu.add(saveGameAsAction);
             mi.setMnemonic(KeyEvent.VK_A);
         }
+        fileMenu.addSeparator();
+
+        mi = fileMenu.add(checkConnectionAction);
+        mi.setMnemonic(KeyEvent.VK_V);
+        fileMenu.addSeparator();
+        
         mi = fileMenu.add(closeBoardAction);
         mi.setMnemonic(KeyEvent.VK_C);
         mi = fileMenu.add(quitGameAction);
