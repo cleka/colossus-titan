@@ -851,7 +851,7 @@ public final class Server extends Thread implements IServer
         Game dummyGame = new Game(null, new String[0]);
 
         new Client("127.0.0.1", port, dummyGame, playerName,
-            false, false, dontUseOptionsFile);
+            this, false, dontUseOptionsFile);
     }
 
     boolean addClient(final IClient client,

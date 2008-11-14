@@ -227,7 +227,7 @@ public final class Start
             // TODO needs to be constructed properly
             Game dummyGame = new Game(null, new String[0]);
 
-            Client c = new Client(hostname, port, dummyGame, playerName, true,
+            Client c = new Client(hostname, port, dummyGame, playerName, null,
                 false, false);
             failed = c.getFailed();
             c = null;
