@@ -614,6 +614,12 @@ public final class Start
                     + "continuing anyway.", (Throwable)null);
         }
 
+        boolean oneClientRunOnly = false;
+        if (cl.optIsSet('c') && cl.optIsSet('g') && cl.optIsSet('q'))
+        {
+            oneClientRunOnly = true;
+        }
+        
         // Cmdline arguments have effect only to first game - or
         // are stored within the options or startOptions.
         cl = null;
@@ -726,7 +732,14 @@ public final class Start
             {
                 // by default (if user does not say anything other when ending), 
                 // after that come back to NetClient dialog.
-                startObject.setWhatToDoNext(NetClientDialog);
+                if (oneClientRunOnly)
+                {
+                    startObject.setWhatToDoNext(QuitAll);
+                }
+                else
+                {
+                    startObject.setWhatToDoNext(NetClientDialog);
+                }
                 dontWait = startNetClient(startOptions);
             }
 
