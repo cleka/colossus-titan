@@ -46,6 +46,7 @@ import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.server.Dice;
 import net.sf.colossus.server.GameServerSide;
 import net.sf.colossus.server.IServer;
+import net.sf.colossus.server.Server;
 import net.sf.colossus.server.Start;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.ChildThreadManager;
@@ -224,7 +225,7 @@ public final class Client implements IClient, IOracle
     private BattleMovement battleMovement;
     private Strike strike;
 
-    private boolean remote;
+    private Server localServer;
     private SocketClientThread sct;
     private Timer connectionCheckTimer;
     
@@ -283,11 +284,11 @@ public final class Client implements IClient, IOracle
      *      network and the serialization/deserialization of all objects
      */
     public Client(String host, int port, Game game, String playerName,
-        boolean remote, boolean byWebClient, boolean noOptionsFile)
+        Server theServer, boolean byWebClient, boolean noOptionsFile)
     {
         this(game, playerName, noOptionsFile);
 
-        this.remote = remote;
+        this.localServer = theServer;
         this.startedByWebClient = byWebClient;
 
         sct = new SocketClientThread(this, host, port);
@@ -306,7 +307,7 @@ public final class Client implements IClient, IOracle
             String title = "Socket initialialization failed!";
             showErrorMessage(reasonFail, title);
 
-            if (remote)
+            if (isRemote())
             {
                 Start.setCurrentWhatToDoNext(Start.NetClientDialog);
             }
@@ -316,7 +317,7 @@ public final class Client implements IClient, IOracle
         else
         {
             this.server = sct;
-            if (remote)
+            if (isRemote())
             {
                 ResourceLoader.setDataServer(host, port + 1);
             }
@@ -373,7 +374,7 @@ public final class Client implements IClient, IOracle
 
     boolean isRemote()
     {
-        return remote;
+        return (localServer == null);
     }
 
     boolean isAlive()
@@ -1453,7 +1454,7 @@ public final class Client implements IClient, IOracle
         }
         else if (closedBy == ClosedByConstant.CLOSED_BY_SERVER)
         {
-            if (remote)
+            if (isRemote())
             {
                 defaultCursor();
                 board.setServerClosedMessage(gameOver);
@@ -4666,7 +4667,7 @@ public final class Client implements IClient, IOracle
         {
             Start.setCurrentWhatToDoNext(Start.StartWebClient);
         }
-        else if (remote)
+        else if (isRemote())
         {
             // Remote clients get back to Network Client dialog
             Start.setCurrentWhatToDoNext(Start.NetClientDialog);
@@ -4680,7 +4681,7 @@ public final class Client implements IClient, IOracle
     public void notifyServer()
     {
         clearUndoStack();
-        if (!remote)
+        if (!isRemote())
         {
             server.stopGame();
         }
