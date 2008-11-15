@@ -882,7 +882,7 @@ public final class MasterBoard extends JPanel
         fileMenu.addSeparator();
 
         mi = fileMenu.add(checkConnectionAction);
-        mi.setMnemonic(KeyEvent.VK_V);
+        mi.setMnemonic(KeyEvent.VK_K);
         fileMenu.addSeparator();
         
         mi = fileMenu.add(closeBoardAction);
