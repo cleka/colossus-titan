@@ -102,21 +102,21 @@ public final class MasterBoard extends JPanel
     /** Last point clicked is needed for popup menus. */
     private Point lastPoint;
 
-    /** List of markers which are currently on the board, 
+    /** List of markers which are currently on the board,
      *  for painting in z-order => the end of the list is on top.
-     *  
+     *
      *  Now synchronized access to prevent NPEs when EDT wants to
      *  paint a marker and asks for the legion for it, and
      *  legion has just been removed.
-     *  I don't use a synchronizedList, because then I get into 
+     *  I don't use a synchronizedList, because then I get into
      *  trouble in the recreateMarkers method.
      *  @TODO: Perhaps the whole list should be legions instead
      *         of markers.
      */
     private final List<Marker> markersOnBoard = new ArrayList<Marker>();
 
-    private final List<LegionClientSide> recruitedChitsLegions = new ArrayList<LegionClientSide>();
-    private final HashMap<MasterHex, List<Chit>> possibleRecruitChits = new HashMap<MasterHex, List<Chit>>();
+    private final Map<Legion, Chit> recruitedChits = new HashMap<Legion, Chit>();
+    private final Map<MasterHex, List<Chit>> possibleRecruitChits = new HashMap<MasterHex, List<Chit>>();
 
     /** The scrollbarspanel, needed to correct lastPoint. */
     private JScrollPane scrollPane;
@@ -303,6 +303,7 @@ public final class MasterBoard extends JPanel
 
     MasterBoard(final Client client)
     {
+        setLayout(null);
         this.client = client;
         net.sf.colossus.webcommon.InstanceTracker.register(this, client
             .getOwningPlayer().getName());
@@ -553,10 +554,10 @@ public final class MasterBoard extends JPanel
         };
 
         /*
-         * After confirmation (if necessary, i.e. not gameover yet), 
+         * After confirmation (if necessary, i.e. not gameover yet),
          * totally quit everything (shut down server and all windows)
          * so that the ViableEntityManager knows it can let the main
-         * go to the end, ending the JVM. 
+         * go to the end, ending the JVM.
          */
         quitGameAction = new AbstractAction(Constants.quitGame)
         {
@@ -884,7 +885,7 @@ public final class MasterBoard extends JPanel
         mi = fileMenu.add(checkConnectionAction);
         mi.setMnemonic(KeyEvent.VK_K);
         fileMenu.addSeparator();
-        
+
         mi = fileMenu.add(closeBoardAction);
         mi.setMnemonic(KeyEvent.VK_C);
         mi = fileMenu.add(quitGameAction);
@@ -1508,6 +1509,7 @@ public final class MasterBoard extends JPanel
         synchronized (markersOnBoard)
         {
             markersOnBoard.remove(marker);
+            recruitedChits.remove(legion);
         }
     }
 
@@ -1711,7 +1713,7 @@ public final class MasterBoard extends JPanel
     {
         int modifiers = e.getModifiers();
         return (((modifiers & InputEvent.BUTTON2_MASK) != 0)
-            || ((modifiers & InputEvent.BUTTON3_MASK) != 0) || e.isAltDown() 
+            || ((modifiers & InputEvent.BUTTON3_MASK) != 0) || e.isAltDown()
             || e.isControlDown());
     }
 
@@ -1999,36 +2001,12 @@ public final class MasterBoard extends JPanel
 
     private void paintRecruitedChits(Graphics g)
     {
-        for (LegionClientSide legion : recruitedChitsLegions)
+        for (Chit chit : recruitedChits.values())
         {
-            Chit chit = legion.getRecruitChit();
-            if (chit != null && g.getClipBounds().intersects(chit.getBounds()))
-            {
-                chit.paintComponent(g);
-            }
+            chit.paintComponent(g);
         }
     }
 
-    void removeRecruitChit(MasterHex masterHex)
-    {
-        Iterator<LegionClientSide> it = recruitedChitsLegions.iterator();
-        while (it.hasNext())
-        {
-            LegionClientSide legion = it.next();
-            Chit chit = legion.getRecruitChit();
-            
-            // TODO the next line can cause an NPE when the user closes the client app
-            GUIMasterHex hex = getGUIHexByMasterHex(masterHex);
-            if (hex != null && hex.contains(chit.getCenter()))
-            {
-                it.remove();
-                return;
-            }
-        }
-        
-        possibleRecruitChits.remove(masterHex);
-    }
-    
     // all hexes
     public void addPossibleRecruitChits(LegionClientSide legion,
         Set<MasterHex> hexes)
@@ -2070,24 +2048,31 @@ public final class MasterBoard extends JPanel
         }
     }
 
-    void addRecruitedChit(LegionClientSide legion)
+    void addRecruitedChit(Legion legion)
     {
-        GUIMasterHex hex = getGUIHexByMasterHex(legion
-            .getCurrentHex());
-        legion.makeOrCleanRecruitChit();
-        recruitedChitsLegions.add(legion);
-        hex.repaint();
+        if (legion.getRecruitName() != null)
+        {
+            MasterHex masterHex = legion.getCurrentHex();
+            int scale = 2 * Scale.get();
+            GUIMasterHex hex = client.getBoard().getGUIHexByMasterHex(
+                masterHex);
+            Chit chit = new Chit(scale, legion.getRecruitName());
+            recruitedChits.put(legion, chit);
+            Point startingPoint = hex.getOffCenter();
+            Point point = new Point(startingPoint);
+            point.x -= scale / 2;
+            point.y -= scale / 2;
+            chit.setLocation(point);
+        }
+        repaint();
     }
 
     void cleanRecruitedChit(LegionClientSide legion)
     {
-        GUIMasterHex hex = getGUIHexByMasterHex(legion
-            .getCurrentHex());
-        legion.makeOrCleanRecruitChit();
-        recruitedChitsLegions.remove(legion);
-        hex.repaint();
+        recruitedChits.remove(legion);
+        repaint();
     }
-    
+
     // one single chit, one hex
     void addPossibleRecruitChit(String imageName, MasterHex masterHex)
     {
@@ -2104,7 +2089,7 @@ public final class MasterBoard extends JPanel
         possibleRecruitChits.put(masterHex, list);
     }
 
-    // all possible recuit chits, one hex
+    // all possible recruit chits, one hex
     void addPossibleRecruitChits(List<CreatureType> imageNameList,
         MasterHex masterHex)
     {
@@ -2135,7 +2120,11 @@ public final class MasterBoard extends JPanel
 
     public void clearRecruitedChits()
     {
-        recruitedChitsLegions.clear();        
+        for (Chit chit : recruitedChits.values())
+        {
+            remove(chit);
+        }
+        recruitedChits.clear();
     }
 
     public void clearPossibleRecruitChits()
@@ -2367,7 +2356,7 @@ public final class MasterBoard extends JPanel
     {
         gameOverStateReached = true;
         enableDoneAction();
-        
+
     }
     public void setServerClosedMessage(boolean gameOver)
     {

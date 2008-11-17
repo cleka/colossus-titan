@@ -1,7 +1,6 @@
 package net.sf.colossus.client;
 
 
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -47,9 +46,6 @@ public final class LegionClientSide extends Legion implements
     private PredictSplitNode myNode;
     private final boolean isMyLegion;
     
-    private Chit recruitChit = null;
-    
-
     // TODO the Client parameter should be a Game(ClientSide), which doesn't exist yet
     public LegionClientSide(String markerId, Client client, MasterHex hex)
     {
@@ -389,43 +385,6 @@ public final class LegionClientSide extends Legion implements
     {
         int numInHex = client.getLegionsByHex(getCurrentHex()).size();
         return (numInHex == 2);
-    }
-
-    /**
-     * If recruitName is set, create the chit for it, otherwise also set
-     * the chit to null.
-     *
-     */
-    public void makeOrCleanRecruitChit()
-    {
-        if (getRecruitName() != null)
-        {
-            MasterHex masterHex = getCurrentHex();
-            int scale = 2 * Scale.get();
-            GUIMasterHex hex = client.getBoard().getGUIHexByMasterHex(masterHex);
-            Chit chit = new Chit(scale, getRecruitName());
-            Point startingPoint = hex.getOffCenter();
-            Point point = new Point(startingPoint);
-            point.x -= scale / 2;
-            point.y -= scale / 2;
-            chit.setLocation(point);
-            recruitChit = chit;
-        }
-        else
-        {
-            recruitChit = null;
-        }
-    }
-   
-    public Chit getRecruitChit()
-    {
-        return recruitChit;
-    }
-
-    public void clearAllChits()
-    {
-        recruitChit = null;
-        makeOrCleanRecruitChit();
     }
 
     /** Return true if the legion has moved and can recruit. */

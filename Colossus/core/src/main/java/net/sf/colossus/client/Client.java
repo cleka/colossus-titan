@@ -1727,7 +1727,6 @@ public final class Client implements IClient, IOracle
         legion.getPlayer().removeLegion(legion);
         if (board != null && !replayOngoing)
         {
-            ((LegionClientSide)legion).clearAllChits();
             board.alignLegions(legion.getCurrentHex());
         }
     }
@@ -3093,7 +3092,7 @@ public final class Client implements IClient, IOracle
 
         if (board != null)
         {
-            board.addRecruitedChit((LegionClientSide)legion);
+            board.addRecruitedChit(legion);
             board.highlightPossibleRecruitLegionHexes();
 
             if (eventViewer != null)
