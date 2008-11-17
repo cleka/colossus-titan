@@ -55,7 +55,7 @@ class Chit extends JPanel
     protected boolean inverted = false;
 
     // Initialize early to avoid NullPointerException with GTK L&F
-    private String id = "";
+    private final String id;
 
     static BasicStroke oneWide = new BasicStroke(1);
     static BasicStroke threeWide = new BasicStroke(3);
@@ -86,7 +86,7 @@ class Chit extends JPanel
         this(scale, id, inverted, dubious, dubiousAsBlank, null);
     }
 
-    // TODO this is a bit confusing: the id parameter can be either the name of a 
+    // TODO this is a bit confusing: the id parameter can be either the name of a
     //      creature type or a markerId (maybe more?). Good thing markerIds have no
     //      overlap with creature names
     Chit(int scale, String id, boolean inverted, boolean dubious,
@@ -95,6 +95,7 @@ class Chit extends JPanel
         // LayoutManager null - we want to place things ourselves
         super((LayoutManager)null);
 
+        assert id != null : "Each chit must have an ID set";
         this.id = id;
         this.inverted = inverted;
         Point point = getLocation();
@@ -235,9 +236,9 @@ class Chit extends JPanel
         {
             // this should never happen, since id is initialized
             // already from beginning on, still someone gets a NPE
-            // just for this id; perhaps due to using GTK L&F ? 
+            // just for this id; perhaps due to using GTK L&F ?
             LOGGER.log(Level.SEVERE, "Chit id is still null ?");
-            id = "<notdefined?>";
+            //            id = "<notdefined?>";
         }
         return id;
     }

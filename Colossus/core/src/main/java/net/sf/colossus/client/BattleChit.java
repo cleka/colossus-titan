@@ -167,12 +167,6 @@ public final class BattleChit extends Chit
         return id;
     }
 
-    @Override
-    public String getName()
-    {
-        return getCreatureName();
-    }
-
     public boolean isTitan()
     {
         return getCreatureName().equals(Constants.titan);

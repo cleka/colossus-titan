@@ -59,7 +59,7 @@ public class SimpleAI implements AI
 
     /**
      * Stores the skill and power bonuses for a single terrain.
-     * 
+     *
      * For internal use only, so we don't bother with encapsulation.
      */
     private static class TerrainBonuses
@@ -81,17 +81,17 @@ public class SimpleAI implements AI
 
     /**
      * Maps the terrain names to their matching bonuses.
-     * 
+     *
      * Only the terrains that have bonuses are in this map, so
      * users have to expect to retrieve null values. Note that
      * the terrain names include names for master board and
      * hazard terrains, so it can be used for lookup up either
      * type.
-     * 
-     * TODO there seems to be some overlap with 
+     *
+     * TODO there seems to be some overlap with
      * {@link HazardTerrain#isNativeBonusTerrain()} and
      * {@link HazardTerrain#isNonNativePenaltyTerrain()}.
-     * 
+     *
      * This is a Map<String,TerrainBonuses>.
      */
     private static final Map<String, TerrainBonuses> TERRAIN_BONUSES = new HashMap<String, TerrainBonuses>();
@@ -449,8 +449,8 @@ public class SimpleAI implements AI
             creatureNames.add(creature.getName());
         }
         String results = Glob.glob(",", creatureNames);
-        // increment BEFORE calling client 
-        // (instead of: return true and caller increments). 
+        // increment BEFORE calling client
+        // (instead of: return true and caller increments).
         // Otherwise we might have a race situation, if callback is quicker
         // than caller incrementing the splitsDone value...
         this.splitsDone++;
@@ -889,13 +889,13 @@ public class SimpleAI implements AI
         if (!player.hasMoved())
         {
             moved = handleForcedSingleMove(player, moveMap);
-            // Earlier here was a comment: 
+            // Earlier here was a comment:
             // "always need to retry" and hardcoded returned true.
             // In [ 1748718 ] Game halt in Abyssal9 this lead to a deadlock;
             // - so, if here is returned "false" as for "I won't do any more
-            // move", that problem does not occur (server recognizes that 
+            // move", that problem does not occur (server recognizes that
             // there is no legal move and accepts it)
-            // -- does this cause negative side effects elsewhere?? 
+            // -- does this cause negative side effects elsewhere??
             // Let's try ;-)
 
             return moved;
@@ -956,8 +956,8 @@ public class SimpleAI implements AI
             for (MasterHex hex : set)
             {
                 // TODO
-                // Do not consider moves onto hexes where we already have a 
-                // legion. This is sub-optimal since the legion in this hex 
+                // Do not consider moves onto hexes where we already have a
+                // legion. This is sub-optimal since the legion in this hex
                 // may be able to move and "get out of the way"
                 if (client.getFriendlyLegions(hex, player).size() > 0)
                 {
@@ -1466,13 +1466,13 @@ public class SimpleAI implements AI
                     // Cannot recruit, unless we have an angel to summon out,
                     // and we're not fighting, and someone else is, and that
                     // other stack summons out our angel.
-                    // Since we don't have enough information about other 
-                    // stacks to be sure that someone will summon from us, 
-                    // just give a small bonus for the possible recruit, if 
+                    // Since we don't have enough information about other
+                    // stacks to be sure that someone will summon from us,
+                    // just give a small bonus for the possible recruit, if
                     // we're not fighting and have a summonable.
                     if (enemyLegion == null && legion.hasSummonable())
                     {
-                        // This is total fudge.  Removing an angel may hurt 
+                        // This is total fudge.  Removing an angel may hurt
                         // this legion, or may help it if the recruit is even
                         // better.  But it'll help someone else.  And we don't
                         // know which legion is more important.  So just give
@@ -1487,7 +1487,7 @@ public class SimpleAI implements AI
                 else
                 {
                     LOGGER.severe("Bogus legion height "
-                        + (legion).getHeight() + " in legion " 
+                        + (legion).getHeight() + " in legion "
                         + legion.getMarkerId() + "; content: " + legion.getCreatures().toString());
                 }
 
@@ -2642,7 +2642,7 @@ public class SimpleAI implements AI
     }
 
     // return power and skill of a given creature given the terrain
-    // board hex label 
+    // board hex label
     protected PowerSkill getNativeValue(CreatureType creature,
         MasterBoardTerrain terrain, boolean defender)
     {
@@ -2659,7 +2659,7 @@ public class SimpleAI implements AI
 
     }
 
-    // return power and skill of a given creature given 
+    // return power and skill of a given creature given
     // a hazard terrain
     protected PowerSkill getNativeTerrainValue(CreatureType creature,
         HazardTerrain terrain, boolean defender)
@@ -2854,8 +2854,8 @@ public class SimpleAI implements AI
     }
 
     /** Try each of the moves in order.  Return the number that succeed,
-     *  scaled by the importance of each critter. 
-     *  In newOrder, if not null, place the moves that are valid.   
+     *  scaled by the importance of each critter.
+     *  In newOrder, if not null, place the moves that are valid.
      */
     private int testMoveOrder(List<CritterMove> order,
         List<CritterMove> newOrder)
@@ -3246,7 +3246,7 @@ public class SimpleAI implements AI
         int GANG_UP_ON_CREATURE = 50;
     }
 
-    /** Return a map of target hex label to number 
+    /** Return a map of target hex label to number
      * of friendly creatures that can strike it */
     private Map<String, Integer> findStrikeMap()
     {
@@ -3328,12 +3328,12 @@ public class SimpleAI implements AI
                 value += bec.NATIVE_BOG;
             }
 
-            /* 
-             Log.debug("Native " + critter.getCreature().getName() + " in " + 
+            /*
+             Log.debug("Native " + critter.getCreature().getName() + " in " +
              hex.getTerrain() +  " bonus " + bonus);
-             Log.debug("Native SKA " + ps.getSkillAttack() + " SKD " + 
+             Log.debug("Native SKA " + ps.getSkillAttack() + " SKD " +
              ps.getSkillDefend());
-             Log.debug("Native PA " + ps.getPowerAttack() + " PD " + 
+             Log.debug("Native PA " + ps.getPowerAttack() + " PD " +
              ps.getPowerDefend() + power);
              Log.debug("Native skill " + native_skill + " skill " + 2*skill);
              Log.debug("Native power " + native_power + " power " + 2*power);
@@ -3449,7 +3449,7 @@ public class SimpleAI implements AI
                     }
 
                     // Attack Warlocks so they don't get Titan
-                    if (target.getName().equals("Warlock"))
+                    if (target.getCreatureName().equals("Warlock"))
                     {
                         value += bec.ADJACENT_TO_BUDDY_TITAN;
                     }
