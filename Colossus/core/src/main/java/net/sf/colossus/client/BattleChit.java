@@ -20,11 +20,11 @@ import net.sf.colossus.variant.CreatureType;
 /**
  * Class BattleChit implements the GUI for a Titan chit representing
  * a creature on a BattleMap.
- * 
+ *
  * TODO this is a pretty wild mixture of GUI code with game logic -- there
  * is no representation of the creature in battle in the model, so this GUI
  * class does all that work, too.
- * 
+ *
  * @version $Id$
  * @author David Ripton
  */
@@ -70,7 +70,7 @@ public final class BattleChit extends Chit
         this.currentHexLabel = currentHexLabel;
         this.client = client;
         this.color = HTMLColor.stringToColor(colorName + "Colossus");
-        setBackground(Color.white);
+        setBackground(Color.WHITE);
     }
 
     public int getTag()
@@ -262,12 +262,12 @@ public final class BattleChit extends Chit
                     fontHeight);
 
                 // Provide a high-contrast background for the number.
-                g2.setColor(Color.white);
+                g2.setColor(Color.WHITE);
                 g2.fillRect(hitRect.x, hitRect.y, hitRect.width,
                     hitRect.height);
 
                 // Show number of hits taken in red.
-                g2.setColor(Color.red);
+                g2.setColor(Color.RED);
                 g2.drawString(hitString, hitRect.x, hitRect.y + fontHeight);
             }
             // Restore the font.
@@ -280,7 +280,7 @@ public final class BattleChit extends Chit
             g2.setColor(color);
             g2.setStroke(borderStroke);
             g2.drawRect(midRect.x, midRect.y, midRect.width, midRect.height);
-            g2.setColor(Color.black);
+            g2.setColor(Color.BLACK);
             g2.setStroke(oneWide);
             g2.drawRect(outerRect.x, outerRect.y, outerRect.width,
                 outerRect.height);
