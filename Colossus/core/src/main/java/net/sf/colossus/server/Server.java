@@ -112,11 +112,8 @@ public final class Server extends Thread implements IServer
 
     private final ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
 
-    // The ClientHandler of which the input is currently processed,
-    // and the player name belonging to that client:
-
+    // The ClientHandler of which the input is currently processed
     ClientHandler processingCH = null;
-    String processingPlayerName = null;
 
     // Channels are queued into here, to be removed from selector on
     // next possible opportunity ( = when all waiting-to-be-processed keys
@@ -359,7 +356,6 @@ public final class Server extends Thread implements IServer
                     else
                     {
                         processingCH = ch;
-                        processingPlayerName = ch.getPlayerName();
 
                         int read = readFromChannel(key, sc);
                         if (read > 0)
@@ -378,7 +374,6 @@ public final class Server extends Thread implements IServer
                             LOGGER.finest("readFromChannel: 0 bytes read.");
                         }
                         processingCH = null;
-                        processingPlayerName = null;
                     }
                 }
                 else
@@ -519,7 +514,7 @@ public final class Server extends Thread implements IServer
                     {
                         processingCH.setIsGone(true);
                         LOGGER.info("EOF on channel for client "
-                            + processingPlayerName + " setting isGone true");
+                            + getPlayerName() + " setting isGone true");
                         // Remote entity did shut the socket down.
                         // Do the same from our end and cancel the channel.
 
@@ -540,7 +535,7 @@ public final class Server extends Thread implements IServer
                 processingCH.setIsGone(true);
                 LOGGER.log(Level.WARNING, "IOException '" + e.getMessage()
                     + "' while reading from channel for player "
-                    + processingPlayerName, e);
+                    + getPlayerName(), e);
                 
                 // The remote forcibly/unexpectedly closed the connection, 
                 // cancel the selection key and close the channel.
@@ -791,12 +786,14 @@ public final class Server extends Thread implements IServer
      */
     String getPlayerName()
     {
-        // processingPlayerName holds the name of the client/player for
+        // Return the playerName for the processingCH.
+        // processingCH holds the name of the client/player for
         // which data is currently read or processed, then and only then
         // when it is reading or processing. While the selector is waiting
         // for next input, it's always set to null.
-        assert processingPlayerName != null : "No processingPlayerName!";
-        return processingPlayerName;
+        assert processingCH != null : "No processingCH!";
+        assert processingCH.getPlayerName() != null : "processingCH ";
+        return processingCH.getPlayerName();
     }
 
     /** 
