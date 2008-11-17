@@ -314,12 +314,6 @@ class Chit extends JPanel
     }
 
     @Override
-    public boolean contains(Point point)
-    {
-        return rect.contains(point);
-    }
-
-    @Override
     public Rectangle getBounds()
     {
         return rect;

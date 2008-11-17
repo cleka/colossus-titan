@@ -1545,7 +1545,7 @@ public final class MasterBoard extends JPanel
             while (lit.hasPrevious())
             {
                 Marker marker = lit.previous();
-                if (marker != null && marker.contains(point))
+                if (marker != null && marker.getBounds().contains(point))
                 {
                     return marker;
                 }
