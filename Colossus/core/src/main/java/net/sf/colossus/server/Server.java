@@ -62,13 +62,11 @@ public final class Server extends Thread implements IServer
 
     /** Map of players to their clients. */
     private final Map<Player, IClient> clientMap = new HashMap<Player, IClient>();
-    private final Map<SocketChannel, ClientHandler> clientChannelMap = new HashMap<SocketChannel, ClientHandler>();
-    // list of Socket that are currently active
-    // TODO: perhaps we could eliminate activeSocketChannelList,
-    //       they are all also in clientChannelMap
+
+    // list of SocketChannels that are currently active
     private final List<SocketChannel> activeSocketChannelList = new ArrayList<SocketChannel>();
 
-    /** Number of remote clients we're waiting for. */
+    /** Number of player clients we're waiting for. */
     private int waitingForClients;
 
     /** Server socket port. */
@@ -85,9 +83,6 @@ public final class Server extends Thread implements IServer
     private Selector selector = null;
     private SelectionKey acceptKey = null;
     private boolean stopAcceptingFlag = false;
-
-    private int numClients;
-    private int maxClients;
 
     /* static so that new instance of Server can destroy a
      * previously allocated FileServerThread */
@@ -224,10 +219,9 @@ public final class Server extends Thread implements IServer
 
     void initSocketServer()
     {
-        numClients = 0;
-        maxClients = game.getNumLivingPlayers();
         LOGGER
-            .log(Level.FINEST, "initSocketServer maxClients = " + maxClients);
+            .log(Level.FINEST, "initSocketServer, expecting "
+                + game.getNumLivingPlayers() + " player clients.");
         LOGGER.log(Level.FINEST, "About to create server socket on port "
             + port);
 
@@ -279,14 +273,14 @@ public final class Server extends Thread implements IServer
     boolean waitForClients()
     {
         logToStartLog("\nStarting up, waiting for " + waitingForClients
-            + " clients at port " + port + "\n");
+            + " player clients at port " + port + "\n");
         serverRunning = true;
-        while (numClients < maxClients && serverRunning && !shuttingDown)
+        while (waitingForClients > 0 && serverRunning && !shuttingDown)
         {
             waitOnSelector(timeoutDuringGame);
         }
 
-        return (numClients >= maxClients);
+        return (waitingForClients > 0 && serverRunning && !shuttingDown);
     }
 
     public void waitOnSelector(int timeout)
@@ -336,18 +330,18 @@ public final class Server extends Thread implements IServer
                     SelectionKey selKey = sc.register(selector,
                         SelectionKey.OP_READ);
                     ClientHandler ch = new ClientHandler(this, sc, selKey);
-                    numClients++;
+                    selKey.attach(ch);
+                    ch.sendToClient("SignOn:\n");
                     synchronized (activeSocketChannelList)
                     {
                         activeSocketChannelList.add(sc);
                     }
-                    clientChannelMap.put(sc, ch);
                 }
                 else if ((key.readyOps() & SelectionKey.OP_READ) == SelectionKey.OP_READ)
                 {
                     // Read the data
                     SocketChannel sc = (SocketChannel)key.channel();
-                    ClientHandler ch = clientChannelMap.get(sc);
+                    ClientHandler ch = (ClientHandler)key.attachment();
                     if (ch == null)
                     {
                         LOGGER.severe("No ClientHandler for socket channel "
@@ -787,7 +781,7 @@ public final class Server extends Thread implements IServer
     String getPlayerName()
     {
         // Return the playerName for the processingCH.
-        // processingCH holds the name of the client/player for
+        // processingCH holds the ClientHandler of the client/player for
         // which data is currently read or processed, then and only then
         // when it is reading or processing. While the selector is waiting
         // for next input, it's always set to null.
@@ -876,10 +870,9 @@ public final class Server extends Thread implements IServer
         if (clientMap.containsKey(player))
         {
             LOGGER.warning("Could not add client, "
-                + "because Player for playerName " + playerName
+                + "because client for playerName " + playerName
                 + " had already signed on.");
             return false;
-
         }
 
         clients.add(client);
@@ -891,7 +884,7 @@ public final class Server extends Thread implements IServer
         }
 
         logToStartLog((remote ? "Remote" : "Local") + " player "
-            + player.getName() + " signed on.");
+            + playerName + " signed on.");
         game.getNotifyWebServer().gotClient(player, remote);
         waitingForClients--;
         LOGGER.info("Decremented waitingForClients to " + waitingForClients);

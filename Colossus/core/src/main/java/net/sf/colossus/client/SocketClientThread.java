@@ -159,6 +159,11 @@ final class SocketClientThread extends Thread implements IServer
             // clients and we would hang in the queue...
             socket.setSoTimeout(5000);
             initialLine = in.readLine();
+            if (initialLine.equals("SignOn:"))
+            {
+                LOGGER.log(Level.INFO, "Got prompt - ok!");
+                initialLine = null;
+            }
             // ... but after we got first data, during game it might take
             // unpredictable time before next thing comes, so reset it to 0
             //  ( = wait forever).
