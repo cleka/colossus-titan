@@ -122,14 +122,14 @@ public final class ShowCreatureDetails extends KDialog implements
             + creature.getPluralName() + ")</i>");
         _trSpan(s, "Power..Skill", creature.getPower() + ".."
             + creature.getSkill());
-        _trSpan(s, "Total count", ""+creature.getMaxCount());
+        _trSpan(s, "Total count", "" + creature.getMaxCount());
         _trSpan(s, "Rangestrike", (creature.isRangestriker() ? "yes" : "no")
             + (creature.useMagicMissile() ? " <b>(magic missiles)</b>" : ""));
         _trSpan(s, "Flier", creature.isFlier() ? "yes" : "no");
         _trSpan(s, "Summonable", creature.isSummonable() ? "yes" : "no");
         // TODO Instead show full list of "where and for each multiple of X 
-        _trSpan(s, "Acquirable", TerrainRecruitLoader.isAcquirable(creature)
-            ? "yes" : "no");
+        _trSpan(s, "Acquirable",
+            TerrainRecruitLoader.isAcquirable(creature) ? "yes" : "no");
         _trSpan(s, _low("Lord"), creature.isLordOrDemiLord() ? (creature
             .isLord() ? "<u><b>Lord</b></u>" : "<b>Demi-Lord</b>")
             : _low("no"));
@@ -187,7 +187,7 @@ public final class ShowCreatureDetails extends KDialog implements
                 // TODO skip the > getMaxCount() already during Variant load
                 else if ((num > 0) && num < recruiter.getMaxCount()
                     && num < RecruitGraph.BIGNUM
-                    &&!recruiter.getName().equals("Titan"))
+                    && !recruiter.getName().equals("Titan"))
                 {
                     buf.append(separator + "by" + sp + num + sp
                         + recruiter.getPluralName());
@@ -197,15 +197,17 @@ public final class ShowCreatureDetails extends KDialog implements
             if (buf.length() > 0)
             {
                 Color color = terrain.getColor().brighter();
-                s.append(MessageFormat.format(
-                    "<tr><td bgcolor={0}>in {1}</td>"
-                    + "<td colspan={2}><font color=blue>{3}</font></td>"
-                    + "</tr>", new Object[] {
-                        HTMLColor.colorToCode(color),
-                        terrain.getId(),
-                        ""
-                        + (HazardTerrain.getAllHazardTerrains()
-                            .size() + 1), buf.toString(), }));
+                s
+                    .append(MessageFormat
+                        .format(
+                            "<tr><td bgcolor={0}>in {1}</td>"
+                                + "<td colspan={2}><font color=blue>{3}</font></td>"
+                                + "</tr>", new Object[] {
+                                HTMLColor.colorToCode(color),
+                                terrain.getId(),
+                                ""
+                                    + (HazardTerrain.getAllHazardTerrains()
+                                        .size() + 1), buf.toString(), }));
             }
         }
         //   out
@@ -232,21 +234,24 @@ public final class ShowCreatureDetails extends KDialog implements
                 {
                     buf.append(separator);
                     separator = ", ";
-                    buf.append(num + sp + "recruit" + sp + "a" + sp + recruit.getName());
+                    buf.append(num + sp + "recruit" + sp + "a" + sp
+                        + recruit.getName());
                 }
             }
             if (buf.length() > 0)
             {
                 Color color = terrain.getColor().brighter();
-                s.append(MessageFormat.format(
-                    "<tr><td bgcolor={0}>in {1}</td>"
-                    + "<td colspan={2}><font color=green>{3}</font></td>"
-                    + "</tr>", new Object[] {
-                        HTMLColor.colorToCode(color),
-                        terrain.getId(),
-                        ""
-                        + (HazardTerrain.getAllHazardTerrains()
-                            .size() + 1), buf.toString(), }));
+                s
+                    .append(MessageFormat
+                        .format(
+                            "<tr><td bgcolor={0}>in {1}</td>"
+                                + "<td colspan={2}><font color=green>{3}</font></td>"
+                                + "</tr>", new Object[] {
+                                HTMLColor.colorToCode(color),
+                                terrain.getId(),
+                                ""
+                                    + (HazardTerrain.getAllHazardTerrains()
+                                        .size() + 1), buf.toString(), }));
             }
         }
 
@@ -426,7 +431,8 @@ public final class ShowCreatureDetails extends KDialog implements
      * very fragile class, i suppose. but it might be worth it.
      * 
      * TODO this gets harder and harder to maintain the more typesafe the model gets.
-     * Figure out what it is really good for and solve the actual problem.
+     * Figure out what it is really good for and solve the actual problem. Currently
+     * it even causes assertion errors since it passes nulls where nulls aren't allowed.
      * 
      * TODO this is the only reference to {@link CreatureServerSide} left in the client
      * code and it probably doesn't need the specific model. If this should stay, it
