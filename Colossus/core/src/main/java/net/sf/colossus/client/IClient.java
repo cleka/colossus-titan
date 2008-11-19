@@ -71,7 +71,7 @@ public interface IClient
 
     public void askChooseStrikePenalty(List<String> choices);
 
-    public void tellGameOver(String message);
+    public void tellGameOver(String message, boolean disposeFollows);
 
     public void tellPlayerElim(Player player, Player slayer);
 

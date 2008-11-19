@@ -703,9 +703,10 @@ final class ClientHandler implements IClient
             + Glob.glob(choices));
     }
 
-    public void tellGameOver(String message)
+    public void tellGameOver(String message, boolean disposeFollows)
     {
-        sendToClient(Constants.tellGameOver + sep + message);
+        sendToClient(Constants.tellGameOver + sep + message + sep
+            + disposeFollows);
     }
 
     public void tellPlayerElim(Player player, Player slayer)

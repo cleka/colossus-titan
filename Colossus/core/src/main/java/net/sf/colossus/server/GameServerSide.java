@@ -912,11 +912,11 @@ public final class GameServerSide extends Game
         this.gameOverMessage = message;
     }
 
-    public void announceGameOver()
+    public void announceGameOver(boolean disposeFollows)
     {
         server.allFullyUpdateAllLegionContents(Constants.reasonGameOver);
         LOGGER.info("Announcing: Game over -- " + gameOverMessage);
-        server.allTellGameOver(gameOverMessage);
+        server.allTellGameOver(gameOverMessage, disposeFollows);
     }
 
     boolean isLoadingGame()
@@ -3342,6 +3342,8 @@ public final class GameServerSide extends Game
         {
             if (getOption(Options.autoQuit))
             {
+                LOGGER.info("Reached Game Over - announce and quit");
+                announceGameOver(true);
                 Start.setCurrentWhatToDoNext(Start.QuitAll);
                 Start.triggerTimedQuit();
                 LOGGER.info("Reached Game Over, AutoQuit - trigger Game Dispose");
@@ -3350,7 +3352,7 @@ public final class GameServerSide extends Game
             else
             {
                 LOGGER.info("Reached Game Over - just announce");
-                announceGameOver();
+                announceGameOver(false);
             }
             LOGGER.info("Game is now over - returning false");
             return false;

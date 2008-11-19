@@ -630,7 +630,13 @@ final class SocketClientThread extends Thread implements IServer
         else if (method.equals(Constants.tellGameOver))
         {
             String message = args.remove(0);
-            client.tellGameOver(message);
+            boolean disposeFollows = false;
+            if (!args.isEmpty())
+            {
+                disposeFollows = Boolean.valueOf(
+                    args.remove(0)).booleanValue();
+            }
+            client.tellGameOver(message, disposeFollows);
         }
         else if (method.equals(Constants.tellPlayerElim))
         {

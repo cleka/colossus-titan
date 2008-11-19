@@ -1207,11 +1207,11 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    void allTellGameOver(String message)
+    void allTellGameOver(String message, boolean disposeFollows)
     {
         for (IClient client : clients)
         {
-            client.tellGameOver(message);
+            client.tellGameOver(message, disposeFollows);
         }
     }
 

@@ -1560,7 +1560,7 @@ public class WebClient extends KFrame implements WindowListener,
         // java.util.Timer, not Swing Timer
         Timer timer = new Timer();
         timeIsUp = false;
-        long timeout = 10; // secs
+        long timeout = 60; // secs
 
         timer.schedule(new TriggerTimeIsUp(), timeout * 1000);
         return timer;
@@ -1596,9 +1596,10 @@ public class WebClient extends KFrame implements WindowListener,
             if (failed)
             {
                 gc = null;
-                JOptionPane.showMessageDialog(this, "Starting game failed!",
+                JOptionPane.showMessageDialog(this,
                     "Connecting to the game server "
-                        + "(starting own MasterBoard) failed!",
+                    + "(starting own MasterBoard) failed!",
+                    "Starting game failed!",
                     JOptionPane.ERROR_MESSAGE);
 
                 state = LoggedIn;
@@ -1643,9 +1644,9 @@ public class WebClient extends KFrame implements WindowListener,
                     JOptionPane
                         .showMessageDialog(
                             this,
-                            "Starting game failed!",
                             "Own client could connect, but game did not start "
-                                + "(probably some other player connecting failed?)",
+                            + "(probably some other player connecting failed?)",
+                            "Starting game failed!",
                             JOptionPane.ERROR_MESSAGE);
                     state = LoggedIn;
                     updateGUI();
@@ -1655,9 +1656,10 @@ public class WebClient extends KFrame implements WindowListener,
         catch (Exception e)
         {
             // client startup failed for some reason
-            JOptionPane.showMessageDialog(this, "Starting game failed!",
+            JOptionPane.showMessageDialog(this,
                 "Unexpected exception while starting the game client: "
-                    + e.toString(), JOptionPane.ERROR_MESSAGE);
+                    + e.toString(), "Starting game failed!", 
+                    JOptionPane.ERROR_MESSAGE);
             state = LoggedIn;
             updateGUI();
         }

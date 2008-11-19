@@ -215,6 +215,7 @@ public final class Client implements IClient, IOracle
 
     /** If the game is over, then quitting does not require confirmation. */
     private boolean gameOver;
+    private String gameOverMessage;
 
     /** One per player. */
     private PlayerClientSide[] players;
@@ -1459,12 +1460,36 @@ public final class Client implements IClient, IOracle
                 defaultCursor();
                 board.setServerClosedMessage(gameOver);
 
-                String message = (gameOver ? "Game over: Connection closed from server side."
-                    : "Connection to server unexpectedly lost?");
+                String message = null;
+                String title = null;
+                
+                if (gameOver)
+                {
+                    // don't show again!
+                    if (gameOverMessage != null)
+                    {
+                        message = "Game over: " + gameOverMessage + "!\n\n" + 
+                            "(connection closed from server side)";
+                        gameOverMessage = null;
+                        title = "Game Over: Server closed connection";
+                    }
+                    else
+                    {
+                        message = "Connection now closed from server side.";
+                        title = "Game Over: server closed connection";
+                    }
+                }
+                else
+                {
+                    message = "Connection to server unexpectedly lost?";
+                    title = "Server closed connection";
+                }
 
-                JOptionPane.showMessageDialog(getMapOrBoardFrame(), message,
-                    "Server closed connection",
-                    JOptionPane.INFORMATION_MESSAGE);
+                if (message != null)
+                {
+                    JOptionPane.showMessageDialog(getMapOrBoardFrame(), 
+                        message, title, JOptionPane.INFORMATION_MESSAGE);
+                }
                 close = false;
             }
             else
@@ -2433,6 +2458,25 @@ public final class Client implements IClient, IOracle
         }
     }
 
+    public void showNonModalMessageDialog(String message)
+    {
+        if (SwingUtilities.isEventDispatchThread())
+        {
+            doShowMessageDialog(message);
+        }
+        else
+        {
+            this.message = message;
+            SwingUtilities.invokeLater(new Runnable()
+            {
+                public void run()
+                {
+                    doShowMessageDialog(getMessage());
+                }
+            });
+        }
+    }
+
     void doShowMessageDialog(String message)
     {
         // Don't bother showing messages to AI players.  Perhaps we
@@ -2479,11 +2523,12 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    public void tellGameOver(String message)
+    public void tellGameOver(String message, boolean disposeFollows)
     {
         LOGGER.info("Client " + getOwningPlayer()
             + " received from server game over message: " + message);
         gameOver = true;
+        
         if (webClient != null)
         {
             webClient.tellGameEnds();
@@ -2497,7 +2542,17 @@ public final class Client implements IClient, IOracle
             }
             defaultCursor();
             board.setGameOverState(message);
-            showMessageDialog(message);
+            if (disposeFollows)
+            {
+                // tell it later, together with the immediately following
+                // server closed connection message
+                gameOverMessage = message;
+            }
+            else
+            {
+                // show right away. Connection closed might come or not.
+                showMessageDialog(message);
+            }
         }
     }
 

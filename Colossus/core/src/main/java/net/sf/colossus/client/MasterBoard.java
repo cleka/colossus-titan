@@ -2388,8 +2388,8 @@ public final class MasterBoard extends JPanel
     {
         masterFrame.setTitle(client.getActivePlayer() + " Turn "
             + client.getTurnNumber() + " : Game Over -- " + message);
-        bottomBar.setPhase(message);
-        disableDoneAction("Game Over");
+        bottomBar.setPhase("Game Over: " + message);
+        disableDoneAction("connection closed from server side");
         makeDoneCloseWindow();
     }
 }
