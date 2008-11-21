@@ -13,7 +13,26 @@
 This describes the recent changes in some more detail than just the
 one-line-info on the main pages "News" section.
 
-<h3>October 29, 2008: Public Testing Build from r3455</h3>
+<h3>November 21, 2008: Public Testing Build from r3500</h3>
+<p>Changes since last Public Build (2008-10-29):</p>
+<p>Not much user-visible changes this time, lot of cleanup.</p>
+
+<ul>
+<li>Several improvements to speed up loading of saved games:
+<ul><li>Do not send events of legions of players that will be dead at the end</li>
+    <li>Skip Caretaker Display and some other screen updates</li>
+</ul>
+<li>Quite some changes to things reported by "FindBugs" tool</li>
+<li>Added in File Menu new item "Check Connection"</li>
+<li>Fixed: 2128216 NW Stresstest opens GUI window and hangs</li>
+<li>Some cleanup in accepting clients stuff (removed some redundant variables;
+    send some message immediately after accepting the client</li>
+<li>Improved handling for remote clients one game end with AutoQuit</li>    
+</ul>
+
+<hr></hr>
+
+<h3>October 29, 2008: Public Build from r3455</h3>
 <p>Changes since last Public Build (2008-10-10):</p>
 <ul>
 <li>Options are now loaded and saved based on whether it is AI or not,
@@ -30,23 +49,16 @@ one-line-info on the main pages "News" section.
 <li>Fixed: 2167276 Doubled Reinforcements</li>
 <li>Fixed: 2160218 Incorrect bramble effect on rangestrike</li>
 <li>Fixed: CowardSimpleAI constants incorrectly affecting SimpleAI.
-</ul>
-<i>*** Public Testing Build 2008-10-22 from r3445 was here ***</i>
-<ul>
 <li>Fixed the "multiple recruits possible" problem reported for Public Testing Build</li>
 <li>Fixed that EventViewer showed all recruitings (after first battle) as "Reinforced"</li>
 <li>Fixed: 1895129 carryover gui issue: should not close with "x"</li>
 <li>Fixed: 2060183 Legion overwiew in user info window needs scrollbar</li>
-<li>Fixes: 2060208 Legion split tree fails if too many legions</li>
+<li>Fixed: 2060208 Legion split tree fails if too many legions</li>
 </ul>
-
-<hr></hr>
-
 <h3>October 10, 2008: Public Build from r3425</h3>
-<p></p>
 <ul>
-<li>Fixed: [ 2078529 ] "Preferences" => scales value is now read from cf file on startup.</li>
-<li>Help=>About now tell also the actual .colossus dir and also the 
+<li>Fixed: [ 2078529 ] "Preferences" =&gt; scales value is now read from cf file on startup.</li>
+<li>Help=&gt;About now tell also the actual .colossus dir and also the 
     log directory where Colossus[012].log files will be created.</li>
 <li>When game is over, MasterBoard tells so also in Title and in "phase" label,
     and DONE button invokes then the Quit/Close/New/Cancel dialog (same as closing
@@ -54,9 +66,8 @@ one-line-info on the main pages "News" section.
 <li>When gameOver state reached, skip summon/reinforce + kick next engagement
     (perhaps we undo this skipping of summon/reinforce soon again...).</li>
 <li>Fixed (hopefully): [ 2074220 ] Exception while loading game with dead players.
-    This includes a lot of small changes related to loading/replaying a saved game.
-<li>Fixed: [ 2044310 ] LoadGame: wrong legions existing/content/location (same as 
-    2074220).</li>
+    This includes a lot of small changes related to loading/replaying a saved game.</li>
+<li>Fixed: [ 2044310 ] LoadGame: wrong legions existing/content/location (same as 2074220) </li>
 <li>During loading of a game the Masterboard Bottombar (where normally the phase is 
     displayed) shows a "replay ongoing - turn x of n (please wait)" text.</li>
 <li>Fixed: [ 2090866 ] AI spinners wrong intialized</li>
@@ -88,22 +99,21 @@ one-line-info on the main pages "News" section.
     attribute, not as before if they have a startlist (e.g. Abyssal, Mantio).
 <li>Fixed the server-client communication, now (hopefully) the right way. 
     Several of the mysterious battle and game-end related bugs shouldn't 
-    happen any more, e.g.:
+    happen any more, e.g.:</li>
   <ul>
     <li>Fixed: [ 2072769 ] Game hangs when AI titan killed by AI </li>
     <li>Fixed (most likely):[ 2090150 ] Stack Counter left after a battle</li>
     <li>Fixed: [ 2095361 ] Game hangs when AI Titan killed</li>
     <li>Fixed: [ 2097773 ] Battlemat fails to close</li>
     <li>Fixed: [ 2113621 ] Major battlemap bugs that end gameplay</li>
-  </ul></li>
+  </ul>
 <li>Some corrections and improvements to CreatureDetails dialog</li>
 <li>When user selects Quit, trigger a timer which would do a 
     System.exit() after 10 seconds - to make sure that the java/javaw
     process will really terminate.</li>
 <li>Fixed: [ 2111020 ] After game completed, start new one: clients don't 
-    come in<br>
-    (when all expected clients did connect, stop listening to 
-    socket and accepting connections)</br></li>
+    come in<br />(when all expected clients did connect, stop listening to 
+    socket and accepting connections)</li>
 </ul>
 
 <h3>August 22, 2008, Public Build made from r3332</h3>
