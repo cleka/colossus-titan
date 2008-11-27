@@ -499,7 +499,7 @@ public final class MasterBoard extends JPanel
                 options[0] = "Yes";
                 options[1] = "No";
                 int answer = JOptionPane.showOptionDialog(masterFrame,
-                    "Are you sure you with to withdraw from the game?",
+                    "Are you sure you wish to withdraw from the game?",
                     "Confirm Withdrawal?", JOptionPane.YES_NO_OPTION,
                     JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 
@@ -574,7 +574,7 @@ public final class MasterBoard extends JPanel
                     options[0] = "Yes";
                     options[1] = "No";
                     int answer = JOptionPane.showOptionDialog(masterFrame,
-                        "Are you sure you wish to quit?", "Quit Game?",
+                        "Are you sure you wish to stop this game and quit?", "Quit Game?",
                         JOptionPane.YES_NO_OPTION,
                         JOptionPane.QUESTION_MESSAGE, null, options,
                         options[1]);
@@ -602,7 +602,7 @@ public final class MasterBoard extends JPanel
                     options[0] = "Yes";
                     options[1] = "No";
                     int answer = JOptionPane.showOptionDialog(masterFrame,
-                        "Are you sure you want to quit this game and "
+                        "Are you sure you want to stop this game and "
                             + "start a new one?", "New Game?",
                         JOptionPane.YES_NO_OPTION,
                         JOptionPane.QUESTION_MESSAGE, null, options,
