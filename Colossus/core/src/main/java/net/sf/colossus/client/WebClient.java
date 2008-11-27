@@ -1037,10 +1037,11 @@ public class WebClient extends KFrame implements WindowListener,
     private void doQuit()
     {
         Client gc = gameClient;
-        dispose();
 
         if (gc != null)
         {
+            // Game client handles confirmation if necessary, 
+            // asks what to do next, and sets startObj accordingly.
             gc.doConfirmAndQuit();
             gc = null;
         }
@@ -1049,6 +1050,7 @@ public class WebClient extends KFrame implements WindowListener,
             Start startObj = Start.getCurrentStartObject();
             startObj.setWhatToDoNext(Start.QuitAll);
             Start.triggerTimedQuit();
+            dispose();
         }
     }
 
