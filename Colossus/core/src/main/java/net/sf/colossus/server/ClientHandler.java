@@ -186,30 +186,10 @@ final class ClientHandler implements IClient
 
     private void sendViaChannel(String msg)
     {
-        int attempt = 0;
-        boolean ok = false;
-        while (!ok)
-        {
-            attempt++;
-            ok = sendViaChannelRaw(msg);
-            if (ok)
-            {
-                if (attempt != 1)
-                {
-                    System.out.println("Now succeeded, attempt = " + attempt);
-                }
-            }
-            else
-            {
-                int delay = 1;
-                System.out.println("Sleeping " + delay + " second(s) ...");
-                sleepFor(delay*1000);
-                System.out.println("Slept.");
-            }
-        }
+        sendViaChannelRaw(msg);
     }
 
-    private boolean sendViaChannelRaw(String msg)
+    private void sendViaChannelRaw(String msg)
     {
         String dataToSend = msg + "\n";
         CharBuffer cb = CharBuffer.allocate(dataToSend.length());
@@ -218,15 +198,30 @@ final class ClientHandler implements IClient
 
         try
         {
+            int attempt = 1;
             ByteBuffer bb = encoder.encode(cb);
             int should = bb.limit();
+            int writtenTotal = 0;
             int written = socketChannel.write(bb);
-            if (written < should)
+            writtenTotal += written;
+            while (writtenTotal < should)
             {
+                int missing = should - (writtenTotal - written);
                 LOGGER.warning("Only written " + written
-                    + " bytes, but should have been " + should
-                    + " (sleeping a while and retrying then)");
-                return false;
+                    + " (" + writtenTotal + ") bytes, but should have been "
+                    + missing + " (" + should + ") "
+                    + " - sleeping a while and retrying then");
+                int delay = 1;
+                LOGGER.finest("Sleeping " + delay + " second(s) ...");
+                sleepFor(delay*1000);
+                LOGGER.finest("Slept.");
+                attempt++;
+                written = socketChannel.write(bb);
+                writtenTotal += written;
+            }
+            if (attempt > 1)
+            {
+                LOGGER.info("Now succeeded, attempt = " + attempt);
             }
         }
         catch (CharacterCodingException e)
@@ -251,7 +246,6 @@ final class ClientHandler implements IClient
             server.disposeClientHandler(this);
         }
         Thread.yield();
-        return true;
     }
 
     private void callMethod(String method, List<String> args)
