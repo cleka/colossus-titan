@@ -773,6 +773,14 @@ public final class Client implements IClient, IOracle
         kickMoves();
     }
 
+    public void tellWhatsHappening(String message)
+    {
+        if (board != null)
+        {
+            board.setPhaseInfo(message);
+        }
+    }
+
     private void kickMoves()
     {
         if (isMyTurn() && options.getOption(Options.autoMasterMove)
@@ -5354,6 +5362,10 @@ public final class Client implements IClient, IOracle
         }
         else
         {
+            if (board != null)
+            {
+                board.setPhaseInfo("Pick a color!");
+            }
             do
             {
                 color = PickColor.pickColor(board.getFrame(), owningPlayer
@@ -5378,6 +5390,10 @@ public final class Client implements IClient, IOracle
         }
         else
         {
+            if (board != null)
+            {
+                board.setPhaseInfo("Pick initial marker!");
+            }
             do
             {
                 markerId = PickMarker.pickMarker(board.getFrame(),

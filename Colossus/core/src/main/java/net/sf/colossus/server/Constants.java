@@ -498,6 +498,7 @@ public final class Constants
     public static final String tellEngagement = "tellEngagement";
     public static final String tellEngagementResults = "tellEngagementResults";
     public static final String tellMovementRoll = "tellMovementRoll";
+    public static final String tellWhatsHappening = "tellWhatsHappening";
     public static final String setOption = "setOption";
     public static final String updatePlayerInfo = "updatePlayerInfo";
     public static final String setColor = "setColor";

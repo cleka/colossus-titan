@@ -573,6 +573,11 @@ final class ClientHandler implements IClient
             + sep + points + sep + turns);
     }
 
+    public void tellWhatsHappening(String message)
+    {
+        sendToClient(Constants.tellWhatsHappening + sep + message);
+    }
+
     public void tellMovementRoll(int roll)
     {
         sendToClient(Constants.tellMovementRoll + sep + roll);

@@ -2435,10 +2435,20 @@ public final class Server extends Thread implements IServer
 
     void askPickColor(Player player, final List<String> colorsLeft)
     {
-        IClient client = getClient(player);
-        if (client != null)
+        IClient activeClient = getClient(player);
+        for (IClient client : clients)
         {
-            client.askPickColor(colorsLeft);
+            if (client != null && client != activeClient)
+            {
+                client.tellWhatsHappening("(Player " + player.getName()
+                    + " picks color)");
+            }
+        }
+        // Do this after loop, so that chances are better that this one
+        // is active/in top at the end.
+        if (activeClient != null)
+        {
+            activeClient.askPickColor(colorsLeft);
         }
     }
 
@@ -2461,10 +2471,20 @@ public final class Server extends Thread implements IServer
 
     void askPickFirstMarker(Player player)
     {
-        IClient client = getClient(player);
-        if (client != null)
+        IClient activeClient = getClient(player);
+        for (IClient client : clients)
         {
-            client.askPickFirstMarker();
+            if (client != null && client != activeClient)
+            {
+                client.tellWhatsHappening("(Player " + player.getName()
+                    + " picks initial marker)");
+            }
+        }
+        // Do this after loop, so that chances are better that this one
+        // is active/in top at the end.
+        if (activeClient != null)
+        {
+            activeClient.askPickFirstMarker();
         }
     }
 

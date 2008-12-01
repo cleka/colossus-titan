@@ -944,6 +944,12 @@ final class SocketClientThread extends Thread implements IServer
             client.tellEngagementResults(legion, resMethod, points, turns);
         }
         
+        else if (method.equals(Constants.tellWhatsHappening))
+        {
+            String message = args.remove(0);
+            client.tellWhatsHappening(message);
+        }
+
         else if (method.equals(Constants.askConfirmCatchUp))
         {
             client.confirmWhenCaughtUp();
@@ -1235,7 +1241,7 @@ final class SocketClientThread extends Thread implements IServer
     {
         sendToServer(Constants.catchupConfirmation);
     }
-    
+
     private MasterHex resolveHex(String label)
     {
         MasterHex hexByLabel = client.getGame().getVariant().getMasterBoard()
