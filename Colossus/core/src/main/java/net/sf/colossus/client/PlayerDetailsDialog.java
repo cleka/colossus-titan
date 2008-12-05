@@ -173,8 +173,18 @@ public final class PlayerDetailsDialog extends KDialog implements
         }
 
         result.add(new JLabel("Split history:"), SECTION_TITLE_CONSTRAINT);
-        JScrollPane splitNodesPanel = new JScrollPane(createSplitNodesPanel());
-        result.add(splitNodesPanel, SECTION_TITLE_CONSTRAINT);
+        if (client.getTurnNumber() < 512)
+        {
+            JScrollPane splitNodesPanel = new JScrollPane(
+                createSplitNodesPanel());
+            result.add(splitNodesPanel, SECTION_TITLE_CONSTRAINT);
+        }
+        else
+        {
+            result.add(new JLabel(
+                " [ Too many turns! Table cannot be created. ] "),
+                SECTION_TITLE_CONSTRAINT);
+        }
 
         return result;
     }
