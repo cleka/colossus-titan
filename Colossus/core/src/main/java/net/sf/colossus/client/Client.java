@@ -62,6 +62,7 @@ import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
+import net.sf.colossus.webclient.WebClient;
 import net.sf.colossus.webcommon.InstanceTracker;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 

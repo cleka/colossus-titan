@@ -1,4 +1,4 @@
-package net.sf.colossus.client;
+package net.sf.colossus.webclient;
 
 
 import java.awt.BorderLayout;
@@ -53,6 +53,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
+import net.sf.colossus.client.Client;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Start;

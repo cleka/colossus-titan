@@ -10,11 +10,11 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.StartClient;
-import net.sf.colossus.client.WebClient;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.util.DebugMethods;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ViableEntityManager;
+import net.sf.colossus.webclient.WebClient;
 
 import com.werken.opt.CommandLine;
 import com.werken.opt.Option;
