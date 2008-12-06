@@ -21,6 +21,8 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import net.sf.colossus.webclient.WebClient.GameTableModel;
 
@@ -172,12 +174,17 @@ class ScheduledGamesTab extends Box implements ActionListener
         schedGameTable = new JTable(schedGameDataModel);
 
         schedGameListSelectionModel = schedGameTable.getSelectionModel();
-        schedGameListSelectionModel
-            .addListSelectionListener(webClient.new GameTableSelectionHandler());
-
-        // TODO is that setting again needed?
-        schedGameTable.setSelectionModel(schedGameListSelectionModel);
-
+        ListSelectionListener listener = new ListSelectionListener()
+        {
+            public void valueChanged(ListSelectionEvent e)
+            {
+                // ListSelectionModel lsm = (ListSelectionModel)e.getSource();
+                System.out.println("update to scheduled game list selection model");
+                // updateGUI();
+            }
+        };
+        schedGameListSelectionModel.addListSelectionListener(listener);
+        
         schedGameTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane tablescrollpane = new JScrollPane(schedGameTable);
         schedGamesPane.add(tablescrollpane);

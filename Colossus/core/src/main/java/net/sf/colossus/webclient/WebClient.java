@@ -202,7 +202,6 @@ public class WebClient extends KFrame implements WindowListener,
     // potential games:
     JTable potGameTable;
     GameTableModel potGameDataModel;
-    ListSelectionModel potGameListSelectionModel;
 
     // running games
     JTable runGameTable;
@@ -646,13 +645,16 @@ public class WebClient extends KFrame implements WindowListener,
         potGameDataModel = new GameTableModel();
         potGameTable = new JTable(potGameDataModel);
 
-        potGameListSelectionModel = potGameTable.getSelectionModel();
-        potGameListSelectionModel
-            .addListSelectionListener(new GameTableSelectionHandler());
+        potGameTable.getSelectionModel().addListSelectionListener(
+            new ListSelectionListener()
+            {
+                public void valueChanged(ListSelectionEvent e)
+                {
+                    System.out.println("list selection in pot Table");
+                    updateGUI();
+                }
+            });
         
-        // TODO is that setting again needed?
-        potGameTable.setSelectionModel(potGameListSelectionModel);
-
         potGameTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane tablescrollpane = new JScrollPane(potGameTable);
         potGamesPane.add(tablescrollpane);
@@ -687,13 +689,16 @@ public class WebClient extends KFrame implements WindowListener,
             "The following games are already running:"));
 
         runGameDataModel = new GameTableModel();
-
         runGameTable = new JTable(runGameDataModel);
-
-        runGameListSelectionModel = runGameTable.getSelectionModel();
-        runGameListSelectionModel
-            .addListSelectionListener(new GameTableSelectionHandler());
-        runGameTable.setSelectionModel(runGameListSelectionModel);
+        runGameTable.getSelectionModel().addListSelectionListener(
+            new ListSelectionListener()
+            {
+                public void valueChanged(ListSelectionEvent e)
+                {
+                    System.out.println("list selection in run Table");
+                    updateGUI();
+                }
+            });
 
         runGameTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane runtablescrollpane = new JScrollPane(runGameTable);
@@ -2463,32 +2468,5 @@ public class WebClient extends KFrame implements WindowListener,
         }
 
     } // END Class GameTableModel
-
-    class GameTableSelectionHandler implements ListSelectionListener
-    {
-        public void valueChanged(ListSelectionEvent e)
-        {
-            ListSelectionModel lsm = (ListSelectionModel)e.getSource();
-            if (lsm == potGameListSelectionModel)
-            {
-                updateGUI();
-            }
-
-            else if (lsm == potGameListSelectionModel)
-            {
-                updateGUI();
-            }
-            
-            else if (lsm == schedulingPanel.getSchedGameTable())
-            {
-                System.out.println("update to scheduled game list selection model");
-                updateGUI();
-            }
-
-            else
-            {
-                // 
-            }
-        }
-    } // END Class GameTableSelectionHandler 
+ 
 }
