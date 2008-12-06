@@ -266,7 +266,8 @@ final class ClientHandler implements IClient
             }
             else
             {
-                sendToClient(Constants.signOn + sep + "rejected");
+                System.out.println("Rejecting unexpected client " + playerName);
+                nak("SignOn", "Invalid player name '" + playerName + "'!");
             }
             InstanceTracker.setId(this, playerName);
         }

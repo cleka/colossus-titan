@@ -58,6 +58,7 @@ public final class Server extends Thread implements IServer
      *  Do not share these references. */
     private final List<IClient> clients = new ArrayList<IClient>();
     private final List<IClient> remoteClients = new ArrayList<IClient>();
+    private final List<IClient> spectatorClients = new ArrayList<IClient>();
     private final List<RemoteLogHandler> remoteLogHandlers = new ArrayList<RemoteLogHandler>();
 
     /** Map of players to their clients. */
@@ -67,7 +68,8 @@ public final class Server extends Thread implements IServer
     private final List<SocketChannel> activeSocketChannelList = new ArrayList<SocketChannel>();
 
     /** Number of player clients we're waiting for. */
-    private int waitingForClients;
+    private int waitingForPlayers;
+    private int spectators = 0;
 
     /** Server socket port. */
     private final int port;
@@ -135,7 +137,7 @@ public final class Server extends Thread implements IServer
             startLog = new StartupProgress(this);
         }
 
-        waitingForClients = game.getNumLivingPlayers();
+        waitingForPlayers = game.getNumLivingPlayers();
         InstanceTracker.register(this, "only one");
     }
 
@@ -272,15 +274,34 @@ public final class Server extends Thread implements IServer
 
     boolean waitForClients()
     {
-        logToStartLog("\nStarting up, waiting for " + waitingForClients
+        logToStartLog("\nStarting up, waiting for " + waitingForPlayers
             + " player clients at port " + port + "\n");
+        StringBuilder living = new StringBuilder("");
+        StringBuilder dead   = new StringBuilder("");
+        for (Player p : game.getPlayers())
+        {
+            String name = p.getName();
+            StringBuilder list = p.isDead() ? dead : living;
+                
+            if (list.length() > 0)
+            {
+                list.append(", ");
+            }
+            list.append(name);
+        }
+        logToStartLog("Players expected to join (= alive): " + living + "\n");
+        if (dead.length() > 0)
+        {
+            logToStartLog("Players already dead before save  : " + dead
+                + "\n");
+        }
         serverRunning = true;
-        while (waitingForClients > 0 && serverRunning && !shuttingDown)
+        while (waitingForPlayers > 0 && serverRunning && !shuttingDown)
         {
             waitOnSelector(timeoutDuringGame);
         }
 
-        return (waitingForClients > 0 && serverRunning && !shuttingDown);
+        return (waitingForPlayers > 0 && serverRunning && !shuttingDown);
     }
 
     public void waitOnSelector(int timeout)
@@ -331,7 +352,9 @@ public final class Server extends Thread implements IServer
                         SelectionKey.OP_READ);
                     ClientHandler ch = new ClientHandler(this, sc, selKey);
                     selKey.attach(ch);
-                    ch.sendToClient("SignOn:\n");
+                    // This is sent only for the reason that the client gets
+                    // an initial response quickly.
+                    ch.sendToClient("SignOn: processing");
                     synchronized (activeSocketChannelList)
                     {
                         activeSocketChannelList.add(sc);
@@ -786,7 +809,8 @@ public final class Server extends Thread implements IServer
         // when it is reading or processing. While the selector is waiting
         // for next input, it's always set to null.
         assert processingCH != null : "No processingCH!";
-        assert processingCH.getPlayerName() != null : "processingCH ";
+        assert processingCH.getPlayerName() != null : 
+            "Name for processingCH must not be null!";
         return processingCH.getPlayerName();
     }
 
@@ -851,7 +875,11 @@ public final class Server extends Thread implements IServer
         LOGGER.finest("Calling Server.addClient() for " + playerName);
 
         Player player = null;
-        if (remote)
+        if (playerName.equals("spectator"))
+        {
+            LOGGER.info("addClient for a spectator.");
+        }
+        else if (remote)
         {
             player = game.findNetworkPlayer(playerName);
         }
@@ -860,52 +888,81 @@ public final class Server extends Thread implements IServer
             player = game.getPlayer(playerName);
         }
 
-        if (player == null)
+        String name = "<undefined>";
+        if (player == null && playerName.equals("spectator"))
         {
-            LOGGER.warning("Could not add client, "
-                + "because no Player was found for playerName " + playerName);
+            ++spectators;
+            name = "spectator_" + spectators;
+            LOGGER.info("Adding spectator " + name);
+        }
+        else if (player == null)
+        {
+            LOGGER.warning("No Player was found for non-spectator playerName "
+                + playerName + "!");
+            logToStartLog("NOTE: One client attempted to join with player name "
+                + playerName + " - rejected, because no such player is expected!");
             return false;
         }
-
-        if (clientMap.containsKey(player))
+        else if (clientMap.containsKey(player))
         {
             LOGGER.warning("Could not add client, "
-                + "because client for playerName " + playerName
+                + "because Player for playerName " + playerName
                 + " had already signed on.");
+            logToStartLog("NOTE: One client attempted to join with player name "
+                + playerName + " - rejected, because same player name already "
+                + "joined.");
             return false;
+        }
+        else
+        {
+            name = playerName;
         }
 
         clients.add(client);
-        clientMap.put(player, client);
+        if (player != null)
+        {
+            clientMap.put(player, client);
+        }
+        else
+        {
+            spectatorClients.add(client);
+        }
 
         if (remote)
         {
             addRemoteClient(client, player);
         }
 
-        logToStartLog((remote ? "Remote" : "Local") + " player "
-            + playerName + " signed on.");
-        game.getNotifyWebServer().gotClient(player, remote);
-        waitingForClients--;
-        LOGGER.info("Decremented waitingForClients to " + waitingForClients);
-
-        if (waitingForClients > 0)
+        if (player != null)
         {
-            String pluralS = (waitingForClients > 1 ? "s" : "");
-            logToStartLog(" ==> Waiting for " + waitingForClients
-                + " more client" + pluralS + " to sign on.\n");
+            logToStartLog((remote ? "Remote" : "Local") + " player "
+                + name + " signed on.");
+            game.getNotifyWebServer().gotClient(player, remote);
+            waitingForPlayers--;
+            LOGGER.info("Decremented waitingForPlayers to " + waitingForPlayers);
+
+            if (waitingForPlayers > 0)
+            {
+                String pluralS = (waitingForPlayers > 1 ? "s" : "");
+                logToStartLog(" ==> Waiting for " + waitingForPlayers
+                    + " more client" + pluralS + " to sign on.\n");
+            }
+            else
+            {
+                logToStartLog("\nGot all clients, game can start now.\n");
+            }
         }
         else
         {
-            logToStartLog("\nGot all clients, game can start now.\n");
+            logToStartLog((remote ? "Remote" : "Local") + " spectator ("
+                + name + ") signed on.");
         }
-
         return true;
     }
 
     public void startGameIfAllPlayers()
     {
-        if (waitingForClients <= 0)
+        if (waitingForPlayers <= 0)
         {
             stopAcceptingFlag = true;
             if (game.isLoadingGame())
@@ -948,6 +1005,11 @@ public final class Server extends Thread implements IServer
 
         remoteClients.add(client);
 
+        if (player == null)
+        {
+            LOGGER.info("addRemoteClient for observer skips name stuff.");
+            return;
+        }
         if (!game.isLoadingGame())
         {
             // Returns original name if no other player has this name
@@ -1132,6 +1194,10 @@ public final class Server extends Thread implements IServer
                     client.initBoard();
                 }
             }
+        }
+        for (IClient client : spectatorClients)
+        {
+            client.initBoard();
         }
     }
 
@@ -2037,6 +2103,12 @@ public final class Server extends Thread implements IServer
             return;
         }
 
+        // spectators or rejected clients:
+        if (getPlayerName() == null || getPlayerName().startsWith("spectator"))
+        {
+            return;
+        }
+
         PlayerServerSide player = getPlayer();
 
         String name = player.getName();
@@ -2374,7 +2446,8 @@ public final class Server extends Thread implements IServer
     {
         LOGGER.info("Server received checkServerConnection request from "
             + "client " + getPlayerName() + " - sending confirmation.");
-        getClient(getPlayer()).serverConfirmsConnection();
+
+        processingCH.serverConfirmsConnection();
     }
 
     private HashSet<IClient> waitingToCatchup = new HashSet<IClient>();

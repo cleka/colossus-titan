@@ -159,7 +159,7 @@ final class SocketClientThread extends Thread implements IServer
             // clients and we would hang in the queue...
             socket.setSoTimeout(5000);
             initialLine = in.readLine();
-            if (initialLine.equals("SignOn:"))
+            if (initialLine.startsWith("SignOn:"))
             {
                 LOGGER.log(Level.INFO, "Got prompt - ok!");
                 initialLine = null;
@@ -217,8 +217,7 @@ final class SocketClientThread extends Thread implements IServer
         {
             goingDown = true;
             String message = "Server not responding (could connect, "
-                + "but didn't got any initial data within 5 seconds. "
-                + "Probably the game has already as many clients as it expects).";
+                + "but didn't got any initial data within 5 seconds).";
             String title = "Joining game failed!";
             client.showErrorMessage(message, title);
         }
@@ -235,12 +234,11 @@ final class SocketClientThread extends Thread implements IServer
         {
             // Right now this should never happen, but since we have
             // the catch and set the flag, let's do something with it:)
-            client
-                .showErrorMessage(
-                    "No messages from server for very long time. "
-                        + "Right now this should never happen because in normal game "
-                        + "situation we work with infinite timeout... ??",
-                    "No messages from server!");
+            client.showErrorMessage(
+                "No messages from server for very long time. "
+                + "Right now this should never happen because in normal game "
+                + "situation we work with infinite timeout... ??",
+                "No messages from server!");
         }
 
         cleanupSocket();
@@ -295,6 +293,11 @@ final class SocketClientThread extends Thread implements IServer
                                 + ex.toString() + "\n" + ex.getMessage()
                                 + "\nline=" + fromServer, ex);
                     }
+                }
+                else
+                {
+                    LOGGER.warning("Client '" + client.getOwningPlayer()
+                        .getName() + "' got empty message from server?");
                 }
             }
 
@@ -914,7 +917,18 @@ final class SocketClientThread extends Thread implements IServer
         }
         else if (method.equals(Constants.nak))
         {
-            client.nak(args.remove(0), args.remove(0));
+            String reason = args.remove(0);
+            String message = args.remove(0);
+            if (reason.equals("SignOn"))
+            {
+                goingDown = true;
+                String title = "Joining game failed!";
+                client.showErrorMessage(message, title);
+            }
+            else
+            {
+                client.nak(reason, message);
+            }
         }
         else if (method.equals(Constants.boardActive))
         {
