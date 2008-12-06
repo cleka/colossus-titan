@@ -32,6 +32,7 @@ public class WebServerGUI extends JFrame implements WindowListener,
     private WebServer webServer;
     private JLabel userInfo;
 
+    private JLabel scheduledGamesInfo;
     private JLabel potentialGamesInfo;
     private JLabel runningGamesInfo;
     private JLabel endingGamesInfo;
@@ -55,6 +56,9 @@ public class WebServerGUI extends JFrame implements WindowListener,
         userInfo = new JLabel("No users connected.");
         mainPane.add(userInfo);
 
+        scheduledGamesInfo = new JLabel("No scheduled games.");
+        mainPane.add(scheduledGamesInfo);
+
         potentialGamesInfo = new JLabel("No potential games.");
         mainPane.add(potentialGamesInfo);
 
@@ -73,6 +77,11 @@ public class WebServerGUI extends JFrame implements WindowListener,
     public void setUserInfo(String s)
     {
         userInfo.setText(s);
+    }
+
+    public void setScheduledGamesInfo(String s)
+    {
+        scheduledGamesInfo.setText(s);
     }
 
     public void setPotentialGamesInfo(String s)

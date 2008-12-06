@@ -266,6 +266,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
         {
             while (!done && (fromServer = this.in.readLine()) != null)
             {
+                System.out.println("Webclient got line: " + fromServer);
                 String[] tokens = fromServer.split(sep, -1);
                 String command = tokens[0];
 
@@ -527,6 +528,14 @@ public class WebClientSocketThread extends Thread implements IWebServer
         send(Propose + sep + initiator + sep + variant + sep + viewmode + sep
             + expire + sep + unlimitedMulligans + sep + balancedTowers + sep
             + min + sep + target + sep + max);
+        return null;
+    }
+
+    public GameInfo scheduleGame(String initiator, long startTime,
+        int duration, String summary)
+    {
+        send(Schedule + sep + initiator + sep + startTime + sep + duration
+            + sep + summary);
         return null;
     }
 

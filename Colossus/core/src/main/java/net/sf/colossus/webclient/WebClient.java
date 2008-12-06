@@ -1,11 +1,11 @@
 package net.sf.colossus.webclient;
 
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -14,11 +14,15 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.lang.reflect.InvocationTargetException;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
+import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
@@ -82,6 +86,11 @@ public class WebClient extends KFrame implements WindowListener,
     private static final Logger LOGGER = Logger.getLogger(WebClient.class
         .getName());
 
+    // TODO make this all based on Locale.getDefault()
+    // Initially: use German. To make it variable, need also to set
+    // the default values / info texts according to Locale.
+    final static Locale myLocale = Locale.GERMANY;
+
     private String hostname;
     private int port;
     private String login;
@@ -126,6 +135,7 @@ public class WebClient extends KFrame implements WindowListener,
     JTabbedPane tabbedPane;
     Box serverTab;
     Box instantGamesTab;
+    Box runningGamesTab;
     Box scheduledGamesTab;
     Box adminTab;
 
@@ -194,13 +204,19 @@ public class WebClient extends KFrame implements WindowListener,
     final static String waitingText = "Client connected successfully, waiting for all other players. Please wait...";
     final static String enrolledText = "While enrolled, you can't propose or enroll to other games.";
     final static String playingText = "While playing, you can't propose or enroll to other games.";
-
+    
     ChatHandler generalChat;
+    GameScheduler schedPanel;
 
     final ArrayList<GameInfo> gamesUpdates = new ArrayList<GameInfo>();
 
     HashMap<String, GameInfo> gameHash = new HashMap<String, GameInfo>();
 
+    // scheduled games:
+    JTable schedGameTable;
+    GameTableModel schedGameDataModel;
+    ListSelectionModel schedGameListSelectionModel;
+    
     // potential games:
     JTable potGameTable;
     GameTableModel potGameDataModel;
@@ -426,8 +442,8 @@ public class WebClient extends KFrame implements WindowListener,
         getContentPane().add(mainPane, BorderLayout.CENTER);
 
         tabbedPane = new JTabbedPane();
-        tabbedPane.setPreferredSize(new Dimension(600, 600)); // width x height
-        tabbedPane.setMinimumSize(new Dimension(600, 530)); // width x height
+        tabbedPane.setPreferredSize(new Dimension(900, 600)); // width x height
+        tabbedPane.setMinimumSize(new Dimension(900, 530)); // width x height
         mainPane.add(tabbedPane);
 
         // ========== Server Tab ===============
@@ -513,41 +529,11 @@ public class WebClient extends KFrame implements WindowListener,
         loginPane.add(registerOrPasswordLabel);
         loginPane.add(registerOrPasswordButton);
 
-        // ============adminTab ==========
-
-        adminTab = new Box(BoxLayout.Y_AXIS);
-
-        JPanel adminPane = new JPanel(new GridLayout(0, 1));
-        adminPane.setBorder(new TitledBorder("Admin mode"));
-        adminPane.setPreferredSize(new Dimension(30, 200));
-
-        commandField = new JTextField("");
-        adminPane.add(commandField);
-
-        debugSubmitButton = new JButton("Submit");
-        debugSubmitButton.addActionListener(this);
-        adminPane.add(debugSubmitButton);
-        debugSubmitButton.setEnabled(false);
-
-        adminPane.add(new JLabel("Server answered:"));
-        receivedField = new JLabel("");
-        adminPane.add(receivedField);
-
-        shutdownButton = new JButton("Shutdown Server");
-        shutdownButton.addActionListener(this);
-        adminPane.add(shutdownButton);
-
-        adminTab.add(adminPane);
-
-        // -----------
+        // ======= instant Games tab =========
+        
         instantGamesTab = new Box(BoxLayout.Y_AXIS);
         tabbedPane.addTab("Instant Games", instantGamesTab);
-
-        scheduledGamesTab = new Box(BoxLayout.Y_AXIS);
-        tabbedPane.addTab("Scheduled Games", scheduledGamesTab);
-        scheduledGamesTab.add(new JLabel(
-            "This feature is not implemented yet."));
-
+        
         JPanel preferencesPane = new JPanel(new GridLayout(0, 2));
         preferencesPane.setBorder(new TitledBorder("Game preferences"));
 
@@ -645,7 +631,7 @@ public class WebClient extends KFrame implements WindowListener,
         playerSelection.add(spinner3);
 
         preferencesPane.add(playerSelection);
-
+        
         instantGamesTab.add(preferencesPane);
 
         // done with game preferences.
@@ -686,12 +672,13 @@ public class WebClient extends KFrame implements WindowListener,
         potGamesPane.add(dummyField);
 
         potGameDataModel = new GameTableModel();
-
         potGameTable = new JTable(potGameDataModel);
 
         potGameListSelectionModel = potGameTable.getSelectionModel();
         potGameListSelectionModel
             .addListSelectionListener(new gameTableSelectionHandler());
+        
+        // TODO is that setting again needed?
         potGameTable.setSelectionModel(potGameListSelectionModel);
 
         potGameTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -706,15 +693,28 @@ public class WebClient extends KFrame implements WindowListener,
         infoTextLabel = new JLabel(enrollText);
         potGamesPane.add(infoTextLabel);
 
-        /*        
-         Dimension d = new Dimension(500,50);
-         potGameTable.setSize(d);
-         potGameTable.setPreferredSize(d);
-         potGameTable.setMaximumSize(d);
-         */
         instantGamesTab.add(potGamesPane);
 
-        //      ====================== Proposed Games ======================
+        
+        // ================== Scheduled Games tab ======================
+        
+        scheduledGamesTab = new Box(BoxLayout.Y_AXIS);
+        tabbedPane.addTab("Scheduled Games", scheduledGamesTab);
+        
+        // scheduledGamesTab.add(preferencesPane);
+        
+        schedPanel = new GameScheduler();
+        scheduledGamesTab.add(schedPanel);
+        scheduledGamesTab.add(Box.createVerticalGlue());
+ 
+        scheduledGamesTab.add(new SchedGamesPanel());
+
+        // ====================== Running Games Tab ======================
+
+        // ----------------- First the table ---------------------
+        
+        runningGamesTab = new Box(BoxLayout.Y_AXIS);
+        tabbedPane.addTab("Running Games", runningGamesTab);
 
         Box runningGamesPane = new Box(BoxLayout.Y_AXIS);
         // runningGamesPane.setAlignmentY(0);
@@ -726,13 +726,6 @@ public class WebClient extends KFrame implements WindowListener,
 
         runGameTable = new JTable(runGameDataModel);
 
-        /*
-         Dimension d2 = new Dimension(500,50);
-         potGameTable.setSize(d2);
-         potGameTable.setPreferredSize(d2);
-         potGameTable.setMaximumSize(d2);
-         */
-
         runGameListSelectionModel = runGameTable.getSelectionModel();
         runGameListSelectionModel
             .addListSelectionListener(new gameTableSelectionHandler());
@@ -742,21 +735,32 @@ public class WebClient extends KFrame implements WindowListener,
         JScrollPane runtablescrollpane = new JScrollPane(runGameTable);
         runningGamesPane.add(runtablescrollpane);
 
-        instantGamesTab.add(runningGamesPane);
+        runningGamesTab.add(runningGamesPane);
 
+
+        // ------------------ Hide WebClient stuff ---------------
+        
+        Box hideClientPanel = new Box(BoxLayout.Y_AXIS);
+        hideClientPanel.setBorder(new TitledBorder("Hiding the Web Client"));
+        
+        runningGamesTab.add(Box.createRigidArea(new Dimension(0, 20)));
+        runningGamesTab.add(Box.createVerticalGlue());
+        
+        hideClientPanel.setAlignmentX(Box.LEFT_ALIGNMENT);
+        
         hideButton = new JButton(HideButtonText);
-        hideButton.setAlignmentY(0);
+        hideButton.setAlignmentX(Box.LEFT_ALIGNMENT);
 
         hideButton.addActionListener(this);
         hideButton.setEnabled(false);
-        runningGamesPane.add(hideButton);
+        hideClientPanel.add(hideButton);
         hideButtonText = new JLabel(CantHideText);
-        runningGamesPane.add(hideButtonText);
+        hideClientPanel.add(hideButtonText);
 
         // automatic actions when game starts (client masterboard comes up):
         JLabel autoDoLabel = new JLabel("When game starts, automatically:");
-        autoDoLabel.setAlignmentX(0);
-        runningGamesPane.add(autoDoLabel);
+        autoDoLabel.setAlignmentX(Box.LEFT_ALIGNMENT);
+        hideClientPanel.add(autoDoLabel);
         Box autoDoButtonPane = new Box(BoxLayout.X_AXIS);
         autoGSNothingRB = new JRadioButton(AutoGameStartActionNothing);
         autoGSHideRB = new JRadioButton(AutoGameStartActionHide);
@@ -800,17 +804,58 @@ public class WebClient extends KFrame implements WindowListener,
             autoGSNothingRB.setSelected(true);
         }
 
-        autoDoButtonPane.setAlignmentX(0);
-        runningGamesPane.add(autoDoButtonPane);
+        autoDoButtonPane.setAlignmentX(Box.LEFT_ALIGNMENT);
+        hideClientPanel.add(autoDoButtonPane);
+        hideClientPanel.add(Box.createVerticalGlue());
 
-        instantGamesTab.add(Box.createVerticalGlue());
+        runningGamesTab.add(Box.createVerticalGlue());
+        runningGamesTab.add(hideClientPanel);
 
+/*      // Somehow this does not work at all...
+
+        // as wide as the running games table, as high as needed:
+        int width = runningGamesPane.getMinimumSize().width;
+        int height = hideClientPanel.getMinimumSize().height;
+        Dimension prefSize = new Dimension(width, height);
+        hideClientPanel.setPreferredSize(prefSize);
+        hideClientPanel.setMinimumSize(prefSize);
+*/                
+        
         // ================== "General" Chat tab ======================
 
         generalChat = new ChatHandler(IWebServer.generalChatName, "Chat", this);
-
         tabbedPane.addTab(generalChat.getTitle(), generalChat.getTab());
+        
+        // ============admin Tab ==========
 
+        adminTab = new Box(BoxLayout.Y_AXIS);
+
+        JPanel adminPane = new JPanel(new GridLayout(0, 1));
+        adminPane.setBorder(new TitledBorder("Admin mode"));
+        adminPane.setPreferredSize(new Dimension(30, 200));
+
+        commandField = new JTextField("");
+        adminPane.add(commandField);
+
+        debugSubmitButton = new JButton("Submit");
+        debugSubmitButton.addActionListener(this);
+        adminPane.add(debugSubmitButton);
+        debugSubmitButton.setEnabled(false);
+
+        adminPane.add(new JLabel("Server answered:"));
+        receivedField = new JLabel("");
+        adminPane.add(receivedField);
+
+        shutdownButton = new JButton("Shutdown Server");
+        shutdownButton.addActionListener(this);
+        adminPane.add(shutdownButton);
+
+        adminTab.add(adminPane);
+        
+        // adminTab is added to tabbedPane then/only when user has
+        // logged in and server informed us that this user as admin user
+
+        // ============== finish all ================
         addWindowListener(this);
         pack();
 
@@ -1042,7 +1087,8 @@ public class WebClient extends KFrame implements WindowListener,
         if (gc != null)
         {
             // Game client handles confirmation if necessary, 
-            // asks what to do next, and sets startObj accordingly.
+            // asks what to do next, and sets startObj accordingly,
+            // and it also disposes this WebClient window.
             gc.doConfirmAndQuit();
             gc = null;
         }
@@ -1139,8 +1185,8 @@ public class WebClient extends KFrame implements WindowListener,
         if (state == NotLoggedIn)
         {
             loginButton.setText(LoginButtonText);
-
             generalChat.setLoginState(false);
+            schedPanel.setLoginState(false);
             registerOrPasswordLabel.setText(createAccountLabelText);
             registerOrPasswordButton.setText(createAccountButtonText);
         }
@@ -1148,6 +1194,7 @@ public class WebClient extends KFrame implements WindowListener,
         {
             loginButton.setText(LogoutButtonText);
             generalChat.setLoginState(true);
+            schedPanel.setLoginState(true);
             registerOrPasswordLabel.setText(chgPasswordLabelText);
             registerOrPasswordButton.setText(chgPasswordButtonText);
         }
@@ -1501,6 +1548,14 @@ public class WebClient extends KFrame implements WindowListener,
         return true;
     }
 
+    public void doScheduling(long startTime, int duration, String summary)
+    {
+        System.out.println("Scheduled game at "
+            + startTime+ " duration " + duration + " summary '" + summary + "'");
+        server.scheduleGame(username, startTime, duration, summary);
+    }
+    
+    
     // ================= those come from server ============
 
     public void grantAdminStatus()
@@ -1743,12 +1798,19 @@ public class WebClient extends KFrame implements WindowListener,
                         GameInfo game = it.next();
 
                         int state = game.getGameState();
-                        if (state == GameInfo.Proposed)
+                        if (state == GameInfo.Scheduled)
                         {
+                            System.out.println("Got a scheduled game, replacing in sched list");
+                            replaceInTable(schedGameTable, game);
+                        }
+                        else if (state == GameInfo.Proposed)
+                        {
+                            System.out.println("Got a proposed game, replacing in proposed list");
                             replaceInTable(potGameTable, game);
                         }
                         else if (state == GameInfo.Running)
                         {
+                            System.out.println("Got a running game, replacing in run game list and remove in pot game list");
                             replaceInTable(runGameTable, game);
                             potGameDataModel.removeGame(game.getGameId());
                         }
@@ -2070,11 +2132,13 @@ public class WebClient extends KFrame implements WindowListener,
 
     class GameTableModel extends AbstractTableModel
     {
-        private final String[] columnNames = { "#", "state", "by", "Variant",
+        private final String[] columnNames = { "#", "state", "by", 
+            "when", "duration", "info", 
+            "Variant",
             "Viewmode", "Expire", "Mull", "Towers", "min", "target", "max",
             "actual", "players" };
 
-        private final Vector<GameInfo> data = new Vector<GameInfo>(13, 1);
+        private final Vector<GameInfo> data = new Vector<GameInfo>(16, 1);
         private final HashMap<String, Integer> rowIndex = new HashMap<String, Integer>();
 
         public int getColumnCount()
@@ -2123,42 +2187,54 @@ public class WebClient extends KFrame implements WindowListener,
                     break;
 
                 case 3:
-                    o = gi.getVariant();
+                    o = humanReadableTime(gi.getStartTime());
                     break;
-
+                    
                 case 4:
-                    o = gi.getViewmode();
+                    o = gi.getDuration().toString() + " min.";
                     break;
 
                 case 5:
-                    o = gi.getEventExpiring();
+                    o = gi.getSummary();
                     break;
 
                 case 6:
-                    o = Boolean.valueOf(gi.getUnlimitedMulligans());
+                    o = gi.getVariant();
                     break;
 
                 case 7:
-                    o = Boolean.valueOf(gi.getBalancedTowers());
+                    o = gi.getViewmode();
                     break;
 
                 case 8:
-                    o = gi.getMin();
+                    o = gi.getEventExpiring();
                     break;
 
                 case 9:
-                    o = gi.getTarget();
+                    o = Boolean.valueOf(gi.getUnlimitedMulligans());
                     break;
 
                 case 10:
-                    o = gi.getMax();
+                    o = Boolean.valueOf(gi.getBalancedTowers());
                     break;
 
                 case 11:
-                    o = gi.getEnrolledCount();
+                    o = gi.getMin();
                     break;
 
                 case 12:
+                    o = gi.getTarget();
+                    break;
+
+                case 13:
+                    o = gi.getMax();
+                    break;
+
+                case 14:
+                    o = gi.getEnrolledCount();
+                    break;
+
+                case 15:
                     o = gi.getPlayerListAsString();
                     break;
             }
@@ -2178,22 +2254,25 @@ public class WebClient extends KFrame implements WindowListener,
                 case 3:
                 case 4:
                 case 5:
+                case 6:
+                case 7:
+                case 8:
                     c = String.class;
                     break;
 
-                case 6:
-                case 7:
+                case 9:
+                case 10:
                     c = Boolean.class;
                     break;
 
-                case 8:
-                case 9:
-                case 10:
                 case 11:
+                case 12:
+                case 13:
+                case 14:
                     c = Integer.class;
                     break;
 
-                case 12:
+                case 15:
                     c = String.class;
                     break;
             }
@@ -2237,42 +2316,54 @@ public class WebClient extends KFrame implements WindowListener,
                     break;
 
                 case 3:
-                    gi.setVariant((String)value);
+                    gi.setStartTime((String)value);
                     break;
 
                 case 4:
-                    gi.setViewmode((String)value);
+                    gi.setDuration((String)value);
                     break;
 
                 case 5:
-                    gi.setEventExpiring((String)value);
+                    gi.setSummary((String)value);
                     break;
-
+                    
                 case 6:
-                    gi.setUnlimitedMulligans(((Boolean)value).booleanValue());
+                    gi.setVariant((String)value);
                     break;
 
                 case 7:
-                    gi.setUnlimitedMulligans(((Boolean)value).booleanValue());
+                    gi.setViewmode((String)value);
                     break;
 
                 case 8:
-                    gi.setMin((Integer)value);
+                    gi.setEventExpiring((String)value);
                     break;
 
                 case 9:
-                    gi.setTarget((Integer)value);
+                    gi.setUnlimitedMulligans(((Boolean)value).booleanValue());
                     break;
 
                 case 10:
-                    gi.setMax((Integer)value);
+                    gi.setUnlimitedMulligans(((Boolean)value).booleanValue());
                     break;
 
                 case 11:
-                    gi.setEnrolledCount((Integer)value);
+                    gi.setMin((Integer)value);
                     break;
 
                 case 12:
+                    gi.setTarget((Integer)value);
+                    break;
+
+                case 13:
+                    gi.setMax((Integer)value);
+                    break;
+
+                case 14:
+                    gi.setEnrolledCount((Integer)value);
+                    break;
+
+                case 15:
                     gi.setPlayerList((ArrayList<User>)value);
                     break;
             }
@@ -2388,6 +2479,13 @@ public class WebClient extends KFrame implements WindowListener,
             {
                 updateGUI();
             }
+            
+            else if (lsm == schedGameListSelectionModel)
+            {
+                System.out.println("update to scheduled game list selection model");
+                updateGUI();
+            }
+
             else
             {
                 // 
@@ -2465,18 +2563,18 @@ public class WebClient extends KFrame implements WindowListener,
             return this.chatTab;
         }
 
-        public void setLoginState(boolean val)
+        public void setLoginState(boolean loggedIn)
         {
-            if (val != loginState)
+            if (loggedIn != loginState)
             {
                 // when logged in, button/field are enabled and vice versa
-                newMessage.setEnabled(val);
-                chatSubmitButton.setEnabled(val);
+                newMessage.setEnabled(loggedIn);
+                chatSubmitButton.setEnabled(loggedIn);
 
                 long now = new Date().getTime();
-                String txt = (val ? " logged in " : " logged out ");
+                String txt = (loggedIn ? " logged in " : " logged out ");
 
-                if (!val)
+                if (!loggedIn)
                 {
                     // logout show immediately
                     chatDisplay(now, username, dashes + txt + dashes);
@@ -2488,7 +2586,7 @@ public class WebClient extends KFrame implements WindowListener,
                     afterResentMessage = dashes + txt + dashes;
                 }
             }
-            loginState = val;
+            loginState = loggedIn;
 
         }
 
@@ -2803,5 +2901,243 @@ public class WebClient extends KFrame implements WindowListener,
             }
         }
 
-    } // END class RegisterPasswordPanel 
+    } // END class RegisterPasswordPanel
+    
+    
+    private String humanReadableTime(Long startTime)
+    {
+        String timeString = "";
+        
+        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT,
+            DateFormat.SHORT, myLocale);
+        df.setTimeZone(TimeZone.getDefault());
+        df.setLenient(false);
+
+        timeString = df.format(startTime);
+
+/*
+        try
+        {
+            timeString = df.format(startTime);
+        }
+        catch(ParseException e)
+        {
+            LOGGER.warning("Problems to Illegal date/time '" + schedule + "'");
+        }
+*/
+        return timeString;
+    }
+
+    class GameScheduler extends Box implements ActionListener
+    {
+               
+        private JTextField atDateField;
+        private JTextField atTimeField;
+        private JTextField durationField;
+        private JTextField summaryText;
+//        private JTextArea infoTextArea;
+        public JButton submitButton;
+
+        final public static String ButtonText = "Submit";
+        
+        
+        GameScheduler()
+        {
+            super(BoxLayout.Y_AXIS);
+           
+            setupGUI();
+        }
+        
+        private void setupGUI()
+        {
+            
+            this.setBorder(new TitledBorder("Schedule a game: "));
+
+            this.setAlignmentX(Box.LEFT_ALIGNMENT);
+            this.setAlignmentY(Box.TOP_ALIGNMENT);
+
+            this.add(new JLabel("Give a start date and time (dd.mm.yyyy and hh:mm) "
+                + "and a minimum duration in minutes:"));
+            Box schedulePanel = new Box(BoxLayout.X_AXIS);
+            schedulePanel.add(new JLabel("Start at: "));
+            
+            atDateField = new JTextField("27.11.2008");
+            schedulePanel.add(atDateField);
+            
+            atTimeField = new JTextField("10:00");
+            schedulePanel.add(atTimeField);
+                       
+            schedulePanel.add(new JLabel(" Duration: "));
+            durationField = new JTextField("90");
+            schedulePanel.add(durationField);
+            
+            schedulePanel.setAlignmentX(Box.LEFT_ALIGNMENT);
+            schedulePanel.setAlignmentY(Box.TOP_ALIGNMENT);
+            
+            this.add(schedulePanel);
+                 
+            JLabel label1 = new JLabel("(the purpose of the duration value is: ");
+            label1.setFont(label1.getFont().deriveFont(Font.PLAIN));
+            this.add(label1);
+            JLabel label2 = new JLabel(" one should only enroll to that game if one "
+                + "knows that one "
+                + " will be available for at least that time)");
+            label2.setFont(label2.getFont().deriveFont(Font.PLAIN));
+            this.add(label2);
+            this.add(Box.createRigidArea(new Dimension(0, 20)));
+            
+            this.add(new JLabel("Summary: "));
+            summaryText = new JTextField("short summary what kind of game");
+            summaryText.setAlignmentX(Box.LEFT_ALIGNMENT);
+            summaryText.setAlignmentY(Box.TOP_ALIGNMENT);
+            this.add(summaryText);
+
+            this.add(Box.createVerticalGlue());
+            this.add(Box.createRigidArea(new Dimension(0, 10)));
+            
+/*
+            JLabel label = new JLabel("Detailed info: ");
+            label.setAlignmentX(Box.LEFT_ALIGNMENT);
+            label.setAlignmentY(Box.TOP_ALIGNMENT);
+            this.add(label);
+
+            String text = "Type here some more details\n"
+                + "(preferences which variant, "
+                + "how many players, beginner or advanced, ...";
+            infoTextArea = new JTextArea(text, 5, 60);
+            infoTextArea.setWrapStyleWord(true);
+            
+            infoTextArea.setAlignmentX(Box.LEFT_ALIGNMENT);
+            infoTextArea.setAlignmentY(Box.TOP_ALIGNMENT);
+            this.add(infoTextArea);
+*/            
+            this.add(Box.createVerticalGlue());
+            this.add(Box.createRigidArea(new Dimension(0, 10)));
+            
+            Box submitPanel = new Box(BoxLayout.X_AXIS);
+            submitPanel.add(Box.createHorizontalGlue());
+            submitButton = new JButton(GameScheduler.ButtonText);
+            submitButton.setAlignmentX(Box.CENTER_ALIGNMENT);
+            submitButton.setEnabled(false);
+            submitPanel.add(submitButton);
+            submitPanel.add(Box.createHorizontalGlue());
+            this.add(submitPanel);
+
+            this.add(Box.createVerticalGlue());
+            
+            submitButton.addActionListener(this);
+            
+        }
+
+        public void setLoginState(boolean loggedIn)
+        {
+            submitButton.setEnabled(loggedIn);
+        }
+
+        
+        public void actionPerformed(ActionEvent e)
+        {
+            String command = e.getActionCommand();
+
+            if (command.equals(GameScheduler.ButtonText))
+            {
+                long when = getStartTime();
+                int duration = getDuration();
+                String summary = getSummary();
+                
+                if (when == -1 || duration == -1 || summary == null
+                    || summary.trim().equals(""))
+                {
+                    System.out.println("Invalud date, time, duration or summary text!");
+                }
+                else
+                {
+                    doScheduling(when, duration, summary);
+                }
+            }
+        }
+        
+        private long getStartTime()
+        {
+            long when = -1;
+            
+            String atDate = atDateField.getText();
+            String atTime = atTimeField.getText();
+            
+            String schedule = atDate + " " + atTime;
+            // System.out.println("schedule is " + schedule);
+            
+            
+            DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT,
+                DateFormat.SHORT, myLocale);
+            df.setTimeZone(TimeZone.getDefault());
+            df.setLenient(false);
+            
+            // System.out.println("default locale    is " + Locale.getDefault());
+            // System.out.println("default time zone is " + TimeZone.getDefault());
+
+            try
+            {
+                Date whenDate = df.parse(schedule);
+                when = whenDate.getTime();
+            }
+            catch(ParseException e)
+            {
+                LOGGER.warning("Illegal date/time '" + schedule + "'");
+            }
+            
+            return when;
+        }
+        
+        private int getDuration()
+        {
+            int duration = -1;
+            
+            String durationString = durationField.getText();
+            duration = Integer.parseInt(durationString);
+            return duration;
+        }
+        
+        private String getSummary()
+        {
+            return summaryText.getText();
+        }
+    }
+    
+    class SchedGamesPanel extends Box
+    {
+        public SchedGamesPanel()
+        {
+            super(BoxLayout.Y_AXIS);
+            this.setBorder(new TitledBorder("Schedules Games: "));
+            
+            
+            Box schedGamesPane = new Box(BoxLayout.Y_AXIS);
+            schedGamesPane.setBorder(new TitledBorder("Scheduled Games"));
+            JLabel dummyField = new JLabel(
+                "The following games were scheduled so far:");
+            schedGamesPane.add(dummyField);
+
+            schedGameDataModel = new GameTableModel();
+            schedGameTable = new JTable(schedGameDataModel);
+
+            schedGameListSelectionModel = schedGameTable.getSelectionModel();
+            schedGameListSelectionModel
+                .addListSelectionListener(new gameTableSelectionHandler());
+
+            // TODO is that setting again needed?
+            schedGameTable.setSelectionModel(schedGameListSelectionModel);
+
+            schedGameTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            JScrollPane tablescrollpane = new JScrollPane(schedGameTable);
+            schedGamesPane.add(tablescrollpane);
+
+            this.add(schedGamesPane);
+            
+            this.add(Box.createRigidArea(new Dimension(0, 10)));
+            this.add(new JButton("Enroll"));
+            
+        }
+    }
+
 }

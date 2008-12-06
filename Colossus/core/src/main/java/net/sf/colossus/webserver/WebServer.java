@@ -56,6 +56,7 @@ public class WebServer implements IWebServer, IRunWebServer
 
     private final int maxClients;
 
+    private ArrayList<GameInfo> scheduledGames = null;
     private ArrayList<GameInfo> potentialGames = null;
     private ArrayList<GameInfo> runningGames = null;
     private ArrayList<GameInfo> endingGames = null;
@@ -133,6 +134,7 @@ public class WebServer implements IWebServer, IRunWebServer
             this.gui = new NullWebServerGUI();
         }
 
+        scheduledGames = new ArrayList<GameInfo>();
         potentialGames = new ArrayList<GameInfo>();
         runningGames = new ArrayList<GameInfo>();
         endingGames = new ArrayList<GameInfo>();
@@ -371,6 +373,8 @@ public class WebServer implements IWebServer, IRunWebServer
     public void updateGUI()
     {
         assert gui != null;
+        gui.setScheduledGamesInfo(scheduledGames.size()
+            + " scheduled games stored");
         gui.setPotentialGamesInfo(potentialGames.size()
             + " potential games stored");
         gui.setRunningGamesInfo(runningGames.size() + " running games");
@@ -388,6 +392,19 @@ public class WebServer implements IWebServer, IRunWebServer
         updateGUI();
         allTellGameInfo(gi);
 
+        return gi;
+    }
+    
+    public GameInfo scheduleGame(String initiator, long startTime,
+        int duration, String summary)
+    {
+        GameInfo gi = new GameInfo(initiator, startTime, duration, summary);
+        scheduledGames.add(gi);
+
+        System.out.println("a new game was scheduled, Id=" + gi.getGameId());
+        updateGUI();
+        allTellGameInfo(gi);
+        
         return gi;
     }
 
@@ -772,6 +789,11 @@ public class WebServer implements IWebServer, IRunWebServer
      */
     private static final class NullWebServerGUI implements IWebServerGUI
     {
+        public void setScheduledGamesInfo(String s)
+        {
+            // nothing
+        }
+
         public void setEndingGamesInfo(String s)
         {
             // nothing

@@ -329,6 +329,16 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             done = true;
         }
 
+        else if (command.equals(IWebServer.Schedule))
+        {
+            String initiator = tokens[1];
+            long startTime = Long.parseLong(tokens[2]);
+            int duration = Integer.parseInt(tokens[3]);
+            String summary = tokens[4];
+
+            gi = server.scheduleGame(initiator, startTime, duration, summary);
+        }
+
         else if (command.equals(IWebServer.Propose))
         {
             String initiator = tokens[1];
@@ -436,6 +446,12 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
 
         if (command.equals(IWebServer.Propose) && gi != null)
         {
+            server.enrollUserToGame(gi.getGameId(), user.getName());
+        }
+
+        if (command.equals(IWebServer.Schedule) && gi != null)
+        {
+            System.out.println("scheduling ... skipping the enroll.");
             server.enrollUserToGame(gi.getGameId(), user.getName());
         }
 

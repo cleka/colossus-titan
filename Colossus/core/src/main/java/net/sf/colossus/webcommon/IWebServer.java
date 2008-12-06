@@ -13,6 +13,7 @@ public interface IWebServer
     public static String Logout = "logout";
     public static String RegisterUser = "register";
     public static String ChangePassword = "changepassword";
+    public static String Schedule = "schedule";
     public static String Propose = "propose";
     public static String Enroll = "enroll";
     public static String Unenroll = "unenroll";
@@ -33,6 +34,9 @@ public interface IWebServer
     public GameInfo proposeGame(String initiator, String variant,
         String viewmode, String expire, boolean unlimMulli, boolean balTowers,
         int min, int target, int max);
+
+    public GameInfo scheduleGame(String initiator, long startTime,
+        int duration, String summary);
 
     public void enrollUserToGame(String gameId, String username);
 

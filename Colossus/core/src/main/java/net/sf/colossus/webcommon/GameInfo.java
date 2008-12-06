@@ -38,6 +38,7 @@ public class GameInfo extends Thread
         .getName());
 
     // the possible states of a game:
+    public final static int Scheduled = 0;
     public final static int Proposed = 1;
     public final static int Running = 3;
     public final static int Ending = 5;
@@ -66,6 +67,13 @@ public class GameInfo extends Thread
     private int target;
     private int max;
 
+    // next three only needed for scheduled games
+    private long startTime = 0;
+    private int duration = 0;
+    private String summary = "";
+    // private String infoText = "";
+    
+    
     private int AIplayers;
     private int enrolledPlayers;
 
@@ -81,12 +89,23 @@ public class GameInfo extends Thread
     private File flagFile;
 
     // used on server side, to create a game proposed by client
+    
+    public GameInfo(int state)
+    {
+        this.gameId = String.valueOf(nextFreeGameId);
+        nextFreeGameId++;
+        this.state = state;
+        
+        this.enrolledPlayers = 0;
+        this.players = new ArrayList<User>();
+        this.server = null;
+    }
+
     public GameInfo(String initiator, String variant, String viewmode,
         String expire, boolean unlimitedMulligans, boolean balancedTowers,
         int min, int target, int max)
     {
-        this.gameId = String.valueOf(nextFreeGameId);
-        nextFreeGameId++;
+        this(Proposed);
 
         this.initiator = initiator;
         this.variant = variant;
@@ -98,7 +117,11 @@ public class GameInfo extends Thread
         this.target = target;
         this.max = max;
 
-        this.state = Proposed;
+        this.startTime = 0;
+        this.duration = 0;
+        this.summary = "<undef>";
+        // this.infoText = "";
+        
         this.enrolledPlayers = 0;
         this.players = new ArrayList<User>();
 
@@ -106,6 +129,18 @@ public class GameInfo extends Thread
         LOGGER.log(Level.FINEST,
             "A new potential game was created!! - variant " + variant
                 + " viewmode " + viewmode);
+    }
+
+    public GameInfo(String initiator, long startTime, int duration,
+        String summary)
+    {
+        this(Scheduled);
+        
+        this.initiator = initiator;
+        this.startTime = startTime;
+        this.duration = duration;
+        this.summary = summary;
+        // this.infoText = "";
     }
 
     public void setState(int state)
@@ -128,6 +163,10 @@ public class GameInfo extends Thread
         String stateString = "<unknown>";
         switch (this.state)
         {
+            case Scheduled:
+                stateString = "Scheduled";
+                break;
+
             case Proposed:
                 stateString = "Proposed";
                 break;
@@ -175,6 +214,36 @@ public class GameInfo extends Thread
     public void setInitiator(String val)
     {
         initiator = val;
+    }
+
+    public Long getStartTime()
+    {
+        return Long.valueOf(startTime);
+    }
+
+    public void setStartTime(String val)
+    {
+        startTime = Long.parseLong(val);
+    }
+
+    public Integer getDuration()
+    {
+        return Integer.valueOf(duration);
+    }
+
+    public void setDuration(String val)
+    {
+        duration = Integer.parseInt(val);
+    }
+
+    public String getSummary()
+    {
+        return summary;
+    }
+
+    public void setSummary(String val)
+    {
+        summary = val;
     }
 
     public String getVariant()
@@ -384,8 +453,9 @@ public class GameInfo extends Thread
 
         String message = gameId + sep + state + sep + initiator + sep
             + variant + sep + viewmode + sep + eventExpiring + sep
-            + unlimitedMulligans + sep + balancedTowers + sep + min + sep
-            + target + sep + max + sep + enrolledPlayers
+            + unlimitedMulligans + sep + balancedTowers + sep 
+            + startTime + sep + duration + sep + summary
+            + sep + min + sep + target + sep + max + sep + enrolledPlayers  
             + playerList.toString();
 
         return message;
@@ -446,15 +516,32 @@ public class GameInfo extends Thread
 
         gi.state = Integer.parseInt(tokens[2]);
         gi.initiator = tokens[3];
-        gi.variant = tokens[4];
-        gi.viewmode = tokens[5];
-        gi.eventExpiring = tokens[6];
-        gi.unlimitedMulligans = Boolean.valueOf(tokens[7]).booleanValue();
-        gi.balancedTowers = Boolean.valueOf(tokens[8]).booleanValue();
-        gi.min = Integer.parseInt(tokens[9]);
-        gi.target = Integer.parseInt(tokens[10]);
-        gi.max = Integer.parseInt(tokens[11]);
-        int lastIndex = 12;
+
+        if (gi.state != Scheduled)
+        {
+            System.out.println("fromString, state != scheduled (" + gi.state + ")");
+            gi.variant = tokens[4];
+            gi.viewmode = tokens[5];
+            gi.eventExpiring = tokens[6];
+            gi.unlimitedMulligans = Boolean.valueOf(tokens[7]).booleanValue();
+            gi.balancedTowers = Boolean.valueOf(tokens[8]).booleanValue();
+            gi.startTime = Long.parseLong(tokens[9]);
+            gi.duration = Integer.parseInt(tokens[10]);
+            gi.summary = tokens[11];
+            gi.min = Integer.parseInt(tokens[12]);
+            gi.target = Integer.parseInt(tokens[13]);
+            gi.max = Integer.parseInt(tokens[14]);
+            // gi.infoText = "";
+        }
+        else
+        {
+            System.out.println("fromString, state == scheduled");
+            gi.startTime = Long.parseLong(tokens[9]);
+            gi.duration = Integer.parseInt(tokens[10]);
+            gi.summary = tokens[11];
+        }
+
+        int lastIndex = 15;
         gi.enrolledPlayers = Integer.parseInt(tokens[lastIndex]);
 
         ArrayList<User> players = new ArrayList<User>();
@@ -753,6 +840,17 @@ public class GameInfo extends Thread
             LOGGER
                 .log(Level.SEVERE, "during wait for line: IOException: ", e1);
         }
+        catch (RuntimeException e2)
+        {
+            LOGGER
+                .log(Level.SEVERE, "during wait for line: RuntimeException: ", e2);
+        }
+        catch (Exception e3)
+        {
+            LOGGER
+                .log(Level.SEVERE, "during wait for line: Whatever Exception: ", e3);
+        }
+
         return line;
     }
 
