@@ -16,7 +16,6 @@ import java.awt.event.WindowListener;
 import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -35,19 +34,16 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
@@ -255,8 +251,6 @@ public class WebClient extends KFrame implements WindowListener,
     private final static String AutoGameStartActionClose = "Close WebClient";
 
     private final static String optAutoGameStartAction = "Auto Game Start Action";
-
-    private final static String chatSubmitButtonText = "Submit";
 
     public WebClient(String hostname, int port, String login, String password)
     {
@@ -814,7 +808,8 @@ public class WebClient extends KFrame implements WindowListener,
         
         // ================== "General" Chat tab ======================
 
-        generalChat = new ChatHandler(IWebServer.generalChatName, "Chat", this);
+        generalChat = new ChatHandler(IWebServer.generalChatName, "Chat",
+            this, server, username);
         tabbedPane.addTab(generalChat.getTitle(), generalChat.getTab());
         
         // ============admin Tab ==========
@@ -1176,7 +1171,7 @@ public class WebClient extends KFrame implements WindowListener,
         if (state == NotLoggedIn)
         {
             loginButton.setText(LoginButtonText);
-            generalChat.setLoginState(false);
+            generalChat.setLoginState(false, server, username);
             schedPanel.setLoginState(false);
             registerOrPasswordLabel.setText(createAccountLabelText);
             registerOrPasswordButton.setText(createAccountButtonText);
@@ -1184,7 +1179,7 @@ public class WebClient extends KFrame implements WindowListener,
         else
         {
             loginButton.setText(LogoutButtonText);
-            generalChat.setLoginState(true);
+            generalChat.setLoginState(true, server, username);
             schedPanel.setLoginState(true);
             registerOrPasswordLabel.setText(chgPasswordLabelText);
             registerOrPasswordButton.setText(chgPasswordButtonText);
@@ -2470,246 +2465,6 @@ public class WebClient extends KFrame implements WindowListener,
             }
         }
     } // END Class gameTableSelectionHandler 
-
-    public class ChatHandler
-    {
-        private final static int textAreaHeight = 20;
-        private final String id;
-        private final String title;
-        private final JPanel chatTab;
-
-        private final JButton chatSubmitButton;
-        private final JTextArea displayArea;
-        private final JScrollPane displayScrollPane;
-        private final JScrollBar displayScrollBar;
-        private final JTextField newMessage;
-
-        private final FormatWhen whenFormatter;
-        private boolean loginState = false;
-
-        private long lastMsgWhen = -1;
-        private boolean resentMode = false;
-        private long afterResentWhen = -1;
-        private String afterResentSender = null;
-        private String afterResentMessage = null;
-
-        private final static String dashes = "--------------------";
-        private final static String doubledashes = "=========================";
-
-        public ChatHandler(String id, String title, ActionListener listener)
-        {
-            this.id = id;
-            this.title = title;
-
-            whenFormatter = new FormatWhen();
-
-            chatTab = new JPanel(new BorderLayout());
-            displayArea = new JTextArea();
-            displayArea.setRows(textAreaHeight);
-            displayArea.setEditable(false);
-            displayArea.setLineWrap(false);
-            displayScrollPane = new JScrollPane(displayArea);
-            displayScrollBar = displayScrollPane.getVerticalScrollBar();
-            chatTab.add(displayScrollPane, BorderLayout.CENTER);
-
-            Box submitPane = new Box(BoxLayout.X_AXIS);
-            newMessage = new JTextField(60);
-            newMessage.addActionListener(listener);
-            newMessage.setEnabled(false);
-            chatSubmitButton = new JButton(chatSubmitButtonText);
-            chatSubmitButton.addActionListener(listener);
-            chatSubmitButton.setEnabled(false);
-            submitPane.setPreferredSize(chatSubmitButton.getMinimumSize());
-
-            submitPane.add(newMessage);
-            submitPane.add(chatSubmitButton);
-            chatTab.add(submitPane, BorderLayout.SOUTH);
-        }
-
-        public String getId()
-        {
-            return this.id;
-        }
-
-        public String getTitle()
-        {
-            return this.title;
-        }
-
-        public JComponent getTab()
-        {
-            return this.chatTab;
-        }
-
-        public void setLoginState(boolean loggedIn)
-        {
-            if (loggedIn != loginState)
-            {
-                // when logged in, button/field are enabled and vice versa
-                newMessage.setEnabled(loggedIn);
-                chatSubmitButton.setEnabled(loggedIn);
-
-                long now = new Date().getTime();
-                String txt = (loggedIn ? " logged in " : " logged out ");
-
-                if (!loggedIn)
-                {
-                    // logout show immediately
-                    chatDisplay(now, username, dashes + txt + dashes);
-                }
-                else
-                {
-                    afterResentWhen = now;
-                    afterResentSender = username;
-                    afterResentMessage = dashes + txt + dashes;
-                }
-            }
-            loginState = loggedIn;
-
-        }
-
-        public boolean submitWasHandled(Object source)
-        {
-            if (source == chatSubmitButton || source == newMessage)
-            {
-                String chatId = IWebServer.generalChatName;
-                String user = username;
-                String message = newMessage.getText();
-                if (message.equals(""))
-                {
-                    message = " ";
-                }
-                newMessage.setText("");
-                server.chatSubmit(chatId, user, message);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        public void chatDeliver(long when, String sender, String message,
-            boolean resent)
-        {
-            if (resent)
-            {
-
-                // null, null on sender side, signals end of resending
-                if (sender.equals("null") && message.equals("null"))
-                {
-                    if (resentMode)
-                    {
-                        displayArea.append(dashes
-                            + " end of redisplaying older messages " + dashes
-                            + "\n");
-                    }
-                    else
-                    {
-                        displayArea.append(dashes
-                            + " (no messages to redisplay) " + dashes + "\n");
-                    }
-                    resentMode = false;
-                    if (afterResentSender != null)
-                    {
-                        chatDisplay(afterResentWhen, afterResentSender,
-                            afterResentMessage);
-                        afterResentWhen = -1;
-                        afterResentSender = null;
-                        afterResentMessage = null;
-                    }
-                }
-                else if (when <= lastMsgWhen)
-                {
-                    // skip display message -- older than lastMsgWhen
-                }
-                else
-                {
-                    if (!resentMode)
-                    {
-                        displayArea.append("\n" + dashes
-                            + " redisplaying last (up to 10) messages "
-                            + dashes + "\n");
-                    }
-                    resentMode = true;
-                    lastMsgWhen = when;
-                    chatDisplay(when, sender, message);
-                }
-            }
-            else
-            {
-
-                lastMsgWhen = when;
-                chatDisplay(when, sender, message);
-            }
-        }
-
-        private void chatDisplay(long when, String sender, String message)
-        {
-            String whenTime = whenFormatter.timeAsString(when);
-            String dateChange = whenFormatter.hasDateChanged();
-            if (dateChange != null)
-            {
-                displayArea.append("\n" + doubledashes + " " + dateChange
-                    + " " + doubledashes + "\n");
-            }
-            displayArea
-                .append(whenTime + " " + sender + ": " + message + "\n");
-            if (displayArea.getLineCount() - 2 > displayArea.getRows())
-            {
-                displayScrollBar.setValue(displayScrollBar.getMaximum());
-            }
-        }
-
-    } // END class ChatHandler
-
-    public class FormatWhen
-    {
-        public static final String DATE_FORMAT = "yyyy-MM-dd";
-        public static final String TIME_FORMAT = "HH:mm:ss";
-
-        private final SimpleDateFormat dateFormatter;
-        private final SimpleDateFormat timeFormatter;
-
-        private String datePrev;
-        private String changedDateString = null;
-
-        public FormatWhen()
-        {
-            datePrev = "";
-            dateFormatter = new SimpleDateFormat(DATE_FORMAT);
-            timeFormatter = new SimpleDateFormat(TIME_FORMAT);
-
-        }
-
-        /* call this *after* timeAsString() call 
-         * It will return the new date, if changed, null otherwise */
-
-        public String hasDateChanged()
-        {
-            return changedDateString;
-        }
-
-        public String timeAsString(long when)
-        {
-            Date whenDate = new Date(when);
-            String timeNow = timeFormatter.format(whenDate);
-            String dateNow = dateFormatter.format(whenDate);
-
-            if (!dateNow.equals(datePrev))
-            {
-                changedDateString = dateNow;
-            }
-            else
-            {
-                changedDateString = null;
-            }
-            datePrev = dateNow;
-
-            return timeNow;
-        }
-
-    } // END class FormatWhen
 
     class RegisterPasswordPanel extends JDialog implements ActionListener
     {
