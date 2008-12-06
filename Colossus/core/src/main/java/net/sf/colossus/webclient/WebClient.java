@@ -153,7 +153,6 @@ public class WebClient extends KFrame implements WindowListener,
     private JLabel receivedField;
 
     private JButton loginButton;
-    // private JButton closeButton;
     private JButton quitButton;
 
     private JCheckBox autologinCB;
@@ -231,7 +230,6 @@ public class WebClient extends KFrame implements WindowListener,
 
     private final static String LoginButtonText = "Login";
     private final static String LogoutButtonText = "Logout";
-    // private final static String closeButtonText = "Close";
     private final static String quitButtonText = "Quit";
     private final static String HideButtonText = "Hide Web Client";
     private final static String CantHideText = "(You can hide web client only if game client is open)";
@@ -481,13 +479,6 @@ public class WebClient extends KFrame implements WindowListener,
         loginButton.addActionListener(this);
         loginButton.setEnabled(true);
         loginPane.add(loginButton);
-
-        // closeButton = new JButton(closeButtonText);
-        // closeButton.addActionListener(this);
-        // closeButton.setEnabled(true);
-        // loginPane.add(closeButton);
-
-        // loginPane.add(new JLabel("Quit closes all:"));
 
         quitButton = new JButton(quitButtonText);
         quitButton.addActionListener(this);
@@ -1202,7 +1193,6 @@ public class WebClient extends KFrame implements WindowListener,
         // Now the ones which are more specific
         if (state == NotLoggedIn)
         {
-            // closeButton.setEnabled(true);
             proposeButton.setEnabled(false);
             enrollButton.setEnabled(false);
             unenrollButton.setEnabled(false);
@@ -1237,7 +1227,6 @@ public class WebClient extends KFrame implements WindowListener,
                 }
             }
             startButton.setEnabled(false);
-            // closeButton.setEnabled(false);
             proposeButton.setEnabled(true);
             unenrollButton.setEnabled(false);
 
@@ -1252,7 +1241,6 @@ public class WebClient extends KFrame implements WindowListener,
         }
         else if (state == Enrolled)
         {
-            // closeButton.setEnabled(false);
             proposeButton.setEnabled(false);
             enrollButton.setEnabled(false);
             unenrollButton.setEnabled(true);
@@ -1287,7 +1275,6 @@ public class WebClient extends KFrame implements WindowListener,
         }
         else if (state == Playing)
         {
-            // closeButton.setEnabled(true);
             proposeButton.setEnabled(false);
             enrollButton.setEnabled(false);
             unenrollButton.setEnabled(false);
@@ -1948,15 +1935,6 @@ public class WebClient extends KFrame implements WindowListener,
         {
             setVisible(false);
         }
-
-        /*
-         else if (source == closeButton)
-         {
-         Start startObj = Start.getCurrentStartObject();
-         startObj.setWhatToDoNext(Start.GetPlayersDialog);
-         dispose();
-         }
-         */
         else if (source == quitButton)
         {
             doQuit();
