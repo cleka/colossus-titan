@@ -1227,14 +1227,9 @@ public final class Server extends Thread implements IServer
 
     void allSetupSplit()
     {
-        for (Player player : game.getPlayers())
+        for (IClient client : clients)
         {
-            IClient client = getClient(player);
-            if (client != null)
-            {
-                client
-                    .setupSplit(game.getActivePlayer(), game.getTurnNumber());
-            }
+            client.setupSplit(game.getActivePlayer(), game.getTurnNumber());
         }
         allUpdatePlayerInfo();
     }
