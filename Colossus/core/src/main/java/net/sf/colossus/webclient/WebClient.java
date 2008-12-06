@@ -131,8 +131,6 @@ public class WebClient extends KFrame implements WindowListener,
     JTabbedPane tabbedPane;
     Box serverTab;
     Box instantGamesTab;
-    Box runningGamesTab;
-    Box scheduledGamesTab;
     Box adminTab;
 
     private final Point defaultLocation = new Point(600, 100);
@@ -201,7 +199,7 @@ public class WebClient extends KFrame implements WindowListener,
     final static String playingText = "While playing, you can't propose or enroll to other games.";
     
     ChatHandler generalChat;
-    GameScheduler schedPanel;
+    ScheduledGameControls schedPanel;
 
     final ArrayList<GameInfo> gamesUpdates = new ArrayList<GameInfo>();
 
@@ -683,22 +681,13 @@ public class WebClient extends KFrame implements WindowListener,
         
         // ================== Scheduled Games tab ======================
         
-        scheduledGamesTab = new Box(BoxLayout.Y_AXIS);
-        tabbedPane.addTab("Scheduled Games", scheduledGamesTab);
+        tabbedPane.addTab("Scheduled Games", makeScheduledGamesTab());
         
-        // scheduledGamesTab.add(preferencesPane);
-        
-        schedPanel = new GameScheduler();
-        scheduledGamesTab.add(schedPanel);
-        scheduledGamesTab.add(Box.createVerticalGlue());
- 
-        scheduledGamesTab.add(new SchedGamesPanel());
-
         // ====================== Running Games Tab ======================
 
         // ----------------- First the table ---------------------
         
-        runningGamesTab = new Box(BoxLayout.Y_AXIS);
+        Box runningGamesTab = new Box(BoxLayout.Y_AXIS);
         tabbedPane.addTab("Running Games", runningGamesTab);
 
         Box runningGamesPane = new Box(BoxLayout.Y_AXIS);
@@ -912,7 +901,6 @@ public class WebClient extends KFrame implements WindowListener,
 
     private void removeAdminTab()
     {
-        tabbedPane.remove(adminTab);
         tabbedPane.remove(adminTab);
     }
 
@@ -2661,7 +2649,7 @@ public class WebClient extends KFrame implements WindowListener,
         return timeString;
     }
 
-    class GameScheduler extends Box implements ActionListener
+    class ScheduledGameControls extends Box implements ActionListener
     {
                
         private JTextField atDateField;
@@ -2674,7 +2662,7 @@ public class WebClient extends KFrame implements WindowListener,
         final public static String ButtonText = "Submit";
         
         
-        GameScheduler()
+        ScheduledGameControls()
         {
             super(BoxLayout.Y_AXIS);
            
@@ -2749,7 +2737,7 @@ public class WebClient extends KFrame implements WindowListener,
             
             Box submitPanel = new Box(BoxLayout.X_AXIS);
             submitPanel.add(Box.createHorizontalGlue());
-            submitButton = new JButton(GameScheduler.ButtonText);
+            submitButton = new JButton(ScheduledGameControls.ButtonText);
             submitButton.setAlignmentX(Box.CENTER_ALIGNMENT);
             submitButton.setEnabled(false);
             submitPanel.add(submitButton);
@@ -2772,7 +2760,7 @@ public class WebClient extends KFrame implements WindowListener,
         {
             String command = e.getActionCommand();
 
-            if (command.equals(GameScheduler.ButtonText))
+            if (command.equals(ScheduledGameControls.ButtonText))
             {
                 long when = getStartTime();
                 int duration = getDuration();
@@ -2837,40 +2825,48 @@ public class WebClient extends KFrame implements WindowListener,
         }
     }
     
-    class SchedGamesPanel extends Box
+    private Container makeScheduledGamesTab()
     {
-        public SchedGamesPanel()
-        {
-            super(BoxLayout.Y_AXIS);
-            this.setBorder(new TitledBorder("Schedules Games: "));
-            
-            
-            Box schedGamesPane = new Box(BoxLayout.Y_AXIS);
-            schedGamesPane.setBorder(new TitledBorder("Scheduled Games"));
-            JLabel dummyField = new JLabel(
-                "The following games were scheduled so far:");
-            schedGamesPane.add(dummyField);
+        Box scheduledGamesTab = new Box(BoxLayout.Y_AXIS);
+               
+        schedPanel = new ScheduledGameControls();
+        scheduledGamesTab.add(schedPanel);
+        scheduledGamesTab.add(Box.createVerticalGlue());
+ 
+        scheduledGamesTab.add(makeScheduledGamesTablePanel());
 
-            schedGameDataModel = new GameTableModel();
-            schedGameTable = new JTable(schedGameDataModel);
-
-            schedGameListSelectionModel = schedGameTable.getSelectionModel();
-            schedGameListSelectionModel
-                .addListSelectionListener(new gameTableSelectionHandler());
-
-            // TODO is that setting again needed?
-            schedGameTable.setSelectionModel(schedGameListSelectionModel);
-
-            schedGameTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            JScrollPane tablescrollpane = new JScrollPane(schedGameTable);
-            schedGamesPane.add(tablescrollpane);
-
-            this.add(schedGamesPane);
-            
-            this.add(Box.createRigidArea(new Dimension(0, 10)));
-            this.add(new JButton("Enroll"));
-            
-        }
+        return scheduledGamesTab;
     }
 
+    private Container makeScheduledGamesTablePanel()
+    {
+        Box schedPanel = new Box(BoxLayout.Y_AXIS);
+        schedPanel.setBorder(new TitledBorder("Schedules Games: "));
+        
+        Box schedGamesPane = new Box(BoxLayout.Y_AXIS);
+        schedGamesPane.setBorder(new TitledBorder("Scheduled Games"));
+        JLabel dummyField = new JLabel(
+            "The following games were scheduled so far:");
+        schedGamesPane.add(dummyField);
+
+        schedGameDataModel = new GameTableModel();
+        schedGameTable = new JTable(schedGameDataModel);
+
+        schedGameListSelectionModel = schedGameTable.getSelectionModel();
+        schedGameListSelectionModel
+            .addListSelectionListener(new gameTableSelectionHandler());
+
+        // TODO is that setting again needed?
+        schedGameTable.setSelectionModel(schedGameListSelectionModel);
+
+        schedGameTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        JScrollPane tablescrollpane = new JScrollPane(schedGameTable);
+        schedGamesPane.add(tablescrollpane);
+
+        schedPanel.add(schedGamesPane);
+        schedPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        schedPanel.add(new JButton("Enroll"));
+        
+        return schedPanel;
+    }
 }
