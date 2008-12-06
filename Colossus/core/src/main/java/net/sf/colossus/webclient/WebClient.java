@@ -3,9 +3,7 @@ package net.sf.colossus.webclient;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -15,9 +13,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
@@ -34,7 +30,6 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -109,7 +104,6 @@ public class WebClient extends KFrame implements WindowListener,
     // boundaries which port nr user may enter in the ServerPort field:
     private final static int minPort = 1;
     private final static int maxPort = 65535;
-    private final static String defaultEmail = "your.email@some.domain";
 
     private final static String sep = net.sf.colossus.server.Constants.protocolTermSeparator;
 
@@ -199,16 +193,11 @@ public class WebClient extends KFrame implements WindowListener,
     final static String playingText = "While playing, you can't propose or enroll to other games.";
     
     ChatHandler generalChat;
-    ScheduledGameControls schedPanel;
+    ScheduledGamesTab schedulingPanel;
 
     final ArrayList<GameInfo> gamesUpdates = new ArrayList<GameInfo>();
 
     HashMap<String, GameInfo> gameHash = new HashMap<String, GameInfo>();
-
-    // scheduled games:
-    JTable schedGameTable;
-    GameTableModel schedGameDataModel;
-    ListSelectionModel schedGameListSelectionModel;
     
     // potential games:
     JTable potGameTable;
@@ -229,6 +218,9 @@ public class WebClient extends KFrame implements WindowListener,
     private final static String CantHideText = "(You can hide web client only if game client is open)";
     private final static String HowtoUnhideText = "You can get web client back from MasterBoard - Window menu";
 
+    private final static String createAccountButtonText = "Register";
+    private final static String chgPasswordButtonText = "Change password";
+
     private final static String ProposeButtonText = "Propose";
     private final static String EnrollButtonText = "Enroll";
     private final static String UnenrollButtonText = "Unenroll";
@@ -240,9 +232,6 @@ public class WebClient extends KFrame implements WindowListener,
 
     private final static String createAccountLabelText = "No login yet? Create one:";
     private final static String chgPasswordLabelText = "Change your password:";
-
-    private final static String createAccountButtonText = "Register";
-    private final static String chgPasswordButtonText = "Change password";
 
     private final static String AutoGameStartActionNothing = "Do nothing";
     private final static String AutoGameStartActionHide = "Hide WebClient";
@@ -659,7 +648,7 @@ public class WebClient extends KFrame implements WindowListener,
 
         potGameListSelectionModel = potGameTable.getSelectionModel();
         potGameListSelectionModel
-            .addListSelectionListener(new gameTableSelectionHandler());
+            .addListSelectionListener(new GameTableSelectionHandler());
         
         // TODO is that setting again needed?
         potGameTable.setSelectionModel(potGameListSelectionModel);
@@ -681,7 +670,8 @@ public class WebClient extends KFrame implements WindowListener,
         
         // ================== Scheduled Games tab ======================
         
-        tabbedPane.addTab("Scheduled Games", makeScheduledGamesTab());
+        schedulingPanel = new ScheduledGamesTab(this, myLocale);
+        tabbedPane.addTab("Scheduled Games", schedulingPanel);
         
         // ====================== Running Games Tab ======================
 
@@ -702,7 +692,7 @@ public class WebClient extends KFrame implements WindowListener,
 
         runGameListSelectionModel = runGameTable.getSelectionModel();
         runGameListSelectionModel
-            .addListSelectionListener(new gameTableSelectionHandler());
+            .addListSelectionListener(new GameTableSelectionHandler());
         runGameTable.setSelectionModel(runGameListSelectionModel);
 
         runGameTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -939,7 +929,17 @@ public class WebClient extends KFrame implements WindowListener,
         receivedField.setText(s);
     }
 
-    private String createLoginWebClientSocketThread(boolean force)
+    public String getHost()
+    {
+        return webserverHostField.getText();
+    }
+
+    public String getPort()
+    {
+        return webserverPortField.getText();
+    }
+
+    public  String createLoginWebClientSocketThread(boolean force)
     {
         String reason = null;
         failedDueToDuplicateLogin = false;
@@ -996,7 +996,7 @@ public class WebClient extends KFrame implements WindowListener,
         return reason;
     }
 
-    private String createRegisterWebClientSocketThread(String username,
+    public String createRegisterWebClientSocketThread(String username,
         String password, String email)
     {
         String reason = null;
@@ -1160,7 +1160,8 @@ public class WebClient extends KFrame implements WindowListener,
         {
             loginButton.setText(LoginButtonText);
             generalChat.setLoginState(false, server, username);
-            schedPanel.setLoginState(false);
+            schedulingPanel.setLoginState(false);
+            
             registerOrPasswordLabel.setText(createAccountLabelText);
             registerOrPasswordButton.setText(createAccountButtonText);
         }
@@ -1168,7 +1169,7 @@ public class WebClient extends KFrame implements WindowListener,
         {
             loginButton.setText(LogoutButtonText);
             generalChat.setLoginState(true, server, username);
-            schedPanel.setLoginState(true);
+            schedulingPanel.setLoginState(true);
             registerOrPasswordLabel.setText(chgPasswordLabelText);
             registerOrPasswordButton.setText(chgPasswordButtonText);
         }
@@ -1317,7 +1318,7 @@ public class WebClient extends KFrame implements WindowListener,
      * false; if valid, returns true.
      */
 
-    private boolean validateField(Component parent, String content,
+    public boolean validateField(Component parent, String content,
         String fieldName)
     {
         String problem = null;
@@ -1477,11 +1478,34 @@ public class WebClient extends KFrame implements WindowListener,
         options.saveOptions();
     }
 
-    private void doRegisterOrPasswordDialog(String type)
+    private void doRegisterOrPasswordDialog(boolean register)
     {
         String username = loginField.getText();
-        registerPanel = new RegisterPasswordPanel(this, type, username);
+        registerPanel = new RegisterPasswordPanel(this, register, username);
         registerPanel.doIt();
+    }
+
+    public String tryChangePassword(String name, String oldPW, String newPW1)
+    {
+        // email and isAdminObj are null, this signals: do not change them
+        String email = null;
+        Boolean isAdminObj = null;
+        
+        String reason = server.changeProperties(name, oldPW,
+            newPW1, email, isAdminObj);
+
+        if (reason == null || reason.equals("null"))
+        {
+            passwordField.setText(newPW1);
+            password = newPW1;
+            // all went fine, panel shows ok.
+            return null;
+        }
+        else
+        {
+            // panel shows failure message and reason
+            return reason;
+        }
     }
 
     private void doCancel(String gameId)
@@ -1771,7 +1795,7 @@ public class WebClient extends KFrame implements WindowListener,
                         if (state == GameInfo.Scheduled)
                         {
                             System.out.println("Got a scheduled game, replacing in sched list");
-                            replaceInTable(schedGameTable, game);
+                            replaceInTable(schedulingPanel.getSchedGameTable(), game);
                         }
                         else if (state == GameInfo.Proposed)
                         {
@@ -1944,11 +1968,11 @@ public class WebClient extends KFrame implements WindowListener,
             // createAccountButtonText chgPasswordButtonText
             if (command.equals(createAccountButtonText))
             {
-                doRegisterOrPasswordDialog(createAccountButtonText);
+                doRegisterOrPasswordDialog(true);
             }
             else if (command.equals(chgPasswordButtonText))
             {
-                doRegisterOrPasswordDialog(chgPasswordButtonText);
+                doRegisterOrPasswordDialog(false);
             }
         }
 
@@ -2426,7 +2450,7 @@ public class WebClient extends KFrame implements WindowListener,
 
     } // END Class GameTableModel
 
-    class gameTableSelectionHandler implements ListSelectionListener
+    class GameTableSelectionHandler implements ListSelectionListener
     {
         public void valueChanged(ListSelectionEvent e)
         {
@@ -2441,7 +2465,7 @@ public class WebClient extends KFrame implements WindowListener,
                 updateGUI();
             }
             
-            else if (lsm == schedGameListSelectionModel)
+            else if (lsm == schedulingPanel.getSchedGameTable())
             {
                 System.out.println("update to scheduled game list selection model");
                 updateGUI();
@@ -2452,178 +2476,8 @@ public class WebClient extends KFrame implements WindowListener,
                 // 
             }
         }
-    } // END Class gameTableSelectionHandler 
+    } // END Class GameTableSelectionHandler 
 
-    class RegisterPasswordPanel extends JDialog implements ActionListener
-    {
-        private boolean isRegister;
-
-        private final JTextField rploginField;
-        private JTextField rpEmailField;
-
-        private JPasswordField rpOldPW;
-        private final JPasswordField rpNewPW1;
-        private final JPasswordField rpNewPW2;
-
-        private final JButton rpButton;
-
-        public RegisterPasswordPanel(KFrame frame, String title,
-            String username)
-        {
-            super(frame, title, true);
-            isRegister = (title.equals(createAccountButtonText) ? true : false);
-
-            Container rootPane = getContentPane();
-
-            JPanel p = new JPanel(new GridLayout(0, 2));
-            rootPane.add(p);
-
-            p.add(new JLabel("Login name"));
-            rploginField = new JTextField(username);
-            p.add(rploginField);
-
-            // old password only needed in change password
-            if (!isRegister)
-            {
-                // @@TODO: in future, for change password (change properties)
-                //   fetch email from server and let user change it?
-                p.add(new JLabel("Old Password"));
-                rpOldPW = new JPasswordField("");
-                p.add(rpOldPW);
-            }
-            else
-            {
-                // register instead needs an email:
-                p.add(new JLabel("Email address"));
-                rpEmailField = new JTextField(defaultEmail);
-                p.add(rpEmailField);
-            }
-
-            p.add(new JLabel("Password"));
-            rpNewPW1 = new JPasswordField("");
-            p.add(rpNewPW1);
-
-            p.add(new JLabel("Repeat Password"));
-            rpNewPW2 = new JPasswordField("");
-            p.add(rpNewPW2);
-
-            String buttonText = (isRegister ? createAccountButtonText
-                : chgPasswordButtonText);
-
-            rpButton = new JButton(buttonText);
-            rpButton.addActionListener(this);
-            rpButton.setEnabled(true);
-            p.add(rpButton);
-
-            this.setLocation(defaultLocation);
-        }
-
-        public void doIt()
-        {
-            pack();
-            setVisible(true);
-        }
-
-        @Override
-        public void dispose()
-        {
-            setVisible(false);
-            super.dispose();
-        }
-
-        public void actionPerformed(ActionEvent e)
-        {
-            String command = e.getActionCommand();
-            Object source = e.getSource();
-
-            if (source == rpButton)
-            {
-                boolean ok = true;
-
-                String name = rploginField.getText();
-                String newPW1 = new String(rpNewPW1.getPassword());
-                String newPW2 = new String(rpNewPW2.getPassword());
-                String oldPW = null;
-
-                ok = ok && validateField(this, name, "Login name");
-                ok = ok && validateField(this, newPW1, "New Password");
-                ok = ok && validateField(this, newPW2, "Password repeat");
-
-                if (!isRegister)
-                {
-                    oldPW = new String(rpOldPW.getPassword());
-                    ok = ok && validateField(this, oldPW, "Old Password");
-                }
-
-                if (!newPW1.equals(newPW2))
-                {
-                    JOptionPane.showMessageDialog(this,
-                        "Old and new password do not match!");
-                    ok = false;
-                }
-
-                // validateXXXchecks and PW-compare showed message dialog if 
-                // something is wrong, so here we simply abort.
-
-                if (!ok)
-                {
-                    return;
-                }
-
-                if (command.equals(createAccountButtonText))
-                {
-                    String hostname = webserverHostField.getText();
-                    String portText = webserverPortField.getText();
-                    String email = rpEmailField.getText();
-
-                    ok = ok && validateField(this, hostname, "Host name");
-                    ok = ok && validatePort(this, portText);
-                    ok = ok && validateField(this, email, "Email Adress");
-
-                    if (!ok)
-                    {
-                        return;
-                    }
-
-                    createRegisterWebClientSocketThread(name, newPW1, email);
-                }
-
-                else if (command.equals(chgPasswordButtonText))
-                {
-                    // email and isAdminObj are null, this signals: do not change them
-                    String email = null;
-                    Boolean isAdminObj = null;
-
-                    String reason = server.changeProperties(name, oldPW,
-                        newPW1, email, isAdminObj);
-                    if (reason == null || reason.equals("null"))
-                    {
-                        JOptionPane.showMessageDialog(this,
-                            "Password was changed successfully.",
-                            "Password change OK",
-                            JOptionPane.INFORMATION_MESSAGE);
-                        passwordField.setText(newPW1);
-                        WebClient.this.password = newPW1;
-                        this.dispose();
-                    }
-                    else
-                    {
-                        JOptionPane.showMessageDialog(this,
-                            "Changing password failed: " + reason,
-                            "Changing password failed",
-                            JOptionPane.ERROR_MESSAGE);
-                    }
-                }
-                else
-                {
-                    LOGGER.log(Level.FINE, "ooops? Unexpected command "
-                        + command + " in RegisterPasswordPanel action?");
-                }
-            }
-        }
-
-    } // END class RegisterPasswordPanel
-    
     
     private String humanReadableTime(Long startTime)
     {
@@ -2647,226 +2501,5 @@ public class WebClient extends KFrame implements WindowListener,
         }
 */
         return timeString;
-    }
-
-    class ScheduledGameControls extends Box implements ActionListener
-    {
-               
-        private JTextField atDateField;
-        private JTextField atTimeField;
-        private JTextField durationField;
-        private JTextField summaryText;
-//        private JTextArea infoTextArea;
-        public JButton submitButton;
-
-        final public static String ButtonText = "Submit";
-        
-        
-        ScheduledGameControls()
-        {
-            super(BoxLayout.Y_AXIS);
-           
-            setupGUI();
-        }
-        
-        private void setupGUI()
-        {
-            
-            this.setBorder(new TitledBorder("Schedule a game: "));
-
-            this.setAlignmentX(Box.LEFT_ALIGNMENT);
-            this.setAlignmentY(Box.TOP_ALIGNMENT);
-
-            this.add(new JLabel("Give a start date and time (dd.mm.yyyy and hh:mm) "
-                + "and a minimum duration in minutes:"));
-            Box schedulePanel = new Box(BoxLayout.X_AXIS);
-            schedulePanel.add(new JLabel("Start at: "));
-            
-            atDateField = new JTextField("27.11.2008");
-            schedulePanel.add(atDateField);
-            
-            atTimeField = new JTextField("10:00");
-            schedulePanel.add(atTimeField);
-                       
-            schedulePanel.add(new JLabel(" Duration: "));
-            durationField = new JTextField("90");
-            schedulePanel.add(durationField);
-            
-            schedulePanel.setAlignmentX(Box.LEFT_ALIGNMENT);
-            schedulePanel.setAlignmentY(Box.TOP_ALIGNMENT);
-            
-            this.add(schedulePanel);
-                 
-            JLabel label1 = new JLabel("(the purpose of the duration value is: ");
-            label1.setFont(label1.getFont().deriveFont(Font.PLAIN));
-            this.add(label1);
-            JLabel label2 = new JLabel(" one should only enroll to that game if one "
-                + "knows that one "
-                + " will be available for at least that time)");
-            label2.setFont(label2.getFont().deriveFont(Font.PLAIN));
-            this.add(label2);
-            this.add(Box.createRigidArea(new Dimension(0, 20)));
-            
-            this.add(new JLabel("Summary: "));
-            summaryText = new JTextField("short summary what kind of game");
-            summaryText.setAlignmentX(Box.LEFT_ALIGNMENT);
-            summaryText.setAlignmentY(Box.TOP_ALIGNMENT);
-            this.add(summaryText);
-
-            this.add(Box.createVerticalGlue());
-            this.add(Box.createRigidArea(new Dimension(0, 10)));
-            
-/*
-            JLabel label = new JLabel("Detailed info: ");
-            label.setAlignmentX(Box.LEFT_ALIGNMENT);
-            label.setAlignmentY(Box.TOP_ALIGNMENT);
-            this.add(label);
-
-            String text = "Type here some more details\n"
-                + "(preferences which variant, "
-                + "how many players, beginner or advanced, ...";
-            infoTextArea = new JTextArea(text, 5, 60);
-            infoTextArea.setWrapStyleWord(true);
-            
-            infoTextArea.setAlignmentX(Box.LEFT_ALIGNMENT);
-            infoTextArea.setAlignmentY(Box.TOP_ALIGNMENT);
-            this.add(infoTextArea);
-*/            
-            this.add(Box.createVerticalGlue());
-            this.add(Box.createRigidArea(new Dimension(0, 10)));
-            
-            Box submitPanel = new Box(BoxLayout.X_AXIS);
-            submitPanel.add(Box.createHorizontalGlue());
-            submitButton = new JButton(ScheduledGameControls.ButtonText);
-            submitButton.setAlignmentX(Box.CENTER_ALIGNMENT);
-            submitButton.setEnabled(false);
-            submitPanel.add(submitButton);
-            submitPanel.add(Box.createHorizontalGlue());
-            this.add(submitPanel);
-
-            this.add(Box.createVerticalGlue());
-            
-            submitButton.addActionListener(this);
-            
-        }
-
-        public void setLoginState(boolean loggedIn)
-        {
-            submitButton.setEnabled(loggedIn);
-        }
-
-        
-        public void actionPerformed(ActionEvent e)
-        {
-            String command = e.getActionCommand();
-
-            if (command.equals(ScheduledGameControls.ButtonText))
-            {
-                long when = getStartTime();
-                int duration = getDuration();
-                String summary = getSummary();
-                
-                if (when == -1 || duration == -1 || summary == null
-                    || summary.trim().equals(""))
-                {
-                    System.out.println("Invalud date, time, duration or summary text!");
-                }
-                else
-                {
-                    doScheduling(when, duration, summary);
-                }
-            }
-        }
-        
-        private long getStartTime()
-        {
-            long when = -1;
-            
-            String atDate = atDateField.getText();
-            String atTime = atTimeField.getText();
-            
-            String schedule = atDate + " " + atTime;
-            // System.out.println("schedule is " + schedule);
-            
-            
-            DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT,
-                DateFormat.SHORT, myLocale);
-            df.setTimeZone(TimeZone.getDefault());
-            df.setLenient(false);
-            
-            // System.out.println("default locale    is " + Locale.getDefault());
-            // System.out.println("default time zone is " + TimeZone.getDefault());
-
-            try
-            {
-                Date whenDate = df.parse(schedule);
-                when = whenDate.getTime();
-            }
-            catch(ParseException e)
-            {
-                LOGGER.warning("Illegal date/time '" + schedule + "'");
-            }
-            
-            return when;
-        }
-        
-        private int getDuration()
-        {
-            int duration = -1;
-            
-            String durationString = durationField.getText();
-            duration = Integer.parseInt(durationString);
-            return duration;
-        }
-        
-        private String getSummary()
-        {
-            return summaryText.getText();
-        }
-    }
-    
-    private Container makeScheduledGamesTab()
-    {
-        Box scheduledGamesTab = new Box(BoxLayout.Y_AXIS);
-               
-        schedPanel = new ScheduledGameControls();
-        scheduledGamesTab.add(schedPanel);
-        scheduledGamesTab.add(Box.createVerticalGlue());
- 
-        scheduledGamesTab.add(makeScheduledGamesTablePanel());
-
-        return scheduledGamesTab;
-    }
-
-    private Container makeScheduledGamesTablePanel()
-    {
-        Box schedPanel = new Box(BoxLayout.Y_AXIS);
-        schedPanel.setBorder(new TitledBorder("Schedules Games: "));
-        
-        Box schedGamesPane = new Box(BoxLayout.Y_AXIS);
-        schedGamesPane.setBorder(new TitledBorder("Scheduled Games"));
-        JLabel dummyField = new JLabel(
-            "The following games were scheduled so far:");
-        schedGamesPane.add(dummyField);
-
-        schedGameDataModel = new GameTableModel();
-        schedGameTable = new JTable(schedGameDataModel);
-
-        schedGameListSelectionModel = schedGameTable.getSelectionModel();
-        schedGameListSelectionModel
-            .addListSelectionListener(new gameTableSelectionHandler());
-
-        // TODO is that setting again needed?
-        schedGameTable.setSelectionModel(schedGameListSelectionModel);
-
-        schedGameTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        JScrollPane tablescrollpane = new JScrollPane(schedGameTable);
-        schedGamesPane.add(tablescrollpane);
-
-        schedPanel.add(schedGamesPane);
-        schedPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        schedPanel.add(new JButton("Enroll"));
-        
-        return schedPanel;
     }
 }
