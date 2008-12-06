@@ -2448,6 +2448,20 @@ public class WebClient extends KFrame implements WindowListener,
             return index;
         }
 
+        private String humanReadableTime(Long startTime)
+        {
+            String timeString = "";
+            
+            DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT,
+                DateFormat.SHORT, myLocale);
+            df.setTimeZone(TimeZone.getDefault());
+            df.setLenient(false);
+
+            timeString = df.format(startTime);
+
+            return timeString;
+        }
+
     } // END Class GameTableModel
 
     class GameTableSelectionHandler implements ListSelectionListener
@@ -2477,29 +2491,4 @@ public class WebClient extends KFrame implements WindowListener,
             }
         }
     } // END Class GameTableSelectionHandler 
-
-    
-    private String humanReadableTime(Long startTime)
-    {
-        String timeString = "";
-        
-        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT,
-            DateFormat.SHORT, myLocale);
-        df.setTimeZone(TimeZone.getDefault());
-        df.setLenient(false);
-
-        timeString = df.format(startTime);
-
-/*
-        try
-        {
-            timeString = df.format(startTime);
-        }
-        catch(ParseException e)
-        {
-            LOGGER.warning("Problems to Illegal date/time '" + schedule + "'");
-        }
-*/
-        return timeString;
-    }
 }
