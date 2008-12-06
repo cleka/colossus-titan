@@ -875,7 +875,7 @@ public final class Server extends Thread implements IServer
         LOGGER.finest("Calling Server.addClient() for " + playerName);
 
         Player player = null;
-        if (playerName.equals("spectator"))
+        if (playerName.equalsIgnoreCase("spectator"))
         {
             LOGGER.info("addClient for a spectator.");
         }
@@ -889,7 +889,7 @@ public final class Server extends Thread implements IServer
         }
 
         String name = "<undefined>";
-        if (player == null && playerName.equals("spectator"))
+        if (player == null && playerName.equalsIgnoreCase("spectator"))
         {
             ++spectators;
             name = "spectator_" + spectators;
@@ -945,11 +945,11 @@ public final class Server extends Thread implements IServer
             {
                 String pluralS = (waitingForPlayers > 1 ? "s" : "");
                 logToStartLog(" ==> Waiting for " + waitingForPlayers
-                    + " more client" + pluralS + " to sign on.\n");
+                    + " more player client" + pluralS + " to sign on.\n");
             }
             else
             {
-                logToStartLog("\nGot all clients, game can start now.\n");
+                logToStartLog("\nGot clients for all players, game can start now.\n");
             }
         }
         else
