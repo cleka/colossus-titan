@@ -1986,12 +1986,9 @@ public final class MasterBoard extends JPanel
     {
         synchronized (markersOnBoard)
         {
-            Iterator<Marker> it = markersOnBoard.iterator();
-            while (it.hasNext())
+            for (Marker marker : markersOnBoard)
             {
-                Marker marker = it.next();
-                if (marker != null
-                    && g.getClipBounds().intersects(marker.getBounds()))
+                if (g.getClipBounds().intersects(marker.getBounds()))
                 {
                     marker.paintComponent(g);
                 }
