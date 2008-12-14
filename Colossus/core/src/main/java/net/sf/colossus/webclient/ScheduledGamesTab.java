@@ -24,7 +24,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import net.sf.colossus.webclient.WebClient.GameTableModel;
+import net.sf.colossus.webclient.GameTableModel;
 
 
 /**
@@ -170,7 +170,7 @@ class ScheduledGamesTab extends Box implements ActionListener
             "The following games were scheduled so far:");
         schedGamesPane.add(dummyField);
 
-        schedGameDataModel = webClient.new GameTableModel();
+        schedGameDataModel = new GameTableModel(myLocale);
         schedGameTable = new JTable(schedGameDataModel);
 
         schedGameListSelectionModel = schedGameTable.getSelectionModel();
