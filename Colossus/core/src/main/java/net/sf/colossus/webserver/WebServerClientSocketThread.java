@@ -329,29 +329,23 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             done = true;
         }
 
-        else if (command.equals(IWebServer.Schedule))
-        {
-            String initiator = tokens[1];
-            long startTime = Long.parseLong(tokens[2]);
-            int duration = Integer.parseInt(tokens[3]);
-            String summary = tokens[4];
-
-            gi = server.scheduleGame(initiator, startTime, duration, summary);
-        }
-
         else if (command.equals(IWebServer.Propose))
         {
             String initiator = tokens[1];
             String variant = tokens[2];
             String viewmode = tokens[3];
-            String expire = tokens[4];
-            boolean unlMullis = Boolean.valueOf(tokens[5]).booleanValue();
-            boolean balTowers = Boolean.valueOf(tokens[6]).booleanValue();
-            int nmin = Integer.parseInt(tokens[7]);
-            int ntarget = Integer.parseInt(tokens[8]);
-            int nmax = Integer.parseInt(tokens[9]);
+            long startAt = Long.parseLong(tokens[4]);
+            int duration = Integer.parseInt(tokens[5]);
+            String summary = tokens[6];
+            String expire = tokens[7];
+            boolean unlMullis = Boolean.valueOf(tokens[8]).booleanValue();
+            boolean balTowers = Boolean.valueOf(tokens[9]).booleanValue();
+            int nmin = Integer.parseInt(tokens[10]);
+            int ntarget = Integer.parseInt(tokens[11]);
+            int nmax = Integer.parseInt(tokens[12]);
 
-            gi = server.proposeGame(initiator, variant, viewmode, expire,
+            gi = server.proposeGame(initiator, variant, viewmode, 
+                startAt, duration, summary, expire,
                 unlMullis, balTowers, nmin, ntarget, nmax);
         }
 
@@ -446,12 +440,6 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
 
         if (command.equals(IWebServer.Propose) && gi != null)
         {
-            server.enrollUserToGame(gi.getGameId(), user.getName());
-        }
-
-        if (command.equals(IWebServer.Schedule) && gi != null)
-        {
-            System.out.println("scheduling ... skipping the enroll.");
             server.enrollUserToGame(gi.getGameId(), user.getName());
         }
 

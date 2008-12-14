@@ -102,10 +102,11 @@ public class GameInfo extends Thread
     }
 
     public GameInfo(String initiator, String variant, String viewmode,
+        long startTime, int duration, String summary,
         String expire, boolean unlimitedMulligans, boolean balancedTowers,
         int min, int target, int max)
     {
-        this(Proposed);
+        this(startTime == -1 ? Scheduled : Proposed);
 
         this.initiator = initiator;
         this.variant = variant;
@@ -117,10 +118,9 @@ public class GameInfo extends Thread
         this.target = target;
         this.max = max;
 
-        this.startTime = 0;
-        this.duration = 0;
-        this.summary = "<undef>";
-        // this.infoText = "";
+        this.startTime = startTime;
+        this.duration = duration;
+        this.summary = summary;
         
         this.enrolledPlayers = 0;
         this.players = new ArrayList<User>();
@@ -129,18 +129,6 @@ public class GameInfo extends Thread
         LOGGER.log(Level.FINEST,
             "A new potential game was created!! - variant " + variant
                 + " viewmode " + viewmode);
-    }
-
-    public GameInfo(String initiator, long startTime, int duration,
-        String summary)
-    {
-        this(Scheduled);
-        
-        this.initiator = initiator;
-        this.startTime = startTime;
-        this.duration = duration;
-        this.summary = summary;
-        // this.infoText = "";
     }
 
     public void setState(int state)
@@ -344,6 +332,11 @@ public class GameInfo extends Thread
     public String getPlayerListAsString()
     {
         StringBuilder playerList = new StringBuilder("");
+        if (playerList.length() == 0)
+        {
+            return "<none>";
+        }
+
         Iterator<User> it = players.iterator();
         while (it.hasNext())
         {
@@ -452,10 +445,10 @@ public class GameInfo extends Thread
         }
 
         String message = gameId + sep + state + sep + initiator + sep
-            + variant + sep + viewmode + sep + eventExpiring + sep
+            + variant + sep + viewmode + sep + startTime + sep
+            + duration + sep + summary + sep + eventExpiring + sep
             + unlimitedMulligans + sep + balancedTowers + sep 
-            + startTime + sep + duration + sep + summary
-            + sep + min + sep + target + sep + max + sep + enrolledPlayers  
+            + min + sep + target + sep + max + sep + enrolledPlayers  
             + playerList.toString();
 
         return message;
@@ -517,29 +510,20 @@ public class GameInfo extends Thread
         gi.state = Integer.parseInt(tokens[2]);
         gi.initiator = tokens[3];
 
-        if (gi.state != Scheduled)
-        {
-            System.out.println("fromString, state != scheduled (" + gi.state + ")");
-            gi.variant = tokens[4];
-            gi.viewmode = tokens[5];
-            gi.eventExpiring = tokens[6];
-            gi.unlimitedMulligans = Boolean.valueOf(tokens[7]).booleanValue();
-            gi.balancedTowers = Boolean.valueOf(tokens[8]).booleanValue();
-            gi.startTime = Long.parseLong(tokens[9]);
-            gi.duration = Integer.parseInt(tokens[10]);
-            gi.summary = tokens[11];
-            gi.min = Integer.parseInt(tokens[12]);
-            gi.target = Integer.parseInt(tokens[13]);
-            gi.max = Integer.parseInt(tokens[14]);
-            // gi.infoText = "";
-        }
-        else
-        {
-            System.out.println("fromString, state == scheduled");
-            gi.startTime = Long.parseLong(tokens[9]);
-            gi.duration = Integer.parseInt(tokens[10]);
-            gi.summary = tokens[11];
-        }
+        System.out.println("fromString, state=" + gi.state + ")");
+        System.out.println("tokens: " + tokens.toString());
+        
+        gi.variant = tokens[4];
+        gi.viewmode = tokens[5];
+        gi.startTime = Long.parseLong(tokens[6]);
+        gi.duration = Integer.parseInt(tokens[7]);
+        gi.summary = tokens[8];
+        gi.eventExpiring = tokens[9];
+        gi.unlimitedMulligans = Boolean.valueOf(tokens[10]).booleanValue();
+        gi.balancedTowers = Boolean.valueOf(tokens[11]).booleanValue();
+        gi.min = Integer.parseInt(tokens[12]);
+        gi.target = Integer.parseInt(tokens[13]);
+        gi.max = Integer.parseInt(tokens[14]);
 
         int lastIndex = 15;
         gi.enrolledPlayers = Integer.parseInt(tokens[lastIndex]);
@@ -554,6 +538,7 @@ public class GameInfo extends Thread
             i++;
         }
         gi.players = players;
+        System.out.println("players: " + players.toString());
 
         return gi;
     }

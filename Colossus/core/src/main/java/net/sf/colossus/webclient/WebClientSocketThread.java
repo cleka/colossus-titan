@@ -522,20 +522,14 @@ public class WebClientSocketThread extends Thread implements IWebServer
     }
 
     public GameInfo proposeGame(String initiator, String variant,
-        String viewmode, String expire, boolean unlimitedMulligans,
+        String viewmode, long startAt, int duration, String summary,
+        String expire, boolean unlimitedMulligans,
         boolean balancedTowers, int min, int target, int max)
     {
         send(Propose + sep + initiator + sep + variant + sep + viewmode + sep
+            + startAt + sep + duration + sep + summary + sep
             + expire + sep + unlimitedMulligans + sep + balancedTowers + sep
             + min + sep + target + sep + max);
-        return null;
-    }
-
-    public GameInfo scheduleGame(String initiator, long startTime,
-        int duration, String summary)
-    {
-        send(Schedule + sep + initiator + sep + startTime + sep + duration
-            + sep + summary);
         return null;
     }
 

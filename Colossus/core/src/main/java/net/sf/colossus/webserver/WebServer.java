@@ -382,29 +382,27 @@ public class WebServer implements IWebServer, IRunWebServer
     }
 
     public GameInfo proposeGame(String initiator, String variant,
-        String viewmode, String expire, boolean unlimitedMulligans,
+        String viewmode, long startAt, int duration, String summary,
+        String expire, boolean unlimitedMulligans,
         boolean balancedTowers, int min, int target, int max)
     {
-        GameInfo gi = new GameInfo(initiator, variant, viewmode, expire,
+        GameInfo gi = new GameInfo(initiator, variant, viewmode,
+            startAt, duration, summary, expire,
             unlimitedMulligans, balancedTowers, min, target, max);
-        potentialGames.add(gi);
+
+        if (startAt == -1)
+        {
+            // startAt -1 means: no starttime, i.e. instantly
+            potentialGames.add(gi);
+        }
+        else
+        {
+            scheduledGames.add(gi);
+        }
 
         updateGUI();
         allTellGameInfo(gi);
 
-        return gi;
-    }
-    
-    public GameInfo scheduleGame(String initiator, long startTime,
-        int duration, String summary)
-    {
-        GameInfo gi = new GameInfo(initiator, startTime, duration, summary);
-        scheduledGames.add(gi);
-
-        System.out.println("a new game was scheduled, Id=" + gi.getGameId());
-        updateGUI();
-        allTellGameInfo(gi);
-        
         return gi;
     }
 

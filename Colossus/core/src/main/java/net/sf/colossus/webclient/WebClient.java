@@ -3,18 +3,25 @@ package net.sf.colossus.webclient;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.lang.reflect.InvocationTargetException;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
@@ -65,7 +72,7 @@ import net.sf.colossus.webcommon.IWebServer;
  *  @author Clemens Katzer
  */
 
-public class WebClient extends KFrame implements WindowListener,
+public class WebClient extends KFrame implements
     ActionListener, IWebClient
 {
     private static final Logger LOGGER = Logger.getLogger(WebClient.class
@@ -105,7 +112,8 @@ public class WebClient extends KFrame implements WindowListener,
 
     private int state = NotLoggedIn;
     private String enrolledGameId = null;
-
+    private boolean scheduledGamesMode;
+    
     private int usersLoggedIn = 0;
     private int usersEnrolled = 0;
     private int usersPlaying = 0;
@@ -118,7 +126,9 @@ public class WebClient extends KFrame implements WindowListener,
 
     JTabbedPane tabbedPane;
     Box serverTab;
-    Box instantGamesTab;
+    JPanel preferencesPane;
+    Box createGamesTab;
+    Box runningGamesTab;
     Box adminTab;
 
     private final Point defaultLocation = new Point(600, 100);
@@ -161,6 +171,11 @@ public class WebClient extends KFrame implements WindowListener,
     private JCheckBox unlimitedMulligansCB;
     private JCheckBox balancedTowersCB;
 
+    private JTextField atDateField;
+    private JTextField atTimeField;
+    private JTextField durationField;
+    private JTextField summaryText;
+    
     private JButton proposeButton;
     private JButton cancelButton;
     private JButton enrollButton;
@@ -187,7 +202,6 @@ public class WebClient extends KFrame implements WindowListener,
     final static String playingText = "While playing, you can't propose or enroll to other games.";
     
     ChatHandler generalChat;
-    ScheduledGamesTab schedulingPanel;
 
     final ArrayList<GameInfo> gamesUpdates = new ArrayList<GameInfo>();
 
@@ -232,6 +246,9 @@ public class WebClient extends KFrame implements WindowListener,
 
     private final static String optAutoGameStartAction = "Auto Game Start Action";
 
+    private final static String defaultSummaryText = "Type here a short "
+        + "summary what kind of game you would wish to play";
+    
     public WebClient(String hostname, int port, String login, String password)
     {
         super(windowTitle);
@@ -380,6 +397,19 @@ public class WebClient extends KFrame implements WindowListener,
         }
     }
 
+    private void setScheduledGamesMode(boolean scheduled)
+    {
+        scheduledGamesMode = scheduled;
+        atDateField.setEnabled(scheduled);
+        atTimeField.setEnabled(scheduled);
+        durationField.setEnabled(scheduled);
+    }
+
+    public boolean getScheduledGamesMode()
+    {
+        return scheduledGamesMode;
+    }
+
     public void onGameStartAutoAction()
     {
         if (SwingUtilities.isEventDispatchThread())
@@ -402,424 +432,42 @@ public class WebClient extends KFrame implements WindowListener,
     {
         getContentPane().setLayout(new BorderLayout());
 
+        // Top of the frame: login and users status/infos:
         Box headPane = new Box(BoxLayout.Y_AXIS);
-        getContentPane().add(headPane, BorderLayout.NORTH);
-
         statusLabel = new JLabel("login status");
         userinfoLabel = new JLabel("user info status");
         headPane.add(statusLabel);
         headPane.add(userinfoLabel);
+        getContentPane().add(headPane, BorderLayout.NORTH);
 
-        Box mainPane = new Box(BoxLayout.Y_AXIS);
-        getContentPane().add(mainPane, BorderLayout.CENTER);
-
+        // A tabbed pane for the various tabs in the CENTER:
         tabbedPane = new JTabbedPane();
         tabbedPane.setPreferredSize(new Dimension(900, 600)); // width x height
         tabbedPane.setMinimumSize(new Dimension(900, 530)); // width x height
+
+        Box mainPane = new Box(BoxLayout.Y_AXIS);
         mainPane.add(tabbedPane);
+        getContentPane().add(mainPane, BorderLayout.CENTER);
 
-        // ========== Server Tab ===============
-        serverTab = new Box(BoxLayout.Y_AXIS);
+        // Now the different tabs of the tabbed pane:
+        createServerTab();
         tabbedPane.addTab("Server", serverTab);
-
-        Box connectionPane = new Box(BoxLayout.X_AXIS);
-
-        JPanel loginPane = new JPanel(new GridLayout(0, 2));
-        loginPane.setBorder(new TitledBorder("Connection information"));
-
-        loginPane.setPreferredSize(new Dimension(150, 200));
-
-        loginPane.add(new JLabel("Web Server"));
-        webserverHostField = new JTextField(this.hostname);
-        // webserverHostField.addActionListener(this);
-        loginPane.add(webserverHostField);
-
-        loginPane.add(new JLabel("Port"));
-        webserverPortField = new JTextField(this.port + "");
-        // webserverPortField.addActionListener(this);
-        loginPane.add(webserverPortField);
-
-        loginPane.add(new JLabel("Login id"));
-        loginField = new JTextField(this.login);
-        // nameField.addActionListener(this);
-        loginPane.add(loginField);
-
-        loginPane.add(new JLabel("Password"));
-        passwordField = new JPasswordField(this.password);
-        // passwordField.addActionListener(this);
-        loginPane.add(passwordField);
-
-        loginButton = new JButton(LoginButtonText);
-        loginButton.addActionListener(this);
-        loginButton.setEnabled(true);
-        loginPane.add(loginButton);
-
-        quitButton = new JButton(quitButtonText);
-        quitButton.addActionListener(this);
-        quitButton.setEnabled(true);
-        loginPane.add(quitButton);
-
-        loginPane.add(new JLabel("Status:"));
-        statusField = new JLabel(statusText);
-        loginPane.add(statusField);
-        updateStatus("Not connected", Color.red);
-
-        serverTab.add(connectionPane);
-
-        connectionPane.add(loginPane);
-        connectionPane.add(Box.createHorizontalGlue());
-        connectionPane.add(Box.createVerticalGlue());
-
-        serverTab.add(Box.createVerticalGlue());
-        serverTab.add(Box.createHorizontalGlue());
-
-        boolean alos = this.options.getOption(AutoLoginCBText);
-        autologinCB = new JCheckBox(AutoLoginCBText, alos);
-        autologinCB.addActionListener(this);
-        loginPane.add(autologinCB);
-        loginPane.add(new JLabel(""));
-
-        boolean algp = this.options.getOption(AutoGamePaneCBText);
-        autoGamePaneCB = new JCheckBox(AutoGamePaneCBText, algp);
-        autoGamePaneCB.addActionListener(this);
-        loginPane.add(autoGamePaneCB);
-        loginPane.add(new JLabel(""));
-
-        // Label can show: registerLabelText or chgPasswordLabelText 
-        registerOrPasswordLabel = new JLabel(createAccountLabelText);
-        // Button can show: createAccountButtonText or chgPasswordButtonText
-        registerOrPasswordButton = new JButton(createAccountButtonText);
-        registerOrPasswordButton.addActionListener(this);
-
-        loginPane.add(registerOrPasswordLabel);
-        loginPane.add(registerOrPasswordButton);
-
-        // ======= instant Games tab =========
-        
-        instantGamesTab = new Box(BoxLayout.Y_AXIS);
-        tabbedPane.addTab("Instant Games", instantGamesTab);
-        
-        JPanel preferencesPane = new JPanel(new GridLayout(0, 2));
-        preferencesPane.setBorder(new TitledBorder("Game preferences"));
-
-        // Variant:
-        String variantName = options.getStringOption(Options.variant);
-        if (variantName == null || variantName.length() == 0)
-        {
-            variantName = Constants.variantArray[0]; // Default variant
-        }
-
-        variantBox = new JComboBox(Constants.variantArray);
-        variantBox.setSelectedItem(variantName);
-        variantBox.addActionListener(this);
-        preferencesPane.add(new JLabel("Select variant:"));
-        preferencesPane.add(variantBox);
-
-        // Viewmode:
-        // String viewmodesArray[] = { "all-public", "auto-tracked", "only-own" };
-        String viewmodeName = options.getStringOption(Options.viewMode);
-        if (viewmodeName == null)
-        {
-            viewmodeName = Options.viewableAll;
-        }
-
-        viewmodeBox = new JComboBox(Options.viewModeArray);
-        viewmodeBox.setSelectedItem(viewmodeName);
-        viewmodeBox.addActionListener(this);
-        preferencesPane.add(new JLabel("Select view mode:"));
-        preferencesPane.add(viewmodeBox);
-
-        // event expiring policy: 
-        String eventExpiringVal = options
-            .getStringOption(Options.eventExpiring);
-        if (eventExpiringVal == null)
-        {
-            eventExpiringVal = "5";
-        }
-
-        eventExpiringBox = new JComboBox(Options.eventExpiringChoices);
-        eventExpiringBox.setSelectedItem(eventExpiringVal);
-        eventExpiringBox.addActionListener(this);
-        preferencesPane.add(new JLabel("Events expire after (turns):"));
-        preferencesPane.add(eventExpiringBox);
-
-        // checkboxes (unlimited mulligans and balanced tower):
-        Box checkboxPane = new Box(BoxLayout.X_AXIS);
-        boolean unlimitedMulligans = options
-            .getOption(Options.unlimitedMulligans);
-        unlimitedMulligansCB = new JCheckBox(Options.unlimitedMulligans,
-            unlimitedMulligans);
-        unlimitedMulligansCB.addActionListener(this);
-        boolean balancedTowers = options.getOption(Options.balancedTowers);
-        balancedTowersCB = new JCheckBox(Options.balancedTowers,
-            balancedTowers);
-        balancedTowersCB.addActionListener(this);
-        checkboxPane.add(unlimitedMulligansCB);
-        checkboxPane.add(balancedTowersCB);
-
-        preferencesPane.add(new JLabel("Various settings:"));
-        preferencesPane.add(checkboxPane);
-
-        // min, target and max nr. of players:
-        preferencesPane.add(new JLabel("Select player count preferences:"));
-        Box playerSelection = new Box(BoxLayout.X_AXIS);
-
-        int min = options.getIntOption(Options.minPlayersWeb);
-        min = (min < 2 || min > 6 ? 2 : min);
-
-        int max = options.getIntOption(Options.maxPlayersWeb);
-        max = (max < min || max > 6 ? 6 : max);
-
-        int middle = java.lang.Math.round(((float)min + (float)max) / 2);
-
-        int targ = options.getIntOption(Options.targPlayersWeb);
-        targ = (targ < min || targ > max ? middle : targ);
-
-        playerSelection.add(new JLabel("min.:"));
-        SpinnerNumberModel model = new SpinnerNumberModel(min, 2, 6, 1);
-        spinner1 = new JSpinner(model);
-        playerSelection.add(spinner1);
-        // spinner uses ChangeListener instead of ActionListener.
-        // Setting them up is quite laborous, and would be called every time
-        // user modifies it by one. So, we rather query the value then when we
-        // need it (before exiting (saveOptions) or before propose).
-        //spinner.addActionListener(this);
-
-        playerSelection.add(new JLabel("target.:"));
-        SpinnerNumberModel model2 = new SpinnerNumberModel(targ, 2, 6, 1);
-        spinner2 = new JSpinner(model2);
-        playerSelection.add(spinner2);
-
-        playerSelection.add(new JLabel("max.:"));
-        SpinnerNumberModel model3 = new SpinnerNumberModel(max, 2, 6, 1);
-        spinner3 = new JSpinner(model3);
-        playerSelection.add(spinner3);
-
-        preferencesPane.add(playerSelection);
-        
-        instantGamesTab.add(preferencesPane);
-
-        // done with game preferences.
-        // Now the buttons and table:
-        JPanel startgamePane = new JPanel(new GridLayout(0, 3));
-        startgamePane.setBorder(new TitledBorder("Start a game"));
-
-        startgamePane.add(new JLabel("Propose a game:"));
-        proposeButton = new JButton(ProposeButtonText);
-        proposeButton.addActionListener(this);
-        proposeButton.setEnabled(false);
-        startgamePane.add(proposeButton);
-
-        cancelButton = new JButton(CancelButtonText);
-        cancelButton.addActionListener(this);
-        cancelButton.setEnabled(false);
-        startgamePane.add(cancelButton);
-
-        startgamePane.add(new JLabel("Join/Leave a game:"));
-        enrollButton = new JButton(EnrollButtonText);
-        enrollButton.addActionListener(this);
-        enrollButton.setEnabled(false);
-        startgamePane.add(enrollButton);
-
-        unenrollButton = new JButton(UnenrollButtonText);
-        unenrollButton.addActionListener(this);
-        unenrollButton.setEnabled(false);
-        startgamePane.add(unenrollButton);
-
-        instantGamesTab.add(startgamePane);
-
-        // ====================== Proposed Games ======================
-
-        Box potGamesPane = new Box(BoxLayout.Y_AXIS);
-        potGamesPane.setBorder(new TitledBorder("Proposed Games"));
-        JLabel dummyField = new JLabel(
-            "The following games are accepting players:");
-        potGamesPane.add(dummyField);
-
-        potGameDataModel = new GameTableModel(myLocale);
-        potGameTable = new JTable(potGameDataModel);
-
-        potGameTable.getSelectionModel().addListSelectionListener(
-            new ListSelectionListener()
-            {
-                public void valueChanged(ListSelectionEvent e)
-                {
-                    System.out.println("list selection in pot Table");
-                    updateGUI();
-                }
-            });
-        
-        potGameTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        JScrollPane tablescrollpane = new JScrollPane(potGameTable);
-        potGamesPane.add(tablescrollpane);
-
-        startButton = new JButton(StartButtonText);
-        startButton.addActionListener(this);
-        startButton.setEnabled(false);
-        potGamesPane.add(startButton);
-
-        infoTextLabel = new JLabel(enrollText);
-        potGamesPane.add(infoTextLabel);
-
-        instantGamesTab.add(potGamesPane);
-
-        
-        // ================== Scheduled Games tab ======================
-        
-        schedulingPanel = new ScheduledGamesTab(this, myLocale);
-        tabbedPane.addTab("Scheduled Games", schedulingPanel);
-        
-        // ====================== Running Games Tab ======================
-
-        // ----------------- First the table ---------------------
-        
-        Box runningGamesTab = new Box(BoxLayout.Y_AXIS);
+       
+        createInstantGamesTab();
+        tabbedPane.addTab("Create or Join", createGamesTab);
+                        
+        createRunningGamesTab();
         tabbedPane.addTab("Running Games", runningGamesTab);
-
-        Box runningGamesPane = new Box(BoxLayout.Y_AXIS);
-        // runningGamesPane.setAlignmentY(0);
-        runningGamesPane.setBorder(new TitledBorder("Running Games"));
-        runningGamesPane.add(new JLabel(
-            "The following games are already running:"));
-
-        runGameDataModel = new GameTableModel(myLocale);
-        runGameTable = new JTable(runGameDataModel);
-        runGameTable.getSelectionModel().addListSelectionListener(
-            new ListSelectionListener()
-            {
-                public void valueChanged(ListSelectionEvent e)
-                {
-                    System.out.println("list selection in run Table");
-                    updateGUI();
-                }
-            });
-
-        runGameTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        JScrollPane runtablescrollpane = new JScrollPane(runGameTable);
-        runningGamesPane.add(runtablescrollpane);
-
-        runningGamesTab.add(runningGamesPane);
-
-
-        // ------------------ Hide WebClient stuff ---------------
         
-        Box hideClientPanel = new Box(BoxLayout.Y_AXIS);
-        hideClientPanel.setBorder(new TitledBorder("Hiding the Web Client"));
-        
-        runningGamesTab.add(Box.createRigidArea(new Dimension(0, 20)));
-        runningGamesTab.add(Box.createVerticalGlue());
-        
-        hideClientPanel.setAlignmentX(Box.LEFT_ALIGNMENT);
-        
-        hideButton = new JButton(HideButtonText);
-        hideButton.setAlignmentX(Box.LEFT_ALIGNMENT);
-
-        hideButton.addActionListener(this);
-        hideButton.setEnabled(false);
-        hideClientPanel.add(hideButton);
-        hideButtonText = new JLabel(CantHideText);
-        hideClientPanel.add(hideButtonText);
-
-        // automatic actions when game starts (client masterboard comes up):
-        JLabel autoDoLabel = new JLabel("When game starts, automatically:");
-        autoDoLabel.setAlignmentX(Box.LEFT_ALIGNMENT);
-        hideClientPanel.add(autoDoLabel);
-        Box autoDoButtonPane = new Box(BoxLayout.X_AXIS);
-        autoGSNothingRB = new JRadioButton(AutoGameStartActionNothing);
-        autoGSHideRB = new JRadioButton(AutoGameStartActionHide);
-        autoGSCloseRB = new JRadioButton(AutoGameStartActionClose);
-        autoDoButtonPane.add(autoGSNothingRB);
-        autoDoButtonPane.add(autoGSHideRB);
-        autoDoButtonPane.add(autoGSCloseRB);
-
-        autoGSNothingRB.addActionListener(this);
-        autoGSHideRB.addActionListener(this);
-        autoGSCloseRB.addActionListener(this);
-
-        autoGSActionGroup = new ButtonGroup();
-        autoGSActionGroup.add(autoGSNothingRB);
-        autoGSActionGroup.add(autoGSHideRB);
-        autoGSActionGroup.add(autoGSCloseRB);
-
-        String autoGSAction = options.getStringOption(optAutoGameStartAction);
-        if (autoGSAction == null || autoGSAction.equals(""))
-        {
-            autoGSAction = AutoGameStartActionNothing;
-            options.setOption(optAutoGameStartAction, autoGSAction);
-        }
-
-        if (autoGSAction.equals(AutoGameStartActionNothing))
-        {
-            autoGSNothingRB.setSelected(true);
-        }
-        else if (autoGSAction.equals(AutoGameStartActionHide))
-        {
-            autoGSHideRB.setSelected(true);
-        }
-        else if (autoGSAction.equals(AutoGameStartActionClose))
-        {
-            autoGSCloseRB.setSelected(true);
-        }
-        else
-        {
-            autoGSAction = AutoGameStartActionNothing;
-            options.setOption(optAutoGameStartAction, autoGSAction);
-            autoGSNothingRB.setSelected(true);
-        }
-
-        autoDoButtonPane.setAlignmentX(Box.LEFT_ALIGNMENT);
-        hideClientPanel.add(autoDoButtonPane);
-        hideClientPanel.add(Box.createVerticalGlue());
-
-        runningGamesTab.add(Box.createVerticalGlue());
-        runningGamesTab.add(hideClientPanel);
-
-/*      // Somehow this does not work at all...
-
-        // as wide as the running games table, as high as needed:
-        int width = runningGamesPane.getMinimumSize().width;
-        int height = hideClientPanel.getMinimumSize().height;
-        Dimension prefSize = new Dimension(width, height);
-        hideClientPanel.setPreferredSize(prefSize);
-        hideClientPanel.setMinimumSize(prefSize);
-*/                
-        
-        // ================== "General" Chat tab ======================
-
         generalChat = new ChatHandler(IWebServer.generalChatName, "Chat",
             this, server, username);
         tabbedPane.addTab(generalChat.getTitle(), generalChat.getTab());
-        
-        // ============admin Tab ==========
 
-        adminTab = new Box(BoxLayout.Y_AXIS);
-
-        JPanel adminPane = new JPanel(new GridLayout(0, 1));
-        adminPane.setBorder(new TitledBorder("Admin mode"));
-        adminPane.setPreferredSize(new Dimension(30, 200));
-
-        commandField = new JTextField("");
-        adminPane.add(commandField);
-
-        debugSubmitButton = new JButton("Submit");
-        debugSubmitButton.addActionListener(this);
-        adminPane.add(debugSubmitButton);
-        debugSubmitButton.setEnabled(false);
-
-        adminPane.add(new JLabel("Server answered:"));
-        receivedField = new JLabel("");
-        adminPane.add(receivedField);
-
-        shutdownButton = new JButton("Shutdown Server");
-        shutdownButton.addActionListener(this);
-        adminPane.add(shutdownButton);
-
-        adminTab.add(adminPane);
-        
+        createAdminTab();
         // adminTab is added to tabbedPane then/only when user has
         // logged in and server informed us that this user as admin user
 
-        // ============== finish all ================
+        // now finish all 
         addWindowListener(this);
         pack();
 
@@ -938,7 +586,555 @@ public class WebClient extends KFrame implements WindowListener,
         return webserverPortField.getText();
     }
 
-    public  String createLoginWebClientSocketThread(boolean force)
+    private void createServerTab()
+    {
+        serverTab = new Box(BoxLayout.Y_AXIS);
+        
+        Box connectionPane = new Box(BoxLayout.X_AXIS);
+
+        JPanel loginPane = new JPanel(new GridLayout(0, 2));
+        loginPane.setBorder(new TitledBorder("Connection information"));
+
+        loginPane.setPreferredSize(new Dimension(150, 200));
+
+        loginPane.add(new JLabel("Web Server"));
+        webserverHostField = new JTextField(this.hostname);
+        // webserverHostField.addActionListener(this);
+        loginPane.add(webserverHostField);
+
+        loginPane.add(new JLabel("Port"));
+        webserverPortField = new JTextField(this.port + "");
+        // webserverPortField.addActionListener(this);
+        loginPane.add(webserverPortField);
+
+        loginPane.add(new JLabel("Login id"));
+        loginField = new JTextField(this.login);
+        // nameField.addActionListener(this);
+        loginPane.add(loginField);
+
+        loginPane.add(new JLabel("Password"));
+        passwordField = new JPasswordField(this.password);
+        // passwordField.addActionListener(this);
+        loginPane.add(passwordField);
+
+        loginButton = new JButton(LoginButtonText);
+        loginButton.addActionListener(this);
+        loginButton.setEnabled(true);
+        loginPane.add(loginButton);
+
+        quitButton = new JButton(quitButtonText);
+        quitButton.addActionListener(this);
+        quitButton.setEnabled(true);
+        loginPane.add(quitButton);
+
+        loginPane.add(new JLabel("Status:"));
+        statusField = new JLabel(statusText);
+        loginPane.add(statusField);
+        updateStatus("Not connected", Color.red);
+
+        serverTab.add(connectionPane);
+
+        connectionPane.add(loginPane);
+        connectionPane.add(Box.createHorizontalGlue());
+        connectionPane.add(Box.createVerticalGlue());
+
+        serverTab.add(Box.createVerticalGlue());
+        serverTab.add(Box.createHorizontalGlue());
+
+        boolean alos = this.options.getOption(AutoLoginCBText);
+        autologinCB = new JCheckBox(AutoLoginCBText, alos);
+        autologinCB.addActionListener(this);
+        loginPane.add(autologinCB);
+        loginPane.add(new JLabel(""));
+
+        boolean algp = this.options.getOption(AutoGamePaneCBText);
+        autoGamePaneCB = new JCheckBox(AutoGamePaneCBText, algp);
+        autoGamePaneCB.addActionListener(this);
+        loginPane.add(autoGamePaneCB);
+        loginPane.add(new JLabel(""));
+
+        // Label can show: registerLabelText or chgPasswordLabelText 
+        registerOrPasswordLabel = new JLabel(createAccountLabelText);
+        // Button can show: createAccountButtonText or chgPasswordButtonText
+        registerOrPasswordButton = new JButton(createAccountButtonText);
+        registerOrPasswordButton.addActionListener(this);
+
+        loginPane.add(registerOrPasswordLabel);
+        loginPane.add(registerOrPasswordButton);
+    }
+
+    private void addRadioButton(Container cont, ButtonGroup group,
+        String text, String cmd, String current, ItemListener listener)
+    {
+        JRadioButton rb = new JRadioButton(text);
+        if (cmd != null && !cmd.equals(""))
+        {
+            rb.setActionCommand(cmd);
+        }
+        rb.addItemListener(listener);
+        group.add(rb);
+        cont.add(rb);
+        boolean selected = (text.equals(current));
+        rb.setAlignmentX(Box.LEFT_ALIGNMENT);
+        rb.setSelected(selected);
+    }
+
+    private JLabel nonBoldLabel(String text)
+    {
+        JLabel l = new JLabel(text);
+        l.setFont(l.getFont().deriveFont(Font.PLAIN));
+        l.setAlignmentX(Box.LEFT_ALIGNMENT);
+        return l;
+    }
+    
+    private void createInstantGamesTab()
+    {
+        createGamesTab = new Box(BoxLayout.Y_AXIS);
+        createGamesTab.setAlignmentX(Box.LEFT_ALIGNMENT);
+                
+        createPreferencesPane();
+        preferencesPane.setAlignmentX(Box.LEFT_ALIGNMENT);
+        createGamesTab.add(preferencesPane);
+        
+        Box proposeGamePane = new Box(BoxLayout.Y_AXIS);
+        proposeGamePane.setAlignmentX(Box.LEFT_ALIGNMENT);
+        proposeGamePane.setBorder(new TitledBorder("Creating games:"));
+        proposeGamePane.add(nonBoldLabel("Set your preferences, fill in "
+            + "the 'Summary' text, then press 'Propose' to create a game:"));
+
+        proposeGamePane.add(new JLabel("Summary: "));
+        summaryText = new JTextField(defaultSummaryText);
+        summaryText.setAlignmentX(Box.LEFT_ALIGNMENT);
+        summaryText.setAlignmentY(Box.TOP_ALIGNMENT);
+        proposeGamePane.add(summaryText);
+
+        ButtonGroup group = new ButtonGroup();
+        Box scheduleModes = new Box(BoxLayout.Y_AXIS);
+        scheduleModes.setAlignmentX(LEFT_ALIGNMENT);
+        // NOTE: the actual radioButtons will be added later, see below
+
+        proposeGamePane.add(new JLabel("Choose the start time:"));
+        proposeGamePane.add(scheduleModes);
+
+        // The panel with all GUI stuff needed to schedule a game:
+        Box schedulingPanel = new Box(BoxLayout.Y_AXIS);
+        schedulingPanel.setAlignmentX(Box.LEFT_ALIGNMENT);
+        schedulingPanel.setAlignmentY(Box.TOP_ALIGNMENT);
+        schedulingPanel.add(nonBoldLabel(
+            "Give a start date and time (dd.mm.yyyy and hh:mm) "
+            + "and a minimum duration in minutes:"));
+        
+        // The panel for the actual schedule: date, time and duration fields
+        Box schedulePanel = new Box(BoxLayout.X_AXIS);
+        schedulePanel.add(new JLabel("Start at: "));
+        
+        atDateField = new JTextField("27.11.2008");
+        schedulePanel.add(atDateField);
+        
+        atTimeField = new JTextField("10:00");
+        schedulePanel.add(atTimeField);
+                   
+        schedulePanel.add(new JLabel(" Duration: "));
+        durationField = new JTextField("90");
+        schedulePanel.add(durationField);
+        
+        schedulePanel.setAlignmentX(Box.LEFT_ALIGNMENT);
+        schedulePanel.setAlignmentY(Box.TOP_ALIGNMENT);
+        
+        schedulingPanel.add(schedulePanel);
+
+        // Now that we have the scheduling fields, add the buttons; now the
+        // fields can be enabled or disabled based on state of the radio buttons:
+        String current = "scheduled";
+        ItemListener iListener = new ItemListener()
+        {
+            public void itemStateChanged(ItemEvent e)
+            {
+                reactOnScheduleRadioButtonChange(e);
+            }
+        };
+        addRadioButton(scheduleModes, group, "instantly", "instantly", current, iListener);
+        addRadioButton(scheduleModes, group, "scheduled", "scheduled", current, iListener);
+        
+        JLabel label1 = new JLabel("(the purpose of the duration value is: ");
+        label1.setFont(label1.getFont().deriveFont(Font.PLAIN));
+        schedulingPanel.add(label1);
+        JLabel label2 = new JLabel(" one should only enroll to that game if one "
+            + "knows that one "
+            + " will be available for at least that time)");
+        label2.setFont(label2.getFont().deriveFont(Font.PLAIN));
+        schedulingPanel.add(label2);
+        schedulingPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        proposeGamePane.add(schedulingPanel);
+
+        // Panel for the propose + cancel buttons, left most field empty:
+        JPanel pcButtonPane = new JPanel(new GridLayout(0, 3));
+        proposeGamePane.add(pcButtonPane);
+        pcButtonPane.add(new JLabel(""));
+        proposeButton = new JButton(ProposeButtonText);
+        proposeButton.addActionListener(this);
+        proposeButton.setEnabled(false);
+        pcButtonPane.add(proposeButton);
+        cancelButton = new JButton(CancelButtonText);
+        cancelButton.addActionListener(this);
+        cancelButton.setEnabled(false);
+        pcButtonPane.add(cancelButton);
+        
+        createGamesTab.add(proposeGamePane);
+              
+        // Panel for the enroll + unenroll buttons:
+        Box joinGamePane = new Box(BoxLayout.Y_AXIS);
+        joinGamePane.setBorder(new TitledBorder("Joining games someone else has proposed:"));
+        joinGamePane.add(nonBoldLabel("Select a game from the table below, "
+            + "and then click enroll to register for that game."));
+        
+        JPanel euButtonPane = new JPanel(new GridLayout(0, 3));
+        euButtonPane.add(new JLabel(""));
+        enrollButton = new JButton(EnrollButtonText);
+        enrollButton.addActionListener(this);
+        enrollButton.setEnabled(false);
+        euButtonPane.add(enrollButton);
+
+        unenrollButton = new JButton(UnenrollButtonText);
+        unenrollButton.addActionListener(this);
+        unenrollButton.setEnabled(false);
+        euButtonPane.add(unenrollButton);
+        joinGamePane.add(euButtonPane);
+        
+        createGamesTab.add(joinGamePane);
+
+        // table of upcoming games (ad hoc or scheduled):
+        Box potGamesPane = new Box(BoxLayout.Y_AXIS);
+        potGamesPane.setBorder(new TitledBorder("Proposed Games"));
+        potGamesPane.add(nonBoldLabel("The following games are accepting players:"));
+
+        potGameDataModel = new GameTableModel(myLocale);
+        potGameTable = new JTable(potGameDataModel);
+
+        potGameTable.getSelectionModel().addListSelectionListener(
+            new ListSelectionListener()
+            {
+                public void valueChanged(ListSelectionEvent e)
+                {
+                    System.out.println("list selection in pot Table");
+                    updateGUI();
+                }
+            });
+        
+        potGameTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        JScrollPane tablescrollpane = new JScrollPane(potGameTable);
+        potGamesPane.add(tablescrollpane);
+
+        startButton = new JButton(StartButtonText);
+        startButton.addActionListener(this);
+        startButton.setEnabled(false);
+        potGamesPane.add(startButton);
+
+        infoTextLabel = new JLabel(enrollText);
+        potGamesPane.add(infoTextLabel);
+
+        createGamesTab.add(potGamesPane);
+    }
+
+    public void reactOnScheduleRadioButtonChange(ItemEvent e)
+    {
+        if (atDateField == null)
+        {
+            // called too early (during creation of buttons)
+            return;
+        }
+
+        boolean switchToScheduling = false;
+        Object o = e.getItem();
+        boolean selected = (e.getStateChange() == ItemEvent.SELECTED);
+        if (!selected)
+        {
+            // ignore the DESELECT - we act based on what was selected.
+            return;
+        }
+
+        if (o instanceof JRadioButton)
+        {
+            JRadioButton b = (JRadioButton) o;
+            String text = b.getText();
+            if (text == null)
+            {
+                System.out.println("ItemEvent Object Text is null???");
+                return;
+            }
+            if (text.equals("scheduled"))
+            {
+                switchToScheduling = true;
+            }
+            else if (text.equals("instantly"))
+            {
+                switchToScheduling = false;
+            }
+            else
+            {
+                System.out.println("ItemEvent Object Text is neither 'scheduled' nor 'instantly'??");
+                return;
+            }
+        }
+        else
+        {
+            System.out.println("ItemEvent Object is not a JRadioButton??");
+            return;
+        }
+
+        System.out.println("setting scheduling controls to " 
+            + (switchToScheduling? "enabled" : "disabled"));
+
+        setScheduledGamesMode(switchToScheduling);
+    }
+    
+    private void createPreferencesPane()
+    {
+        preferencesPane = new JPanel(new GridLayout(0, 2));
+        preferencesPane.setBorder(new TitledBorder("Game preferences"));
+
+        // Variant:
+        String variantName = options.getStringOption(Options.variant);
+        if (variantName == null || variantName.length() == 0)
+        {
+            variantName = Constants.variantArray[0]; // Default variant
+        }
+
+        variantBox = new JComboBox(Constants.variantArray);
+        variantBox.setSelectedItem(variantName);
+        variantBox.addActionListener(this);
+        preferencesPane.add(new JLabel("Select variant:"));
+        preferencesPane.add(variantBox);
+
+        // Viewmode:
+        // String viewmodesArray[] = { "all-public", "auto-tracked", "only-own" };
+        String viewmodeName = options.getStringOption(Options.viewMode);
+        if (viewmodeName == null)
+        {
+            viewmodeName = Options.viewableAll;
+        }
+
+        viewmodeBox = new JComboBox(Options.viewModeArray);
+        viewmodeBox.setSelectedItem(viewmodeName);
+        viewmodeBox.addActionListener(this);
+        preferencesPane.add(new JLabel("Select view mode:"));
+        preferencesPane.add(viewmodeBox);
+
+        // event expiring policy: 
+        String eventExpiringVal = options
+            .getStringOption(Options.eventExpiring);
+        if (eventExpiringVal == null)
+        {
+            eventExpiringVal = "5";
+        }
+
+        eventExpiringBox = new JComboBox(Options.eventExpiringChoices);
+        eventExpiringBox.setSelectedItem(eventExpiringVal);
+        eventExpiringBox.addActionListener(this);
+        preferencesPane.add(new JLabel("Events expire after (turns):"));
+        preferencesPane.add(eventExpiringBox);
+
+        // checkboxes (unlimited mulligans and balanced tower):
+        Box checkboxPane = new Box(BoxLayout.X_AXIS);
+        boolean unlimitedMulligans = options
+            .getOption(Options.unlimitedMulligans);
+        unlimitedMulligansCB = new JCheckBox(Options.unlimitedMulligans,
+            unlimitedMulligans);
+        unlimitedMulligansCB.addActionListener(this);
+        boolean balancedTowers = options.getOption(Options.balancedTowers);
+        balancedTowersCB = new JCheckBox(Options.balancedTowers,
+            balancedTowers);
+        balancedTowersCB.addActionListener(this);
+        checkboxPane.add(unlimitedMulligansCB);
+        checkboxPane.add(balancedTowersCB);
+
+        preferencesPane.add(new JLabel("Various settings:"));
+        preferencesPane.add(checkboxPane);
+
+        // min, target and max nr. of players:
+        preferencesPane.add(new JLabel("Select player count preferences:"));
+        Box playerSelection = new Box(BoxLayout.X_AXIS);
+
+        int min = options.getIntOption(Options.minPlayersWeb);
+        min = (min < 2 || min > 6 ? 2 : min);
+
+        int max = options.getIntOption(Options.maxPlayersWeb);
+        max = (max < min || max > 6 ? 6 : max);
+
+        int middle = java.lang.Math.round(((float)min + (float)max) / 2);
+
+        int targ = options.getIntOption(Options.targPlayersWeb);
+        targ = (targ < min || targ > max ? middle : targ);
+
+        playerSelection.add(new JLabel("min.:"));
+        SpinnerNumberModel model = new SpinnerNumberModel(min, 2, 6, 1);
+        spinner1 = new JSpinner(model);
+        playerSelection.add(spinner1);
+        // spinner uses ChangeListener instead of ActionListener.
+        // Setting them up is quite laborous, and would be called every time
+        // user modifies it by one. So, we rather query the value then when we
+        // need it (before exiting (saveOptions) or before propose).
+        //spinner.addActionListener(this);
+
+        playerSelection.add(new JLabel("target.:"));
+        SpinnerNumberModel model2 = new SpinnerNumberModel(targ, 2, 6, 1);
+        spinner2 = new JSpinner(model2);
+        playerSelection.add(spinner2);
+
+        playerSelection.add(new JLabel("max.:"));
+        SpinnerNumberModel model3 = new SpinnerNumberModel(max, 2, 6, 1);
+        spinner3 = new JSpinner(model3);
+        playerSelection.add(spinner3);
+
+        preferencesPane.add(playerSelection);
+    }
+
+    private Box createRunningGamesTab()
+    {
+        Box runningGamesTab = new Box(BoxLayout.Y_AXIS);
+        
+        // ----------------- First the table ---------------------
+
+        Box runningGamesPane = new Box(BoxLayout.Y_AXIS);
+        // runningGamesPane.setAlignmentY(0);
+        runningGamesPane.setBorder(new TitledBorder("Running Games"));
+        runningGamesPane.add(new JLabel(
+            "The following games are already running:"));
+
+        runGameDataModel = new GameTableModel(myLocale);
+        runGameTable = new JTable(runGameDataModel);
+        runGameTable.getSelectionModel().addListSelectionListener(
+            new ListSelectionListener()
+            {
+                public void valueChanged(ListSelectionEvent e)
+                {
+                    System.out.println("list selection in run Table");
+                    updateGUI();
+                }
+            });
+
+        runGameTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        JScrollPane runtablescrollpane = new JScrollPane(runGameTable);
+        runningGamesPane.add(runtablescrollpane);
+
+        runningGamesTab.add(runningGamesPane);
+
+
+        // ------------------ Hide WebClient stuff ---------------
+        
+        Box hideClientPanel = new Box(BoxLayout.Y_AXIS);
+        hideClientPanel.setBorder(new TitledBorder("Hiding the Web Client"));
+        
+        runningGamesTab.add(Box.createRigidArea(new Dimension(0, 20)));
+        runningGamesTab.add(Box.createVerticalGlue());
+        
+        hideClientPanel.setAlignmentX(Box.LEFT_ALIGNMENT);
+        
+        hideButton = new JButton(HideButtonText);
+        hideButton.setAlignmentX(Box.LEFT_ALIGNMENT);
+
+        hideButton.addActionListener(this);
+        hideButton.setEnabled(false);
+        hideClientPanel.add(hideButton);
+        hideButtonText = new JLabel(CantHideText);
+        hideClientPanel.add(hideButtonText);
+
+        // automatic actions when game starts (client masterboard comes up):
+        JLabel autoDoLabel = new JLabel("When game starts, automatically:");
+        autoDoLabel.setAlignmentX(Box.LEFT_ALIGNMENT);
+        hideClientPanel.add(autoDoLabel);
+        Box autoDoButtonPane = new Box(BoxLayout.X_AXIS);
+        autoGSNothingRB = new JRadioButton(AutoGameStartActionNothing);
+        autoGSHideRB = new JRadioButton(AutoGameStartActionHide);
+        autoGSCloseRB = new JRadioButton(AutoGameStartActionClose);
+        autoDoButtonPane.add(autoGSNothingRB);
+        autoDoButtonPane.add(autoGSHideRB);
+        autoDoButtonPane.add(autoGSCloseRB);
+
+        autoGSNothingRB.addActionListener(this);
+        autoGSHideRB.addActionListener(this);
+        autoGSCloseRB.addActionListener(this);
+
+        autoGSActionGroup = new ButtonGroup();
+        autoGSActionGroup.add(autoGSNothingRB);
+        autoGSActionGroup.add(autoGSHideRB);
+        autoGSActionGroup.add(autoGSCloseRB);
+
+        String autoGSAction = options.getStringOption(optAutoGameStartAction);
+        if (autoGSAction == null || autoGSAction.equals(""))
+        {
+            autoGSAction = AutoGameStartActionNothing;
+            options.setOption(optAutoGameStartAction, autoGSAction);
+        }
+
+        if (autoGSAction.equals(AutoGameStartActionNothing))
+        {
+            autoGSNothingRB.setSelected(true);
+        }
+        else if (autoGSAction.equals(AutoGameStartActionHide))
+        {
+            autoGSHideRB.setSelected(true);
+        }
+        else if (autoGSAction.equals(AutoGameStartActionClose))
+        {
+            autoGSCloseRB.setSelected(true);
+        }
+        else
+        {
+            autoGSAction = AutoGameStartActionNothing;
+            options.setOption(optAutoGameStartAction, autoGSAction);
+            autoGSNothingRB.setSelected(true);
+        }
+
+        autoDoButtonPane.setAlignmentX(Box.LEFT_ALIGNMENT);
+        hideClientPanel.add(autoDoButtonPane);
+        hideClientPanel.add(Box.createVerticalGlue());
+
+        runningGamesTab.add(Box.createVerticalGlue());
+        runningGamesTab.add(hideClientPanel);
+
+/*      // Somehow this does not work at all...
+
+        // as wide as the running games table, as high as needed:
+        int width = runningGamesPane.getMinimumSize().width;
+        int height = hideClientPanel.getMinimumSize().height;
+        Dimension prefSize = new Dimension(width, height);
+        hideClientPanel.setPreferredSize(prefSize);
+        hideClientPanel.setMinimumSize(prefSize);
+*/                
+
+        return runningGamesTab;
+    }
+    
+    private void createAdminTab()
+    {
+        adminTab = new Box(BoxLayout.Y_AXIS);
+        
+        JPanel adminPane = new JPanel(new GridLayout(0, 1));
+        adminPane.setBorder(new TitledBorder("Admin mode"));
+        adminPane.setPreferredSize(new Dimension(30, 200));
+
+        commandField = new JTextField("");
+        adminPane.add(commandField);
+
+        debugSubmitButton = new JButton("Submit");
+        debugSubmitButton.addActionListener(this);
+        adminPane.add(debugSubmitButton);
+        debugSubmitButton.setEnabled(false);
+
+        adminPane.add(new JLabel("Server answered:"));
+        receivedField = new JLabel("");
+        adminPane.add(receivedField);
+
+        shutdownButton = new JButton("Shutdown Server");
+        shutdownButton.addActionListener(this);
+        adminPane.add(shutdownButton);
+
+        adminTab.add(adminPane);
+    }
+    
+    public String createLoginWebClientSocketThread(boolean force)
     {
         String reason = null;
         failedDueToDuplicateLogin = false;
@@ -1159,7 +1355,6 @@ public class WebClient extends KFrame implements WindowListener,
         {
             loginButton.setText(LoginButtonText);
             generalChat.setLoginState(false, server, username);
-            schedulingPanel.setLoginState(false);
             
             registerOrPasswordLabel.setText(createAccountLabelText);
             registerOrPasswordButton.setText(createAccountButtonText);
@@ -1168,7 +1363,6 @@ public class WebClient extends KFrame implements WindowListener,
         {
             loginButton.setText(LogoutButtonText);
             generalChat.setLoginState(true, server, username);
-            schedulingPanel.setLoginState(true);
             registerOrPasswordLabel.setText(chgPasswordLabelText);
             registerOrPasswordButton.setText(chgPasswordButtonText);
         }
@@ -1449,7 +1643,7 @@ public class WebClient extends KFrame implements WindowListener,
             options.saveOptions();
             if (autoGamePaneCB.isSelected())
             {
-                tabbedPane.setSelectedComponent(instantGamesTab);
+                tabbedPane.setSelectedComponent(createGamesTab);
             }
         }
         else
@@ -1513,12 +1707,65 @@ public class WebClient extends KFrame implements WindowListener,
         updateGUI();
     }
 
+    public void doScheduleDummy()
+    {
+        // just a dummay as long as we still have ScheduledGamesTab class...
+    }
+
     private void do_proposeGame(String variant, String viewmode,
+        long startAt, int duration, String summary,
         String expire, boolean unlimMulli, boolean balTowers, int min,
         int target, int max)
     {
-        server.proposeGame(username, variant, viewmode, expire, unlimMulli,
+        server.proposeGame(username, variant, viewmode, 
+            startAt, duration, summary, expire, unlimMulli,
             balTowers, min, target, max);
+    }
+
+    private long getStartTime()
+    {
+        long when = -1;
+        
+        String atDate = atDateField.getText();
+        String atTime = atTimeField.getText();
+        
+        String schedule = atDate + " " + atTime;
+        // System.out.println("schedule is " + schedule);
+        
+        
+        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT,
+            DateFormat.SHORT, myLocale);
+        df.setTimeZone(TimeZone.getDefault());
+        df.setLenient(false);
+        
+        // System.out.println("default locale    is " + Locale.getDefault());
+        // System.out.println("default time zone is " + TimeZone.getDefault());
+
+        try
+        {
+            Date whenDate = df.parse(schedule);
+            when = whenDate.getTime();
+        }
+        catch(ParseException e)
+        {
+            LOGGER.warning("Illegal date/time '" + schedule + "'");
+        }
+        
+        return when;
+    }
+
+    private int getDuration()
+    {
+        int duration = -1;
+        
+        String durationString = durationField.getText();
+        duration = Integer.parseInt(durationString);
+        return duration;
+    }
+
+    private String getSummaryText()
+    {
+        return summaryText.getText();
     }
 
     private boolean doEnroll(String gameId)
@@ -1541,14 +1788,6 @@ public class WebClient extends KFrame implements WindowListener,
         return true;
     }
 
-    public void doScheduling(long startTime, int duration, String summary)
-    {
-        System.out.println("Scheduled game at "
-            + startTime+ " duration " + duration + " summary '" + summary + "'");
-        server.scheduleGame(username, startTime, duration, summary);
-    }
-    
-    
     // ================= those come from server ============
 
     public void grantAdminStatus()
@@ -1794,7 +2033,7 @@ public class WebClient extends KFrame implements WindowListener,
                         if (state == GameInfo.Scheduled)
                         {
                             System.out.println("Got a scheduled game, replacing in sched list");
-                            replaceInTable(schedulingPanel.getSchedGameTable(), game);
+                            // replaceInTable(schedulingPanel.getSchedGameTable(), game);
                         }
                         else if (state == GameInfo.Proposed)
                         {
@@ -1878,8 +2117,16 @@ public class WebClient extends KFrame implements WindowListener,
             int target = ((Integer)spinner2.getValue()).intValue();
             int max = ((Integer)spinner3.getValue()).intValue();
 
+            boolean scheduled = getScheduledGamesMode();
+            long startAt = scheduled ? getStartTime() : -1;
+            int duration = getDuration();
+            String summaryText = getSummaryText();
+            
+            System.out.println("WebCLient propose: scheduled=" + scheduled + ", start=" + startAt);
             do_proposeGame(variantBox.getSelectedItem().toString(),
-                viewmodeBox.getSelectedItem().toString(), eventExpiringBox
+                viewmodeBox.getSelectedItem().toString(), 
+                startAt, duration, summaryText,
+                eventExpiringBox
                     .getSelectedItem().toString(), unlimitedMulligansCB
                     .isSelected(), balancedTowersCB.isSelected(), min, target,
                 max);
