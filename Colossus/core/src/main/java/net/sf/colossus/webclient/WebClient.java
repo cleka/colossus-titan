@@ -8,7 +8,6 @@ import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.lang.reflect.InvocationTargetException;
@@ -2047,71 +2046,5 @@ public class WebClient extends KFrame implements WindowListener,
         Start startObj = Start.getCurrentStartObject();
         startObj.setWhatToDoNext(Start.GetPlayersDialog);
         dispose();
-    }
-
-    @Override
-    public void mouseClicked(MouseEvent e)
-    {
-        // nothing to do
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e)
-    {
-        // nothing to do
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e)
-    {
-        // nothing to do
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e)
-    {
-        // nothing to do
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e)
-    {
-        // nothing to do
-    }
-
-    @Override
-    public void windowClosed(WindowEvent e)
-    {
-        // nothing to do
-    }
-
-    @Override
-    public void windowActivated(WindowEvent e)
-    {
-        // nothing to do
-    }
-
-    @Override
-    public void windowDeactivated(WindowEvent e)
-    {
-        // nothing to do
-    }
-
-    @Override
-    public void windowDeiconified(WindowEvent e)
-    {
-        // nothing to do
-    }
-
-    @Override
-    public void windowIconified(WindowEvent e)
-    {
-        //
-    }
-
-    @Override
-    public void windowOpened(WindowEvent e)
-    {
-        // nothing to do
     }
 }
