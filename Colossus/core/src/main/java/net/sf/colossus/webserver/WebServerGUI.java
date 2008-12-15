@@ -18,8 +18,8 @@ import javax.swing.ScrollPaneConstants;
 
 
 /** The web server GUI - so far shows only simple info
- *  like amount of users logged in, potential-, running-
- *  and ending games.
+ *  like amount of users logged in, scheduled-, instant-,
+ *  running- and ending games.
  *  
  *  @version $Id$
  *  @author Clemens Katzer
@@ -33,7 +33,7 @@ public class WebServerGUI extends JFrame implements WindowListener,
     private JLabel userInfo;
 
     private JLabel scheduledGamesInfo;
-    private JLabel potentialGamesInfo;
+    private JLabel instantGamesInfo;
     private JLabel runningGamesInfo;
     private JLabel endingGamesInfo;
 
@@ -59,8 +59,8 @@ public class WebServerGUI extends JFrame implements WindowListener,
         scheduledGamesInfo = new JLabel("No scheduled games.");
         mainPane.add(scheduledGamesInfo);
 
-        potentialGamesInfo = new JLabel("No potential games.");
-        mainPane.add(potentialGamesInfo);
+        instantGamesInfo = new JLabel("No instant games.");
+        mainPane.add(instantGamesInfo);
 
         runningGamesInfo = new JLabel("No running games.");
         mainPane.add(runningGamesInfo);
@@ -84,9 +84,9 @@ public class WebServerGUI extends JFrame implements WindowListener,
         scheduledGamesInfo.setText(s);
     }
 
-    public void setPotentialGamesInfo(String s)
+    public void setInstantGamesInfo(String s)
     {
-        potentialGamesInfo.setText(s);
+        instantGamesInfo.setText(s);
     }
 
     public void setRunningGamesInfo(String s)

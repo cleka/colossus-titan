@@ -25,7 +25,7 @@ import net.sf.colossus.webcommon.User;
  *  - brings up the WebServer GUI
  *  - starts the ServerSocket and listens there for WebClients
  *  - based on actions coming from clients, keeps book of 
- *    "potential" and "running" games (both GameInfo objects),
+ *    "instant" and "running" games (both GameInfo objects),
  *    and tell the GameInfo objects when to start the game.
  *
  *  @version $Id$
@@ -57,7 +57,7 @@ public class WebServer implements IWebServer, IRunWebServer
     private final int maxClients;
 
     private ArrayList<GameInfo> scheduledGames = null;
-    private ArrayList<GameInfo> potentialGames = null;
+    private ArrayList<GameInfo> instantGames = null;
     private ArrayList<GameInfo> runningGames = null;
     private ArrayList<GameInfo> endingGames = null;
 
@@ -135,7 +135,7 @@ public class WebServer implements IWebServer, IRunWebServer
         }
 
         scheduledGames = new ArrayList<GameInfo>();
-        potentialGames = new ArrayList<GameInfo>();
+        instantGames = new ArrayList<GameInfo>();
         runningGames = new ArrayList<GameInfo>();
         endingGames = new ArrayList<GameInfo>();
 
@@ -375,8 +375,8 @@ public class WebServer implements IWebServer, IRunWebServer
         assert gui != null;
         gui.setScheduledGamesInfo(scheduledGames.size()
             + " scheduled games stored");
-        gui.setPotentialGamesInfo(potentialGames.size()
-            + " potential games stored");
+        gui.setInstantGamesInfo(instantGames.size()
+            + " instant games stored");
         gui.setRunningGamesInfo(runningGames.size() + " running games");
         gui.setEndingGamesInfo(endingGames.size() + " games just ending");
     }
@@ -386,6 +386,8 @@ public class WebServer implements IWebServer, IRunWebServer
         String expire, boolean unlimitedMulligans,
         boolean balancedTowers, int min, int target, int max)
     {
+        System.out.println("\n=============\nWebServer.proposeGame, startAt = " + startAt);
+        
         GameInfo gi = new GameInfo(initiator, variant, viewmode,
             startAt, duration, summary, expire,
             unlimitedMulligans, balancedTowers, min, target, max);
@@ -393,7 +395,7 @@ public class WebServer implements IWebServer, IRunWebServer
         if (startAt == -1)
         {
             // startAt -1 means: no starttime, i.e. instantly
-            potentialGames.add(gi);
+            instantGames.add(gi);
         }
         else
         {
@@ -403,19 +405,8 @@ public class WebServer implements IWebServer, IRunWebServer
         updateGUI();
         allTellGameInfo(gi);
 
+        System.out.println("Webserver, game created: " + gi.toString());
         return gi;
-    }
-
-    public void tellAllPotentialGamesToOne(WebServerClientSocketThread cst)
-    {
-        IWebClient client = cst;
-
-        Iterator<GameInfo> it = potentialGames.iterator();
-        while (it.hasNext())
-        {
-            GameInfo gi = it.next();
-            client.gameInfo(gi);
-        }
     }
 
     public void reEnrollIfNecessary(WebServerClientSocketThread newCst)
@@ -423,7 +414,7 @@ public class WebServer implements IWebServer, IRunWebServer
         IWebClient client = newCst;
         User newUser = newCst.getUser();
 
-        Iterator<GameInfo> it = potentialGames.iterator();
+        Iterator<GameInfo> it = instantGames.iterator();
         while (it.hasNext())
         {
             GameInfo gi = it.next();
@@ -437,16 +428,32 @@ public class WebServer implements IWebServer, IRunWebServer
         }
     }
 
-    public void tellAllRunningGamesToOne(WebServerClientSocketThread cst)
+    public void tellAllGamesFromListToOne(WebServerClientSocketThread cst,
+        ArrayList<GameInfo> games)
     {
         IWebClient client = cst;
 
-        Iterator<GameInfo> it = runningGames.iterator();
+        Iterator<GameInfo> it = games.iterator();
         while (it.hasNext())
         {
             GameInfo gi = it.next();
             client.gameInfo(gi);
         }
+    }
+
+    public void tellAllScheduledGamesToOne(WebServerClientSocketThread cst)
+    {
+        tellAllGamesFromListToOne(cst, scheduledGames);
+    }
+
+    public void tellAllInstantGamesToOne(WebServerClientSocketThread cst)
+    {
+        tellAllGamesFromListToOne(cst, instantGames);
+    }
+
+    public void tellAllRunningGamesToOne(WebServerClientSocketThread cst)
+    {
+        tellAllGamesFromListToOne(cst, runningGames);
     }
 
     public void allTellGameInfo(GameInfo gi)
@@ -563,7 +570,7 @@ public class WebServer implements IWebServer, IRunWebServer
                 client.gameCancelled(gameId, byUser);
             }
 
-            potentialGames.remove(gi);
+            instantGames.remove(gi);
             updateGUI();
         }
     }
@@ -693,7 +700,7 @@ public class WebServer implements IWebServer, IRunWebServer
     {
         GameInfo gi_found = null;
 
-        Iterator<GameInfo> it = potentialGames.iterator();
+        Iterator<GameInfo> it = instantGames.iterator();
         while (it.hasNext())
         {
             GameInfo gi = it.next();
@@ -736,7 +743,7 @@ public class WebServer implements IWebServer, IRunWebServer
             gi.start();
             LOGGER.log(Level.FINEST, "Returned from starter");
 
-            potentialGames.remove(gi);
+            instantGames.remove(gi);
             runningGames.add(gi);
 
             updateGUI();
@@ -797,7 +804,7 @@ public class WebServer implements IWebServer, IRunWebServer
             // nothing
         }
 
-        public void setPotentialGamesInfo(String s)
+        public void setInstantGamesInfo(String s)
         {
             // nothing
         }

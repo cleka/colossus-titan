@@ -1,6 +1,7 @@
 package net.sf.colossus.webclient;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -192,7 +193,7 @@ public class WebClient extends KFrame implements
     // automatic actions when game starts (client masterboard comes up):
     private ButtonGroup autoGSActionGroup;
 
-    JLabel infoTextLabel;
+    private JLabel infoTextLabel;
     final static String needLoginText = "You need to login to browse or propose Games.";
     final static String enrollText = "Propose or Enroll, and when enough players have enrolled, one of them can press 'Start'.";
     final static String startingText = "Game is starting, MasterBoard should appear soon. Please wait...";
@@ -201,20 +202,29 @@ public class WebClient extends KFrame implements
     final static String enrolledText = "While enrolled, you can't propose or enroll to other games.";
     final static String playingText = "While playing, you can't propose or enroll to other games.";
     
-    ChatHandler generalChat;
+    private ChatHandler generalChat;
 
-    final ArrayList<GameInfo> gamesUpdates = new ArrayList<GameInfo>();
+    private final ArrayList<GameInfo> gamesUpdates = new ArrayList<GameInfo>();
 
-    HashMap<String, GameInfo> gameHash = new HashMap<String, GameInfo>();
+    private HashMap<String, GameInfo> gameHash = new HashMap<String, GameInfo>();
+
+    private JPanel gamesTablesPanel;
+    private JPanel gamesCards; 
+    private JPanel schedGamesCard;
+    private JPanel instGamesCard;
     
-    // potential games:
-    JTable potGameTable;
-    GameTableModel potGameDataModel;
+    // scheduled games
+    private JTable schedGameTable;
+    private GameTableModel schedGameDataModel;
+    
+    // instant games (can start as soon as enough players have joined):
+    private JTable instGameTable;
+    private GameTableModel instGameDataModel;
 
     // running games
-    JTable runGameTable;
-    GameTableModel runGameDataModel;
-    ListSelectionModel runGameListSelectionModel;
+    private JTable runGameTable;
+    private GameTableModel runGameDataModel;
+    // private ListSelectionModel runGameListSelectionModel;
 
     private static String windowTitle = "Web Client";
 
@@ -403,6 +413,14 @@ public class WebClient extends KFrame implements
         atDateField.setEnabled(scheduled);
         atTimeField.setEnabled(scheduled);
         durationField.setEnabled(scheduled);
+        
+        if (instGamesCard == null || schedGamesCard == null || gamesCards == null)
+        {
+            System.out.println("too early!");
+            return;
+        }
+        CardLayout cl = (CardLayout)(gamesCards.getLayout());
+        cl.show(gamesCards, scheduled ? "scheduled" : "instantly");
     }
 
     public boolean getScheduledGamesMode()
@@ -469,6 +487,9 @@ public class WebClient extends KFrame implements
 
         // now finish all 
         addWindowListener(this);
+        
+        // setScheduledGamesMode(getScheduledGamesMode());
+        
         pack();
 
         useSaveWindow(options, "WebClient", defaultLocation);
@@ -742,19 +763,6 @@ public class WebClient extends KFrame implements
         schedulePanel.setAlignmentY(Box.TOP_ALIGNMENT);
         
         schedulingPanel.add(schedulePanel);
-
-        // Now that we have the scheduling fields, add the buttons; now the
-        // fields can be enabled or disabled based on state of the radio buttons:
-        String current = "scheduled";
-        ItemListener iListener = new ItemListener()
-        {
-            public void itemStateChanged(ItemEvent e)
-            {
-                reactOnScheduleRadioButtonChange(e);
-            }
-        };
-        addRadioButton(scheduleModes, group, "instantly", "instantly", current, iListener);
-        addRadioButton(scheduleModes, group, "scheduled", "scheduled", current, iListener);
         
         JLabel label1 = new JLabel("(the purpose of the duration value is: ");
         label1.setFont(label1.getFont().deriveFont(Font.PLAIN));
@@ -804,37 +812,100 @@ public class WebClient extends KFrame implements
         
         createGamesTab.add(joinGamePane);
 
-        // table of upcoming games (ad hoc or scheduled):
-        Box potGamesPane = new Box(BoxLayout.Y_AXIS);
-        potGamesPane.setBorder(new TitledBorder("Proposed Games"));
-        potGamesPane.add(nonBoldLabel("The following games are accepting players:"));
+        gamesTablesPanel = new JPanel(new BorderLayout());
+        createGamesTab.add(gamesTablesPanel);
 
-        potGameDataModel = new GameTableModel(myLocale);
-        potGameTable = new JTable(potGameDataModel);
+        // One panel, either the one for instant games, or the one for 
+        // scheduled games, will be added later based on the "current"
+        // value of the radiobutton.
+        startButton = new JButton(StartButtonText);
+        startButton.addActionListener(this);
+        startButton.setEnabled(false);
+        
+        Box startButtonPane = new Box(BoxLayout.X_AXIS);
+        startButtonPane.add(startButton);
+        startButtonPane.add(Box.createHorizontalGlue());
+        gamesTablesPanel.add(startButtonPane, BorderLayout.SOUTH);
+        
+        gamesCards = new JPanel(new CardLayout());
+        gamesTablesPanel.add(gamesCards, BorderLayout.CENTER);
+        
+        // Panel/Table for upcoming instant games:
+        instGamesCard = new JPanel(new BorderLayout());
+        instGamesCard.setBorder(new TitledBorder("Proposed Games"));
+        instGamesCard.add(nonBoldLabel("The following games are accepting players:"),
+            BorderLayout.NORTH);
 
-        potGameTable.getSelectionModel().addListSelectionListener(
+        instGameDataModel = new GameTableModel(myLocale);
+        instGameTable = new JTable(instGameDataModel);
+
+        instGameTable.getSelectionModel().addListSelectionListener(
             new ListSelectionListener()
             {
                 public void valueChanged(ListSelectionEvent e)
                 {
-                    System.out.println("list selection in pot Table");
+                    System.out.println("list selection in inst Table");
                     updateGUI();
                 }
             });
         
-        potGameTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        JScrollPane tablescrollpane = new JScrollPane(potGameTable);
-        potGamesPane.add(tablescrollpane);
+        instGameTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        JScrollPane instScrollpane = new JScrollPane(instGameTable);
+        instGamesCard.add(instScrollpane, BorderLayout.CENTER);
+        instGamesCard.add(startButton, BorderLayout.SOUTH);
+        System.out.println("instGamePane initialized");
+        
+        // Table for scheduled games:
+        schedGamesCard = new JPanel(new BorderLayout());
+        schedGamesCard.setBorder(new TitledBorder("Scheduled Games"));
+        schedGamesCard.add(nonBoldLabel("The following are already scheduled:"),
+            BorderLayout.NORTH);
 
-        startButton = new JButton(StartButtonText);
-        startButton.addActionListener(this);
-        startButton.setEnabled(false);
-        potGamesPane.add(startButton);
+        schedGameDataModel = new GameTableModel(myLocale);
+        schedGameTable = new JTable(schedGameDataModel);
 
+        schedGameTable.getSelectionModel().addListSelectionListener(
+            new ListSelectionListener()
+            {
+                public void valueChanged(ListSelectionEvent e)
+                {
+                    System.out.println("list selection in sched Table");
+                    updateGUI();
+                }
+            });
+
+        schedGameTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        JScrollPane schedScrollpane = new JScrollPane(schedGameTable);
+        schedGamesCard.add(schedScrollpane, BorderLayout.CENTER);
+        
+        JPanel dummyCard = new JPanel(new BorderLayout());
+        dummyCard.add(Box.createRigidArea(new Dimension(0, 50)));
+        
+        gamesCards.add(instGamesCard, "instantly");
+        gamesCards.add(schedGamesCard, "scheduled");
+        gamesCards.add(dummyCard, "dummy");
+        
+        CardLayout cl = (CardLayout)gamesCards.getLayout();
+        cl.show(gamesCards, "dummy");
+        
         infoTextLabel = new JLabel(enrollText);
-        potGamesPane.add(infoTextLabel);
+        gamesTablesPanel.add(infoTextLabel, BorderLayout.SOUTH);
 
-        createGamesTab.add(potGamesPane);
+        // Now that we have the scheduling fields and the tables,
+        // we can add the buttons; because now the fields and tables
+        // can be enabled or disabled based on "current" (initial) state 
+        // of the radio buttons:
+        String current = "instantly";
+        ItemListener iListener = new ItemListener()
+        {
+            public void itemStateChanged(ItemEvent e)
+            {
+                reactOnScheduleRadioButtonChange(e);
+            }
+        };
+        addRadioButton(scheduleModes, group, "instantly", "instantly", current, iListener);
+        addRadioButton(scheduleModes, group, "scheduled", "scheduled", current, iListener);
+
     }
 
     public void reactOnScheduleRadioButtonChange(ItemEvent e)
@@ -882,12 +953,11 @@ public class WebClient extends KFrame implements
             System.out.println("ItemEvent Object is not a JRadioButton??");
             return;
         }
-
         System.out.println("setting scheduling controls to " 
             + (switchToScheduling? "enabled" : "disabled"));
 
         setScheduledGamesMode(switchToScheduling);
-    }
+}
     
     private void createPreferencesPane()
     {
@@ -992,7 +1062,7 @@ public class WebClient extends KFrame implements
 
     private Box createRunningGamesTab()
     {
-        Box runningGamesTab = new Box(BoxLayout.Y_AXIS);
+        runningGamesTab = new Box(BoxLayout.Y_AXIS);
         
         // ----------------- First the table ---------------------
 
@@ -1376,7 +1446,7 @@ public class WebClient extends KFrame implements
             cancelButton.setEnabled(false);
             startButton.setEnabled(false);
             debugSubmitButton.setEnabled(false);
-            potGameTable.setEnabled(true);
+            instGameTable.setEnabled(true);
 
             infoTextLabel.setText(needLoginText);
             statusLabel.setText("Status: not logged in");
@@ -1385,7 +1455,7 @@ public class WebClient extends KFrame implements
         }
         else if (state == LoggedIn)
         {
-            int selRow = potGameTable.getSelectedRow();
+            int selRow = instGameTable.getSelectedRow();
             if (selRow == -1)
             {
                 enrollButton.setEnabled(false);
@@ -1408,7 +1478,7 @@ public class WebClient extends KFrame implements
             unenrollButton.setEnabled(false);
 
             debugSubmitButton.setEnabled(true);
-            potGameTable.setEnabled(true);
+            instGameTable.setEnabled(true);
 
             infoTextLabel.setText(enrollText);
             statusLabel.setText("Status: logged in as " + username);
@@ -1422,7 +1492,7 @@ public class WebClient extends KFrame implements
             enrollButton.setEnabled(false);
             unenrollButton.setEnabled(true);
             debugSubmitButton.setEnabled(true);
-            potGameTable.setEnabled(false);
+            instGameTable.setEnabled(false);
             cancelButton.setEnabled(false);
 
             GameInfo gi = findGameById(enrolledGameId);
@@ -1458,7 +1528,7 @@ public class WebClient extends KFrame implements
             cancelButton.setEnabled(false);
             startButton.setEnabled(false);
             debugSubmitButton.setEnabled(false);
-            potGameTable.setEnabled(true);
+            instGameTable.setEnabled(true);
 
             infoTextLabel.setText(playingText);
             userinfoLabel.setText("Userinfo: " + getUserinfoText());
@@ -1492,7 +1562,7 @@ public class WebClient extends KFrame implements
 
     private boolean isOwner(int row)
     {
-        String initiator = (String)potGameTable.getValueAt(row, 2);
+        String initiator = (String)instGameTable.getValueAt(row, 2);
         if (username.equals(initiator))
         {
             return true;
@@ -1800,8 +1870,8 @@ public class WebClient extends KFrame implements
         state = Enrolled;
         enrolledGameId = gameId;
 
-        int index = potGameDataModel.getRowIndex(gameId).intValue();
-        potGameTable.setRowSelectionInterval(index, index);
+        int index = instGameDataModel.getRowIndex(gameId).intValue();
+        instGameTable.setRowSelectionInterval(index, index);
         updateGUI();
     }
 
@@ -1967,7 +2037,7 @@ public class WebClient extends KFrame implements
             updateGUI();
         }
 
-        potGameDataModel.removeGame(gameId);
+        instGameDataModel.removeGame(gameId);
 
     }
 
@@ -2033,18 +2103,18 @@ public class WebClient extends KFrame implements
                         if (state == GameInfo.Scheduled)
                         {
                             System.out.println("Got a scheduled game, replacing in sched list");
-                            // replaceInTable(schedulingPanel.getSchedGameTable(), game);
+                            replaceInTable(schedGameTable, game);
                         }
-                        else if (state == GameInfo.Proposed)
+                        else if (state == GameInfo.Instant)
                         {
-                            System.out.println("Got a proposed game, replacing in proposed list");
-                            replaceInTable(potGameTable, game);
+                            System.out.println("Got an instant game, replacing in instant list");
+                            replaceInTable(instGameTable, game);
                         }
                         else if (state == GameInfo.Running)
                         {
-                            System.out.println("Got a running game, replacing in run game list and remove in pot game list");
+                            System.out.println("Got a running game, replacing in run game list and remove in inst game list");
                             replaceInTable(runGameTable, game);
-                            potGameDataModel.removeGame(game.getGameId());
+                            instGameDataModel.removeGame(game.getGameId());
                         }
                         else if (state == GameInfo.Ending)
                         {
@@ -2097,7 +2167,7 @@ public class WebClient extends KFrame implements
         {
             gamesUpdates.clear();
         }
-        resetTable(potGameTable);
+        resetTable(instGameTable);
         resetTable(runGameTable);
         updateGUI();
 
@@ -2134,52 +2204,52 @@ public class WebClient extends KFrame implements
 
         else if (source == enrollButton)
         {
-            int selRow = potGameTable.getSelectedRow();
+            int selRow = instGameTable.getSelectedRow();
             if (selRow != -1)
             {
-                String gameId = (String)potGameTable.getValueAt(selRow, 0);
+                String gameId = (String)instGameTable.getValueAt(selRow, 0);
                 boolean ok = doEnroll(gameId);
                 if (ok)
                 {
-                    // potGameTable.setEnabled(false);
+                    // instGameTable.setEnabled(false);
                 }
             }
         }
         else if (source == unenrollButton)
         {
-            int selRow = potGameTable.getSelectedRow();
+            int selRow = instGameTable.getSelectedRow();
             if (selRow != -1)
             {
-                String gameId = (String)potGameTable.getValueAt(selRow, 0);
+                String gameId = (String)instGameTable.getValueAt(selRow, 0);
                 boolean ok = doUnenroll(gameId);
                 if (ok)
                 {
-                    potGameTable.setEnabled(true);
+                    instGameTable.setEnabled(true);
                 }
             }
         }
 
         else if (source == cancelButton)
         {
-            int selRow = potGameTable.getSelectedRow();
+            int selRow = instGameTable.getSelectedRow();
             if (selRow != -1)
             {
-                String gameId = (String)potGameTable.getValueAt(selRow, 0);
+                String gameId = (String)instGameTable.getValueAt(selRow, 0);
                 doCancel(gameId);
             }
         }
 
         else if (source == startButton)
         {
-            int selRow = potGameTable.getSelectedRow();
+            int selRow = instGameTable.getSelectedRow();
             if (selRow != -1)
             {
-                String gameId = (String)potGameTable.getValueAt(selRow, 0);
+                String gameId = (String)instGameTable.getValueAt(selRow, 0);
 
                 boolean ok = doStart(gameId);
                 if (ok)
                 {
-                    potGameTable.setEnabled(false);
+                    instGameTable.setEnabled(false);
                 }
             }
         }

@@ -7,7 +7,7 @@ public interface IWebServerGUI
 
     public abstract void setScheduledGamesInfo(String s);
 
-    public abstract void setPotentialGamesInfo(String s);
+    public abstract void setInstantGamesInfo(String s);
 
     public abstract void setRunningGamesInfo(String s);
 
