@@ -19,7 +19,7 @@ import javax.swing.JTextField;
 /** A panel with which one can either create a new account,
  *  or change the password.
  */
-class RegisterPasswordPanel extends JDialog implements ActionListener
+class RegisterPasswordPanel extends JDialog
 {
     private final static Point defaultLocation = new Point(600, 100);
     private final static String defaultEmail = "your.email@some.domain";
@@ -82,17 +82,99 @@ class RegisterPasswordPanel extends JDialog implements ActionListener
         String buttonText = isRegister ? "Create account" : "Change password";
 
         rpButton = new JButton(buttonText);
-        rpButton.addActionListener(this);
+        rpButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                if (e.getSource() == rpButton)
+                {
+                    buttonPressed();
+                }
+            }
+        });
+
         rpButton.setEnabled(true);
         p.add(rpButton);
 
         this.setLocation(defaultLocation);
     }
 
-    public void doIt()
+    public void packAndShow()
     {
         pack();
         setVisible(true);
+    }
+
+    private void buttonPressed()
+    {
+        boolean ok = true;
+
+        String name = rploginField.getText();
+        String newPW1 = new String(rpNewPW1.getPassword());
+        String newPW2 = new String(rpNewPW2.getPassword());
+        String oldPW = null;
+
+        ok = ok && webClient.validateField(this, name, "Login name");
+        ok = ok && webClient.validateField(this, newPW1, "New Password");
+        ok = ok && webClient.validateField(this, newPW2, "Password repeat");
+
+        if (!isRegister)
+        {
+            oldPW = new String(rpOldPW.getPassword());
+            ok = ok && webClient.validateField(this, oldPW, "Old Password");
+        }
+
+        if (!newPW1.equals(newPW2))
+        {
+            JOptionPane.showMessageDialog(this,
+                "Old and new password do not match!");
+            ok = false;
+        }
+
+        // validateXXXchecks and PW-compare showed message dialog if 
+        // something is wrong, so here we simply abort.
+        if (!ok)
+        {
+            return;
+        }
+
+        if (isRegister)
+        {
+            String hostname = webClient.getHost();
+            String portText = webClient.getPort();
+            String email = rpEmailField.getText();
+
+            ok = ok && webClient.validateField(this, hostname, "Host name");
+            ok = ok && webClient.validatePort(this, portText);
+            ok = ok && webClient.validateField(this, email, "Email Adress");
+
+            if (!ok)
+            {
+                return;
+            }
+
+            webClient.createRegisterWebClientSocketThread(name, newPW1, email);
+        }
+
+        else
+        {
+            String reason = webClient.tryChangePassword(name, oldPW, newPW1);
+            if (reason == null)
+            {
+                JOptionPane.showMessageDialog(this,
+                    "Password was changed successfully.",
+                    "Password change OK",
+                    JOptionPane.INFORMATION_MESSAGE);
+                this.dispose();
+            }
+            else
+            {
+                JOptionPane.showMessageDialog(this,
+                    "Changing password failed: " + reason,
+                    "Changing password failed",
+                    JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
 
     @Override
@@ -100,82 +182,5 @@ class RegisterPasswordPanel extends JDialog implements ActionListener
     {
         setVisible(false);
         super.dispose();
-    }
-
-    public void actionPerformed(ActionEvent e)
-    {
-        Object source = e.getSource();
-
-        if (source == rpButton)
-        {
-            boolean ok = true;
-
-            String name = rploginField.getText();
-            String newPW1 = new String(rpNewPW1.getPassword());
-            String newPW2 = new String(rpNewPW2.getPassword());
-            String oldPW = null;
-
-            ok = ok && webClient.validateField(this, name, "Login name");
-            ok = ok && webClient.validateField(this, newPW1, "New Password");
-            ok = ok && webClient.validateField(this, newPW2, "Password repeat");
-
-            if (!isRegister)
-            {
-                oldPW = new String(rpOldPW.getPassword());
-                ok = ok && webClient.validateField(this, oldPW, "Old Password");
-            }
-
-            if (!newPW1.equals(newPW2))
-            {
-                JOptionPane.showMessageDialog(this,
-                    "Old and new password do not match!");
-                ok = false;
-            }
-
-            // validateXXXchecks and PW-compare showed message dialog if 
-            // something is wrong, so here we simply abort.
-            if (!ok)
-            {
-                return;
-            }
-
-            if (isRegister)
-            {
-                String hostname = webClient.getHost();
-                String portText = webClient.getPort();
-                String email = rpEmailField.getText();
-
-                ok = ok && webClient.validateField(this, hostname, "Host name");
-                ok = ok && webClient.validatePort(this, portText);
-                ok = ok && webClient.validateField(this, email, "Email Adress");
-
-                if (!ok)
-                {
-                    return;
-                }
-
-                webClient.createRegisterWebClientSocketThread(name, newPW1, email);
-            }
-
-            else
-            {
-                String reason = webClient.tryChangePassword(name, oldPW, newPW1);
-                if (reason == null)
-                {
-                    JOptionPane.showMessageDialog(this,
-                        "Password was changed successfully.",
-                        "Password change OK",
-                        JOptionPane.INFORMATION_MESSAGE);
-                    this.dispose();
-                }
-                else
-                {
-                    JOptionPane.showMessageDialog(this,
-                        "Changing password failed: " + reason,
-                        "Changing password failed",
-                        JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        }
     }
 }

@@ -13,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
@@ -73,8 +74,7 @@ import net.sf.colossus.webcommon.IWebServer;
  *  @author Clemens Katzer
  */
 
-public class WebClient extends KFrame implements
-    ActionListener, IWebClient
+public class WebClient extends KFrame implements ActionListener, IWebClient
 {
     private static final Logger LOGGER = Logger.getLogger(WebClient.class
         .getName());
@@ -478,18 +478,28 @@ public class WebClient extends KFrame implements
         tabbedPane.addTab("Running Games", runningGamesTab);
         
         generalChat = new ChatHandler(IWebServer.generalChatName, "Chat",
-            this, server, username);
+            server, username);
         tabbedPane.addTab(generalChat.getTitle(), generalChat.getTab());
 
         createAdminTab();
         // adminTab is added to tabbedPane then/only when user has
-        // logged in and server informed us that this user as admin user
+        // logged in and server informed us that this user is admin user
 
-        // now finish all 
-        addWindowListener(this);
-        
+        addWindowListener(new WindowAdapter()
+        {
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+                Start startObj = Start.getCurrentStartObject();
+                startObj.setWhatToDoNext(Start.GetPlayersDialog);
+                dispose();
+            }
+        });
+
+        // TODO read from preferences?
         // setScheduledGamesMode(getScheduledGamesMode());
         
+        // now finish all 
         pack();
 
         useSaveWindow(options, "WebClient", defaultLocation);
@@ -957,7 +967,7 @@ public class WebClient extends KFrame implements
             + (switchToScheduling? "enabled" : "disabled"));
 
         setScheduledGamesMode(switchToScheduling);
-}
+    }
     
     private void createPreferencesPane()
     {
@@ -1420,6 +1430,7 @@ public class WebClient extends KFrame implements
     // this should always be called inside a invokeLater (i.e. in EDT)!!
     public void actualUpdateGUI()
     {
+        System.out.println("actualUpdateGUI, username " + username);
         // Many settings are only "loggedIn or not" specific - those first:
         if (state == NotLoggedIn)
         {
@@ -1745,7 +1756,7 @@ public class WebClient extends KFrame implements
     {
         String username = loginField.getText();
         registerPanel = new RegisterPasswordPanel(this, register, username);
-        registerPanel.doIt();
+        registerPanel.packAndShow();
     }
 
     public String tryChangePassword(String name, String oldPW, String newPW1)
@@ -2342,11 +2353,6 @@ public class WebClient extends KFrame implements
                 .isSelected());
         }
 
-        else if (generalChat.submitWasHandled(source))
-        {
-            // chatHandler did all what is needed; returned true
-            // iff it was an event in that chatTab
-        }
         else
         // A combo box was changed.
         {
@@ -2355,13 +2361,5 @@ public class WebClient extends KFrame implements
             // rather, we read the current state then when
             // user presses Propose game button.
         }
-    }
-
-    @Override
-    public void windowClosing(WindowEvent e)
-    {
-        Start startObj = Start.getCurrentStartObject();
-        startObj.setWhatToDoNext(Start.GetPlayersDialog);
-        dispose();
     }
 }

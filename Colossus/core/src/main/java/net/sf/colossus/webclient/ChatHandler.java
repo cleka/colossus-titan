@@ -1,9 +1,11 @@
 package net.sf.colossus.webclient;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.logging.Logger;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -19,14 +21,17 @@ import net.sf.colossus.webcommon.IWebServer;
 
 public class ChatHandler
 {
+    private static final Logger LOGGER = Logger.getLogger(ChatHandler.class
+        .getName());
+
     private final static String chatSubmitButtonText = "Submit";
-    
+
     private final static int textAreaHeight = 20;
     private final String id;
     private final String title;
     private String username;
     private IWebServer server = null;
-    
+
     private final JPanel chatTab;
 
     private final JButton chatSubmitButton;
@@ -47,8 +52,8 @@ public class ChatHandler
     private final static String dashes = "--------------------";
     private final static String doubledashes = "=========================";
 
-    public ChatHandler(String id, String title, ActionListener listener,
-        IWebServer server, String username)
+    public ChatHandler(String id, String title, IWebServer server,
+        String username)
     {
         this.id = id;
         this.title = title;
@@ -68,10 +73,18 @@ public class ChatHandler
 
         Box submitPane = new Box(BoxLayout.X_AXIS);
         newMessage = new JTextField(60);
-        newMessage.addActionListener(listener);
+        
+        ActionListener submitListener = new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                submitText(e.getSource());
+            }
+        };
+        newMessage.addActionListener(submitListener);
         newMessage.setEnabled(false);
         chatSubmitButton = new JButton(chatSubmitButtonText);
-        chatSubmitButton.addActionListener(listener);
+        chatSubmitButton.addActionListener(submitListener);
         chatSubmitButton.setEnabled(false);
         submitPane.setPreferredSize(chatSubmitButton.getMinimumSize());
 
@@ -115,6 +128,7 @@ public class ChatHandler
             }
             else
             {
+                this.username = username;
                 afterResentWhen = now;
                 afterResentSender = username;
                 afterResentMessage = dashes + txt + dashes;
@@ -124,7 +138,7 @@ public class ChatHandler
 
     }
 
-    public boolean submitWasHandled(Object source)
+    public void submitText(Object source)
     {
         if (source == chatSubmitButton || source == newMessage)
         {
@@ -136,11 +150,10 @@ public class ChatHandler
             }
             newMessage.setText("");
             server.chatSubmit(chatId, username, message);
-            return true;
         }
         else
         {
-            return false;
+            LOGGER.warning("");
         }
     }
 
