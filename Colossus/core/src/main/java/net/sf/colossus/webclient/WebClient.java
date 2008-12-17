@@ -35,6 +35,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -84,6 +85,9 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     // the default values / info texts according to Locale.
     final static Locale myLocale = Locale.GERMANY;
 
+    final static String TYPE_SCHEDULED = "scheduled";
+    final static String TYPE_INSTANTLY = "instantly";
+    
     private String hostname;
     private int port;
     private String login;
@@ -109,7 +113,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
     private final static String sep = net.sf.colossus.server.Constants.protocolTermSeparator;
 
-    boolean failedDueToDuplicateLogin = false;
+    private boolean failedDueToDuplicateLogin = false;
 
     private int state = NotLoggedIn;
     private String enrolledGameId = null;
@@ -125,12 +129,12 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     private IWebServer server = null;
     private WebClientSocketThread cst = null;
 
-    JTabbedPane tabbedPane;
-    Box serverTab;
-    JPanel preferencesPane;
-    Box createGamesTab;
-    Box runningGamesTab;
-    Box adminTab;
+    private JTabbedPane tabbedPane;
+    private Box serverTab;
+    private JPanel preferencesPane;
+    private Box createGamesTab;
+    private Box runningGamesTab;
+    private Box adminTab;
 
     private final Point defaultLocation = new Point(600, 100);
 
@@ -318,7 +322,6 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             else
             {
                 this.hostname = Constants.defaultWebServer;
-
             }
         }
 
@@ -420,7 +423,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             return;
         }
         CardLayout cl = (CardLayout)(gamesCards.getLayout());
-        cl.show(gamesCards, scheduled ? "scheduled" : "instantly");
+        cl.show(gamesCards, scheduled ? TYPE_SCHEDULED : TYPE_INSTANTLY);
     }
 
     public boolean getScheduledGamesMode()
@@ -463,15 +466,15 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         tabbedPane.setPreferredSize(new Dimension(900, 600)); // width x height
         tabbedPane.setMinimumSize(new Dimension(900, 530)); // width x height
 
-        Box mainPane = new Box(BoxLayout.Y_AXIS);
-        mainPane.add(tabbedPane);
-        getContentPane().add(mainPane, BorderLayout.CENTER);
+        // Box mainPane = new Box(BoxLayout.Y_AXIS);
+        // mainPane.add(tabbedPane);
+        getContentPane().add(tabbedPane, BorderLayout.CENTER);
 
         // Now the different tabs of the tabbed pane:
         createServerTab();
         tabbedPane.addTab("Server", serverTab);
        
-        createInstantGamesTab();
+        createCreateGamesTab();
         tabbedPane.addTab("Create or Join", createGamesTab);
                         
         createRunningGamesTab();
@@ -695,8 +698,11 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     }
 
     private void addRadioButton(Container cont, ButtonGroup group,
-        String text, String cmd, String current, ItemListener listener)
+        String text, String current, ItemListener listener)
     {
+        // use same word for cmd as the text on it:
+        String cmd = text;
+        
         JRadioButton rb = new JRadioButton(text);
         if (cmd != null && !cmd.equals(""))
         {
@@ -706,7 +712,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         group.add(rb);
         cont.add(rb);
         boolean selected = (text.equals(current));
-        rb.setAlignmentX(Box.LEFT_ALIGNMENT);
+        // rb.setAlignmentX(Box.LEFT_ALIGNMENT);
         rb.setSelected(selected);
     }
 
@@ -714,46 +720,58 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     {
         JLabel l = new JLabel(text);
         l.setFont(l.getFont().deriveFont(Font.PLAIN));
-        l.setAlignmentX(Box.LEFT_ALIGNMENT);
+        // l.setAlignmentX(Box.RIGHT_ALIGNMENT);
         return l;
     }
     
-    private void createInstantGamesTab()
+    private Box makeTextBox(Component c)
+    {
+        Box labelBox = new Box(BoxLayout.X_AXIS);
+        labelBox.add(c);
+        labelBox.add(Box.createHorizontalGlue());
+        return labelBox;
+    }
+
+    private void createCreateGamesTab()
     {
         createGamesTab = new Box(BoxLayout.Y_AXIS);
-        createGamesTab.setAlignmentX(Box.LEFT_ALIGNMENT);
+        // createGamesTab.setAlignmentX(Box.LEFT_ALIGNMENT);
                 
         createPreferencesPane();
-        preferencesPane.setAlignmentX(Box.LEFT_ALIGNMENT);
+        //preferencesPane.setAlignmentX(Box.LEFT_ALIGNMENT);
         createGamesTab.add(preferencesPane);
         
         Box proposeGamePane = new Box(BoxLayout.Y_AXIS);
-        proposeGamePane.setAlignmentX(Box.LEFT_ALIGNMENT);
+        proposeGamePane.setAlignmentX(Box.CENTER_ALIGNMENT);
         proposeGamePane.setBorder(new TitledBorder("Creating games:"));
-        proposeGamePane.add(nonBoldLabel("Set your preferences, fill in "
-            + "the 'Summary' text, then press 'Propose' to create a game:"));
+        
+        proposeGamePane.add(makeTextBox(
+            nonBoldLabel("Set your preferences, fill in "
+            + "the 'Summary' text, then press 'Propose' to create a game:")));
 
-        proposeGamePane.add(new JLabel("Summary: "));
+        proposeGamePane.add(Box.createRigidArea(new Dimension(0, 20)));
+        proposeGamePane.add(makeTextBox(new JLabel("Summary: ")));
         summaryText = new JTextField(defaultSummaryText);
-        summaryText.setAlignmentX(Box.LEFT_ALIGNMENT);
-        summaryText.setAlignmentY(Box.TOP_ALIGNMENT);
+        //summaryText.setAlignmentX(Box.LEFT_ALIGNMENT);
+        //summaryText.setAlignmentY(Box.TOP_ALIGNMENT);
         proposeGamePane.add(summaryText);
 
         ButtonGroup group = new ButtonGroup();
         Box scheduleModes = new Box(BoxLayout.Y_AXIS);
-        scheduleModes.setAlignmentX(LEFT_ALIGNMENT);
+        //scheduleModes.setAlignmentX(LEFT_ALIGNMENT);
         // NOTE: the actual radioButtons will be added later, see below
 
-        proposeGamePane.add(new JLabel("Choose the start time:"));
-        proposeGamePane.add(scheduleModes);
+        proposeGamePane.add(Box.createRigidArea(new Dimension(0, 20)));
+        proposeGamePane.add(makeTextBox(new JLabel("Choose the start time:")));
+        proposeGamePane.add(makeTextBox(scheduleModes));
 
         // The panel with all GUI stuff needed to schedule a game:
         Box schedulingPanel = new Box(BoxLayout.Y_AXIS);
-        schedulingPanel.setAlignmentX(Box.LEFT_ALIGNMENT);
+        //schedulingPanel.setAlignmentX(Box.LEFT_ALIGNMENT);
         schedulingPanel.setAlignmentY(Box.TOP_ALIGNMENT);
-        schedulingPanel.add(nonBoldLabel(
+        schedulingPanel.add(makeTextBox(nonBoldLabel(
             "Give a start date and time (dd.mm.yyyy and hh:mm) "
-            + "and a minimum duration in minutes:"));
+            + "and a minimum duration in minutes:")));
         
         // The panel for the actual schedule: date, time and duration fields
         Box schedulePanel = new Box(BoxLayout.X_AXIS);
@@ -769,19 +787,15 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         durationField = new JTextField("90");
         schedulePanel.add(durationField);
         
-        schedulePanel.setAlignmentX(Box.LEFT_ALIGNMENT);
+        //schedulePanel.setAlignmentX(Box.LEFT_ALIGNMENT);
         schedulePanel.setAlignmentY(Box.TOP_ALIGNMENT);
         
         schedulingPanel.add(schedulePanel);
-        
-        JLabel label1 = new JLabel("(the purpose of the duration value is: ");
-        label1.setFont(label1.getFont().deriveFont(Font.PLAIN));
-        schedulingPanel.add(label1);
-        JLabel label2 = new JLabel(" one should only enroll to that game if one "
-            + "knows that one "
-            + " will be available for at least that time)");
-        label2.setFont(label2.getFont().deriveFont(Font.PLAIN));
-        schedulingPanel.add(label2);
+        schedulingPanel.add(makeTextBox(nonBoldLabel(
+            "(the purpose of the duration value is: ")));
+        schedulingPanel.add(makeTextBox(nonBoldLabel(
+            " one should only enroll to that game if one "
+            + "knows that one " + " will be available for at least that time)")));
         schedulingPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
         proposeGamePane.add(schedulingPanel);
@@ -804,8 +818,8 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         // Panel for the enroll + unenroll buttons:
         Box joinGamePane = new Box(BoxLayout.Y_AXIS);
         joinGamePane.setBorder(new TitledBorder("Joining games someone else has proposed:"));
-        joinGamePane.add(nonBoldLabel("Select a game from the table below, "
-            + "and then click enroll to register for that game."));
+        joinGamePane.add(makeTextBox(nonBoldLabel("Select a game from the table below, "
+            + "and then click enroll to register for that game.")));
         
         JPanel euButtonPane = new JPanel(new GridLayout(0, 3));
         euButtonPane.add(new JLabel(""));
@@ -863,7 +877,6 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         JScrollPane instScrollpane = new JScrollPane(instGameTable);
         instGamesCard.add(instScrollpane, BorderLayout.CENTER);
         instGamesCard.add(startButton, BorderLayout.SOUTH);
-        System.out.println("instGamePane initialized");
         
         // Table for scheduled games:
         schedGamesCard = new JPanel(new BorderLayout());
@@ -891,8 +904,8 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         JPanel dummyCard = new JPanel(new BorderLayout());
         dummyCard.add(Box.createRigidArea(new Dimension(0, 50)));
         
-        gamesCards.add(instGamesCard, "instantly");
-        gamesCards.add(schedGamesCard, "scheduled");
+        gamesCards.add(instGamesCard, TYPE_INSTANTLY);
+        gamesCards.add(schedGamesCard, TYPE_SCHEDULED);
         gamesCards.add(dummyCard, "dummy");
         
         CardLayout cl = (CardLayout)gamesCards.getLayout();
@@ -905,7 +918,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         // we can add the buttons; because now the fields and tables
         // can be enabled or disabled based on "current" (initial) state 
         // of the radio buttons:
-        String current = "instantly";
+        String current = TYPE_INSTANTLY;
         ItemListener iListener = new ItemListener()
         {
             public void itemStateChanged(ItemEvent e)
@@ -913,8 +926,8 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
                 reactOnScheduleRadioButtonChange(e);
             }
         };
-        addRadioButton(scheduleModes, group, "instantly", "instantly", current, iListener);
-        addRadioButton(scheduleModes, group, "scheduled", "scheduled", current, iListener);
+        addRadioButton(scheduleModes, group, TYPE_INSTANTLY, current, iListener);
+        addRadioButton(scheduleModes, group, TYPE_SCHEDULED, current, iListener);
 
     }
 
@@ -944,11 +957,11 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
                 System.out.println("ItemEvent Object Text is null???");
                 return;
             }
-            if (text.equals("scheduled"))
+            if (text.equals(TYPE_SCHEDULED))
             {
                 switchToScheduling = true;
             }
-            else if (text.equals("instantly"))
+            else if (text.equals(TYPE_INSTANTLY))
             {
                 switchToScheduling = false;
             }
@@ -963,9 +976,6 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             System.out.println("ItemEvent Object is not a JRadioButton??");
             return;
         }
-        System.out.println("setting scheduling controls to " 
-            + (switchToScheduling? "enabled" : "disabled"));
-
         setScheduledGamesMode(switchToScheduling);
     }
     
@@ -1070,14 +1080,14 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         preferencesPane.add(playerSelection);
     }
 
-    private Box createRunningGamesTab()
+    private void createRunningGamesTab()
     {
         runningGamesTab = new Box(BoxLayout.Y_AXIS);
         
         // ----------------- First the table ---------------------
 
         Box runningGamesPane = new Box(BoxLayout.Y_AXIS);
-        // runningGamesPane.setAlignmentY(0);
+        runningGamesPane.setAlignmentY(0);
         runningGamesPane.setBorder(new TitledBorder("Running Games"));
         runningGamesPane.add(new JLabel(
             "The following games are already running:"));
@@ -1184,7 +1194,6 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         hideClientPanel.setMinimumSize(prefSize);
 */                
 
-        return runningGamesTab;
     }
     
     private void createAdminTab()
