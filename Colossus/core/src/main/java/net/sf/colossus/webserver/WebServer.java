@@ -570,7 +570,15 @@ public class WebServer implements IWebServer, IRunWebServer
                 client.gameCancelled(gameId, byUser);
             }
 
-            instantGames.remove(gi);
+            boolean scheduled = gi.isScheduledGame();
+            if (scheduled)
+            {
+                scheduledGames.remove(gi);
+            }
+            else
+            {
+                instantGames.remove(gi);
+            }
             updateGUI();
         }
     }
@@ -698,19 +706,22 @@ public class WebServer implements IWebServer, IRunWebServer
 
     private GameInfo findByGameId(String gameId)
     {
-        GameInfo gi_found = null;
-
-        Iterator<GameInfo> it = instantGames.iterator();
-        while (it.hasNext())
+        for (GameInfo gi : instantGames)
         {
-            GameInfo gi = it.next();
             if (gi.getGameId().equals(gameId))
             {
-                gi_found = gi;
+                return gi;
+            }
+        }
+        for (GameInfo gi : scheduledGames)
+        {
+            if (gi.getGameId().equals(gameId))
+            {
+                return gi;
             }
         }
 
-        return gi_found;
+        return null;
     }
 
     private boolean startOneGame(GameInfo gi)

@@ -148,6 +148,11 @@ public class GameInfo extends Thread
         return this.state;
     }
 
+    public boolean isScheduledGame()
+    {
+        return this.state == Scheduled;
+    }
+
     public String getStateString()
     {
         String stateString = "<unknown>";
@@ -334,20 +339,18 @@ public class GameInfo extends Thread
     public String getPlayerListAsString()
     {
         StringBuilder playerList = new StringBuilder("");
-        if (playerList.length() == 0)
+        if (players.size() == 0)
         {
             return "<none>";
         }
 
-        Iterator<User> it = players.iterator();
-        while (it.hasNext())
+        for (User u : players)
         {
             if (playerList.length() != 0)
             {
                 playerList.append(", ");
             }
-            User user = it.next();
-            playerList.append(user.getName());
+            playerList.append(u.getName());
         }
 
         return playerList.substring(0);

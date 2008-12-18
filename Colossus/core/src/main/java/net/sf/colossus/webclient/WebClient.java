@@ -35,7 +35,6 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -712,7 +711,6 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         group.add(rb);
         cont.add(rb);
         boolean selected = (text.equals(current));
-        // rb.setAlignmentX(Box.LEFT_ALIGNMENT);
         rb.setSelected(selected);
     }
 
@@ -735,10 +733,8 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     private void createCreateGamesTab()
     {
         createGamesTab = new Box(BoxLayout.Y_AXIS);
-        // createGamesTab.setAlignmentX(Box.LEFT_ALIGNMENT);
                 
         createPreferencesPane();
-        //preferencesPane.setAlignmentX(Box.LEFT_ALIGNMENT);
         createGamesTab.add(preferencesPane);
         
         Box proposeGamePane = new Box(BoxLayout.Y_AXIS);
@@ -752,13 +748,10 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         proposeGamePane.add(Box.createRigidArea(new Dimension(0, 20)));
         proposeGamePane.add(makeTextBox(new JLabel("Summary: ")));
         summaryText = new JTextField(defaultSummaryText);
-        //summaryText.setAlignmentX(Box.LEFT_ALIGNMENT);
-        //summaryText.setAlignmentY(Box.TOP_ALIGNMENT);
         proposeGamePane.add(summaryText);
 
         ButtonGroup group = new ButtonGroup();
         Box scheduleModes = new Box(BoxLayout.Y_AXIS);
-        //scheduleModes.setAlignmentX(LEFT_ALIGNMENT);
         // NOTE: the actual radioButtons will be added later, see below
 
         proposeGamePane.add(Box.createRigidArea(new Dimension(0, 20)));
@@ -767,7 +760,6 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
         // The panel with all GUI stuff needed to schedule a game:
         Box schedulingPanel = new Box(BoxLayout.Y_AXIS);
-        //schedulingPanel.setAlignmentX(Box.LEFT_ALIGNMENT);
         schedulingPanel.setAlignmentY(Box.TOP_ALIGNMENT);
         schedulingPanel.add(makeTextBox(nonBoldLabel(
             "Give a start date and time (dd.mm.yyyy and hh:mm) "
@@ -786,8 +778,6 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         schedulePanel.add(new JLabel(" Duration: "));
         durationField = new JTextField("90");
         schedulePanel.add(durationField);
-        
-        //schedulePanel.setAlignmentX(Box.LEFT_ALIGNMENT);
         schedulePanel.setAlignmentY(Box.TOP_ALIGNMENT);
         
         schedulingPanel.add(schedulePanel);
@@ -849,8 +839,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         Box startButtonPane = new Box(BoxLayout.X_AXIS);
         startButtonPane.add(startButton);
         startButtonPane.add(Box.createHorizontalGlue());
-        gamesTablesPanel.add(startButtonPane, BorderLayout.SOUTH);
-        
+
         gamesCards = new JPanel(new CardLayout());
         gamesTablesPanel.add(gamesCards, BorderLayout.CENTER);
         
@@ -876,7 +865,6 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         instGameTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane instScrollpane = new JScrollPane(instGameTable);
         instGamesCard.add(instScrollpane, BorderLayout.CENTER);
-        instGamesCard.add(startButton, BorderLayout.SOUTH);
         
         // Table for scheduled games:
         schedGamesCard = new JPanel(new BorderLayout());
@@ -911,8 +899,11 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         CardLayout cl = (CardLayout)gamesCards.getLayout();
         cl.show(gamesCards, "dummy");
         
+        Box bottomPanel = new Box(BoxLayout.Y_AXIS);
+        bottomPanel.add(startButtonPane);
         infoTextLabel = new JLabel(enrollText);
-        gamesTablesPanel.add(infoTextLabel, BorderLayout.SOUTH);
+        bottomPanel.add(infoTextLabel);
+        gamesTablesPanel.add(bottomPanel, BorderLayout.SOUTH);
 
         // Now that we have the scheduling fields and the tables,
         // we can add the buttons; because now the fields and tables
@@ -928,7 +919,6 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         };
         addRadioButton(scheduleModes, group, TYPE_INSTANTLY, current, iListener);
         addRadioButton(scheduleModes, group, TYPE_SCHEDULED, current, iListener);
-
     }
 
     public void reactOnScheduleRadioButtonChange(ItemEvent e)
@@ -1436,10 +1426,34 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
     }
 
+    public String getSelectedGameId()
+    {
+        String id = null;
+        
+        if (getScheduledGamesMode())
+        {
+            int selRow = schedGameTable.getSelectedRow();
+            if (selRow != -1)
+            {
+                id = (String)schedGameTable.getValueAt(selRow, 0);
+                // System.out.println("getSelectedGameId: type scheduled, id is " + id);
+            }
+        }
+        else
+        {
+            int selRow = instGameTable.getSelectedRow();
+            if (selRow != -1)
+            {
+                id = (String)instGameTable.getValueAt(selRow, 0);
+                // System.out.println("getSelectedGameId: type instant, id is " + id);
+            }
+        }
+        return id;
+    }
+
     // this should always be called inside a invokeLater (i.e. in EDT)!!
     public void actualUpdateGUI()
     {
-        System.out.println("actualUpdateGUI, username " + username);
         // Many settings are only "loggedIn or not" specific - those first:
         if (state == NotLoggedIn)
         {
@@ -1475,8 +1489,8 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         }
         else if (state == LoggedIn)
         {
-            int selRow = instGameTable.getSelectedRow();
-            if (selRow == -1)
+            String selectedGameId = getSelectedGameId();
+            if (selectedGameId == null)
             {
                 enrollButton.setEnabled(false);
                 cancelButton.setEnabled(false);
@@ -1484,7 +1498,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             else
             {
                 enrollButton.setEnabled(true);
-                if (isOwner(selRow))
+                if (isOwner(selectedGameId))
                 {
                     cancelButton.setEnabled(true);
                 }
@@ -1580,14 +1594,11 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         return gi;
     }
 
-    private boolean isOwner(int row)
+    private boolean isOwner(String gameId)
     {
-        String initiator = (String)instGameTable.getValueAt(row, 2);
-        if (username.equals(initiator))
-        {
-            return true;
-        }
-        return false;
+        GameInfo gi = findGameById(gameId);
+        String initiator = gi.getInitiator();
+        return(username.equals(initiator));
     }
 
     /* Validate that the given field does not contain any substring which
@@ -1793,6 +1804,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
     private void doCancel(String gameId)
     {
+        System.out.println("doing server.cancel gameId " + gameId + " user " + username);
         server.cancelGame(gameId, username);
         updateGUI();
     }
@@ -1889,9 +1901,19 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     {
         state = Enrolled;
         enrolledGameId = gameId;
-
-        int index = instGameDataModel.getRowIndex(gameId).intValue();
-        instGameTable.setRowSelectionInterval(index, index);
+        GameInfo gi = findGameById(gameId); 
+        boolean scheduled = gi.isScheduledGame();
+        
+        if (scheduled)
+        {
+            int index = schedGameDataModel.getRowIndex(gameId).intValue();
+            schedGameTable.setRowSelectionInterval(index, index);
+        }
+        else
+        {
+            int index = instGameDataModel.getRowIndex(gameId).intValue();
+            instGameTable.setRowSelectionInterval(index, index);
+        }
         updateGUI();
     }
 
@@ -2047,6 +2069,8 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
     public void gameCancelled(String gameId, String byUser)
     {
+        System.out.println("Game " + gameId + " was cancelled.");
+        
         if (state == Enrolled && enrolledGameId.equals(gameId))
         {
             String message = "Game " + gameId + " was cancelled by user "
@@ -2057,8 +2081,14 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             updateGUI();
         }
 
-        instGameDataModel.removeGame(gameId);
-
+        if (getScheduledGamesMode())
+        {
+            schedGameDataModel.removeGame(gameId);
+        }
+        else
+        {
+            instGameDataModel.removeGame(gameId);
+        }
     }
 
     public void chatDeliver(String chatId, long when, String sender,
@@ -2224,11 +2254,10 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
         else if (source == enrollButton)
         {
-            int selRow = instGameTable.getSelectedRow();
-            if (selRow != -1)
+            String selectedGameId = getSelectedGameId();
+            if (selectedGameId != null)
             {
-                String gameId = (String)instGameTable.getValueAt(selRow, 0);
-                boolean ok = doEnroll(gameId);
+                boolean ok = doEnroll(selectedGameId);
                 if (ok)
                 {
                     // instGameTable.setEnabled(false);
@@ -2237,13 +2266,13 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         }
         else if (source == unenrollButton)
         {
-            int selRow = instGameTable.getSelectedRow();
-            if (selRow != -1)
+            String selectedGameId = getSelectedGameId();
+            if (selectedGameId != null)
             {
-                String gameId = (String)instGameTable.getValueAt(selRow, 0);
-                boolean ok = doUnenroll(gameId);
+                boolean ok = doUnenroll(selectedGameId);
                 if (ok)
                 {
+                    schedGameTable.setEnabled(true);
                     instGameTable.setEnabled(true);
                 }
             }
@@ -2251,24 +2280,22 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
         else if (source == cancelButton)
         {
-            int selRow = instGameTable.getSelectedRow();
-            if (selRow != -1)
+            String selectedGameId = getSelectedGameId();
+            if (selectedGameId != null)
             {
-                String gameId = (String)instGameTable.getValueAt(selRow, 0);
-                doCancel(gameId);
+                doCancel(selectedGameId);
             }
         }
 
         else if (source == startButton)
         {
-            int selRow = instGameTable.getSelectedRow();
-            if (selRow != -1)
+            String selectedGameId = getSelectedGameId();
+            if (selectedGameId != null)
             {
-                String gameId = (String)instGameTable.getValueAt(selRow, 0);
-
-                boolean ok = doStart(gameId);
+                boolean ok = doStart(selectedGameId);
                 if (ok)
                 {
+                    schedGameTable.setEnabled(false);
                     instGameTable.setEnabled(false);
                 }
             }
