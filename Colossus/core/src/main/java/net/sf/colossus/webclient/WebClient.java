@@ -193,9 +193,6 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     private JRadioButton autoGSHideRB;
     private JRadioButton autoGSCloseRB;
 
-    // automatic actions when game starts (client masterboard comes up):
-    private ButtonGroup autoGSActionGroup;
-
     private JLabel infoTextLabel;
     final static String needLoginText = "You need to login to browse or propose Games.";
     final static String enrollText = "Propose or Enroll, and when enough players have enrolled, one of them can press 'Start'.";
@@ -1136,7 +1133,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         autoGSHideRB.addActionListener(this);
         autoGSCloseRB.addActionListener(this);
 
-        autoGSActionGroup = new ButtonGroup();
+        ButtonGroup autoGSActionGroup = new ButtonGroup();
         autoGSActionGroup.add(autoGSNothingRB);
         autoGSActionGroup.add(autoGSHideRB);
         autoGSActionGroup.add(autoGSCloseRB);
