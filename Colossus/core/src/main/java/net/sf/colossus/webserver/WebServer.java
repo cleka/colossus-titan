@@ -507,14 +507,15 @@ public class WebServer implements IWebServer, IRunWebServer
     {
         String gameId = gi.getGameId();
 
-        ArrayList<User> players = gi.getPlayers();
-        Iterator<User> it = players.iterator();
-
-        while (it.hasNext())
+        for (User u : gi.getPlayers())
         {
-            User u = it.next();
             IWebClient client = (IWebClient)u.getThread();
-            client.gameStarted(gameId);
+            // might be null, for example if automatic
+            // "on game start close web client" is in use
+            if (client != null)
+            {
+                client.gameStarted(gameId);
+            }
         }
     }
 
