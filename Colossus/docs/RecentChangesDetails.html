@@ -13,6 +13,25 @@
 This describes the recent changes in some more detail than just the
 one-line-info on the main pages "News" section.
 
+<h3>December 27+, 2008: Public Testing Build from r3514+</h3>
+<p>Changes since last Public Testing Build (2008-11-21):</p>
+<p>Some small user-visible changes this time, some cleanup 
+   and some work on the "WebSercer/WebClient"</p>
+
+<ul>
+<li>Fixed the problem that Quit in WebClient did not really directly Quit</li>
+<li>Fixed: 2322870 Bogus packet (only half message written and then fully)</li>
+<li>During pick color (and pick initial marker), display in the bottom bar 
+    a message telling so</li>
+<li>If game is already 512 turns (or more ;-) do not display the split history
+    graph (would cause error messages)</li>
+<li>Move WebClient classes to own, new package</li>    
+<li>Improvements to the "accepting clients" handling</li>
+<li>Quite some work on the "Scheduled Games" functionality for WebServer code</li>
+</ul>
+
+<hr></hr>
+
 <h3>November 21, 2008: Public Testing Build from r3500</h3>
 <p>Changes since last Public Build (2008-10-29):</p>
 <p>Not much user-visible changes this time, lot of cleanup.</p>
@@ -29,8 +48,6 @@ one-line-info on the main pages "News" section.
     send some message immediately after accepting the client</li>
 <li>Improved handling for remote clients one game end with AutoQuit</li>    
 </ul>
-
-<hr></hr>
 
 <h3>October 29, 2008: Public Build from r3455</h3>
 <p>Changes since last Public Build (2008-10-10):</p>
