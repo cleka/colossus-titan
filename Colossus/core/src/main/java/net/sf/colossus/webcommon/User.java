@@ -48,8 +48,15 @@ public class User
     private String email;
     private boolean isAdmin;
     private String created;
+    // Only needed during registration:
+    private String confirmationCode;
+
+    private static final HashMap<String, User> pendingRegistrations
+        = new HashMap<String, User>();
 
     private Thread thread;
+    private static final int MAX_RANDOM = 99;
+
 
     public User(String name)
     {
@@ -57,13 +64,14 @@ public class User
     }
 
     public User(String name, String password, String email, boolean isAdmin,
-        String created)
+        String created, String confCode)
     {
         this.name = name;
         this.password = password;
         this.email = email;
         this.isAdmin = isAdmin;
         this.created = created;
+        this.confirmationCode = confCode;
     }
 
     public String getName()
@@ -74,6 +82,12 @@ public class User
     public String getEmail()
     {
         return email;
+    }
+
+    // Only used during while registration is pending.
+    private String getConfirmationnCode()
+    {
+        return confirmationCode;
     }
 
     public boolean isAdmin()
@@ -198,8 +212,9 @@ public class User
     }
 
     public static String registerUser(String username, String password,
-        String email, boolean isAdmin)
+        String email)
     {
+        boolean isAdmin = false;
         User alreadyExisting = findUserByName(username);
         if (alreadyExisting != null)
         {
@@ -216,12 +231,84 @@ public class User
         else
         {
             String created = makeCreatedDate(new Date().getTime());
+            String cCode = makeConfirmationCode();
+            User u = new User(username, password, email, isAdmin, created, cCode);
+            
+            String reason = sendConfirmationMail(username, email, cCode);
+            if (reason != null)
+            {
+                // mail sending failed, for some reason. Let user know it.
+                return reason;
+            }
+                
+            pendingRegistrations.put(username, u);
+            // so far everything fine. Now client shall request the conf. code
+            
+            // DEBUG: for now, client side does not support the handling
+            //        of the the confirmation code, so we skip it now 
+            //        and just say all is fine by returning null.
+            // reason = "Please provide confirmation code";
 
-            User u = new User(username, password, email, isAdmin, created);
+            // DEBUG: instead, complete registration as before.
+            pendingRegistrations.remove(username);
             storeUser(u);
             storeUsersToFile();
-            return null;
+
+            // No need to set it null, it IS null anyway...
+            return reason;
         }
+    }
+
+    public static String sendConfirmationMail(String username,
+        String email, String confCode)
+    {
+        // this is in webcommon package:
+        return ColossusMail.sendConfirmationMail(username, email, confCode);
+    }
+
+    private static String makeConfirmationCode()
+    {
+        long n1 = Math.round((MAX_RANDOM * Math.random()));
+        long n2 = (new Date().getTime()) % MAX_RANDOM;
+        long n3 = Math.round((MAX_RANDOM * Math.random()));
+
+        return n1 + " " + n2 + " " + n3;
+    }
+
+    public static String confirmUserRegistration(String username,
+        String confirmationCode)
+    {
+        String reason = "";
+        if (confirmationCode == null || confirmationCode.equals("null")
+            || confirmationCode.equals(""))
+        {
+            reason = "Missing confirmation code";
+            return reason;
+        }
+
+        
+        reason = confirmIfCorrectCode(username, confirmationCode);
+        return reason;
+    }
+
+    private static String confirmIfCorrectCode(String username, String confirmationCode)
+    {
+        User u = pendingRegistrations.get(username);
+        if (u == null)
+        {
+            return "No confirmation pending for this username";
+        }
+        
+        if (!u.getConfirmationnCode().equals(confirmationCode))
+        {
+            return "Wrong confirmation code!";
+        }
+
+        pendingRegistrations.remove(username);
+        storeUser(u);
+        storeUsersToFile();
+        
+        return null;
     }
 
     public static String changeProperties(String username, String oldPW,
@@ -289,7 +376,7 @@ public class User
             LOGGER.log(Level.WARNING, "invalid type '" + type
                 + "' in user file line '" + line + "'");
         }
-        User u = new User(name, password, email, isAdmin, created);
+        User u = new User(name, password, email, isAdmin, created, "");
         storeUser(u);
     }
 

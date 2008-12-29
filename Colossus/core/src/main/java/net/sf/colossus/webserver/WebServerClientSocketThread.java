@@ -301,7 +301,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
                 String password = tokens[2];
                 String email = tokens[3];
 
-                reason = server.registerUser(username, password, email, false);
+                reason = server.registerUser(username, password, email);
                 if (reason == null)
                 {
                     ok = true;

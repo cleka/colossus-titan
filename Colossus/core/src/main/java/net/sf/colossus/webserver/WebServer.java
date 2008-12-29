@@ -68,6 +68,7 @@ public class WebServer implements IWebServer, IRunWebServer
 
     private final List<ChatMessage> lastNChatMessages = new ArrayList<ChatMessage>();
 
+
     public static void main(String[] args)
     {
         String optionsFileName = WebServerConstants.defaultOptionsFilename;
@@ -688,10 +689,16 @@ public class WebServer implements IWebServer, IRunWebServer
         // only listed here to satisfy the interface.
     }
 
-    public String registerUser(String username, String password, String email,
-        boolean isAdmin)
+    public String registerUser(String username, String password, String email)
     {
-        String reason = User.registerUser(username, password, email, isAdmin);
+        String reason = User.registerUser(username, password, email);
+        return reason;
+    }
+
+    public String confirmUserRegistration(String username,
+        String confirmationCode)
+    {
+        String reason = User.confirmUserRegistration(username, confirmationCode);
         return reason;
     }
 
