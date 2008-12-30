@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import net.sf.colossus.webcommon.GameInfo;
 import net.sf.colossus.webcommon.IWebClient;
 import net.sf.colossus.webcommon.IWebServer;
+import net.sf.colossus.webcommon.User;
 
 
 /** This implements the webserver/client communication at client side.
@@ -58,7 +59,8 @@ public class WebClientSocketThread extends Thread implements IWebServer
     private WebClientSocketThreadException failedException = null;
 
     public WebClientSocketThread(WebClient wcGUI, String hostname, int port,
-        String username, String password, boolean force, String email)
+        String username, String password, boolean force, String email,
+        String confCode)
     {
         super("WebClientSocketThread for user " + username);
         this.webClient = wcGUI;
@@ -75,13 +77,22 @@ public class WebClientSocketThread extends Thread implements IWebServer
 
         try
         {
-            // they both or all three might throw an exception if they fail:
+            // connect, as well as any of the three below 
+            // might throw an exception if they fail:
             connect();
 
-            // If client GUI provided a password, it's a registration attempt,
+            // If client GUI provided a confirmation code, then in is a 
+            // confirmation for a previously sent registration; otherwise:
+            // If client GUI provided an email, it's a registration attempt,
             // otherwise just a normal login.
-            if (email != null)
+            if (confCode != null)
             {
+                // confirmation
+                confirm(confCode);
+            }
+            else if (email != null)
+            {
+                // initial registration
                 register();
             }
             else
@@ -131,10 +142,15 @@ public class WebClientSocketThread extends Thread implements IWebServer
         if (info != null)
         {
             String message = info;
-            throw new WebClientSocketThreadException(message, false);
+            throw new WebClientSocketThreadException(message);
         }
     }
 
+    /**
+     * Initial registration attempt
+     * 
+     * @throws WebClientSocketThreadException
+     */
     private void register() throws WebClientSocketThreadException
     {
         String info = null;
@@ -179,10 +195,70 @@ public class WebClientSocketThread extends Thread implements IWebServer
 
         if (info != null)
         {
-            String message = "Registration failed: " + info;
-            // not needed in reg. case, just the exception constructor expects it
-            boolean duplicateLogin = false;
-            throw new WebClientSocketThreadException(message, duplicateLogin);
+            String message = info;
+            if (!info.equals(User.PROVIDE_CONFCODE))
+            {
+                message = "Registration failed: " + info;
+            }
+
+            throw new WebClientSocketThreadException(message);
+        }
+    }
+
+    /**
+     * Send the confirmation code 
+     * @throws WebClientSocketThreadException
+     */
+    private void confirm(String confCode) throws WebClientSocketThreadException
+    {
+        String info = null;
+
+        try
+        {
+            this.in = new BufferedReader(new InputStreamReader(socket
+                .getInputStream()));
+
+            send(ConfirmRegistration + sep + username + sep + confCode);
+            String fromServer = null;
+
+            if ((fromServer = this.in.readLine()) != null)
+            {
+                if (fromServer.startsWith("ACK:"))
+                {
+                    // ("WCST.confirm(): ok, got ACK! ("+fromServer+")");
+                }
+                else
+                {
+                    String prefix = "NACK: " + IWebServer.ConfirmRegistration + sep;
+                    if (fromServer.startsWith(prefix))
+                    {
+                        info = fromServer.substring(prefix.length());
+                    }
+                    else
+                    {
+                        info = fromServer;
+                    }
+                }
+            }
+            else
+            {
+                info = "NULL reply from server (socket closed??)!";
+            }
+        }
+        catch (Exception ex)
+        {
+            writeLog(ex.toString());
+            info = "Creating or reading from buffered reader failed";
+        }
+
+        if (info != null)
+        {
+            String message = info;
+            if (!info.equals(User.PROVIDE_CONFCODE))
+            {
+                message = "Registration failed: " + info;
+            }
+            throw new WebClientSocketThreadException(message);
         }
     }
 
@@ -266,7 +342,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
         {
             while (!done && (fromServer = this.in.readLine()) != null)
             {
-                System.out.println("Webclient got line: " + fromServer);
+                // System.out.println("Webclient got line: " + fromServer);
                 String[] tokens = fromServer.split(sep, -1);
                 String command = tokens[0];
 
@@ -597,10 +673,15 @@ public class WebClientSocketThread extends Thread implements IWebServer
             failedBecauseAlreadyLoggedIn = dupl;
         }
 
+        public WebClientSocketThreadException(String message)
+        {
+            super(message);
+            failedBecauseAlreadyLoggedIn = false;
+        }
+
         public boolean failedBecauseAlreadyLoggedIn()
         {
             return failedBecauseAlreadyLoggedIn;
         }
     }
-
 }

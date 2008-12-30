@@ -12,6 +12,7 @@ public interface IWebServer
     public static String Login = "login";
     public static String Logout = "logout";
     public static String RegisterUser = "register";
+    public static String ConfirmRegistration = "confirm";
     public static String ChangePassword = "changepassword";
     public static String Propose = "propose";
     public static String Enroll = "enroll";

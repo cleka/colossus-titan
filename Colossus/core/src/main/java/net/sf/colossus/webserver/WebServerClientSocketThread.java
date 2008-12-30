@@ -292,10 +292,33 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             }
         }
 
+        else if (!loggedIn && command.equals(IWebServer.ConfirmRegistration))
+        {
+            ok = false;
+            if (tokens.length >= 2)
+            {
+                String username = tokens[1];
+                String confCode = tokens[2];
+
+                reason = server.confirmRegistration(username, confCode);
+                if (reason == null)
+                {
+                    ok = true;
+                }
+            }
+            else
+            {
+                reason = "Username or confirmation code missing.";
+                ok = false;
+            }
+
+            done = true;
+        }
+
         else if (!loggedIn && command.equals(IWebServer.RegisterUser))
         {
             ok = false;
-            if (tokens.length >= 4)
+            if (tokens.length >= 3)
             {
                 String username = tokens[1];
                 String password = tokens[2];

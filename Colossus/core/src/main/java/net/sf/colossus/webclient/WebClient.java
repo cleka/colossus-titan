@@ -415,7 +415,6 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         
         if (instGamesCard == null || schedGamesCard == null || gamesCards == null)
         {
-            System.out.println("too early!");
             return;
         }
         CardLayout cl = (CardLayout)(gamesCards.getLayout());
@@ -554,7 +553,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         }
     }
 
-    private void updateStatus(String text, Color color)
+    public void updateStatus(String text, Color color)
     {
         this.statusText = text;
         statusField.setText(text);
@@ -941,7 +940,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             String text = b.getText();
             if (text == null)
             {
-                System.out.println("ItemEvent Object Text is null???");
+                LOGGER.warning("ItemEvent Object Text is null???");
                 return;
             }
             if (text.equals(TYPE_SCHEDULED))
@@ -954,13 +953,13 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             }
             else
             {
-                System.out.println("ItemEvent Object Text is neither 'scheduled' nor 'instantly'??");
+                LOGGER.warning("ItemEvent Object Text is neither 'scheduled' nor 'instantly'??");
                 return;
             }
         }
         else
         {
-            System.out.println("ItemEvent Object is not a JRadioButton??");
+            LOGGER.warning("ItemEvent Object is not a JRadioButton??");
             return;
         }
         setScheduledGamesMode(switchToScheduling);
@@ -1217,7 +1216,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
         // email is null: WCST does login
         cst = new WebClientSocketThread(this, hostname, port, username,
-            password, force, null);
+            password, force, null, null);
         WebClientSocketThread.WebClientSocketThreadException e = cst
             .getException();
         if (e == null)
@@ -1268,14 +1267,16 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     }
 
     public String createRegisterWebClientSocketThread(String username,
-        String password, String email)
+        String password, String email, String confCode)
     {
         String reason = null;
         boolean force = false; // dummy
 
-        // email is NOT null: WCST does register first instead of login
+        // 1) confCode is not null: WCST does the confirmation
+        // 2) email is NOT null: WCST does register first instead
+        // 3) otherwise: normal login
         cst = new WebClientSocketThread(this, hostname, port, username,
-            password, force, email);
+            password, force, email, confCode);
 
         WebClientSocketThread.WebClientSocketThreadException e = cst
             .getException();
@@ -1298,16 +1299,14 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         else
         {
             reason = e.getMessage();
-
             if (reason == null)
             {
                 reason = "Unknown reason";
             }
 
-            updateStatus("Registration/login failed", Color.red);
-
-            JOptionPane.showMessageDialog(registerPanel, reason);
-            return reason;
+            // Register password panel handles this from here on,
+            // namely let the user input the confirmation code and
+            // submitting it.
         }
 
         return reason;
@@ -1801,7 +1800,6 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
     private void doCancel(String gameId)
     {
-        System.out.println("doing server.cancel gameId " + gameId + " user " + username);
         server.cancelGame(gameId, username);
         updateGUI();
     }
@@ -2066,8 +2064,6 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
     public void gameCancelled(String gameId, String byUser)
     {
-        System.out.println("Game " + gameId + " was cancelled.");
-        
         if (state == Enrolled && enrolledGameId.equals(gameId))
         {
             String message = "Game " + gameId + " was cancelled by user "
@@ -2239,7 +2235,6 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             int duration = getDuration();
             String summaryText = getSummaryText();
             
-            System.out.println("WebCLient propose: scheduled=" + scheduled + ", start=" + startAt);
             do_proposeGame(variantBox.getSelectedItem().toString(),
                 viewmodeBox.getSelectedItem().toString(), 
                 startAt, duration, summaryText,

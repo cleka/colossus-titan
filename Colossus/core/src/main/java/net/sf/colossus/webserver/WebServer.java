@@ -695,10 +695,10 @@ public class WebServer implements IWebServer, IRunWebServer
         return reason;
     }
 
-    public String confirmUserRegistration(String username,
+    public String confirmRegistration(String username,
         String confirmationCode)
     {
-        String reason = User.confirmUserRegistration(username, confirmationCode);
+        String reason = User.confirmRegistration(username, confirmationCode);
         return reason;
     }
 

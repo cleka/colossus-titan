@@ -1,5 +1,6 @@
 package net.sf.colossus.webclient;
 
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.Point;
@@ -13,6 +14,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+
+import net.sf.colossus.webcommon.User;
 
 
 
@@ -67,7 +70,7 @@ class RegisterPasswordPanel extends JDialog
         {
             // register instead needs an email:
             p.add(new JLabel("Email address"));
-            rpEmailField = new JTextField(defaultEmail);
+            rpEmailField = new JTextField(defaultEmail, 20);
             p.add(rpEmailField);
         }
 
@@ -107,6 +110,28 @@ class RegisterPasswordPanel extends JDialog
 
     private void buttonPressed()
     {
+        Runnable tempRunnable = new Runnable()
+        {
+            public void run()
+            {
+                // System.out.println("** Runnable started");
+                buttonPressedActualAction();
+                // System.out.println("** Runnable completed");
+            }
+        };
+        // System.out.println("* Creating the runnable");
+        Thread tempThread = new Thread(tempRunnable,
+            "RegisterPasswordPanelButtonPressedRunnable");
+        tempThread.start();
+        // System.out.println("* Done with creating the runnable");
+    }
+    
+    /** Run inside the Runnable/thread that was created when the
+     *  Register / Change password button was pressed.
+     *
+     */
+    private void buttonPressedActualAction()
+    {
         boolean ok = true;
 
         String name = rploginField.getText();
@@ -127,7 +152,14 @@ class RegisterPasswordPanel extends JDialog
         if (!newPW1.equals(newPW2))
         {
             JOptionPane.showMessageDialog(this,
-                "Old and new password do not match!");
+                "Password and repeated password do not match!");
+            ok = false;
+        }
+
+        if (newPW1.equals(oldPW))
+        {
+            JOptionPane.showMessageDialog(this,
+                "Old and new are the same - no point to change!");
             ok = false;
         }
 
@@ -148,12 +180,34 @@ class RegisterPasswordPanel extends JDialog
             ok = ok && webClient.validatePort(this, portText);
             ok = ok && webClient.validateField(this, email, "Email Adress");
 
+            if (email.equals(defaultEmail))
+            {
+                JOptionPane.showMessageDialog(this,
+                    "Please provide an email address!");
+                ok = false;
+            }
+            else if (!looksLikeValidEmailAddress(email))
+            {
+                ok = false;
+            }
+
             if (!ok)
             {
                 return;
             }
 
-            webClient.createRegisterWebClientSocketThread(name, newPW1, email);
+            String reason = webClient.createRegisterWebClientSocketThread(
+                name, newPW1, email, null);
+            
+            if (reason.equals(User.PROVIDE_CONFCODE))
+            {
+                handleConfirmation(name, newPW1, email);
+            }
+            else
+            {
+                webClient.updateStatus("Registration failed", Color.red);
+                JOptionPane.showMessageDialog(this, reason);
+            }
         }
 
         else
@@ -173,6 +227,60 @@ class RegisterPasswordPanel extends JDialog
                     "Changing password failed: " + reason,
                     "Changing password failed",
                     JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private boolean looksLikeValidEmailAddress(String email)
+    {
+        String regex = "[-.\\w]+@[-.\\w]+\\.[-\\w]+";
+        if (email.matches(regex))
+        {
+            return true;
+        }
+        else
+        {
+            JOptionPane.showMessageDialog(this,
+                "Email address does appear to be invalid!\n"
+                + "(allowed are: 'a-z, A-Z, 0-9, _ - .' and one '@'.");
+            return false;
+        }
+    }
+
+    private void handleConfirmation(String name, String newPW1, String email)
+    {
+        boolean done = false;
+        while (!done)
+        {
+            String providedConfCode = JOptionPane.showInputDialog(this,
+                "Type in the confirmation code", User.TEMPLATE_CONFCODE);
+//            System.out.println("input dialog returned result '"
+//                + providedConfCode + "'!");
+
+            if (providedConfCode == null)
+            {
+                // TODO send a cancel message to server so that it 
+                //      removes the pending user from list?
+                //      Not critical, because if user tries again
+                //      it will replace it anyway...
+                done = true;
+            }
+            else if (providedConfCode.equals(User.TEMPLATE_CONFCODE)
+                ||   providedConfCode.equals("") )
+            {
+                JOptionPane.showMessageDialog(this,
+                    "Confirmation code must not be empty and not "
+                    + "the provided example!!");
+            }
+            else
+            {
+                String reason2 = webClient.
+                    createRegisterWebClientSocketThread(name, newPW1,
+                        email, providedConfCode);
+                if (reason2 == null)
+                {
+                    done = true;
+                }
             }
         }
     }

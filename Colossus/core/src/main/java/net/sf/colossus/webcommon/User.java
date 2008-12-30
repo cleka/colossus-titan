@@ -57,6 +57,11 @@ public class User
     private Thread thread;
     private static final int MAX_RANDOM = 99;
 
+    public final static String PROVIDE_CONFCODE = "Provide the confirmation code";
+    public final static String TEMPLATE_CONFCODE = "10 20 30";
+    public final static String TEMPLATE_CONFCODE_REPLACEMENT = "11 21 31";
+    
+    
 
     public User(String name)
     {
@@ -85,7 +90,7 @@ public class User
     }
 
     // Only used during while registration is pending.
-    private String getConfirmationnCode()
+    private String getConfirmationCode()
     {
         return confirmationCode;
     }
@@ -243,18 +248,8 @@ public class User
                 
             pendingRegistrations.put(username, u);
             // so far everything fine. Now client shall request the conf. code
-            
-            // DEBUG: for now, client side does not support the handling
-            //        of the the confirmation code, so we skip it now 
-            //        and just say all is fine by returning null.
-            // reason = "Please provide confirmation code";
 
-            // DEBUG: instead, complete registration as before.
-            pendingRegistrations.remove(username);
-            storeUser(u);
-            storeUsersToFile();
-
-            // No need to set it null, it IS null anyway...
+            reason = PROVIDE_CONFCODE;
             return reason;
         }
     }
@@ -272,10 +267,17 @@ public class User
         long n2 = (new Date().getTime()) % MAX_RANDOM;
         long n3 = Math.round((MAX_RANDOM * Math.random()));
 
-        return n1 + " " + n2 + " " + n3;
+        String confCode = n1 + " " + n2 + " " + n3;
+        // Do not let happen it to be exactly the template code
+        // - the client GUI verifies that user has typed something different
+        if (confCode.equals(TEMPLATE_CONFCODE))
+        {
+            confCode = TEMPLATE_CONFCODE_REPLACEMENT;
+        }
+        return confCode;
     }
 
-    public static String confirmUserRegistration(String username,
+    public static String confirmRegistration(String username,
         String confirmationCode)
     {
         String reason = "";
@@ -299,10 +301,13 @@ public class User
             return "No confirmation pending for this username";
         }
         
-        if (!u.getConfirmationnCode().equals(confirmationCode))
+        if (!u.getConfirmationCode().equals(confirmationCode))
         {
             return "Wrong confirmation code!";
         }
+
+        LOGGER.info("Registration confirmed for user '" + username
+            + "', email '" + u.getEmail() + "'.");
 
         pendingRegistrations.remove(username);
         storeUser(u);
