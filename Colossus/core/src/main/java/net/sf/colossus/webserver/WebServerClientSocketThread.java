@@ -424,7 +424,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
                 {
                     public void run()
                     {
-                        server.initiateShutdown(false);
+                        server.initiateShutdown(user.getName());
                     }
                 });
             }

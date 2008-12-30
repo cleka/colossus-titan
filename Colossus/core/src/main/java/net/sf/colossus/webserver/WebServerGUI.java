@@ -104,7 +104,7 @@ public class WebServerGUI extends JFrame implements WindowListener,
         if (e.getActionCommand().equals("Shutdown"))
         {
             dispose();
-            webServer.initiateShutdown(true);
+            webServer.initiateShutdown(null);
         }
 
         else

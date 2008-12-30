@@ -118,7 +118,7 @@ public class WebServer implements IWebServer, IRunWebServer
 
         User.readUsersFromFile(usersFile, maxUsers);
 
-        LOGGER.log(Level.ALL, "Server started: port " + port + ", maxClients "
+        LOGGER.log(Level.INFO, "Server started: port " + port + ", maxClients "
             + maxClients);
 
         long now = new Date().getTime();
@@ -206,16 +206,25 @@ public class WebServer implements IWebServer, IRunWebServer
         options = null;
         portBookKeeper = null;
 
-        LOGGER.log(Level.FINEST, "User Server after main loop.");
+        LOGGER.log(Level.FINE, "Web Server after main loop.");
     }
 
     // called by WebServerGUI.closeWindow() event 
     // OR     by WebServerSocketThread.shutdownServer().
     // If the latter ( = admin user requested it remotely), need to close
     // also the GUI window -- if there is one.
-    public void initiateShutdown(boolean byGUI)
+    public void initiateShutdown(String byUserName)
     {
-        shutdownInitiatedByGUI = byGUI;
+        if (byUserName == null)
+        {
+            LOGGER.info("Web Server shut down by GUI");
+            shutdownInitiatedByGUI = true;
+        }
+        else
+        {
+            LOGGER.info("Web server shut down remotely by user '"
+                + byUserName + "'");
+        }
         try
         {
             shutdownServer();

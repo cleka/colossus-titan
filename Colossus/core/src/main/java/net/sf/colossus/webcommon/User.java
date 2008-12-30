@@ -288,6 +288,9 @@ public class User
             return reason;
         }
 
+        String msg = "User " + username + " attempts confirmation "
+        + "with code '" + confirmationCode + "'.";
+        LOGGER.fine(msg);
         
         reason = confirmIfCorrectCode(username, confirmationCode);
         return reason;
