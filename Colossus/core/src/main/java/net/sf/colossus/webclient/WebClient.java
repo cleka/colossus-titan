@@ -1685,14 +1685,9 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
     public void doLogin()
     {
-        boolean ok = true;
-        String portText = webserverPortField.getText();
+        boolean ok = validateServerAndPort();
 
-        ok = ok && validatePort(this, portText);
-        ok = ok
-            && validateField(this, webserverHostField.getText(), "Host name");
-        ok = ok && validateField(this, loginField.getText(), "Login name");
-        ok = ok
+        ok = ok && validateField(this, loginField.getText(), "Login name")
             && validateField(this, new String(passwordField.getPassword()),
                 "Password");
 
@@ -1701,8 +1696,6 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             return;
         }
 
-        this.port = Integer.parseInt(portText);
-        this.hostname = webserverHostField.getText();
         this.login = loginField.getText();
         this.username = this.login;
         this.password = new String(passwordField.getPassword());
@@ -1749,6 +1742,21 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         }
     }
 
+    public boolean validateServerAndPort()
+    {
+        String portText = webserverPortField.getText();
+        boolean ok = validatePort(this, portText)
+            && validateField(this, webserverHostField.getText(), "Host name");
+
+        if (ok)
+        {
+            this.port = Integer.parseInt(webserverPortField.getText());
+            this.hostname = webserverHostField.getText();
+        }
+
+        return ok;
+    }
+
     public void doLogout()
     {
         if (state == Enrolled)
@@ -1770,9 +1778,14 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
     private void doRegisterOrPasswordDialog(boolean register)
     {
-        String username = loginField.getText();
-        registerPanel = new RegisterPasswordPanel(this, register, username);
-        registerPanel.packAndShow();
+        boolean ok = validateServerAndPort();
+        if (ok)
+        {
+            String username = loginField.getText();
+            registerPanel = new RegisterPasswordPanel(this, register,
+                username);
+            registerPanel.packAndShow();
+        }
     }
 
     public String tryChangePassword(String name, String oldPW, String newPW1)
