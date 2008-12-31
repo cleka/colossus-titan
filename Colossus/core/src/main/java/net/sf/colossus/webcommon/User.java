@@ -217,7 +217,7 @@ public class User
     }
 
     public static String registerUser(String username, String password,
-        String email)
+        String email, ColossusMail mailObject)
     {
         boolean isAdmin = false;
         User alreadyExisting = findUserByName(username);
@@ -239,7 +239,7 @@ public class User
             String cCode = makeConfirmationCode();
             User u = new User(username, password, email, isAdmin, created, cCode);
             
-            String reason = sendConfirmationMail(username, email, cCode);
+            String reason = sendConfirmationMail(username, email, cCode, mailObject);
             if (reason != null)
             {
                 // mail sending failed, for some reason. Let user know it.
@@ -255,10 +255,10 @@ public class User
     }
 
     public static String sendConfirmationMail(String username,
-        String email, String confCode)
+        String email, String confCode, ColossusMail mailObject)
     {
         // this is in webcommon package:
-        return ColossusMail.sendConfirmationMail(username, email, confCode);
+        return mailObject.sendConfirmationMail(username, email, confCode);
     }
 
     private static String makeConfirmationCode()

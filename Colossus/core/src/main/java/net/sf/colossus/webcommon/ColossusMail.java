@@ -1,9 +1,15 @@
 package net.sf.colossus.webcommon;
 
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.logging.Logger;
 
 import net.sf.colossus.webserver.SmtpSimple;
+import net.sf.colossus.webserver.WebServerOptions;
+import net.sf.colossus.webserver.WebServerConstants;
 
 /** Encapsulates the way how the web server sends mail in some situations,
  *  so far only for registration procedure.
@@ -26,15 +32,59 @@ public class ColossusMail
 
     // TODO Those (or at least some of those) should come from a config file...
     // For sending the registration mail:
-    private final static String MAILSERVER = "localhost";
-    private final static String FROM_ADR = "cpgs@cleka.net";
-    private final static String FROM_NAME = "Colossus Public Game Server Registration Service";
-    private final static String THIS_SERVER = "Colossus Public Game Server";
-    private final static String CONTACT_EMAIL = "no_such_user_yet@cleka.net";
-    private final static String CONTACT_WWW = "www.cleka.net:/no.such.page.yet.html";
+    private final String mailServer;
+    private final String fromAddress;
+    private final String fromName;
+    private final String thisServer;
+    private final String contactMail;
+    private final String contactWWW;
+    private final boolean reallyMail;
+    private final String mailToFileName;
+    private final File mailToFileFile;
+    private final boolean mailToFileFlag;
 
 
-    public static String sendConfirmationMail(String username,
+    public ColossusMail(WebServerOptions options)
+    {
+        mailServer = options.getStringOption(WebServerConstants.optMailServer);
+        fromAddress = options.getStringOption(WebServerConstants.optMailFromAddress);
+        fromName = options.getStringOption(WebServerConstants.optMailFromName);
+        thisServer = options.getStringOption(WebServerConstants.optMailThisServer);
+        contactMail = options.getStringOption(WebServerConstants.optMailContactEmail);
+        contactWWW = options.getStringOption(WebServerConstants.optMailContactWWW);
+        reallyMail = options.getOption(WebServerConstants.optMailReallyMail);
+        mailToFileName = options.getStringOption(WebServerConstants.optMailToFile);
+       
+        boolean success = false;
+        
+        File testFile = null;
+        
+        if (mailToFileName != null && !mailToFileName.equals(""))
+        {
+            try
+            {
+                testFile = new File(mailToFileName);
+                PrintWriter mailToFileWriter = new PrintWriter(
+                    new FileOutputStream(testFile, true));
+                mailToFileWriter.println("");
+                mailToFileWriter.println("WebServer started.");
+                mailToFileWriter.println("");
+                mailToFileWriter.close();
+                success = true;
+            }
+            catch(IOException e)
+            {
+                LOGGER.warning("Exception while) trying to write "
+                    + "initial message to mail file: " + e);
+            }
+            
+        }
+        mailToFileFlag = success;
+        mailToFileFile = testFile;
+    }
+
+
+    public String sendConfirmationMail(String username,
         String email, String confCode)
     {
         try
@@ -42,11 +92,11 @@ public class ColossusMail
             SmtpSimple smtp = new SmtpSimple();
             
             String subject = "Confirmation code for registration at "
-                + THIS_SERVER;
+                + thisServer;
             String message = "Hello " + username + ",\n\n"
                 + "please use the following confirmation code\n\n    "
                 + confCode + "\n\n"
-                + "to complete your registration at the " + THIS_SERVER + "."
+                + "to complete your registration at the " + thisServer + "."
                 + "\n\n\nWith Regards,\n\n"
                 + "Clemens Katzer (administrator of this server)\n\n\n"
                 + "\n-------------\n\n"
@@ -55,31 +105,52 @@ public class ColossusMail
                 + "at this server,\n"
                 + "probably someone else used your email address\n"
                 + "(accidentally or intentionally).\n\n"
-                + "If you wish, you may report this to " + CONTACT_EMAIL + ",\n"
-                + "or go to " + CONTACT_WWW + " to contact us.\n\n\n--\n"
+                + "If you wish, you may report this to " + contactMail + ",\n"
+                + "or go to " + contactWWW + " to contact us.\n\n\n--\n"
                 + "PS: do not reply to this email - noone will read it...\n";
                 
             // SmtpServer FromAdr FromRealName ToAdr ToRealName Subject Text
 
-            boolean reallySendMail = false;
-            if (reallySendMail)
+            
+            if (reallyMail)
             {
                 LOGGER.fine("ok, sending mail to " + username
                     + " <" + email + ">");
                 
-                String result = smtp.sendEmail(MAILSERVER, FROM_ADR, FROM_NAME,
+                String result = smtp.sendEmail(mailServer, fromAddress, fromName,
                     email, username, subject, message);
                 System.out.println("SENDING EMAIL, RESULT BEGIN\n-----\n"
                     + result
                     + "SENDING EMAIL, RESULT END\n-----\n");
             }
-            else
+            
+            if (mailToFileFlag)
             {
-                System.err.println("\nI WOULD NOW SEND THE FOLLOWING MAIL:\n\n"
-                    + "From: " + FROM_NAME + " <" + FROM_ADR + ">\n"
-                    + "To: " + username + " <" + email + ">\n"
-                    + "Subject: " + subject + "\n\n"
-                    + message + "\nEND OF MAIL\n\n");
+                PrintWriter mailOut = null;
+                try
+                {
+                    mailOut = new PrintWriter(
+                        new FileOutputStream(mailToFileFile, true));
+                    
+                    mailOut.println("\nI WOULD NOW SEND THE FOLLOWING MAIL:\n\n"
+                        + "From: " + fromName + " <" + fromAddress + ">\n"
+                        + "To: " + username + " <" + email + ">\n"
+                        + "Subject: " + subject + "\n\n"
+                        + message + "\nEND OF MAIL\n\n");
+                }
+                catch(IOException e)
+                {
+                    LOGGER.warning("Exception while) trying to write "
+                        + "a mail for user '" + username + "' to mail file: "
+                        + e);
+                }
+                finally
+                {
+                    if (mailOut != null)
+                    {
+                        mailOut.close();
+                    }
+                }
             }
         }
         catch(Exception ex)

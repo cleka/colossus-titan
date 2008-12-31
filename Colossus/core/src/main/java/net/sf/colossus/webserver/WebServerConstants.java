@@ -8,7 +8,7 @@ package net.sf.colossus.webserver;
  *  @author Clemens Katzer
  */
 
-final class WebServerConstants
+public final class WebServerConstants
 {
 
     public final static String defaultOptionsFilename = "WebServer.cf";
@@ -29,6 +29,16 @@ final class WebServerConstants
 
     public final static String optWorkFilesBaseDir = "WorkFilesBaseDir";
 
+    // Mail sending related options / cf file entries:
+    public final static String optMailServer = "MailServer";
+    public final static String optMailFromAddress = "MailFromAddress";
+    public final static String optMailFromName = "MailFromName";
+    public final static String optMailThisServer = "ThisServer";
+    public final static String optMailContactEmail = "ContactEmail";
+    public final static String optMailContactWWW = "ContactWWW";
+    public final static String optMailReallyMail = "MailReallyMail";
+    public final static String optMailToFile = "MailToFile";
+    
     // how many messages does chat server cache, for redisplay to
     // those who just log in:
     public final static int keepLastNMessages = 10;
