@@ -293,7 +293,7 @@ public final class GameServerSide extends Game
         phase = Constants.Phase.SPLIT;
         players.clear();
 
-        VariantSupport.loadVariant(options.getStringOption(Options.variant),
+        VariantSupport.loadVariantByName(options.getStringOption(Options.variant),
             true);
 
         LOGGER.info("Starting new game");
@@ -1548,8 +1548,8 @@ public final class GameServerSide extends Game
 
             // we're server, but the file generation process has been done
             // by loading the savefile.
-            VariantSupport.loadVariant(fil.getValue(), dir.getValue(),
-                varName, false);
+            VariantSupport.loadVariant(varName, fil.getValue(), dir.getValue(),
+                false);
             // old save games (before r3360, 09/2008) do not save the
             // variant name - retrieve it back from VariantSupport.
             // TODO remove this one day?

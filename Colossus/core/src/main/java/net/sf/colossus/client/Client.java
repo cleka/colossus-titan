@@ -2166,7 +2166,7 @@ public final class Client implements IClient, IOracle
         LOGGER.finest(owningPlayer.getName() + " Client.initBoard()");
         if (isRemote())
         {
-            VariantSupport.loadVariant(options
+            VariantSupport.loadVariantByName(options
                 .getStringOption(Options.variant), false);
         }
 

@@ -63,6 +63,7 @@ public final class Options implements IOptions
 
     // Rules options
     public static final String variant = "Variant";
+    public static final String variantFileWithFullPath = "Variant full path";
     public static final String viewMode = "ViewMode";
     public static final String dubiousAsBlanks = "Uncertain as blank (Autoinspector etc.)";
 

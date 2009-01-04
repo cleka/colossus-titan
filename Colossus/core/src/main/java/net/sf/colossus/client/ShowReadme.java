@@ -34,6 +34,7 @@ public final class ShowReadme extends KFrame
         super("ShowReadme");
 
         String variantName = options.getStringOption(Options.variant);
+        String variantFullPath = options.getStringOption(Options.variantFileWithFullPath);
 
         // XXX Make sure chosen variant is in the list.
         // XXX2 Same code in GetPlayer.java
@@ -50,8 +51,9 @@ public final class ShowReadme extends KFrame
         net.sf.colossus.webcommon.InstanceTracker.setId(this, title);
 
         myReadme = new JEditorPane();
+        Document doc = VariantSupport.loadVariantByName(variantFullPath, false);
 
-        JScrollPane content = readmeContentScrollPane(myReadme, variantName);
+        JScrollPane content = readmeContentScrollPane(myReadme, doc);
         getContentPane().add(content);
         pack();
         setVisible(true);
@@ -73,7 +75,7 @@ public final class ShowReadme extends KFrame
      * Also used by GetPlayer.java
      */
     public static final JScrollPane readmeContentScrollPane(
-        JEditorPane readme, String variantName)
+        JEditorPane readme, Document doc)
     {
         JPanel readmePane = new JPanel();
         JScrollPane readmeScrollPane = new JScrollPane(readmePane,
@@ -93,7 +95,6 @@ public final class ShowReadme extends KFrame
         readmeScrollPane.setPreferredSize(readmeScrollPrefSize);
         readmePane.add(readme);
 
-        Document doc = VariantSupport.loadVariant(variantName, true);
         readme.setContentType((String)doc
             .getProperty(ResourceLoader.keyContentType));
         readme.setDocument(doc);

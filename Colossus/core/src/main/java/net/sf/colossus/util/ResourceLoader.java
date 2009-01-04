@@ -1380,11 +1380,20 @@ public final class ResourceLoader
         while (it.hasNext())
         {
             String mapKey = it.next();
-            byte[] data = fileCache.get(mapKey);
-            Element el = new Element("DataFile");
-            el.setAttribute("DataFileKey", mapKey);
-            el.addContent(new org.jdom.CDATA(new String(data)));
-            allElement.add(el);
+            // Heuristic: do not store class files. Their map key looks e.g.:
+            //   "PET3variantHint.class,C:\workspace\variants-own\PET3variant,Default"
+            if (mapKey.indexOf("Hint.class,") != -1 )
+            {
+                // Do not dump class file - it expects only XML datafiles.
+            }
+            else
+            {
+                byte[] data = fileCache.get(mapKey);
+                Element el = new Element("DataFile");
+                el.setAttribute("DataFileKey", mapKey);
+                el.addContent(new org.jdom.CDATA(new String(data)));
+                allElement.add(el);
+            }
         }
         return allElement;
     }

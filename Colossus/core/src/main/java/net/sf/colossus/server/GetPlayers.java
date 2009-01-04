@@ -79,6 +79,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
     private final JTabbedPane tabbedPane;
 
     private final JComboBox variantBox;
+    private final Vector<String> variantVector; 
     private final JComboBox viewModeBox;
     private final JComboBox eventExpiringBox;
 
@@ -258,21 +259,99 @@ public final class GetPlayers extends KFrame implements WindowListener,
         // XXX Make sure chosen variant is in the list.
         String variantName = options.getStringOption(Options.variant,
             Constants.variantArray[0]);
-        variantBox = new JComboBox(Constants.variantArray);
+        String variantFullPath = options.getStringOption(Options.variantFileWithFullPath, "null");
+        if (variantFullPath == null || variantFullPath.equals(""))
+        {
+            variantFullPath = "null"; 
+        }
+
+        // validate variant name and full path we got from options:
+        boolean isValidExternVariant = false;
+        if (!variantFullPath.equals("null"))
+        {
+            File varFile = new File(variantFullPath);
+            if (varFile.exists())
+            {
+                isValidExternVariant = true;
+            }
+            else
+            {
+                LOGGER.warning("Invalid variant file name (full path: '"
+                    + variantFullPath + "') from Options! Resetting to Default.");
+                
+                variantName = Constants.variantArray[0];
+                variantFullPath = "null";
+                options.setOption(Options.variant, variantName);
+                options.setOption(Options.variantFileWithFullPath, "null");
+            }
+        }
+        
+        // We must ensure that the variantFullPath option is now never null
+        // nor empty string any more, otherwise synchronizing it to clients
+        // causes NPEs.
+        options.setOption(Options.variantFileWithFullPath, variantFullPath);
+        
+        variantVector = new Vector<String>(Constants.numVariants, 1);
+        boolean isBuiltinVariant = false;
+        for (int i=0 ; i < Constants.numVariants ; i++)
+        {
+            String name = Constants.variantArray[i];
+            variantVector.add(i, name);
+            if (name.equals(variantName))
+            {
+                isBuiltinVariant = true;
+            }
+        }
+       
+        variantBox = new JComboBox(variantVector);
         variantBox.addActionListener(this);
-        variantBox.setSelectedItem(variantName);
+        if (isBuiltinVariant)
+        {
+            variantBox.setSelectedItem(variantName);
+        }
+        else if (isValidExternVariant)
+        {
+            VariantSupport.rememberFullPathFileForVariantName(variantName,
+                variantFullPath);
+            variantVector.add(variantName);
+            variantBox.setSelectedItem(variantName);
+            options.setOption(Options.variant, variantName);
+            options.setOption(Options.variantFileWithFullPath, variantFullPath);
+        }
+        else
+        {
+            // This should never happen...
+            LOGGER.severe("Unexpected else case? Invalid variant name, perhaps?");
+            
+            variantName = Constants.variantArray[0];
+            variantFullPath = "null";
+            options.setOption(Options.variant, variantName);
+            options.setOption(Options.variantFileWithFullPath, "null");
+        }
+        
         variantPane.add(variantBox);
         JButton buttonVariant = new JButton(loadVariant);
         variantPane.add(buttonVariant);
         buttonVariant.addActionListener(this);
-
-        options.setOption(Options.variant, variantName);
-
+       
         // ================== Variant README tab =====================
         // if we don't pass the JEditorPane ("readme"), 
         // it won't be updated when Variant changes.
-        readmeScrollPane = ShowReadme.readmeContentScrollPane(readme,
-            variantName);
+
+        Document doc;
+        if (isValidExternVariant)
+        {
+            doc = VariantSupport.loadVariantByName(variantName, true);
+       //     File varFile = new File(variantFullPath);
+       //     doc = VariantSupport.loadVariantByFile(varFile, true);
+        }
+        else
+        {
+            // A standard (builtin) variant
+            doc = VariantSupport.loadVariantByName(variantName, true);
+        }
+
+        readmeScrollPane = ShowReadme.readmeContentScrollPane(readme, doc);
         tabbedPane.addTab("Variant README", readmeScrollPane);
 
         JPanel clientPane = new JPanel();
@@ -686,12 +765,15 @@ public final class GetPlayers extends KFrame implements WindowListener,
         if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION)
         {
             File varFile = varChooser.getSelectedFile().getAbsoluteFile();
-            Document doc = VariantSupport.loadVariant(varFile, true);
+            Document doc = VariantSupport.loadVariantByFile(varFile, true);
             if (doc != null)
             {
                 String name = varFile.getName();
+                String fullPath = varFile.getPath();
+               
                 name = name.substring(0, name.lastIndexOf(Constants.varEnd));
                 options.setOption(Options.variant, name);
+                options.setOption(Options.variantFileWithFullPath, fullPath);
                 readme.setContentType((String)doc
                     .getProperty(ResourceLoader.keyContentType));
                 readme.setDocument(doc);
@@ -741,6 +823,20 @@ public final class GetPlayers extends KFrame implements WindowListener,
         }
         
         return tryName.toString();
+    }
+
+    private void addVariantToBoxIfNeeded(String varName)
+    {
+        int cnt = variantBox.getItemCount();
+        for (int i=0 ; i < cnt ; i++)
+        {
+            String item = (String) variantBox.getItemAt(i);
+            if (item.equals(varName))
+            {
+                return;
+            }
+        }
+        variantBox.addItem(varName);
     }
 
     public synchronized void actionPerformed(ActionEvent e)
@@ -795,14 +891,8 @@ public final class GetPlayers extends KFrame implements WindowListener,
             String varName = VariantSupport.getVariantName();
             if (!(Constants.getVariantList().contains(varName)))
             {
-                String buttonName = varName.substring(0, varName
-                    .lastIndexOf(Constants.varEnd));
-                if (variantBox.getItemCount() > Constants.numVariants)
-                {
-                    variantBox.removeItemAt(Constants.numVariants);
-                }
-                variantBox.addItem(buttonName);
-                variantBox.setSelectedItem(buttonName);
+                addVariantToBoxIfNeeded(varName);
+                variantBox.setSelectedItem(varName);
             }
         }
         else
@@ -812,20 +902,23 @@ public final class GetPlayers extends KFrame implements WindowListener,
             if (source == variantBox)
             {
                 int maxPlayers = VariantSupport.getMaxPlayers();
-                String value = (String)variantBox.getSelectedItem();
-                if (VariantSupport.getVariantName().equals(
-                    value + Constants.varEnd))
+                String varName = (String)variantBox.getSelectedItem();
+                
+                if (VariantSupport.getVariantName().equals(varName))
                 {
                     // re-selecting the same ; do nothing
                 }
                 else
-                { // selecting different ; remove all non-included
-                    if (variantBox.getItemCount() > Constants.numVariants)
+                {
+                    Document doc = VariantSupport.loadVariantByName(varName, true);
+                    options.setOption(Options.variant, varName);
+                    String varFileWithFullPath = VariantSupport.getFullPathFileForVariantName(varName);
+                    if (varFileWithFullPath == null)
                     {
-                        variantBox.removeItemAt(Constants.numVariants);
+                        varFileWithFullPath = "null";
                     }
-                    Document doc = VariantSupport.loadVariant(value, true);
-                    options.setOption(Options.variant, value);
+                    options.setOption(Options.variantFileWithFullPath, varFileWithFullPath);
+                    
                     String prop = (String)doc
                         .getProperty(ResourceLoader.keyContentType);
                     readme.setContentType(prop);
