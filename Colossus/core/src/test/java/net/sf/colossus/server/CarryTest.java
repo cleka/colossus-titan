@@ -49,7 +49,7 @@ public class CarryTest extends TestCase
     protected void setUp()
     {
         game = new GameServerSide();
-        VariantSupport.loadVariant("Default", true);
+        VariantSupport.loadVariantByName("Default", true);
 
         red = game.addPlayer("Red", "SimpleAI");
         blue = game.addPlayer("Blue", "SimpleAI");

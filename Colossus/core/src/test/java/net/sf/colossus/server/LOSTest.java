@@ -57,7 +57,7 @@ public class LOSTest extends TestCase
     protected void setUp()
     {
         game = new GameServerSide();
-        VariantSupport.loadVariant("Default", true);
+        VariantSupport.loadVariantByName("Default", true);
 
         black = game.addPlayer("Black", "SimpleAI");
         green = game.addPlayer("Green", "SimpleAI");
@@ -512,7 +512,7 @@ public class LOSTest extends TestCase
     public void testLOS5()
     {
         LOGGER.log(Level.FINEST, "testLOS5()");
-        VariantSupport.loadVariant("TG-ConceptIII", true);
+        VariantSupport.loadVariantByName("TG-ConceptIII", true);
         MasterHex hex = game.getVariant().getMasterBoard().getHexByLabel("1"); // Plains - Delta
 
         defender = new LegionServerSide("Gr03", "Gr01", hex, null, green,
@@ -600,7 +600,7 @@ public class LOSTest extends TestCase
     public void testLOS6()
     {
         LOGGER.log(Level.FINEST, "testLOS6()");
-        VariantSupport.loadVariant("Badlands-JDG", true);
+        VariantSupport.loadVariantByName("Badlands-JDG", true);
         MasterHex hex = game.getVariant().getMasterBoard().getHexByLabel(
             "5000"); // MountainsAlt
 

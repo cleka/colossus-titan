@@ -110,7 +110,7 @@ public class PredictSplitsTest extends TestCase
     @Override
     protected void setUp()
     {
-        VariantSupport.loadVariant("Default", true);
+        VariantSupport.loadVariantByName("Default", true);
         aps = new AllPredictSplits();
 
         cnl = new ArrayList<String>();

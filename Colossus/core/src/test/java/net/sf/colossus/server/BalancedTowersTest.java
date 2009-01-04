@@ -18,7 +18,7 @@ public class BalancedTowersTest extends TestCase
     public BalancedTowersTest(String name)
     {
         super(name);
-        VariantSupport.loadVariant("Default", true);
+        VariantSupport.loadVariantByName("Default", true);
     }
 
     public void testGetBalancedTowers()
