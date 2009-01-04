@@ -34,7 +34,6 @@ public final class ShowReadme extends KFrame
         super("ShowReadme");
 
         String variantName = options.getStringOption(Options.variant);
-        String variantFullPath = options.getStringOption(Options.variantFileWithFullPath);
 
         // XXX Make sure chosen variant is in the list.
         // XXX2 Same code in GetPlayer.java
@@ -51,7 +50,7 @@ public final class ShowReadme extends KFrame
         net.sf.colossus.webcommon.InstanceTracker.setId(this, title);
 
         myReadme = new JEditorPane();
-        Document doc = VariantSupport.loadVariantByName(variantFullPath, false);
+        Document doc = VariantSupport.loadVariantByName(variantName, false);
 
         JScrollPane content = readmeContentScrollPane(myReadme, doc);
         getContentPane().add(content);
