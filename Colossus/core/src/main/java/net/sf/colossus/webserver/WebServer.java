@@ -53,7 +53,6 @@ public class WebServer implements IWebServer, IRunWebServer
     private final boolean runGUI = !GraphicsEnvironment.isHeadless();
 
     private boolean shutdownRequested = false;
-    private boolean shutdownInitiatedByGUI = false;
 
     private final int maxClients;
 
@@ -199,12 +198,7 @@ public class WebServer implements IWebServer, IRunWebServer
         User.storeUsersToFile();
         User.cleanup();
 
-        if (!shutdownInitiatedByGUI)
-        {
-            gui.cleanup();
-            gui.dispose();
-        }
-
+        gui.shutdown();
         gui = null;
         options = null;
         portBookKeeper = null;
@@ -221,7 +215,6 @@ public class WebServer implements IWebServer, IRunWebServer
         if (byUserName == null)
         {
             LOGGER.info("Web Server shut down by GUI");
-            shutdownInitiatedByGUI = true;
         }
         else
         {
@@ -850,12 +843,7 @@ public class WebServer implements IWebServer, IRunWebServer
             // nothing
         }
 
-        public void cleanup()
-        {
-            // nothing
-        }
-
-        public void dispose()
+        public void shutdown()
         {
             // nothing
         }

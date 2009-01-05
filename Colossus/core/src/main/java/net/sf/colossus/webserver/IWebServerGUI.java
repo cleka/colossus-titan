@@ -13,7 +13,5 @@ public interface IWebServerGUI
 
     public abstract void setEndingGamesInfo(String s);
 
-    public abstract void cleanup();
-
-    public abstract void dispose();
+    public abstract void shutdown();
 }

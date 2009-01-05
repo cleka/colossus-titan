@@ -4,10 +4,8 @@ package net.sf.colossus.webserver;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -25,8 +23,7 @@ import javax.swing.ScrollPaneConstants;
  *  @author Clemens Katzer
  */
 
-public class WebServerGUI extends JFrame implements WindowListener,
-    ActionListener, IWebServerGUI
+public class WebServerGUI extends JFrame implements IWebServerGUI
 {
 
     private WebServer webServer;
@@ -68,7 +65,15 @@ public class WebServerGUI extends JFrame implements WindowListener,
         endingGamesInfo = new JLabel("No ending games.");
         mainPane.add(endingGamesInfo);
 
-        addWindowListener(this);
+        addWindowListener(new WindowAdapter()
+        {
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+                WebServerGUI.this.webServer.initiateShutdown(null);
+                // rest is done when webServer calls our shutdown()
+            } 
+        });
         pack();
 
         setVisible(true);
@@ -99,60 +104,14 @@ public class WebServerGUI extends JFrame implements WindowListener,
         endingGamesInfo.setText(s);
     }
 
-    public void actionPerformed(ActionEvent e)
-    {
-        if (e.getActionCommand().equals("Shutdown"))
-        {
-            dispose();
-            webServer.initiateShutdown(null);
-        }
-
-        else
-        // A combo box was changed.
-        {
-            //     no combo boxes yet.
-        }
-    }
-
     public void cleanup()
     {
         this.webServer = null;
     }
-
-    public void windowClosing(WindowEvent e)
+    
+    public void shutdown()
     {
-        webServer.shutdownServer();
         cleanup();
         dispose();
-    }
-
-    public void windowClosed(WindowEvent e)
-    {
-        // nothing to do
-    }
-
-    public void windowActivated(WindowEvent e)
-    {
-        // nothing to do
-    }
-
-    public void windowDeactivated(WindowEvent e)
-    {
-        // nothing to do
-    }
-
-    public void windowDeiconified(WindowEvent e)
-    {
-        // nothing to do
-    }
-
-    public void windowIconified(WindowEvent e)
-    {
-        // nothing to do
-    }
-
-    public void windowOpened(WindowEvent e)
-    {
-        // nothing to do
     }
 }
