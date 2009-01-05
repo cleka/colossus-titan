@@ -69,7 +69,29 @@ public class DevRandom extends Random
         else
         {
             randomPropertySource = PRNG;
-            String randomFile = System.getProperty(randomPropertyName);
+            String randomFile = null;
+            /*
+            It's amazing. When game starts with an external variant
+            (name and path from options file), during instantiation
+            of the HintsFile it needs DevRandom and during that
+            the access to the getProperty(randomPropertyName) call
+            throws an SecurityException (from JWS log file):
+              <message>Jan 6, 2009 12:22:51 AM net.sf.colossus.util.ResourceLoader getNewObject
+              SEVERE: Instantiating "PET3variant.PET3variantHint" failed
+              java.security.AccessControlException: access denied (java.util.PropertyPermission net.sf.colossus.randomFile read)
+            But when run normally from cmdline this problem does not occur :-(
+            Anyway, to be safe we need to catch the exception...
+            */
+            try
+            {
+                randomFile = System.getProperty(randomPropertyName);
+            }
+            catch(SecurityException e)
+            {
+                LOGGER.info("Unable to access System property '" 
+                    + randomPropertyName + "'. Ignored.");
+            }
+            
             if (randomFile != null)
             {
                 LOGGER.log(Level.FINEST, randomPropertyName
