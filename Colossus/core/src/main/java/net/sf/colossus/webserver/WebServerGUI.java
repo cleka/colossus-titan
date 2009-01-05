@@ -70,13 +70,18 @@ public class WebServerGUI extends JFrame implements IWebServerGUI
             @Override
             public void windowClosing(WindowEvent e)
             {
-                WebServerGUI.this.webServer.initiateShutdown(null);
-                // rest is done when webServer calls our shutdown()
+                initiateShutdown();
             } 
         });
         pack();
 
         setVisible(true);
+    }
+
+    public void initiateShutdown()
+    {
+        webServer.initiateShutdown(null);
+        // rest is done when webServer calls our shutdown()
     }
 
     public void setUserInfo(String s)
