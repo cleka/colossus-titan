@@ -413,6 +413,10 @@ public final class Start
         int numHumans = 0;
         int numAIs = 0;
         int numNetworks = 0;
+        
+        int numSimpleAIs = 0;
+        int numRationalAIs = 0;
+        int numMilvangAIs = 0;
 
         options.removeOption(Options.autoPlay);
         options.removeOption(Options.goOnWithoutObserver);
@@ -478,6 +482,24 @@ public final class Start
             String buf = cl.getOptValue('i');
             numAIs = Integer.parseInt(buf);
         }
+        if (cl.optIsSet('Z'))
+        {
+            options.clearPlayerInfo();
+            String buf = cl.getOptValue('Z');
+            numSimpleAIs = Integer.parseInt(buf);
+        }
+        if (cl.optIsSet('r'))
+        {
+            options.clearPlayerInfo();
+            String buf = cl.getOptValue('r');
+            numRationalAIs = Integer.parseInt(buf);
+        }
+        if (cl.optIsSet('M'))
+        {
+            options.clearPlayerInfo();
+            String buf = cl.getOptValue('M');
+            numMilvangAIs = Integer.parseInt(buf);
+        }
         if (cl.optIsSet('n'))
         {
             options.clearPlayerInfo();
@@ -492,6 +514,12 @@ public final class Start
             LOGGER.log(Level.SEVERE, "Illegal number of players");
             return false;
         }
+        if (numAIs < (numSimpleAIs + numRationalAIs + numMilvangAIs)) {
+            LOGGER.log(Level.SEVERE, "Illegal number of specific AIs");
+            return false;
+        }
+
+        
 
         for (int i = 0; i < numHumans; i++)
         {
@@ -523,7 +551,17 @@ public final class Start
             //            String name = Constants.byColor + k;
             String name = Constants.byType + k;
             options.setOption(Options.playerName + k, name);
-            options.setOption(Options.playerType + k, Constants.defaultAI);
+            if (numSimpleAIs > 0) {
+                options.setOption(Options.playerType + k, "SimpleAI");
+                numSimpleAIs --;
+            } else if (numRationalAIs > 0) {
+                options.setOption(Options.playerType + k, "RationalAI");
+                numRationalAIs --;
+            } else if (numMilvangAIs > 0) {
+                options.setOption(Options.playerType + k, "MilvangAI");
+                numMilvangAIs --;
+            } else
+                options.setOption(Options.playerType + k, Constants.defaultAI);
         }
 
         return true;
@@ -546,7 +584,10 @@ public final class Start
             opts.addOption('g', "go", false, "Skip startup dialogs");
             opts.addOption('v', "variant", true, "Set variant");
             opts.addOption('u', "nhuman", true, "Number of humans");
-            opts.addOption('i', "nai", true, "Number of SimpleAIs");
+            opts.addOption('i', "nai", true, "Number of AIs (default: random)");
+            opts.addOption('Z', "simpleai", true, "Number of SimpleAIs");
+            opts.addOption('r', "rationalai", true, "Number of RationalAIs");
+            opts.addOption('M', "milvangai", true, "Number of MilvangAIs");
             opts.addOption('n', "nnetwork", true, "Number of network slots");
             opts.addOption('q', "quit", false, "Quit JVM when game ends");
             opts.addOption('p', "port", true, "Server port number");
