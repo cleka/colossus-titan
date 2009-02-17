@@ -253,7 +253,7 @@ class RegisterPasswordPanel extends JDialog
         while (!done)
         {
             String providedConfCode = JOptionPane.showInputDialog(this,
-                "Type in the confirmation code", User.TEMPLATE_CONFCODE);
+                "Type in the confirmation code sent to you via mail: ", User.TEMPLATE_CONFCODE);
 //            System.out.println("input dialog returned result '"
 //                + providedConfCode + "'!");
 
