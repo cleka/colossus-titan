@@ -2,11 +2,13 @@ package net.sf.colossus.ai;
 
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import java.util.logging.Logger;
@@ -44,17 +46,33 @@ class OnTheFlyLegionMove implements Collection<LegionMove> {
     }
 
     class OnTheFlyLegionMoveIterator implements Iterator<LegionMove> {
-        private final Set<LegionMove> alreadydone = new HashSet<LegionMove>();
+        class myIntArrayComparator implements Comparator<int[]> {
+            public int compare(int[] t1, int[] t2) {
+                if (t1.length > t2.length) {
+                    return  1;
+                }
+                if (t1.length < t2.length) {
+                    return -1;
+                }
+                for (int i = 0 ; i < t1.length ; i++) {
+                    if (t1[i] > t2[i])
+                        return  1;
+                    if (t1[i] < t2[i])
+                        return -1;
+                }
+                return 0;
+            }
+        }
+
+        private final TreeMap<int[],LegionMove> alreadydone = new TreeMap<int[],LegionMove>(new myIntArrayComparator());
         private final OnTheFlyLegionMove daddy;
         private LegionMove lastone = null;
         private final Random rand = new DevRandom();
-        private final int[] indexes;
         private final int dim;
 
         OnTheFlyLegionMoveIterator(OnTheFlyLegionMove d) {
             daddy = d;
             dim = daddy.getDim();
-            indexes = new int[dim];
         }
 
         public boolean hasNext() {
@@ -64,27 +82,39 @@ class OnTheFlyLegionMove implements Collection<LegionMove> {
         }
         
         public LegionMove next() {
-            // BEGIN OBSOLETE COMMENT, it can't work with a TreeSet (contains() !)
-            // each newly generated LegionMove is put in lastone,
-            // and is only added to alreadydone when we generate
-            // the next LegionMove. Why? Because our TreeSet uses
-            // value to sort, and it won't be set until later.
-            // And you really don't want to scr*w up the sort order
-            // when the elements are already in the TreeSet.
-            // END OBSOLETE COMMENT
             // TODO: replace by a genetic algorithm :-)
-            if (lastone != null)
-                alreadydone.add(lastone);
+            int[] indexes = new int[dim];
             lastone = null;
             int ntry = 0;
-            while ((lastone == null) && (ntry < 100)) {
+            while ((lastone == null) && (ntry < 1000)) {
                 ntry ++;
                 for (int i = 0 ; i < dim ; i++) {
                     indexes[i] = rand.nextInt(daddy.allCritterMoves.get(i).size());
                 }
-                LegionMove temp = SimpleAI.makeLegionMove(indexes, daddy.allCritterMoves);
-                if (!alreadydone.contains(temp))
-                    lastone = temp;
+                Set<String> duplicateHexChecker = new HashSet<String>();
+                boolean offboard = false;
+                boolean isBad = false;
+                for (int j = 0; j < dim; j++)
+                {
+                    List<CritterMove> moveList = daddy.allCritterMoves.get(j);
+                    CritterMove cm = moveList.get(indexes[j]);
+                    String endingHexLabel = cm.getEndingHexLabel();
+                    if (endingHexLabel.startsWith("X"))
+                    {
+                        offboard = true;
+                    }
+                    else if (duplicateHexChecker.contains(endingHexLabel))
+                    {
+                        isBad = true;
+                    }
+                    duplicateHexChecker.add(cm.getEndingHexLabel());
+                }
+                if (!isBad) {
+                    if (!alreadydone.keySet().contains(indexes)) {
+                        lastone = SimpleAI.makeLegionMove(indexes, daddy.allCritterMoves);
+                        alreadydone.put(indexes, lastone);
+                    }
+                }
             }
 
             if (lastone == null) { // make one up...
