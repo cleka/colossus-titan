@@ -3052,7 +3052,11 @@ public class SimpleAI implements AI
                 bestScore = score;
                 best = lm;
                 LOGGER.finest("INTERMEDIATE Best legion move: "
-                               + ((best == null) ? "none " : best.toString()) + " (" + bestScore
+                               + lm.toString() + " (" + score
+                               + ")");
+            } else {
+                LOGGER.finest("INTERMEDIATE      legion move: "
+                               + lm.toString() + " (" + score
                                + ")");
             }
 
@@ -3075,7 +3079,7 @@ public class SimpleAI implements AI
             }
         }
         findBestLegionMoveTimer.cancel();
-        LOGGER.finest("Best legion move: "
+        LOGGER.finest("Best legion move of " + count + " checked : "
             + ((best == null) ? "none " : best.toString()) + " (" + bestScore
             + ")");
         return best;
@@ -3099,9 +3103,9 @@ public class SimpleAI implements AI
         List<LegionMove> legionMoves = new ArrayList<LegionMove>();
         int[] indexes = new int[critterMoves.size()];
 
-        nestForLoop(indexes, indexes.length - 1, critterMoves, legionMoves);
+        nestForLoop(indexes, indexes.length, critterMoves, legionMoves);
 
-        LOGGER.finest("Got " + legionMoves.size() + " legion moves");
+        LOGGER.warning("findLegionMoves got " + legionMoves.size() + " legion moves");
         return legionMoves;
     }
 
@@ -3153,9 +3157,19 @@ public class SimpleAI implements AI
         }
         else
         {
-            for (int i = 0; i < indexes.length; i++)
+            int howmany = critterMoves.get(level-1).size();
+            int size = critterMoves.size();
+            // try and limit conbinatorial explosion to less than 20 millions
+            int thresh = 11;
+            if (size < 6)
+                thresh = 27; // there's 27 real hex, odds are, we won't need offboard X 
+            else if (size < 7)
+                thresh = 16;
+            if (howmany > thresh)
+                howmany = thresh;
+            for (int i = 0; i < howmany; i++)
             {
-                indexes[level] = i;
+                indexes[level-1] = i;
                 nestForLoop(indexes, level - 1, critterMoves, legionMoves);
             }
         }
