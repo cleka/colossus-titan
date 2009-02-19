@@ -69,19 +69,36 @@ class OnTheFlyLegionMove implements Collection<LegionMove> {
         private LegionMove lastone = null;
         private final Random rand = new DevRandom();
         private final int dim;
+        private final Collection<LegionMove> buffer;
+        private final Iterator<LegionMove> it;
 
         OnTheFlyLegionMoveIterator(OnTheFlyLegionMove d) {
             daddy = d;
             dim = daddy.getDim();
+
+            if ((dim < 4) ||
+                (daddy.size() < 20000)) { // small enough, we can afford to pre-generate
+                buffer = SimpleAI.findLegionMoves(daddy.allCritterMoves, true);
+                it = buffer.iterator();
+            } else {
+                buffer = null;
+                it = null;
+            }
         }
 
         public boolean hasNext() {
+            if (it != null)
+                return it.hasNext();
+
             if (alreadydone.size() < daddy.size())
                 return true;
             return false;
         }
         
         public LegionMove next() {
+            if (it != null)
+                return it.next();
+
             // TODO: replace by a genetic algorithm :-)
             int[] indexes = new int[dim];
             lastone = null;

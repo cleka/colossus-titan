@@ -3092,8 +3092,12 @@ public class SimpleAI implements AI
      *  of LegionMoves.  A LegionMove is a List of one CritterMove per
      *  mobile critter in the legion, where no two critters move to the
      *  same hex. */
-    Collection<LegionMove> findLegionMoves(
-        final List<List<CritterMove>> allCritterMoves)
+    static Collection<LegionMove> findLegionMoves(
+        final List<List<CritterMove>> allCritterMoves) {
+        return findLegionMoves(allCritterMoves, false);
+    }
+    static Collection<LegionMove> findLegionMoves(
+        final List<List<CritterMove>> allCritterMoves, boolean forceAll)
     {
         List<List<CritterMove>> critterMoves = new ArrayList<List<CritterMove>>(
             allCritterMoves);
@@ -3105,23 +3109,24 @@ public class SimpleAI implements AI
         List<LegionMove> legionMoves = new ArrayList<LegionMove>();
         int[] indexes = new int[critterMoves.size()];
 
-        nestForLoop(indexes, indexes.length, critterMoves, legionMoves);
+        nestForLoop(indexes, indexes.length, critterMoves, legionMoves, forceAll);
 
         LOGGER.finest("findLegionMoves got " + legionMoves.size() + " legion moves");
         return legionMoves;
     }
 
-    private final Set<String> duplicateHexChecker = new HashSet<String>();
+    //private final Set<String> duplicateHexChecker = new HashSet<String>();
 
-    private void nestForLoop(int[] indexes, final int level,
+    static private void nestForLoop(int[] indexes, final int level,
         final List<List<CritterMove>> critterMoves,
-        List<LegionMove> legionMoves)
+        List<LegionMove> legionMoves, boolean forceAll)
     {
         // TODO See if doing the set test at every level is faster than
         // always going down to level 0 then checking.
         if (level == 0)
         {
-            duplicateHexChecker.clear();
+            Set<String> duplicateHexChecker = new HashSet<String>();
+            //duplicateHexChecker.clear();
             boolean offboard = false;
             for (int j = 0; j < indexes.length; j++)
             {
@@ -3171,12 +3176,12 @@ public class SimpleAI implements AI
                 thresh = 14;
             else if (size < 7)
                 thresh = 9;
-            if (howmany > thresh)
+            if (!forceAll && (howmany > thresh))
                 howmany = thresh;
             for (int i = 0; i < howmany; i++)
             {
                 indexes[level-1] = i;
-                nestForLoop(indexes, level - 1, critterMoves, legionMoves);
+                nestForLoop(indexes, level - 1, critterMoves, legionMoves, forceAll);
             }
         }
     }
@@ -3195,7 +3200,7 @@ public class SimpleAI implements AI
     }
 
     /** Modify allCritterMoves in place, and return true if it changed. */
-    boolean trimCritterMoves(List<List<CritterMove>> allCritterMoves)
+    static boolean trimCritterMoves(List<List<CritterMove>> allCritterMoves)
     {
         Set<String> takenHexLabels = new HashSet<String>(); // XXX reuse?
         boolean changed = false;
@@ -3351,7 +3356,7 @@ public class SimpleAI implements AI
                 why.append(" [Def_NobodyGetsHurt]");
             }
         }
-        return value;
+        return 0; /* value; */ /* temporarily disabled, side-effects are brutal */
     }
 
     /** strikeMap is optional */
