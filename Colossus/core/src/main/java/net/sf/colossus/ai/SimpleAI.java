@@ -2,6 +2,7 @@ package net.sf.colossus.ai;
 
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -3034,12 +3035,13 @@ public class SimpleAI implements AI
 
     /** Evaluate all legion moves in the list, and return the best one.
      *  Break out early if the time limit is exceeded. */
-    LegionMove findBestLegionMove(List<LegionMove> legionMoves)
+    LegionMove findBestLegionMove(Collection<LegionMove> legionMoves)
     {
         int bestScore = Integer.MIN_VALUE;
         LegionMove best = null;
 
-        Collections.shuffle(legionMoves, random);
+        if (legionMoves instanceof List)
+            Collections.shuffle((List)legionMoves, random);
 
         Timer findBestLegionMoveTimer = setupTimer();
 
@@ -3052,11 +3054,11 @@ public class SimpleAI implements AI
                 bestScore = score;
                 best = lm;
                 LOGGER.finest("INTERMEDIATE Best legion move: "
-                               + lm.toString() + " (" + score
+                               + lm.getStringWithEvaluation() + " (" + score
                                + ")");
             } else {
                 LOGGER.finest("INTERMEDIATE      legion move: "
-                               + lm.toString() + " (" + score
+                               + lm.getStringWithEvaluation() + " (" + score
                                + ")");
             }
 
@@ -3080,7 +3082,7 @@ public class SimpleAI implements AI
         }
         findBestLegionMoveTimer.cancel();
         LOGGER.finest("Best legion move of " + count + " checked : "
-            + ((best == null) ? "none " : best.toString()) + " (" + bestScore
+            + ((best == null) ? "none " : best.getStringWithEvaluation()) + " (" + bestScore
             + ")");
         return best;
     }
@@ -3931,6 +3933,16 @@ public class SimpleAI implements AI
 
         @Override
         public String toString()
+        {
+            List<String> cmStrings = new ArrayList<String>();
+            for (CritterMove cm : critterMoves)
+            {
+                cmStrings.add(cm.toString());
+            }
+            return Glob.glob(", ", cmStrings);
+        }
+
+        public String getStringWithEvaluation()
         {
             List<String> cmStrings = new ArrayList<String>();
             for (CritterMove cm : critterMoves)
