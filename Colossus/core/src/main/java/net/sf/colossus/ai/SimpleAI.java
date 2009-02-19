@@ -2720,7 +2720,7 @@ public class SimpleAI implements AI
         // getting stuff out of the way so that a reinforcement
         // has room to enter.
 
-        List<LegionMove> legionMoves = findBattleMoves();
+        Collection<LegionMove> legionMoves = findBattleMoves();
         LegionMove bestLegionMove = findBestLegionMove(legionMoves);
         List<CritterMove> bestMoveOrder = findMoveOrder(bestLegionMove);
 
@@ -2917,7 +2917,7 @@ public class SimpleAI implements AI
         return (Math.min(max, mobileCritters));
     }
 
-    List<LegionMove> findBattleMoves()
+    Collection<LegionMove> findBattleMoves()
     {
         LOGGER.finest("Called findBattleMoves()");
 
@@ -2954,7 +2954,7 @@ public class SimpleAI implements AI
             }
         }
 
-        List<LegionMove> legionMoves = findLegionMoves(allCritterMoves);
+        Collection<LegionMove> legionMoves = findLegionMoves(allCritterMoves);
         return legionMoves;
     }
 
@@ -3081,7 +3081,7 @@ public class SimpleAI implements AI
             }
         }
         findBestLegionMoveTimer.cancel();
-        LOGGER.finest("Best legion move of " + count + " checked : "
+        LOGGER.warning("Best legion move of " + count + " checked : "
             + ((best == null) ? "none " : best.getStringWithEvaluation()) + " (" + bestScore
             + ")");
         return best;
@@ -3092,7 +3092,7 @@ public class SimpleAI implements AI
      *  of LegionMoves.  A LegionMove is a List of one CritterMove per
      *  mobile critter in the legion, where no two critters move to the
      *  same hex. */
-    List<LegionMove> findLegionMoves(
+    Collection<LegionMove> findLegionMoves(
         final List<List<CritterMove>> allCritterMoves)
     {
         List<List<CritterMove>> critterMoves = new ArrayList<List<CritterMove>>(
@@ -3181,7 +3181,7 @@ public class SimpleAI implements AI
         }
     }
 
-    private LegionMove makeLegionMove(int[] indexes,
+    static LegionMove makeLegionMove(int[] indexes,
         List<List<CritterMove>> critterMoves)
     {
         LegionMove lm = new LegionMove();
@@ -3879,6 +3879,8 @@ public class SimpleAI implements AI
             cm.getCritter().moveToHex(cm.getStartingHexLabel());
         }
 
+        lm.setValue(sum);
+
         return sum;
     }
 
@@ -3896,89 +3898,6 @@ public class SimpleAI implements AI
             * skill
             * VariantSupport.getHintedRecruitmentValueOffset(creature
                 .getName(), section);
-    }
-
-    /** LegionMove has a List of one CritterMove per mobile critter
-     *  in the legion. */
-    class LegionMove
-    {
-        private final List<CritterMove> critterMoves = new ArrayList<CritterMove>();
-        private Map<CritterMove,String> evaluation = null;
-        private String lmeval = null;
-
-        void add(CritterMove cm)
-        {
-            critterMoves.add(cm);
-        }
-
-        List<CritterMove> getCritterMoves()
-        {
-            return Collections.unmodifiableList(critterMoves);
-        }
-
-        void resetEvaluate() {
-            evaluation = null;
-            lmeval = null;
-        }
-
-        void setEvaluate(CritterMove cm, String val) {
-            if (evaluation == null)
-                evaluation = new HashMap<CritterMove,String>();
-            evaluation.put(cm, val);
-        }
-
-        void setEvaluate(String val) {
-            lmeval = val;
-        }
-
-        @Override
-        public String toString()
-        {
-            List<String> cmStrings = new ArrayList<String>();
-            for (CritterMove cm : critterMoves)
-            {
-                cmStrings.add(cm.toString());
-            }
-            return Glob.glob(", ", cmStrings);
-        }
-
-        public String getStringWithEvaluation()
-        {
-            List<String> cmStrings = new ArrayList<String>();
-            for (CritterMove cm : critterMoves)
-            {
-                StringBuffer buf = new StringBuffer();
-                buf.append(cm.toString());
-                if (evaluation != null) {
-                    if (evaluation.containsKey(cm)) {
-                        buf.append(" [");
-                        buf.append(evaluation.get(cm));
-                        buf.append("]");
-                    }
-                }
-                cmStrings.add(buf.toString());
-            }
-            if (lmeval != null)
-                cmStrings.add(" {" + lmeval + "}");
-            return Glob.glob(", ", cmStrings);
-        }
-
-        @Override
-        public boolean equals(Object ob)
-        {
-            if (!(ob instanceof LegionMove))
-            {
-                return false;
-            }
-            LegionMove lm = (LegionMove)ob;
-            return toString().equals(lm.toString());
-        }
-
-        @Override
-        public int hashCode()
-        {
-            return toString().hashCode();
-        }
     }
 
     class TriggerTimeIsUp extends TimerTask

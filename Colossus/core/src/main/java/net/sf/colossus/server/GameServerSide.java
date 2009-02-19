@@ -528,6 +528,10 @@ public final class GameServerSide extends Game
         {
             newName = "Milvang" + number;
         }
+        else if (shortName.equals("ExperimentalAI"))
+        {
+            newName = "Experimental" + number;
+        }
         else
         {
             newName = null;
