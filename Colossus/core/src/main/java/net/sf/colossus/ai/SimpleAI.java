@@ -3105,7 +3105,7 @@ public class SimpleAI implements AI
 
         nestForLoop(indexes, indexes.length, critterMoves, legionMoves);
 
-        LOGGER.warning("findLegionMoves got " + legionMoves.size() + " legion moves");
+        LOGGER.finest("findLegionMoves got " + legionMoves.size() + " legion moves");
         return legionMoves;
     }
 
@@ -3159,12 +3159,16 @@ public class SimpleAI implements AI
         {
             int howmany = critterMoves.get(level-1).size();
             int size = critterMoves.size();
-            // try and limit conbinatorial explosion to less than 20 millions
-            int thresh = 11;
-            if (size < 6)
-                thresh = 27; // there's 27 real hex, odds are, we won't need offboard X 
+            // try and limit conbinatorial explosion to about half a million
+            // this should be improved ; if a critter has very limited movement
+            // capability, other can explore more positions.
+            int thresh = 7;
+            if (size < 5)
+                thresh = 27; // 27 real hex, if we access them, no need for Xs.
+            else if (size < 6)
+                thresh = 14;
             else if (size < 7)
-                thresh = 16;
+                thresh = 9;
             if (howmany > thresh)
                 howmany = thresh;
             for (int i = 0; i < howmany; i++)
@@ -3232,7 +3236,7 @@ public class SimpleAI implements AI
 
     class BattleEvalConstants
     {
-
+        /* per critter */
         int OFFBOARD_DEATH_SCALE_FACTOR = -150;
         int NATIVE_BONUS_TERRAIN = 40; // 50 -- old value
         int NATIVE_BOG = 20;
@@ -3262,6 +3266,10 @@ public class SimpleAI implements AI
         int ADJACENT_TO_BUDDY = 100;
         int ADJACENT_TO_BUDDY_TITAN = 600; // 200
         int GANG_UP_ON_CREATURE = 50;
+        /* per legion */
+        int DEF__NOBODY_GETS_HURT = 2000;
+        int DEF__NOONE_IS_GANGBANGED = 1000;
+        int DEF__AT_MOST_ONE_IS_REACHABLE = 500;
     }
 
     /** Return a map of target hex label to number
@@ -3287,6 +3295,61 @@ public class SimpleAI implements AI
             }
         }
         return map;
+    }
+
+    protected int evaluateLegionBattleMoveAsAWhole(LegionMove lm, Map<String, Integer> strikeMap, StringBuffer why) {
+        int value = 0;
+        final LegionClientSide legion = (LegionClientSide)client.getMyEngagedLegion();
+        if (legion.equals(client.getAttacker())) {
+            // TODO, something
+        } else {
+            boolean nobodyGetsHurt = true;
+            int numCanBeReached = 0;
+            int maxThatCanReach = 0;
+            for (CritterMove cm : lm.getCritterMoves())
+            {
+                int canReachMe = 0;
+                BattleChit critter = cm.getCritter();
+                BattleHex myHex = client.getBattleHex(critter);
+                List<BattleChit> foes = client.getInactiveBattleChits();
+                for (BattleChit foe : foes) {
+                    BattleHex foeHex = client.getBattleHex(foe);
+                    int range = Strike.getRange(foeHex, myHex, true);
+                    if ((range != Constants.OUT_OF_RANGE) &&
+                        ((range - 2) <= foe.getSkill())) {
+                        canReachMe++;
+                    }
+                }
+                if (canReachMe > 0) {
+                    nobodyGetsHurt = false;
+                    numCanBeReached ++;
+                    if (maxThatCanReach < canReachMe)
+                        maxThatCanReach = canReachMe;
+                }
+            }
+            if (numCanBeReached == 1) // TODO: Rangestriker
+            {
+                value += bec.DEF__AT_MOST_ONE_IS_REACHABLE;
+                why.append("+");
+                why.append(bec.DEF__AT_MOST_ONE_IS_REACHABLE);
+                why.append(" [Def_AtMostOneIsReachable]");
+            }
+            if (maxThatCanReach == 1) // TODO: Rangestriker
+            {
+                value += bec.DEF__NOONE_IS_GANGBANGED;
+                why.append("+");
+                why.append(bec.DEF__NOONE_IS_GANGBANGED);
+                why.append(" [Def_NoOneIsGangbanged]");
+            }
+            if (nobodyGetsHurt) // TODO: Rangestriker
+            {
+                value += bec.DEF__NOBODY_GETS_HURT;
+                why.append("+");
+                why.append(bec.DEF__NOBODY_GETS_HURT);
+                why.append(" [Def_NobodyGetsHurt]");
+            }
+        }
+        return value;
     }
 
     /** strikeMap is optional */
@@ -3800,6 +3863,14 @@ public class SimpleAI implements AI
             sum += val;
         }
 
+        // whole position evaluation
+        {
+            StringBuffer why = new StringBuffer();
+            int val = evaluateLegionBattleMoveAsAWhole(lm, strikeMap, why);
+            lm.setEvaluate(why.toString());
+            sum += val;
+        }
+
         // Then move them all back.
         for (CritterMove cm : lm.getCritterMoves())
         {
@@ -3831,6 +3902,7 @@ public class SimpleAI implements AI
     {
         private final List<CritterMove> critterMoves = new ArrayList<CritterMove>();
         private Map<CritterMove,String> evaluation = null;
+        private String lmeval = null;
 
         void add(CritterMove cm)
         {
@@ -3844,12 +3916,17 @@ public class SimpleAI implements AI
 
         void resetEvaluate() {
             evaluation = null;
+            lmeval = null;
         }
 
         void setEvaluate(CritterMove cm, String val) {
             if (evaluation == null)
                 evaluation = new HashMap<CritterMove,String>();
             evaluation.put(cm, val);
+        }
+
+        void setEvaluate(String val) {
+            lmeval = val;
         }
 
         @Override
@@ -3869,6 +3946,8 @@ public class SimpleAI implements AI
                 }
                 cmStrings.add(buf.toString());
             }
+            if (lmeval != null)
+                cmStrings.add(" {" + lmeval + "}");
             return Glob.glob(", ", cmStrings);
         }
 

@@ -1627,7 +1627,7 @@ public final class Client implements IClient, IOracle
             });
     }
 
-    List<BattleChit> getInactiveBattleChits()
+    public List<BattleChit> getInactiveBattleChits()
     {
         return CollectionHelper.selectAsList(battleChits,
             new Predicate<BattleChit>()
