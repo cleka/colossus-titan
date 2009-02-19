@@ -2979,6 +2979,7 @@ public class SimpleAI implements AI
 
         for (String hexLabel : moves)
         {
+            StringBuffer why = new StringBuffer();
             CritterMove cm = new CritterMove(critter, currentHexLabel,
                 hexLabel);
 
@@ -2986,7 +2987,7 @@ public class SimpleAI implements AI
             critter.moveToHex(hexLabel);
 
             // Compute and save the value for each CritterMove.
-            cm.setValue(evaluateCritterMove(critter, null));
+            cm.setValue(evaluateCritterMove(critter, null, why));
             moveList.add(cm);
             // Move the critter back where it started.
             critter.moveToHex(critter.getStartingHexLabel());
@@ -3050,6 +3051,9 @@ public class SimpleAI implements AI
             {
                 bestScore = score;
                 best = lm;
+                LOGGER.finest("INTERMEDIATE Best legion move: "
+                               + ((best == null) ? "none " : best.toString()) + " (" + bestScore
+                               + ")");
             }
 
             count++;
@@ -3273,7 +3277,7 @@ public class SimpleAI implements AI
 
     /** strikeMap is optional */
     private int evaluateCritterMove(BattleChit critter,
-        Map<String, Integer> strikeMap)
+        Map<String, Integer> strikeMap, StringBuffer why)
     {
         final MasterBoardTerrain terrain = client.getBattleSite().getTerrain();
         final LegionClientSide legion = (LegionClientSide)client
@@ -3301,11 +3305,17 @@ public class SimpleAI implements AI
             // Staying offboard to die is really bad.
             value += bec.OFFBOARD_DEATH_SCALE_FACTOR
                 * getCombatValue(critter, terrain);
+            why.append("+");
+            why.append(bec.OFFBOARD_DEATH_SCALE_FACTOR * getCombatValue(critter, terrain));
+            why.append(" [StayingOffboard]");
         }
         else if (hex.isNativeBonusTerrain()
             && critter.getCreature().isNativeIn(hex.getTerrain()))
         {
             value += bec.NATIVE_BONUS_TERRAIN;
+            why.append("+");
+            why.append(bec.NATIVE_BONUS_TERRAIN);
+            why.append(" [NativeBonusTerrain]");
 
             // Above gives a small base value.
             // Scale remaining bonus to size of benefit
@@ -3319,6 +3329,9 @@ public class SimpleAI implements AI
                 + (native_skill - 2 * skill) * power;
 
             value += 3 * bonus;
+            why.append("+");
+            why.append(3 * bonus);
+            why.append(" [More NativeBonusTerrain]");
 
             // We want marsh natives to slightly prefer moving to bog hexes,
             // even though there's no real bonus there, to leave other hexes
@@ -3326,6 +3339,9 @@ public class SimpleAI implements AI
             if (hex.getTerrain().equals(HazardTerrain.BOG))
             {
                 value += bec.NATIVE_BOG;
+                why.append("+");
+                why.append(bec.NATIVE_BOG);
+                why.append(" [NativeBog]");
             }
 
             /*
@@ -3346,6 +3362,9 @@ public class SimpleAI implements AI
                 && (!critter.getCreature().isNativeIn(hex.getTerrain())))
             {
                 value += bec.NON_NATIVE_PENALTY_TERRAIN;
+                why.append("+");
+                why.append(bec.NON_NATIVE_PENALTY_TERRAIN);
+                why.append(" [NonNativePenalty]");
 
                 // Above gives a small base value.
                 // Scale remaining bonus to size of benefit
@@ -3353,12 +3372,19 @@ public class SimpleAI implements AI
                     + (native_skill - 2 * skill) * power;
 
                 value += 3 * bonus; // bonus should be negative here
+                why.append("+");
+                why.append(3 * bonus);
+                why.append(" [More NonNativePenalty]");
             }
         }
 
         /* damage is positive, healing is negative, so we can always add */
         value += bec.PENALTY_DAMAGE_TERRAIN
             * hex.damageToCreature(critter.getCreature());
+        why.append("+");
+        why.append(bec.PENALTY_DAMAGE_TERRAIN
+                   * hex.damageToCreature(critter.getCreature()));
+        why.append(" [PenaltyDamageTerrain]");
 
         Set<String> targetHexLabels = client.findStrikes(critter.getTag());
         int numTargets = targetHexLabels.size();
@@ -3369,12 +3395,18 @@ public class SimpleAI implements AI
             {
                 // Rangestrikes.
                 value += bec.FIRST_RANGESTRIKE_TARGET;
+                why.append("+");
+                why.append(bec.FIRST_RANGESTRIKE_TARGET);
+                why.append(" [FirstRangestrikeTarget]");
 
                 // Having multiple targets is good, in case someone else
                 // kills one.
                 if (numTargets >= 2)
                 {
                     value += bec.EXTRA_RANGESTRIKE_TARGET;
+                    why.append("+");
+                    why.append(bec.EXTRA_RANGESTRIKE_TARGET);
+                    why.append(" [ExtraRangestrikeTarget]");
                 }
 
                 // Non-warlock skill 4 rangestrikers should slightly prefer
@@ -3388,6 +3420,9 @@ public class SimpleAI implements AI
                     if (target.isTitan())
                     {
                         value += bec.RANGESTRIKE_TITAN;
+                        why.append("+");
+                        why.append(bec.RANGESTRIKE_TITAN);
+                        why.append(" [RangestrikeTitan]");
                     }
                     int strikeNum = client.getStrike().getStrikeNumber(
                         critter, target);
@@ -3404,12 +3439,18 @@ public class SimpleAI implements AI
                         if (numAttackingThisTarget > 1)
                         {
                             value += bec.GANG_UP_ON_CREATURE;
+                            why.append("+");
+                            why.append(bec.GANG_UP_ON_CREATURE);
+                            why.append(" [GangUpOnCreature]");
                         }
                     }
                 }
                 if (!penalty)
                 {
                     value += bec.RANGESTRIKE_WITHOUT_PENALTY;
+                    why.append("+");
+                    why.append(bec.RANGESTRIKE_WITHOUT_PENALTY);
+                    why.append(" [RangestrikeWithoutPenalty]");
                 }
             }
             else
@@ -3420,11 +3461,17 @@ public class SimpleAI implements AI
                 if (legion.equals(client.getAttacker()))
                 {
                     value += bec.ATTACKER_ADJACENT_TO_ENEMY;
+                    why.append("+");
+                    why.append(bec.ATTACKER_ADJACENT_TO_ENEMY);
+                    why.append(" [AttackerAdjacentToEnemy]");
                 }
                 // Slightly penalize being adjacent to an enemy if defending.
                 else
                 {
                     value += bec.DEFENDER_ADJACENT_TO_ENEMY;
+                    why.append("+");
+                    why.append(bec.DEFENDER_ADJACENT_TO_ENEMY);
+                    why.append(" [DefenderAdjacentToEnemy]");
                 }
 
                 int killValue = 0;
@@ -3439,6 +3486,9 @@ public class SimpleAI implements AI
                     if (target.isTitan())
                     {
                         value += bec.ADJACENT_TO_ENEMY_TITAN;
+                        why.append("+");
+                        why.append(bec.ADJACENT_TO_ENEMY_TITAN);
+                        why.append(" [AdjacentToEnemyTitan]");
                     }
 
                     // Reward being next to a rangestriker, so it can't hang
@@ -3446,12 +3496,18 @@ public class SimpleAI implements AI
                     if (target.isRangestriker() && !critter.isRangestriker())
                     {
                         value += bec.ADJACENT_TO_RANGESTRIKER;
+                        why.append("+");
+                        why.append(bec.ADJACENT_TO_RANGESTRIKER);
+                        why.append(" [AdjacenttoRangestriker]");
                     }
 
                     // Attack Warlocks so they don't get Titan
                     if (target.getCreatureName().equals("Warlock"))
                     {
                         value += bec.ADJACENT_TO_BUDDY_TITAN;
+                        why.append("+");
+                        why.append(bec.ADJACENT_TO_BUDDY_TITAN);
+                        why.append(" [AdjacentToBuddyTitan]");
                     }
 
                     // Reward being next to an enemy that we can probably
@@ -3482,6 +3538,9 @@ public class SimpleAI implements AI
                         if (numAttackingThisTarget > 1)
                         {
                             value += bec.GANG_UP_ON_CREATURE;
+                            why.append("+");
+                            why.append(bec.GANG_UP_ON_CREATURE);
+                            why.append(" [GangUpOnCreature 2]");
                         }
                     }
 
@@ -3499,12 +3558,22 @@ public class SimpleAI implements AI
                     value += bec.ATTACKER_KILL_SCALE_FACTOR * killValue
                         + bec.KILLABLE_TARGETS_SCALE_FACTOR
                         * numKillableTargets;
+                    why.append("+");
+                    why.append(bec.ATTACKER_KILL_SCALE_FACTOR * killValue
+                               + bec.KILLABLE_TARGETS_SCALE_FACTOR
+                               * numKillableTargets);
+                    why.append(" [Attacker Killable Stuff]");
                 }
                 else
                 {
                     value += bec.DEFENDER_KILL_SCALE_FACTOR * killValue
                         + bec.KILLABLE_TARGETS_SCALE_FACTOR
                         * numKillableTargets;
+                    why.append("+");
+                    why.append(bec.DEFENDER_KILL_SCALE_FACTOR * killValue
+                               + bec.KILLABLE_TARGETS_SCALE_FACTOR
+                               * numKillableTargets);
+                    why.append(" [Defender Killable Stuff]");
                 }
 
                 int hits = critter.getHits();
@@ -3519,11 +3588,19 @@ public class SimpleAI implements AI
                         {
                             value += bec.ATTACKER_GET_KILLED_SCALE_FACTOR
                                 * getKillValue(critter, terrain);
+                            why.append("+");
+                            why.append(bec.ATTACKER_GET_KILLED_SCALE_FACTOR
+                                       * getKillValue(critter, terrain));
+                            why.append(" [AttackerGetKilled]");
                         }
                         else
                         {
                             value += bec.DEFENDER_GET_KILLED_SCALE_FACTOR
                                 * getKillValue(critter, terrain);
+                            why.append("+");
+                            why.append(bec.DEFENDER_GET_KILLED_SCALE_FACTOR
+                                       * getKillValue(critter, terrain));
+                            why.append(" [DefenderGetKilled]");
                         }
                     }
                     else
@@ -3532,11 +3609,19 @@ public class SimpleAI implements AI
                         {
                             value += bec.ATTACKER_GET_HIT_SCALE_FACTOR
                                 * getKillValue(critter, terrain);
+                            why.append("+");
+                            why.append(bec.ATTACKER_GET_HIT_SCALE_FACTOR
+                                       * getKillValue(critter, terrain));
+                            why.append(" [AttackerGetHit]");
                         }
                         else
                         {
                             value += bec.DEFENDER_GET_HIT_SCALE_FACTOR
                                 * getKillValue(critter, terrain);
+                            why.append("+");
+                            why.append(bec.DEFENDER_GET_HIT_SCALE_FACTOR
+                                       * getKillValue(critter, terrain));
+                            why.append(" [DefendergetHit]");
                         }
                     }
                 }
@@ -3556,6 +3641,9 @@ public class SimpleAI implements AI
             {
                 // Stick to the center of the tower.
                 value += bec.TITAN_TOWER_HEIGHT_BONUS * hex.getElevation();
+                why.append("+");
+                why.append(bec.TITAN_TOWER_HEIGHT_BONUS * hex.getElevation());
+                why.append(" [TitanTowerHeightBonus]");
             }
             else
             {
@@ -3563,6 +3651,10 @@ public class SimpleAI implements AI
                 {
                     value += bec.TITAN_FORWARD_EARLY_PENALTY
                         * Strike.getRange(hex, entrance, true);
+                    why.append("+");
+                    why.append(bec.TITAN_FORWARD_EARLY_PENALTY
+                               * Strike.getRange(hex, entrance, true));
+                    why.append(" [TitanForwardEarlyPenalty]");
                     for (int i = 0; i < 6; i++)
                     {
                         BattleHex neighbor = hex.getNeighbor(i);
@@ -3571,6 +3663,9 @@ public class SimpleAI implements AI
                                 .equals(HazardTerrain.TREE))
                         {
                             value += bec.TITAN_BY_EDGE_OR_TREE_BONUS;
+                            why.append("+");
+                            why.append(bec.TITAN_BY_EDGE_OR_TREE_BONUS);
+                            why.append(" [TitanByEdgeOrTree]");
                         }
                     }
                 }
@@ -3584,6 +3679,9 @@ public class SimpleAI implements AI
             {
                 // Stick to the center of the tower.
                 value += bec.DEFENDER_TOWER_HEIGHT_BONUS * hex.getElevation();
+                why.append("+");
+                why.append(bec.DEFENDER_TOWER_HEIGHT_BONUS * hex.getElevation());
+                why.append(" [DefenderTowerHeightBonus]");
             }
             else
             {
@@ -3602,6 +3700,10 @@ public class SimpleAI implements AI
                 {
                     value += bec.DEFENDER_FORWARD_EARLY_PENALTY
                         * Math.abs(range - preferredRange);
+                    why.append("+");
+                    why.append(bec.DEFENDER_FORWARD_EARLY_PENALTY
+                               * Math.abs(range - preferredRange));
+                    why.append(" [DefenderForwardEarlyPenalty]");
                 }
             }
         }
@@ -3612,6 +3714,10 @@ public class SimpleAI implements AI
             // Head for enemy creatures.
             value += bec.ATTACKER_DISTANCE_FROM_ENEMY_PENALTY
                 * client.getStrike().minRangeToEnemy(critter);
+            why.append("+");
+            why.append(bec.ATTACKER_DISTANCE_FROM_ENEMY_PENALTY
+                       * client.getStrike().minRangeToEnemy(critter));
+            why.append(" [AttackerDistanceFromEnemyPenalty]");
         }
 
         // Adjacent buddies
@@ -3630,23 +3736,38 @@ public class SimpleAI implements AI
                         if (other.isTitan())
                         {
                             value += bec.ADJACENT_TO_BUDDY_TITAN;
+                            why.append("+");
+                            why.append(bec.ADJACENT_TO_BUDDY_TITAN);
+                            why.append(" [AdjacentToBuddyTitan 2]");
                             value += native_skill
                                 * (native_power - critter.getHits());
+                            why.append("+");
+                            why.append(native_skill
+                                       * (native_power - critter.getHits()));
+                            why.append(" [More AdjacentToBuddyTitan 2]");
                         }
                         else
                         {
                             value += bec.ADJACENT_TO_BUDDY;
+                            why.append("+");
+                            why.append(bec.ADJACENT_TO_BUDDY);
+                            why.append(" [AdjacentToBuddy]");
                         }
                     }
                 }
             }
         }
 
+        why.append(" = ");
+        why.append(value);
+
         return value;
     }
 
     private int evaluateLegionBattleMove(LegionMove lm)
     {
+        lm.resetEvaluate();
+
         // First we need to move all critters into position.
         for (CritterMove cm : lm.getCritterMoves())
         {
@@ -3659,7 +3780,10 @@ public class SimpleAI implements AI
         int sum = 0;
         for (CritterMove cm : lm.getCritterMoves())
         {
-            sum += evaluateCritterMove(cm.getCritter(), strikeMap);
+            StringBuffer why = new StringBuffer();
+            int val = evaluateCritterMove(cm.getCritter(), strikeMap, why);
+            lm.setEvaluate(cm, why.toString());
+            sum += val;
         }
 
         // Then move them all back.
@@ -3692,6 +3816,7 @@ public class SimpleAI implements AI
     class LegionMove
     {
         private final List<CritterMove> critterMoves = new ArrayList<CritterMove>();
+        private Map<CritterMove,String> evaluation = null;
 
         void add(CritterMove cm)
         {
@@ -3703,13 +3828,32 @@ public class SimpleAI implements AI
             return Collections.unmodifiableList(critterMoves);
         }
 
+        void resetEvaluate() {
+            evaluation = null;
+        }
+
+        void setEvaluate(CritterMove cm, String val) {
+            if (evaluation == null)
+                evaluation = new HashMap<CritterMove,String>();
+            evaluation.put(cm, val);
+        }
+
         @Override
         public String toString()
         {
             List<String> cmStrings = new ArrayList<String>();
             for (CritterMove cm : critterMoves)
             {
-                cmStrings.add(cm.toString());
+                StringBuffer buf = new StringBuffer();
+                buf.append(cm.toString());
+                if (evaluation != null) {
+                    if (evaluation.containsKey(cm)) {
+                        buf.append(" [");
+                        buf.append(evaluation.get(cm));
+                        buf.append("]");
+                    }
+                }
+                cmStrings.add(buf.toString());
             }
             return Glob.glob(", ", cmStrings);
         }
