@@ -457,6 +457,10 @@ public final class Start
         {
             options.setOption(Options.autoPlay, true);
         }
+        if (cl.optIsSet('N'))
+        {
+            options.setOption(Options.nonRandomBattleDice, true);
+        }
         if (cl.optIsSet('d'))
         {
             String buf = cl.getOptValue('d');
@@ -600,6 +604,7 @@ public final class Start
             opts.addOption('s', "server", true, "Server name or IP");
             opts.addOption('S', "autosave", false, "Autosave");
             opts.addOption('A', "autoplay", false, "Autoplay");
+            opts.addOption('N', "non-random-battle-dice", false, "Use non-random battle dice");
             opts.addOption('R', "resetOptions", false, "Reset options");
             opts.addOption('m', "myname", true, "My player name");
             opts.addOption('O', "noobserver", false, "Go on without observer");
