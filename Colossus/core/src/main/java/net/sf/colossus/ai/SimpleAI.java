@@ -3091,11 +3091,17 @@ public class SimpleAI implements AI
      *  sorted List of CritterMoves for one critter.  Return a sorted List
      *  of LegionMoves.  A LegionMove is a List of one CritterMove per
      *  mobile critter in the legion, where no two critters move to the
-     *  same hex. */
-    static Collection<LegionMove> findLegionMoves(
+     *  same hex.
+     * This is the function called elsewhere in the code. It is NOT static,
+     * because it can be (and is) overidden by subclasses.
+     */
+    Collection<LegionMove> findLegionMoves(
         final List<List<CritterMove>> allCritterMoves) {
         return findLegionMoves(allCritterMoves, false);
     }
+    /** This version of findLegionMoves does the work, and is static
+     *  because it can be called from other AI stuff.
+     */
     static Collection<LegionMove> findLegionMoves(
         final List<List<CritterMove>> allCritterMoves, boolean forceAll)
     {
