@@ -21,7 +21,9 @@ public class ExperimentalAI extends SimpleAI
     }
 
 
+    /*
     Collection<LegionMove> findLegionMoves(final List<List<CritterMove>> allCritterMoves) {
         return new OnTheFlyLegionMove(allCritterMoves);
     }
+    */
 }
