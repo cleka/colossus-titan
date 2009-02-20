@@ -3312,57 +3312,8 @@ public class SimpleAI implements AI
 
     protected int evaluateLegionBattleMoveAsAWhole(LegionMove lm, Map<String, Integer> strikeMap, StringBuffer why) {
         int value = 0;
-        final LegionClientSide legion = (LegionClientSide)client.getMyEngagedLegion();
-        if (legion.equals(client.getAttacker())) {
-            // TODO, something
-        } else {
-            boolean nobodyGetsHurt = true;
-            int numCanBeReached = 0;
-            int maxThatCanReach = 0;
-            for (CritterMove cm : lm.getCritterMoves())
-            {
-                int canReachMe = 0;
-                BattleChit critter = cm.getCritter();
-                BattleHex myHex = client.getBattleHex(critter);
-                List<BattleChit> foes = client.getInactiveBattleChits();
-                for (BattleChit foe : foes) {
-                    BattleHex foeHex = client.getBattleHex(foe);
-                    int range = Strike.getRange(foeHex, myHex, true);
-                    if ((range != Constants.OUT_OF_RANGE) &&
-                        ((range - 2) <= foe.getSkill())) {
-                        canReachMe++;
-                    }
-                }
-                if (canReachMe > 0) {
-                    nobodyGetsHurt = false;
-                    numCanBeReached ++;
-                    if (maxThatCanReach < canReachMe)
-                        maxThatCanReach = canReachMe;
-                }
-            }
-            if (numCanBeReached == 1) // TODO: Rangestriker
-            {
-                value += bec.DEF__AT_MOST_ONE_IS_REACHABLE;
-                why.append("+");
-                why.append(bec.DEF__AT_MOST_ONE_IS_REACHABLE);
-                why.append(" [Def_AtMostOneIsReachable]");
-            }
-            if (maxThatCanReach == 1) // TODO: Rangestriker
-            {
-                value += bec.DEF__NOONE_IS_GANGBANGED;
-                why.append("+");
-                why.append(bec.DEF__NOONE_IS_GANGBANGED);
-                why.append(" [Def_NoOneIsGangbanged]");
-            }
-            if (nobodyGetsHurt) // TODO: Rangestriker
-            {
-                value += bec.DEF__NOBODY_GETS_HURT;
-                why.append("+");
-                why.append(bec.DEF__NOBODY_GETS_HURT);
-                why.append(" [Def_NobodyGetsHurt]");
-            }
-        }
-        return 0; /* value; */ /* temporarily disabled, side-effects are brutal */
+        // This is empty, to be overidden by subclasses.
+        return value;
     }
 
     /** strikeMap is optional */
