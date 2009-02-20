@@ -55,6 +55,7 @@ public final class Start
 
     private int whatToDoNext;
     private final Options stOptions;
+    private static int howManyGamesLeft = 0;
 
     public Start(int whatToDoNext, Options stOptions)
     {
@@ -670,7 +671,8 @@ public final class Start
         // are stored within the options or startOptions.
         cl = null;
 
-        int howManyGamesLeft = Options.getHowManyStresstestRoundsProperty();
+        howManyGamesLeft = Options.getHowManyStresstestRoundsProperty();
+        String loadFileName = null;
 
         boolean dontWait = false;
         int whatToDoNext;
@@ -750,6 +752,13 @@ public final class Start
             {
                 startObject.setWhatToDoNext(GetPlayersDialog);
                 int port = startOptions.getIntOption(Options.serveAtPort);
+                loadFileName = startOptions
+                    .getStringOption(Options.loadGameFileName);
+                if (!(howManyGamesLeft > 0))
+                {
+                    startOptions.removeOption(Options.loadGameFileName);
+                }
+
                 String filename = startOptions
                     .getStringOption(Options.loadGameFileName);
                 startOptions.removeOption(Options.loadGameFileName);
@@ -853,7 +862,15 @@ public final class Start
             {
                 LOGGER.log(Level.ALL, "howManyGamesLeft now "
                     + howManyGamesLeft + "\n");
-                startObject.setWhatToDoNext(Start.StartGame);
+
+                if (loadFileName != null)
+                {
+                    startObject.setWhatToDoNext(Start.LoadGame);
+                }
+                else
+                {
+                    startObject.setWhatToDoNext(Start.StartGame);
+                }
             }
 
         } // end WHILE not QuitAll
@@ -904,7 +921,15 @@ public final class Start
      */
     public static void triggerTimedQuit()
     {
-        new TimedJvmQuit().start();
+        if (howManyGamesLeft > 0)
+        {
+            LOGGER.info("HowManyGamesLeft not zero yet - ignoring the "
+                + "request to trigger a timed quit.");
+        }
+        else
+        {
+            new TimedJvmQuit().start();
+        }
     }
 
     /**
