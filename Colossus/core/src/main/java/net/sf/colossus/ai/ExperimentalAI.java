@@ -9,9 +9,7 @@ import net.sf.colossus.client.Client;
 import net.sf.colossus.client.CritterMove;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.client.Strike;
-
 import net.sf.colossus.server.Constants;
-
 import net.sf.colossus.variant.BattleHex;
 
 
@@ -28,10 +26,12 @@ public class ExperimentalAI extends SimpleAI
         super(client);
     }
 
+    @Override
     Collection<LegionMove> findLegionMoves(final List<List<CritterMove>> allCritterMoves) {
         return new OnTheFlyLegionMove(allCritterMoves);
     }
 
+    @Override
     protected int evaluateLegionBattleMoveAsAWhole(LegionMove lm, Map<String, Integer> strikeMap, StringBuffer why) {
         int value = 0;
         final LegionClientSide legion = (LegionClientSide)client.getMyEngagedLegion();

@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
-
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.CritterMove;
@@ -27,7 +25,7 @@ class OnTheFlyLegionMove implements Collection<LegionMove> {
     private static final Logger LOGGER = Logger.getLogger(OnTheFlyLegionMove.class.getName());
     private final List<List<CritterMove>> allCritterMoves;
     private final int mysize;
-    
+
     OnTheFlyLegionMove(final List<List<CritterMove>> acm) {
         allCritterMoves = acm;
 
@@ -94,7 +92,7 @@ class OnTheFlyLegionMove implements Collection<LegionMove> {
                 return true;
             return false;
         }
-        
+
         public LegionMove next() {
             if (it != null)
                 return it.next();
@@ -140,7 +138,7 @@ class OnTheFlyLegionMove implements Collection<LegionMove> {
                 }
                 lastone = SimpleAI.makeLegionMove(indexes, daddy.allCritterMoves);
             }
-            
+
             return lastone;
         }
 
@@ -153,7 +151,7 @@ class OnTheFlyLegionMove implements Collection<LegionMove> {
         //Ensures that this collection contains the specified element (optional operation).
         throw new UnsupportedOperationException();
     }
-    
+
     public boolean	addAll(Collection<? extends LegionMove> c) {
         //Adds all of the elements in the specified collection to this collection (optional operation).
         throw new UnsupportedOperationException();
@@ -176,11 +174,13 @@ class OnTheFlyLegionMove implements Collection<LegionMove> {
         return false;
     }
 
+    @Override
     public boolean	equals(Object o) {
         //Compares the specified object with this collection for equality.
         LOGGER.warning(" should be implemented ...");
         return false;
     }
+    @Override
     public int	hashCode() {
         //Returns the hash code value for this collection.
         return super.hashCode();

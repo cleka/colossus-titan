@@ -71,12 +71,12 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  *  Lives on the client side and handles all communication
  *  with the server.  It talks to the client classes locally, and to
  *  Server via the network protocol.  There is one client per player.
- *  
+ *
  *  TODO the logic for the battles could probably be separated from the
  *  rest of this code. At the moment the battle logic seems to bounce
  *  back and forth between BattleBoard (which is really a GUI class) and
  *  this class.
- *  
+ *
  *  TODO there are quite a few spots where the existence of GUI elements
  *  is checked, e.g. "board == null" or "getPreferredParent() == null".
  *  Having a GUI class whose GUI may not be initialized seems utterly
@@ -84,20 +84,20 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  *  game logic out. AIs without visible GUI should not use GUI classes.
  *  And if someone wants to watch AIs play it might be a better idea to
  *  create a notion of a passive observer of a game.
- *  
+ *
  *  TODO this class also has the functionality of a GameClientSide class,
  *  which should be separated and ideally moved up into the {@link Game}
- *  class. The whole {@link IOracle} interface is part of that. 
+ *  class. The whole {@link IOracle} interface is part of that.
  *  One approach would be moving code from {@link GameServerSide}
  *  up into {@link Game} and then reuse it here in the matching methods,
  *  then inlining it into the calling code. Another one would be creating
  *  the GameClientSide for now and relocating code there.
- *  
+ *
  *  TODO there are a few places where an Iterator is used to remove all elements
  *  of a list -- an enhanced for loop with a Collection.clear() would probably
  *  look better and be more efficient (not that the latter would be significant
  *  in any of the cases)
- *  
+ *
  *  @version $Id$
  *  @author David Ripton
  *  @author Romain Dolbeau
@@ -141,12 +141,12 @@ public final class Client implements IClient, IOracle
 
     private final List<BattleChit> battleChits = new ArrayList<BattleChit>();
 
-    /** 
+    /**
      * Stack of legion marker ID's, to allow multiple levels of undo for
      * splits, moves, and recruits.
-     * (for battle actions, the Strings are not actually marker ID's, 
+     * (for battle actions, the Strings are not actually marker ID's,
      *  it's battle hex ID's there instead).
-     * 
+     *
      * TODO it would probably be good to have a full Command pattern here, similar
      * to Swing's {@link UndoManager} stuff. In the GUI client we could/should
      * probably just use that. A list of objects (which are mostly the string
@@ -160,9 +160,9 @@ public final class Client implements IClient, IOracle
     // Per-client and per-player options.
     private final Options options;
 
-    /** 
+    /**
      * Player who owns this client.
-     * 
+     *
      * TODO should be final but can't be until the constructor gets all the data
      * needed
      */
@@ -174,10 +174,10 @@ public final class Client implements IClient, IOracle
      */
     private final Game game;
 
-    /** 
+    /**
      * Starting marker color of player who owns this client.
-     * 
-     * TODO most likely redundant with owningPlayer.getColor() 
+     *
+     * TODO most likely redundant with owningPlayer.getColor()
      */
     private String color;
 
@@ -197,7 +197,7 @@ public final class Client implements IClient, IOracle
     /**
      * This is used as a placeholder for activePlayer and battleActivePlayer since they
      * are sometimes accessed when they are not available.
-     * 
+     *
      * TODO this is a hack. Those members should just not be accessed at times where they
      * are not available. It seems to happen during startup (the not yet set case) and in
      * some GUI parts after battles, when battleActivePlayer has been reset already.
@@ -230,8 +230,8 @@ public final class Client implements IClient, IOracle
     private Server localServer;
     private SocketClientThread sct;
     private Timer connectionCheckTimer;
-    
-    /* This is a number of seconds to wait for connection check 
+
+    /* This is a number of seconds to wait for connection check
      * confirmation message before assuming connection is broken and
      * displaying a message telling so.
      */
@@ -243,7 +243,7 @@ public final class Client implements IClient, IOracle
 
     /**
      * Constants modeling the party who closed this client.
-     * 
+     *
      * TODO the CLOSED_BY_WEBCLIENT seems unused
      */
     private enum ClosedByConstant
@@ -268,8 +268,8 @@ public final class Client implements IClient, IOracle
     private int viewMode;
     private int recruitChitMode;
 
-    // Once we got dispose from server (or user initiated it himself), 
-    // we'll ignore it if we we get it from server again 
+    // Once we got dispose from server (or user initiated it himself),
+    // we'll ignore it if we we get it from server again
     // - it's then up to the user to do some "disposing" action.
     private boolean gotDisposeAlready = false;
 
@@ -279,7 +279,7 @@ public final class Client implements IClient, IOracle
      * TODO since Client is currently still the equivalent of GameClientSide it should
      *      create the Game instance instead of getting it passed in. The problem is
      *      getting all the player names to begin with.
-     *      
+     *
      * TODO try to make the Client class agnostic of the network or not question by
      *      having the SCT outside and behaving like a normal server -- that way it
      *      would be easier to run the local clients without the detour across the
@@ -395,7 +395,7 @@ public final class Client implements IClient, IOracle
     }
 
     /*
-     * If webclient is just hidden, bring it back; 
+     * If webclient is just hidden, bring it back;
      * if it had been used, ask whether to restore;
      * Otherwise just do nothing
      */
@@ -625,7 +625,7 @@ public final class Client implements IClient, IOracle
     }
 
     /* Create the event viewer, so that it can collect data from beginning on.
-     * EventViewer shows itself depending on whether the option for it is set. 
+     * EventViewer shows itself depending on whether the option for it is set.
      */
     private void initEventViewer()
     {
@@ -730,7 +730,7 @@ public final class Client implements IClient, IOracle
 
     /**
      * TODO since we are doing Swing nowadays it would probably be much better to replace
-     * all this rescaling code with just using {@link AffineTransform} on the right 
+     * all this rescaling code with just using {@link AffineTransform} on the right
      * {@link Graphics2D} instances.
      */
     void rescaleAllWindows()
@@ -822,7 +822,7 @@ public final class Client implements IClient, IOracle
     }
 
     /** public so that server can set autoPlay for AIs.
-     *  
+     *
      * TODO This it totally confusing: this method is declared
      * to fulfill the IClient interface, but it is never actually
      * used, since the SocketClientThread directly deals with
@@ -842,7 +842,7 @@ public final class Client implements IClient, IOracle
 
     /**
      * Trigger side effects after changing an option value.
-     * 
+     *
      *  TODO now that there are listeners, many of the other classes could listen to the
      *  options relevant to them instead of dispatching it all through the Client class.
      */
@@ -989,7 +989,7 @@ public final class Client implements IClient, IOracle
                     if (engagementResults != null)
                     {
                         // maybeShow decides by itself based on the current value
-                        // of the option whether to hide or show. 
+                        // of the option whether to hide or show.
                         engagementResults.maybeShow();
                     }
                 }
@@ -1036,9 +1036,9 @@ public final class Client implements IClient, IOracle
         syncCheckboxes();
     }
 
-    /** 
+    /**
      * Ensure that Player menu checkboxes reflect the correct state.
-     * 
+     *
      * TODO let the checkboxes have their own listeners instead. Or even
      * better: use a binding framework.
      */
@@ -1209,7 +1209,7 @@ public final class Client implements IClient, IOracle
             caretakerDisplay.update();
         }
     }
-    
+
     private void disposeMasterBoard()
     {
         if (board != null)
@@ -1231,7 +1231,7 @@ public final class Client implements IClient, IOracle
     private void disposePickCarryDialog()
     {
         if (pickCarryDialog != null)
-        {   
+        {
             if (battleBoard != null)
             {
                 battleBoard.unselectAllHexes();
@@ -1447,7 +1447,7 @@ public final class Client implements IClient, IOracle
         boolean close = true;
 
         // I don't use "getPlayerInfo().isAI() here, because if done
-        // so very early, getPlayerInfo delivers null. 
+        // so very early, getPlayerInfo delivers null.
         boolean isAI = true;
         String pType = options.getStringOption(Options.playerType);
         if (pType != null
@@ -1456,7 +1456,7 @@ public final class Client implements IClient, IOracle
             isAI = false;
         }
 
-        // AIs in general, and any (local or remote) client during 
+        // AIs in general, and any (local or remote) client during
         // stresstesting should close without asking...
         if (isAI || Options.isStresstest())
         {
@@ -1471,13 +1471,13 @@ public final class Client implements IClient, IOracle
 
                 String message = null;
                 String title = null;
-                
+
                 if (gameOver)
                 {
                     // don't show again!
                     if (gameOverMessage != null)
                     {
-                        message = "Game over: " + gameOverMessage + "!\n\n" + 
+                        message = "Game over: " + gameOverMessage + "!\n\n" +
                             "(connection closed from server side)";
                         gameOverMessage = null;
                         title = "Game Over: Server closed connection";
@@ -1494,11 +1494,8 @@ public final class Client implements IClient, IOracle
                     title = "Server closed connection";
                 }
 
-                if (message != null)
-                {
-                    JOptionPane.showMessageDialog(getMapOrBoardFrame(), 
-                        message, title, JOptionPane.INFORMATION_MESSAGE);
-                }
+                JOptionPane.showMessageDialog(getMapOrBoardFrame(), message,
+                    title, JOptionPane.INFORMATION_MESSAGE);
                 close = false;
             }
             else
@@ -1509,7 +1506,7 @@ public final class Client implements IClient, IOracle
         return close;
     }
 
-    /* Dispose all windows, and clean up lot of references, 
+    /* Dispose all windows, and clean up lot of references,
      * so that GC can do it's job
      * - in case we keep JVM open to play another one...
      */
@@ -1704,7 +1701,7 @@ public final class Client implements IClient, IOracle
 
     /**
      * Get this legion's info or create if necessary.
-     * 
+     *
      * TODO move legion creation into a factory on {@link Player}
      */
     public LegionClientSide getLegion(String markerId)
@@ -1888,9 +1885,9 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    /** Reveal creatures in this legion, some of which already may be known. 
-     *  - this "reveal" is related to data coming from server being  
-     *  revealed to the split prediction 
+    /** Reveal creatures in this legion, some of which already may be known.
+     *  - this "reveal" is related to data coming from server being
+     *  revealed to the split prediction
      * */
 
     public void revealCreatures(Legion legion, final List<String> names,
@@ -2537,7 +2534,7 @@ public final class Client implements IClient, IOracle
         LOGGER.info("Client " + getOwningPlayer()
             + " received from server game over message: " + message);
         gameOver = true;
-        
+
         if (webClient != null)
         {
             webClient.tellGameEnds();
@@ -2682,7 +2679,7 @@ public final class Client implements IClient, IOracle
             replyToProposal.dispose();
         }
         replyToProposal = new ReplyToProposal(this, proposal);
-        
+
     }
 
     public BattleHex getBattleHex(BattleChit chit)
@@ -2724,7 +2721,7 @@ public final class Client implements IClient, IOracle
         }
 
         disposePickCarryDialog();
-                
+
         BattleChit targetChit = getBattleChit(targetTag);
         if (battleBoard != null)
         {
@@ -2920,7 +2917,7 @@ public final class Client implements IClient, IOracle
         this.battleTurnNumber = battleTurnNumber;
         setBattleActivePlayer(battleActivePlayer);
         this.battlePhase = battlePhase;
-        // TODO the following three are probably not needed, 
+        // TODO the following three are probably not needed,
         //      they are already set during tellEngagement()
         this.attacker = attacker;
         this.defender = defender;
@@ -3148,9 +3145,9 @@ public final class Client implements IClient, IOracle
             }
             revealCreatures(legion, recruiters, Constants.reasonRecruiter);
         }
-        String reason = (battleSite != null ? 
+        String reason = (battleSite != null ?
             Constants.reasonReinforced : Constants.reasonRecruited);
-        
+
         addCreature(legion, recruitName, reason);
         ((LegionClientSide)legion).setRecruitName(recruitName);
 
@@ -3190,7 +3187,7 @@ public final class Client implements IClient, IOracle
         {
             board.cleanRecruitedChit((LegionClientSide)legion);
             board.highlightPossibleRecruitLegionHexes();
-            
+
             if (eventViewer != null)
             {
                 eventViewer.undoEvent(eventType, legion
@@ -3311,7 +3308,7 @@ public final class Client implements IClient, IOracle
                 // for this once per turn and clean up.
                 validateLegions();
             }
-            
+
             disposeMovementDie();
             board.setupSplitMenu();
             board.fullRepaint(); // Ensure that movement die goes away
@@ -3342,7 +3339,7 @@ public final class Client implements IClient, IOracle
     private void validateLegions()
     {
         boolean foundProblem = false;
-        
+
         for (Player p : players)
         {
             if (p.isDead())
@@ -3364,7 +3361,7 @@ public final class Client implements IClient, IOracle
             board.recreateMarkers();
         }
     }
-    
+
     private void kickSplit()
     {
         if (isMyTurn() && options.getOption(Options.autoSplit)
@@ -4052,7 +4049,7 @@ public final class Client implements IClient, IOracle
     }
 
     /** List the lords eligible to teleport this legion to hexLabel,
-     *  as strings. 
+     *  as strings.
      *
      *  TODO return value should be List<Creature> or List<CreatureType>
      */
@@ -4212,7 +4209,7 @@ public final class Client implements IClient, IOracle
                     null, 0);
             }
         }
-                
+
         if (board != null)
         {
             board.clearPossibleRecruitChits();
@@ -4271,10 +4268,10 @@ public final class Client implements IClient, IOracle
     }
 
     /*
-     * Reset the cached reservations. 
-     * Should be called at begin of each recruit turn, if 
+     * Reset the cached reservations.
+     * Should be called at begin of each recruit turn, if
      * reserveRecruit and getReservedCount() are going to be used.
-     * 
+     *
      */
     public void resetRecruitReservations()
     {
@@ -4282,8 +4279,8 @@ public final class Client implements IClient, IOracle
     }
 
     /*
-     * Reserve one. Expects that getReservedCount() had been called in this 
-     * turn for same creature before called reserveRecruit (= to cache the 
+     * Reserve one. Expects that getReservedCount() had been called in this
+     * turn for same creature before called reserveRecruit (= to cache the
      * caretakers stack value).
      * Returns whether creature can still be recruited (=is available according
      * to caretakers stack plus reservations)
@@ -4321,8 +4318,8 @@ public final class Client implements IClient, IOracle
     /*
      * On first call (during a turn), cache remaining count from recruiter,
      * decrement on each further reserve for this creature.
-     * This way we are independent of when the changes which are triggered by 
-     * didRecruit influence the caretaker Stack. 
+     * This way we are independent of when the changes which are triggered by
+     * didRecruit influence the caretaker Stack.
      * Returns how many creatures can still be recruited (=according
      * to caretaker's stack plus reservations)
      */
@@ -4342,8 +4339,8 @@ public final class Client implements IClient, IOracle
             recruitReservations.remove(recruitType);
         }
 
-        // in case someone called getReservedRemain with bypassing the 
-        // reset or reserve methods, to be sure double check against the 
+        // in case someone called getReservedRemain with bypassing the
+        // reset or reserve methods, to be sure double check against the
         // real remaining value.
         int realCount = getGame().getCaretaker()
             .getAvailableCount(recruitType);
@@ -4356,8 +4353,8 @@ public final class Client implements IClient, IOracle
         return remain;
     }
 
-    /** Return a list of Creatures (ignore reservations). 
-     * 
+    /** Return a list of Creatures (ignore reservations).
+     *
      * TODO the extra hexLabel parameter is probably not needed anymore
      */
     public List<CreatureType> findEligibleRecruits(Legion legion, MasterHex hex)
@@ -4366,7 +4363,7 @@ public final class Client implements IClient, IOracle
     }
 
     /** Return a list of Creatures. Consider reservations if wanted
-     * 
+     *
      * TODO the extra hexLabel parameter is probably not needed anymore
      */
     public List<CreatureType> findEligibleRecruits(Legion legion,
@@ -4427,9 +4424,9 @@ public final class Client implements IClient, IOracle
         return recruits;
     }
 
-    /** 
+    /**
      * Return a list of creature name strings.
-     * 
+     *
      * TODO return List<CreatureType>
      */
     public List<String> findEligibleRecruiters(Legion legion,
@@ -4594,7 +4591,7 @@ public final class Client implements IClient, IOracle
 
     /**
      * Return a set of all hexes with engagements.
-     * 
+     *
      * TODO if we can be sure that the activePlayer is set properly, we could
      *      just create a set of all hexes he is on and then check if someone
      *      else occupies any of the same
@@ -4723,7 +4720,7 @@ public final class Client implements IClient, IOracle
             });
     }
 
-    // Used by File=>Close and Window closing 
+    // Used by File=>Close and Window closing
     public void setWhatToDoNextForClose()
     {
         if (startedByWebClient)
@@ -4762,7 +4759,7 @@ public final class Client implements IClient, IOracle
 
     public void menuQuitGame()
     {
-        // Note that if this called from webclient, webclient has already 
+        // Note that if this called from webclient, webclient has already
         // beforehand called client to set webclient to null :)
         if (webClient != null)
         {
@@ -4824,15 +4821,15 @@ public final class Client implements IClient, IOracle
     {
         if (sct.isAlreadyDown())
         {
-            JOptionPane.showMessageDialog(getMapOrBoardFrame(), 
+            JOptionPane.showMessageDialog(getMapOrBoardFrame(),
                 "No point to send check message - we know already that "
-                + " the socket connection is in 'down' state!", 
+                + " the socket connection is in 'down' state!",
                 "Useless attempt to check connection",
                 JOptionPane.INFORMATION_MESSAGE);
 
             return;
         }
-        connectionCheckTimer = new Timer(1000*CONN_CHECK_TIMEOUT, 
+        connectionCheckTimer = new Timer(1000*CONN_CHECK_TIMEOUT,
             new ActionListener()
         {
             public void actionPerformed(ActionEvent e)
@@ -4842,9 +4839,9 @@ public final class Client implements IClient, IOracle
         });
         connectionCheckTimer.start();
 
-        LOGGER.info("Client for player " + getOwningPlayer().getName() + 
+        LOGGER.info("Client for player " + getOwningPlayer().getName() +
         " checking server connection (sending request)");
-        
+
         server.checkServerConnection();
     }
 
@@ -4853,13 +4850,13 @@ public final class Client implements IClient, IOracle
      */
     public synchronized void serverConfirmsConnection()
     {
-        LOGGER.info("Client for player " + getOwningPlayer().getName() + 
+        LOGGER.info("Client for player " + getOwningPlayer().getName() +
             " received confirmation that connection is OK.");
         finishServerConnectionCheck(true);
     }
 
     /** Timeout reached. Cancel timer and show error message
-     */ 
+     */
     public synchronized void timeoutAbortsConnectionCheck()
     {
         finishServerConnectionCheck(false);
@@ -4883,20 +4880,20 @@ public final class Client implements IClient, IOracle
         connectionCheckTimer = null;
         if (success)
         {
-            JOptionPane.showMessageDialog(getMapOrBoardFrame(), 
+            JOptionPane.showMessageDialog(getMapOrBoardFrame(),
                 "Received confirmation from server - connection to "
                 + "server is ok!", "Connection check succeeded.",
                 JOptionPane.INFORMATION_MESSAGE);
         }
         else
         {
-            JOptionPane.showMessageDialog(getMapOrBoardFrame(), 
+            JOptionPane.showMessageDialog(getMapOrBoardFrame(),
                 "Did not receive confirmation message from server within "
                 + CONN_CHECK_TIMEOUT + " seconds - connection to "
                 + "server is probably broken, or something hangs.",
                 "Connection check failed!",
                 JOptionPane.ERROR_MESSAGE);
-            
+
         }
     }
 
@@ -4950,7 +4947,7 @@ public final class Client implements IClient, IOracle
         }
         else
         {
-            // fine. So this client does not even have eventViewer 
+            // fine. So this client does not even have eventViewer
             // (probably then not even a masterBoard, i.e. AI)
         }
 
@@ -5026,10 +5023,10 @@ public final class Client implements IClient, IOracle
 
     /**
      * Finishes the current phase.
-     * 
+     *
      * Depending on the current phase this method dispatches to
      * the different done methods.
-     * 
+     *
      * @see Client#doneWithSplits()
      * @see Client#doneWithMoves()
      * @see Client#doneWithEngagements()()
@@ -5266,9 +5263,9 @@ public final class Client implements IClient, IOracle
         server.doSplit(parent, childMarker, results);
     }
 
-    /** 
+    /**
      * Callback from server after any successful split.
-     * 
+     *
      * TODO childHeight is probably redundant now that we pass the legion object
      */
     public void didSplit(MasterHex hex, Legion parent, Legion child,
@@ -5292,7 +5289,7 @@ public final class Client implements IClient, IOracle
             Marker marker = new Marker(3 * Scale.get(), child.getMarkerId(),
                 this);
             setMarker(child, marker);
-            
+
             if (replayOngoing)
             {
                 replayTurnChange(turn);

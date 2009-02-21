@@ -3041,7 +3041,7 @@ public class SimpleAI implements AI
         LegionMove best = null;
 
         if (legionMoves instanceof List)
-            Collections.shuffle((List)legionMoves, random);
+            Collections.shuffle((List<LegionMove>)legionMoves, random);
 
         Timer findBestLegionMoveTimer = setupTimer();
 
@@ -3310,6 +3310,7 @@ public class SimpleAI implements AI
         return map;
     }
 
+    @SuppressWarnings("unused")
     protected int evaluateLegionBattleMoveAsAWhole(LegionMove lm, Map<String, Integer> strikeMap, StringBuffer why) {
         int value = 0;
         // This is empty, to be overidden by subclasses.
