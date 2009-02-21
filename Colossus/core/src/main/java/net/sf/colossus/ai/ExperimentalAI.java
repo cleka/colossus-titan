@@ -21,6 +21,8 @@ import net.sf.colossus.variant.BattleHex;
 
 public class ExperimentalAI extends SimpleAI
 {
+    private final static long MAX_EXHAUSTIVE_SEATCH_MOVES = 30000;
+
     public ExperimentalAI(Client client)
     {
         super(client);
@@ -28,6 +30,12 @@ public class ExperimentalAI extends SimpleAI
 
     @Override
     Collection<LegionMove> findLegionMoves(final List<List<CritterMove>> allCritterMoves) {
+        long realcount = 1;
+        for (List<CritterMove> lcm : allCritterMoves) {
+            realcount *= lcm.size();
+        }
+        if (realcount < MAX_EXHAUSTIVE_SEATCH_MOVES)
+            return generateLegionMoves(allCritterMoves, true);
         return new OnTheFlyLegionMove(allCritterMoves);
     }
 
