@@ -3081,7 +3081,7 @@ public class SimpleAI implements AI
             }
         }
         findBestLegionMoveTimer.cancel();
-        LOGGER.warning("Best legion move of " + count + " checked : "
+        LOGGER.info("Best legion move of " + count + " checked : "
             + ((best == null) ? "none " : best.getStringWithEvaluation()) + " (" + bestScore
             + ")");
         return best;
