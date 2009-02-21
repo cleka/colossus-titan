@@ -752,30 +752,30 @@ public final class Start
             {
                 startObject.setWhatToDoNext(GetPlayersDialog);
                 int port = startOptions.getIntOption(Options.serveAtPort);
-                loadFileName = startOptions
-                    .getStringOption(Options.loadGameFileName);
-                if (!(howManyGamesLeft > 0))
+                if (loadFileName == null)
                 {
-                    startOptions.removeOption(Options.loadGameFileName);
+                    loadFileName = startOptions
+                        .getStringOption(Options.loadGameFileName);
+                
+                    if (!(howManyGamesLeft > 0))
+                    {
+                        startOptions.removeOption(Options.loadGameFileName);
+                    }
                 }
 
-                String filename = startOptions
-                    .getStringOption(Options.loadGameFileName);
-                startOptions.removeOption(Options.loadGameFileName);
-
-                if (filename != null && filename.length() > 0)
+                if (loadFileName != null && loadFileName.length() > 0)
                 {
                     game = new GameServerSide();
                     game.setPort(port);
                     game.setOptions(serverOptions);
                     serverOptions.clearPlayerInfo();
-                    game.loadGame(filename);
+                    game.loadGame(loadFileName);
                 }
                 else
                 {
                     LOGGER.log(Level.SEVERE,
                         "Selected action LoadGame, but filename is '"
-                            + filename + "' (= null or empty)!",
+                            + loadFileName + "' (= null or empty)!",
                         (Throwable)null);
                 }
             }
