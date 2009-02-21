@@ -3330,7 +3330,30 @@ public final class GameServerSide extends Game
             pointsScored, turnCombatFinished);
 
         engagementResult = null;
-        
+
+        // This output is produced for optimizing AI battle functionality:
+        String result = "not set";
+        if (winner == null)
+        {
+            result = "draw";
+        }
+        else
+        {
+            result = "winner is " + winner.getMarkerId()
+                + " (player " + winner.getPlayer().getName() + ")";
+        }
+        LOGGER.info("Battle completed, result: " + result);
+
+        if (options.getOption(Options.endAfterFirstBattle))
+        {
+            // System.err.println("Battle completed, result: " + result);
+            LOGGER.info("endAfterFirstBattle is set, terminating game.");
+            Start.setCurrentWhatToDoNext(Start.QuitAll);
+            Start.triggerTimedQuit();
+            server.triggerDispose();
+            return;
+        }
+
         if (gameShouldContinue())
         {
             server.nextEngagement();
