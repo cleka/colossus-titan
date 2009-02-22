@@ -3344,7 +3344,8 @@ public final class GameServerSide extends Game
         }
         LOGGER.info("Battle completed, result: " + result);
 
-        if (options.getOption(Options.endAfterFirstBattle))
+        // This comes from a system property:
+        if (Constants.EndAfterFirstBattle)
         {
             // System.err.println("Battle completed, result: " + result);
             LOGGER.info("endAfterFirstBattle is set, terminating game.");

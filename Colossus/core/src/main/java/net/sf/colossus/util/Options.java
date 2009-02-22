@@ -58,7 +58,6 @@ public final class Options implements IOptions
     public static final String autosaveVerboseNames = "Verbose autosave names";
     public static final String autoStop = "AIs stop when humans dead";
     public static final String autoQuit = "Auto quit when game over";
-    public static final String endAfterFirstBattle = "End after first battle";
     public static final String goOnWithoutObserver = "Go on without observer";
     public static final String hotSeatMode = "Hot seat mode";
 

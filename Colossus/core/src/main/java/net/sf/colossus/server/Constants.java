@@ -196,6 +196,15 @@ public final class Constants
         }
     }
 
+
+    // Special feature to end the game after one battle is completed,
+    // for tuning the AI
+    private static String endAfterFirstBattleProperty =
+        "net.sf.colossus.endAfterFirstBattle";
+    public static final boolean EndAfterFirstBattle = Boolean.valueOf(
+        System.getProperty(endAfterFirstBattleProperty, "false").toString()).
+        booleanValue();
+
     /** Base path for all external game data files. */
     public static final String gameDataPath = System.getProperty("user.home")
         + File.separator + ".colossus" + File.separator;
