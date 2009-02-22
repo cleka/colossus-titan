@@ -13,6 +13,9 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.CritterMove;
+import net.sf.colossus.client.PlayerClientSide;
+
+import net.sf.colossus.game.Legion;
 
 /**
  * Abstract implementation of the Colossus AI interface.
@@ -68,6 +71,17 @@ abstract public class AbstractAI implements AI
         int DEF__AT_MOST_ONE_IS_REACHABLE = 100;
     }
 
+    /** Test whether a Legion belongs to a Human player */
+    protected boolean isHumanLegion(Legion legion)
+    {
+        return !((PlayerClientSide)legion.getPlayer()).isAI();
+    }
+    /** Test whether a Legion belongs to an AI player */
+    protected boolean isAILegion(Legion legion)
+    {
+        return  ((PlayerClientSide)legion.getPlayer()).isAI();
+    }
+
 
     private static final Logger LOGGER = Logger.getLogger(AbstractAI.class.getName());
 
@@ -81,7 +95,7 @@ abstract public class AbstractAI implements AI
      *  Otherwise, it will try to limit to a reasonable number (the exact
      *  algorithm is in nestForLoop)
      */
-    final Collection<LegionMove> generateLegionMoves(
+    protected final Collection<LegionMove> generateLegionMoves(
         final List<List<CritterMove>> allCritterMoves, boolean forceAll)
     {
         List<List<CritterMove>> critterMoves = new ArrayList<List<CritterMove>>(
@@ -201,7 +215,7 @@ abstract public class AbstractAI implements AI
     }
 
     /** Modify allCritterMoves in place, and return true if it changed. */
-    final boolean trimCritterMoves(List<List<CritterMove>> allCritterMoves)
+    protected final boolean trimCritterMoves(List<List<CritterMove>> allCritterMoves)
     {
         Set<String> takenHexLabels = new HashSet<String>(); // XXX reuse?
         boolean changed = false;

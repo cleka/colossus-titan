@@ -1882,11 +1882,6 @@ public class RationalAI extends SimpleAI
         return (int)value;
     }
 
-    boolean isHumanLegion(Legion legion)
-    {
-        return !((PlayerClientSide)legion.getPlayer()).isAI();
-    }
-
     static class BattleResults
     {
         private final double ev; // expected value of attack
