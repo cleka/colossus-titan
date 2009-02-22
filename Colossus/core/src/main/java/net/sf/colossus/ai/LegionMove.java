@@ -11,7 +11,10 @@ import net.sf.colossus.client.CritterMove;
 import net.sf.colossus.util.Glob;
 
 /** LegionMove has a List of one CritterMove per mobile critter
- *  in the legion. */
+ *  in the legion.
+ * Originally in SimpleAI, which at the time had the following authors.
+ * @author Bruce Sherrod, David Ripton, Romain Dolbeau
+*/
 class LegionMove implements Comparable<LegionMove>
 {
     private final List<CritterMove> critterMoves = new ArrayList<CritterMove>();
