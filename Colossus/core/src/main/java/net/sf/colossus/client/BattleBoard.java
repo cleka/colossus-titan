@@ -8,6 +8,8 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -29,6 +31,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
@@ -65,6 +68,7 @@ public final class BattleBoard extends KFrame
     private JMenu phaseMenu;
     private JMenu helpMenu;
     private final InfoPanel infoPanel;
+    private final DicePanel dicePanel;
     private final Client client;
     private final Cursor defaultCursor;
 
@@ -86,7 +90,55 @@ public final class BattleBoard extends KFrame
     private final SaveWindow saveWindow;
 
     private final BattleMap battleMap;
-    private final BattleDice battleDice;
+
+    private static class DicePanel extends JPanel
+    {
+        private final BattleDice battleDice;
+        private final JScrollBar scrollBar;
+
+        DicePanel()
+        {
+            setLayout(new BorderLayout());
+            battleDice = new BattleDice();
+            add(battleDice, BorderLayout.CENTER);
+
+            scrollBar = new JScrollBar(JScrollBar.VERTICAL);
+            scrollBar.setVisibleAmount(1);
+            scrollBar.addAdjustmentListener(new AdjustmentListener()
+            {
+                @Override
+                public void adjustmentValueChanged(AdjustmentEvent pArg0)
+                {
+                    if (pArg0.getAdjustmentType() == AdjustmentEvent.TRACK)
+                    {
+                        battleDice.setCurrentRoll(pArg0.getValue() + 1);
+                    }
+                }
+            });
+            add(scrollBar, BorderLayout.EAST);
+        }
+
+        void rescale()
+        {
+            battleDice.rescale();
+        }
+
+        void addValues(String pBattlePhaseDesc, String pAttckerDesc,
+            String pStrikerDesc, String pTargetDesc, int pTargetNumber,
+            List<String> pRolls)
+        {
+            int max = battleDice.getHistoryLength();
+            battleDice.addValues(pBattlePhaseDesc, pAttckerDesc, pStrikerDesc,
+                pTargetDesc, pTargetNumber, pRolls);
+            scrollBar.setMaximum(max);
+            scrollBar.setValue(max);
+        }
+
+        void showLastRoll()
+        {
+            battleDice.showLastRoll();
+        }
+    }
 
     // TODO pass Legions instead of the markerIds
     public BattleBoard(final Client client, MasterHex masterHex,
@@ -151,7 +203,7 @@ public final class BattleBoard extends KFrame
 
                 BattleChit chit = getBattleChitAtPoint(point);
                 GUIBattleHex hex = battleMap.getHexContainingPoint(point);
-                
+
                 handleMousePressed(chit, hex);
             }
         });
@@ -167,8 +219,8 @@ public final class BattleBoard extends KFrame
         }
         defaultCursor = getCursor();
 
-        battleDice = new BattleDice();
-        getContentPane().add(battleDice, BorderLayout.SOUTH);
+        dicePanel = new DicePanel();
+        getContentPane().add(dicePanel, BorderLayout.SOUTH);
 
         setTitle(client.getOwningPlayer().getName() + ": "
             + LegionServerSide.getMarkerName(attackerMarkerId) + " ("
@@ -205,10 +257,10 @@ public final class BattleBoard extends KFrame
 
         String choiceDesc;
         PickCarry pickCarryDialog = client.getPickCarryDialog();
-        boolean ownChit = ( chit != null
-            && client.getPlayerByTag(chit.getTag()).equals(
-                client.getBattleActivePlayer())); 
-        
+        boolean ownChit = (chit != null && client
+            .getPlayerByTag(chit.getTag()).equals(
+                client.getBattleActivePlayer()));
+
         if (pickCarryDialog != null)
         {
             if (chit != null && !ownChit)
@@ -715,7 +767,7 @@ public final class BattleBoard extends KFrame
         }
         alignChits(battleMap.getAllHexLabels());
 
-        battleDice.rescale();
+        dicePanel.rescale();
 
         setSize(getPreferredSize());
         pack();
@@ -909,7 +961,6 @@ public final class BattleBoard extends KFrame
         {
             doneButton.setEnabled(true);
         }
-
     }
 
     public void enableDoneButton()
@@ -932,10 +983,16 @@ public final class BattleBoard extends KFrame
         battleMap.unselectHexByLabel(hexLabel);
     }
 
-    public void setDiceValues(String strikerDesc, String targetDesc,
+    public void addDiceResults(String strikerDesc, String targetDesc,
         int targetNumber, List<String> rolls)
     {
-        battleDice.setValues(strikerDesc, targetDesc, targetNumber, rolls);
-        battleDice.showRoll();
+        if (rolls.size() == 0)
+        {
+            return;
+        }
+        dicePanel.addValues("Battle Phase " + client.getBattleTurnNumber(),
+            client.getBattleActivePlayer().getName(), strikerDesc, targetDesc,
+            targetNumber, rolls);
+        dicePanel.showLastRoll();
     }
 }

@@ -134,7 +134,6 @@ public final class Client implements IClient, IOracle
 
     private PickCarry pickCarryDialog = null;
 
-
     /** hexLabel of MasterHex for current or last engagement. */
     private MasterHex battleSite;
     private BattleBoard battleBoard;
@@ -2725,8 +2724,11 @@ public final class Client implements IClient, IOracle
         BattleChit targetChit = getBattleChit(targetTag);
         if (battleBoard != null)
         {
-            battleBoard.setDiceValues(getBattleChitDescription(chit),
-                getBattleChitDescription(targetChit), strikeNumber, rolls);
+            if (!wasCarry)
+            {
+                battleBoard.addDiceResults(getBattleChitDescription(chit),
+                    getBattleChitDescription(targetChit), strikeNumber, rolls);
+            }
             battleBoard.unselectAllHexes();
         }
 
