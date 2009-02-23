@@ -37,9 +37,13 @@ abstract public class AbstractAI implements AI
 {    
     protected BattleEvalConstants bec = new BattleEvalConstants();
     
-   
+    /** The Client we're working for. */
     final protected Client client;
+    /** Our random source. */
     final protected Random random = new DevRandom();
+    /** for the Oracle Hint tuff, the section we use.
+     * This can be replaced by AI implementation.
+     */
     protected String[] hintSectionUsed = { Constants.sectionOffensiveAI };
 
     protected AbstractAI(Client client) {
@@ -99,7 +103,7 @@ abstract public class AbstractAI implements AI
         return  ((PlayerClientSide)legion.getPlayer()).isAI();
     }
 
-    /* return the variant player */
+    /** Get the variant played */
     final protected Variant getVariantPlayed()
     {
         return this.client.getGame().getVariant();
@@ -137,6 +141,10 @@ abstract public class AbstractAI implements AI
         return legionMoves;
     }
 
+    /** Set of hex name, to check for duplicates.
+     * I assume the reason it is a class variable and not a local variable
+     * inside the function is performance (avoiding creation/recreation).
+     */
     final private Set<String> duplicateHexChecker = new HashSet<String>();
     /** Private helper for generateLegionMoves
      *  If forceAll is true, generate all possible moves. Otherwise,
