@@ -31,11 +31,11 @@
         <Creature name="Wyvern" remaining="18" dead="0" />
     </Caretaker>
     <Player name="Red1" type="net.sf.colossus.ai.SimpleAI" color="Red" startingTower="6000" score="0" dead="false" mulligansLeft="1" colorsElim="" movementRoll="0" teleported="false" summoned="false">
-        <Legion name="Rd01" currentHex="1" startingHex="1" moved="false" entrySide="0" parent="null" recruitName="null" battleTally="0">
+        <Legion name="Rd01" currentHex="5" startingHex="5" moved="false" entrySide="0" parent="null" recruitName="null" battleTally="0">
         </Legion>
     </Player>
     <Player name="Brown" type="net.sf.colossus.ai.SimpleAI" color="Brown" startingTower="2000" score="0" dead="false" mulligansLeft="1" colorsElim="" movementRoll="0" teleported="false" summoned="false">
-        <Legion name="Br01" currentHex="2" startingHex="2" moved="false" entrySide="0" parent="null" recruitName="null" battleTally="0">
+        <Legion name="Br01" currentHex="6" startingHex="6" moved="false" entrySide="0" parent="null" recruitName="null" battleTally="0">
         </Legion>
     </Player>
     <DataFile DataFileKey="Swamp.xml,SmallTitan/Battlelands,Default/Battlelands"><![CDATA[<?xml version="1.0"?>
