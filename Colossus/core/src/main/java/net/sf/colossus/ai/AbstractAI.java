@@ -129,14 +129,14 @@ abstract public class AbstractAI implements AI
         int total = 0;
         for (int roll = 1; roll <= 6; roll++) {
             Set<MasterHex> tempset = client.getMovement().listAllMoves(legion, hex, roll, true);
-            if (setContainsHexWithTerrain(tempset, terrainTypeName)) {
+            if (doesSetContainsHexWithTerrain(tempset, terrainTypeName)) {
                 total++;
             }
         }
         return total;
     }
 
-    final protected boolean setContainsHexWithTerrain(Set<MasterHex> set, String terrainTypeName) {
+    final protected boolean doesSetContainsHexWithTerrain(Set<MasterHex> set, String terrainTypeName) {
         for (MasterHex hex : set) {
             if (hex.getTerrain().getDisplayName().equals(terrainTypeName)) {
                 return true;
