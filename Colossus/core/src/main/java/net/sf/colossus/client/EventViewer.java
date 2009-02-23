@@ -784,7 +784,7 @@ final class EventViewer extends KDialog implements WindowListener,
             // titan killed, some others survived, 
             // titan-killing-legion eliminated.
             // The above is for normal game. What if load from history??
-            LOGGER.log(Level.FINEST,
+            LOGGER.log(Level.INFO,
                 "tellEngagementResultHandling, winner null");
 
             // mutual elimination
