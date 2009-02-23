@@ -136,7 +136,7 @@
       </chainedmapper>
     </pathconvert>
     <jar jarfile="Colossus.jar" basedir="${build.classes.dir}"
-    includes="**" excludes="**/webserver/**">
+    includes="**" excludes="**/webserver/**, **/tools/**">
       <manifest>
         <attribute name="Main-Class"
         value="net.sf.colossus.server.Start" />
