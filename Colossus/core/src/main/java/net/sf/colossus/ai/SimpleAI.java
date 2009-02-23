@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,7 +28,6 @@ import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Dice;
-import net.sf.colossus.server.HintOracleInterface;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.Options;
@@ -40,7 +38,6 @@ import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardTerrain;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
-import net.sf.colossus.variant.Variant;
 import net.sf.colossus.webcommon.InstanceTracker;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
@@ -1113,78 +1110,6 @@ public class SimpleAI extends AbstractAI
         return client.doMove(legion, hex);
     }
 
-    // arrays and generics don't work well together -- TODO replace the
-    // array with a list or model some intermediate classes
-    @SuppressWarnings("unchecked")
-    Map<MasterHex, List<Legion>>[] buildEnemyAttackMap(Player player)
-    {
-        Map<MasterHex, List<Legion>>[] enemyMap = (Map<MasterHex, List<Legion>>[])new HashMap<?, ?>[7];
-        for (int i = 1; i <= 6; i++)
-        {
-            enemyMap[i] = new HashMap<MasterHex, List<Legion>>();
-        }
-
-        // for each enemy player
-        for (PlayerClientSide enemyPlayer : client.getPlayers())
-        {
-            if (enemyPlayer == player)
-            {
-                continue;
-            }
-
-            // for each legion that player controls
-            for (LegionClientSide legion : enemyPlayer.getLegions())
-            {
-                // for each movement roll he might make
-                for (int roll = 1; roll <= 6; roll++)
-                {
-                    // count the moves he can get to
-                    Set<MasterHex> set;
-
-                    // Only allow Titan teleport
-                    // Remember, tower teleports cannot attack
-                    if (legion.hasTitan()
-                        && legion.getPlayer().canTitanTeleport()
-                        && client.getMovement().titanTeleportAllowed())
-                    {
-                        set = client.getMovement().listAllMoves(legion,
-                            legion.getCurrentHex(), roll);
-                    }
-                    else
-                    {
-                        set = client.getMovement().listNormalMoves(legion,
-                            legion.getCurrentHex(), roll);
-                    }
-
-                    for (MasterHex hex : set)
-                    {
-                        for (int effectiveRoll = roll; effectiveRoll <= 6; effectiveRoll++)
-                        {
-                            // legion can attack to hexlabel on a effectiveRoll
-                            List<Legion> list = enemyMap[effectiveRoll]
-                                .get(hex);
-
-                            if (list == null)
-                            {
-                                list = new ArrayList<Legion>();
-                            }
-
-                            if (list.contains(legion))
-                            {
-                                continue;
-                            }
-
-                            list.add(legion);
-                            enemyMap[effectiveRoll].put(hex, list);
-                        }
-                    }
-                }
-            }
-        }
-
-        return enemyMap;
-    }
-
     // cheap, inaccurate evaluation function.  Returns a value for
     // moving this legion to this hex.  The value defines a distance
     // metric over the set of all possible moves.
@@ -1729,175 +1654,6 @@ public class SimpleAI extends AbstractAI
         {
             return LOSE;
         }
-    }
-
-    class SimpleAIOracle implements HintOracleInterface
-    {
-        LegionClientSide legion;
-        MasterHex hex;
-        List<CreatureType> recruits;
-        Map<MasterHex, List<Legion>>[] enemyAttackMap = null;
-
-        SimpleAIOracle(LegionClientSide legion, MasterHex hex,
-            List<CreatureType> recruits2)
-        {
-            this.legion = legion;
-            this.hex = hex;
-            this.recruits = recruits2;
-
-        }
-
-        public boolean canReach(String terrainTypeName)
-        {
-            int now = getNumberOfWaysToTerrain(legion, hex, terrainTypeName);
-            return (now > 0);
-        }
-
-        public int creatureAvailable(String name)
-        {
-            // TODO name doesn't seem to always refer to an actual creature
-            //      type, which means the next line can return null, then
-            //      causing an NPE in getReservedRemain(..)
-            // Still TODO ?
-            //      Fixed "Griffon vs. Griffin" in Undead, which was the
-            //      reason in all cases I got that exception (Clemens).
-            CreatureType type = client.getGame().getVariant()
-                .getCreatureByName(name);
-            int count = client.getReservedRemain(type);
-            return count;
-        }
-
-        public boolean otherFriendlyStackHasCreature(List<String> allNames)
-        {
-            for (Legion other : client.getOwningPlayer().getLegions())
-            {
-                if (!(legion.equals(other)))
-                {
-                    boolean hasAll = true;
-
-                    for (String name : allNames)
-                    {
-                        if (((LegionClientSide)other).numCreature(name) <= 0)
-                        {
-                            hasAll = false;
-                        }
-                    }
-                    if (hasAll)
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
-        public boolean hasCreature(String name)
-        {
-            int num = legion.numCreature(name);
-            return num > 0;
-        }
-
-        public boolean canRecruit(String name)
-        {
-            return recruits.contains(client.getGame().getVariant()
-                .getCreatureByName(name));
-        }
-
-        public int stackHeight()
-        {
-            return legion.getHeight();
-        }
-
-        public String hexLabel()
-        {
-            return hex.getLabel();
-        }
-
-        public int biggestAttackerHeight()
-        {
-            if (enemyAttackMap == null)
-            {
-                enemyAttackMap = buildEnemyAttackMap(client.getOwningPlayer());
-            }
-            int worst = 0;
-            for (int i = 1; i < 6; i++)
-            {
-                List<Legion> enemyList = enemyAttackMap[i].get(legion
-                    .getCurrentHex());
-                if (enemyList != null)
-                {
-                    for (Legion enemy : enemyList)
-                    {
-                        if ((enemy).getHeight() > worst)
-                        {
-                            worst = (enemy).getHeight();
-                        }
-                    }
-                }
-            }
-            return worst;
-        }
-    }
-
-    public CreatureType getVariantRecruitHint(LegionClientSide legion,
-        MasterHex hex, List<CreatureType> recruits)
-    {
-        String recruitName = VariantSupport.getRecruitHint(hex.getTerrain(),
-            legion, recruits, new SimpleAIOracle(legion, hex, recruits),
-            hintSectionUsed);
-
-        if (recruitName == null)
-        {
-            return recruits.get(recruits.size() - 1);
-        }
-        if ((recruitName.equals("nothing")) || (recruitName.equals("Nothing")))
-        {
-            // suggest recruiting nothing
-            return null;
-        }
-
-        CreatureType recruit = client.getGame().getVariant()
-            .getCreatureByName(recruitName);
-        if (!(recruits.contains(recruit)))
-        {
-            LOGGER
-                .warning("HINT: Invalid Hint for this variant ! (can't recruit "
-                    + recruitName
-                    + "; recruits="
-                    + recruits.toString()
-                    + ") in " + hex.getTerrain());
-            return (recruits.get(recruits.size() - 1));
-        }
-        return recruit;
-    }
-
-    int getNumberOfWaysToTerrain(LegionClientSide legion, MasterHex hex,
-        String terrainTypeName)
-    {
-        int total = 0;
-        for (int roll = 1; roll <= 6; roll++)
-        {
-            Set<MasterHex> set = client.getMovement().listAllMoves(legion,
-                hex, roll, true);
-            if (setContainsHexWithTerrain(set, terrainTypeName))
-            {
-                total++;
-            }
-        }
-        return total;
-    }
-
-    private boolean setContainsHexWithTerrain(Set<MasterHex> set,
-        String terrainTypeName)
-    {
-        for (MasterHex hex : set)
-        {
-            if (hex.getTerrain().getDisplayName().equals(terrainTypeName))
-            {
-                return true;
-            }
-        }
-        return false;
     }
 
     // This is a really dumb placeholder.  TODO Make it smarter.
