@@ -27,7 +27,7 @@ public class MakeBattle {
             for (int i2 = 0; i2 < n2; i2++) {
                 Element C = (Element) l2.item(i2);
                 if (C.getAttribute("name").equals(creature)) {
-                    System.err.println("Taking one " + C.getAttribute("name"));
+                    //System.err.println("Taking one " + C.getAttribute("name"));
                     String R = C.getAttribute("remaining");
                     int r = Integer.parseInt(R);
                     C.setAttribute("remaining", "" + (r - 1));
@@ -77,29 +77,61 @@ public class MakeBattle {
         }
     }
 
-    static void doTheJob(Document doc, String[] aca, String[] dca) {
+    static void addCreaturesToLegions(Document doc, String al, String[] aca, String dl, String[] dca) {
 
         for (int i = 0; i < aca.length; i++) {
-            addCreature(doc, "Rd01", aca[i]);
+            addCreature(doc, al, aca[i]);
         }
         for (int i = 0; i < dca.length; i++) {
-            addCreature(doc, "Br01", dca[i]);
+            addCreature(doc, dl, dca[i]);
+        }
+    }
+
+    static void replaceAIs(Document doc, String ap, String aAI, String dp, String dAI) {
+        Element root = doc.getDocumentElement();
+        NodeList l;
+        int n;
+
+        /* take from caretaker */
+        l = root.getElementsByTagName("Player");
+        n = l.getLength();
+        for (int i = 0; i < n; i++) {
+            Element c = (Element) l.item(i);
+            if (c.getAttribute("name").equals(ap)) {
+                c.setAttribute("type", "net.sf.colossus.ai." + aAI);
+            }
+            if (c.getAttribute("name").equals(dp)) {
+                c.setAttribute("type", "net.sf.colossus.ai." + dAI);
+            }
         }
     }
 
     public static void main(String[] arg) {
         Document doc = null;
+        String[] aca = null;
+        String[] dca = null;
+        String aAI = "SimpleAI";
+        String dAI = "SimpleAI";
 
+        for (int i = 0; i < arg.length; i++) {
 
-        if (arg.length < 2) {
-            System.err.println("usage:\n\t <whatever_to_launch>" +
-                    "<comma separated list of attacking creature> " +
-                    "<comma separated list of defending creature>");
-            System.exit(-1);
+            if (arg[i].startsWith("--alist=")) {
+                aca = arg[i].substring(8).split(",");
+            } else if (arg[i].startsWith("--dlist=")) {
+                dca = arg[i].substring(8).split(",");
+            } else if (arg[i].startsWith("--aAI=")) {
+                aAI = arg[i].substring(6);
+            } else if (arg[i].startsWith("--dAI=")) {
+                dAI = arg[i].substring(6);
+            } else {
+                System.err.println("usage:\n\t <whatever_to_launch>" +
+                        "--alist=<comma separated list of attacking creature> " +
+                        "--dlist=<comma separated list of defending creature> " +
+                        "--aAI=<attacking AI name> " +
+                        "--dAI=<defending AI name> ");
+                System.exit(-1);
+            }
         }
-
-        String[] aca = arg[0].split(",");
-        String[] dca = arg[1].split(",");
 
         try {
             javax.xml.parsers.DocumentBuilder db =
@@ -116,7 +148,8 @@ public class MakeBattle {
             System.err.println("Open failed (SAXException): " + se);
         }
 
-        doTheJob(doc, aca, dca);
+        addCreaturesToLegions(doc, "Rd01", aca, "Br01", dca);
+        replaceAIs(doc, "Red1", aAI, "Brown", dAI);
 
 
         DOMSource domSource = new DOMSource(doc);
