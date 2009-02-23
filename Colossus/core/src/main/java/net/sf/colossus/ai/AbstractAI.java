@@ -13,6 +13,7 @@ import java.util.Set;
 
 import java.util.logging.Logger;
 
+import net.sf.colossus.client.BattleChit;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.CritterMove;
 import net.sf.colossus.client.LegionClientSide;
@@ -27,6 +28,7 @@ import net.sf.colossus.server.VariantSupport;
 
 import net.sf.colossus.util.DevRandom;
 
+import net.sf.colossus.util.Probs;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;
@@ -143,6 +145,53 @@ abstract public class AbstractAI implements AI
             }
         }
         return false;
+    }
+
+    /**
+     * Return a map of target hex label to number
+     * of friendly creatures that can strike it
+     */
+    final protected Map<String, Integer> findStrikeMap() {
+        Map<String, Integer> map = new HashMap<String, Integer>();
+        for (BattleChit critter : client.getActiveBattleChits()) {
+            Set<String> targets = client.findStrikes(critter.getTag());
+            for (String hexLabel : targets) {
+                Integer old = map.get(hexLabel);
+                if (old == null) {
+                    map.put(hexLabel, Integer.valueOf(1));
+                } else {
+                    map.put(hexLabel, Integer.valueOf(old.intValue() + 1));
+                }
+            }
+        }
+        return map;
+    }
+
+    /**
+     * Create a map containing each target and the number of hits it would
+     * likely take if all possible creatures attacked it.
+     */
+    final protected Map<BattleChit, Double> generateDamageMap() {
+        Map<BattleChit, Double> map = new HashMap<BattleChit, Double>();
+        for (BattleChit critter : client.getActiveBattleChits()) {
+            // Offboard critters can't strike.
+            if (critter.getCurrentHexLabel().startsWith("X")) {
+                continue;
+            }
+            Set<String> set = client.findStrikes(critter.getTag());
+            for (String hexLabel : set) {
+                BattleChit target = client.getBattleChit(hexLabel);
+                int dice = client.getStrike().getDice(critter, target);
+                int strikeNumber = client.getStrike().getStrikeNumber(critter, target);
+                double h = Probs.meanHits(dice, strikeNumber);
+                if (map.containsKey(target)) {
+                    double d = map.get(target).doubleValue();
+                    h += d;
+                }
+                map.put(target, new Double(h));
+            }
+        }
+        return map;
     }
 
     /** Various constans used by the AIs code.

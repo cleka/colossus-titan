@@ -1978,39 +1978,6 @@ public class SimpleAI extends AbstractAI
             + ":" + bestLegion.getMarkerId());
     }
 
-    /** Create a map containing each target and the number of hits it would
-     *  likely take if all possible creatures attacked it. */
-    private Map<BattleChit, Double> generateDamageMap()
-    {
-        Map<BattleChit, Double> map = new HashMap<BattleChit, Double>();
-        for (BattleChit critter : client.getActiveBattleChits())
-        {
-            // Offboard critters can't strike.
-            if (critter.getCurrentHexLabel().startsWith("X"))
-            {
-                continue;
-            }
-            Set<String> set = client.findStrikes(critter.getTag());
-            for (String hexLabel : set)
-            {
-                BattleChit target = client.getBattleChit(hexLabel);
-                int dice = client.getStrike().getDice(critter, target);
-                int strikeNumber = client.getStrike().getStrikeNumber(critter,
-                    target);
-                double h = Probs.meanHits(dice, strikeNumber);
-
-                if (map.containsKey(target))
-                {
-                    double d = map.get(target).doubleValue();
-                    h += d;
-                }
-
-                map.put(target, new Double(h));
-            }
-        }
-        return map;
-    }
-
     private BattleChit findBestTarget()
     {
         BattleChit bestTarget = null;
@@ -2848,31 +2815,6 @@ public class SimpleAI extends AbstractAI
     Collection<LegionMove> findLegionMoves(
         final List<List<CritterMove>> allCritterMoves) {
         return generateLegionMoves(allCritterMoves, false);
-    }
-
-    /** Return a map of target hex label to number
-     * of friendly creatures that can strike it */
-    private Map<String, Integer> findStrikeMap()
-    {
-        Map<String, Integer> map = new HashMap<String, Integer>();
-
-        for (BattleChit critter : client.getActiveBattleChits())
-        {
-            Set<String> targets = client.findStrikes(critter.getTag());
-            for (String hexLabel : targets)
-            {
-                Integer old = map.get(hexLabel);
-                if (old == null)
-                {
-                    map.put(hexLabel, Integer.valueOf(1));
-                }
-                else
-                {
-                    map.put(hexLabel, Integer.valueOf(old.intValue() + 1));
-                }
-            }
-        }
-        return map;
     }
 
     @SuppressWarnings("unused")
