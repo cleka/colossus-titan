@@ -1110,14 +1110,16 @@ public class SimpleAI extends AbstractAI
         return client.doMove(legion, hex);
     }
 
-    // cheap, inaccurate evaluation function.  Returns a value for
-    // moving this legion to this hex.  The value defines a distance
-    // metric over the set of all possible moves.
-    //
-    // TODO: should be parameterized with weights
-    // TODO: the hex parameter is probably not needed anymore now that we
-    // pass the legion instead of just the marker
-    //
+    /** cheap, inaccurate evaluation function.  Returns a value for
+     * moving this legion to this hex.  The value defines a distance
+     * metric over the set of all possible moves.
+     *
+     * TODO: should be parameterized with weights
+     * TODO: the hex parameter is probably not needed anymore now that we
+     * pass the legion instead of just the marker [RD: actually,
+     * handleVoluntaryMove sees to call this one with several different
+     * hexes, so we probably can't remove it]
+     */
     int evaluateMove(LegionClientSide legion, MasterHex hex, boolean moved,
         Map<MasterHex, List<Legion>>[] enemyAttackMap)
     {
