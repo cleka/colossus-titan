@@ -618,7 +618,6 @@ public final class Client implements IClient, IOracle
                 tellEngagementResultsAttackerLegionCertainities,
                 tellEngagementResultsDefenderLegionCertainities, isMyTurn());
         }
-        LOGGER.info("EngagementResults: " + winner + " by " + method + " at turn " + turns);
         battleSite = null;
         attacker = null;
         defender = null;
