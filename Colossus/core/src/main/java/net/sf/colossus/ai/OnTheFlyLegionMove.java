@@ -22,6 +22,9 @@ import net.sf.colossus.util.DevRandom;
  * @author Romain Dolbeau
  */
 class OnTheFlyLegionMove implements Collection<LegionMove> {
+    final static private int RANDOM_MAX_TRY = 100;
+    final static private int REFILL_SIZE = 1000;
+
     private static final Logger LOGGER = Logger.getLogger(OnTheFlyLegionMove.class.getName());
     private final List<List<CritterMove>> allCritterMoves;
     private final int mysize;
@@ -62,67 +65,138 @@ class OnTheFlyLegionMove implements Collection<LegionMove> {
             }
         }
 
+        /** map from indexes to LegionMove, what we have already sent to the AI */
         private final TreeMap<int[],LegionMove> alreadydone = new TreeMap<int[],LegionMove>(new myIntArrayComparator());
+        /** map from indexes to LegionMove, the next batch to send to the AI */
+        private final TreeMap<int[],LegionMove> beingdone = new TreeMap<int[],LegionMove>(new myIntArrayComparator());
         private final OnTheFlyLegionMove daddy;
-        private LegionMove lastone = null;
         private final Random rand = new DevRandom();
         private final int dim;
 
         OnTheFlyLegionMoveIterator(OnTheFlyLegionMove d) {
             daddy = d;
             dim = daddy.getDim();
+            firstfill();
         }
 
         public boolean hasNext() {
-            if (alreadydone.size() < daddy.size())
-                return true;
-            return false;
+            if (beingdone.isEmpty())
+                refill(REFILL_SIZE);
+            return (!beingdone.isEmpty());
+        }
+
+        private boolean isBad(int[] indexes) {
+            Set<String> duplicateHexChecker = new HashSet<String>();
+            boolean offboard = false;
+            boolean isBad = false;
+            for (int j = 0; j < dim; j++) {
+                List<CritterMove> moveList = daddy.allCritterMoves.get(j);
+                CritterMove cm = moveList.get(indexes[j]);
+                String endingHexLabel = cm.getEndingHexLabel();
+                if (endingHexLabel.startsWith("X")) {
+                    offboard = true;
+                } else if (duplicateHexChecker.contains(endingHexLabel)) {
+                    isBad = true;
+                }
+                duplicateHexChecker.add(cm.getEndingHexLabel());
+            }
+            return isBad;
+        }
+
+        private int recurseGenerate(int index, int[] counts, int[] actual) {
+            int total = 0;
+            if (index < dim) {
+                for (int i = 0; i < counts[index]; i++) {
+                    actual[index] = i;
+                    total += recurseGenerate(index + 1, counts, actual);
+                }
+            } else {
+                total = 1;
+                int[] indexes = new int[dim];
+                for (int i = 0; i < dim; i++) {
+                    indexes[i] = actual[i];
+                }
+                if (!isBad(indexes)) {
+                    if (!beingdone.keySet().contains(indexes)) {
+                        LegionMove current = AbstractAI.makeLegionMove(indexes, daddy.allCritterMoves);
+                        beingdone.put(indexes, current);
+                        //LOGGER.finest("Generated a good one.");
+                    }
+                } else {
+                    //LOGGER.finest("Tested combination was bad.");
+                }
+            }
+            return total;
+        }
+
+        /** fill beingdone with the first, supposedly most interesting
+         * combinatione.
+         * @return The number of combinations generated.
+         */
+        private int firstfill() {
+            int[] counts = new int[dim];
+            int[] actual = new int[dim];
+            int total = 0;
+            for (int i = 0; i < dim; i++) {
+                counts[i] = i + 2;
+                if (counts[i] > daddy.allCritterMoves.get(i).size()) {
+                    counts[i] = daddy.allCritterMoves.get(i).size();
+                }
+            }
+            total = recurseGenerate(0, counts, actual);
+
+            int count = beingdone.keySet().size();
+            LOGGER.finer("Firstfill generated " + count+ " out of " + total + " checked");
+            return count;
+        }
+        /** fill beingdone with up to n random, not-yet-done combinations.
+          * Should be replaced by a genetic algorithm, ideally.
+          * @param n The number of requeste combinations.
+          * @return The number of combinations generated.
+          */
+        private int refill(int n) {
+            if (beingdone.size() > 0) {
+                return 0;
+            }
+            for (int k = 0; k < n; k++) {
+                int[] indexes = new int[dim];
+                int ntry = 0;
+                LegionMove current = null;
+                while ((current == null) && (ntry < RANDOM_MAX_TRY)) {
+                    ntry++;
+                    for (int i = 0; i < dim; i++) {
+                        indexes[i] = rand.nextInt(daddy.allCritterMoves.get(i).size());
+                    }
+                    if (!isBad(indexes)) {
+                        if (!beingdone.keySet().contains(indexes)) {
+                            current = AbstractAI.makeLegionMove(indexes, daddy.allCritterMoves);
+                            beingdone.put(indexes, current);
+                        }
+                    }
+                    if (current != null) {
+                        //LOGGER.finest("Try " + ntry + " for move #" + k + " found something.");
+                    } else {
+                        if (ntry == RANDOM_MAX_TRY) {
+                            //LOGGER.finest("Try " + ntry + " for move #" + k + " STILL hasn't found anything.");
+                        }
+                    }
+                }
+            }
+            int count = beingdone.keySet().size();
+            LOGGER.finer("Refill generated " + count + " out of " + n + " requested");
+            return count;
         }
 
         public LegionMove next() {
-            // TODO: replace by a genetic algorithm :-)
-            int[] indexes = new int[dim];
-            lastone = null;
-            int ntry = 0;
-            while ((lastone == null) && (ntry < 1000)) {
-                ntry ++;
-                for (int i = 0 ; i < dim ; i++) {
-                    indexes[i] = rand.nextInt(daddy.allCritterMoves.get(i).size());
-                }
-                Set<String> duplicateHexChecker = new HashSet<String>();
-                boolean offboard = false;
-                boolean isBad = false;
-                for (int j = 0; j < dim; j++)
-                {
-                    List<CritterMove> moveList = daddy.allCritterMoves.get(j);
-                    CritterMove cm = moveList.get(indexes[j]);
-                    String endingHexLabel = cm.getEndingHexLabel();
-                    if (endingHexLabel.startsWith("X"))
-                    {
-                        offboard = true;
-                    }
-                    else if (duplicateHexChecker.contains(endingHexLabel))
-                    {
-                        isBad = true;
-                    }
-                    duplicateHexChecker.add(cm.getEndingHexLabel());
-                }
-                if (!isBad) {
-                    if (!alreadydone.keySet().contains(indexes)) {
-                        lastone = SimpleAI.makeLegionMove(indexes, daddy.allCritterMoves);
-                        alreadydone.put(indexes, lastone);
-                    }
-                }
+            if (beingdone.isEmpty()) {
+                LOGGER.warning("next() call but beingdone is empty!");
+                return null;
             }
-
-            if (lastone == null) { // make one up...
-                for (int i = 0 ; i < dim ; i++) {
-                    indexes[i] = rand.nextInt(daddy.allCritterMoves.get(i).size());
-                }
-                lastone = SimpleAI.makeLegionMove(indexes, daddy.allCritterMoves);
-            }
-
-            return lastone;
+            int[] anext = beingdone.firstKey();
+            LegionMove lmnext = beingdone.get(anext);
+            beingdone.remove(anext);
+            alreadydone.put(anext, lmnext);
+            return lmnext;
         }
 
         public void remove() {

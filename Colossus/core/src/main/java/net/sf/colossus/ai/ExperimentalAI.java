@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import java.util.logging.Logger;
+
 import net.sf.colossus.client.BattleChit;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.CritterMove;
@@ -21,7 +23,9 @@ import net.sf.colossus.variant.BattleHex;
 
 public class ExperimentalAI extends SimpleAI
 {
-    private final static long MAX_EXHAUSTIVE_SEATCH_MOVES = 30000;
+    private static final Logger LOGGER = Logger.getLogger(SimpleAI.class.getName());
+
+    private final static long MAX_EXHAUSTIVE_SEARCH_MOVES = 10000;
 
     public ExperimentalAI(Client client)
     {
@@ -34,8 +38,11 @@ public class ExperimentalAI extends SimpleAI
         for (List<CritterMove> lcm : allCritterMoves) {
             realcount *= lcm.size();
         }
-        if (realcount < MAX_EXHAUSTIVE_SEATCH_MOVES)
+        if (realcount < MAX_EXHAUSTIVE_SEARCH_MOVES) {
+            LOGGER.finer("Less than " + MAX_EXHAUSTIVE_SEARCH_MOVES + ", using exhaustive search.");
             return generateLegionMoves(allCritterMoves, true);
+        }
+        LOGGER.finer("More than " + MAX_EXHAUSTIVE_SEARCH_MOVES + ", using on-the-fly search.");
         return new OnTheFlyLegionMove(allCritterMoves);
     }
 
