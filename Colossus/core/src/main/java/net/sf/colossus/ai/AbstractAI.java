@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import java.util.logging.Logger;
@@ -16,10 +17,17 @@ import net.sf.colossus.client.CritterMove;
 import net.sf.colossus.client.PlayerClientSide;
 
 import net.sf.colossus.game.Legion;
+import net.sf.colossus.server.Constants;
+import net.sf.colossus.util.DevRandom;
+import net.sf.colossus.variant.Variant;
 
 /**
  * Abstract implementation of the Colossus AI interface.
  * This class should hold most of the helper functions.
+ * Ideally, most (all) "data-gathering" functions from the AIs
+ * should be here, mostly as "final protected". AIs should mostly
+ * only use information gathered from here to make decisions.
+ * There's still a LOT of work to do...
  * 
  * @version $Id: SimpleAI.java 3556 2009-02-20 08:37:40Z dolbeau $
  * @author Bruce Sherrod, David Ripton
@@ -28,6 +36,15 @@ import net.sf.colossus.game.Legion;
 abstract public class AbstractAI implements AI
 {    
     protected BattleEvalConstants bec = new BattleEvalConstants();
+    
+   
+    final protected Client client;
+    final protected Random random = new DevRandom();
+    protected String[] hintSectionUsed = { Constants.sectionOffensiveAI };
+
+    protected AbstractAI(Client client) {
+        this.client = client;
+    }
 
     /** Various constans used by the AIs code.
      * Each specific AI should be able to override them
@@ -72,18 +89,24 @@ abstract public class AbstractAI implements AI
     }
 
     /** Test whether a Legion belongs to a Human player */
-    protected boolean isHumanLegion(Legion legion)
+    final protected boolean isHumanLegion(Legion legion)
     {
         return !((PlayerClientSide)legion.getPlayer()).isAI();
     }
     /** Test whether a Legion belongs to an AI player */
-    protected boolean isAILegion(Legion legion)
+    final protected boolean isAILegion(Legion legion)
     {
         return  ((PlayerClientSide)legion.getPlayer()).isAI();
     }
 
+    /* return the variant player */
+    final protected Variant getVariantPlayed()
+    {
+        return this.client.getGame().getVariant();
+    }
 
-    private static final Logger LOGGER = Logger.getLogger(AbstractAI.class.getName());
+
+    final static private Logger LOGGER = Logger.getLogger(AbstractAI.class.getName());
 
     /** allCritterMoves is a List of sorted MoveLists.  A MoveList is a
      *  sorted List of CritterMoves for one critter.  Return a sorted List
@@ -95,7 +118,7 @@ abstract public class AbstractAI implements AI
      *  Otherwise, it will try to limit to a reasonable number (the exact
      *  algorithm is in nestForLoop)
      */
-    protected final Collection<LegionMove> generateLegionMoves(
+    final protected Collection<LegionMove> generateLegionMoves(
         final List<List<CritterMove>> allCritterMoves, boolean forceAll)
     {
         List<List<CritterMove>> critterMoves = new ArrayList<List<CritterMove>>(
@@ -114,7 +137,7 @@ abstract public class AbstractAI implements AI
         return legionMoves;
     }
 
-    private final Set<String> duplicateHexChecker = new HashSet<String>();
+    final private Set<String> duplicateHexChecker = new HashSet<String>();
     /** Private helper for generateLegionMoves
      *  If forceAll is true, generate all possible moves. Otherwise,
      *  this function tries to limit the number of moves.
@@ -125,7 +148,7 @@ abstract public class AbstractAI implements AI
      *  own favorite spot, higher levels need to be able to fall back
      *  on a not-so-good choice).
      */
-    private final void nestForLoop(int[] indexes, final int level,
+    final private void nestForLoop(int[] indexes, final int level,
         final List<List<CritterMove>> critterMoves,
         List<LegionMove> legionMoves, boolean forceAll)
     {
@@ -215,7 +238,7 @@ abstract public class AbstractAI implements AI
     }
 
     /** Modify allCritterMoves in place, and return true if it changed. */
-    protected final boolean trimCritterMoves(List<List<CritterMove>> allCritterMoves)
+    final protected boolean trimCritterMoves(List<List<CritterMove>> allCritterMoves)
     {
         Set<String> takenHexLabels = new HashSet<String>(); // XXX reuse?
         boolean changed = false;

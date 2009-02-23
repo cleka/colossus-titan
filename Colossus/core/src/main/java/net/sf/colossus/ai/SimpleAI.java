@@ -11,7 +11,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.Timer;
@@ -32,7 +31,6 @@ import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Dice;
 import net.sf.colossus.server.HintOracleInterface;
 import net.sf.colossus.server.VariantSupport;
-import net.sf.colossus.util.DevRandom;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.PermutationIterator;
@@ -118,19 +116,15 @@ public class SimpleAI extends AbstractAI
         // the other types have only movement bonuses
     }
 
-    Client client;
-
     int timeLimit = Constants.DEFAULT_AI_TIME_LIMIT; // in s
     boolean timeIsUp;
-    Random random = new DevRandom();
-    String[] hintSectionUsed = { Constants.sectionOffensiveAI };
     int splitsDone = 0;
     int splitsAcked = 0;
     ArrayList<String> remainingMarkers = null;
 
     public SimpleAI(Client client)
     {
-        this.client = client;
+        super(client);
         // initialize the creature info needed by the AI
         InstanceTracker.register(this, client.getOwningPlayer().getName());
     }
@@ -3683,10 +3677,5 @@ public class SimpleAI extends AbstractAI
         {
             timeIsUp = true;
         }
-    }
-
-    protected Variant getVariantPlayed()
-    {
-        return this.client.getGame().getVariant();
     }
 }
