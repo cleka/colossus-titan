@@ -89,6 +89,9 @@ public class SimpleAI extends AbstractAI
      * {@link HazardTerrain#isNonNativePenaltyTerrain()}.
      *
      * This is a Map<String,TerrainBonuses>.
+     *
+     * TODO: this shouldn't be here, this is a property of the Variant player
+     * (well, not yet, but it should be, someday).
      */
     private static final Map<String, TerrainBonuses> TERRAIN_BONUSES = new HashMap<String, TerrainBonuses>();
     static
@@ -2268,7 +2271,7 @@ public class SimpleAI extends AbstractAI
     // a Hex terrain label
     // TODO this either or is dangerous and forces us to use the label
     //      instead of the objects
-    private PowerSkill calc_bonus(CreatureType creature, String terrain,
+    private PowerSkill calcBonus(CreatureType creature, String terrain,
         boolean defender)
     {
         int power = creature.getPower();
@@ -2316,7 +2319,7 @@ public class SimpleAI extends AbstractAI
                 creature.getSkill());
         }
 
-        return calc_bonus(creature, terrain.getId(), defender);
+        return calcBonus(creature, terrain.getId(), defender);
 
     }
 
@@ -2325,7 +2328,7 @@ public class SimpleAI extends AbstractAI
     protected PowerSkill getNativeTerrainValue(CreatureType creature,
         HazardTerrain terrain, boolean defender)
     {
-        return calc_bonus(creature, terrain.getName(), defender);
+        return calcBonus(creature, terrain.getName(), defender);
     }
 
     ////////////////////////////////////////////////////////////////
