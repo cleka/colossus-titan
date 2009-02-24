@@ -197,6 +197,28 @@ abstract public class AbstractAI implements AI
         return map;
     }
 
+    /** Return which creature the variant suggest splitting at turn 1 when
+     * starting in a specific hex.
+     * @param hex The masterboard hex where the split occurs.
+     * @return The List of Creaturetype to split.
+     */
+    final protected List<CreatureType> getInitialSplitHint(MasterHex hex) {
+        List<String> byName = VariantSupport.getInitialSplitHint(hex, hintSectionUsed);
+        if (byName == null) {
+            return null;
+        }
+        List<CreatureType> byCreature = new ArrayList<CreatureType>();
+        for (String name : byName) {
+            CreatureType cre = client.getGame().getVariant().getCreatureByName(name);
+            if (cre == null) {
+                LOGGER.severe("HINT: Unknown creature in hint (" + name + "), aborting.");
+                return null;
+            }
+            byCreature.add(cre);
+        }
+        return byCreature;
+    }
+
     /** Various constans used by the AIs code.
      * Each specific AI should be able to override them
      * to tweak the evaluation results w/o rewriting the code.

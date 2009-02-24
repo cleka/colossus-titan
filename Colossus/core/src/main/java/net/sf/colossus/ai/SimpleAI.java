@@ -795,33 +795,6 @@ public class SimpleAI extends AbstractAI
         return splitoffs;
     }
 
-    List<CreatureType> getInitialSplitHint(MasterHex hex)
-    {
-        List<String> byName = VariantSupport.getInitialSplitHint(hex,
-            hintSectionUsed);
-
-        if (byName == null)
-        {
-            return null;
-        }
-
-        List<CreatureType> byCreature = new ArrayList<CreatureType>();
-
-        for (String name : byName)
-        {
-            CreatureType cre = client.getGame().getVariant()
-                .getCreatureByName(name);
-            if (cre == null)
-            {
-                LOGGER.severe("HINT: Unknown creature in hint (" + name
-                    + "), aborting.");
-                return null;
-            }
-            byCreature.add(cre);
-        }
-        return byCreature;
-    }
-
     /** Return true if we need to run this method again after the server
      *  updates the client with the results of a move or mulligan. */
     public boolean masterMove()
