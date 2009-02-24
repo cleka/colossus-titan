@@ -75,6 +75,14 @@ public class CreatureLoader
         // ANSWER by RD: because there was an error in the first commit of the first
         // variant loading system and nobody ever fiexd it. And it got ported vebratim
         // to the XMLM version. Same goes for 'sanddune' below.
+        /* this should be replaced by something like:
+         * for (HazardTerrain terrain : HazardTerrain.getAllHazardTerrains()) {
+         *   Attribute a = el.getAttribute(terrain.getName());
+         *   if ((a != null) && a.getBooleanValue())
+         *     nativeTerrains.add(terrain);
+         * }
+         * which is 100% generic. And much shorter.
+         */
         if (el.getAttribute("bramble").getBooleanValue())
         {
             nativeTerrains.add(HazardTerrain.BRAMBLES);
