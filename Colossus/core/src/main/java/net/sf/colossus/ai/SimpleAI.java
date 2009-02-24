@@ -935,8 +935,9 @@ public class SimpleAI extends AbstractAI
             List<MoveInfo> moveList = new ArrayList<MoveInfo>();
             moveMap.put(legion, moveList);
 
+            ValueRecorder why = new ValueRecorder();
             MoveInfo sitStillMove = new MoveInfo(legion, null, evaluateMove(
-                legion, legion.getCurrentHex(), false, enemyAttackMap), 0);
+                legion, legion.getCurrentHex(), false, enemyAttackMap,why), 0);
             moveList.add(sitStillMove);
 
             // find the best move (1-ply search)
@@ -955,8 +956,9 @@ public class SimpleAI extends AbstractAI
                 {
                     continue;
                 }
+                ValueRecorder whyR = new ValueRecorder();
                 final int value = evaluateMove(legion, hex, true,
-                    enemyAttackMap);
+                    enemyAttackMap, whyR);
 
                 if (value > bestValue || bestHex == null)
                 {
@@ -1121,13 +1123,13 @@ public class SimpleAI extends AbstractAI
      * hexes, so we probably can't remove it]
      */
     int evaluateMove(LegionClientSide legion, MasterHex hex, boolean moved,
-        Map<MasterHex, List<Legion>>[] enemyAttackMap)
+        Map<MasterHex, List<Legion>>[] enemyAttackMap, ValueRecorder value)
     {
         // Avoid using MIN_VALUE and MAX_VALUE because of possible overflow.
         final int WIN_GAME = Integer.MAX_VALUE / 2;
         final int LOSE_LEGION = -10000;
 
-        int value = 0;
+        //int value = 0;
         // consider making an attack
         final Legion enemyLegion = client.getFirstEnemyLegion(hex, legion
             .getPlayer());
@@ -1145,17 +1147,17 @@ public class SimpleAI extends AbstractAI
                         + " and WIN_WITH_MINIMAL_LOSSES");
 
                     // we score a fraction of a basic acquirable
-                    value += ((client.getGame().getVariant()
+                    value.add( ((client.getGame().getVariant()
                         .getCreatureByName(TerrainRecruitLoader
                             .getPrimaryAcquirable())).getPointValue() * enemyPointValue)
                         / TerrainRecruitLoader
-                            .getAcquirableRecruitmentsValue();
+                            .getAcquirableRecruitmentsValue(), "Explanation Here");
                     // plus a fraction of a titan strength
                     // TODO Should be by variant
-                    value += (6 * enemyPointValue)
-                        / TerrainRecruitLoader.getTitanImprovementValue();
+                    value.add( (6 * enemyPointValue)
+                        / TerrainRecruitLoader.getTitanImprovementValue(), "Explanation Here");
                     // plus some more for killing a group (this is arbitrary)
-                    value += (10 * enemyPointValue) / 100;
+                    value.add( (10 * enemyPointValue) / 100, "Explanation Here");
 
                     // TODO if enemy titan, we also score half points
                     // (this may make the AI unfairly gun for your titan)
@@ -1192,12 +1194,12 @@ public class SimpleAI extends AbstractAI
                             && client.getNumLivingPlayers() == 2)
                         {
                             // do it and win the game
-                            value += enemyPointValue;
+                            value.add( enemyPointValue, "Explanation Here");
                         }
                         else
                         {
                             // ack! we'll fuck up our titan group
-                            value += LOSE_LEGION + 10;
+                            value.add( LOSE_LEGION + 10, "Explanation Here");
                         }
                     }
                     // don't do this if we'll lose our only summonable group
@@ -1207,21 +1209,21 @@ public class SimpleAI extends AbstractAI
                         && enemyPointValue < TerrainRecruitLoader
                             .getAcquirableRecruitmentsValue() * .88)
                     {
-                        value += LOSE_LEGION + 5;
+                        value.add( LOSE_LEGION + 5, "Explanation Here");
                     }
                     else
                     {
                         // we score a fraction of a basic acquirable
-                        value += ((client.getGame().getVariant()
+                        value.add( ((client.getGame().getVariant()
                             .getCreatureByName(TerrainRecruitLoader
                                 .getPrimaryAcquirable())).getPointValue() * enemyPointValue)
                             / TerrainRecruitLoader
-                                .getAcquirableRecruitmentsValue();
+                                .getAcquirableRecruitmentsValue(), "Explanation Here");
                         // plus a fraction of a titan strength
-                        value += (6 * enemyPointValue)
-                            / TerrainRecruitLoader.getTitanImprovementValue();
+                        value.add( (6 * enemyPointValue)
+                            / TerrainRecruitLoader.getTitanImprovementValue(), "Explanation Here");
                         // but we lose this group
-                        value -= (20 * legion.getPointValue()) / 100;
+                        value.add( - (20 * legion.getPointValue()) / 100, "Explanation Here");
                         // TODO: if we have no other angels, more penalty here
                         // TODO: if enemy titan, we also score half points
                         // (this may make the AI unfairly gun for your titan)
@@ -1242,17 +1244,17 @@ public class SimpleAI extends AbstractAI
                         // If there are only 2 players, we should do this.
                         if (client.getNumLivingPlayers() == 2)
                         {
-                            value = WIN_GAME;
+                            value.resetTo(WIN_GAME, "WinGame");
                         }
                         else
                         {
-                            value += enemyPointValue / 6;
+                            value.add( enemyPointValue / 6, "Explanation Here");
                         }
                     }
                     else
                     {
                         // otherwise no thanks
-                        value += LOSE_LEGION + 2;
+                        value.add( LOSE_LEGION + 2, "Explanation Here");
                     }
                     break;
 
@@ -1262,14 +1264,14 @@ public class SimpleAI extends AbstractAI
                         + " and LOSE_BUT_INFLICT_HEAVY_LOSSES");
 
                     // TODO: how important is it that we damage his group?
-                    value += LOSE_LEGION + 1;
+                    value.add( LOSE_LEGION + 1, "Explanation Here");
                     break;
 
                 case LOSE:
                     LOGGER.finest("legion " + legion + " can attack "
                         + enemyLegion + " in " + hex + " and LOSE");
 
-                    value += LOSE_LEGION;
+                    value.add( LOSE_LEGION, "Explanation Here");
                     break;
 
                 default:
@@ -1286,12 +1288,12 @@ public class SimpleAI extends AbstractAI
 
             if (recruit != null)
             {
-                int oldval = value;
+                int oldval = value.getValue();
 
                 if (legion.getHeight() <= 5)
                 {
-                    value += getHintedRecruitmentValue(recruit, legion,
-                        hintSectionUsed);
+                    value.add( getHintedRecruitmentValue(recruit, legion,
+                        hintSectionUsed), "Explanation Here");
                 }
                 else if (legion.getHeight() == 6)
                 {
@@ -1379,9 +1381,9 @@ public class SimpleAI extends AbstractAI
                         + Math.max(maxCreaturePV, getHintedRecruitmentValue(
                             recruit, legion, hintSectionUsed));
 
-                    value += (newPV - oldPV)
+                    value.add( (newPV - oldPV)
                         + getHintedRecruitmentValue(recruit, legion,
-                            hintSectionUsed);
+                            hintSectionUsed), "Explanation Here");
                 }
                 else if (legion.getHeight() == 7)
                 {
@@ -1401,9 +1403,9 @@ public class SimpleAI extends AbstractAI
                         // a small bonus for possibly being able to summon out
                         // an angel and recruit.
                         double POSSIBLE_SUMMON_FACTOR = 0.1;
-                        value += POSSIBLE_SUMMON_FACTOR
+                        value.add( (int)Math.round(POSSIBLE_SUMMON_FACTOR
                             * getHintedRecruitmentValue(recruit, legion,
-                                hintSectionUsed);
+                                hintSectionUsed)), "Explanation Here");
                     }
                 }
                 else
@@ -1415,7 +1417,7 @@ public class SimpleAI extends AbstractAI
 
                 LOGGER.finest("--- if " + legion + " moves to " + hex
                     + " then recruit " + recruit.toString() + " (adding "
-                    + (value - oldval) + ")");
+                    + (value.getValue() - oldval) + ")");
             }
         }
 
@@ -1471,7 +1473,7 @@ public class SimpleAI extends AbstractAI
         }
 
         nextTurnValue /= 6; // 1/6 chance of each happening
-        value += nextTurnValue;
+        value.add( nextTurnValue, "Explanation Here");
 
         // consider risk of being attacked
         if (enemyAttackMap != null)
@@ -1530,7 +1532,7 @@ public class SimpleAI extends AbstractAI
                     risk = -legion.getPointValue() / 2.0 * chanceToAttack;
                 }
 
-                value += risk;
+                value.add( (int)Math.round(risk), "Explanation Here");
             }
         }
 
@@ -1549,7 +1551,7 @@ public class SimpleAI extends AbstractAI
         LOGGER.finest("EVAL " + legion + (moved ? " move to " : " stay in ")
             + hex + " = " + value);
 
-        return value;
+        return value.getValue();
     }
 
     static final int WIN_WITH_MINIMAL_LOSSES = 0;
@@ -2850,12 +2852,12 @@ public class SimpleAI extends AbstractAI
         {
             // Staying offboard to die is really bad.
             value.add( bec.OFFBOARD_DEATH_SCALE_FACTOR
-                * getCombatValue(critter, terrain), " [StayingOffboard]");
+                * getCombatValue(critter, terrain), "StayingOffboard");
         }
         else if (hex.isNativeBonusTerrain()
             && critter.getCreature().isNativeIn(hex.getTerrain()))
         {
-            value.add( bec.NATIVE_BONUS_TERRAIN, " [NativeBonusTerrain]");
+            value.add( bec.NATIVE_BONUS_TERRAIN, "NativeBonusTerrain");
 
             // Above gives a small base value.
             // Scale remaining bonus to size of benefit
@@ -2868,14 +2870,14 @@ public class SimpleAI extends AbstractAI
             int bonus = (native_power - 2 * power) * skill
                 + (native_skill - 2 * skill) * power;
 
-            value.add( 3 * bonus, " [More NativeBonusTerrain]");
+            value.add( 3 * bonus, "More NativeBonusTerrain");
 
             // We want marsh natives to slightly prefer moving to bog hexes,
             // even though there's no real bonus there, to leave other hexes
             // clear for non-native allies.
             if (hex.getTerrain().equals(HazardTerrain.BOG))
             {
-                value.add( bec.NATIVE_BOG, " [NativeBog]");
+                value.add( bec.NATIVE_BOG, "NativeBog");
             }
 
             /*
@@ -2895,20 +2897,20 @@ public class SimpleAI extends AbstractAI
             if (hex.isNonNativePenaltyTerrain()
                 && (!critter.getCreature().isNativeIn(hex.getTerrain())))
             {
-                value.add( bec.NON_NATIVE_PENALTY_TERRAIN, " [NonNativePenalty]");
+                value.add( bec.NON_NATIVE_PENALTY_TERRAIN, "NonNativePenalty");
 
                 // Above gives a small base value.
                 // Scale remaining bonus to size of benefit
                 int bonus = (native_power - 2 * power) * skill
                     + (native_skill - 2 * skill) * power;
 
-                value.add( 3 * bonus, " [More NonNativePenalty]");
+                value.add( 3 * bonus, "More NonNativePenalty");
             }
         }
 
         /* damage is positive, healing is negative, so we can always add */
         value.add( bec.PENALTY_DAMAGE_TERRAIN
-            * hex.damageToCreature(critter.getCreature()), " [PenaltyDamageTerrain]");
+            * hex.damageToCreature(critter.getCreature()), "PenaltyDamageTerrain");
 
         Set<String> targetHexLabels = client.findStrikes(critter.getTag());
         int numTargets = targetHexLabels.size();
@@ -2918,13 +2920,13 @@ public class SimpleAI extends AbstractAI
             if (!client.isInContact(critter, true))
             {
                 // Rangestrikes.
-                value.add( bec.FIRST_RANGESTRIKE_TARGET, " [FirstRangestrikeTarget]");
+                value.add( bec.FIRST_RANGESTRIKE_TARGET, "FirstRangestrikeTarget");
 
                 // Having multiple targets is good, in case someone else
                 // kills one.
                 if (numTargets >= 2)
                 {
-                    value.add( bec.EXTRA_RANGESTRIKE_TARGET, " [ExtraRangestrikeTarget]");
+                    value.add( bec.EXTRA_RANGESTRIKE_TARGET, "ExtraRangestrikeTarget");
                 }
 
                 // Non-warlock skill 4 rangestrikers should slightly prefer
@@ -2937,7 +2939,7 @@ public class SimpleAI extends AbstractAI
                     BattleChit target = client.getBattleChit(hexLabel);
                     if (target.isTitan())
                     {
-                        value.add( bec.RANGESTRIKE_TITAN, " [RangestrikeTitan]");
+                        value.add( bec.RANGESTRIKE_TITAN, "RangestrikeTitan");
                     }
                     int strikeNum = client.getStrike().getStrikeNumber(
                         critter, target);
@@ -2953,13 +2955,13 @@ public class SimpleAI extends AbstractAI
                             .intValue();
                         if (numAttackingThisTarget > 1)
                         {
-                            value.add( bec.GANG_UP_ON_CREATURE, " [GangUpOnCreature]");
+                            value.add( bec.GANG_UP_ON_CREATURE, "GangUpOnCreature");
                         }
                     }
                 }
                 if (!penalty)
                 {
-                    value.add( bec.RANGESTRIKE_WITHOUT_PENALTY, " [RangestrikeWithoutPenalty]");
+                    value.add( bec.RANGESTRIKE_WITHOUT_PENALTY, "RangestrikeWithoutPenalty");
                 }
             }
             else
@@ -2969,12 +2971,12 @@ public class SimpleAI extends AbstractAI
                 // Reward being adjacent to an enemy if attacking.
                 if (legion.equals(client.getAttacker()))
                 {
-                    value.add( bec.ATTACKER_ADJACENT_TO_ENEMY, " [AttackerAdjacentToEnemy]");
+                    value.add( bec.ATTACKER_ADJACENT_TO_ENEMY, "AttackerAdjacentToEnemy");
                 }
                 // Slightly penalize being adjacent to an enemy if defending.
                 else
                 {
-                    value.add( bec.DEFENDER_ADJACENT_TO_ENEMY, " [DefenderAdjacentToEnemy]");
+                    value.add( bec.DEFENDER_ADJACENT_TO_ENEMY, "DefenderAdjacentToEnemy");
                 }
 
                 int killValue = 0;
@@ -2988,20 +2990,20 @@ public class SimpleAI extends AbstractAI
                     // Reward being next to enemy titans.  (Banzai!)
                     if (target.isTitan())
                     {
-                        value.add( bec.ADJACENT_TO_ENEMY_TITAN, " [AdjacentToEnemyTitan]");
+                        value.add( bec.ADJACENT_TO_ENEMY_TITAN, "AdjacentToEnemyTitan");
                     }
 
                     // Reward being next to a rangestriker, so it can't hang
                     // back and plink us.
                     if (target.isRangestriker() && !critter.isRangestriker())
                     {
-                        value.add( bec.ADJACENT_TO_RANGESTRIKER, " [AdjacenttoRangestriker]");
+                        value.add( bec.ADJACENT_TO_RANGESTRIKER, "AdjacenttoRangestriker");
                     }
 
                     // Attack Warlocks so they don't get Titan
                     if (target.getCreatureName().equals("Warlock"))
                     {
-                        value.add( bec.ADJACENT_TO_BUDDY_TITAN, " [AdjacentToBuddyTitan]");
+                        value.add( bec.ADJACENT_TO_BUDDY_TITAN, "AdjacentToBuddyTitan");
                     }
 
                     // Reward being next to an enemy that we can probably
@@ -3031,7 +3033,7 @@ public class SimpleAI extends AbstractAI
                             .intValue();
                         if (numAttackingThisTarget > 1)
                         {
-                            value.add( bec.GANG_UP_ON_CREATURE, " [GangUpOnCreature 2]");
+                            value.add( bec.GANG_UP_ON_CREATURE, "GangUpOnCreature 2");
                         }
                     }
 
@@ -3048,13 +3050,13 @@ public class SimpleAI extends AbstractAI
                 {
                     value.add( bec.ATTACKER_KILL_SCALE_FACTOR * killValue
                         + bec.KILLABLE_TARGETS_SCALE_FACTOR
-                        * numKillableTargets, " [Attacker Killable Stuff]");
+                        * numKillableTargets, "Attacker Killable Stuff");
                 }
                 else
                 {
                     value.add( bec.DEFENDER_KILL_SCALE_FACTOR * killValue
                         + bec.KILLABLE_TARGETS_SCALE_FACTOR
-                        * numKillableTargets, " [Defender Killable Stuff]");
+                        * numKillableTargets, "Defender Killable Stuff");
                 }
 
                 int hits = critter.getHits();
@@ -3068,12 +3070,12 @@ public class SimpleAI extends AbstractAI
                         if (legion.equals(client.getAttacker()))
                         {
                             value.add( bec.ATTACKER_GET_KILLED_SCALE_FACTOR
-                                * getKillValue(critter, terrain), " [AttackerGetKilled]");
+                                * getKillValue(critter, terrain), "AttackerGetKilled");
                         }
                         else
                         {
                             value.add( bec.DEFENDER_GET_KILLED_SCALE_FACTOR
-                                * getKillValue(critter, terrain), " [DefenderGetKilled]");
+                                * getKillValue(critter, terrain), "DefenderGetKilled");
                         }
                     }
                     else
@@ -3081,12 +3083,12 @@ public class SimpleAI extends AbstractAI
                         if (legion.equals(client.getAttacker()))
                         {
                             value.add( bec.ATTACKER_GET_HIT_SCALE_FACTOR
-                                * getKillValue(critter, terrain), " [AttackerGetHit]");
+                                * getKillValue(critter, terrain), "AttackerGetHit");
                         }
                         else
                         {
                             value.add( bec.DEFENDER_GET_HIT_SCALE_FACTOR
-                                * getKillValue(critter, terrain), " [DefendergetHit]");
+                                * getKillValue(critter, terrain), "DefendergetHit");
                         }
                     }
                 }
@@ -3105,14 +3107,14 @@ public class SimpleAI extends AbstractAI
             if (terrain.isTower() && legion.equals(client.getDefender()))
             {
                 // Stick to the center of the tower.
-                value.add( bec.TITAN_TOWER_HEIGHT_BONUS * hex.getElevation(), " [TitanTowerHeightBonus]");
+                value.add( bec.TITAN_TOWER_HEIGHT_BONUS * hex.getElevation(), "TitanTowerHeightBonus");
             }
             else
             {
                 if (turn <= 4)
                 {
                     value.add( bec.TITAN_FORWARD_EARLY_PENALTY
-                        * Strike.getRange(hex, entrance, true), " [TitanForwardEarlyPenalty]");
+                        * Strike.getRange(hex, entrance, true), "TitanForwardEarlyPenalty");
                     for (int i = 0; i < 6; i++)
                     {
                         BattleHex neighbor = hex.getNeighbor(i);
@@ -3120,7 +3122,7 @@ public class SimpleAI extends AbstractAI
                             || neighbor.getTerrain()
                                 .equals(HazardTerrain.TREE))
                         {
-                            value.add( bec.TITAN_BY_EDGE_OR_TREE_BONUS, " [TitanByEdgeOrTree]");
+                            value.add( bec.TITAN_BY_EDGE_OR_TREE_BONUS, "TitanByEdgeOrTree");
                         }
                     }
                 }
@@ -3133,7 +3135,7 @@ public class SimpleAI extends AbstractAI
             if (terrain.isTower())
             {
                 // Stick to the center of the tower.
-                value.add( bec.DEFENDER_TOWER_HEIGHT_BONUS * hex.getElevation(), " [DefenderTowerHeightBonus]");
+                value.add( bec.DEFENDER_TOWER_HEIGHT_BONUS * hex.getElevation(), "DefenderTowerHeightBonus");
             }
             else
             {
@@ -3151,7 +3153,7 @@ public class SimpleAI extends AbstractAI
                 if (range != preferredRange)
                 {
                     value.add( bec.DEFENDER_FORWARD_EARLY_PENALTY
-                        * Math.abs(range - preferredRange), " [DefenderForwardEarlyPenalty]");
+                        * Math.abs(range - preferredRange), "DefenderForwardEarlyPenalty");
                 }
             }
         }
@@ -3161,7 +3163,7 @@ public class SimpleAI extends AbstractAI
         {
             // Head for enemy creatures.
             value.add( bec.ATTACKER_DISTANCE_FROM_ENEMY_PENALTY
-                * client.getStrike().minRangeToEnemy(critter), " [AttackerDistanceFromEnemyPenalty]");
+                * client.getStrike().minRangeToEnemy(critter), "AttackerDistanceFromEnemyPenalty");
         }
 
         // Adjacent buddies
@@ -3179,13 +3181,13 @@ public class SimpleAI extends AbstractAI
                         // Buddy
                         if (other.isTitan())
                         {
-                            value.add( bec.ADJACENT_TO_BUDDY_TITAN, " [AdjacentToBuddyTitan 2]");
+                            value.add( bec.ADJACENT_TO_BUDDY_TITAN, "AdjacentToBuddyTitan 2");
                             value.add( native_skill
-                                * (native_power - critter.getHits()), " [More AdjacentToBuddyTitan 2]");
+                                * (native_power - critter.getHits()), "More AdjacentToBuddyTitan 2");
                         }
                         else
                         {
-                            value.add( bec.ADJACENT_TO_BUDDY, " [AdjacentToBuddy]");
+                            value.add( bec.ADJACENT_TO_BUDDY, "AdjacentToBuddy");
                         }
                     }
                 }

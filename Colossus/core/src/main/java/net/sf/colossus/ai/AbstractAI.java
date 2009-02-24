@@ -552,6 +552,12 @@ abstract public class AbstractAI implements AI
             value += v;
         }
 
+        public void resetTo(int v, String r) {
+            why.append(" | " + v);
+            why.append(" [ " + r + "]");
+            value = v;
+        }
+
         public int getValue() {
             return value;
         }
