@@ -15,9 +15,12 @@ import net.sf.colossus.client.CritterMove;
 import net.sf.colossus.util.DevRandom;
 
 /**
- * Horrible kludge to generate LegionMove on the fly, rather than pre-generating
- * them before evaluation. This is put into a Collection with brute force, and
- * is a good example of what not to do in java.
+ * On-the-fly generation of the Collection of all possible LegionMove.
+ * This doesn't full respect the Collection interface:
+ * The random generation may fail before all alements have been returned,
+ * so to iterators may return different subsets of the entire collection.
+ * Also, this may cause size() to return a value higher than what is really
+ * accessible.
  * @version $Id$
  * @author Romain Dolbeau
  */

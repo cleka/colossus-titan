@@ -41,9 +41,12 @@ import net.sf.colossus.variant.Variant;
  * only use information gathered from here to make decisions.
  * There's still a LOT of work to do...
  * 
- * @version $Id: SimpleAI.java 3556 2009-02-20 08:37:40Z dolbeau $
- * @author Bruce Sherrod, David Ripton
+ * @version $Id$
  * @author Romain Dolbeau
+ * Also contains extracted code from SimpleAI:
+ * @author Bruce Sherrod, David Ripton, Romain Dolbeau
+ * Also contains extracted code from RationalAI:
+ * @author Bruce Sherrod, David Ripton, Romain Dolbeau, Corwin Joy
  */
 abstract public class AbstractAI implements AI
 {    
