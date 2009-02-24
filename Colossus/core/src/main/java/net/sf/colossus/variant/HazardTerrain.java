@@ -28,7 +28,7 @@ public class HazardTerrain extends Hazards
         EffectOnStrike effectforAttackingFromTerrain,
         ScopeOfEffectOnStrike scopeForAttackEffect,
         int attackEffectAdjustment,
-        EffectOnStrike effectForBeingRangeSruckInTerrain,
+        EffectOnStrike effectForBeingRangeStruckInTerrain,
         ScopeOfEffectOnStrike scopeForRangeStruckEffect,
         int RangeStruckEffectAdjustment,
         EffectOnStrike effectforRangeStrikeFromTerrain,
@@ -41,7 +41,7 @@ public class HazardTerrain extends Hazards
             effectforDefendingInTerrain, scopeForDefenceEffect,
             defenceEffectAdjustment, effectforAttackingFromTerrain,
             scopeForAttackEffect, attackEffectAdjustment,
-            effectForBeingRangeSruckInTerrain, scopeForRangeStruckEffect,
+            effectForBeingRangeStruckInTerrain, scopeForRangeStruckEffect,
             RangeStruckEffectAdjustment, effectforRangeStrikeFromTerrain,
             scopeForRangeStrikeEffect, RangeStrikeEffectAdjustment,
             RangeStrikeSpecial, terrainSpecial);
@@ -234,15 +234,15 @@ public class HazardTerrain extends Hazards
         }
         if (effectforAttackingFromTerrain == EffectOnStrike.SKILLPENALTY) {
             if (scopeForAttackEffect == ScopeOfEffectOnStrike.ALL) {
-                return AttackEffectAdjustment;
+                return attackEffectAdjustment;
             }
             if (attackerIsNative &&
                     scopeForAttackEffect == ScopeOfEffectOnStrike.NATIVES) {
-                return AttackEffectAdjustment;
+                return attackEffectAdjustment;
             }
             if (!attackerIsNative &&
                     scopeForAttackEffect == ScopeOfEffectOnStrike.FOREIGNERS) {
-                return AttackEffectAdjustment;
+                return attackEffectAdjustment;
             }
             if ((scopeForAttackEffect == ScopeOfEffectOnStrike.PATRIOTS) ||
                 (scopeForAttackEffect == ScopeOfEffectOnStrike.IMPERIALS)) {

@@ -24,17 +24,17 @@ public abstract class Hazards implements HazardConstants
 
     public final EffectOnStrike effectforAttackingFromTerrain;
     public final ScopeOfEffectOnStrike scopeForAttackEffect;
-    public final int AttackEffectAdjustment;
+    public final int attackEffectAdjustment;
 
     public final EffectOnStrike effectForBeingRangeSruckInTerrain;
     public final ScopeOfEffectOnStrike scopeForRangeStruckEffect;
-    public final int RangeStruckEffectAdjustment;
+    public final int rangeStruckEffectAdjustment;
 
     public final EffectOnStrike effectforRangeStrikeFromTerrain;
     public final ScopeOfEffectOnStrike scopeForRangeStrikeEffect;
-    public final int RangeStrikeEffectAdjustment;
+    public final int rangeStrikeEffectAdjustment;
 
-    public final RangeStrikeSpecialEffect RangeStrikeSpecial;
+    public final RangeStrikeSpecialEffect rangeStrikeSpecial;
     public final SpecialEffect terrainSpecial;
 
     public Hazards(String name, char code,
@@ -66,14 +66,14 @@ public abstract class Hazards implements HazardConstants
 
         this.effectforAttackingFromTerrain = effectforAttackingFromTerrain;
         this.scopeForAttackEffect = scopeForAttackEffect;
-        this.AttackEffectAdjustment = attackEffectAdjustment;
+        this.attackEffectAdjustment = attackEffectAdjustment;
         this.effectForBeingRangeSruckInTerrain = effectForBeingRangeSruckInTerrain;
         this.scopeForRangeStruckEffect = scopeForRangeStruckEffect;
-        this.RangeStruckEffectAdjustment = RangeStruckEffectAdjustment;
+        this.rangeStruckEffectAdjustment = RangeStruckEffectAdjustment;
         this.effectforRangeStrikeFromTerrain = effectforRangeStrikeFromTerrain;
         this.scopeForRangeStrikeEffect = scopeForRangeStrikeEffect;
-        this.RangeStrikeEffectAdjustment = RangeStrikeEffectAdjustment;
-        this.RangeStrikeSpecial = RangeStrikeSpecial;
+        this.rangeStrikeEffectAdjustment = RangeStrikeEffectAdjustment;
+        this.rangeStrikeSpecial = RangeStrikeSpecial;
         this.terrainSpecial = terrainSpecial;
 
     }

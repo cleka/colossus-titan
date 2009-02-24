@@ -347,14 +347,14 @@ public class BattleTerrainHazardWindow extends KDialog
     private void addSpecialInfo(Container container, Hazards hazard)
     {
         Chit rangeStrikeSymbol;
-        if (hazard.RangeStrikeSpecial
+        if (hazard.rangeStrikeSpecial
             .equals(HazardConstants.RangeStrikeSpecialEffect.RANGESTRIKEBLOCKED))
         {
             rangeStrikeSymbol = new Chit(EFFECT_SIZE, "RangeStrikeBlocked");
             rangeStrikeSymbol
                 .setToolTipText("Blocks normal Rangestrikes-Magic is not blocked");
         }
-        else if (hazard.RangeStrikeSpecial
+        else if (hazard.rangeStrikeSpecial
             .equals(HazardConstants.RangeStrikeSpecialEffect.RANGESTRIKEWALL))
         {
             rangeStrikeSymbol = new Chit(EFFECT_SIZE, "RangeStrikeWall");
@@ -362,7 +362,7 @@ public class BattleTerrainHazardWindow extends KDialog
                 .setToolTipText("Blocks Rangestrikes unless Hazard is"
                     + "occupied by either the Rangestriker or the target.");
         }
-        else if (hazard.RangeStrikeSpecial
+        else if (hazard.rangeStrikeSpecial
             .equals(HazardConstants.RangeStrikeSpecialEffect.RANGESTRIKESKILLPENALTY))
         {
             rangeStrikeSymbol = new Chit(EFFECT_SIZE, "RangeStrikeSkill");
@@ -389,22 +389,22 @@ public class BattleTerrainHazardWindow extends KDialog
     {
         container.add(makeStrikeEffect("Defending",
             hazard.effectforAttackingFromTerrain, hazard.scopeForAttackEffect,
-            hazard.AttackEffectAdjustment), GBC_NORTHEAST);
+            hazard.attackEffectAdjustment), GBC_NORTHEAST);
         container.add(makeStrikeEffect("Being Rangestruck",
             hazard.effectforRangeStrikeFromTerrain,
             hazard.scopeForRangeStrikeEffect,
-            hazard.RangeStrikeEffectAdjustment), GBC_NORTHWEST);
+            hazard.rangeStrikeEffectAdjustment), GBC_NORTHWEST);
     }
 
     private void addStrikeInfo(Container container, Hazards hazard)
     {
         container.add(makeStrikeEffect("Attacking",
             hazard.effectforAttackingFromTerrain, hazard.scopeForAttackEffect,
-            hazard.AttackEffectAdjustment), GBC_NORTHEAST);
+            hazard.attackEffectAdjustment), GBC_NORTHEAST);
         container.add(makeStrikeEffect("Rangestriking",
             hazard.effectforRangeStrikeFromTerrain,
             hazard.scopeForRangeStrikeEffect,
-            hazard.RangeStrikeEffectAdjustment), GBC_NORTHWEST);
+            hazard.rangeStrikeEffectAdjustment), GBC_NORTHWEST);
     }
 
     private Chit makeStrikeEffect(String strike,
