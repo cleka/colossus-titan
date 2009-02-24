@@ -386,7 +386,8 @@ public class BattleHex extends Hex
         int cost = NORMAL_COST;
 
         // Check to see if the hex is occupied or totally impassable.
-        if (terrain.isNativeOnly() && (!creature.isNativeIn(terrain)))
+        if (terrain.blocksGround() ||
+            (terrain.isGroundNativeOnly() && (!creature.isNativeIn(terrain))))
         {
             cost += IMPASSIBLE_COST;
         }
@@ -449,13 +450,13 @@ public class BattleHex extends Hex
             return false;
         }
        
-        boolean denyBecauseForeigner = (terrain.isNativeFlyersOnly() 
+        boolean denyBecauseForeigner = (terrain.isFlyersNativeOnly()
             && !creature.isNativeIn(terrain));
 
         // (...||...): It's forbidden if it blocks flying generally,
         //             or denies flying to foreigners (and cre is foreigner)
         // !():   It's allowed if it's not forbidden
-        return !(terrain.blocksFlying() || denyBecauseForeigner);
+        return !(terrain.blocksFlyers() || denyBecauseForeigner);
     }
 
     /**

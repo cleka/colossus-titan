@@ -92,11 +92,6 @@ public class HazardTerrain extends Hazards
         return (effectsAttack || effectsDefence);
     }
 
-    public boolean isNativeOnly()
-    {
-        return effectOnGroundMovement.equals(EffectOnMovement.BLOCKFOREIGNER);
-    }
-
     public static HazardTerrain getTerrainByName(String name)
     {
         return TERRAIN_MAP.get(name);
@@ -216,19 +211,21 @@ public class HazardTerrain extends Hazards
         return builder.toString();
     }
 
-    public boolean blocksFlying()
+    public boolean blocksFlyers()
     {
         return effectOnFlyerMovement.equals(EffectOnMovement.BLOCKALL);
     }
-
-    public boolean isFlyersOnly()
+    public boolean blocksGround()
     {
         return effectOnGroundMovement.equals(EffectOnMovement.BLOCKALL);
     }
-
-    public boolean isNativeFlyersOnly()
+    public boolean isFlyersNativeOnly()
     {
         return effectOnFlyerMovement.equals(EffectOnMovement.BLOCKFOREIGNER);
+    }
+    public boolean isGroundNativeOnly()
+    {
+        return effectOnGroundMovement.equals(EffectOnMovement.BLOCKFOREIGNER);
     }
 
     public boolean slowsGround(boolean isNative)

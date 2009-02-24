@@ -1,11 +1,15 @@
 package net.sf.colossus.variant;
 
+import java.util.logging.Logger;
+
 
 /** 
  * Superclass for BattleMap hazards: Terrain & Hexsides, 
  */
 public abstract class Hazards implements HazardConstants
 {
+    private static final Logger LOGGER = Logger
+        .getLogger(Hazards.class.getName());
     /**
      * The name used for serialization.
      */
