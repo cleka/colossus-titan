@@ -72,6 +72,9 @@ public class CreatureLoader
         Set<HazardTerrain> nativeTerrains = new HashSet<HazardTerrain>();
 
         // TODO why is this "bramble" while the string for the terrain is "Brambles"?
+        // ANSWER by RD: because there was an error in the first commit of the first
+        // variant loading system and nobody ever fiexd it. And it got ported vebratim
+        // to the XMLM version. Same goes for 'sanddune' below.
         if (el.getAttribute("bramble").getBooleanValue())
         {
             nativeTerrains.add(HazardTerrain.BRAMBLES);

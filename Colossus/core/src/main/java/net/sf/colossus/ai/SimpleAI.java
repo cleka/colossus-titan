@@ -2824,7 +2824,7 @@ public class SimpleAI extends AbstractAI
             // We want marsh natives to slightly prefer moving to bog hexes,
             // even though there's no real bonus there, to leave other hexes
             // clear for non-native allies.
-            if (hex.getTerrain().equals(HazardTerrain.BOG))
+            if (hex.getTerrain().equals(HazardTerrain.getTerrainByName("Bog")))
             {
                 value.add( bec.NATIVE_BOG, "NativeBog");
             }

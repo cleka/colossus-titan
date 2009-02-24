@@ -34,10 +34,16 @@ public interface HazardConstants
     {
         SKILLBONUS, SKILLPENALTY, POWERBONUS, POWERPENALTY, BLOCKED, NOEFFECT
     }
-
+    /** Special effects.
+     */
     public enum SpecialEffect
     {
-        NOSPECIAL, HEALTHDRAIN
+        /** No special effect */
+        NOSPECIAL,
+        /** Drain health from non-native */
+        HEALTHDRAIN,
+        /** Drain health from water dweller */
+        HEALTHDRAIN_WATERDWELLER
     }
 
     /**

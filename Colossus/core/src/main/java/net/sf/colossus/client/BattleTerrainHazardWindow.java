@@ -202,7 +202,7 @@ public class BattleTerrainHazardWindow extends KDialog
         }
         else
         {
-            model.setTerrain(HazardTerrain.PLAINS);
+            model.setTerrain(HazardTerrain.getDefaultTerrain());
             // to see the hexsides (or at least most of them) we have to configure 
             // them on the neighbors
             // TODO top is broken, three are still missing
@@ -234,7 +234,7 @@ public class BattleTerrainHazardWindow extends KDialog
 
     private void configureHexModel(HazardHexside hazard, BattleHex model)
     {
-        model.setTerrain(HazardTerrain.PLAINS);
+        model.setTerrain(HazardTerrain.getDefaultTerrain());
         for (int i = 0; i <= 5; i++)
         {
             model.setHexside(i, hazard.getCode());
@@ -382,6 +382,12 @@ public class BattleTerrainHazardWindow extends KDialog
         {
             Chit special = new Chit(EFFECT_SIZE, "HealthDrain");
             special.setToolTipText("Non natives lose 1 health per turn");
+        }
+        if (hazard.terrainSpecial
+            .equals(HazardConstants.SpecialEffect.HEALTHDRAIN_WATERDWELLER))
+        {
+            Chit special = new Chit(EFFECT_SIZE, "HealthDrain");
+            special.setToolTipText("Water Dweller lose 1 health per turn");
         }
     }
 

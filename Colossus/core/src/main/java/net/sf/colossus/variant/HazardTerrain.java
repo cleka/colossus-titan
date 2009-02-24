@@ -92,9 +92,18 @@ public class HazardTerrain extends Hazards
         return (effectsAttack || effectsDefence);
     }
 
+    /** Get the HazardTerrain by its name.
+     * Ideally, this shouldn't be used anywhere but in the Variant code
+     * at load-time, thus becoming package private.
+     * @param name The name of the terrain to access.
+     * @return The terrain of the requested name.
+     */
     public static HazardTerrain getTerrainByName(String name)
     {
         return TERRAIN_MAP.get(name);
+    }
+    public static HazardTerrain getDefaultTerrain() {
+        return getTerrainByName("Plains");
     }
 
     /**
@@ -110,8 +119,17 @@ public class HazardTerrain extends Hazards
         return TERRAIN_MAP.values();
     }
 
+    /* ALL the static objects here should be protected (or even private),
+     * no-one should do direct access. That's why the static accessor
+     * are for.
+     * The main problems before this becomes possible are:
+     * 1) XMLparser. We should fix the attributes to use the proper name and
+     *    simplify the parser.
+     * 2) The Color in BattleHex. it should be moved here.
+     */
+
     /* genuine Titan Hazard */
-    public static final HazardTerrain PLAINS = new HazardTerrain("Plains",
+    protected static final HazardTerrain PLAINS = new HazardTerrain("Plains",
         ' ', EffectOnMovement.FREEMOVE, EffectOnMovement.FREEMOVE,
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
@@ -171,7 +189,7 @@ public class HazardTerrain extends Hazards
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
-        RangeStrikeSpecialEffect.RANGESTRIKEFREE, SpecialEffect.NOSPECIAL);
+        RangeStrikeSpecialEffect.RANGESTRIKEFREE, SpecialEffect.HEALTHDRAIN_WATERDWELLER);
 
     public static final HazardTerrain TOWER = new HazardTerrain("Tower", 'w',
         EffectOnMovement.FREEMOVE, EffectOnMovement.FREEMOVE,

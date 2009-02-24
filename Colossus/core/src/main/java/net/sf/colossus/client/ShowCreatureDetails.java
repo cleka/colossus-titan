@@ -265,9 +265,9 @@ public final class ShowCreatureDetails extends KDialog implements
                 "" + (HazardTerrain.getAllHazardTerrains().size() + 2),
                 "Target in Plains", }));
         SimulatedCritter critter = new SimulatedCritter(creature,
-            HazardTerrain.PLAINS);
+            HazardTerrain.getDefaultTerrain());
         SimulatedCritter other = new SimulatedCritter(creature,
-            HazardTerrain.PLAINS);
+            HazardTerrain.getDefaultTerrain());
         //   hazards row 1
         s.append("<tr><td ROWSPAN=2 align=right>" + creature.getName()
             + " in</td><td></td>");
@@ -459,7 +459,7 @@ public final class ShowCreatureDetails extends KDialog implements
         /** in hazard Plains. */
         SimulatedCritter(final CreatureType creature)
         {
-            this(creature, HazardTerrain.PLAINS);
+            this(creature, HazardTerrain.getDefaultTerrain());
         }
 
         /** create the simulated hex. */
