@@ -416,15 +416,9 @@ public class BattleHex extends Hex
             cost += SLOW_INCREMENT_COST;
         }
 
-        // Bramble, drift, and sand slow non-natives, except that sand
-        //     doesn't slow fliers.
-        if ((terrain.equals(HazardTerrain.BRAMBLES) && !creature
-            .isNativeIn(HazardTerrain.BRAMBLES))
-            || (terrain.equals(HazardTerrain.DRIFT) && !creature
-                .isNativeIn(HazardTerrain.DRIFT))
-            || (terrain.equals(HazardTerrain.SAND)
-                && !creature.isNativeIn(HazardTerrain.SAND) && !creature
-                .isFlier()))
+        // check whether that terrain is slowing us.
+        if (terrain.slows(creature.isNativeIn(terrain),
+                creature.isFlier()))
         {
             cost += SLOW_INCREMENT_COST;
         }

@@ -49,11 +49,17 @@ public class HazardTerrain extends Hazards
         LOGGER.finest("Terrain " + name + " with code " + code + " is giving out:" +
                 "\n\tgetSkillPenaltyStrikeFrom(true) = " + getSkillPenaltyStrikeFrom(true) +
                 "\n\tgetSkillPenaltyStrikeFrom(false) = " + getSkillPenaltyStrikeFrom(false));
-        LOGGER.finest("Terrain " + name + " with code " + code + " is giving out:" +
+        LOGGER.finest(
                 "\n\tgetSkillBonusStruckFrom(true, true) = " + getSkillBonusStruckIn(true, true) +
                 "\n\tgetSkillBonusStruckFrom(true, false) = " + getSkillBonusStruckIn(true, false) +
                 "\n\tgetSkillBonusStruckFrom(false, true) = " + getSkillBonusStruckIn(false, true) +
                 "\n\tgetSkillBonusStruckFrom(false, false) = " + getSkillBonusStruckIn(false, false));
+        LOGGER.finest(
+                "\n\tslowsGround(true) = " + slowsGround(true) +
+                "\n\tslowsGround(false) = " + slowsGround(false));
+        LOGGER.finest(
+                "\n\tslowsFlyer(true) = " + slowsFlyer(true) +
+                "\n\tslowsFlyer(false) = " + slowsFlyer(false));
     }
     
     public boolean isNativeBonusTerrain()
@@ -225,10 +231,54 @@ public class HazardTerrain extends Hazards
         return effectOnFlyerMovement.equals(EffectOnMovement.BLOCKFOREIGNER);
     }
 
-    public boolean slowsNonNative()
+    public boolean slowsGround(boolean isNative)
     {
-        return effectOnFlyerMovement.equals(EffectOnMovement.SLOWFOREIGNER)
-            || effectOnGroundMovement.equals(EffectOnMovement.SLOWFOREIGNER);
+        if (effectOnGroundMovement == EffectOnMovement.SLOWALL) {
+            return true;
+        }
+        if (effectOnGroundMovement == EffectOnMovement.SLOWFOREIGNER) {
+            return !isNative;
+        }
+        if (effectOnGroundMovement == EffectOnMovement.BLOCKALL) {
+            LOGGER.warning("Can't be slowed if everybody is blocked.");
+            return false;
+        }
+        if (effectOnGroundMovement == EffectOnMovement.BLOCKFOREIGNER) {
+            if (!isNative) {
+                LOGGER.warning("Can't be slowed if foreigner is blocked.");
+            }
+            return false;
+        }
+        return false;
+    }
+    public boolean slowsFlyer(boolean isNative)
+    {
+        if (effectOnFlyerMovement == EffectOnMovement.SLOWALL) {
+            return true;
+        }
+        if (effectOnFlyerMovement == EffectOnMovement.SLOWFOREIGNER) {
+            return !isNative;
+        }
+        if (effectOnFlyerMovement == EffectOnMovement.BLOCKALL) {
+            LOGGER.warning("Can't be slowed if everybody is blocked.");
+            return false;
+        }
+        if (effectOnFlyerMovement == EffectOnMovement.BLOCKFOREIGNER) {
+            if (!isNative) {
+                LOGGER.warning("Can't be slowed if foreigner is blocked.");
+            }
+            return false;
+        }
+        return false;
+    }
+    public boolean slows(boolean isNative, boolean isFlyer) {
+        if (isFlyer && !slowsFlyer(isNative)) {
+            return false;
+        }
+        if (!slowsGround(isNative)) {
+            return false;
+        }
+        return true;
     }
 
     /** Return the penalty to apply to the Strike Factor of a creature
