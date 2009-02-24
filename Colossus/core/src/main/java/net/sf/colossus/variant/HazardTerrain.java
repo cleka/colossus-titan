@@ -46,6 +46,7 @@ public class HazardTerrain extends Hazards
             scopeForRangeStrikeEffect, RangeStrikeEffectAdjustment,
             RangeStrikeSpecial, terrainSpecial);
         TERRAIN_MAP.put(name, this);
+        /*
         LOGGER.finest("Terrain " + name + " with code " + code + " is giving out:" +
                 "\n\tgetSkillPenaltyStrikeFrom(true) = " + getSkillPenaltyStrikeFrom(true) +
                 "\n\tgetSkillPenaltyStrikeFrom(false) = " + getSkillPenaltyStrikeFrom(false));
@@ -60,6 +61,7 @@ public class HazardTerrain extends Hazards
         LOGGER.finest(
                 "\n\tslowsFlyer(true) = " + slowsFlyer(true) +
                 "\n\tslowsFlyer(false) = " + slowsFlyer(false));
+         */
     }
     
     public boolean isNativeBonusTerrain()
