@@ -295,8 +295,17 @@ abstract public class AbstractAI implements AI
         int ADJACENT_TO_BUDDY_TITAN = 600; // 200
         int GANG_UP_ON_CREATURE = 50;
         /* per legion */
+        /** Bonus when no defender will be reachable by the attacker
+         * next half-turn.
+         */
         int DEF__NOBODY_GETS_HURT = 2000;
+        /** Bonus when no defender will be reachable by more than one
+         * attacker next half-turn.
+         */
         int DEF__NOONE_IS_GANGBANGED = 200;
+        /** Bonus when at most one defender will be reachable by the
+         * attacker next half-turn.
+         */
         int DEF__AT_MOST_ONE_IS_REACHABLE = 100;
     }
     /** Various constants used by the AIs code for creature evaluation.
@@ -305,7 +314,12 @@ abstract public class AbstractAI implements AI
      */
     protected class CreatureValueConstants
     {
-        int HAS_NATIVE_COMBAT_BONUS = 3;
+        /** Bonus to the 'kill value' when the terrain offer a bonus
+         * in combat to the creature.
+         * 0 by default, so the default 'kill value' is the point value.
+         * SimpleAI (and all its subclasses) override this to 3.
+         */
+        int HAS_NATIVE_COMBAT_BONUS = 0;
     }
 
     /** Test whether a Legion belongs to a Human player */

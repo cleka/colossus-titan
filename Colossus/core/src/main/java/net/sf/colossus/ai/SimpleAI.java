@@ -122,6 +122,9 @@ public class SimpleAI extends AbstractAI
     public SimpleAI(Client client)
     {
         super(client);
+        // small bonus to the 'kill value' of a creature when there's some
+        // terrain bonus to combat.
+        cvc.HAS_NATIVE_COMBAT_BONUS = 3;
         // initialize the creature info needed by the AI
         InstanceTracker.register(this, client.getOwningPlayer().getName());
     }
