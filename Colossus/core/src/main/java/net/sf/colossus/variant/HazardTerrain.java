@@ -118,9 +118,14 @@ public class HazardTerrain extends Hazards
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
         RangeStrikeSpecialEffect.RANGESTRIKEFREE, SpecialEffect.NOSPECIAL);
 
+    /** Tree is genuine Titan hazard, but the effect on anybody inside is
+     * custom, as noone can enter a tree in Titan.
+     * For Colossus, native defending in a Tree against a non-native
+     * gains 1 Skill. It blocks rangestrike through it, but not to it.
+     */
     public static final HazardTerrain TREE = new HazardTerrain("Tree", 't',
         EffectOnMovement.BLOCKFOREIGNER, EffectOnMovement.FREEMOVE,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
+        EffectOnStrike.SKILLBONUS, ScopeOfEffectOnStrike.PATRIOTS, 1,
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
         EffectOnStrike.BLOCKED, ScopeOfEffectOnStrike.IMPERIALS, 0,
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
@@ -184,13 +189,16 @@ public class HazardTerrain extends Hazards
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
         RangeStrikeSpecialEffect.RANGESTRIKEFREE, SpecialEffect.NOSPECIAL);
 
+    /** Stone native gains 1 skill when defending against non-native ;
+     * Stone cannot be entered by Flyer or non-native.
+     */
     public static final HazardTerrain STONE = new HazardTerrain("Stone", 'n',
         EffectOnMovement.BLOCKFOREIGNER, EffectOnMovement.BLOCKALL,
+        EffectOnStrike.SKILLBONUS, ScopeOfEffectOnStrike.PATRIOTS, 1,
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
-        RangeStrikeSpecialEffect.RANGESTRIKEFREE, SpecialEffect.NOSPECIAL);
+        RangeStrikeSpecialEffect.RANGESTRIKEBLOCKED, SpecialEffect.NOSPECIAL);
 
     @Override
     public String toString()
