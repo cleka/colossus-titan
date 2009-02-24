@@ -47,10 +47,15 @@ public class HazardTerrain extends Hazards
             RangeStrikeSpecial, terrainSpecial);
         TERRAIN_MAP.put(name, this);
         LOGGER.finest("Terrain " + name + " with code " + code + " is giving out:" +
-                " getSkillPenaltyStrikeFrom(true) = " + getSkillPenaltyStrikeFrom(true) +
-                " getSkillPenaltyStrikeFrom(false) = " + getSkillPenaltyStrikeFrom(false));
+                "\n\tgetSkillPenaltyStrikeFrom(true) = " + getSkillPenaltyStrikeFrom(true) +
+                "\n\tgetSkillPenaltyStrikeFrom(false) = " + getSkillPenaltyStrikeFrom(false));
+        LOGGER.finest("Terrain " + name + " with code " + code + " is giving out:" +
+                "\n\tgetSkillBonusStruckFrom(true, true) = " + getSkillBonusStruckIn(true, true) +
+                "\n\tgetSkillBonusStruckFrom(true, false) = " + getSkillBonusStruckIn(true, false) +
+                "\n\tgetSkillBonusStruckFrom(false, true) = " + getSkillBonusStruckIn(false, true) +
+                "\n\tgetSkillBonusStruckFrom(false, false) = " + getSkillBonusStruckIn(false, false));
     }
-
+    
     public boolean isNativeBonusTerrain()
     {
         return (scopeForAttackEffect.equals(ScopeOfEffectOnStrike.NATIVES)
@@ -218,27 +223,25 @@ public class HazardTerrain extends Hazards
             || effectOnGroundMovement.equals(EffectOnMovement.SLOWFOREIGNER);
     }
 
-    /*
-     * Scope Constants -
-     * All - is everyone
-     * Natives means Natives vs anyone
-     * Patriots means Natives vs Foreigners
-     * Foreigners are Non-Natives vs anyone
-     * Imperials means Foreigners vs Natives
-     */
     /** Return the penalty to apply to the Strike Factor of a creature
      * striking out from that terrain on a unspecified creature.
      * @param attackerIsNative Whether the attacker is native from this HazardTerrain
      * @return The amount of penalty to apply.
      */
     public int getSkillPenaltyStrikeFrom(boolean attackerIsNative) {
+        if (effectforAttackingFromTerrain == EffectOnStrike.NOEFFECT) {
+            return 0;
+        }
         if (effectforAttackingFromTerrain == EffectOnStrike.SKILLPENALTY) {
-            if (scopeForAttackEffect == ScopeOfEffectOnStrike.ALL)
-                return AttackEffectAdjustment;
-            if (attackerIsNative && scopeForAttackEffect == ScopeOfEffectOnStrike.NATIVES) {
+            if (scopeForAttackEffect == ScopeOfEffectOnStrike.ALL) {
                 return AttackEffectAdjustment;
             }
-            if (!attackerIsNative && scopeForAttackEffect == ScopeOfEffectOnStrike.FOREIGNERS) {
+            if (attackerIsNative &&
+                    scopeForAttackEffect == ScopeOfEffectOnStrike.NATIVES) {
+                return AttackEffectAdjustment;
+            }
+            if (!attackerIsNative &&
+                    scopeForAttackEffect == ScopeOfEffectOnStrike.FOREIGNERS) {
                 return AttackEffectAdjustment;
             }
             if ((scopeForAttackEffect == ScopeOfEffectOnStrike.PATRIOTS) ||
@@ -250,6 +253,61 @@ public class HazardTerrain extends Hazards
             }
             return 0;
         }
+        if (effectforAttackingFromTerrain == EffectOnStrike.SKILLBONUS) {
+            LOGGER.warning("Called with an unsupported effect " +
+                    effectforAttackingFromTerrain);
+            return 0;
+        }
+        if (effectforAttackingFromTerrain == EffectOnStrike.BLOCKED) {
+            LOGGER.warning("Called with an unlikely effect " +
+                    effectforAttackingFromTerrain);
+            return 0;
+        }
         return 0;
     }
+    public int getSkillBonusStruckIn(boolean attackerIsNative, boolean defenderIsNative) {
+        if (effectforDefendingInTerrain == EffectOnStrike.SKILLBONUS) {
+            if (scopeForDefenceEffect == ScopeOfEffectOnStrike.ALL) {
+                return defenceEffectAdjustment;
+            }
+            if (defenderIsNative &&
+                    scopeForDefenceEffect == ScopeOfEffectOnStrike.NATIVES) {
+                return defenceEffectAdjustment;
+            }
+            if (!defenderIsNative &&
+                    scopeForDefenceEffect == ScopeOfEffectOnStrike.FOREIGNERS) {
+                return defenceEffectAdjustment;
+            }
+            if (defenderIsNative &&
+                    !attackerIsNative &&
+                    scopeForDefenceEffect == ScopeOfEffectOnStrike.PATRIOTS) {
+                return defenceEffectAdjustment;
+            }
+            if (!defenderIsNative &&
+                    attackerIsNative &&
+                    scopeForDefenceEffect == ScopeOfEffectOnStrike.IMPERIALS) {
+                return defenceEffectAdjustment;
+            }
+            return 0;
+        }
+        if (effectforDefendingInTerrain == EffectOnStrike.SKILLPENALTY) {
+            LOGGER.warning("Called with an unsupported effect " +
+                    effectforDefendingInTerrain);
+            return 0;
+        }
+        if (effectforDefendingInTerrain == EffectOnStrike.BLOCKED) {
+            LOGGER.warning("Called with an unlikely effect " +
+                    effectforDefendingInTerrain);
+            return 0;
+        }
+        return 0;
+    }
+        /*
+     * Scope Constants -
+     * All - is everyone
+     * Natives means Natives vs anyone
+     * Patriots means Natives vs Non-Natives
+     * Foreigners are Non-Natives vs anyone
+     * Imperials means Non-Natives vs Natives
+     */
 }
