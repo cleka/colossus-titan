@@ -318,4 +318,10 @@ public class HazardTerrain extends Hazards
      * Foreigners are Non-Natives vs anyone
      * Imperials means Non-Natives vs Natives
      */
+    /** Whether this terrain blocks rangestrike.
+     * @return Whether this terrain blocks rangestrike.
+     */
+    public boolean blocksLineOfSight() {
+        return rangeStrikeSpecial == RangeStrikeSpecialEffect.RANGESTRIKEBLOCKED;
+    }
 }

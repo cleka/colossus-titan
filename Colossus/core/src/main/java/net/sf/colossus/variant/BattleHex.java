@@ -363,14 +363,12 @@ public class BattleHex extends Hex
         return false;
     }
 
-    /**
-     * @warning wrong implementation, should delegate to HazardTerrain
-     *
+    /** Whether this hex blocks rangestrike.
+     * @return Whether this hex blocks rangestrike.
      */
     public boolean blocksLineOfSight()
     {
-        return (terrain.equals(HazardTerrain.TREE) || terrain
-            .equals(HazardTerrain.STONE));
+        return terrain.blocksLineOfSight();
     }
 
     /**
