@@ -2699,7 +2699,7 @@ public class SimpleAI extends AbstractAI
 
         for (String hexLabel : moves)
         {
-            StringBuffer why = new StringBuffer();
+            ValueRecorder why = new ValueRecorder();
             CritterMove cm = new CritterMove(critter, currentHexLabel,
                 hexLabel);
 
@@ -2826,7 +2826,7 @@ public class SimpleAI extends AbstractAI
 
     /** strikeMap is optional */
     private int evaluateCritterMove(BattleChit critter,
-        Map<String, Integer> strikeMap, StringBuffer why)
+        Map<String, Integer> strikeMap, ValueRecorder value)
     {
         final MasterBoardTerrain terrain = client.getBattleSite().getTerrain();
         final LegionClientSide legion = (LegionClientSide)client
@@ -2842,26 +2842,20 @@ public class SimpleAI extends AbstractAI
         int native_power = ps.getPowerAttack() + (ps.getPowerDefend() + power);
         int native_skill = ps.getSkillAttack() + ps.getSkillDefend();
 
-        int value = 0;
+        //int value = 0;
 
         // Add for sitting in favorable terrain.
         // Subtract for sitting in unfavorable terrain.
         if (hex.isEntrance())
         {
             // Staying offboard to die is really bad.
-            value += bec.OFFBOARD_DEATH_SCALE_FACTOR
-                * getCombatValue(critter, terrain);
-            why.append("+");
-            why.append(bec.OFFBOARD_DEATH_SCALE_FACTOR * getCombatValue(critter, terrain));
-            why.append(" [StayingOffboard]");
+            value.add( bec.OFFBOARD_DEATH_SCALE_FACTOR
+                * getCombatValue(critter, terrain), " [StayingOffboard]");
         }
         else if (hex.isNativeBonusTerrain()
             && critter.getCreature().isNativeIn(hex.getTerrain()))
         {
-            value += bec.NATIVE_BONUS_TERRAIN;
-            why.append("+");
-            why.append(bec.NATIVE_BONUS_TERRAIN);
-            why.append(" [NativeBonusTerrain]");
+            value.add( bec.NATIVE_BONUS_TERRAIN, " [NativeBonusTerrain]");
 
             // Above gives a small base value.
             // Scale remaining bonus to size of benefit
@@ -2874,20 +2868,14 @@ public class SimpleAI extends AbstractAI
             int bonus = (native_power - 2 * power) * skill
                 + (native_skill - 2 * skill) * power;
 
-            value += 3 * bonus;
-            why.append("+");
-            why.append(3 * bonus);
-            why.append(" [More NativeBonusTerrain]");
+            value.add( 3 * bonus, " [More NativeBonusTerrain]");
 
             // We want marsh natives to slightly prefer moving to bog hexes,
             // even though there's no real bonus there, to leave other hexes
             // clear for non-native allies.
             if (hex.getTerrain().equals(HazardTerrain.BOG))
             {
-                value += bec.NATIVE_BOG;
-                why.append("+");
-                why.append(bec.NATIVE_BOG);
-                why.append(" [NativeBog]");
+                value.add( bec.NATIVE_BOG, " [NativeBog]");
             }
 
             /*
@@ -2907,30 +2895,20 @@ public class SimpleAI extends AbstractAI
             if (hex.isNonNativePenaltyTerrain()
                 && (!critter.getCreature().isNativeIn(hex.getTerrain())))
             {
-                value += bec.NON_NATIVE_PENALTY_TERRAIN;
-                why.append("+");
-                why.append(bec.NON_NATIVE_PENALTY_TERRAIN);
-                why.append(" [NonNativePenalty]");
+                value.add( bec.NON_NATIVE_PENALTY_TERRAIN, " [NonNativePenalty]");
 
                 // Above gives a small base value.
                 // Scale remaining bonus to size of benefit
                 int bonus = (native_power - 2 * power) * skill
                     + (native_skill - 2 * skill) * power;
 
-                value += 3 * bonus; // bonus should be negative here
-                why.append("+");
-                why.append(3 * bonus);
-                why.append(" [More NonNativePenalty]");
+                value.add( 3 * bonus, " [More NonNativePenalty]");
             }
         }
 
         /* damage is positive, healing is negative, so we can always add */
-        value += bec.PENALTY_DAMAGE_TERRAIN
-            * hex.damageToCreature(critter.getCreature());
-        why.append("+");
-        why.append(bec.PENALTY_DAMAGE_TERRAIN
-                   * hex.damageToCreature(critter.getCreature()));
-        why.append(" [PenaltyDamageTerrain]");
+        value.add( bec.PENALTY_DAMAGE_TERRAIN
+            * hex.damageToCreature(critter.getCreature()), " [PenaltyDamageTerrain]");
 
         Set<String> targetHexLabels = client.findStrikes(critter.getTag());
         int numTargets = targetHexLabels.size();
@@ -2940,19 +2918,13 @@ public class SimpleAI extends AbstractAI
             if (!client.isInContact(critter, true))
             {
                 // Rangestrikes.
-                value += bec.FIRST_RANGESTRIKE_TARGET;
-                why.append("+");
-                why.append(bec.FIRST_RANGESTRIKE_TARGET);
-                why.append(" [FirstRangestrikeTarget]");
+                value.add( bec.FIRST_RANGESTRIKE_TARGET, " [FirstRangestrikeTarget]");
 
                 // Having multiple targets is good, in case someone else
                 // kills one.
                 if (numTargets >= 2)
                 {
-                    value += bec.EXTRA_RANGESTRIKE_TARGET;
-                    why.append("+");
-                    why.append(bec.EXTRA_RANGESTRIKE_TARGET);
-                    why.append(" [ExtraRangestrikeTarget]");
+                    value.add( bec.EXTRA_RANGESTRIKE_TARGET, " [ExtraRangestrikeTarget]");
                 }
 
                 // Non-warlock skill 4 rangestrikers should slightly prefer
@@ -2965,10 +2937,7 @@ public class SimpleAI extends AbstractAI
                     BattleChit target = client.getBattleChit(hexLabel);
                     if (target.isTitan())
                     {
-                        value += bec.RANGESTRIKE_TITAN;
-                        why.append("+");
-                        why.append(bec.RANGESTRIKE_TITAN);
-                        why.append(" [RangestrikeTitan]");
+                        value.add( bec.RANGESTRIKE_TITAN, " [RangestrikeTitan]");
                     }
                     int strikeNum = client.getStrike().getStrikeNumber(
                         critter, target);
@@ -2984,19 +2953,13 @@ public class SimpleAI extends AbstractAI
                             .intValue();
                         if (numAttackingThisTarget > 1)
                         {
-                            value += bec.GANG_UP_ON_CREATURE;
-                            why.append("+");
-                            why.append(bec.GANG_UP_ON_CREATURE);
-                            why.append(" [GangUpOnCreature]");
+                            value.add( bec.GANG_UP_ON_CREATURE, " [GangUpOnCreature]");
                         }
                     }
                 }
                 if (!penalty)
                 {
-                    value += bec.RANGESTRIKE_WITHOUT_PENALTY;
-                    why.append("+");
-                    why.append(bec.RANGESTRIKE_WITHOUT_PENALTY);
-                    why.append(" [RangestrikeWithoutPenalty]");
+                    value.add( bec.RANGESTRIKE_WITHOUT_PENALTY, " [RangestrikeWithoutPenalty]");
                 }
             }
             else
@@ -3006,18 +2969,12 @@ public class SimpleAI extends AbstractAI
                 // Reward being adjacent to an enemy if attacking.
                 if (legion.equals(client.getAttacker()))
                 {
-                    value += bec.ATTACKER_ADJACENT_TO_ENEMY;
-                    why.append("+");
-                    why.append(bec.ATTACKER_ADJACENT_TO_ENEMY);
-                    why.append(" [AttackerAdjacentToEnemy]");
+                    value.add( bec.ATTACKER_ADJACENT_TO_ENEMY, " [AttackerAdjacentToEnemy]");
                 }
                 // Slightly penalize being adjacent to an enemy if defending.
                 else
                 {
-                    value += bec.DEFENDER_ADJACENT_TO_ENEMY;
-                    why.append("+");
-                    why.append(bec.DEFENDER_ADJACENT_TO_ENEMY);
-                    why.append(" [DefenderAdjacentToEnemy]");
+                    value.add( bec.DEFENDER_ADJACENT_TO_ENEMY, " [DefenderAdjacentToEnemy]");
                 }
 
                 int killValue = 0;
@@ -3031,29 +2988,20 @@ public class SimpleAI extends AbstractAI
                     // Reward being next to enemy titans.  (Banzai!)
                     if (target.isTitan())
                     {
-                        value += bec.ADJACENT_TO_ENEMY_TITAN;
-                        why.append("+");
-                        why.append(bec.ADJACENT_TO_ENEMY_TITAN);
-                        why.append(" [AdjacentToEnemyTitan]");
+                        value.add( bec.ADJACENT_TO_ENEMY_TITAN, " [AdjacentToEnemyTitan]");
                     }
 
                     // Reward being next to a rangestriker, so it can't hang
                     // back and plink us.
                     if (target.isRangestriker() && !critter.isRangestriker())
                     {
-                        value += bec.ADJACENT_TO_RANGESTRIKER;
-                        why.append("+");
-                        why.append(bec.ADJACENT_TO_RANGESTRIKER);
-                        why.append(" [AdjacenttoRangestriker]");
+                        value.add( bec.ADJACENT_TO_RANGESTRIKER, " [AdjacenttoRangestriker]");
                     }
 
                     // Attack Warlocks so they don't get Titan
                     if (target.getCreatureName().equals("Warlock"))
                     {
-                        value += bec.ADJACENT_TO_BUDDY_TITAN;
-                        why.append("+");
-                        why.append(bec.ADJACENT_TO_BUDDY_TITAN);
-                        why.append(" [AdjacentToBuddyTitan]");
+                        value.add( bec.ADJACENT_TO_BUDDY_TITAN, " [AdjacentToBuddyTitan]");
                     }
 
                     // Reward being next to an enemy that we can probably
@@ -3083,10 +3031,7 @@ public class SimpleAI extends AbstractAI
                             .intValue();
                         if (numAttackingThisTarget > 1)
                         {
-                            value += bec.GANG_UP_ON_CREATURE;
-                            why.append("+");
-                            why.append(bec.GANG_UP_ON_CREATURE);
-                            why.append(" [GangUpOnCreature 2]");
+                            value.add( bec.GANG_UP_ON_CREATURE, " [GangUpOnCreature 2]");
                         }
                     }
 
@@ -3101,25 +3046,15 @@ public class SimpleAI extends AbstractAI
 
                 if (legion.equals(client.getAttacker()))
                 {
-                    value += bec.ATTACKER_KILL_SCALE_FACTOR * killValue
+                    value.add( bec.ATTACKER_KILL_SCALE_FACTOR * killValue
                         + bec.KILLABLE_TARGETS_SCALE_FACTOR
-                        * numKillableTargets;
-                    why.append("+");
-                    why.append(bec.ATTACKER_KILL_SCALE_FACTOR * killValue
-                               + bec.KILLABLE_TARGETS_SCALE_FACTOR
-                               * numKillableTargets);
-                    why.append(" [Attacker Killable Stuff]");
+                        * numKillableTargets, " [Attacker Killable Stuff]");
                 }
                 else
                 {
-                    value += bec.DEFENDER_KILL_SCALE_FACTOR * killValue
+                    value.add( bec.DEFENDER_KILL_SCALE_FACTOR * killValue
                         + bec.KILLABLE_TARGETS_SCALE_FACTOR
-                        * numKillableTargets;
-                    why.append("+");
-                    why.append(bec.DEFENDER_KILL_SCALE_FACTOR * killValue
-                               + bec.KILLABLE_TARGETS_SCALE_FACTOR
-                               * numKillableTargets);
-                    why.append(" [Defender Killable Stuff]");
+                        * numKillableTargets, " [Defender Killable Stuff]");
                 }
 
                 int hits = critter.getHits();
@@ -3132,42 +3067,26 @@ public class SimpleAI extends AbstractAI
                     {
                         if (legion.equals(client.getAttacker()))
                         {
-                            value += bec.ATTACKER_GET_KILLED_SCALE_FACTOR
-                                * getKillValue(critter, terrain);
-                            why.append("+");
-                            why.append(bec.ATTACKER_GET_KILLED_SCALE_FACTOR
-                                       * getKillValue(critter, terrain));
-                            why.append(" [AttackerGetKilled]");
+                            value.add( bec.ATTACKER_GET_KILLED_SCALE_FACTOR
+                                * getKillValue(critter, terrain), " [AttackerGetKilled]");
                         }
                         else
                         {
-                            value += bec.DEFENDER_GET_KILLED_SCALE_FACTOR
-                                * getKillValue(critter, terrain);
-                            why.append("+");
-                            why.append(bec.DEFENDER_GET_KILLED_SCALE_FACTOR
-                                       * getKillValue(critter, terrain));
-                            why.append(" [DefenderGetKilled]");
+                            value.add( bec.DEFENDER_GET_KILLED_SCALE_FACTOR
+                                * getKillValue(critter, terrain), " [DefenderGetKilled]");
                         }
                     }
                     else
                     {
                         if (legion.equals(client.getAttacker()))
                         {
-                            value += bec.ATTACKER_GET_HIT_SCALE_FACTOR
-                                * getKillValue(critter, terrain);
-                            why.append("+");
-                            why.append(bec.ATTACKER_GET_HIT_SCALE_FACTOR
-                                       * getKillValue(critter, terrain));
-                            why.append(" [AttackerGetHit]");
+                            value.add( bec.ATTACKER_GET_HIT_SCALE_FACTOR
+                                * getKillValue(critter, terrain), " [AttackerGetHit]");
                         }
                         else
                         {
-                            value += bec.DEFENDER_GET_HIT_SCALE_FACTOR
-                                * getKillValue(critter, terrain);
-                            why.append("+");
-                            why.append(bec.DEFENDER_GET_HIT_SCALE_FACTOR
-                                       * getKillValue(critter, terrain));
-                            why.append(" [DefendergetHit]");
+                            value.add( bec.DEFENDER_GET_HIT_SCALE_FACTOR
+                                * getKillValue(critter, terrain), " [DefendergetHit]");
                         }
                     }
                 }
@@ -3186,21 +3105,14 @@ public class SimpleAI extends AbstractAI
             if (terrain.isTower() && legion.equals(client.getDefender()))
             {
                 // Stick to the center of the tower.
-                value += bec.TITAN_TOWER_HEIGHT_BONUS * hex.getElevation();
-                why.append("+");
-                why.append(bec.TITAN_TOWER_HEIGHT_BONUS * hex.getElevation());
-                why.append(" [TitanTowerHeightBonus]");
+                value.add( bec.TITAN_TOWER_HEIGHT_BONUS * hex.getElevation(), " [TitanTowerHeightBonus]");
             }
             else
             {
                 if (turn <= 4)
                 {
-                    value += bec.TITAN_FORWARD_EARLY_PENALTY
-                        * Strike.getRange(hex, entrance, true);
-                    why.append("+");
-                    why.append(bec.TITAN_FORWARD_EARLY_PENALTY
-                               * Strike.getRange(hex, entrance, true));
-                    why.append(" [TitanForwardEarlyPenalty]");
+                    value.add( bec.TITAN_FORWARD_EARLY_PENALTY
+                        * Strike.getRange(hex, entrance, true), " [TitanForwardEarlyPenalty]");
                     for (int i = 0; i < 6; i++)
                     {
                         BattleHex neighbor = hex.getNeighbor(i);
@@ -3208,10 +3120,7 @@ public class SimpleAI extends AbstractAI
                             || neighbor.getTerrain()
                                 .equals(HazardTerrain.TREE))
                         {
-                            value += bec.TITAN_BY_EDGE_OR_TREE_BONUS;
-                            why.append("+");
-                            why.append(bec.TITAN_BY_EDGE_OR_TREE_BONUS);
-                            why.append(" [TitanByEdgeOrTree]");
+                            value.add( bec.TITAN_BY_EDGE_OR_TREE_BONUS, " [TitanByEdgeOrTree]");
                         }
                     }
                 }
@@ -3224,10 +3133,7 @@ public class SimpleAI extends AbstractAI
             if (terrain.isTower())
             {
                 // Stick to the center of the tower.
-                value += bec.DEFENDER_TOWER_HEIGHT_BONUS * hex.getElevation();
-                why.append("+");
-                why.append(bec.DEFENDER_TOWER_HEIGHT_BONUS * hex.getElevation());
-                why.append(" [DefenderTowerHeightBonus]");
+                value.add( bec.DEFENDER_TOWER_HEIGHT_BONUS * hex.getElevation(), " [DefenderTowerHeightBonus]");
             }
             else
             {
@@ -3244,12 +3150,8 @@ public class SimpleAI extends AbstractAI
                 }
                 if (range != preferredRange)
                 {
-                    value += bec.DEFENDER_FORWARD_EARLY_PENALTY
-                        * Math.abs(range - preferredRange);
-                    why.append("+");
-                    why.append(bec.DEFENDER_FORWARD_EARLY_PENALTY
-                               * Math.abs(range - preferredRange));
-                    why.append(" [DefenderForwardEarlyPenalty]");
+                    value.add( bec.DEFENDER_FORWARD_EARLY_PENALTY
+                        * Math.abs(range - preferredRange), " [DefenderForwardEarlyPenalty]");
                 }
             }
         }
@@ -3258,12 +3160,8 @@ public class SimpleAI extends AbstractAI
         // Attacker, non-titan, needs to charge.
         {
             // Head for enemy creatures.
-            value += bec.ATTACKER_DISTANCE_FROM_ENEMY_PENALTY
-                * client.getStrike().minRangeToEnemy(critter);
-            why.append("+");
-            why.append(bec.ATTACKER_DISTANCE_FROM_ENEMY_PENALTY
-                       * client.getStrike().minRangeToEnemy(critter));
-            why.append(" [AttackerDistanceFromEnemyPenalty]");
+            value.add( bec.ATTACKER_DISTANCE_FROM_ENEMY_PENALTY
+                * client.getStrike().minRangeToEnemy(critter), " [AttackerDistanceFromEnemyPenalty]");
         }
 
         // Adjacent buddies
@@ -3281,33 +3179,20 @@ public class SimpleAI extends AbstractAI
                         // Buddy
                         if (other.isTitan())
                         {
-                            value += bec.ADJACENT_TO_BUDDY_TITAN;
-                            why.append("+");
-                            why.append(bec.ADJACENT_TO_BUDDY_TITAN);
-                            why.append(" [AdjacentToBuddyTitan 2]");
-                            value += native_skill
-                                * (native_power - critter.getHits());
-                            why.append("+");
-                            why.append(native_skill
-                                       * (native_power - critter.getHits()));
-                            why.append(" [More AdjacentToBuddyTitan 2]");
+                            value.add( bec.ADJACENT_TO_BUDDY_TITAN, " [AdjacentToBuddyTitan 2]");
+                            value.add( native_skill
+                                * (native_power - critter.getHits()), " [More AdjacentToBuddyTitan 2]");
                         }
                         else
                         {
-                            value += bec.ADJACENT_TO_BUDDY;
-                            why.append("+");
-                            why.append(bec.ADJACENT_TO_BUDDY);
-                            why.append(" [AdjacentToBuddy]");
+                            value.add( bec.ADJACENT_TO_BUDDY, " [AdjacentToBuddy]");
                         }
                     }
                 }
             }
         }
 
-        why.append(" = ");
-        why.append(value);
-
-        return value;
+        return value.getValue();
     }
 
     private int evaluateLegionBattleMove(LegionMove lm)
@@ -3326,7 +3211,7 @@ public class SimpleAI extends AbstractAI
         int sum = 0;
         for (CritterMove cm : lm.getCritterMoves())
         {
-            StringBuffer why = new StringBuffer();
+            ValueRecorder why = new ValueRecorder();
             int val = evaluateCritterMove(cm.getCritter(), strikeMap, why);
             lm.setEvaluate(cm, why.toString());
             sum += val;

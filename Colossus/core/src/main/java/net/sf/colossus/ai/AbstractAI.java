@@ -537,4 +537,28 @@ abstract public class AbstractAI implements AI
             return worst;
         }
     }
+
+    protected class ValueRecorder {
+        private int value = 0;
+        private StringBuffer why = new StringBuffer();
+
+        public void add(int v, String r) {
+            if (why.toString().equals("") || v < 0) {
+                why.append("" + v);
+            } else {
+                why.append("+" + v);
+            }
+            why.append(" [" + r + "]");
+            value += v;
+        }
+
+        public int getValue() {
+            return value;
+        }
+
+        @Override
+        public String toString() {
+            return why.toString() + " = " + value;
+        }
+    }
 }
