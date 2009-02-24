@@ -1028,6 +1028,10 @@ public class SimpleAI extends AbstractAI
                     boolean moved = doMove(move.legion, move.hex);
                     if (moved)
                     {
+                        LOGGER.finer("Moved " + move.legion + " to " + move.hex +
+                            " after evaluating: " +
+                            move.why.toString() +
+                            " as we couldn't sit tight");
                         return true;
                     }
                 }
@@ -1082,6 +1086,10 @@ public class SimpleAI extends AbstractAI
             boolean moved = doMove(move.legion, move.hex);
             if (moved)
             {
+                LOGGER.finer("Moved " + move.legion + " to " + move.hex +
+                            " after evaluating: " +
+                            move.why.toString() +
+                            " as we must move somebody.");
                 return true;
             }
         }
