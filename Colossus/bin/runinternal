@@ -1,0 +1,31 @@
+#! /bin/sh
+
+#
+# A simple wrapper to run a bunch of games inside the same JVM
+# Can run each game from scratch, or all of them from the same
+# savegame file.
+#
+
+
+IROUNDS=5
+
+if [ $# -gt 0 ]
+then
+  IROUNDS=$1
+  shift
+fi
+
+echo "Starting Colossus to run internally $IROUNDS games."
+
+if [ $# -gt 0 ]
+then
+  FILE=$1
+  echo "Games will start from savegame $FILE."
+  shift
+  LOADOPTION=" --load FILE "
+fi
+
+
+java -Djava.util.logging.config.file=logging.properties  -Dnet.sf.colossus.stressTestRounds=$IROUNDS -Dnet.sf.colossus.forceViewBoard=yes -Dnet.sf.colossus.endAfterFirstBattle=true  -Xmx128M -jar Colossus.jar  -gS -q -A
+
+# EOF
