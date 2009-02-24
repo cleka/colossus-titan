@@ -849,8 +849,11 @@ public final class Start
             // DebugStuff.doCleanupStuff(false);
 
             // For Stresstesting (controlled by a system property):
-            if (--howManyGamesLeft > 0)
+            if (howManyGamesLeft > 1)
             {
+                // Decrement in here, not in if, otherwise we decrement it
+                // until negative infinity ;-)
+                howManyGamesLeft--;
                 LOGGER.log(Level.ALL, "howManyGamesLeft now "
                     + howManyGamesLeft + "\n");
 
