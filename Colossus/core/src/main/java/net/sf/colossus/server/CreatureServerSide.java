@@ -949,21 +949,38 @@ public class CreatureServerSide extends Creature
         return getType().isNativeHexside(h);
     }
 
+    /** @deprecated all isNative<HazardTerrain> are obsolete, one should use
+     * isNativeTerrain(<HazardTerrain>) instead, with no explicit reference
+     * to the name. This will ease adding new HazardTerrain in variant.
+     */
+    @Deprecated
     public boolean isNativeBramble()
     {
         return getType().isNativeIn(HazardTerrain.BRAMBLES);
     }
-
+    /** @deprecated all isNative<HazardTerrain> are obsolete, one should use
+     * isNativeTerrain(<HazardTerrain>) instead, with no explicit reference
+     * to the name. This will ease adding new HazardTerrain in variant.
+     */
+    @Deprecated
     public boolean isNativeDrift()
     {
         return getType().isNativeIn(HazardTerrain.DRIFT);
     }
-
+    /** @deprecated all isNative<HazardTerrain> are obsolete, one should use
+     * isNativeTerrain(<HazardTerrain>) instead, with no explicit reference
+     * to the name. This will ease adding new HazardTerrain in variant.
+     */
+    @Deprecated
     public boolean isNativeBog()
     {
         return getType().isNativeIn(HazardTerrain.BOG);
     }
-
+    /** @deprecated all isNative<HazardTerrain> are obsolete, one should use
+     * isNativeTerrain(<HazardTerrain>) instead, with no explicit reference
+     * to the name. This will ease adding new HazardTerrain in variant.
+     */
+    @Deprecated
     public boolean isNativeSandDune()
     {
         return getType().isNativeIn(HazardTerrain.SAND);
@@ -973,7 +990,11 @@ public class CreatureServerSide extends Creature
     {
         return getType().isNativeSlope();
     }
-
+    /** @deprecated all isNative<HazardTerrain> are obsolete, one should use
+     * isNativeTerrain(<HazardTerrain>) instead, with no explicit reference
+     * to the name. This will ease adding new HazardTerrain in variant.
+     */
+    @Deprecated
     public boolean isNativeVolcano()
     {
         return getType().isNativeIn(HazardTerrain.VOLCANO);
@@ -983,12 +1004,20 @@ public class CreatureServerSide extends Creature
     {
         return getType().isNativeRiver();
     }
-
+    /** @deprecated all isNative<HazardTerrain> are obsolete, one should use
+     * isNativeTerrain(<HazardTerrain>) instead, with no explicit reference
+     * to the name. This will ease adding new HazardTerrain in variant.
+     */
+    @Deprecated
     public boolean isNativeStone()
     {
         return getType().isNativeIn(HazardTerrain.STONE);
     }
-
+    /** @deprecated all isNative<HazardTerrain> are obsolete, one should use
+     * isNativeTerrain(<HazardTerrain>) instead, with no explicit reference
+     * to the name. This will ease adding new HazardTerrain in variant.
+     */
+    @Deprecated
     public boolean isNativeTree()
     {
         return getType().isNativeIn(HazardTerrain.TREE);

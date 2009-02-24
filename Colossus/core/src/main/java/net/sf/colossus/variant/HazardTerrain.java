@@ -4,6 +4,7 @@ package net.sf.colossus.variant;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 
 /** 
@@ -12,6 +13,7 @@ import java.util.Map;
  */
 public class HazardTerrain extends Hazards
 {
+    private static final Logger LOGGER = Logger.getLogger(HazardTerrain.class.getName());
     /**
      * A map from the serialization string of a terrain to the instances.
      */
@@ -211,5 +213,40 @@ public class HazardTerrain extends Hazards
     {
         return effectOnFlyerMovement.equals(EffectOnMovement.SLOWFOREIGNER)
             || effectOnGroundMovement.equals(EffectOnMovement.SLOWFOREIGNER);
+    }
+
+    /*
+     * Scope Constants -
+     * All - is everyone
+     * Natives means Natives vs anyone
+     * Patriots means Natives vs Foreigners
+     * Foreigners are Non-Natives vs anyone
+     * Imperials means Foreigners vs Natives
+     */
+    /** Return the penalty to apply to the Strike Factor of a creature
+     * striking out from that terrain on a unspecified creature.
+     * @param attackerIsNative Whether the attacker is native from this HazardTerrain
+     * @return The amount of penalty to apply.
+     */
+    public int getSkillPenaltyStrikeFrom(boolean attackerIsNative) {
+        if (effectforAttackingFromTerrain == EffectOnStrike.SKILLPENALTY) {
+            if (scopeForAttackEffect == ScopeOfEffectOnStrike.ALL)
+                return AttackEffectAdjustment;
+            if (attackerIsNative && scopeForAttackEffect == ScopeOfEffectOnStrike.NATIVES) {
+                return AttackEffectAdjustment;
+            }
+            if (!attackerIsNative && scopeForAttackEffect == ScopeOfEffectOnStrike.FOREIGNERS) {
+                return AttackEffectAdjustment;
+            }
+            if ((scopeForAttackEffect == ScopeOfEffectOnStrike.PATRIOTS) ||
+                (scopeForAttackEffect == ScopeOfEffectOnStrike.IMPERIALS)) {
+                /* not enough information to decide */
+                LOGGER.warning("Called without the native status of the defender," +
+                        "and effect " + scopeForAttackEffect + " requires it.");
+                return 0;
+            }
+            return 0;
+        }
+        return 0;
     }
 }
