@@ -2244,7 +2244,7 @@ public class SimpleAI extends AbstractAI
         return val;
     }
 
-    class PowerSkill
+    protected class PowerSkill
     {
         private final String name;
         private final int power_attack;
@@ -2836,9 +2836,6 @@ public class SimpleAI extends AbstractAI
         final BattleHex hex = client.getBattleHex(critter);
         final int turn = client.getBattleTurnNumber();
 
-        // TODO this is broken: the method expects a master terrain name,
-        // not the hazard terrain name -- most likely the expectation of
-        // the method should be changed to expect a HazardTerrain instance
         PowerSkill ps = getNativeTerrainValue(critter.getCreature(), hex
             .getTerrain(), true);
 
