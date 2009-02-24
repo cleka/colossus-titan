@@ -1495,6 +1495,24 @@ public final class GameServerSide extends Game
             file = new File(Constants.saveDirname + filename);
         }
 
+        if (!file.exists())
+        {
+            String tryXMLFile = file.getPath() + ".xml";
+            File xmlFile = new File(tryXMLFile);
+            if (xmlFile.exists())
+            {
+                LOGGER.warning("Given filename does not exist - loading "
+                    + "instead the one with .xml appended to the name!");
+                file = xmlFile;
+            }
+            else
+            {
+                LOGGER.severe("Cannot load saved game: file "
+                    + file.getPath() + " does not exist!");
+                return;
+            }
+        }
+        
         try
         {
             LOGGER.info("Loading game from " + file);
