@@ -672,7 +672,6 @@ public final class Start
         cl = null;
 
         howManyGamesLeft = Options.getHowManyStresstestRoundsProperty();
-        String loadFileName = null;
 
         boolean dontWait = false;
         int whatToDoNext;
@@ -752,17 +751,9 @@ public final class Start
             {
                 startObject.setWhatToDoNext(GetPlayersDialog);
                 int port = startOptions.getIntOption(Options.serveAtPort);
-                if (loadFileName == null)
-                {
-                    loadFileName = startOptions
-                        .getStringOption(Options.loadGameFileName);
+                String loadFileName = startOptions
+                    .getStringOption(Options.loadGameFileName);
                 
-                    if (!(howManyGamesLeft > 0))
-                    {
-                        startOptions.removeOption(Options.loadGameFileName);
-                    }
-                }
-
                 if (loadFileName != null && loadFileName.length() > 0)
                 {
                     game = new GameServerSide();
@@ -863,6 +854,8 @@ public final class Start
                 LOGGER.log(Level.ALL, "howManyGamesLeft now "
                     + howManyGamesLeft + "\n");
 
+                String loadFileName = startOptions
+                    .getStringOption(Options.loadGameFileName);
                 if (loadFileName != null)
                 {
                     startObject.setWhatToDoNext(Start.LoadGame);
