@@ -822,26 +822,6 @@ public class SimpleAI extends AbstractAI
         return byCreature;
     }
 
-    /** little helper to store info about possible moves */
-    private class MoveInfo
-    {
-        final LegionClientSide legion;
-
-        /** hex to move to.  if hex == null, then this means sit still. */
-        final MasterHex hex;
-        final int value;
-        final int difference; // difference from sitting still
-
-        MoveInfo(LegionClientSide legion, MasterHex hex, int value,
-            int difference)
-        {
-            this.legion = legion;
-            this.hex = hex;
-            this.value = value;
-            this.difference = difference;
-        }
-    }
-
     /** Return true if we need to run this method again after the server
      *  updates the client with the results of a move or mulligan. */
     public boolean masterMove()
@@ -937,11 +917,12 @@ public class SimpleAI extends AbstractAI
 
             ValueRecorder why = new ValueRecorder();
             MoveInfo sitStillMove = new MoveInfo(legion, null, evaluateMove(
-                legion, legion.getCurrentHex(), false, enemyAttackMap,why), 0);
+                legion, legion.getCurrentHex(), false, enemyAttackMap, why), 0, why);
             moveList.add(sitStillMove);
 
             // find the best move (1-ply search)
             MasterHex bestHex = null;
+            MoveInfo bestMove = null;
             int bestValue = Integer.MIN_VALUE;
             Set<MasterHex> set = client.getMovement().listAllMoves(legion,
                 legion.getCurrentHex(), client.getMovementRoll());
@@ -960,13 +941,14 @@ public class SimpleAI extends AbstractAI
                 final int value = evaluateMove(legion, hex, true,
                     enemyAttackMap, whyR);
 
+                MoveInfo move = new MoveInfo(legion, hex, value, value
+                    - sitStillMove.value, whyR);
                 if (value > bestValue || bestHex == null)
                 {
                     bestValue = value;
                     bestHex = hex;
+                    bestMove = move;
                 }
-                MoveInfo move = new MoveInfo(legion, hex, value, value
-                    - sitStillMove.value);
                 moveList.add(move);
             }
 
@@ -976,6 +958,11 @@ public class SimpleAI extends AbstractAI
                 moved = doMove(legion, bestHex);
                 if (moved)
                 {
+                    LOGGER.finer("Moved " + legion + " to " + bestHex +
+                            " after evaluating: " +
+                            bestMove.why.toString() +
+                            " is better than sitting tight: "
+                            + sitStillMove.why.toString());
                     return true;
                 }
             }
@@ -1151,13 +1138,13 @@ public class SimpleAI extends AbstractAI
                         .getCreatureByName(TerrainRecruitLoader
                             .getPrimaryAcquirable())).getPointValue() * enemyPointValue)
                         / TerrainRecruitLoader
-                            .getAcquirableRecruitmentsValue(), "Explanation Here");
+                            .getAcquirableRecruitmentsValue(), "Fraction Basic Acquirable");
                     // plus a fraction of a titan strength
                     // TODO Should be by variant
                     value.add( (6 * enemyPointValue)
-                        / TerrainRecruitLoader.getTitanImprovementValue(), "Explanation Here");
+                        / TerrainRecruitLoader.getTitanImprovementValue(), "Fraction Titan Strength");
                     // plus some more for killing a group (this is arbitrary)
-                    value.add( (10 * enemyPointValue) / 100, "Explanation Here");
+                    value.add( (10 * enemyPointValue) / 100, "Arbitrary For Killing");
 
                     // TODO if enemy titan, we also score half points
                     // (this may make the AI unfairly gun for your titan)
@@ -1194,12 +1181,12 @@ public class SimpleAI extends AbstractAI
                             && client.getNumLivingPlayers() == 2)
                         {
                             // do it and win the game
-                            value.add( enemyPointValue, "Explanation Here");
+                            value.add( enemyPointValue, "Killing Last Enemy Titan");
                         }
                         else
                         {
                             // ack! we'll fuck up our titan group
-                            value.add( LOSE_LEGION + 10, "Explanation Here");
+                            value.add( LOSE_LEGION + 10, "<Profanity> Our Titan Group");
                         }
                     }
                     // don't do this if we'll lose our only summonable group
@@ -1209,7 +1196,7 @@ public class SimpleAI extends AbstractAI
                         && enemyPointValue < TerrainRecruitLoader
                             .getAcquirableRecruitmentsValue() * .88)
                     {
-                        value.add( LOSE_LEGION + 5, "Explanation Here");
+                        value.add( LOSE_LEGION + 5, "Lose Legion");
                     }
                     else
                     {
@@ -1218,12 +1205,12 @@ public class SimpleAI extends AbstractAI
                             .getCreatureByName(TerrainRecruitLoader
                                 .getPrimaryAcquirable())).getPointValue() * enemyPointValue)
                             / TerrainRecruitLoader
-                                .getAcquirableRecruitmentsValue(), "Explanation Here");
+                                .getAcquirableRecruitmentsValue(), "Fraction Basic Acquirable 2");
                         // plus a fraction of a titan strength
                         value.add( (6 * enemyPointValue)
-                            / TerrainRecruitLoader.getTitanImprovementValue(), "Explanation Here");
+                            / TerrainRecruitLoader.getTitanImprovementValue(), "Fraction Titan Strength 2");
                         // but we lose this group
-                        value.add( - (20 * legion.getPointValue()) / 100, "Explanation Here");
+                        value.add( - (20 * legion.getPointValue()) / 100, "Lost This Group");
                         // TODO: if we have no other angels, more penalty here
                         // TODO: if enemy titan, we also score half points
                         // (this may make the AI unfairly gun for your titan)
@@ -1248,13 +1235,13 @@ public class SimpleAI extends AbstractAI
                         }
                         else
                         {
-                            value.add( enemyPointValue / 6, "Explanation Here");
+                            value.add( enemyPointValue / 6, "Unfairly Assault Titan");
                         }
                     }
                     else
                     {
                         // otherwise no thanks
-                        value.add( LOSE_LEGION + 2, "Explanation Here");
+                        value.add( LOSE_LEGION + 2, "Lose Legion 2");
                     }
                     break;
 
@@ -1264,14 +1251,14 @@ public class SimpleAI extends AbstractAI
                         + " and LOSE_BUT_INFLICT_HEAVY_LOSSES");
 
                     // TODO: how important is it that we damage his group?
-                    value.add( LOSE_LEGION + 1, "Explanation Here");
+                    value.add( LOSE_LEGION + 1, "Lose Legion 3");
                     break;
 
                 case LOSE:
                     LOGGER.finest("legion " + legion + " can attack "
                         + enemyLegion + " in " + hex + " and LOSE");
 
-                    value.add( LOSE_LEGION, "Explanation Here");
+                    value.add( LOSE_LEGION, "Lose Legion 4");
                     break;
 
                 default:
@@ -1293,7 +1280,7 @@ public class SimpleAI extends AbstractAI
                 if (legion.getHeight() <= 5)
                 {
                     value.add( getHintedRecruitmentValue(recruit, legion,
-                        hintSectionUsed), "Explanation Here");
+                        hintSectionUsed), "Hinted Recruitment Value");
                 }
                 else if (legion.getHeight() == 6)
                 {
@@ -1383,7 +1370,7 @@ public class SimpleAI extends AbstractAI
 
                     value.add( (newPV - oldPV)
                         + getHintedRecruitmentValue(recruit, legion,
-                            hintSectionUsed), "Explanation Here");
+                            hintSectionUsed), "Hinted Recruitment Value 2");
                 }
                 else if (legion.getHeight() == 7)
                 {
@@ -1405,7 +1392,7 @@ public class SimpleAI extends AbstractAI
                         double POSSIBLE_SUMMON_FACTOR = 0.1;
                         value.add( (int)Math.round(POSSIBLE_SUMMON_FACTOR
                             * getHintedRecruitmentValue(recruit, legion,
-                                hintSectionUsed)), "Explanation Here");
+                                hintSectionUsed)), "Hinted Recruitment Value 3");
                     }
                 }
                 else
@@ -1422,10 +1409,9 @@ public class SimpleAI extends AbstractAI
         }
 
         // consider what we might be able to recruit next turn, from here
-        int nextTurnValue = 0;
-
         for (int roll = 1; roll <= 6; roll++)
         {
+            int nextTurnValue = 0;
             // XXX Should ignore friends.
             Set<MasterHex> moves = client.getMovement().listAllMoves(legion,
                 hex, roll);
@@ -1470,10 +1456,10 @@ public class SimpleAI extends AbstractAI
             }
 
             nextTurnValue += bestRecruitVal;
+            nextTurnValue /= 6; // 1/6 chance of each happening
+            value.add( nextTurnValue, "Next Turn Value (for roll " + roll + ")");
         }
 
-        nextTurnValue /= 6; // 1/6 chance of each happening
-        value.add( nextTurnValue, "Explanation Here");
 
         // consider risk of being attacked
         if (enemyAttackMap != null)
@@ -1532,7 +1518,7 @@ public class SimpleAI extends AbstractAI
                     risk = -legion.getPointValue() / 2.0 * chanceToAttack;
                 }
 
-                value.add( (int)Math.round(risk), "Explanation Here");
+                value.add( (int)Math.round(risk), "Risk (not the trademark)");
             }
         }
 

@@ -538,6 +538,28 @@ abstract public class AbstractAI implements AI
         }
     }
 
+    /** little helper to store info about possible moves */
+    protected class MoveInfo
+    {
+        final LegionClientSide legion;
+
+        /** hex to move to.  if hex == null, then this means sit still. */
+        final MasterHex hex;
+        final int value;
+        final int difference; // difference from sitting still
+        final ValueRecorder why; // explain value
+
+        MoveInfo(LegionClientSide legion, MasterHex hex, int value,
+            int difference, ValueRecorder why)
+        {
+            this.legion = legion;
+            this.hex = hex;
+            this.value = value;
+            this.difference = difference;
+            this.why = why;
+        }
+    }
+
     protected class ValueRecorder {
         private int value = 0;
         private StringBuffer why = new StringBuffer();
