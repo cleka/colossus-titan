@@ -363,6 +363,10 @@ public class BattleHex extends Hex
         return false;
     }
 
+    /**
+     * @warning wrong implementation, should delegate to HazardTerrain
+     *
+     */
     public boolean blocksLineOfSight()
     {
         return (terrain.equals(HazardTerrain.TREE) || terrain

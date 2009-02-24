@@ -510,6 +510,10 @@ public class CreatureServerSide extends Creature
         return attackerSkill;
     }
 
+    /** @deprecated another function with explicit reference to Bramble
+     * that should be fixed.
+     */
+    @Deprecated
     protected int countBrambleHexes(final BattleHex targetHex)
     {
         return battle.countBrambleHexes(getCurrentHex(), targetHex);
