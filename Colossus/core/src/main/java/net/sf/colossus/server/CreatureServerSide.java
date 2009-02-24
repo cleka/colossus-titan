@@ -441,12 +441,10 @@ public class CreatureServerSide extends Creature
         // Skill can be modified by terrain.
         if (!rangestrike)
         {
-            // Non-native striking out of bramble: -1
-            if (hex.getTerrain().equals(HazardTerrain.BRAMBLES)
-                && !isNativeBramble())
-            {
-                attackerSkill--;
-            }
+            // striking out of possible hazard
+            attackerSkill -=
+                     hex.getTerrain().getSkillPenaltyStrikeFrom(
+                       this.isNativeTerrain(hex.getTerrain()));
 
             if (hex.getElevation() > targetHex.getElevation())
             {
