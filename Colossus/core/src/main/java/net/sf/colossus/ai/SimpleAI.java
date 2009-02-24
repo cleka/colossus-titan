@@ -2182,37 +2182,6 @@ public class SimpleAI extends AbstractAI
         return val;
     }
 
-    static int getKillValue(final CreatureType creature)
-    {
-        return getKillValue(creature, null);
-    }
-
-    // XXX titan power
-    static int getKillValue(final BattleChit chit,
-        final MasterBoardTerrain terrain)
-    {
-        return getKillValue(chit.getCreature(), terrain);
-    }
-
-    private static int getKillValue(final CreatureType creature,
-        MasterBoardTerrain terrain)
-    {
-        int val;
-        if (creature == null)
-        {
-            LOGGER.warning("Called getKillValue with null creature");
-            return 0;
-        }
-        // get non-terrain modified part of kill value
-        val = creature.getKillValue();
-        // modify with terrain
-        if (terrain != null && terrain.hasNativeCombatBonus(creature))
-        {
-            val += 3;
-        }
-        return val;
-    }
-
     protected class PowerSkill
     {
         private final String name;

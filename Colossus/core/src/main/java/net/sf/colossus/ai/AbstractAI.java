@@ -30,6 +30,7 @@ import net.sf.colossus.util.DevRandom;
 
 import net.sf.colossus.util.Probs;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;
 
@@ -51,6 +52,7 @@ import net.sf.colossus.variant.Variant;
 abstract public class AbstractAI implements AI
 {    
     protected BattleEvalConstants bec = new BattleEvalConstants();
+    protected CreatureValueConstants cvc = new CreatureValueConstants();
     
     /** The Client we're working for. */
     final protected Client client;
@@ -219,7 +221,44 @@ abstract public class AbstractAI implements AI
         return byCreature;
     }
 
-    /** Various constans used by the AIs code.
+    /** Get the 'kill value' of a creature on a specific terrain.
+     * @param chit The BattleChit whose value is requested.
+     * @param terrain The terrain on which the value is requested, or null.
+     * @return The 'kill value' value of chit, on terrain if non-null
+     */
+    protected int getKillValue(final BattleChit chit, final MasterBoardTerrain terrain) {
+        return getKillValue(chit.getCreature(), terrain);
+    }
+
+    /** Get the 'kill value' of a creature on an unspecified terrain.
+     * @param creature The CreatureType whose value is requested.
+     * @return The 'kill value' value of creature.
+     */
+    protected int getKillValue(final CreatureType creature) {
+        return getKillValue(creature, null);
+    }
+
+    /** Get the 'kill value' of a creature on a specific terrain.
+     * @param creature The CreatureType whose value is requested.
+     * @param terrain The terrain on which the value is requested, or null
+     * @return The 'kill value' value of chit, on terrain if non-null
+     */
+    private int getKillValue(final CreatureType creature, MasterBoardTerrain terrain) {
+        int val;
+        if (creature == null) {
+            LOGGER.warning("Called getKillValue with null creature");
+            return 0;
+        }
+        // get non-terrain modified part of kill value
+        val = creature.getKillValue();
+        // modify with terrain
+        if (terrain != null && terrain.hasNativeCombatBonus(creature)) {
+            val += cvc.HAS_NATIVE_COMBAT_BONUS;
+        }
+        return val;
+    }
+
+    /** Various constants used by the AIs code for battle evaluation.
      * Each specific AI should be able to override them
      * to tweak the evaluation results w/o rewriting the code.
      */
@@ -259,6 +298,14 @@ abstract public class AbstractAI implements AI
         int DEF__NOBODY_GETS_HURT = 2000;
         int DEF__NOONE_IS_GANGBANGED = 200;
         int DEF__AT_MOST_ONE_IS_REACHABLE = 100;
+    }
+    /** Various constants used by the AIs code for creature evaluation.
+     * Each specific AI should be able to override them
+     * to tweak the evaluation results w/o rewriting the code.
+     */
+    protected class CreatureValueConstants
+    {
+        int HAS_NATIVE_COMBAT_BONUS = 3;
     }
 
     /** Test whether a Legion belongs to a Human player */
