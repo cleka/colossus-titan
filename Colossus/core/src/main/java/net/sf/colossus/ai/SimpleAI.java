@@ -91,7 +91,14 @@ public class SimpleAI extends AbstractAI
      * This is a Map<String,TerrainBonuses>.
      *
      * TODO: this shouldn't be here, this is a property of the Variant player
-     * (well, not yet, but it should be, someday).
+     * (well, not yet for Hazard, but it should be, someday).
+     * Actually, this doesn't make sense to me (RD). tower has bonus for
+     * both attacker & defender (because of walls, I assume), but is special-
+     * cased for attacker & defender. Brush and Jungle assumes Brushes, but
+     * Jungle has Tree, too. And the comments themselves makes clear that
+     * 'Sand' is actually 'Slope', but mixing up Attacker & Native and Defender
+     * & non-native.
+     * This and calcBonus should be reviewed thoroughly.
      */
     private static final Map<String, TerrainBonuses> TERRAIN_BONUSES = new HashMap<String, TerrainBonuses>();
     static

@@ -99,6 +99,7 @@ public class HazardTerrain extends Hazards
         return TERRAIN_MAP.values();
     }
 
+    /* genuine Titan Hazard */
     public static final HazardTerrain PLAINS = new HazardTerrain("Plains",
         ' ', EffectOnMovement.FREEMOVE, EffectOnMovement.FREEMOVE,
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
@@ -164,6 +165,7 @@ public class HazardTerrain extends Hazards
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
         RangeStrikeSpecialEffect.RANGESTRIKEFREE, SpecialEffect.NOSPECIAL);
 
+    /* extra standard Colossus hazard */
     public static final HazardTerrain LAKE = new HazardTerrain("Lake", 'l',
         EffectOnMovement.BLOCKFOREIGNER, EffectOnMovement.FREEMOVE,
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
