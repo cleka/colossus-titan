@@ -867,7 +867,7 @@ public final class Strike
             char hexside = hex.getHexside(direction);
 
             // Native striking down a dune hexside: +2
-            if (hexside == 'd' && striker.isNativeIn(HazardTerrain.SAND))
+            if (hexside == 'd' && striker.isNativeDune())
             {
                 dice += 2;
             }
@@ -877,7 +877,7 @@ public final class Strike
                 dice++;
             }
             // Non-native striking up a dune hexside: -1
-            else if (!striker.isNativeIn(HazardTerrain.SAND)
+            else if (!striker.isNativeDune()
                 && hex.getOppositeHexside(direction) == 'd')
             {
                 dice--;

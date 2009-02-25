@@ -261,7 +261,7 @@ public class BattleTerrainHazardWindow extends KDialog
             else
             {
                 if ((hazard.equals(HazardHexside.DUNE) && creature
-                    .isNativeIn(HazardTerrain.SAND))
+                    .isNativeDune())
                     || (hazard.equals(HazardHexside.SLOPE) && creature
                         .isNativeSlope())
                     || (hazard.equals(HazardHexside.RIVER) && creature

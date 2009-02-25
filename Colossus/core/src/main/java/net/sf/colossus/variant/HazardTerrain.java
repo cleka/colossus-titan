@@ -391,4 +391,10 @@ public class HazardTerrain extends Hazards
     public boolean blocksLineOfSight() {
         return rangeStrikeSpecial == RangeStrikeSpecialEffect.RANGESTRIKEBLOCKED;
     }
+    public boolean isDamagingToNonNative() {
+        return this.terrainSpecial == SpecialEffect.HEALTHDRAIN;
+    }
+    public boolean isDamagingToWaterDweller() {
+        return this.terrainSpecial == SpecialEffect.HEALTHDRAIN_WATERDWELLER;
+    }
 }

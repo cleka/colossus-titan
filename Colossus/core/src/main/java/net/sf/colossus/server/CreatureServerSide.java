@@ -409,7 +409,7 @@ public class CreatureServerSide extends Creature
             char hexside = hex.getHexside(direction);
 
             // Native striking down a dune hexside: +2
-            if (hexside == 'd' && isNativeSandDune())
+            if (hexside == 'd' && isNativeDune())
             {
                 dice += 2;
             }
@@ -419,7 +419,7 @@ public class CreatureServerSide extends Creature
                 dice++;
             }
             // Non-native striking up a dune hexside: -1
-            else if (!isNativeSandDune()
+            else if (!isNativeDune()
                 && hex.getOppositeHexside(direction) == 'd')
             {
                 dice--;
@@ -979,10 +979,16 @@ public class CreatureServerSide extends Creature
      * isNativeTerrain(<HazardTerrain>) instead, with no explicit reference
      * to the name. This will ease adding new HazardTerrain in variant.
      */
+    /*
     @Deprecated
     public boolean isNativeSandDune()
     {
         return getType().isNativeIn(HazardTerrain.SAND);
+    }
+    */
+    public boolean isNativeDune()
+    {
+        return getType().isNativeDune();
     }
 
     public boolean isNativeSlope()
