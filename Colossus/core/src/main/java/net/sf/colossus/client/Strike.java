@@ -715,7 +715,11 @@ public final class Strike
 
     /** Return the number of intervening bramble hexes.  If LOS is along a
      *  hexspine, go left if argument left is true, right otherwise.  If
-     *  LOS is blocked, return a large number. */
+     *  LOS is blocked, return a large number.
+     * @deprecated another function with explicit reference to Bramble
+     * that should be fixed.
+     */
+    @Deprecated
     private int countBrambleHexesDir(BattleHex hex1, BattleHex hex2,
         boolean left, int previousCount)
     {
@@ -750,8 +754,12 @@ public final class Strike
         return countBrambleHexesDir(nextHex, hex2, left, count);
     }
 
-    // Return the number of intervening bramble hexes.  If LOS is along a
-    // hexspine and there are two choices, pick the lower one.
+    /** Return the number of intervening bramble hexes.  If LOS is along a
+     * hexspine and there are two choices, pick the lower one.
+     * @deprecated another function with explicit reference to Bramble
+     * that should be fixed.
+     */
+    @Deprecated
     private int countBrambleHexes(BattleHex hex1, BattleHex hex2)
     {
         if (hex1 == hex2)
