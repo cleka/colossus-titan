@@ -121,7 +121,7 @@ public class HazardTerrain extends Hazards
         return TERRAIN_MAP.values();
     }
 
-    /* ALL the static objects here should be protected (or even private),
+    /* ALL the static objects here should be package private (or even protected),
      * no-one should do direct access. That's why the static accessor
      * are for.
      * The main problems before this becomes possible are:
@@ -131,7 +131,7 @@ public class HazardTerrain extends Hazards
      */
 
     /* genuine Titan Hazard */
-    protected static final HazardTerrain PLAINS = new HazardTerrain("Plains",
+    static final HazardTerrain PLAINS = new HazardTerrain("Plains",
         ' ', EffectOnMovement.FREEMOVE, EffectOnMovement.FREEMOVE,
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
@@ -185,7 +185,7 @@ public class HazardTerrain extends Hazards
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
         RangeStrikeSpecialEffect.RANGESTRIKEFREE, SpecialEffect.NOSPECIAL);
 
-    public static final HazardTerrain SAND = new HazardTerrain("Sand", 's',
+    static final HazardTerrain SAND = new HazardTerrain("Sand", 's',
         EffectOnMovement.SLOWFOREIGNER, EffectOnMovement.FREEMOVE,
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,

@@ -886,7 +886,8 @@ public final class Strike
 
         return dice;
     }
-
+    
+    /** WARNING: this is duplicated in CreatureServerSide */
     private int getAttackerSkill(BattleChit striker, BattleChit target)
     {
         BattleHex hex = client.getBattleHex(striker);
@@ -899,13 +900,11 @@ public final class Strike
         // Skill can be modified by terrain.
         if (!rangestrike)
         {
-            // Non-native striking out of bramble: -1
             HazardTerrain terrain = hex.getTerrain();
-            if (terrain.isNonNativePenaltyTerrain()
-                && !striker.getCreature().isNativeIn(terrain))
-            {
-                attackerSkill--;
-            }
+            // striking out of possible hazard
+            attackerSkill -=
+                     hex.getTerrain().getSkillPenaltyStrikeFrom(
+                       striker.getCreature().isNativeIn(hex.getTerrain()));
 
             if (hex.getElevation() > targetHex.getElevation())
             {
@@ -970,6 +969,7 @@ public final class Strike
         return attackerSkill;
     }
 
+    /** WARNING: this is duplicated in CreatureServerSide */
     public int getStrikeNumber(BattleChit striker, BattleChit target)
     {
         boolean rangestrike = !client.isInContact(striker, true);
@@ -979,47 +979,31 @@ public final class Strike
 
         int strikeNumber = 4 - attackerSkill + defenderSkill;
 
-        // Note: the code for 
-        //    "Non-Native striking out of bramble: +1"
-        // removed because the getAttackerSkill was fixed to take care
-        // of that, same as it is done in server side code
+        HazardTerrain terrain = client.getBattleHex(target).getTerrain();
 
-        // Strike number can be modified directly by terrain.
-        
-        // Target native defending in bramble, from strike by a non-native: +1
-        // Target Native defending in bramble, from rangestrike by a non-native
-        //     non-magicMissile: +1
-        if (client.getBattleHex(target).getTerrain().equals(
-            HazardTerrain.BRAMBLES)
-            && target.getCreature().isNativeIn(HazardTerrain.BRAMBLES)
-            && !striker.getCreature().isNativeIn(HazardTerrain.BRAMBLES)
-            && !(rangestrike && striker.getCreature().useMagicMissile()))
-        {
-            strikeNumber++;
-        }
+        if (!rangestrike) {
+            // Strike number can be modified directly by terrain.
+            strikeNumber += terrain.getSkillBonusStruckIn(
+                    striker.getCreature().isNativeIn(terrain),
+                    target.getCreature().isNativeIn(terrain));
+        } else {
+            // Native defending in bramble, from rangestrike by a non-native
+            //     non-magicMissile: +1
+            if (terrain.equals(HazardTerrain.BRAMBLES) &&
+                    target.getCreature().isNativeIn(HazardTerrain.BRAMBLES) &&
+                    !striker.getCreature().isNativeIn(HazardTerrain.BRAMBLES) &&
+                    !striker.getCreature().useMagicMissile()) {
+                strikeNumber++;
+            }
 
-        // Native defending in stone, from strike by a non-native: +1
-        // Native defending in stone, from rangestrike by a non-native
-        //     non-magicMissile: +1
-        if (client.getBattleHex(target).getTerrain().equals(
-            HazardTerrain.STONE)
-            && target.getCreature().isNativeIn(HazardTerrain.STONE)
-            && !striker.getCreature().isNativeIn(HazardTerrain.STONE)
-            && !(rangestrike && striker.getCreature().useMagicMissile()))
-        {
-            strikeNumber++;
-        }
-
-        // Native defending in tree, from strike by a non-native: +1
-        // Native defending in tree, from rangestrike by a non-native
-        //     non-magicMissile: no effect
-        if (client.getBattleHex(target).getTerrain()
-            .equals(HazardTerrain.TREE)
-            && target.getCreature().isNativeIn(HazardTerrain.TREE)
-            && !striker.getCreature().isNativeIn(HazardTerrain.TREE)
-            && !(rangestrike))
-        {
-            strikeNumber++;
+            // Native defending in stone, from rangestrike by a non-native
+            //     non-magicMissile: +1
+            if (terrain.equals(HazardTerrain.STONE) &&
+                    target.getCreature().isNativeIn(HazardTerrain.STONE) &&
+                    !striker.getCreature().isNativeIn(HazardTerrain.STONE) &&
+                    !striker.getCreature().useMagicMissile()) {
+                strikeNumber++;
+            }
         }
 
         // Sixes always hit.

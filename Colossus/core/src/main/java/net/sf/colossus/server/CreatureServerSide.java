@@ -428,7 +428,8 @@ public class CreatureServerSide extends Creature
 
         return dice;
     }
-
+    
+    /** WARNING: this is duplicated in Strike */
     private int getAttackerSkill(CreatureServerSide target)
     {
         BattleHex hex = getCurrentHex();
@@ -519,6 +520,7 @@ public class CreatureServerSide extends Creature
         return battle.countBrambleHexes(getCurrentHex(), targetHex);
     }
 
+    /** WARNING: this is duplicated in Strike */
     protected int getStrikeNumber(CreatureServerSide target)
     {
         boolean rangestrike = !isInContact(true);
@@ -1022,11 +1024,13 @@ public class CreatureServerSide extends Creature
      * isNativeTerrain(<HazardTerrain>) instead, with no explicit reference
      * to the name. This will ease adding new HazardTerrain in variant.
      */
+    /*
     @Deprecated
     public boolean isNativeTree()
     {
         return getType().isNativeIn(HazardTerrain.TREE);
     }
+    */
 
     public boolean isWaterDwelling()
     {
