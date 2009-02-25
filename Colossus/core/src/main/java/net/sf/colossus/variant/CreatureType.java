@@ -366,40 +366,6 @@ public class CreatureType
         }
     }
 
-    public int getStrikingSkill(CreatureType target,
-            int myElevation,
-            int targetElevation,
-            HazardTerrain myHexTerrain,
-            HazardTerrain targetHexTerrain,
-            HazardHexside myHexside,
-            HazardHexside targetHexside) {
-        int attackerSkill = getSkill();
-
-        // Skill can be modified by terrain.
-        // striking out of possible hazard
-        attackerSkill -=
-                myHexTerrain.getSkillPenaltyStrikeFrom(
-                this.isNativeIn(myHexTerrain));
-
-        if (myElevation > targetElevation) {
-            // Striking down across wall: +1
-            if (myHexside.equals(HazardHexside.TOWER)) {
-                attackerSkill++;
-            }
-        } else if (myElevation < targetElevation) {
-            // Non-native striking up slope: -1
-            // Striking up across wall: -1
-            if ((targetHexside.equals(HazardHexside.SLOPE) &&
-                    !isNativeSlope()) ||
-                    targetHexside.equals(HazardHexside.TOWER)) {
-                attackerSkill--;
-            }
-        }
-
-
-        return attackerSkill;
-    }
-
     /** 
      * Get the non-terrainified part of the kill-value.
      * 
