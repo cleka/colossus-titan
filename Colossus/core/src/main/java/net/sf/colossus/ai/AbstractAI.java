@@ -1,6 +1,5 @@
 package net.sf.colossus.ai;
 
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -51,10 +50,10 @@ import net.sf.colossus.variant.Variant;
  * @author Bruce Sherrod, David Ripton, Romain Dolbeau, Corwin Joy
  */
 abstract public class AbstractAI implements AI
-{    
+{
+
     protected BattleEvalConstants bec = new BattleEvalConstants();
     protected CreatureValueConstants cvc = new CreatureValueConstants();
-    
     /** The Client we're working for. */
     final protected Client client;
     /** Our random source. */
@@ -62,24 +61,38 @@ abstract public class AbstractAI implements AI
     /** for the Oracle Hint tuff, the section we use.
      * This can be replaced by AI implementation.
      */
-    protected String[] hintSectionUsed = { Constants.sectionOffensiveAI };
+    protected String[] hintSectionUsed =
+    {
+        Constants.sectionOffensiveAI
+    };
 
-    protected AbstractAI(Client client) {
+    protected AbstractAI(Client client)
+    {
         this.client = client;
     }
 
-    final public CreatureType getVariantRecruitHint(LegionClientSide legion, MasterHex hex, List<CreatureType> recruits) {
-        String recruitName = VariantSupport.getRecruitHint(hex.getTerrain(), legion, recruits, new AbstractAIOracle(legion, hex, recruits), hintSectionUsed);
-        if (recruitName == null) {
+    final public CreatureType getVariantRecruitHint(LegionClientSide legion,
+            MasterHex hex, List<CreatureType> recruits)
+    {
+        String recruitName = VariantSupport.getRecruitHint(hex.getTerrain(),
+                legion, recruits, new AbstractAIOracle(legion, hex, recruits),
+                hintSectionUsed);
+        if (recruitName == null)
+        {
             return recruits.get(recruits.size() - 1);
         }
-        if ((recruitName.equals("nothing")) || (recruitName.equals("Nothing"))) {
+        if ((recruitName.equals("nothing")) || (recruitName.equals("Nothing")))
+        {
             // suggest recruiting nothing
             return null;
         }
-        CreatureType recruit = client.getGame().getVariant().getCreatureByName(recruitName);
-        if (!(recruits.contains(recruit))) {
-            LOGGER.warning("HINT: Invalid Hint for this variant ! (can\'t recruit " + recruitName + "; recruits=" + recruits.toString() + ") in " + hex.getTerrain());
+        CreatureType recruit =
+                client.getGame().getVariant().getCreatureByName(recruitName);
+        if (!(recruits.contains(recruit)))
+        {
+            LOGGER.warning("HINT: Invalid Hint for this variant !" +
+                    " (can\'t recruit " + recruitName + "; recruits=" +
+                    recruits.toString() + ") in " + hex.getTerrain());
             return recruits.get(recruits.size() - 1);
         }
         return recruit;
@@ -90,37 +103,58 @@ abstract public class AbstractAI implements AI
      *  array with a list or model some intermediate classes
      */
     @SuppressWarnings(value = "unchecked")
-    final protected Map<MasterHex, List<Legion>>[] buildEnemyAttackMap(Player player) {
-        Map<MasterHex, List<Legion>>[] enemyMap = (Map<MasterHex, List<Legion>>[]) new HashMap<?, ?>[7];
-        for (int i = 1; i <= 6; i++) {
+    final protected Map<MasterHex, List<Legion>>[] buildEnemyAttackMap(
+            Player player)
+    {
+        Map<MasterHex, List<Legion>>[] enemyMap =
+                (Map<MasterHex, List<Legion>>[]) new HashMap<?, ?>[7];
+        for (int i = 1; i <= 6; i++)
+        {
             enemyMap[i] = new HashMap<MasterHex, List<Legion>>();
         }
         // for each enemy player
-        for (PlayerClientSide enemyPlayer : client.getPlayers()) {
-            if (enemyPlayer == player) {
+        for (PlayerClientSide enemyPlayer : client.getPlayers())
+        {
+            if (enemyPlayer == player)
+            {
                 continue;
             }
             // for each legion that player controls
-            for (LegionClientSide legion : enemyPlayer.getLegions()) {
+            for (LegionClientSide legion : enemyPlayer.getLegions())
+            {
                 // for each movement roll he might make
-                for (int roll = 1; roll <= 6; roll++) {
+                for (int roll = 1; roll <= 6; roll++)
+                {
                     // count the moves he can get to
                     Set<MasterHex> set;
                     // Only allow Titan teleport
                     // Remember, tower teleports cannot attack
-                    if (legion.hasTitan() && legion.getPlayer().canTitanTeleport() && client.getMovement().titanTeleportAllowed()) {
-                        set = client.getMovement().listAllMoves(legion, legion.getCurrentHex(), roll);
-                    } else {
-                        set = client.getMovement().listNormalMoves(legion, legion.getCurrentHex(), roll);
+                    if (legion.hasTitan() &&
+                            legion.getPlayer().canTitanTeleport() &&
+                            client.getMovement().titanTeleportAllowed())
+                    {
+                        set = client.getMovement().listAllMoves(legion,
+                                legion.getCurrentHex(), roll);
                     }
-                    for (MasterHex hex : set) {
-                        for (int effectiveRoll = roll; effectiveRoll <= 6; effectiveRoll++) {
+                    else
+                    {
+                        set = client.getMovement().listNormalMoves(legion,
+                                legion.getCurrentHex(), roll);
+                    }
+                    for (MasterHex hex : set)
+                    {
+                        for (int effectiveRoll = roll;
+                                effectiveRoll <= 6;
+                                effectiveRoll++)
+                        {
                             // legion can attack to hexlabel on a effectiveRoll
                             List<Legion> list = enemyMap[effectiveRoll].get(hex);
-                            if (list == null) {
+                            if (list == null)
+                            {
                                 list = new ArrayList<Legion>();
                             }
-                            if (list.contains(legion)) {
+                            if (list.contains(legion))
+                            {
                                 continue;
                             }
                             list.add(legion);
@@ -133,20 +167,29 @@ abstract public class AbstractAI implements AI
         return enemyMap;
     }
 
-    final protected int getNumberOfWaysToTerrain(LegionClientSide legion, MasterHex hex, String terrainTypeName) {
+    final protected int getNumberOfWaysToTerrain(LegionClientSide legion,
+            MasterHex hex, String terrainTypeName)
+    {
         int total = 0;
-        for (int roll = 1; roll <= 6; roll++) {
-            Set<MasterHex> tempset = client.getMovement().listAllMoves(legion, hex, roll, true);
-            if (doesSetContainsHexWithTerrain(tempset, terrainTypeName)) {
+        for (int roll = 1; roll <= 6; roll++)
+        {
+            Set<MasterHex> tempset = client.getMovement().listAllMoves(legion,
+                    hex, roll, true);
+            if (doesSetContainsHexWithTerrain(tempset, terrainTypeName))
+            {
                 total++;
             }
         }
         return total;
     }
 
-    final protected boolean doesSetContainsHexWithTerrain(Set<MasterHex> set, String terrainTypeName) {
-        for (MasterHex hex : set) {
-            if (hex.getTerrain().getDisplayName().equals(terrainTypeName)) {
+    final protected boolean doesSetContainsHexWithTerrain(Set<MasterHex> set,
+            String terrainTypeName)
+    {
+        for (MasterHex hex : set)
+        {
+            if (hex.getTerrain().getDisplayName().equals(terrainTypeName))
+            {
                 return true;
             }
         }
@@ -157,15 +200,21 @@ abstract public class AbstractAI implements AI
      * Return a map of target hex label to number
      * of friendly creatures that can strike it
      */
-    final protected Map<String, Integer> findStrikeMap() {
+    final protected Map<String, Integer> findStrikeMap()
+    {
         Map<String, Integer> map = new HashMap<String, Integer>();
-        for (BattleChit critter : client.getActiveBattleChits()) {
+        for (BattleChit critter : client.getActiveBattleChits())
+        {
             Set<String> targets = client.findStrikes(critter.getTag());
-            for (String hexLabel : targets) {
+            for (String hexLabel : targets)
+            {
                 Integer old = map.get(hexLabel);
-                if (old == null) {
+                if (old == null)
+                {
                     map.put(hexLabel, Integer.valueOf(1));
-                } else {
+                }
+                else
+                {
                     map.put(hexLabel, Integer.valueOf(old.intValue() + 1));
                 }
             }
@@ -177,20 +226,26 @@ abstract public class AbstractAI implements AI
      * Create a map containing each target and the number of hits it would
      * likely take if all possible creatures attacked it.
      */
-    final protected Map<BattleChit, Double> generateDamageMap() {
+    final protected Map<BattleChit, Double> generateDamageMap()
+    {
         Map<BattleChit, Double> map = new HashMap<BattleChit, Double>();
-        for (BattleChit critter : client.getActiveBattleChits()) {
+        for (BattleChit critter : client.getActiveBattleChits())
+        {
             // Offboard critters can't strike.
-            if (critter.getCurrentHexLabel().startsWith("X")) {
+            if (critter.getCurrentHexLabel().startsWith("X"))
+            {
                 continue;
             }
             Set<String> set = client.findStrikes(critter.getTag());
-            for (String hexLabel : set) {
+            for (String hexLabel : set)
+            {
                 BattleChit target = client.getBattleChit(hexLabel);
                 int dice = client.getStrike().getDice(critter, target);
-                int strikeNumber = client.getStrike().getStrikeNumber(critter, target);
+                int strikeNumber =
+                        client.getStrike().getStrikeNumber(critter, target);
                 double h = Probs.meanHits(dice, strikeNumber);
-                if (map.containsKey(target)) {
+                if (map.containsKey(target))
+                {
                     double d = map.get(target).doubleValue();
                     h += d;
                 }
@@ -205,16 +260,23 @@ abstract public class AbstractAI implements AI
      * @param hex The masterboard hex where the split occurs.
      * @return The List of Creaturetype to split.
      */
-    final protected List<CreatureType> getInitialSplitHint(MasterHex hex) {
-        List<String> byName = VariantSupport.getInitialSplitHint(hex, hintSectionUsed);
-        if (byName == null) {
+    final protected List<CreatureType> getInitialSplitHint(MasterHex hex)
+    {
+        List<String> byName = VariantSupport.getInitialSplitHint(hex,
+                hintSectionUsed);
+        if (byName == null)
+        {
             return null;
         }
         List<CreatureType> byCreature = new ArrayList<CreatureType>();
-        for (String name : byName) {
-            CreatureType cre = client.getGame().getVariant().getCreatureByName(name);
-            if (cre == null) {
-                LOGGER.severe("HINT: Unknown creature in hint (" + name + "), aborting.");
+        for (String name : byName)
+        {
+            CreatureType cre = client.getGame().getVariant().getCreatureByName(
+                    name);
+            if (cre == null)
+            {
+                LOGGER.severe("HINT: Unknown creature in hint (" + name +
+                        "), aborting.");
                 return null;
             }
             byCreature.add(cre);
@@ -227,7 +289,9 @@ abstract public class AbstractAI implements AI
      * @param terrain The terrain on which the value is requested, or null.
      * @return The 'kill value' value of chit, on terrain if non-null
      */
-    protected int getKillValue(final BattleChit chit, final MasterBoardTerrain terrain) {
+    protected int getKillValue(final BattleChit chit,
+            final MasterBoardTerrain terrain)
+    {
         return getKillValue(chit.getCreature(), terrain);
     }
 
@@ -235,7 +299,8 @@ abstract public class AbstractAI implements AI
      * @param creature The CreatureType whose value is requested.
      * @return The 'kill value' value of creature.
      */
-    protected int getKillValue(final CreatureType creature) {
+    protected int getKillValue(final CreatureType creature)
+    {
         return getKillValue(creature, null);
     }
 
@@ -244,16 +309,20 @@ abstract public class AbstractAI implements AI
      * @param terrain The terrain on which the value is requested, or null
      * @return The 'kill value' value of chit, on terrain if non-null
      */
-    private int getKillValue(final CreatureType creature, MasterBoardTerrain terrain) {
+    private int getKillValue(final CreatureType creature,
+            MasterBoardTerrain terrain)
+    {
         int val;
-        if (creature == null) {
+        if (creature == null)
+        {
             LOGGER.warning("Called getKillValue with null creature");
             return 0;
         }
         // get non-terrain modified part of kill value
         val = creature.getKillValue();
         // modify with terrain
-        if (terrain != null && terrain.hasNativeCombatBonus(creature)) {
+        if (terrain != null && terrain.hasNativeCombatBonus(creature))
+        {
             val += cvc.HAS_NATIVE_COMBAT_BONUS;
         }
         return val;
@@ -266,6 +335,7 @@ abstract public class AbstractAI implements AI
     protected class BattleEvalConstants
     {
         /* per critter */
+
         int OFFBOARD_DEATH_SCALE_FACTOR = -150;
         int NATIVE_BONUS_TERRAIN = 40; // 50 -- old value
         int NATIVE_BOG = 20;
@@ -310,12 +380,14 @@ abstract public class AbstractAI implements AI
          */
         int DEF__AT_MOST_ONE_IS_REACHABLE = 100;
     }
+
     /** Various constants used by the AIs code for creature evaluation.
      * Each specific AI should be able to override them
      * to tweak the evaluation results w/o rewriting the code.
      */
     protected class CreatureValueConstants
     {
+
         /** Bonus to the 'kill value' when the terrain offer a bonus
          * in combat to the creature.
          * 0 by default, so the default 'kill value' is the 'kill value'
@@ -328,12 +400,13 @@ abstract public class AbstractAI implements AI
     /** Test whether a Legion belongs to a Human player */
     final protected boolean isHumanLegion(Legion legion)
     {
-        return !((PlayerClientSide)legion.getPlayer()).isAI();
+        return !((PlayerClientSide) legion.getPlayer()).isAI();
     }
+
     /** Test whether a Legion belongs to an AI player */
     final protected boolean isAILegion(Legion legion)
     {
-        return  ((PlayerClientSide)legion.getPlayer()).isAI();
+        return ((PlayerClientSide) legion.getPlayer()).isAI();
     }
 
     /** Get the variant played */
@@ -342,19 +415,21 @@ abstract public class AbstractAI implements AI
         return this.client.getGame().getVariant();
     }
 
-    final protected boolean hasOpponentNativeCreature(HazardTerrain terrain) {
-        boolean honc  = false;
-        for (BattleChit critter : client.getInactiveBattleChits()) {
-            if (critter.getCreature().isNativeIn(terrain)) {
+    final protected boolean hasOpponentNativeCreature(HazardTerrain terrain)
+    {
+        boolean honc = false;
+        for (BattleChit critter : client.getInactiveBattleChits())
+        {
+            if (critter.getCreature().isNativeIn(terrain))
+            {
                 honc = true;
                 break;
             }
         }
         return honc;
     }
-
-
-    final static private Logger LOGGER = Logger.getLogger(AbstractAI.class.getName());
+    final static private Logger LOGGER = Logger.getLogger(AbstractAI.class.
+            getName());
 
     /** allCritterMoves is a List of sorted MoveLists.  A MoveList is a
      *  sorted List of CritterMoves for one critter.  Return a sorted List
@@ -367,10 +442,10 @@ abstract public class AbstractAI implements AI
      *  algorithm is in nestForLoop)
      */
     final protected Collection<LegionMove> generateLegionMoves(
-        final List<List<CritterMove>> allCritterMoves, boolean forceAll)
+            final List<List<CritterMove>> allCritterMoves, boolean forceAll)
     {
         List<List<CritterMove>> critterMoves = new ArrayList<List<CritterMove>>(
-            allCritterMoves);
+                allCritterMoves);
         while (trimCritterMoves(critterMoves))
         {// Just trimming
         }
@@ -381,15 +456,16 @@ abstract public class AbstractAI implements AI
 
         nestForLoop(indexes, indexes.length, critterMoves, legionMoves, forceAll);
 
-        LOGGER.finest("findLegionMoves got " + legionMoves.size() + " legion moves");
+        LOGGER.finest("findLegionMoves got " + legionMoves.size() +
+                " legion moves");
         return legionMoves;
     }
-
     /** Set of hex name, to check for duplicates.
      * I assume the reason it is a class variable and not a local variable
      * inside the function is performance (avoiding creation/recreation).
      */
     final private Set<String> duplicateHexChecker = new HashSet<String>();
+
     /** Private helper for generateLegionMoves
      *  If forceAll is true, generate all possible moves. Otherwise,
      *  this function tries to limit the number of moves.
@@ -401,8 +477,8 @@ abstract public class AbstractAI implements AI
      *  on a not-so-good choice).
      */
     final private void nestForLoop(int[] indexes, final int level,
-        final List<List<CritterMove>> critterMoves,
-        List<LegionMove> legionMoves, boolean forceAll)
+            final List<List<CritterMove>> critterMoves,
+            List<LegionMove> legionMoves, boolean forceAll)
     {
         // TODO See if doing the set test at every level is faster than
         // always going down to level 0 then checking.
@@ -446,7 +522,7 @@ abstract public class AbstractAI implements AI
         }
         else
         {
-            int howmany = critterMoves.get(level-1).size();
+            int howmany = critterMoves.get(level - 1).size();
             int size = critterMoves.size();
             // try and limit combinatorial explosion
             // criterions here:
@@ -454,19 +530,30 @@ abstract public class AbstractAI implements AI
             // 2) not too many moves in total...
             int thresh = level + 1; // default: a bit more than the minimum
             if (size < 5)
+            {
                 thresh = level + 16;
+            }
             else if (size < 6)
+            {
                 thresh = level + 8;
+            }
             else if (size < 7)
+            {
                 thresh = level + 3;
+            }
             if (thresh < level) // safety belt... for older codes.
+            {
                 thresh = level;
+            }
             if (!forceAll && (howmany > thresh))
+            {
                 howmany = thresh;
+            }
             for (int i = 0; i < howmany; i++)
             {
-                indexes[level-1] = i;
-                nestForLoop(indexes, level - 1, critterMoves, legionMoves, forceAll);
+                indexes[level - 1] = i;
+                nestForLoop(indexes, level - 1, critterMoves, legionMoves,
+                        forceAll);
             }
         }
     }
@@ -477,7 +564,7 @@ abstract public class AbstractAI implements AI
      *  MoveList. The CritterMove is selected by the index.
      */
     final static LegionMove makeLegionMove(int[] indexes,
-        List<List<CritterMove>> critterMoves)
+            List<List<CritterMove>> critterMoves)
     {
         LegionMove lm = new LegionMove();
         for (int i = 0; i < indexes.length; i++)
@@ -490,7 +577,8 @@ abstract public class AbstractAI implements AI
     }
 
     /** Modify allCritterMoves in place, and return true if it changed. */
-    final protected boolean trimCritterMoves(List<List<CritterMove>> allCritterMoves)
+    final protected boolean trimCritterMoves(
+            List<List<CritterMove>> allCritterMoves)
     {
         Set<String> takenHexLabels = new HashSet<String>(); // XXX reuse?
         boolean changed = false;
@@ -529,16 +617,16 @@ abstract public class AbstractAI implements AI
         return changed;
     }
 
-
     protected class AbstractAIOracle implements HintOracleInterface
     {
+
         LegionClientSide legion;
         MasterHex hex;
         List<CreatureType> recruits;
         Map<MasterHex, List<Legion>>[] enemyAttackMap = null;
 
         AbstractAIOracle(LegionClientSide legion, MasterHex hex,
-            List<CreatureType> recruits2)
+                List<CreatureType> recruits2)
         {
             this.legion = legion;
             this.hex = hex;
@@ -560,8 +648,8 @@ abstract public class AbstractAI implements AI
             // Still TODO ?
             //      Fixed "Griffon vs. Griffin" in Undead, which was the
             //      reason in all cases I got that exception (Clemens).
-            CreatureType type = client.getGame().getVariant()
-                .getCreatureByName(name);
+            CreatureType type = client.getGame().getVariant().getCreatureByName(
+                    name);
             int count = client.getReservedRemain(type);
             return count;
         }
@@ -576,7 +664,7 @@ abstract public class AbstractAI implements AI
 
                     for (String name : allNames)
                     {
-                        if (((LegionClientSide)other).numCreature(name) <= 0)
+                        if (((LegionClientSide) other).numCreature(name) <= 0)
                         {
                             hasAll = false;
                         }
@@ -598,8 +686,8 @@ abstract public class AbstractAI implements AI
 
         public boolean canRecruit(String name)
         {
-            return recruits.contains(client.getGame().getVariant()
-                .getCreatureByName(name));
+            return recruits.contains(client.getGame().getVariant().
+                    getCreatureByName(name));
         }
 
         public int stackHeight()
@@ -621,8 +709,8 @@ abstract public class AbstractAI implements AI
             int worst = 0;
             for (int i = 1; i < 6; i++)
             {
-                List<Legion> enemyList = enemyAttackMap[i].get(legion
-                    .getCurrentHex());
+                List<Legion> enemyList = enemyAttackMap[i].get(legion.
+                        getCurrentHex());
                 if (enemyList != null)
                 {
                     for (Legion enemy : enemyList)
@@ -641,8 +729,8 @@ abstract public class AbstractAI implements AI
     /** little helper to store info about possible moves */
     protected class MoveInfo
     {
-        final LegionClientSide legion;
 
+        final LegionClientSide legion;
         /** hex to move to.  if hex == null, then this means sit still. */
         final MasterHex hex;
         final int value;
@@ -650,7 +738,7 @@ abstract public class AbstractAI implements AI
         final ValueRecorder why; // explain value
 
         MoveInfo(LegionClientSide legion, MasterHex hex, int value,
-            int difference, ValueRecorder why)
+                int difference, ValueRecorder why)
         {
             this.legion = legion;
             this.hex = hex;
@@ -660,32 +748,41 @@ abstract public class AbstractAI implements AI
         }
     }
 
-    protected class ValueRecorder {
+    protected class ValueRecorder
+    {
+
         private int value = 0;
         private StringBuffer why = new StringBuffer();
 
-        public void add(int v, String r) {
-            if (why.toString().equals("") || v < 0) {
+        public void add(int v, String r)
+        {
+            if (why.toString().equals("") || v < 0)
+            {
                 why.append("" + v);
-            } else {
+            }
+            else
+            {
                 why.append("+" + v);
             }
             why.append(" [" + r + "]");
             value += v;
         }
 
-        public void resetTo(int v, String r) {
+        public void resetTo(int v, String r)
+        {
             why.append(" | " + v);
             why.append(" [ " + r + "]");
             value = v;
         }
 
-        public int getValue() {
+        public int getValue()
+        {
             return value;
         }
 
         @Override
-        public String toString() {
+        public String toString()
+        {
             return why.toString() + " = " + value;
         }
     }
