@@ -26,7 +26,7 @@ import net.sf.colossus.util.DevRandom;
  */
 class OnTheFlyLegionMove implements Collection<LegionMove> {
     final static private int RANDOM_MAX_TRY = 100;
-    final static private int REFILL_SIZE = 1000;
+    final static private int REFILL_SIZE = 2000;
 
     private static final Logger LOGGER = Logger.getLogger(OnTheFlyLegionMove.class.getName());
     private final List<List<CritterMove>> allCritterMoves;

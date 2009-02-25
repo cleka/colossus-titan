@@ -141,22 +141,14 @@ class Chit extends JPanel
             if (id.startsWith("Titan-"))
             {
                 String[] filenames = new String[4 + (dubious ? 1 : 0)];
-                int index = 6;
-                int index2 = index;
-                char c = id.charAt(index2);
-                while ((c >= '0') && (c <= '9'))
-                {
-                    index2++;
-                    c = id.charAt(index2);
-                }
-                int power = Integer.parseInt(id.substring(index, index2));
-                String color = id.substring(index2) + "Colossus";
-                filenames[0] = "Plain" + color;
+                int power = getTitanPower();
+                String color = id.split("-")[2] + "Colossus";
+                filenames[0] = "Plain" + "-" + color;
                 filenames[1] = "TitanMask";
-                filenames[2] = "Power-" + power + color;
+                filenames[2] = "Power-" + power + "-" + color;
                 int skill = (VariantSupport.getCurrentVariant()
                     .getCreatureByName("Titan")).getSkill();
-                filenames[3] = "Skill-" + skill + "" + color;
+                filenames[3] = "Skill-" + skill + "-" + color;
 
                 if (dubious)
                 {
@@ -186,22 +178,14 @@ class Chit extends JPanel
         }
     }
 
-    // XXX Duplicate code.
     int getTitanPower()
     {
         if (!id.startsWith("Titan-"))
         {
             return -1;
         }
-        int index = 6;
-        int index2 = index;
-        char c = id.charAt(index2);
-        while ((c >= '0') && (c <= '9'))
-        {
-            index2++;
-            c = id.charAt(index2);
-        }
-        int power = Integer.parseInt(id.substring(index, index2));
+        String[] parts = id.split("-");
+        int power = Integer.parseInt(parts[1]);
         return power;
     }
 
