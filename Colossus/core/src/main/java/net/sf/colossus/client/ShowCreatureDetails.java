@@ -504,6 +504,10 @@ public final class ShowCreatureDetails extends KDialog implements
         }
 
         /** not needed here -- fake returns 0. */
+        /** @deprecated another function with explicit reference to Bramble
+         * that should be fixed.
+         */
+        @Deprecated
         @Override
         protected int countBrambleHexes(final BattleHex targetHex)
         {
