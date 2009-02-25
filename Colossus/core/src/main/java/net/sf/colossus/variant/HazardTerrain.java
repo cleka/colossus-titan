@@ -174,7 +174,7 @@ public class HazardTerrain extends Hazards
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
         EffectOnStrike.POWERBONUS, ScopeOfEffectOnStrike.NATIVES, 2,
         EffectOnStrike.SKILLBONUS, ScopeOfEffectOnStrike.NATIVES, 1,
-        EffectOnStrike.POWERBONUS, ScopeOfEffectOnStrike.NATIVES, 0,
+        EffectOnStrike.POWERBONUS, ScopeOfEffectOnStrike.NATIVES, 2,
         RangeStrikeSpecialEffect.RANGESTRIKEFREE, SpecialEffect.NOSPECIAL);
 
     static final HazardTerrain BOG = new HazardTerrain("Bog", 'o',
