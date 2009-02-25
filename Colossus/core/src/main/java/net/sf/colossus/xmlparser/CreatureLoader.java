@@ -15,6 +15,7 @@ import net.sf.colossus.variant.CreatureTypeTitan;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardTerrain;
 
+import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -31,7 +32,7 @@ public class CreatureLoader
 {
     private static final Logger LOGGER = Logger.getLogger(CreatureLoader.class
         .getName());
-
+    private static final String currentVersion = "2";
     private final ArrayList<CreatureType> creatures;
 
     // we need to cast since JDOM is not generified
@@ -44,6 +45,11 @@ public class CreatureLoader
         {
             Document doc = builder.build(creIS);
             Element root = doc.getRootElement();
+            Attribute v = root.getAttribute("version");
+            if ((v == null) ||
+                (!v.getValue().equals(currentVersion))) {
+                LOGGER.severe("Wrong / missing version in Creature file.");
+            }
 
             List<Element> creatures = root.getChildren("creature");
             for (Element el : creatures)
@@ -61,68 +67,44 @@ public class CreatureLoader
         }
     }
 
+    /** Lookup attribute of name name in Element el, and return
+     * its value as boolean. Assume lack of attribtue menas false.
+     * @param el The element with the attribute (or not)
+     * @param name The name of the attribute
+     * @return The boolean value of the attribute, defaulting to false if absent
+     */
+    private boolean getAttributeBoolean(Element el, String name)
+            throws JDOMException {
+        Attribute a = el.getAttribute(name);
+        if (a == null)
+            return false;
+        return a.getBooleanValue();
+    }
+
     private void handleCreature(Element el) throws JDOMException
     {
         String name = el.getAttributeValue("name");
         int power = el.getAttribute("power").getIntValue();
         int skill = el.getAttribute("skill").getIntValue();
-        boolean rangestrikes = el.getAttribute("rangestrikes")
-            .getBooleanValue();
-        boolean flies = el.getAttribute("flies").getBooleanValue();
+        boolean rangestrikes = getAttributeBoolean(el, "rangestrikes");
+        boolean flies = getAttributeBoolean(el, "flies");
         Set<HazardTerrain> nativeTerrains = new HashSet<HazardTerrain>();
 
-        // TODO why is this "bramble" while the string for the terrain is "Brambles"?
-        // ANSWER by RD: because there was an error in the first commit of the first
-        // variant loading system and nobody ever fiexd it. And it got ported vebratim
-        // to the XMLM version. Same goes for 'sanddune' below.
-        /* this should be replaced by something like:
-         * for (HazardTerrain terrain : HazardTerrain.getAllHazardTerrains()) {
-         *   Attribute a = el.getAttribute(terrain.getName());
-         *   if ((a != null) && a.getBooleanValue())
-         *     nativeTerrains.add(terrain);
-         * }
-         * which is 100% generic. And much shorter.
-         */
-        if (el.getAttribute("bramble").getBooleanValue())
-        {
-            nativeTerrains.add(HazardTerrain.BRAMBLES);
+        for (HazardTerrain terrain : HazardTerrain.getAllHazardTerrains()) {
+            if (getAttributeBoolean(el, terrain.getName())) {
+                nativeTerrains.add(terrain);
+            }
         }
-        if (el.getAttribute("drift").getBooleanValue())
-        {
-            nativeTerrains.add(HazardTerrain.DRIFT);
-        }
-        if (el.getAttribute("bog").getBooleanValue())
-        {
-            nativeTerrains.add(HazardTerrain.BOG);
-        }
-        if (el.getAttribute("sanddune").getBooleanValue())
-        {
-            nativeTerrains.add(HazardTerrain.SAND);
-        }
-        boolean slope = el.getAttribute("slope").getBooleanValue();
-        if (el.getAttribute("volcano").getBooleanValue())
-        {
-            nativeTerrains.add(HazardTerrain.VOLCANO);
-        }
-        boolean river = el.getAttribute("river").getBooleanValue();
-        if (el.getAttribute("stone").getBooleanValue())
-        {
-            nativeTerrains.add(HazardTerrain.STONE);
-        }
-        if (el.getAttribute("tree").getBooleanValue())
-        {
-            nativeTerrains.add(HazardTerrain.TREE);
-        }
-        boolean water = el.getAttribute("water").getBooleanValue();
-        if (water)
-        {
-            nativeTerrains.add(HazardTerrain.LAKE);
-        }
-        boolean magic_missile = el.getAttribute("magic_missile")
-            .getBooleanValue();
-        boolean summonable = el.getAttribute("summonable").getBooleanValue();
-        boolean lord = el.getAttribute("lord").getBooleanValue();
-        boolean demilord = el.getAttribute("demilord").getBooleanValue();
+
+        boolean slope = getAttributeBoolean(el, "slope");
+        boolean river = getAttributeBoolean(el, "river");
+        // maybe the next one should be split in its own attribute ?
+        boolean water = getAttributeBoolean(el, "Lake");
+
+        boolean magic_missile = getAttributeBoolean(el, "magic_missile");
+        boolean summonable = getAttributeBoolean(el, "summonable");
+        boolean lord = getAttributeBoolean(el, "lord");
+        boolean demilord = getAttributeBoolean(el, "demilord");
         int count = el.getAttribute("count").getIntValue();
         String plural_name = el.getAttributeValue("plural_name");
         String base_color = el.getAttributeValue("base_color");
