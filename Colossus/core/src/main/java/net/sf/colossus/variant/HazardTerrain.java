@@ -144,7 +144,7 @@ public class HazardTerrain extends Hazards
      * For Colossus, native defending in a Tree against a non-native
      * gains 1 Skill. It blocks rangestrike through it, but not to it.
      */
-    public static final HazardTerrain TREE = new HazardTerrain("Tree", 't',
+    static final HazardTerrain TREE = new HazardTerrain("Tree", 't',
         EffectOnMovement.BLOCKFOREIGNER, EffectOnMovement.FREEMOVE,
         EffectOnStrike.SKILLBONUS, ScopeOfEffectOnStrike.PATRIOTS, 1,
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
@@ -161,7 +161,7 @@ public class HazardTerrain extends Hazards
         RangeStrikeSpecialEffect.RANGESTRIKESKILLPENALTY,
         SpecialEffect.NOSPECIAL);
 
-    public static final HazardTerrain DRIFT = new HazardTerrain("Drift", 'd',
+    static final HazardTerrain DRIFT = new HazardTerrain("Drift", 'd',
         EffectOnMovement.SLOWFOREIGNER, EffectOnMovement.SLOWFOREIGNER,
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
@@ -177,7 +177,7 @@ public class HazardTerrain extends Hazards
         EffectOnStrike.POWERBONUS, ScopeOfEffectOnStrike.NATIVES, 0,
         RangeStrikeSpecialEffect.RANGESTRIKEFREE, SpecialEffect.NOSPECIAL);
 
-    public static final HazardTerrain BOG = new HazardTerrain("Bog", 'o',
+    static final HazardTerrain BOG = new HazardTerrain("Bog", 'o',
         EffectOnMovement.BLOCKFOREIGNER, EffectOnMovement.FREEMOVE,
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
@@ -193,7 +193,7 @@ public class HazardTerrain extends Hazards
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
         RangeStrikeSpecialEffect.RANGESTRIKEFREE, SpecialEffect.HEALTHDRAIN_WATERDWELLER);
 
-    public static final HazardTerrain TOWER = new HazardTerrain("Tower", 'w',
+    static final HazardTerrain TOWER = new HazardTerrain("Tower", 'w',
         EffectOnMovement.FREEMOVE, EffectOnMovement.FREEMOVE,
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
@@ -202,7 +202,7 @@ public class HazardTerrain extends Hazards
         RangeStrikeSpecialEffect.RANGESTRIKEFREE, SpecialEffect.NOSPECIAL);
 
     /* extra standard Colossus hazard */
-    public static final HazardTerrain LAKE = new HazardTerrain("Lake", 'l',
+    static final HazardTerrain LAKE = new HazardTerrain("Lake", 'l',
         EffectOnMovement.BLOCKFOREIGNER, EffectOnMovement.FREEMOVE,
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,

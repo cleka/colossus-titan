@@ -30,6 +30,7 @@ import net.sf.colossus.util.DevRandom;
 
 import net.sf.colossus.util.Probs;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.HazardTerrain;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;
@@ -288,7 +289,7 @@ abstract public class AbstractAI implements AI
         int TITAN_TOWER_HEIGHT_BONUS = 2000;
         int DEFENDER_TOWER_HEIGHT_BONUS = 80;
         int TITAN_FORWARD_EARLY_PENALTY = -10000;
-        int TITAN_BY_EDGE_OR_TREE_BONUS = 400;
+        int TITAN_BY_EDGE_OR_BLOCKINGHAZARD_BONUS = 400;
         int DEFENDER_FORWARD_EARLY_PENALTY = -60;
         int ATTACKER_DISTANCE_FROM_ENEMY_PENALTY = -300;
         int ADJACENT_TO_BUDDY = 100;
@@ -338,6 +339,17 @@ abstract public class AbstractAI implements AI
     final protected Variant getVariantPlayed()
     {
         return this.client.getGame().getVariant();
+    }
+
+    final protected boolean hasOpponentNativeCreature(HazardTerrain terrain) {
+        boolean honc  = false;
+        for (BattleChit critter : client.getInactiveBattleChits()) {
+            if (critter.getCreature().isNativeIn(terrain)) {
+                honc = true;
+                break;
+            }
+        }
+        return honc;
     }
 
 

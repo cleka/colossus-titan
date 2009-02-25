@@ -961,11 +961,13 @@ public class CreatureServerSide extends Creature
      * isNativeTerrain(<HazardTerrain>) instead, with no explicit reference
      * to the name. This will ease adding new HazardTerrain in variant.
      */
+    /*
     @Deprecated
     public boolean isNativeDrift()
     {
         return getType().isNativeIn(HazardTerrain.DRIFT);
     }
+    */
     /** @deprecated all isNative<HazardTerrain> are obsolete, one should use
      * isNativeTerrain(<HazardTerrain>) instead, with no explicit reference
      * to the name. This will ease adding new HazardTerrain in variant.

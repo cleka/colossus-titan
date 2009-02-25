@@ -101,10 +101,10 @@ public class CreatureType
         this.baseColor = baseColor;
 
         /* warn about likely inappropriate combinations */
-        if (waterDwelling && isNativeIn(HazardTerrain.SAND))
+        if (waterDwelling && isNativeDune())
         {
             LOGGER.warning("Creature " + name
-                + " is both a Water Dweller and native to Sand and Dune.");
+                + " is both a Water Dweller and native to Dune.");
         }
     }
 

@@ -3067,11 +3067,13 @@ public class SimpleAI extends AbstractAI
                     for (int i = 0; i < 6; i++)
                     {
                         BattleHex neighbor = hex.getNeighbor(i);
-                        if (neighbor == null
-                            || neighbor.getTerrain()
-                                .equals(HazardTerrain.TREE))
+                        if (neighbor == null /* Edge of the map */
+                            || neighbor.getTerrain().blocksGround()
+                            || (neighbor.getTerrain().isGroundNativeOnly()
+                                && !hasOpponentNativeCreature(neighbor.getTerrain())))
                         {
-                            value.add( bec.TITAN_BY_EDGE_OR_TREE_BONUS, "TitanByEdgeOrTree");
+                            value.add(bec.TITAN_BY_EDGE_OR_BLOCKINGHAZARD_BONUS,
+                                    "TitanByEdgeOrBlockingHazard (" + i + ")");
                         }
                     }
                 }
