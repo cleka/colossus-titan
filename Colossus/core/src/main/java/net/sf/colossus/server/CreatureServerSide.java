@@ -372,7 +372,9 @@ public class CreatureServerSide extends Creature
     }
 
     /** Return the number of dice that will be rolled when striking this
-     *  target, including modifications for terrain. */
+     *  target, including modifications for terrain.
+     * WARNING: this is duplicated in Strike
+     */
     protected int getDice(CreatureServerSide target)
     {
         BattleHex hex = getCurrentHex();

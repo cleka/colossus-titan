@@ -820,7 +820,9 @@ public final class Strike
     // on server side.
     
     /** Return the number of dice that will be rolled when striking this
-     *  target, including modifications for terrain. */
+     *  target, including modifications for terrain.
+     * WARNING: this is duplicated in CreatureServerSide
+     */
     public int getDice(BattleChit chit, BattleChit target)
     {
         BattleHex hex = client.getBattleHex(chit);
