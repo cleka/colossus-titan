@@ -316,7 +316,8 @@ abstract public class AbstractAI implements AI
     {
         /** Bonus to the 'kill value' when the terrain offer a bonus
          * in combat to the creature.
-         * 0 by default, so the default 'kill value' is the point value.
+         * 0 by default, so the default 'kill value' is the 'kill value'
+         * returned by the creature type.
          * SimpleAI (and all its subclasses) override this to 3.
          */
         int HAS_NATIVE_COMBAT_BONUS = 0;
