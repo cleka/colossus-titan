@@ -387,41 +387,32 @@ public class BattleHex extends Hex
 
         // Check to see if the hex is occupied or totally impassable.
         if (terrain.blocksGround() ||
-            (terrain.isGroundNativeOnly() && (!creature.isNativeIn(terrain))))
-        {
+                (terrain.isGroundNativeOnly() && (!creature.isNativeIn(terrain)))) {
             cost += IMPASSIBLE_COST;
-        }
+        } else {
+            char hexside = getHexside(cameFrom);
 
-        char hexside = getHexside(cameFrom);
+            // Non-fliers may not cross cliffs.
+            if ((hexside == 'c' || getOppositeHexside(cameFrom) == 'c') && !creature.isFlier()) {
+                cost += IMPASSIBLE_COST;
+            } else {
 
-        // Non-fliers may not cross cliffs.
-        if ((hexside == 'c' || getOppositeHexside(cameFrom) == 'c')
-            && !creature.isFlier())
-        {
-            cost += IMPASSIBLE_COST;
-        }
+                // river slows both way, except native & water dwellers
+                if ((hexside == 'r' || getOppositeHexside(cameFrom) == 'r') && !creature.isFlier() && !creature.isWaterDwelling() && !creature.isNativeRiver()) {
+                    cost += SLOW_INCREMENT_COST;
+                }
 
-        // river slows both way, except native & water dwellers
-        if ((hexside == 'r' || getOppositeHexside(cameFrom) == 'r')
-            && !creature.isFlier() && !creature.isWaterDwelling()
-            && !creature.isNativeRiver())
-        {
-            cost += SLOW_INCREMENT_COST;
-        }
+                // Check for a slowing hexside.
+                if ((hexside == 'w' || (hexside == 's' && !creature.isNativeSlope())) && !creature.isFlier() && elevation > getNeighbor(cameFrom).getElevation()) {
+                    cost += SLOW_INCREMENT_COST;
+                }
 
-        // Check for a slowing hexside.
-        if ((hexside == 'w' || (hexside == 's' && !creature.isNativeSlope()))
-            && !creature.isFlier()
-            && elevation > getNeighbor(cameFrom).getElevation())
-        {
-            cost += SLOW_INCREMENT_COST;
-        }
-
-        // check whether that terrain is slowing us.
-        if (terrain.slows(creature.isNativeIn(terrain),
-                creature.isFlier()))
-        {
-            cost += SLOW_INCREMENT_COST;
+                // check whether that terrain is slowing us.
+                if (terrain.slows(creature.isNativeIn(terrain),
+                        creature.isFlier())) {
+                    cost += SLOW_INCREMENT_COST;
+                }
+            }
         }
 
         if (cost > IMPASSIBLE_COST)
