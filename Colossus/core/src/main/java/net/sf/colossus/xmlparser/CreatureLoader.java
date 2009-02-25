@@ -51,8 +51,8 @@ public class CreatureLoader
                 LOGGER.severe("Wrong / missing version in Creature file.");
             }
 
-            List<Element> creatures = root.getChildren("creature");
-            for (Element el : creatures)
+            List<Element> lcreatures = root.getChildren("creature");
+            for (Element el : lcreatures)
             {
                 handleCreature(el);
             }
@@ -100,6 +100,8 @@ public class CreatureLoader
         boolean river = getAttributeBoolean(el, "river");
         // maybe the next one should be split in its own attribute ?
         boolean water = getAttributeBoolean(el, "Lake");
+        // maybe the next one should be split in its own attribute ?
+        boolean dune = getAttributeBoolean(el, "Sand");
 
         boolean magic_missile = getAttributeBoolean(el, "magic_missile");
         boolean summonable = getAttributeBoolean(el, "summonable");
@@ -113,14 +115,14 @@ public class CreatureLoader
         if (name.equals("Titan"))
         {
             creature = new CreatureTypeTitan(name, power, skill, rangestrikes,
-                flies, nativeTerrains, slope, river, water, magic_missile,
+                flies, nativeTerrains, slope, river, dune, water, magic_missile,
                 summonable, lord, demilord, count, plural_name, base_color);
         }
         else
         {
             creature = new CreatureType(name, power, skill, rangestrikes,
-                flies, nativeTerrains, slope, river, water, magic_missile,
-                summonable, lord, demilord, count, plural_name, base_color);
+                flies, nativeTerrains, slope, river, dune, water,
+                magic_missile, summonable, lord, demilord, count, plural_name,base_color);
         }
         this.creatures.add(creature);
     }

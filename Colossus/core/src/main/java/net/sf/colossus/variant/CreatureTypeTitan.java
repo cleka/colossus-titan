@@ -34,13 +34,13 @@ public class CreatureTypeTitan extends CreatureType
     public CreatureTypeTitan(String name, int power, int skill,
         boolean rangestrikes, boolean flies,
         Set<HazardTerrain> nativeTerrrains, boolean nativeSlope,
-        boolean nativeRiver, boolean waterDwelling, boolean magicMissile,
+        boolean nativeRiver, boolean nativeDune, boolean waterDwelling, boolean magicMissile,
         boolean summonable, boolean lord, boolean demilord, int maxCount,
         String pluralName, String baseColor)
     {
         super(name, power, skill, rangestrikes, flies, nativeTerrrains,
-            nativeSlope, nativeRiver, waterDwelling, magicMissile, summonable,
-            lord, demilord, maxCount, pluralName, baseColor);
+            nativeSlope, nativeRiver, nativeDune, waterDwelling, magicMissile,
+            summonable, lord, demilord, maxCount, pluralName,baseColor);
 
         if (!name.equals(Constants.titan))
         {

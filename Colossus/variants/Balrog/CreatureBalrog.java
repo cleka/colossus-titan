@@ -22,13 +22,13 @@ public class CreatureBalrog extends CreatureType
     public CreatureBalrog(String name, Integer power, Integer skill,
         Boolean rangestrikes, Boolean flies,
         Set<HazardTerrain> nativeTerrrains, Boolean nativeSlope,
-        Boolean nativeRiver, Boolean waterDwelling, Boolean magicMissile,
+        Boolean nativeRiver, Boolean nativeDune, Boolean waterDwelling, Boolean magicMissile,
         Boolean summonable, Boolean lord, Boolean demilord, Integer maxCount,
         String pluralName, String baseColor)
     {
         super(name, power.intValue(), skill.intValue(), rangestrikes
             .booleanValue(), flies.booleanValue(), nativeTerrrains,
-            nativeSlope.booleanValue(), nativeRiver.booleanValue(),
+            nativeSlope.booleanValue(), nativeRiver.booleanValue(), nativeDune.booleanValue(),
             waterDwelling.booleanValue(), magicMissile.booleanValue(),
             summonable.booleanValue(), lord.booleanValue(), demilord
                 .booleanValue(), maxCount.intValue(), pluralName, baseColor);

@@ -54,6 +54,8 @@ public class CreatureType
 
     private final boolean nativeRiver;
 
+    private final boolean nativeDune;
+
     private final boolean waterDwelling;
 
     private final boolean magicMissile;
@@ -73,7 +75,7 @@ public class CreatureType
     public CreatureType(String name, int power, int skill,
         boolean rangestrikes, boolean flies,
         Set<HazardTerrain> nativeTerrains, boolean nativeSlope,
-        boolean nativeRiver, boolean waterDwelling, boolean magicMissile,
+        boolean nativeRiver, boolean nativeDune, boolean waterDwelling, boolean magicMissile,
         boolean summonable, boolean lord, boolean demilord, int maxCount,
         String pluralName, String baseColor)
     {
@@ -90,6 +92,7 @@ public class CreatureType
         this.flies = flies;
         this.nativeSlope = nativeSlope;
         this.nativeRiver = nativeRiver;
+        this.nativeDune = nativeDune;
         this.waterDwelling = waterDwelling;
         this.magicMissile = magicMissile;
         this.lord = lord;
@@ -304,7 +307,7 @@ public class CreatureType
                 return false;
 
             case 'd':
-                return isNativeIn(HazardTerrain.SAND);
+                return isNativeDune();
 
             case 'c': /* undefined */
                 return false;
@@ -328,6 +331,11 @@ public class CreatureType
     public boolean isNativeRiver()
     {
         return nativeRiver;
+    }
+
+    public boolean isNativeDune()
+    {
+        return nativeDune;
     }
 
     public boolean isWaterDwelling()
