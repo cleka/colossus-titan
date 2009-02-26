@@ -37,6 +37,8 @@
   value="${build.dir}/testresults" />
   <property name="datatools.src.dir"
   value="datatools/src/main/java" />
+  <property name="datatoolsparser.src.dir"
+  value="datatools/src/main/javacc" />
   <property name="source.level" value="1.5" />
   <property name="target.level" value="1.5" />
   <path id="project.class.path">
@@ -72,8 +74,7 @@
   description="Compiles Colossus without datatools and variants">
     <javac debug="yes" deprecation="yes" target="${target.level}"
     source="${source.level}" srcdir="${core.src.dir}"
-    destdir="${build.classes.dir}"
-    excludes="**/tools/**">
+    destdir="${build.classes.dir}">
       <classpath refid="project.class.path" />
     </javac>
   </target>
@@ -85,11 +86,19 @@
       <classpath refid="project.class.path" />
     </javac>
   </target>
-  <target name="compileDatatools" depends="init"
+  <target name="compileDatatoolsParser" depends="init,compile"
+  description="Compiles the datatools parsers using javac">
+    <javac debug="yes" deprecation="yes" target="${target.level}"
+    source="${source.level}" srcdir="${datatoolsparser.src.dir}"
+    destdir="${build.classes.dir}" excludes="**/datatools/**">
+      <classpath refid="project.class.path" />
+    </javac>
+  </target>
+  <target name="compileDatatools" depends="init,compile,compileDatatoolsParser"
   description="Compiles the datatools using javac">
     <javac debug="yes" deprecation="yes" target="${target.level}"
     source="${source.level}" srcdir="${datatools.src.dir}"
-    destdir="${build.classes.dir}">
+    destdir="${build.classes.dir}" excludes="**/datatools/**">
       <classpath refid="project.class.path" />
     </javac>
   </target>
@@ -137,7 +146,7 @@
       </chainedmapper>
     </pathconvert>
     <jar jarfile="Colossus.jar" basedir="${build.classes.dir}"
-    includes="**" excludes="**/webserver/**, **/tools/**">
+    includes="**" excludes="**/webserver/**">
       <manifest>
         <attribute name="Main-Class"
         value="net.sf.colossus.server.Start" />
@@ -161,7 +170,6 @@
   description="Make WebServer jar file">
     <jar jarfile="ColossusWeb.jar" basedir="${build.classes.dir}"
     includes="**/webcommon/**, **/webserver/**, **/util/Log.class, **/util/Options.class, **/client/IOptions.class, **/server/Constants.class">
-
       <manifest>
         <attribute name="Main-Class"
         value="net.sf.colossus.webserver.WebServer" />
@@ -203,23 +211,31 @@
   </target>
   <!-- Tools -->
   <target name="tools" depends="bbjar,brjar" />
-  <target name="bbjar" depends="init,compile,version"
+  <target name="bbjar" depends="init,compile,compileVariants,compileDatatools,version"
   description="Make Battlelands Builder jar file">
-    <jar jarfile="BattlelandsBuilder.jar" basedir="."
-    includes="net/sf/colossus/datatools/*.class, net/sf/colossus/client/*.class, net/sf/colossus/parser/*.class, net/sf/colossus/server/*.class, net/sf/colossus/util/*.class, Default, TitanPlus, ExtTitan, Badlands, Undead, Outlands">
-
+    <pathconvert property="manifest.classpath" pathsep=" ">
+      <path refid="project.class.path" />
+      <chainedmapper>
+        <flattenmapper />
+        <globmapper from="*" to="libs/*" />
+      </chainedmapper>
+    </pathconvert>
+    <jar jarfile="BattlelandsBuilder.jar" basedir="${build.classes.dir}"
+    includes="**" excludes="**/webserver/**">
       <manifest>
         <attribute name="Main-Class"
-        value="net/sf/colossus/datatools/BattlelandsBuilder" />
-      </manifest>
+        value="net.sf.colossus.tools.BattlelandsBuilder" />
+        <attribute name="Class-Path"
+        value="${manifest.classpath}" />      </manifest>
     </jar>
+    <jar jarfile="BattlelandsBuilder.jar" basedir="${variants.dir}"
+    includes="**" excludes="*.java" update="true" />
     <chmod file="BattlelandsBuilder.jar" perm="755" />
   </target>
   <target name="brjar" depends="init,compile,version"
   description="Make Battlelands Randomizer jar file">
     <jar jarfile="BattlelandsRandomizer.jar" basedir="."
     includes="net/sf/colossus/datatools/*.class, net/sf/colossus/client/*.class, net/sf/colossus/parser/*.class, net/sf/colossus/server/*.class, net/sf/colossus/util/*.class, Default, TitanPlus, ExtTitan, Badlands, Undead, Outlands">
-
       <manifest>
         <attribute name="Main-Class"
         value="net/sf/colossus/datatools/BattlelandsRandomizer" />
