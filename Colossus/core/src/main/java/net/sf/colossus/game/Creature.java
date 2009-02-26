@@ -1,6 +1,7 @@
 package net.sf.colossus.game;
 
 
+import java.util.logging.Logger;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardHexside;
 import net.sf.colossus.variant.HazardTerrain;
@@ -16,6 +17,8 @@ import net.sf.colossus.variant.HazardTerrain;
  */
 public class Creature
 {
+    private static final Logger LOGGER = Logger.getLogger(
+            Creature.class.getName());
     private final CreatureType type;
 
     public Creature(CreatureType type)
@@ -53,7 +56,8 @@ public class Creature
 
 
         // Dice can be modified by terrain.
-        dice += myHexTerrain.getPowerBonusStrikeFrom(myType.isNativeIn(myHexTerrain));
+        dice += myHexTerrain.getPowerBonusStrikeFrom(myType.isNativeIn(
+                myHexTerrain));
 
         // Native striking down a dune hexside: +2
         if (myHexside.equals(HazardHexside.DUNE) && myType.isNativeDune())
@@ -71,8 +75,11 @@ public class Creature
         {
             dice--;
         }
-
-
+        LOGGER.finest("Found " + dice + " dice for " + myType.getName() + " [" +
+                myHexTerrain.getName() + "  " + myElevation + ", " + myHexside.
+                getName() + " ] vs. " +
+                targetType.getName() + " [" + targetHexTerrain.getName() + " " +
+                targetElevation + ", " + targetHexside.getName() + " ]");
         return dice;
     }
 
@@ -124,7 +131,12 @@ public class Creature
                 attackerSkill--;
             }
         }
-
+        LOGGER.finest("Found skill " + attackerSkill + "  for " +
+                myType.getName() + " [" +
+                myHexTerrain.getName() + "  " + myElevation + ", " + myHexside.
+                getName() + " ] vs. " +
+                targetType.getName() + " [" + targetHexTerrain.getName() + " " +
+                targetElevation + ", " + targetHexside.getName() + " ]");
         return attackerSkill;
     }
 }
