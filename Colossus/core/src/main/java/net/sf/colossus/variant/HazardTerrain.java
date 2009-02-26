@@ -250,49 +250,63 @@ public class HazardTerrain extends Hazards
 
     public boolean slowsGround(boolean isNative)
     {
-        if (effectOnGroundMovement == EffectOnMovement.SLOWALL) {
+        if (effectOnGroundMovement == EffectOnMovement.SLOWALL)
+        {
             return true;
         }
-        if (effectOnGroundMovement == EffectOnMovement.SLOWFOREIGNER) {
+        if (effectOnGroundMovement == EffectOnMovement.SLOWFOREIGNER)
+        {
             return !isNative;
         }
-        if (effectOnGroundMovement == EffectOnMovement.BLOCKALL) {
+        if (effectOnGroundMovement == EffectOnMovement.BLOCKALL)
+        {
             LOGGER.warning("Can't be slowed if everybody is blocked.");
             return false;
         }
-        if (effectOnGroundMovement == EffectOnMovement.BLOCKFOREIGNER) {
-            if (!isNative) {
+        if (effectOnGroundMovement == EffectOnMovement.BLOCKFOREIGNER)
+        {
+            if (!isNative)
+            {
                 LOGGER.warning("Can't be slowed if foreigner is blocked.");
             }
             return false;
         }
         return false;
     }
+
     public boolean slowsFlyer(boolean isNative)
     {
-        if (effectOnFlyerMovement == EffectOnMovement.SLOWALL) {
+        if (effectOnFlyerMovement == EffectOnMovement.SLOWALL)
+        {
             return true;
         }
-        if (effectOnFlyerMovement == EffectOnMovement.SLOWFOREIGNER) {
+        if (effectOnFlyerMovement == EffectOnMovement.SLOWFOREIGNER)
+        {
             return !isNative;
         }
-        if (effectOnFlyerMovement == EffectOnMovement.BLOCKALL) {
+        if (effectOnFlyerMovement == EffectOnMovement.BLOCKALL)
+        {
             LOGGER.warning("Can't be slowed if everybody is blocked.");
             return false;
         }
-        if (effectOnFlyerMovement == EffectOnMovement.BLOCKFOREIGNER) {
-            if (!isNative) {
+        if (effectOnFlyerMovement == EffectOnMovement.BLOCKFOREIGNER)
+        {
+            if (!isNative)
+            {
                 LOGGER.warning("Can't be slowed if foreigner is blocked.");
             }
             return false;
         }
         return false;
     }
-    public boolean slows(boolean isNative, boolean isFlyer) {
-        if (isFlyer && !slowsFlyer(isNative)) {
+    public boolean slows(boolean isNative, boolean isFlyer)
+    {
+        if (isFlyer && !slowsFlyer(isNative))
+        {
             return false;
         }
-        if (!slowsGround(isNative)) {
+        if (!slowsGround(isNative))
+        {
             return false;
         }
         return true;
@@ -301,26 +315,34 @@ public class HazardTerrain extends Hazards
     /** Return the penalty to apply to the Strike Factor of a creature
      * striking out from that terrain on a unspecified creature.
      * @param attackerIsNative Whether the attacker is native from this HazardTerrain
-     * @return The amount of penalty to apply.
+     * @return The amount of penalty to apply (negative if it's a bonus).
+     * @see getSkillBonusStrikeFrom, getPowerBonusStrikeFrom, getPowerPenaltyStrikeFrom
      */
-    public int getSkillPenaltyStrikeFrom(boolean attackerIsNative) {
-        if (effectforAttackingFromTerrain == EffectOnStrike.NOEFFECT) {
+    public int getSkillPenaltyStrikeFrom(boolean attackerIsNative)
+    {
+        if (effectforAttackingFromTerrain == EffectOnStrike.NOEFFECT)
+        {
             return 0;
         }
-        if (effectforAttackingFromTerrain == EffectOnStrike.SKILLPENALTY) {
-            if (scopeForAttackEffect == ScopeOfEffectOnStrike.ALL) {
+        if (effectforAttackingFromTerrain == EffectOnStrike.SKILLPENALTY)
+        {
+            if (scopeForAttackEffect == ScopeOfEffectOnStrike.ALL)
+            {
                 return attackEffectAdjustment;
             }
             if (attackerIsNative &&
-                    scopeForAttackEffect == ScopeOfEffectOnStrike.NATIVES) {
+                    scopeForAttackEffect == ScopeOfEffectOnStrike.NATIVES)
+            {
                 return attackEffectAdjustment;
             }
             if (!attackerIsNative &&
-                    scopeForAttackEffect == ScopeOfEffectOnStrike.FOREIGNERS) {
+                    scopeForAttackEffect == ScopeOfEffectOnStrike.FOREIGNERS)
+            {
                 return attackEffectAdjustment;
             }
             if ((scopeForAttackEffect == ScopeOfEffectOnStrike.PATRIOTS) ||
-                (scopeForAttackEffect == ScopeOfEffectOnStrike.IMPERIALS)) {
+                    (scopeForAttackEffect == ScopeOfEffectOnStrike.IMPERIALS))
+            {
                 /* not enough information to decide */
                 LOGGER.warning("Called without the native status of the defender," +
                         "and effect " + scopeForAttackEffect + " requires it.");
@@ -328,56 +350,227 @@ public class HazardTerrain extends Hazards
             }
             return 0;
         }
-        if (effectforAttackingFromTerrain == EffectOnStrike.SKILLBONUS) {
+        if (effectforAttackingFromTerrain == EffectOnStrike.SKILLBONUS)
+        {
             LOGGER.warning("Called with an unsupported effect " +
                     effectforAttackingFromTerrain);
             return 0;
         }
-        if (effectforAttackingFromTerrain == EffectOnStrike.BLOCKED) {
+        if (effectforAttackingFromTerrain == EffectOnStrike.BLOCKED)
+        {
             LOGGER.warning("Called with an unlikely effect " +
                     effectforAttackingFromTerrain);
             return 0;
         }
         return 0;
     }
-    public int getSkillBonusStruckIn(boolean attackerIsNative, boolean defenderIsNative) {
-        if (effectforDefendingInTerrain == EffectOnStrike.SKILLBONUS) {
-            if (scopeForDefenceEffect == ScopeOfEffectOnStrike.ALL) {
+
+    /** Return the bonus to apply to the Strike Factor of a creature
+     * striking out from that terrain on a unspecified creature.
+     * @param attackerIsNative Whether the attacker is native from this HazardTerrain
+     * @return The amount of bonus to apply (negative if it's a penalty).
+     */
+    public int getSkillBonusStrikeFrom(boolean attackerIsNative)
+    {
+        return -(this.getSkillPenaltyStrikeFrom(attackerIsNative));
+    }
+
+    /** Return the bonus to apply to the Strike Factor of a creature struck
+     * in this terrain by a unspecified creature.
+     * @param attackerIsNative Whether the attacker is native from this HazardTerrain
+     * @param defenderIsNative Whether the defender is native from this HazardTerrain
+     * @return The amount of bonus to apply (negative if it's a penalty).
+     */
+    public int getSkillBonusStruckIn(boolean attackerIsNative,
+            boolean defenderIsNative)
+    {
+        if (effectforDefendingInTerrain == EffectOnStrike.SKILLBONUS)
+        {
+            if (scopeForDefenceEffect == ScopeOfEffectOnStrike.ALL)
+            {
                 return defenceEffectAdjustment;
             }
             if (defenderIsNative &&
-                    scopeForDefenceEffect == ScopeOfEffectOnStrike.NATIVES) {
+                    scopeForDefenceEffect == ScopeOfEffectOnStrike.NATIVES)
+            {
                 return defenceEffectAdjustment;
             }
             if (!defenderIsNative &&
-                    scopeForDefenceEffect == ScopeOfEffectOnStrike.FOREIGNERS) {
+                    scopeForDefenceEffect == ScopeOfEffectOnStrike.FOREIGNERS)
+            {
                 return defenceEffectAdjustment;
             }
             if (defenderIsNative &&
                     !attackerIsNative &&
-                    scopeForDefenceEffect == ScopeOfEffectOnStrike.PATRIOTS) {
+                    scopeForDefenceEffect == ScopeOfEffectOnStrike.PATRIOTS)
+            {
                 return defenceEffectAdjustment;
             }
             if (!defenderIsNative &&
                     attackerIsNative &&
-                    scopeForDefenceEffect == ScopeOfEffectOnStrike.IMPERIALS) {
+                    scopeForDefenceEffect == ScopeOfEffectOnStrike.IMPERIALS)
+            {
                 return defenceEffectAdjustment;
             }
             return 0;
         }
-        if (effectforDefendingInTerrain == EffectOnStrike.SKILLPENALTY) {
+        if (effectforDefendingInTerrain == EffectOnStrike.SKILLPENALTY)
+        {
             LOGGER.warning("Called with an unsupported effect " +
                     effectforDefendingInTerrain);
             return 0;
         }
-        if (effectforDefendingInTerrain == EffectOnStrike.BLOCKED) {
+        if (effectforDefendingInTerrain == EffectOnStrike.BLOCKED)
+        {
             LOGGER.warning("Called with an unlikely effect " +
                     effectforDefendingInTerrain);
             return 0;
         }
         return 0;
     }
-        /*
+
+    /** Return the penalty to apply to the Strike Factor of a creature struck
+     * in this terrain by a unspecified creature.
+     * @param attackerIsNative Whether the attacker is native from this HazardTerrain
+     * @param defenderIsNative Whether the defender is native from this HazardTerrain
+     * @return The amount of penalty to apply (negative if it's a bonus).
+     */
+    public int getSkillPenaltyStruckIn(boolean attackerIsNative,
+            boolean defenderIsNative)
+    {
+        return -(this.getSkillBonusStruckIn(attackerIsNative, defenderIsNative));
+    }
+
+    /** Return the penalty to apply to the Power Factor of a creature
+     * striking out from that terrain on a unspecified creature.
+     * @param attackerIsNative Whether the attacker is native from this HazardTerrain
+     * @return The amount of penalty to apply (negative if it's a bonus).
+     */
+    public int getPowerPenaltyStrikeFrom(boolean attackerIsNative)
+    {
+        if (effectforAttackingFromTerrain == EffectOnStrike.NOEFFECT)
+        {
+            return 0;
+        }
+        if (effectforAttackingFromTerrain == EffectOnStrike.POWERPENALTY)
+        {
+            if (scopeForAttackEffect == ScopeOfEffectOnStrike.ALL)
+            {
+                return attackEffectAdjustment;
+            }
+            if (attackerIsNative &&
+                    scopeForAttackEffect == ScopeOfEffectOnStrike.NATIVES)
+            {
+                return attackEffectAdjustment;
+            }
+            if (!attackerIsNative &&
+                    scopeForAttackEffect == ScopeOfEffectOnStrike.FOREIGNERS)
+            {
+                return attackEffectAdjustment;
+            }
+            if ((scopeForAttackEffect == ScopeOfEffectOnStrike.PATRIOTS) ||
+                    (scopeForAttackEffect == ScopeOfEffectOnStrike.IMPERIALS))
+            {
+                /* not enough information to decide */
+                LOGGER.warning("Called without the native status of the defender," +
+                        "and effect " + scopeForAttackEffect + " requires it.");
+                return 0;
+            }
+            return 0;
+        }
+        if (effectforAttackingFromTerrain == EffectOnStrike.POWERBONUS)
+        {
+            LOGGER.warning("Called with an unsupported effect " +
+                    effectforAttackingFromTerrain);
+            return 0;
+        }
+        if (effectforAttackingFromTerrain == EffectOnStrike.BLOCKED)
+        {
+            LOGGER.warning("Called with an unlikely effect " +
+                    effectforAttackingFromTerrain);
+            return 0;
+        }
+        return 0;
+    }
+
+    /** Return the bonus to apply to the Strike Factor of a creature
+     * striking out from that terrain on a unspecified creature.
+     * @param attackerIsNative Whether the attacker is native from this HazardTerrain
+     * @return The amount of bonus to apply (negative if it's a penalty).
+     */
+    public int getPowerBonusStrikeFrom(boolean attackerIsNative)
+    {
+        return -(this.getPowerPenaltyStrikeFrom(attackerIsNative));
+    }
+
+    /** Return the bonus to apply to the Strike Factor of a creature struck
+     * in this terrain by a unspecified creature.
+     * @param attackerIsNative Whether the attacker is native from this HazardTerrain
+     * @param defenderIsNative Whether the defender is native from this HazardTerrain
+     * @return The amount of bonus to apply (negative if it's a penalty).
+     */
+    public int getPowerBonusStruckIn(boolean attackerIsNative,
+            boolean defenderIsNative)
+    {
+        if (effectforDefendingInTerrain == EffectOnStrike.POWERBONUS)
+        {
+            if (scopeForDefenceEffect == ScopeOfEffectOnStrike.ALL)
+            {
+                return defenceEffectAdjustment;
+            }
+            if (defenderIsNative &&
+                    scopeForDefenceEffect == ScopeOfEffectOnStrike.NATIVES)
+            {
+                return defenceEffectAdjustment;
+            }
+            if (!defenderIsNative &&
+                    scopeForDefenceEffect == ScopeOfEffectOnStrike.FOREIGNERS)
+            {
+                return defenceEffectAdjustment;
+            }
+            if (defenderIsNative &&
+                    !attackerIsNative &&
+                    scopeForDefenceEffect == ScopeOfEffectOnStrike.PATRIOTS)
+            {
+                return defenceEffectAdjustment;
+            }
+            if (!defenderIsNative &&
+                    attackerIsNative &&
+                    scopeForDefenceEffect == ScopeOfEffectOnStrike.IMPERIALS)
+            {
+                return defenceEffectAdjustment;
+            }
+            return 0;
+        }
+        if (effectforDefendingInTerrain == EffectOnStrike.POWERPENALTY)
+        {
+            LOGGER.warning("Called with an unsupported effect " +
+                    effectforDefendingInTerrain);
+            return 0;
+        }
+        if (effectforDefendingInTerrain == EffectOnStrike.BLOCKED)
+        {
+            LOGGER.warning("Called with an unlikely effect " +
+                    effectforDefendingInTerrain);
+            return 0;
+        }
+        return 0;
+    }
+
+    /** Return the penalty to apply to the Strike Factor of a creature struck
+     * in this terrain by a unspecified creature.
+     * @param attackerIsNative Whether the attacker is native from this HazardTerrain
+     * @param defenderIsNative Whether the defender is native from this HazardTerrain
+     * @return The amount of penalty to apply (negative if it's a bonus).
+     */
+    public int getPowerPenaltyStruckIn(boolean attackerIsNative,
+            boolean defenderIsNative)
+    {
+        return -(this.getPowerBonusStruckIn(attackerIsNative, defenderIsNative));
+    }
+
+
+    /*
      * Scope Constants -
      * All - is everyone
      * Natives means Natives vs anyone
@@ -388,13 +581,18 @@ public class HazardTerrain extends Hazards
     /** Whether this terrain blocks rangestrike.
      * @return Whether this terrain blocks rangestrike.
      */
-    public boolean blocksLineOfSight() {
+    public boolean blocksLineOfSight()
+    {
         return rangeStrikeSpecial == RangeStrikeSpecialEffect.RANGESTRIKEBLOCKED;
     }
-    public boolean isDamagingToNonNative() {
+
+    public boolean isDamagingToNonNative()
+    {
         return this.terrainSpecial == SpecialEffect.HEALTHDRAIN;
     }
-    public boolean isDamagingToWaterDweller() {
+
+    public boolean isDamagingToWaterDweller()
+    {
         return this.terrainSpecial == SpecialEffect.HEALTHDRAIN_WATERDWELLER;
     }
 }

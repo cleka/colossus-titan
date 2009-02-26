@@ -28,6 +28,54 @@ public class Creature
         return type;
     }
 
+    /** get the Striking Power of this Creature when striking directly at
+     * target undet the circumstances in parameters.
+     * @param target The Creature that is struck by the current Creature
+     * @param myElevation Height of the Hex on which stands the current Creature
+     * @param targetElevation Height of the hex on which stands the target Creature
+     * @param myHexTerrain Type of Hazard of the current Hex
+     * @param targetHexTerrain Type of Hazard of the target hex
+     * @param myHexside Type of hexside hazard between the current hex and the target hex
+     * @param targetHexside Type of hexside hazard between the target hex and the current hex
+     * @return The Power Factor of the current Creature when all modifiers are factored in
+     */
+    public int getStrikingPower(Creature target,
+            int myElevation,
+            int targetElevation,
+            HazardTerrain myHexTerrain,
+            HazardTerrain targetHexTerrain,
+            HazardHexside myHexside,
+            HazardHexside targetHexside)
+    {
+        CreatureType myType = this.getType();
+        CreatureType targetType = target.getType();
+        int dice = type.getPower();
+
+
+        // Dice can be modified by terrain.
+        dice += myHexTerrain.getPowerBonusStrikeFrom(myType.isNativeIn(myHexTerrain));
+
+        // Native striking down a dune hexside: +2
+        if (myHexside.equals(HazardHexside.DUNE) && myType.isNativeDune())
+        {
+            dice += 2;
+        }
+        // Native striking down a slope hexside: +1
+        else if (myHexside.equals(HazardHexside.SLOPE) && myType.isNativeSlope())
+        {
+            dice++;
+        }
+        // Non-native striking up a dune hexside: -1
+        else if (!myType.isNativeDune() && targetHexside.equals(
+                HazardHexside.DUNE))
+        {
+            dice--;
+        }
+
+
+        return dice;
+    }
+
     /** get the Striking Skill of this Creature when striking directly at
      * target undet the circumstances in parameters.
      * @param target The Creature that is struck by the current Creature
