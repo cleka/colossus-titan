@@ -25,8 +25,6 @@ Change Quit button in GetPlayers dialog to Cancel.  Go back to existing
 
 Add "no 2s or 5s" mulligan option.
 
-Add UI for players to specify favorite colors.
-
 Add a window that shows all players' units
 
 Add a ShowLegionMarkers window that shows each player's remaining markers.
@@ -76,6 +74,9 @@ ShowLegion on mouseover, not click, with permanent dialog.
 
 Make split prediction optional.
 => DONE (??): ViewModes
+
+Add UI for players to specify favorite colors.
+=> DONE: ??
 
 
 ######################################################################
