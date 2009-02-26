@@ -11,9 +11,10 @@ PARSER_BEGIN(BattlelandRandomizerLoader)
 package net.sf.colossus.parser;
 
 import java.util.*;
+import java.util.logging.*;
 
-import net.sf.colossus.util.Log;
-import net.sf.colossus.client.BattleHex;
+import net.sf.colossus.variant.BattleHex;
+import net.sf.colossus.variant.HazardTerrain;
 
 /**
  * BattlelandRandomizerLoader create a randomized Battleland from a description file.
@@ -243,7 +244,7 @@ public class BattlelandRandomizerLoader
         int pos = rand.nextInt(al.size());
         address a = (address)al.remove(pos);
         BattleHex hex = h[a.x][a.y];
-        hex.setTerrain(t.terrain);
+        hex.setTerrain(HazardTerrain.getTerrainByName(t.terrain));
         result = rand.nextDouble() * 100.;
         hex.setElevation(0);
         if (result > t.e_prob[0])
@@ -384,9 +385,9 @@ public class BattlelandRandomizerLoader
                         BattleHex hd = h[i][j].getNeighbor(k);
                         if (hd != null)
                         {
-                            String ts = h[i][j].getTerrain();
+                            String ts = h[i][j].getTerrain().getName();
                             int  es = h[i][j].getElevation();
-                            String td = hd.getTerrain();
+                            String td = hd.getTerrain().getName();
                             int  ed = hd.getElevation();
                             hazardPair hp = new hazardPair(ts,es,td,ed);
                             List hsl = findHazardPairBestMatch(hp);

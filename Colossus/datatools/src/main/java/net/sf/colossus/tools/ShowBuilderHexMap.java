@@ -401,7 +401,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                 repaint();
             }
         };
-        /*
+        
         randomizeAction = new AbstractAction("Randomize Map (from file)")
         {
         public void actionPerformed(ActionEvent e)
@@ -410,7 +410,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
         repaint();
         }
         };
-         */
+        
         fillWithSlopeAction = new AbstractAction("Fill Edge With Slope")
         {
 
@@ -438,7 +438,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
         mi = fileMenu.add(printBattlelandAction);
         mi = fileMenu.add(showBattlelandAction);
         mi = fileMenu.add(eraseAction);
-        //mi = fileMenu.add(randomizeAction);
+        mi = fileMenu.add(randomizeAction);
         mi = fileMenu.add(fillWithSlopeAction);
         mi = fileMenu.add(quitAction);
         mi.setMnemonic(KeyEvent.VK_Q);
