@@ -22,6 +22,7 @@ public class MasterBoardTerrain
 {
     private final String id;
     private final String displayName;
+    private       String subtitle;
     private final Color color;
     // TODO this should be a List<BattleHex> (and BattleHex should be part of the variant package)
     private List<String> startList;
@@ -35,6 +36,7 @@ public class MasterBoardTerrain
         this.id = id;
         this.displayName = displayName;
         this.color = color;
+        this.subtitle = null;
     }
 
     public String getId()
@@ -45,6 +47,16 @@ public class MasterBoardTerrain
     public String getDisplayName()
     {
         return displayName;
+    }
+
+    public String getSubtitle()
+    {
+        return subtitle;
+    }
+
+    public void setSubtitle(String s)
+    {
+        subtitle = s;
     }
 
     public Color getColor()

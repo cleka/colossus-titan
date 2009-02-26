@@ -204,6 +204,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                 List<String> tempTowerStartList = bl.getStartList();
                 masterBoardTerrain.setStartList(tempTowerStartList);
                 masterBoardTerrain.setTower(bl.isTower());
+                masterBoardTerrain.setSubtitle(bl.getSubtitle());
             }
             /*  Commented out until ported to XML
             else
@@ -725,7 +726,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             MasterBoardTerrain terrain = getMasterHex().getTerrain();
             String dn = terrain.getDisplayName();
             String bn = terrain.getId();
-            String sub = dn.equals(bn) ? null : bn;
+            String sub = terrain.getSubtitle();
 
             g.setFont(ResourceLoader.defaultFont.deriveFont((float)48));
             fm = g.getFontMetrics();
