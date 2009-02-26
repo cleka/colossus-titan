@@ -19,18 +19,38 @@ public abstract class Hazards implements HazardConstants
     /**
      * Properties - 
      */
-    public final EffectOnMovement effectOnGroundMovement; // Also flyers at end of move
+    /** Effect to apply to land-bound creature, and to flyer at the
+     * end of their movement (when they, presumably, land.).
+     */
+    public final EffectOnMovement effectOnGroundMovement;
+    /** Effect to apply to flying creature, except at the
+     * end of their movement (when they, presumably, land.).
+     */
     public final EffectOnMovement effectOnFlyerMovement;
 
+    /** Effect to apply when a creature is struck in this terrain.
+     */
     public final EffectOnStrike effectforDefendingInTerrain;
+    /** Scope of {@link effectforDefendingInTerrain}. Note that
+     * the first nativity (first vs. second) aply to the defending
+     * creature in this case.
+     */
     public final ScopeOfEffectOnStrike scopeForDefenceEffect;
+    /** Amount of {@link effectforDefendingInTerrain} */
     public final int defenceEffectAdjustment;
 
+    /** Effect to apply when a creature strike out from this terrain.
+     */
     public final EffectOnStrike effectforAttackingFromTerrain;
+    /** Scope of {@link effectforAttackingFromTerrain}. Note that
+     * the first nativity (first vs. second) aply to the attacking
+     * creature in this case.
+     */
     public final ScopeOfEffectOnStrike scopeForAttackEffect;
+    /** Amount of {@link effectforAttackingFromTerrain} */
     public final int attackEffectAdjustment;
 
-    public final EffectOnStrike effectForBeingRangeSruckInTerrain;
+    public final EffectOnStrike effectForBeingRangeStruckInTerrain;
     public final ScopeOfEffectOnStrike scopeForRangeStruckEffect;
     public final int rangeStruckEffectAdjustment;
 
@@ -71,7 +91,7 @@ public abstract class Hazards implements HazardConstants
         this.effectforAttackingFromTerrain = effectforAttackingFromTerrain;
         this.scopeForAttackEffect = scopeForAttackEffect;
         this.attackEffectAdjustment = attackEffectAdjustment;
-        this.effectForBeingRangeSruckInTerrain = effectForBeingRangeSruckInTerrain;
+        this.effectForBeingRangeStruckInTerrain = effectForBeingRangeSruckInTerrain;
         this.scopeForRangeStruckEffect = scopeForRangeStruckEffect;
         this.rangeStruckEffectAdjustment = RangeStruckEffectAdjustment;
         this.effectforRangeStrikeFromTerrain = effectforRangeStrikeFromTerrain;
