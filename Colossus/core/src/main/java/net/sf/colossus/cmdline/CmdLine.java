@@ -110,6 +110,10 @@ public class CmdLine
                 inLeftovers = true;
             }
         }
+        if (expectingValue)
+        {
+            throw new RuntimeException("last option never got its arg");
+        }
     }
 
     /** Return true iff the option has been seen. */
