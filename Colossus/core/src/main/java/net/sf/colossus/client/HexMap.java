@@ -77,6 +77,14 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     int cx = 6 * scale;
     int cy = 2 * scale;
 
+    /* not just a cache of the MasterHex info,
+     * but also a way for MasterHex-less subclass
+     * to set those informations.
+     */
+    protected String displayName = "undefined";
+    protected String basicName = "undefined";
+    protected String subtitle = null;
+
     public HexMap(MasterHex masterHex) {
         this(masterHex, true);
     }
@@ -90,6 +98,10 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         if (doSetup)
         {
             setupHexes();
+            MasterBoardTerrain terrain = masterHex.getTerrain();
+            displayName = terrain.getDisplayName();
+            basicName = terrain.getId();
+            subtitle = terrain.getSubtitle();
         }
     }
 
@@ -723,10 +735,6 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             // TODO this should probably be a standard JLabel placed properly
             Font oldFont = g.getFont();
             FontMetrics fm;
-            MasterBoardTerrain terrain = getMasterHex().getTerrain();
-            String dn = terrain.getDisplayName();
-            String bn = terrain.getId();
-            String sub = terrain.getSubtitle();
 
             g.setFont(ResourceLoader.defaultFont.deriveFont((float)48));
             fm = g.getFontMetrics();
@@ -734,22 +742,22 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
             // calculate needed space, set xPos so that it's drawn 
             // right-aligned 80 away from right window border.
-            Rectangle2D bounds = fm.getStringBounds(dn, g);
+            Rectangle2D bounds = fm.getStringBounds(displayName, g);
             int width = (int)bounds.getWidth();
             int windowWidth = super.getWidth();
             int xPos = windowWidth - 80 - width;
-            g.drawString(dn, xPos, 4 + tma);
+            g.drawString(displayName, xPos, 4 + tma);
 
-            if (sub != null)
+            if (subtitle != null)
             {
                 g.setFont(ResourceLoader.defaultFont.deriveFont((float)24));
                 fm = g.getFontMetrics();
                 int tma2 = fm.getMaxAscent();
-                bounds = fm.getStringBounds(sub, g);
+                bounds = fm.getStringBounds(subtitle, g);
                 width = (int)bounds.getWidth();
                 windowWidth = super.getWidth();
                 xPos = windowWidth - 80 - width;
-                g.drawString(sub, xPos, 4 + tma + 8 + tma2);
+                g.drawString(subtitle, xPos, 4 + tma + 8 + tma2);
             }
 
             /* reset antialiasing */

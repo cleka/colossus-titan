@@ -155,6 +155,9 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                     {
                         selectHexesByLabels(new HashSet<String>(startList));
                     }
+                    subtitle = parser.getSubtitle();
+                    displayName = temploadFileName.replaceAll(".xml", "");
+                    basicName = temploadFileName.replaceAll(".xml", "");
                 } catch (Exception e)
                 {
                     System.err.println(e);
@@ -328,9 +331,9 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
     private AbstractAction loadFileAction;
     JMenuBar menuBar;
 
-    ShowBuilderHexMap(String f)
+    ShowBuilderHexMap()
     {
-        super(f);
+        super();
 
         menuBar = new JMenuBar();
         JMenu fileMenu = new JMenu("File");

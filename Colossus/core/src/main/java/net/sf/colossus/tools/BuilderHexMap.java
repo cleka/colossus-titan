@@ -21,16 +21,14 @@ import net.sf.colossus.variant.HazardTerrain;
  */
 public class BuilderHexMap extends HexMap
 {
-    String filename = null;
     protected boolean isTower = false;
     protected int scale = 2 * 15;
     protected int cx = 6 * scale;
     protected int cy = 2 * scale;
 
-    BuilderHexMap(String f)
+    BuilderHexMap()
     {
         super(null, false);
-        filename = f;
 
         setOpaque(true);
         setBackground(Color.white);
@@ -41,7 +39,9 @@ public class BuilderHexMap extends HexMap
     {
         setupHexesGUI();
         setupNeighbors(h);
-        setupHexesGameState2(getBattleHexArray());
+        displayName = "Unnamed Battleland";
+        basicName = "Unnamed Battleland";
+        subtitle = null;
     }
 
     BattleHex[][] getBattleHexArray()
@@ -61,32 +61,6 @@ public class BuilderHexMap extends HexMap
         return h2;
     }
 
-    /** Add terrain, hexsides, elevation, and exits to hexes.
-     *  Cliffs are bidirectional; other hexside obstacles are noted
-     *  only on the high side, since they only interfere with
-     *  uphill movement. */
-    private synchronized void setupHexesGameState2(BattleHex[][] lh)
-    {
-        if (filename != null)
-        {
-            InputStream terIS = null;
-
-            try
-            {
-                terIS = new FileInputStream(filename);
-            } catch (Exception e)
-            {
-                System.out.println("Battlelands file loading failed : " + e);
-            }
-            try
-            {
-                BattlelandLoader bl = new BattlelandLoader(terIS, lh);
-            } catch (Exception e)
-            {
-                System.out.println("Battlelands file parsing failed : " + e);
-            }
-        }
-    }
 
     public void paintComponent(Graphics g)
     {

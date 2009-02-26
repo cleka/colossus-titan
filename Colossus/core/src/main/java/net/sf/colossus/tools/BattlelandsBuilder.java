@@ -15,16 +15,9 @@ public class BattlelandsBuilder
     {
          VariantSupport.loadVariantByName("Default",
             true);
-        String file = null;
-
-        if (arg.length > 0)
-        {
-            file = arg[0];
-            System.out.println("Opening " + file);
-        }
 
         GUIHex.setOverlay(true);
 
-        new ShowBuilderHexMap(file);
+        new ShowBuilderHexMap();
     }
 }
