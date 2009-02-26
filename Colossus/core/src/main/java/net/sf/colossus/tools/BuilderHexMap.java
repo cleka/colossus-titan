@@ -27,7 +27,7 @@ public class BuilderHexMap extends JPanel implements MouseListener,
 
     // GUI hexes need to be recreated for each object, since scale varies.
     protected GUIBattleHex[][] h = new GUIBattleHex[6][6];
-    private List hexes = new ArrayList(33);
+    private List<GUIBattleHex> hexes = new ArrayList<GUIBattleHex>(33);
     /** ne, e, se, sw, w, nw */
     private GUIBattleHex[] entrances = new GUIBattleHex[6];
     private static final boolean[][] show =
@@ -56,9 +56,9 @@ public class BuilderHexMap extends JPanel implements MouseListener,
         }
     };
     protected boolean isTower = false;
-    int scale = 2 * 15;
-    int cx = 6 * scale;
-    int cy = 2 * scale;
+    protected int scale = 2 * 15;
+    protected int cx = 6 * scale;
+    protected int cy = 2 * scale;
 
     BuilderHexMap(String f)
     {
@@ -258,10 +258,8 @@ public class BuilderHexMap extends JPanel implements MouseListener,
 
     void unselectAllHexes()
     {
-        Iterator it = hexes.iterator();
-        while (it.hasNext())
+        for (GUIBattleHex hex : hexes)
         {
-            GUIBattleHex hex = (GUIBattleHex) it.next();
             if (hex.isSelected())
             {
                 hex.unselect();
@@ -272,10 +270,8 @@ public class BuilderHexMap extends JPanel implements MouseListener,
 
     void unselectHexByLabel(String label)
     {
-        Iterator it = hexes.iterator();
-        while (it.hasNext())
+        for (GUIBattleHex hex : hexes)
         {
-            GUIBattleHex hex = (GUIBattleHex) it.next();
             if (hex.isSelected() && label.equals(hex.getHexModel().getLabel()))
             {
                 hex.unselect();
@@ -287,10 +283,8 @@ public class BuilderHexMap extends JPanel implements MouseListener,
 
     void unselectHexesByLabels(Set labels)
     {
-        Iterator it = hexes.iterator();
-        while (it.hasNext())
+        for (GUIBattleHex hex : hexes)
         {
-            GUIBattleHex hex = (GUIBattleHex) it.next();
             if (hex.isSelected() &&
                     labels.contains(hex.getHexModel().getLabel()))
             {
@@ -302,10 +296,8 @@ public class BuilderHexMap extends JPanel implements MouseListener,
 
     void selectHexByLabel(String label)
     {
-        Iterator it = hexes.iterator();
-        while (it.hasNext())
+        for (GUIBattleHex hex : hexes)
         {
-            GUIBattleHex hex = (GUIBattleHex) it.next();
             if (!hex.isSelected() && label.equals(hex.getHexModel().getLabel()))
             {
                 hex.select();
@@ -317,10 +309,8 @@ public class BuilderHexMap extends JPanel implements MouseListener,
 
     void selectHexesByLabels(Set labels)
     {
-        Iterator it = hexes.iterator();
-        while (it.hasNext())
+        for (GUIBattleHex hex : hexes)
         {
-            GUIBattleHex hex = (GUIBattleHex) it.next();
             if (!hex.isSelected() && labels.contains(
                     hex.getHexModel().getLabel()))
             {
@@ -334,10 +324,8 @@ public class BuilderHexMap extends JPanel implements MouseListener,
      *  a match.  Return the hex, or null. */
     GUIBattleHex getGUIHexByLabel(String label)
     {
-        Iterator it = hexes.iterator();
-        while (it.hasNext())
+        for (GUIBattleHex hex : hexes)
         {
-            GUIBattleHex hex = (GUIBattleHex) it.next();
             if (hex.getHexModel().getLabel().equals(label))
             {
                 return hex;
@@ -352,10 +340,8 @@ public class BuilderHexMap extends JPanel implements MouseListener,
      *  null if none does. */
     GUIBattleHex getHexContainingPoint(Point point)
     {
-        Iterator it = hexes.iterator();
-        while (it.hasNext())
+        for (GUIBattleHex hex : hexes)
         {
-            GUIBattleHex hex = (GUIBattleHex) it.next();
             if (hex.contains(point))
             {
                 return hex;
@@ -365,14 +351,12 @@ public class BuilderHexMap extends JPanel implements MouseListener,
         return null;
     }
 
-    Set getAllHexLabels()
+    Set<String> getAllHexLabels()
     {
-        Set set = new HashSet();
-        Iterator it = hexes.iterator();
-        while (it.hasNext())
+        Set<String> set = new HashSet<String>();
+        for (GUIBattleHex hex : hexes)
         {
-            BattleHex hex = (BattleHex) it.next();
-            set.add(hex.getLabel());
+            set.add(hex.getHexModel().getLabel());
         }
         return set;
     }
@@ -436,10 +420,8 @@ public class BuilderHexMap extends JPanel implements MouseListener,
             return;
         }
 
-        Iterator it = hexes.iterator();
-        while (it.hasNext())
+        for (GUIBattleHex hex : hexes)
         {
-            GUIBattleHex hex = (GUIBattleHex) it.next();
             if (!hex.getHexModel().isEntrance() && rectClip.intersects(hex.
                     getBounds()))
             {
@@ -464,7 +446,7 @@ public class BuilderHexMap extends JPanel implements MouseListener,
         HazardTerrain terrain;
         char s;
         int e;
-        List localStartList = new ArrayList();
+        List<GUIBattleHex> localStartList = new ArrayList<GUIBattleHex>();
 
         buf.append("# Battlelands generated by BattlelandsBuilder\n");
         buf.append(
@@ -568,10 +550,7 @@ public class BuilderHexMap extends JPanel implements MouseListener,
         if (!localStartList.isEmpty())
         {
             buf.append("# This terrain has a startlist\nSTARTLIST");
-            java.util.Iterator it = localStartList.iterator();
-            while (it.hasNext())
-            {
-                GUIBattleHex lh = (GUIBattleHex) it.next();
+            for (GUIBattleHex lh : localStartList) {
                 buf.append(" " + lh.getHexModel().getLabel());
             }
             buf.append("\n");
@@ -582,15 +561,13 @@ public class BuilderHexMap extends JPanel implements MouseListener,
 
     void eraseMap()
     {
-        Iterator it = hexes.iterator();
-        while (it.hasNext())
+        for (GUIBattleHex hex : hexes)
         {
-            BattleHex hex = (BattleHex) it.next();
-            hex.setTerrain(HazardTerrain.getTerrainByName("Plains"));
-            hex.setElevation(0);
+            hex.getHexModel().setTerrain(HazardTerrain.getTerrainByName("Plains"));
+            hex.getHexModel().setElevation(0);
             for (int i = 0; i < 6; i++)
             {
-                hex.setHexside(i, ' ');
+                hex.getHexModel().setHexside(i, ' ');
             }
         }
     }
