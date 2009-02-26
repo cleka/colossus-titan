@@ -72,7 +72,8 @@
   description="Compiles Colossus without datatools and variants">
     <javac debug="yes" deprecation="yes" target="${target.level}"
     source="${source.level}" srcdir="${core.src.dir}"
-    destdir="${build.classes.dir}">
+    destdir="${build.classes.dir}"
+    excludes="**/tools/**">
       <classpath refid="project.class.path" />
     </javac>
   </target>
