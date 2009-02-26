@@ -60,13 +60,6 @@ of type checking it's important to ask for the right kind of value
 for each option.  Properties includes the interface we use for file 
 saving and loading.
 
-Command-line options are parsed using the werken.opt package.  It 
-has certain limitations -- for example, each option name can only 
-be used once.  So in the short term, when the server and all clients 
-run in the same JVM, we will only support command-line setting of 
-server options, not client options.  We can add command-line control 
-of client options after networking is done.
-
 The rule when option settings conflict is that command-line options
 override options loaded from a config file at game start.  Options
 changed on a menu should override anything set earlier on the command 

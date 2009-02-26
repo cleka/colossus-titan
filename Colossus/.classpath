@@ -6,6 +6,5 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="libs/jdom.jar"/>
 	<classpathentry kind="lib" path="libs/junit.jar"/>
-	<classpathentry kind="lib" path="libs/werken.opt.jar"/>
 	<classpathentry kind="output" path="build/eclipse"/>
 </classpath>

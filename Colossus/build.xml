@@ -241,9 +241,6 @@
     <signjar jar="libs/junit.jar" alias="${user.name}"
     keystore="${user.name}Keystore"
     storepass="${env.JARPASSWORD}" />
-    <signjar jar="libs/werken.opt.jar" alias="${user.name}"
-    keystore="${user.name}Keystore"
-    storepass="${env.JARPASSWORD}" />
   </target>
   <!-- Tasks from here down are only needed for installation on the web site. -->
   <target name="dist" depends="clean,init,sign"
@@ -276,9 +273,6 @@
       <arg line="-a --chmod=ug=rw,o=r Colossus.jar ${SERVER}:${HTML_DIR}/public-build/Colossus.jar" />
     </exec>
     <exec executable="rsync">
-      <arg line="-a --chmod=ug=rw,o=r libs/werken.opt.jar ${SERVER}:${HTML_DIR}/public-build/libs/werken.opt.jar" />
-    </exec>
-    <exec executable="rsync">
       <arg line="-a --chmod=ug=rw,o=r libs/jdom.jar ${SERVER}:${HTML_DIR}/public-build/libs/jdom.jar" />
     </exec>
     <exec executable="rsync">
@@ -303,9 +297,6 @@
       <arg line="-a --chmod=ug=rw,o=r Colossus.jar ${SERVER}:${HTML_DIR}/public-testing/Colossus.jar" />
     </exec>
     <exec executable="rsync">
-      <arg line="-a --chmod=ug=rw,o=r libs/werken.opt.jar ${SERVER}:${HTML_DIR}/public-testing/libs/werken.opt.jar" />
-    </exec>
-    <exec executable="rsync">
       <arg line="-a --chmod=ug=rw,o=r libs/jdom.jar ${SERVER}:${HTML_DIR}/public-testing/libs/jdom.jar" />
     </exec>
     <exec executable="rsync">
@@ -325,9 +316,6 @@
     </exec>
     <exec executable="rsync">
       <arg line="-a --chmod=ug=rw,o=r Colossus.jar ${SERVER}:${HTML_DIR}/special-build/Colossus.jar" />
-    </exec>
-    <exec executable="rsync">
-      <arg line="-a --chmod=ug=rw,o=r libs/werken.opt.jar ${SERVER}:${HTML_DIR}/special-build/libs/werken.opt.jar" />
     </exec>
     <exec executable="rsync">
       <arg line="-a --chmod=ug=rw,o=r libs/jdom.jar ${SERVER}:${HTML_DIR}/special-build/libs/jdom.jar" />

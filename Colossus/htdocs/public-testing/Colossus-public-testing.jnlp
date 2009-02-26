@@ -14,7 +14,6 @@
        </information>
        <resources>
          <jar href="public-testing/Colossus.jar"/>
-         <jar href="public-testing/libs/werken.opt.jar"/>
          <jar href="public-testing/libs/jdom.jar"/>
          <j2se version="1.5+" max-heap-size="128M"/>
        </resources>

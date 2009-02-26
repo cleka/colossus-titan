@@ -10,14 +10,14 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.StartClient;
+import net.sf.colossus.cmdline.CmdLine;
+import net.sf.colossus.cmdline.Opt;
+import net.sf.colossus.cmdline.Opts;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.util.DebugMethods;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ViableEntityManager;
 import net.sf.colossus.webclient.WebClient;
-
-import com.werken.opt.CommandLine;
-import com.werken.opt.Option;
 
 
 /**
@@ -149,16 +149,21 @@ public final class Start
         return startObject;
     }
 
+    /** 
+     *  Print a usage string to stdout.  (*Not* to the logfile, where casual
+     *  users will miss it.)
+     */
     // unchecked conversion from options library
     @SuppressWarnings("unchecked")
-    private static void usage(com.werken.opt.Options opts)
+    private static void usage(Opts opts)
     {
-        LOGGER.log(Level.INFO, "Usage: java -jar Colossus.jar [options]");
-        Iterator<Option> it = opts.getOptions().iterator();
+        System.out.println("Usage: java -jar Colossus.jar [options]");
+        Iterator<Opt> it = opts.getOptions().iterator();
         while (it.hasNext())
         {
-            Option opt = it.next();
-            LOGGER.log(Level.INFO, opt.toString());
+            Opt opt = it.next();
+            // This needs to go to the console, not the log, to be useful.
+            System.out.println(opt.toString());
         }
     }
 
@@ -256,7 +261,7 @@ public final class Start
      * Expects that server (cf) options are already loaded.
      * 
      */
-    public static void setInitialAction(CommandLine cl,
+    public static void setInitialAction(CmdLine cl,
         Options netclientOptions, Options serverOptions, Options startOptions,
         Start startObject)
     {
@@ -403,7 +408,7 @@ public final class Start
      * Modify options from command-line args if possible.
      * Return false if something is wrong.  
      */
-    private static boolean setupOptionsFromCommandLine(CommandLine cl,
+    private static boolean setupOptionsFromCommandLine(CmdLine cl,
         Options startOptions, Options options)
     {
         if (cl == null)
@@ -577,8 +582,8 @@ public final class Start
         LOGGER.log(Level.INFO, "Start for Colossus version "
             + Client.getVersion() + " at " + new Date().getTime());
 
-        com.werken.opt.Options opts = new com.werken.opt.Options();
-        CommandLine cl = null;
+        Opts opts = new Opts();
+        CmdLine cl = null;
 
         // Catch-all block so we can log fatal exceptions.
         try
@@ -600,8 +605,7 @@ public final class Start
             opts.addOption('t', "timelimit", true, "AI time limit in s");
             opts.addOption('c', "client", false, "Run network client instead");
             opts.addOption('w', "webclient", false, "Run web client instead");
-            opts.addOption('F', "flagfile", true,
-                "Create flagfile when socket up");
+            opts.addOption('F', "flagfile", true, "Create flagfile when socket up");
             opts.addOption('s', "server", true, "Server name or IP");
             opts.addOption('S', "autosave", false, "Autosave");
             opts.addOption('A', "autoplay", false, "Autoplay");
