@@ -143,6 +143,6 @@ public class CmdLine
      *  were parsed. */
     public Collection<String> getLeftovers()
     {
-        return (Collection<String>)leftovers.clone();
+        return new ArrayList<String>(leftovers);
     }
 }

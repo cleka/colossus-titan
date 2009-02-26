@@ -13,10 +13,10 @@ import java.util.TreeMap;
 public class Opts
 {
     // maps the single char abbreviation to the Opt
-    private TreeMap<Character, Opt> optchToOpt = new TreeMap();
+    private TreeMap<Character, Opt> optchToOpt = new TreeMap<Character, Opt>();
 
     // maps the long option name to the Opt
-    private TreeMap<String, Opt> nameToOpt = new TreeMap();
+    private TreeMap<String, Opt> nameToOpt = new TreeMap<String, Opt>();
 
     public Opts()
     {
@@ -25,7 +25,7 @@ public class Opts
     /** Return a Collection of all my Opt objects. */
     public Collection<Opt> getOptions()
     {
-        return (Collection<Opt>)optchToOpt.values();
+        return optchToOpt.values();
     }
 
     /** Add one Opt. */
