@@ -3,7 +3,12 @@ package net.sf.colossus.tools;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.print.*;
+import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import javax.swing.*;
 
@@ -50,21 +55,43 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
 
         public String getDescription()
         {
-            return ("Colossus RaNDom generator file");
+            return ("Colossus RaNDom generator files");
+        }
+    }
+
+    class xmlFileFilter extends javax.swing.filechooser.FileFilter
+    {
+
+        public boolean accept(java.io.File f)
+        {
+            if (f.isDirectory())
+            {
+                return (true);
+            }
+            if (f.getName().endsWith(".xml"))
+            {
+                return (true);
+            }
+            return (false);
+        }
+
+        public String getDescription()
+        {
+            return ("XML files");
         }
     }
 
     /*
     private void doLoadRandom(BattleHex[][] h)
     {
-    javax.swing.JFileChooser rndChooser = new JFileChooser(".");
-    rndChooser.setFileFilter(new rndFileFilter());
-    rndChooser.setDialogTitle(
+    javax.swing.JFileChooser loadFileChooser = new JFileChooser(".");
+    loadFileChooser.setFileFilter(new rndFileFilter());
+    loadFileChooser.setDialogTitle(
     "Choose the RaNDom file to open (or cancel for nothing)");
-    int returnVal = rndChooser.showOpenDialog(rndChooser);
+    int returnVal = loadFileChooser.showOpenDialog(loadFileChooser);
     if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION)
     {
-    java.io.File rndFile = rndChooser.getSelectedFile();
+    java.io.File rndFile = loadFileChooser.getSelectedFile();
     String tempRndName = rndFile.getName();
     String tempRndDirectory = rndFile.getParentFile().getAbsolutePath();
     List directories = new java.util.ArrayList();
@@ -99,20 +126,21 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
      */
     private void doLoadFile(BattleHex[][] h)
     {
-        javax.swing.JFileChooser rndChooser = new JFileChooser(".");
-        rndChooser.setDialogTitle(
+        JFileChooser loadFileChooser = new JFileChooser();
+        loadFileChooser.setFileFilter(new xmlFileFilter());
+        loadFileChooser.setDialogTitle(
                 "Choose the battleland file to open (or cancel for nothing)");
-        int returnVal = rndChooser.showOpenDialog(rndChooser);
+        int returnVal = loadFileChooser.showOpenDialog(loadFileChooser);
         if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION)
         {
-            java.io.File rndFile = rndChooser.getSelectedFile();
-            String tempRndName = rndFile.getName();
-            String tempRndDirectory = rndFile.getParentFile().getAbsolutePath();
-            List directories = new java.util.ArrayList();
-            directories.add(tempRndDirectory);
-            java.io.InputStream inputFile =
+            File loadFileFile = loadFileChooser.getSelectedFile();
+            String temploadFileName = loadFileFile.getName();
+            String temploadFileDirectory = loadFileFile.getParentFile().getAbsolutePath();
+            List<String> directories = new ArrayList<String>();
+            directories.add(temploadFileDirectory);
+            InputStream inputFile =
                     net.sf.colossus.util.ResourceLoader.getInputStream(
-                    tempRndName,
+                    temploadFileName,
                     directories);
             if (inputFile != null)
             {
@@ -122,10 +150,10 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                 {
                     towerItem.setState(parser.isTower());
                     isTower = parser.isTower();
-                    List startList = parser.getStartList();
+                    List<String> startList = parser.getStartList();
                     if (startList != null)
                     {
-                        selectHexesByLabels(new java.util.HashSet(startList));
+                        selectHexesByLabels(new HashSet<String>(startList));
                     }
                 } catch (Exception e)
                 {
@@ -137,20 +165,20 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
 
     private void doSaveFile()
     {
-        javax.swing.JFileChooser rndChooser = new JFileChooser(".");
-        rndChooser.setDialogTitle(
+        javax.swing.JFileChooser saveFileChooser = new JFileChooser();
+        saveFileChooser.setDialogTitle(
                 "Choose the battleland file to save (or cancel for nothing)");
-        int returnVal = rndChooser.showOpenDialog(rndChooser);
+        int returnVal = saveFileChooser.showSaveDialog(saveFileChooser);
         if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION)
         {
-            java.io.File rndFile = rndChooser.getSelectedFile();
-            String tempRndName = rndFile.getName();
-            String tempRndDirectory = rndFile.getParentFile().getAbsolutePath();
-            List directories = new java.util.ArrayList();
-            directories.add(tempRndDirectory);
-            java.io.OutputStream outputFile =
+            java.io.File saveFileFile = saveFileChooser.getSelectedFile();
+            String tempsaveFileName = saveFileFile.getName();
+            String tempsaveFileDirectory = saveFileFile.getParentFile().getAbsolutePath();
+            List<String> directories = new ArrayList<String>();
+            directories.add(tempsaveFileDirectory);
+            OutputStream outputFile =
                     net.sf.colossus.util.ResourceLoader.getOutputStream(
-                    tempRndName,
+                    tempsaveFileName,
                     directories);
             if (outputFile != null)
             {

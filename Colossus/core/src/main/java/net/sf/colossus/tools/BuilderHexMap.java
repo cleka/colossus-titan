@@ -307,7 +307,7 @@ public class BuilderHexMap extends JPanel implements MouseListener,
         }
     }
 
-    void selectHexesByLabels(Set labels)
+    void selectHexesByLabels(Set<String> labels)
     {
         for (GUIBattleHex hex : hexes)
         {
