@@ -914,7 +914,8 @@ public final class Strike
             // striking out of possible hazard
             attackerSkill -=
                      hex.getTerrain().getSkillPenaltyStrikeFrom(
-                       striker.getCreature().isNativeIn(hex.getTerrain()));
+                       striker.getCreature().isNativeIn(hex.getTerrain()),
+                       target.getCreature().isNativeIn(hex.getTerrain()));
 
             if (hex.getElevation() > targetHex.getElevation())
             {

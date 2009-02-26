@@ -57,7 +57,7 @@ public class Creature
 
         // Dice can be modified by terrain.
         dice += myHexTerrain.getPowerBonusStrikeFrom(myType.isNativeIn(
-                myHexTerrain));
+                myHexTerrain), targetType.isNativeIn(myHexTerrain));
 
         // Native striking down a dune hexside: +2
         if (myHexside.equals(HazardHexside.DUNE) && myType.isNativeDune())
@@ -110,7 +110,8 @@ public class Creature
         // striking out of possible hazard
         attackerSkill -=
                 myHexTerrain.getSkillPenaltyStrikeFrom(
-                myType.isNativeIn(myHexTerrain));
+                myType.isNativeIn(myHexTerrain),
+                targetType.isNativeIn(myHexTerrain));
 
         if (myElevation > targetElevation)
         {

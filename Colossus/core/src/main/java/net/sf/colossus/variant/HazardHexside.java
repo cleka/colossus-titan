@@ -16,6 +16,7 @@ public class HazardHexside extends Hazards
     * A map from the serialization string of a Hexside to the instances.
     */
     private final static Map<String, HazardHexside> HEXSIDE_MAP = new HashMap<String, HazardHexside>();
+    private final static Map<Character, HazardHexside> HEXSIDE_MAP_UGLY = new HashMap<Character, HazardHexside>();
 
     public HazardHexside(String name, char code,
         EffectOnMovement effectOnGroundMovement,
@@ -44,11 +45,17 @@ public class HazardHexside extends Hazards
             scopeForRangeStrikeEffect, RangeStrikeEffectAdjustment,
             RangeStrikeSpecial, terrainSpecial);
         HEXSIDE_MAP.put(name, this);
+        HEXSIDE_MAP_UGLY.put(code, this);
     }
 
     public static HazardHexside getHexsideByName(String name)
     {
         return HEXSIDE_MAP.get(name);
+    }
+    /** @deprecated, helper function, we want to get rid of the single char stuff */
+    public static HazardHexside getHexsideByCode(char code)
+    {
+        return HEXSIDE_MAP_UGLY.get(code);
     }
 
     /**

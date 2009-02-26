@@ -18,6 +18,7 @@ import net.sf.colossus.game.Player;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.HazardHexside;
 import net.sf.colossus.variant.HazardTerrain;
 
 
@@ -447,7 +448,8 @@ public class CreatureServerSide extends Creature
             // striking out of possible hazard
             attackerSkill -=
                      hex.getTerrain().getSkillPenaltyStrikeFrom(
-                       this.isNativeTerrain(hex.getTerrain()));
+                       this.isNativeTerrain(hex.getTerrain()),
+                       target.isNativeTerrain(hex.getTerrain()));
 
             if (hex.getElevation() > targetHex.getElevation())
             {
@@ -474,6 +476,17 @@ public class CreatureServerSide extends Creature
                     attackerSkill--;
                 }
             }
+            /* TODO: remove TEST TEST TEST TEST TEST */
+            int checkStrikingSkill = getStrikingSkill(target,
+                    hex.getElevation(),targetHex.getElevation(),
+                    hex.getTerrain(),targetHex.getTerrain(),
+                    HazardHexside.getHexsideByCode(hex.getHexside(BattleServerSide.getDirection(hex, targetHex,
+                    false))),
+                    HazardHexside.getHexsideByCode(targetHex.getHexside(BattleServerSide.getDirection(targetHex, hex,
+                    false))));
+            if (checkStrikingSkill != attackerSkill)
+                LOGGER.warning("attackerSkill says " + attackerSkill + " but checkStrikingSkill says " + checkStrikingSkill);
+            /* END TODO: remove TEST TEST TEST TEST TEST */
         }
         else if (!useMagicMissile())
         {
