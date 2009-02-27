@@ -110,7 +110,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
             java.io.File rndFile = loadFileChooser.getSelectedFile();
             String tempRndName = rndFile.getName();
             String tempRndDirectory = rndFile.getParentFile().getAbsolutePath();
-            List directories = new java.util.ArrayList();
+            List<String> directories = new java.util.ArrayList<String>();
             directories.add(tempRndDirectory);
             java.io.InputStream inputFile =
                     net.sf.colossus.util.ResourceLoader.getInputStream(
@@ -127,10 +127,10 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                     }
                     parser.resolveAllHexsides(h);
                     towerItem.setState(parser.isTower());
-                    List startList = parser.getStartList();
+                    List<String> startList = parser.getStartList();
                     if (startList != null)
                     {
-                        selectHexesByLabels(new java.util.HashSet(startList));
+                        selectHexesByLabels(new java.util.HashSet<String>(startList));
                     }
                 } catch (Exception e)
                 {

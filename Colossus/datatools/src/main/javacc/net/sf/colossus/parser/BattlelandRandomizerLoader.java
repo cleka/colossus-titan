@@ -10,7 +10,7 @@ import net.sf.colossus.variant.HazardTerrain;
 /**
  * BattlelandRandomizerLoader create a randomized Battleland from a description file.
  * @author Romain Dolbeau
- * @version $Id: BattlelandRandomizerLoader.jj 2004 2002-11-29 13:54:21Z dolbeau $
+ * @version $Id: BattlelandRandomizerLoader.jj 3649 2009-02-26 17:49:11Z dolbeau $
  * @see net.sf.colossus.client.BattleHex
  */
 public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderConstants {
@@ -25,20 +25,20 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
     };
     private static final Random rand = new net.sf.colossus.util.DevRandom();
 
-    private List leftover;
-    private List usedup;
+    private List<address> leftover;
+    private List<address> usedup;
 
     BattleHex[][] hexes;
 
-    Hashtable labels = new Hashtable();
+    Hashtable<String,List<address>> labels = new Hashtable<String,List<address>>();
 
     /* code executed just before the constructor call */
     /* used to add the predefined labels to the Hashtable */
     {
         int i,j;
-        List al;
+        List<address> al;
 
-        al = new ArrayList();
+        al = new ArrayList<address>();
 
         for (i = 1; i <= 4 ; i++)
             for (j = 2; j <= 3 ; j++)
@@ -48,27 +48,27 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
             al.add(new address(i,4));
         labels.put("inside", al);
 
-        al = new ArrayList();
+        al = new ArrayList<address>();
 
         for (i = 2; i <= 4 ; i++)
             al.add(new address(0,i));
         labels.put("leftdefenseentry", al);
 
-        al = new ArrayList();
+        al = new ArrayList<address>();
 
         al.add(new address(3,0));
         for (i = 4; i <= 5 ; i++)
             al.add(new address(i,1));
         labels.put("upperdefenseentry", al);
 
-        al = new ArrayList();
+        al = new ArrayList<address>();
 
         al.add(new address(5,4));
         for (i = 3; i <= 4 ; i++)
             al.add(new address(i,5));
         labels.put("lowerdefenseentry", al);
 
-        al = new ArrayList();
+        al = new ArrayList<address>();
 
         for (i = 0; i < 6 ; i++)
             for (j = 0; j < 6 ; j++)
@@ -77,7 +77,7 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
         labels.put("anywhere", al);
     }
 
-    private class randomHazard implements Comparable
+    private class randomHazard implements Comparable<randomHazard>
     {
         private final String terrain;
         private final double prob;
@@ -132,9 +132,8 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
             s = s + " [" + e_prob[0] + "/" + e_prob[1] + "/" + e_prob[2] + "]";
             return s;
         }
-        public int compareTo(Object o)
+        public int compareTo(randomHazard other)
         {
-            randomHazard other = (randomHazard)o;
             if (other.prob != prob)
             {
                 return (prob > other.prob ? -1 : 1);
@@ -142,7 +141,7 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
             return 0;
         }
     }
-    private class address implements Comparable
+    private class address implements Comparable<address>
     {
         final int x;
         final int y;
@@ -186,9 +185,8 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
             }
             return (xc + "" + yc);
         }
-        public int compareTo(Object o)
+        public int compareTo(address other)
         {
-            address other = (address)o;
             if (other.x != x)
             {
                 return (x < other.x ? -1 : 1);
@@ -224,7 +222,7 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
             min = mi; max = ma;
         }
     }
-    private void resolveOne(BattleHex[][] h, List al, randomHazard t)
+    private void resolveOne(BattleHex[][] h, List<address> al, randomHazard t)
     {
         if (al.isEmpty())
             return;
@@ -244,19 +242,19 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
         usedup.add(a);
     }
 
-    private void resolveAll(BattleHex[][] h, List al, List tl)
+    private void resolveAll(BattleHex[][] h, List<address> al, List<randomHazard> tl)
     {
-        usedup = new ArrayList();
-        Iterator it = tl.iterator();
+        usedup = new ArrayList<address>();
+        Iterator<randomHazard> it = tl.iterator();
         while (it.hasNext())
         {
-            randomHazard rt = (randomHazard)it.next();
+            randomHazard rt = it.next();
             resolveOne(h, al, rt);
         }
         leftover = al;
     }
 
-    private Map hexsideRandomness = new TreeMap();
+    private Map<hazardPair,List<randomHexside>> hexsideRandomness = new TreeMap<hazardPair,List<randomHexside>>();
     private class hazardPair implements Comparable
     {
         final String hs;
@@ -339,24 +337,24 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
         }
     }
 
-    private List findHazardPairBestMatch(hazardPair p)
+    private List<randomHexside> findHazardPairBestMatch(hazardPair p)
     {
         hazardPair p2;
-        List al;
+        List<randomHexside> al;
         p2 = p;
-        al = (List)hexsideRandomness.get(p2);
+        al = hexsideRandomness.get(p2);
         if (al != null) // exact match
             return al;
         p2 = new hazardPair(p.hs, p.es, p.hd, -1);
-        al = (List)hexsideRandomness.get(p2);
+        al = hexsideRandomness.get(p2);
         if (al != null)
             return al;
         p2 = new hazardPair(p.hs, -1, p.hd, p.ed);
-        al = (List)hexsideRandomness.get(p2);
+        al = hexsideRandomness.get(p2);
         if (al != null)
             return al;
         p2 = new hazardPair(p.hs, -1, p.hd, -1);
-        al = (List)hexsideRandomness.get(p2);
+        al = hexsideRandomness.get(p2);
         if (al != null)
             return al;
         return null;
@@ -380,11 +378,11 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
                             String td = hd.getTerrain().getName();
                             int  ed = hd.getElevation();
                             hazardPair hp = new hazardPair(ts,es,td,ed);
-                            List hsl = findHazardPairBestMatch(hp);
+                            List<randomHexside> hsl = findHazardPairBestMatch(hp);
                             if (hsl != null)
                             {
                                 boolean attributed = false;
-                                Iterator it = hsl.iterator();
+                                Iterator<randomHexside> it = hsl.iterator();
                                 while (!attributed && it.hasNext())
                                 {
                                     randomHexside rhs = (randomHexside)it.next();
@@ -403,8 +401,8 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
         }
         if (startlistAddress != null)
         {
-            startlist = new java.util.ArrayList();
-            java.util.Iterator it = startlistAddress.iterator();
+            startlist = new java.util.ArrayList<String>();
+            java.util.Iterator<address> it = startlistAddress.iterator();
             while (it.hasNext())
             {
                 address ad = (address)it.next();
@@ -414,15 +412,15 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
     }
 
     /** hold the list of label for the startlist */
-    private java.util.List startlist = null;
+    private java.util.List<String> startlist = null;
 
     /** hold the list of address prior resolution for the startlist */
-    private java.util.List startlistAddress = null;
+    private java.util.List<address> startlistAddress = null;
 
     /** is the terrain a Tower ? */
     private boolean isTower = false;
 
-    public java.util.List getStartList()
+    public java.util.List<String> getStartList()
     {
         return startlist;
     }
@@ -496,7 +494,7 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
 
   final public address z_address() throws ParseException {
     int x,y;
-    List al;
+    List<address> al;
     if (jj_2_7(20)) {
       jj_consume_token(OPENPAR);
       x = z_number();
@@ -554,9 +552,9 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
     throw new Error("Missing return statement in function");
   }
 
-  final public List z_listAddress() throws ParseException {
+  final public List<address> z_listAddress() throws ParseException {
     address ad;
-    List al, al2, al3;
+    List<address> al, al2, al3;
     int x,y;
     range r1, r2;
     int i,j;
@@ -569,7 +567,7 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
       al2 = z_listAddress();
       jj_consume_token(CLOSEPAR);
       al = z_listAddress();
-        List al4 = new ArrayList(al);
+        List<address> al4 = new ArrayList<address>(al);
         while (!al2.isEmpty() && (x > 0))
         {
             ad = (address)al2.remove(rand.nextInt(al2.size()));
@@ -585,8 +583,8 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
       al2 = z_listAddress();
       jj_consume_token(CLOSEPAR);
       al = z_listAddress();
-        List al4 = new ArrayList(al);
-        Iterator it = al3.iterator();
+        List<address> al4 = new ArrayList<address>(al);
+        Iterator<address> it = al3.iterator();
         while (it.hasNext())
         {
             ad = (address)it.next();
@@ -601,10 +599,10 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
       jj_consume_token(LEFTOVER);
       jj_consume_token(CLOSEPAR);
       al = z_listAddress();
-        List al4 = new ArrayList(al);
+        List<address> al4 = new ArrayList<address>(al);
         if (leftover != null)
         {
-            Iterator it = leftover.iterator();
+            Iterator<address> it = leftover.iterator();
             while (it.hasNext())
                 al4.add(it.next());
         }
@@ -615,11 +613,11 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
       al2 = z_listAddress();
       jj_consume_token(CLOSEPAR);
       al = z_listAddress();
-        List al4 = new ArrayList(al);
+        List<address> al4 = new ArrayList<address>(al);
         if (al2 != null)
         {
-            Set  tempSet = new TreeSet();
-            Iterator it = al2.iterator();
+            Set<address> tempSet = new TreeSet<address>();
+            Iterator<address> it = al2.iterator();
             while (it.hasNext())
             {
                 ad = (address)it.next();
@@ -652,10 +650,10 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
       jj_consume_token(USEDUP);
       jj_consume_token(CLOSEPAR);
       al = z_listAddress();
-        List al4 = new ArrayList(al);
+        List<address> al4 = new ArrayList<address>(al);
         if (usedup != null)
         {
-            Iterator it = usedup.iterator();
+            Iterator<address> it = usedup.iterator();
             while (it.hasNext())
                 al4.add(it.next());
         }
@@ -665,11 +663,11 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
       s = z_label();
       jj_consume_token(CLOSEPAR);
       al = z_listAddress();
-        List al4 = new ArrayList(al);
-        List ll = (List)labels.get(s);
+        List<address> al4 = new ArrayList<address>(al);
+        List<address> ll = labels.get(s);
         if (ll != null)
         {
-            Iterator it = ll.iterator();
+            Iterator<address> it = ll.iterator();
             while (it.hasNext())
                 al4.add(it.next());
         }
@@ -724,15 +722,15 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
         }
         {if (true) return al;}
     } else {
-      {if (true) return new ArrayList();}
+      {if (true) return new ArrayList<address>();}
     }
     throw new Error("Missing return statement in function");
   }
 
-  final public List z_listHazard() throws ParseException {
+  final public List<randomHazard> z_listHazard() throws ParseException {
     String t;
     int e = 0;
-    List tl;
+    List<randomHazard> tl;
     double p = 100.0,p1,p2,p3;
     if (jj_2_22(20)) {
       t = z_chaine();
@@ -771,15 +769,15 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
         tl.add(rt);
         {if (true) return tl;}
     } else {
-      {if (true) return new ArrayList();}
+      {if (true) return new ArrayList<randomHazard>();}
     }
     throw new Error("Missing return statement in function");
   }
 
-  final public List z_listHexside() throws ParseException {
+  final public List<randomHexside> z_listHexside() throws ParseException {
     char t;
     int e = 0;
-    List hl;
+    List<randomHexside> hl;
     double p = 100.0,p1,p2,p3;
     if (jj_2_25(20)) {
       t = z_terrain();
@@ -794,7 +792,7 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
         hl.add(rh);
         {if (true) return hl;}
     } else {
-      {if (true) return new ArrayList();}
+      {if (true) return new ArrayList<randomHexside>();}
     }
     throw new Error("Missing return statement in function");
   }
@@ -817,8 +815,9 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
   }
 
   final public int oneArea(BattleHex h[][]) throws ParseException {
-    List al;
-    List tl;
+    List<address> al;
+    List<randomHazard> tl;
+    List<randomHexside> tl2;
     String s;
     hexes = h;
     hazardPair hp;
@@ -845,10 +844,10 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
       jj_consume_token(PAIR);
       hp = z_hazardPair();
       jj_consume_token(HEXSIDES);
-      tl = z_listHexside();
-        //System.out.println("For " + hp + " we'll use " + tl);
-        Collections.reverse(tl);
-        hexsideRandomness.put(hp,tl);
+      tl2 = z_listHexside();
+        //System.out.println("For " + hp + " we'll use " + tl2);
+        Collections.reverse(tl2);
+        hexsideRandomness.put(hp,tl2);
         //System.out.println("NOW: " + hexsideRandomness);
         {if (true) return(0);}
     } else if (jj_2_29(20)) {
@@ -858,7 +857,7 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
     } else if (jj_2_30(20)) {
       jj_consume_token(STARTLIST);
       al = z_listAddress();
-        startlistAddress = new java.util.ArrayList(al);
+        startlistAddress = new java.util.ArrayList<address>(al);
         {if (true) return 0;}
     } else if (jj_2_31(20)) {
       jj_consume_token(EOL);
@@ -1107,16 +1106,13 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
     finally { jj_save(32, xla); }
   }
 
-  private boolean jj_3R_12() {
-    if (jj_scan_token(COMMENT)) return true;
+  private boolean jj_3_29() {
+    if (jj_scan_token(TOWER)) return true;
     return false;
   }
 
-  private boolean jj_3_11() {
-    if (jj_scan_token(OPENPAR)) return true;
-    if (jj_scan_token(LEFTOVER)) return true;
-    if (jj_scan_token(CLOSEPAR)) return true;
-    if (jj_3R_2()) return true;
+  private boolean jj_3R_12() {
+    if (jj_scan_token(COMMENT)) return true;
     return false;
   }
 
@@ -1125,6 +1121,14 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
     if (jj_3R_5()) return true;
     if (jj_scan_token(COMMA)) return true;
     if (jj_3R_5()) return true;
+    if (jj_scan_token(CLOSEPAR)) return true;
+    if (jj_3R_2()) return true;
+    return false;
+  }
+
+  private boolean jj_3_11() {
+    if (jj_scan_token(OPENPAR)) return true;
+    if (jj_scan_token(LEFTOVER)) return true;
     if (jj_scan_token(CLOSEPAR)) return true;
     if (jj_3R_2()) return true;
     return false;
@@ -1192,6 +1196,14 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
     return false;
   }
 
+  private boolean jj_3_26() {
+    if (jj_scan_token(AREA)) return true;
+    if (jj_3R_2()) return true;
+    if (jj_scan_token(HAZARDS)) return true;
+    if (jj_3R_8()) return true;
+    return false;
+  }
+
   private boolean jj_3R_6() {
     Token xsp;
     xsp = jj_scanpos;
@@ -1204,14 +1216,6 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
 
   private boolean jj_3_3() {
     if (jj_scan_token(FPNUMBER)) return true;
-    return false;
-  }
-
-  private boolean jj_3_26() {
-    if (jj_scan_token(AREA)) return true;
-    if (jj_3R_2()) return true;
-    if (jj_scan_token(HAZARDS)) return true;
-    if (jj_3R_8()) return true;
     return false;
   }
 
@@ -1460,17 +1464,17 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
     return false;
   }
 
+  private boolean jj_3_30() {
+    if (jj_scan_token(STARTLIST)) return true;
+    if (jj_3R_2()) return true;
+    return false;
+  }
+
   private boolean jj_3_12() {
     if (jj_scan_token(SURROUNDINGSOF)) return true;
     if (jj_scan_token(OPENPAR)) return true;
     if (jj_3R_2()) return true;
     if (jj_scan_token(CLOSEPAR)) return true;
-    if (jj_3R_2()) return true;
-    return false;
-  }
-
-  private boolean jj_3_30() {
-    if (jj_scan_token(STARTLIST)) return true;
     if (jj_3R_2()) return true;
     return false;
   }
@@ -1491,11 +1495,6 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
     if (jj_scan_token(COMMA)) return true;
     if (jj_3R_1()) return true;
     if (jj_scan_token(CLOSEPAR)) return true;
-    return false;
-  }
-
-  private boolean jj_3_29() {
-    if (jj_scan_token(TOWER)) return true;
     return false;
   }
 

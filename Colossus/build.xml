@@ -92,6 +92,7 @@
     source="${source.level}" srcdir="${datatoolsparser.src.dir}"
     destdir="${build.classes.dir}" excludes="**/datatools/**">
       <classpath refid="project.class.path" />
+      <compilerarg value="-Xlint:unchecked" />
     </javac>
   </target>
   <target name="compileDatatools" depends="init,compile,compileDatatoolsParser"
@@ -100,6 +101,7 @@
     source="${source.level}" srcdir="${datatools.src.dir}"
     destdir="${build.classes.dir}" excludes="**/datatools/**">
       <classpath refid="project.class.path" />
+      <compilerarg value="-Xlint:unchecked" />
     </javac>
   </target>
   <target name="compileTests" depends="compile"
