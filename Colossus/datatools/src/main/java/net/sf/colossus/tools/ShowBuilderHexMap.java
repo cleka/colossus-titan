@@ -351,6 +351,47 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
         }
     }
 
+    class CleanAllHexsideAction extends AbstractAction
+    {
+        boolean myself;
+
+        CleanAllHexsideAction(String t, boolean myself)
+        {
+            super(t);
+            this.myself = myself;
+        }
+
+        public void actionPerformed(ActionEvent e)
+        {
+            GUIBattleHex h = getHexContainingPoint(lastPoint);
+            if (myself)
+            {
+                for (int i = 0; i < 6; i++)
+                {
+                    h.getHexModel().setHexside(i, ' ');
+                    GUIBattleHex n = h.getNeighbor(i);
+                    if (n != null)
+                    {
+                        n.repaint();
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i < 6; i++)
+                {
+                    GUIBattleHex n = h.getNeighbor(i);
+                    if (n != null)
+                    {
+                        n.getHexModel().setHexside((i + 3) % 6, ' ');
+                        n.repaint();
+                    }
+                }
+            }
+            h.repaint();
+        }
+    }
+
     class ElevationAction extends AbstractAction
     {
 
@@ -646,6 +687,11 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                     "Set Elevation to: " + i,
                     i));
         }
+        popupMenuTerrain.addSeparator();
+
+        popupMenuTerrain.add(new CleanAllHexsideAction("Clear my hexsides", true));
+        popupMenuTerrain.add(new CleanAllHexsideAction("Clear my neighbors' hexsides", false));
+        
         popupMenuTerrain.addSeparator();
         AbstractAction select = new AbstractAction("Select/Unselect (StartList)")
         {
