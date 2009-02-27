@@ -621,15 +621,21 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
         defaultRandom.put("Tower", "Battlelands/Tower.rnd");
         defaultRandom.put("Tundra", "Battlelands/Tundra.rnd");
         defaultRandom.put("Woods", "Battlelands/Woods.rnd");
-
         for (String name : defaultRandom.keySet()) {
             mi = randomMenu.add(new randomizeActionPredef(name, defaultRandom.get(name)));
         }
+        randomMenu.addSeparator();
+        defaultRandom.clear();
+        defaultRandom.put("Beach", "Battlelands/Custom_Beach.rnd");
+        for (String name : defaultRandom.keySet()) {
+            mi = randomMenu.add(new randomizeActionPredef(name, defaultRandom.get(name)));
+        }
+        randomMenu.addSeparator();
 
-        specialMenu.addSeparator();
 
         mi = randomMenu.add(randomizeAction);
-        
+
+        specialMenu.addSeparator();
         specialMenu.add(randomMenu);
                
         frame = new JFrame("BattlelandBuilder");

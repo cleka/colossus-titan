@@ -1,0 +1,29 @@
+# $Id$
+TITLE "Beach"
+SUBTITLE "Randomized!"
+
+#You really don't want to be the defender from this side,
+#this is for custom maps only!
+#the lake is on the left
+AREA (leftdefenseentry) HAZARDS Lake Lake Lake,50.
+LABEL mylake1 = (usedup)
+LABEL smylake1 = SURROUNDINGSOF((mylake1))
+AREA (smylake1) HAZARDS Lake,50. Lake,50.
+LABEL mylake2 = (usedup)(mylake1)
+
+#and near the lake we have the beach
+LABEL thebeach = SURROUNDINGSOF((mylake2))
+AREA (thebeach) HAZARDS Sand Sand Sand Sand Sand Sand Sand Sand Sand
+LABEL uptonow1 = (usedup) (mylake2)
+LABEL morebeach = SURROUNDINGSOF((uptonow1))
+AREA (morebeach) HAZARDS Sand Sand,50. Sand,25. Sand,10. Sand,5.
+LABEL uptonow2 = (usedup) (uptonow1)
+
+#the little brush on the dune
+LABEL thelittlebrusharea = SURROUNDINGSOF((uptonow2))
+AREA (thelittlebrusharea) HAZARDS Brush,10.
+
+# hexside probability
+# 40% of the hexside will be dune, and 50% of the remaining will be Cliff
+# This for any elevation
+PAIR (Sand,*)(Plains,*) HEXSIDES d,40. c,50.
