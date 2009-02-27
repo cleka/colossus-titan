@@ -12,6 +12,7 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.game.Battle;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
@@ -407,7 +408,7 @@ public class CreatureServerSide extends Creature
             }
 
             // Adjacent hex, so only one possible direction.
-            int direction = BattleServerSide.getDirection(hex, targetHex,
+            int direction = Battle.getDirection(hex, targetHex,
                 false);
             char hexside = hex.getHexside(direction);
 

@@ -185,7 +185,11 @@ public final class Strike
     }
 
     /** Return the titan range (inclusive at both ends) from the critter to the
-     *  closest enemy critter.  Return OUT_OF_RANGE if there are none. */
+     *  closest enemy critter.  Return OUT_OF_RANGE if there are none.
+     * WARNING: this is a duplication from code in Battle ; caller should use
+     * a Battle instance instead.
+     * @deprecated Should use an extension of Battle instead of Strike
+     */
     public int minRangeToEnemy(BattleChit chit)
     {
         BattleHex hex = client.getBattleHex(chit);
@@ -214,7 +218,12 @@ public final class Strike
         return min;
     }
 
-    /** Caller must ensure that yDist != 0 */
+    /**
+     * WARNING: this is a duplication from code in Battle ; caller should use
+     * a Battle instance instead.
+     * @deprecated Should use an extension of Battle instead of Strike
+     */
+    @Deprecated
     private static boolean toLeft(double xDist, double yDist)
     {
         double ratio = xDist / yDist;
@@ -228,14 +237,25 @@ public final class Strike
             return false;
         }
     }
-
+    /*
+     * WARNING: this is a duplication from code in Battle ; caller should use
+     * a Battle instance instead.
+     * @deprecated Should use an extension of Battle instead of Strike
+     * @deprecated This is the realm of HazardEdge, not direct use of hexside
+     * */
+    @Deprecated
     static boolean isObstacle(char hexside)
     {
         return (hexside != ' ') && (hexside != 'r');
     }
 
     /** Check LOS, going to the left of hexspines if argument left is true, or
-     *  to the right if it is false. */
+     *  to the right if it is false.
+     * WARNING: this is a duplication from code in Battle ; caller should use
+     * a Battle instance instead.
+     * @deprecated Should use an extension of Battle instead of Strike
+     */
+    @Deprecated
     private boolean isLOSBlockedDir(BattleHex initialHex,
         BattleHex currentHex, BattleHex finalHex, boolean left,
         int strikeElevation, boolean strikerAtop, boolean strikerAtopCliff,
@@ -392,7 +412,12 @@ public final class Strike
 
     /** Check to see if the LOS from hex1 to hex2 is blocked.  If the LOS
      *  lies along a hexspine, check both and return true only if both are
-     *  blocked. */
+     *  blocked.
+     * WARNING: this is a duplication from code in Battle ; caller should use
+     * a Battle instance instead.
+     * @deprecated Should use an extension of Battle instead of Strike
+     */
+    @Deprecated
     private boolean isLOSBlocked(BattleHex hex1, BattleHex hex2)
     {
         if (hex1 == hex2)
@@ -483,7 +508,12 @@ public final class Strike
     /** Return the hexside direction of the path from hex1 to hex2.
      *  Sometimes two directions are possible.  If the left parameter
      *  is set, the direction further left will be given.  Otherwise,
-     *  the direction further right will be given. */
+     *  the direction further right will be given.
+     * WARNING: this is a duplication from code in Battle ; caller should use
+     * a Battle instance instead.
+     * @deprecated Should use an extension of Battle instead of Strike
+     */
+    @Deprecated
     private static int getDirection(BattleHex hex1, BattleHex hex2,
         boolean left)
     {
