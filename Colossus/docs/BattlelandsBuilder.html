@@ -49,18 +49,14 @@
         <li>The &quot;Show Battleland&quot; menu item dump the Battleland on
         standard output (can be seen only if you have a CLI or a way to access
         standard output...)</li>
-        <li>The &quot;Erase Map&quot; menu item return the map to the default,
-        i.e. only Plains of elevation 0, and no hexside. Warning: startlist is
-        unchanged.</li>
-        <li>The &quot;Randomize Map&quot; menu item is used to generate a
-        random map from a description file. See the 
-        <a href="BattlelandsRandomizer.html">BattlelandsRandomizer</a>
-         for a description of the input file.</li>
       </ul>
     </div>
     <div class="p">The &quot;Special&quot; Menu:</div>
     <div class="p">
       <ul>
+        <li>The &quot;Erase Map&quot; menu item return the map to the default,
+        i.e. only Plains of elevation 0, and no hexside. Warning: startlist is
+        unchanged.</li>
         <li>The &quot;Terrain is a Tower&quot; is used to specify if the
         terrain is designed to be a Tower or not (i.e. the 
         <tt>TOWER</tt>
@@ -70,6 +66,22 @@
         <li>The &quot;Remove StartList&quot; removes all hexes from the
         startlist. See the file format link above for a startlist
         description.</li>
+        <li>The &quot;Fill Edge with Slope&quot; put a slope on every hexside
+        between plains with a difference in elevation of exactly one, unless an
+        hexside was already present.</li>
+        <li>The &quot;Fill High Edge with Cliff&quot; put a cliff on every hexside
+        between plains with a difference in elevation of two or more, unless an
+        hexside was already present.</li>
+        <li>The &quot;Fill Sand Edge with Dune&quot; put a dune on every hexside
+        between plain and sand, unless an hexside was already present.</li>
+        <li>The &quot;Randomize&quot; submenu items are used to generate a
+        random map from a description file (many are predefined).
+        See the
+        <a href="BattlelandsRandomizer.html">BattlelandsRandomizer</a>
+         for a description of the input file. The loaded battleland is
+        <em>merged</em>
+         with the currently displayed battleland. Use &quot;Erase Map&quot;
+        from the File menu if you want to start from scratch.</li>
       </ul>
     </div>
     <div class="p">

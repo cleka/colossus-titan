@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import javax.swing.*;
 
 import net.sf.colossus.variant.BattleHex;
@@ -31,6 +33,8 @@ import net.sf.colossus.client.GUIBattleHex;
 import net.sf.colossus.variant.HazardTerrain;
 import net.sf.colossus.xmlparser.BattlelandLoader;
 import net.sf.colossus.parser.BattlelandRandomizerLoader;
+import net.sf.colossus.server.VariantSupport;
+import net.sf.colossus.util.ResourceLoader;
 
 /**
  * Class ShowBuilderHexMap displays a battle map.
@@ -97,6 +101,27 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
         }
     }
 
+    private void doRandomization(BattleHex[][] h, InputStream inputFile)
+    {
+        BattlelandRandomizerLoader parser =
+                new BattlelandRandomizerLoader(inputFile);
+        try
+        {
+            while (parser.oneArea(h) >= 0)
+            {
+            }
+            parser.resolveAllHexsides(h);
+            towerItem.setState(parser.isTower());
+            List<String> startList = parser.getStartList();
+            if (startList != null)
+            {
+                selectHexesByLabels(new java.util.HashSet<String>(startList));
+            }
+        } catch (Exception e)
+        {
+            System.err.println(e);
+        }
+    }
     
     private void doLoadRandom(BattleHex[][] h)
     {
@@ -112,30 +137,11 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
             String tempRndDirectory = rndFile.getParentFile().getAbsolutePath();
             List<String> directories = new java.util.ArrayList<String>();
             directories.add(tempRndDirectory);
-            java.io.InputStream inputFile =
-                    net.sf.colossus.util.ResourceLoader.getInputStream(
-                    tempRndName,
+            InputStream inputFile = ResourceLoader.getInputStream(tempRndName,
                     directories);
             if (inputFile != null)
             {
-                BattlelandRandomizerLoader parser =
-                        new BattlelandRandomizerLoader( inputFile);
-                try
-                {
-                    while (parser.oneArea(h) >= 0)
-                    {
-                    }
-                    parser.resolveAllHexsides(h);
-                    towerItem.setState(parser.isTower());
-                    List<String> startList = parser.getStartList();
-                    if (startList != null)
-                    {
-                        selectHexesByLabels(new java.util.HashSet<String>(startList));
-                    }
-                } catch (Exception e)
-                {
-                    System.err.println(e);
-                }
+                doRandomization(h, inputFile);
             }
         }
     }
@@ -259,7 +265,37 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
         return Printable.PAGE_EXISTS;
     }
 
-    private void doFillSlope(BattleHex[][] h)
+    private void doFillDune(BattleHex[][] h)
+    {
+        for (int i = 0; i < h.length; i++)
+        {
+            for (int j = 0; j < h[i].length; j++)
+            {
+                if (h[i][j] != null)
+                {
+                    for (int k = 0; k < 6; k++)
+                    {
+                        if ((h[i][j].getHexside(k) == ' ') &&
+                                (h[i][j].getOppositeHexside(k) == ' '))
+                        {
+                            BattleHex n = h[i][j].getNeighbor(k);
+                            if (n != null)
+                            {
+                                if (h[i][j].getTerrain().getName().equals("Sand")
+                                    &&
+                                    n.getTerrain().getName().equals("Plains"))
+                                {
+                                    h[i][j].setHexside(k, 'd');
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void doFillCliff(BattleHex[][] h)
     {
         for (int i = 0; i < h.length; i++)
         {
@@ -276,7 +312,36 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                             if (n != null)
                             {
                                 if (h[i][j].getElevation() >
-                                        n.getElevation())
+                                        (n.getElevation()+1))
+                                {
+                                    h[i][j].setHexside(k, 'c');
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void doFillSlope(BattleHex[][] h)
+    {
+        for (int i = 0; i < h.length; i++)
+        {
+            for (int j = 0; j < h[i].length; j++)
+            {
+                if (h[i][j] != null)
+                {
+                    for (int k = 0; k < 6; k++)
+                    {
+                        if ((h[i][j].getHexside(k) == ' ') &&
+                                (h[i][j].getOppositeHexside(k) == ' '))
+                        {
+                            BattleHex n = h[i][j].getNeighbor(k);
+                            if (n != null)
+                            {
+                                if (h[i][j].getElevation() ==
+                                        (n.getElevation()+1))
                                 {
                                     h[i][j].setHexside(k, 's');
                                 }
@@ -352,8 +417,30 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
     private AbstractAction eraseAction;
     private AbstractAction randomizeAction;
     private AbstractAction fillWithSlopeAction;
+    private AbstractAction fillWithCliffAction;
+    private AbstractAction fillWithDuneAction;
     private AbstractAction loadFileAction;
     JMenuBar menuBar;
+
+    private class randomizeActionPredef extends AbstractAction
+    {
+
+        private final String filename;
+
+        randomizeActionPredef(String name, String filename)
+        {
+            super(name);
+            this.filename = filename;
+        }
+
+        public void actionPerformed(ActionEvent e)
+        {
+            InputStream inputFile = ResourceLoader.getInputStream(filename,
+                    VariantSupport.getVarDirectoriesList());
+            doRandomization(getBattleHexArray(), inputFile);
+            repaint();
+        }
+    }
 
     ShowBuilderHexMap()
     {
@@ -374,7 +461,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
             }
         };
 
-        saveBattlelandAsAction = new AbstractAction("Save Battleland As...")
+        saveBattlelandAsAction = new AbstractAction("Save Battleland as file...")
         {
 
             public void actionPerformed(ActionEvent e)
@@ -401,7 +488,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
             }
         };
 
-        eraseAction = new AbstractAction("Erase Map")
+        eraseAction = new AbstractAction("Erase all map hexes & hexsides")
         {
 
             public void actionPerformed(ActionEvent e)
@@ -411,16 +498,17 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
             }
         };
         
-        randomizeAction = new AbstractAction("Randomize Map (from file)")
+        randomizeAction = new AbstractAction("Randomize Map from file...")
         {
-        public void actionPerformed(ActionEvent e)
-        {
-        doLoadRandom(getBattleHexArray());
-        repaint();
-        }
+
+            public void actionPerformed(ActionEvent e)
+            {
+                doLoadRandom(getBattleHexArray());
+                repaint();
+            }
         };
 
-        loadFileAction = new AbstractAction("Load Map (from file)")
+        loadFileAction = new AbstractAction("Load Map from file...")
         {
 
             public void actionPerformed(ActionEvent e)
@@ -436,13 +524,13 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
         mi.setMnemonic(KeyEvent.VK_S);
         mi = fileMenu.add(printBattlelandAction);
         mi = fileMenu.add(showBattlelandAction);
-        mi = fileMenu.add(eraseAction);
-        mi = fileMenu.add(randomizeAction);
         mi = fileMenu.add(quitAction);
         mi.setMnemonic(KeyEvent.VK_Q);
 
         JMenu specialMenu = new JMenu("Special");
         menuBar.add(specialMenu);
+        
+        mi = specialMenu.add(eraseAction);
 
         towerAction = new AbstractAction("Terrain is a Tower")
         {
@@ -478,7 +566,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
         
         mi = specialMenu.add(clearStartListAction);
 
-        fillWithSlopeAction = new AbstractAction("Fill Edge With Slope")
+        fillWithSlopeAction = new AbstractAction("Fill Low Edge with Slope")
         {
 
             public void actionPerformed(ActionEvent e)
@@ -487,15 +575,50 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                 repaint();
             }
         };
+        fillWithCliffAction = new AbstractAction("Fill High Edge with Cliff")
+        {
+
+            public void actionPerformed(ActionEvent e)
+            {
+                doFillCliff(getBattleHexArray());
+                repaint();
+            }
+        };
+        fillWithDuneAction = new AbstractAction("Fill Sand Edge with Dune")
+        {
+
+            public void actionPerformed(ActionEvent e)
+            {
+                doFillDune(getBattleHexArray());
+                repaint();
+            }
+        };
 
         mi = specialMenu.add(fillWithSlopeAction);
+        mi = specialMenu.add(fillWithCliffAction);
+        mi = specialMenu.add(fillWithDuneAction);
 
-        JMenu randomMenu = new JMenu("Randomize ...");
-        
-        JMenuItem random1 = new JMenuItem("Random file 1...");
-        JMenuItem random2 = new JMenuItem("Random file 2...");
-        randomMenu.add(random1);
-        randomMenu.add(random2);
+        JMenu randomMenu = new JMenu("Randomize as ");
+
+        final Map<String,String> defaultRandom = new TreeMap<String,String>();
+
+        defaultRandom.put("Brush", "Battlelands/Brush.rnd");
+        defaultRandom.put("Desert", "Battlelands/Desert.rnd");
+        defaultRandom.put("Hills", "Battlelands/Hills.rnd");
+        defaultRandom.put("Jungle", "Battlelands/Jungle.rnd");
+        defaultRandom.put("Marsh", "Battlelands/Marsh.rnd");
+        defaultRandom.put("Mountains", "Battlelands/Mountains.rnd");
+        defaultRandom.put("Plains", "Battlelands/Plains.rnd");
+        defaultRandom.put("Swamp", "Battlelands/Swamp.rnd");
+        defaultRandom.put("Tower", "Battlelands/Tower.rnd");
+        defaultRandom.put("Tundra", "Battlelands/Tundra.rnd");
+        defaultRandom.put("Woods", "Battlelands/Woods.rnd");
+
+        for (String name : defaultRandom.keySet()) {
+            mi = randomMenu.add(new randomizeActionPredef(name, defaultRandom.get(name)));
+        }
+
+        mi = randomMenu.add(randomizeAction);
         
         specialMenu.add(randomMenu);
                

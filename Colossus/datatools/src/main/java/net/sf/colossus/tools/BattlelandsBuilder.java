@@ -13,8 +13,8 @@ public class BattlelandsBuilder
 
     public static void main(String[] arg)
     {
-         VariantSupport.loadVariantByName("Default",
-            true);
+        /* must load "Random" here so that the Randomize menu work. */
+         VariantSupport.loadVariantByName("Random", true);
 
         GUIHex.setOverlay(true);
 
