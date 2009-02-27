@@ -122,6 +122,12 @@ public class CmdLine
         return optchSeen.contains(optch);
     }
 
+    /** Return true iff the option has been seen. */
+    public boolean optIsSet(String name)
+    {
+        return nameSeen.contains(name);
+    }
+
     /** Return the option value as a String. 
      *  Will raise if the option has not been set or does
      *  not take an argument. */
