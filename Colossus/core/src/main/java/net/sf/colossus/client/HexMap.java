@@ -81,9 +81,9 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
      * but also a way for MasterHex-less subclass
      * to set those informations.
      */
-    protected String displayName = "undefined";
-    protected String basicName = "undefined";
-    protected String subtitle = null;
+    private String displayName = "undefined";
+    private String basicName = "undefined";
+    private String subtitle = null;
 
     public HexMap(MasterHex masterHex) {
         this(masterHex, true);
@@ -742,22 +742,22 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
             // calculate needed space, set xPos so that it's drawn 
             // right-aligned 80 away from right window border.
-            Rectangle2D bounds = fm.getStringBounds(displayName, g);
+            Rectangle2D bounds = fm.getStringBounds(getDisplayName(),g);
             int width = (int)bounds.getWidth();
             int windowWidth = super.getWidth();
             int xPos = windowWidth - 80 - width;
-            g.drawString(displayName, xPos, 4 + tma);
+            g.drawString(getDisplayName(),xPos, 4 + tma);
 
-            if (subtitle != null)
+            if (getSubtitle() != null)
             {
                 g.setFont(ResourceLoader.defaultFont.deriveFont((float)24));
                 fm = g.getFontMetrics();
                 int tma2 = fm.getMaxAscent();
-                bounds = fm.getStringBounds(subtitle, g);
+                bounds = fm.getStringBounds(getSubtitle(),g);
                 width = (int)bounds.getWidth();
                 windowWidth = super.getWidth();
                 xPos = windowWidth - 80 - width;
-                g.drawString(subtitle, xPos, 4 + tma + 8 + tma2);
+                g.drawString(getSubtitle(),xPos, 4 + tma + 8 + tma2);
             }
 
             /* reset antialiasing */
@@ -780,5 +780,53 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     public Dimension getPreferredSize()
     {
         return new Dimension(60 * Scale.get(), 55 * Scale.get());
+    }
+
+    /**
+     * @return the basicName
+     */
+    public String getBasicName()
+    {
+        return basicName;
+    }
+
+    /**
+     * @param basicName the basicName to set
+     */
+    public void setBasicName(String basicName)
+    {
+        this.basicName = basicName;
+    }
+
+    /**
+     * @return the displayName
+     */
+    public String getDisplayName()
+    {
+        return displayName;
+    }
+
+    /**
+     * @param displayName the displayName to set
+     */
+    public void setDisplayName(String displayName)
+    {
+        this.displayName = displayName;
+    }
+
+    /**
+     * @return the subtitle
+     */
+    public String getSubtitle()
+    {
+        return subtitle;
+    }
+
+    /**
+     * @param subtitle the subtitle to set
+     */
+    public void setSubtitle(String subtitle)
+    {
+        this.subtitle = subtitle;
     }
 }

@@ -1,21 +1,22 @@
-package net.sf.colossus.datatools;
+package net.sf.colossus.tools;
 
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.colossus.client.BattleHex;
-import net.sf.colossus.parser.BattlelandRandomizerLoader;
+import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.util.ResourceLoader;
 
 
 /**
  * Class BattlelandsRandomizer
- * @version $Id$
+ * @version $Id: BattlelandsRandomizer.java 2557 2006-05-05 10:42:15Z peterbecker $
  * @author Romain Dolbeau
  */
 public class BattlelandsRandomizer
 {
+
     public static void main(String[] arg)
     {
         String file = null;
@@ -23,7 +24,8 @@ public class BattlelandsRandomizer
         if (arg.length > 0)
         {
             file = arg[0];
-            System.out.println("# BattlelandsRandomizer is using " + file);
+            System.err.println("<!-- BattlelandsRandomizer is using " + file +
+                    " -->");
         }
         else
         {
@@ -31,30 +33,18 @@ public class BattlelandsRandomizer
             System.exit(0);
         }
 
-        BuilderHexMap bhm = new BuilderHexMap(null);
+        BuilderHexMap bhm = new BuilderHexMap();
 
-        List directories = new java.util.ArrayList();
+        List<String> directories = new ArrayList<String>();
         directories.add(".");
         directories.add("");
         InputStream inputFile = ResourceLoader.getInputStream(file, directories);
-        BattlelandRandomizerLoader parser = new BattlelandRandomizerLoader(inputFile);
 
         BattleHex[][] h = bhm.getBattleHexArray();
-        try
-        {
-            while (parser.oneArea(h) >= 0)
-            {
-            }
-            parser.resolveAllHexsides(h);
-        }
-        catch (Exception e)
-        {
-            System.err.println(e);
-        }
+        bhm.doRandomization(h, inputFile);
 
         System.out.println(bhm.dumpAsString());
 
         System.exit(0);
     }
-
 }

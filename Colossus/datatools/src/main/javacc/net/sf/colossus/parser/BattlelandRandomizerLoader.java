@@ -10,7 +10,7 @@ import net.sf.colossus.variant.HazardTerrain;
 /**
  * BattlelandRandomizerLoader create a randomized Battleland from a description file.
  * @author Romain Dolbeau
- * @version $Id: BattlelandRandomizerLoader.jj 3655 2009-02-27 09:41:32Z dolbeau $
+ * @version $Id: BattlelandRandomizerLoader.jj 3657 2009-02-27 11:25:21Z dolbeau $
  * @see net.sf.colossus.client.BattleHex
  */
 public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderConstants {

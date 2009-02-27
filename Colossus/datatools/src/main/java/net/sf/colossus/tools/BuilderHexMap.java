@@ -6,6 +6,7 @@ import java.awt.event.*;
 import java.util.*;
 import java.util.List;
 
+import net.sf.colossus.parser.BattlelandRandomizerLoader;
 import net.sf.colossus.xmlparser.BattlelandLoader;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.client.GUIBattleHex;
@@ -27,6 +28,9 @@ public class BuilderHexMap extends HexMap
     protected int cx = 6 * scale;
     protected int cy = 2 * scale;
 
+
+
+
     BuilderHexMap()
     {
         super(null, false);
@@ -40,9 +44,9 @@ public class BuilderHexMap extends HexMap
     {
         setupHexesGUI();
         setupNeighbors(h);
-        displayName = "Unnamed Battleland";
-        basicName = "Unnamed Battleland";
-        subtitle = null;
+        setDisplayName("Unnamed Battleland");
+        setBasicName("Unnamed Battleland");
+        setSubtitle(null);
     }
 
     BattleHex[][] getBattleHexArray()
@@ -86,11 +90,11 @@ public class BuilderHexMap extends HexMap
         List<GUIBattleHex> localStartList = new ArrayList<GUIBattleHex>();
 
         buf.append("<?xml version=\"1.0\"?>\n");
-        buf.append("<battlemap terrain=\"" + basicName + "\" tower=\"" + (isTower
+        buf.append("<battlemap terrain=\"" + getBasicName() + "\" tower=\"" + (isTower
                 ? "True" : "False") + "\"");
-        if (subtitle != null)
+        if (getSubtitle() != null)
         {
-            buf.append(" subtitle=\"" + subtitle + "\"");
+            buf.append(" subtitle=\"" + getSubtitle() + "\"");
         }
         buf.append(">\n");
         buf.append(
@@ -210,6 +214,31 @@ public class BuilderHexMap extends HexMap
             {
                 hex.getHexModel().setHexside(i, ' ');
             }
+        }
+    }
+
+    public void doRandomization(BattleHex[][] h, InputStream inputFile)
+    {
+        BattlelandRandomizerLoader parser =
+                new BattlelandRandomizerLoader(inputFile);
+        try
+        {
+            while (parser.oneArea(h) >= 0)
+            {
+            }
+            parser.resolveAllHexsides(h);
+            isTower = parser.isTower();
+            List<String> startList = parser.getStartList();
+            if (startList != null)
+            {
+                selectHexesByLabels(new HashSet<String>(startList));
+            }
+            setBasicName(parser.getTitle());
+            setDisplayName(parser.getTitle());
+            setSubtitle(parser.getSubtitle());
+        } catch (Exception e)
+        {
+            System.err.println(e);
         }
     }
 }

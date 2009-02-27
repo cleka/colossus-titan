@@ -50,7 +50,6 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
     private JPopupMenu popupMenuTerrain;
     private JPopupMenu popupMenuBorder;
     private Point lastPoint;
-    private Component lastComponent;
     private int lastSide;
     private JCheckBoxMenuItem towerItem;
     private AbstractAction towerAction;
@@ -100,33 +99,6 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
             return ("XML files");
         }
     }
-
-    private void doRandomization(BattleHex[][] h, InputStream inputFile)
-    {
-        BattlelandRandomizerLoader parser =
-                new BattlelandRandomizerLoader(inputFile);
-        try
-        {
-            while (parser.oneArea(h) >= 0)
-            {
-            }
-            parser.resolveAllHexsides(h);
-            towerItem.setState(parser.isTower());
-            List<String> startList = parser.getStartList();
-            if (startList != null)
-            {
-                selectHexesByLabels(new java.util.HashSet<String>(startList));
-            }
-            basicName = parser.getTitle();
-            displayName = parser.getTitle();
-            subtitle = parser.getSubtitle();
-            setMapName(basicName);
-            
-        } catch (Exception e)
-        {
-            System.err.println(e);
-        }
-    }
     
     private void doLoadRandom(BattleHex[][] h)
     {
@@ -147,6 +119,8 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
             if (inputFile != null)
             {
                 doRandomization(h, inputFile);
+                setMapName(getDisplayName());
+                towerItem.setState(isTower);
             }
         }
     }
@@ -182,11 +156,11 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                     {
                         selectHexesByLabels(new HashSet<String>(startList));
                     }
-                    subtitle = parser.getSubtitle();
+                    setSubtitle(parser.getSubtitle());
                     String mapName = temploadFileName.replaceAll(".xml", ""); 
-                    displayName = mapName;
-                    basicName = mapName;
-                    setMapName(displayName);
+                    setDisplayName(mapName);
+                    setBasicName(mapName);
+                    setMapName(getDisplayName());
                     super.repaint();
                 } catch (Exception e)
                 {
@@ -222,9 +196,9 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                     outputFile.flush();
                     outputFile.close();
                     String mapName = tempsaveFileName.replaceAll(".xml", ""); 
-                    displayName = mapName;
-                    basicName = mapName;
-                    setMapName(displayName);
+                    setDisplayName(mapName);
+                    setBasicName(mapName);
+                    setMapName(getDisplayName());
                     super.repaint();
                 } catch (Exception e)
                 {
@@ -443,6 +417,8 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
             InputStream inputFile = ResourceLoader.getInputStream(filename,
                     VariantSupport.getVarDirectoriesList());
             doRandomization(getBattleHexArray(), inputFile);
+            setMapName(getDisplayName());
+            towerItem.setState(isTower);
             repaint();
         }
     }
@@ -703,7 +679,6 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
         }
 
         lastPoint = new Point(0, 0);
-        lastComponent = contentPane;
         lastSide = 0;
     }
 
@@ -718,7 +693,6 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
     public void mousePressed(MouseEvent e)
     {
         lastPoint = e.getPoint();
-        lastComponent = e.getComponent();
         GUIBattleHex h = getHexContainingPoint(lastPoint);
         if (h != null)
         {

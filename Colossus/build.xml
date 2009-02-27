@@ -228,21 +228,33 @@
         <attribute name="Main-Class"
         value="net.sf.colossus.tools.BattlelandsBuilder" />
         <attribute name="Class-Path"
-        value="${manifest.classpath}" />      </manifest>
+        value="${manifest.classpath}" />
+      </manifest>
     </jar>
     <jar jarfile="BattlelandsBuilder.jar" basedir="${variants.dir}"
     includes="**" excludes="*.java" update="true" />
     <chmod file="BattlelandsBuilder.jar" perm="755" />
   </target>
-  <target name="brjar" depends="init,compile,version"
+  <target name="brjar" depends="init,compile,compileVariants,compileDatatools,version"
   description="Make Battlelands Randomizer jar file">
-    <jar jarfile="BattlelandsRandomizer.jar" basedir="."
-    includes="net/sf/colossus/datatools/*.class, net/sf/colossus/client/*.class, net/sf/colossus/parser/*.class, net/sf/colossus/server/*.class, net/sf/colossus/util/*.class, Default, TitanPlus, ExtTitan, Badlands, Undead, Outlands">
+    <pathconvert property="manifest.classpath" pathsep=" ">
+      <path refid="project.class.path" />
+      <chainedmapper>
+        <flattenmapper />
+        <globmapper from="*" to="libs/*" />
+      </chainedmapper>
+    </pathconvert>
+    <jar jarfile="BattlelandsRandomizer.jar" basedir="${build.classes.dir}"
+    includes="**" excludes="**/webserver/**">
       <manifest>
         <attribute name="Main-Class"
-        value="net/sf/colossus/datatools/BattlelandsRandomizer" />
+        value="net.sf.colossus.tools.BattlelandsRandomizer" />
+        <attribute name="Class-Path"
+        value="${manifest.classpath}" />
       </manifest>
     </jar>
+    <jar jarfile="BattlelandsRandomizer.jar" basedir="${variants.dir}"
+    includes="**" excludes="*.java" update="true" />
     <chmod file="BattlelandsRandomizer.jar" perm="755" />
   </target>
   <target name="sign" depends="jar"
