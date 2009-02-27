@@ -1,7 +1,6 @@
 package net.sf.colossus.tools;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -32,7 +31,6 @@ import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.client.GUIBattleHex;
 import net.sf.colossus.variant.HazardTerrain;
 import net.sf.colossus.xmlparser.BattlelandLoader;
-import net.sf.colossus.parser.BattlelandRandomizerLoader;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.ResourceLoader;
 
@@ -157,10 +155,10 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                         selectHexesByLabels(new HashSet<String>(startList));
                     }
                     setSubtitle(parser.getSubtitle());
-                    String mapName = temploadFileName.replaceAll(".xml", ""); 
-                    setDisplayName(mapName);
-                    setBasicName(mapName);
-                    setMapName(getDisplayName());
+                    String lMapName = temploadFileName.replaceAll(".xml", "");
+                    setDisplayName(lMapName);
+                    setBasicName(lMapName);
+                    setMapName(lMapName);
                     super.repaint();
                 } catch (Exception e)
                 {
@@ -195,9 +193,9 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                     outputFile.write(outStr.getBytes());
                     outputFile.flush();
                     outputFile.close();
-                    String mapName = tempsaveFileName.replaceAll(".xml", ""); 
-                    setDisplayName(mapName);
-                    setBasicName(mapName);
+                    String lMapName = tempsaveFileName.replaceAll(".xml", "");
+                    setDisplayName(lMapName);
+                    setBasicName(lMapName);
                     setMapName(getDisplayName());
                     super.repaint();
                 } catch (Exception e)
