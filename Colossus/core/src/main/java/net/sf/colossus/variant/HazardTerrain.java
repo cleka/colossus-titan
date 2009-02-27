@@ -506,6 +506,124 @@ public class HazardTerrain extends Hazards
     }
 
 
+    /** Return the bonus to apply to the Strike Factor of a creature
+     * rangestriking out from that terrain.
+     * @param attackerIsNative Whether the attacker is native from this HazardTerrain
+     * @param defenderIsNative Whether the defender is native from this HazardTerrain
+     * @return The amount of bonus to apply (negative if it's a penalty).
+     */
+    public int getSkillBonusRangestrikeFrom(boolean attackerIsNative,
+            boolean defenderIsNative)
+    {
+        return computeSkillOrPowerBonus(attackerIsNative, defenderIsNative,
+                effectforRangeStrikeFromTerrain,
+                scopeForRangeStrikeEffect,
+                EffectOnStrike.SKILLBONUS,
+                EffectOnStrike.SKILLPENALTY,
+                rangeStrikeEffectAdjustment);
+    }
+
+    /** Return the penalty to apply to the Strike Factor of a creature
+     * rangestriking out from that terrain.
+     * @param attackerIsNative Whether the attacker is native from this HazardTerrain
+     * @param defenderIsNative Whether the defender is native from this HazardTerrain
+     * @return The amount of penalty to apply (negative if it's a bonus).
+     * @see getSkillBonusRangestrikeFrom, getPowerBonusRangestrikeFrom, getPowerPenaltyRangestrikeFrom
+     */
+    public int getSkillPenaltyRangestrikeFrom(boolean attackerIsNative,
+            boolean defenderIsNative)
+    {
+        return -getSkillBonusRangestrikeFrom(attackerIsNative, defenderIsNative);
+    }
+
+    /** Return the bonus to apply to the Strike Factor of a creature Rangestruck
+     * in this terrain.
+     * @param attackerIsNative Whether the attacker is native from this HazardTerrain
+     * @param defenderIsNative Whether the defender is native from this HazardTerrain
+     * @return The amount of bonus to apply (negative if it's a penalty).
+     */
+    public int getSkillBonusRangestruckIn(boolean attackerIsNative,
+            boolean defenderIsNative)
+    {
+        return computeSkillOrPowerBonus(defenderIsNative, attackerIsNative,
+                effectForBeingRangeStruckInTerrain,
+                scopeForRangeStruckEffect,
+                EffectOnStrike.SKILLBONUS,
+                EffectOnStrike.SKILLPENALTY,
+                rangeStruckEffectAdjustment);
+    }
+
+    /** Return the penalty to apply to the Strike Factor of a creature Rangestruck
+     * in this terrain.
+     * @param attackerIsNative Whether the attacker is native from this HazardTerrain
+     * @param defenderIsNative Whether the defender is native from this HazardTerrain
+     * @return The amount of penalty to apply (negative if it's a bonus).
+     */
+    public int getSkillPenaltyRangestruckIn(boolean attackerIsNative,
+            boolean defenderIsNative)
+    {
+        return -(this.getSkillBonusRangestruckIn(attackerIsNative, defenderIsNative));
+    }
+
+    /** Return the bonus to apply to the Strike Factor of a creature
+     * rangestriking out from that terrain on a unspecified creature.
+     * @param attackerIsNative Whether the attacker is native from this HazardTerrain
+     * @param defenderIsNative Whether the defender is native from this HazardTerrain
+     * @return The amount of bonus to apply (negative if it's a penalty).
+     */
+    public int getPowerBonusRangestrikeFrom(boolean attackerIsNative,
+            boolean defenderIsNative)
+    {
+        return computeSkillOrPowerBonus(attackerIsNative, defenderIsNative,
+                effectforRangeStrikeFromTerrain,
+                scopeForRangeStrikeEffect,
+                EffectOnStrike.POWERBONUS,
+                EffectOnStrike.POWERPENALTY,
+                rangeStrikeEffectAdjustment);
+    }
+
+    /** Return the penalty to apply to the Power Factor of a creature
+     * rangestriking out from that terrain on a unspecified creature.
+     * @param attackerIsNative Whether the attacker is native from this HazardTerrain
+     * @param defenderIsNative Whether the defender is native from this HazardTerrain
+     * @return The amount of penalty to apply (negative if it's a bonus).
+     */
+    public int getPowerPenaltyRangestrikeFrom(boolean attackerIsNative,
+            boolean defenderIsNative)
+    {
+        return -(this.getPowerBonusRangestrikeFrom(attackerIsNative, defenderIsNative));
+    }
+
+    /** Return the bonus to apply to the Strike Factor of a creature Rangestruck
+     * in this terrain by a unspecified creature.
+     * @param attackerIsNative Whether the attacker is native from this HazardTerrain
+     * @param defenderIsNative Whether the defender is native from this HazardTerrain
+     * @return The amount of bonus to apply (negative if it's a penalty).
+     */
+    public int getPowerBonusRangestruckIn(boolean attackerIsNative,
+            boolean defenderIsNative)
+    {
+        return computeSkillOrPowerBonus(defenderIsNative, attackerIsNative,
+                effectForBeingRangeStruckInTerrain,
+                scopeForRangeStruckEffect,
+                EffectOnStrike.POWERBONUS,
+                EffectOnStrike.POWERPENALTY,
+                rangeStruckEffectAdjustment);
+    }
+
+    /** Return the penalty to apply to the Strike Factor of a creature Rangestruck
+     * in this terrain by a unspecified creature.
+     * @param attackerIsNative Whether the attacker is native from this HazardTerrain
+     * @param defenderIsNative Whether the defender is native from this HazardTerrain
+     * @return The amount of penalty to apply (negative if it's a bonus).
+     */
+    public int getPowerPenaltyRangestruckIn(boolean attackerIsNative,
+            boolean defenderIsNative)
+    {
+        return -(this.getPowerBonusRangestruckIn(attackerIsNative, defenderIsNative));
+    }
+
+
     /** Whether this terrain blocks rangestrike.
      * @return Whether this terrain blocks rangestrike.
      */
