@@ -40,6 +40,12 @@ public class BattlelandRandomizerLoader
 
     BattleHex[][] hexes;
 
+    private String title = "Randomized!";
+    private String subtitle = "Randomized!";
+
+    public String getTitle() { return title; }
+    public String getSubtitle() { return subtitle; }
+
     Hashtable<String,List<address>> labels = new Hashtable<String,List<address>>();
 
     /* code executed just before the constructor call */
@@ -480,6 +486,8 @@ TOKEN :
 |   < USEDUP : "usedup" >
 |   < STARTLIST: "STARTLIST" >
 |   < TOWER: "TOWER" >
+|   < KEYTITLE : "TITLE" >
+|   < KEYSUBTITLE : "SUBTITLE" >
 }
 
 TOKEN :
@@ -508,7 +516,7 @@ TOKEN :
 |   < QUOTEDCHAINE : "\"" (<QUOTEDCAR>)+ "\"" >
 |   < #CAR : ["a"-"z","A"-"Z",".","_"] >
 |   < #NUMCAR : <CAR>|["0"-"9"] >
-|   < #QUOTEDCAR : <NUMCAR>|" " >
+|   < #QUOTEDCAR : <NUMCAR>|[" ","!","?",";",",",":","/","+","="] >
 }
 
 char z_terrain() :
@@ -836,6 +844,16 @@ int oneArea(BattleHex h[][]) :
 |   <KEYLABEL> (s = z_label()) <EQUAL> (al = z_listAddress())
     {
         labels.put(s, al);
+        return(0);
+    }
+|   <KEYTITLE> (s = z_chaine())
+    {
+        title = s;
+        return(0);
+    }
+|   <KEYSUBTITLE> (s = z_chaine())
+    {
+        subtitle = s;
         return(0);
     }
 |   <PAIR> (hp = z_hazardPair()) <HEXSIDES> (tl2 = z_listHexside())

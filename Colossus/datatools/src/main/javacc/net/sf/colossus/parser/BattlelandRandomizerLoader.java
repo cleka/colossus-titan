@@ -30,6 +30,12 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
 
     BattleHex[][] hexes;
 
+    private String title = "Randomized!";
+    private String subtitle = "Randomized!";
+
+    public String getTitle() { return title; }
+    public String getSubtitle() { return subtitle; }
+
     Hashtable<String,List<address>> labels = new Hashtable<String,List<address>>();
 
     /* code executed just before the constructor call */
@@ -841,6 +847,16 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
         labels.put(s, al);
         {if (true) return(0);}
     } else if (jj_2_28(20)) {
+      jj_consume_token(KEYTITLE);
+      s = z_chaine();
+        title = s;
+        {if (true) return(0);}
+    } else if (jj_2_29(20)) {
+      jj_consume_token(KEYSUBTITLE);
+      s = z_chaine();
+        subtitle = s;
+        {if (true) return(0);}
+    } else if (jj_2_30(20)) {
       jj_consume_token(PAIR);
       hp = z_hazardPair();
       jj_consume_token(HEXSIDES);
@@ -850,22 +866,22 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
         hexsideRandomness.put(hp,tl2);
         //System.out.println("NOW: " + hexsideRandomness);
         {if (true) return(0);}
-    } else if (jj_2_29(20)) {
+    } else if (jj_2_31(20)) {
       jj_consume_token(TOWER);
         isTower = true;
         {if (true) return 0;}
-    } else if (jj_2_30(20)) {
+    } else if (jj_2_32(20)) {
       jj_consume_token(STARTLIST);
       al = z_listAddress();
         startlistAddress = new java.util.ArrayList<address>(al);
         {if (true) return 0;}
-    } else if (jj_2_31(20)) {
+    } else if (jj_2_33(20)) {
       jj_consume_token(EOL);
         {if (true) return(0);}
-    } else if (jj_2_32(20)) {
+    } else if (jj_2_34(20)) {
       s = z_comment();
         {if (true) return(0);}
-    } else if (jj_2_33(20)) {
+    } else if (jj_2_35(20)) {
       jj_consume_token(0);
         {if (true) return(-1);}
     } else {
@@ -1106,39 +1122,28 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
     finally { jj_save(32, xla); }
   }
 
-  private boolean jj_3_29() {
-    if (jj_scan_token(TOWER)) return true;
+  private boolean jj_2_34(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_34(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(33, xla); }
+  }
+
+  private boolean jj_2_35(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_35(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(34, xla); }
+  }
+
+  private boolean jj_3_28() {
+    if (jj_scan_token(KEYTITLE)) return true;
+    if (jj_3R_7()) return true;
     return false;
   }
 
   private boolean jj_3R_12() {
     if (jj_scan_token(COMMENT)) return true;
-    return false;
-  }
-
-  private boolean jj_3_18() {
-    if (jj_scan_token(OPENPAR)) return true;
-    if (jj_3R_5()) return true;
-    if (jj_scan_token(COMMA)) return true;
-    if (jj_3R_5()) return true;
-    if (jj_scan_token(CLOSEPAR)) return true;
-    if (jj_3R_2()) return true;
-    return false;
-  }
-
-  private boolean jj_3_11() {
-    if (jj_scan_token(OPENPAR)) return true;
-    if (jj_scan_token(LEFTOVER)) return true;
-    if (jj_scan_token(CLOSEPAR)) return true;
-    if (jj_3R_2()) return true;
-    return false;
-  }
-
-  private boolean jj_3_28() {
-    if (jj_scan_token(PAIR)) return true;
-    if (jj_3R_11()) return true;
-    if (jj_scan_token(HEXSIDES)) return true;
-    if (jj_3R_10()) return true;
     return false;
   }
 
@@ -1240,17 +1245,6 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
     return false;
   }
 
-  private boolean jj_3_9() {
-    if (jj_scan_token(SOMEOF)) return true;
-    if (jj_scan_token(OPENPAR)) return true;
-    if (jj_3R_1()) return true;
-    if (jj_scan_token(COMMA)) return true;
-    if (jj_3R_2()) return true;
-    if (jj_scan_token(CLOSEPAR)) return true;
-    if (jj_3R_2()) return true;
-    return false;
-  }
-
   private boolean jj_3R_2() {
     Token xsp;
     xsp = jj_scanpos;
@@ -1288,8 +1282,14 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
     return false;
   }
 
-  private boolean jj_3_1() {
-    if (jj_scan_token(NUMBER)) return true;
+  private boolean jj_3_9() {
+    if (jj_scan_token(SOMEOF)) return true;
+    if (jj_scan_token(OPENPAR)) return true;
+    if (jj_3R_1()) return true;
+    if (jj_scan_token(COMMA)) return true;
+    if (jj_3R_2()) return true;
+    if (jj_scan_token(CLOSEPAR)) return true;
+    if (jj_3R_2()) return true;
     return false;
   }
 
@@ -1300,6 +1300,11 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
     jj_scanpos = xsp;
     if (jj_3_2()) return true;
     }
+    return false;
+  }
+
+  private boolean jj_3_1() {
+    if (jj_scan_token(NUMBER)) return true;
     return false;
   }
 
@@ -1401,6 +1406,16 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
     return false;
   }
 
+  private boolean jj_3_35() {
+    if (jj_scan_token(0)) return true;
+    return false;
+  }
+
+  private boolean jj_3_34() {
+    if (jj_3R_12()) return true;
+    return false;
+  }
+
   private boolean jj_3_23() {
     if (jj_3R_7()) return true;
     Token xsp;
@@ -1413,7 +1428,7 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
   }
 
   private boolean jj_3_33() {
-    if (jj_scan_token(0)) return true;
+    if (jj_scan_token(EOL)) return true;
     return false;
   }
 
@@ -1446,12 +1461,13 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
   }
 
   private boolean jj_3_32() {
-    if (jj_3R_12()) return true;
+    if (jj_scan_token(STARTLIST)) return true;
+    if (jj_3R_2()) return true;
     return false;
   }
 
   private boolean jj_3_31() {
-    if (jj_scan_token(EOL)) return true;
+    if (jj_scan_token(TOWER)) return true;
     return false;
   }
 
@@ -1461,12 +1477,6 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
   }
 
   private boolean jj_3R_13() {
-    return false;
-  }
-
-  private boolean jj_3_30() {
-    if (jj_scan_token(STARTLIST)) return true;
-    if (jj_3R_2()) return true;
     return false;
   }
 
@@ -1498,6 +1508,38 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
     return false;
   }
 
+  private boolean jj_3_30() {
+    if (jj_scan_token(PAIR)) return true;
+    if (jj_3R_11()) return true;
+    if (jj_scan_token(HEXSIDES)) return true;
+    if (jj_3R_10()) return true;
+    return false;
+  }
+
+  private boolean jj_3_29() {
+    if (jj_scan_token(KEYSUBTITLE)) return true;
+    if (jj_3R_7()) return true;
+    return false;
+  }
+
+  private boolean jj_3_11() {
+    if (jj_scan_token(OPENPAR)) return true;
+    if (jj_scan_token(LEFTOVER)) return true;
+    if (jj_scan_token(CLOSEPAR)) return true;
+    if (jj_3R_2()) return true;
+    return false;
+  }
+
+  private boolean jj_3_18() {
+    if (jj_scan_token(OPENPAR)) return true;
+    if (jj_3R_5()) return true;
+    if (jj_scan_token(COMMA)) return true;
+    if (jj_3R_5()) return true;
+    if (jj_scan_token(CLOSEPAR)) return true;
+    if (jj_3R_2()) return true;
+    return false;
+  }
+
   /** Generated Token Manager. */
   public BattlelandRandomizerLoaderTokenManager token_source;
   SimpleCharStream jj_input_stream;
@@ -1522,7 +1564,7 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
    private static void jj_la1_init_1() {
       jj_la1_1 = new int[] {};
    }
-  final private JJCalls[] jj_2_rtns = new JJCalls[33];
+  final private JJCalls[] jj_2_rtns = new JJCalls[35];
   private boolean jj_rescan = false;
   private int jj_gc = 0;
 
@@ -1706,7 +1748,7 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[36];
+    boolean[] la1tokens = new boolean[38];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -1723,7 +1765,7 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
         }
       }
     }
-    for (int i = 0; i < 36; i++) {
+    for (int i = 0; i < 38; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;
@@ -1750,7 +1792,7 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
 
   private void jj_rescan_token() {
     jj_rescan = true;
-    for (int i = 0; i < 33; i++) {
+    for (int i = 0; i < 35; i++) {
     try {
       JJCalls p = jj_2_rtns[i];
       do {
@@ -1790,6 +1832,8 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
             case 30: jj_3_31(); break;
             case 31: jj_3_32(); break;
             case 32: jj_3_33(); break;
+            case 33: jj_3_34(); break;
+            case 34: jj_3_35(); break;
           }
         }
         p = p.next;

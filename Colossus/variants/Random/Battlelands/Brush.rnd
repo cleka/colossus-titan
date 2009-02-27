@@ -1,4 +1,6 @@
 # $Id$
+TITLE "Brush"
+SUBTITLE "Randomized!"
 
 # areaone to three are the second lines of attackers
 LABEL areaone=B3 C4 D5

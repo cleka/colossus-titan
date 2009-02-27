@@ -117,6 +117,11 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
             {
                 selectHexesByLabels(new java.util.HashSet<String>(startList));
             }
+            basicName = parser.getTitle();
+            displayName = parser.getTitle();
+            subtitle = parser.getSubtitle();
+            setMapName(basicName);
+            
         } catch (Exception e)
         {
             System.err.println(e);
@@ -532,6 +537,8 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
         
         mi = specialMenu.add(eraseAction);
 
+        specialMenu.addSeparator();
+
         towerAction = new AbstractAction("Terrain is a Tower")
         {
 
@@ -565,6 +572,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
         };
         
         mi = specialMenu.add(clearStartListAction);
+        specialMenu.addSeparator();
 
         fillWithSlopeAction = new AbstractAction("Fill Low Edge with Slope")
         {
@@ -617,6 +625,8 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
         for (String name : defaultRandom.keySet()) {
             mi = randomMenu.add(new randomizeActionPredef(name, defaultRandom.get(name)));
         }
+
+        specialMenu.addSeparator();
 
         mi = randomMenu.add(randomizeAction);
         

@@ -1,4 +1,6 @@
 # $Id$
+TITLE "Tower"
+SUBTITLE "Randomized!"
 
 LABEL heighest = D4
 LABEL nextdoor = SURROUNDINGSOF((heighest))

@@ -41,39 +41,43 @@ public interface BattlelandRandomizerLoaderConstants {
   /** RegularExpression Id. */
   int TOWER = 18;
   /** RegularExpression Id. */
-  int NUMBER = 19;
+  int KEYTITLE = 19;
   /** RegularExpression Id. */
-  int FPNUMBER = 20;
+  int KEYSUBTITLE = 20;
   /** RegularExpression Id. */
-  int DIGIT = 21;
+  int NUMBER = 21;
   /** RegularExpression Id. */
-  int COMMA = 22;
+  int FPNUMBER = 22;
   /** RegularExpression Id. */
-  int DOT = 23;
+  int DIGIT = 23;
   /** RegularExpression Id. */
-  int OPENPAR = 24;
+  int COMMA = 24;
   /** RegularExpression Id. */
-  int CLOSEPAR = 25;
+  int DOT = 25;
   /** RegularExpression Id. */
-  int CARET = 26;
+  int OPENPAR = 26;
   /** RegularExpression Id. */
-  int EQUAL = 27;
+  int CLOSEPAR = 27;
   /** RegularExpression Id. */
-  int STAR = 28;
+  int CARET = 28;
   /** RegularExpression Id. */
-  int CASELABEL = 29;
+  int EQUAL = 29;
   /** RegularExpression Id. */
-  int HAZARD = 30;
+  int STAR = 30;
   /** RegularExpression Id. */
-  int CHAINE = 31;
+  int CASELABEL = 31;
   /** RegularExpression Id. */
-  int QUOTEDCHAINE = 32;
+  int HAZARD = 32;
   /** RegularExpression Id. */
-  int CAR = 33;
+  int CHAINE = 33;
   /** RegularExpression Id. */
-  int NUMCAR = 34;
+  int QUOTEDCHAINE = 34;
   /** RegularExpression Id. */
-  int QUOTEDCAR = 35;
+  int CAR = 35;
+  /** RegularExpression Id. */
+  int NUMCAR = 36;
+  /** RegularExpression Id. */
+  int QUOTEDCAR = 37;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -99,6 +103,8 @@ public interface BattlelandRandomizerLoaderConstants {
     "\"usedup\"",
     "\"STARTLIST\"",
     "\"TOWER\"",
+    "\"TITLE\"",
+    "\"SUBTITLE\"",
     "<NUMBER>",
     "<FPNUMBER>",
     "<DIGIT>",
