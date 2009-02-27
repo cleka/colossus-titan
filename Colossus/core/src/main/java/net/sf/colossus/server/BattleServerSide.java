@@ -1042,7 +1042,7 @@ public final class BattleServerSide extends Battle
                 if (!target.isDead())
                 {
                     BattleHex targetHex = target.getCurrentHex();
-                    if (isRangestrikePossible(critter, target))
+                    if (isRangestrikePossible(critter, target,currentHex, targetHex))
                     {
                         set.add(targetHex.getLabel());
                     }
@@ -1116,33 +1116,6 @@ public final class BattleServerSide extends Battle
         }
         server.allTellCarryResults(target, dealt, carryDamage,
             getCarryTargets());
-    }
-
-    /** Return true if the rangestrike is possible. */
-    private boolean isRangestrikePossible(CreatureServerSide critter,
-        CreatureServerSide target)
-    {
-        BattleHex currentHex = critter.getCurrentHex();
-        BattleHex targetHex = target.getCurrentHex();
-
-        int range = getRange(currentHex, targetHex, false);
-        int skill = critter.getSkill();
-
-        if (range > skill)
-        {
-            return false;
-        }
-
-        // Only magicMissile can rangestrike at range 2, rangestrike Lords,
-        // or rangestrike without LOS.
-        else if (!critter.useMagicMissile()
-            && (range < 3 || target.isLord() || isLOSBlocked(currentHex,
-                targetHex)))
-        {
-            return false;
-        }
-
-        return true;
     }
 
     /** Return the number of intervening bramble hexes.  If LOS is along a

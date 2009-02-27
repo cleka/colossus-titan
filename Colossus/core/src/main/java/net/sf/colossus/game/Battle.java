@@ -492,4 +492,25 @@ abstract public class Battle
     {
         return isOccupied(hex.getLabel());
     }
+
+    /**
+     * Return true if the rangestrike is possible.
+     */
+    protected boolean isRangestrikePossible(Creature critter, Creature target,
+            BattleHex currentHex, BattleHex targetHex)
+    {
+        int range = getRange(currentHex, targetHex, false);
+        int skill = critter.getType().getSkill();
+        if (range > skill)
+        {
+            return false;
+        }
+        else if (!critter.getType().useMagicMissile() &&
+                (range < 3 || target.getType().isLord() ||
+                isLOSBlocked(currentHex, targetHex)))
+        {
+            return false;
+        }
+        return true;
+    }
 }

@@ -470,6 +470,13 @@ public final class Strike
     }
 
     /** Return true if the rangestrike is possible. */
+    /*
+     * WARNING: this is a duplication from code in Battle ; caller should use
+     * a Battle instance instead.
+     * @deprecated Should use an extension of Battle instead of Strike, with
+     *   extension of Creature instead of BattleChit and extra BattleHex
+     */
+    @Deprecated
     private boolean isRangestrikePossible(BattleChit chit, BattleChit target)
     {
         CreatureType creature = client.getGame().getVariant()
