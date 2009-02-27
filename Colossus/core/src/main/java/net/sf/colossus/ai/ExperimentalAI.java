@@ -10,7 +10,7 @@ import net.sf.colossus.client.BattleChit;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.CritterMove;
 import net.sf.colossus.client.LegionClientSide;
-import net.sf.colossus.client.Strike;
+import net.sf.colossus.game.Battle;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.variant.BattleHex;
 
@@ -77,7 +77,7 @@ public class ExperimentalAI extends SimpleAI
                 for (BattleChit foe : foes)
                 {
                     BattleHex foeHex = client.getBattleHex(foe);
-                    int range = Strike.getRange(foeHex, myHex, true);
+                    int range = Battle.getRange(foeHex, myHex, true);
                     if ((range != Constants.OUT_OF_RANGE) &&
                             ((range - 2) <= foe.getSkill()))
                     {

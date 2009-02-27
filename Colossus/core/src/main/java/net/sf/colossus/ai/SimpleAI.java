@@ -23,7 +23,7 @@ import net.sf.colossus.client.Client;
 import net.sf.colossus.client.CritterMove;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.client.PlayerClientSide;
-import net.sf.colossus.client.Strike;
+import net.sf.colossus.game.Battle;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.server.Constants;
@@ -3063,7 +3063,7 @@ public class SimpleAI extends AbstractAI
                 if (turn <= 4)
                 {
                     value.add( bec.TITAN_FORWARD_EARLY_PENALTY
-                        * Strike.getRange(hex, entrance, true), "TitanForwardEarlyPenalty");
+                        * Battle.getRange(hex, entrance, true), "TitanForwardEarlyPenalty");
                     for (int i = 0; i < 6; i++)
                     {
                         BattleHex neighbor = hex.getNeighbor(i);
@@ -3090,7 +3090,7 @@ public class SimpleAI extends AbstractAI
             }
             else
             {
-                int range = Strike.getRange(hex, entrance, true);
+                int range = Battle.getRange(hex, entrance, true);
 
                 // To ensure that defending legions completely enter
                 // the board, prefer the second row to the first.  The
