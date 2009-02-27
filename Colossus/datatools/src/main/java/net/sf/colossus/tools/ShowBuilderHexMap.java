@@ -42,7 +42,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
         MouseListener, Printable
 {
 
-    private JDialog dialog;
+    private JFrame frame;
     private JPopupMenu popupMenuTerrain;
     private JPopupMenu popupMenuBorder;
     private Point lastPoint;
@@ -51,6 +51,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
     private JCheckBoxMenuItem towerItem;
     private AbstractAction towerAction;
     private AbstractAction clearStartListAction;
+    private String mapName = null;
 
     class rndFileFilter extends javax.swing.filechooser.FileFilter
     {
@@ -171,8 +172,11 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                         selectHexesByLabels(new HashSet<String>(startList));
                     }
                     subtitle = parser.getSubtitle();
-                    displayName = temploadFileName.replaceAll(".xml", "");
-                    basicName = temploadFileName.replaceAll(".xml", "");
+                    String mapName = temploadFileName.replaceAll(".xml", ""); 
+                    displayName = mapName;
+                    basicName = mapName;
+                    setMapName(displayName);
+                    super.repaint();
                 } catch (Exception e)
                 {
                     System.err.println(e);
@@ -206,6 +210,11 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                     outputFile.write(outStr.getBytes());
                     outputFile.flush();
                     outputFile.close();
+                    String mapName = tempsaveFileName.replaceAll(".xml", ""); 
+                    displayName = mapName;
+                    basicName = mapName;
+                    setMapName(displayName);
+                    super.repaint();
                 } catch (Exception e)
                 {
                     System.err.println(e);
@@ -410,16 +419,6 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
         repaint();
         }
         };
-        
-        fillWithSlopeAction = new AbstractAction("Fill Edge With Slope")
-        {
-
-            public void actionPerformed(ActionEvent e)
-            {
-                doFillSlope(getBattleHexArray());
-                repaint();
-            }
-        };
 
         loadFileAction = new AbstractAction("Load Map (from file)")
         {
@@ -439,7 +438,6 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
         mi = fileMenu.add(showBattlelandAction);
         mi = fileMenu.add(eraseAction);
         mi = fileMenu.add(randomizeAction);
-        mi = fileMenu.add(fillWithSlopeAction);
         mi = fileMenu.add(quitAction);
         mi.setMnemonic(KeyEvent.VK_Q);
 
@@ -477,20 +475,42 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                 }
             }
         };
+        
         mi = specialMenu.add(clearStartListAction);
 
-        dialog = new JDialog();
+        fillWithSlopeAction = new AbstractAction("Fill Edge With Slope")
+        {
 
-        Container contentPane = dialog.getContentPane();
+            public void actionPerformed(ActionEvent e)
+            {
+                doFillSlope(getBattleHexArray());
+                repaint();
+            }
+        };
+
+        mi = specialMenu.add(fillWithSlopeAction);
+
+        JMenu randomMenu = new JMenu("Randomize ...");
+        
+        JMenuItem random1 = new JMenuItem("Random file 1...");
+        JMenuItem random2 = new JMenuItem("Random file 2...");
+        randomMenu.add(random1);
+        randomMenu.add(random2);
+        
+        specialMenu.add(randomMenu);
+               
+        frame = new JFrame("BattlelandBuilder");
+
+        Container contentPane = frame.getContentPane();
         contentPane.setLayout(new BorderLayout());
         contentPane.add(menuBar, BorderLayout.NORTH);
 
         addMouseListener(this);
-        dialog.addWindowListener(this);
+        frame.addWindowListener(this);
 
         contentPane.add(this, BorderLayout.CENTER);
-        dialog.pack();
-        dialog.setVisible(true);
+        frame.pack();
+        frame.setVisible(true);
 
         popupMenuTerrain = new JPopupMenu("Choose Terrain");
         contentPane.add(popupMenuTerrain);
@@ -548,6 +568,14 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
         lastSide = 0;
     }
 
+    private void setMapName(String name)
+    {
+        mapName = name;
+        frame.setTitle("BattlelandBuilder" + 
+            (mapName == null ? "" : ": " + mapName)); 
+    }
+    
+    
     public void mousePressed(MouseEvent e)
     {
         lastPoint = e.getPoint();
