@@ -65,7 +65,7 @@ public class BattleHex extends Hex
 
     public BattleHex(int xCoord, int yCoord)
     {
-        super(xCoord, yCoord);
+        super(createLabel(xCoord, yCoord), xCoord, yCoord);
 
         for (int i = 0; i < 6; i++)
         {
@@ -73,7 +73,32 @@ public class BattleHex extends Hex
         }
 
         terrain = HazardTerrain.PLAINS;
-        setLabel(createLabel());
+    }
+
+
+    private static String createLabel(int xCoord, int yCoord)
+    {
+        String label;
+        if (xCoord < 0)
+        {
+            label = "X" + yCoord;
+        }
+        else
+        {
+            final int yLabel = 6 - yCoord
+                - Math.abs(((xCoord - 3) / 2));
+            label = "" + _intXCoordToXLabel(xCoord) + yLabel;
+        }
+        return label;
+    }
+
+    /** a char for an int: 0:'A'=0, 1:'B', ... int(w):'W', else:'?', <0:undef.
+     * */
+    private final static char _intXCoordToXLabel(final int x)
+    {
+        return (x < 'X') // 'X' is used for -1
+        ? (char)('A' + x)
+            : '?';
     }
 
     public HazardTerrain getTerrain()
@@ -239,31 +264,6 @@ public class BattleHex extends Hex
             result = result || isNonNativePenaltyHexside(h);
         }
         return result;
-    }
-
-    private String createLabel()
-    {
-        String label;
-        if (getXCoord() < 0)
-        {
-            label = "X" + getYCoord();
-        }
-        else
-        {
-            final int yLabel = 6 - getYCoord()
-                - Math.abs(((getXCoord() - 3) / 2));
-            label = "" + _intXCoordToXLabel(getXCoord()) + yLabel;
-        }
-        return label;
-    }
-
-    /** a char for an int: 0:'A'=0, 1:'B', ... int(w):'W', else:'?', <0:undef.
-     * */
-    private final static char _intXCoordToXLabel(final int x)
-    {
-        return (x < 'X') // 'X' is used for -1 
-        ? (char)('A' + x)
-            : '?';
     }
 
     public void setHexside(int i, char hexside)

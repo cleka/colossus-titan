@@ -24,8 +24,7 @@ public abstract class Hex
     //              4---------3
 
     // Game state variables
-    // TODO make label final -- currently BattleHex still calculates it
-    private String label = "";
+    final private String label;
     private final int xCoord;
     private final int yCoord;
 
@@ -36,20 +35,9 @@ public abstract class Hex
         this.yCoord = yCoord;
     }
 
-    public Hex(int xCoord, int yCoord)
-    {
-        this.xCoord = xCoord;
-        this.yCoord = yCoord;
-    }
-
     public String getLabel()
     {
         return label;
-    }
-
-    public void setLabel(String label)
-    {
-        this.label = label;
     }
 
     public abstract String getTerrainName();
