@@ -55,7 +55,7 @@
     directory and copy the default files in it, then you can change them with
     any text editor.
 
-    You can also use other variants as examples. Warning: almost no sanity
+    Warning: almost no sanity
     checks are performed, and some combinations might give strange and/or
     unexpected results, particurly in Battlelands (slope next to a tree, or
     cliff between two bogs...). Also, ensuring consistency between the files is
@@ -68,7 +68,42 @@
     <b>TER</b>
     and 
     <b>MAP</b>
-    files, but don&#39;t hold your breath, as nobody is working on it yet. 
+    files, but don&#39;t hold your breath, as nobody is working on it yet.<p>
+
+    You can also use other variants as examples:
+
+    <ul>
+        <li> The Default variant represent the default rules set. It's a good
+        starting point to undesrtand the file format, and all the files in there
+        can be used from any variant, you only have to point at their names (in
+        the XML-based VAR file), or for images and Battlelands, it's automatic.
+        <li> The variants starting in TG only replace the Battlelands, it's the
+        easiest of all the possible modifications. Create the directories, add
+        a README or README.html file, copy the DefaultVar.xml file and change
+        the name (the XML tag name in the variant element). Now, you only have
+        to create new Battlelands with BattlelandsBuilder and put them in the
+        Battlelands subdirectory. NOTE: For the Battlelands to work, the
+        filename and the terrain attribute of the Battlelands element must match
+        one of the default Titan Battelands. Again, use one of the TG variants
+        as an example.
+        <li> The variant Badlands also modify the content of the masterboard
+        to exploit a larger number of Battlelands. This means using modifying
+        the XML-based MAP file, modifying the XML-based TER file (to include the
+        new terrains), and adding a Hint implementation for the AI to exploit
+        intelligently (well, not excessively dumbly, anyway) the new terrains.
+        <li> The variant ExtTitan uses a larger masterboard, and new creatures,
+        thus requiring a XML-based CRE file and new images. The Battelands are
+        the default ones here.
+        <li> Some variants (like Abyssal6) basically extends everything using
+        the default rules. This is the harder of the 'reasonably safe to use'
+        level of variants.
+        <li> Finally, there is Balrog. This one implements some of the Java
+        interface of the code to alter the basic Titan ruleset. An advice:
+        before trying to do the same, contact the developers on the mailing-list
+        and discuss your ideas, because that kind of variant is very hard to
+        create and even harder to maintain (that's why there's only one yet).
+    </ul>
+
     <h2>Frequently Asked Questions</h2>
     <ul>
     </ul>
