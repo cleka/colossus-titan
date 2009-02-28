@@ -186,6 +186,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
      *  Cliffs are bidirectional; other hexside obstacles are noted
      *  only on the high side, since they only interfere with
      *  uphill movement. */
+    @SuppressWarnings("unused")
     private static synchronized void setupHexesGameState(
         MasterBoardTerrain masterBoardTerrain, GUIBattleHex[][] h,
         boolean serverSideFirstLoad)
