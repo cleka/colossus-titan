@@ -12,56 +12,50 @@
     <body>
     <P>
     <h2>The Variant Pack</h2>
-    <B><FONT color="red">NOTE: This document is somewhat outdated, 
-    and loading own variant may or may not be fully functional right
-     now [Juli 2007].</FONT></B>
     <P>
     <h4>How do I use a Variant Pack ?</h4>
     Just use the 
     <b>Load External Variant</b>
     button and open the 
-    <b>VAR</b>
+    XML-based <b>VAR</b>
     file inside the variant directory, then start a new game. That should be
-    enough. Alternatively, some variants are now supplied in the standard
+    enough. Alternatively, many variants are now supplied in the standard
     distribution ; simply use the pop-up menu to select which variant to play (
     <b>Default</b>
     is the Classic Titan ruleset). 
     <h4>What&#39;s in a Variant Pack ?</h4>
     A Variant Pack should be a directory (folder) containing: 
     <ul>
-        <li>A 
-        <b>VAR</b>
+        <li>A mandatory
+        XML-based <b>VAR</b>
         file, that describes the other files</li>
-        <li>
-        <b>CRE</b>
+        <li> Optionals
+        XML-based <b>CRE</b>
         , 
-        <b>TER</b>
+        XML-based <b>TER</b>
         and 
-        <b>MAP</b>
+        XML-based <b>MAP</b>
         files that describe the variant</li>
-        <li>A 
+        <li>An optional
         <b>Battlelands</b>
         subdirectory that contains the new and/or changed Battlelands</li>
-        <li>An 
+        <li>An optional
         <b>images</b>
         subdirectory that contains the new and/or changed pictures.</li>
-        <li>A
+        <li>A mandatory
         <b>Hint</b>
         Java source file that helps the AI play your variant.  This is 
         <b>required</b> if you have non-standard Tower numbers.  (If you 
         don't know Java, ask for help on the colossus-developers list.)
     </ul>
-    The various files are described in details inside the 
-    <a
-     href="FileFormat.html">file formats document</a>
-    . 
+    The various files are either XML-based or Java code, and at the moment there
+    is no proper description of the formats. Sorry.
     <h4>How do I create a Variant Pack ?</h4>
     There&#39;s no user-friendly way yet. The easiest way is to build the
     directory and copy the default files in it, then you can change them with
-    any text editor. The contents of the files are described in the 
-    <a
-     href="FileFormat.html">file formats document</a>
-    . You can also use other variants as examples. Warning: almost no sanity
+    any text editor.
+
+    You can also use other variants as examples. Warning: almost no sanity
     checks are performed, and some combinations might give strange and/or
     unexpected results, particurly in Battlelands (slope next to a tree, or
     cliff between two bogs...). Also, ensuring consistency between the files is
@@ -77,38 +71,6 @@
     files, but don&#39;t hold your breath, as nobody is working on it yet. 
     <h2>Frequently Asked Questions</h2>
     <ul>
-        <li>My creature won&#39;t load, or my creature is displayed as a dull
-        grey square 
-        <br />
-        <br />
-        <p>The creature&#39;s name (the first column of a 
-        <b>CRE</b>
-        file) should not contain spaces or other non-alphabetical characters
-        (you can&#39;t use digits yet), unless put between doublequotes
-        (&quot;). i.e. proper names are 
-        <b>&quot;KillerRabbitTwo&quot;</b>
-        or 
-        <b>&quot;Killer Rabbit 2&quot;</b>
-        . The same name must be used in the 
-        <b>CRE</b>
-        and 
-        <b>TER</b>
-        files. The creature&#39;s name is also used as the base name of the
-        pictures. So a 
-        <b>KillerRabbitTwo</b>
-        will use the file 
-        <b>KillerRabbitTwo.gif</b>
-        in the subdirectory 
-        <b>images</b>
-        . Spaces will be replaced by underscores (_), and double quotes will be
-        ignored. So 
-        <b>&quot;Killer Rabbit 2&quot;</b>
-        will use 
-        <b>Killer_Rabbit_2.gif</b>
-        . You should be able to re-use an existing name, as the 
-        <b>images</b>
-        subdirectory is accessed before the default GIF files.</p>
-        </li>
     </ul>
     </body>
 </html>
