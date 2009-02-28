@@ -11,25 +11,21 @@ for more details and the original copyright on Badlands.
 
 Badlands was implemented in Colossus by Romain Dolbeau <romain@dolbeau.org>
 
-2) How to use it ?
-
-Just use the "Load Variant" button in Colossus, and
-open the Badlands.var file inside the Badlands directory.
-That should be enough. If not, please report the problem.
-
-3) What are the differences with regular Titan ?
+2) What are the differences with regular Titan ?
 
 New Battlelands for some terrains.
 
-4) What are the differences between the original Badlands
+3) What are the differences between the original Badlands
 and Badlands in Colossus ?
 
 In the original Badlands, Battlelands were used randomly
 when multiple Battlelands were available. In the current
 implementation for Colossus, alternate Battlelands are
-distributed statically on the strategic map.
+distributed statically on the strategic map. The alternate
+Tundra is not used, as there is only a small, odd number
+of Tundra on the masterboard.
 
-This restriction is due to technical limitations in Colossus,
+This difference is due to technical limitations in Colossus,
 it might be lifted in the future :-)
 
 File Version: $Header$
