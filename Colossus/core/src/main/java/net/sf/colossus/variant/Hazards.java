@@ -100,6 +100,7 @@ public abstract class Hazards implements HazardConstants
         this.rangeStrikeSpecial = RangeStrikeSpecial;
         this.terrainSpecial = terrainSpecial;
 
+        LOGGER.finest("Create Hazards: " + name);
     }
 
     public String getName()

@@ -113,6 +113,7 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
             return (!beingdone.isEmpty());
         }
 
+        @SuppressWarnings("unused")
         private boolean isBad(int[] indexes)
         {
             Set<String> duplicateHexChecker = new HashSet<String>();

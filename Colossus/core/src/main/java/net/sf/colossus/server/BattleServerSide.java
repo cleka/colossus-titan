@@ -1289,6 +1289,7 @@ public final class BattleServerSide extends Battle
         return critters;
     }
 
+    @Override
     protected boolean isOccupied(String hexLabel)
     {
         Iterator<CreatureServerSide> it = getAllCritters().iterator();

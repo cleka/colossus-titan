@@ -190,6 +190,7 @@ public final class Strike
      * a Battle instance instead.
      * @deprecated Should use an extension of Battle instead of Strike
      */
+    @Deprecated
     public int minRangeToEnemy(BattleChit chit)
     {
         BattleHex hex = client.getBattleHex(chit);
@@ -864,8 +865,8 @@ public final class Strike
             // striking out of possible hazard
             attackerSkill -=
                      hex.getTerrain().getSkillPenaltyStrikeFrom(
-                       striker.getCreature().isNativeIn(hex.getTerrain()),
-                       target.getCreature().isNativeIn(hex.getTerrain()));
+                       striker.getCreature().isNativeIn(terrain),
+                       target.getCreature().isNativeIn(terrain));
 
             if (hex.getElevation() > targetHex.getElevation())
             {
