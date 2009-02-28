@@ -45,17 +45,18 @@ public class HazardHexside extends Hazards
             scopeForRangeStrikeEffect, RangeStrikeEffectAdjustment,
             RangeStrikeSpecial, terrainSpecial);
         HEXSIDE_MAP.put(name, this);
-        HEXSIDE_MAP_UGLY.put(code, this);
+        HEXSIDE_MAP_UGLY.put(new Character(code), this);
     }
 
     public static HazardHexside getHexsideByName(String name)
     {
         return HEXSIDE_MAP.get(name);
     }
+
     /** @deprecated, helper function, we want to get rid of the single char stuff */
     public static HazardHexside getHexsideByCode(char code)
     {
-        return HEXSIDE_MAP_UGLY.get(code);
+        return HEXSIDE_MAP_UGLY.get(new Character(code));
     }
 
     /**

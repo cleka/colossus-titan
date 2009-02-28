@@ -1,11 +1,13 @@
 package net.sf.colossus.cmdline;
 
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
 
 /** 
  *  Class CmdLine represents a parsed command line for one run of a program.
@@ -37,22 +39,15 @@ import java.util.TreeSet;
 
 public class CmdLine
 {
-    private Opts opts;
-    private String [] args;
     // Anything on the command line after the last valid option.
     private ArrayList<String> leftovers;
-    private Map<Character, String> optchToValue = new TreeMap<Character, 
-      String>();
-    private Map<String, String> nameToValue = new TreeMap<String, String>();
-    private Set<Character> optchSeen = new TreeSet<Character>();
-    private Set<String> nameSeen = new TreeSet<String>();
+    private final Map<Character, String> optchToValue = new TreeMap<Character, String>();
+    private final Map<String, String> nameToValue = new TreeMap<String, String>();
+    private final Set<Character> optchSeen = new TreeSet<Character>();
+    private final Set<String> nameSeen = new TreeSet<String>();
 
-
-    public CmdLine(Opts opts, String [] args)
+    public CmdLine(Opts opts, String[] args)
     {
-        this.opts = opts;
-        this.args = args;
-
         boolean expectingValue = false;
         char optch = '\0';
         boolean inLeftovers = false;
@@ -68,7 +63,7 @@ public class CmdLine
                 Opt opt = opts.getOpt(optch);
                 String name = opt.getName();
                 String value = arg;
-                optchToValue.put(optch, value);
+                optchToValue.put(new Character(optch), value);
                 nameToValue.put(name, value);
                 expectingValue = false;
             }
@@ -77,7 +72,7 @@ public class CmdLine
                 String name = arg.substring(2);
                 Opt opt = opts.getOpt(name);
                 optch = opt.getOptch();
-                optchSeen.add(optch);
+                optchSeen.add(new Character(optch));
                 nameSeen.add(name);
                 expectingValue = opt.hasArg();
             }
@@ -86,7 +81,7 @@ public class CmdLine
                 optch = arg.charAt(1);
                 Opt opt = opts.getOpt(optch);
                 String name = opt.getName();
-                optchSeen.add(optch);
+                optchSeen.add(new Character(optch));
                 nameSeen.add(name);
                 expectingValue = opt.hasArg();
                 if (arg.length() > 2)
@@ -94,7 +89,7 @@ public class CmdLine
                     if (expectingValue)
                     {
                         String value = arg.substring(2);
-                        optchToValue.put(optch, value);
+                        optchToValue.put(new Character(optch), value);
                         nameToValue.put(name, value);
                         expectingValue = false;
                     }
@@ -119,7 +114,7 @@ public class CmdLine
     /** Return true iff the option has been seen. */
     public boolean optIsSet(char optch)
     {
-        return optchSeen.contains(optch);
+        return optchSeen.contains(new Character(optch));
     }
 
     /** Return true iff the option has been seen. */
@@ -133,7 +128,7 @@ public class CmdLine
      *  not take an argument. */
     public String getOptValue(char optch)
     {
-        return optchToValue.get(optch);
+        return optchToValue.get(new Character(optch));
     }
 
     /** Return the option value as a String. 

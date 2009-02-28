@@ -1,5 +1,6 @@
 package net.sf.colossus.cmdline;
 
+
 /** 
  *  Class Opt represents a single command-line option.
  *  @version $Id$
@@ -8,10 +9,10 @@ package net.sf.colossus.cmdline;
 
 public class Opt
 {
-    private char optch;
-    private String name;
-    private boolean hasarg;
-    private String help;
+    private final char optch;
+    private final String name;
+    private final boolean hasarg;
+    private final String help;
 
     public Opt(char optch, String name, boolean hasarg, String help)
     {
@@ -45,17 +46,18 @@ public class Opt
         return help;
     }
 
+    @Override
     public String toString()
     {
         StringBuilder sb = new StringBuilder();
         sb.append("-" + optch);
-        sb.append(", "); 
+        sb.append(", ");
         sb.append("--" + name);
-        sb.append(", "); 
+        sb.append(", ");
         if (hasarg)
         {
             sb.append("+ ARG");
-            sb.append(", "); 
+            sb.append(", ");
         }
         sb.append(help);
         return sb.toString();
