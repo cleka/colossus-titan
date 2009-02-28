@@ -20,6 +20,10 @@ import net.sf.colossus.variant.MasterHex;
 
 /**
  * Custom class to allow recruitment of Balrog in 6-tower game.
+ *
+ * One becomes available in a Player home Tower for every 300 points earned
+ * by the Player.
+ *
  * @version $Id$
  * @author Romain Dolbeau
  */
@@ -45,6 +49,10 @@ public class BalrogRecruitment extends CustomRecruitBase
         return new ArrayList<CreatureType>();
     }
 
+    /** This one is called from an inner loop in the TerrainRecruitLoader,
+     * BEFORE the current Variant becomes available through VariantSupport.
+     * This means we can't enumerate all CreatureType here!!!!
+     */
     @Override
     public List<CreatureType> getAllPossibleSpecialRecruits(
         MasterBoardTerrain terrain)
@@ -114,6 +122,9 @@ public class BalrogRecruitment extends CustomRecruitBase
         }
     }
 
+    /** The magic function that add more Balrogs to the Caretaker when
+     * experience points goes up.
+     */
     private synchronized void updateBalrogCount(MasterHex tower)
     {
         String name = balrogPrefix + tower.getLabel();

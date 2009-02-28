@@ -13,7 +13,12 @@ import net.sf.colossus.variant.HazardTerrain;
 /**
  * Custom class implementing the Balrog Creature. 
  * 
- * It is a DemiLord yet isn't immortal, and it's Image Name is Balrog no matter what is it's Creature Name.
+ * It is a DemiLord yet isn't immortal, and it's Image Name is Balrog no matter
+ * what is it's Creature Name.
+ *
+ * One becomes available in a Player home Tower for every 300 points earned
+ * by the Player. This means the maximum number of aailable Balrog changes,
+ * which is why we need a custom CreatureType.
  * 
  * @version $Id$
  * @author Romain Dolbeau
@@ -25,6 +30,10 @@ public class CreatureBalrog extends CreatureType
     private int localMaxCount;
     private final static List<CreatureType> allBalrogs = new ArrayList<CreatureType>();
 
+    /** The protortype of the constructor must be exactly what is tried
+     * in the Loader, otherwise creation fails (no superclass or interface
+     * allowed, only cold, hard implementation).
+     */
     public CreatureBalrog(String name, Integer power, Integer skill,
             Boolean rangestrikes, Boolean flies,
             HashSet<HazardTerrain> nativeTerrrains, Boolean nativeSlope,
