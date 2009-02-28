@@ -944,11 +944,22 @@ public class SimpleAI extends AbstractAI
                 moved = doMove(legion, bestHex);
                 if (moved)
                 {
-                    LOGGER.finer("Moved " + legion + " to " + bestHex +
-                            " after evaluating: " +
-                            bestMove.why.toString() +
-                            " is better than sitting tight: "
-                            + sitStillMove.why.toString());
+                    if (bestMove != null)
+                    {
+                        LOGGER.finer("Moved " + legion + " to " + bestHex +
+                                " after evaluating: " +
+                                bestMove.why.toString() +
+                                " is better than sitting tight: " +
+                                sitStillMove.why.toString());
+                    }
+                    else
+                    {
+                        LOGGER.warning("Moved " + legion + " to " + bestHex +
+                                " after evaluating: " +
+                                " BEST MOVE IS NULL! RUN FOR COVER! " +
+                                " is better than sitting tight: " +
+                                sitStillMove.why.toString());
+                    }
                     return true;
                 }
             }
