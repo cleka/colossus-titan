@@ -3,6 +3,7 @@
     <terrain_recruits filename="BalrogTer.xml" />
     <creatures filename="BalrogCre.xml" />
     <depends>
+	<!-- for the Balrog image, we need ExtTitan -->
         <depend variant="ExtTitan" />
     </depends>
     <hint classname="Balrog.BalrogHint" />
