@@ -4,7 +4,6 @@ package Balrog;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -50,18 +49,7 @@ public class BalrogRecruitment extends CustomRecruitBase
     public List<CreatureType> getAllPossibleSpecialRecruits(
         MasterBoardTerrain terrain)
     {
-        List<CreatureType> temp = new ArrayList<CreatureType>();
-        Iterator<CreatureType> it = VariantSupport.getCurrentVariant()
-            .getCreatureTypes().iterator();
-        while (it.hasNext())
-        {
-            CreatureType cre = it.next();
-            if (cre.getName().startsWith(balrogPrefix))
-            {
-                temp.add(cre);
-            }
-        }
-        return temp;
+        return CreatureBalrog.getAllBalrogs();
     }
 
     @Override
@@ -88,8 +76,15 @@ public class BalrogRecruitment extends CustomRecruitBase
         updateBalrogCount(hex);
 
         String name = balrogPrefix + hex.getLabel();
-        CreatureType balrogType = VariantSupport.getCurrentVariant()
-            .getCreatureByName(name);
+        List<CreatureType> allBalrogs = CreatureBalrog.getAllBalrogs();
+        CreatureType balrogType = null;
+        for (CreatureType bt : allBalrogs)
+        {
+            if (bt.getName().equals(name))
+            {
+                balrogType = bt;
+            }
+        }
 
         if (getCount(balrogType) > 0)
         {
@@ -121,7 +116,7 @@ public class BalrogRecruitment extends CustomRecruitBase
 
     private synchronized void updateBalrogCount(MasterHex tower)
     {
-        String name = balrogPrefix + tower;
+        String name = balrogPrefix + tower.getLabel();
 
         Player pi = findPlayerWithStartingTower(tower);
 
@@ -180,7 +175,7 @@ public class BalrogRecruitment extends CustomRecruitBase
         }
         else if (difference < 0)
         {
-            LOGGER.finest("CUSTOM: WARNING: DIMINISHING the total number of "
+            LOGGER.warning("CUSTOM: DIMINISHING the total number of "
                 + name + " from " + alreadyNumber + " to " + nowNumber
                 + " (new available count is: " + newcount + ")");
         }
@@ -188,9 +183,13 @@ public class BalrogRecruitment extends CustomRecruitBase
 
     private Player findPlayerWithStartingTower(MasterHex tower)
     {
+        //LOGGER.finest("Finding player for tower " + tower);
         for (Player player : allPlayers)
         {
-            if (player.getStartingTower().equals(tower))
+            //LOGGER.finest("Finding tower for player " + player);
+            MasterHex pst = player.getStartingTower();
+            //LOGGER.finest("Found tower " + pst + " for player " + player);
+            if ((pst != null) && (pst.equals(tower)))
             {
                 return player;
             }

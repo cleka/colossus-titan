@@ -1321,6 +1321,12 @@ public final class ResourceLoader
                 LOGGER.log(Level.SEVERE,
                     "Loading or instantiating class' constructor for \""
                         + className + "\" failed", e);
+                Constructor[] constructors = theClass.getConstructors();
+                for (int i = 0; i < constructors.length; i++)
+                {
+                    LOGGER.log(Level.SEVERE, "I have access to: " +
+                            constructors[i]);
+                }
                 return null;
             }
         }

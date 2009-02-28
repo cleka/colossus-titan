@@ -419,7 +419,7 @@ public final class Constants
         "Abyssal6", "Abyssal9", "Badlands", "Badlands-JDG", "Beelzebub",
         "Beelzebub12", "BeelzeGods12", "ExtTitan", "Infinite", "Outlands",
         "Pantheon", "SmallTitan", "TG-ConceptI", "TG-ConceptII", "TG-ConceptIII",
-        "TG-SetII", "TG-SetIII", "TG-Wild", "TitanPlus", "Undead", "Unified" };
+        "TG-SetII", "TG-SetIII", "TG-Wild", "TitanPlus", "Undead", "Unified", "Balrog" };
     // XXX Currently broken variants
     //    "Balrog",
     //    "Random"

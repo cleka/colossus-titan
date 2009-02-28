@@ -1,8 +1,11 @@
 package Balrog;
 
 
-import java.util.Set;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.logging.Logger;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardTerrain;
 
@@ -17,22 +20,41 @@ import net.sf.colossus.variant.HazardTerrain;
  */
 public class CreatureBalrog extends CreatureType
 {
+    private static final Logger LOGGER = Logger
+        .getLogger(CreatureBalrog.class.getName());
     private int localMaxCount;
+    private final static List<CreatureType> allBalrogs = new ArrayList<CreatureType>();
 
     public CreatureBalrog(String name, Integer power, Integer skill,
-        Boolean rangestrikes, Boolean flies,
-        Set<HazardTerrain> nativeTerrrains, Boolean nativeSlope,
-        Boolean nativeRiver, Boolean nativeDune, Boolean waterDwelling, Boolean magicMissile,
-        Boolean summonable, Boolean lord, Boolean demilord, Integer maxCount,
-        String pluralName, String baseColor)
+            Boolean rangestrikes, Boolean flies,
+            HashSet<HazardTerrain> nativeTerrrains, Boolean nativeSlope,
+            Boolean nativeRiver, Boolean nativeDune, Boolean waterDwelling,
+            Boolean magicMissile,
+            Boolean summonable, Boolean lord, Boolean demilord,
+            Integer maxCount,
+            String pluralName, String baseColor)
     {
-        super(name, power.intValue(), skill.intValue(), rangestrikes
-            .booleanValue(), flies.booleanValue(), nativeTerrrains,
-            nativeSlope.booleanValue(), nativeRiver.booleanValue(), nativeDune.booleanValue(),
-            waterDwelling.booleanValue(), magicMissile.booleanValue(),
-            summonable.booleanValue(), lord.booleanValue(), demilord
-                .booleanValue(), maxCount.intValue(), pluralName, baseColor);
+        super(name, power.intValue(), skill.intValue(), rangestrikes.
+                booleanValue(), flies.booleanValue(), nativeTerrrains,
+                nativeSlope.booleanValue(), nativeRiver.booleanValue(),
+                nativeDune.booleanValue(),
+                waterDwelling.booleanValue(), magicMissile.booleanValue(),
+                summonable.booleanValue(), lord.booleanValue(), demilord.
+                booleanValue(), maxCount.intValue(), pluralName, baseColor);
         localMaxCount = maxCount.intValue();
+        LOGGER.finest("Successfully created custom CreatureType " + name +
+                " (class " + CreatureBalrog.class.getName() + ")");
+        allBalrogs.add(this);
+    }
+
+    final static void removeAllBalrogs()
+    {
+        allBalrogs.clear();
+    }
+
+    final static List<CreatureType> getAllBalrogs()
+    {
+        return allBalrogs;
     }
 
     @Override

@@ -11,6 +11,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.server.VariantSupport;
+import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.variant.CreatureTypeTitan;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardTerrain;
@@ -111,7 +113,10 @@ public class CreatureLoader
         String plural_name = el.getAttributeValue("plural_name");
         String base_color = el.getAttributeValue("base_color");
 
+        String custom_class = el.getAttributeValue("special");
+
         CreatureType creature = null;
+        if (custom_class == null) {
         if (name.equals("Titan"))
         {
             creature = new CreatureTypeTitan(name, power, skill, rangestrikes,
@@ -123,6 +128,27 @@ public class CreatureLoader
             creature = new CreatureType(name, power, skill, rangestrikes,
                 flies, nativeTerrains, slope, river, dune, water,
                 magic_missile, summonable, lord, demilord, count, plural_name,base_color);
+        }
+        } else {
+            Object[] parameters = new Object[17];
+            parameters[0] = name;
+            parameters[1] = power;
+            parameters[2] = skill;
+            parameters[3] = rangestrikes;
+            parameters[4] = flies;
+            parameters[5] = nativeTerrains;
+            parameters[6] = slope;
+            parameters[7] = river;
+            parameters[8] = dune;
+            parameters[9] = water;
+            parameters[10] = magic_missile;
+            parameters[11] = summonable;
+            parameters[12] = lord;
+            parameters[13] = demilord;
+            parameters[14] = count;
+            parameters[15] = plural_name;
+            parameters[16] = base_color;
+            creature = (CreatureType)ResourceLoader.getNewObject(custom_class, VariantSupport.getVarDirectoriesList(), parameters);
         }
         this.creatures.add(creature);
     }

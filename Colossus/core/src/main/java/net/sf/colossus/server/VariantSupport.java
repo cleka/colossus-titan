@@ -297,9 +297,19 @@ public final class VariantSupport
             task = "getDocument README*";
             varREADME = ResourceLoader.getDocument("README", directories);
 
+            /* OK, what is the proper order here ?
+             * We should start with HazardTerrain & HazardHexside, but those
+             * aren't in variant yet. They don't require anything else.
+             * Then must comes the CreatureType. They are only natives to
+             * HazardTerrain & HazardHexside, and don't need anything else.
+             * Then we can load the terrains & recruits ; they need the
+             * CreatureType.
+             * Finally we can load the Battlelands, they need the terrain.
+             */
+
+            List<CreatureType> creatureTypes = loadCreatures();
             loadTerrainsAndRecruits(serverSide);
             // TODO add things as the variant package gets fleshed out
-            List<CreatureType> creatureTypes = loadCreatures();
             List<MasterBoardTerrain> battleLands = new ArrayList<MasterBoardTerrain>();
             MasterBoard masterBoard = new MasterBoard();
             CURRENT_VARIANT = new Variant(creatureTypes, battleLands,

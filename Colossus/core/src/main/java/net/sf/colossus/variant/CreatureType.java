@@ -72,6 +72,21 @@ public class CreatureType
 
     private final boolean isSummonable;
 
+    /* NOTE for variant builder:
+     * The subclasses in variant must use the following signature for the
+     * constructor:
+     *     public CreatureXXX(String name, Integer power, Integer skill,
+            Boolean rangestrikes, Boolean flies,
+            HashSet<HazardTerrain> nativeTerrrains, Boolean nativeSlope,
+            Boolean nativeRiver, Boolean nativeDune, Boolean waterDwelling,
+            Boolean magicMissile,
+            Boolean summonable, Boolean lord, Boolean demilord,
+            Integer maxCount,
+            String pluralName, String baseColor);
+     * Otherwise the class loading system won't find it. Not that this is
+     * really HashSet, not just Set.
+     */
+
     public CreatureType(String name, int power, int skill,
         boolean rangestrikes, boolean flies,
         Set<HazardTerrain> nativeTerrains, boolean nativeSlope,

@@ -20,12 +20,31 @@ import java.util.Map;
  */
 public class MasterBoardTerrain
 {
+    /** The (unique) identifier of this terrain.
+     * Should also be used for all Battlelands purpose.
+     */
     private final String id;
+    /** The name displayed on the Masterboard.
+     * Should also be used for all recruiting purpose.
+     * WARNING: this is not done that way yet. It shoud be, so that a single
+     * name on the Masterboard will represent a single recruiting branch,
+     * even if it' backed by several different Battlelands. This would also
+     * remove a lot of duplicated entries in the Full Recruit Tree.
+     * WIP.
+     */
     private final String displayName;
+    /** Subtitle, for the Battlelands. Cosmetic only, but nice */
     private       String subtitle;
     private final Color color;
-    // TODO this should be a List<BattleHex> (and BattleHex should be part of the variant package)
+    /** TODO this should be a List<BattleHex> ... or a List<GUIBattleHex> ???
+     * If non-null, this is the list of hexes a defending legion will start
+     * in, in a similar way to the Tower in the Default variant.
+     */
     private List<String> startList;
+    /** Whether this is a Tower-like building, with regards to starting the
+     * game, not recruiting or defender entering in a non-default location on
+     * the Battlemap.
+     */
     private boolean isTower;
     private Map<HazardTerrain, Integer> hazardNumberMap;
     // TODO this should be a Map<HazardHexside, Integer>
