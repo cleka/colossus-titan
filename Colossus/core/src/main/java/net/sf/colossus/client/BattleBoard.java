@@ -106,7 +106,6 @@ public final class BattleBoard extends KFrame
             scrollBar.setVisibleAmount(1);
             scrollBar.addAdjustmentListener(new AdjustmentListener()
             {
-                @Override
                 public void adjustmentValueChanged(AdjustmentEvent pArg0)
                 {
                     if (pArg0.getAdjustmentType() == AdjustmentEvent.TRACK)
