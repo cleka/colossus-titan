@@ -62,7 +62,7 @@ public class VariantLoader
             {
                 map = strategicMap.getAttributeValue("filename");
             }
-            List<Element> lcreatures = (List<Element>)root.getChildren("creatures");
+            List<Element> lcreatures = root.getChildren("creatures");
             for (Element creatures : lcreatures)
             {
                 cre.add(creatures.getAttributeValue("filename"));

@@ -83,6 +83,7 @@ public class CreatureLoader
         return a.getBooleanValue();
     }
 
+    @SuppressWarnings("boxing")
     private void handleCreature(Element el) throws JDOMException
     {
         String name = el.getAttributeValue("name");

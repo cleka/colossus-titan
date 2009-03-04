@@ -1018,6 +1018,7 @@ public class CreatureServerSide extends Creature
     }
     */
 
+    @Deprecated
     public boolean isWaterDwelling()
     {
         return getType().isWaterDwelling();
