@@ -97,7 +97,12 @@ public final class VariantSupport
     {
         return rememberCustomDirs.get(varName);
     }
-    
+
+    public static Document getVariantReadme()
+    {
+        return varREADME;
+    }
+
     /**
      * Load a Colossus Variant by name.
      * @param variantName The name of the variant.

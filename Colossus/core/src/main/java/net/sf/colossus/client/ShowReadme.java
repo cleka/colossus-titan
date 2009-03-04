@@ -50,7 +50,7 @@ public final class ShowReadme extends KFrame
         net.sf.colossus.webcommon.InstanceTracker.setId(this, title);
 
         myReadme = new JEditorPane();
-        Document doc = VariantSupport.loadVariantByName(variantName, false);
+        Document doc = VariantSupport.getVariantReadme();
 
         JScrollPane content = readmeContentScrollPane(myReadme, doc);
         getContentPane().add(content);
