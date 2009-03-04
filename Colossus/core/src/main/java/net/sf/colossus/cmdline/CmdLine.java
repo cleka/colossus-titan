@@ -141,10 +141,10 @@ public class CmdLine
         return nameToValue.get(name);
     }
 
-    /** Return a Collection of all leftover arguments that
+    /** Return an ArrayList of all leftover arguments that
      *  were found on the command line after valid options
      *  were parsed. */
-    public Collection<String> getLeftovers()
+    public ArrayList<String> getLeftovers()
     {
         return new ArrayList<String>(leftovers);
     }
