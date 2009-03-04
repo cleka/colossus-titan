@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.TreeMap;
 
 
-/** 
+/**
  *  Class Opts represents a configured group of command-line options
  *  for a program.
  *  @version $Id$
@@ -15,7 +15,8 @@ import java.util.TreeMap;
 public class Opts
 {
     // maps the single char abbreviation to the Opt
-    private final TreeMap<Character, Opt> optchToOpt = new TreeMap<Character, Opt>();
+    private final TreeMap<Character, Opt> optchToOpt =
+        new TreeMap<Character, Opt>();
 
     // maps the long option name to the Opt
     private final TreeMap<String, Opt> nameToOpt = new TreeMap<String, Opt>();

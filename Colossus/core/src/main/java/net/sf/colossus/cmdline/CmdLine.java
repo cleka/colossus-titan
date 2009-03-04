@@ -9,14 +9,14 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 
-/** 
+/**
  *  Class CmdLine represents a parsed command line for one run of a program.
  *  @version $Id$
  *  @author David Ripton
  */
 
-/* The rules: 
- 
+/* The rules:
+
    You can choose '-' followed by the one-character short
    option name, or "--" followed by the long option name.
    No other switch characters are valid.
@@ -40,9 +40,11 @@ import java.util.TreeSet;
 public class CmdLine
 {
     // Anything on the command line after the last valid option.
-    private ArrayList<String> leftovers;
-    private final Map<Character, String> optchToValue = new TreeMap<Character, String>();
-    private final Map<String, String> nameToValue = new TreeMap<String, String>();
+    private ArrayList<String> leftovers = new ArrayList<String>();
+    private final Map<Character, String> optchToValue =
+        new TreeMap<Character, String>();
+    private final Map<String, String> nameToValue =
+        new TreeMap<String, String>();
     private final Set<Character> optchSeen = new TreeSet<Character>();
     private final Set<String> nameSeen = new TreeSet<String>();
 
@@ -123,7 +125,7 @@ public class CmdLine
         return nameSeen.contains(name);
     }
 
-    /** Return the option value as a String. 
+    /** Return the option value as a String.
      *  Will raise if the option has not been set or does
      *  not take an argument. */
     public String getOptValue(char optch)
@@ -131,7 +133,7 @@ public class CmdLine
         return optchToValue.get(new Character(optch));
     }
 
-    /** Return the option value as a String. 
+    /** Return the option value as a String.
      *  Will raise if the option has not been set or does
      *  not take an argument. */
     public String getOptValue(String name)
