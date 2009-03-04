@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <variant name="Balrog">
     <terrain_recruits filename="BalrogTer.xml" />
+    <creatures filename="DefaultCre.xml" />
     <creatures filename="BalrogCre.xml" />
     <depends>
 	<!-- for the Balrog image, we need ExtTitan -->

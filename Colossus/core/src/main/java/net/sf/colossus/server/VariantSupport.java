@@ -55,7 +55,7 @@ public final class VariantSupport
     private static String mapName = "";
     private static String recruitName = "";
     private static String hintName = "";
-    private static String creaturesName = "";
+    private static List<String> lCreaturesName;
     private static Document varREADME = null;
     private static List<String> dependUpon = null;
     private static boolean loadedVariant = false;
@@ -272,12 +272,15 @@ public final class VariantSupport
                 }
                 LOGGER.log(Level.FINEST, "Variant using MAP " + mapName);
 
-                creaturesName = vl.getCre();
-                if (creaturesName == null)
+                lCreaturesName = vl.getCre();
+                if (lCreaturesName.isEmpty())
                 {
-                    creaturesName = Constants.defaultCREFile;
+                    lCreaturesName.add(Constants.defaultCREFile);
                 }
-                LOGGER.log(Level.FINEST, "Variant using CRE " + creaturesName);
+                for (String creaturesName : lCreaturesName)
+                {
+                    LOGGER.log(Level.FINEST, "Variant using CRE " + creaturesName);
+                }
 
                 recruitName = vl.getTer();
                 if (recruitName == null)
@@ -337,7 +340,8 @@ public final class VariantSupport
             mapName = Constants.defaultMAPFile;
             recruitName = Constants.defaultTERFile;
             hintName = Constants.defaultHINTFile;
-            creaturesName = Constants.defaultCREFile;
+            lCreaturesName.clear();
+            lCreaturesName.add(Constants.defaultCREFile);
             maxPlayers = Constants.DEFAULT_MAX_PLAYERS;
             varREADME = null;
         }
@@ -386,15 +390,18 @@ public final class VariantSupport
         {
             creatures.clear();
             List<String> directories = VariantSupport.getVarDirectoriesList();
-            InputStream creIS = ResourceLoader.getInputStream(VariantSupport
-                .getCreaturesName(), directories);
-            if (creIS == null)
+            for (String creaturesName : VariantSupport.getCreaturesNames())
             {
-                throw new FileNotFoundException(VariantSupport
-                    .getCreaturesName());
+                InputStream creIS =
+                        ResourceLoader.getInputStream(creaturesName,
+                        directories);
+                if (creIS == null)
+                {
+                    throw new FileNotFoundException(creaturesName);
+                }
+                CreatureLoader creatureLoader = new CreatureLoader(creIS);
+                creatures.addAll(creatureLoader.getCreatures());
             }
-            CreatureLoader creatureLoader = new CreatureLoader(creIS);
-            creatures.addAll(creatureLoader.getCreatures());
         }
         catch (Exception e)
         {
@@ -454,9 +461,9 @@ public final class VariantSupport
         return recruitName;
     }
 
-    public static String getCreaturesName()
+    public static List<String> getCreaturesNames()
     {
-        return creaturesName;
+        return lCreaturesName;
     }
 
     public static List<String> getVarDirectoriesList()

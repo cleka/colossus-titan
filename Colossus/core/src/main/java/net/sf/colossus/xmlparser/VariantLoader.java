@@ -26,7 +26,7 @@ public class VariantLoader
 
     private String map;
     private String ter;
-    private String cre;
+    final private List<String> cre = new ArrayList<String>();
     private String hintName;
     private int maxPlayers = 0;
     private final ArrayList<String> depends = new ArrayList<String>();
@@ -62,10 +62,10 @@ public class VariantLoader
             {
                 map = strategicMap.getAttributeValue("filename");
             }
-            Element creatures = root.getChild("creatures");
-            if (creatures != null)
+            List<Element> lcreatures = (List<Element>)root.getChildren("creatures");
+            for (Element creatures : lcreatures)
             {
-                cre = creatures.getAttributeValue("filename");
+                cre.add(creatures.getAttributeValue("filename"));
             }
             Element terrain_recruits = root.getChild("terrain_recruits");
             if (terrain_recruits != null)
@@ -99,7 +99,7 @@ public class VariantLoader
         return ter;
     }
 
-    public String getCre()
+    public List<String> getCre()
     {
         return cre;
     }
