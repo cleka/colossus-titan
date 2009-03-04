@@ -98,11 +98,6 @@ public final class VariantSupport
         return rememberCustomDirs.get(varName);
     }
 
-    public static Document getVariantReadme()
-    {
-        return varREADME;
-    }
-
     /**
      * Load a Colossus Variant by name.
      * @param variantName The name of the variant.
@@ -320,8 +315,6 @@ public final class VariantSupport
             // TODO add things as the variant package gets fleshed out
             List<MasterBoardTerrain> battleLands = new ArrayList<MasterBoardTerrain>();
             MasterBoard masterBoard = new MasterBoard();
-            CURRENT_VARIANT = new Variant(creatureTypes, battleLands,
-                masterBoard);
 
             // varREADME seems to be used as flag for a successfully loaded
             // variant, but breaking the whole variant loading just because
@@ -331,6 +324,9 @@ public final class VariantSupport
             {
                 varREADME = getMissingReadmeNotification();
             }
+
+            CURRENT_VARIANT = new Variant(creatureTypes, battleLands,
+                masterBoard, varREADME, variantName);
         }
         catch (Exception e)
         {

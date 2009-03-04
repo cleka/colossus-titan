@@ -8,6 +8,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.text.Document;
+
 import net.sf.colossus.game.Game;
 import net.sf.colossus.util.CollectionHelper;
 import net.sf.colossus.util.Predicate;
@@ -32,6 +34,8 @@ public class Variant
     private final List<CreatureType> summonableCreatureTypes;
     private final List<MasterBoardTerrain> battleLands;
     private final MasterBoard masterBoard;
+    private final Document readme;
+    private final String variantName;
 
     /** 
      * A map for fast lookup of creatures by their name.
@@ -41,7 +45,8 @@ public class Variant
     private final Map<String, CreatureType> creatureTypeByNameCache = new HashMap<String, CreatureType>();
 
     public Variant(List<CreatureType> creatureTypes,
-        List<MasterBoardTerrain> battleLands, MasterBoard masterBoard)
+        List<MasterBoardTerrain> battleLands, MasterBoard masterBoard,
+        Document readme, String name)
     {
         // defensive copies to ensure immutability
         this.creatureTypes = new ArrayList<CreatureType>(creatureTypes);
@@ -60,6 +65,8 @@ public class Variant
 
         this.battleLands = new ArrayList<MasterBoardTerrain>(battleLands);
         this.masterBoard = masterBoard;
+        this.readme = readme;
+        this.variantName = name;
     }
 
     public List<CreatureType> getCreatureTypes()
@@ -75,6 +82,16 @@ public class Variant
     public MasterBoard getMasterBoard()
     {
         return masterBoard;
+    }
+
+    public Document getReadme()
+    {
+        return readme;
+    }
+
+    public String getName()
+    {
+        return variantName;
     }
 
     /** 

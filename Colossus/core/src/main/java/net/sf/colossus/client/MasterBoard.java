@@ -796,7 +796,7 @@ public final class MasterBoard extends JPanel
                 {
                     showReadme.dispose();
                 }
-                showReadme = new ShowReadme(client.getOptions());
+                showReadme = new ShowReadme(client.getGame().getVariant());
             }
         };
         viewHelpDocAction = new AbstractAction(viewHelpDoc)

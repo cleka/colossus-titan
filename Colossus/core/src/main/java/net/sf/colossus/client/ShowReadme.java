@@ -10,11 +10,9 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.text.Document;
 
-import net.sf.colossus.server.Constants;
-import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.KFrame;
-import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
+import net.sf.colossus.variant.Variant;
 
 
 /**
@@ -29,19 +27,12 @@ public final class ShowReadme extends KFrame
 {
     JEditorPane myReadme;
 
-    ShowReadme(IOptions options)
+    ShowReadme(Variant variant)
     {
         super("ShowReadme");
 
-        String variantName = options.getStringOption(Options.variant);
-
-        // XXX Make sure chosen variant is in the list.
-        // XXX2 Same code in GetPlayer.java
-        if (variantName == null || variantName.length() == 0)
-        {
-            // Default variant
-            variantName = Constants.variantArray[0];
-        }
+        String variantName = variant.getName();
+        Document doc = variant.getReadme();
 
         String title = "README for variant " + variantName;
         setTitle(title);
@@ -50,8 +41,6 @@ public final class ShowReadme extends KFrame
         net.sf.colossus.webcommon.InstanceTracker.setId(this, title);
 
         myReadme = new JEditorPane();
-        Document doc = VariantSupport.getVariantReadme();
-
         JScrollPane content = readmeContentScrollPane(myReadme, doc);
         getContentPane().add(content);
         pack();
