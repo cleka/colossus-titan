@@ -13,7 +13,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import net.sf.colossus.util.KDialog;
@@ -21,6 +20,7 @@ import net.sf.colossus.util.Options;
 import net.sf.colossus.variant.MasterHex;
 
 
+@SuppressWarnings("serial")
 public class AutoInspector extends KDialog
 {
     private final IOptions options;
@@ -39,7 +39,7 @@ public class AutoInspector extends KDialog
         boolean dubiousAsBlanks)
     {
         super(frame, "Inspector", false);
-        assert SwingUtilities.isEventDispatchThread() : "GUI code should only run on the EDT";
+        assertEDT(); // maybe better in KDialog
         this.parentFrame = frame;
         this.options = options;
         this.viewMode = viewMode;
@@ -87,8 +87,7 @@ public class AutoInspector extends KDialog
 
     public void showLegion(LegionClientSide legion)
     {
-        assert SwingUtilities.isEventDispatchThread() : "GUI code should only run on the EDT";
-        
+        assertEDT();
         scrollPane.getViewport().removeAll();
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
@@ -108,7 +107,7 @@ public class AutoInspector extends KDialog
 
     public void showHexRecruitTree(GUIMasterHex hex)
     {
-        assert SwingUtilities.isEventDispatchThread() : "GUI code should only run on the EDT";
+        assertEDT();
         setTitle("Inspector");
         scrollPane.getViewport().removeAll();
         MasterHex hexModel = hex.getHexModel();

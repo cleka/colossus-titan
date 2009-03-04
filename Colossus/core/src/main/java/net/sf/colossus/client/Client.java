@@ -2,12 +2,10 @@ package net.sf.colossus.client;
 
 
 import java.awt.Cursor;
-import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.geom.AffineTransform;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -102,7 +100,7 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  *  @author David Ripton
  *  @author Romain Dolbeau
  */
-
+@SuppressWarnings("serial")
 public final class Client implements IClient, IOracle
 {
     private static final Logger LOGGER = Logger.getLogger(Client.class
@@ -577,8 +575,7 @@ public final class Client implements IClient, IOracle
         {
             if (caretakerDisplay == null)
             {
-                JFrame parent = getPreferredParent();
-                caretakerDisplay = new CreatureCollectionView(parent, this);
+                caretakerDisplay = new CreatureCollectionView(getPreferredParent(), this);
             }
         }
         else
@@ -1324,17 +1321,17 @@ public final class Client implements IClient, IOracle
     // Used by MasterBoard and by BattleBoard
     public void askNewCloseQuitCancel(JFrame frame, boolean fromBattleBoard)
     {
-        String[] options = new String[4];
-        options[0] = "New Game";
-        options[1] = "Quit";
-        options[2] = "Close";
-        options[3] = "Cancel";
+        String[] dialogOptions = new String[4];
+        dialogOptions[0] = "New Game";
+        dialogOptions[1] = "Quit";
+        dialogOptions[2] = "Close";
+        dialogOptions[3] = "Cancel";
         int answer = JOptionPane
             .showOptionDialog(
                 frame,
                 "Choose one of: Play another game, Quit, Close just this board, or Cancel",
                 "Play another game?", JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE, null, options, options[3]);
+                JOptionPane.QUESTION_MESSAGE, null, dialogOptions, dialogOptions[3]);
         frame = null;
         if (answer == -1 || answer == 3)
         {

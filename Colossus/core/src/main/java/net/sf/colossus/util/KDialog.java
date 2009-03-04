@@ -15,6 +15,7 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 
+import javax.swing.SwingUtilities;
 import net.sf.colossus.client.IOptions;
 import net.sf.colossus.client.SaveWindow;
 import net.sf.colossus.webcommon.InstanceTracker;
@@ -25,6 +26,7 @@ import net.sf.colossus.webcommon.InstanceTracker;
  *  @version $Id$
  *  @author David Ripton
  */
+@SuppressWarnings("serial")
 public class KDialog extends JDialog implements MouseListener, WindowListener
 {
     private SaveWindow kSaveWindow;
@@ -36,6 +38,17 @@ public class KDialog extends JDialog implements MouseListener, WindowListener
     {
         super(owner, title, modal);
         InstanceTracker.register(this, "KDialog-for-?");
+    }
+
+    /**
+     * Asserts that the current thread is the Event Dispatch Thread.
+     *
+     * @throws AssertionError if assertions are enabled and the current thread is
+     *                        not the EDT
+     */
+    protected void assertEDT() throws AssertionError
+    {
+        assert SwingUtilities.isEventDispatchThread() : "GUI code should only run on the EDT";
     }
 
     /** 

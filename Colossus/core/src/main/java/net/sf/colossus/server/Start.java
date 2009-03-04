@@ -570,8 +570,9 @@ public final class Start
             } else if (numMilvangAIs > 0) {
                 options.setOption(Options.playerType + k, "MilvangAI");
                 numMilvangAIs --;
-            } else
+            } else {
                 options.setOption(Options.playerType + k, Constants.defaultAI);
+            }
         }
 
         return true;

@@ -55,7 +55,7 @@ import net.sf.colossus.variant.MasterHex;
  * split is not really completed, there is still code which potentially belongs into
  * the other class.
  */
-
+@SuppressWarnings("serial")
 public final class BattleBoard extends KFrame
 {
     private static final Logger LOGGER = Logger.getLogger(BattleMap.class
@@ -139,7 +139,6 @@ public final class BattleBoard extends KFrame
         }
     }
 
-    // TODO pass Legions instead of the markerIds
     public BattleBoard(final Client client, MasterHex masterHex,
         Legion attacker, Legion defender)
     {

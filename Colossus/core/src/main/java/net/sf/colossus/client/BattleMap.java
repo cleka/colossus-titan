@@ -30,6 +30,7 @@ import net.sf.colossus.webcommon.InstanceTracker;
  * @version $Id$
  * @author David Ripton
  */
+@SuppressWarnings("serial")
 public final class BattleMap extends HexMap implements MouseListener,
     WindowListener
 {
