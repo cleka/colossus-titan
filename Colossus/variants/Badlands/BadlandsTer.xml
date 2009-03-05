@@ -75,9 +75,9 @@
     <alias name="TundraAlt" source="Marsh" display_name="Tundra" color="skyBlue" />
     <alias name="WoodsAlt" source="Marsh" display_name="Woods" color="olive" />
 <!--  New (Badlands) Battlelands, same as Plains -->
-    <alias name="Fort" source="Plains" color="yellow" regular_recruit="True" />
-    <alias name="Town" source="Plains" color="yellow" regular_recruit="True" />
-    <alias name="Waterhole" source="Plains" color="yellow" regular_recruit="True" />
+    <alias name="Fort" source="Plains" color="yellow" />
+    <alias name="Town" source="Plains" color="yellow" />
+    <alias name="Waterhole" source="Plains" color="yellow" />
     <acquirable name="Angel" points="100" />
     <acquirable name="Archangel" points="500" />
 </terrains>
