@@ -29,6 +29,7 @@ import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;
 import net.sf.colossus.xmlparser.CreatureLoader;
+import net.sf.colossus.xmlparser.StrategicMapLoader;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 import net.sf.colossus.xmlparser.VariantLoader;
 
@@ -314,7 +315,18 @@ public final class VariantSupport
             loadTerrainsAndRecruits(serverSide);
             // TODO add things as the variant package gets fleshed out
             List<MasterBoardTerrain> battleLands = new ArrayList<MasterBoardTerrain>();
-            MasterBoard masterBoard = new MasterBoard();
+
+            List<String> directoriesForMap = getVarDirectoriesList();
+            InputStream mapIS = ResourceLoader.getInputStream(VariantSupport
+                .getMapName(), directoriesForMap);
+            if (mapIS == null)
+            {
+                throw new FileNotFoundException(VariantSupport.getMapName());
+            }
+            StrategicMapLoader sml = new StrategicMapLoader(mapIS);
+            
+            MasterBoard masterBoard = new MasterBoard(sml.getHorizSize(),
+                sml.getVertSize(), sml.getShow(), sml.getHexes());
 
             // varREADME seems to be used as flag for a successfully loaded
             // variant, but breaking the whole variant loading just because

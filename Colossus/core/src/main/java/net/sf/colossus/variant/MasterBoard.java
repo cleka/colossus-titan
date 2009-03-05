@@ -1,24 +1,18 @@
 package net.sf.colossus.variant;
 
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.server.Constants;
-import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.ArrayHelper;
 import net.sf.colossus.util.NullCheckPredicate;
-import net.sf.colossus.util.ResourceLoader;
-import net.sf.colossus.xmlparser.StrategicMapLoader;
 
 
 /**
@@ -68,24 +62,13 @@ public class MasterBoard
      */
     private final Map<String, MasterHex> hexByLabelCache = new HashMap<String, MasterHex>();
 
-    /**
-     * TODO move loading code out of here, make constructor taking all the values and put
-     * method on the loader returning an instance of this class.
-     */
-    public MasterBoard() throws FileNotFoundException
+    public MasterBoard(int horizSize, int vertSize, boolean show[][],
+        MasterHex[][] plainHexArray)
     {
-        List<String> directories = VariantSupport.getVarDirectoriesList();
-        InputStream mapIS = ResourceLoader.getInputStream(VariantSupport
-            .getMapName(), directories);
-        if (mapIS == null)
-        {
-            throw new FileNotFoundException(VariantSupport.getMapName());
-        }
-        StrategicMapLoader sml = new StrategicMapLoader(mapIS);
-        this.horizSize = sml.getHorizSize();
-        this.vertSize = sml.getVertSize();
-        this.show = sml.getShow();
-        this.plainHexArray = sml.getHexes();
+        this.horizSize = horizSize;
+        this.vertSize = vertSize;
+        this.show = show;
+        this.plainHexArray = plainHexArray;
 
         initHexByLabelCache();
         this.boardParity = computeBoardParity();
