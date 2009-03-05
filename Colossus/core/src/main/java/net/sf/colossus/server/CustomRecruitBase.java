@@ -231,9 +231,10 @@ abstract public class CustomRecruitBase
         MasterBoardTerrain terrain);
 
     /** 
-     * List creatures that can recruit in this terrain in a special way now. 
-     *
-     * TODO the hex parameter might be superfluous
+     * List creatures that can recruit in this terrain in a special way now.
+     * @param terrain The MasterBoardTerrain considered for recruiting
+     * @param hex The specific MasterHex considered for recruiting.
+     * @return A List of possible special Recruiters in this hex.
      */
     abstract public List<CreatureType> getPossibleSpecialRecruiters(
         MasterBoardTerrain terrain, MasterHex hex);
@@ -241,8 +242,10 @@ abstract public class CustomRecruitBase
     /** 
      * List creatures that can be recruited in this terrain 
      * in a special way now.
-     *
-     * TODO the hex parameter might be superfluous
+     * @param terrain The MasterBoardTerrain considered for recruiting
+     * @param hex The specific MasterHex considered for recruiting (for
+     * instance see {@link BalrogRecruitment#getPossibleSpecialRecruits()}
+     * @return A List of possible special Recruits in this hex.
      */
     abstract public List<CreatureType> getPossibleSpecialRecruits(
         MasterBoardTerrain terrain, MasterHex hex);
@@ -250,8 +253,6 @@ abstract public class CustomRecruitBase
     /**
      * Number of recruiters needed to get a recruit 
      * in a special way in this terrain now.
-     *
-     * TODO the hex parameter might be superfluous
      */
     abstract public int numberOfRecruiterNeeded(CreatureType recruiter,
         CreatureType recruit, MasterBoardTerrain terrain, MasterHex hex);
