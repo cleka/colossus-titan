@@ -6,4 +6,10 @@
     <strategic_map filename="BeelzebubMap.xml" />
     <terrain_recruits filename="BeelzebubTer.xml" />
     <hint classname="Beelzebub.BeelzebubHint" />
+    <depends>
+        <!-- make sure we pick stuff in Default instead of Undead -->
+        <depend variant="Default" />
+        <!-- for the Ruins Battlelands only -->
+        <depend variant="Undead" />
+    </depends>
 </variant>
