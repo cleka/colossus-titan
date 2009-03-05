@@ -119,7 +119,7 @@ public class TerrainRecruitLoader
      * Add an entire terrain recruiting list to the Recruiting Graph.
      * @param rl The list of RecruitNumber to add to the graph.
      */
-    private static void addToGraph(ArrayList<RecruitNumber> rl,
+    private static void addToGraph(List<RecruitNumber> rl,
         MasterBoardTerrain t)
     {
         Iterator<RecruitNumber> it = rl.iterator();
@@ -233,6 +233,11 @@ public class TerrainRecruitLoader
             {
                 handleTerrain(el);
             }
+            List<Element> aliases = root.getChildren("alias");
+            for (Element el : aliases)
+            {
+                handleAlias(el);
+            }
 
             List<Element> acquirables = root.getChildren("acquirable");
             for (Element el : acquirables)
@@ -301,6 +306,39 @@ public class TerrainRecruitLoader
         terrains.put(name, terrain);
 
         addToGraph(rl, terrain);
+    }
+
+    // we need to cast since JDOM is not generified
+    @SuppressWarnings("unchecked")
+    private void handleAlias(Element el) throws JDOMException, ParseException
+    {
+        String name = el.getAttributeValue("name");
+        String source = el.getAttributeValue("source");
+        String displayName = el.getAttributeValue("display_name");
+        if (displayName == null)
+        {
+            displayName = name;
+        }
+        String color = el.getAttributeValue("color");
+        MasterBoardTerrain source_terrain = terrains.get(source);
+        if (source_terrain == null)
+        {
+            throw new ParseException("Alias uses an invalid source name");
+        }
+
+        MasterBoardTerrain terrain = new MasterBoardTerrain(name, displayName,
+                HTMLColor.stringToColor(color));
+
+        TerrainRecruitLoader.strToRecruits.put(terrain,
+                strToRecruits.get(source_terrain));
+        TerrainRecruitLoader.strToBelow.put(terrain,
+                strToBelow.get(source_terrain));
+        // XXX Random not yet supported:
+        TerrainRecruitLoader.strToRnd.put(terrain, null);
+
+        terrains.put(name, terrain);
+
+        addToGraph(strToRecruits.get(source_terrain), terrain);
     }
 
     private void handleAcquirable(Element el) throws JDOMException,
@@ -443,6 +481,8 @@ public class TerrainRecruitLoader
     /**
      * Give an array of the starting creatures, those available in the first
      * turn and in a particular kind of Tower.
+     * @todo FIXME: this heuristic (first 3 creatures in the tower) should
+     * be replaced by a real entry in the Tower terrain (similar to startlist).
      * @param terrain The kind of Tower considered.
      * @return an array of Creature representing the starting creatures.
      * @see net.sf.colossus.server.CreatureType
