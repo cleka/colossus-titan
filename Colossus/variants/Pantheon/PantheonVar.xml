@@ -5,6 +5,7 @@
     <terrain_recruits filename="PantheonTer.xml" />
     <depends>
         <depend variant="ExtTitan" />
+        <depend variant="Abyssal6" />
     </depends>
     <hint classname="Pantheon.PantheonHint" />
 </variant>
