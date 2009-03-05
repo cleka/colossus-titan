@@ -86,6 +86,10 @@ public final class Server extends Thread implements IServer
     private SelectionKey acceptKey = null;
     private boolean stopAcceptingFlag = false;
 
+    private Object guiRequestMutex = new Object();
+    private boolean guiRequestSaveFlag = false;
+    private String guiRequestSaveFilename = null;
+
     /* static so that new instance of Server can destroy a
      * previously allocated FileServerThread */
     private static Thread fileServerThread = null;
@@ -320,8 +324,11 @@ public final class Server extends Thread implements IServer
             LOGGER.log(Level.FINEST, "select returned, " + num
                 + " channels are ready to be processed.");
 
-            // Timeout:
-            if (num == 0)
+            if (handleGuiRequests())
+            {
+                // ok, select returned due to a wakeup call
+            }
+            else if (num == 0)
             {
                 LOGGER.info("Server side select timeout...");
             }
@@ -2437,9 +2444,49 @@ public final class Server extends Thread implements IServer
         game.loadGame(filename);
     }
 
+    // This was earlier called from Client via network message
+    // TODO: to be perhaps removed soon? See also SocketClientThread
     public void saveGame(String filename)
     {
-        game.saveGame(filename);
+        saveGame(filename, false);
+    }
+
+    public void saveGame(String filename, boolean autoSave)
+    {
+        game.saveGame(filename, autoSave);
+    }
+
+    // User has requested to save game via File=>Save Game or Save Game as...
+    // Inject that into the "handle incoming messages from clients" select
+    // loop, to be sure it does not run concurrently while some message
+    // from client is currently processed and would change the state of the
+    // game while the save is ongoing.
+    public void initiateSaveGame(String filename)
+    {
+        synchronized(guiRequestMutex)
+        {
+            guiRequestSaveFlag = true;
+            guiRequestSaveFilename = filename;
+            selector.wakeup();
+        }
+    }
+
+    public boolean handleGuiRequests()
+    {
+        boolean didSomething = false;
+
+        synchronized(guiRequestMutex)
+        {
+            if (guiRequestSaveFlag)
+            {
+                game.saveGame(guiRequestSaveFilename, false);
+                guiRequestSaveFlag = false;
+                guiRequestSaveFilename = null;
+                didSomething = true;
+            }
+        }
+
+        return didSomething;
     }
 
     public void checkServerConnection()

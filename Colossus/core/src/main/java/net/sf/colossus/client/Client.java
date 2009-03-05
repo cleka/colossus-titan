@@ -4809,7 +4809,23 @@ public final class Client implements IClient, IOracle
 
     void menuSaveGame(String filename)
     {
-        server.saveGame(filename);
+        if (isRemote())
+        {
+            // In practice this should never happen, because in remote
+            // clients the File=>Save menu actions should not be visible
+            // at all. But who knows...
+            JOptionPane.showMessageDialog(getMapOrBoardFrame(),
+                "The variable 'localServer' is null, which means you are "
+                + "playing with a remote client. How on earth did you manage "
+                + "to trigger a File=>Save action?\nAnyway, from a remote "
+                + "client I can't do File=>Save for you...",
+                "Save Game not available on remote client",
+                JOptionPane.ERROR_MESSAGE);
+        }
+        else
+        {
+            localServer.initiateSaveGame(filename);
+        }
     }
 
     /** When user requests it from File menu, this method here

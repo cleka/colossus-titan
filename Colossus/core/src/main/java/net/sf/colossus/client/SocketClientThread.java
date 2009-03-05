@@ -1241,6 +1241,9 @@ final class SocketClientThread extends Thread implements IServer
         sendToServer(Constants.loadGame + sep + filename);
     }
 
+    // TODO Can this be removed, because save game is done directly
+    // instead of via socket message? Or do we keep it, for games
+    // that are run on the "Web Server" ?
     public void saveGame(String filename)
     {
         sendToServer(Constants.saveGame + sep + filename);
