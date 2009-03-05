@@ -75,6 +75,10 @@ public class StrategicMapLoader
 
         MasterBoardTerrain terrain = TerrainRecruitLoader
             .getTerrainById(terrainId);
+        if ((terrain == null) || (terrain.equals(""))) {
+            LOGGER.warning("Null/empty terrain in " + label + ", trying Plains");
+            terrain = TerrainRecruitLoader.getTerrainById("Plains");
+        }
         MasterHex hex = new MasterHex(label, terrain, xpos, ypos);
 
         List<Element> exits = el.getChildren("exit");
