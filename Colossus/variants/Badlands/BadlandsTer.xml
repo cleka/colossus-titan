@@ -71,9 +71,9 @@
     <alias name="DesertAlt" source="Desert" display_name="Desert" color="orange" />
     <alias name="JungleAlt" source="Jungle" display_name="Jungle" color="darkGreen"  />
     <alias name="MarshAlt" source="Marsh" display_name="Marsh" color="sienna" />
-    <alias name="SwampAlt" source="Marsh" display_name="Swamp" color="blue" />
-    <alias name="TundraAlt" source="Marsh" display_name="Tundra" color="skyBlue" />
-    <alias name="WoodsAlt" source="Marsh" display_name="Woods" color="olive" />
+    <alias name="SwampAlt" source="Swamp" display_name="Swamp" color="blue" />
+    <alias name="TundraAlt" source="Tundra" display_name="Tundra" color="skyBlue" />
+    <alias name="WoodsAlt" source="Woods" display_name="Woods" color="olive" />
 <!--  New (Badlands) Battlelands, same as Plains -->
     <alias name="Fort" source="Plains" color="yellow" />
     <alias name="Town" source="Plains" color="yellow" />
