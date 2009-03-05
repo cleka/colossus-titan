@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 
 /**
@@ -18,7 +20,7 @@ import java.util.Map;
  * Battle land information could probably split out into another class, which could then
  * be immutable.
  */
-public class MasterBoardTerrain
+public class MasterBoardTerrain implements Comparable<MasterBoardTerrain>
 {
     /** The (unique) identifier of this terrain.
      * Should also be used for all Battlelands purpose.
@@ -50,12 +52,39 @@ public class MasterBoardTerrain
     // TODO this should be a Map<HazardHexside, Integer>
     private Map<Character, Integer> hazardSideNumberMap;
 
-    public MasterBoardTerrain(String id, String displayName, Color color)
+    /** The other MasterBoardTerrain using the same recruit tree */
+    private final Set<MasterBoardTerrain> aliases = new TreeSet<MasterBoardTerrain>();
+    /** Whether this terrain uses another Terrain recruit tree. */
+    private final boolean isAlias;
+
+    public MasterBoardTerrain(String id, String displayName, Color color, boolean isAlias)
     {
         this.id = id;
         this.displayName = displayName;
         this.color = color;
         this.subtitle = null;
+        this.isAlias = isAlias;
+    }
+    
+    public MasterBoardTerrain(String id, String displayName, Color color)
+    {
+        this(id, displayName, color, false);
+    }
+
+    public int compareTo(MasterBoardTerrain m) {
+        return this.id.compareTo(m.id);
+    }
+
+    public void addAlias(MasterBoardTerrain t) {
+        aliases.add(t);
+    }
+
+    public boolean isAlias() {
+        return isAlias;
+    }
+
+    public Set<MasterBoardTerrain> getAliases() {
+        return Collections.unmodifiableSet(aliases);
     }
 
     public String getId()

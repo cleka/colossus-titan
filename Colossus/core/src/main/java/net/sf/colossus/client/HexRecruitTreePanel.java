@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import java.util.Set;
+import java.util.TreeSet;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JFrame;
@@ -51,7 +53,37 @@ public class HexRecruitTreePanel extends Box
         setBorder(BorderFactory.createLineBorder(Color.black));
         setBackground(terrain.getColor());
 
-        JLabel terrainLabel = new JLabel(terrain.getDisplayName());
+        StringBuffer theLabel = new StringBuffer();
+        Set<String> doneNames = new TreeSet<String>();
+        String displayName = terrain.getDisplayName();
+        theLabel.append(displayName);
+        doneNames.add(displayName);
+        Set<MasterBoardTerrain> aliases = terrain.getAliases();
+        if (!aliases.isEmpty())
+        {
+            boolean prefixDone = false;
+            Iterator<MasterBoardTerrain> it = aliases.iterator();
+            while (it.hasNext()) {
+                MasterBoardTerrain alias = it.next();
+                if (!doneNames.contains(alias.getDisplayName()))
+                {
+                    if (!prefixDone)
+                    {
+                        prefixDone = true;
+                        theLabel.append("(also: ");
+                    } else {
+                        theLabel.append(", ");
+                    }
+                    theLabel.append(alias.getDisplayName());
+                    doneNames.add(alias.getDisplayName());
+                }
+            }
+            if (prefixDone)
+            {
+                theLabel.append(")");
+            }
+        }
+        JLabel terrainLabel = new JLabel(theLabel.toString());
         terrainLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         add(terrainLabel);
 

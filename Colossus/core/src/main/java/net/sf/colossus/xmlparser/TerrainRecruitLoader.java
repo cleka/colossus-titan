@@ -327,7 +327,7 @@ public class TerrainRecruitLoader
         }
 
         MasterBoardTerrain terrain = new MasterBoardTerrain(name, displayName,
-                HTMLColor.stringToColor(color));
+                HTMLColor.stringToColor(color), true);
 
         TerrainRecruitLoader.strToRecruits.put(terrain,
                 strToRecruits.get(source_terrain));
@@ -339,6 +339,8 @@ public class TerrainRecruitLoader
         terrains.put(name, terrain);
 
         addToGraph(strToRecruits.get(source_terrain), terrain);
+
+        source_terrain.addAlias(terrain);
     }
 
     private void handleAcquirable(Element el) throws JDOMException,

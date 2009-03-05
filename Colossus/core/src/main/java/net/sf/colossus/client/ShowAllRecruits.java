@@ -39,7 +39,10 @@ final class ShowAllRecruits extends AbstractShowRecruits
 
         for (MasterBoardTerrain terrain : terrains)
         {
-            doOneTerrain(terrain, null);
+            if (!terrain.isAlias())
+            {
+                doOneTerrain(terrain, null);
+            }
         }
 
         pack();
