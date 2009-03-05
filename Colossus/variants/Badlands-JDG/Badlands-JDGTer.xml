@@ -67,83 +67,21 @@
         <recruit name="Warlock" number="1" />
     </terrain>
 <!--  Alternate (Badlands) Battlelands -->
-    <terrain name="BrushAlt" display_name="Brush" color="green" regular_recruit="True" >
-        <recruit name="Gargoyle" number="1" />
-        <recruit name="Cyclops" number="2" />
-        <recruit name="Gorgon" number="2" />
-    </terrain>
-    <terrain name="DesertAlt" display_name="Desert" color="orange" regular_recruit="True" >
-        <recruit name="Lion" number="1" />
-        <recruit name="Griffon" number="3" />
-        <recruit name="Hydra" number="2" />
-    </terrain>
-    <terrain name="JungleAlt" display_name="Jungle" color="darkGreen" regular_recruit="True" >
-        <recruit name="Gargoyle" number="1" />
-        <recruit name="Cyclops" number="2" />
-        <recruit name="Behemoth" number="3" />
-        <recruit name="Serpent" number="2" />
-    </terrain>
-    <terrain name="MarshAlt" display_name="Marsh" color="sienna" regular_recruit="True" >
-        <recruit name="Ogre" number="1" />
-        <recruit name="Troll" number="2" />
-        <recruit name="Ranger" number="2" />
-    </terrain>
-    <terrain name="SwampAlt" display_name="Swamp" color="blue" regular_recruit="True" >
-        <recruit name="Troll" number="1" />
-        <recruit name="Wyvern" number="3" />
-        <recruit name="Hydra" number="2" />
-    </terrain>
-    <terrain name="TundraAlt" display_name="Tundra" color="skyBlue" regular_recruit="True" >
-        <recruit name="Troll" number="1" />
-        <recruit name="Warbear" number="2" />
-        <recruit name="Giant" number="2" />
-        <recruit name="Colossus" number="2" />
-    </terrain>
-    <terrain name="WoodsAlt" display_name="Woods" color="olive" regular_recruit="True" >
-        <recruit name="Centaur" number="1" />
-        <recruit name="Warbear" number="3" />
-        <recruit name="Unicorn" number="2" />
-    </terrain>
+    <alias name="BrushAlt" source="Brush" display_name="Brush" color="green" />
+    <alias name="DesertAlt" source="Desert" display_name="Desert" color="orange" />
+    <alias name="JungleAlt" source="Jungle" display_name="Jungle" color="darkGreen"  />
+    <alias name="MarshAlt" source="Marsh" display_name="Marsh" color="sienna" />
+    <alias name="SwampAlt" source="Swamp" display_name="Swamp" color="blue" />
+    <alias name="TundraAlt" source="Tundra" display_name="Tundra" color="skyBlue" />
+    <alias name="WoodsAlt" source="Woods" display_name="Woods" color="olive" />
 <!--  New (Badlands) Battlelands, same as Plains -->
-    <terrain name="Fort" color="yellow" regular_recruit="True" >
-        <recruit name="Centaur" number="1" />
-        <recruit name="Lion" number="2" />
-        <recruit name="Ranger" number="2" />
-    </terrain>
-    <terrain name="Town" color="yellow" regular_recruit="True" >
-        <recruit name="Centaur" number="1" />
-        <recruit name="Lion" number="2" />
-        <recruit name="Ranger" number="2" />
-    </terrain>
-    <terrain name="Waterhole" color="yellow" regular_recruit="True" >
-        <recruit name="Centaur" number="1" />
-        <recruit name="Lion" number="2" />
-        <recruit name="Ranger" number="2" />
-    </terrain>
+    <alias name="Fort" source="Plains" color="yellow" />
+    <alias name="Town" source="Plains" color="yellow" />
+    <alias name="Waterhole" source="Plains" color="yellow" />
 <!--  New Galt Battlelands -->
-    <terrain name="MountainsAlt" display_name="Mountains" color="red" regular_recruit="True" >
-        <recruit name="Lion" number="1" />
-        <recruit name="Minotaur" number="2" />
-        <recruit name="Dragon" number="2" />
-        <recruit name="Colossus" number="2" />
-    </terrain>
-    <terrain name="HillsAlt" display_name="Hills" color="saddleBrown" regular_recruit="True" >
-        <recruit name="Ogre" number="1" />
-        <recruit name="Minotaur" number="3" />
-        <recruit name="Unicorn" number="2" />
-    </terrain>
-    <terrain name="TowerAlt" display_name="Tower" color="grey" regular_recruit="False" >
-        <recruit name="Anything" number="0" />
-        <recruit name="Centaur" number="0" />
-        <recruit name="Anything" number="0" />
-        <recruit name="Gargoyle" number="0" />
-        <recruit name="Anything" number="0" />
-        <recruit name="Ogre" number="0" />
-        <recruit name="AnyNonLord" number="0" />
-        <recruit name="Guardian" number="3" />
-        <recruit name="Titan" number="-1" />
-        <recruit name="Warlock" number="1" />
-    </terrain>
+    <alias name="MountainsAlt" source="Mountains" display_name="Mountains" color="red" />
+    <alias name="HillsAlt" source="Hills" display_name="Hills" color="saddleBrown" />
+    <alias name="TowerAlt" source="Tower" display_name="Tower" color="grey" />
     <acquirable name="Angel" points="100" />
     <acquirable name="Archangel" points="500" />
 </terrains>
