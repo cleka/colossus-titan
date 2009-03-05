@@ -117,20 +117,27 @@ public class CreatureLoader
         String custom_class = el.getAttributeValue("special");
 
         CreatureType creature = null;
-        if (custom_class == null) {
-        if (name.equals("Titan"))
+        if (custom_class == null)
         {
-            creature = new CreatureTypeTitan(name, power, skill, rangestrikes,
-                flies, nativeTerrains, slope, river, dune, water, magic_missile,
-                summonable, lord, demilord, count, plural_name, base_color);
+            if (name.equals("Titan"))
+            {
+                creature = new CreatureTypeTitan(name, power, skill,
+                        rangestrikes,
+                        flies, nativeTerrains, slope, river, dune, water,
+                        magic_missile,
+                        summonable, lord, demilord, count, plural_name,
+                        base_color);
+            }
+            else
+            {
+                creature = new CreatureType(name, power, skill, rangestrikes,
+                        flies, nativeTerrains, slope, river, dune, water,
+                        magic_missile, summonable, lord, demilord, count,
+                        plural_name, base_color);
+            }
         }
         else
         {
-            creature = new CreatureType(name, power, skill, rangestrikes,
-                flies, nativeTerrains, slope, river, dune, water,
-                magic_missile, summonable, lord, demilord, count, plural_name,base_color);
-        }
-        } else {
             Object[] parameters = new Object[17];
             parameters[0] = name;
             parameters[1] = power;
@@ -149,7 +156,8 @@ public class CreatureLoader
             parameters[14] = count;
             parameters[15] = plural_name;
             parameters[16] = base_color;
-            creature = (CreatureType)ResourceLoader.getNewObject(custom_class, VariantSupport.getVarDirectoriesList(), parameters);
+            creature = (CreatureType) ResourceLoader.getNewObject(custom_class,
+                    VariantSupport.getVarDirectoriesList(), parameters);
         }
         this.creatures.add(creature);
     }
