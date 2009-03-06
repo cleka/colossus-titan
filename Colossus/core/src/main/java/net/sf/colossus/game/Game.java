@@ -16,8 +16,6 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  * 
  * As opposed to {@link Variant} this class holds information about an ongoing game
  * and its status.
- * 
- * Instances of this class are immutable.
  */
 public class Game
 {
