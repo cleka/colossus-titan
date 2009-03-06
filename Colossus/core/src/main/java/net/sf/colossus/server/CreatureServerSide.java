@@ -478,30 +478,59 @@ public class CreatureServerSide extends Creature
                 }
             }
             /* TODO: remove TEST TEST TEST TEST TEST */
+            /* getStrikingSkill should be used instead of the logic above, but
+             * 1) I'm not sure everyone will agree it belongs in Creature
+             * 2) I haven't had time to verify it's correct.
+             * Incidentally, if you're reading this after noticing the warning
+             * below in your logfile, then it isn't correct ;-)
+             */
             int checkStrikingSkill = getStrikingSkill(target,
-                    hex.getElevation(),targetHex.getElevation(),
-                    hex.getTerrain(),targetHex.getTerrain(),
-                    HazardHexside.getHexsideByCode(hex.getHexside(BattleServerSide.getDirection(hex, targetHex,
-                    false))),
-                    HazardHexside.getHexsideByCode(targetHex.getHexside(BattleServerSide.getDirection(targetHex, hex,
-                    false))));
+                    hex.getElevation(), targetHex.getElevation(),
+                    hex.getTerrain(), targetHex.getTerrain(),
+                    HazardHexside.getHexsideByCode(hex.getHexside(
+                      BattleServerSide.getDirection(hex, targetHex, false))),
+                    HazardHexside.getHexsideByCode(targetHex.getHexside(
+                      BattleServerSide.getDirection(targetHex, hex,false))));
             if (checkStrikingSkill != attackerSkill)
-                LOGGER.warning("attackerSkill says " + attackerSkill + " but checkStrikingSkill says " + checkStrikingSkill);
+            {
+                LOGGER.warning("attackerSkill says " + attackerSkill +
+                        " but checkStrikingSkill says " + checkStrikingSkill);
+            }
             /* END TODO: remove TEST TEST TEST TEST TEST */
         }
         else if (!useMagicMissile())
         {
             // Range penalty
-            if (BattleServerSide.getRange(hex, targetHex, false) == 4)
+            /* Range 4 means a penalty of 1 to the attacker.
+             * I hereby extend this so that range 5 means a penalty of 2,
+             * and so one, for creature with higher skill.
+             */
+            int range = BattleServerSide.getRange(hex, targetHex, false);
+            if (range >= 4)
             {
-                attackerSkill--;
+                attackerSkill -= (range - 3);
             }
-
+            int bramblesPenalty = 0;
             // Non-native rangestrikes: -1 per intervening bramble hex
             if (!isNativeBramble())
             {
-                attackerSkill -= countBrambleHexes(targetHex);
+                bramblesPenalty += countBrambleHexes(targetHex);
             }
+            /* TODO: remove TEST TEST TEST TEST TEST */
+            /* computeSkillPenaltyRangestrikeThrough should be used instead of the logic above, but
+             * 1) I'm not sure everyone will agree it belongs in Battle
+             * 2) I haven't had time to verify it's correct.
+             * Incidentally, if you're reading this after noticing the warning
+             * below in your logfile, then it isn't correct ;-)
+             */
+            int interveningPenalty = battle.computeSkillPenaltyRangestrikeThrough(
+                    getCurrentHex(), targetHex, this);
+            if (interveningPenalty != bramblesPenalty) {
+                LOGGER.warning("bramblesPenalty says " + bramblesPenalty + " but interveningPenalty says " + interveningPenalty);
+            }
+            /* END TODO: remove TEST TEST TEST TEST TEST */
+
+            attackerSkill -= bramblesPenalty;
 
             // Rangestrike up across wall: -1 per wall
             if (targetHex.hasWall())
@@ -513,11 +542,18 @@ public class CreatureServerSide extends Creature
                     // Because of the design of the tower map, a strike to
                     // a higher tower hex always crosses one wall per
                     // elevation difference.
+                    /* actually this need some better logic, as some Wall are
+                     * in a completely different patterns that the Tower
+                     * nowaday
+                     */
                     attackerSkill -= heightDeficit;
                 }
             }
 
             // Rangestrike into volcano: -1
+            /* actually, it's only for native ... but then non-native are
+             * blocked. Anyway this will should to HazardTerrain someday.
+             */
             if (targetHex.getTerrain().equals(HazardTerrain.VOLCANO))
             {
                 attackerSkill--;
