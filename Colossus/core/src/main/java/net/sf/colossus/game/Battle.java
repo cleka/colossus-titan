@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.CompareDoubles;
 import net.sf.colossus.variant.BattleHex;
+import net.sf.colossus.variant.HazardTerrain;
 import net.sf.colossus.variant.MasterBoardTerrain;
 
 
@@ -60,7 +61,6 @@ abstract public class Battle
      */
     abstract protected boolean isOccupied(String hexLabel);
 
-    /** Caller must ensure that yDist != 0 */
     /**
      * Caller must ensure that yDist != 0
      */
@@ -518,5 +518,112 @@ abstract public class Battle
             return false;
         }
         return true;
+    }
+
+
+    private int computeSkillPenaltyRangestrikeThroughDir(BattleHex hex1,
+            BattleHex hex2, Creature c, boolean left, int previousCount)
+    {
+        int count = previousCount;
+
+        // Offboard hexes are not allowed.
+        if (hex1.getXCoord() == -1 || hex2.getXCoord() == -1)
+        {
+            return Constants.BIGNUM;
+        }
+
+        int direction = getDirection(hex1, hex2, left);
+
+        BattleHex nextHex = hex1.getNeighbor(direction);
+        if (nextHex == null)
+        {
+            return Constants.BIGNUM;
+        }
+
+        if (nextHex == hex2)
+        {
+            // Success!
+            return count;
+        }
+
+        HazardTerrain terrain = nextHex.getTerrain();
+
+        count += terrain.getSkillPenaltyRangestrikeThrough(c.getType().
+                isNativeIn(terrain));
+
+        return computeSkillPenaltyRangestrikeThroughDir(nextHex, hex2, c, left,
+                count);
+    }
+
+    /** Compute the minimum Skill penalty that the creature will endure to
+     * rangestrike from hex1 to a creature in hex2 from the intervening hex.
+     * @param hex1 The hex in which the rangestriker sit
+     * @param hex2 The hex in which the rangestruck sit
+     * @param c The rangestriker
+     * @return The penalty to the Skill Factor of the rangestriker from intervening hex.
+     */
+    public int computeSkillPenaltyRangestrikeThrough(BattleHex hex1,
+            BattleHex hex2, Creature c)
+    {
+        if (hex1 == hex2)
+        {
+            return 0;
+        }
+
+        int x1 = hex1.getXCoord();
+        double y1 = hex1.getYCoord();
+        int x2 = hex2.getXCoord();
+        double y2 = hex2.getYCoord();
+
+        // Offboard hexes are not allowed.
+        if (x1 == -1 || x2 == -1)
+        {
+            return Constants.BIGNUM;
+        }
+
+        // Hexes with odd X coordinates are pushed down half a hex.
+        if ((x1 & 1) == 1)
+        {
+            y1 += 0.5;
+        }
+        if ((x2 & 1) == 1)
+        {
+            y2 += 0.5;
+        }
+
+        double xDist = x2 - x1;
+        double yDist = y2 - y1;
+
+        if (CompareDoubles.almostEqual(yDist, 0.0) || CompareDoubles.
+                almostEqual(Math.abs(yDist), 1.5 * Math.abs(xDist)))
+        {
+            int strikeElevation = Math.min(hex1.getElevation(), hex2.
+                    getElevation());
+            // Hexspine; try unblocked side(s)
+            if (isLOSBlockedDir(hex1, hex1, hex2, true, strikeElevation,
+                    false, false, false, false, false, 0))
+            {
+                return computeSkillPenaltyRangestrikeThroughDir(hex1, hex2, c,
+                        false, 0);
+            }
+            else if (isLOSBlockedDir(hex1, hex1, hex2, false, strikeElevation,
+                    false, false, false, false, false, 0))
+            {
+                return computeSkillPenaltyRangestrikeThroughDir(hex1, hex2, c,
+                        true, 0);
+            }
+            else
+            {
+                return Math.min(computeSkillPenaltyRangestrikeThroughDir(hex1,
+                        hex2, c, true, 0),
+                        computeSkillPenaltyRangestrikeThroughDir(hex1, hex2, c,
+                        false, 0));
+            }
+        }
+        else
+        {
+            return computeSkillPenaltyRangestrikeThroughDir(hex1, hex2, c,
+                    toLeft(xDist, yDist), 0);
+        }
     }
 }
