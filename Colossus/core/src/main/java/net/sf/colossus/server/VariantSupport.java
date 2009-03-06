@@ -165,12 +165,12 @@ public final class VariantSupport
     private static String getVariantNameFromFilename(String varFilename)
         throws Exception
     {
-        String variantName = null;
+        String result = null;
         if (varFilename.endsWith(Constants.varEnd))
         {
             // We need the Variantname for loading a game with
             // remote players.
-            variantName = varFilename.substring(0,
+            result = varFilename.substring(0,
                 varFilename.length() - Constants.varEnd.length());
         }
         else
@@ -186,7 +186,7 @@ public final class VariantSupport
             throw(new Exception(
                 "IllegalVariantFilenameException"));
         }
-        return variantName;
+        return result;
 
     }
     
