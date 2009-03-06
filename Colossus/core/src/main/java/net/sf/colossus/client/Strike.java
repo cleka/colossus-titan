@@ -896,9 +896,10 @@ public final class Strike
         else if (!striker.getCreature().useMagicMissile())
         {
             // Range penalty
-            if (Battle.getRange(hex, targetHex, false) == 4)
+            int range = Battle.getRange(hex, targetHex, false);
+            if (range >= 4)
             {
-                attackerSkill--;
+                attackerSkill -= (range - 3);
             }
 
             // Non-native rangestrikes: -1 per intervening bramble hex
