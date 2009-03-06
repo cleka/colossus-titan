@@ -4,7 +4,9 @@
     <creatures filename="PantheonCre.xml" />
     <terrain_recruits filename="PantheonTer.xml" />
     <depends>
+        <!-- for some images, ExtTitan -->
         <depend variant="ExtTitan" />
+        <!-- many Battlelabds from Abyssal6 -->
         <depend variant="Abyssal6" />
     </depends>
     <hint classname="Pantheon.PantheonHint" />
