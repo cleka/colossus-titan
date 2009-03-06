@@ -1006,17 +1006,6 @@ public class CreatureServerSide extends Creature
     {
         return getType().isNativeIn(HazardTerrain.STONE);
     }
-    /** @deprecated all isNative<HazardTerrain> are obsolete, one should use
-     * isNativeTerrain(<HazardTerrain>) instead, with no explicit reference
-     * to the name. This will ease adding new HazardTerrain in variant.
-     */
-    /*
-    @Deprecated
-    public boolean isNativeTree()
-    {
-        return getType().isNativeIn(HazardTerrain.TREE);
-    }
-    */
 
     @Deprecated
     public boolean isWaterDwelling()
