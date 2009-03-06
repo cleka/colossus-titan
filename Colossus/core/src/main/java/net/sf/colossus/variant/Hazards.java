@@ -28,6 +28,21 @@ public abstract class Hazards implements HazardConstants
      */
     public final EffectOnMovement effectOnFlyerMovement;
 
+    /** WiP : instead of a bunch of variables, group them by
+     * category so it's easier to recognize them / deal with them.
+     */
+    private class CombatEffect {
+        final EffectOnStrike effect;
+        final ScopeOfEffectOnStrike scope;
+        final int adjustement;
+
+        CombatEffect(EffectOnStrike effect, ScopeOfEffectOnStrike scope, int adjustement) {
+            this.effect = effect;
+            this.scope = scope;
+            this.adjustement = adjustement;
+        }
+    }
+
     /** Effect to apply when a creature is struck in this terrain.
      */
     public final EffectOnStrike effectforDefendingInTerrain;
