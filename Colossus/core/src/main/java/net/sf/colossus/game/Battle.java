@@ -51,7 +51,13 @@ abstract public class Battle
         return land;
     }
 
-
+    /** Whether the hex is occupied by a critter/creature/chit/...
+     * This is abstract because the specific information about critter/...
+     * is currently kept in the subclass, but this information is required
+     * by several helper function located in the Battle class.
+     * @param hexLabel The label of the hex whose occupancy is being checked
+     * @return Whether the hex is occupied by a critter/creature/chit/...
+     */
     abstract protected boolean isOccupied(String hexLabel);
 
     /** Caller must ensure that yDist != 0 */
