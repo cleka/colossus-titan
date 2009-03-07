@@ -153,8 +153,6 @@ public final class Start
      *  Print a usage string to stdout.  (*Not* to the logfile, where casual
      *  users will miss it.)
      */
-    // unchecked conversion from options library
-    @SuppressWarnings("unchecked")
     private static void usage(Opts opts)
     {
         System.out.println("Usage: java -jar Colossus.jar [options]");
@@ -952,7 +950,7 @@ public final class Start
         private static final String defaultName = "TimedJvmQuit thread";
         private final String name;
         
-        private long timeOutInSecs = 10;
+        private final long timeOutInSecs = 10;
         
         public TimedJvmQuit()
         {

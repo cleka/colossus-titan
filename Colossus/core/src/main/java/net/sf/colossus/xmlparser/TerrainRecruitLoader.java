@@ -30,13 +30,13 @@ import org.jdom.input.SAXBuilder;
 
 /**
  * TerrainRecruitLoader load the terrains and recruits descriptions.
- * 
+ *
  * TODO check if any of the methods still needs the "String terrain" parameter
- * 
+ *
  * TODO we still use plenty of strings in here since the creatures are mixed with the
  *      special recruit requirements such as Anything/Lord/AnyNonLord or the custom
  *      recruits marked by the "Special:" keyword
- * 
+ *
  * @author Romain Dolbeau
  * @version $Id$
  * @see net.sf.colossus.server.CreatureType
@@ -54,7 +54,7 @@ public class TerrainRecruitLoader
 
     /**
      * Map a terrain to a list of recruits.
-     *   
+     *
      * TODO integrate into {@link MasterBoardTerrain}
      */
     private static Map<MasterBoardTerrain, List<RecruitNumber>> strToRecruits = new HashMap<MasterBoardTerrain, List<RecruitNumber>>();
@@ -62,15 +62,15 @@ public class TerrainRecruitLoader
     /**
      * Map a terrain to a boolean,
      * telling if a Creature can recruit in the usual way or not.
-     *   
+     *
      * TODO integrate into {@link MasterBoardTerrain}
      */
     private static Map<MasterBoardTerrain, Boolean> strToBelow = new HashMap<MasterBoardTerrain, Boolean>();
 
     /**
-     * Map a terrain to an 
+     * Map a terrain to an
      *   optional BattlelandsRandomizer filename.
-     *   
+     *
      * TODO integrate into {@link MasterBoardTerrain}
      */
     private static Map<MasterBoardTerrain, String> strToRnd = new HashMap<MasterBoardTerrain, String>();
@@ -170,7 +170,7 @@ public class TerrainRecruitLoader
                 }
                 if ((v2 != null) && v2.startsWith(Keyword_Special))
                 {
-                    // special recruitment, need to add edge 
+                    // special recruitment, need to add edge
                     // between the special aned every possible recruit
                     CustomRecruitBase cri = getCustomRecruitBase(v2);
                     List<CreatureType> allRecruits = cri
@@ -300,7 +300,7 @@ public class TerrainRecruitLoader
         TerrainRecruitLoader.strToRecruits.put(terrain, rl);
         TerrainRecruitLoader.strToBelow.put(terrain, Boolean
             .valueOf(regularRecruit));
-        // XXX Random not yet supported:            
+        // XXX Random not yet supported:
         TerrainRecruitLoader.strToRnd.put(terrain, null);
 
         terrains.put(name, terrain);
@@ -309,8 +309,7 @@ public class TerrainRecruitLoader
     }
 
     // we need to cast since JDOM is not generified
-    @SuppressWarnings("unchecked")
-    private void handleAlias(Element el) throws JDOMException, ParseException
+    private void handleAlias(Element el) throws ParseException
     {
         String name = el.getAttributeValue("name");
         String source = el.getAttributeValue("source");
@@ -395,7 +394,7 @@ public class TerrainRecruitLoader
 
     /**
      * Return a collection of all possible terrains.
-     * 
+     *
      * @return A collection containing all instances of {@link MasterBoardTerrain}.
      */
     public static Collection<MasterBoardTerrain> getTerrains()
@@ -503,13 +502,13 @@ public class TerrainRecruitLoader
     /**
      * Tell whether given type is in the loaded variant a start creature,
      * i.e. one of those one gets in the initial legion in the tower.
-     * 
+     *
      * I plan to use this for e.g. HexRecruitTreePanel, to show there
-     * how one can get to have a certain creature: 
-     * start creature 
+     * how one can get to have a certain creature:
+     * start creature
      * -or- acquirable
      * -or- recruitable by N of from prev. in tree,
-     * -or- recruitable by any/Lord/DemiLord/anyNonLord 
+     * -or- recruitable by any/Lord/DemiLord/anyNonLord
      * -or- recruitable by N of something else (e.g. Titan=>Warlock)
      * @param type
      * @return true if this is a start creature in the loaded variant
@@ -537,7 +536,7 @@ public class TerrainRecruitLoader
     /**
      * Give the name of the random filename to use to generate this terrain,
      * or null if it's a static Battlelands.
-     * 
+     *
      * @param masterBoardTerrain A mastre board terrain.
      * @return The name of the random source file as a String
      */
@@ -563,7 +562,7 @@ public class TerrainRecruitLoader
         {
             RecruitNumber tr = it.next();
             if ((tr.getNumber() >= 0)
-                && isConcreteCreature(tr.getName()) 
+                && isConcreteCreature(tr.getName())
                 && !tr.getName().equals("Titan"))
             {
                 result.add(VariantSupport.getCurrentVariant()
@@ -585,10 +584,10 @@ public class TerrainRecruitLoader
 
     /**
      * Give a modifiable list of the possible recruiters in a terrain.
-     * 
+     *
      * TODO if clients need to modify they should make copies themselves, it
      * seems better if have this class return an unmodifiable list
-     * 
+     *
      * @param terrain String representing a terrain.
      * @return List of Creatures that can recruit in the terrain.
      * @see net.sf.colossus.server.CreatureType
@@ -666,9 +665,9 @@ public class TerrainRecruitLoader
     /**
      * Give the number of a given recruiters needed to recruit a given
      * Creature.
-     * 
+     *
      * TODO do we need the terrain parameter
-     * 
+     *
      * @param recruiter The Creature that wish to recruit.
      * @param recruit The Creature that is to be recruited.
      * @param terrain String representing a terrain, in which the

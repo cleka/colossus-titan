@@ -48,7 +48,7 @@ import org.jdom.Element;
 
 
 /**
- * Class ResourceLoader is an utility class to load a resource from 
+ * Class ResourceLoader is an utility class to load a resource from
  * a filename and a list of directory.
  * @version $Id$
  * @author Romain Dolbeau
@@ -371,9 +371,9 @@ public final class ResourceLoader
     }
 
     /**
-     * Return the first InputStream from file of name filename in the 
+     * Return the first InputStream from file of name filename in the
      * list of directories, tell the getInputStream not to complain
-     * if not found. 
+     * if not found.
      * @param filename Name of the file to load.
      * @param directories List of directories to search (in order).
      * @return The InputStream, or null if it was not found.
@@ -386,7 +386,7 @@ public final class ResourceLoader
     }
 
     /**
-     * Return the first InputStream from file of name filename in the 
+     * Return the first InputStream from file of name filename in the
      * list of directories.
      * @param filename Name of the file to load.
      * @param directories List of directories to search (in order).
@@ -405,9 +405,9 @@ public final class ResourceLoader
      * @param filename Name of the file to load.
      * @param directories List of directories to search (in order).
      * @param remote Ask the server for the stream.
-     * @param cachedOnly Only look in the cache file, 
+     * @param cachedOnly Only look in the cache file,
      *     do not try to load the file from permanent storage.
-     * @param ignoreFail (=don't complain) if file not found    
+     * @param ignoreFail (=don't complain) if file not found
      * @return The InputStream, or null if it was not found.
      */
     public static InputStream getInputStream(String filename,
@@ -457,7 +457,7 @@ public final class ResourceLoader
                         // let's assume a remote requester later sees it the
                         // same way.
                         // Right now, the remote-requesting is not able to
-                        // submit the "ignore-fail" property... 
+                        // submit the "ignore-fail" property...
                         // @TODO: submit that properly?
                         // fileCacheIgnoreFail.put(mapKey, new Boolean(true));
                     }
@@ -509,7 +509,7 @@ public final class ResourceLoader
 
                             if (ignoreFail)
                             {
-                                // Not in this version yet (05/2007). 
+                                // Not in this version yet (05/2007).
                                 // New clients could not talk with old server.
                                 // Take this into full use somewhat later.
                                 //out.print(
@@ -551,9 +551,9 @@ public final class ResourceLoader
      * Return the content of the specified file as an array of byte.
      * @param filename Name of the file to load.
      * @param directories List of directories to search (in order).
-     * @param cachedOnly Only look in the cache file, 
+     * @param cachedOnly Only look in the cache file,
      *     do not try to load the file from permanent storage.
-     * @return An array of byte representing the content of the file, 
+     * @return An array of byte representing the content of the file,
      *     or null if it fails.
      */
     public static byte[] getBytesFromFile(String filename,
@@ -579,7 +579,7 @@ public final class ResourceLoader
     /**
      * Return the content of the specified InputStream as an array of byte.
      * @param InputStream The InputStream to use.
-     * @return An array of byte representing the content 
+     * @return An array of byte representing the content
      *     of the InputStream, or null if it fails.
      */
     private static byte[] getBytesFromInputStream(InputStream is)
@@ -629,7 +629,7 @@ public final class ResourceLoader
     }
 
     /**
-     * Return the first OutputStream from file of name filename in 
+     * Return the first OutputStream from file of name filename in
      *     the list of directories.
      * @param filename Name of the file to load.
      * @param directories List of directories to search (in order).
@@ -659,9 +659,9 @@ public final class ResourceLoader
     }
 
     /**
-     * Return the first Document from file of name filename in 
+     * Return the first Document from file of name filename in
      *   the list of directories.
-     * It also add a property of key keyContentType and of type String 
+     * It also add a property of key keyContentType and of type String
      *   describing the content type of the Document.
      * This can currently load HTML and pure text.
      * @param filename Name of the file to load.
@@ -754,7 +754,7 @@ public final class ResourceLoader
      * @param filenames Array of name of files.
      * @param directories List of directories.
      * @return A String to use as a key when storing/loading in a cache
-     *   the specified array of name of files from the specified 
+     *   the specified array of name of files from the specified
      *   list of directories.
      */
     private static String getMapKey(String[] filenames,
@@ -1008,7 +1008,7 @@ public final class ResourceLoader
     }
 
     /**
-     * Create an Image that only contains a colored rectangle, 
+     * Create an Image that only contains a colored rectangle,
      *   with an optional border.
      * @param width Width of the image to create.
      * @param height Height of the image to create
@@ -1045,7 +1045,7 @@ public final class ResourceLoader
      * @param filename Name of the Image file to load.
      * @param directories List of directories to search (in order).
      * @param color Color to use.
-     * @return An Image composed of the content of the file, 
+     * @return An Image composed of the content of the file,
      *     with the transparent part filled the the given color.
      */
     private static Image createColorizedImage(String filename, Color color,
@@ -1183,7 +1183,7 @@ public final class ResourceLoader
      * Extract a color name from a filename, ignoring a prefix
      * @param filename File name to extract from.
      * @param prefix Prefix to ignore. Has to match the beginning of the file
-     * name, otherwise "black" will be used as default value. 
+     * name, otherwise "black" will be used as default value.
      * @return The extracted color name.
      */
     private static String colorNameFromFilename(String filename, String prefix)
@@ -1276,17 +1276,17 @@ public final class ResourceLoader
     /**
      * Create an instance of the class whose name is in parameter,
      *     using parameters.
-     *     
+     *
      * If no parameters are given, the default constructor is used.
-     * 
+     *
      * @TODO this is full of catch(Exception) blocks, which all return null.
      *       Esp. returning null seems a rather bad idea, since it will most
      *       likely turn out to be NPEs somewhere later.
-     *     
+     *
      * @param className The name of the class to use, must not be null.
      * @param directories List of directories to search (in order), must not be null.
      * @param parameter Array of parameters to pass to the constructor, can be null.
-     * @return A new object, instance from the given class or null if 
+     * @return A new object, instance from the given class or null if
      *         instantiation failed.
      */
     public static Object getNewObject(String className,
@@ -1321,7 +1321,7 @@ public final class ResourceLoader
                 LOGGER.log(Level.SEVERE,
                     "Loading or instantiating class' constructor for \""
                         + className + "\" failed", e);
-                Constructor[] constructors = theClass.getConstructors();
+                Constructor<?>[] constructors = theClass.getConstructors();
                 for (int i = 0; i < constructors.length; i++)
                 {
                     LOGGER.log(Level.SEVERE, "I have access to: " +
@@ -1374,7 +1374,7 @@ public final class ResourceLoader
 
     /**
      * Dump the file cache as a List of XML "DataFile" Element,
-     *     with the file key as attribute "DataFileKey", and the 
+     *     with the file key as attribute "DataFileKey", and the
      *     file data as a CDATA content.
      * @return A list of XML Element.
      */
