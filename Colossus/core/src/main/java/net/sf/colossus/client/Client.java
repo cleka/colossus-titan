@@ -3361,6 +3361,18 @@ public final class Client implements IClient, IOracle
         }
     }
 
+    public boolean onlyAIsRemain()
+    {
+        for (Player p : players)
+        {
+            if (!p.isAI() && !p.isDead())
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private void kickSplit()
     {
         if (isMyTurn() && options.getOption(Options.autoSplit)

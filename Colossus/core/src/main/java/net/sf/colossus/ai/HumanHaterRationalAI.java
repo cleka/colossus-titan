@@ -23,4 +23,23 @@ public class HumanHaterRationalAI extends RationalAI
          the proper hints section */
         hintSectionUsed[0] = Constants.sectionDefensiveAI;
     }
+
+    /** Return true if we need to run this method again after the server
+     *  updates the client with the results of a move or mulligan. */
+    @Override
+    public boolean masterMove()
+    {
+        if (this.I_HATE_HUMANS)
+        {
+            // check that this is still the case
+            if (this.client.onlyAIsRemain())
+            {
+                // only computer players remain.
+                this.I_HATE_HUMANS = false;
+            }
+        }
+
+        // call the (overridden) parent method.
+        return super.masterMove();
+    }
 }
