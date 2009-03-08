@@ -18,53 +18,29 @@ import java.util.Map;
 
 public final class Constants
 {
-    /**
-     * A typesafe enumeration for the different phases of the main game.
-     * 
-     * TODO replace with normal enum now that we use Java 5
-     */
-    public static class Phase
+    public static enum Phase
     {
-        public static final Phase SPLIT = new Phase("Split", 1);
-        public static final Phase MOVE = new Phase("Move", 2);
-        public static final Phase FIGHT = new Phase("Fight", 3);
-        public static final Phase MUSTER = new Phase("Muster", 4);
+        SPLIT("Split", 1), MOVE("Move", 2), FIGHT("Fight", 3), MUSTER(
+            "Muster", 4);
 
         /**
          * Deserialize enum from integer value.
-         * 
+         *
          * @param i The number for the phase.
          * @return The matching Phase instance.
-         * 
-         * @throws IllegalArgumentException iff the number is not valid.
+         *
+         * @throws ArrayOutOfBoundsException iff the number is not valid.
          */
         public static Phase fromInt(int i)
         {
-            switch (i)
-            {
-                case 1:
-                    return SPLIT;
-
-                case 2:
-                    return MOVE;
-
-                case 3:
-                    return FIGHT;
-
-                case 4:
-                    return MUSTER;
-
-                default:
-                    throw new IllegalArgumentException(
-                        "Invalid number for phase");
-            }
+            return values()[i];
         }
 
         /**
          * Serialize the object to an integer code.
-         * 
+         *
          * Used for savegames.
-         * 
+         *
          * @return An integer code representing the phase.
          */
         public int toInt()
@@ -86,64 +62,35 @@ public final class Constants
 
         private Phase(String name, int value)
         {
-            //private constructor
             this.name = name;
             this.value = value;
         }
     }
 
-    /**
-     * A typesafe enumeration of the phases of a battle.
-     * 
-     * TODO replace with normal enum now that we use Java 5
-     */
-    public static class BattlePhase
+    public static enum BattlePhase
     {
-        public static final BattlePhase SUMMON = new BattlePhase("Summon", 0);
-        public static final BattlePhase RECRUIT = new BattlePhase("Recruit", 1);
-        public static final BattlePhase MOVE = new BattlePhase("Move", 2);
-        public static final BattlePhase FIGHT = new BattlePhase("Fight", 3);
-        public static final BattlePhase STRIKEBACK = new BattlePhase(
-            "Strikeback", 4);
+        SUMMON("Summon", 0, true, false), RECRUIT("Recruit", 1, true, false), MOVE(
+            "Move", 2, true, false), FIGHT("Fight", 3, false, true), STRIKEBACK(
+            "Strikeback", 4, false, true);
 
         /**
          * Deserialize enum from integer value.
-         * 
+         *
          * @param i The number for the phase.
          * @return The matching Phase instance.
-         * 
-         * @throws IllegalArgumentException iff the number is not valid.
+         *
+         * @throws ArrayOutOfBoundsException iff the number is not valid.
          */
         public static BattlePhase fromInt(int i)
         {
-            switch (i)
-            {
-                case 0:
-                    return SUMMON;
-
-                case 1:
-                    return RECRUIT;
-
-                case 2:
-                    return MOVE;
-
-                case 3:
-                    return FIGHT;
-
-                case 4:
-                    return STRIKEBACK;
-
-                default:
-                    throw new IllegalArgumentException(
-                        "Invalid number for battle phase");
-            }
+             return BattlePhase.values()[i];
         }
 
         /**
          * Serialize the object to an integer code.
-         * 
+         *
          * Used for savegames.
-         * 
+         *
          * @return An integer code representing the phase.
          */
         public int toInt()
@@ -153,12 +100,12 @@ public final class Constants
 
         /**
          * Determine if the phase is part of the fighting.
-         * 
+         *
          * @return true iff the phase is either FIGHT or STRIKEBACK.
          */
         public boolean isFightPhase()
         {
-            return value == 3 || value == 4;
+            return isFightPhase;
         }
 
         /**
@@ -167,13 +114,13 @@ public final class Constants
          * (currently they are own phases; I would like those actions
          *  to happen as part of the move phase instead, then this here
          *  can be changed).
-         *  
+         *
          * @return true iff the phase is a move phase;
-         * 
+         *
          */
         public boolean isMovePhase()
         {
-            return value == 0 || value == 1 || value == 2;
+            return isMovePhase;
         }
 
         /**
@@ -187,12 +134,16 @@ public final class Constants
 
         private final String name;
         private final int value;
+        private final boolean isMovePhase;
+        private final boolean isFightPhase;
 
-        private BattlePhase(String name, int value)
+        private BattlePhase(String name, int value, boolean isMovePhase,
+            boolean isFightPhase)
         {
-            //private constructor
             this.name = name;
             this.value = value;
+            this.isMovePhase = isMovePhase;
+            this.isFightPhase = isFightPhase;
         }
     }
 
@@ -409,8 +360,8 @@ public final class Constants
     public static final String runClient = "Run network client";
     public static final String runWebClient = "Run web client";
 
-    // Used as prompt, and as the string for "strike penalty" send to server 
-    // for cancelling the strike. 
+    // Used as prompt, and as the string for "strike penalty" send to server
+    // for cancelling the strike.
     public static final String cancelStrike = "Cancel";
 
     /** Available internal variants  Try to keep this list mostly
@@ -595,7 +546,7 @@ public final class Constants
             return noShortName;
         }
     }
-    
+
     public static int getColorMnemonic(int i)
     {
         return colorMnemonics[i];
