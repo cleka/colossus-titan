@@ -623,7 +623,7 @@ public final class MasterBoard extends JPanel
             {
                 // No need for confirmation because the user can cancel
                 // from the load game dialog.
-                JFileChooser chooser = new JFileChooser(Constants.saveDirname);
+                JFileChooser chooser = new JFileChooser(Constants.SAVE_DIR_NAME);
                 chooser.setFileFilter(new XMLSnapshotFilter());
                 int returnVal = chooser.showOpenDialog(masterFrame);
                 if (returnVal == JFileChooser.APPROVE_OPTION)
@@ -646,7 +646,7 @@ public final class MasterBoard extends JPanel
             // TODO: Need a confirmation dialog on overwrite?
             public void actionPerformed(ActionEvent e)
             {
-                File savesDir = new File(Constants.saveDirname);
+                File savesDir = new File(Constants.SAVE_DIR_NAME);
                 if (!savesDir.exists())
                 {
                     LOGGER.log(Level.INFO, "Trying to make directory "
@@ -689,9 +689,9 @@ public final class MasterBoard extends JPanel
                         .getAbsolutePath();
                     String basename = chooser.getSelectedFile().getName();
                     // Add default savegame extension.
-                    if (!basename.endsWith(Constants.xmlExtension))
+                    if (!basename.endsWith(Constants.XML_EXTENSION))
                     {
-                        basename += Constants.xmlExtension;
+                        basename += Constants.XML_EXTENSION;
                     }
                     client.menuSaveGame(dirname + '/' + basename);
                 }

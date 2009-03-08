@@ -18,7 +18,7 @@ public final class ConfigFileFilter extends javax.swing.filechooser.FileFilter
 
     public boolean accept(File dir, String name)
     {
-        if (name.endsWith(Constants.optionsExtension))
+        if (name.endsWith(Constants.OPTIONS_EXTENSION))
         {
             return true;
         }

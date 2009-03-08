@@ -71,7 +71,7 @@ public class StartClient extends KFrame implements WindowListener,
         this.port = stOptions.getIntOption(Options.runClientPort);
 
         // LRU list of hosts, and window geometry from NetClient cf file
-        netclientOptions = new Options(Constants.optionsNetClientName);
+        netclientOptions = new Options(Constants.OPTIONS_NET_CLIENT_NAME);
         netclientOptions.loadOptions();
 
         Container panel = getContentPane();

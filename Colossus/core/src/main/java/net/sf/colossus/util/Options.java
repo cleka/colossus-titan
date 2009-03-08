@@ -193,18 +193,18 @@ public final class Options implements IOptions
 
     public Options(String owner)
     {
-        this(owner, Constants.gameDataPath, false);
+        this(owner, Constants.GAME_DATA_PATH, false);
     }
 
     public Options(String owner, boolean noFile)
     {
-        this(owner, Constants.gameDataPath, noFile);
+        this(owner, Constants.GAME_DATA_PATH, noFile);
     }
     
     public String getOptionsFilename()
     {
-        return dataPath + Constants.optionsBase + owner
-            + Constants.optionsExtension;
+        return dataPath + Constants.OPTIONS_BASE + owner
+            + Constants.OPTIONS_EXTENSION;
     }
 
     synchronized public void loadOptions()
@@ -282,7 +282,7 @@ public final class Options implements IOptions
         try
         {
             out = new FileOutputStream(optionsFile);
-            props.store(out, Constants.configVersion);
+            props.store(out, Constants.CONFIG_VERSION);
         }
         catch (IOException e)
         {

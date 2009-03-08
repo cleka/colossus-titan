@@ -263,7 +263,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     {
         super(windowTitle);
 
-        options = new Options(Constants.optionsWebClientName);
+        options = new Options(Constants.OPTIONS_WEB_CLIENT_NAME);
         options.loadOptions();
 
         // Initialize those 4 values + username from either given

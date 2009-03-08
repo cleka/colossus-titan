@@ -18,7 +18,7 @@ public final class XMLSnapshotFilter extends
 
     public boolean accept(File dir, String name)
     {
-        if (name.endsWith(Constants.xmlExtension))
+        if (name.endsWith(Constants.XML_EXTENSION))
         {
             return true;
         }

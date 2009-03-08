@@ -661,7 +661,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
 
     private void doLoadGame()
     {
-        JFileChooser chooser = new JFileChooser(Constants.saveDirname);
+        JFileChooser chooser = new JFileChooser(Constants.SAVE_DIR_NAME);
         chooser.setFileFilter(new XMLSnapshotFilter());
         int returnVal = chooser.showOpenDialog(this);
         if (returnVal == JFileChooser.APPROVE_OPTION)
@@ -757,7 +757,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
     {
         int maxPlayers = VariantSupport.getMaxPlayers();
         javax.swing.JFileChooser varChooser = new JFileChooser(
-            Constants.gameDataPath);
+            Constants.GAME_DATA_PATH);
         varChooser.setFileFilter(new varFileFilter());
         varChooser
             .setDialogTitle("Choose your variant (or cancel for default game)");

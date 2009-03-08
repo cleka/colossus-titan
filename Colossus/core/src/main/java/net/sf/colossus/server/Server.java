@@ -1866,7 +1866,7 @@ public final class Server extends Thread implements IServer
         while (it.hasNext())
         {
             IClient client = it.next();
-            client.tellStrikeResults(Constants.hexDamage, target.getTag(), 0,
+            client.tellStrikeResults(Constants.HEX_DAMAGE, target.getTag(), 0,
                 null, damage, target.isDead(), false, 0, null);
         }
     }

@@ -1193,8 +1193,8 @@ public final class GameServerSide extends Game
                 + getPhase();
         }
 
-        String name = Constants.saveDirname + Constants.xmlSnapshotStart
-            + date.getTime() + infoPart + Constants.xmlExtension;
+        String name = Constants.SAVE_DIR_NAME + Constants.XML_SNAPSHOT_START
+            + date.getTime() + infoPart + Constants.XML_EXTENSION;
         return name;
     }
 
@@ -1205,12 +1205,12 @@ public final class GameServerSide extends Game
 
         if (filename == null || filename.equals("null"))
         {
-            File savesDir = new File(Constants.saveDirname);
+            File savesDir = new File(Constants.SAVE_DIR_NAME);
 
             if (!savesDir.exists() || !savesDir.isDirectory())
             {
                 LOGGER.info("Trying to make directory "
-                    + Constants.saveDirname);
+                    + Constants.SAVE_DIR_NAME);
                 if (!savesDir.mkdirs())
                 {
                     LOGGER.log(Level.SEVERE,
@@ -1267,7 +1267,7 @@ public final class GameServerSide extends Game
         {
             Element root = new Element("ColossusSnapshot");
 
-            root.setAttribute("version", Constants.xmlSnapshotVersion);
+            root.setAttribute("version", Constants.XML_SNAPSHOT_VERSION);
 
             Document doc = new Document(root);
 
@@ -1474,7 +1474,7 @@ public final class GameServerSide extends Game
 
         if (filename.equals("--latest"))
         {
-            File dir = new File(Constants.saveDirname);
+            File dir = new File(Constants.SAVE_DIR_NAME);
 
             if (!dir.exists() || !dir.isDirectory())
             {
@@ -1491,7 +1491,7 @@ public final class GameServerSide extends Game
                 dispose();
                 return;
             }
-            file = new File(Constants.saveDirname
+            file = new File(Constants.SAVE_DIR_NAME
                 + latestSaveFilename(filenames));
         }
         else if (filename.indexOf("/") >= 0 || filename.indexOf("\\") >= 0)
@@ -1501,7 +1501,7 @@ public final class GameServerSide extends Game
         }
         else
         {
-            file = new File(Constants.saveDirname + filename);
+            file = new File(Constants.SAVE_DIR_NAME + filename);
         }
 
         if (!file.exists())
@@ -1531,7 +1531,7 @@ public final class GameServerSide extends Game
             Element root = doc.getRootElement();
             Attribute ver = root.getAttribute("version");
 
-            if (!ver.getValue().equals(Constants.xmlSnapshotVersion))
+            if (!ver.getValue().equals(Constants.XML_SNAPSHOT_VERSION))
             {
                 LOGGER.severe("Can't load this savegame version.");
                 dispose();
@@ -3372,7 +3372,7 @@ public final class GameServerSide extends Game
         LOGGER.info("Battle completed, result: " + result);
 
         // This comes from a system property:
-        if (Constants.EndAfterFirstBattle)
+        if (Constants.END_AFTER_FIRST_BATTLE)
         {
             // System.err.println("Battle completed, result: " + result);
             LOGGER.info("endAfterFirstBattle is set, terminating game.");

@@ -2744,7 +2744,7 @@ public final class Client implements IClient, IOracle
             }
         }
 
-        if (strikerTag == Constants.hexDamage)
+        if (strikerTag == Constants.HEX_DAMAGE)
         {
             // Do not trigger auto strikes in parallel with setupBattleFight()
         }

@@ -14,6 +14,9 @@ import java.util.Map;
  * Class Constants just holds constants.
  * @version $Id$
  * @author David Ripton
+ *
+ * TODO some of this would probably have a decent place somewhere else, e.g.
+ * the Phase and BattlePhase enums could be in the game package.
  */
 
 public final class Constants
@@ -150,53 +153,56 @@ public final class Constants
 
     // Special feature to end the game after one battle is completed,
     // for tuning the AI
-    private static String endAfterFirstBattleProperty =
+    private static String END_AFTER_FIRST_BATTLE_PROPERTY =
         "net.sf.colossus.endAfterFirstBattle";
-    public static final boolean EndAfterFirstBattle = Boolean.valueOf(
-        System.getProperty(endAfterFirstBattleProperty, "false").toString()).
+    public static final boolean END_AFTER_FIRST_BATTLE = Boolean.valueOf(
+        System.getProperty(END_AFTER_FIRST_BATTLE_PROPERTY, "false").toString()).
         booleanValue();
 
     /** Base path for all external game data files. */
-    public static final String gameDataPath = System.getProperty("user.home")
+    public static final String GAME_DATA_PATH = System.getProperty("user.home")
         + File.separator + ".colossus" + File.separator;
 
     // Constants related to the options config files
-    public static final String optionsPath = gameDataPath;
-    public static final String optionsBase = "Colossus-";
-    public static final String optionsServerName = "server";
-    public static final String optionsNetClientName = "netclient";
-    public static final String optionsWebClientName = "webclient";
+    public static final String OPTIONS_PATH = GAME_DATA_PATH;
+    public static final String OPTIONS_BASE = "Colossus-";
+    public static final String OPTIONS_SERVER_NAME = "server";
+    public static final String OPTIONS_NET_CLIENT_NAME = "netclient";
+    public static final String OPTIONS_WEB_CLIENT_NAME = "webclient";
     // virtual "name" for Options instance in GetPlayers (never saved)
-    public static final String optionsStart = "start";
-    public static final String optionsExtension = ".cfg";
+    public static final String OPTIONS_START = "start";
+    public static final String OPTIONS_EXTENSION = ".cfg";
 
-    public static final String configVersion = "Colossus config file version 2";
+    public static final String CONFIG_VERSION = "Colossus config file version 2";
 
     // Constants for savegames
 
     /** Must include trailing slash. */
-    public static final String saveDirname = gameDataPath
+    public static final String SAVE_DIR_NAME = GAME_DATA_PATH
         + File.separator + "saves" + File.separator;
-    public static final String xmlExtension = ".xml";
-    public static final String xmlSnapshotStart = "snap";
-    public static final String xmlSnapshotVersion = "12";
+    public static final String XML_EXTENSION = ".xml";
+    public static final String XML_SNAPSHOT_START = "snap";
+    public static final String XML_SNAPSHOT_VERSION = "12";
 
     public static final int BIGNUM = 99;
     public static final int OUT_OF_RANGE = 5;
 
     /** Fake striker id for drift and other hex damage. */
-    public static final int hexDamage = -1;
+    public static final int HEX_DAMAGE = -1;
 
     // Angel-summoning states
+    // TODO probably an enum
     public static final int NO_KILLS = 0;
     public static final int FIRST_BLOOD = 1;
     public static final int TOO_LATE = 2;
 
     // Legion tags
+    // TODO probably an enum
     public static final int DEFENDER = 0;
     public static final int ATTACKER = 1;
 
     // Constants for hexside gates.
+    // TODO probably an enum
     public static final int NONE = 0;
     public static final int BLOCK = 1;
     public static final int ARCH = 2;
@@ -228,6 +234,7 @@ public final class Constants
      shortened name directly */
 
     /* all should be MAX_MAX_PLAYERS long */
+    // TODO should be a single enum with properties
     public static final String[] colorNames = { "Black", "Blue", "Brown",
         "Gold", "Green", "Red", "Orange", "Purple", "Silver", "Sky", "Pine",
         "Indigo" };
@@ -371,9 +378,6 @@ public final class Constants
         "Beelzebub12", "BeelzeGods12", "ExtTitan", "Infinite", "Outlands",
         "Pantheon", "SmallTitan", "TG-ConceptI", "TG-ConceptII", "TG-ConceptIII",
         "TG-SetII", "TG-SetIII", "TG-Wild", "TitanPlus", "Undead", "Unified", "Balrog" };
-    // XXX Currently broken variants
-    //    "Balrog",
-    //    "Random"
 
     public static final int numVariants = variantArray.length;
 

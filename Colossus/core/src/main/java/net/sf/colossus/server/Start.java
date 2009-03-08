@@ -631,11 +631,11 @@ public final class Start
         }
 
         // Read option settings (from Server cf file)
-        Options serverOptions = new Options(Constants.optionsServerName);
+        Options serverOptions = new Options(Constants.OPTIONS_SERVER_NAME);
         serverOptions.loadOptions();
 
         // Read netclient option settings (from own cf file)
-        Options netclientOptions = new Options(Constants.optionsNetClientName);
+        Options netclientOptions = new Options(Constants.OPTIONS_NET_CLIENT_NAME);
         netclientOptions.loadOptions();
 
         // Options remembered only inside this running application,
@@ -644,7 +644,7 @@ public final class Start
         // We never save those startOptions, but some of them are copied
         // to the server options in GetPlayers when the user initiates
         // a related action.
-        Options startOptions = new Options(Constants.optionsStart);
+        Options startOptions = new Options(Constants.OPTIONS_START);
 
         // The static startObject represents/stores the action we 
         // have to do next; default action: GetPlayers dialog.
@@ -687,7 +687,7 @@ public final class Start
             // according to cmdline options
             if (serverOptions == null)
             {
-                serverOptions = new Options(Constants.optionsServerName);
+                serverOptions = new Options(Constants.OPTIONS_SERVER_NAME);
                 serverOptions.loadOptions();
                 if (Options.isStresstest())
                 {
@@ -696,7 +696,7 @@ public final class Start
             }
             if (netclientOptions == null)
             {
-                netclientOptions = new Options(Constants.optionsNetClientName);
+                netclientOptions = new Options(Constants.OPTIONS_NET_CLIENT_NAME);
                 netclientOptions.loadOptions();
             }
 
