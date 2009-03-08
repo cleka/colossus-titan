@@ -30,6 +30,7 @@ import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
+import net.sf.colossus.server.Constants.BattlePhase;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Split;
@@ -52,12 +53,12 @@ import org.jdom.output.XMLOutputter;
 
 /**
  * Class Game gets and holds high-level data about a Titan game.
- * 
+ *
  * This is the old design with the game information in the server. Some
  * of the functionality here is supposed to be moved into the {@link net.sf.colossus.game.Game}
  * class which then can be shared between server and clients (the class, not the instances).
  * Other parts should be moved into the {@link Server} class or elsewhere.
- * 
+ *
  * @version $Id$
  * @author David Ripton
  * @author Bruce Sherrod
@@ -144,7 +145,7 @@ public final class GameServerSide extends Game
         });
     }
 
-    /** 
+    /**
      * Update the dead and available counts for a creature type on all clients.
      */
     private void updateCaretakerDisplaysFor(CreatureType type)
@@ -161,7 +162,7 @@ public final class GameServerSide extends Game
         }
     }
 
-    /** 
+    /**
      * Update the dead and available counts for all creature types on all clients.
      */
     private void updateCaretakerDisplays()
@@ -195,7 +196,7 @@ public final class GameServerSide extends Game
 
     private void initServer()
     {
-        // create it even if not needed (=no web server). 
+        // create it even if not needed (=no web server).
         // This way we can have all the "if <there is a webserver>"
         // wrappers inside the notify Class, instead spread over the code...
         notifyWebServer = new NotifyWebServer(flagFilename);
@@ -215,7 +216,7 @@ public final class GameServerSide extends Game
             // are *Network type* players in the Player list (instead of
             // whether there is something in the socket list, which was bogus,
             // because also local clients will be in socket list).
-            // It's also not necessary to be after the socket server-start 
+            // It's also not necessary to be after the socket server-start
             //   / client-accepting, "because FST accepts only request from known
             //       client addresses"  -- in fact a client won't request files
             // before he is registered. So, do the FST start first and we are safe.
@@ -326,7 +327,7 @@ public final class GameServerSide extends Game
         }
     }
 
-    /* Called from the last ClientHandler connecting 
+    /* Called from the last ClientHandler connecting
      *  ( = when expected nr. of clients has connected).
      */
     void newGame2()
@@ -940,7 +941,7 @@ public final class GameServerSide extends Game
         return phase;
     }
 
-    /** 
+    /**
      * Advance to the next phase, only if the passed oldPhase and playerName
      * are current.
      */
@@ -1366,7 +1367,7 @@ public final class GameServerSide extends Game
                     + battle.getActivePlayer().getName());
                 bat
                     .setAttribute("phase", ""
-                        + battle.getBattlePhase().toInt());
+                        + battle.getBattlePhase().ordinal());
                 bat.setAttribute("summonState", "" + battle.getSummonState());
                 bat.setAttribute("carryDamage", "" + battle.getCarryDamage());
                 bat.setAttribute("driftDamageApplied", ""
@@ -1461,10 +1462,10 @@ public final class GameServerSide extends Game
         }
     }
 
-    /** 
+    /**
      * Try to load a game from saveDirName/filename.
-     * 
-     * If the filename is "--latest" then load the latest savegame found in saveDirName. 
+     *
+     * If the filename is "--latest" then load the latest savegame found in saveDirName.
      */
     // JDOM lacks generics, so we need casts
     @SuppressWarnings("unchecked")
@@ -1521,7 +1522,7 @@ public final class GameServerSide extends Game
                 return;
             }
         }
-        
+
         try
         {
             LOGGER.info("Loading game from " + file);
@@ -1593,7 +1594,7 @@ public final class GameServerSide extends Game
             el = root.getChild("TurnNumber");
             turnNumber = Integer.parseInt(el.getTextTrim());
             // not quite the same as it was when saved, but the idea of lastRTN
-            // is only to prevent stresstest games from hanging forever... 
+            // is only to prevent stresstest games from hanging forever...
             lastRecruitTurnNumber = turnNumber;
 
             el = root.getChild("CurrentPlayer");
@@ -1637,7 +1638,7 @@ public final class GameServerSide extends Game
                 String name = pla.getAttribute("name").getValue();
                 String type = pla.getAttribute("type").getValue();
 
-                PlayerServerSide player = addPlayer(name, type); 
+                PlayerServerSide player = addPlayer(name, type);
 
                 String color = pla.getAttribute("color").getValue();
                 player.setColor(color);
@@ -1687,7 +1688,7 @@ public final class GameServerSide extends Game
                     Element leg = it2.next();
                     readLegion(leg, player);
                 }
-                
+
                 player.backupLoadedData();
             }
 
@@ -1703,10 +1704,9 @@ public final class GameServerSide extends Game
                     .getIntValue();
                 String battleActivePlayerName = bat.getAttribute(
                     "activePlayer").getValue();
-                Constants.BattlePhase battlePhase = Constants.BattlePhase
-                    .fromInt(bat.getAttribute("phase").getIntValue());
-                int summonState = bat.getAttribute("summonState")
-                    .getIntValue();
+                Constants.BattlePhase battlePhase = BattlePhase.values()[bat.getAttribute("phase").getIntValue()];
+                Constants.AngelSummoningStates summonState = Constants.AngelSummoningStates
+                    .values()[bat.getAttribute("summonState").getIntValue()];
                 int carryDamage = bat.getAttribute("carryDamage")
                     .getIntValue();
                 boolean driftDamageApplied = bat.getAttribute(
@@ -1727,18 +1727,18 @@ public final class GameServerSide extends Game
                 Legion defender = getFirstEnemyLegion(engagementHex,
                     attackingPlayer);
 
-                int activeLegionNum;
+                Constants.LegionTags activeLegionTag;
                 if (battleActivePlayerName.equals(attackingPlayer.getName()))
                 {
-                    activeLegionNum = Constants.ATTACKER;
+                    activeLegionTag = Constants.LegionTags.ATTACKER;
                 }
                 else
                 {
-                    activeLegionNum = Constants.DEFENDER;
+                    activeLegionTag = Constants.LegionTags.DEFENDER;
                 }
 
                 battle = new BattleServerSide(this, attacker, defender,
-                    activeLegionNum, engagementHex, battleTurnNum, battlePhase);
+                    activeLegionTag, engagementHex, battleTurnNum, battlePhase);
                 battle.setSummonState(summonState);
                 battle.setCarryDamage(carryDamage);
                 battle.setDriftDamageApplied(driftDamageApplied);
@@ -1857,7 +1857,7 @@ public final class GameServerSide extends Game
         legion.addToBattleTally(battleTally);
     }
 
-    /* Called from the last ClientHandler connecting 
+    /* Called from the last ClientHandler connecting
      *  ( = when expected nr. of clients has connected).
      */
     boolean loadGame2()
@@ -1877,13 +1877,13 @@ public final class GameServerSide extends Game
         history.fireEventsFromXML(server);
         boolean ok = resyncBackupData();
         LOGGER.info("Loading and resync result: " + ok);
-        
+
         if (!ok)
         {
             LOGGER.severe("Loading and resync failed - Aborting!!");
             return false;
         }
-        
+
         for (PlayerServerSide p : getPlayers())
         {
             p.computeMarkersAvailable();
@@ -1897,7 +1897,7 @@ public final class GameServerSide extends Game
 
         server.allSetupTurnState();
         updateCaretakerDisplays();
-        
+
         server.allRequestConfirmCatchup("KickstartGame");
         return ok;
     }
@@ -1960,9 +1960,9 @@ public final class GameServerSide extends Game
             });
     }
 
-    /** 
+    /**
      * Return a list of eligible recruits, as Creatures.
-     * 
+     *
      * TODO second parameter is probably superfluous
      */
     List<CreatureType> findEligibleRecruits(Legion legion, MasterHex hex)
@@ -2117,7 +2117,7 @@ public final class GameServerSide extends Game
     /**
      * If the legion can acquire (height < 7), find out which acquirable it
      * might get for the pointsToAdd, and fire off the askAcquirable messages.
-     * @param legion  Legion which earned the points and thus is entitled to 
+     * @param legion  Legion which earned the points and thus is entitled to
      *                get the acqirable
      * @param scoreBeforeAdd Score from which to start
      * @param pointsToAdd How many points were earned
@@ -2180,7 +2180,7 @@ public final class GameServerSide extends Game
      *  If block >= 0, go only that way.  If block == -1, use arches and
      *  arrows.  If block == -2, use only arrows.  Do not double back in
      *  the direction you just came from.  Return a set of
-     *  hexLabel:entrySide tuples. 
+     *  hexLabel:entrySide tuples.
      *
      *  TODO use proper data structure instead of String serializations
      */
@@ -2242,7 +2242,9 @@ public final class GameServerSide extends Game
         {
             for (int i = 0; i < 6; i++)
             {
-                if (hex.getExitType(i) >= Constants.ARCH && i != cameFrom)
+                if (hex.getExitType(i).ordinal() >= Constants.HexsideGates.ARCH
+                    .ordinal()
+                    && i != cameFrom)
                 {
                     set.addAll(findNormalMoves(hex.getNeighbor(i), legion,
                         roll - 1, Constants.ARROWS_ONLY, (i + 3) % 6,
@@ -2254,7 +2256,9 @@ public final class GameServerSide extends Game
         {
             for (int i = 0; i < 6; i++)
             {
-                if (hex.getExitType(i) >= Constants.ARROW && i != cameFrom)
+                if (hex.getExitType(i).ordinal() >= Constants.HexsideGates.ARROW
+                    .ordinal()
+                    && i != cameFrom)
                 {
                     set.addAll(findNormalMoves(hex.getNeighbor(i), legion,
                         roll - 1, Constants.ARROWS_ONLY, (i + 3) % 6,
@@ -2282,8 +2286,8 @@ public final class GameServerSide extends Game
             for (int i = 0; i < 6; i++)
             {
                 if (i != cameFrom
-                    && (hex.getExitType(i) != Constants.NONE || hex
-                        .getEntranceType(i) != Constants.NONE))
+                    && (hex.getExitType(i) != Constants.HexsideGates.NONE || hex
+                        .getEntranceType(i) != Constants.HexsideGates.NONE))
                 {
                     set.addAll(findNearbyUnoccupiedHexes(hex.getNeighbor(i),
                         legion, roll - 1, (i + 3) % 6, ignoreFriends));
@@ -2311,7 +2315,7 @@ public final class GameServerSide extends Game
         int block = Constants.ARCHES_AND_ARROWS;
         for (int j = 0; j < 6; j++)
         {
-            if (hex.getExitType(j) == Constants.BLOCK)
+            if (hex.getExitType(j) == Constants.HexsideGates.BLOCK)
             {
                 // Only this path is allowed.
                 block = j;
@@ -2525,11 +2529,11 @@ public final class GameServerSide extends Game
 
                 // Clemens 4.10.2007:
                 // This optimization can lead to problems ("Illegal entry side")
-                // in mountains/tundra on a movement roll 4, when client and 
+                // in mountains/tundra on a movement roll 4, when client and
                 // server store the items in their Move-hashmaps in different
                 // order (different java version, platform, ... ?)
                 // So, removed this optimization to see whether it fixes the bug:
-                //  [colossus-Bugs-1789116 ] illegal move: 29 plain to 2000 tundra 
+                //  [colossus-Bugs-1789116 ] illegal move: 29 plain to 2000 tundra
                 /*
                  // Don't bother finding more than one entry side if unoccupied.
                  if (!isOccupied(targetHexLabel))
@@ -2687,9 +2691,9 @@ public final class GameServerSide extends Game
         checkEngagementDone();
     }
 
-    /** 
+    /**
      * Return a set of hexes containing summonables.
-     * 
+     *
      * TODO rename -- it is not specific for angels
      */
     Set<MasterHex> findSummonableAngels(String markerId)
@@ -3111,7 +3115,8 @@ public final class GameServerSide extends Game
                 Constants.reasonBattleStarts);
 
             battle = new BattleServerSide(this, attacker, defender,
-                Constants.DEFENDER, hex, 1, Constants.BattlePhase.MOVE);
+                Constants.LegionTags.DEFENDER, hex, 1,
+                Constants.BattlePhase.MOVE);
             battle.init();
         }
     }
@@ -3187,7 +3192,7 @@ public final class GameServerSide extends Game
         {
             boolean attackerHasTitan = attacker.hasTitan();
             boolean defenderHasTitan = defender.hasTitan();
-            
+
             // Remove both legions and give no points.
             ((LegionServerSide)attacker).remove();
             ((LegionServerSide)defender).remove();
@@ -3267,7 +3272,7 @@ public final class GameServerSide extends Game
             points = loser.getPointValue();
 
             Player losingPlayer = loser.getPlayer();
-            
+
             // Need to check and remember this before removing the legion
             boolean loserHasTitan = loser.hasTitan();
 
@@ -3293,7 +3298,7 @@ public final class GameServerSide extends Game
             {
                 LOGGER.info("Negotiation (non-mutual) causes Game Over - "
                     + "skipping summon/reinforce procedures.");
-    
+
             }
             else if (winner == defender)
             {
@@ -3627,7 +3632,7 @@ public final class GameServerSide extends Game
     }
 
     /**
-     * TODO this could probably be done much easier as getFirstEnemyLegion(Legion) 
+     * TODO this could probably be done much easier as getFirstEnemyLegion(Legion)
      */
     Legion getFirstEnemyLegion(MasterHex masterHex, Player player)
     {
@@ -3716,10 +3721,10 @@ public final class GameServerSide extends Game
     /* Interface from Game/Server to WebServer who started this.
      * Perhaps later replaced with a two-way socket connection?
      * Class is always created, no matter whether we have a web
-     * server ( => active == true) or not ( => active == false); 
+     * server ( => active == true) or not ( => active == false);
      * but this way, we can have all the
-     *    "if (we have a web server) { } " 
-     * checking done inside this class and do not clutter the 
+     *    "if (we have a web server) { } "
+     * checking done inside this class and do not clutter the
      * main server code.
      */
 

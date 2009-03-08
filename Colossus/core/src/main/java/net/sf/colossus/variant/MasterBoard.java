@@ -11,13 +11,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.server.Constants;
+import net.sf.colossus.server.Constants.HexsideGates;
 import net.sf.colossus.util.ArrayHelper;
 import net.sf.colossus.util.NullCheckPredicate;
 
 
 /**
  * The master board as part of a variant.
- * 
+ *
  * Instances of this class are immutable.
  */
 public class MasterBoard
@@ -35,7 +36,7 @@ public class MasterBoard
      */
     private final int vertSize;
 
-    /** 
+    /**
      * "parity" of the board, so that hexes are displayed the proper way
      */
     private final int boardParity;
@@ -46,7 +47,7 @@ public class MasterBoard
      */
     private final MasterHex[][] plainHexArray;
 
-    /** 
+    /**
      * The hexes in the horizSize*vertSize array that actually exist are
      * represented by true.
      */
@@ -57,7 +58,7 @@ public class MasterBoard
      */
     private final Set<MasterHex> towerSet;
 
-    /** 
+    /**
      * A cache for faster lookup of hexes using their labels.
      */
     private final Map<String, MasterHex> hexByLabelCache = new HashMap<String, MasterHex>();
@@ -133,7 +134,7 @@ public class MasterBoard
                 {
                     for (int k = 0; k < 3; k++)
                     {
-                        if (h[i][j].getBaseExitType(k) != Constants.NONE)
+                        if (h[i][j].getBaseExitType(k) != Constants.HexsideGates.NONE)
                         {
                             setupOneExit(h, i, j, k);
                         }
@@ -186,8 +187,8 @@ public class MasterBoard
                 {
                     for (int k = 0; k < 6; k++)
                     {
-                        int gateType = h[i][j].getExitType(k);
-                        if (gateType != Constants.NONE)
+                        HexsideGates gateType = h[i][j].getExitType(k);
+                        if (gateType != Constants.HexsideGates.NONE)
                         {
                             switch (k)
                             {
@@ -354,33 +355,33 @@ public class MasterBoard
                 {
                     MasterHex hex = h[i][j];
 
-                    if (hex.getExitType(0) != Constants.NONE
-                        || hex.getEntranceType(0) != Constants.NONE)
+                    if (hex.getExitType(0) != Constants.HexsideGates.NONE
+                        || hex.getEntranceType(0) != Constants.HexsideGates.NONE)
                     {
                         hex.setNeighbor(0, h[i][j - 1]);
                     }
-                    if (hex.getExitType(1) != Constants.NONE
-                        || hex.getEntranceType(1) != Constants.NONE)
+                    if (hex.getExitType(1) != Constants.HexsideGates.NONE
+                        || hex.getEntranceType(1) != Constants.HexsideGates.NONE)
                     {
                         hex.setNeighbor(1, h[i + 1][j]);
                     }
-                    if (hex.getExitType(2) != Constants.NONE
-                        || hex.getEntranceType(2) != Constants.NONE)
+                    if (hex.getExitType(2) != Constants.HexsideGates.NONE
+                        || hex.getEntranceType(2) != Constants.HexsideGates.NONE)
                     {
                         hex.setNeighbor(2, h[i + 1][j]);
                     }
-                    if (hex.getExitType(3) != Constants.NONE
-                        || hex.getEntranceType(3) != Constants.NONE)
+                    if (hex.getExitType(3) != Constants.HexsideGates.NONE
+                        || hex.getEntranceType(3) != Constants.HexsideGates.NONE)
                     {
                         hex.setNeighbor(3, h[i][j + 1]);
                     }
-                    if (hex.getExitType(4) != Constants.NONE
-                        || hex.getEntranceType(4) != Constants.NONE)
+                    if (hex.getExitType(4) != Constants.HexsideGates.NONE
+                        || hex.getEntranceType(4) != Constants.HexsideGates.NONE)
                     {
                         hex.setNeighbor(4, h[i - 1][j]);
                     }
-                    if (hex.getExitType(5) != Constants.NONE
-                        || hex.getEntranceType(5) != Constants.NONE)
+                    if (hex.getExitType(5) != Constants.HexsideGates.NONE
+                        || hex.getEntranceType(5) != Constants.HexsideGates.NONE)
                     {
                         hex.setNeighbor(5, h[i - 1][j]);
                     }
@@ -405,7 +406,7 @@ public class MasterBoard
 
     /**
      * Retrieve a hex by its label.
-     * 
+     *
      * @param label The label to find the hex for. Valid label, not null.
      * @return The label found.
      */
@@ -440,7 +441,7 @@ public class MasterBoard
             });
     }
 
-    /** 
+    /**
      * Return a set of all hex labels.
      */
     public Set<String> getAllHexLabels()
@@ -448,7 +449,7 @@ public class MasterBoard
         return hexByLabelCache.keySet();
     }
 
-    /** 
+    /**
      * Return a set of all hex labels.
      */
     public Collection<MasterHex> getAllHexes()

@@ -756,7 +756,7 @@ final class ClientHandler implements IClient
     {
         sendToClient(Constants.initBattle + sep + hex.getLabel() + sep
             + battleTurnNumber + sep + battleActivePlayer.getName() + sep
-            + battlePhase.toInt() + sep + attacker.getMarkerId() + sep
+            + battlePhase.ordinal() + sep + attacker.getMarkerId() + sep
             + defender.getMarkerId());
     }
 
@@ -838,7 +838,7 @@ final class ClientHandler implements IClient
     public void setupBattleFight(Constants.BattlePhase battlePhase,
         Player battleActivePlayer)
     {
-        sendToClient(Constants.setupBattleFight + sep + battlePhase.toInt()
+        sendToClient(Constants.setupBattleFight + sep + battlePhase.ordinal()
             + sep + battleActivePlayer.getName());
     }
 

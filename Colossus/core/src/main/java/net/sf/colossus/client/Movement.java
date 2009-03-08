@@ -54,12 +54,12 @@ public final class Movement
         return entrySide;
     }
 
-    /** Recursively find conventional moves from this hex.  
-     *  If block >= 0, go only that way.  If block == -1, use arches and 
+    /** Recursively find conventional moves from this hex.
+     *  If block >= 0, go only that way.  If block == -1, use arches and
      *  arrows.  If block == -2, use only arrows.  Do not double back in
-     *  the direction you just came from.  Return a set of 
+     *  the direction you just came from.  Return a set of
      *  hexLabel:entrySide tuples.
-     *  
+     *
      *  TODO get rid of this String serialization and return a proper data
      *       structure
      */
@@ -128,7 +128,9 @@ public final class Movement
         {
             for (int i = 0; i < 6; i++)
             {
-                if (hex.getExitType(i) >= Constants.ARCH && i != cameFrom)
+                if (hex.getExitType(i).ordinal() >= Constants.HexsideGates.ARCH
+                    .ordinal()
+                    && i != cameFrom)
                 {
                     result.addAll(findNormalMoves(hex.getNeighbor(i), legion,
                         roll - 1, Constants.ARROWS_ONLY, (i + 3) % 6, null));
@@ -140,7 +142,9 @@ public final class Movement
         {
             for (int i = 0; i < 6; i++)
             {
-                if (hex.getExitType(i) >= Constants.ARROW && i != cameFrom)
+                if (hex.getExitType(i).ordinal() >= Constants.HexsideGates.ARROW
+                    .ordinal()
+                    && i != cameFrom)
                 {
                     result.addAll(findNormalMoves(hex.getNeighbor(i), legion,
                         roll - 1, Constants.ARROWS_ONLY, (i + 3) % 6, null));
@@ -170,8 +174,8 @@ public final class Movement
             for (int i = 0; i < 6; i++)
             {
                 if (i != cameFrom
-                    && (hex.getExitType(i) != Constants.NONE || hex
-                        .getEntranceType(i) != Constants.NONE))
+                    && (hex.getExitType(i) != Constants.HexsideGates.NONE || hex
+                        .getEntranceType(i) != Constants.HexsideGates.NONE))
                 {
                     result.addAll(findNearbyUnoccupiedHexes(
                         hex.getNeighbor(i), legion, roll - 1, (i + 3) % 6));
@@ -204,7 +208,7 @@ public final class Movement
         int block = Constants.ARCHES_AND_ARROWS;
         for (int j = 0; j < 6; j++)
         {
-            if (hex.getExitType(j) == Constants.BLOCK)
+            if (hex.getExitType(j) == Constants.HexsideGates.BLOCK)
             {
                 // Only this path is allowed.
                 block = j;
@@ -381,7 +385,7 @@ public final class Movement
     }
 
     /** Return a Set of Strings "Left" "Right" or "Bottom" describing
-     *  possible entry sides.  If the hex is unoccupied, just return 
+     *  possible entry sides.  If the hex is unoccupied, just return
      *  one entry side since it doesn't matter. */
     Set<String> listPossibleEntrySides(LegionClientSide legion,
         MasterHex targetHex, boolean teleport)

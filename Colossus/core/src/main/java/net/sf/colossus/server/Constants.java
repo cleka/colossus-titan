@@ -21,10 +21,11 @@ import java.util.Map;
 
 public final class Constants
 {
+    // TODO this should probably start numbering with zero as does the BattlePhase and
+    // as does any other Java enum -- currently SPLIT is serialized as "1"
     public static enum Phase
     {
-        SPLIT("Split", 1), MOVE("Move", 2), FIGHT("Fight", 3), MUSTER(
-            "Muster", 4);
+        SPLIT("Split"), MOVE("Move"), FIGHT("Fight"), MUSTER("Muster");
 
         /**
          * Deserialize enum from integer value.
@@ -36,7 +37,7 @@ public final class Constants
          */
         public static Phase fromInt(int i)
         {
-            return values()[i];
+            return values()[i - 1];
         }
 
         /**
@@ -48,7 +49,7 @@ public final class Constants
          */
         public int toInt()
         {
-            return value;
+            return ordinal() + 1;
         }
 
         /**
@@ -61,45 +62,18 @@ public final class Constants
         }
 
         private final String name;
-        private final int value;
 
-        private Phase(String name, int value)
+        private Phase(String name)
         {
             this.name = name;
-            this.value = value;
         }
     }
 
     public static enum BattlePhase
     {
-        SUMMON("Summon", 0, true, false), RECRUIT("Recruit", 1, true, false), MOVE(
-            "Move", 2, true, false), FIGHT("Fight", 3, false, true), STRIKEBACK(
-            "Strikeback", 4, false, true);
-
-        /**
-         * Deserialize enum from integer value.
-         *
-         * @param i The number for the phase.
-         * @return The matching Phase instance.
-         *
-         * @throws ArrayOutOfBoundsException iff the number is not valid.
-         */
-        public static BattlePhase fromInt(int i)
-        {
-             return BattlePhase.values()[i];
-        }
-
-        /**
-         * Serialize the object to an integer code.
-         *
-         * Used for savegames.
-         *
-         * @return An integer code representing the phase.
-         */
-        public int toInt()
-        {
-            return value;
-        }
+        SUMMON("Summon", true, false), RECRUIT("Recruit", true, false), MOVE(
+            "Move", true, false), FIGHT("Fight", false, true), STRIKEBACK(
+            "Strikeback", false, true);
 
         /**
          * Determine if the phase is part of the fighting.
@@ -136,15 +110,13 @@ public final class Constants
         }
 
         private final String name;
-        private final int value;
         private final boolean isMovePhase;
         private final boolean isFightPhase;
 
-        private BattlePhase(String name, int value, boolean isMovePhase,
+        private BattlePhase(String name, boolean isMovePhase,
             boolean isFightPhase)
         {
             this.name = name;
-            this.value = value;
             this.isMovePhase = isMovePhase;
             this.isFightPhase = isFightPhase;
         }
@@ -190,38 +162,24 @@ public final class Constants
     /** Fake striker id for drift and other hex damage. */
     public static final int HEX_DAMAGE = -1;
 
-    // Angel-summoning states
-    // TODO probably an enum
-    public static final int NO_KILLS = 0;
-    public static final int FIRST_BLOOD = 1;
-    public static final int TOO_LATE = 2;
+    public static enum AngelSummoningStates
+    {
+        NO_KILLS, FIRST_BLOOD, TOO_LATE
+    }
 
-    // Legion tags
-    // TODO probably an enum
-    public static final int DEFENDER = 0;
-    public static final int ATTACKER = 1;
+    public static enum LegionTags
+    {
+        DEFENDER, ATTACKER
+    }
 
-    // Constants for hexside gates.
-    // TODO probably an enum
-    public static final int NONE = 0;
-    public static final int BLOCK = 1;
-    public static final int ARCH = 2;
-    public static final int ARROW = 3;
-    public static final int ARROWS = 4;
+    public static enum HexsideGates
+    {
+        NONE, BLOCK, ARCH, ARROW, ARROWS
+    }
 
     public static final int ARCHES_AND_ARROWS = -1;
     public static final int ARROWS_ONLY = -2;
     public static final int NOWHERE = -1;
-
-    public static final Map<String, Integer> hexsideMap = new HashMap<String, Integer>();
-    static
-    {
-        hexsideMap.put("NONE", Integer.valueOf(NONE));
-        hexsideMap.put("BLOCK", Integer.valueOf(BLOCK));
-        hexsideMap.put("ARCH", Integer.valueOf(ARCH));
-        hexsideMap.put("ARROW", Integer.valueOf(ARROW));
-        hexsideMap.put("ARROWS", Integer.valueOf(ARROWS));
-    }
 
     // MasterBoard size
     public static final int MIN_HORIZ_SIZE = 15;

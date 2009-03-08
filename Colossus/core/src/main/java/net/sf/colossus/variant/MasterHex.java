@@ -3,6 +3,8 @@ package net.sf.colossus.variant;
 
 import java.awt.Color;
 
+import net.sf.colossus.server.Constants;
+
 
 /**
  * Class MasterHex describes one Masterboard hex, without GUI info.
@@ -16,17 +18,25 @@ public class MasterHex extends Hex
     private final MasterHex[] neighbors = new MasterHex[6];
 
     private int labelSide;
-    private final int[] exitType = new int[6];
-    private final int[] entranceType = new int[6];
+    private final Constants.HexsideGates[] exitType = new Constants.HexsideGates[] {
+        Constants.HexsideGates.NONE, Constants.HexsideGates.NONE,
+        Constants.HexsideGates.NONE, Constants.HexsideGates.NONE,
+        Constants.HexsideGates.NONE, Constants.HexsideGates.NONE };
+    private final Constants.HexsideGates[] entranceType = new Constants.HexsideGates[] {
+        Constants.HexsideGates.NONE, Constants.HexsideGates.NONE,
+        Constants.HexsideGates.NONE, Constants.HexsideGates.NONE,
+        Constants.HexsideGates.NONE, Constants.HexsideGates.NONE };
 
     /**
      * TODO these base exit types and labels are somehow used only during setup of the MasterBoard,
      * no real need to keep them around.
-     * 
+     *
      * It seems to be related to the fact that the master board hexes are really triangles and
      * stored as such in the XML files. Maybe they should not be hexes in the code either.
      */
-    private final int[] baseExitType = new int[3];
+    private final Constants.HexsideGates[] baseExitType = new Constants.HexsideGates[] {
+        Constants.HexsideGates.NONE, Constants.HexsideGates.NONE,
+        Constants.HexsideGates.NONE };
     private final String[] baseExitLabel = new String[3];
 
     private final MasterBoardTerrain terrain;
@@ -98,23 +108,24 @@ public class MasterHex extends Hex
         this.labelSide = labelSide;
     }
 
-    public int getExitType(int i)
+    public Constants.HexsideGates getExitType(int i)
     {
         return exitType[i];
     }
 
-    public void setExitType(int i, int exitType)
+    public void setExitType(int i, Constants.HexsideGates exitType)
     {
         this.exitType[i] = exitType;
     }
 
-    public int getBaseExitType(int i)
+    public Constants.HexsideGates getBaseExitType(int i)
     {
         return baseExitType[i];
     }
 
-    public void setBaseExitType(int i, int exitType)
+    public void setBaseExitType(int i, Constants.HexsideGates exitType)
     {
+        assert exitType != null;
         this.baseExitType[i] = exitType;
     }
 
@@ -128,13 +139,14 @@ public class MasterHex extends Hex
         this.baseExitLabel[i] = label;
     }
 
-    public int getEntranceType(int i)
+    public Constants.HexsideGates getEntranceType(int i)
     {
         return entranceType[i];
     }
 
-    public void setEntranceType(int i, int entranceType)
+    public void setEntranceType(int i, Constants.HexsideGates entranceType)
     {
+        assert entranceType != null;
         this.entranceType[i] = entranceType;
     }
 }

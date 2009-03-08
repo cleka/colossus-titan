@@ -50,11 +50,11 @@ public final class LegionServerSide extends Legion implements
 
     /**
      * Creates a new Legion instance.
-     * 
-     * Not that this class does not constraint the number of creatures. In a 
+     *
+     * Not that this class does not constraint the number of creatures. In a
      * normal Titan game it is between 0 and 8 creatures, but this class does
      * not enforce this.
-     * 
+     *
      * TODO the game parameter should be redundant since it should be the same
      *      as player.getGame()
      */
@@ -431,10 +431,10 @@ public final class LegionServerSide extends Legion implements
     }
 
     /*
-     * Can't use undoRecruit, because undoRecruit directly removes it, 
+     * Can't use undoRecruit, because undoRecruit directly removes it,
      * and the iterator in removeAllDead removes as well
      * Even if not so, undoRecruit removes the first it finds, not
-     * the one which was reinforced. 
+     * the one which was reinforced.
      */
     void undoReinforcement()
     {
@@ -635,8 +635,8 @@ public final class LegionServerSide extends Legion implements
         return null;
     }
 
-    /** 
-     * Sort critters into descending order of importance. 
+    /**
+     * Sort critters into descending order of importance.
      *
      * TODO maybe a SortedSet would be better instead of sorting every now and then
      */
@@ -764,10 +764,10 @@ public final class LegionServerSide extends Legion implements
         return lords;
     }
 
-    /** 
+    /**
      * Legions are sorted in descending order of total point value,
      * with the titan legion always coming first.
-     * 
+     *
      * TODO This is inconsistent with equals() which means the Comparable
      *      contract is not fulfilled. Probably better of in a Comparator
      *      in any case.

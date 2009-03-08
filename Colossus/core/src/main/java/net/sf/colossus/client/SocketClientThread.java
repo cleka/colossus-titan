@@ -21,6 +21,7 @@ import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.IServer;
+import net.sf.colossus.server.Constants.BattlePhase;
 import net.sf.colossus.util.ChildThreadManager;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.Split;
@@ -706,8 +707,7 @@ final class SocketClientThread extends Thread implements IServer
             String masterHexLabel = args.remove(0);
             int battleTurnNumber = Integer.parseInt(args.remove(0));
             String battleActivePlayerName = args.remove(0);
-            Constants.BattlePhase battlePhase = Constants.BattlePhase
-                .fromInt(Integer.parseInt(args.remove(0)));
+            Constants.BattlePhase battlePhase = BattlePhase.values()[Integer.parseInt(args.remove(0))];
             String attackerMarkerId = args.remove(0);
             String defenderMarkerId = args.remove(0);
             client.initBattle(resolveHex(masterHexLabel), battleTurnNumber,
@@ -792,8 +792,7 @@ final class SocketClientThread extends Thread implements IServer
         }
         else if (method.equals(Constants.setupBattleFight))
         {
-            Constants.BattlePhase battlePhase = Constants.BattlePhase
-                .fromInt(Integer.parseInt(args.remove(0)));
+            Constants.BattlePhase battlePhase = BattlePhase.values()[Integer.parseInt(args.remove(0))];
             String battleActivePlayerName = args.remove(0);
             client.setupBattleFight(battlePhase, client
                 .getPlayerInfo(battleActivePlayerName));

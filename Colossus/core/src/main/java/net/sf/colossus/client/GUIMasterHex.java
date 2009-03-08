@@ -180,7 +180,7 @@ public final class GUIMasterHex extends GUIHex<MasterHex>
             // hexside inside the hexside, and the outer edge is 1/12 of a
             // hexside outside the hexside.
 
-            if (model.getExitType(i) != Constants.NONE)
+            if (model.getExitType(i) != Constants.HexsideGates.NONE)
             {
                 drawGate(g2, xVertex[i], yVertex[i], xVertex[n], yVertex[n],
                     model.getExitType(i));
@@ -191,7 +191,7 @@ public final class GUIMasterHex extends GUIHex<MasterHex>
             // they sometimes get overdrawn.  So we need to draw them
             // again from the other hex, as entrances.
 
-            if (model.getEntranceType(i) != Constants.NONE)
+            if (model.getEntranceType(i) != Constants.HexsideGates.NONE)
             {
                 drawGate(g2, xVertex[n], yVertex[n], xVertex[i], yVertex[i],
                     model.getEntranceType(i));
@@ -300,7 +300,7 @@ public final class GUIMasterHex extends GUIHex<MasterHex>
     }
 
     private void drawGate(Graphics2D g2, double vx1, double vy1, double vx2,
-        double vy2, int gateType)
+        double vy2, Constants.HexsideGates gateType)
     {
         double x0; // first focus point
         double y0;
@@ -321,7 +321,7 @@ public final class GUIMasterHex extends GUIHex<MasterHex>
 
         switch (gateType)
         {
-            case Constants.BLOCK:
+            case BLOCK:
                 x[0] = x0 - len * Math.sin(theta);
                 y[0] = y0 + len * Math.cos(theta);
                 x[1] = x0 + len * Math.sin(theta);
@@ -339,7 +339,7 @@ public final class GUIMasterHex extends GUIHex<MasterHex>
                 g2.draw(polygon);
                 break;
 
-            case Constants.ARCH:
+            case ARCH:
                 x[0] = x0 - len * Math.sin(theta);
                 y[0] = y0 + len * Math.cos(theta);
                 x[1] = x0 + len * Math.sin(theta);
@@ -388,7 +388,7 @@ public final class GUIMasterHex extends GUIHex<MasterHex>
                 g2.draw(new Line2D.Double(x[2], y[2], x0, y0));
                 break;
 
-            case Constants.ARROW:
+            case ARROW:
                 x[0] = x0 - len * Math.sin(theta);
                 y[0] = y0 + len * Math.cos(theta);
                 x[1] = (x0 + x1) / 2 + len * Math.sin(theta);
@@ -404,7 +404,7 @@ public final class GUIMasterHex extends GUIHex<MasterHex>
                 g2.draw(polygon);
                 break;
 
-            case Constants.ARROWS:
+            case ARROWS:
                 for (int j = 0; j < 3; j++)
                 {
                     x0 = vx1 + (vx2 - vx1) * (2 + 3 * j) / 12;
@@ -428,9 +428,9 @@ public final class GUIMasterHex extends GUIHex<MasterHex>
                     g2.draw(polygon);
                 }
                 break;
-
-            default:
-                LOGGER.log(Level.SEVERE, "Bogus gate type");
+            case NONE:
+                LOGGER.log(Level.WARNING,
+                    "Drawing code called for gate type NONE");
         }
     }
 
