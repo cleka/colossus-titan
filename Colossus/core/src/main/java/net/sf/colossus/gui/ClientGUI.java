@@ -1854,6 +1854,14 @@ public class ClientGUI implements IClientGUI
             return;
         }
 
+        // If battle was resolved by negotiation, close remaining
+        // dialogs (also on the one which did NOT press Accept)
+        // as soon as possible, don't let them open until
+        // user presses "Done" in Resolve Engagements or picks next
+        // engagement. If it stays open and user picks something there,
+        // it would cause trouble.
+        cleanupNegotiationDialogs();
+
         if (eventViewer != null)
         {
             eventViewer.tellEngagementResults(winner, method, turns);
