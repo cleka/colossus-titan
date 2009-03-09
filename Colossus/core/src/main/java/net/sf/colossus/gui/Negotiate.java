@@ -42,9 +42,8 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
     private Proposal proposal;
     private Point location;
     private final SaveWindow saveWindow;
-    private Marker attackerMarker;
-    private Marker defenderMarker;
-
+    private final Marker attackerMarker;
+    private final Marker defenderMarker;
 
     Negotiate(Client client, Legion attacker, Legion defender)
     {
@@ -131,8 +130,8 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
     /*
      * If not all are dead yet, mark all as dead;
      * but if all are dead, unmark all 
-     */  
-    private void toggleAllDead(List <Chit> chits)
+     */
+    private void toggleAllDead(List<Chit> chits)
     {
         boolean allDead = true;
         for (Chit c : chits)
@@ -147,7 +146,7 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
             c.setDead(!allDead);
         }
     }
-    
+
     @Override
     public void mousePressed(MouseEvent e)
     {
@@ -160,7 +159,8 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
         {
             toggleAllDead(defenderChits);
         }
-        else if (attackerChits.contains(source) || defenderChits.contains(source))
+        else if (attackerChits.contains(source)
+            || defenderChits.contains(source))
         {
             Chit chit = (Chit)source;
             chit.toggleDead();
@@ -208,8 +208,8 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
             if (!attackersLeft && !defendersLeft)
             {
                 // Mutual destruction.
-                proposal = new Proposal(attacker.getMarkerId(), defender
-                    .getMarkerId(), false, true, null, null);
+                proposal = new Proposal(attacker, defender, false, true, null,
+                    null);
             }
             else
             {
@@ -258,9 +258,8 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
                         winnerLosses.add(name);
                     }
                 }
-                proposal = new Proposal(attacker.getMarkerId(), defender
-                    .getMarkerId(), false, false, winnerLegion.getMarkerId(),
-                    winnerLosses);
+                proposal = new Proposal(attacker, defender, false, false,
+                    winnerLegion, winnerLosses);
             }
 
             // Exit this dialog.
@@ -269,8 +268,8 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
 
         else if (e.getActionCommand().equals("Fight"))
         {
-            proposal = new Proposal(attacker.getMarkerId(), defender
-                .getMarkerId(), true, false, null, null);
+            proposal = new Proposal(attacker, defender, true, false, null,
+                null);
 
             // Exit this dialog.
             cleanup();

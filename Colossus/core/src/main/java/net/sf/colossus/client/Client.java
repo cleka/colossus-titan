@@ -294,6 +294,8 @@ public final class Client implements IClient, IOracle
 
         this.game = game;
 
+        ((GameClientSide)game).setClient(this);
+
         // TODO this is currently not set properly straight away, it is fixed in
         // updatePlayerInfo(..) when the PlayerInfos are initialized. Should really
         // happen here, but doesn't yet since we don't have all players (not even as
@@ -1552,8 +1554,9 @@ public final class Client implements IClient, IOracle
         if (options.getOption(Options.autoNegotiate))
         {
             // XXX AI players just fight for now.
-            Proposal proposal = new Proposal(attacker.getMarkerId(), defender
-                .getMarkerId(), true, false, null, null);
+            Proposal proposal = new Proposal(attacker, defender, true, false,
+                null, null);
+
             makeProposal(proposal);
         }
         else
@@ -3800,6 +3803,11 @@ public final class Client implements IClient, IOracle
     public Game getGame()
     {
         return game;
+    }
+
+    public GameClientSide getGameClientSide()
+    {
+        return (GameClientSide)game;
     }
 
     public Options getOptions()

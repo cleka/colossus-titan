@@ -25,8 +25,10 @@ import javax.swing.undo.UndoManager;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.IOptions;
+import net.sf.colossus.client.IOracle;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.client.Proposal;
+import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.server.Constants;
@@ -99,7 +101,12 @@ public class ClientGUI implements IClientGUI
 
     private String gameOverMessage;
 
-    private final Client client;
+    protected final Client client;
+
+    // for things other GUI components need to inquire,
+    // use the Oracle (on the long run, I guess there will be the
+    // GameClientSide class behind it...)
+    protected final IOracle oracle;
 
     // Per-client and per-player options.
     private final Options options;
@@ -107,6 +114,7 @@ public class ClientGUI implements IClientGUI
     public ClientGUI(Client client, Options options)
     {
         this.client = client;
+        this.oracle = client;
         this.options = options;
     }
 
@@ -178,6 +186,26 @@ public class ClientGUI implements IClientGUI
     public MasterBoard getBoard()
     {
         return board;
+    }
+
+    public Client getClient()
+    {
+        return client;
+    }
+
+    private Player getOwningPlayer()
+    {
+        return client.getOwningPlayer();
+    }
+
+    public Game getGame()
+    {
+        return client.getGame();
+    }
+
+    public IOptions getOptions()
+    {
+        return options;
     }
 
     private boolean isReplayOngoing()
@@ -498,7 +526,7 @@ public class ClientGUI implements IClientGUI
             });
         connectionCheckTimer.start();
 
-        LOGGER.info("Client for player " + client.getOwningPlayer().getName()
+        LOGGER.info("Client for player " + getOwningPlayer().getName()
             + " checking server connection (sending request)");
 
         client.doCheckServerConnection();
@@ -509,7 +537,7 @@ public class ClientGUI implements IClientGUI
      */
     public synchronized void serverConfirmsConnection()
     {
-        LOGGER.info("Client for player " + client.getOwningPlayer().getName()
+        LOGGER.info("Client for player " + getOwningPlayer().getName()
             + " received confirmation that connection is OK.");
         finishServerConnectionCheck(true);
     }
@@ -2190,12 +2218,15 @@ public class ClientGUI implements IClientGUI
      */
     public void tellProposal(String proposalString)
     {
-        Proposal proposal = Proposal.makeFromString(proposalString);
+        Proposal proposal = Proposal.makeFromString(proposalString, client
+            .getGameClientSide());
         if (replyToProposal != null)
         {
             replyToProposal.dispose();
         }
-        replyToProposal = new ReplyToProposal(client, proposal);
+        replyToProposal = new ReplyToProposal(board.getFrame(), this,
+            getOwningPlayer().getName(), client, options, oracle, proposal);
+
     }
 
     /* (non-Javadoc)
@@ -2256,7 +2287,7 @@ public class ClientGUI implements IClientGUI
                 focusBoard();
                 defaultCursor();
                 if (!options.getOption(Options.autoSplit)
-                    && (client.getOwningPlayer().getMarkersAvailable().size() < 1 || client
+                    && (getOwningPlayer().getMarkersAvailable().size() < 1 || client
                         .findTallLegionHexes(4).isEmpty()))
                 {
                     client.doneWithSplits();
@@ -2884,7 +2915,7 @@ public class ClientGUI implements IClientGUI
         // should log them.
         if (options.getOption(Options.autoPlay))
         {
-            boolean isAI = client.getOwningPlayer().isAI();
+            boolean isAI = getOwningPlayer().isAI();
             if ((message.equals("Draw") || message.endsWith(" wins")) && !isAI
                 && !options.getOption(Options.autoQuit))
             {
@@ -2940,4 +2971,9 @@ public class ClientGUI implements IClientGUI
         }
     }
 
+    // From other GUI components:
+    void negotiateCallback(Proposal proposal, boolean respawn)
+    {
+        getClient().negotiateCallback(proposal, respawn);
+    }
 }

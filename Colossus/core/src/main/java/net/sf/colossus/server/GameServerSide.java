@@ -945,8 +945,7 @@ public final class GameServerSide extends Game
      * Advance to the next phase, only if the passed oldPhase and playerName
      * are current.
      */
-    void advancePhase(final Constants.Phase oldPhase,
-        final Player player)
+    void advancePhase(final Constants.Phase oldPhase, final Player player)
     {
         if (oldPhase != phase)
         {
@@ -1365,9 +1364,8 @@ public final class GameServerSide extends Game
                 bat.setAttribute("turnNumber", "" + battle.getTurnNumber());
                 bat.setAttribute("activePlayer", ""
                     + battle.getActivePlayer().getName());
-                bat
-                    .setAttribute("phase", ""
-                        + battle.getBattlePhase().ordinal());
+                bat.setAttribute("phase", ""
+                    + battle.getBattlePhase().ordinal());
                 bat.setAttribute("summonState", "" + battle.getSummonState());
                 bat.setAttribute("carryDamage", "" + battle.getCarryDamage());
                 bat.setAttribute("driftDamageApplied", ""
@@ -1517,8 +1515,8 @@ public final class GameServerSide extends Game
             }
             else
             {
-                LOGGER.severe("Cannot load saved game: file "
-                    + file.getPath() + " does not exist!");
+                LOGGER.severe("Cannot load saved game: file " + file.getPath()
+                    + " does not exist!");
                 return;
             }
         }
@@ -1580,8 +1578,8 @@ public final class GameServerSide extends Game
 
             // we're server, but the file generation process has been done
             // by loading the savefile.
-            VariantSupport.loadVariant(varName, fil.getValue(), dir.getValue(),
-                false);
+            VariantSupport.loadVariant(varName, fil.getValue(),
+                dir.getValue(), false);
             // old save games (before r3360, 09/2008) do not save the
             // variant name - retrieve it back from VariantSupport.
             // TODO remove this one day?
@@ -1704,7 +1702,8 @@ public final class GameServerSide extends Game
                     .getIntValue();
                 String battleActivePlayerName = bat.getAttribute(
                     "activePlayer").getValue();
-                Constants.BattlePhase battlePhase = BattlePhase.values()[bat.getAttribute("phase").getIntValue()];
+                Constants.BattlePhase battlePhase = BattlePhase.values()[bat
+                    .getAttribute("phase").getIntValue()];
                 Constants.AngelSummoningStates summonState = Constants.AngelSummoningStates
                     .values()[bat.getAttribute("summonState").getIntValue()];
                 int carryDamage = bat.getAttribute("carryDamage")
@@ -2184,8 +2183,8 @@ public final class GameServerSide extends Game
      *
      *  TODO use proper data structure instead of String serializations
      */
-    private Set<String> findNormalMoves(MasterHex hex,
-        Legion legion, int roll, int block, int cameFrom, boolean ignoreFriends)
+    private Set<String> findNormalMoves(MasterHex hex, Legion legion,
+        int roll, int block, int cameFrom, boolean ignoreFriends)
     {
         Set<String> set = new HashSet<String>();
         Player player = legion.getPlayer();
@@ -2648,8 +2647,8 @@ public final class GameServerSide extends Game
         return battle;
     }
 
-    void finishBattle(MasterHex masterHex,
-        boolean attackerEntered, int points, int turnDone)
+    void finishBattle(MasterHex masterHex, boolean attackerEntered,
+        int points, int turnDone)
     {
         battle.cleanRefs();
         battle = null;
@@ -3041,7 +3040,7 @@ public final class GameServerSide extends Game
             return;
         }
 
-        Proposal proposal = Proposal.makeFromString(proposalString);
+        Proposal proposal = Proposal.makeFromString(proposalString, this);
         final Set<Proposal> ourProposals;
         final Set<Proposal> opponentProposals;
 
@@ -3059,7 +3058,7 @@ public final class GameServerSide extends Game
         // If this player wants to fight, cancel negotiations.
         if (proposal.isFight())
         {
-            Legion attacker = getLegionByMarkerId(proposal.getAttackerId());
+            Legion attacker = proposal.getAttacker();
             fight(attacker.getCurrentHex());
         }
 
@@ -3077,7 +3076,7 @@ public final class GameServerSide extends Game
             Player other = null;
             if (playerName.equals(getActivePlayer().getName()))
             {
-                Legion defender = getLegionByMarkerId(proposal.getDefenderId());
+                Legion defender = proposal.getDefender();
 
                 other = defender.getPlayer();
             }
@@ -3106,6 +3105,9 @@ public final class GameServerSide extends Game
                 return;
             }
 
+            System.out.println("fight: attacker " + attacker);
+            System.out.println("fight: defender " + defender);
+
             battleInProgress = true;
 
             // Reveal both legions to all players.
@@ -3121,8 +3123,7 @@ public final class GameServerSide extends Game
         }
     }
 
-    private void handleConcession(Legion loser, Legion winner,
-        boolean fled)
+    private void handleConcession(Legion loser, Legion winner, boolean fled)
     {
         // Figure how many points the victor receives.
         int points = ((LegionServerSide)loser).getPointValue();
@@ -3183,8 +3184,8 @@ public final class GameServerSide extends Game
 
     private void handleNegotiation(Proposal results)
     {
-        Legion attacker = getLegionByMarkerId(results.getAttackerId());
-        Legion defender = getLegionByMarkerId(results.getDefenderId());
+        Legion attacker = results.getAttacker();
+        Legion defender = results.getDefender();
         Legion winner = null;
         int points = 0;
 
@@ -3228,7 +3229,7 @@ public final class GameServerSide extends Game
         else
         {
             // One legion was eliminated during negotiations.
-            winner = getLegionByMarkerId(results.getWinnerId());
+            winner = results.getWinner();
             Legion loser;
             if (winner == defender)
             {
@@ -3371,8 +3372,8 @@ public final class GameServerSide extends Game
         }
         else
         {
-            result = "winner is " + winner.getMarkerId()
-                + " (player " + winner.getPlayer().getName() + ")";
+            result = "winner is " + winner.getMarkerId() + " (player "
+                + winner.getPlayer().getName() + ")";
         }
         LOGGER.info("Battle completed, result: " + result);
 
@@ -3406,7 +3407,8 @@ public final class GameServerSide extends Game
                 announceGameOver(true);
                 Start.setCurrentWhatToDoNext(Start.QuitAll);
                 Start.triggerTimedQuit();
-                LOGGER.info("Reached Game Over, AutoQuit - trigger Game Dispose");
+                LOGGER
+                    .info("Reached Game Over, AutoQuit - trigger Game Dispose");
                 server.triggerDispose();
             }
             else
@@ -3451,7 +3453,8 @@ public final class GameServerSide extends Game
         return list;
     }
 
-    LegionServerSide getLegionByMarkerId(String markerId)
+    @Override
+    public LegionServerSide getLegionByMarkerId(String markerId)
     {
         for (PlayerServerSide player : players)
         {
@@ -3587,8 +3590,7 @@ public final class GameServerSide extends Game
         return count;
     }
 
-    Legion getFirstFriendlyLegion(MasterHex masterHex,
-        Player player)
+    Legion getFirstFriendlyLegion(MasterHex masterHex, Player player)
     {
         for (Legion legion : player.getLegions())
         {
@@ -3600,8 +3602,8 @@ public final class GameServerSide extends Game
         return null;
     }
 
-    List<LegionServerSide> getFriendlyLegions(
-        MasterHex masterHex, PlayerServerSide player)
+    List<LegionServerSide> getFriendlyLegions(MasterHex masterHex,
+        PlayerServerSide player)
     {
         List<LegionServerSide> newLegions = new ArrayList<LegionServerSide>();
         List<LegionServerSide> legions = player.getLegions();

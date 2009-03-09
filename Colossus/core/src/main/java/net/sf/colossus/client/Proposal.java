@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import net.sf.colossus.game.Game;
+import net.sf.colossus.game.Legion;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.Split;
 
@@ -17,23 +19,23 @@ import net.sf.colossus.util.Split;
 
 public final class Proposal
 {
-    private String attackerId;
-    private String defenderId;
-    private boolean fight;
-    private boolean mutual;
-    private String winnerId;
-    private List<String> winnerLosses;
+    private final Legion attacker;
+    private final Legion defender;
+    private final boolean fight;
+    private final boolean mutual;
+    private final Legion winner;
+    private final List<String> winnerLosses;
 
     private static final String sep = Glob.sep;
 
-    public Proposal(String attackerId, String defenderId, boolean fight,
-        boolean mutual, String winnerId, List<String> winnerLosses)
+    public Proposal(Legion attacker, Legion defender, boolean fight,
+        boolean mutual, Legion winner, List<String> winnerLosses)
     {
-        this.attackerId = attackerId;
-        this.defenderId = defenderId;
+        this.attacker = attacker;
+        this.defender = defender;
         this.fight = fight;
         this.mutual = mutual;
-        this.winnerId = winnerId;
+        this.winner = winner;
         this.winnerLosses = winnerLosses;
         if (winnerLosses != null)
         {
@@ -41,14 +43,35 @@ public final class Proposal
         }
     }
 
-    public String getAttackerId()
+    public Legion getAttacker()
     {
-        return attackerId;
+        return attacker;
     }
 
-    public String getDefenderId()
+    public Legion getDefender()
     {
-        return defenderId;
+        return defender;
+    }
+
+    public Legion getWinner()
+    {
+        return winner;
+    }
+
+    // Mostly needed for toString()
+    private String getAttackerId()
+    {
+        return attacker == null ? null : attacker.getMarkerId();
+    }
+
+    private String getDefenderId()
+    {
+        return defender == null ? null : defender.getMarkerId();
+    }
+
+    private String getWinnerId()
+    {
+        return winner == null ? null : winner.getMarkerId();
     }
 
     public boolean isFight()
@@ -59,11 +82,6 @@ public final class Proposal
     public boolean isMutual()
     {
         return mutual;
-    }
-
-    public String getWinnerId()
-    {
-        return winnerId;
     }
 
     public List<String> getWinnerLosses()
@@ -98,7 +116,8 @@ public final class Proposal
             return false;
         }
 
-        if (!winnerId.equals(otherProposal.getWinnerId()))
+        // TODO can we compare legions directly?
+        if (!winner.equals(otherProposal.getWinner()))
         {
             return false;
         }
@@ -120,7 +139,7 @@ public final class Proposal
         {
             return 2;
         }
-        return winnerId.hashCode() + winnerLosses.hashCode();
+        return getWinnerId().hashCode() + winnerLosses.hashCode();
     }
 
     @Override
@@ -131,11 +150,11 @@ public final class Proposal
         sb.append(sep);
         sb.append(mutual);
         sb.append(sep);
-        sb.append(attackerId);
+        sb.append(getAttackerId());
         sb.append(sep);
-        sb.append(defenderId);
+        sb.append(getDefenderId());
         sb.append(sep);
-        sb.append(winnerId);
+        sb.append(getWinnerId());
         sb.append(sep);
         if (winnerLosses != null)
         {
@@ -155,7 +174,7 @@ public final class Proposal
     }
 
     /** Create a Proposal from a {sep}-separated list of fields. */
-    public static Proposal makeFromString(String s)
+    public static Proposal makeFromString(String s, Game game)
     {
         List<String> li = Split.split(sep, s);
 
@@ -163,10 +182,13 @@ public final class Proposal
         boolean mutual = Boolean.valueOf(li.remove(0)).booleanValue();
         String attackerId = li.remove(0);
         String defenderId = li.remove(0);
+        Legion attacker = game.getLegionByMarkerId(attackerId);
+        Legion defender = game.getLegionByMarkerId(defenderId);
         String winnerId = li.remove(0);
+        Legion winner = game.getLegionByMarkerId(winnerId);
         List<String> winnerLosses = li;
 
-        return new Proposal(attackerId, defenderId, fight, mutual, winnerId,
+        return new Proposal(attacker, defender, fight, mutual, winner,
             winnerLosses);
     }
 }

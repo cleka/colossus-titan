@@ -64,8 +64,7 @@ public final class BattleServerSide extends Battle
 
     BattleServerSide(GameServerSide game, Legion attacker, Legion defender,
         Constants.LegionTags activeLegionTag, MasterHex masterHex,
-        int turnNumber,
-        Constants.BattlePhase phase)
+        int turnNumber, Constants.BattlePhase phase)
     {
         super(game, attacker, defender, null);
         server = game.getServer();
@@ -73,6 +72,9 @@ public final class BattleServerSide extends Battle
         this.activeLegionTag = activeLegionTag;
         this.turnNumber = turnNumber;
         this.phase = phase;
+
+        System.out.println("BSS: attacker " + attacker);
+        System.out.println("BSS: defender " + defender);
 
         // Set defender's entry side opposite attacker's.
         int side = attacker.getEntrySide();
@@ -794,7 +796,7 @@ public final class BattleServerSide extends Battle
         Legion legion = critter.getLegion();
         LegionServerSide donor = null;
 
-        PlayerServerSide player = (PlayerServerSide) legion.getPlayer();
+        PlayerServerSide player = (PlayerServerSide)legion.getPlayer();
 
         // After turn 1, offboard creatures are returned to the
         // stacks or the legion they were summoned from, with
@@ -1046,7 +1048,8 @@ public final class BattleServerSide extends Battle
                 if (!target.isDead())
                 {
                     BattleHex targetHex = target.getCurrentHex();
-                    if (isRangestrikePossible(critter, target,currentHex, targetHex))
+                    if (isRangestrikePossible(critter, target, currentHex,
+                        targetHex))
                     {
                         set.add(targetHex.getLabel());
                     }
@@ -1200,8 +1203,9 @@ public final class BattleServerSide extends Battle
         double xDist = x2 - x1;
         double yDist = y2 - y1;
 
-        if (CompareDoubles.almostEqual(yDist, 0.0) || CompareDoubles
-            .almostEqual(Math.abs(yDist), 1.5 * Math.abs(xDist)))
+        if (CompareDoubles.almostEqual(yDist, 0.0)
+            || CompareDoubles.almostEqual(Math.abs(yDist), 1.5 * Math
+                .abs(xDist)))
         {
             int strikeElevation = Math.min(hex1.getElevation(), hex2
                 .getElevation());

@@ -4,6 +4,7 @@ package net.sf.colossus.game;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.variant.MasterBoardTerrain;
@@ -19,6 +20,8 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  */
 public class Game
 {
+    private static final Logger LOGGER = Logger
+        .getLogger(Game.class.getName());
     /**
      * The variant played in this game.
      */
@@ -94,4 +97,14 @@ public class Game
     {
         return caretaker;
     }
+
+    // For making Proposals needed both client and server side
+    public Legion getLegionByMarkerId(String markerId)
+    {
+        LOGGER.severe("getLegionByMarkerId called for markerId " + markerId
+            + "in the non-overriden method of game.Game class!!");
+        Thread.dumpStack();
+        return null;
+    }
+
 }

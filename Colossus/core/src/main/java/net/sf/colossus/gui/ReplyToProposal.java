@@ -13,11 +13,15 @@ import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import net.sf.colossus.client.Client;
+import net.sf.colossus.client.IOracle;
 import net.sf.colossus.client.Proposal;
+import net.sf.colossus.game.Legion;
 import net.sf.colossus.util.KDialog;
+import net.sf.colossus.util.Options;
 
 
 /**
@@ -28,27 +32,27 @@ import net.sf.colossus.util.KDialog;
 
 final class ReplyToProposal extends KDialog implements ActionListener
 {
-    private final String attackerId;
-    private final String defenderId;
+    private final Legion attacker;
+    private final Legion defender;
     private final List<Chit> attackerChits = new ArrayList<Chit>();
     private final List<Chit> defenderChits = new ArrayList<Chit>();
     private final Marker attackerMarker;
     private final Marker defenderMarker;
-    private final Client client;
+    private final ClientGUI gui;
     private Proposal proposal;
     private Point location;
     private final SaveWindow saveWindow;
 
-    ReplyToProposal(Client client, Proposal proposal)
+    ReplyToProposal(JFrame parentframe, ClientGUI gui, String playerName,
+        Client client, Options options, IOracle oracle, Proposal proposal)
     {
-        super(client.getBoard().getFrame(), client.getOwningPlayer().getName()
-            + ": Reply to Proposal", false);
+        super(parentframe, playerName + ": Reply to Proposal", false);
 
-        this.client = client;
         this.proposal = proposal;
+        this.gui = gui;
 
-        attackerId = proposal.getAttackerId();
-        defenderId = proposal.getDefenderId();
+        attacker = proposal.getAttacker();
+        defender = proposal.getDefender();
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
@@ -60,11 +64,10 @@ final class ReplyToProposal extends KDialog implements ActionListener
         JPanel attackerPane = new JPanel();
         contentPane.add(attackerPane);
 
-        attackerMarker = new Marker(scale, attackerId, client);
+        attackerMarker = new Marker(scale, attacker.getMarkerId(), client);
         attackerPane.add(attackerMarker);
 
-        List<String> attackerImageNames = client.getLegionImageNames(client
-            .getLegion(attackerId));
+        List<String> attackerImageNames = oracle.getLegionImageNames(attacker);
         Iterator<String> it = attackerImageNames.iterator();
         while (it.hasNext())
         {
@@ -77,11 +80,10 @@ final class ReplyToProposal extends KDialog implements ActionListener
         JPanel defenderPane = new JPanel();
         contentPane.add(defenderPane);
 
-        defenderMarker = new Marker(scale, defenderId, client);
+        defenderMarker = new Marker(scale, defender.getMarkerId(), client);
         defenderPane.add(defenderMarker);
 
-        List<String> defenderImageNames = client.getLegionImageNames(client
-            .getLegion(defenderId));
+        List<String> defenderImageNames = oracle.getLegionImageNames(defender);
         it = defenderImageNames.iterator();
         while (it.hasNext())
         {
@@ -93,18 +95,18 @@ final class ReplyToProposal extends KDialog implements ActionListener
 
         if (proposal.isMutual())
         {
-            markAllDead(attackerId);
-            markAllDead(defenderId);
+            markAllDead(attacker);
+            markAllDead(defender);
         }
-        else if (attackerId.equals(proposal.getWinnerId()))
+        else if (attacker.equals(proposal.getWinner()))
         {
-            markAllDead(defenderId);
-            markSomeDead(attackerId, proposal.getWinnerLosses());
+            markAllDead(defender);
+            markSomeDead(attacker, proposal.getWinnerLosses());
         }
-        else if (defenderId.equals(proposal.getWinnerId()))
+        else if (defender.equals(proposal.getWinner()))
         {
-            markAllDead(attackerId);
-            markSomeDead(defenderId, proposal.getWinnerLosses());
+            markAllDead(attacker);
+            markSomeDead(defender, proposal.getWinnerLosses());
         }
 
         JPanel buttonPane = new JPanel();
@@ -124,7 +126,7 @@ final class ReplyToProposal extends KDialog implements ActionListener
 
         pack();
 
-        saveWindow = new SaveWindow(client.getOptions(), "ReplyToProposal");
+        saveWindow = new SaveWindow(options, "ReplyToProposal");
 
         location = saveWindow.loadLocation();
         if (location == null)
@@ -140,10 +142,10 @@ final class ReplyToProposal extends KDialog implements ActionListener
         repaint();
     }
 
-    private void markAllDead(String markerId)
+    private void markAllDead(Legion legion)
     {
         Iterator<Chit> it = null;
-        if (markerId.equals(attackerId))
+        if (legion.equals(attacker))
         {
             it = attackerChits.iterator();
         }
@@ -158,13 +160,13 @@ final class ReplyToProposal extends KDialog implements ActionListener
         }
     }
 
-    private void markSomeDead(String markerId, List<String> losses)
+    private void markSomeDead(Legion legion, List<String> losses)
     {
         // Don't mess with the original list.
         List<String> creatures = new ArrayList<String>(losses);
 
         Iterator<Chit> it = null;
-        if (markerId.equals(attackerId))
+        if (legion.equals(attacker))
         {
             it = attackerChits.iterator();
         }
@@ -195,7 +197,13 @@ final class ReplyToProposal extends KDialog implements ActionListener
         location = getLocation();
         saveWindow.saveLocation(location);
         dispose();
-        client.negotiateCallback(proposal, false);
+        // Accept or Fight, the Negotiate dialog in which one could make
+        // further proposals is not needed any more
+        if (proposal != null)
+        {
+            gui.cleanupNegotiationDialogs();
+        }
+        gui.negotiateCallback(proposal, false);
     }
 
     public void actionPerformed(ActionEvent e)
@@ -214,7 +222,7 @@ final class ReplyToProposal extends KDialog implements ActionListener
 
         else if (e.getActionCommand().equals("Fight"))
         {
-            proposal = new Proposal(attackerId, defenderId, true, false, null,
+            proposal = new Proposal(attacker, defender, true, false, null,
                 null);
 
             // Exit this dialog.

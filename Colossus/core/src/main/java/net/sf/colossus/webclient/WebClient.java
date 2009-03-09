@@ -54,7 +54,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import net.sf.colossus.client.Client;
-import net.sf.colossus.game.Game;
+import net.sf.colossus.client.GameClientSide;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Start;
 import net.sf.colossus.util.KFrame;
@@ -2004,7 +2004,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
             // a hack to pass something into the Client constructor
             // TODO needs to be constructed properly
-            Game dummyGame = new Game(null, new String[0]);
+            GameClientSide dummyGame = new GameClientSide(null, new String[0]);
             boolean noOptionsFile = false;
             gc = new Client(hostname, p, dummyGame, username, null, true,
                 noOptionsFile, false);
