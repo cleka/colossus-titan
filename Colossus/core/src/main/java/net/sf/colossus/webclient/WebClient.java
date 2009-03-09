@@ -1,5 +1,6 @@
 package net.sf.colossus.webclient;
 
+
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -86,7 +87,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
     final static String TYPE_SCHEDULED = "scheduled";
     final static String TYPE_INSTANTLY = "instantly";
-    
+
     private String hostname;
     private int port;
     private String login;
@@ -117,7 +118,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     private int state = NotLoggedIn;
     private String enrolledGameId = null;
     private boolean scheduledGamesMode;
-    
+
     private int usersLoggedIn = 0;
     private int usersEnrolled = 0;
     private int usersPlaying = 0;
@@ -179,7 +180,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     private JTextField atTimeField;
     private JTextField durationField;
     private JTextField summaryText;
-    
+
     private JButton proposeButton;
     private JButton cancelButton;
     private JButton enrollButton;
@@ -201,22 +202,22 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     final static String waitingText = "Client connected successfully, waiting for all other players. Please wait...";
     final static String enrolledText = "While enrolled, you can't propose or enroll to other games.";
     final static String playingText = "While playing, you can't propose or enroll to other games.";
-    
+
     private ChatHandler generalChat;
 
     private final ArrayList<GameInfo> gamesUpdates = new ArrayList<GameInfo>();
 
-    private HashMap<String, GameInfo> gameHash = new HashMap<String, GameInfo>();
+    private final HashMap<String, GameInfo> gameHash = new HashMap<String, GameInfo>();
 
     private JPanel gamesTablesPanel;
-    private JPanel gamesCards; 
+    private JPanel gamesCards;
     private JPanel schedGamesCard;
     private JPanel instGamesCard;
-    
+
     // scheduled games
     private JTable schedGameTable;
     private GameTableModel schedGameDataModel;
-    
+
     // instant games (can start as soon as enough players have joined):
     private JTable instGameTable;
     private GameTableModel instGameDataModel;
@@ -258,7 +259,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
     private final static String defaultSummaryText = "Type here a short "
         + "summary what kind of game you would wish to play";
-    
+
     public WebClient(String hostname, int port, String login, String password)
     {
         super(windowTitle);
@@ -412,8 +413,9 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         atDateField.setEnabled(scheduled);
         atTimeField.setEnabled(scheduled);
         durationField.setEnabled(scheduled);
-        
-        if (instGamesCard == null || schedGamesCard == null || gamesCards == null)
+
+        if (instGamesCard == null || schedGamesCard == null
+            || gamesCards == null)
         {
             return;
         }
@@ -468,13 +470,13 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         // Now the different tabs of the tabbed pane:
         createServerTab();
         tabbedPane.addTab("Server", serverTab);
-       
+
         createCreateGamesTab();
         tabbedPane.addTab("Create or Join", createGamesTab);
-                        
+
         createRunningGamesTab();
         tabbedPane.addTab("Running Games", runningGamesTab);
-        
+
         generalChat = new ChatHandler(IWebServer.generalChatName, "Chat",
             server, username);
         tabbedPane.addTab(generalChat.getTitle(), generalChat.getTab());
@@ -496,7 +498,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
         // TODO read from preferences?
         // setScheduledGamesMode(getScheduledGamesMode());
-        
+
         // now finish all 
         pack();
 
@@ -618,7 +620,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     private void createServerTab()
     {
         serverTab = new Box(BoxLayout.Y_AXIS);
-        
+
         Box connectionPane = new Box(BoxLayout.X_AXIS);
 
         JPanel loginPane = new JPanel(new GridLayout(0, 2));
@@ -697,7 +699,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     {
         // use same word for cmd as the text on it:
         String cmd = text;
-        
+
         JRadioButton rb = new JRadioButton(text);
         if (cmd != null && !cmd.equals(""))
         {
@@ -717,7 +719,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         // l.setAlignmentX(Box.RIGHT_ALIGNMENT);
         return l;
     }
-    
+
     private Box makeTextBox(Component c)
     {
         Box labelBox = new Box(BoxLayout.X_AXIS);
@@ -729,17 +731,17 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     private void createCreateGamesTab()
     {
         createGamesTab = new Box(BoxLayout.Y_AXIS);
-                
+
         createPreferencesPane();
         createGamesTab.add(preferencesPane);
-        
+
         Box proposeGamePane = new Box(BoxLayout.Y_AXIS);
         proposeGamePane.setAlignmentX(Box.CENTER_ALIGNMENT);
         proposeGamePane.setBorder(new TitledBorder("Creating games:"));
-        
-        proposeGamePane.add(makeTextBox(
-            nonBoldLabel("Set your preferences, fill in "
-            + "the 'Summary' text, then press 'Propose' to create a game:")));
+
+        proposeGamePane
+            .add(makeTextBox(nonBoldLabel("Set your preferences, fill in "
+                + "the 'Summary' text, then press 'Propose' to create a game:")));
 
         proposeGamePane.add(Box.createRigidArea(new Dimension(0, 20)));
         proposeGamePane.add(makeTextBox(new JLabel("Summary: ")));
@@ -757,31 +759,32 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         // The panel with all GUI stuff needed to schedule a game:
         Box schedulingPanel = new Box(BoxLayout.Y_AXIS);
         schedulingPanel.setAlignmentY(Box.TOP_ALIGNMENT);
-        schedulingPanel.add(makeTextBox(nonBoldLabel(
-            "Give a start date and time (dd.mm.yyyy and hh:mm) "
-            + "and a minimum duration in minutes:")));
-        
+        schedulingPanel
+            .add(makeTextBox(nonBoldLabel("Give a start date and time (dd.mm.yyyy and hh:mm) "
+                + "and a minimum duration in minutes:")));
+
         // The panel for the actual schedule: date, time and duration fields
         Box schedulePanel = new Box(BoxLayout.X_AXIS);
         schedulePanel.add(new JLabel("Start at: "));
-        
+
         atDateField = new JTextField("27.11.2008");
         schedulePanel.add(atDateField);
-        
+
         atTimeField = new JTextField("10:00");
         schedulePanel.add(atTimeField);
-                   
+
         schedulePanel.add(new JLabel(" Duration: "));
         durationField = new JTextField("90");
         schedulePanel.add(durationField);
         schedulePanel.setAlignmentY(Box.TOP_ALIGNMENT);
-        
+
         schedulingPanel.add(schedulePanel);
-        schedulingPanel.add(makeTextBox(nonBoldLabel(
-            "(the purpose of the duration value is: ")));
-        schedulingPanel.add(makeTextBox(nonBoldLabel(
-            " one should only enroll to that game if one "
-            + "knows that one " + " will be available for at least that time)")));
+        schedulingPanel
+            .add(makeTextBox(nonBoldLabel("(the purpose of the duration value is: ")));
+        schedulingPanel
+            .add(makeTextBox(nonBoldLabel(" one should only enroll to that game if one "
+                + "knows that one "
+                + " will be available for at least that time)")));
         schedulingPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
         proposeGamePane.add(schedulingPanel);
@@ -798,15 +801,17 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         cancelButton.addActionListener(this);
         cancelButton.setEnabled(false);
         pcButtonPane.add(cancelButton);
-        
+
         createGamesTab.add(proposeGamePane);
-              
+
         // Panel for the enroll + unenroll buttons:
         Box joinGamePane = new Box(BoxLayout.Y_AXIS);
-        joinGamePane.setBorder(new TitledBorder("Joining games someone else has proposed:"));
-        joinGamePane.add(makeTextBox(nonBoldLabel("Select a game from the table below, "
-            + "and then click enroll to register for that game.")));
-        
+        joinGamePane.setBorder(new TitledBorder(
+            "Joining games someone else has proposed:"));
+        joinGamePane
+            .add(makeTextBox(nonBoldLabel("Select a game from the table below, "
+                + "and then click enroll to register for that game.")));
+
         JPanel euButtonPane = new JPanel(new GridLayout(0, 3));
         euButtonPane.add(new JLabel(""));
         enrollButton = new JButton(EnrollButtonText);
@@ -819,7 +824,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         unenrollButton.setEnabled(false);
         euButtonPane.add(unenrollButton);
         joinGamePane.add(euButtonPane);
-        
+
         createGamesTab.add(joinGamePane);
 
         gamesTablesPanel = new JPanel(new BorderLayout());
@@ -831,18 +836,19 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         startButton = new JButton(StartButtonText);
         startButton.addActionListener(this);
         startButton.setEnabled(false);
-        
+
         Box startButtonPane = new Box(BoxLayout.X_AXIS);
         startButtonPane.add(startButton);
         startButtonPane.add(Box.createHorizontalGlue());
 
         gamesCards = new JPanel(new CardLayout());
         gamesTablesPanel.add(gamesCards, BorderLayout.CENTER);
-        
+
         // Panel/Table for upcoming instant games:
         instGamesCard = new JPanel(new BorderLayout());
         instGamesCard.setBorder(new TitledBorder("Proposed Games"));
-        instGamesCard.add(nonBoldLabel("The following games are accepting players:"),
+        instGamesCard.add(
+            nonBoldLabel("The following games are accepting players:"),
             BorderLayout.NORTH);
 
         instGameDataModel = new GameTableModel(myLocale);
@@ -857,15 +863,16 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
                     updateGUI();
                 }
             });
-        
+
         instGameTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane instScrollpane = new JScrollPane(instGameTable);
         instGamesCard.add(instScrollpane, BorderLayout.CENTER);
-        
+
         // Table for scheduled games:
         schedGamesCard = new JPanel(new BorderLayout());
         schedGamesCard.setBorder(new TitledBorder("Scheduled Games"));
-        schedGamesCard.add(nonBoldLabel("The following are already scheduled:"),
+        schedGamesCard.add(
+            nonBoldLabel("The following are already scheduled:"),
             BorderLayout.NORTH);
 
         schedGameDataModel = new GameTableModel(myLocale);
@@ -884,17 +891,17 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         schedGameTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane schedScrollpane = new JScrollPane(schedGameTable);
         schedGamesCard.add(schedScrollpane, BorderLayout.CENTER);
-        
+
         JPanel dummyCard = new JPanel(new BorderLayout());
         dummyCard.add(Box.createRigidArea(new Dimension(0, 50)));
-        
+
         gamesCards.add(instGamesCard, TYPE_INSTANTLY);
         gamesCards.add(schedGamesCard, TYPE_SCHEDULED);
         gamesCards.add(dummyCard, "dummy");
-        
+
         CardLayout cl = (CardLayout)gamesCards.getLayout();
         cl.show(gamesCards, "dummy");
-        
+
         Box bottomPanel = new Box(BoxLayout.Y_AXIS);
         bottomPanel.add(startButtonPane);
         infoTextLabel = new JLabel(enrollText);
@@ -913,8 +920,10 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
                 reactOnScheduleRadioButtonChange(e);
             }
         };
-        addRadioButton(scheduleModes, group, TYPE_INSTANTLY, current, iListener);
-        addRadioButton(scheduleModes, group, TYPE_SCHEDULED, current, iListener);
+        addRadioButton(scheduleModes, group, TYPE_INSTANTLY, current,
+            iListener);
+        addRadioButton(scheduleModes, group, TYPE_SCHEDULED, current,
+            iListener);
     }
 
     public void reactOnScheduleRadioButtonChange(ItemEvent e)
@@ -936,7 +945,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
         if (o instanceof JRadioButton)
         {
-            JRadioButton b = (JRadioButton) o;
+            JRadioButton b = (JRadioButton)o;
             String text = b.getText();
             if (text == null)
             {
@@ -953,7 +962,8 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             }
             else
             {
-                LOGGER.warning("ItemEvent Object Text is neither 'scheduled' nor 'instantly'??");
+                LOGGER
+                    .warning("ItemEvent Object Text is neither 'scheduled' nor 'instantly'??");
                 return;
             }
         }
@@ -964,7 +974,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         }
         setScheduledGamesMode(switchToScheduling);
     }
-    
+
     private void createPreferencesPane()
     {
         preferencesPane = new JPanel(new GridLayout(0, 2));
@@ -1069,7 +1079,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     private void createRunningGamesTab()
     {
         runningGamesTab = new Box(BoxLayout.Y_AXIS);
-        
+
         // ----------------- First the table ---------------------
 
         Box runningGamesPane = new Box(BoxLayout.Y_AXIS);
@@ -1096,17 +1106,16 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
         runningGamesTab.add(runningGamesPane);
 
-
         // ------------------ Hide WebClient stuff ---------------
-        
+
         Box hideClientPanel = new Box(BoxLayout.Y_AXIS);
         hideClientPanel.setBorder(new TitledBorder("Hiding the Web Client"));
-        
+
         runningGamesTab.add(Box.createRigidArea(new Dimension(0, 20)));
         runningGamesTab.add(Box.createVerticalGlue());
-        
+
         hideClientPanel.setAlignmentX(Box.LEFT_ALIGNMENT);
-        
+
         hideButton = new JButton(HideButtonText);
         hideButton.setAlignmentX(Box.LEFT_ALIGNMENT);
 
@@ -1170,22 +1179,22 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         runningGamesTab.add(Box.createVerticalGlue());
         runningGamesTab.add(hideClientPanel);
 
-/*      // Somehow this does not work at all...
+        /*      // Somehow this does not work at all...
 
-        // as wide as the running games table, as high as needed:
-        int width = runningGamesPane.getMinimumSize().width;
-        int height = hideClientPanel.getMinimumSize().height;
-        Dimension prefSize = new Dimension(width, height);
-        hideClientPanel.setPreferredSize(prefSize);
-        hideClientPanel.setMinimumSize(prefSize);
-*/                
+                // as wide as the running games table, as high as needed:
+                int width = runningGamesPane.getMinimumSize().width;
+                int height = hideClientPanel.getMinimumSize().height;
+                Dimension prefSize = new Dimension(width, height);
+                hideClientPanel.setPreferredSize(prefSize);
+                hideClientPanel.setMinimumSize(prefSize);
+        */
 
     }
-    
+
     private void createAdminTab()
     {
         adminTab = new Box(BoxLayout.Y_AXIS);
-        
+
         JPanel adminPane = new JPanel(new GridLayout(0, 1));
         adminPane.setBorder(new TitledBorder("Admin mode"));
         adminPane.setPreferredSize(new Dimension(30, 200));
@@ -1208,7 +1217,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
         adminTab.add(adminPane);
     }
-    
+
     public String createLoginWebClientSocketThread(boolean force)
     {
         String reason = null;
@@ -1333,7 +1342,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             // Game client handles confirmation if necessary, 
             // asks what to do next, and sets startObj accordingly,
             // and it also disposes this WebClient window.
-            gc.doConfirmAndQuit();
+            gc.getGUI().doConfirmAndQuit();
             gc = null;
         }
         else
@@ -1369,7 +1378,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
         if (gameClient != null)
         {
-            gameClient.setWebClient(null);
+            gameClient.getGUI().setWebClient(null);
             gameClient = null;
         }
 
@@ -1425,7 +1434,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     public String getSelectedGameId()
     {
         String id = null;
-        
+
         if (getScheduledGamesMode())
         {
             int selRow = schedGameTable.getSelectedRow();
@@ -1455,7 +1464,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         {
             loginButton.setText(LoginButtonText);
             generalChat.setLoginState(false, server, username);
-            
+
             registerOrPasswordLabel.setText(createAccountLabelText);
             registerOrPasswordButton.setText(createAccountButtonText);
         }
@@ -1594,7 +1603,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     {
         GameInfo gi = findGameById(gameId);
         String initiator = gi.getInitiator();
-        return(username.equals(initiator));
+        return (username.equals(initiator));
     }
 
     /* Validate that the given field does not contain any substring which
@@ -1687,7 +1696,8 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     {
         boolean ok = validateServerAndPort();
 
-        ok = ok && validateField(this, loginField.getText(), "Login name")
+        ok = ok
+            && validateField(this, loginField.getText(), "Login name")
             && validateField(this, new String(passwordField.getPassword()),
                 "Password");
 
@@ -1782,8 +1792,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         if (ok)
         {
             String username = loginField.getText();
-            registerPanel = new RegisterPasswordPanel(this, register,
-                username);
+            registerPanel = new RegisterPasswordPanel(this, register, username);
             registerPanel.packAndShow();
         }
     }
@@ -1793,9 +1802,9 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         // email and isAdminObj are null, this signals: do not change them
         String email = null;
         Boolean isAdminObj = null;
-        
-        String reason = server.changeProperties(name, oldPW,
-            newPW1, email, isAdminObj);
+
+        String reason = server.changeProperties(name, oldPW, newPW1, email,
+            isAdminObj);
 
         if (reason == null || reason.equals("null"))
         {
@@ -1822,32 +1831,29 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         // just a dummay as long as we still have ScheduledGamesTab class...
     }
 
-    private void do_proposeGame(String variant, String viewmode,
-        long startAt, int duration, String summary,
-        String expire, boolean unlimMulli, boolean balTowers, int min,
-        int target, int max)
+    private void do_proposeGame(String variant, String viewmode, long startAt,
+        int duration, String summary, String expire, boolean unlimMulli,
+        boolean balTowers, int min, int target, int max)
     {
-        server.proposeGame(username, variant, viewmode, 
-            startAt, duration, summary, expire, unlimMulli,
-            balTowers, min, target, max);
+        server.proposeGame(username, variant, viewmode, startAt, duration,
+            summary, expire, unlimMulli, balTowers, min, target, max);
     }
 
     private long getStartTime()
     {
         long when = -1;
-        
+
         String atDate = atDateField.getText();
         String atTime = atTimeField.getText();
-        
+
         String schedule = atDate + " " + atTime;
         // System.out.println("schedule is " + schedule);
-        
-        
+
         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT,
             DateFormat.SHORT, myLocale);
         df.setTimeZone(TimeZone.getDefault());
         df.setLenient(false);
-        
+
         // System.out.println("default locale    is " + Locale.getDefault());
         // System.out.println("default time zone is " + TimeZone.getDefault());
 
@@ -1856,18 +1862,18 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             Date whenDate = df.parse(schedule);
             when = whenDate.getTime();
         }
-        catch(ParseException e)
+        catch (ParseException e)
         {
             LOGGER.warning("Illegal date/time '" + schedule + "'");
         }
-        
+
         return when;
     }
 
     private int getDuration()
     {
         int duration = -1;
-        
+
         String durationString = durationField.getText();
         duration = Integer.parseInt(durationString);
         return duration;
@@ -1909,9 +1915,9 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     {
         state = Enrolled;
         enrolledGameId = gameId;
-        GameInfo gi = findGameById(gameId); 
+        GameInfo gi = findGameById(gameId);
         boolean scheduled = gi.isScheduledGame();
-        
+
         if (scheduled)
         {
             int index = schedGameDataModel.getRowIndex(gameId).intValue();
@@ -2001,16 +2007,15 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             Game dummyGame = new Game(null, new String[0]);
             boolean noOptionsFile = false;
             gc = new Client(hostname, p, dummyGame, username, null, true,
-                noOptionsFile);
+                noOptionsFile, false);
             boolean failed = gc.getFailed();
             if (failed)
             {
                 gc = null;
                 JOptionPane.showMessageDialog(this,
                     "Connecting to the game server "
-                    + "(starting own MasterBoard) failed!",
-                    "Starting game failed!",
-                    JOptionPane.ERROR_MESSAGE);
+                        + "(starting own MasterBoard) failed!",
+                    "Starting game failed!", JOptionPane.ERROR_MESSAGE);
 
                 state = LoggedIn;
                 updateGUI();
@@ -2019,7 +2024,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             {
                 infoTextLabel.setText(waitingText);
                 setGameClient(gc);
-                gc.setWebClient(this);
+                gc.getGUI().setWebClient(this);
 
                 Timer timeoutStartup = setupTimer();
 
@@ -2055,9 +2060,8 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
                         .showMessageDialog(
                             this,
                             "Own client could connect, but game did not start "
-                            + "(probably some other player connecting failed?)",
-                            "Starting game failed!",
-                            JOptionPane.ERROR_MESSAGE);
+                                + "(probably some other player connecting failed?)",
+                            "Starting game failed!", JOptionPane.ERROR_MESSAGE);
                     state = LoggedIn;
                     updateGUI();
                 }
@@ -2068,8 +2072,8 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             // client startup failed for some reason
             JOptionPane.showMessageDialog(this,
                 "Unexpected exception while starting the game client: "
-                    + e.toString(), "Starting game failed!", 
-                    JOptionPane.ERROR_MESSAGE);
+                    + e.toString(), "Starting game failed!",
+                JOptionPane.ERROR_MESSAGE);
             state = LoggedIn;
             updateGUI();
         }
@@ -2158,17 +2162,20 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
                         int state = game.getGameState();
                         if (state == GameInfo.Scheduled)
                         {
-                            System.out.println("Got a scheduled game, replacing in sched list");
+                            System.out
+                                .println("Got a scheduled game, replacing in sched list");
                             replaceInTable(schedGameTable, game);
                         }
                         else if (state == GameInfo.Instant)
                         {
-                            System.out.println("Got an instant game, replacing in instant list");
+                            System.out
+                                .println("Got an instant game, replacing in instant list");
                             replaceInTable(instGameTable, game);
                         }
                         else if (state == GameInfo.Running)
                         {
-                            System.out.println("Got a running game, replacing in run game list and remove in inst game list");
+                            System.out
+                                .println("Got a running game, replacing in run game list and remove in inst game list");
                             replaceInTable(runGameTable, game);
                             instGameDataModel.removeGame(game.getGameId());
                         }
@@ -2247,14 +2254,12 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             long startAt = scheduled ? getStartTime() : -1;
             int duration = getDuration();
             String summaryText = getSummaryText();
-            
+
             do_proposeGame(variantBox.getSelectedItem().toString(),
-                viewmodeBox.getSelectedItem().toString(), 
-                startAt, duration, summaryText,
-                eventExpiringBox
-                    .getSelectedItem().toString(), unlimitedMulligansCB
-                    .isSelected(), balancedTowersCB.isSelected(), min, target,
-                max);
+                viewmodeBox.getSelectedItem().toString(), startAt, duration,
+                summaryText, eventExpiringBox.getSelectedItem().toString(),
+                unlimitedMulligansCB.isSelected(), balancedTowersCB
+                    .isSelected(), min, target, max);
         }
 
         else if (source == enrollButton)

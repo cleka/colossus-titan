@@ -10,12 +10,12 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.client.BattleMap;
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.game.Battle;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
+import net.sf.colossus.gui.BattleMap;
 import net.sf.colossus.util.CompareDoubles;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.variant.BattleHex;

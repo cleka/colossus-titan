@@ -232,7 +232,7 @@ public final class Start
             Game dummyGame = new Game(null, new String[0]);
 
             Client c = new Client(hostname, port, dummyGame, playerName, null,
-                false, false);
+                false, false, true);
             failed = c.getFailed();
             c = null;
         }
@@ -259,9 +259,8 @@ public final class Start
      * Expects that server (cf) options are already loaded.
      * 
      */
-    public static void setInitialAction(CmdLine cl,
-        Options netclientOptions, Options serverOptions, Options startOptions,
-        Start startObject)
+    public static void setInitialAction(CmdLine cl, Options netclientOptions,
+        Options serverOptions, Options startOptions, Start startObject)
     {
         // Host, port and playername are stored back only to the startObject.
         // They would be copied to the server cf file in GetPlayers, when one
@@ -417,7 +416,7 @@ public final class Start
         int numHumans = 0;
         int numAIs = 0;
         int numNetworks = 0;
-        
+
         int numSimpleAIs = 0;
         int numRationalAIs = 0;
         int numMilvangAIs = 0;
@@ -522,12 +521,11 @@ public final class Start
             LOGGER.log(Level.SEVERE, "Illegal number of players");
             return false;
         }
-        if (numAIs < (numSimpleAIs + numRationalAIs + numMilvangAIs)) {
+        if (numAIs < (numSimpleAIs + numRationalAIs + numMilvangAIs))
+        {
             LOGGER.log(Level.SEVERE, "Illegal number of specific AIs");
             return false;
         }
-
-        
 
         for (int i = 0; i < numHumans; i++)
         {
@@ -559,16 +557,23 @@ public final class Start
             //            String name = Constants.byColor + k;
             String name = Constants.byType + k;
             options.setOption(Options.playerName + k, name);
-            if (numSimpleAIs > 0) {
+            if (numSimpleAIs > 0)
+            {
                 options.setOption(Options.playerType + k, "SimpleAI");
-                numSimpleAIs --;
-            } else if (numRationalAIs > 0) {
+                numSimpleAIs--;
+            }
+            else if (numRationalAIs > 0)
+            {
                 options.setOption(Options.playerType + k, "RationalAI");
-                numRationalAIs --;
-            } else if (numMilvangAIs > 0) {
+                numRationalAIs--;
+            }
+            else if (numMilvangAIs > 0)
+            {
                 options.setOption(Options.playerType + k, "MilvangAI");
-                numMilvangAIs --;
-            } else {
+                numMilvangAIs--;
+            }
+            else
+            {
                 options.setOption(Options.playerType + k, Constants.defaultAI);
             }
         }
@@ -669,7 +674,7 @@ public final class Start
         {
             oneClientRunOnly = true;
         }
-        
+
         // Cmdline arguments have effect only to first game - or
         // are stored within the options or startOptions.
         cl = null;
@@ -756,7 +761,7 @@ public final class Start
                 int port = startOptions.getIntOption(Options.serveAtPort);
                 String loadFileName = startOptions
                     .getStringOption(Options.loadGameFileName);
-                
+
                 if (loadFileName != null && loadFileName.length() > 0)
                 {
                     game = new GameServerSide();
@@ -905,7 +910,7 @@ public final class Start
 
         LOGGER.log(Level.FINE, "Start.main() at the end "
             + "- JVM should exit now by itself.");
-            
+
         // JVM should do a clean exit now, no System.exit() needed.
         // To be sure, at all places where user selects "Quit", a demon 
         // thread is started that does the System.exit() after a certain
@@ -946,12 +951,12 @@ public final class Start
     {
         private static final Logger LOGGER = Logger.getLogger(Start.class
             .getName());
-        
+
         private static final String defaultName = "TimedJvmQuit thread";
         private final String name;
-        
+
         private final long timeOutInSecs = 10;
-        
+
         public TimedJvmQuit()
         {
             super();
@@ -962,8 +967,8 @@ public final class Start
         @Override
         public void run()
         {
-            LOGGER.info(this.name + ": started... (sleeping "
-                + timeOutInSecs + " seconds)");
+            LOGGER.info(this.name + ": started... (sleeping " + timeOutInSecs
+                + " seconds)");
             sleepFor(this.timeOutInSecs * 1000);
             LOGGER.warning(this.name + ": JVM still alive? "
                 + "Ok, it's time to do System.exit()...");

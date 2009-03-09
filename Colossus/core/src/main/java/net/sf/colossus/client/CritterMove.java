@@ -1,5 +1,7 @@
 package net.sf.colossus.client;
 
+import net.sf.colossus.gui.BattleChit;
+
 
 /**
  * One battle move for one critter.

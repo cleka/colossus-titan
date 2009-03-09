@@ -15,7 +15,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import net.sf.colossus.client.Client;
-import net.sf.colossus.client.SaveWindow;
+import net.sf.colossus.gui.SaveWindow;
 
 
 /** 

@@ -1,23 +1,15 @@
 package net.sf.colossus.client;
 
 
-import java.awt.Cursor;
-import java.awt.GraphicsDevice;
-import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -28,17 +20,22 @@ import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
-import javax.swing.UIManager;
-import javax.swing.UIManager.LookAndFeelInfo;
-import javax.swing.undo.UndoManager;
 
 import net.sf.colossus.ai.AI;
 import net.sf.colossus.ai.SimpleAI;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
+import net.sf.colossus.gui.BattleChit;
+import net.sf.colossus.gui.BattleMap;
+import net.sf.colossus.gui.ClientGUI;
+import net.sf.colossus.gui.GUIMasterHex;
+import net.sf.colossus.gui.IClientGUI;
+import net.sf.colossus.gui.Marker;
+import net.sf.colossus.gui.MasterBoard;
+import net.sf.colossus.gui.NullClientGUI;
+import net.sf.colossus.gui.RevealEvent;
+import net.sf.colossus.gui.Scale;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.server.Dice;
@@ -49,8 +46,6 @@ import net.sf.colossus.server.Start;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.ChildThreadManager;
 import net.sf.colossus.util.CollectionHelper;
-import net.sf.colossus.util.KFrame;
-import net.sf.colossus.util.LogWindow;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.Predicate;
 import net.sf.colossus.util.ResourceLoader;
@@ -60,7 +55,6 @@ import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
-import net.sf.colossus.webclient.WebClient;
 import net.sf.colossus.webcommon.InstanceTracker;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
@@ -111,51 +105,29 @@ public final class Client implements IClient, IOracle
     private IServer server;
     private ChildThreadManager threadMgr;
 
-    private WebClient webClient = null;
-    private boolean startedByWebClient = false;
-
     public boolean failed = false;
+
+    // TODO keep in sync with GUI
     private boolean replayOngoing = false;
-    private int replayLastTurn = -1;
-    private int replayMaxTurn = 0;
 
-    // TODO the naming of these classes is confusing, they should be clearly named
-    // as dialogs
-    private MasterBoard board;
-    private StatusScreen statusScreen;
-    private CreatureCollectionView caretakerDisplay;
-    private MovementDie movementDie;
-    private EngagementResults engagementResults;
-    private AutoInspector autoInspector;
-    private EventViewer eventViewer;
-    private PreferencesWindow preferencesWindow;
+    private IClientGUI gui;
 
-    private PickCarry pickCarryDialog = null;
-
-    /** hexLabel of MasterHex for current or last engagement. */
+    // TODO TODO TODO : CHECK !!
+    // this is possibly updated (at least reset to null) only properly if GUI is there!!!
+    private Legion attacker;
+    private Legion defender;
     private MasterHex battleSite;
-    private BattleBoard battleBoard;
 
     private final List<BattleChit> battleChits = new ArrayList<BattleChit>();
-
-    /**
-     * Stack of legion marker ID's, to allow multiple levels of undo for
-     * splits, moves, and recruits.
-     * (for battle actions, the Strings are not actually marker ID's,
-     *  it's battle hex ID's there instead).
-     *
-     * TODO it would probably be good to have a full Command pattern here, similar
-     * to Swing's {@link UndoManager} stuff. In the GUI client we could/should
-     * probably just use that. A list of objects (which are mostly the string
-     * identifiers of something) isn't that safe.
-     */
-    private final LinkedList<Object> undoStack = new LinkedList<Object>();
 
     // Information on the current moving legion.
     private LegionClientSide mover;
 
     // Per-client and per-player options.
     private final Options options;
+
+    // TODO move to Constants?
+    // private static String propNameForceViewBoard = "net.sf.colossus.forceViewBoard";
 
     /**
      * Player who owns this client.
@@ -181,11 +153,7 @@ public final class Client implements IClient, IOracle
     /** Last movement roll for any player. */
     private int movementRoll = -1;
 
-    /** the parent frame for secondary windows */
-    private JFrame secondaryParent = null;
-
     private Legion parent;
-    private int numSplitsThisTurn;
 
     // This ai is either the actual ai player for an AI player, but is also
     // used by human clients for the autoXXX actions.
@@ -208,12 +176,9 @@ public final class Client implements IClient, IOracle
     private int battleTurnNumber = -1;
     private Player battleActivePlayer;
     private Constants.BattlePhase battlePhase;
-    private Legion attacker;
-    private Legion defender;
 
     /** If the game is over, then quitting does not require confirmation. */
     private boolean gameOver;
-    private String gameOverMessage;
 
     /** One per player. */
     private PlayerClientSide[] players;
@@ -226,17 +191,6 @@ public final class Client implements IClient, IOracle
 
     private Server localServer;
     private SocketClientThread sct;
-    private Timer connectionCheckTimer;
-
-    /* This is a number of seconds to wait for connection check
-     * confirmation message before assuming connection is broken and
-     * displaying a message telling so.
-     */
-    private final static int CONN_CHECK_TIMEOUT = 5;
-
-    // For negotiation.  (And AI battle.)
-    private Negotiate negotiate;
-    private ReplyToProposal replyToProposal;
 
     /**
      * Constants modeling the party who closed this client.
@@ -253,6 +207,8 @@ public final class Client implements IClient, IOracle
     // XXX temporary until things are synched
     private boolean tookMulligan;
 
+    private int numSplitsThisTurn;
+
     private int delay = -1;
 
     /** For battle AI. */
@@ -260,10 +216,6 @@ public final class Client implements IClient, IOracle
     private List<CritterMove> failedBattleMoves = null;
 
     private final Hashtable<CreatureType, Integer> recruitReservations = new Hashtable<CreatureType, Integer>();
-
-    private LogWindow logWindow;
-    private int viewMode;
-    private int recruitChitMode;
 
     // Once we got dispose from server (or user initiated it himself),
     // we'll ignore it if we we get it from server again
@@ -283,12 +235,14 @@ public final class Client implements IClient, IOracle
      *      network and the serialization/deserialization of all objects
      */
     public Client(String host, int port, Game game, String playerName,
-        Server theServer, boolean byWebClient, boolean noOptionsFile)
+        Server theServer, boolean byWebClient, boolean noOptionsFile,
+        boolean createGUI)
     {
-        this(game, playerName, noOptionsFile);
+        this(game, playerName, noOptionsFile, createGUI);
 
         this.localServer = theServer;
-        this.startedByWebClient = byWebClient;
+
+        gui.setStartedByWebClient(byWebClient);
 
         sct = new SocketClientThread(this, host, port);
 
@@ -304,7 +258,7 @@ public final class Client implements IClient, IOracle
             sct = null;
 
             String title = "Socket initialialization failed!";
-            showErrorMessage(reasonFail, title);
+            gui.showErrorMessage(reasonFail, title);
 
             if (isRemote())
             {
@@ -333,7 +287,8 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    private Client(Game game, String playerName, boolean noOptionsFile)
+    private Client(Game game, String playerName, boolean noOptionsFile,
+        boolean createGUI)
     {
         assert playerName != null;
 
@@ -361,6 +316,40 @@ public final class Client implements IClient, IOracle
         InstanceTracker.register(this, "Client " + playerName);
 
         options = new Options(playerName, noOptionsFile);
+
+        /*
+                // Intended for stresstest, to see whats happening, and that graphics
+                // stuff is there done, too.
+                // This here works only if name setting is done "by-type", so that
+                // at least one AI gets a name ending with "1".
+                boolean forceViewBoard = false;
+                String propViewBoard = System.getProperty(propNameForceViewBoard);
+                if (propViewBoard != null && propViewBoard.equalsIgnoreCase("yes"))
+                {
+                    forceViewBoard = true;
+                    options.setOption(Options.showEventViewer, "true");
+                    options.setOption(Options.showStatusScreen, "true");
+                }
+
+                if (!options.getOption(Options.autoPlay)
+                    || (forceViewBoard && (getOwningPlayer().getName().endsWith("1")
+                        || options.getStringOption(Options.playerType).endsWith(
+                            "Human") || options.getStringOption(Options.playerType)
+                        .endsWith("Network"))))
+                {
+                    createGUI = true;
+                }
+        */
+
+        if (createGUI)
+        {
+            this.gui = new ClientGUI(this, options);
+        }
+        else
+        {
+            this.gui = new NullClientGUI(this, options);
+        }
+
         setupOptionListeners();
         // Need to load options early so they don't overwrite server options.
         loadOptions();
@@ -371,19 +360,32 @@ public final class Client implements IClient, IOracle
         return threadMgr;
     }
 
-    boolean isRemote()
+    public boolean isRemote()
     {
         return (localServer == null);
     }
 
-    boolean isAlive()
+    public boolean isAlive()
     {
         return playerAlive;
     }
 
-    public void setWebClient(WebClient wc)
+    public void doCheckServerConnection()
     {
-        this.webClient = wc;
+        server.checkServerConnection();
+    }
+
+    /** Upon request with checkServerConnection, server sends a confirmation.
+     *  This method here processes the confirmation.
+     */
+    public synchronized void serverConfirmsConnection()
+    {
+        gui.serverConfirmsConnection();
+    }
+
+    public void locallyInitiateSaveGame(String filename)
+    {
+        localServer.initiateSaveGame(filename);
     }
 
     public boolean getFailed()
@@ -391,53 +393,34 @@ public final class Client implements IClient, IOracle
         return failed;
     }
 
-    /*
-     * If webclient is just hidden, bring it back;
-     * if it had been used, ask whether to restore;
-     * Otherwise just do nothing
-     */
-    void handleWebClientRestore()
+    // because of synchronization issues we need to
+    // be able to pass an undo split request to the server even if it is not
+    // yet in the client UndoStack
+    public void undoSplit(Legion splitoff)
     {
-        if (this.webClient != null)
-        {
-            // was only Hidden, so bring it up without asking
-            this.webClient.setVisible(true);
-        }
-        else
-        {
-            // webclient never used (local game), or explicitly closed
-            // - don't bother user with it
-            // If he now said quit -- he probably wants quit.
-            // if he now used close or new game, he can get to web client
-            // from GetPlayers dialog.
-        }
-    }
+        getServer().undoSplit(splitoff);
+        getOwningPlayer().addMarkerAvailable(splitoff.getMarkerId());
 
-    public void showWebClient()
-    {
-        if (this.webClient == null)
+        numSplitsThisTurn++;
+
+        if (getTurnNumber() == 1 && numSplitsThisTurn == 0)
         {
-            this.webClient = new WebClient(null, -1, null, null);
-            this.webClient.setGameClient(this);
+            gui.informSplitRequiredFirstRound();
         }
-        else
-        {
-            this.webClient.setVisible(true);
-        }
+        LOGGER.log(Level.FINEST, "called server.undoSplit");
     }
 
     /** Take a mulligan. */
     public void mulligan()
     {
-        undoAllMoves(); // XXX Maybe move entirely to server
-        clearUndoStack();
+        gui.undoAllMoves(); // XXX Maybe move entirely to server
+        gui.clearUndoStack();
+
         tookMulligan = true;
 
         // TODO: should not be needed any more here?
-        if (eventViewer != null)
-        {
-            eventViewer.setMulliganOldRoll(movementRoll);
-        }
+        gui.setMulliganOldRoll(movementRoll);
+
         server.mulligan();
     }
 
@@ -448,7 +431,7 @@ public final class Client implements IClient, IOracle
     }
 
     /** Resolve engagement in land. */
-    void engage(MasterHex hex)
+    public void engage(MasterHex hex)
     {
         server.engage(hex);
     }
@@ -466,7 +449,7 @@ public final class Client implements IClient, IOracle
         return null;
     }
 
-    void concede()
+    public void concede()
     {
         concede(getMyEngagedLegion());
     }
@@ -490,175 +473,22 @@ public final class Client implements IClient, IOracle
         server.fight(hex);
     }
 
-    private List<String> tellEngagementResultsAttackerStartingContents = null;
-    private List<String> tellEngagementResultsDefenderStartingContents = null;
-    private List<Boolean> tellEngagementResultsAttackerLegionCertainities = null;
-    private List<Boolean> tellEngagementResultsDefenderLegionCertainities = null;
-
     public void tellEngagement(MasterHex hex, Legion attacker, Legion defender)
     {
         this.battleSite = hex;
         this.attacker = attacker;
         this.defender = defender;
-        if (eventViewer != null)
-        {
-            eventViewer.tellEngagement(attacker, defender, turnNumber);
-        }
 
-        // remember for end of battle.
-        tellEngagementResultsAttackerStartingContents = getLegionImageNames(attacker);
-        tellEngagementResultsDefenderStartingContents = getLegionImageNames(defender);
-        // TODO: I have the feeling that getLegionCertainties()
-        //   does not work here.
-        //   I always seem to get either ALL true or ALL false.
-        tellEngagementResultsAttackerLegionCertainities = getLegionCreatureCertainties(attacker);
-        tellEngagementResultsDefenderLegionCertainities = getLegionCreatureCertainties(defender);
-
-        highlightBattleSite();
-    }
-
-    private JFrame getPreferredParent()
-    {
-        if ((secondaryParent == null) && (board != null))
-        {
-            return board.getFrame();
-        }
-        return secondaryParent;
-    }
-
-    private void initShowEngagementResults()
-    {
-        JFrame parent = getPreferredParent();
-        // no board at all, e.g. AI - nothing to do.
-        if (parent == null)
-        {
-            return;
-        }
-
-        engagementResults = new EngagementResults(parent, this, options);
-        engagementResults.maybeShow();
-    }
-
-    private void showOrHideAutoInspector(boolean bval)
-    {
-        JFrame parent = getPreferredParent();
-        if (parent == null)
-        {
-            // No board yet, or no board at all - nothing to do.
-            // Initial show will be done in initBoard.
-            return;
-        }
-        if (bval)
-        {
-            if (autoInspector == null)
-            {
-                autoInspector = new AutoInspector(parent, options, viewMode,
-                    options.getOption(Options.dubiousAsBlanks));
-            }
-        }
-        else
-        {
-            disposeInspector();
-        }
-    }
-
-    private void showOrHideCaretaker(boolean bval)
-    {
-        if (board == null)
-        {
-            // No board yet, or no board at all - nothing to do.
-            // Initial show will be done in initBoard.
-            return;
-        }
-
-        if (bval)
-        {
-            if (caretakerDisplay == null)
-            {
-                caretakerDisplay = new CreatureCollectionView(getPreferredParent(), this);
-            }
-        }
-        else
-        {
-            disposeCaretakerDisplay();
-        }
-    }
-
-    void highlightBattleSite()
-    {
-        if (board != null && battleSite != null)
-        {
-            board.unselectAllHexes();
-            board.selectHexByLabel(battleSite.getLabel());
-        }
+        gui.tellEngagement(attacker, defender, turnNumber);
     }
 
     public void tellEngagementResults(Legion winner, String method,
         int points, int turns)
     {
-        JFrame frame = getMapOrBoardFrame();
-        if (frame == null)
-        {
-            return;
-        }
-
-        if (eventViewer != null)
-        {
-            eventViewer.tellEngagementResults(winner, method, turns);
-        }
-
-        if (engagementResults != null)
-        {
-            engagementResults.addData(winner, method, points, turns,
-                tellEngagementResultsAttackerStartingContents,
-                tellEngagementResultsDefenderStartingContents,
-                tellEngagementResultsAttackerLegionCertainities,
-                tellEngagementResultsDefenderLegionCertainities, isMyTurn());
-        }
-        battleSite = null;
-        attacker = null;
-        defender = null;
-    }
-
-    /* Create the event viewer, so that it can collect data from beginning on.
-     * EventViewer shows itself depending on whether the option for it is set.
-     */
-    private void initEventViewer()
-    {
-        if (eventViewer == null)
-        {
-            JFrame parent = getPreferredParent();
-            eventViewer = new EventViewer(parent, options, this);
-        }
-    }
-
-    private void initPreferencesWindow()
-    {
-        if (preferencesWindow == null)
-        {
-            preferencesWindow = new PreferencesWindow(options, this);
-        }
-    }
-
-    public void setPreferencesWindowVisible(boolean val)
-    {
-        if (preferencesWindow != null)
-        {
-            preferencesWindow.setVisible(val);
-        }
-    }
-
-    /**
-     * Displays the marker and its legion if possible.
-     */
-    public void showMarker(Marker marker)
-    {
-        if (autoInspector != null)
-        {
-            String markerId = marker.getId();
-            Legion legion = getLegion(markerId);
-            autoInspector.showLegion((LegionClientSide)legion);
-        }
+        gui.actOnTellEngagementResults(winner, method, points, turns);
+        this.battleSite = null;
+        this.attacker = null;
+        this.defender = null;
     }
 
     /**
@@ -666,31 +496,19 @@ public final class Client implements IClient, IOracle
      */
     public void showHexRecruitTree(GUIMasterHex hex)
     {
-        if (autoInspector != null)
-        {
-            autoInspector.showHexRecruitTree(hex);
-        }
+        gui.showHexRecruitTree(hex);
     }
 
     /** Legion summoner summons unit from legion donor. */
     void doSummon(Legion summoner, Legion donor, String unit)
     {
         server.doSummon(summoner, donor, unit);
-        if (board != null)
-        {
-            highlightEngagements();
-            board.repaint();
-        }
+        gui.actOnDoSummon();
     }
 
     public void didSummon(Legion summoner, Legion donor, String summon)
     {
-        if (eventViewer != null)
-        {
-            eventViewer.newCreatureRevealEvent(RevealEvent.eventSummon, donor
-                .getMarkerId(), (donor).getHeight(), summon, summoner
-                .getMarkerId(), (summoner).getHeight());
-        }
+        gui.didSummon(summoner, donor, summon);
     }
 
     /** This player quits the whole game. The server needs to always honor
@@ -704,78 +522,25 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    private void repaintAllWindows()
-    {
-        if (statusScreen != null)
-        {
-            statusScreen.repaint();
-        }
-        if (caretakerDisplay != null)
-        {
-            caretakerDisplay.repaint();
-        }
-        if (board != null)
-        {
-            board.getFrame().repaint();
-        }
-        if (battleBoard != null)
-        {
-            battleBoard.repaint();
-        }
-    }
-
-    /**
-     * TODO since we are doing Swing nowadays it would probably be much better to replace
-     * all this rescaling code with just using {@link AffineTransform} on the right
-     * {@link Graphics2D} instances.
-     */
-    void rescaleAllWindows()
-    {
-        if (statusScreen != null)
-        {
-            statusScreen.rescale();
-        }
-        if (board != null)
-        {
-            board.clearRecruitedChits();
-            board.clearPossibleRecruitChits();
-            board.rescale();
-        }
-        if (battleBoard != null)
-        {
-            battleBoard.rescale();
-        }
-        repaintAllWindows();
-    }
-
     public void tellMovementRoll(int roll)
     {
-        if (eventViewer != null)
-        {
-            eventViewer.tellMovementRoll(roll);
-        }
-
-        movementRoll = roll;
-        if (movementDie == null || roll != movementDie.getLastRoll())
-        {
-            initMovementDie(roll);
-            if (board != null)
-            {
-                if (board.getFrame().getExtendedState() != JFrame.ICONIFIED)
-                {
-                    board.repaint();
-                }
-            }
-        }
+        gui.tellMovementRoll(roll);
         kickMoves();
+    }
+
+    // TODO: this exists only because tellMovementRoll changes the
+    // variable movementRoll between two GUI stuff blocks and I didn't
+    // want to change the order of things.
+    // Perhaps movementRoll isnot needed here at all?
+
+    public void changeMovementRoll(int roll)
+    {
+        movementRoll = roll;
     }
 
     public void tellWhatsHappening(String message)
     {
-        if (board != null)
-        {
-            board.setPhaseInfo(message);
-        }
+        gui.tellWhatsHappening(message);
     }
 
     private void kickMoves()
@@ -797,26 +562,6 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    private void initMovementDie(int roll)
-    {
-        movementRoll = roll;
-        if (board != null)
-        {
-            movementDie = new MovementDie(4 * Scale.get(), MovementDie
-                .getDieImageName(roll));
-        }
-    }
-
-    private void disposeMovementDie()
-    {
-        movementDie = null;
-    }
-
-    MovementDie getMovementDie()
-    {
-        return movementDie;
-    }
-
     /** public so that server can set autoPlay for AIs.
      *
      * TODO This it totally confusing: this method is declared
@@ -827,13 +572,8 @@ public final class Client implements IClient, IOracle
     public void setOption(String optname, String value)
     {
         options.setOption(optname, value);
-        syncCheckboxes();
+        gui.syncCheckboxes();
         options.saveOptions();
-    }
-
-    public int getViewMode()
-    {
-        return this.viewMode;
     }
 
     /**
@@ -844,176 +584,8 @@ public final class Client implements IClient, IOracle
      */
     private void setupOptionListeners()
     {
-        options.addListener(Options.antialias, new IOptions.Listener()
-        {
-            @Override
-            public void booleanOptionChanged(String optname, boolean oldValue,
-                boolean newValue)
-            {
-                GUIHex.setAntialias(newValue);
-                repaintAllWindows();
-            }
-        });
-        options.addListener(Options.useOverlay, new IOptions.Listener()
-        {
-            @Override
-            public void booleanOptionChanged(String optname, boolean oldValue,
-                boolean newValue)
-            {
-                GUIHex.setOverlay(newValue);
-                if (board != null)
-                {
-                    board.repaintAfterOverlayChanged();
-                }
-            }
-        });
-        options.addListener(Options.showRecruitChitsSubmenu,
-            new IOptions.Listener()
-            {
-                @Override
-                public void stringOptionChanged(String optname,
-                    String oldValue, String newValue)
-                {
-                    recruitChitMode = options
-                        .getNumberForRecruitChitSelection(newValue);
-                }
-            });
-        options.addListener(Options.noBaseColor, new IOptions.Listener()
-        {
-            @Override
-            public void booleanOptionChanged(String optname, boolean oldValue,
-                boolean newValue)
-            {
-                CreatureType.setNoBaseColor(newValue);
-                net.sf.colossus.util.ResourceLoader.purgeImageCache();
-                repaintAllWindows();
-            }
-        });
-        options.addListener(Options.useColoredBorders, new IOptions.Listener()
-        {
-            @Override
-            public void booleanOptionChanged(String optname, boolean oldValue,
-                boolean newValue)
-            {
-                BattleChit.setUseColoredBorders(newValue);
-                repaintAllWindows();
-            }
-        });
-        options.addListener(Options.showCaretaker, new IOptions.Listener()
-        {
-            @Override
-            public void booleanOptionChanged(String optname, boolean oldValue,
-                boolean newValue)
-            {
-                showOrHideCaretaker(newValue);
-                syncCheckboxes();
-            }
-        });
-        options.addListener(Options.showLogWindow, new IOptions.Listener()
-        {
-            @Override
-            public void booleanOptionChanged(String optname, boolean oldValue,
-                boolean newValue)
-            {
-                showOrHideLogWindow(newValue);
-                syncCheckboxes();
-            }
-        });
-        options.addListener(Options.showStatusScreen, new IOptions.Listener()
-        {
-            @Override
-            public void booleanOptionChanged(String optname, boolean oldValue,
-                boolean newValue)
-            {
-                updateStatusScreen();
-            }
-        });
-        options.addListener(Options.showAutoInspector, new IOptions.Listener()
-        {
-            @Override
-            public void booleanOptionChanged(String optname, boolean oldValue,
-                boolean newValue)
-            {
-                showOrHideAutoInspector(newValue);
-                syncCheckboxes();
-            }
-        });
-        options.addListener(Options.showEventViewer, new IOptions.Listener()
-        {
-            @Override
-            public void booleanOptionChanged(String optname, boolean oldValue,
-                boolean newValue)
-            {
-                // if null: no board (not yet, or not at all) => no eventviewer
-                if (eventViewer != null)
-                {
-                    // Eventviewer takes care of showing/hiding itself
-                    eventViewer.setVisibleMaybe();
-                }
-                syncCheckboxes();
-            }
-        });
-        options.addListener(Options.viewMode, new IOptions.Listener()
-        {
-            @Override
-            public void stringOptionChanged(String optname, String oldValue,
-                String newValue)
-            {
-                viewMode = options.getNumberForViewMode(newValue);
-            }
-        });
-        options.addListener(Options.dubiousAsBlanks, new IOptions.Listener()
-        {
-            @Override
-            public void booleanOptionChanged(String optname, boolean oldValue,
-                boolean newValue)
-            {
-                if (autoInspector != null)
-                {
-                    autoInspector.setDubiousAsBlanks(newValue);
-                }
-            }
-        });
-        options.addListener(Options.showEngagementResults,
-            new IOptions.Listener()
-            {
-                @Override
-                public void booleanOptionChanged(String optname,
-                    boolean oldValue, boolean newValue)
-                {
-                    // null if there is no board, e.g. AI
-                    if (engagementResults != null)
-                    {
-                        // maybeShow decides by itself based on the current value
-                        // of the option whether to hide or show.
-                        engagementResults.maybeShow();
-                    }
-                }
-            });
-        options.addListener(Options.favoriteLookFeel, new IOptions.Listener()
-        {
-            @Override
-            public void stringOptionChanged(String optname, String oldValue,
-                String newValue)
-            {
-                setLookAndFeel(newValue);
-            }
-        });
-        options.addListener(Options.scale, new IOptions.Listener()
-        {
-            // TODO check if we could use the intOptionChanged callback here
-            @Override
-            public void stringOptionChanged(String optname, String oldValue,
-                String newValue)
-            {
-                int scale = Integer.parseInt(newValue);
-                if (scale > 0)
-                {
-                    Scale.set(scale);
-                    rescaleAllWindows();
-                }
-            }
-        });
+        gui.setupGUIOptionListeners();
+
         options.addListener(Options.playerType, new IOptions.Listener()
         {
             @Override
@@ -1029,28 +601,7 @@ public final class Client implements IClient, IOracle
     private void loadOptions()
     {
         options.loadOptions();
-        syncCheckboxes();
-    }
-
-    /**
-     * Ensure that Player menu checkboxes reflect the correct state.
-     *
-     * TODO let the checkboxes have their own listeners instead. Or even
-     * better: use a binding framework.
-     */
-    private void syncCheckboxes()
-    {
-        if (board == null)
-        {
-            return;
-        }
-        Enumeration<String> en = options.propertyNames();
-        while (en.hasMoreElements())
-        {
-            String name = en.nextElement();
-            boolean value = options.getOption(name);
-            board.twiddleOption(name, value);
-        }
+        gui.syncCheckboxes();
     }
 
     // public for IOracle
@@ -1097,50 +648,11 @@ public final class Client implements IClient, IOracle
         {
             players[i].update(infoStrings.get(i));
         }
-        updateStatusScreen();
-    }
-
-    private void updateStatusScreen()
-    {
-        if (getNumPlayers() < 1)
-        {
-            // Called too early.
-            return;
-        }
-        if (options.getOption(Options.showStatusScreen))
-        {
-            if (statusScreen != null)
-            {
-                statusScreen.updateStatusScreen();
-            }
-            else
-            {
-                if (board != null)
-                {
-                    statusScreen = new StatusScreen(getPreferredParent(),
-                        this, options, this);
-                }
-            }
-        }
-        else
-        {
-            if (board != null)
-            {
-                board.twiddleOption(Options.showStatusScreen, false);
-            }
-            if (statusScreen != null)
-            {
-                statusScreen.dispose();
-            }
-            this.statusScreen = null;
-        }
-
-        // XXX Should be called somewhere else, just once.
-        setupPlayerLabel();
+        gui.updateStatusScreen();
     }
 
     // TODO fix this mess with lots of different methods for retrieving Player[Info]s
-    PlayerClientSide getPlayer(int playerNum)
+    public PlayerClientSide getPlayer(int playerNum)
     {
         return players[playerNum];
     }
@@ -1182,6 +694,7 @@ public final class Client implements IClient, IOracle
         return (int)(Math.round((double)totalValue / totalLegions));
     }
 
+    // TODO probably unnecessary?
     public void setColor(String color)
     {
         this.color = color;
@@ -1191,131 +704,12 @@ public final class Client implements IClient, IOracle
     {
         getGame().getCaretaker().setAvailableCount(type, count);
         getGame().getCaretaker().setDeadCount(type, deadCount);
-        updateCreatureCountDisplay();
-    }
-
-    private void updateCreatureCountDisplay()
-    {
-        if (board == null)
-        {
-            return;
-        }
-        if (caretakerDisplay != null && !replayOngoing)
-        {
-            caretakerDisplay.update();
-        }
-    }
-
-    private void disposeMasterBoard()
-    {
-        if (board != null)
-        {
-            board.dispose();
-            board = null;
-        }
-    }
-
-    private void disposeBattleBoard()
-    {
-        if (battleBoard != null)
-        {
-            battleBoard.dispose();
-            battleBoard = null;
-        }
-    }
-
-    private void disposePickCarryDialog()
-    {
-        if (pickCarryDialog != null)
-        {
-            if (battleBoard != null)
-            {
-                battleBoard.unselectAllHexes();
-            }
-            pickCarryDialog.dispose();
-            pickCarryDialog = null;
-        }
-    }
-
-    private void disposeStatusScreen()
-    {
-        if (statusScreen != null)
-        {
-            statusScreen.dispose();
-            statusScreen = null;
-        }
-    }
-
-    private void disposeLogWindow()
-    {
-        if (logWindow != null)
-        {
-            logWindow.setVisible(false);
-            logWindow.dispose();
-            logWindow = null;
-        }
-    }
-
-    private void disposeEventViewer()
-    {
-        if (eventViewer != null)
-        {
-            eventViewer.dispose();
-            eventViewer = null;
-        }
-    }
-
-    private void disposePreferencesWindow()
-    {
-        if (preferencesWindow != null)
-        {
-            preferencesWindow.dispose();
-            preferencesWindow = null;
-        }
-    }
-
-    void disposeEngagementResults()
-    {
-        if (engagementResults != null)
-        {
-            engagementResults.dispose();
-            engagementResults = null;
-        }
-    }
-
-    private void disposeCaretakerDisplay()
-    {
-        if (caretakerDisplay != null)
-        {
-            caretakerDisplay.dispose();
-            caretakerDisplay = null;
-        }
-    }
-
-    private void disposeInspector()
-    {
-        if (autoInspector != null)
-        {
-            autoInspector.setVisible(false);
-            autoInspector.dispose();
-            autoInspector = null;
-        }
+        gui.updateCreatureCountDisplay();
     }
 
     public void setClosedByServer()
     {
         closedBy = ClosedByConstant.CLOSED_BY_SERVER;
-    }
-
-    // called by WebClient
-    public void doConfirmAndQuit()
-    {
-        if (board != null)
-        {
-            // Board does the "Really Quit?" confirmation and initiates
-            // then (if user confirmed) the disposal of everything.
-            board.doQuitGameAction();
-        }
     }
 
     // Used by MasterBoard and by BattleBoard
@@ -1331,7 +725,8 @@ public final class Client implements IClient, IOracle
                 frame,
                 "Choose one of: Play another game, Quit, Close just this board, or Cancel",
                 "Play another game?", JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE, null, dialogOptions, dialogOptions[3]);
+                JOptionPane.QUESTION_MESSAGE, null, dialogOptions,
+                dialogOptions[3]);
         frame = null;
         if (answer == -1 || answer == 3)
         {
@@ -1346,11 +741,11 @@ public final class Client implements IClient, IOracle
         }
         if (answer == 0)
         {
-            menuNewGame();
+            gui.menuNewGame();
         }
         else if (answer == 1)
         {
-            menuQuitGame();
+            gui.menuQuitGame();
         }
         else if (answer == 2)
         {
@@ -1358,7 +753,7 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    private void disposeClientOriginated()
+    public void disposeClientOriginated()
     {
         if (disposeInProgress)
         {
@@ -1398,7 +793,7 @@ public final class Client implements IClient, IOracle
 
     public void disposeWholeClient()
     {
-        handleWebClientRestore();
+        gui.handleWebClientRestore();
 
         // -----------------------------------------------
         // Now a long decision making, whether to actually close
@@ -1421,11 +816,8 @@ public final class Client implements IClient, IOracle
             {
                 disposeInProgress = true;
                 disposeAll();
-                if (webClient != null)
-                {
-                    webClient.setGameClient(null);
-                    webClient = null;
-                }
+
+                gui.setClientInWebClientNull();
             }
             // just in case, so we are sure to get the unregistering done
             catch (Exception e)
@@ -1462,36 +854,8 @@ public final class Client implements IClient, IOracle
         {
             if (isRemote())
             {
-                defaultCursor();
-                board.setServerClosedMessage(gameOver);
+                gui.closePerhapsWithMessage();
 
-                String message = null;
-                String title = null;
-
-                if (gameOver)
-                {
-                    // don't show again!
-                    if (gameOverMessage != null)
-                    {
-                        message = "Game over: " + gameOverMessage + "!\n\n" +
-                            "(connection closed from server side)";
-                        gameOverMessage = null;
-                        title = "Game Over: Server closed connection";
-                    }
-                    else
-                    {
-                        message = "Connection now closed from server side.";
-                        title = "Game Over: server closed connection";
-                    }
-                }
-                else
-                {
-                    message = "Connection to server unexpectedly lost?";
-                    title = "Server closed connection";
-                }
-
-                JOptionPane.showMessageDialog(getMapOrBoardFrame(), message,
-                    title, JOptionPane.INFORMATION_MESSAGE);
                 close = false;
             }
             else
@@ -1516,66 +880,21 @@ public final class Client implements IClient, IOracle
         threadMgr.cleanup();
         threadMgr = null;
 
-        if (SwingUtilities.isEventDispatchThread())
-        {
-            cleanupGUI();
-        }
-        else
-        {
-            try
-            {
-                SwingUtilities.invokeAndWait(new Runnable()
-                {
-                    public void run()
-                    {
-                        cleanupGUI();
-                    }
-                });
-            }
-            catch (InterruptedException e)
-            {/* ignore */
-            }
-            catch (InvocationTargetException e2)
-            {/* ignore */
-            }
-        }
+        gui.doCleanupGUI();
+
     }
 
-    private void cleanupGUI()
+    /* This was earlier done at end of cleanupGUI inside client.
+     * Now that is moved to GUI class, its called from there after all
+     * other cleanup has completed (inside the invokeAndWait call).
+     */
+    public void doAdditionalCleanup()
     {
-        try
-        {
-            disposeInspector();
-            disposeCaretakerDisplay();
-        }
-        catch (Exception e)
-        {
-            LOGGER.log(Level.SEVERE,
-                "During disposal of Inspector and Caretaker: " + e.toString(),
-                e);
-        }
-
-        cleanupBattle();
-        disposeLogWindow();
-        disposeMovementDie();
-        disposeStatusScreen();
-        disposeEventViewer();
-        disposePreferencesWindow();
-        disposeEngagementResults();
-        disposeBattleBoard();
-        disposeMasterBoard();
-
-        // Options must be saved after all satellites are disposed,
-        // because they store their location and state (enabled or not, e.g.)
-        // in disposal.
-        options.saveOptions();
-        movement.dispose();
-
         this.movement = null;
         this.battleMovement = null;
         this.strike = null;
-        this.secondaryParent = null;
         this.players = null;
+        movement.dispose();
 
         net.sf.colossus.server.CustomRecruitBase.reset();
     }
@@ -1583,19 +902,19 @@ public final class Client implements IClient, IOracle
     /** Called from BattleBoard to leave carry mode. */
     public void leaveCarryMode()
     {
-        disposePickCarryDialog();
+        gui.disposePickCarryDialog();
         server.leaveCarryMode();
         doAutoStrikes();
     }
 
-    void doneWithBattleMoves()
+    public void doneWithBattleMoves()
     {
         aiPause();
-        clearUndoStack();
+        gui.clearUndoStack();
         server.doneWithBattleMoves();
     }
 
-    boolean anyOffboardCreatures()
+    public boolean anyOffboardCreatures()
     {
         for (BattleChit chit : getActiveBattleChits())
         {
@@ -1645,7 +964,7 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    void doneWithStrikes()
+    public void doneWithStrikes()
     {
         aiPause();
         server.doneWithStrikes();
@@ -1683,10 +1002,7 @@ public final class Client implements IClient, IOracle
             else
             {
                 boolean struck = makeForcedStrikes();
-                if (battleBoard != null)
-                {
-                    battleBoard.highlightCrittersWithTargets();
-                }
+                gui.highlightCrittersWithTargets();
                 if (!struck && findCrittersWithTargets().isEmpty())
                 {
                     doneWithStrikes();
@@ -1726,24 +1042,16 @@ public final class Client implements IClient, IOracle
         return player.hasLegion(markerId);
     }
 
-    /** Add the marker to the end of the list and to the LegionInfo.
-     If it's already in the list, remove the earlier entry. */
-    void setMarker(Legion legion, Marker marker)
+    public void setMarkerForLegion(Legion legion, Marker marker)
     {
-        if (board != null)
-        {
-            board.markerToTop(marker);
-        }
+        // TODO next line seems redundant since setMarker(..) does set the marker on the legion
         ((LegionClientSide)legion).setMarker(marker);
     }
 
     /** Remove this eliminated legion, and clean up related stuff. */
     public void removeLegion(Legion legion)
     {
-        if (board != null)
-        {
-            board.removeMarkerForLegion(legion);
-        }
+        gui.actOnRemoveLegion(legion);
 
         // TODO Do for all players
         if (isMyLegion(legion))
@@ -1752,13 +1060,11 @@ public final class Client implements IClient, IOracle
         }
 
         legion.getPlayer().removeLegion(legion);
-        if (board != null && !replayOngoing)
-        {
-            board.alignLegions(legion.getCurrentHex());
-        }
+
+        gui.alignLegionsMaybe(legion);
     }
 
-    int getLegionHeight(String markerId)
+    public int getLegionHeight(String markerId)
     {
         Legion legionInfo = getLegion(markerId);
         if (legionInfo == null)
@@ -1824,17 +1130,9 @@ public final class Client implements IClient, IOracle
     public void addCreature(Legion legion, String name, String reason)
     {
         ((LegionClientSide)legion).addCreature(name);
-        if (board != null && !replayOngoing)
-        {
-            GUIMasterHex hex = board.getGUIHexByMasterHex(legion
-                .getCurrentHex());
-            hex.repaint();
-        }
 
-        if (eventViewer != null)
-        {
-            eventViewer.addCreature(legion.getMarkerId(), name, reason);
-        }
+        gui.actOnAddCreature(legion, name, reason);
+
     }
 
     public void removeCreature(Legion legion, String name, String reason)
@@ -1843,23 +1141,8 @@ public final class Client implements IClient, IOracle
         {
             return;
         }
-        if (eventViewer != null)
-        {
-            if (reason.equals(Constants.reasonUndidReinforce))
-            {
-                LOGGER.warning("removeCreature should not be called for undidReinforce!");
-            }
-            else if (reason.equals(Constants.reasonUndidRecruit))
-            {
-                // normal undidRecruit does not use this, but during loading a game
-                // they appear as add- and removeCreature calls.
-                LOGGER.info("removeCreature called for undidRecruit - ignored");
-            }
-            else
-            {
-                eventViewer.removeCreature(legion.getMarkerId(), name);
-            }
-        }
+
+        gui.actOnRemoveCreature(legion, name, reason);
 
         int height = legion.getHeight();
         ((LegionClientSide)legion).removeCreature(name);
@@ -1873,12 +1156,8 @@ public final class Client implements IClient, IOracle
             // hack to remove legions correctly during load
             removeLegion(legion);
         }
-        if (board != null && !replayOngoing)
-        {
-            GUIMasterHex hex = board.getGUIHexByMasterHex(legion
-                .getCurrentHex());
-            hex.repaint();
-        }
+
+        gui.actOnRemoveCreaturePart2(legion);
     }
 
     /** Reveal creatures in this legion, some of which already may be known.
@@ -1889,49 +1168,27 @@ public final class Client implements IClient, IOracle
     public void revealCreatures(Legion legion, final List<String> names,
         String reason)
     {
-        if (eventViewer != null)
-        {
-            eventViewer.revealCreatures(legion, names, reason);
-        }
+        gui.eventViewerRevealCreatures(legion, names, reason);
 
         ((LegionClientSide)legion).revealCreatures(names);
     }
 
-    /* pass revealed info to EventViewer and SplitPrediction, and
-     * additionally remember the images list for later, the engagement report
+    /* pass revealed info to SplitPrediction and the GUI
      */
     public void revealEngagedCreatures(Legion legion,
         final List<String> names, boolean isAttacker, String reason)
     {
         revealCreatures(legion, names, reason);
-        // in engagement we need to update the remembered list, too.
-        if (isAttacker)
-        {
-            tellEngagementResultsAttackerStartingContents = getLegionImageNames(legion);
-            // towi: should return a list of trues, right?
-            // TODO if comment above is right: add assertion
-            tellEngagementResultsAttackerLegionCertainities = getLegionCreatureCertainties(legion);
-        }
-        else
-        {
-            tellEngagementResultsDefenderStartingContents = getLegionImageNames(legion);
-            // towi: should return a list of trues, right?
-            // TODO if comment above is right: add assertion
-            tellEngagementResultsDefenderLegionCertainities = getLegionCreatureCertainties(legion);
-        }
 
-        if (eventViewer != null)
-        {
-            eventViewer.revealEngagedCreatures(names, isAttacker, reason);
-        }
+        gui.revealEngagedCreatures(legion, names, isAttacker, reason);
     }
 
-    List<BattleChit> getBattleChits()
+    public List<BattleChit> getBattleChits()
     {
         return Collections.unmodifiableList(battleChits);
     }
 
-    List<BattleChit> getBattleChits(final String hexLabel)
+    public List<BattleChit> getBattleChits(final String hexLabel)
     {
         return CollectionHelper.selectAsList(battleChits,
             new Predicate<BattleChit>()
@@ -1983,42 +1240,34 @@ public final class Client implements IClient, IOracle
                 {
                     Legion legion = defender;
                     ((LegionClientSide)legion).removeCreature(name);
-                    if (eventViewer != null)
-                    {
-                        eventViewer.defenderSetCreatureDead(name, legion
-                            .getHeight());
-                    }
+                    gui.eventViewerDefenderSetCreatureDead(name, legion
+                        .getHeight());
+
                 }
                 else
                 {
                     Legion info = attacker;
                     ((LegionClientSide)info).removeCreature(name);
-                    if (eventViewer != null)
-                    {
-                        eventViewer.attackerSetCreatureDead(name, info
-                            .getHeight());
-                    }
+
+                    gui.eventViewerAttackerSetCreatureDead(name, info
+                        .getHeight());
+
                 }
             }
         }
-        if (battleBoard != null)
-        {
-            battleBoard.repaint();
-        }
+
+        gui.repaintBattleBoard();
     }
 
+    // TODO move to GUI ?
     public void placeNewChit(String imageName, boolean inverted, int tag,
         String hexLabel)
     {
         addBattleChit(imageName, inverted, tag, hexLabel);
-        if (battleBoard != null)
-        {
-            battleBoard.alignChits(hexLabel);
-            // Make sure map is visible after summon or muster.
-            focusMap();
-        }
+        gui.actOnPlaceNewChit(hexLabel);
     }
 
+    // TODO move to GUI ?
     /** Create a new BattleChit and add it to the end of the list. */
     private void addBattleChit(final String bareImageName, boolean inverted,
         int tag, String hexLabel)
@@ -2051,102 +1300,44 @@ public final class Client implements IClient, IOracle
         battleChits.add(chit);
     }
 
-
-    public int getRecruitChitMode()
-    {
-        return recruitChitMode;
-    }
-
-    public void addPossibleRecruitChits(LegionClientSide legion,
-        Set<MasterHex> hexes)
-    {
-        if (recruitChitMode == Options.showRecruitChitsNumNone)
-        {
-            return;
-        }
-
-        if (board != null)
-        {
-            board.addPossibleRecruitChits(legion, hexes);
-        }
-    }
-
-
-    CreatureType chooseBestPotentialRecruit(LegionClientSide legion,
+    public CreatureType chooseBestPotentialRecruit(LegionClientSide legion,
         MasterHex hex, List<CreatureType> recruits)
     {
         CreatureType recruit = ai.getVariantRecruitHint(legion, hex, recruits);
         return recruit;
     }
 
-    private void clearUndoStack()
-    {
-        undoStack.clear();
-    }
-
-    private Object popUndoStack()
-    {
-        return undoStack.removeFirst();
-    }
-
-    private void pushUndoStack(Object object)
-    {
-        undoStack.addFirst(object);
-    }
-
-    private boolean isUndoStackEmpty()
-    {
-        return undoStack.isEmpty();
-    }
-
-    Legion getMover()
+    public Legion getMover()
     {
         return mover;
     }
 
-    void setMover(LegionClientSide legion)
+    public void setMover(LegionClientSide legion)
     {
         this.mover = legion;
     }
 
-    MasterBoard getBoard()
+    // TODO several gui components still need to ask the client for access
+    //      to the board via the gui class ... - can this cleaned up?
+    public MasterBoard getBoard()
     {
-        return board;
+        return gui.getBoard();
     }
 
-    private static String propNameForceViewBoard = "net.sf.colossus.forceViewBoard";
+    public IClientGUI getGUI()
+    {
+        return gui;
+    }
 
     public void tellReplay(boolean val, int maxTurn)
     {
         replayOngoing = val;
-        if (replayOngoing)
-        {
-            replayMaxTurn = maxTurn;
-            if (board != null)
-            {
-                board.setReplayMode();
-                board.updateReplayText(0, replayMaxTurn);
-            }
-        }
-        else
-        {
-            if (board != null)
-            {
-                board.recreateMarkers();
-            }
-        }
+        gui.actOnTellReplay(maxTurn);
     }
 
-    public void replayTurnChange(int nowTurn)
+    public boolean isReplayOngoing()
     {
-        if (board != null)
-        {
-            if (nowTurn != replayLastTurn)
-            {
-                board.updateReplayText(nowTurn, replayMaxTurn);
-                replayLastTurn = nowTurn;
-            }
-        }
+        return replayOngoing;
     }
 
     public void confirmWhenCaughtUp()
@@ -2156,128 +1347,19 @@ public final class Client implements IClient, IOracle
 
     public void initBoard()
     {
-        LOGGER.finest(owningPlayer.getName() + " Client.initBoard()");
+        LOGGER.finest(getOwningPlayer().getName() + " Client.initBoard()");
         if (isRemote())
         {
             VariantSupport.loadVariantByName(options
                 .getStringOption(Options.variant), false);
         }
 
-        String viewModeName = options.getStringOption(Options.viewMode);
-        viewMode = options.getNumberForViewMode(viewModeName);
-
-        String rcMode = options
-            .getStringOption(Options.showRecruitChitsSubmenu);
-        if (rcMode == null || rcMode.equals(""))
-        {
-            // not set: convert from old "showAllRecruitChits" option
-            boolean showAll = options.getOption(Options.showAllRecruitChits);
-            if (showAll)
-            {
-                rcMode = Options.showRecruitChitsAll;
-            }
-            else
-            {
-                rcMode = Options.showRecruitChitsStrongest;
-            }
-            // initialize new option
-            options.setOption(Options.showRecruitChitsSubmenu, rcMode);
-            // clean up obsolete option from cfg file
-            options.removeOption(Options.showAllRecruitChits);
-        }
-        recruitChitMode = options.getNumberForRecruitChitSelection(rcMode);
-
-        // Intended for stresstest, to see whats happening, and that graphics
-        // stuff is there done, too.
-        // This here works only if name setting is done "by-type", so that
-        // at least one AI gets a name ending with "1".
-        boolean forceViewBoard = false;
-        String propViewBoard = System.getProperty(propNameForceViewBoard);
-        if (propViewBoard != null && propViewBoard.equalsIgnoreCase("yes"))
-        {
-            forceViewBoard = true;
-            options.setOption(Options.showEventViewer, "true");
-            options.setOption(Options.showStatusScreen, "true");
-        }
-
-        if (!options.getOption(Options.autoPlay)
-            || (forceViewBoard && (owningPlayer.getName().endsWith("1")
-                || options.getStringOption(Options.playerType).endsWith(
-                    "Human") || options.getStringOption(Options.playerType)
-                .endsWith("Network"))))
-        {
-            ensureEdtSetupClientGUI();
-        }
-
-        if (startedByWebClient)
-        {
-            if (webClient != null)
-            {
-                webClient.notifyComingUp();
-            }
-        }
-    }
-
-    public void ensureEdtSetupClientGUI()
-    {
-        if (SwingUtilities.isEventDispatchThread())
-        {
-            setupClientGUI();
-        }
-        else
-        {
-            try
-            {
-                SwingUtilities.invokeAndWait(new Runnable()
-                {
-                    public void run()
-                    {
-                        setupClientGUI();
-                    }
-                });
-            }
-            catch (InvocationTargetException e)
-            {
-                LOGGER.log(Level.SEVERE,
-                    "Failed to run setupClientGUI with invokeAndWait(): ", e);
-            }
-            catch (InterruptedException e2)
-            {
-                LOGGER.log(Level.SEVERE,
-                    "Failed to run setupClientGUI with invokeAndWait(): ", e2);
-            }
-
-        }
+        gui.initBoard();
     }
 
     public void setupClientGUI()
     {
-        disposeEventViewer();
-        disposePreferencesWindow();
-        disposeEngagementResults();
-        disposeInspector();
-        disposeCaretakerDisplay();
-        disposeLogWindow();
-        disposeMasterBoard();
-
-        int scale = options.getIntOption(Options.scale);
-        if (scale == -1)
-        {
-            scale = 15;
-            options.setOption(Options.scale, scale);
-            options.saveOptions();
-        }
-        Scale.set(scale);
-
-        board = new MasterBoard(this);
-        initEventViewer();
-        initShowEngagementResults();
-        initPreferencesWindow();
-        showOrHideAutoInspector(options.getOption(Options.showAutoInspector));
-        showOrHideLogWindow(options.getOption(Options.showLogWindow));
-        showOrHideCaretaker(options.getOption(Options.showCaretaker));
-
-        focusBoard();
+        gui.setupClientGUI();
     }
 
     public void setPlayerName(String playerName)
@@ -2302,7 +1384,8 @@ public final class Client implements IClient, IOracle
         }
         else
         {
-            typeColonDonor = SummonAngel.summonAngel(this, legion);
+            typeColonDonor = gui.doPickSummonAngel(legion);
+
         }
         if (typeColonDonor != null)
         {
@@ -2333,12 +1416,11 @@ public final class Client implements IClient, IOracle
         }
         else
         {
-            board.deiconify();
-            new AcquireAngel(board.getFrame(), this, legion, recruits);
+            gui.doAcquireAngel(legion, recruits);
         }
     }
 
-    void acquireAngelCallback(Legion legion, String angelType)
+    public void acquireAngelCallback(Legion legion, String angelType)
     {
         server.acquireAngel(legion, angelType);
     }
@@ -2351,20 +1433,14 @@ public final class Client implements IClient, IOracle
         {
             return false;
         }
+
         // No point in teleporting if entry side is moot.
         if (!isOccupied(hex))
         {
             return false;
         }
 
-        String[] options = new String[2];
-        options[0] = "Teleport";
-        options[1] = "Move Normally";
-        int answer = JOptionPane.showOptionDialog(board, "Teleport?",
-            "Teleport?", JOptionPane.YES_NO_OPTION,
-            JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-
-        return (answer == JOptionPane.YES_OPTION);
+        return gui.chooseWhetherToTeleport();
     }
 
     /** Allow the player to choose whether to take a penalty (fewer dice
@@ -2378,130 +1454,14 @@ public final class Client implements IClient, IOracle
         }
         else
         {
-            new PickStrikePenalty(battleBoard, this, choices);
+            gui.doPickStrikePenalty(this, choices);
         }
     }
 
-    void assignStrikePenalty(String prompt)
+    public void assignStrikePenalty(String prompt)
     {
-        if (battleBoard != null)
-        {
-            battleBoard.highlightCrittersWithTargets();
-        }
+        gui.highlightCrittersWithTargets();
         server.assignStrikePenalty(prompt);
-    }
-
-    private JFrame getMapOrBoardFrame()
-    {
-        JFrame frame = null;
-        if (battleBoard != null)
-        {
-            frame = battleBoard;
-        }
-        else if (board != null)
-        {
-            frame = board.getFrame();
-        }
-        return frame;
-    }
-
-    public void showErrorMessage(String reason, String title)
-    {
-        boolean isDummyFrame = false;
-        JFrame f = getMapOrBoardFrame();
-        // I do not use null or a simple frame, because then the System.exit(0)
-        // does not exit by itself (due to some bug in Swing/AWT).
-        if (f == null)
-        {
-            f = new KFrame("Dummyframe for Client error message dialog");
-            isDummyFrame = true;
-        }
-        JOptionPane.showMessageDialog(f, reason, title,
-            JOptionPane.ERROR_MESSAGE);
-        if (isDummyFrame)
-        {
-            f.dispose();
-            f = null;
-        }
-    }
-
-    String getMessage()
-    {
-        return this.message;
-    }
-
-    String message = "";
-
-    public void showMessageDialog(String message)
-    {
-        if (SwingUtilities.isEventDispatchThread())
-        {
-            doShowMessageDialog(message);
-        }
-        else
-        {
-            this.message = message;
-            try
-            {
-                SwingUtilities.invokeAndWait(new Runnable()
-                {
-                    public void run()
-                    {
-                        doShowMessageDialog(getMessage());
-                    }
-                });
-            }
-            catch (InterruptedException e)
-            {/* ignore */
-            }
-            catch (InvocationTargetException e2)
-            {/* ignore */
-            }
-        }
-    }
-
-    public void showNonModalMessageDialog(String message)
-    {
-        if (SwingUtilities.isEventDispatchThread())
-        {
-            doShowMessageDialog(message);
-        }
-        else
-        {
-            this.message = message;
-            SwingUtilities.invokeLater(new Runnable()
-            {
-                public void run()
-                {
-                    doShowMessageDialog(getMessage());
-                }
-            });
-        }
-    }
-
-    void doShowMessageDialog(String message)
-    {
-        // Don't bother showing messages to AI players.  Perhaps we
-        // should log them.
-        if (options.getOption(Options.autoPlay))
-        {
-            boolean isAI = getOwningPlayer().isAI();
-            if ((message.equals("Draw") || message.endsWith(" wins")) && !isAI
-                && !options.getOption(Options.autoQuit))
-            {
-                // show it for humans, even in autoplay,
-                //  but not when autoQuit set (=> remote stresstest)
-            }
-            else
-            {
-                return;
-            }
-        }
-        JFrame frame = getMapOrBoardFrame();
-        if (frame != null)
-        {
-            JOptionPane.showMessageDialog(frame, message);
-        }
     }
 
     // TODO Move legion markers to slayer on client side.
@@ -2531,39 +1491,15 @@ public final class Client implements IClient, IOracle
             + " received from server game over message: " + message);
         gameOver = true;
 
-        if (webClient != null)
-        {
-            webClient.tellGameEnds();
-        }
-
-        if (board != null)
-        {
-            if (statusScreen != null)
-            {
-                statusScreen.repaint();
-            }
-            defaultCursor();
-            board.setGameOverState(message);
-            if (disposeFollows)
-            {
-                // tell it later, together with the immediately following
-                // server closed connection message
-                gameOverMessage = message;
-            }
-            else
-            {
-                // show right away. Connection closed might come or not.
-                showMessageDialog(message);
-            }
-        }
+        gui.actOnTellGameOver(message, disposeFollows);
     }
 
-    boolean isGameOver()
+    public boolean isGameOver()
     {
         return gameOver;
     }
 
-    void doFight(MasterHex hex)
+    public void doFight(MasterHex hex)
     {
         if (!isMyTurn())
         {
@@ -2580,7 +1516,7 @@ public final class Client implements IClient, IOracle
         }
         else
         {
-            Concede.concede(this, board.getFrame(), ally, enemy);
+            gui.showConcede(this, ally, enemy);
         }
     }
 
@@ -2592,11 +1528,11 @@ public final class Client implements IClient, IOracle
         }
         else
         {
-            Concede.flee(this, board.getFrame(), ally, enemy);
+            gui.showFlee(this, ally, enemy);
         }
     }
 
-    void answerFlee(Legion ally, boolean answer)
+    public void answerFlee(Legion ally, boolean answer)
     {
         if (answer)
         {
@@ -2608,7 +1544,7 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    void answerConcede(Legion legion, boolean answer)
+    public void answerConcede(Legion legion, boolean answer)
     {
         if (answer)
         {
@@ -2634,12 +1570,18 @@ public final class Client implements IClient, IOracle
         }
         else
         {
-            negotiate = new Negotiate(this, attacker, defender);
+            gui.showNegotiate(attacker, defender);
         }
     }
 
+    /** Inform this player about the other player's proposal. */
+    public void tellProposal(String proposalString)
+    {
+        gui.tellProposal(proposalString);
+    }
+
     /** Called from both Negotiate and ReplyToProposal. */
-    void negotiateCallback(Proposal proposal, boolean respawn)
+    public void negotiateCallback(Proposal proposal, boolean respawn)
     {
         if (proposal != null && proposal.isFight())
         {
@@ -2653,12 +1595,9 @@ public final class Client implements IClient, IOracle
 
         if (respawn)
         {
-            if (negotiate != null)
-            {
-                negotiate.dispose();
-            }
-            negotiate = new Negotiate(this, attacker, defender);
+            gui.respawnNegotiate();
         }
+
     }
 
     private void makeProposal(Proposal proposal)
@@ -2666,16 +1605,9 @@ public final class Client implements IClient, IOracle
         server.makeProposal(proposal.toString());
     }
 
-    /** Inform this player about the other player's proposal. */
-    public void tellProposal(String proposalString)
+    public void doTellProposal(String proposalString)
     {
-        Proposal proposal = Proposal.makeFromString(proposalString);
-        if (replyToProposal != null)
-        {
-            replyToProposal.dispose();
-        }
-        replyToProposal = new ReplyToProposal(this, proposal);
-
+        gui.tellProposal(proposalString);
     }
 
     public BattleHex getBattleHex(BattleChit chit)
@@ -2695,16 +1627,6 @@ public final class Client implements IClient, IOracle
         return !getBattleChits(hex.getLabel()).isEmpty();
     }
 
-    private String getBattleChitDescription(BattleChit chit)
-    {
-        if (chit == null)
-        {
-            return "";
-        }
-        BattleHex hex = getBattleHex(chit);
-        return chit.getCreatureName() + " in " + hex.getDescription();
-    }
-
     public void tellStrikeResults(int strikerTag, int targetTag,
         int strikeNumber, List<String> rolls, int damage, boolean killed,
         boolean wasCarry, int carryDamageLeft,
@@ -2716,18 +1638,12 @@ public final class Client implements IClient, IOracle
             chit.setStruck(true);
         }
 
-        disposePickCarryDialog();
+        gui.disposePickCarryDialog();
 
         BattleChit targetChit = getBattleChit(targetTag);
-        if (battleBoard != null)
-        {
-            if (!wasCarry)
-            {
-                battleBoard.addDiceResults(getBattleChitDescription(chit),
-                    getBattleChitDescription(targetChit), strikeNumber, rolls);
-            }
-            battleBoard.unselectAllHexes();
-        }
+
+        gui.actOnTellStrikeResults(wasCarry, strikeNumber, rolls, chit,
+            targetChit);
 
         if (targetChit != null)
         {
@@ -2876,34 +1792,8 @@ public final class Client implements IClient, IOracle
             }
             else
             {
-                Set<String> carryTargetHexes = new TreeSet<String>();
-                for (String desc : carryTargetDescriptions)
-                {
-                    carryTargetHexes.add(desc.substring(desc.length() - 2));
-                }
-                battleBoard.highlightPossibleCarries(carryTargetHexes);
-                pickCarryDialog = new PickCarry(battleBoard, this, carryDamage,
-                    carryTargetDescriptions);
+                gui.doPickCarries(this, carryDamage, carryTargetDescriptions);
             }
-        }
-    }
-
-    public PickCarry getPickCarryDialog()
-    {
-        return pickCarryDialog;
-    }
-
-    void cleanupNegotiationDialogs()
-    {
-        if (negotiate != null)
-        {
-            negotiate.dispose();
-            negotiate = null;
-        }
-        if (replyToProposal != null)
-        {
-            replyToProposal.dispose();
-            replyToProposal = null;
         }
     }
 
@@ -2911,7 +1801,7 @@ public final class Client implements IClient, IOracle
         Player battleActivePlayer, Constants.BattlePhase battlePhase,
         Legion attacker, Legion defender)
     {
-        cleanupNegotiationDialogs();
+        gui.cleanupNegotiationDialogs();
 
         this.battleTurnNumber = battleTurnNumber;
         setBattleActivePlayer(battleActivePlayer);
@@ -2926,75 +1816,21 @@ public final class Client implements IClient, IOracle
         int defenderSide = (attackerSide + 3) % 6;
         this.defender.setEntrySide(defenderSide);
 
-        if (board != null)
-        {
-            ensureEdtNewBattleBoard();
-        }
+        gui.actOnInitBattle();
     }
 
-    public void ensureEdtNewBattleBoard()
+    public void showMessageDialog(String message)
     {
-        if (SwingUtilities.isEventDispatchThread())
-        {
-            doNewBattleBoard();
-        }
-        else
-        {
-            // @TODO: use invokeLater() instead of invokeAndWait() ?
-            //
-            // Right now I don't dare to use invokeLater() - this way here
-            // it preserves the execution order as it was without EDT,
-            // but GUI stuff is one in EDT so we are safe from exceptions.
-            Exception e = null;
-            try
-            {
-                SwingUtilities.invokeAndWait(new Runnable()
-                {
-                    public void run()
-                    {
-                        doNewBattleBoard();
-                    }
-
-                });
-            }
-            catch (InvocationTargetException e1)
-            {
-                e = e1;
-            }
-            catch (InterruptedException e2)
-            {
-                e = e2;
-            }
-
-            if (e != null)
-            {
-                String message = "Failed to run doNewBattleBoard with "
-                    + "invokeAndWait(): ";
-                LOGGER.log(Level.SEVERE, message, e);
-            }
-        }
-    }
-
-    public void doNewBattleBoard()
-    {
-        if (battleBoard != null)
-        {
-            LOGGER.warning("Old BattleBoard still in place? Disposing it.");
-            battleBoard.dispose();
-            battleBoard = null;
-        }
-        battleBoard = new BattleBoard(this, battleSite, attacker, defender);
+        gui.showMessageDialog(message);
     }
 
     public void cleanupBattle()
     {
         LOGGER.log(Level.FINEST, owningPlayer.getName()
             + " Client.cleanupBattle()");
-        if (battleBoard != null)
-        {
-            battleBoard.dispose();
-            battleBoard = null;
-        }
+
+        gui.actOnCleanupBattle();
+
         battleChits.clear();
         battlePhase = null;
         battleTurnNumber = -1;
@@ -3012,21 +1848,9 @@ public final class Client implements IClient, IOracle
         return 7;
     }
 
-    private void highlightEngagements()
-    {
-        if (board != null)
-        {
-            if (owningPlayer.equals(getActivePlayer()))
-            {
-                focusBoard();
-            }
-            board.highlightEngagements();
-        }
-    }
-
     public void nextEngagement()
     {
-        highlightEngagements();
+        gui.highlightEngagements();
         if (isMyTurn())
         {
             if (options.getOption(Options.autoPickEngagements))
@@ -3044,22 +1868,20 @@ public final class Client implements IClient, IOracle
             }
             else
             {
-                defaultCursor();
+                gui.defaultCursor();
             }
-            if (findEngagements().isEmpty() && board != null)
-            {
-                board.enableDoneAction();
-            }
+
+            gui.actOnNextEngagement();
         }
     }
 
     /** Used for human players only.  */
-    void doRecruit(Legion legion)
+    public void doRecruit(Legion legion)
     {
         if (isMyTurn() && isMyLegion(legion)
             && ((LegionClientSide)legion).hasRecruited())
         {
-            undoRecruit(legion);
+            gui.undoRecruit(legion);
             return;
         }
 
@@ -3069,12 +1891,9 @@ public final class Client implements IClient, IOracle
             return;
         }
 
-        List<CreatureType> recruits = findEligibleRecruits(legion, legion
-            .getCurrentHex());
         String hexDescription = legion.getCurrentHex().getDescription();
 
-        String recruitName = PickRecruit.pickRecruit(board.getFrame(),
-            recruits, hexDescription, legion, this);
+        String recruitName = gui.doPickRecruit(legion, hexDescription);
 
         if (recruitName == null)
         {
@@ -3110,12 +1929,9 @@ public final class Client implements IClient, IOracle
         }
         else
         {
-            List<CreatureType> recruits = findEligibleRecruits(legion, legion
-                .getCurrentHex());
             String hexDescription = legion.getCurrentHex().getDescription();
 
-            String recruitName = PickRecruit.pickRecruit(board.getFrame(),
-                recruits, hexDescription, legion, this);
+            String recruitName = gui.doPickRecruit(legion, hexDescription);
 
             String recruiterName = null;
             if (recruitName != null)
@@ -3132,7 +1948,7 @@ public final class Client implements IClient, IOracle
     {
         if (isMyLegion(legion))
         {
-            pushUndoStack(legion.getMarkerId());
+            gui.pushUndoStack(legion.getMarkerId());
         }
 
         List<String> recruiters = new ArrayList<String>();
@@ -3144,23 +1960,14 @@ public final class Client implements IClient, IOracle
             }
             revealCreatures(legion, recruiters, Constants.reasonRecruiter);
         }
-        String reason = (battleSite != null ?
-            Constants.reasonReinforced : Constants.reasonRecruited);
+        String reason = (battleSite != null ? Constants.reasonReinforced
+            : Constants.reasonRecruited);
 
         addCreature(legion, recruitName, reason);
         ((LegionClientSide)legion).setRecruitName(recruitName);
 
-        if (board != null)
-        {
-            board.addRecruitedChit(legion);
-            board.highlightPossibleRecruitLegionHexes();
+        gui.actOnDidRecruit(legion, recruitName, recruiters, reason);
 
-            if (eventViewer != null)
-            {
-                eventViewer.recruitEvent(legion.getMarkerId(), (legion)
-                    .getHeight(), recruitName, recruiters, reason);
-            }
-        }
     }
 
     public void undidRecruit(Legion legion, String recruitName)
@@ -3169,10 +1976,9 @@ public final class Client implements IClient, IOracle
         if (battlePhase != null)
         {
             eventType = RevealEvent.eventReinforce;
-            if (eventViewer != null)
-            {
-                eventViewer.cancelReinforcement(recruitName, getTurnNumber());
-            }
+
+            gui.eventViewerCancelReinforcement(recruitName, getTurnNumber());
+
         }
         else
         {
@@ -3182,17 +1988,9 @@ public final class Client implements IClient, IOracle
         }
 
         ((LegionClientSide)legion).setRecruitName(null);
-        if (board != null)
-        {
-            board.cleanRecruitedChit((LegionClientSide)legion);
-            board.highlightPossibleRecruitLegionHexes();
 
-            if (eventViewer != null)
-            {
-                eventViewer.undoEvent(eventType, legion
-                    .getMarkerId(), null, turnNumber);
-            }
-        }
+        gui.actOnUndidRecruitPart2(legion, eventType, turnNumber);
+
     }
 
     /** null means cancel.  "none" means no recruiter (tower creature). */
@@ -3219,14 +2017,8 @@ public final class Client implements IClient, IOracle
         }
         else
         {
-            // Even if PickRecruiter dialog is modal, this only prevents mouse
-            // and keyboard into; but with pressing "D" one could still end the
-            // recruiting phase which leaves game in inconsisten state...
-            // So, forcibly really disable the Done action for that time.
-            board.disableDoneAction("Finish 'Pick Recruiter' first");
-            recruiterName = PickRecruiter.pickRecruiter(board.getFrame(),
-                recruiters, hexDescription, legion, this);
-            board.enableDoneAction();
+            recruiterName = gui.doPickRecruiter(recruiters, hexDescription,
+                legion);
         }
         return recruiterName;
     }
@@ -3237,11 +2029,11 @@ public final class Client implements IClient, IOracle
     {
         this.activePlayer = (PlayerClientSide)activePlayer;
         this.turnNumber = turnNumber;
-        if (eventViewer != null)
-        {
-            eventViewer.turnOrPlayerChange(this, turnNumber, this.activePlayer
+
+        gui
+            .turnOrPlayerChange(this, turnNumber, this.activePlayer
                 .getNumber());
-        }
+
     }
 
     private void resetAllMoves()
@@ -3257,108 +2049,26 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    private void defaultCursor()
-    {
-        if (board != null)
-        {
-            board.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-        }
-    }
-
-    private void waitCursor()
-    {
-        if (board != null)
-        {
-            board.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        }
-    }
-
     public void setBoardActive(boolean val)
     {
-        board.setBoardActive(val);
+        gui.setBoardActive(val);
     }
 
     public void setupSplit(Player activePlayer, int turnNumber)
     {
-        clearUndoStack();
-        cleanupNegotiationDialogs();
-
         this.activePlayer = (PlayerClientSide)activePlayer;
         this.turnNumber = turnNumber;
 
-        if (eventViewer != null)
-        {
-            eventViewer.turnOrPlayerChange(this, turnNumber, this.activePlayer
-                .getNumber());
-        }
-
-        this.phase = Constants.Phase.SPLIT;
+        gui.actOnSetupSplit(this, turnNumber, this.activePlayer.getNumber());
 
         numSplitsThisTurn = 0;
+        this.phase = Constants.Phase.SPLIT;
 
         resetAllMoves();
 
-        if (board != null)
-        {
-            if (isMyTurn())
-            {
-                // for debug purposes. We had a bug where legions remain
-                // on the board even if player is dead. So, let's check
-                // for this once per turn and clean up.
-                validateLegions();
-            }
+        gui.actOnSetupSplitPart2();
 
-            disposeMovementDie();
-            board.setupSplitMenu();
-            board.fullRepaint(); // Ensure that movement die goes away
-            if (isMyTurn())
-            {
-                if (turnNumber == 1)
-                {
-                    board.disableDoneAction("Split legions in first round");
-                }
-                focusBoard();
-                defaultCursor();
-                if (!options.getOption(Options.autoSplit)
-                    && (getOwningPlayer().getMarkersAvailable().size() < 1 || findTallLegionHexes(
-                        4).isEmpty()))
-                {
-                    doneWithSplits();
-                }
-            }
-            else
-            {
-                waitCursor();
-            }
-        }
-        updateStatusScreen();
         kickSplit();
-    }
-
-    private void validateLegions()
-    {
-        boolean foundProblem = false;
-
-        for (Player p : players)
-        {
-            if (p.isDead())
-            {
-                for (Legion l : p.getLegions())
-                {
-                    LOGGER.warning("Dead player " + p.getName() + " has "
-                        + "still legion " + l.getMarkerId()
-                        + ". Removing it.");
-                    p.removeLegion(l);
-                    foundProblem = true;
-                }
-            }
-        }
-        if (foundProblem)
-        {
-            LOGGER.info("Found legion(s) for dead player "
-                + "- recreating markers");
-            board.recreateMarkers();
-        }
     }
 
     public boolean onlyAIsRemain()
@@ -3389,31 +2099,19 @@ public final class Client implements IClient, IOracle
     public void setupMove()
     {
         this.phase = Constants.Phase.MOVE;
-        clearUndoStack();
-        if (board != null)
-        {
-            board.setupMoveMenu();
-        }
-        if (isMyTurn())
-        {
-            defaultCursor();
-        }
-        updateStatusScreen();
+
+        gui.actOnSetupMove();
     }
 
     public void setupFight()
     {
-        clearUndoStack();
         this.phase = Constants.Phase.FIGHT;
-        if (board != null)
-        {
-            board.setupFightMenu();
-        }
-        updateStatusScreen();
+
+        gui.actOnSetupFight();
 
         if (isMyTurn())
         {
-            defaultCursor();
+            gui.defaultCursor();
             if (options.getOption(Options.autoPickEngagements))
             {
                 aiPause();
@@ -3431,26 +2129,9 @@ public final class Client implements IClient, IOracle
 
     public void setupMuster()
     {
-        clearUndoStack();
-        cleanupNegotiationDialogs();
-
         this.phase = Constants.Phase.MUSTER;
 
-        if (board != null)
-        {
-            board.setupMusterMenu();
-            if (isMyTurn())
-            {
-                focusBoard();
-                defaultCursor();
-                if (!options.getOption(Options.autoRecruit)
-                    && getPossibleRecruitHexes().isEmpty())
-                {
-                    doneWithRecruits();
-                }
-            }
-        }
-        updateStatusScreen();
+        gui.actOnSetupMuster();
 
         // I changed the "&& !isGameOver()" to "&& I am not dead";
         // before, this makes autorecruit stop working also for human
@@ -3476,22 +2157,8 @@ public final class Client implements IClient, IOracle
         setBattleActivePlayer(battleActivePlayer);
         this.battleTurnNumber = battleTurnNumber;
 
-        if (battleBoard != null)
-        {
-            battleBoard.setPhase(battlePhase);
-            battleBoard.setTurn(battleTurnNumber);
-            if (isMyBattlePhase())
-            {
-                focusMap();
-                battleBoard.setupSummonMenu();
-                defaultCursor();
-            }
-            else
-            {
-                waitCursor();
-            }
-        }
-        updateStatusScreen();
+        gui.actOnSetupBattleSummon();
+
     }
 
     public void setupBattleRecruit(Player battleActivePlayer,
@@ -3501,17 +2168,8 @@ public final class Client implements IClient, IOracle
         setBattleActivePlayer(battleActivePlayer);
         this.battleTurnNumber = battleTurnNumber;
 
-        if (battleBoard != null)
-        {
-            battleBoard.setPhase(battlePhase);
-            battleBoard.setTurn(battleTurnNumber);
-            if (isMyBattlePhase())
-            {
-                focusMap();
-                battleBoard.setupRecruitMenu();
-            }
-        }
-        updateStatusScreen();
+        gui.actOnSetupBattleRecruit();
+
     }
 
     private void resetAllBattleMoves()
@@ -3530,21 +2188,12 @@ public final class Client implements IClient, IOracle
 
         // Just in case the other player started the battle
         // really quickly.
-        cleanupNegotiationDialogs();
+        gui.cleanupNegotiationDialogs();
         resetAllBattleMoves();
         this.battlePhase = Constants.BattlePhase.MOVE;
-        if (battleBoard != null)
-        {
-            battleBoard.setPhase(battlePhase);
-            battleBoard.setTurn(battleTurnNumber);
-            if (isMyBattlePhase())
-            {
-                focusMap();
-                defaultCursor();
-                battleBoard.setupMoveMenu();
-            }
-        }
-        updateStatusScreen();
+
+        gui.actOnSetupBattleMove();
+
         if (isMyBattlePhase() && options.getOption(Options.autoPlay))
         {
             bestMoveOrder = ai.battleMove();
@@ -3600,22 +2249,7 @@ public final class Client implements IClient, IOracle
             markOffboardCreaturesDead();
         }
 
-        if (battleBoard != null)
-        {
-            battleBoard.setPhase(battlePhase);
-            battleBoard.setTurn(battleTurnNumber);
-            if (isMyBattlePhase())
-            {
-                focusMap();
-                defaultCursor();
-            }
-            else
-            {
-                waitCursor();
-            }
-            battleBoard.setupFightMenu();
-        }
-        updateStatusScreen();
+        gui.actOnSetupBattleFight(battlePhase, battleTurnNumber);
 
         doAutoStrikes();
     }
@@ -3625,35 +2259,15 @@ public final class Client implements IClient, IOracle
     {
         legion.setCurrentHex(hex);
 
-        if (board != null)
-        {
-            // @TODO: this creates it every time, not only when necessary ?
-            Marker marker = new Marker(3 * Scale.get(), legion.getMarkerId(),
-                this);
-            setMarker(legion, marker);
-            // TODO next line seems redundant since setMarker(..) does set the marker on the legion
-            ((LegionClientSide)legion).setMarker(marker);
-            if (!replayOngoing)
-            {
-                board.alignLegions(hex);
-            }
-        }
+        gui.actOnTellLegionLocation(legion, hex);
     }
 
-    private void setupPlayerLabel()
-    {
-        if (board != null)
-        {
-            board.setupPlayerLabel();
-        }
-    }
-
-    String getColor()
+    public String getColor()
     {
         return color;
     }
 
-    String getShortColor()
+    public String getShortColor()
     {
         return Constants.getShortColorName(color);
     }
@@ -3712,7 +2326,7 @@ public final class Client implements IClient, IOracle
         return attacker;
     }
 
-    Constants.BattlePhase getBattlePhase()
+    public Constants.BattlePhase getBattlePhase()
     {
         return battlePhase;
     }
@@ -3736,7 +2350,7 @@ public final class Client implements IClient, IOracle
         return battleTurnNumber;
     }
 
-    void doBattleMove(int tag, String hexLabel)
+    public void doBattleMove(int tag, String hexLabel)
     {
         server.doBattleMove(tag, hexLabel);
     }
@@ -3786,7 +2400,7 @@ public final class Client implements IClient, IOracle
     {
         if (isMyCritter(tag) && !undo)
         {
-            pushUndoStack(endingHexLabel);
+            gui.pushUndoStack(endingHexLabel);
             if (options.getOption(Options.autoPlay))
             {
                 markBattleMoveSuccessful(tag, endingHexLabel);
@@ -3798,13 +2412,9 @@ public final class Client implements IClient, IOracle
             chit.setHexLabel(endingHexLabel);
             chit.setMoved(!undo);
         }
-        if (battleBoard != null)
-        {
-            battleBoard.alignChits(startingHexLabel);
-            battleBoard.alignChits(endingHexLabel);
-            battleBoard.repaint();
-            battleBoard.highlightMobileCritters();
-        }
+
+        gui.actOnTellBattleMove(startingHexLabel, endingHexLabel);
+
     }
 
     /** Attempt to have critter tag strike the critter in hexLabel. */
@@ -3818,28 +2428,7 @@ public final class Client implements IClient, IOracle
     public void applyCarries(String hexLabel)
     {
         server.applyCarries(hexLabel);
-        if (battleBoard != null)
-        {
-            battleBoard.unselectHexByLabel(hexLabel);
-            battleBoard.repaint();
-        }
-    }
-
-    void undoLastBattleMove()
-    {
-        if (!isUndoStackEmpty())
-        {
-            String hexLabel = (String)popUndoStack();
-            server.undoBattleMove(hexLabel);
-        }
-    }
-
-    void undoAllBattleMoves()
-    {
-        while (!isUndoStackEmpty())
-        {
-            undoLastBattleMove();
-        }
+        gui.actOnAppliyCarries(hexLabel);
     }
 
     // public for IOracle
@@ -3888,7 +2477,7 @@ public final class Client implements IClient, IOracle
     }
 
     /** Return a set of hexLabels. */
-    Set<String> findMobileCritterHexes()
+    public Set<String> findMobileCritterHexes()
     {
         Set<String> set = new HashSet<String>();
         for (BattleChit chit : getActiveBattleChits())
@@ -3922,7 +2511,7 @@ public final class Client implements IClient, IOracle
     }
 
     /** Return a set of hexLabels. */
-    Set<String> findCrittersWithTargets()
+    public Set<String> findCrittersWithTargets()
     {
         return strike.findCrittersWithTargets();
     }
@@ -3933,7 +2522,8 @@ public final class Client implements IClient, IOracle
         return strike.findStrikes(tag);
     }
 
-    void setStrikeNumbers(int tag, Set<String> targetHexLabels)
+    // TODO GUI stuff?
+    public void setStrikeNumbers(int tag, Set<String> targetHexLabels)
     {
         BattleChit chit = getBattleChit(tag);
         for (String targetHexLabel : targetHexLabels)
@@ -3969,7 +2559,7 @@ public final class Client implements IClient, IOracle
     }
 
     /** reset all strike numbers on chits */
-    void resetStrikeNumbers()
+    public void resetStrikeNumbers()
     {
         for (BattleChit chit : battleChits)
         {
@@ -3978,7 +2568,7 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    Player getPlayerByTag(int tag)
+    public Player getPlayerByTag(int tag)
     {
         BattleChit chit = getBattleChit(tag);
         assert chit != null : "Illegal value for tag parameter";
@@ -4004,7 +2594,7 @@ public final class Client implements IClient, IOracle
         return activePlayer;
     }
 
-    Constants.Phase getPhase()
+    public Constants.Phase getPhase()
     {
         return phase;
     }
@@ -4054,7 +2644,7 @@ public final class Client implements IClient, IOracle
                 }
                 else
                 {
-                    return PickLord.pickLord(options, board.getFrame(), lords);
+                    return gui.doPickLord(lords);
                 }
         }
     }
@@ -4106,7 +2696,7 @@ public final class Client implements IClient, IOracle
         return lords;
     }
 
-    boolean doMove(MasterHex hex)
+    public boolean doMove(MasterHex hex)
     {
         return doMove(mover, hex);
     }
@@ -4149,8 +2739,7 @@ public final class Client implements IClient, IOracle
         }
         else
         {
-            entrySide = PickEntrySide.pickEntrySide(board.getFrame(), hex,
-                entrySides);
+            entrySide = gui.doPickEntrySide(hex, entrySides);
         }
 
         if (!goodEntrySide(entrySide))
@@ -4201,45 +2790,21 @@ public final class Client implements IClient, IOracle
     {
         if (isMyLegion(legion))
         {
-            pushUndoStack(legion.getMarkerId());
+            gui.pushUndoStack(legion.getMarkerId());
         }
         legion.setCurrentHex(currentHex);
         legion.setMoved(true);
         ((LegionClientSide)legion).setEntrySide(BattleMap
             .entrySideNum(entrySide));
 
-        // old version server does not send the teleportingLord,
-        // socketCLientThread sets then it to null.
-        if (teleport && teleportingLord != null)
+        if (teleport)
         {
             legion.setTeleported(true);
-            if (eventViewer != null)
-            {
-                eventViewer.newCreatureRevealEvent(RevealEvent.eventTeleport,
-                    legion.getMarkerId(), legion.getHeight(), teleportingLord,
-                    null, 0);
-            }
         }
 
-        if (board != null)
-        {
-            board.clearPossibleRecruitChits();
-            board.alignLegions(startingHex);
-            board.alignLegions(currentHex);
-            board.highlightUnmovedLegions();
-            board.repaint();
-            if (isMyLegion(legion))
-            {
-                if (splitLegionHasForcedMove)
-                {
-                    board.disableDoneAction("Split legion needs to move");
-                }
-                else
-                {
-                    board.enableDoneAction();
-                }
-            }
-        }
+        gui.actOnDidMove(legion, startingHex, currentHex, teleport,
+            teleportingLord, splitLegionHasForcedMove);
+
         kickMoves();
     }
 
@@ -4251,31 +2816,10 @@ public final class Client implements IClient, IOracle
         legion.setMoved(false);
         boolean didTeleport = legion.hasTeleported();
         legion.setTeleported(false);
-        if (board != null)
-        {
-            board.clearPossibleRecruitChits();
-            board.alignLegions(formerHex);
-            board.alignLegions(currentHex);
-            board.highlightUnmovedLegions();
-            board.repaint();
-            if (isMyTurn())
-            {
-                if (isUndoStackEmpty())
-                {
-                    board.disableDoneAction("At least one legion must move");
-                }
-                if (splitLegionHasForcedMove)
-                {
-                    board.disableDoneAction("Split legion needs to move");
-                }
-            }
 
-            if (didTeleport && eventViewer != null)
-            {
-                eventViewer.undoEvent(RevealEvent.eventTeleport, legion
-                    .getMarkerId(), null, turnNumber);
-            }
-        }
+        gui.actOnUndidMove(legion, formerHex, currentHex,
+            splitLegionHasForcedMove, didTeleport);
+
     }
 
     /*
@@ -4482,7 +3026,7 @@ public final class Client implements IClient, IOracle
     }
 
     /** Return a set of hexLabels. */
-    Set<MasterHex> getPossibleRecruitHexes()
+    public Set<MasterHex> getPossibleRecruitHexes()
     {
         Set<MasterHex> result = new HashSet<MasterHex>();
 
@@ -4528,21 +3072,21 @@ public final class Client implements IClient, IOracle
     }
 
     /** Return a set of hexLabels. */
-    Set<MasterHex> listTeleportMoves(Legion legion)
+    public Set<MasterHex> listTeleportMoves(Legion legion)
     {
         MasterHex hex = legion.getCurrentHex();
         return movement.listTeleportMoves(legion, hex, movementRoll);
     }
 
     /** Return a set of hexLabels. */
-    Set<MasterHex> listNormalMoves(LegionClientSide legion)
+    public Set<MasterHex> listNormalMoves(LegionClientSide legion)
     {
         return movement.listNormalMoves(legion, legion.getCurrentHex(),
             movementRoll);
     }
 
-    Set<String> listPossibleEntrySides(LegionClientSide mover, MasterHex hex,
-        boolean teleport)
+    public Set<String> listPossibleEntrySides(LegionClientSide mover,
+        MasterHex hex, boolean teleport)
     {
         return movement.listPossibleEntrySides(mover, hex, teleport);
     }
@@ -4564,7 +3108,7 @@ public final class Client implements IClient, IOracle
         return legions;
     }
 
-    Set<MasterHex> findUnmovedLegionHexes()
+    public Set<MasterHex> findUnmovedLegionHexes()
     {
         Set<MasterHex> result = new HashSet<MasterHex>();
         for (Legion legion : activePlayer.getLegions())
@@ -4579,14 +3123,14 @@ public final class Client implements IClient, IOracle
 
     /** Return a set of hexLabels for the active player's legions with
      *  7 or more creatures. */
-    Set<MasterHex> findTallLegionHexes()
+    public Set<MasterHex> findTallLegionHexes()
     {
         return findTallLegionHexes(7);
     }
 
     /** Return a set of hexLabels for the active player's legions with
      *  minHeight or more creatures. */
-    Set<MasterHex> findTallLegionHexes(int minHeight)
+    public Set<MasterHex> findTallLegionHexes(int minHeight)
     {
         Set<MasterHex> result = new HashSet<MasterHex>();
 
@@ -4731,27 +3275,9 @@ public final class Client implements IClient, IOracle
             });
     }
 
-    // Used by File=>Close and Window closing
-    public void setWhatToDoNextForClose()
-    {
-        if (startedByWebClient)
-        {
-            Start.setCurrentWhatToDoNext(Start.StartWebClient);
-        }
-        else if (isRemote())
-        {
-            // Remote clients get back to Network Client dialog
-            Start.setCurrentWhatToDoNext(Start.NetClientDialog);
-        }
-        else
-        {
-            Start.setCurrentWhatToDoNext(Start.GetPlayersDialog);
-        }
-    }
-
     public void notifyServer()
     {
-        clearUndoStack();
+        gui.clearUndoStack();
         if (!isRemote())
         {
             server.stopGame();
@@ -4759,239 +3285,29 @@ public final class Client implements IClient, IOracle
         disposeClientOriginated();
     }
 
-    boolean quitAlreadyTried = false;
-
-    public void menuCloseBoard()
+    public boolean isSctAlreadyDown()
     {
-        clearUndoStack();
-        Start.setCurrentWhatToDoNext(Start.GetPlayersDialog);
-        disposeClientOriginated();
-    }
-
-    public void menuQuitGame()
-    {
-        // Note that if this called from webclient, webclient has already
-        // beforehand called client to set webclient to null :)
-        if (webClient != null)
-        {
-            webClient.dispose();
-            webClient = null;
-        }
-
-        // as a fallback/safety: if the close/dispose chain does not work,
-        // on 2nd attempt directly do System.exit() so that user can somehow
-        // get rid of the game "cleanly"...
-        if (quitAlreadyTried)
-        {
-            JOptionPane.showMessageDialog(getMapOrBoardFrame(),
-                "Arggh!! Seems the standard Quit procedure does not work.\n"
-                    + "Doing System.exit() now the hard way.",
-                "Proper quitting failed!", JOptionPane.INFORMATION_MESSAGE);
-
-            System.exit(1);
-        }
-        quitAlreadyTried = true;
-
-        Start.setCurrentWhatToDoNext(Start.QuitAll);
-        Start.triggerTimedQuit();
-        notifyServer();
-    }
-
-    void menuNewGame()
-    {
-        if (webClient != null)
-        {
-            webClient.dispose();
-            webClient = null;
-        }
-        setWhatToDoNextForClose();
-        notifyServer();
-    }
-
-    void menuLoadGame(String filename)
-    {
-        if (webClient != null)
-        {
-            webClient.dispose();
-            webClient = null;
-        }
-        Start.setCurrentWhatToDoNext(Start.LoadGame, filename);
-        notifyServer();
-    }
-
-    void menuSaveGame(String filename)
-    {
-        if (isRemote())
-        {
-            // In practice this should never happen, because in remote
-            // clients the File=>Save menu actions should not be visible
-            // at all. But who knows...
-            JOptionPane.showMessageDialog(getMapOrBoardFrame(),
-                "The variable 'localServer' is null, which means you are "
-                + "playing with a remote client. How on earth did you manage "
-                + "to trigger a File=>Save action?\nAnyway, from a remote "
-                + "client I can't do File=>Save for you...",
-                "Save Game not available on remote client",
-                JOptionPane.ERROR_MESSAGE);
-        }
-        else
-        {
-            localServer.initiateSaveGame(filename);
-        }
-    }
-
-    /** When user requests it from File menu, this method here
-     *  requests the server to send us a confirmation package,
-     *  to confirm that connection is still alive and ok.
-     */
-    synchronized void checkServerConnection()
-    {
-        if (sct.isAlreadyDown())
-        {
-            JOptionPane.showMessageDialog(getMapOrBoardFrame(),
-                "No point to send check message - we know already that "
-                + " the socket connection is in 'down' state!",
-                "Useless attempt to check connection",
-                JOptionPane.INFORMATION_MESSAGE);
-
-            return;
-        }
-        connectionCheckTimer = new Timer(1000*CONN_CHECK_TIMEOUT,
-            new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                timeoutAbortsConnectionCheck();
-            }
-        });
-        connectionCheckTimer.start();
-
-        LOGGER.info("Client for player " + getOwningPlayer().getName() +
-        " checking server connection (sending request)");
-
-        server.checkServerConnection();
-    }
-
-    /** Upon request with checkServerConnection, server sends a confirmation.
-     *  This method here processes the confirmation.
-     */
-    public synchronized void serverConfirmsConnection()
-    {
-        LOGGER.info("Client for player " + getOwningPlayer().getName() +
-            " received confirmation that connection is OK.");
-        finishServerConnectionCheck(true);
-    }
-
-    /** Timeout reached. Cancel timer and show error message
-     */
-    public synchronized void timeoutAbortsConnectionCheck()
-    {
-        finishServerConnectionCheck(false);
-    }
-
-    /** Cleanup everything related to the serverConnectionCheck timer,
-     *  and show a message telling whether it went ok or not.
-     */
-    private void finishServerConnectionCheck(boolean success)
-    {
-        if (connectionCheckTimer == null)
-        {
-            // race - the other one came nearly same time, and comes now
-            // after the first one left this synchronized method.
-            return;
-        }
-        if (connectionCheckTimer.isRunning())
-        {
-            connectionCheckTimer.stop();
-        }
-        connectionCheckTimer = null;
-        if (success)
-        {
-            JOptionPane.showMessageDialog(getMapOrBoardFrame(),
-                "Received confirmation from server - connection to "
-                + "server is ok!", "Connection check succeeded.",
-                JOptionPane.INFORMATION_MESSAGE);
-        }
-        else
-        {
-            JOptionPane.showMessageDialog(getMapOrBoardFrame(),
-                "Did not receive confirmation message from server within "
-                + CONN_CHECK_TIMEOUT + " seconds - connection to "
-                + "server is probably broken, or something hangs.",
-                "Connection check failed!",
-                JOptionPane.ERROR_MESSAGE);
-
-        }
-    }
-
-    void undoLastSplit()
-    {
-        if (!isUndoStackEmpty())
-        {
-            String splitoffId = (String)popUndoStack();
-            undoSplit(getLegion(splitoffId));
-        }
-    }
-
-    // because of synchronization issues we need to
-    // be able to pass an undo split request to the server even if it is not
-    // yet in the client UndoStack
-    public void undoSplit(Legion splitoff)
-    {
-        server.undoSplit(splitoff);
-        getOwningPlayer().addMarkerAvailable(splitoff.getMarkerId());
-        numSplitsThisTurn--;
-        if (turnNumber == 1 && numSplitsThisTurn == 0)
-        {
-            // must split in first turn - Done not allowed now
-            if (board != null && isMyTurn())
-            {
-                board.disableDoneAction("Split required in first round");
-            }
-        }
-        LOGGER.log(Level.FINEST, "called server.undoSplit");
-    }
-
-    void undoLastMove()
-    {
-        if (!isUndoStackEmpty())
-        {
-            String markerId = (String)popUndoStack();
-            server.undoMove(getLegion(markerId));
-        }
+        return sct.isAlreadyDown();
     }
 
     public void undidSplit(Legion splitoff, Legion survivor, int turn)
     {
         ((LegionClientSide)survivor).merge(splitoff);
         removeLegion(splitoff);
+
         // do the eventViewer stuff before the board, so we are sure to get
         // a repaint.
-        if (eventViewer != null && !replayOngoing)
+
+        if (!replayOngoing)
         {
-            eventViewer.undoEvent(RevealEvent.eventSplit, survivor
-                .getMarkerId(), splitoff.getMarkerId(), turn);
-        }
-        else
-        {
-            // fine. So this client does not even have eventViewer
-            // (probably then not even a masterBoard, i.e. AI)
+            gui.eventViewerUndoEvent(splitoff, survivor, turn);
         }
 
-        if (board != null)
-        {
-            if (replayOngoing)
-            {
-                replayTurnChange(turn);
-            }
-            else
-            {
-                board.alignLegions(survivor.getCurrentHex());
-                board.highlightTallLegions();
-            }
-        }
-        if (isMyTurn() && this.phase == Constants.Phase.SPLIT && !replayOngoing
-            && options.getOption(Options.autoSplit) && !isGameOver())
+        gui.boardActOnUndidSplit(survivor, turn);
+
+        if (isMyTurn() && this.phase == Constants.Phase.SPLIT
+            && !replayOngoing && options.getOption(Options.autoSplit)
+            && !isGameOver())
         {
             boolean done = ai.splitCallback(null, null);
             if (done)
@@ -5001,51 +3317,11 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    void undoLastRecruit()
-    {
-        if (!isUndoStackEmpty())
-        {
-            String markerId = (String)popUndoStack();
-            server.undoRecruit(getLegion(markerId));
-        }
-    }
+    // TODO HACK to reduce work...
 
-    void undoRecruit(Legion legion)
+    public IServer getServer()
     {
-        if (undoStack.contains(legion.getMarkerId()))
-        {
-            undoStack.remove(legion.getMarkerId());
-        }
-        server.undoRecruit(legion);
-    }
-
-    void undoAllSplits()
-    {
-        while (!isUndoStackEmpty())
-        {
-            undoLastSplit();
-        }
-    }
-
-    void undoAllMoves()
-    {
-        if (board != null)
-        {
-            board.clearRecruitedChits();
-            board.clearPossibleRecruitChits();
-        }
-        while (!isUndoStackEmpty())
-        {
-            undoLastMove();
-        }
-    }
-
-    void undoAllRecruits()
-    {
-        while (!isUndoStackEmpty())
-        {
-            undoLastRecruit();
-        }
+        return server;
     }
 
     /**
@@ -5059,7 +3335,7 @@ public final class Client implements IClient, IOracle
      * @see Client#doneWithEngagements()()
      * @see Client#doneWithRecruits()()
      */
-    void doneWithPhase()
+    public void doneWithPhase()
     {
         if (phase == Constants.Phase.SPLIT)
         {
@@ -5083,17 +3359,16 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    void doneWithSplits()
+    public void doneWithSplits()
     {
         if (!isMyTurn())
         {
             return;
         }
         server.doneWithSplits();
-        if (board != null)
-        {
-            board.clearRecruitedChits();
-        }
+
+        gui.actOnDoneWithSplits();
+
     }
 
     void doneWithMoves()
@@ -5103,11 +3378,8 @@ public final class Client implements IClient, IOracle
             return;
         }
         aiPause();
-        if (board != null)
-        {
-            board.clearRecruitedChits();
-            board.clearPossibleRecruitChits();
-        }
+
+        gui.actOnDoneWithMoves();
         server.doneWithMoves();
     }
 
@@ -5121,7 +3393,7 @@ public final class Client implements IClient, IOracle
         server.doneWithEngagements();
     }
 
-    void doneWithRecruits()
+    public void doneWithRecruits()
     {
         if (!isMyTurn())
         {
@@ -5177,17 +3449,17 @@ public final class Client implements IClient, IOracle
         return owningPlayer.equals(getPlayerByMarkerId(markerId));
     }
 
-    private boolean isMyLegion(Legion legion)
+    public boolean isMyLegion(Legion legion)
     {
         return owningPlayer.equals(legion.getPlayer());
     }
 
-    boolean isMyTurn()
+    public boolean isMyTurn()
     {
         return owningPlayer.equals(getActivePlayer());
     }
 
-    boolean isMyBattlePhase()
+    public boolean isMyBattlePhase()
     {
         // check also for phase, because delayed callbacks could come
         // after our phase is over but activePlayerName not updated yet
@@ -5201,12 +3473,12 @@ public final class Client implements IClient, IOracle
     }
 
     // TODO inline
-    int getMulligansLeft()
+    public int getMulligansLeft()
     {
         return owningPlayer.getMulligansLeft();
     }
 
-    void doSplit(Legion legion)
+    public void doSplit(Legion legion)
     {
         LOGGER.log(Level.FINER, "Client.doSplit " + legion);
         this.parent = null;
@@ -5228,21 +3500,24 @@ public final class Client implements IClient, IOracle
         // Need a legion marker to split.
         if (markersAvailable.size() < 1)
         {
-            showMessageDialog("No legion markers");
+            gui.showMessageDialog("No legion markers");
             kickSplit();
             return;
         }
         // Legion must be tall enough to split.
         if (legion.getHeight() < 4)
         {
-            showMessageDialog("Legion is too short to split");
+            gui.showMessageDialog("Legion is too short to split");
             kickSplit();
             return;
         }
+
+        // TODO Questionable: why does this depend on numSplitsThisTurn?
+        //      is that modified at all when there is no GUI ?
         // Enforce only one split on turn 1.
         if (getTurnNumber() == 1 && numSplitsThisTurn > 0)
         {
-            showMessageDialog("Can only split once on the first turn");
+            gui.showMessageDialog("Can only split once on the first turn");
             kickSplit();
             return;
         }
@@ -5256,11 +3531,12 @@ public final class Client implements IClient, IOracle
         }
         else
         {
-            childId = PickMarker.pickMarker(board.getFrame(), owningPlayer,
-                markersAvailable, options);
+            childId = gui.doPickMarker(markersAvailable);
         }
         pickMarkerCallback(childId);
     }
+
+    // TODO whole method to gui ?
 
     /** Called after a marker is picked, either first marker or split. */
     void pickMarkerCallback(String childMarker)
@@ -5275,7 +3551,8 @@ public final class Client implements IClient, IOracle
             server.assignFirstMarker(childMarker);
             return;
         }
-        String results = SplitLegion.splitLegion(this, parent, childMarker);
+        String results = gui.doPickSplitLegion(parent, childMarker);
+
         if (results != null)
         {
             doSplit(parent, childMarker, results);
@@ -5305,59 +3582,22 @@ public final class Client implements IClient, IOracle
 
         child.setCurrentHex(hex);
 
-        if (eventViewer != null && !replayOngoing)
-        {
-            eventViewer.newSplitEvent(turn, parent.getMarkerId(), (parent)
-                .getHeight(), null, child.getMarkerId(), (child).getHeight());
-        }
-
-        if (board != null)
-        {
-            Marker marker = new Marker(3 * Scale.get(), child.getMarkerId(),
-                this);
-            setMarker(child, marker);
-
-            if (replayOngoing)
-            {
-                replayTurnChange(turn);
-            }
-            else
-            {
-                board.alignLegions(hex);
-            }
-        }
+        gui.actOnDidSplit(turn, parent, child, hex);
 
         if (isMyLegion(child))
         {
-            if (board != null)
-            {
-                board.clearRecruitedChits();
-                board.clearPossibleRecruitChits();
-            }
-
-            pushUndoStack(child.getMarkerId());
             getOwningPlayer().removeMarkerAvailable(child.getMarkerId());
         }
 
         numSplitsThisTurn++;
-        if (turnNumber == 1 && board != null && isMyTurn())
-        {
-            board.enableDoneAction();
-        }
 
-        if (board != null)
-        {
-            if (!replayOngoing)
-            {
-                board.alignLegions(hex);
-                board.highlightTallLegions();
-            }
-        }
+        gui.actOnDidSplitPart2(hex);
 
         // check also for phase, because delayed callbacks could come
         // after our phase is over but activePlayerName not updated yet.
-        if (isMyTurn() && this.phase == Constants.Phase.SPLIT && !replayOngoing
-            && options.getOption(Options.autoSplit) && !isGameOver())
+        if (isMyTurn() && this.phase == Constants.Phase.SPLIT
+            && !replayOngoing && options.getOption(Options.autoSplit)
+            && !isGameOver())
         {
             boolean done = ai.splitCallback(parent, child);
             if (done)
@@ -5387,18 +3627,10 @@ public final class Client implements IClient, IOracle
         }
         else
         {
-            if (board != null)
-            {
-                board.setPhaseInfo("Pick a color!");
-            }
-            do
-            {
-                color = PickColor.pickColor(board.getFrame(), owningPlayer
-                    .getName(), colorsLeft, options);
-            }
-            while (color == null);
+            color = gui.doPickColor(owningPlayer.getName(), colorsLeft);
         }
 
+        // TODO probably unnecessary?
         setColor(color);
 
         server.assignColor(color);
@@ -5415,68 +3647,9 @@ public final class Client implements IClient, IOracle
         }
         else
         {
-            if (board != null)
-            {
-                board.setPhaseInfo("Pick initial marker!");
-            }
-            do
-            {
-                markerId = PickMarker.pickMarker(board.getFrame(),
-                    owningPlayer, markersAvailable, options);
-            }
-            while (markerId == null);
+            markerId = gui.doPickMarkerUntilGotOne(markersAvailable);
         }
         pickMarkerCallback(markerId);
-    }
-
-    void setLookAndFeel(String lfName)
-    {
-        try
-        {
-            UIManager.setLookAndFeel(lfName);
-            UIManager.LookAndFeelInfo[] lnfInfos = UIManager
-                .getInstalledLookAndFeels();
-            boolean exist = false;
-            for (LookAndFeelInfo lnfInfo : lnfInfos)
-            {
-                exist = exist || lnfInfo.getClassName().equals(lfName);
-            }
-            if (!exist)
-            {
-                UIManager.installLookAndFeel(new UIManager.LookAndFeelInfo(
-                    UIManager.getLookAndFeel().getName(), lfName));
-            }
-            updateEverything();
-            LOGGER.log(Level.FINEST, "Switched to Look & Feel: " + lfName);
-            options.setOption(Options.favoriteLookFeel, lfName);
-        }
-        catch (Exception e)
-        {
-            LOGGER.log(Level.SEVERE, "Look & Feel " + lfName + " not usable",
-                e);
-        }
-    }
-
-    private void updateTreeAndPack(Window window)
-    {
-        if (window != null)
-        {
-            SwingUtilities.updateComponentTreeUI(window);
-            window.pack();
-        }
-    }
-
-    private void updateEverything()
-    {
-        if (board != null)
-        {
-            board.updateComponentTreeUI();
-            board.pack();
-        }
-        updateTreeAndPack(statusScreen);
-        updateTreeAndPack(caretakerDisplay);
-        updateTreeAndPack(preferencesWindow);
-        repaintAllWindows();
     }
 
     public void log(String message)
@@ -5615,35 +3788,6 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    void setChosenDevice(GraphicsDevice chosen)
-    {
-        if (chosen != null)
-        {
-            secondaryParent = new JFrame(chosen.getDefaultConfiguration());
-            disposeStatusScreen();
-            updateStatusScreen();
-            disposeCaretakerDisplay();
-            boolean bval = options.getOption(Options.showCaretaker);
-            showOrHideCaretaker(bval);
-        }
-    }
-
-    private void focusMap()
-    {
-        if (battleBoard != null)
-        {
-            battleBoard.reqFocus();
-        }
-    }
-
-    private void focusBoard()
-    {
-        if (board != null)
-        {
-            board.reqFocus();
-        }
-    }
-
     class MarkerComparator implements Comparator<String>
     {
         public int compare(String s1, String s2)
@@ -5673,22 +3817,5 @@ public final class Client implements IClient, IOracle
     public Options getOptions()
     {
         return options;
-    }
-
-    private void showOrHideLogWindow(boolean show)
-    {
-        if (board != null && show)
-        {
-            if (logWindow == null)
-            {
-                // the logger with the empty name is parent to all loggers
-                // and thus catches all messages
-                logWindow = new LogWindow(Client.this, Logger.getLogger(""));
-            }
-        }
-        else
-        {
-            disposeLogWindow();
-        }
     }
 }

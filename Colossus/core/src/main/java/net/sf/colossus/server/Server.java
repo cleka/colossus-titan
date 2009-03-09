@@ -86,7 +86,7 @@ public final class Server extends Thread implements IServer
     private SelectionKey acceptKey = null;
     private boolean stopAcceptingFlag = false;
 
-    private Object guiRequestMutex = new Object();
+    private final Object guiRequestMutex = new Object();
     private boolean guiRequestSaveFlag = false;
     private String guiRequestSaveFilename = null;
 
@@ -173,14 +173,14 @@ public final class Server extends Thread implements IServer
                 disposeRound++;
             }
         }
-        
+
         if (serverRunning && disposeRound >= 60)
         {
             LOGGER.warning("The game.dispose() not triggered by caughtUp"
                 + " - doing it now.");
             game.dispose();
         }
-        
+
         if (shuttingDown)
         {
             closeSocketAndSelector();
@@ -225,9 +225,8 @@ public final class Server extends Thread implements IServer
 
     void initSocketServer()
     {
-        LOGGER
-            .log(Level.FINEST, "initSocketServer, expecting "
-                + game.getNumLivingPlayers() + " player clients.");
+        LOGGER.log(Level.FINEST, "initSocketServer, expecting "
+            + game.getNumLivingPlayers() + " player clients.");
         LOGGER.log(Level.FINEST, "About to create server socket on port "
             + port);
 
@@ -246,32 +245,32 @@ public final class Server extends Thread implements IServer
         }
         catch (IOException ex)
         {
-            String message =  "Could not create server side socket.\n"
+            String message = "Could not create server side socket.\n"
                 + "Configure networking in OS, or check that no previous "
                 + "Colossus instance got stuck and is blocking the socket.\n"
                 + "Got IOException: " + ex;
-                
+
             LOGGER.log(Level.SEVERE, message);
             JOptionPane.showMessageDialog(startLog.getFrame(), message,
-                "Starting game (server side) failed!", 
+                "Starting game (server side) failed!",
                 JOptionPane.ERROR_MESSAGE);
 
             System.exit(1);
         }
         catch (Exception anyex)
         {
-            String message =  "Could not create server side socket.\n"
+            String message = "Could not create server side socket.\n"
                 + "Configure networking in OS, or check that no previous "
                 + "Colossus instance got stuck and is blocking the socket.\n"
                 + "Got Exception: " + anyex;
-                
+
             LOGGER.log(Level.SEVERE, message);
             JOptionPane.showMessageDialog(startLog.getFrame(), message,
-                "Starting game (server side) failed!", 
+                "Starting game (server side) failed!",
                 JOptionPane.ERROR_MESSAGE);
 
             System.exit(1);
-            
+
         }
         createLocalClients();
     }
@@ -281,12 +280,12 @@ public final class Server extends Thread implements IServer
         logToStartLog("\nStarting up, waiting for " + waitingForPlayers
             + " player clients at port " + port + "\n");
         StringBuilder living = new StringBuilder("");
-        StringBuilder dead   = new StringBuilder("");
+        StringBuilder dead = new StringBuilder("");
         for (Player p : game.getPlayers())
         {
             String name = p.getName();
             StringBuilder list = p.isDead() ? dead : living;
-                
+
             if (list.length() > 0)
             {
                 list.append(", ");
@@ -296,8 +295,7 @@ public final class Server extends Thread implements IServer
         logToStartLog("Players expected to join (= alive): " + living + "\n");
         if (dead.length() > 0)
         {
-            logToStartLog("Players already dead before save  : " + dead
-                + "\n");
+            logToStartLog("Players already dead before save  : " + dead + "\n");
         }
         serverRunning = true;
         while (waitingForPlayers > 0 && serverRunning && !shuttingDown)
@@ -313,7 +311,7 @@ public final class Server extends Thread implements IServer
         try
         {
             if (stopAcceptingFlag)
-            {   
+            {
                 LOGGER.info("cancelDummy was set...");
                 stopAccepting();
                 stopAcceptingFlag = false;
@@ -470,7 +468,7 @@ public final class Server extends Thread implements IServer
         LOGGER.info("Canceling connection accepting key.");
         acceptKey.cancel();
         acceptKey = null;
-    
+
         LOGGER.info("Closing server socket");
         serverSocket.close();
         serverSocket = null;
@@ -517,7 +515,7 @@ public final class Server extends Thread implements IServer
             LOGGER.fine("After loop: ok, server Selector was already closed");
         }
     }
-    
+
     // I took as model this page:
     //   http://www.javafaq.nu/java-article1102.html
     // Throws IOException when closing the channel fails.
@@ -542,8 +540,9 @@ public final class Server extends Thread implements IServer
                         // Remote entity did shut the socket down.
                         // Do the same from our end and cancel the channel.
 
-                        LOGGER.log(Level.FINE,
-                            "Remote side cleanly closed the connection (r == -1)");
+                        LOGGER
+                            .log(Level.FINE,
+                                "Remote side cleanly closed the connection (r == -1)");
                         withdrawFromGame();
                         disconnectChannel(sc, key);
 
@@ -560,7 +559,7 @@ public final class Server extends Thread implements IServer
                 LOGGER.log(Level.WARNING, "IOException '" + e.getMessage()
                     + "' while reading from channel for player "
                     + getPlayerName(), e);
-                
+
                 // The remote forcibly/unexpectedly closed the connection, 
                 // cancel the selection key and close the channel.
                 withdrawFromGame();
@@ -638,7 +637,8 @@ public final class Server extends Thread implements IServer
     {
         if (!game.isOver())
         {
-            LOGGER.info("stopServerRunning called when game was not over yet.");
+            LOGGER
+                .info("stopServerRunning called when game was not over yet.");
             game.setGameOver(true, "Game stopped by system");
         }
 
@@ -649,7 +649,7 @@ public final class Server extends Thread implements IServer
         {
             disposeAllClients();
         }
-        
+
         serverRunning = false;
         shuttingDown = true;
     }
@@ -816,8 +816,7 @@ public final class Server extends Thread implements IServer
         // when it is reading or processing. While the selector is waiting
         // for next input, it's always set to null.
         assert processingCH != null : "No processingCH!";
-        assert processingCH.getPlayerName() != null : 
-            "Name for processingCH must not be null!";
+        assert processingCH.getPlayerName() != null : "Name for processingCH must not be null!";
         return processingCH.getPlayerName();
     }
 
@@ -856,7 +855,7 @@ public final class Server extends Thread implements IServer
             if (!player.getDeadBeforeSave()
                 && !player.getType().endsWith(Constants.network))
             {
-                
+
                 createLocalClient(player);
             }
         }
@@ -866,18 +865,19 @@ public final class Server extends Thread implements IServer
     {
         String playerName = player.getName();
         boolean dontUseOptionsFile = player.isAI();
+        boolean createGUI = !player.isAI();
         LOGGER.finest("Called Server.createLocalClient() for " + playerName);
 
         // a hack to pass something into the Client constructor
         // TODO needs to be constructed properly
         Game dummyGame = new Game(null, new String[0]);
 
-        new Client("127.0.0.1", port, dummyGame, playerName,
-            this, false, dontUseOptionsFile);
+        new Client("127.0.0.1", port, dummyGame, playerName, this, false,
+            dontUseOptionsFile, createGUI);
     }
 
-    boolean addClient(final IClient client,
-        final String playerName, final boolean remote)
+    boolean addClient(final IClient client, final String playerName,
+        final boolean remote)
     {
         LOGGER.finest("Calling Server.addClient() for " + playerName);
 
@@ -907,7 +907,8 @@ public final class Server extends Thread implements IServer
             LOGGER.warning("No Player was found for non-spectator playerName "
                 + playerName + "!");
             logToStartLog("NOTE: One client attempted to join with player name "
-                + playerName + " - rejected, because no such player is expected!");
+                + playerName
+                + " - rejected, because no such player is expected!");
             return false;
         }
         else if (clientMap.containsKey(player))
@@ -916,8 +917,8 @@ public final class Server extends Thread implements IServer
                 + "because Player for playerName " + playerName
                 + " had already signed on.");
             logToStartLog("NOTE: One client attempted to join with player name "
-                + playerName + " - rejected, because same player name already "
-                + "joined.");
+                + playerName
+                + " - rejected, because same player name already " + "joined.");
             return false;
         }
         else
@@ -942,11 +943,12 @@ public final class Server extends Thread implements IServer
 
         if (player != null)
         {
-            logToStartLog((remote ? "Remote" : "Local") + " player "
-                + name + " signed on.");
+            logToStartLog((remote ? "Remote" : "Local") + " player " + name
+                + " signed on.");
             game.getNotifyWebServer().gotClient(player, remote);
             waitingForPlayers--;
-            LOGGER.info("Decremented waitingForPlayers to " + waitingForPlayers);
+            LOGGER.info("Decremented waitingForPlayers to "
+                + waitingForPlayers);
 
             if (waitingForPlayers > 0)
             {
@@ -1074,9 +1076,9 @@ public final class Server extends Thread implements IServer
     {
         JOptionPane.showMessageDialog(startLog.getFrame(),
             "Loading, replay of history and comparison between saved "
-            + "state and replay result failed!!\n\n"
-            + "Click Abort on the Startup Progress Dialog to return to "
-            + "Game setup dialog to start a different or new one.",
+                + "state and replay result failed!!\n\n"
+                + "Click Abort on the Startup Progress Dialog to return to "
+                + "Game setup dialog to start a different or new one.",
             "Loading game failed!", JOptionPane.ERROR_MESSAGE);
     }
 
@@ -1141,15 +1143,16 @@ public final class Server extends Thread implements IServer
                 "Illegal attempt to end phase (wrong player)");
             return;
         }
-        
+
         BattleServerSide battle = game.getBattle();
         if (!battle.getBattlePhase().isMovePhase())
         {
             LOGGER.severe(getPlayerName()
                 + " illegally called doneWithBattleMoves()");
-            getClient(getPlayer()).nak(Constants.doneWithBattleMoves,
-                "Illegal attempt to end phase (wrong phase " 
-                + battle.getBattlePhase().toString() + ")");
+            getClient(getPlayer()).nak(
+                Constants.doneWithBattleMoves,
+                "Illegal attempt to end phase (wrong phase "
+                    + battle.getBattlePhase().toString() + ")");
             return;
         }
         battle.doneWithMoves();
@@ -1219,7 +1222,7 @@ public final class Server extends Thread implements IServer
     void allRequestConfirmCatchup(String action)
     {
         // First put them all to the list, send messages after that
-        synchronized(waitingToCatchup)
+        synchronized (waitingToCatchup)
         {
             caughtUpAction = action;
             waitingToCatchup.clear();
@@ -1227,13 +1230,13 @@ public final class Server extends Thread implements IServer
             {
                 waitingToCatchup.add(client);
             }
-        
-        /* better to do the sending not inside the notify. It *might*
-         * happen that the sendTo goes an extra way around the wait on 
-         * selector if the queue is just full and if that reply would
-         * want to e.g. remove already from waitingToCatchup list
-         * (which is blocked by the sync. up here) we have a deadlock...
-         */
+
+            /* better to do the sending not inside the notify. It *might*
+             * happen that the sendTo goes an extra way around the wait on 
+             * selector if the queue is just full and if that reply would
+             * want to e.g. remove already from waitingToCatchup list
+             * (which is blocked by the sync. up here) we have a deadlock...
+             */
             for (IClient client : clients)
             {
                 client.confirmWhenCaughtUp();
@@ -1857,8 +1860,7 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    void allTellHexDamageResults(CreatureServerSide target,
-        int damage)
+    void allTellHexDamageResults(CreatureServerSide target, int damage)
     {
         this.target = target;
 
@@ -2197,8 +2199,8 @@ public final class Server extends Thread implements IServer
         }
         if (!game.doSplit(parent, childId, results))
         {
-            LOGGER.warning(getPlayerName() + " tried split for "
-                + parent + ", failed!");
+            LOGGER.warning(getPlayerName() + " tried split for " + parent
+                + ", failed!");
             client.nak(Constants.doSplit, "Illegal split / Split failed!");
         }
     }
@@ -2234,7 +2236,8 @@ public final class Server extends Thread implements IServer
             IClient client = it.next();
             if (client != activeClient)
             {
-                client.didSplit(hex, parent, child, childSize, splitoffs, turn);
+                client
+                    .didSplit(hex, parent, child, childSize, splitoffs, turn);
             }
         }
     }
@@ -2463,7 +2466,7 @@ public final class Server extends Thread implements IServer
     // game while the save is ongoing.
     public void initiateSaveGame(String filename)
     {
-        synchronized(guiRequestMutex)
+        synchronized (guiRequestMutex)
         {
             guiRequestSaveFlag = true;
             guiRequestSaveFilename = filename;
@@ -2475,7 +2478,7 @@ public final class Server extends Thread implements IServer
     {
         boolean didSomething = false;
 
-        synchronized(guiRequestMutex)
+        synchronized (guiRequestMutex)
         {
             if (guiRequestSaveFlag)
             {
@@ -2497,14 +2500,14 @@ public final class Server extends Thread implements IServer
         processingCH.serverConfirmsConnection();
     }
 
-    private HashSet<IClient> waitingToCatchup = new HashSet<IClient>();
-    
+    private final HashSet<IClient> waitingToCatchup = new HashSet<IClient>();
+
     public void clientConfirmedCatchup()
     {
         ClientHandler ch = processingCH;
         String playerName = ch.getPlayerName();
 
-        synchronized(waitingToCatchup)
+        synchronized (waitingToCatchup)
         {
             if (waitingToCatchup.contains(ch))
             {
@@ -2515,11 +2518,11 @@ public final class Server extends Thread implements IServer
                 LOGGER.warning("Client for " + playerName
                     + " not found from waitingForCatchup list!");
             }
-        
+
             int remaining = waitingToCatchup.size();
             LOGGER.info("Client " + playerName + " confirmed catch-up. "
                 + "Remaining: " + remaining);
-            if (remaining <= 0 )
+            if (remaining <= 0)
             {
                 if (caughtUpAction.equals("KickstartGame"))
                 {
@@ -2533,7 +2536,8 @@ public final class Server extends Thread implements IServer
                 }
                 else
                 {
-                    LOGGER.severe("All clients caught up, but no action set??");
+                    LOGGER
+                        .severe("All clients caught up, but no action set??");
                 }
             }
         }

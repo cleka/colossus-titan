@@ -26,7 +26,7 @@ public final class Proposal
 
     private static final String sep = Glob.sep;
 
-    Proposal(String attackerId, String defenderId, boolean fight,
+    public Proposal(String attackerId, String defenderId, boolean fight,
         boolean mutual, String winnerId, List<String> winnerLosses)
     {
         this.attackerId = attackerId;

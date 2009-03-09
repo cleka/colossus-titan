@@ -42,9 +42,9 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.text.Document;
 
-import net.sf.colossus.client.PickIntValue;
-import net.sf.colossus.client.SaveWindow;
-import net.sf.colossus.client.ShowReadme;
+import net.sf.colossus.gui.PickIntValue;
+import net.sf.colossus.gui.SaveWindow;
+import net.sf.colossus.gui.ShowReadme;
 import net.sf.colossus.util.KFrame;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;

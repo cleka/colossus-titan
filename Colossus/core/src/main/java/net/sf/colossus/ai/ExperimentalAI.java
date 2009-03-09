@@ -6,11 +6,11 @@ import java.util.Map;
 
 import java.util.logging.Logger;
 
-import net.sf.colossus.client.BattleChit;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.CritterMove;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.game.Battle;
+import net.sf.colossus.gui.BattleChit;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.variant.BattleHex;
 

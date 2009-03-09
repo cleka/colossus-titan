@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.client.BattleMap;
 import net.sf.colossus.game.Caretaker;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
+import net.sf.colossus.gui.BattleMap;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;

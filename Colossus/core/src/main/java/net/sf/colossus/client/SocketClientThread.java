@@ -220,7 +220,7 @@ final class SocketClientThread extends Thread implements IServer
             String message = "Server not responding (could connect, "
                 + "but didn't got any initial data within 5 seconds).";
             String title = "Joining game failed!";
-            client.showErrorMessage(message, title);
+            client.getGUI().showErrorMessage(message, title);
         }
 
         // ---------------------------------------------------------------
@@ -235,7 +235,7 @@ final class SocketClientThread extends Thread implements IServer
         {
             // Right now this should never happen, but since we have
             // the catch and set the flag, let's do something with it:)
-            client.showErrorMessage(
+            client.getGUI().showErrorMessage(
                 "No messages from server for very long time. "
                 + "Right now this should never happen because in normal game "
                 + "situation we work with infinite timeout... ??",
@@ -922,7 +922,7 @@ final class SocketClientThread extends Thread implements IServer
             {
                 goingDown = true;
                 String title = "Joining game failed!";
-                client.showErrorMessage(message, title);
+                client.getGUI().showErrorMessage(message, title);
             }
             else
             {

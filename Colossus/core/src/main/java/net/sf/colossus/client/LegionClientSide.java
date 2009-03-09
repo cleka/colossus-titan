@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
+import net.sf.colossus.gui.Marker;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.variant.CreatureType;
@@ -76,7 +77,7 @@ public final class LegionClientSide extends Legion implements
         this.marker = marker;
     }
 
-    Marker getMarker()
+    public Marker getMarker()
     {
         return marker;
     }
@@ -186,7 +187,7 @@ public final class LegionClientSide extends Legion implements
     }
 
     /** Return a list of Booleans. */
-    List<Boolean> getCertainties()
+    public List<Boolean> getCertainties()
     {
         List<Boolean> booleans = new ArrayList<Boolean>();
         List<CreatureInfo> cil = getNode().getCreatures();
@@ -211,7 +212,7 @@ public final class LegionClientSide extends Legion implements
      *  
      * TODO this is really not legion-specific, but player-specific 
      */
-    String getTitanBasename()
+    public String getTitanBasename()
     {
         try
         {

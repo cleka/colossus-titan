@@ -58,32 +58,32 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
         child2 = null;
     }
 
-    String getMarkerId()
+    public String getMarkerId()
     {
         return markerId;
     }
 
-    String getFullName()
+    public String getFullName()
     {
         return markerId + '(' + turnCreated + ')';
     }
 
-    PredictSplitNode getChild1()
+    public PredictSplitNode getChild1()
     {
         return child1;
     }
 
-    PredictSplitNode getChild2()
+    public PredictSplitNode getChild2()
     {
         return child2;
     }
 
-    PredictSplitNode getParent()
+    public PredictSplitNode getParent()
     {
         return parent;
     }
 
-    int getTurnCreated()
+    public int getTurnCreated()
     {
         return turnCreated;
     }

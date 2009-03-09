@@ -28,6 +28,9 @@ import java.util.logging.Logger;
 
 import javax.swing.JPanel;
 
+import net.sf.colossus.gui.GUIBattleHex;
+import net.sf.colossus.gui.GUIHex;
+import net.sf.colossus.gui.Scale;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.variant.BattleHex;
@@ -74,8 +77,8 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         { false, true, true, true, true, false } };
 
     int scale = 2 * Scale.get();
-    int cx = 6 * scale;
-    int cy = 2 * scale;
+    protected int cx = 6 * scale;
+    protected int cy = 2 * scale;
 
     /* not just a cache of the MasterHex info,
      * but also a way for MasterHex-less subclass
@@ -147,7 +150,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         }
     }
 
-    MasterHex getMasterHex()
+    protected MasterHex getMasterHex()
     {
         return masterHex;
     }

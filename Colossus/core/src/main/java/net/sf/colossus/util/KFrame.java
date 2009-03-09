@@ -12,7 +12,7 @@ import java.awt.event.WindowListener;
 import javax.swing.JFrame;
 
 import net.sf.colossus.client.IOptions;
-import net.sf.colossus.client.SaveWindow;
+import net.sf.colossus.gui.SaveWindow;
 import net.sf.colossus.webcommon.InstanceTracker;
 
 

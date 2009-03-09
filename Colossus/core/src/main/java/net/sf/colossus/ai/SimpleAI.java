@@ -17,8 +17,6 @@ import java.util.TimerTask;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
-import net.sf.colossus.client.BattleChit;
-import net.sf.colossus.client.BattleMap;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.CritterMove;
 import net.sf.colossus.client.LegionClientSide;
@@ -26,6 +24,8 @@ import net.sf.colossus.client.PlayerClientSide;
 import net.sf.colossus.game.Battle;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
+import net.sf.colossus.gui.BattleChit;
+import net.sf.colossus.gui.BattleMap;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Dice;
 import net.sf.colossus.server.VariantSupport;
@@ -2786,6 +2786,7 @@ public class SimpleAI extends AbstractAI
         return value;
     }
 
+    @SuppressWarnings("deprecation")
     /** strikeMap is optional */
     private int evaluateCritterMove(BattleChit critter,
         Map<String, Integer> strikeMap, ValueRecorder value)

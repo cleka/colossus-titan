@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
+import net.sf.colossus.gui.BattleMap;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.Split;
