@@ -880,11 +880,11 @@ public final class Client implements IClient, IOracle
      */
     public void doAdditionalCleanup()
     {
+        movement.dispose();
         this.movement = null;
         this.battleMovement = null;
         this.strike = null;
         this.players = null;
-        movement.dispose();
 
         net.sf.colossus.server.CustomRecruitBase.reset();
     }
