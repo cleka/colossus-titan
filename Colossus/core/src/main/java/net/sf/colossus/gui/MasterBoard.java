@@ -2058,8 +2058,7 @@ public final class MasterBoard extends JPanel
         {
             MasterHex masterHex = legion.getCurrentHex();
             int scale = 2 * Scale.get();
-            GUIMasterHex hex = client.getBoard().getGUIHexByMasterHex(
-                masterHex);
+            GUIMasterHex hex = getGUIHexByMasterHex(masterHex);
             Chit chit = new Chit(scale, legion.getRecruitName());
             recruitedChits.put(legion, chit);
             Point startingPoint = hex.getOffCenter();
