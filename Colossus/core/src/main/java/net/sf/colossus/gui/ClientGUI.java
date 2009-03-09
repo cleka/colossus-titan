@@ -1913,8 +1913,6 @@ public class ClientGUI implements IClientGUI
             eventViewer.tellMovementRoll(roll);
         }
 
-        client.changeMovementRoll(roll);
-
         if (movementDie == null || roll != movementDie.getLastRoll())
         {
             if (board != null)

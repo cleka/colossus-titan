@@ -418,9 +418,6 @@ public final class Client implements IClient, IOracle
 
         tookMulligan = true;
 
-        // TODO: should not be needed any more here?
-        gui.setMulliganOldRoll(movementRoll);
-
         server.mulligan();
     }
 
@@ -524,18 +521,9 @@ public final class Client implements IClient, IOracle
 
     public void tellMovementRoll(int roll)
     {
+        movementRoll = roll;
         gui.tellMovementRoll(roll);
         kickMoves();
-    }
-
-    // TODO: this exists only because tellMovementRoll changes the
-    // variable movementRoll between two GUI stuff blocks and I didn't
-    // want to change the order of things.
-    // Perhaps movementRoll isnot needed here at all?
-
-    public void changeMovementRoll(int roll)
-    {
-        movementRoll = roll;
     }
 
     public void tellWhatsHappening(String message)
