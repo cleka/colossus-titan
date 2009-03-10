@@ -183,7 +183,7 @@ public final class Proposal
         Legion winner = null;
         String winnerId = li.remove(0);
         // Do not try to re-instantiate if markerId is null
-        // (client, esp. AI, selected "Fight!" and probably also for mutual      
+        // (client, esp. AI, selected "Fight!" and probably also for mutual)
         if (!fight && winnerId != null)
         {
             winner = game.getLegionByMarkerId(winnerId);
