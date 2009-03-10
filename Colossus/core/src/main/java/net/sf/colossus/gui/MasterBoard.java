@@ -463,7 +463,7 @@ public final class MasterBoard extends JPanel
             {
                 if (gameOverStateReached)
                 {
-                    client.askNewCloseQuitCancel(masterFrame, false);
+                    gui.askNewCloseQuitCancel(masterFrame, false);
                 }
                 else
                 {
@@ -1900,7 +1900,7 @@ public final class MasterBoard extends JPanel
         @Override
         public void windowClosing(WindowEvent e)
         {
-            client.askNewCloseQuitCancel(masterFrame, false);
+            gui.askNewCloseQuitCancel(masterFrame, false);
         }
     }
 

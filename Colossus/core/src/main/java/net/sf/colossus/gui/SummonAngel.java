@@ -25,10 +25,9 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 
-import net.sf.colossus.client.Client;
-import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
+import net.sf.colossus.game.SummonInfo;
 import net.sf.colossus.util.KDialog;
 
 
@@ -45,26 +44,25 @@ final class SummonAngel extends KDialog implements MouseListener,
     private static final Logger LOGGER = Logger.getLogger(SummonAngel.class
         .getName());
 
-    private final Legion legion;
+    private final Legion target;
     private final List<Chit> sumChitList = new ArrayList<Chit>();
     private final JButton cancelButton;
     private static boolean active;
-    private static final String baseSummonString = 
-        ": Summon Angel into Legion ";
+    private static final String baseSummonString = ": Summon Angel into Legion ";
     private final SaveWindow saveWindow;
-    private static String typeColonDonor = null;
-    private Map<Chit, Legion> chitToDonor = new HashMap<Chit, Legion>();
+    private static SummonInfo summonInfo = null;
+    private final Map<Chit, Legion> chitToDonor = new HashMap<Chit, Legion>();
 
-    private SummonAngel(Client client, Legion legion)
+    private SummonAngel(ClientGUI gui, Legion legion)
     {
-        super(client.getBoard().getFrame(), client.getOwningPlayer().getName()
+        super(gui.getBoard().getFrame(), gui.getOwningPlayer().getName()
             + baseSummonString + legion, false);
 
-        this.legion = legion;
+        this.target = legion;
 
         // TODO this should really not happen in a constructor
-        SortedSet<Legion> possibleDonors = 
-            client.findLegionsWithSummonableAngels(legion);
+        SortedSet<Legion> possibleDonors = gui.getClient()
+            .findLegionsWithSummonableAngels(legion);
         if (possibleDonors.size() < 1)
         {
             cleanup(null, null);
@@ -89,12 +87,12 @@ final class SummonAngel extends KDialog implements MouseListener,
         contentPane.add(Box.createRigidArea(new Dimension(0, scale / 4)));
         Box txtBox = new Box(BoxLayout.X_AXIS);
         txtBox.add(Box.createRigidArea(new Dimension(8, scale / 8)));
-        txtBox.add(new JLabel("The following legions contain summonable " 
+        txtBox.add(new JLabel("The following legions contain summonable "
             + "creatures (they have a red border):   "));
         txtBox.add(Box.createHorizontalGlue());
         contentPane.add(txtBox);
         contentPane.add(Box.createRigidArea(new Dimension(0, scale / 4)));
-        
+
         sumChitList.clear();
 
         for (Legion donor : possibleDonors)
@@ -109,7 +107,7 @@ final class SummonAngel extends KDialog implements MouseListener,
                 String name = creature.getType().getName();
                 if (creature.getType().isTitan())
                 {
-                    name = ((LegionClientSide)legion).getTitanBasename();
+                    name = gui.getTitanBaseName(legion);
                 }
                 Chit chit = new Chit(scale, name);
                 box.add(chit);
@@ -126,7 +124,7 @@ final class SummonAngel extends KDialog implements MouseListener,
             contentPane.add(box);
             contentPane.add(Box.createRigidArea(new Dimension(0, scale / 8)));
         }
-        
+
         txtBox = new Box(BoxLayout.X_AXIS);
         txtBox.add(Box.createRigidArea(new Dimension(scale / 8, 0)));
         txtBox.add(Box.createHorizontalGlue());
@@ -149,7 +147,7 @@ final class SummonAngel extends KDialog implements MouseListener,
 
         pack();
 
-        saveWindow = new SaveWindow(client.getOptions(), "SummonAngel");
+        saveWindow = new SaveWindow(gui.getOptions(), "SummonAngel");
         Point location = saveWindow.loadLocation();
         if (location == null)
         {
@@ -164,10 +162,21 @@ final class SummonAngel extends KDialog implements MouseListener,
         repaint();
     }
 
-    /** Return a string like Angel:Bk12 or Archangel:Rd02, or null. */
-    static String summonAngel(Client client, Legion legion)
+    // TODO Now that the SummonInfo object should never be null,
+    // we could make returning null being the signal for canceling
+    // a summoning, and then this could be part of the move phase,
+    // instead of the "do it now or never" style as it is now.
+
+    /** 
+     * Returns a SummonInfo object, which contains Summoner, Donor legion
+     * and the summoned unit, _OR_ the flag noSummoningWanted is set.
+     */
+    static SummonInfo summonAngel(ClientGUI gui, Legion legion)
     {
-        typeColonDonor = null;
+        // Default constructor creates an info with the flag
+        // "noSummoningWanted" set to true
+        summonInfo = new SummonInfo();
+
         LOGGER.log(Level.FINER, "called summonAngel for " + legion);
         if (!active)
         {
@@ -175,8 +184,8 @@ final class SummonAngel extends KDialog implements MouseListener,
             LOGGER.log(Level.FINEST, "creating new SummonAngel dialog for "
                 + legion);
 
-            SummonAngel saDialog = new SummonAngel(client, legion);
-            
+            SummonAngel saDialog = new SummonAngel(gui, legion);
+
             synchronized (saDialog)
             {
                 try
@@ -185,21 +194,19 @@ final class SummonAngel extends KDialog implements MouseListener,
                 }
                 catch (InterruptedException e)
                 {
-                    LOGGER.log(Level.WARNING, "While static SummonAngel() was "
-                        + "waiting for SummonAngel dialog to complete, "
-                        + "received InterruptedException?");
+                    LOGGER.log(Level.WARNING,
+                        "While static SummonAngel() was "
+                            + "waiting for SummonAngel dialog to complete, "
+                            + "received InterruptedException?");
                 }
             }
             saDialog = null;
             active = false;
         }
-        LOGGER.log(Level.FINEST, "summonAngel returning " + typeColonDonor);
-        return typeColonDonor;
-    }
+        LOGGER.log(Level.FINEST, "summonAngel returning "
+            + summonInfo.toString());
 
-    Legion getLegion()
-    {
-        return legion;
+        return summonInfo;
     }
 
     private void cleanup(Legion donor, String angel)
@@ -207,11 +214,17 @@ final class SummonAngel extends KDialog implements MouseListener,
         LOGGER.log(Level.FINEST, "SummonAngel.cleanup " + donor + " " + angel);
         if (donor != null && angel != null)
         {
-            typeColonDonor = angel + ":" + donor.toString();
+            summonInfo = new SummonInfo(target, donor, angel);
+        }
+        else
+        {
+            // Default constructor creates an info with the flag
+            // "noSummoningWanted" set to true
+            summonInfo = new SummonInfo();
         }
         saveWindow.saveLocation(getLocation());
         dispose();
-        synchronized(this)
+        synchronized (this)
         {
             this.notify();
         }

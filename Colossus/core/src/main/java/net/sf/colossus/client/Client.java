@@ -18,14 +18,12 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-
 import net.sf.colossus.ai.AI;
 import net.sf.colossus.ai.SimpleAI;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
+import net.sf.colossus.game.SummonInfo;
 import net.sf.colossus.gui.BattleChit;
 import net.sf.colossus.gui.BattleMap;
 import net.sf.colossus.gui.ClientGUI;
@@ -498,10 +496,21 @@ public final class Client implements IClient, IOracle
         gui.showHexRecruitTree(hex);
     }
 
-    /** Legion summoner summons unit from legion donor. */
-    void doSummon(Legion summoner, Legion donor, String unit)
+    /** Legion target summons unit from legion donor. */
+    void doSummon(SummonInfo summonInfo)
     {
-        server.doSummon(summoner, donor, unit);
+        assert summonInfo != null : "SummonInfo object must not be null!";
+
+        if (summonInfo.noSummoningWanted())
+        {
+            // could also use getXXX from object... 
+            server.doSummon(null, null, null);
+        }
+        else
+        {
+            server.doSummon(summonInfo.getTarget(), summonInfo.getDonor(),
+                summonInfo.getUnit());
+        }
         gui.actOnDoSummon();
     }
 
@@ -700,47 +709,6 @@ public final class Client implements IClient, IOracle
     public void setClosedByServer()
     {
         closedBy = ClosedByConstant.CLOSED_BY_SERVER;
-    }
-
-    // Used by MasterBoard and by BattleBoard
-    public void askNewCloseQuitCancel(JFrame frame, boolean fromBattleBoard)
-    {
-        String[] dialogOptions = new String[4];
-        dialogOptions[0] = "New Game";
-        dialogOptions[1] = "Quit";
-        dialogOptions[2] = "Close";
-        dialogOptions[3] = "Cancel";
-        int answer = JOptionPane
-            .showOptionDialog(
-                frame,
-                "Choose one of: Play another game, Quit, Close just this board, or Cancel",
-                "Play another game?", JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE, null, dialogOptions,
-                dialogOptions[3]);
-        frame = null;
-        if (answer == -1 || answer == 3)
-        {
-            return;
-        }
-        else
-        {
-            if (fromBattleBoard)
-            {
-                concede();
-            }
-        }
-        if (answer == 0)
-        {
-            gui.menuNewGame();
-        }
-        else if (answer == 1)
-        {
-            gui.menuQuitGame();
-        }
-        else if (answer == 2)
-        {
-            disposeClientOriginated();
-        }
     }
 
     public void disposeClientOriginated()
@@ -1367,28 +1335,18 @@ public final class Client implements IClient, IOracle
 
     public void createSummonAngel(Legion legion)
     {
-        String typeColonDonor;
+        SummonInfo summonInfo = new SummonInfo();
         if (options.getOption(Options.autoSummonAngels))
         {
-            typeColonDonor = ai.summonAngel(legion);
+            summonInfo = ai.summonAngel(legion);
         }
         else
         {
-            typeColonDonor = gui.doPickSummonAngel(legion);
+            summonInfo = gui.doPickSummonAngel(legion);
 
         }
-        if (typeColonDonor != null)
-        {
-            List<String> parts = Split.split(':', typeColonDonor);
-            String unit = parts.get(0);
-            String donor = parts.get(1);
-            doSummon(legion, getLegion(donor), unit);
-        }
-        else
-        {
-            // necessary to keep the game moving
-            doSummon(null, null, null);
-        }
+
+        doSummon(summonInfo);
     }
 
     /**
@@ -2271,6 +2229,8 @@ public final class Client implements IClient, IOracle
     }
 
     // TODO this would probably work better as state in PlayerState
+    // TODO Comment Clemens I think this would be better a variable
+    //      in GameClientSide...
     public Player getBattleActivePlayer()
     {
         return battleActivePlayer;

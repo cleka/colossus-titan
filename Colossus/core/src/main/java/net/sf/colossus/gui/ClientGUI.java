@@ -31,6 +31,7 @@ import net.sf.colossus.client.Proposal;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
+import net.sf.colossus.game.SummonInfo;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Start;
 import net.sf.colossus.util.KFrame;
@@ -191,11 +192,6 @@ public class ClientGUI implements IClientGUI
     public Client getClient()
     {
         return client;
-    }
-
-    private Player getOwningPlayer()
-    {
-        return client.getOwningPlayer();
     }
 
     public Game getGame()
@@ -410,7 +406,7 @@ public class ClientGUI implements IClientGUI
             battleBoard.dispose();
             battleBoard = null;
         }
-        battleBoard = new BattleBoard(client, client.getBattleSite(), client
+        battleBoard = new BattleBoard(this, client.getBattleSite(), client
             .getAttacker(), client.getDefender());
     }
 
@@ -498,6 +494,47 @@ public class ClientGUI implements IClientGUI
         Start.setCurrentWhatToDoNext(Start.QuitAll);
         Start.triggerTimedQuit();
         client.notifyServer();
+    }
+
+    // Used by MasterBoard and by BattleBoard
+    void askNewCloseQuitCancel(JFrame frame, boolean fromBattleBoard)
+    {
+        String[] dialogOptions = new String[4];
+        dialogOptions[0] = "New Game";
+        dialogOptions[1] = "Quit";
+        dialogOptions[2] = "Close";
+        dialogOptions[3] = "Cancel";
+        int answer = JOptionPane
+            .showOptionDialog(
+                frame,
+                "Choose one of: Play another game, Quit, Close just this board, or Cancel",
+                "Play another game?", JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE, null, dialogOptions,
+                dialogOptions[3]);
+        frame = null;
+        if (answer == -1 || answer == 3)
+        {
+            return;
+        }
+        else
+        {
+            if (fromBattleBoard)
+            {
+                client.concede();
+            }
+        }
+        if (answer == 0)
+        {
+            menuNewGame();
+        }
+        else if (answer == 1)
+        {
+            menuQuitGame();
+        }
+        else if (answer == 2)
+        {
+            client.disposeClientOriginated();
+        }
     }
 
     /** When user requests it from File menu, this method here
@@ -2072,9 +2109,9 @@ public class ClientGUI implements IClientGUI
     /* (non-Javadoc)
      * @see net.sf.colossus.gui.IClientGUI#doPickSummonAngel(net.sf.colossus.game.Legion)
      */
-    public String doPickSummonAngel(Legion legion)
+    public SummonInfo doPickSummonAngel(Legion legion)
     {
-        return SummonAngel.summonAngel(client, legion);
+        return SummonAngel.summonAngel(this, legion);
     }
 
     /* (non-Javadoc)
@@ -2976,4 +3013,17 @@ public class ClientGUI implements IClientGUI
     {
         getClient().negotiateCallback(proposal, respawn);
     }
+
+    // All kind of other GUI components might need this, too.
+    public Player getOwningPlayer()
+    {
+        return client.getOwningPlayer();
+    }
+
+    // Called e.g. by SummonAngel
+    public String getTitanBaseName(Legion legion)
+    {
+        return ((LegionClientSide)legion).getTitanBasename();
+    }
+
 }

@@ -9,6 +9,7 @@ import net.sf.colossus.client.Client;
 import net.sf.colossus.client.IOptions;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.game.Legion;
+import net.sf.colossus.game.SummonInfo;
 import net.sf.colossus.server.Constants.BattlePhase;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.webclient.WebClient;
@@ -398,7 +399,7 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public String doPickSummonAngel(Legion legion)
+    public SummonInfo doPickSummonAngel(Legion legion)
     {
         // TODO Auto-generated method stub
         return null;

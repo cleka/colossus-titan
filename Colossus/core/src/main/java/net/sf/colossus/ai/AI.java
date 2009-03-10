@@ -7,6 +7,7 @@ import java.util.Set;
 import net.sf.colossus.client.CritterMove;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.game.Legion;
+import net.sf.colossus.game.SummonInfo;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
 
@@ -61,7 +62,7 @@ public interface AI
     String acquireAngel(Legion legion, List<String> recruits);
 
     /** choose whether to summon an angel or archangel */
-    String summonAngel(Legion summoner);
+    SummonInfo summonAngel(Legion summoner);
 
     /** pick a color of legion markers */
     String pickColor(List<String> colors, List<String> favoriteColors);

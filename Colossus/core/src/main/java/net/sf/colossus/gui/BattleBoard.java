@@ -72,6 +72,8 @@ public final class BattleBoard extends KFrame
     private final InfoPanel infoPanel;
     private final DicePanel dicePanel;
     private final Client client;
+    private final ClientGUI gui;
+    private final String infoText;
     private final Cursor defaultCursor;
 
     /** tag of the selected critter, or -1 if no critter is selected. */
@@ -141,12 +143,13 @@ public final class BattleBoard extends KFrame
         }
     }
 
-    public BattleBoard(final Client client, MasterHex masterHex,
+    public BattleBoard(final ClientGUI gui, MasterHex masterHex,
         Legion attacker, Legion defender)
     {
         super(); // title will be set later
 
-        this.client = client;
+        this.gui = gui;
+        this.client = gui.getClient();
 
         String attackerMarkerId = attacker.getMarkerId();
         String defenderMarkerId = defender.getMarkerId();
@@ -164,7 +167,7 @@ public final class BattleBoard extends KFrame
             @Override
             public void windowClosing(WindowEvent e)
             {
-                client.askNewCloseQuitCancel(BattleBoard.this, true);
+                gui.askNewCloseQuitCancel(BattleBoard.this, true);
             }
         });
 
@@ -172,7 +175,7 @@ public final class BattleBoard extends KFrame
         setupTopMenu();
         setupHelpMenu();
 
-        saveWindow = new SaveWindow(client.getOptions(), "BattleMap");
+        saveWindow = new SaveWindow(gui.getOptions(), "BattleMap");
 
         if (location == null)
         {
@@ -193,7 +196,7 @@ public final class BattleBoard extends KFrame
             public void mousePressed(MouseEvent e)
             {
                 // Only the active player can click on stuff.
-                if (!client.getOwningPlayer().equals(
+                if (!gui.getOwningPlayer().equals(
                     client.getBattleActivePlayer()))
                 {
                     return;
@@ -222,11 +225,13 @@ public final class BattleBoard extends KFrame
         dicePanel = new DicePanel();
         getContentPane().add(dicePanel, BorderLayout.SOUTH);
 
-        setTitle(client.getOwningPlayer().getName() + ": "
+        infoText = gui.getOwningPlayer().getName() + ": "
             + LegionServerSide.getMarkerName(attackerMarkerId) + " ("
             + attackerMarkerId + ") attacks "
             + LegionServerSide.getMarkerName(defenderMarkerId) + " ("
-            + defenderMarkerId + ") in " + masterHex.getLabel());
+            + defenderMarkerId + ") in " + masterHex.getLabel();
+
+        setTitle(getInfoText());
 
         String instanceId = client.getOwningPlayer().getName() + ": "
             + attackerMarkerId + "/" + defenderMarkerId + " (" + count + ")";
@@ -304,12 +309,26 @@ public final class BattleBoard extends KFrame
         battleMap.setBattleMarkerLocation(isDefender, hexLabel);
     }
 
-    // TODO replace with instance var?
+    // TODO perhaps this is not needed at all, 
+    //      - use the instance variable everywhere?
     private IClientGUI getGUI()
     {
-        return client.getGUI();
+        return gui;
     }
-    
+
+    // TODO: access to variable client should be replaced with this here,
+    // or rather, on the long run, probably many of them should get the
+    // info they need from Game (gui.getGame() or gui.getGameClientSide?)
+    private Client getClient()
+    {
+        return gui.getClient();
+    }
+
+    private String getInfoText()
+    {
+        return infoText;
+    }
+
     private void setupActions()
     {
         showTerrainHazardAction = new AbstractAction(showTerrainHazard)
@@ -996,9 +1015,16 @@ public final class BattleBoard extends KFrame
         {
             return;
         }
-        dicePanel.addValues("Battle Phase " + client.getBattleTurnNumber(),
-            client.getBattleActivePlayer().getName(), strikerDesc, targetDesc,
+        dicePanel.addValues("Battle Phase "
+            + getClient().getBattleTurnNumber(), getClient()
+            .getBattleActivePlayer().getName(), strikerDesc, targetDesc,
             targetNumber, rolls);
         dicePanel.showLastRoll();
+    }
+
+    @Override
+    public String toString()
+    {
+        return "BattleBoard for: " + infoText;
     }
 }
