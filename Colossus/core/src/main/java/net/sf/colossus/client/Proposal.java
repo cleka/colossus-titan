@@ -180,12 +180,16 @@ public final class Proposal
 
         boolean fight = Boolean.valueOf(li.remove(0)).booleanValue();
         boolean mutual = Boolean.valueOf(li.remove(0)).booleanValue();
-        String attackerId = li.remove(0);
-        String defenderId = li.remove(0);
-        Legion attacker = game.getLegionByMarkerId(attackerId);
-        Legion defender = game.getLegionByMarkerId(defenderId);
+        Legion attacker = game.getLegionByMarkerId(li.remove(0));
+        Legion defender = game.getLegionByMarkerId(li.remove(0));
+        Legion winner = null;
         String winnerId = li.remove(0);
-        Legion winner = game.getLegionByMarkerId(winnerId);
+        // Do not try to re-instantiate if markerId is null
+        // (client, esp. AI, selected "Fight!" and probably also for mutual      
+        if (!fight && winnerId != null)
+        {
+            winner = game.getLegionByMarkerId(winnerId);
+        }
         List<String> winnerLosses = li;
 
         return new Proposal(attacker, defender, fight, mutual, winner,
