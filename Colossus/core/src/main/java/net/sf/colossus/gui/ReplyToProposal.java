@@ -16,8 +16,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import net.sf.colossus.client.Client;
-import net.sf.colossus.client.IOracle;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Proposal;
 import net.sf.colossus.util.KDialog;
@@ -44,7 +42,7 @@ final class ReplyToProposal extends KDialog implements ActionListener
     private final SaveWindow saveWindow;
 
     ReplyToProposal(JFrame parentframe, ClientGUI gui, String playerName,
-        Client client, Options options, IOracle oracle, Proposal proposal)
+        Options options, Proposal proposal)
     {
         super(parentframe, playerName + ": Reply to Proposal", false);
 
@@ -64,10 +62,12 @@ final class ReplyToProposal extends KDialog implements ActionListener
         JPanel attackerPane = new JPanel();
         contentPane.add(attackerPane);
 
-        attackerMarker = new Marker(scale, attacker.getMarkerId(), client);
+        attackerMarker = new Marker(scale, attacker.getMarkerId(), gui
+            .getClient());
         attackerPane.add(attackerMarker);
 
-        List<String> attackerImageNames = oracle.getLegionImageNames(attacker);
+        List<String> attackerImageNames = gui.getOracle().getLegionImageNames(
+            attacker);
         Iterator<String> it = attackerImageNames.iterator();
         while (it.hasNext())
         {
@@ -80,10 +80,12 @@ final class ReplyToProposal extends KDialog implements ActionListener
         JPanel defenderPane = new JPanel();
         contentPane.add(defenderPane);
 
-        defenderMarker = new Marker(scale, defender.getMarkerId(), client);
+        defenderMarker = new Marker(scale, defender.getMarkerId(), gui
+            .getClient());
         defenderPane.add(defenderMarker);
 
-        List<String> defenderImageNames = oracle.getLegionImageNames(defender);
+        List<String> defenderImageNames = gui.getOracle().getLegionImageNames(
+            defender);
         it = defenderImageNames.iterator();
         while (it.hasNext())
         {

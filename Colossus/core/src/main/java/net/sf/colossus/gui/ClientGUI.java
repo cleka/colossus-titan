@@ -194,6 +194,11 @@ public class ClientGUI implements IClientGUI
         return client;
     }
 
+    public IOracle getOracle()
+    {
+        return client;
+    }
+
     public Game getGame()
     {
         return client.getGame();
@@ -1824,7 +1829,7 @@ public class ClientGUI implements IClientGUI
      */
     public void showNegotiate(Legion attacker, Legion defender)
     {
-        negotiate = new Negotiate(client, attacker, defender);
+        negotiate = new Negotiate(this, attacker, defender);
     }
 
     /* (non-Javadoc)
@@ -1836,7 +1841,7 @@ public class ClientGUI implements IClientGUI
         {
             negotiate.dispose();
         }
-        negotiate = new Negotiate(client, client.getAttacker(), client
+        negotiate = new Negotiate(this, client.getAttacker(), client
             .getDefender());
     }
 
@@ -2262,7 +2267,7 @@ public class ClientGUI implements IClientGUI
             replyToProposal.dispose();
         }
         replyToProposal = new ReplyToProposal(board.getFrame(), this,
-            getOwningPlayer().getName(), client, options, oracle, proposal);
+            getOwningPlayer().getName(), options, proposal);
 
     }
 
