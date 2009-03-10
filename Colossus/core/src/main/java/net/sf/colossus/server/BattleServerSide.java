@@ -73,9 +73,6 @@ public final class BattleServerSide extends Battle
         this.turnNumber = turnNumber;
         this.phase = phase;
 
-        System.out.println("BSS: attacker " + attacker);
-        System.out.println("BSS: defender " + defender);
-
         // Set defender's entry side opposite attacker's.
         int side = attacker.getEntrySide();
         if (side != 1 && side != 3 && side != 5)
@@ -152,7 +149,7 @@ public final class BattleServerSide extends Battle
         initBattleChits(getDefender());
 
         boolean advance = false;
-        switch(phase)
+        switch (phase)
         {
             case SUMMON:
                 advance = setupSummon();

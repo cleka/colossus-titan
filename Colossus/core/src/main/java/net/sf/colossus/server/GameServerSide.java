@@ -2684,7 +2684,8 @@ public final class GameServerSide extends Game
         }
         battleInProgress = false;
 
-        setEngagementResult(Constants.erMethodFight, battleWinner, points, turnDone);
+        setEngagementResult(Constants.erMethodFight, battleWinner, points,
+            turnDone);
         checkEngagementDone();
     }
 
@@ -3103,9 +3104,6 @@ public final class GameServerSide extends Game
                 return;
             }
 
-            System.out.println("fight: attacker " + attacker);
-            System.out.println("fight: defender " + defender);
-
             battleInProgress = true;
 
             // Reveal both legions to all players.
@@ -3182,8 +3180,8 @@ public final class GameServerSide extends Game
 
     private void handleNegotiation(Proposal results)
     {
-        LegionServerSide attacker = (LegionServerSide) results.getAttacker();
-        LegionServerSide defender = (LegionServerSide) results.getDefender();
+        LegionServerSide attacker = (LegionServerSide)results.getAttacker();
+        LegionServerSide defender = (LegionServerSide)results.getDefender();
         LegionServerSide negotiatedWinner = null;
         int points = 0;
 
@@ -3225,7 +3223,7 @@ public final class GameServerSide extends Game
         else
         {
             // One legion was eliminated during negotiations.
-            negotiatedWinner = (LegionServerSide) results.getWinner();
+            negotiatedWinner = (LegionServerSide)results.getWinner();
             LegionServerSide loser;
             if (negotiatedWinner == defender)
             {
@@ -3255,8 +3253,8 @@ public final class GameServerSide extends Game
                 CreatureType creature = getVariant().getCreatureByName(
                     creatureName);
                 negotiatedWinner.removeCreature(creature, true, true);
-                server.allTellRemoveCreature(negotiatedWinner, creatureName, true,
-                    Constants.reasonNegotiated);
+                server.allTellRemoveCreature(negotiatedWinner, creatureName,
+                    true, Constants.reasonNegotiated);
             }
             LOGGER.info(log.toString());
 
@@ -3276,7 +3274,8 @@ public final class GameServerSide extends Game
             loser.remove();
 
             // Add points, and angels if necessary.
-            negotiatedWinner.getPlayer().awardPoints(points, negotiatedWinner, false);
+            negotiatedWinner.getPlayer().awardPoints(points, negotiatedWinner,
+                false);
 
             LOGGER.info("Legion " + loser + " is eliminated by legion "
                 + negotiatedWinner + " via negotiation");
@@ -3316,7 +3315,8 @@ public final class GameServerSide extends Game
             }
         }
 
-        setEngagementResult(Constants.erMethodNegotiate, negotiatedWinner, points, 0);
+        setEngagementResult(Constants.erMethodNegotiate, negotiatedWinner,
+            points, 0);
         checkEngagementDone();
     }
 
