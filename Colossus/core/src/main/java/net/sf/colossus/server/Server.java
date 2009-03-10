@@ -576,7 +576,7 @@ public final class Server extends Thread implements IServer
      *  Put the ClientHandler into the queue to be removed
      *  from selector on next possible opportunity
      */
-    public void disposeClientHandler(ClientHandler ch)
+    void disposeClientHandler(ClientHandler ch)
     {
         if (currentThread().equals(this))
         {
@@ -1761,18 +1761,18 @@ public final class Server extends Thread implements IServer
             client.nak(Constants.strike, "No critter with that tag");
             return;
         }
-        CreatureServerSide target = battle.getCritter(hexLabel);
-        if (target == null)
+        CreatureServerSide strikeTarget = battle.getCritter(hexLabel);
+        if (strikeTarget == null)
         {
             LOGGER.severe("No target in hex " + hexLabel
                 + " in Server.strike()");
             client.nak(Constants.strike, "No target in that hex");
             return;
         }
-        if (target.getPlayer() == critter.getPlayer())
+        if (strikeTarget.getPlayer() == critter.getPlayer())
         {
             LOGGER.severe(critter.getDescription()
-                + " tried to strike allied " + target.getDescription());
+                + " tried to strike allied " + strikeTarget.getDescription());
             client.nak(Constants.strike, "Target is friendly");
             return;
         }
@@ -1782,7 +1782,7 @@ public final class Server extends Thread implements IServer
             client.nak(Constants.strike, "Critter already struck");
             return;
         }
-        critter.strike(target);
+        critter.strike(strikeTarget);
     }
 
     public void applyCarries(String hexLabel)

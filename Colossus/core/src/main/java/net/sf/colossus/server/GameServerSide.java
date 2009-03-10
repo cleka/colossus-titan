@@ -154,7 +154,6 @@ public final class GameServerSide extends Game
         {
             return;
         }
-        Server server = getServer();
         if (server != null)
         {
             server.allUpdateCreatureCount(type, getCaretaker()
@@ -852,7 +851,7 @@ public final class GameServerSide extends Game
     Player getWinner()
     {
         int remaining = 0;
-        Player winner = null;
+        Player result = null;
         Iterator<PlayerServerSide> it = players.iterator();
 
         while (it.hasNext())
@@ -868,11 +867,11 @@ public final class GameServerSide extends Game
                 }
                 else
                 {
-                    winner = player;
+                    result = player;
                 }
             }
         }
-        return winner;
+        return result;
     }
 
     void checkForVictory()
@@ -1064,7 +1063,6 @@ public final class GameServerSide extends Game
 
     private void setupPhase()
     {
-        Constants.Phase phase = getPhase();
         if (phase == Constants.Phase.SPLIT)
         {
             setupSplit();
@@ -1673,7 +1671,7 @@ public final class GameServerSide extends Game
                     .getBooleanValue());
 
                 String playersElim = pla.getAttribute("colorsElim").getValue();
-                if (playersElim == "null")
+                if ("null".contains(playersElim))
                 {
                     playersElim = "";
                 }
@@ -2653,40 +2651,40 @@ public final class GameServerSide extends Game
         battle.cleanRefs();
         battle = null;
         server.allCleanupBattle();
-        LegionServerSide winner = null;
+        LegionServerSide battleWinner = null;
 
         // Handle any after-battle angel summoning or recruiting.
         if (getNumLegions(masterHex) == 1)
         {
-            winner = (LegionServerSide)getFirstLegion(masterHex);
+            battleWinner = (LegionServerSide)getFirstLegion(masterHex);
 
             // Make all creatures in the victorious legion visible.
-            server.allRevealLegion(winner, Constants.reasonWinner);
+            server.allRevealLegion(battleWinner, Constants.reasonWinner);
             // Remove battle info from winning legion and its creatures.
-            winner.clearBattleInfo();
+            battleWinner.clearBattleInfo();
 
-            if (winner.getPlayer() == getActivePlayer())
+            if (battleWinner.getPlayer() == getActivePlayer())
             {
                 // Attacker won, so possibly summon angel.
-                if (winner.canSummonAngel())
+                if (battleWinner.canSummonAngel())
                 {
-                    createSummonAngel(winner);
+                    createSummonAngel(battleWinner);
                 }
             }
             else
             {
                 // Defender won, so possibly recruit reinforcement.
-                if (attackerEntered && winner.canRecruit())
+                if (attackerEntered && battleWinner.canRecruit())
                 {
                     LOGGER
                         .finest("Calling Game.reinforce() from Game.finishBattle()");
-                    reinforce(winner);
+                    reinforce(battleWinner);
                 }
             }
         }
         battleInProgress = false;
 
-        setEngagementResult(Constants.erMethodFight, winner, points, turnDone);
+        setEngagementResult(Constants.erMethodFight, battleWinner, points, turnDone);
         checkEngagementDone();
     }
 
@@ -2806,7 +2804,7 @@ public final class GameServerSide extends Game
 
             for (CreatureType creature : creatures)
             {
-                if ((creature).isLord())
+                if (creature.isLord())
                 {
                     numLords++;
                 }
@@ -3184,9 +3182,9 @@ public final class GameServerSide extends Game
 
     private void handleNegotiation(Proposal results)
     {
-        Legion attacker = results.getAttacker();
-        Legion defender = results.getDefender();
-        Legion winner = null;
+        LegionServerSide attacker = (LegionServerSide) results.getAttacker();
+        LegionServerSide defender = (LegionServerSide) results.getDefender();
+        LegionServerSide negotiatedWinner = null;
         int points = 0;
 
         if (results.isMutual())
@@ -3195,8 +3193,8 @@ public final class GameServerSide extends Game
             boolean defenderHasTitan = defender.hasTitan();
 
             // Remove both legions and give no points.
-            ((LegionServerSide)attacker).remove();
-            ((LegionServerSide)defender).remove();
+            attacker.remove();
+            defender.remove();
 
             LOGGER.info(attacker + " and " + defender
                 + " agree to mutual elimination");
@@ -3205,8 +3203,8 @@ public final class GameServerSide extends Game
             if (attackerHasTitan && defenderHasTitan)
             {
                 // Make defender die first, to simplify turn advancing.
-                ((PlayerServerSide)defender.getPlayer()).die(null);
-                ((PlayerServerSide)attacker.getPlayer()).die(null);
+                defender.getPlayer().die(null);
+                attacker.getPlayer().die(null);
                 checkForVictory();
             }
 
@@ -3214,24 +3212,22 @@ public final class GameServerSide extends Game
             // half points to the victor.
             else if (attackerHasTitan)
             {
-                ((PlayerServerSide)attacker.getPlayer()).die(defender
-                    .getPlayer());
+                attacker.getPlayer().die(defender.getPlayer());
                 checkForVictory();
             }
 
             else if (defenderHasTitan)
             {
-                ((PlayerServerSide)defender.getPlayer()).die(attacker
-                    .getPlayer());
+                defender.getPlayer().die(attacker.getPlayer());
                 checkForVictory();
             }
         }
         else
         {
             // One legion was eliminated during negotiations.
-            winner = results.getWinner();
-            Legion loser;
-            if (winner == defender)
+            negotiatedWinner = (LegionServerSide) results.getWinner();
+            LegionServerSide loser;
+            if (negotiatedWinner == defender)
             {
                 loser = attacker;
             }
@@ -3242,7 +3238,7 @@ public final class GameServerSide extends Game
 
             StringBuilder log = new StringBuilder("Winning legion ");
 
-            log.append(((LegionServerSide)winner).getLongMarkerName());
+            log.append(negotiatedWinner.getLongMarkerName());
             log.append(" loses creatures ");
 
             // Remove all dead creatures from the winning legion.
@@ -3258,40 +3254,38 @@ public final class GameServerSide extends Game
                 }
                 CreatureType creature = getVariant().getCreatureByName(
                     creatureName);
-                ((LegionServerSide)winner)
-                    .removeCreature(creature, true, true);
-                server.allTellRemoveCreature(winner, creatureName, true,
+                negotiatedWinner.removeCreature(creature, true, true);
+                server.allTellRemoveCreature(negotiatedWinner, creatureName, true,
                     Constants.reasonNegotiated);
             }
             LOGGER.info(log.toString());
 
-            server.oneRevealLegion(winner, attacker.getPlayer(),
+            server.oneRevealLegion(negotiatedWinner, attacker.getPlayer(),
                 Constants.reasonNegotiated);
-            server.oneRevealLegion(winner, defender.getPlayer(),
+            server.oneRevealLegion(negotiatedWinner, defender.getPlayer(),
                 Constants.reasonNegotiated);
 
             points = loser.getPointValue();
 
-            Player losingPlayer = loser.getPlayer();
+            PlayerServerSide losingPlayer = loser.getPlayer();
 
             // Need to check and remember this before removing the legion
             boolean loserHasTitan = loser.hasTitan();
 
             // Remove the losing legion.
-            ((LegionServerSide)loser).remove();
+            loser.remove();
 
             // Add points, and angels if necessary.
-            ((PlayerServerSide)winner.getPlayer()).awardPoints(points,
-                (LegionServerSide)winner, false);
+            negotiatedWinner.getPlayer().awardPoints(points, negotiatedWinner, false);
 
             LOGGER.info("Legion " + loser + " is eliminated by legion "
-                + winner + " via negotiation");
+                + negotiatedWinner + " via negotiation");
 
             // If this was the titan stack, its owner dies and gives half
             // points to the victor.
             if (loserHasTitan)
             {
-                ((PlayerServerSide)losingPlayer).die(winner.getPlayer());
+                losingPlayer.die(negotiatedWinner.getPlayer());
                 checkForVictory();
             }
 
@@ -3301,9 +3295,9 @@ public final class GameServerSide extends Game
                     + "skipping summon/reinforce procedures.");
 
             }
-            else if (winner == defender)
+            else if (negotiatedWinner == defender)
             {
-                if (((LegionServerSide)defender).canRecruit())
+                if (defender.canRecruit())
                 {
                     // If the defender won the battle by agreement,
                     // he may recruit.
@@ -3313,7 +3307,7 @@ public final class GameServerSide extends Game
             else
             {
                 if (attacker.getHeight() < 7
-                    && !((PlayerServerSide)attacker.getPlayer()).hasSummoned())
+                    && !attacker.getPlayer().hasSummoned())
                 {
                     // If the attacker won the battle by agreement,
                     // he may summon an angel.
@@ -3322,7 +3316,7 @@ public final class GameServerSide extends Game
             }
         }
 
-        setEngagementResult(Constants.erMethodNegotiate, winner, points, 0);
+        setEngagementResult(Constants.erMethodNegotiate, negotiatedWinner, points, 0);
         checkEngagementDone();
     }
 
@@ -3715,7 +3709,7 @@ public final class GameServerSide extends Game
         history.playerElimEvent(player, slayer, turnNumber);
     }
 
-    public NotifyWebServer getNotifyWebServer()
+    NotifyWebServer getNotifyWebServer()
     {
         return this.notifyWebServer;
     }

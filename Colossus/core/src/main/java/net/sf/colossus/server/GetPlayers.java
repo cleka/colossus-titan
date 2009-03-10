@@ -57,7 +57,7 @@ import net.sf.colossus.util.ResourceLoader;
  * @author David Ripton
  * @author Romain Dolbeau
  */
-
+@SuppressWarnings("serial")
 public final class GetPlayers extends KFrame implements WindowListener,
     ActionListener, ItemListener
 {

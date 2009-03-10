@@ -49,16 +49,13 @@ public final class StartupProgress implements ActionListener
         net.sf.colossus.webcommon.InstanceTracker.register(this, "only one");
 
         //Create and set up the window.
-        final KFrame logFrame = new KFrame("Server startup progress log");
-        this.logFrame = logFrame;
+        this.logFrame = new KFrame("Server startup progress log");
 
         logFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
-        Container pane = logFrame.getContentPane();
-        this.pane = pane;
+        this.pane = logFrame.getContentPane();
 
-        TextArea text = new TextArea("", 20, 80);
-        this.text = text;
+        this.text = new TextArea("", 20, 80);
         pane.add(text, BorderLayout.CENTER);
 
         JButton b1 = new JButton("Abort");

@@ -152,26 +152,26 @@ public final class BattleServerSide extends Battle
         initBattleChits(getDefender());
 
         boolean advance = false;
-        Constants.BattlePhase phase = getBattlePhase();
-        if (phase == Constants.BattlePhase.SUMMON)
+        switch(phase)
         {
-            advance = setupSummon();
-        }
-        else if (phase == Constants.BattlePhase.RECRUIT)
-        {
-            advance = setupRecruit();
-        }
-        else if (phase == Constants.BattlePhase.MOVE)
-        {
-            advance = setupMove();
-        }
-        else if (phase.isFightPhase())
-        {
-            advance = setupFight();
-        }
-        else
-        {
-            LOGGER.log(Level.SEVERE, "Bogus phase");
+            case SUMMON:
+                advance = setupSummon();
+                break;
+            case RECRUIT:
+                advance = setupRecruit();
+                break;
+            case MOVE:
+                advance = setupMove();
+                break;
+            default:
+                if (phase.isFightPhase())
+                {
+                    advance = setupFight();
+                }
+                else
+                {
+                    LOGGER.log(Level.SEVERE, "Bogus phase");
+                }
         }
         if (advance)
         {
@@ -980,7 +980,6 @@ public final class BattleServerSide extends Battle
     boolean doneWithStrikes()
     {
         // Advance only if there are no unresolved strikes.
-        Constants.BattlePhase phase = getBattlePhase();
         if (!isForcedStrikeRemaining() && phase.isFightPhase())
         {
             commitStrikes();

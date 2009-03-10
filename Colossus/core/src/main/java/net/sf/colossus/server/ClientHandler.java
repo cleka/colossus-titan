@@ -252,24 +252,24 @@ final class ClientHandler implements IClient
     {
         if (method.equals(Constants.signOn))
         {
-            String playerName = args.remove(0);
+            String tmpPlayerName = args.remove(0);
             boolean remote = Boolean.valueOf(args.remove(0)).booleanValue();
-            boolean success = server.addClient(this, playerName, remote);
+            boolean success = server.addClient(this, tmpPlayerName, remote);
             if (success)
             {
                 // this setPlayerName is only send for the reason that the client
                 // expects a response quickly
-                setPlayerName(playerName);
+                setPlayerName(tmpPlayerName);
                 // @TODO: move to outside Select loop 
                 //   => notify main thread to so this?
                 server.startGameIfAllPlayers();
             }
             else
             {
-                System.out.println("Rejecting unexpected client " + playerName);
-                nak("SignOn", "Invalid player name '" + playerName + "'!");
+                System.out.println("Rejecting unexpected client " + tmpPlayerName);
+                nak("SignOn", "Invalid player name '" + tmpPlayerName + "'!");
             }
-            InstanceTracker.setId(this, playerName);
+            InstanceTracker.setId(this, tmpPlayerName);
         }
         else if (method.equals(Constants.fixName))
         {

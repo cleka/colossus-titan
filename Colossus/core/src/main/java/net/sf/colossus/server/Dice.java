@@ -20,7 +20,7 @@ public final class Dice
         .getLogger(Dice.class.getName());
 
     private static Random random = new DevRandom();
-    private static int[] stats = new int[6];
+    private static final int[] stats = new int[6];
     private static int rcount = 0;
 
     static void init(String source)
