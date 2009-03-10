@@ -88,7 +88,7 @@ final class PickRecruit extends KDialog implements MouseListener,
             "  Pick one of the following to recruit it, or cancel");
         label.setAlignmentX(FlowLayout.LEADING);
         contentPane.add(label);
-        
+
         JPanel recruitPane = new JPanel();
         contentPane.add(recruitPane);
 
@@ -138,8 +138,9 @@ final class PickRecruit extends KDialog implements MouseListener,
     }
 
     /** Return the creature recruited, or null if none. */
-    static synchronized String pickRecruit(JFrame parentFrame, List<CreatureType> recruits,
-        String hexDescription, Legion legion, Client client)
+    static synchronized String pickRecruit(JFrame parentFrame,
+        List<CreatureType> recruits, String hexDescription, Legion legion,
+        Client client)
     {
         String recruit = null;
         if (!active)

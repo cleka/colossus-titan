@@ -186,8 +186,8 @@ public class BalrogRecruitment extends CustomRecruitBase
         }
         else if (difference < 0)
         {
-            LOGGER.warning("CUSTOM: DIMINISHING the total number of "
-                + name + " from " + alreadyNumber + " to " + nowNumber
+            LOGGER.warning("CUSTOM: DIMINISHING the total number of " + name
+                + " from " + alreadyNumber + " to " + nowNumber
                 + " (new available count is: " + newcount + ")");
         }
     }

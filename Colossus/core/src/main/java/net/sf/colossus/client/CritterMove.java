@@ -1,5 +1,6 @@
 package net.sf.colossus.client;
 
+
 import net.sf.colossus.gui.BattleChit;
 
 

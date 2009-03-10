@@ -51,8 +51,7 @@ public class User
     // Only needed during registration:
     private String confirmationCode;
 
-    private static final HashMap<String, User> pendingRegistrations
-        = new HashMap<String, User>();
+    private static final HashMap<String, User> pendingRegistrations = new HashMap<String, User>();
 
     private Thread thread;
     private static final int MAX_RANDOM = 99;
@@ -60,8 +59,6 @@ public class User
     public final static String PROVIDE_CONFCODE = "Provide the confirmation code";
     public final static String TEMPLATE_CONFCODE = "10 20 30";
     public final static String TEMPLATE_CONFCODE_REPLACEMENT = "11 21 31";
-    
-    
 
     public User(String name)
     {
@@ -237,15 +234,17 @@ public class User
         {
             String created = makeCreatedDate(new Date().getTime());
             String cCode = makeConfirmationCode();
-            User u = new User(username, password, email, isAdmin, created, cCode);
-            
-            String reason = sendConfirmationMail(username, email, cCode, mailObject);
+            User u = new User(username, password, email, isAdmin, created,
+                cCode);
+
+            String reason = sendConfirmationMail(username, email, cCode,
+                mailObject);
             if (reason != null)
             {
                 // mail sending failed, for some reason. Let user know it.
                 return reason;
             }
-                
+
             pendingRegistrations.put(username, u);
             // so far everything fine. Now client shall request the conf. code
 
@@ -254,8 +253,8 @@ public class User
         }
     }
 
-    public static String sendConfirmationMail(String username,
-        String email, String confCode, ColossusMail mailObject)
+    public static String sendConfirmationMail(String username, String email,
+        String confCode, ColossusMail mailObject)
     {
         // this is in webcommon package:
         return mailObject.sendConfirmationMail(username, email, confCode);
@@ -289,21 +288,22 @@ public class User
         }
 
         String msg = "User " + username + " attempts confirmation "
-        + "with code '" + confirmationCode + "'.";
+            + "with code '" + confirmationCode + "'.";
         LOGGER.fine(msg);
-        
+
         reason = confirmIfCorrectCode(username, confirmationCode);
         return reason;
     }
 
-    private static String confirmIfCorrectCode(String username, String confirmationCode)
+    private static String confirmIfCorrectCode(String username,
+        String confirmationCode)
     {
         User u = pendingRegistrations.get(username);
         if (u == null)
         {
             return "No confirmation pending for this username";
         }
-        
+
         if (!u.getConfirmationCode().equals(confirmationCode))
         {
             return "Wrong confirmation code!";
@@ -315,7 +315,7 @@ public class User
         pendingRegistrations.remove(username);
         storeUser(u);
         storeUsersToFile();
-        
+
         return null;
     }
 

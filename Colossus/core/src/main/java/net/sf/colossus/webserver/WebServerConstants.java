@@ -38,7 +38,7 @@ public final class WebServerConstants
     public final static String optMailContactWWW = "ContactWWW";
     public final static String optMailReallyMail = "MailReallyMail";
     public final static String optMailToFile = "MailToFile";
-    
+
     // how many messages does chat server cache, for redisplay to
     // those who just log in:
     public final static int keepLastNMessages = 10;

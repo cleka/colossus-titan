@@ -1,7 +1,6 @@
 package net.sf.colossus.gui;
 
 
-
 /**
  * Class StrikeDie displays a die representing the threshold for 
  * a successful hit during the Strike/strike-back phase.

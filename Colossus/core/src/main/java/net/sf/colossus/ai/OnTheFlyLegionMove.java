@@ -1,5 +1,6 @@
 package net.sf.colossus.ai;
 
+
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -12,6 +13,7 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.client.CritterMove;
 import net.sf.colossus.util.DevRandom;
+
 
 /**
  * On-the-fly generation of the Collection of all possible LegionMove.
@@ -28,8 +30,8 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
 
     final static private int RANDOM_MAX_TRY = 100;
     final static private int REFILL_SIZE = 2000;
-    private static final Logger LOGGER = Logger.getLogger(
-            OnTheFlyLegionMove.class.getName());
+    private static final Logger LOGGER = Logger
+        .getLogger(OnTheFlyLegionMove.class.getName());
     private final List<List<CritterMove>> allCritterMoves;
     private final int mysize;
 
@@ -48,7 +50,7 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
         }
         else
         {
-            mysize = (int) realcount;
+            mysize = (int)realcount;
         }
     }
 
@@ -87,12 +89,13 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
                 return 0;
             }
         }
+
         /** map from indexes to LegionMove, what we have already sent to the AI */
-        private final TreeMap<int[], LegionMove> alreadydone =
-                new TreeMap<int[], LegionMove>(new myIntArrayComparator());
+        private final TreeMap<int[], LegionMove> alreadydone = new TreeMap<int[], LegionMove>(
+            new myIntArrayComparator());
         /** map from indexes to LegionMove, the next batch to send to the AI */
-        private final TreeMap<int[], LegionMove> beingdone =
-                new TreeMap<int[], LegionMove>(new myIntArrayComparator());
+        private final TreeMap<int[], LegionMove> beingdone = new TreeMap<int[], LegionMove>(
+            new myIntArrayComparator());
         private final OnTheFlyLegionMove daddy;
         private final Random rand = new DevRandom();
         private final int dim;
@@ -160,10 +163,10 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
                 {
                     if (!beingdone.keySet().contains(indexes))
                     {
-                        LegionMove current = AbstractAI.makeLegionMove(indexes,
-                                daddy.allCritterMoves);
+                        LegionMove current = AbstractAI.makeLegionMove(
+                            indexes, daddy.allCritterMoves);
                         beingdone.put(indexes, current);
-                    //LOGGER.finest("Generated a good one.");
+                        //LOGGER.finest("Generated a good one.");
                     }
                 }
                 else
@@ -194,8 +197,8 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
             total = recurseGenerate(0, counts, actual);
 
             int count = beingdone.keySet().size();
-            LOGGER.finer("Firstfill generated " + count + " out of " + total +
-                    " checked");
+            LOGGER.finer("Firstfill generated " + count + " out of " + total
+                + " checked");
             return count;
         }
 
@@ -220,15 +223,15 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
                     ntry++;
                     for (int i = 0; i < dim; i++)
                     {
-                        indexes[i] = rand.nextInt(daddy.allCritterMoves.get(i).
-                                size());
+                        indexes[i] = rand.nextInt(daddy.allCritterMoves.get(i)
+                            .size());
                     }
                     if (!isBad(indexes))
                     {
                         if (!beingdone.keySet().contains(indexes))
                         {
                             current = AbstractAI.makeLegionMove(indexes,
-                                    daddy.allCritterMoves);
+                                daddy.allCritterMoves);
                             beingdone.put(indexes, current);
                         }
                     }
@@ -246,8 +249,8 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
                 }
             }
             int count = beingdone.keySet().size();
-            LOGGER.finer("Refill generated " + count + " out of " + n +
-                    " requested");
+            LOGGER.finer("Refill generated " + count + " out of " + n
+                + " requested");
             return count;
         }
 

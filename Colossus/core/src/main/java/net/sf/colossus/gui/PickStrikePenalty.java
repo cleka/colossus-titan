@@ -16,6 +16,7 @@ import net.sf.colossus.util.KDialog;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.server.Constants;
 
+
 /** Chooses between multiple strike penalty options.
  *  @version $Id$
  *  @author David Ripton
@@ -32,7 +33,7 @@ final class PickStrikePenalty extends KDialog implements ActionListener
         this.client = client;
 
         choices.add(Constants.cancelStrike);
-        
+
         getContentPane().setLayout(new GridLayout(choices.size(), 1));
         Iterator<String> it = choices.iterator();
         while (it.hasNext())
@@ -70,7 +71,7 @@ final class PickStrikePenalty extends KDialog implements ActionListener
         saveWindow.saveLocation(getLocation());
         dispose();
     }
-    
+
     public void windowClosing()
     {
         client.assignStrikePenalty(Constants.cancelStrike);

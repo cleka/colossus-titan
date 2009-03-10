@@ -200,7 +200,7 @@ public final class Options implements IOptions
     {
         this(owner, Constants.GAME_DATA_PATH, noFile);
     }
-    
+
     public String getOptionsFilename()
     {
         return dataPath + Constants.OPTIONS_BASE + owner
@@ -299,9 +299,9 @@ public final class Options implements IOptions
         }
         catch (IOException e)
         {
-            LOGGER.log(Level.SEVERE, 
+            LOGGER.log(Level.SEVERE,
                 "Couldn't close outputstream after options written to "
-                + optionsFile, e);
+                    + optionsFile, e);
         }
     }
 

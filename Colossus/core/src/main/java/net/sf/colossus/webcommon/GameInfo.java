@@ -72,8 +72,7 @@ public class GameInfo extends Thread
     private int duration = 0;
     private String summary = "";
     // private String infoText = "";
-    
-    
+
     private int AIplayers;
     private int enrolledPlayers;
 
@@ -89,24 +88,24 @@ public class GameInfo extends Thread
     private File flagFile;
 
     // used on server side, to create a game proposed by client
-    
+
     public GameInfo(int state)
     {
         this.gameId = String.valueOf(nextFreeGameId);
         nextFreeGameId++;
         this.state = state;
-        
+
         this.enrolledPlayers = 0;
         this.players = new ArrayList<User>();
         this.server = null;
     }
 
     public GameInfo(String initiator, String variant, String viewmode,
-        long startTime, int duration, String summary,
-        String expire, boolean unlimitedMulligans, boolean balancedTowers,
-        int min, int target, int max)
+        long startTime, int duration, String summary, String expire,
+        boolean unlimitedMulligans, boolean balancedTowers, int min,
+        int target, int max)
     {
-        this(startTime == -1 ? Instant : Scheduled );
+        this(startTime == -1 ? Instant : Scheduled);
 
         this.initiator = initiator;
         this.variant = variant;
@@ -121,7 +120,7 @@ public class GameInfo extends Thread
         this.startTime = startTime;
         this.duration = duration;
         this.summary = summary;
-        
+
         this.enrolledPlayers = 0;
         this.players = new ArrayList<User>();
 
@@ -129,7 +128,7 @@ public class GameInfo extends Thread
         LOGGER.log(Level.FINEST,
             "A new potential game was created!! - variant " + variant
                 + " viewmode " + viewmode);
-        
+
         System.out.println("NEW GameInfo server side, " + this.toString());
     }
 
@@ -450,11 +449,10 @@ public class GameInfo extends Thread
         }
 
         String message = gameId + sep + state + sep + initiator + sep
-            + variant + sep + viewmode + sep + startTime + sep
-            + duration + sep + summary + sep + eventExpiring + sep
-            + unlimitedMulligans + sep + balancedTowers + sep 
-            + min + sep + target + sep + max + sep + enrolledPlayers  
-            + playerList.toString();
+            + variant + sep + viewmode + sep + startTime + sep + duration
+            + sep + summary + sep + eventExpiring + sep + unlimitedMulligans
+            + sep + balancedTowers + sep + min + sep + target + sep + max
+            + sep + enrolledPlayers + playerList.toString();
 
         return message;
     }
@@ -490,7 +488,8 @@ public class GameInfo extends Thread
     public GameInfo(String gameId)
     {
         this.gameId = gameId;
-        System.out.println("NEW empty GameInfo client side, " + this.toString());
+        System.out.println("NEW empty GameInfo client side, "
+            + this.toString());
     }
 
     public static GameInfo fromString(String[] tokens,
@@ -520,7 +519,7 @@ public class GameInfo extends Thread
 
         System.out.println("fromString, state=" + gi.state + ")");
         System.out.println("tokens: " + tokens.toString());
-        
+
         gi.variant = tokens[4];
         gi.viewmode = tokens[5];
         gi.startTime = Long.parseLong(tokens[6]);
@@ -836,13 +835,13 @@ public class GameInfo extends Thread
         }
         catch (RuntimeException e2)
         {
-            LOGGER
-                .log(Level.SEVERE, "during wait for line: RuntimeException: ", e2);
+            LOGGER.log(Level.SEVERE,
+                "during wait for line: RuntimeException: ", e2);
         }
         catch (Exception e3)
         {
-            LOGGER
-                .log(Level.SEVERE, "during wait for line: Whatever Exception: ", e3);
+            LOGGER.log(Level.SEVERE,
+                "during wait for line: Whatever Exception: ", e3);
         }
 
         return line;

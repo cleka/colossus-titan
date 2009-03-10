@@ -1,5 +1,6 @@
 package net.sf.colossus.cmdline;
 
+
 import junit.framework.TestCase;
 import net.sf.colossus.cmdline.CmdLine;
 import net.sf.colossus.cmdline.Opt;
@@ -67,7 +68,7 @@ public class CmdLineTest extends TestCase
         Opts opts = new Opts();
         opts.addOption('v', "verbose", false, "log more stuff");
         opts.addOption('p', "port", true, "server port number");
-        String [] args = {"-p", "1234", "-v"};
+        String[] args = { "-p", "1234", "-v" };
         CmdLine cl = opts.parse(args);
         assertTrue(cl.optIsSet('p'));
         assertTrue(cl.optIsSet("port"));
@@ -76,7 +77,7 @@ public class CmdLineTest extends TestCase
         assertEquals(cl.getOptValue('p'), "1234");
         assertEquals(cl.getOptValue("port"), "1234");
 
-        String [] args2 = {"--port", "1234", "--verbose"};
+        String[] args2 = { "--port", "1234", "--verbose" };
         cl = opts.parse(args2);
         assertTrue(cl.optIsSet('p'));
         assertTrue(cl.optIsSet("port"));
@@ -85,7 +86,7 @@ public class CmdLineTest extends TestCase
         assertEquals(cl.getOptValue('p'), "1234");
         assertEquals(cl.getOptValue("port"), "1234");
 
-        String [] args3 = {"-p1234", "--verbose"};
+        String[] args3 = { "-p1234", "--verbose" };
         cl = opts.parse(args3);
         assertTrue(cl.optIsSet('p'));
         assertTrue(cl.optIsSet("port"));
@@ -100,7 +101,7 @@ public class CmdLineTest extends TestCase
         Opts opts = new Opts();
         opts.addOption('v', "verbose", false, "log more stuff");
         opts.addOption('p', "port", true, "server port number");
-        String [] args = {"-p", "1234", "-v", "hi", "mom"};
+        String[] args = { "-p", "1234", "-v", "hi", "mom" };
         CmdLine cl = opts.parse(args);
         assertTrue(cl.optIsSet('p'));
         assertTrue(cl.optIsSet("port"));

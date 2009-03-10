@@ -1,5 +1,6 @@
 package net.sf.colossus.ai;
 
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ import net.sf.colossus.gui.BattleChit;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.variant.BattleHex;
 
+
 /**
  * Yet Another AI, to test some stuff.
  * @version $Id$
@@ -22,8 +24,8 @@ import net.sf.colossus.variant.BattleHex;
 public class ExperimentalAI extends SimpleAI
 {
 
-    private static final Logger LOGGER = Logger.getLogger(
-            SimpleAI.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(SimpleAI.class
+        .getName());
     private final static long MAX_EXHAUSTIVE_SEARCH_MOVES = 10000;
 
     public ExperimentalAI(Client client)
@@ -33,7 +35,7 @@ public class ExperimentalAI extends SimpleAI
 
     @Override
     Collection<LegionMove> findLegionMoves(
-            final List<List<CritterMove>> allCritterMoves)
+        final List<List<CritterMove>> allCritterMoves)
     {
         long realcount = 1;
         for (List<CritterMove> lcm : allCritterMoves)
@@ -42,22 +44,22 @@ public class ExperimentalAI extends SimpleAI
         }
         if (realcount < MAX_EXHAUSTIVE_SEARCH_MOVES)
         {
-            LOGGER.finer("Less than " + MAX_EXHAUSTIVE_SEARCH_MOVES +
-                    ", using exhaustive search.");
+            LOGGER.finer("Less than " + MAX_EXHAUSTIVE_SEARCH_MOVES
+                + ", using exhaustive search.");
             return generateLegionMoves(allCritterMoves, true);
         }
-        LOGGER.finer("More than " + MAX_EXHAUSTIVE_SEARCH_MOVES +
-                ", using on-the-fly search.");
+        LOGGER.finer("More than " + MAX_EXHAUSTIVE_SEARCH_MOVES
+            + ", using on-the-fly search.");
         return new OnTheFlyLegionMove(allCritterMoves);
     }
 
     @Override
     protected int evaluateLegionBattleMoveAsAWhole(LegionMove lm,
-            Map<String, Integer> strikeMap, StringBuffer why)
+        Map<String, Integer> strikeMap, StringBuffer why)
     {
         int value = 0;
-        final LegionClientSide legion = (LegionClientSide) client.
-                getMyEngagedLegion();
+        final LegionClientSide legion = (LegionClientSide)client
+            .getMyEngagedLegion();
         if (legion.equals(client.getAttacker()))
         {
             // TODO, something
@@ -78,8 +80,8 @@ public class ExperimentalAI extends SimpleAI
                 {
                     BattleHex foeHex = client.getBattleHex(foe);
                     int range = Battle.getRange(foeHex, myHex, true);
-                    if ((range != Constants.OUT_OF_RANGE) &&
-                            ((range - 2) <= foe.getSkill()))
+                    if ((range != Constants.OUT_OF_RANGE)
+                        && ((range - 2) <= foe.getSkill()))
                     {
                         canReachMe++;
                     }

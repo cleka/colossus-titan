@@ -122,17 +122,16 @@ public final class Constants
         }
     }
 
-
     // Special feature to end the game after one battle is completed,
     // for tuning the AI
-    private static String END_AFTER_FIRST_BATTLE_PROPERTY =
-        "net.sf.colossus.endAfterFirstBattle";
+    private static String END_AFTER_FIRST_BATTLE_PROPERTY = "net.sf.colossus.endAfterFirstBattle";
     public static final boolean END_AFTER_FIRST_BATTLE = Boolean.valueOf(
-        System.getProperty(END_AFTER_FIRST_BATTLE_PROPERTY, "false").toString()).
-        booleanValue();
+        System.getProperty(END_AFTER_FIRST_BATTLE_PROPERTY, "false")
+            .toString()).booleanValue();
 
     /** Base path for all external game data files. */
-    public static final String GAME_DATA_PATH = System.getProperty("user.home")
+    public static final String GAME_DATA_PATH = System
+        .getProperty("user.home")
         + File.separator + ".colossus" + File.separator;
 
     // Constants related to the options config files
@@ -150,8 +149,8 @@ public final class Constants
     // Constants for savegames
 
     /** Must include trailing slash. */
-    public static final String SAVE_DIR_NAME = GAME_DATA_PATH
-        + File.separator + "saves" + File.separator;
+    public static final String SAVE_DIR_NAME = GAME_DATA_PATH + File.separator
+        + "saves" + File.separator;
     public static final String XML_EXTENSION = ".xml";
     public static final String XML_SNAPSHOT_START = "snap";
     public static final String XML_SNAPSHOT_VERSION = "12";
@@ -198,10 +197,10 @@ public final class Constants
         "Indigo" };
     private static final String[] shortColorNames = { "Bk", "Bu", "Br", "Gd",
         "Gr", "Rd", "Or", "Pu", "Si", "Sk", "Pi", "In" };
-    private static final int[] colorMnemonics = { KeyEvent.VK_B, KeyEvent.VK_L,
-        KeyEvent.VK_O, KeyEvent.VK_G, KeyEvent.VK_E, KeyEvent.VK_R,
-        KeyEvent.VK_A, KeyEvent.VK_P, KeyEvent.VK_S, KeyEvent.VK_K,
-        KeyEvent.VK_N, KeyEvent.VK_I };
+    private static final int[] colorMnemonics = { KeyEvent.VK_B,
+        KeyEvent.VK_L, KeyEvent.VK_O, KeyEvent.VK_G, KeyEvent.VK_E,
+        KeyEvent.VK_R, KeyEvent.VK_A, KeyEvent.VK_P, KeyEvent.VK_S,
+        KeyEvent.VK_K, KeyEvent.VK_N, KeyEvent.VK_I };
 
     public static final String noShortName = "XX";
     private static final Map<String, String> shortNamesMap = new HashMap<String, String>();
@@ -284,8 +283,7 @@ public final class Constants
     public static final String anyAI = "A Random AI";
     public static final String defaultAI = anyAI;
     public static final String[] aiArray = { "SimpleAI", "CowardSimpleAI",
-                                             "RationalAI", "HumanHaterRationalAI",
-                                             "MilvangAI", "ExperimentalAI" };
+        "RationalAI", "HumanHaterRationalAI", "MilvangAI", "ExperimentalAI" };
 
     public static final int numAITypes = aiArray.length;
     public static final String all = "All";
@@ -334,8 +332,9 @@ public final class Constants
     public static final String[] variantArray = { "Default", "Abyssal3",
         "Abyssal6", "Abyssal9", "Badlands", "Badlands-JDG", "Beelzebub",
         "Beelzebub12", "BeelzeGods12", "ExtTitan", "Infinite", "Outlands",
-        "Pantheon", "SmallTitan", "TG-ConceptI", "TG-ConceptII", "TG-ConceptIII",
-        "TG-SetII", "TG-SetIII", "TG-Wild", "TitanPlus", "Undead", "Unified", "Balrog" };
+        "Pantheon", "SmallTitan", "TG-ConceptI", "TG-ConceptII",
+        "TG-ConceptIII", "TG-SetII", "TG-SetIII", "TG-Wild", "TitanPlus",
+        "Undead", "Unified", "Balrog" };
 
     public static final int numVariants = variantArray.length;
 

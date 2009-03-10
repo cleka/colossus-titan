@@ -1,5 +1,6 @@
 package net.sf.colossus.webclient;
 
+
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,16 +16,14 @@ import net.sf.colossus.webcommon.User;
 
 public class GameTableModel extends AbstractTableModel
 {
-    private final String[] columnNames = { "#", "state", "by", 
-        "when", "duration", "info", 
-        "Variant",
-        "Viewmode", "Expire", "Mull", "Towers", "min", "target", "max",
-        "actual", "players" };
+    private final String[] columnNames = { "#", "state", "by", "when",
+        "duration", "info", "Variant", "Viewmode", "Expire", "Mull", "Towers",
+        "min", "target", "max", "actual", "players" };
 
     private final Vector<GameInfo> data = new Vector<GameInfo>(16, 1);
     private final HashMap<String, Integer> rowIndex = new HashMap<String, Integer>();
     private final Locale myLocale;
-    
+
     public GameTableModel(Locale myLocale)
     {
         super();
@@ -79,7 +78,7 @@ public class GameTableModel extends AbstractTableModel
             case 3:
                 o = humanReadableTime(gi.getStartTime());
                 break;
-                
+
             case 4:
                 o = gi.getDuration().toString() + " min.";
                 break;
@@ -216,7 +215,7 @@ public class GameTableModel extends AbstractTableModel
             case 5:
                 gi.setSummary((String)value);
                 break;
-                
+
             case 6:
                 gi.setVariant((String)value);
                 break;
@@ -356,7 +355,7 @@ public class GameTableModel extends AbstractTableModel
     private String humanReadableTime(Long startTime)
     {
         String timeString = "";
-        
+
         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT,
             DateFormat.SHORT, myLocale);
         df.setTimeZone(TimeZone.getDefault());

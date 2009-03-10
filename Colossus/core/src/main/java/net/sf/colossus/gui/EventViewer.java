@@ -418,7 +418,8 @@ final class EventViewer extends KDialog implements WindowListener,
                 if (maxTurnsOpt > maxVal)
                 {
                     maxTurnsOpt = maxVal;
-                    maxTurnsOptString = Integer.valueOf(maxTurnsOpt).toString();
+                    maxTurnsOptString = Integer.valueOf(maxTurnsOpt)
+                        .toString();
                 }
             }
             catch (NumberFormatException e)
@@ -788,8 +789,8 @@ final class EventViewer extends KDialog implements WindowListener,
             // titan killed, some others survived, 
             // titan-killing-legion eliminated.
             // The above is for normal game. What if load from history??
-            LOGGER.log(Level.INFO,
-                "tellEngagementResultHandling, winner null");
+            LOGGER
+                .log(Level.INFO, "tellEngagementResultHandling, winner null");
 
             // mutual elimination
             // attackerEventLegion.setAllDead();
@@ -1110,7 +1111,7 @@ final class EventViewer extends KDialog implements WindowListener,
             recruitType = RevealEvent.eventRecruit;
             rc.setWasRecruited(true);
         }
-        
+
         rcList.add(rc);
         newEvent(recruitType, markerId, height, rcList, null, 0);
     }
@@ -1187,9 +1188,9 @@ final class EventViewer extends KDialog implements WindowListener,
             }
         }
         else if (type == RevealEvent.eventRecruit
-             ||  type == RevealEvent.eventReinforce
-             ||  type == RevealEvent.eventSummon
-             ||  type == RevealEvent.eventTeleport )
+            || type == RevealEvent.eventReinforce
+            || type == RevealEvent.eventSummon
+            || type == RevealEvent.eventTeleport)
         {
             synchronized (syncdEventList)
             {

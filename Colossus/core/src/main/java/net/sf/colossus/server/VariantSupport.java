@@ -52,7 +52,7 @@ public final class VariantSupport
 
     private static String varDirectory = "";
     private static String varFilename = "";
-    private static String variantName = "";    
+    private static String variantName = "";
     private static String mapName = "";
     private static String recruitName = "";
     private static String hintName = "";
@@ -84,13 +84,12 @@ public final class VariantSupport
         }
     }
 
-    private static HashMap<String, String> rememberCustomDirs 
-    = new HashMap<String, String>();
+    private static HashMap<String, String> rememberCustomDirs = new HashMap<String, String>();
 
     public static void rememberFullPathFileForVariantName(String varName,
         String varFullPathFilename)
     {
-        
+
         rememberCustomDirs.put(varName, varFullPathFilename);
     }
 
@@ -105,7 +104,8 @@ public final class VariantSupport
      * @param serverSide We're loading on a server.
      * @return A Document describing the variant.
      */
-    public static Document loadVariantByName(String variantName, boolean serverSide)
+    public static Document loadVariantByName(String variantName,
+        boolean serverSide)
     {
         // if it's a variant earlier loaded with Load Extern Variant, find out the 
         // directory path for it:
@@ -138,15 +138,15 @@ public final class VariantSupport
     public static Document loadVariantByFile(java.io.File varFile,
         boolean serverSide)
     {
-        
-        String tempVarFilename  = varFile.getName();
+
+        String tempVarFilename = varFile.getName();
         String tempVarDirectory = varFile.getParentFile().getAbsolutePath();
         String tempVarName = null;
         try
         {
             tempVarName = getVariantNameFromFilename(tempVarFilename);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             LOGGER.severe("IllegalVariantFileName - unable to conclude "
                 + "variant name from filename '" + tempVarFilename + "'!");
@@ -157,7 +157,7 @@ public final class VariantSupport
         // variant (where re-selected in combo box) can be loaded again:
         String tempFullPathFilename = varFile.getAbsolutePath();
         rememberFullPathFileForVariantName(tempVarName, tempFullPathFilename);
-        
+
         return loadVariant(tempVarName, tempVarFilename, tempVarDirectory,
             serverSide);
     }
@@ -170,8 +170,8 @@ public final class VariantSupport
         {
             // We need the Variantname for loading a game with
             // remote players.
-            result = varFilename.substring(0,
-                varFilename.length() - Constants.varEnd.length());
+            result = varFilename.substring(0, varFilename.length()
+                - Constants.varEnd.length());
         }
         else
         {
@@ -183,13 +183,12 @@ public final class VariantSupport
              * it should store a 3rd property to hold the variant
              * name (not just file and dir).
              */
-            throw(new Exception(
-                "IllegalVariantFilenameException"));
+            throw (new Exception("IllegalVariantFilenameException"));
         }
         return result;
 
     }
-    
+
     /**
      * Load a Colossus Variant from the specified filename
      *   in the specified path.
@@ -203,16 +202,14 @@ public final class VariantSupport
      * to retrieve the variant name from the variant file name.
      */
     public static Document loadVariant(String tempVariantName,
-        String tempVarFilename,
-        String tempVarDirectory, 
-        boolean serverSide)
+        String tempVarFilename, String tempVarDirectory, boolean serverSide)
     {
         if (tempVariantName == null)
         {
             LOGGER.severe("variantName must not be null!");
             return null;
         }
-        
+
         if (loadedVariant && varFilename.equals(tempVarFilename)
             && varDirectory.equals(tempVarDirectory))
         {
@@ -280,7 +277,8 @@ public final class VariantSupport
                 }
                 for (String creaturesName : lCreaturesName)
                 {
-                    LOGGER.log(Level.FINEST, "Variant using CRE " + creaturesName);
+                    LOGGER.log(Level.FINEST, "Variant using CRE "
+                        + creaturesName);
                 }
 
                 recruitName = vl.getTer();
@@ -324,9 +322,9 @@ public final class VariantSupport
                 throw new FileNotFoundException(VariantSupport.getMapName());
             }
             StrategicMapLoader sml = new StrategicMapLoader(mapIS);
-            
-            MasterBoard masterBoard = new MasterBoard(sml.getHorizSize(),
-                sml.getVertSize(), sml.getShow(), sml.getHexes());
+
+            MasterBoard masterBoard = new MasterBoard(sml.getHorizSize(), sml
+                .getVertSize(), sml.getShow(), sml.getHexes());
 
             // varREADME seems to be used as flag for a successfully loaded
             // variant, but breaking the whole variant loading just because
@@ -343,7 +341,7 @@ public final class VariantSupport
         catch (Exception e)
         {
             LOGGER.severe("\n******\nCATCH - reset to DEFAULT\n");
-            
+
             // TODO this seems like a classic case of fail-slow, rethrowing the exception
             // might be better
             LOGGER.log(Level.SEVERE, "Variant loading failed : " + e, e);
@@ -376,18 +374,15 @@ public final class VariantSupport
             }
             else
             {
-                JOptionPane.showMessageDialog(null,
-                    "Trying to load variant '" + tempVariantName + "' failed "
-                    + "(task='"+task+"')."
+                JOptionPane.showMessageDialog(null, "Trying to load variant '"
+                    + tempVariantName + "' failed " + "(task='" + task + "')."
                     + "\nI will try to load variant 'Default' instead...",
-                    "Variant loading failed!",
-                    JOptionPane.ERROR_MESSAGE);
+                    "Variant loading failed!", JOptionPane.ERROR_MESSAGE);
                 LOGGER.log(Level.WARNING, "Loading variant " + tempVariantName
                     + " failed - trying to load Default instead...");
 
                 varREADME = loadVariant(Constants.defaultVarName,
-                    Constants.defaultVARFile,
-                    Constants.defaultDirName,  
+                    Constants.defaultVARFile, Constants.defaultDirName,
                     serverSide);
             }
         }
@@ -405,9 +400,8 @@ public final class VariantSupport
             List<String> directories = VariantSupport.getVarDirectoriesList();
             for (String creaturesName : VariantSupport.getCreaturesNames())
             {
-                InputStream creIS =
-                        ResourceLoader.getInputStream(creaturesName,
-                        directories);
+                InputStream creIS = ResourceLoader.getInputStream(
+                    creaturesName, directories);
                 if (creIS == null)
                 {
                     throw new FileNotFoundException(creaturesName);

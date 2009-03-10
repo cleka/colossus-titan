@@ -34,6 +34,7 @@ public interface HazardConstants
     {
         SKILLBONUS, SKILLPENALTY, POWERBONUS, POWERPENALTY, BLOCKED, NOEFFECT
     }
+
     /** Special effects.
      */
     public enum SpecialEffect

@@ -239,6 +239,7 @@ public final class Strike
             return false;
         }
     }
+
     /*
      * WARNING: this is a duplication from code in Battle ; caller should use
      * a Battle instance instead.
@@ -455,8 +456,9 @@ public final class Strike
         int strikeElevation = Math.min(hex1.getElevation(), hex2
             .getElevation());
 
-        if (CompareDoubles.almostEqual(yDist, 0.0) || CompareDoubles
-            .almostEqual(Math.abs(yDist), 1.5 * Math.abs(xDist)))
+        if (CompareDoubles.almostEqual(yDist, 0.0)
+            || CompareDoubles.almostEqual(Math.abs(yDist), 1.5 * Math
+                .abs(xDist)))
         {
             // Hexspine; try both sides.
             return (isLOSBlockedDir(hex1, hex1, hex2, true, strikeElevation,
@@ -725,8 +727,8 @@ public final class Strike
         double y2 = hex2.getYCoord();
 
         // Offboard hexes are not allowed.
-        if (CompareDoubles.almostEqual(x1,-1.0)
-            || CompareDoubles.almostEqual(x2,-1))
+        if (CompareDoubles.almostEqual(x1, -1.0)
+            || CompareDoubles.almostEqual(x2, -1))
         {
             return Constants.BIGNUM;
         }
@@ -744,8 +746,9 @@ public final class Strike
         double xDist = x2 - x1;
         double yDist = y2 - y1;
 
-        if (CompareDoubles.almostEqual(yDist, 0.0) || CompareDoubles
-            .almostEqual(Math.abs(yDist), 1.5 * Math.abs(xDist)))
+        if (CompareDoubles.almostEqual(yDist, 0.0)
+            || CompareDoubles.almostEqual(Math.abs(yDist), 1.5 * Math
+                .abs(xDist)))
         {
             int strikeElevation = Math.min(hex1.getElevation(), hex2
                 .getElevation());
@@ -778,7 +781,7 @@ public final class Strike
     // For the hit result it was applied right, but the preview (here,
     // client side) was missing something. ==> should use same code as
     // on server side.
-    
+
     /** Return the number of dice that will be rolled when striking this
      *  target, including modifications for terrain.
      * WARNING: this is duplicated in CreatureServerSide
@@ -848,7 +851,7 @@ public final class Strike
 
         return dice;
     }
-    
+
     /** WARNING: this is duplicated in CreatureServerSide */
     private int getAttackerSkill(BattleChit striker, BattleChit target)
     {
@@ -864,10 +867,9 @@ public final class Strike
         {
             HazardTerrain terrain = hex.getTerrain();
             // striking out of possible hazard
-            attackerSkill -=
-                     hex.getTerrain().getSkillPenaltyStrikeFrom(
-                       striker.getCreature().isNativeIn(terrain),
-                       target.getCreature().isNativeIn(terrain));
+            attackerSkill -= hex.getTerrain().getSkillPenaltyStrikeFrom(
+                striker.getCreature().isNativeIn(terrain),
+                target.getCreature().isNativeIn(terrain));
 
             if (hex.getElevation() > targetHex.getElevation())
             {
@@ -945,27 +947,32 @@ public final class Strike
 
         HazardTerrain terrain = client.getBattleHex(target).getTerrain();
 
-        if (!rangestrike) {
+        if (!rangestrike)
+        {
             // Strike number can be modified directly by terrain.
-            strikeNumber += terrain.getSkillBonusStruckIn(
-                    striker.getCreature().isNativeIn(terrain),
-                    target.getCreature().isNativeIn(terrain));
-        } else {
+            strikeNumber += terrain.getSkillBonusStruckIn(striker
+                .getCreature().isNativeIn(terrain), target.getCreature()
+                .isNativeIn(terrain));
+        }
+        else
+        {
             // Native defending in bramble, from rangestrike by a non-native
             //     non-magicMissile: +1
-            if (terrain.equals(HazardTerrain.BRAMBLES) &&
-                    target.getCreature().isNativeIn(HazardTerrain.BRAMBLES) &&
-                    !striker.getCreature().isNativeIn(HazardTerrain.BRAMBLES) &&
-                    !striker.getCreature().useMagicMissile()) {
+            if (terrain.equals(HazardTerrain.BRAMBLES)
+                && target.getCreature().isNativeIn(HazardTerrain.BRAMBLES)
+                && !striker.getCreature().isNativeIn(HazardTerrain.BRAMBLES)
+                && !striker.getCreature().useMagicMissile())
+            {
                 strikeNumber++;
             }
 
             // Native defending in stone, from rangestrike by a non-native
             //     non-magicMissile: +1
-            if (terrain.equals(HazardTerrain.STONE) &&
-                    target.getCreature().isNativeIn(HazardTerrain.STONE) &&
-                    !striker.getCreature().isNativeIn(HazardTerrain.STONE) &&
-                    !striker.getCreature().useMagicMissile()) {
+            if (terrain.equals(HazardTerrain.STONE)
+                && target.getCreature().isNativeIn(HazardTerrain.STONE)
+                && !striker.getCreature().isNativeIn(HazardTerrain.STONE)
+                && !striker.getCreature().useMagicMissile())
+            {
                 strikeNumber++;
             }
         }

@@ -28,14 +28,15 @@ public abstract class AbstractShowRecruits extends KDialog
         super(parentFrame, "Recruits", false);
 
         assert SwingUtilities.isEventDispatchThread() : "GUI code should only run on the EDT";
-        
+
         setBackground(Color.lightGray);
         addWindowListener(this);
         getContentPane().setLayout(
             new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        addMouseListener(new MouseAdapter(){
+        addMouseListener(new MouseAdapter()
+        {
             @Override
             public void mouseClicked(MouseEvent e)
             {
@@ -47,10 +48,11 @@ public abstract class AbstractShowRecruits extends KDialog
     void doOneTerrain(MasterBoardTerrain terrain, MasterHex hex)
     {
         assert SwingUtilities.isEventDispatchThread() : "GUI code should only run on the EDT";
-        
-        JFrame frame = (JFrame) this.getParent();
+
+        JFrame frame = (JFrame)this.getParent();
         getContentPane().add(
-            new HexRecruitTreePanel(BoxLayout.Y_AXIS, terrain, hex, frame, true));
+            new HexRecruitTreePanel(BoxLayout.Y_AXIS, terrain, hex, frame,
+                true));
     }
 
     @Override
@@ -60,7 +62,7 @@ public abstract class AbstractShowRecruits extends KDialog
         {
             if (c instanceof HexRecruitTreePanel)
             {
-                ((HexRecruitTreePanel) c).closeCreatureWindows();
+                ((HexRecruitTreePanel)c).closeCreatureWindows();
             }
         }
         super.dispose();

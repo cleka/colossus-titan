@@ -1,5 +1,6 @@
 package net.sf.colossus.ai;
 
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import net.sf.colossus.client.CritterMove;
 
 import net.sf.colossus.util.Glob;
 
+
 /** LegionMove has a List of one CritterMove per mobile critter
  *  in the legion.
  * Originally in SimpleAI, which at the time had the following authors.
@@ -18,7 +20,7 @@ import net.sf.colossus.util.Glob;
 class LegionMove implements Comparable<LegionMove>
 {
     private final List<CritterMove> critterMoves = new ArrayList<CritterMove>();
-    private Map<CritterMove,String> evaluation = null;
+    private Map<CritterMove, String> evaluation = null;
     private String lmeval = null;
     private int value;
 
@@ -32,32 +34,37 @@ class LegionMove implements Comparable<LegionMove>
         return Collections.unmodifiableList(critterMoves);
     }
 
-    void resetEvaluate() {
+    void resetEvaluate()
+    {
         evaluation = null;
         lmeval = null;
         value = Integer.MIN_VALUE;
     }
 
-    int getValue() {
+    int getValue()
+    {
         return value;
     }
 
-    void setValue(int v) {
+    void setValue(int v)
+    {
         value = v;
     }
 
-    void setEvaluate(CritterMove cm, String val) {
+    void setEvaluate(CritterMove cm, String val)
+    {
         if (evaluation == null)
-            evaluation = new HashMap<CritterMove,String>();
+            evaluation = new HashMap<CritterMove, String>();
         evaluation.put(cm, val);
     }
 
-    void setEvaluate(String val) {
+    void setEvaluate(String val)
+    {
         lmeval = val;
     }
 
     @Override
-        public String toString()
+    public String toString()
     {
         List<String> cmStrings = new ArrayList<String>();
         for (CritterMove cm : critterMoves)
@@ -74,8 +81,10 @@ class LegionMove implements Comparable<LegionMove>
         {
             StringBuffer buf = new StringBuffer();
             buf.append(cm.toString());
-            if (evaluation != null) {
-                if (evaluation.containsKey(cm)) {
+            if (evaluation != null)
+            {
+                if (evaluation.containsKey(cm))
+                {
                     buf.append(" [");
                     buf.append(evaluation.get(cm));
                     buf.append("]");
@@ -89,7 +98,7 @@ class LegionMove implements Comparable<LegionMove>
     }
 
     @Override
-        public boolean equals(Object ob)
+    public boolean equals(Object ob)
     {
         if (!(ob instanceof LegionMove))
         {
@@ -99,20 +108,21 @@ class LegionMove implements Comparable<LegionMove>
         return toString().equals(lm.toString());
     }
 
-    public int compareTo(LegionMove m) {
+    public int compareTo(LegionMove m)
+    {
         if (this.equals(m))
             return 0; // we're trying to guarantee consistency with equals
 
         if (this.getValue() < m.getValue())
             return -1;
         if (this.getValue() > m.getValue())
-            return  1;
+            return 1;
 
         return this.toString().compareTo(m.toString());
     }
 
     @Override
-        public int hashCode()
+    public int hashCode()
     {
         return toString().hashCode();
     }

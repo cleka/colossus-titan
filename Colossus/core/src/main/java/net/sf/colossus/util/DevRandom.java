@@ -86,12 +86,12 @@ public class DevRandom extends Random
             {
                 randomFile = System.getProperty(randomPropertyName);
             }
-            catch(SecurityException e)
+            catch (SecurityException e)
             {
-                LOGGER.info("Unable to access System property '" 
+                LOGGER.info("Unable to access System property '"
                     + randomPropertyName + "'. Ignored.");
             }
-            
+
             if (randomFile != null)
             {
                 LOGGER.log(Level.FINEST, randomPropertyName

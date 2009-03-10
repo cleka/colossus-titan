@@ -75,7 +75,6 @@ public class BattleHex extends Hex
         terrain = HazardTerrain.PLAINS;
     }
 
-
     private static String createLabel(int xCoord, int yCoord)
     {
         String label;
@@ -85,8 +84,7 @@ public class BattleHex extends Hex
         }
         else
         {
-            final int yLabel = 6 - yCoord
-                - Math.abs(((xCoord - 3) / 2));
+            final int yLabel = 6 - yCoord - Math.abs(((xCoord - 3) / 2));
             label = "" + _intXCoordToXLabel(xCoord) + yLabel;
         }
         return label;
@@ -386,30 +384,45 @@ public class BattleHex extends Hex
         int cost = NORMAL_COST;
 
         // Check to see if the hex is occupied or totally impassable.
-        if (terrain.blocksGround() ||
-                (terrain.isGroundNativeOnly() && (!creature.isNativeIn(terrain)))) {
+        if (terrain.blocksGround()
+            || (terrain.isGroundNativeOnly() && (!creature.isNativeIn(terrain))))
+        {
             cost += IMPASSIBLE_COST;
-        } else {
+        }
+        else
+        {
             char hexside = getHexside(cameFrom);
 
             // Non-fliers may not cross cliffs.
-            if ((hexside == 'c' || getOppositeHexside(cameFrom) == 'c') && !creature.isFlier()) {
+            if ((hexside == 'c' || getOppositeHexside(cameFrom) == 'c')
+                && !creature.isFlier())
+            {
                 cost += IMPASSIBLE_COST;
-            } else {
+            }
+            else
+            {
 
                 // river slows both way, except native & water dwellers
-                if ((hexside == 'r' || getOppositeHexside(cameFrom) == 'r') && !creature.isFlier() && !creature.isWaterDwelling() && !creature.isNativeRiver()) {
+                if ((hexside == 'r' || getOppositeHexside(cameFrom) == 'r')
+                    && !creature.isFlier() && !creature.isWaterDwelling()
+                    && !creature.isNativeRiver())
+                {
                     cost += SLOW_INCREMENT_COST;
                 }
 
                 // Check for a slowing hexside.
-                if ((hexside == 'w' || (hexside == 's' && !creature.isNativeSlope())) && !creature.isFlier() && elevation > getNeighbor(cameFrom).getElevation()) {
+                if ((hexside == 'w' || (hexside == 's' && !creature
+                    .isNativeSlope()))
+                    && !creature.isFlier()
+                    && elevation > getNeighbor(cameFrom).getElevation())
+                {
                     cost += SLOW_INCREMENT_COST;
                 }
 
                 // check whether that terrain is slowing us.
-                if (terrain.slows(creature.isNativeIn(terrain),
-                        creature.isFlier())) {
+                if (terrain.slows(creature.isNativeIn(terrain), creature
+                    .isFlier()))
+                {
                     cost += SLOW_INCREMENT_COST;
                 }
             }
@@ -440,9 +453,9 @@ public class BattleHex extends Hex
         { // non-flyer can't fly, obviously...
             return false;
         }
-       
-        boolean denyBecauseForeigner = (terrain.isFlyersNativeOnly()
-            && !creature.isNativeIn(terrain));
+
+        boolean denyBecauseForeigner = (terrain.isFlyersNativeOnly() && !creature
+            .isNativeIn(terrain));
 
         // (...||...): It's forbidden if it blocks flying generally,
         //             or denies flying to foreigners (and cre is foreigner)
@@ -457,13 +470,11 @@ public class BattleHex extends Hex
      */
     public int damageToCreature(CreatureType creature)
     {
-        if (terrain.isDamagingToNonNative()
-            && (!creature.isNativeIn(terrain)))
+        if (terrain.isDamagingToNonNative() && (!creature.isNativeIn(terrain)))
         { // Non-native take damage in Drift
             return 1;
         }
-        if (terrain.isDamagingToWaterDweller()
-            && (creature.isWaterDwelling()))
+        if (terrain.isDamagingToWaterDweller() && (creature.isWaterDwelling()))
         { // Water Dweller (amphibious) take damage in Sand
             return 1;
         }

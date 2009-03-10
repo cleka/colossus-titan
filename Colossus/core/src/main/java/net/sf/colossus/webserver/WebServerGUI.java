@@ -71,7 +71,7 @@ public class WebServerGUI extends JFrame implements IWebServerGUI
             public void windowClosing(WindowEvent e)
             {
                 initiateShutdown();
-            } 
+            }
         });
         pack();
 
@@ -113,7 +113,7 @@ public class WebServerGUI extends JFrame implements IWebServerGUI
     {
         this.webServer = null;
     }
-    
+
     public void shutdown()
     {
         cleanup();

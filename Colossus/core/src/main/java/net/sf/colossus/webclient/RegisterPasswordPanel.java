@@ -1,5 +1,6 @@
 package net.sf.colossus.webclient;
 
+
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.GridLayout;
@@ -16,7 +17,6 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import net.sf.colossus.webcommon.User;
-
 
 
 /** A panel with which one can either create a new account,
@@ -43,7 +43,7 @@ class RegisterPasswordPanel extends JDialog
         String username)
     {
         super(webClient, "", true);
-        
+
         this.webClient = webClient;
         this.isRegister = isRegister;
         setTitle(isRegister ? "Create account" : "Change password");
@@ -125,7 +125,7 @@ class RegisterPasswordPanel extends JDialog
         tempThread.start();
         // System.out.println("* Done with creating the runnable");
     }
-    
+
     /** Run inside the Runnable/thread that was created when the
      *  Register / Change password button was pressed.
      *
@@ -198,7 +198,7 @@ class RegisterPasswordPanel extends JDialog
 
             String reason = webClient.createRegisterWebClientSocketThread(
                 name, newPW1, email, null);
-            
+
             if (reason.equals(User.PROVIDE_CONFCODE))
             {
                 handleConfirmation(name, newPW1, email);
@@ -217,16 +217,14 @@ class RegisterPasswordPanel extends JDialog
             {
                 JOptionPane.showMessageDialog(this,
                     "Password was changed successfully.",
-                    "Password change OK",
-                    JOptionPane.INFORMATION_MESSAGE);
+                    "Password change OK", JOptionPane.INFORMATION_MESSAGE);
                 this.dispose();
             }
             else
             {
                 JOptionPane.showMessageDialog(this,
                     "Changing password failed: " + reason,
-                    "Changing password failed",
-                    JOptionPane.ERROR_MESSAGE);
+                    "Changing password failed", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
@@ -242,7 +240,7 @@ class RegisterPasswordPanel extends JDialog
         {
             JOptionPane.showMessageDialog(this,
                 "Email address does appear to be invalid!\n"
-                + "(allowed are: 'a-z, A-Z, 0-9, _ - .' and one '@'.");
+                    + "(allowed are: 'a-z, A-Z, 0-9, _ - .' and one '@'.");
             return false;
         }
     }
@@ -253,9 +251,10 @@ class RegisterPasswordPanel extends JDialog
         while (!done)
         {
             String providedConfCode = JOptionPane.showInputDialog(this,
-                "Type in the confirmation code sent to you via mail: ", User.TEMPLATE_CONFCODE);
-//            System.out.println("input dialog returned result '"
-//                + providedConfCode + "'!");
+                "Type in the confirmation code sent to you via mail: ",
+                User.TEMPLATE_CONFCODE);
+            //            System.out.println("input dialog returned result '"
+            //                + providedConfCode + "'!");
 
             if (providedConfCode == null)
             {
@@ -266,17 +265,17 @@ class RegisterPasswordPanel extends JDialog
                 done = true;
             }
             else if (providedConfCode.equals(User.TEMPLATE_CONFCODE)
-                ||   providedConfCode.equals("") )
+                || providedConfCode.equals(""))
             {
                 JOptionPane.showMessageDialog(this,
                     "Confirmation code must not be empty and not "
-                    + "the provided example!!");
+                        + "the provided example!!");
             }
             else
             {
-                String reason2 = webClient.
-                    createRegisterWebClientSocketThread(name, newPW1,
-                        email, providedConfCode);
+                String reason2 = webClient
+                    .createRegisterWebClientSocketThread(name, newPW1, email,
+                        providedConfCode);
                 if (reason2 == null)
                 {
                     done = true;

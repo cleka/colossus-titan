@@ -65,7 +65,7 @@ public final class PlayerClientSide extends Player
             setStartingTower(getGame().getVariant().getMasterBoard()
                 .getHexByLabel(towerHex));
         }
-        catch(NullPointerException e)
+        catch (NullPointerException e)
         {
             // When loading a game in remote client, in beginning variant is
             // not loaded yes, so that may cause NPE which we ignore here.

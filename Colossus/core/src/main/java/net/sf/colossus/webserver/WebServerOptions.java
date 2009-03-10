@@ -1,10 +1,12 @@
 package net.sf.colossus.webserver;
 
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 
 /** WebServer specific version of the Options / cf file handling.
  * 
@@ -34,8 +36,8 @@ public class WebServerOptions
         }
         catch (IOException e)
         {
-            LOGGER.log(Level.SEVERE, "Couldn't read options from "
-                + filename, e);
+            LOGGER.log(Level.SEVERE, "Couldn't read options from " + filename,
+                e);
             return;
         }
     }
@@ -88,8 +90,8 @@ public class WebServerOptions
         int val = getIntOption(optname);
         if (val == -1)
         {
-            LOGGER.log(Level.SEVERE, "Invalid or not set value for "
-                + optname + " from WebServer config file " + filename);
+            LOGGER.log(Level.SEVERE, "Invalid or not set value for " + optname
+                + " from WebServer config file " + filename);
             System.exit(1);
         }
         return val;

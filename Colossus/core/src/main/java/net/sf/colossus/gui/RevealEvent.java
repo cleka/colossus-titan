@@ -97,7 +97,7 @@ public class RevealEvent
         eventRecruitText, eventSummonText, eventTeleportText,
         eventAcquireText, eventWonText, eventLostText, eventTurnChangeText,
         eventPlayerChangeText, eventMulliganText, eventMoveRollText,
-        eventBattleText, eventReinforceText };   
+        eventBattleText, eventReinforceText };
 
     /**
      * TODO replace marker/height combos with Legion objects
@@ -280,7 +280,7 @@ public class RevealEvent
             readyToDie = null;
             return;
         }
-        
+
         Iterator<RevealedCreature> it = this.knownCreatures.iterator();
         boolean done = false;
         while (!done && it.hasNext())
@@ -344,8 +344,8 @@ public class RevealEvent
     {
         if (turnNumber != this.turnNumber)
         {
-            LOGGER.log(Level.WARNING, "removeReinforcement for " + this.toString()
-                + " -- wrong turn.");
+            LOGGER.log(Level.WARNING, "removeReinforcement for "
+                + this.toString() + " -- wrong turn.");
             return false;
         }
         Iterator<RevealedCreature> it = this.knownCreatures.iterator();

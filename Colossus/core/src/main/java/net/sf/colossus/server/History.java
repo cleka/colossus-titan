@@ -318,19 +318,19 @@ public class History
                 List<String> content = childLegion.getImageNames();
                 LOGGER.severe("During replay of history: child legion "
                     + childId + " should not " + "exist yet (turn=" + turn
-                    + ")!!\n"
-                    + "Exists already with: " + content.toString() + " but "
-                    + "should now be created with creatures: " + creatures);
-              
+                    + ")!!\n" + "Exists already with: " + content.toString()
+                    + " but " + "should now be created with creatures: "
+                    + creatures);
+
                 childLegion.remove();
             }
-                
+
             childLegion = new LegionServerSide(childId, null, parentLegion
-                .getCurrentHex(), parentLegion.getCurrentHex(), player,
-                game, creatures.toArray(new CreatureType[creatures.size()]));
+                .getCurrentHex(), parentLegion.getCurrentHex(), player, game,
+                creatures.toArray(new CreatureType[creatures.size()]));
 
             player.addLegion(childLegion);
-            
+
             for (CreatureType creature : creatures)
             {
                 parentLegion.removeCreature(creature, false, false);
@@ -348,7 +348,7 @@ public class History
             String survivorId = el.getAttributeValue("survivorId");
             String turnString = el.getAttributeValue("turn");
             int turn = Integer.parseInt(turnString);
-            
+
             LegionServerSide splitoff = game.getLegionByMarkerId(splitoffId);
             LegionServerSide survivor = game.getLegionByMarkerId(survivorId);
 
@@ -395,8 +395,8 @@ public class History
             LegionServerSide legion = game.getLegionByMarkerId(markerId);
             if (legion == null)
             {
-                LOGGER.warning("removeCreature " + creatureName + 
-                    " from legion " + markerId + ", legion is null");
+                LOGGER.warning("removeCreature " + creatureName
+                    + " from legion " + markerId + ", legion is null");
                 return;
             }
             else
@@ -408,7 +408,7 @@ public class History
                     crenames.add(c.getName());
                 }
             }
-            
+
             // don't use disbandIfEmpty parameter since that'll fire another history event
             legion.removeCreature(game.getVariant().getCreatureByName(
                 creatureName), false, false);
@@ -416,7 +416,8 @@ public class History
             // Skip for players that will be dead by end of replay
             if (!legion.getPlayer().getDeadBeforeSave())
             {
-                server.allTellRemoveCreature(legion, creatureName, false, reason);
+                server.allTellRemoveCreature(legion, creatureName, false,
+                    reason);
             }
             LOGGER.finest("Legion '" + markerId + "' now contains "
                 + legion.getCreatures());

@@ -36,14 +36,12 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 public class HexRecruitTreePanel extends Box
 {
-    private HashMap<Chit, CreatureType> chitToCreatureMap
-        = new HashMap<Chit, CreatureType>();
+    private HashMap<Chit, CreatureType> chitToCreatureMap = new HashMap<Chit, CreatureType>();
 
-    private ArrayList<ShowCreatureDetails> creatureWindows
-        = new ArrayList<ShowCreatureDetails>();
+    private ArrayList<ShowCreatureDetails> creatureWindows = new ArrayList<ShowCreatureDetails>();
 
     private JFrame parentFrame;
-    
+
     public HexRecruitTreePanel(int direction, MasterBoardTerrain terrain,
         MasterHex hex, JFrame parent, boolean clickable)
     {
@@ -63,7 +61,8 @@ public class HexRecruitTreePanel extends Box
         {
             boolean prefixDone = false;
             Iterator<MasterBoardTerrain> it = aliases.iterator();
-            while (it.hasNext()) {
+            while (it.hasNext())
+            {
                 MasterBoardTerrain alias = it.next();
                 if (!doneNames.contains(alias.getDisplayName()))
                 {
@@ -71,7 +70,9 @@ public class HexRecruitTreePanel extends Box
                     {
                         prefixDone = true;
                         theLabel.append("(also: ");
-                    } else {
+                    }
+                    else
+                    {
                         theLabel.append(", ");
                     }
                     theLabel.append(alias.getDisplayName());
@@ -136,7 +137,7 @@ public class HexRecruitTreePanel extends Box
                         }
                     }
                 };
-            
+
                 chit.addMouseListener(creListener);
             }
             chit.repaint();
@@ -151,8 +152,8 @@ public class HexRecruitTreePanel extends Box
         if (source instanceof Chit)
         {
             CreatureType type = chitToCreatureMap.get(source);
-            ShowCreatureDetails creatureWindow = new 
-                ShowCreatureDetails(this.parentFrame, type, null, null);
+            ShowCreatureDetails creatureWindow = new ShowCreatureDetails(
+                this.parentFrame, type, null, null);
             creatureWindows.add(creatureWindow);
         }
         else

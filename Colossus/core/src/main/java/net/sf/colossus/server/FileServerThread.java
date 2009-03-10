@@ -107,7 +107,7 @@ final class FileServerThread extends Thread
                             new InputStreamReader(is));
 
                         String request = in.readLine();
-                        
+
                         if (request == null)
                         {
                             LOGGER.log(Level.WARNING,

@@ -17,7 +17,6 @@ public class CowardSimpleAI extends SimpleAI
     {
         super(client);
 
-
         /* this is a defensive AI, not an offensive one, so use
          the proper hints section */
         hintSectionUsed[0] = Constants.sectionDefensiveAI;

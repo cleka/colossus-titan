@@ -46,8 +46,7 @@ import net.sf.colossus.util.Options;
 import net.sf.colossus.util.Split;
 
 
-class PreferencesWindow extends KFrame implements ItemListener,
-    ActionListener
+class PreferencesWindow extends KFrame implements ItemListener, ActionListener
 {
     /**
      * Gridbag constraints for a vertical filling (use with empty JPanel).

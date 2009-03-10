@@ -209,7 +209,8 @@ public class WebClientSocketThread extends Thread implements IWebServer
      * Send the confirmation code 
      * @throws WebClientSocketThreadException
      */
-    private void confirm(String confCode) throws WebClientSocketThreadException
+    private void confirm(String confCode)
+        throws WebClientSocketThreadException
     {
         String info = null;
 
@@ -229,7 +230,8 @@ public class WebClientSocketThread extends Thread implements IWebServer
                 }
                 else
                 {
-                    String prefix = "NACK: " + IWebServer.ConfirmRegistration + sep;
+                    String prefix = "NACK: " + IWebServer.ConfirmRegistration
+                        + sep;
                     if (fromServer.startsWith(prefix))
                     {
                         info = fromServer.substring(prefix.length());
@@ -599,13 +601,13 @@ public class WebClientSocketThread extends Thread implements IWebServer
 
     public GameInfo proposeGame(String initiator, String variant,
         String viewmode, long startAt, int duration, String summary,
-        String expire, boolean unlimitedMulligans,
-        boolean balancedTowers, int min, int target, int max)
+        String expire, boolean unlimitedMulligans, boolean balancedTowers,
+        int min, int target, int max)
     {
         send(Propose + sep + initiator + sep + variant + sep + viewmode + sep
-            + startAt + sep + duration + sep + summary + sep
-            + expire + sep + unlimitedMulligans + sep + balancedTowers + sep
-            + min + sep + target + sep + max);
+            + startAt + sep + duration + sep + summary + sep + expire + sep
+            + unlimitedMulligans + sep + balancedTowers + sep + min + sep
+            + target + sep + max);
         return null;
     }
 

@@ -598,7 +598,8 @@ public final class Start
             opts.addOption('g', "go", false, "Skip startup dialogs");
             opts.addOption('v', "variant", true, "Set variant");
             opts.addOption('u', "nhuman", true, "Number of humans");
-            opts.addOption('i', "nai", true, "Number of AIs (default: random)");
+            opts
+                .addOption('i', "nai", true, "Number of AIs (default: random)");
             opts.addOption('Z', "simpleai", true, "Number of SimpleAIs");
             opts.addOption('r', "rationalai", true, "Number of RationalAIs");
             opts.addOption('M', "milvangai", true, "Number of MilvangAIs");
@@ -609,11 +610,13 @@ public final class Start
             opts.addOption('t', "timelimit", true, "AI time limit in s");
             opts.addOption('c', "client", false, "Run network client instead");
             opts.addOption('w', "webclient", false, "Run web client instead");
-            opts.addOption('F', "flagfile", true, "Create flagfile when socket up");
+            opts.addOption('F', "flagfile", true,
+                "Create flagfile when socket up");
             opts.addOption('s', "server", true, "Server name or IP");
             opts.addOption('S', "autosave", false, "Autosave");
             opts.addOption('A', "autoplay", false, "Autoplay");
-            opts.addOption('N', "non-random-battle-dice", false, "Use non-random battle dice");
+            opts.addOption('N', "non-random-battle-dice", false,
+                "Use non-random battle dice");
             opts.addOption('R', "resetOptions", false, "Reset options");
             opts.addOption('m', "myname", true, "My player name");
             opts.addOption('O', "noobserver", false, "Go on without observer");
@@ -640,7 +643,8 @@ public final class Start
         serverOptions.loadOptions();
 
         // Read netclient option settings (from own cf file)
-        Options netclientOptions = new Options(Constants.OPTIONS_NET_CLIENT_NAME);
+        Options netclientOptions = new Options(
+            Constants.OPTIONS_NET_CLIENT_NAME);
         netclientOptions.loadOptions();
 
         // Options remembered only inside this running application,
@@ -701,7 +705,8 @@ public final class Start
             }
             if (netclientOptions == null)
             {
-                netclientOptions = new Options(Constants.OPTIONS_NET_CLIENT_NAME);
+                netclientOptions = new Options(
+                    Constants.OPTIONS_NET_CLIENT_NAME);
                 netclientOptions.loadOptions();
             }
 

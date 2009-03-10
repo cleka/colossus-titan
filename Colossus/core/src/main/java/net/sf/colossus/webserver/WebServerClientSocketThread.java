@@ -367,9 +367,9 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             int ntarget = Integer.parseInt(tokens[11]);
             int nmax = Integer.parseInt(tokens[12]);
 
-            gi = server.proposeGame(initiator, variant, viewmode, 
-                startAt, duration, summary, expire,
-                unlMullis, balTowers, nmin, ntarget, nmax);
+            gi = server.proposeGame(initiator, variant, viewmode, startAt,
+                duration, summary, expire, unlMullis, balTowers, nmin,
+                ntarget, nmax);
         }
 
         else if (command.equals(IWebServer.Enroll))

@@ -15,8 +15,8 @@ import net.sf.colossus.variant.MasterBoardTerrain;
  */
 abstract public class Battle
 {
-    private static final Logger LOGGER = Logger
-        .getLogger(Battle.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Battle.class
+        .getName());
 
     private final Game game;
     private final Legion attacker;
@@ -67,8 +67,8 @@ abstract public class Battle
     protected static boolean toLeft(double xDist, double yDist)
     {
         double ratio = xDist / yDist;
-        if (ratio >= 1.5 || (ratio >= 0 && ratio <= 0.75) ||
-                (ratio >= -1.5 && ratio <= -0.75))
+        if (ratio >= 1.5 || (ratio >= 0 && ratio <= 0.75)
+            || (ratio >= -1.5 && ratio <= -0.75))
         {
             return true;
         }
@@ -231,7 +231,7 @@ abstract public class Battle
      * inclusive at both ends.
      */
     public static int getRange(BattleHex hex1, BattleHex hex2,
-            boolean allowEntrance)
+        boolean allowEntrance)
     {
         if (hex1 == null || hex2 == null)
         {
@@ -274,19 +274,19 @@ abstract public class Battle
         double yDist = Math.abs(y2 - y1);
         if (xDist >= 2 * yDist)
         {
-            return (int) Math.ceil(xDist + 1);
+            return (int)Math.ceil(xDist + 1);
         }
         else if (xDist >= yDist)
         {
-            return (int) Math.floor(xDist + 2);
+            return (int)Math.floor(xDist + 2);
         }
         else if (yDist >= 2 * xDist)
         {
-            return (int) Math.ceil(yDist + 1);
+            return (int)Math.ceil(yDist + 1);
         }
         else
         {
-            return (int) Math.floor(yDist + 2);
+            return (int)Math.floor(yDist + 2);
         }
     }
 
@@ -296,8 +296,7 @@ abstract public class Battle
     private static int minRangeToNeighbor(BattleHex hex1, BattleHex hex2)
     {
         int min = Constants.OUT_OF_RANGE;
-        for (int i = 0; i < 6;
-                i++)
+        for (int i = 0; i < 6; i++)
         {
             BattleHex hex = hex1.getNeighbor(i);
             if (hex != null)
@@ -344,21 +343,21 @@ abstract public class Battle
         double xDist = x2 - x1;
         double yDist = y2 - y1;
         // Creatures below the level of the strike do not block LOS.
-        int strikeElevation =
-                Math.min(hex1.getElevation(), hex2.getElevation());
-        if (CompareDoubles.almostEqual(yDist, 0.0) ||
-                CompareDoubles.almostEqual(Math.abs(yDist),
-                1.5 * Math.abs(xDist)))
+        int strikeElevation = Math.min(hex1.getElevation(), hex2
+            .getElevation());
+        if (CompareDoubles.almostEqual(yDist, 0.0)
+            || CompareDoubles.almostEqual(Math.abs(yDist), 1.5 * Math
+                .abs(xDist)))
         {
             return isLOSBlockedDir(hex1, hex1, hex2, true, strikeElevation,
-                    false, false, false, false, false, 0) &&
-                    isLOSBlockedDir(hex1, hex1, hex2, false, strikeElevation,
+                false, false, false, false, false, 0)
+                && isLOSBlockedDir(hex1, hex1, hex2, false, strikeElevation,
                     false, false, false, false, false, 0);
         }
         else
         {
             return isLOSBlockedDir(hex1, hex1, hex2, toLeft(xDist, yDist),
-                    strikeElevation, false, false, false, false, false, 0);
+                strikeElevation, false, false, false, false, false, 0);
         }
     }
 
@@ -366,10 +365,11 @@ abstract public class Battle
      * Check LOS, going to the left of hexspines if argument left is true, or
      * to the right if it is false.
      */
-    protected boolean isLOSBlockedDir(BattleHex initialHex, BattleHex currentHex,
-            BattleHex finalHex, boolean left, int strikeElevation,
-            boolean strikerAtop, boolean strikerAtopCliff, boolean midObstacle,
-            boolean midCliff, boolean midChit, int totalObstacles)
+    protected boolean isLOSBlockedDir(BattleHex initialHex,
+        BattleHex currentHex, BattleHex finalHex, boolean left,
+        int strikeElevation, boolean strikerAtop, boolean strikerAtopCliff,
+        boolean midObstacle, boolean midCliff, boolean midChit,
+        int totalObstacles)
     {
         boolean targetAtop = false;
         boolean targetAtopCliff = false;
@@ -451,8 +451,8 @@ abstract public class Battle
             {
                 return true;
             }
-            if (totalObstacles >= 3 && (!strikerAtop || !targetAtop) &&
-                    (!strikerAtopCliff && !targetAtopCliff))
+            if (totalObstacles >= 3 && (!strikerAtop || !targetAtop)
+                && (!strikerAtopCliff && !targetAtopCliff))
             {
                 return true;
             }
@@ -484,14 +484,14 @@ abstract public class Battle
         // Creatures block LOS, unless both striker and target are at higher
         //     elevation than the creature, or unless the creature is at
         //     the base of a cliff and the striker or target is atop it.
-        if (isOccupied(nextHex) && nextHex.getElevation() >= strikeElevation &&
-                (!strikerAtopCliff || currentHex != initialHex))
+        if (isOccupied(nextHex) && nextHex.getElevation() >= strikeElevation
+            && (!strikerAtopCliff || currentHex != initialHex))
         {
             midChit = true;
         }
         return isLOSBlockedDir(initialHex, nextHex, finalHex, left,
-                strikeElevation, strikerAtop, strikerAtopCliff, midObstacle,
-                midCliff, midChit, totalObstacles);
+            strikeElevation, strikerAtop, strikerAtopCliff, midObstacle,
+            midCliff, midChit, totalObstacles);
     }
 
     protected boolean isOccupied(BattleHex hex)
@@ -503,7 +503,7 @@ abstract public class Battle
      * Return true if the rangestrike is possible.
      */
     protected boolean isRangestrikePossible(Creature critter, Creature target,
-            BattleHex currentHex, BattleHex targetHex)
+        BattleHex currentHex, BattleHex targetHex)
     {
         int range = getRange(currentHex, targetHex, false);
         int skill = critter.getType().getSkill();
@@ -511,18 +511,17 @@ abstract public class Battle
         {
             return false;
         }
-        else if (!critter.getType().useMagicMissile() &&
-                (range < 3 || target.getType().isLord() ||
-                isLOSBlocked(currentHex, targetHex)))
+        else if (!critter.getType().useMagicMissile()
+            && (range < 3 || target.getType().isLord() || isLOSBlocked(
+                currentHex, targetHex)))
         {
             return false;
         }
         return true;
     }
 
-
     private int computeSkillPenaltyRangestrikeThroughDir(BattleHex hex1,
-            BattleHex hex2, Creature c, boolean left, int previousCount)
+        BattleHex hex2, Creature c, boolean left, int previousCount)
     {
         int count = previousCount;
 
@@ -548,11 +547,11 @@ abstract public class Battle
 
         HazardTerrain terrain = nextHex.getTerrain();
 
-        count += terrain.getSkillPenaltyRangestrikeThrough(c.getType().
-                isNativeIn(terrain));
+        count += terrain.getSkillPenaltyRangestrikeThrough(c.getType()
+            .isNativeIn(terrain));
 
-        return computeSkillPenaltyRangestrikeThroughDir(nextHex, hex2, c, left,
-                count);
+        return computeSkillPenaltyRangestrikeThroughDir(nextHex, hex2, c,
+            left, count);
     }
 
     /** Compute the minimum Skill penalty that the creature will endure to
@@ -563,7 +562,7 @@ abstract public class Battle
      * @return The penalty to the Skill Factor of the rangestriker from intervening hex.
      */
     public int computeSkillPenaltyRangestrikeThrough(BattleHex hex1,
-            BattleHex hex2, Creature c)
+        BattleHex hex2, Creature c)
     {
         if (hex1 == hex2)
         {
@@ -594,36 +593,37 @@ abstract public class Battle
         double xDist = x2 - x1;
         double yDist = y2 - y1;
 
-        if (CompareDoubles.almostEqual(yDist, 0.0) || CompareDoubles.
-                almostEqual(Math.abs(yDist), 1.5 * Math.abs(xDist)))
+        if (CompareDoubles.almostEqual(yDist, 0.0)
+            || CompareDoubles.almostEqual(Math.abs(yDist), 1.5 * Math
+                .abs(xDist)))
         {
-            int strikeElevation = Math.min(hex1.getElevation(), hex2.
-                    getElevation());
+            int strikeElevation = Math.min(hex1.getElevation(), hex2
+                .getElevation());
             // Hexspine; try unblocked side(s)
             if (isLOSBlockedDir(hex1, hex1, hex2, true, strikeElevation,
-                    false, false, false, false, false, 0))
+                false, false, false, false, false, 0))
             {
                 return computeSkillPenaltyRangestrikeThroughDir(hex1, hex2, c,
-                        false, 0);
+                    false, 0);
             }
             else if (isLOSBlockedDir(hex1, hex1, hex2, false, strikeElevation,
-                    false, false, false, false, false, 0))
+                false, false, false, false, false, 0))
             {
                 return computeSkillPenaltyRangestrikeThroughDir(hex1, hex2, c,
-                        true, 0);
+                    true, 0);
             }
             else
             {
                 return Math.min(computeSkillPenaltyRangestrikeThroughDir(hex1,
-                        hex2, c, true, 0),
-                        computeSkillPenaltyRangestrikeThroughDir(hex1, hex2, c,
+                    hex2, c, true, 0),
+                    computeSkillPenaltyRangestrikeThroughDir(hex1, hex2, c,
                         false, 0));
             }
         }
         else
         {
             return computeSkillPenaltyRangestrikeThroughDir(hex1, hex2, c,
-                    toLeft(xDist, yDist), 0);
+                toLeft(xDist, yDist), 0);
         }
     }
 }

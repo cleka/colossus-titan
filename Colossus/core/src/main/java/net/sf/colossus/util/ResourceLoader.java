@@ -1324,8 +1324,8 @@ public final class ResourceLoader
                 Constructor<?>[] constructors = theClass.getConstructors();
                 for (int i = 0; i < constructors.length; i++)
                 {
-                    LOGGER.log(Level.SEVERE, "I have access to: " +
-                            constructors[i]);
+                    LOGGER.log(Level.SEVERE, "I have access to: "
+                        + constructors[i]);
                 }
                 return null;
             }
@@ -1388,7 +1388,7 @@ public final class ResourceLoader
             String mapKey = it.next();
             // Heuristic: do not store class files. Their map key looks e.g.:
             //   "PET3variantHint.class,C:\workspace\variants-own\PET3variant,Default"
-            if (mapKey.indexOf("Hint.class,") != -1 )
+            if (mapKey.indexOf("Hint.class,") != -1)
             {
                 // Do not dump class file - it expects only XML datafiles.
             }

@@ -40,10 +40,8 @@ public class CmdLine
 {
     // Anything on the command line after the last valid option.
     private ArrayList<String> leftovers = new ArrayList<String>();
-    private final Map<Character, String> optchToValue =
-        new TreeMap<Character, String>();
-    private final Map<String, String> nameToValue =
-        new TreeMap<String, String>();
+    private final Map<Character, String> optchToValue = new TreeMap<Character, String>();
+    private final Map<String, String> nameToValue = new TreeMap<String, String>();
     private final Set<Character> optchSeen = new TreeSet<Character>();
     private final Set<String> nameSeen = new TreeSet<String>();
 

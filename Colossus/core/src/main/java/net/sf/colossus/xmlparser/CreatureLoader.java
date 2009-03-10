@@ -48,8 +48,8 @@ public class CreatureLoader
             Document doc = builder.build(creIS);
             Element root = doc.getRootElement();
             Attribute v = root.getAttribute("version");
-            if ((v == null) ||
-                (!v.getValue().equals(currentVersion))) {
+            if ((v == null) || (!v.getValue().equals(currentVersion)))
+            {
                 LOGGER.severe("Wrong / missing version in Creature file.");
             }
 
@@ -76,7 +76,8 @@ public class CreatureLoader
      * @return The boolean value of the attribute, defaulting to false if absent
      */
     private boolean getAttributeBoolean(Element el, String name)
-            throws JDOMException {
+        throws JDOMException
+    {
         Attribute a = el.getAttribute(name);
         if (a == null)
             return false;
@@ -93,8 +94,10 @@ public class CreatureLoader
         boolean flies = getAttributeBoolean(el, "flies");
         Set<HazardTerrain> nativeTerrains = new HashSet<HazardTerrain>();
 
-        for (HazardTerrain terrain : HazardTerrain.getAllHazardTerrains()) {
-            if (getAttributeBoolean(el, terrain.getName())) {
+        for (HazardTerrain terrain : HazardTerrain.getAllHazardTerrains())
+        {
+            if (getAttributeBoolean(el, terrain.getName()))
+            {
                 nativeTerrains.add(terrain);
             }
         }
@@ -122,18 +125,16 @@ public class CreatureLoader
             if (name.equals("Titan"))
             {
                 creature = new CreatureTypeTitan(name, power, skill,
-                        rangestrikes,
-                        flies, nativeTerrains, slope, river, dune, water,
-                        magic_missile,
-                        summonable, lord, demilord, count, plural_name,
-                        base_color);
+                    rangestrikes, flies, nativeTerrains, slope, river, dune,
+                    water, magic_missile, summonable, lord, demilord, count,
+                    plural_name, base_color);
             }
             else
             {
                 creature = new CreatureType(name, power, skill, rangestrikes,
-                        flies, nativeTerrains, slope, river, dune, water,
-                        magic_missile, summonable, lord, demilord, count,
-                        plural_name, base_color);
+                    flies, nativeTerrains, slope, river, dune, water,
+                    magic_missile, summonable, lord, demilord, count,
+                    plural_name, base_color);
             }
         }
         else
@@ -156,8 +157,8 @@ public class CreatureLoader
             parameters[14] = count;
             parameters[15] = plural_name;
             parameters[16] = base_color;
-            creature = (CreatureType) ResourceLoader.getNewObject(custom_class,
-                    VariantSupport.getVarDirectoriesList(), parameters);
+            creature = (CreatureType)ResourceLoader.getNewObject(custom_class,
+                VariantSupport.getVarDirectoriesList(), parameters);
         }
         this.creatures.add(creature);
     }

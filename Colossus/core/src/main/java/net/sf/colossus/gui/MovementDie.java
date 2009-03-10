@@ -1,7 +1,6 @@
 package net.sf.colossus.gui;
 
 
-
 /**
  * Class MovementDie displays dice rolls during a battle.
  * @version $Id$

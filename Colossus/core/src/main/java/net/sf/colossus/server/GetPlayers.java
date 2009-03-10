@@ -79,7 +79,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
     private final JTabbedPane tabbedPane;
 
     private final JComboBox variantBox;
-    private final Vector<String> variantVector; 
+    private final Vector<String> variantVector;
     private final JComboBox viewModeBox;
     private final JComboBox eventExpiringBox;
 
@@ -259,10 +259,11 @@ public final class GetPlayers extends KFrame implements WindowListener,
         // XXX Make sure chosen variant is in the list.
         String variantName = options.getStringOption(Options.variant,
             Constants.variantArray[0]);
-        String variantFullPath = options.getStringOption(Options.variantFileWithFullPath, "null");
+        String variantFullPath = options.getStringOption(
+            Options.variantFileWithFullPath, "null");
         if (variantFullPath == null || variantFullPath.equals(""))
         {
-            variantFullPath = "null"; 
+            variantFullPath = "null";
         }
 
         // validate variant name and full path we got from options:
@@ -277,23 +278,24 @@ public final class GetPlayers extends KFrame implements WindowListener,
             else
             {
                 LOGGER.warning("Invalid variant file name (full path: '"
-                    + variantFullPath + "') from Options! Resetting to Default.");
-                
+                    + variantFullPath
+                    + "') from Options! Resetting to Default.");
+
                 variantName = Constants.variantArray[0];
                 variantFullPath = "null";
                 options.setOption(Options.variant, variantName);
                 options.setOption(Options.variantFileWithFullPath, "null");
             }
         }
-        
+
         // We must ensure that the variantFullPath option is now never null
         // nor empty string any more, otherwise synchronizing it to clients
         // causes NPEs.
         options.setOption(Options.variantFileWithFullPath, variantFullPath);
-        
+
         variantVector = new Vector<String>(Constants.numVariants, 1);
         boolean isBuiltinVariant = false;
-        for (int i=0 ; i < Constants.numVariants ; i++)
+        for (int i = 0; i < Constants.numVariants; i++)
         {
             String name = Constants.variantArray[i];
             variantVector.add(i, name);
@@ -302,7 +304,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
                 isBuiltinVariant = true;
             }
         }
-       
+
         variantBox = new JComboBox(variantVector);
         variantBox.addActionListener(this);
         if (isBuiltinVariant)
@@ -316,24 +318,26 @@ public final class GetPlayers extends KFrame implements WindowListener,
             variantVector.add(variantName);
             variantBox.setSelectedItem(variantName);
             options.setOption(Options.variant, variantName);
-            options.setOption(Options.variantFileWithFullPath, variantFullPath);
+            options
+                .setOption(Options.variantFileWithFullPath, variantFullPath);
         }
         else
         {
             // This should never happen...
-            LOGGER.severe("Unexpected else case? Invalid variant name, perhaps?");
-            
+            LOGGER
+                .severe("Unexpected else case? Invalid variant name, perhaps?");
+
             variantName = Constants.variantArray[0];
             variantFullPath = "null";
             options.setOption(Options.variant, variantName);
             options.setOption(Options.variantFileWithFullPath, "null");
         }
-        
+
         variantPane.add(variantBox);
         JButton buttonVariant = new JButton(loadVariant);
         variantPane.add(buttonVariant);
         buttonVariant.addActionListener(this);
-       
+
         // ================== Variant README tab =====================
         // if we don't pass the JEditorPane ("readme"), 
         // it won't be updated when Variant changes.
@@ -342,8 +346,8 @@ public final class GetPlayers extends KFrame implements WindowListener,
         if (isValidExternVariant)
         {
             doc = VariantSupport.loadVariantByName(variantName, true);
-       //     File varFile = new File(variantFullPath);
-       //     doc = VariantSupport.loadVariantByFile(varFile, true);
+            //     File varFile = new File(variantFullPath);
+            //     doc = VariantSupport.loadVariantByFile(varFile, true);
         }
         else
         {
@@ -618,25 +622,25 @@ public final class GetPlayers extends KFrame implements WindowListener,
                 names.add(name);
                 types.add(type);
             }
-            if (type.equals(Constants.human) 
-                && (name.startsWith(Constants.byColor)
-                    || name.startsWith(Constants.byType)))
+            if (type.equals(Constants.human)
+                && (name.startsWith(Constants.byColor) || name
+                    .startsWith(Constants.byType)))
             {
-                sb.append("Invalid name \"" + name
-                    + "\" for Player " + (i+1) + "\n");
+                sb.append("Invalid name \"" + name + "\" for Player "
+                    + (i + 1) + "\n");
             }
 
         }
 
         if (sb.length() > 0)
         {
-            String message = sb.substring(0) + "\n" 
+            String message = sb.substring(0) + "\n"
                 + "Reason: <by...> names are not allowed for human players!";
             JOptionPane.showMessageDialog(this, message);
             return false;
-            
+
         }
-        
+
         // Exit if there aren't enough unique player names.
         if (numPlayers < 1 || names.size() != numPlayers)
         {
@@ -770,7 +774,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
             {
                 String name = varFile.getName();
                 String fullPath = varFile.getPath();
-               
+
                 name = name.substring(0, name.lastIndexOf(Constants.varEnd));
                 options.setOption(Options.variant, name);
                 options.setOption(Options.variantFileWithFullPath, fullPath);
@@ -807,7 +811,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
             if (duplicate)
             {
                 int nr;
-                
+
                 // on first attempt, take row number
                 if (tryName.toString().equals(Constants.username))
                 {
@@ -821,16 +825,16 @@ public final class GetPlayers extends KFrame implements WindowListener,
                 tryName.append(String.valueOf(nr));
             }
         }
-        
+
         return tryName.toString();
     }
 
     private void addVariantToBoxIfNeeded(String varName)
     {
         int cnt = variantBox.getItemCount();
-        for (int i=0 ; i < cnt ; i++)
+        for (int i = 0; i < cnt; i++)
         {
-            String item = (String) variantBox.getItemAt(i);
+            String item = (String)variantBox.getItemAt(i);
             if (item.equals(varName))
             {
                 return;
@@ -903,22 +907,25 @@ public final class GetPlayers extends KFrame implements WindowListener,
             {
                 int maxPlayers = VariantSupport.getMaxPlayers();
                 String varName = (String)variantBox.getSelectedItem();
-                
+
                 if (VariantSupport.getVariantName().equals(varName))
                 {
                     // re-selecting the same ; do nothing
                 }
                 else
                 {
-                    Document doc = VariantSupport.loadVariantByName(varName, true);
+                    Document doc = VariantSupport.loadVariantByName(varName,
+                        true);
                     options.setOption(Options.variant, varName);
-                    String varFileWithFullPath = VariantSupport.getFullPathFileForVariantName(varName);
+                    String varFileWithFullPath = VariantSupport
+                        .getFullPathFileForVariantName(varName);
                     if (varFileWithFullPath == null)
                     {
                         varFileWithFullPath = "null";
                     }
-                    options.setOption(Options.variantFileWithFullPath, varFileWithFullPath);
-                    
+                    options.setOption(Options.variantFileWithFullPath,
+                        varFileWithFullPath);
+
                     String prop = (String)doc
                         .getProperty(ResourceLoader.keyContentType);
                     readme.setContentType(prop);

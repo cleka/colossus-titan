@@ -90,9 +90,9 @@ public class CreatureType
     public CreatureType(String name, int power, int skill,
         boolean rangestrikes, boolean flies,
         Set<HazardTerrain> nativeTerrains, boolean nativeSlope,
-        boolean nativeRiver, boolean nativeDune, boolean waterDwelling, boolean magicMissile,
-        boolean summonable, boolean lord, boolean demilord, int maxCount,
-        String pluralName, String baseColor)
+        boolean nativeRiver, boolean nativeDune, boolean waterDwelling,
+        boolean magicMissile, boolean summonable, boolean lord,
+        boolean demilord, int maxCount, String pluralName, String baseColor)
     {
         this.name = name;
         this.pluralName = pluralName;

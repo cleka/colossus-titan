@@ -408,8 +408,7 @@ public class CreatureServerSide extends Creature
             }
 
             // Adjacent hex, so only one possible direction.
-            int direction = Battle.getDirection(hex, targetHex,
-                false);
+            int direction = Battle.getDirection(hex, targetHex, false);
             char hexside = hex.getHexside(direction);
 
             // Native striking down a dune hexside: +2
@@ -432,7 +431,7 @@ public class CreatureServerSide extends Creature
 
         return dice;
     }
-    
+
     /** WARNING: this is duplicated in Strike */
     private int getAttackerSkill(CreatureServerSide target)
     {
@@ -447,10 +446,9 @@ public class CreatureServerSide extends Creature
         if (!rangestrike)
         {
             // striking out of possible hazard
-            attackerSkill -=
-                     hex.getTerrain().getSkillPenaltyStrikeFrom(
-                       this.isNativeTerrain(hex.getTerrain()),
-                       target.isNativeTerrain(hex.getTerrain()));
+            attackerSkill -= hex.getTerrain().getSkillPenaltyStrikeFrom(
+                this.isNativeTerrain(hex.getTerrain()),
+                target.isNativeTerrain(hex.getTerrain()));
 
             if (hex.getElevation() > targetHex.getElevation())
             {
@@ -484,17 +482,17 @@ public class CreatureServerSide extends Creature
              * Incidentally, if you're reading this after noticing the warning
              * below in your logfile, then it isn't correct ;-)
              */
-            int checkStrikingSkill = getStrikingSkill(target,
-                    hex.getElevation(), targetHex.getElevation(),
-                    hex.getTerrain(), targetHex.getTerrain(),
-                    HazardHexside.getHexsideByCode(hex.getHexside(
-                      BattleServerSide.getDirection(hex, targetHex, false))),
-                    HazardHexside.getHexsideByCode(targetHex.getHexside(
-                      BattleServerSide.getDirection(targetHex, hex,false))));
+            int checkStrikingSkill = getStrikingSkill(target, hex
+                .getElevation(), targetHex.getElevation(), hex.getTerrain(),
+                targetHex.getTerrain(), HazardHexside.getHexsideByCode(hex
+                    .getHexside(BattleServerSide.getDirection(hex, targetHex,
+                        false))), HazardHexside.getHexsideByCode(targetHex
+                    .getHexside(BattleServerSide.getDirection(targetHex, hex,
+                        false))));
             if (checkStrikingSkill != attackerSkill)
             {
-                LOGGER.warning("attackerSkill says " + attackerSkill +
-                        " but checkStrikingSkill says " + checkStrikingSkill);
+                LOGGER.warning("attackerSkill says " + attackerSkill
+                    + " but checkStrikingSkill says " + checkStrikingSkill);
             }
             /* END TODO: remove TEST TEST TEST TEST TEST */
         }
@@ -523,10 +521,13 @@ public class CreatureServerSide extends Creature
              * Incidentally, if you're reading this after noticing the warning
              * below in your logfile, then it isn't correct ;-)
              */
-            int interveningPenalty = battle.computeSkillPenaltyRangestrikeThrough(
-                    getCurrentHex(), targetHex, this);
-            if (interveningPenalty != bramblesPenalty) {
-                LOGGER.warning("bramblesPenalty says " + bramblesPenalty + " but interveningPenalty says " + interveningPenalty);
+            int interveningPenalty = battle
+                .computeSkillPenaltyRangestrikeThrough(getCurrentHex(),
+                    targetHex, this);
+            if (interveningPenalty != bramblesPenalty)
+            {
+                LOGGER.warning("bramblesPenalty says " + bramblesPenalty
+                    + " but interveningPenalty says " + interveningPenalty);
             }
             /* END TODO: remove TEST TEST TEST TEST TEST */
 
@@ -584,25 +585,28 @@ public class CreatureServerSide extends Creature
 
         HazardTerrain terrain = target.getCurrentHex().getTerrain();
 
-        if (!rangestrike) {
+        if (!rangestrike)
+        {
             // Strike number can be modified directly by terrain.
-            strikeNumber += terrain.getSkillBonusStruckIn(
-                    this.isNativeTerrain(terrain),
-                    target.isNativeTerrain(terrain));
-        } else {
+            strikeNumber += terrain.getSkillBonusStruckIn(this
+                .isNativeTerrain(terrain), target.isNativeTerrain(terrain));
+        }
+        else
+        {
             // Native defending in bramble, from rangestrike by a non-native
             //     non-magicMissile: +1
-            if (terrain.equals(HazardTerrain.BRAMBLES) &&
-                    target.isNativeBramble() && !isNativeBramble() &&
-                    !useMagicMissile()) {
+            if (terrain.equals(HazardTerrain.BRAMBLES)
+                && target.isNativeBramble() && !isNativeBramble()
+                && !useMagicMissile())
+            {
                 strikeNumber++;
             }
 
             // Native defending in stone, from rangestrike by a non-native
             //     non-magicMissile: +1
-            if (terrain.equals(HazardTerrain.STONE) &&
-                    target.isNativeStone() && !isNativeStone() &&
-                    !useMagicMissile()) {
+            if (terrain.equals(HazardTerrain.STONE) && target.isNativeStone()
+                && !isNativeStone() && !useMagicMissile())
+            {
                 strikeNumber++;
             }
         }
@@ -665,7 +669,7 @@ public class CreatureServerSide extends Creature
             battle.clearCarryTargets();
             return;
         }
-        
+
         PenaltyOption po = matchingPenaltyOption(prompt);
         if (po != null)
         {
@@ -1009,7 +1013,7 @@ public class CreatureServerSide extends Creature
     {
         return getType().isNativeIn(HazardTerrain.BRAMBLES);
     }
- 
+
     public boolean isNativeDune()
     {
         return getType().isNativeDune();
@@ -1019,6 +1023,7 @@ public class CreatureServerSide extends Creature
     {
         return getType().isNativeSlope();
     }
+
     /** @deprecated all isNative<HazardTerrain> are obsolete, one should use
      * isNativeTerrain(<HazardTerrain>) instead, with no explicit reference
      * to the name. This will ease adding new HazardTerrain in variant.
@@ -1033,6 +1038,7 @@ public class CreatureServerSide extends Creature
     {
         return getType().isNativeRiver();
     }
+
     /** @deprecated all isNative<HazardTerrain> are obsolete, one should use
      * isNativeTerrain(<HazardTerrain>) instead, with no explicit reference
      * to the name. This will ease adding new HazardTerrain in variant.

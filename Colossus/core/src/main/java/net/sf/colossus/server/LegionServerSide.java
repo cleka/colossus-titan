@@ -64,8 +64,7 @@ public final class LegionServerSide extends Legion implements
     {
         super(player, markerId, currentHex);
         assert markerId != null : "MarkerId must not be null";
-        assert !markerId.equals(parentId)
-            : "Parent can not have the same markerId as we have";
+        assert !markerId.equals(parentId) : "Parent can not have the same markerId as we have";
         assert startingHex != null : "Legion needs to start on some hex";
         assert game != null : "Legion needs to be part of some game";
         assert game == player.getGame() : "Legion needs to be part of the same game as its player";

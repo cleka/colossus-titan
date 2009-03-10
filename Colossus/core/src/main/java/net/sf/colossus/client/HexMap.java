@@ -88,9 +88,11 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     private String basicName = "undefined";
     private String subtitle = null;
 
-    public HexMap(MasterHex masterHex) {
+    public HexMap(MasterHex masterHex)
+    {
         this(masterHex, true);
     }
+
     public HexMap(MasterHex masterHex, boolean doSetup)
     {
         this.masterHex = masterHex;
@@ -506,8 +508,8 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     {
         for (GUIBattleHex hex : hexes)
         {
-            if (hex.isSelected() &&
-                    labels.contains(hex.getHexModel().getLabel()))
+            if (hex.isSelected()
+                && labels.contains(hex.getHexModel().getLabel()))
             {
                 hex.unselect();
                 hex.repaint();
@@ -519,7 +521,8 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     {
         for (GUIBattleHex hex : hexes)
         {
-            if (!hex.isSelected() && label.equals(hex.getHexModel().getLabel()))
+            if (!hex.isSelected()
+                && label.equals(hex.getHexModel().getLabel()))
             {
                 hex.select();
                 hex.repaint();
@@ -532,8 +535,8 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     {
         for (GUIBattleHex hex : hexes)
         {
-            if (!hex.isSelected() && labels.contains(
-                    hex.getHexModel().getLabel()))
+            if (!hex.isSelected()
+                && labels.contains(hex.getHexModel().getLabel()))
             {
                 hex.select();
                 hex.repaint();
@@ -746,22 +749,22 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
             // calculate needed space, set xPos so that it's drawn 
             // right-aligned 80 away from right window border.
-            Rectangle2D bounds = fm.getStringBounds(getDisplayName(),g);
+            Rectangle2D bounds = fm.getStringBounds(getDisplayName(), g);
             int width = (int)bounds.getWidth();
             int windowWidth = super.getWidth();
             int xPos = windowWidth - 80 - width;
-            g.drawString(getDisplayName(),xPos, 4 + tma);
+            g.drawString(getDisplayName(), xPos, 4 + tma);
 
             if (getSubtitle() != null)
             {
                 g.setFont(ResourceLoader.defaultFont.deriveFont((float)24));
                 fm = g.getFontMetrics();
                 int tma2 = fm.getMaxAscent();
-                bounds = fm.getStringBounds(getSubtitle(),g);
+                bounds = fm.getStringBounds(getSubtitle(), g);
                 width = (int)bounds.getWidth();
                 windowWidth = super.getWidth();
                 xPos = windowWidth - 80 - width;
-                g.drawString(getSubtitle(),xPos, 4 + tma + 8 + tma2);
+                g.drawString(getSubtitle(), xPos, 4 + tma + 8 + tma2);
             }
 
             /* reset antialiasing */

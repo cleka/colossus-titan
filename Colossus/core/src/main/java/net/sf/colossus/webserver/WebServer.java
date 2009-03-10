@@ -68,7 +68,6 @@ public class WebServer implements IWebServer, IRunWebServer
 
     private final List<ChatMessage> lastNChatMessages = new ArrayList<ChatMessage>();
 
-
     public static void main(String[] args)
     {
         String optionsFileName = WebServerConstants.defaultOptionsFilename;
@@ -111,7 +110,7 @@ public class WebServer implements IWebServer, IRunWebServer
             .getIntOptionNoUndef(WebServerConstants.optAvailablePorts);
 
         mailObject = new ColossusMail(options);
-        
+
         portBookKeeper = new PortBookKeeper(portRangeFrom, availablePorts);
 
         String usersFile = options
@@ -120,8 +119,8 @@ public class WebServer implements IWebServer, IRunWebServer
 
         User.readUsersFromFile(usersFile, maxUsers);
 
-        LOGGER.log(Level.INFO, "Server started: port " + port + ", maxClients "
-            + maxClients);
+        LOGGER.log(Level.INFO, "Server started: port " + port
+            + ", maxClients " + maxClients);
 
         long now = new Date().getTime();
         ChatMessage startMsg = new ChatMessage(IWebServer.generalChatName,
@@ -218,8 +217,8 @@ public class WebServer implements IWebServer, IRunWebServer
         }
         else
         {
-            LOGGER.info("Web server shut down remotely by user '"
-                + byUserName + "'");
+            LOGGER.info("Web server shut down remotely by user '" + byUserName
+                + "'");
         }
         try
         {
@@ -381,22 +380,23 @@ public class WebServer implements IWebServer, IRunWebServer
         assert gui != null;
         gui.setScheduledGamesInfo(scheduledGames.size()
             + " scheduled games stored");
-        gui.setInstantGamesInfo(instantGames.size()
-            + " instant games stored");
+        gui.setInstantGamesInfo(instantGames.size() + " instant games stored");
         gui.setRunningGamesInfo(runningGames.size() + " running games");
         gui.setEndingGamesInfo(endingGames.size() + " games just ending");
     }
 
     public GameInfo proposeGame(String initiator, String variant,
         String viewmode, long startAt, int duration, String summary,
-        String expire, boolean unlimitedMulligans,
-        boolean balancedTowers, int min, int target, int max)
+        String expire, boolean unlimitedMulligans, boolean balancedTowers,
+        int min, int target, int max)
     {
-        System.out.println("\n=============\nWebServer.proposeGame, startAt = " + startAt);
-        
-        GameInfo gi = new GameInfo(initiator, variant, viewmode,
-            startAt, duration, summary, expire,
-            unlimitedMulligans, balancedTowers, min, target, max);
+        System.out
+            .println("\n=============\nWebServer.proposeGame, startAt = "
+                + startAt);
+
+        GameInfo gi = new GameInfo(initiator, variant, viewmode, startAt,
+            duration, summary, expire, unlimitedMulligans, balancedTowers,
+            min, target, max);
 
         if (startAt == -1)
         {
@@ -696,12 +696,12 @@ public class WebServer implements IWebServer, IRunWebServer
 
     public String registerUser(String username, String password, String email)
     {
-        String reason = User.registerUser(username, password, email, mailObject);
+        String reason = User.registerUser(username, password, email,
+            mailObject);
         return reason;
     }
 
-    public String confirmRegistration(String username,
-        String confirmationCode)
+    public String confirmRegistration(String username, String confirmationCode)
     {
         String reason = User.confirmRegistration(username, confirmationCode);
         return reason;

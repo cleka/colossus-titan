@@ -101,10 +101,11 @@ final class PickColor extends KDialog implements WindowListener,
         return color;
     }
 
-    static synchronized String pickColor(JFrame parentFrame, String playerName,
-        List<String> colorsLeft, IOptions options)
+    static synchronized String pickColor(JFrame parentFrame,
+        String playerName, List<String> colorsLeft, IOptions options)
     {
-        PickColor pc = new PickColor(parentFrame, playerName, colorsLeft, options);
+        PickColor pc = new PickColor(parentFrame, playerName, colorsLeft,
+            options);
         return pc.getColor();
     }
 

@@ -33,7 +33,7 @@ public class MultiSet<T>
         {
             Integer val = map.get(key);
             int prev = val.intValue();
-            map.put(key, Integer.valueOf(prev+1));
+            map.put(key, Integer.valueOf(prev + 1));
         }
     }
 

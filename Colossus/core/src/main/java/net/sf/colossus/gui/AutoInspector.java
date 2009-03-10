@@ -30,7 +30,7 @@ class AutoInspector extends KDialog
     private final SaveWindow saveWindow;
 
     private final JScrollPane scrollPane;
-    
+
     private final JFrame parentFrame;
 
     private final int viewMode;

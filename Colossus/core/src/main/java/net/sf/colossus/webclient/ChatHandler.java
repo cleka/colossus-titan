@@ -1,5 +1,6 @@
 package net.sf.colossus.webclient;
 
+
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -18,6 +19,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import net.sf.colossus.webcommon.IWebServer;
+
 
 public class ChatHandler
 {
@@ -73,7 +75,7 @@ public class ChatHandler
 
         Box submitPane = new Box(BoxLayout.X_AXIS);
         newMessage = new JTextField(60);
-        
+
         ActionListener submitListener = new ActionListener()
         {
             public void actionPerformed(ActionEvent e)
@@ -174,8 +176,8 @@ public class ChatHandler
                 }
                 else
                 {
-                    displayArea.append(dashes
-                        + " (no messages to redisplay) " + dashes + "\n");
+                    displayArea.append(dashes + " (no messages to redisplay) "
+                        + dashes + "\n");
                 }
                 resentMode = false;
                 if (afterResentSender != null)
@@ -196,8 +198,8 @@ public class ChatHandler
                 if (!resentMode)
                 {
                     displayArea.append("\n" + dashes
-                        + " redisplaying last (up to 10) messages "
-                        + dashes + "\n");
+                        + " redisplaying last (up to 10) messages " + dashes
+                        + "\n");
                 }
                 resentMode = true;
                 lastMsgWhen = when;
@@ -218,11 +220,10 @@ public class ChatHandler
         String dateChange = whenFormatter.hasDateChanged();
         if (dateChange != null)
         {
-            displayArea.append("\n" + doubledashes + " " + dateChange
-                + " " + doubledashes + "\n");
+            displayArea.append("\n" + doubledashes + " " + dateChange + " "
+                + doubledashes + "\n");
         }
-        displayArea
-            .append(whenTime + " " + sender + ": " + message + "\n");
+        displayArea.append(whenTime + " " + sender + ": " + message + "\n");
         if (displayArea.getLineCount() - 2 > displayArea.getRows())
         {
             displayScrollBar.setValue(displayScrollBar.getMaximum());
@@ -276,5 +277,5 @@ public class ChatHandler
         }
 
     } // END class FormatWhen
-    
+
 } // END class ChatHandler

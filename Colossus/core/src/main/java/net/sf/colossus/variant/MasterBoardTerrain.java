@@ -36,7 +36,7 @@ public class MasterBoardTerrain implements Comparable<MasterBoardTerrain>
      */
     private final String displayName;
     /** Subtitle, for the Battlelands. Cosmetic only, but nice */
-    private       String subtitle;
+    private String subtitle;
     private final Color color;
     /** TODO this should be a List<BattleHex> ... or a List<GUIBattleHex> ???
      * If non-null, this is the list of hexes a defending legion will start
@@ -57,7 +57,8 @@ public class MasterBoardTerrain implements Comparable<MasterBoardTerrain>
     /** Whether this terrain uses another Terrain recruit tree. */
     private final boolean isAlias;
 
-    public MasterBoardTerrain(String id, String displayName, Color color, boolean isAlias)
+    public MasterBoardTerrain(String id, String displayName, Color color,
+        boolean isAlias)
     {
         this.id = id;
         this.displayName = displayName;
@@ -65,25 +66,29 @@ public class MasterBoardTerrain implements Comparable<MasterBoardTerrain>
         this.subtitle = null;
         this.isAlias = isAlias;
     }
-    
+
     public MasterBoardTerrain(String id, String displayName, Color color)
     {
         this(id, displayName, color, false);
     }
 
-    public int compareTo(MasterBoardTerrain m) {
+    public int compareTo(MasterBoardTerrain m)
+    {
         return this.id.compareTo(m.id);
     }
 
-    public void addAlias(MasterBoardTerrain t) {
+    public void addAlias(MasterBoardTerrain t)
+    {
         aliases.add(t);
     }
 
-    public boolean isAlias() {
+    public boolean isAlias()
+    {
         return isAlias;
     }
 
-    public Set<MasterBoardTerrain> getAliases() {
+    public Set<MasterBoardTerrain> getAliases()
+    {
         return Collections.unmodifiableSet(aliases);
     }
 

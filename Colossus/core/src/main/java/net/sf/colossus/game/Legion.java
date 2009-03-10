@@ -191,7 +191,6 @@ public abstract class Legion
      */
     public abstract int getPointValue();
 
-    
     public String getRecruitName()
     {
         return recruitName;
@@ -389,13 +388,13 @@ public abstract class Legion
         {
             return acquirableNames;
         }
-        
+
         // so far not used anywhere
         public int getPoints()
         {
             return points;
         }
-        
+
         // so far not used anywhere
         public Legion getLegion()
         {

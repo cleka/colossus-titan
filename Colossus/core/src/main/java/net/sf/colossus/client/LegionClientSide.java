@@ -46,7 +46,7 @@ public final class LegionClientSide extends Legion implements
     private Marker marker;
     private PredictSplitNode myNode;
     private final boolean isMyLegion;
-    
+
     // TODO the Client parameter should be a Game(ClientSide), which doesn't exist yet
     public LegionClientSide(String markerId, Client client, MasterHex hex)
     {

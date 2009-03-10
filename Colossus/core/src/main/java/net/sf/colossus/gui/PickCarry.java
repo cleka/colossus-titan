@@ -126,7 +126,7 @@ final class PickCarry extends KDialog implements ActionListener
         saveWindow.saveLocation(getLocation());
         dispose();
     }
-    
+
     public void actionPerformed(ActionEvent e)
     {
         String desc = e.getActionCommand();

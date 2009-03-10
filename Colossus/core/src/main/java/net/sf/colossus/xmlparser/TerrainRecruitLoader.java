@@ -108,19 +108,18 @@ public class TerrainRecruitLoader
 
     private static boolean isConcreteCreature(String name)
     {
-        return ( !(name.equals(Keyword_Anything))
-            &&   !(name.equals(Keyword_AnyNonLord))
-            &&   !(name.equals(Keyword_Lord))
-            &&   !(name.equals(Keyword_DemiLord))
-            &&   !(name.startsWith(Keyword_Special)));
+        return (!(name.equals(Keyword_Anything))
+            && !(name.equals(Keyword_AnyNonLord))
+            && !(name.equals(Keyword_Lord))
+            && !(name.equals(Keyword_DemiLord)) && !(name
+            .startsWith(Keyword_Special)));
     }
 
     /**
      * Add an entire terrain recruiting list to the Recruiting Graph.
      * @param rl The list of RecruitNumber to add to the graph.
      */
-    private static void addToGraph(List<RecruitNumber> rl,
-        MasterBoardTerrain t)
+    private static void addToGraph(List<RecruitNumber> rl, MasterBoardTerrain t)
     {
         Iterator<RecruitNumber> it = rl.iterator();
         String v1 = null;
@@ -326,12 +325,12 @@ public class TerrainRecruitLoader
         }
 
         MasterBoardTerrain terrain = new MasterBoardTerrain(name, displayName,
-                HTMLColor.stringToColor(color), true);
+            HTMLColor.stringToColor(color), true);
 
-        TerrainRecruitLoader.strToRecruits.put(terrain,
-                strToRecruits.get(source_terrain));
-        TerrainRecruitLoader.strToBelow.put(terrain,
-                strToBelow.get(source_terrain));
+        TerrainRecruitLoader.strToRecruits.put(terrain, strToRecruits
+            .get(source_terrain));
+        TerrainRecruitLoader.strToBelow.put(terrain, strToBelow
+            .get(source_terrain));
         // XXX Random not yet supported:
         TerrainRecruitLoader.strToRnd.put(terrain, null);
 
@@ -521,8 +520,7 @@ public class TerrainRecruitLoader
             if (terrain.isTower())
             {
                 CreatureType[] bc = getStartingCreatures(terrain);
-                if (   type.equals(bc[0])
-                    || type.equals(bc[1])
+                if (type.equals(bc[0]) || type.equals(bc[1])
                     || type.equals(bc[2]))
                 {
                     isSC = true;
@@ -561,8 +559,7 @@ public class TerrainRecruitLoader
         while (it.hasNext())
         {
             RecruitNumber tr = it.next();
-            if ((tr.getNumber() >= 0)
-                && isConcreteCreature(tr.getName())
+            if ((tr.getNumber() >= 0) && isConcreteCreature(tr.getName())
                 && !tr.getName().equals("Titan"))
             {
                 result.add(VariantSupport.getCurrentVariant()

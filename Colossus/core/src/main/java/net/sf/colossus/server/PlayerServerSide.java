@@ -59,9 +59,9 @@ public final class PlayerServerSide extends Player implements
     /* Needed during loading a game: */
     private String playersEliminatedBackup = "";
     private final List<Legion> legionsBackup = new ArrayList<Legion>();
-    
+
     private boolean deadBeforeSave = false;
-    
+
     PlayerServerSide(String name, GameServerSide game)
     {
         // TODO why are the players on the client side numbered but not here?
@@ -631,7 +631,7 @@ public final class PlayerServerSide extends Player implements
         li.addAll(getMarkersAvailable());
         return Glob.glob(":", li);
     }
- 
+
     /* After legions are loaded, put them aside (legions and who owns them
      * might be totally mismatching esp. after player elimination.
      * Reconstruct creation, deceasing, surviving legions, player elimination
@@ -639,56 +639,57 @@ public final class PlayerServerSide extends Player implements
      * After that, synchronize state info like location, hasMoved etc 
      * from the backup.
      */
-    
+
     public void backupLoadedData()
     {
         playersEliminatedBackup = getPlayersElim();
         setPlayersElim("");
-                
+
         for (LegionServerSide l : getLegions())
         {
             legionsBackup.add(l);
         }
         removeAllLegions();
     }
-    
+
     public boolean resyncBackupData()
     {
-        if ( !(playersEliminatedBackup != null
-                && getPlayersElim() != null
-                && getPlayersElim().equals(playersEliminatedBackup)))
+        if (!(playersEliminatedBackup != null && getPlayersElim() != null && getPlayersElim()
+            .equals(playersEliminatedBackup)))
         {
             LOGGER.severe("PlayersEliminated strings NOT in sync: replayed "
-                + " is '"+ getPlayersElim() + "' but loaded is '" 
-                + playersEliminatedBackup + "'!" );
+                + " is '" + getPlayersElim() + "' but loaded is '"
+                + playersEliminatedBackup + "'!");
             return false;
         }
-        
-        if (getLegions().size() != legionsBackup.size() )
+
+        if (getLegions().size() != legionsBackup.size())
         {
-            LOGGER.severe("Loaded player data, legion lists different size!" +
-                " replay: " + getLegions().size() +
-                ", loaded: " + legionsBackup.size());
+            LOGGER.severe("Loaded player data, legion lists different size!"
+                + " replay: " + getLegions().size() + ", loaded: "
+                + legionsBackup.size());
             return false;
         }
-        
+
         boolean ok = true;
         for (Legion bl : legionsBackup)
         {
             Legion l = getLegionByMarkerId(bl.getMarkerId());
-                        
-            String list1 = ((LegionServerSide)  l).getImageNames().toString();
-            String list2 = ((LegionServerSide) bl).getImageNames().toString();
-                                
+
+            String list1 = ((LegionServerSide)l).getImageNames().toString();
+            String list2 = ((LegionServerSide)bl).getImageNames().toString();
+
             if (!list1.equals(list2))
             {
-                LOGGER.severe("Loaded legion data differs from replay result: "
-                    + "Replay-Legion content for " + l.getMarkerId() + " is " 
-                    + list1 + ", Loaded-Legion content is " + list2);
+                LOGGER
+                    .severe("Loaded legion data differs from replay result: "
+                        + "Replay-Legion content for " + l.getMarkerId()
+                        + " is " + list1 + ", Loaded-Legion content is "
+                        + list2);
                 ok = false;
             }
         }
-        
+
         if (ok)
         {
             // discard the replay results and get the backup data back into
@@ -698,15 +699,15 @@ public final class PlayerServerSide extends Player implements
             {
                 addLegion(l);
             }
-        }        
+        }
         return ok;
     }
-    
+
     public void setDeadBeforeSave(boolean val)
     {
         this.deadBeforeSave = val;
     }
-    
+
     public boolean getDeadBeforeSave()
     {
         return this.deadBeforeSave;

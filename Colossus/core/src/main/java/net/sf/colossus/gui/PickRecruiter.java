@@ -62,12 +62,12 @@ final class PickRecruiter extends KDialog implements MouseListener,
 
         JLabel label = new JLabel(
             "  There is more than one way you can recruit this.");
-        label.setAlignmentX(FlowLayout.LEADING );
-        
+        label.setAlignmentX(FlowLayout.LEADING);
+
         contentPane.add(Box.createRigidArea(new Dimension(0, scale / 4)));
         contentPane.add(label);
         contentPane.add(Box.createRigidArea(new Dimension(0, scale / 4)));
-        
+
         JPanel legionPane = new JPanel();
         String legionId = legion.getMarkerId();
         String text = "Current content of legion " + legionId + ":";
@@ -90,9 +90,9 @@ final class PickRecruiter extends KDialog implements MouseListener,
 
         JLabel label2 = new JLabel(
             "  Pick the creature type you want to reveal:  ");
-        label2.setAlignmentX(FlowLayout.LEADING );
+        label2.setAlignmentX(FlowLayout.LEADING);
         contentPane.add(label2);
-        
+
         JPanel recruiterPane = new JPanel();
         contentPane.add(recruiterPane);
 
@@ -132,8 +132,9 @@ final class PickRecruiter extends KDialog implements MouseListener,
         return recruiterName;
     }
 
-    static synchronized String pickRecruiter(JFrame parentFrame, List<String> recruiters,
-        String hexDescription, Legion legion, Client client)
+    static synchronized String pickRecruiter(JFrame parentFrame,
+        List<String> recruiters, String hexDescription, Legion legion,
+        Client client)
     {
         PickRecruiter pr = new PickRecruiter(parentFrame, recruiters,
             hexDescription, legion, client);

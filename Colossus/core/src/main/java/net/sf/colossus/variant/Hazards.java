@@ -1,5 +1,6 @@
 package net.sf.colossus.variant;
 
+
 import java.util.logging.Logger;
 
 
@@ -8,8 +9,8 @@ import java.util.logging.Logger;
  */
 public abstract class Hazards implements HazardConstants
 {
-    private static final Logger LOGGER = Logger
-        .getLogger(Hazards.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Hazards.class
+        .getName());
     /**
      * The name used for serialization.
      */
@@ -31,12 +32,15 @@ public abstract class Hazards implements HazardConstants
     /** WiP : instead of a bunch of variables, group them by
      * category so it's easier to recognize them / deal with them.
      */
-    private class CombatEffect {
+    private class CombatEffect
+    {
         final EffectOnStrike effect;
         final ScopeOfEffectOnStrike scope;
         final int adjustement;
 
-        CombatEffect(EffectOnStrike effect, ScopeOfEffectOnStrike scope, int adjustement) {
+        CombatEffect(EffectOnStrike effect, ScopeOfEffectOnStrike scope,
+            int adjustement)
+        {
             this.effect = effect;
             this.scope = scope;
             this.adjustement = adjustement;

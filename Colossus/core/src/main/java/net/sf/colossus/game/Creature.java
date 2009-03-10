@@ -17,8 +17,8 @@ import net.sf.colossus.variant.HazardTerrain;
  */
 public class Creature
 {
-    private static final Logger LOGGER = Logger.getLogger(
-            Creature.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Creature.class
+        .getName());
     private final CreatureType type;
 
     public Creature(CreatureType type)
@@ -42,22 +42,18 @@ public class Creature
      * @param targetHexside Type of hexside hazard between the target hex and the current hex
      * @return The Power Factor of the current Creature when all modifiers are factored in
      */
-    public int getStrikingPower(Creature target,
-            int myElevation,
-            int targetElevation,
-            HazardTerrain myHexTerrain,
-            HazardTerrain targetHexTerrain,
-            HazardHexside myHexside,
-            HazardHexside targetHexside)
+    public int getStrikingPower(Creature target, int myElevation,
+        int targetElevation, HazardTerrain myHexTerrain,
+        HazardTerrain targetHexTerrain, HazardHexside myHexside,
+        HazardHexside targetHexside)
     {
         CreatureType myType = this.getType();
         CreatureType targetType = target.getType();
         int dice = type.getPower();
 
-
         // Dice can be modified by terrain.
-        dice += myHexTerrain.getPowerBonusStrikeFrom(myType.isNativeIn(
-                myHexTerrain), targetType.isNativeIn(myHexTerrain));
+        dice += myHexTerrain.getPowerBonusStrikeFrom(myType
+            .isNativeIn(myHexTerrain), targetType.isNativeIn(myHexTerrain));
 
         // Native striking down a dune hexside: +2
         if (myHexside.equals(HazardHexside.DUNE) && myType.isNativeDune())
@@ -65,21 +61,22 @@ public class Creature
             dice += 2;
         }
         // Native striking down a slope hexside: +1
-        else if (myHexside.equals(HazardHexside.SLOPE) && myType.isNativeSlope())
+        else if (myHexside.equals(HazardHexside.SLOPE)
+            && myType.isNativeSlope())
         {
             dice++;
         }
         // Non-native striking up a dune hexside: -1
-        else if (!myType.isNativeDune() && targetHexside.equals(
-                HazardHexside.DUNE))
+        else if (!myType.isNativeDune()
+            && targetHexside.equals(HazardHexside.DUNE))
         {
             dice--;
         }
-        LOGGER.finest("Found " + dice + " dice for " + myType.getName() + " [" +
-                myHexTerrain.getName() + "  " + myElevation + ", " + myHexside.
-                getName() + " ] vs. " +
-                targetType.getName() + " [" + targetHexTerrain.getName() + " " +
-                targetElevation + ", " + targetHexside.getName() + " ]");
+        LOGGER.finest("Found " + dice + " dice for " + myType.getName() + " ["
+            + myHexTerrain.getName() + "  " + myElevation + ", "
+            + myHexside.getName() + " ] vs. " + targetType.getName() + " ["
+            + targetHexTerrain.getName() + " " + targetElevation + ", "
+            + targetHexside.getName() + " ]");
         return dice;
     }
 
@@ -94,13 +91,10 @@ public class Creature
      * @param targetHexside Type of hexside hazard between the target hex and the current hex
      * @return The Skill Factor of the current Creature when all modifiers are factored in
      */
-    public int getStrikingSkill(Creature target,
-            int myElevation,
-            int targetElevation,
-            HazardTerrain myHexTerrain,
-            HazardTerrain targetHexTerrain,
-            HazardHexside myHexside,
-            HazardHexside targetHexside)
+    public int getStrikingSkill(Creature target, int myElevation,
+        int targetElevation, HazardTerrain myHexTerrain,
+        HazardTerrain targetHexTerrain, HazardHexside myHexside,
+        HazardHexside targetHexside)
     {
         CreatureType myType = this.getType();
         CreatureType targetType = target.getType();
@@ -108,10 +102,8 @@ public class Creature
 
         // Skill can be modified by terrain.
         // striking out of possible hazard
-        attackerSkill -=
-                myHexTerrain.getSkillPenaltyStrikeFrom(
-                myType.isNativeIn(myHexTerrain),
-                targetType.isNativeIn(myHexTerrain));
+        attackerSkill -= myHexTerrain.getSkillPenaltyStrikeFrom(myType
+            .isNativeIn(myHexTerrain), targetType.isNativeIn(myHexTerrain));
 
         if (myElevation > targetElevation)
         {
@@ -125,19 +117,18 @@ public class Creature
         {
             // Non-native striking up slope: -1
             // Striking up across wall: -1
-            if ((targetHexside.equals(HazardHexside.SLOPE) &&
-                    !myType.isNativeSlope()) ||
-                    targetHexside.equals(HazardHexside.TOWER))
+            if ((targetHexside.equals(HazardHexside.SLOPE) && !myType
+                .isNativeSlope())
+                || targetHexside.equals(HazardHexside.TOWER))
             {
                 attackerSkill--;
             }
         }
-        LOGGER.finest("Found skill " + attackerSkill + "  for " +
-                myType.getName() + " [" +
-                myHexTerrain.getName() + "  " + myElevation + ", " + myHexside.
-                getName() + " ] vs. " +
-                targetType.getName() + " [" + targetHexTerrain.getName() + " " +
-                targetElevation + ", " + targetHexside.getName() + " ]");
+        LOGGER.finest("Found skill " + attackerSkill + "  for "
+            + myType.getName() + " [" + myHexTerrain.getName() + "  "
+            + myElevation + ", " + myHexside.getName() + " ] vs. "
+            + targetType.getName() + " [" + targetHexTerrain.getName() + " "
+            + targetElevation + ", " + targetHexside.getName() + " ]");
         return attackerSkill;
     }
 }

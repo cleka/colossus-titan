@@ -57,7 +57,7 @@ final class SocketClientThread extends Thread implements IServer
 
     private final Object isWaitingLock = new Object();
     private boolean isWaiting = false;
-        
+
     SocketClientThread(Client client, String host, int port)
     {
         super("Client " + client.getOwningPlayer().getName());
@@ -235,11 +235,13 @@ final class SocketClientThread extends Thread implements IServer
         {
             // Right now this should never happen, but since we have
             // the catch and set the flag, let's do something with it:)
-            client.getGUI().showErrorMessage(
-                "No messages from server for very long time. "
-                + "Right now this should never happen because in normal game "
-                + "situation we work with infinite timeout... ??",
-                "No messages from server!");
+            client
+                .getGUI()
+                .showErrorMessage(
+                    "No messages from server for very long time. "
+                        + "Right now this should never happen because in normal game "
+                        + "situation we work with infinite timeout... ??",
+                    "No messages from server!");
         }
 
         cleanupSocket();
@@ -297,8 +299,9 @@ final class SocketClientThread extends Thread implements IServer
                 }
                 else
                 {
-                    LOGGER.warning("Client '" + client.getOwningPlayer()
-                        .getName() + "' got empty message from server?");
+                    LOGGER.warning("Client '"
+                        + client.getOwningPlayer().getName()
+                        + "' got empty message from server?");
                 }
             }
 
@@ -389,7 +392,7 @@ final class SocketClientThread extends Thread implements IServer
             {
                 socket.close();
                 socket = null;
-            }                
+            }
             else
             {
                 LOGGER.log(Level.FINEST, "SCT Closing socket not needed in "
@@ -470,14 +473,14 @@ final class SocketClientThread extends Thread implements IServer
 
             String method = li.remove(0);
             callMethod(method, li);
-         }
+        }
     }
 
     private void callMethod(String method, List<String> args)
     {
         LOGGER.finer("Client '" + client.getOwningPlayer().getName()
             + "' processing message: " + method);
-        
+
         if (method.equals(Constants.tellMovementRoll))
         {
             int roll = Integer.parseInt(args.remove(0));
@@ -567,8 +570,7 @@ final class SocketClientThread extends Thread implements IServer
                 // this can happen on game startup since there is no explicit
                 // event creating the first legions
                 // TODO try to make this less implicit
-                assert client.getTurnNumber() == -1 :
-                    "Implicit legion creation should happen only "
+                assert client.getTurnNumber() == -1 : "Implicit legion creation should happen only "
                     + "before the first round";
                 legion = new LegionClientSide(markerId, client, player
                     .getStartingTower());
@@ -637,8 +639,8 @@ final class SocketClientThread extends Thread implements IServer
             boolean disposeFollows = false;
             if (!args.isEmpty())
             {
-                disposeFollows = Boolean.valueOf(
-                    args.remove(0)).booleanValue();
+                disposeFollows = Boolean.valueOf(args.remove(0))
+                    .booleanValue();
             }
             client.tellGameOver(message, disposeFollows);
         }
@@ -707,7 +709,8 @@ final class SocketClientThread extends Thread implements IServer
             String masterHexLabel = args.remove(0);
             int battleTurnNumber = Integer.parseInt(args.remove(0));
             String battleActivePlayerName = args.remove(0);
-            Constants.BattlePhase battlePhase = BattlePhase.values()[Integer.parseInt(args.remove(0))];
+            Constants.BattlePhase battlePhase = BattlePhase.values()[Integer
+                .parseInt(args.remove(0))];
             String attackerMarkerId = args.remove(0);
             String defenderMarkerId = args.remove(0);
             client.initBattle(resolveHex(masterHexLabel), battleTurnNumber,
@@ -792,7 +795,8 @@ final class SocketClientThread extends Thread implements IServer
         }
         else if (method.equals(Constants.setupBattleFight))
         {
-            Constants.BattlePhase battlePhase = BattlePhase.values()[Integer.parseInt(args.remove(0))];
+            Constants.BattlePhase battlePhase = BattlePhase.values()[Integer
+                .parseInt(args.remove(0))];
             String battleActivePlayerName = args.remove(0);
             client.setupBattleFight(battlePhase, client
                 .getPlayerInfo(battleActivePlayerName));
@@ -956,7 +960,7 @@ final class SocketClientThread extends Thread implements IServer
             }
             client.tellEngagementResults(legion, resMethod, points, turns);
         }
-        
+
         else if (method.equals(Constants.tellWhatsHappening))
         {
             String message = args.remove(0);
@@ -1014,9 +1018,9 @@ final class SocketClientThread extends Thread implements IServer
         }
 
         // Peter made this assertion, I guess...
-        assert legion != null : "SocketClientThread.resolveLegion("
-            + markerId + " in client of player "
-            + client.getOwningPlayer().getName() + " returned null!";
+        assert legion != null : "SocketClientThread.resolveLegion(" + markerId
+            + " in client of player " + client.getOwningPlayer().getName()
+            + " returned null!";
 
         return legion;
     }
@@ -1076,7 +1080,7 @@ final class SocketClientThread extends Thread implements IServer
 
     public void doSummon(Legion legion, Legion donor, String angel)
     {
-        sendToServer(Constants.doSummon + sep 
+        sendToServer(Constants.doSummon + sep
             + (legion != null ? legion.getMarkerId() : null) + sep
             + (donor != null ? donor.getMarkerId() : null) + sep + angel);
     }

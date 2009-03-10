@@ -1,9 +1,9 @@
 package net.sf.colossus.webserver;
 
 
-
 import java.net.*;
 import java.io.*;
+
 
 /** Sending a simple (text-only) mail by submitting it to the SMTP
  *  server at port 25.
@@ -12,17 +12,17 @@ import java.io.*;
  */
 public class SmtpSimple
 {
-    private DataOutputStream os  = null;
-    private BufferedReader   is  = null;
-    private String           sRt = "";
+    private DataOutputStream os = null;
+    private BufferedReader is = null;
+    private String sRt = "";
 
     public static void main(String[] args)
     {
-        System.out.println(
-            "\nSmtpSimple.java. Send simple email.\nUsage:\n" +
-            "  java SmtpSimple SmtpServer FromAdr FromRealName ToAdr ToRealName Subject Text\n" +
-            "Example:\n" +
-            "  java SmtpSimple mail.gmx.net MeinName@MeinProvider.de \"Vorname Nachname\" x@y.z xyz S T\n");
+        System.out
+            .println("\nSmtpSimple.java. Send simple email.\nUsage:\n"
+                + "  java SmtpSimple SmtpServer FromAdr FromRealName ToAdr ToRealName Subject Text\n"
+                + "Example:\n"
+                + "  java SmtpSimple mail.gmx.net MeinName@MeinProvider.de \"Vorname Nachname\" x@y.z xyz S T\n");
         if (null == args || 6 > args.length)
         {
             System.out.println("Error: parameters missing!");
@@ -34,11 +34,11 @@ public class SmtpSimple
             {
                 SmtpSimple smtp = new SmtpSimple();
                 String result = smtp.sendEmail(args[0], args[1], args[2],
-                    args[3], args[4], args[5],
-                    (6 < args.length) ? args[6] : null);
+                    args[3], args[4], args[5], (6 < args.length) ? args[6]
+                        : null);
                 System.out.println(result);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 System.out.println("Error:\n" + ex);
                 System.exit(2);
@@ -48,34 +48,37 @@ public class SmtpSimple
     }
 
     public synchronized final String sendEmail(String sSmtpServer,
-        String sFromAdr, String sFromRealName,
-        String sToAdr,   String sToRealName,
-        String sSubject, String sText)
-    throws IOException, Exception
+        String sFromAdr, String sFromRealName, String sToAdr,
+        String sToRealName, String sSubject, String sText) throws IOException,
+        Exception
     {
         Socket so = null;
-        try {
+        try
+        {
             sRt = "";
-            if (null == sSmtpServer  || 0 >= sSmtpServer.length() ||
-                null == sFromAdr     || 0 >= sFromAdr.length()    ||
-                null == sToAdr       || 0 >= sToAdr.length()      ||
-                (     (null == sSubject || 0 >= sSubject.length())
-                   && (null == sText    || 0 >= sText.length())))
+            if (null == sSmtpServer
+                || 0 >= sSmtpServer.length()
+                || null == sFromAdr
+                || 0 >= sFromAdr.length()
+                || null == sToAdr
+                || 0 >= sToAdr.length()
+                || ((null == sSubject || 0 >= sSubject.length()) && (null == sText || 0 >= sText
+                    .length())))
             {
-                throw new Exception("Invalid Parameters for SmtpSimple.sendEmail().");
+                throw new Exception(
+                    "Invalid Parameters for SmtpSimple.sendEmail().");
             }
             if (null == sFromRealName || 0 >= sFromRealName.length())
             {
                 sFromRealName = sFromAdr;
             }
-            if (null == sToRealName   || 0 >= sToRealName.length())
-            {   
-                sToRealName   = sToAdr;
+            if (null == sToRealName || 0 >= sToRealName.length())
+            {
+                sToRealName = sToAdr;
             }
             so = new Socket(sSmtpServer, 25);
             os = new DataOutputStream(so.getOutputStream());
-            is = new BufferedReader(
-                new InputStreamReader(so.getInputStream()));
+            is = new BufferedReader(new InputStreamReader(so.getInputStream()));
             so.setSoTimeout(10000);
             writeRead(true, "220", null);
             writeRead(true, "250", "HELO " + sSmtpServer + "\n");
@@ -83,12 +86,16 @@ public class SmtpSimple
             writeRead(true, "250", "MAIL FROM:<" + sFromAdr + ">\n");
             writeRead(true, "250", "RCPT TO:<" + sToAdr + ">\n");
             writeRead(true, "354", "DATA\n");
-            writeRead(false, null, "To: " + sToRealName + " <" + sToAdr + ">\n");
-            writeRead(false, null, "From: " + sFromRealName + " <" + sFromAdr + ">\n");
+            writeRead(false, null, "To: " + sToRealName + " <" + sToAdr
+                + ">\n");
+            writeRead(false, null, "From: " + sFromRealName + " <" + sFromAdr
+                + ">\n");
             writeRead(false, null, "Subject: " + sSubject + "\n");
             writeRead(false, null, "Mime-Version: 1.0\n");
-            writeRead(false, null, "Content-Type: text/plain; charset=\"iso-8859-1\"\n");
-            writeRead(false, null, "Content-Transfer-Encoding: quoted-printable\n\n");
+            writeRead(false, null,
+                "Content-Type: text/plain; charset=\"iso-8859-1\"\n");
+            writeRead(false, null,
+                "Content-Transfer-Encoding: quoted-printable\n\n");
             writeRead(false, null, sText + "\n");
             writeRead(true, "250", ".\n");
             writeRead(true, "221", "QUIT\n");
@@ -96,18 +103,38 @@ public class SmtpSimple
         }
         finally
         {
-            if (is != null) try { is.close(); } catch (Exception ex) { /* ignore */ }
-            if (os != null) try { os.close(); } catch (Exception ex) { /* ignore */ }
-            if (so != null) try { so.close(); } catch (Exception ex) { /* ignore */ }
+            if (is != null)
+                try
+                {
+                    is.close();
+                }
+                catch (Exception ex)
+                { /* ignore */
+                }
+            if (os != null)
+                try
+                {
+                    os.close();
+                }
+                catch (Exception ex)
+                { /* ignore */
+                }
+            if (so != null)
+                try
+                {
+                    so.close();
+                }
+                catch (Exception ex)
+                { /* ignore */
+                }
             is = null;
             os = null;
         }
     }
 
     private final void writeRead(boolean bReadAnswer,
-        String  sAnswerMustStartWith,
-        String  sWrite)
-    throws IOException, Exception
+        String sAnswerMustStartWith, String sWrite) throws IOException,
+        Exception
     {
         if (null != sWrite && 0 < sWrite.length())
         {

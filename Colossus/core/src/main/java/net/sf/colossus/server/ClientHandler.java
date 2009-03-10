@@ -59,7 +59,7 @@ final class ClientHandler implements IClient
 
     private String incompleteInput = "";
     private String incompleteText = "";
-    
+
     // Charset and encoder: by default according to the property, 
     // fallback US-ASCII
     String defaultCharSet = System.getProperty("file.encoding");
@@ -72,7 +72,7 @@ final class ClientHandler implements IClient
     // CLIENT_CTR_ACK_EVERY messages (currently 20)
     // The two values above and the client value must fit together
     // that it does not cause a deadlock.
-    
+
     ClientHandler(Server server, SocketChannel channel, SelectionKey selKey)
     {
         this.server = server;
@@ -207,13 +207,12 @@ final class ClientHandler implements IClient
             while (writtenTotal < should)
             {
                 int missing = should - (writtenTotal - written);
-                LOGGER.warning("Only written " + written
-                    + " (" + writtenTotal + ") bytes, but should have been "
-                    + missing + " (" + should + ") "
-                    + " - sleeping a while and retrying then");
+                LOGGER.warning("Only written " + written + " (" + writtenTotal
+                    + ") bytes, but should have been " + missing + " ("
+                    + should + ") " + " - sleeping a while and retrying then");
                 int delay = 1;
                 LOGGER.finest("Sleeping " + delay + " second(s) ...");
-                sleepFor(delay*1000);
+                sleepFor(delay * 1000);
                 LOGGER.finest("Slept.");
                 attempt++;
                 written = socketChannel.write(bb);
@@ -266,7 +265,8 @@ final class ClientHandler implements IClient
             }
             else
             {
-                System.out.println("Rejecting unexpected client " + tmpPlayerName);
+                System.out.println("Rejecting unexpected client "
+                    + tmpPlayerName);
                 nak("SignOn", "Invalid player name '" + tmpPlayerName + "'!");
             }
             InstanceTracker.setId(this, tmpPlayerName);
@@ -501,7 +501,7 @@ final class ClientHandler implements IClient
             withdrawnAlready = true;
         }
     }
-    
+
     private MasterHex resolveMasterHex(String hexLabel)
     {
         return server.getGame().getVariant().getMasterBoard().getHexByLabel(
