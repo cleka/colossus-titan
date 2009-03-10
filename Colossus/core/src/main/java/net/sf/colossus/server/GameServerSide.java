@@ -23,12 +23,12 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 import net.sf.colossus.client.HexMap;
-import net.sf.colossus.client.Proposal;
 import net.sf.colossus.game.Caretaker;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
+import net.sf.colossus.game.Proposal;
 import net.sf.colossus.gui.BattleMap;
 import net.sf.colossus.server.Constants.BattlePhase;
 import net.sf.colossus.util.Options;

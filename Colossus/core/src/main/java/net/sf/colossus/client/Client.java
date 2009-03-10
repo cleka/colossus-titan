@@ -23,6 +23,7 @@ import net.sf.colossus.ai.SimpleAI;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
+import net.sf.colossus.game.Proposal;
 import net.sf.colossus.game.SummonInfo;
 import net.sf.colossus.gui.BattleChit;
 import net.sf.colossus.gui.BattleMap;

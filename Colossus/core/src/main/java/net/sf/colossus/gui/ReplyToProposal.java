@@ -18,8 +18,8 @@ import javax.swing.JPanel;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.IOracle;
-import net.sf.colossus.client.Proposal;
 import net.sf.colossus.game.Legion;
+import net.sf.colossus.game.Proposal;
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Options;
 

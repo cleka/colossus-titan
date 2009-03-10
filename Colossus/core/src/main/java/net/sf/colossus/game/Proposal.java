@@ -1,12 +1,10 @@
-package net.sf.colossus.client;
+package net.sf.colossus.game;
 
 
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import net.sf.colossus.game.Game;
-import net.sf.colossus.game.Legion;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.Split;
 
