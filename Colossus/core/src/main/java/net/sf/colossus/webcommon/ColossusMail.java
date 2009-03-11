@@ -30,7 +30,6 @@ public class ColossusMail
     private static final Logger LOGGER = Logger.getLogger(ColossusMail.class
         .getName());
 
-    // TODO Those (or at least some of those) should come from a config file...
     // For sending the registration mail:
     private final String mailServer;
     private final String fromAddress;
