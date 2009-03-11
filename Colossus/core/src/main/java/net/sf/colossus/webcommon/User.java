@@ -49,7 +49,7 @@ public class User
     private boolean isAdmin;
     private String created;
     // Only needed during registration:
-    private String confirmationCode;
+    private String lastSentConfirmationCode;
 
     private static final HashMap<String, User> pendingRegistrations = new HashMap<String, User>();
 
@@ -57,6 +57,7 @@ public class User
     private static final int MAX_RANDOM = 99;
 
     public final static String PROVIDE_CONFCODE = "Provide the confirmation code";
+    public final static String WRONG_CONFCODE = "Wrong confirmation code!";
     public final static String TEMPLATE_CONFCODE = "10 20 30";
     public final static String TEMPLATE_CONFCODE_REPLACEMENT = "11 21 31";
 
@@ -73,7 +74,7 @@ public class User
         this.email = email;
         this.isAdmin = isAdmin;
         this.created = created;
-        this.confirmationCode = confCode;
+        this.lastSentConfirmationCode = confCode;
     }
 
     public String getName()
@@ -87,9 +88,9 @@ public class User
     }
 
     // Only used during while registration is pending.
-    private String getConfirmationCode()
+    private String getLastConfirmationCode()
     {
-        return confirmationCode;
+        return lastSentConfirmationCode;
     }
 
     public boolean isAdmin()
@@ -234,6 +235,9 @@ public class User
         {
             String created = makeCreatedDate(new Date().getTime());
             String cCode = makeConfirmationCode();
+            LOGGER.info("Confirmation code for user " + username + " is: "
+                + cCode);
+
             User u = new User(username, password, email, isAdmin, created,
                 cCode);
 
@@ -260,11 +264,18 @@ public class User
         return mailObject.sendConfirmationMail(username, email, confCode);
     }
 
+    // Make sure it is a 2 digit number, to avoid problems in
+    // comparison between "56 5 12" and "56 05 12".
+    private static long atLeast10(long original)
+    {
+        return (original < 10L ? original + 10L : original);
+    }
+
     private static String makeConfirmationCode()
     {
-        long n1 = Math.round((MAX_RANDOM * Math.random()));
-        long n2 = (new Date().getTime()) % MAX_RANDOM;
-        long n3 = Math.round((MAX_RANDOM * Math.random()));
+        long n1 = atLeast10(Math.round((MAX_RANDOM * Math.random())));
+        long n2 = atLeast10((new Date().getTime()) % MAX_RANDOM);
+        long n3 = atLeast10(Math.round((MAX_RANDOM * Math.random())));
 
         String confCode = n1 + " " + n2 + " " + n3;
         // Do not let happen it to be exactly the template code
@@ -296,7 +307,7 @@ public class User
     }
 
     private static String confirmIfCorrectCode(String username,
-        String confirmationCode)
+        String tryConfirmationCode)
     {
         User u = pendingRegistrations.get(username);
         if (u == null)
@@ -304,9 +315,9 @@ public class User
             return "No confirmation pending for this username";
         }
 
-        if (!u.getConfirmationCode().equals(confirmationCode))
+        if (!u.getLastConfirmationCode().equals(tryConfirmationCode))
         {
-            return "Wrong confirmation code!";
+            return WRONG_CONFCODE;
         }
 
         LOGGER.info("Registration confirmed for user '" + username

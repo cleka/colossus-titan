@@ -15,7 +15,6 @@ import java.util.logging.Logger;
 import net.sf.colossus.webcommon.GameInfo;
 import net.sf.colossus.webcommon.IWebClient;
 import net.sf.colossus.webcommon.IWebServer;
-import net.sf.colossus.webcommon.User;
 
 
 /** This implements the webserver/client communication at client side.
@@ -65,6 +64,9 @@ public class WebClientSocketThread extends Thread implements IWebServer
         super("WebClientSocketThread for user " + username);
         this.webClient = wcGUI;
         this.hostname = hostname;
+        LOGGER.info("WCST constructor: user " + username + " host " + hostname
+            + " port " + port + " password " + password);
+
         this.port = port;
         this.username = username;
         this.password = password;
@@ -105,6 +107,22 @@ public class WebClientSocketThread extends Thread implements IWebServer
         {
             this.failedException = e;
         }
+    }
+
+    public String getOneLine() throws IOException
+    {
+        String line = "No line - got exception!";
+        try
+        {
+            line = this.in.readLine();
+        }
+        catch (IOException e)
+        {
+            LOGGER.log(Level.SEVERE, "Exception during read from socket!", e);
+            Thread.dumpStack();
+            throw e;
+        }
+        return line;
     }
 
     public WebClientSocketThreadException getException()
@@ -163,7 +181,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
             send(RegisterUser + sep + username + sep + password + sep + email);
             String fromServer = null;
 
-            if ((fromServer = this.in.readLine()) != null)
+            if ((fromServer = getOneLine()) != null)
             {
                 if (fromServer.startsWith("ACK:"))
                 {
@@ -171,6 +189,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
                 }
                 else
                 {
+                    // TODO: why do we handle this with NACKs ?
                     String prefix = "NACK: " + IWebServer.RegisterUser + sep;
                     if (fromServer.startsWith(prefix))
                     {
@@ -195,11 +214,8 @@ public class WebClientSocketThread extends Thread implements IWebServer
 
         if (info != null)
         {
+            LOGGER.info("register() : info != null, info: " + info);
             String message = info;
-            if (!info.equals(User.PROVIDE_CONFCODE))
-            {
-                message = "Registration failed: " + info;
-            }
 
             throw new WebClientSocketThreadException(message);
         }
@@ -222,7 +238,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
             send(ConfirmRegistration + sep + username + sep + confCode);
             String fromServer = null;
 
-            if ((fromServer = this.in.readLine()) != null)
+            if ((fromServer = getOneLine()) != null)
             {
                 if (fromServer.startsWith("ACK:"))
                 {
@@ -255,12 +271,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
 
         if (info != null)
         {
-            String message = info;
-            if (!info.equals(User.PROVIDE_CONFCODE))
-            {
-                message = "Registration failed: " + info;
-            }
-            throw new WebClientSocketThreadException(message);
+            throw new WebClientSocketThreadException(info);
         }
     }
 
@@ -276,7 +287,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
             send(Login + sep + username + sep + password + sep + force);
             String fromServer = null;
 
-            if ((fromServer = this.in.readLine()) != null)
+            if ((fromServer = getOneLine()) != null)
             {
                 if (fromServer.startsWith("ACK:"))
                 {
@@ -342,7 +353,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
         boolean forcedLogout = false;
         try
         {
-            while (!done && (fromServer = this.in.readLine()) != null)
+            while (!done && (fromServer = getOneLine()) != null)
             {
                 // System.out.println("Webclient got line: " + fromServer);
                 String[] tokens = fromServer.split(sep, -1);
@@ -658,7 +669,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
 
     private void writeLog(String s)
     {
-        if (false)
+        if (true)
         {
             LOGGER.log(Level.INFO, s);
 

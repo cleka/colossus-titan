@@ -7,6 +7,7 @@ import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -24,6 +25,9 @@ import net.sf.colossus.webcommon.User;
  */
 class RegisterPasswordPanel extends JDialog
 {
+    private static final Logger LOGGER = Logger
+        .getLogger(RegisterPasswordPanel.class.getName());
+
     private final static Point defaultLocation = new Point(600, 100);
     private final static String defaultEmail = "your.email@some.domain";
 
@@ -198,14 +202,25 @@ class RegisterPasswordPanel extends JDialog
 
             String reason = webClient.createRegisterWebClientSocketThread(
                 name, newPW1, email, null);
+            LOGGER.info("First createRegisterReturnsWCST() reason:" + reason);
 
             if (reason.equals(User.PROVIDE_CONFCODE))
             {
+                webClient
+                    .updateStatus("Provide confirmation code", Color.blue);
+                handleConfirmation(name, newPW1, email);
+            }
+            else if (reason.equals(User.WRONG_CONFCODE))
+            {
+                LOGGER.severe("WRONG CONF CODE message on first try??");
+                JOptionPane.showMessageDialog(this, reason);
+                webClient.updateStatus(User.WRONG_CONFCODE, Color.red);
                 handleConfirmation(name, newPW1, email);
             }
             else
             {
-                webClient.updateStatus("Registration failed", Color.red);
+                webClient.updateStatus("Registration failed " + "(" + reason
+                    + ")", Color.red);
                 JOptionPane.showMessageDialog(this, reason);
             }
         }
@@ -253,8 +268,6 @@ class RegisterPasswordPanel extends JDialog
             String providedConfCode = JOptionPane.showInputDialog(this,
                 "Type in the confirmation code sent to you via mail: ",
                 User.TEMPLATE_CONFCODE);
-            //            System.out.println("input dialog returned result '"
-            //                + providedConfCode + "'!");
 
             if (providedConfCode == null)
             {
@@ -273,12 +286,20 @@ class RegisterPasswordPanel extends JDialog
             }
             else
             {
+                providedConfCode = providedConfCode.trim();
                 String reason2 = webClient
                     .createRegisterWebClientSocketThread(name, newPW1, email,
                         providedConfCode);
                 if (reason2 == null)
                 {
+                    // OK!
                     done = true;
+                }
+                else
+                {
+                    // otherwise just show what's wrong
+                    webClient.updateStatus(reason2, Color.red);
+                    JOptionPane.showMessageDialog(this, reason2);
                 }
             }
         }

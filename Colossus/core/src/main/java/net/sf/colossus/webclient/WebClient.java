@@ -63,6 +63,7 @@ import net.sf.colossus.util.ViableEntityManager;
 import net.sf.colossus.webcommon.GameInfo;
 import net.sf.colossus.webcommon.IWebClient;
 import net.sf.colossus.webcommon.IWebServer;
+import net.sf.colossus.webcommon.User;
 
 
 /** This is the main class for one user client for the web server.
@@ -1278,6 +1279,9 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     public String createRegisterWebClientSocketThread(String username,
         String password, String email, String confCode)
     {
+        LOGGER.info("Creating a RegisterWCST, username " + username
+            + " password " + password + " and confcode " + confCode);
+
         String reason = null;
         boolean force = false; // dummy
 
@@ -1291,18 +1295,20 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             .getException();
         if (e == null)
         {
+            LOGGER.info("Account for user" + username
+                + " created successfully!");
             cst.start();
             server = cst;
+            updateStatus("Successfully registered", Color.green);
             JOptionPane.showMessageDialog(registerPanel,
-                "Account was created successfully.", "Registration OK",
-                JOptionPane.INFORMATION_MESSAGE);
+                "Account was created successfully!\nYou can Login now.",
+                "Registration OK", JOptionPane.INFORMATION_MESSAGE);
             loginField.setText(username);
             passwordField.setText(password);
             WebClient.this.login = username;
             WebClient.this.username = username;
             WebClient.this.password = password;
 
-            updateStatus("Successfully registered", Color.green);
             registerPanel.dispose();
         }
         else
@@ -1311,6 +1317,17 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             if (reason == null)
             {
                 reason = "Unknown reason";
+            }
+
+            if (reason.equals(User.PROVIDE_CONFCODE))
+            {
+                LOGGER.info("As expected, server asks us now for "
+                    + "the confirmation code for user " + username);
+            }
+            else
+            {
+                LOGGER.info("Failed to create account for user " + username
+                    + "; reason: '" + reason + "'");
             }
 
             // Register password panel handles this from here on,
