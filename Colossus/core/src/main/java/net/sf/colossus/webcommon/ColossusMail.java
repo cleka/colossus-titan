@@ -8,8 +8,8 @@ import java.io.PrintWriter;
 import java.util.logging.Logger;
 
 import net.sf.colossus.webserver.SmtpSimple;
-import net.sf.colossus.webserver.WebServerOptions;
 import net.sf.colossus.webserver.WebServerConstants;
+import net.sf.colossus.webserver.WebServerOptions;
 
 
 /** Encapsulates the way how the web server sends mail in some situations,
@@ -119,8 +119,8 @@ public class ColossusMail
 
                 String result = smtp.sendEmail(mailServer, fromAddress,
                     fromName, email, username, subject, message);
-                System.out.println("SENDING EMAIL, RESULT BEGIN\n-----\n"
-                    + result + "SENDING EMAIL, RESULT END\n-----\n");
+                //                System.out.println("SENDING EMAIL, RESULT BEGIN\n-----\n"
+                //                    + result + "SENDING EMAIL, RESULT END\n-----\n");
             }
 
             if (mailToFileFlag)

@@ -129,7 +129,7 @@ public class GameInfo extends Thread
             "A new potential game was created!! - variant " + variant
                 + " viewmode " + viewmode);
 
-        System.out.println("NEW GameInfo server side, " + this.toString());
+        // System.out.println("NEW GameInfo server side, " + this.toString());
     }
 
     public void setState(int state)
@@ -488,8 +488,8 @@ public class GameInfo extends Thread
     public GameInfo(String gameId)
     {
         this.gameId = gameId;
-        System.out.println("NEW empty GameInfo client side, "
-            + this.toString());
+        // System.out.println("NEW empty GameInfo client side, "
+        //    + this.toString());
     }
 
     public static GameInfo fromString(String[] tokens,
@@ -505,20 +505,20 @@ public class GameInfo extends Thread
         {
             // use the object webclient has created earlier
             gi = games.get(key);
-            System.out.println("Found already, updating");
+            // System.out.println("Found already, updating");
         }
         else
         {
             gi = new GameInfo(gameId);
             games.put(key, gi);
-            System.out.println("Creating a new one");
+            // System.out.println("Creating a new one");
         }
 
         gi.state = Integer.parseInt(tokens[2]);
         gi.initiator = tokens[3];
 
-        System.out.println("fromString, state=" + gi.state + ")");
-        System.out.println("tokens: " + tokens.toString());
+        // System.out.println("fromString, state=" + gi.state + ")");
+        // System.out.println("tokens: " + tokens.toString());
 
         gi.variant = tokens[4];
         gi.viewmode = tokens[5];
@@ -545,9 +545,9 @@ public class GameInfo extends Thread
             i++;
         }
         gi.players = players;
-        System.out.println("players: " + players.toString());
+        // System.out.println("players: " + players.toString());
 
-        System.out.println("RESTORED GameInfo client side, " + gi.toString());
+        // System.out.println("RESTORED GameInfo client side, " + gi.toString());
         return gi;
     }
 

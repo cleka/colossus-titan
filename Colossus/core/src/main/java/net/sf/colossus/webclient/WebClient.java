@@ -860,7 +860,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             {
                 public void valueChanged(ListSelectionEvent e)
                 {
-                    System.out.println("list selection in inst Table");
+                    // System.out.println("list selection in inst Table");
                     updateGUI();
                 }
             });
@@ -884,7 +884,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             {
                 public void valueChanged(ListSelectionEvent e)
                 {
-                    System.out.println("list selection in sched Table");
+                    // System.out.println("list selection in sched Table");
                     updateGUI();
                 }
             });
@@ -1107,7 +1107,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             {
                 public void valueChanged(ListSelectionEvent e)
                 {
-                    System.out.println("list selection in run Table");
+                    // System.out.println("list selection in run Table");
                     updateGUI();
                 }
             });
@@ -2190,20 +2190,20 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
                         int state = game.getGameState();
                         if (state == GameInfo.Scheduled)
                         {
-                            System.out
-                                .println("Got a scheduled game, replacing in sched list");
+                            // System.out
+                            //    .println("Got a scheduled game, replacing in sched list");
                             replaceInTable(schedGameTable, game);
                         }
                         else if (state == GameInfo.Instant)
                         {
-                            System.out
-                                .println("Got an instant game, replacing in instant list");
+                            // System.out
+                            //     .println("Got an instant game, replacing in instant list");
                             replaceInTable(instGameTable, game);
                         }
                         else if (state == GameInfo.Running)
                         {
-                            System.out
-                                .println("Got a running game, replacing in run game list and remove in inst game list");
+                            // System.out
+                            //     .println("Got a running game, replacing in run game list and remove in inst game list");
                             replaceInTable(runGameTable, game);
                             instGameDataModel.removeGame(game.getGameId());
                         }
