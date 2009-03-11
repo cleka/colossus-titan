@@ -925,6 +925,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             iListener);
         addRadioButton(scheduleModes, group, TYPE_SCHEDULED, current,
             iListener);
+
     }
 
     public void reactOnScheduleRadioButtonChange(ItemEvent e)
@@ -974,6 +975,16 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             return;
         }
         setScheduledGamesMode(switchToScheduling);
+        if (switchToScheduling)
+        {
+            JOptionPane
+                .showMessageDialog(
+                    this,
+                    "Please note! The 'scheduled games' feature is not ready implemented,\n"
+                        + "and trying to use it might cause the application to behave unpredictable...",
+                    "Feature not ready!", JOptionPane.INFORMATION_MESSAGE);
+        }
+
     }
 
     private void createPreferencesPane()
