@@ -54,6 +54,16 @@ public class ExperimentalAI extends SimpleAI
     }
 
     @Override
+    public List<CritterMove> battleMove() {
+        List<CritterMove> r = super.battleMove();
+        /* force the GC, so we have a chance to call the finalize() from
+         * the OnTheFlyLegionMove::Iterator used in findBattleMoves.
+         */
+        Runtime.getRuntime().gc();
+        return r;
+    }
+
+    @Override
     protected int evaluateLegionBattleMoveAsAWhole(LegionMove lm,
         Map<String, Integer> strikeMap, StringBuffer why)
     {

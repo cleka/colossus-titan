@@ -1,7 +1,9 @@
 package net.sf.colossus.ai;
 
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -27,9 +29,40 @@ import net.sf.colossus.util.DevRandom;
  */
 class OnTheFlyLegionMove implements Collection<LegionMove>
 {
-
+    /** Maximum number of try before giving up generating a new element.
+     * Ideally this is only a safety belt.
+     */
     final static private int RANDOM_MAX_TRY = 100;
+    /** number of elements to put in each new batch of element.
+     * From my experiments, should be about 1-3 second worth of evaluation.
+     */
     final static private int REFILL_SIZE = 2000;
+    /* genetic stuff */
+    /** Percentage that a gene will be random instead of inherited.
+     * Low will densify exploration around the current maximums.
+     * High will widen the explorated space around the current maximums.
+     */
+    final static private int RANDOM_GENE_PERCENT = 10;
+    /** Percentage of a randomly chosen parent.
+     * Another parameter to avoid inbreeding and missing not-yet-detected
+     * local maximums.
+     */
+    final static private int RANDOM_PARENT_PERCENT = 10;
+    /** Percentage from the top (of the already avaluated space) to pick
+     * a 'good' parent.
+     * Low will pick parent only from very near the local maximums.
+     * High will give not-so-good parents a chance.to breed.
+     */
+    final static private int GOOD_PARENT_TOP_PERCENT = 20;
+    /** Minimum number of possible 'good' parents.
+     * For small exploration space, this avoid excessive inbreeding.
+     */
+    final static private int MIN_PARENT_CHOICE = 50;
+    /** Percentage of fully random new elements
+     * This helps diversifying the gene pool.
+     */
+    final static private int SPONTANEOUS_GENERATION_PERCENT = 5;
+    
     private static final Logger LOGGER = Logger
         .getLogger(OnTheFlyLegionMove.class.getName());
     private final List<List<CritterMove>> allCritterMoves;
@@ -50,8 +83,11 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
         }
         else
         {
-            mysize = (int)realcount;
+            mysize = (int) realcount;
         }
+        LOGGER.finest("OnTheFlyLegionMove created for " + realcount +
+                " combinations" + (mysize != realcount ? " limited to " +
+                mysize : ""));
     }
 
     int getDim()
@@ -90,9 +126,28 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
             }
         }
 
+        class myIntArrayLegionValueComparator extends myIntArrayComparator {
+            @Override
+            public int compare(int[] t1, int[] t2) {
+                int v1 = alreadydone.get(t1).getValue();
+                int v2 = alreadydone.get(t2).getValue();
+                if (v1 > v2)
+                    return 1;
+                if (v2 > v1)
+                    return -1;
+                return super.compare(t1, t2);
+            }
+
+        }
+
         /** map from indexes to LegionMove, what we have already sent to the AI */
         private final TreeMap<int[], LegionMove> alreadydone = new TreeMap<int[], LegionMove>(
             new myIntArrayComparator());
+        /** already done & evaluated, sorted by legion value */
+        private final ArrayList<int[]> byValues = new ArrayList<int[]>();
+        private final myIntArrayLegionValueComparator byValuesComparator = new myIntArrayLegionValueComparator();
+        /** the previously returned object */
+        private int[] lastone = null;
         /** map from indexes to LegionMove, the next batch to send to the AI */
         private final TreeMap<int[], LegionMove> beingdone = new TreeMap<int[], LegionMove>(
             new myIntArrayComparator());
@@ -109,6 +164,12 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
 
         public boolean hasNext()
         {
+            if (lastone != null)
+            { // the previously returned value has been evaluated now
+              // so we can put it in the byvalues set.
+                byValues.add(lastone);
+                lastone = null;
+            }
             if (beingdone.isEmpty())
             {
                 refill(REFILL_SIZE);
@@ -140,6 +201,7 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
             return isBad;
         }
 
+        /** full recursive generation */
         private int recurseGenerate(int index, int[] counts, int[] actual)
         {
             int total = 0;
@@ -202,8 +264,95 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
             return count;
         }
 
-        /** fill beingdone with up to n random, not-yet-done combinations.
-         * Should be replaced by a genetic algorithm, ideally.
+        /** create a fully random combination */
+        private int[] spontaneousGeneration()
+        {
+            int[] child = new int[dim];
+            for (int i = 0; i < dim; i++)
+            {
+                child[i] = rand.nextInt(daddy.allCritterMoves.get(i).size());
+            }
+            return child;
+        }
+
+        /** create a genetic combination */
+        private int[] geneticGeneration()
+        {
+            int[] mom = getParent(RANDOM_PARENT_PERCENT,
+                    GOOD_PARENT_TOP_PERCENT);
+            int[] dad = getParent(RANDOM_PARENT_PERCENT,
+                    GOOD_PARENT_TOP_PERCENT);
+
+            int[] child = breed(mom, dad, RANDOM_GENE_PERCENT);
+
+            return child;
+        }
+
+        /** pick a parent */
+        private int[] getParent(int percentRandom, int percentTop)
+        {
+            int[] parent;
+            int length = byValues.size();
+            if (rand.nextInt(100) < percentRandom)
+            {
+                parent = byValues.get(rand.nextInt(length));
+            }
+            else
+            {
+                long nChoice = ((long) byValues.size() * (long) percentTop) /
+                        (long) 100;
+                if (nChoice < MIN_PARENT_CHOICE)
+                {
+                    nChoice = MIN_PARENT_CHOICE;
+                }
+                if (nChoice > length)
+                {
+                    nChoice = length;
+                }
+                parent = byValues.get((int) ((length - nChoice) + rand.nextInt(
+                        (int) nChoice)));
+            }
+            return parent;
+        }
+
+        /** breed a combination from parents */
+        private int[] breed(int[] mom, int[] dad, int percentRandom)
+        {
+            if (dim != dad.length)
+            {
+                return null;
+            }
+            if (dim != mom.length)
+            {
+                return null;
+            }
+            int[] child = new int[dim];
+
+            for (int i = 0; i < dim; i++)
+            {
+                if (rand.nextInt(100) < percentRandom)
+                {
+                    child[i] =
+                            rand.nextInt(daddy.allCritterMoves.get(i).size());
+                }
+                else
+                {
+                    if (rand.nextInt(100) < 50)
+                    {
+                        child[i] = mom[i];
+                    }
+                    else
+                    {
+                        child[i] = dad[i];
+                    }
+                }
+            }
+
+            return child;
+        }
+
+        /** fill beingdone with up to n genetically generated, not-yet-done
+         * combinations.
          * @param n The number of requeste combinations.
          * @return The number of combinations generated.
          */
@@ -213,44 +362,60 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
             {
                 return 0;
             }
+            int ngenetic = 0;
+            Collections.sort(byValues, byValuesComparator);
             for (int k = 0; k < n; k++)
             {
-                int[] indexes = new int[dim];
+                int[] indexes;
                 int ntry = 0;
                 LegionMove current = null;
                 while ((current == null) && (ntry < RANDOM_MAX_TRY))
                 {
+                    boolean genetic;
                     ntry++;
-                    for (int i = 0; i < dim; i++)
+                    if (rand.nextInt(100) < SPONTANEOUS_GENERATION_PERCENT)
                     {
-                        indexes[i] = rand.nextInt(daddy.allCritterMoves.get(i)
-                            .size());
+                        indexes = spontaneousGeneration();
+                        genetic = false;
+                    }
+                    else
+                    {
+                        indexes = geneticGeneration();
+                        genetic = true;
                     }
                     if (!isBad(indexes))
                     {
                         if (!beingdone.keySet().contains(indexes))
                         {
                             current = AbstractAI.makeLegionMove(indexes,
-                                daddy.allCritterMoves);
+                                    daddy.allCritterMoves);
                             beingdone.put(indexes, current);
                         }
                     }
                     if (current != null)
                     {
-                        //LOGGER.finest("Try " + ntry + " for move #" + k + " found something.");
+                        /*
+                        LOGGER.finest("Try " + ntry + " for move #" + k +
+                                " found something (" +
+                                (genetic ? "genetic" : "random") + ")");
+                         * */
+                        if (genetic)
+                            ngenetic ++;
                     }
                     else
                     {
                         if (ntry == RANDOM_MAX_TRY)
                         {
-                            //LOGGER.finest("Try " + ntry + " for move #" + k + " STILL hasn't found anything.");
+                            LOGGER.finest("Try " + ntry + " for move #" + k +
+                                    " STILL hasn't found anything.");
                         }
                     }
                 }
             }
             int count = beingdone.keySet().size();
-            LOGGER.finer("Refill generated " + count + " out of " + n
-                + " requested");
+            LOGGER.finer("Refill generated " + count + " out of " + n +
+                    " requested ; " + ngenetic +
+                    " genetic (" + ((100. * ngenetic) / count) + " %)");
             return count;
         }
 
@@ -265,6 +430,7 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
             LegionMove lmnext = beingdone.get(anext);
             beingdone.remove(anext);
             alreadydone.put(anext, lmnext);
+            lastone = anext;
             return lmnext;
         }
 
@@ -272,6 +438,22 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
         {
             throw new UnsupportedOperationException();
         }
+
+        @Override
+        protected void finalize() throws Throwable
+        {
+            if (lastone != null)
+            { // the previously returned value has been evaluated now
+                // so we can put it in the byvalues set.
+                byValues.add(lastone);
+                lastone = null;
+            }
+            LOGGER.finest("From our " + mysize + " combinations, " + byValues.
+                    size() + " we evaluated (" + ((100. * byValues.size()) /
+                    mysize) + " %)");
+            super.finalize();
+        }
+
     }
 
     public boolean add(LegionMove o)
