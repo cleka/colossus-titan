@@ -385,7 +385,8 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
                     }
                     if (!isBad(indexes))
                     {
-                        if (!beingdone.keySet().contains(indexes))
+                        if (!beingdone.keySet().contains(indexes) &&
+                            !alreadydone.keySet().contains(indexes))
                         {
                             current = AbstractAI.makeLegionMove(indexes,
                                     daddy.allCritterMoves);
