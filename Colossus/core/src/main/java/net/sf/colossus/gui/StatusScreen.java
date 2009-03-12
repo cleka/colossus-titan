@@ -31,7 +31,7 @@ import net.sf.colossus.util.Options;
  * @version $Id$
  * @author David Ripton
  */
-
+@SuppressWarnings("serial")
 final class StatusScreen extends KDialog implements WindowListener
 {
     private final int numPlayers;
@@ -297,7 +297,7 @@ final class StatusScreen extends KDialog implements WindowListener
                 setPlayerLabelBackground(i, Color.LIGHT_GRAY);
             }
 
-            if (!player.getColor().equals("null"))
+            if (player.getColor() != null)
             {
                 setPlayerLabelColors(nameLabel[i], PickColor
                     .getBackgroundColor(player.getColor()), PickColor

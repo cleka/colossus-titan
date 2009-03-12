@@ -147,7 +147,7 @@ public final class Client implements IClient, IOracle
      *
      * TODO most likely redundant with owningPlayer.getColor()
      */
-    private String color;
+    private Constants.PlayerColor color;
 
     /** Last movement roll for any player. */
     private int movementRoll = -1;
@@ -695,7 +695,7 @@ public final class Client implements IClient, IOracle
     }
 
     // TODO probably unnecessary?
-    public void setColor(String color)
+    public void setColor(Constants.PlayerColor color)
     {
         this.color = color;
     }
@@ -1243,19 +1243,19 @@ public final class Client implements IClient, IOracle
                 imageName = getTitanBasename(attacker);
             }
         }
-        String colorName;
+        Constants.PlayerColor playerColor;
         if (inverted)
         {
             Player player = defender.getPlayer();
-            colorName = player.getColor();
+            playerColor = player.getColor();
         }
         else
         {
             Player player = attacker.getPlayer();
-            colorName = player.getColor();
+            playerColor = player.getColor();
         }
         BattleChit chit = new BattleChit(5 * Scale.get(), imageName, inverted,
-            tag, hexLabel, colorName, this);
+            tag, hexLabel, playerColor, this);
         battleChits.add(chit);
     }
 
@@ -2212,14 +2212,14 @@ public final class Client implements IClient, IOracle
         gui.actOnTellLegionLocation(legion, hex);
     }
 
-    public String getColor()
+    public Constants.PlayerColor getColor()
     {
         return color;
     }
 
     public String getShortColor()
     {
-        return Constants.getShortColorName(color);
+        return color.getShortName();
     }
 
     // public for RevealEvent
@@ -3559,21 +3559,20 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    public void askPickColor(List<String> colorsLeft)
+    public void askPickColor(List<Constants.PlayerColor> colorsLeft)
     {
-        String color = null;
         if (options.getOption(Options.autoPickColor))
         {
             // Convert favorite colors from a comma-separated string to a list.
             String favorites = options.getStringOption(Options.favoriteColors);
-            List<String> favoriteColors = null;
+            List<Constants.PlayerColor> favoriteColors = null;
             if (favorites != null)
             {
-                favoriteColors = Split.split(',', favorites);
+                favoriteColors = Constants.PlayerColor.getByName(Split.split(',', favorites));
             }
             else
             {
-                favoriteColors = new ArrayList<String>();
+                favoriteColors = new ArrayList<Constants.PlayerColor>();
             }
             color = ai.pickColor(colorsLeft, favoriteColors);
         }
@@ -3581,10 +3580,6 @@ public final class Client implements IClient, IOracle
         {
             color = gui.doPickColor(owningPlayer.getName(), colorsLeft);
         }
-
-        // TODO probably unnecessary?
-        setColor(color);
-
         server.assignColor(color);
     }
 

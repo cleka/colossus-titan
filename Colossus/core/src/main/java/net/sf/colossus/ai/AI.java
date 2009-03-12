@@ -8,6 +8,7 @@ import net.sf.colossus.client.CritterMove;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.SummonInfo;
+import net.sf.colossus.server.Constants;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
 
@@ -65,7 +66,7 @@ public interface AI
     SummonInfo summonAngel(Legion summoner);
 
     /** pick a color of legion markers */
-    String pickColor(List<String> colors, List<String> favoriteColors);
+    Constants.PlayerColor pickColor(List<Constants.PlayerColor> colors, List<Constants.PlayerColor> favoriteColors);
 
     /** pick a legion marker */
     String pickMarker(Set<String> markerIds, String preferredShortColor);

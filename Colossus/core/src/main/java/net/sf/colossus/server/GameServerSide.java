@@ -97,7 +97,7 @@ public final class GameServerSide extends Game
     private final Set<Proposal> defenderProposals = new HashSet<Proposal>();
 
     private final LinkedList<Player> colorPickOrder = new LinkedList<Player>();
-    private List<String> colorsLeft;
+    private List<Constants.PlayerColor> colorsLeft;
     private final PhaseAdvancer phaseAdvancer = new GamePhaseAdvancer();
     private Options options = null;
 
@@ -429,13 +429,9 @@ public final class GameServerSide extends Game
 
     private void assignColors()
     {
-        List<String> cli = new ArrayList<String>();
+        List<Constants.PlayerColor> cli = new ArrayList<Constants.PlayerColor>(Arrays.asList(Constants.PlayerColor.values()));
 
-        colorsLeft = new ArrayList<String>();
-        for (String colorName : Constants.colorNames)
-        {
-            cli.add(colorName);
-        }
+        colorsLeft = new ArrayList<Constants.PlayerColor>();
 
         /* Add the first 6 colors in random order, ... */
         for (int i = 0; i < Constants.DEFAULT_MAX_PLAYERS; i++)
@@ -539,7 +535,7 @@ public final class GameServerSide extends Game
         return newName;
     }
 
-    void assignColor(Player player, String color)
+    void assignColor(Player player, Constants.PlayerColor color)
     {
         colorPickOrder.remove(player);
         colorsLeft.remove(color);
@@ -566,8 +562,8 @@ public final class GameServerSide extends Game
 
         if (gotName.startsWith(Constants.byColor))
         {
-            server.setPlayerName(player, color);
-            player.setName(color);
+            server.setPlayerName(player, color.getName());
+            player.setName(color.getName());
         }
         LOGGER.info(player + " chooses color " + color);
         ((PlayerServerSide)player).initMarkersAvailable();
@@ -1318,7 +1314,7 @@ public final class GameServerSide extends Game
                 el = new Element("Player");
                 el.setAttribute("name", player.getName());
                 el.setAttribute("type", player.getType());
-                el.setAttribute("color", player.getColor());
+                el.setAttribute("color", player.getColor().getName());
                 el.setAttribute("startingTower", player.getStartingTower()
                     .getLabel());
                 el.setAttribute("score", "" + player.getScore());
@@ -1636,8 +1632,8 @@ public final class GameServerSide extends Game
 
                 PlayerServerSide player = addPlayer(name, type);
 
-                String color = pla.getAttribute("color").getValue();
-                player.setColor(color);
+                String colorName = pla.getAttribute("color").getValue();
+                player.setColor(Constants.PlayerColor.getByName(colorName));
 
                 String towerLabel = pla.getAttribute("startingTower")
                     .getValue();

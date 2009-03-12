@@ -499,8 +499,8 @@ final class SocketClientThread extends Thread implements IServer
         }
         else if (method.equals(Constants.setColor))
         {
-            String color = args.remove(0);
-            client.setColor(color);
+            String colorName = args.remove(0);
+            client.setColor(Constants.PlayerColor.getByName(colorName));
         }
         else if (method.equals(Constants.updateCreatureCount))
         {
@@ -902,8 +902,10 @@ final class SocketClientThread extends Thread implements IServer
         else if (method.equals(Constants.askPickColor))
         {
             List<String> clList = Split.split(Glob.sep, args.remove(0));
-            List<String> colorsLeft = new ArrayList<String>();
-            colorsLeft.addAll(clList);
+            List<Constants.PlayerColor> colorsLeft = new ArrayList<Constants.PlayerColor>();
+            for (String colorName : clList) {
+                colorsLeft.add(Constants.PlayerColor.getByName(colorName));
+            }
             client.askPickColor(colorsLeft);
         }
         else if (method.equals(Constants.askPickFirstMarker))
@@ -1224,9 +1226,9 @@ final class SocketClientThread extends Thread implements IServer
             + teleportingLord);
     }
 
-    public void assignColor(String color)
+    public void assignColor(Constants.PlayerColor color)
     {
-        sendToServer(Constants.assignColor + sep + color);
+        sendToServer(Constants.assignColor + sep + color.getName());
     }
 
     public void assignFirstMarker(String markerId)

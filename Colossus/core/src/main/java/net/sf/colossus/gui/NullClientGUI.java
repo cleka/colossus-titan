@@ -10,6 +10,7 @@ import net.sf.colossus.client.IOptions;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.SummonInfo;
+import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Constants.BattlePhase;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.webclient.WebClient;
@@ -344,7 +345,7 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public String doPickColor(String playerName, List<String> colorsLeft)
+    public Constants.PlayerColor doPickColor(String playerName, List<Constants.PlayerColor> colorsLeft)
     {
         // TODO Auto-generated method stub
         return null;

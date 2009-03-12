@@ -31,7 +31,7 @@ public interface IClient
 
     public void updatePlayerInfo(List<String> infoStrings);
 
-    public void setColor(String color);
+    public void setColor(Constants.PlayerColor color);
 
     public void updateCreatureCount(CreatureType type, int count, int deadCount);
 
@@ -147,7 +147,7 @@ public interface IClient
     public void didSplit(MasterHex hex, Legion parent, Legion child,
         int childHeight, List<String> splitoffs, int turn);
 
-    public void askPickColor(List<String> colorsLeft);
+    public void askPickColor(List<Constants.PlayerColor> colorsLeft);
 
     public void askPickFirstMarker();
 

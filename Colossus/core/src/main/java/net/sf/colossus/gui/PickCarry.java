@@ -21,6 +21,7 @@ import net.sf.colossus.util.KDialog;
  *  @version $Id$
  *  @author David Ripton
  */
+@SuppressWarnings("serial")
 final class PickCarry extends KDialog implements ActionListener
 {
     private final Client client;

@@ -140,9 +140,9 @@ public class SimpleAI extends AbstractAI
         InstanceTracker.register(this, client.getOwningPlayer().getName());
     }
 
-    public String pickColor(List<String> colors, List<String> favoriteColors)
+    public Constants.PlayerColor pickColor(List<Constants.PlayerColor> colors, List<Constants.PlayerColor> favoriteColors)
     {
-        for (String preferredColor : favoriteColors)
+        for (Constants.PlayerColor preferredColor : favoriteColors)
         {
             if (colors.contains(preferredColor))
             {
@@ -150,7 +150,7 @@ public class SimpleAI extends AbstractAI
             }
         }
         // Can't have one of our favorites, so take what's there.
-        for (String color : colors)
+        for (Constants.PlayerColor color : colors)
         {
             return color;
         }

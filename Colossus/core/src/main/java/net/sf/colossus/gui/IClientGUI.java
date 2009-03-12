@@ -252,8 +252,8 @@ public interface IClientGUI
 
     public abstract PickCarry getPickCarryDialog();
 
-    public abstract String doPickColor(String playerName,
-        List<String> colorsLeft);
+    public abstract Constants.PlayerColor doPickColor(String playerName,
+        List<Constants.PlayerColor> colorsLeft);
 
     public abstract String doPickMarker(Set<String> markersAvailable);
 

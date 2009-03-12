@@ -28,13 +28,14 @@ import net.sf.colossus.util.Options;
  * @version $Id$
  * @author David Ripton
  */
-
+@SuppressWarnings("serial")
 final class PickColor extends KDialog implements WindowListener,
     ActionListener
 {
+    // TODO the next two arrays should be members in Constants.PlayerColor
     private static final Color[] background;
     private static final Color[] foreground;
-    private String color;
+    private Constants.PlayerColor color;
     private final SaveWindow saveWindow;
 
     static
@@ -44,7 +45,7 @@ final class PickColor extends KDialog implements WindowListener,
 
         for (int i = 0; i < Constants.MAX_MAX_PLAYERS; i++)
         {
-            background[i] = HTMLColor.stringToColor(Constants.colorNames[i]
+            background[i] = HTMLColor.stringToColor(Constants.PlayerColor.values()[i].getName()
                 + "Colossus");
             int sum = background[i].getRed() + background[i].getGreen()
                 + background[i].getBlue();
@@ -53,7 +54,7 @@ final class PickColor extends KDialog implements WindowListener,
     }
 
     private PickColor(JFrame parentFrame, String playerName,
-        List<String> colorsLeft, IOptions options)
+        List<Constants.PlayerColor> colorsLeft, IOptions options)
     {
         super(parentFrame, playerName + ", Pick a Color", true);
 
@@ -67,13 +68,14 @@ final class PickColor extends KDialog implements WindowListener,
 
         for (int i = 0; i < Constants.MAX_MAX_PLAYERS; i++)
         {
-            if (colorsLeft.contains(Constants.colorNames[i]))
+            final Constants.PlayerColor curColor = Constants.PlayerColor.values()[i];
+            if (colorsLeft.contains(curColor))
             {
                 JButton button = new JButton();
                 int scale = Scale.get();
                 button.setPreferredSize(new Dimension(7 * scale, 3 * scale));
-                button.setText(Constants.colorNames[i]);
-                button.setMnemonic(Constants.getColorMnemonic(i));
+                button.setText(curColor.getName());
+                button.setMnemonic(curColor.getMnemonic());
                 button.setBackground(background[i]);
                 button.setForeground(foreground[i]);
                 button.addActionListener(this);
@@ -96,13 +98,13 @@ final class PickColor extends KDialog implements WindowListener,
         setVisible(true);
     }
 
-    private String getColor()
+    private Constants.PlayerColor getColor()
     {
         return color;
     }
 
-    static synchronized String pickColor(JFrame parentFrame,
-        String playerName, List<String> colorsLeft, IOptions options)
+    static synchronized Constants.PlayerColor pickColor(JFrame parentFrame,
+        String playerName, List<Constants.PlayerColor> colorsLeft, IOptions options)
     {
         PickColor pc = new PickColor(parentFrame, playerName, colorsLeft,
             options);
@@ -111,30 +113,30 @@ final class PickColor extends KDialog implements WindowListener,
 
     static String getColorName(int i)
     {
-        if (i >= 0 && i < Constants.colorNames.length)
+        if (i >= 0 && i < Constants.PlayerColor.values().length)
         {
-            return Constants.colorNames[i];
+            return Constants.PlayerColor.values()[i].getName();
         }
         return null;
     }
 
-    static Color getForegroundColor(String colorName)
+    static Color getForegroundColor(Constants.PlayerColor playerColor)
     {
-        for (int i = 0; i < Constants.colorNames.length; i++)
+        for (int i = 0; i < Constants.PlayerColor.values().length; i++)
         {
-            if (colorName.equals(Constants.colorNames[i]))
+            if (playerColor.equals(Constants.PlayerColor.values()[i]))
             {
-                return foreground[i];
+                return foreground[i]; // TODO this could probably be expressed via playerColor.ordinal()
             }
         }
         return null;
     }
 
-    static Color getBackgroundColor(String colorName)
+    static Color getBackgroundColor(Constants.PlayerColor color)
     {
-        for (int i = 0; i < Constants.colorNames.length; i++)
+        for (int i = 0; i < Constants.PlayerColor.values().length; i++)
         {
-            if (colorName.equals(Constants.colorNames[i]))
+            if (color.equals(Constants.PlayerColor.values()[i]))
             {
                 return background[i];
             }
@@ -144,7 +146,7 @@ final class PickColor extends KDialog implements WindowListener,
 
     public void actionPerformed(ActionEvent e)
     {
-        color = e.getActionCommand();
+        color = Constants.PlayerColor.getByName(e.getActionCommand());
         saveWindow.saveLocation(getLocation());
         dispose();
     }
@@ -152,10 +154,10 @@ final class PickColor extends KDialog implements WindowListener,
     public static void main(String[] args)
     {
         Logger logger = Logger.getLogger(PickColor.class.getName());
-        List<String> colorsLeft = Arrays.asList(Constants.colorNames);
+        List<Constants.PlayerColor> colorsLeft = Arrays.asList(Constants.PlayerColor.values());
         Options options = new Options("Player");
-        String color = pickColor(new JFrame(), "Player", colorsLeft, options);
-        logger.info("Picked " + color);
+        Constants.PlayerColor color = pickColor(new JFrame(), "Player", colorsLeft, options);
+        logger.info("Picked " + color.getName());
         System.exit(0);
     }
 }

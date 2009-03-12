@@ -1794,8 +1794,8 @@ public final class Server extends Thread implements IServer
             return;
         }
         BattleServerSide battle = game.getBattle();
-        CreatureServerSide target = battle.getCritter(hexLabel);
-        battle.applyCarries(target);
+        CreatureServerSide ourTarget = battle.getCritter(hexLabel);
+        battle.applyCarries(ourTarget);
     }
 
     public void undoBattleMove(String hexLabel)
@@ -2552,7 +2552,7 @@ public final class Server extends Thread implements IServer
         client.setPlayerName(newName);
     }
 
-    void askPickColor(Player player, final List<String> colorsLeft)
+    void askPickColor(Player player, final List<Constants.PlayerColor> colorsLeft)
     {
         IClient activeClient = getClient(player);
         for (IClient client : clients)
@@ -2571,7 +2571,7 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    public void assignColor(String color)
+    public void assignColor(Constants.PlayerColor color)
     {
         Player p = getPlayer();
         assert p != null : "getPlayer returned null player (in thread "
@@ -2623,7 +2623,7 @@ public final class Server extends Thread implements IServer
         while (it.hasNext())
         {
             PlayerServerSide player = it.next();
-            String color = player.getColor();
+            Constants.PlayerColor color = player.getColor();
             IClient client = getClient(player);
             if (client != null)
             {

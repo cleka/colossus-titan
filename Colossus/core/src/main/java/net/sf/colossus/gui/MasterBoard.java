@@ -989,12 +989,12 @@ public final class MasterBoard extends JPanel
         }
         bottomBar.setPlayerName(playerName);
 
-        String colorName = client.getColor();
+        Constants.PlayerColor clientColor = client.getColor();
         // If we call this before player colors are chosen, just use
         // the defaults.
-        if (colorName != null)
+        if (clientColor != null)
         {
-            Color color = PickColor.getBackgroundColor(colorName);
+            Color color = PickColor.getBackgroundColor(clientColor);
             bottomBar.setPlayerColor(color);
             // Don't do this again.
             playerLabelDone = true;

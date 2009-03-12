@@ -532,9 +532,9 @@ public class RevealEvent
     {
         try
         {
-            String color = info.getColor();
+            Constants.PlayerColor color = info.getColor();
             int power = info.getTitanPower();
-            return "Titan-" + power + "-" + color;
+            return "Titan-" + power + "-" + color.getName();
         }
         catch (Exception ex)
         {

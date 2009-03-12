@@ -214,11 +214,11 @@ public final class BattleBoard extends KFrame
         infoPanel = new InfoPanel();
         contentPane.add(infoPanel, BorderLayout.NORTH);
 
-        String colorName = client.getColor();
-        if (colorName != null)
+        Constants.PlayerColor color = client.getColor();
+        if (color != null)
         {
-            Color color = PickColor.getBackgroundColor(colorName);
-            contentPane.setBorder(BorderFactory.createLineBorder(color));
+            Color bgColor = PickColor.getBackgroundColor(color);
+            contentPane.setBorder(BorderFactory.createLineBorder(bgColor));
         }
         defaultCursor = getCursor();
 

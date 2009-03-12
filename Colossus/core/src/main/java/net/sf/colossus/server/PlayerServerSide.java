@@ -620,7 +620,7 @@ public final class PlayerServerSide extends Player implements
         li.add(Boolean.toString(!treatDeadAsAlive && isDead()));
         li.add(getName());
         li.add(getStartingTower().getLabel());
-        li.add(getColor());
+        li.add((getColor()!=null)?getColor().getName():null);
         li.add(getType());
         li.add(getPlayersElim());
         li.add(Integer.toString(getLegions().size()));

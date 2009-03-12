@@ -77,7 +77,7 @@ public interface IServer
     public void doMove(Legion legion, MasterHex hex, String entrySide,
         boolean teleport, String teleportingLord);
 
-    public void assignColor(String color);
+    public void assignColor(Constants.PlayerColor color);
 
     public void assignFirstMarker(String markerId);
 

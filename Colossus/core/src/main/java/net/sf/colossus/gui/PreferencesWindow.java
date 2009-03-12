@@ -46,6 +46,7 @@ import net.sf.colossus.util.Options;
 import net.sf.colossus.util.Split;
 
 
+@SuppressWarnings("serial")
 class PreferencesWindow extends KFrame implements ItemListener, ActionListener
 {
     /**
@@ -99,8 +100,8 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
     private Box rcModes; // Recruit Chit modes
     private JPanel favColorPane;
     private int activePaneIndex;
-    private List<String> favoriteColors;
-    private ArrayList<String> colorsLeft;
+    private List<Constants.PlayerColor> favoriteColors;
+    private List<Constants.PlayerColor> colorsLeft;
 
     PreferencesWindow(IOptions options, Client client)
     {
@@ -356,18 +357,18 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
             .createTitledBorder("Favorite Colors"));
         String favorites = options.getStringOption(Options.favoriteColors);
         favoriteColors = null;
-        colorsLeft = new ArrayList<String>();
-        for (String colorName : Constants.colorNames)
+        colorsLeft = new ArrayList<Constants.PlayerColor>();
+        for (Constants.PlayerColor playerColor : Constants.PlayerColor.values())
         {
-            colorsLeft.add(colorName);
+            colorsLeft.add(playerColor);
         }
         if (favorites != null)
         {
-            favoriteColors = Split.split(',', favorites);
+            favoriteColors = Constants.PlayerColor.getByName(Split.split(',', favorites));
         }
         else
         {
-            favoriteColors = new ArrayList<String>();
+            favoriteColors = new ArrayList<Constants.PlayerColor>();
         }
         ActionListener selectColorAL = new ActionListener()
         {
@@ -390,7 +391,7 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
         colorPane.add(favColorPane, BorderLayout.CENTER);
         for (int i = 0; i < favoriteColors.size(); i++)
         {
-            String color = favoriteColors.get(i);
+            Constants.PlayerColor color = favoriteColors.get(i);
             addColor(color);
             colorsLeft.remove(color);
         }
@@ -469,13 +470,13 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
         if (favoriteColors.size() > 0)
         {
             StringBuilder favorites = new StringBuilder();
-            for (String string : favoriteColors)
+            for (Constants.PlayerColor color : favoriteColors)
             {
                 if (favorites.length() > 0)
                 {
                     favorites.append(',');
                 }
-                favorites.append(string);
+                favorites.append(color.getName());
             }
             client.getOptions().setOption(Options.favoriteColors,
                 favorites.toString());
@@ -488,12 +489,12 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
 
     private void clearColor()
     {
-        favoriteColors = new ArrayList<String>();
+        favoriteColors = new ArrayList<Constants.PlayerColor>();
         favColorPane.removeAll();
-        colorsLeft = new ArrayList<String>();
-        for (String colorName : Constants.colorNames)
+        colorsLeft = new ArrayList<Constants.PlayerColor>();
+        for (Constants.PlayerColor color : Constants.PlayerColor.values())
         {
-            colorsLeft.add(colorName);
+            colorsLeft.add(color);
         }
         this.repaint();
         saveFavColor();
@@ -501,18 +502,19 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
 
     private void unselectColor(JButton button)
     {
-        String color = button.getText();
+        String colorName = button.getText();
         favColorPane.remove(button);
+        final Constants.PlayerColor color = Constants.PlayerColor.getByName(colorName);
         colorsLeft.add(color);
         this.repaint();
         favoriteColors.remove(color);
         saveFavColor();
     }
 
-    private void addColor(String color)
+    private void addColor(Constants.PlayerColor color)
     {
-        Color realColor = HTMLColor.stringToColor(color + "Colossus");
-        JButton button = new JButton(color);
+        Color realColor = HTMLColor.stringToColor(color.getName() + "Colossus");
+        JButton button = new JButton(color.getName());
         button.setBackground(realColor);
         int sum = realColor.getRed() + realColor.getGreen()
             + realColor.getBlue();
@@ -530,7 +532,7 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
 
     private void selectColor()
     {
-        String c = PickColor.pickColor(this, "You", colorsLeft, options);
+        Constants.PlayerColor c = PickColor.pickColor(this, "You", colorsLeft, options);
         if (c != null)
         {
             addColor(c);

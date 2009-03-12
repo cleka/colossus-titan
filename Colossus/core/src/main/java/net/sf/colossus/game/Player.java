@@ -73,7 +73,7 @@ public class Player
      * TODO similar to {@link #startingTower} this should be set only once but probably
      *      can't be set in the constructor.
      */
-    private String color;
+    private Constants.PlayerColor color;
 
     /**
      * The type of player: local human, AI or network.
@@ -185,26 +185,25 @@ public class Player
         return startingTower;
     }
 
-    public void setColor(String color)
+    public void setColor(Constants.PlayerColor color)
     {
         this.color = color;
     }
 
-    public String getColor()
+    public Constants.PlayerColor getColor()
     {
         return color;
     }
 
     public String getShortColor()
     {
-        String color = getColor();
         if (color == null)
         {
             return null;
         }
         else
         {
-            return Constants.getShortColorName(color);
+            return color.getShortName();
         }
     }
 

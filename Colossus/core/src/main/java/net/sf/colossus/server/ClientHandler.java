@@ -452,7 +452,7 @@ final class ClientHandler implements IClient
         else if (method.equals(Constants.assignColor))
         {
             String color = args.remove(0);
-            server.assignColor(color);
+            server.assignColor(Constants.PlayerColor.getByName(color));
         }
         else if (method.equals(Constants.assignFirstMarker))
         {
@@ -594,9 +594,9 @@ final class ClientHandler implements IClient
         sendToClient(Constants.updatePlayerInfo + sep + Glob.glob(infoStrings));
     }
 
-    public void setColor(String color)
+    public void setColor(Constants.PlayerColor color)
     {
-        sendToClient(Constants.setColor + sep + color);
+        sendToClient(Constants.setColor + sep + color.getName());
     }
 
     public void updateCreatureCount(CreatureType type, int count, int deadCount)
@@ -899,7 +899,7 @@ final class ClientHandler implements IClient
             + childHeight + sep + Glob.glob(splitoffs) + sep + turn);
     }
 
-    public void askPickColor(List<String> colorsLeft)
+    public void askPickColor(List<Constants.PlayerColor> colorsLeft)
     {
         sendToClient(Constants.askPickColor + sep + Glob.glob(colorsLeft));
     }

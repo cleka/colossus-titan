@@ -6,6 +6,7 @@ import java.util.List;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
+import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.webcommon.InstanceTracker;
@@ -73,7 +74,7 @@ public final class PlayerClientSide extends Player
             // and in initBoard it is loaded, so all future updates go fine.
         }
 
-        setColor(data.remove(0));
+        setColor(Constants.PlayerColor.getByName(data.remove(0)));
 
         setType(data.remove(0));
 

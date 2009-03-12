@@ -29,7 +29,7 @@ import net.sf.colossus.variant.CreatureType;
  * @version $Id$
  * @author David Ripton
  */
-
+@SuppressWarnings("serial")
 public final class BattleChit extends Chit
 {
     private static final Logger LOGGER = Logger.getLogger(BattleChit.class
@@ -59,7 +59,7 @@ public final class BattleChit extends Chit
     private static boolean useColoredBorders = false;
 
     public BattleChit(int scale, String id, boolean inverted, int tag,
-        String currentHexLabel, String colorName, Client client)
+        String currentHexLabel, Constants.PlayerColor playerColor, Client client)
     {
         super(scale, id, inverted);
         if (id == null)
@@ -70,7 +70,7 @@ public final class BattleChit extends Chit
         this.tag = tag;
         this.currentHexLabel = currentHexLabel;
         this.client = client;
-        this.color = HTMLColor.stringToColor(colorName + "Colossus");
+        this.color = HTMLColor.stringToColor(playerColor.getName() + "Colossus");
         setBackground(Color.WHITE);
     }
 

@@ -42,7 +42,7 @@ import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.webclient.WebClient;
 
-
+@SuppressWarnings("serial")
 public class ClientGUI implements IClientGUI
 {
     private static final Logger LOGGER = Logger.getLogger(ClientGUI.class
@@ -382,9 +382,9 @@ public class ClientGUI implements IClientGUI
 
             if (e != null)
             {
-                String message = "Failed to run doNewBattleBoard with "
+                String errorMessage = "Failed to run doNewBattleBoard with "
                     + "invokeAndWait(): ";
-                LOGGER.log(Level.SEVERE, message, e);
+                LOGGER.log(Level.SEVERE, errorMessage, e);
             }
         }
     }
@@ -1239,12 +1239,12 @@ public class ClientGUI implements IClientGUI
      */
     public boolean chooseWhetherToTeleport()
     {
-        String[] options = new String[2];
-        options[0] = "Teleport";
-        options[1] = "Move Normally";
+        String[] dialogOptions = new String[2];
+        dialogOptions[0] = "Teleport";
+        dialogOptions[1] = "Move Normally";
         int answer = JOptionPane.showOptionDialog(board, "Teleport?",
             "Teleport?", JOptionPane.YES_NO_OPTION,
-            JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+            JOptionPane.QUESTION_MESSAGE, null, dialogOptions, dialogOptions[1]);
 
         return (answer == JOptionPane.YES_OPTION);
     }
@@ -2151,12 +2151,9 @@ public class ClientGUI implements IClientGUI
         return pickCarryDialog;
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#doPickColor(java.lang.String, java.util.List)
-     */
-    public String doPickColor(String playerName, List<String> colorsLeft)
+    public Constants.PlayerColor doPickColor(String playerName, List<Constants.PlayerColor> colorsLeft)
     {
-        String color = null;
+        Constants.PlayerColor color = null;
         if (board != null)
         {
             board.setPhaseInfo("Pick a color!");
@@ -2921,32 +2918,32 @@ public class ClientGUI implements IClientGUI
         defaultCursor();
         board.setServerClosedMessage(client.isGameOver());
 
-        String message = null;
-        String title = null;
+        String dialogMessage = null;
+        String dialogTitle = null;
 
         if (client.isGameOver())
         {
             // don't show again!
             if (gameOverMessage != null)
             {
-                message = "Game over: " + gameOverMessage + "!\n\n"
+                dialogMessage = "Game over: " + gameOverMessage + "!\n\n"
                     + "(connection closed from server side)";
                 gameOverMessage = null;
-                title = "Game Over: Server closed connection";
+                dialogTitle = "Game Over: Server closed connection";
             }
             else
             {
-                message = "Connection now closed from server side.";
-                title = "Game Over: server closed connection";
+                dialogMessage = "Connection now closed from server side.";
+                dialogTitle = "Game Over: server closed connection";
             }
         }
         else
         {
-            message = "Connection to server unexpectedly lost?";
-            title = "Server closed connection";
+            dialogMessage = "Connection to server unexpectedly lost?";
+            dialogTitle = "Server closed connection";
         }
 
-        JOptionPane.showMessageDialog(getMapOrBoardFrame(), message, title,
+        JOptionPane.showMessageDialog(getMapOrBoardFrame(), dialogMessage, dialogTitle,
             JOptionPane.INFORMATION_MESSAGE);
     }
 
