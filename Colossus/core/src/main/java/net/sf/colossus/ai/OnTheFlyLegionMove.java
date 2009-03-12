@@ -32,7 +32,7 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
     /** Maximum number of try before giving up generating a new element.
      * Ideally this is only a safety belt.
      */
-    final static private int RANDOM_MAX_TRY = 100;
+    final static private int RANDOM_MAX_TRY = 50;
     /** number of elements to put in each new batch of element.
      * From my experiments, should be about 1-3 second worth of evaluation.
      */
@@ -97,10 +97,56 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
 
     class OnTheFlyLegionMoveIterator implements Iterator<LegionMove>
     {
-
+        String intArrayToString(int[] t)  {
+            StringBuffer buf = new StringBuffer();
+            buf.append(t[0]);
+            for (int i = 1 ; i < t.length ; i++) {
+                buf.append(" " + t[i]);
+            }
+            return buf.toString();
+        }
         class myIntArrayComparator implements Comparator<int[]>
         {
-
+             long baseXvalue(int[] t) {
+                long temp = 0;
+                long factor = 1;
+                /* interpret the array as a base-X number */
+                /* we have 27 hexes and change, this should fit */
+                for (int i = 0; i < t.length ; i++)
+                {
+                    temp += t[i] * factor;
+                    factor *= daddy.allCritterMoves.get(i).size();
+                }
+                return temp;
+            }
+            int[] nextValue(int[] t)
+            {
+                int[] temp = new int[t.length];
+                for (int i = 0; i < t.length; i++)
+                {
+                    temp[i] = t[i];
+                }
+                int j = 0;
+                boolean ok = false;
+                while (!ok && j < t.length)
+                {
+                    temp[j]++;
+                    if (temp[j] < daddy.allCritterMoves.get(j).size())
+                    {
+                        ok = true;
+                    }
+                    else
+                    {
+                        temp[j] -= daddy.allCritterMoves.get(j).size();
+                        j++;
+                    }
+                }
+                if (j == t.length)
+                {
+                    return null;
+                }
+                return temp;
+            }
             public int compare(int[] t1, int[] t2)
             {
                 if (t1.length > t2.length)
@@ -111,18 +157,12 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
                 {
                     return -1;
                 }
-                for (int i = 0; i < t1.length; i++)
-                {
-                    if (t1[i] > t2[i])
-                    {
-                        return 1;
-                    }
-                    if (t1[i] < t2[i])
-                    {
-                        return -1;
-                    }
-                }
-                return 0;
+                long temp = baseXvalue(t1) - baseXvalue(t2);
+                if (temp > Integer.MAX_VALUE)
+                    temp = Integer.MAX_VALUE;
+                if (temp < Integer.MIN_VALUE)
+                    temp = Integer.MIN_VALUE;
+                return (int)temp;
             }
         }
 
@@ -154,6 +194,7 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
         private final OnTheFlyLegionMove daddy;
         private final Random rand = new DevRandom();
         private final int dim;
+        private boolean abort = false;
 
         OnTheFlyLegionMoveIterator(OnTheFlyLegionMove d)
         {
@@ -166,11 +207,11 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
         {
             if (lastone != null)
             { // the previously returned value has been evaluated now
-              // so we can put it in the byvalues set.
+                // so we can put it in the byvalues set.
                 byValues.add(lastone);
                 lastone = null;
             }
-            if (beingdone.isEmpty())
+            if (beingdone.isEmpty() && !abort)
             {
                 refill(REFILL_SIZE);
             }
@@ -262,6 +303,52 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
             LOGGER.finer("Firstfill generated " + count + " out of " + total
                 + " checked");
             return count;
+        }
+
+
+
+        /** deterministically make up a on-used combination */
+        private int[] lastDense = null;
+        private int[] failoverGeneration()
+        {
+            int[] temp = new int[dim];
+            if (lastDense == null)
+            {
+                lastDense = new int[dim];
+            }
+            for (int i = 0; i < dim; i++)
+            {
+                temp[i] = 0;
+            }
+            if (!alreadydone.keySet().contains(temp) &&
+                !beingdone.keySet().contains(temp) &&
+                !isBad(temp))
+            {
+                for (int i = 0; i < dim; i++)
+                {
+                    lastDense[i] = temp[i];
+                }
+                return temp;
+            }
+            /* ok, complicated ... */
+            myIntArrayComparator comp = new myIntArrayComparator();
+            while (temp != null &&
+                    (alreadydone.keySet().contains(temp) ||
+                     beingdone.keySet().contains(temp) ||
+                     isBad(temp)))
+            {
+                temp = comp.nextValue(temp);
+            }
+
+            if (temp != null)
+            {
+                for (int i = 0; i < dim; i++)
+                {
+                    lastDense[i] = temp[i];
+                }
+            }
+
+            return temp;
         }
 
         /** create a fully random combination */
@@ -363,13 +450,14 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
                 return 0;
             }
             int ngenetic = 0;
+            int nfailover = 0;
             Collections.sort(byValues, byValuesComparator);
-            for (int k = 0; k < n; k++)
+            for (int k = 0; (k < n) && !abort; k++)
             {
                 int[] indexes;
                 int ntry = 0;
                 LegionMove current = null;
-                while ((current == null) && (ntry < RANDOM_MAX_TRY))
+                while ((current == null) && (ntry < RANDOM_MAX_TRY) && (!abort))
                 {
                     boolean genetic;
                     ntry++;
@@ -407,8 +495,34 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
                     {
                         if (ntry == RANDOM_MAX_TRY)
                         {
+                            /*
                             LOGGER.finest("Try " + ntry + " for move #" + k +
-                                    " STILL hasn't found anything.");
+                                    " still hasn't found anything.");
+                            */
+                            indexes = failoverGeneration();
+                            while ((indexes != null) &&
+                                    isBad(indexes))
+                            {
+                                /*
+                                LOGGER.finest("Next dense (" +
+                                        intArrayToString(indexes) +
+                                        ") was bad, trying again.");
+                                */
+                                indexes = failoverGeneration();
+                            }
+                            if (indexes != null)
+                            {
+                                current = AbstractAI.makeLegionMove(indexes,
+                                        daddy.allCritterMoves);
+                                beingdone.put(indexes, current);
+                                nfailover ++;
+                            }
+                            else
+                            {
+                                LOGGER.finest(
+                                        "Even failover didn't produce a result");
+                                abort = true;
+                            }
                         }
                     }
                 }
@@ -416,7 +530,8 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
             int count = beingdone.keySet().size();
             LOGGER.finer("Refill generated " + count + " out of " + n +
                     " requested ; " + ngenetic +
-                    " genetic (" + ((100. * ngenetic) / count) + " %)");
+                    " genetic (" + ((100. * ngenetic) / count) + " %) ; " + nfailover +
+                    " sequential (" + ((100. * nfailover) / count) + " %)");
             return count;
         }
 
