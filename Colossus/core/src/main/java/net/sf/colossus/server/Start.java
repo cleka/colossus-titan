@@ -165,7 +165,9 @@ public final class Start
         }
     }
 
-    /* 
+    /* TODO this description (the network client part) is probably 
+     *      somewhat obsolete...
+     *  
      * Bring up the getplayers dialog (depending on startObject it starts 
      * either as GetPlayers or ready switched to Network client),
      * and then we wait here until is has set startObject to the next 
