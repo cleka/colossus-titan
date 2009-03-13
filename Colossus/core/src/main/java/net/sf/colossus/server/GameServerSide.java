@@ -39,6 +39,7 @@ import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
+import net.sf.colossus.webclient.WebClient;
 import net.sf.colossus.webcommon.InstanceTracker;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
@@ -105,6 +106,8 @@ public final class GameServerSide extends Game
     private int port;
     private String flagFilename = null;
     private NotifyWebServer notifyWebServer = null;
+    private String hostingPlayerName = null;
+    private WebClient startingWebClient = null;
 
     private History history;
 
@@ -193,6 +196,11 @@ public final class GameServerSide extends Game
         this.flagFilename = flagFilename;
     }
 
+    public String getHostingPlayer()
+    {
+        return hostingPlayerName;
+    }
+
     private void initServer()
     {
         // create it even if not needed (=no web server).
@@ -206,6 +214,10 @@ public final class GameServerSide extends Game
             server.disposeAllClients();
         }
         server = new Server(this, port);
+        if (startingWebClient != null)
+        {
+            startingWebClient.setLocalServer(server);
+        }
         try
         {
             // Clemens 12/2007:
@@ -225,11 +237,29 @@ public final class GameServerSide extends Game
             if (server.waitForClients())
             {
                 ViableEntityManager.register(this, "Server/Game " + gameId);
+
+                // Note server.start() is done even if not all clients came in.
+                // This is needed to that run() after the loop notifies that
+                // the game is over.
+                server.start();
+
+                if (startingWebClient != null)
+                {
+                    // Tell WebClient to inform the WebServer that the game
+                    // was started (on this player's PC) and all clients have
+                    // connected (WebClients updates the status in bottom row
+                    // then).
+                    startingWebClient.informGameStartedLocally();
+                }
             }
-            // Note server.start() is done even if not all clients came in.
-            // This is needed to that run() after the loop notifies that
-            // the game is over.
-            server.start();
+            else
+            {
+                // Note server.start() is done even if not all clients came in.
+                // This is needed to that run() after the loop notifies that
+                // the game is over.
+                server.start();
+            }
+
         }
         catch (Exception e)
         {
@@ -277,6 +307,13 @@ public final class GameServerSide extends Game
         options.clearPlayerInfo();
 
         getVariant().getCreatureByName("Titan").setMaxCount(getNumPlayers());
+    }
+
+    void newGame(String hostingPlayer, WebClient webClient)
+    {
+        hostingPlayerName = hostingPlayer;
+        startingWebClient = webClient;
+        newGame();
     }
 
     /** Start a new game. */
@@ -429,7 +466,8 @@ public final class GameServerSide extends Game
 
     private void assignColors()
     {
-        List<Constants.PlayerColor> cli = new ArrayList<Constants.PlayerColor>(Arrays.asList(Constants.PlayerColor.values()));
+        List<Constants.PlayerColor> cli = new ArrayList<Constants.PlayerColor>(
+            Arrays.asList(Constants.PlayerColor.values()));
 
         colorsLeft = new ArrayList<Constants.PlayerColor>();
 

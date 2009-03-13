@@ -395,6 +395,23 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             String gameId = tokens[1];
             server.startGame(gameId);
         }
+        else if (command.equals(IWebServer.StartAtPlayer))
+        {
+            // System.out.println("WSCST start at player");
+            String gameId = tokens[1];
+            String hostingPlayer = tokens[2];
+            String playerHost = tokens[3];
+            int port = Integer.parseInt(tokens[4]);
+            server.startGameOnPlayerHost(gameId, hostingPlayer, playerHost,
+                port);
+        }
+
+        else if (command.equals(IWebServer.StartedByPlayer))
+        {
+            String gameId = tokens[1];
+            server.informStartedByPlayer(gameId);
+        }
+
         else if (command.equals(IWebServer.ChatSubmit))
         {
             String chatId = tokens[1];
@@ -577,9 +594,10 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
         sendToClient(gameStartsSoon + sep + gameId);
     }
 
-    public void gameStartsNow(String gameId, int port)
+    public void gameStartsNow(String gameId, int port, String hostingHost)
     {
-        sendToClient(gameStartsNow + sep + gameId + sep + port);
+        sendToClient(gameStartsNow + sep + gameId + sep + port + sep
+            + hostingHost);
     }
 
     public void gameStarted(String gameId)

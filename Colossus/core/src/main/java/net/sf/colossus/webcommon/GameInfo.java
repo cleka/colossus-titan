@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.Options;
 
 
@@ -337,6 +338,13 @@ public class GameInfo extends Thread
 
     public String getPlayerListAsString()
     {
+        if (players == null)
+        {
+            LOGGER.warning("Tried to get player list as string for gameId "
+                + gameId + ", but player list == null");
+            return "<none>";
+        }
+
         StringBuilder playerList = new StringBuilder("");
         if (players.size() == 0)
         {
@@ -488,8 +496,7 @@ public class GameInfo extends Thread
     public GameInfo(String gameId)
     {
         this.gameId = gameId;
-        // System.out.println("NEW empty GameInfo client side, "
-        //    + this.toString());
+        this.players = new ArrayList<User>();
     }
 
     public static GameInfo fromString(String[] tokens,
@@ -773,6 +780,56 @@ public class GameInfo extends Thread
         gameOptions.saveOptions();
 
         return ok;
+    }
+
+    public void createStartLocallyOptionsObject(Options gameOptions,
+        String localPlayer)
+    {
+        gameOptions.setOption(Options.serveAtPort, Constants.defaultPort);
+        gameOptions.setOption(Options.variant, this.variant);
+        gameOptions.setOption(Options.viewMode, this.viewmode);
+        gameOptions.setOption(Options.autosave, this.autoSave);
+        gameOptions.setOption(Options.eventExpiring, this.eventExpiring);
+        gameOptions.setOption(Options.unlimitedMulligans,
+            this.unlimitedMulligans);
+        gameOptions.setOption(Options.balancedTowers, this.balancedTowers);
+
+        // gameOptions.setOption(Options.autoQuit, true);
+        String name;
+        String type;
+        Iterator<User> it = this.players.iterator();
+
+        for (int i = 0; i < this.target; i++)
+        {
+            if (it.hasNext())
+            {
+                User u = it.next();
+
+                name = u.getName();
+                if (name.equals(localPlayer))
+                {
+                    type = Constants.human;
+                    // use user real name;
+                }
+                else
+                {
+                    type = Constants.network;
+                    name = Constants.byClient;
+
+                }
+            }
+            else
+            {
+                type = Constants.anyAI;
+                name = Constants.byColor;
+            }
+            gameOptions.setOption(Options.playerName + i, name);
+            gameOptions.setOption(Options.playerType + i, type);
+        }
+
+        gameOptions.setOption(Options.autoStop, true);
+
+        return;
     }
 
     /*

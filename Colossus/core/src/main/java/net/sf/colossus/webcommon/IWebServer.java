@@ -18,6 +18,8 @@ public interface IWebServer
     public static String Enroll = "enroll";
     public static String Unenroll = "unenroll";
     public static String Start = "start";
+    public static String StartAtPlayer = "startAtPlayer";
+    public static String StartedByPlayer = "startedByPlayer";
     public static String Cancel = "cancel";
     public static String ChatSubmit = "chatsubmit";
     public static String ShutdownServer = "shutdownserver";
@@ -47,7 +49,19 @@ public interface IWebServer
 
     public void cancelGame(String gameId, String byUser);
 
+    /**
+     *  A game was started by a WebClient user locally on his computer
+     *  and is ready to accept the other players as remote client;
+     *  so we notify them and tell them host and port to where to connect.
+     */
+    public void startGameOnPlayerHost(String gameId, String hostingPlayer,
+        String playerHost, int port);
+
     public void startGame(String gameId);
+
+    // Game started on players computer, tell WebServer that
+    // he can inform all WebClient that game started successfully
+    public void informStartedByPlayer(String gameId);
 
     public void chatSubmit(String chatId, String sender, String message);
 

@@ -390,10 +390,6 @@ public class WebServer implements IWebServer, IRunWebServer
         String expire, boolean unlimitedMulligans, boolean balancedTowers,
         int min, int target, int max)
     {
-        System.out
-            .println("\n=============\nWebServer.proposeGame, startAt = "
-                + startAt);
-
         GameInfo gi = new GameInfo(initiator, variant, viewmode, startAt,
             duration, summary, expire, unlimitedMulligans, balancedTowers,
             min, target, max);
@@ -411,7 +407,6 @@ public class WebServer implements IWebServer, IRunWebServer
         updateGUI();
         allTellGameInfo(gi);
 
-        System.out.println("Webserver, game created: " + gi.toString());
         return gi;
     }
 
@@ -505,7 +500,7 @@ public class WebServer implements IWebServer, IRunWebServer
         {
             User u = it.next();
             IWebClient client = (IWebClient)u.getThread();
-            client.gameStartsNow(gameId, port);
+            client.gameStartsNow(gameId, port, null);
         }
     }
 
@@ -603,6 +598,53 @@ public class WebServer implements IWebServer, IRunWebServer
                 LOGGER.log(Level.SEVERE, "\nstarting/running game " + gameId
                     + " failed!!\n");
             }
+        }
+    }
+
+    /**
+     *  A game was started by a WebClient user locally on his computer
+     *  and is ready to accept the other players as remote client;
+     *  so we notify them and tell them host and port to where to connect.
+     */
+    public void startGameOnPlayerHost(String gameId, String hostingPlayer,
+        String playerHost, int port)
+    {
+        // System.out.println("WebServer.startGameOnPlayerHost " + playerHost);
+
+        GameInfo gi = findByGameId(gameId);
+        if (gi != null)
+        {
+            ArrayList<User> users = gi.getPlayers();
+            for (User u : users)
+            {
+                LOGGER.info("Informing player " + u.getName()
+                    + " that game starts at host of hosting player "
+                    + hostingPlayer);
+                IWebClient webClient = (IWebClient)u.getThread();
+                webClient.gameStartsNow(gameId, port, playerHost);
+            }
+        }
+        else
+        {
+            LOGGER.warning("Did not find a GameInfo for gameId " + gameId
+                + " to inform the other players to connect to host "
+                + playerHost + " port " + port);
+        }
+    }
+
+    public void informStartedByPlayer(String gameId)
+    {
+        LOGGER.info("Tell enrolled players that game " + gameId
+            + " was started by a player.");
+        GameInfo gi = findByGameId(gameId);
+        if (gi != null)
+        {
+            tellEnrolledGameStarted(gi);
+        }
+        else
+        {
+            LOGGER.severe("Got request informGameStarted but did not find "
+                + "any game for gameId " + gameId);
         }
     }
 

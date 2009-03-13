@@ -126,6 +126,18 @@ public final class Start
         return this.stOptions;
     }
 
+    public static void startWebGameLocally(Options presetOptions,
+        String username, WebClient webClient)
+    {
+        int port = presetOptions.getIntOption(Options.serveAtPort);
+
+        game = new GameServerSide();
+        game.setPort(port);
+        game.setOptions(presetOptions);
+
+        game.newGame(username, webClient);
+    }
+
     // ====================================================================
     // Here starts the static, main() related method stuff:
 

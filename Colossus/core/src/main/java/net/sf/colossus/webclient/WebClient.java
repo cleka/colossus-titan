@@ -56,6 +56,8 @@ import javax.swing.event.ListSelectionListener;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.GameClientSide;
 import net.sf.colossus.server.Constants;
+import net.sf.colossus.server.GetPlayersWeb;
+import net.sf.colossus.server.Server;
 import net.sf.colossus.server.Start;
 import net.sf.colossus.util.KFrame;
 import net.sf.colossus.util.Options;
@@ -99,6 +101,15 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
     private final Options options;
     private Client gameClient;
+    private Object playersDialogMutex;
+    private Server localServer = null;
+    private String startedGameId = null;
+    private int startedAtPort;
+    private String startedAtHost;
+
+    // To exchange data between WebClient and the GetPlayersWeb dialog
+    // when game is started locally
+    private Options presetOptions;
 
     private RegisterPasswordPanel registerPanel;
 
@@ -187,6 +198,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     private JButton enrollButton;
     private JButton unenrollButton;
     private JButton startButton;
+    private JButton startLocallyButton;
 
     private JButton hideButton;
     private JLabel hideButtonText;
@@ -245,6 +257,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     private final static String UnenrollButtonText = "Unenroll";
     private final static String CancelButtonText = "Cancel";
     private final static String StartButtonText = "Start";
+    private final static String StartLocallyButtonText = "Start locally";
 
     private final static String AutoLoginCBText = "Auto-login on start";
     private final static String AutoGamePaneCBText = "After login Game pane";
@@ -618,6 +631,11 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         return webserverPortField.getText();
     }
 
+    public Object getPlayersDialogMutex()
+    {
+        return playersDialogMutex;
+    }
+
     private void createServerTab()
     {
         serverTab = new Box(BoxLayout.Y_AXIS);
@@ -838,8 +856,13 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         startButton.addActionListener(this);
         startButton.setEnabled(false);
 
+        startLocallyButton = new JButton(StartLocallyButtonText);
+        startLocallyButton.addActionListener(this);
+        startLocallyButton.setEnabled(false);
+
         Box startButtonPane = new Box(BoxLayout.X_AXIS);
         startButtonPane.add(startButton);
+        startButtonPane.add(startLocallyButton);
         startButtonPane.add(Box.createHorizontalGlue());
 
         gamesCards = new JPanel(new CardLayout());
@@ -1512,6 +1535,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             unenrollButton.setEnabled(false);
             cancelButton.setEnabled(false);
             startButton.setEnabled(false);
+            startLocallyButton.setEnabled(false);
             debugSubmitButton.setEnabled(false);
             instGameTable.setEnabled(true);
 
@@ -1541,6 +1565,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
                 }
             }
             startButton.setEnabled(false);
+            startLocallyButton.setEnabled(false);
             proposeButton.setEnabled(true);
             unenrollButton.setEnabled(false);
 
@@ -1568,11 +1593,13 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
                 if (gi.getEnrolledCount().intValue() >= gi.getMin().intValue())
                 {
                     startButton.setEnabled(true);
+                    startLocallyButton.setEnabled(true);
                 }
 
                 else
                 {
                     startButton.setEnabled(false);
+                    startLocallyButton.setEnabled(false);
                 }
             }
             else
@@ -1594,6 +1621,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             unenrollButton.setEnabled(false);
             cancelButton.setEnabled(false);
             startButton.setEnabled(false);
+            startLocallyButton.setEnabled(false);
             debugSubmitButton.setEnabled(false);
             instGameTable.setEnabled(true);
 
@@ -1924,12 +1952,151 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         return true;
     }
 
+    // Called when user presses the "Start" button in 
+    // "Create or Join" tab
     boolean doStart(String gameId)
     {
         startButton.setEnabled(false);
+        startLocallyButton.setEnabled(false);
         server.startGame(gameId);
 
         return true;
+    }
+
+    // Called when user presses the "Start Locally" button in 
+    // "Create or Join" tab
+    private boolean doStartLocally(String gameId)
+    {
+        startButton.setEnabled(false);
+        startLocallyButton.setEnabled(false);
+
+        boolean ok = true;
+        GameInfo gi = findGameById(gameId);
+        Start startObject = Start.getCurrentStartObject();
+
+        presetOptions = new Options("server", true);
+        gi.createStartLocallyOptionsObject(presetOptions, username);
+
+        // starts a runnable which waits on a mutex until 
+        // GetPlayersWeb dialog notifies the mutex;
+        // when that happens, the runnable starts the game by calling
+        // doInitiateStartLocally().
+        this.runGetPlayersWebDialogAndWait(presetOptions, startObject);
+
+        return ok;
+    }
+
+    /* TODO this description (the network client part) is probably 
+     *      somewhat obsolete...
+     *  
+     * Bring up the getplayers dialog (depending on startObject it starts 
+     * either as GetPlayers or ready switched to Network client),
+     * and then we wait here until is has set startObject to the next 
+     * action to do and notified us to continue.
+     */
+    void runGetPlayersWebDialogAndWait(Options presetOptions, Start startObject)
+    {
+        playersDialogMutex = new Object();
+        new GetPlayersWeb(presetOptions, playersDialogMutex, startObject);
+
+        // System.out.println("doStartLocally after GetPlayersWeb");
+
+        // TODO
+        startObject.setWhatToDoNext(Start.StartWebClient);
+
+        Runnable waitForAction = new Runnable()
+        {
+            public void run()
+            {
+                WebClient webClient = WebClient.this;
+                Object mutex = webClient.getPlayersDialogMutex();
+                // System.out.println("Runnable-run() before sync");
+                synchronized (mutex)
+                {
+                    // System.out.println("Runnable-run() now in sync");
+                    try
+                    {
+                        // System.out.println("Runnable-run() now before wait");
+                        mutex.wait();
+                    }
+                    catch (InterruptedException e)
+                    {
+                        LOGGER.log(Level.WARNING, "WebClient.runGetPlayers"
+                            + "DialogAndWait waiting for GetPlayersWeb "
+                            + "to complete, wait interrupted?");
+                        // just to be sure to do something useful there...
+
+                    }
+                }
+                mutex = null;
+                webClient.doInitiateStartLocally();
+            }
+        };
+
+        new Thread(waitForAction).start();
+    }
+
+    // TODO move to GameInfo instead, 
+    // TODO use the gi thread instead of own Runnable,
+    // TODO is the sleep 5000  needed?
+    public void doInitiateStartLocally()
+    {
+        Runnable informThem = new Runnable()
+        {
+            public void run()
+            {
+                int port = presetOptions.getIntOption(Options.serveAtPort);
+                String hostingPlayer = username;
+                String playerHost = "localhost";
+
+                // TODO is this needed? DO somehow better...
+                //      perhaps move whole thing to GameInfo
+                // System.out.println("sleep 5000");
+                sleepFor(5000);
+                // System.out.println("slept 5000");
+
+                // System.out.println("before startGameOnPlayerHost");
+                // GameInfo startedGame = findGameById(getSelectedGameId());
+
+                // Tell webServer to inform the other WebClients that
+                // they can connect now.
+
+                server.startGameOnPlayerHost(getSelectedGameId(),
+                    hostingPlayer, playerHost, port);
+                // System.out.println("after startGameOnPlayerHost");
+            }
+        };
+        new Thread(informThem).start();
+
+        // Start the server process
+        Start.startWebGameLocally(presetOptions, username, this);
+
+        // System.out.println("doInitiateStartLocally ENDS");
+    }
+
+    public void setLocalServer(Server server)
+    {
+        localServer = server;
+    }
+
+    public void informGameStartedLocally()
+    {
+        // System.out.println("** WebClient.informGameStarted()");
+        server.informStartedByPlayer(this.startedGameId);
+        // System.out.println("** after WebClient.informGameStarted()");
+    }
+
+    public static void sleepFor(long millis)
+    {
+        try
+        {
+            Thread.sleep(millis);
+        }
+        catch (InterruptedException e)
+        {
+            LOGGER.log(Level.FINEST,
+                "sleepFor: InterruptException caught... ignoring it...");
+        }
     }
 
     // ================= those come from server ============
@@ -1975,12 +2142,15 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     public void gameStartsSoon(String gameId)
     {
         startButton.setEnabled(false);
+        startLocallyButton.setEnabled(false);
         infoTextLabel.setText(startingText);
     }
 
+    // TODO the below is probably never used?
     public void gameStarted(String gameId)
     {
         startButton.setEnabled(false);
+        startLocallyButton.setEnabled(false);
         infoTextLabel.setText(startedText);
     }
 
@@ -1990,9 +2160,12 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     // Client calls this
     public void notifyComingUp()
     {
+        // System.out.println("BEFORE SYNC notify coming up");
         synchronized (comingUpMutex)
         {
             clientIsUp = true;
+            // System.out
+            //     .println("notify coming up client is up now SET TO TRUE");
             comingUpMutex.notify();
         }
     }
@@ -2023,26 +2196,85 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         }
     }
 
-    public void gameStartsNow(String gameId, int port)
+    public void gameStartsNow(String gameId, int port, String hostingHost)
     {
+
+        if (hostingHost == null || hostingHost.equals("null"))
+        {
+            // Hosted on Game Server
+            hostingHost = hostname;
+        }
+
+        // TODO for now, just always use runnable. Is it always necessary?
+        if (startedGameId == null && false)
+        {
+            // is null means: it was not this webclient that started locally
+            // so it does not matter if we do a wait() (???)
+            startOwnClient(gameId, port, hostingHost);
+        }
+        // This WebClient did start it...
+        else
+        {
+            // ... then we need to start the Client in own runnable,
+            // otherwise we (in WebClientSocketThread) will not be
+            // back at the socket to receive the "Game is now up" message
+            startedAtPort = port;
+            startedAtHost = hostingHost;
+            startedGameId = gameId;
+
+            Runnable r = new Runnable()
+            {
+                public void run()
+                {
+                    String gameId = WebClient.this.startedGameId;
+                    int port = WebClient.this.startedAtPort;
+                    String host = WebClient.this.startedAtHost;
+
+                    startOwnClient(gameId, port, host);
+                }
+            };
+            new Thread(r).start();
+            // System.out
+            //     .println("++ Runnable to start the Game Client now started...\n");
+        }
+    }
+
+    public void startOwnClient(String gameId, int port, String hostingHost)
+    {
+        LOGGER.info("StartingOwnClient for gameId " + gameId + " hostingHost "
+            + hostingHost + " port " + port);
+
         Client gc;
         try
         {
             int p = port;
 
+            if (hostingHost == null || hostingHost.equals(""))
+            {
+                // Game runs on WebServer
+                hostingHost = hostname;
+            }
+            else
+            {
+                // Runs on a players computer
+            }
+
             // a hack to pass something into the Client constructor
             // TODO needs to be constructed properly
             GameClientSide dummyGame = new GameClientSide(null, new String[0]);
             boolean noOptionsFile = false;
-            gc = new Client(hostname, p, dummyGame, username, null, true,
-                noOptionsFile, true);
+            // System.out.println("in webclient, before new Client for username "
+            //     + username);
+            gc = new Client(hostingHost, p, dummyGame, username, localServer,
+                true, noOptionsFile, true);
             boolean failed = gc.getFailed();
             if (failed)
             {
                 gc = null;
                 JOptionPane.showMessageDialog(this,
-                    "Connecting to the game server "
-                        + "(starting own MasterBoard) failed!",
+                    "Connecting to the game server hostimg the game ("
+                        + hostingHost
+                        + ") or starting own MasterBoard failed!",
                     "Starting game failed!", JOptionPane.ERROR_MESSAGE);
 
                 state = LoggedIn;
@@ -2062,7 +2294,9 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
                     {
                         try
                         {
+                            // System.out.println("before comingUpMutex.wait()");
                             comingUpMutex.wait();
+                            // System.out.println("after  comingUpMutex.wait()");
                         }
                         catch (InterruptedException e)
                         {
@@ -2074,6 +2308,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
                         }
                     }
                 }
+
                 timeoutStartup.cancel();
 
                 if (clientIsUp)
@@ -2331,6 +2566,20 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             if (selectedGameId != null)
             {
                 boolean ok = doStart(selectedGameId);
+                if (ok)
+                {
+                    schedGameTable.setEnabled(false);
+                    instGameTable.setEnabled(false);
+                }
+            }
+        }
+
+        else if (source == startLocallyButton)
+        {
+            String selectedGameId = getSelectedGameId();
+            if (selectedGameId != null)
+            {
+                boolean ok = doStartLocally(selectedGameId);
                 if (ok)
                 {
                     schedGameTable.setEnabled(false);

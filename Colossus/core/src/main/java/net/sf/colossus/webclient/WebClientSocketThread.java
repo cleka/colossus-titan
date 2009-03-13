@@ -355,7 +355,6 @@ public class WebClientSocketThread extends Thread implements IWebServer
         {
             while (!done && (fromServer = getOneLine()) != null)
             {
-                // System.out.println("Webclient got line: " + fromServer);
                 String[] tokens = fromServer.split(sep, -1);
                 String command = tokens[0];
 
@@ -424,7 +423,8 @@ public class WebClientSocketThread extends Thread implements IWebServer
                 {
                     String gameId = tokens[1];
                     int port = Integer.parseInt(tokens[2]);
-                    webClient.gameStartsNow(gameId, port);
+                    String host = tokens[3];
+                    webClient.gameStartsNow(gameId, port, host);
                 }
 
                 else if (command.equals(IWebClient.gameStartsSoon))
@@ -640,6 +640,18 @@ public class WebClientSocketThread extends Thread implements IWebServer
     public void startGame(String gameId)
     {
         send(Start + sep + gameId);
+    }
+
+    public void informStartedByPlayer(String gameId)
+    {
+        send(StartedByPlayer + sep + gameId);
+    }
+
+    public void startGameOnPlayerHost(String gameId, String hostingPlayer,
+        String playerHost, int port)
+    {
+        send(StartAtPlayer + sep + gameId + sep + hostingPlayer + sep
+            + playerHost + sep + port);
     }
 
     public void chatSubmit(String chatId, String sender, String message)

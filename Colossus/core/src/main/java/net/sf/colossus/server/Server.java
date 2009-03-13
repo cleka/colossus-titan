@@ -856,7 +856,18 @@ public final class Server extends Thread implements IServer
                 && !player.getType().endsWith(Constants.network))
             {
 
-                createLocalClient(player);
+                if (player.getName().equals(game.getHostingPlayer()))
+                {
+                    LOGGER.info("Skipping creation of local client for "
+                        + "hosting player " + player.getName());
+                }
+                else
+                {
+                    LOGGER.info("Creating local client for player "
+                        + player.getName());
+                    createLocalClient(player);
+                }
+
             }
         }
     }
