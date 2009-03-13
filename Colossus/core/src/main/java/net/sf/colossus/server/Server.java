@@ -303,7 +303,7 @@ public final class Server extends Thread implements IServer
             waitOnSelector(timeoutDuringGame);
         }
 
-        return (waitingForPlayers > 0 && serverRunning && !shuttingDown);
+        return (waitingForPlayers == 0);
     }
 
     public void waitOnSelector(int timeout)
@@ -2552,7 +2552,8 @@ public final class Server extends Thread implements IServer
         client.setPlayerName(newName);
     }
 
-    void askPickColor(Player player, final List<Constants.PlayerColor> colorsLeft)
+    void askPickColor(Player player,
+        final List<Constants.PlayerColor> colorsLeft)
     {
         IClient activeClient = getClient(player);
         for (IClient client : clients)
