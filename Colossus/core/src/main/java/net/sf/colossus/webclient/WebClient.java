@@ -2035,7 +2035,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             GameClientSide dummyGame = new GameClientSide(null, new String[0]);
             boolean noOptionsFile = false;
             gc = new Client(hostname, p, dummyGame, username, null, true,
-                noOptionsFile, false);
+                noOptionsFile, true);
             boolean failed = gc.getFailed();
             if (failed)
             {
