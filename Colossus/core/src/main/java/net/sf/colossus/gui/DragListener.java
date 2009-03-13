@@ -27,7 +27,6 @@ public class DragListener extends MouseAdapter implements MouseMotionListener
         this.component = component;
     }
 
-    @Override
     public void mouseDragged(MouseEvent e)
     {
         Point loc = component.getLocation();
@@ -46,7 +45,6 @@ public class DragListener extends MouseAdapter implements MouseMotionListener
         lastMousePos = newMousePos;
     }
 
-    @Override
     public void mouseMoved(MouseEvent e)
     {
         // nothing to do
