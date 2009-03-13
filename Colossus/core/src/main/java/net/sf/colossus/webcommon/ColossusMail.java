@@ -109,17 +109,13 @@ public class ColossusMail
                 + "or go to " + contactWWW + " to contact us.\n\n\n--\n"
                 + "PS: do not reply to this email - noone will read it...\n";
 
-            // SmtpServer FromAdr FromRealName ToAdr ToRealName Subject Text
-
             if (reallyMail)
             {
                 LOGGER.fine("ok, sending mail to " + username + " <" + email
                     + ">");
 
-                String result = smtp.sendEmail(mailServer, fromAddress,
-                    fromName, email, username, subject, message);
-                //                System.out.println("SENDING EMAIL, RESULT BEGIN\n-----\n"
-                //                    + result + "SENDING EMAIL, RESULT END\n-----\n");
+                smtp.sendEmail(mailServer, fromAddress, fromName, email,
+                    username, subject, message);
             }
 
             if (mailToFileFlag)
