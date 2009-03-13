@@ -433,7 +433,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
                     webClient.gameStartsSoon(gameId);
                 }
 
-                else if (command.equals(IWebClient.gameStartsSoon))
+                else if (command.equals(IWebClient.gameStarted))
                 {
                     String gameId = tokens[1];
                     webClient.gameStarted(gameId);
