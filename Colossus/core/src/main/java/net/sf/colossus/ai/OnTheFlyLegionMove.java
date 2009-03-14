@@ -8,11 +8,14 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.logging.Logger;
 
+import net.sf.colossus.ai.OnTheFlyLegionMove;
 import net.sf.colossus.client.CritterMove;
 import net.sf.colossus.util.DevRandom;
 
@@ -124,25 +127,46 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
                 return temp;
             }
 
-            int[] nextValue(int[] t)
+            int[] roundNextUp(int[] t, int factor)
+            {
+                int[] temp = new int[t.length];
+                for (int i = 0; i < t.length; i++)
+                {
+                    if (i < factor)
+                    {
+                        temp[i] = 0;
+                    }
+                    else
+                    {
+                        temp[i] = t[i];
+                    }
+                }
+                return nextValue(temp, factor);
+            }
+
+            int[] nextValue(int[] t) {
+                return nextValue(t, 0);
+            }
+            int[] nextValue(int[] t, int factor)
             {
                 int[] temp = new int[t.length];
                 for (int i = 0; i < t.length; i++)
                 {
                     temp[i] = t[i];
                 }
-                int j = 0;
+                int j = factor;
                 boolean ok = false;
                 while (!ok && j < t.length)
                 {
+                    int size = daddy.allCritterMoves.get(j).size();
                     temp[j]++;
-                    if (temp[j] < daddy.allCritterMoves.get(j).size())
+                    if (temp[j] < size)
                     {
                         ok = true;
                     }
                     else
                     {
-                        temp[j] -= daddy.allCritterMoves.get(j).size();
+                        temp[j] -= size;
                         j++;
                     }
                 }
@@ -180,12 +204,15 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
                 int v1 = alreadydone.get(t1).getValue();
                 int v2 = alreadydone.get(t2).getValue();
                 if (v1 > v2)
+                {
                     return 1;
+                }
                 if (v2 > v1)
+                {
                     return -1;
+                }
                 return super.compare(t1, t2);
             }
-
         }
 
         /** map from indexes to LegionMove, what we have already sent to the AI */
@@ -203,12 +230,54 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
         private final Random rand = new DevRandom();
         private final int dim;
         private boolean abort = false;
+        private Map<Integer,Map<Integer,Map<Integer,Set<Integer>>>> incomp =
+                new TreeMap<Integer,Map<Integer,Map<Integer,Set<Integer>>>>();
 
         OnTheFlyLegionMoveIterator(OnTheFlyLegionMove d)
         {
             daddy = d;
             dim = daddy.getDim();
+            buildIncompMap();
             firstfill();
+        }
+
+
+
+        private void buildIncompMap()
+        {
+            LOGGER.finest("BuildIncompMap started");
+            for (int i = 0; i < dim; i++)
+            {
+                List<CritterMove> li = daddy.allCritterMoves.get(i);
+                Map<Integer, Map<Integer, Set<Integer>>> jk =
+                        new TreeMap<Integer, Map<Integer, Set<Integer>>>();
+                incomp.put(i, jk);
+                for (int j = 0; j < dim; j++)
+                {
+                    if (i != j)
+                    {
+                        List<CritterMove> lj = daddy.allCritterMoves.get(j);
+                        Map<Integer, Set<Integer>> kl =
+                                new TreeMap<Integer, Set<Integer>>();
+                        jk.put(j, kl);
+                        for (int k = 0; k < li.size(); k++)
+                        {
+                            String a = li.get(k).getEndingHexLabel();
+                            Set<Integer> s = new TreeSet<Integer>();
+                            kl.put(k, s);
+                            for (int l = 0; l < lj.size(); l++)
+                            {
+                                String b = lj.get(l).getEndingHexLabel();
+                                if (a.equals(b))
+                                {
+                                    s.add(l);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            LOGGER.finest("BuildIncompMap done");
         }
 
         public boolean hasNext()
@@ -226,26 +295,36 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
             return (!beingdone.isEmpty());
         }
 
-        @SuppressWarnings("unused")
+        private int higherRankIncomp(int[] indexes) {
+            /* not i >= 0, because we return 0 anyway, so why waste time
+             * checking ?*/
+            for (int i = dim - 1; i > 0; i--)
+            {
+                for (int k = dim - 1; k > i; k--)
+                {
+                    Set<Integer> inc = incomp.get(i).get(k).get(indexes[i]);
+                    if (inc.contains(indexes[k]))
+                    {
+                        return i;
+                    }
+                }
+            }
+            return 0;
+        }
+
         private boolean isBad(int[] indexes)
         {
-            Set<String> duplicateHexChecker = new HashSet<String>();
-            boolean offboard = false;
             boolean isBad = false;
-            for (int j = 0; j < dim; j++)
+            for (int i = 0; i < dim && !isBad; i++)
             {
-                List<CritterMove> moveList = daddy.allCritterMoves.get(j);
-                CritterMove cm = moveList.get(indexes[j]);
-                String endingHexLabel = cm.getEndingHexLabel();
-                if (endingHexLabel.startsWith("X"))
+                for (int k = 0; k < i && !isBad; k++)
                 {
-                    offboard = true;
+                    Set<Integer> inc = incomp.get(i).get(k).get(indexes[i]);
+                    if (inc.contains(indexes[k]))
+                    {
+                        isBad = true;
+                    }
                 }
-                else if (duplicateHexChecker.contains(endingHexLabel))
-                {
-                    isBad = true;
-                }
-                duplicateHexChecker.add(cm.getEndingHexLabel());
             }
             return isBad;
         }
@@ -316,8 +395,12 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
         /** deterministically make up a on-used combination */
         private int[] lastDense = null;
 
+
+
         private int[] failoverGeneration()
         {
+            //LOGGER.finest("failoverGeneration start");
+            int count = 0;
             int[] temp = new int[dim];
             if (lastDense == null)
             {
@@ -325,24 +408,28 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
             }
             for (int i = 0; i < dim; i++)
             {
-                temp[i] = 0;
+                temp[i] = lastDense[i];
             }
-            if (!alreadydone.keySet().contains(temp)
-                && !beingdone.keySet().contains(temp) && !isBad(temp))
-            {
-                for (int i = 0; i < dim; i++)
-                {
-                    lastDense[i] = temp[i];
-                }
-                return temp;
-            }
-            /* ok, complicated ... */
             myIntArrayComparator comp = new myIntArrayComparator();
-            while (temp != null
-                && (alreadydone.keySet().contains(temp)
-                    || beingdone.keySet().contains(temp) || isBad(temp)))
+            while (temp != null && (alreadydone.keySet().contains(temp) || beingdone.keySet().
+                    contains(temp) || isBad(temp)))
             {
-                temp = comp.nextValue(temp);
+                /* check if some of the higher index positions are
+                 * incompatible. If yes, try to break the higher index
+                 * incompatibility.
+                 * In practice the else branch could be folded into the
+                 * then branch, as they do the same thing
+                 */
+                count ++;
+                int hr = higherRankIncomp(temp);
+                if (hr == 0)
+                {
+                    temp = comp.nextValue(temp);
+                }
+                else
+                {
+                    temp = comp.roundNextUp(temp, hr);
+                }
             }
 
             if (temp != null)
@@ -352,7 +439,7 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
                     lastDense[i] = temp[i];
                 }
             }
-
+            //LOGGER.finest("failoverGeneration done after " + count + " attempts.");
             return temp;
         }
 

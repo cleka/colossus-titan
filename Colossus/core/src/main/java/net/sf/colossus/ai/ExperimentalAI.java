@@ -26,7 +26,7 @@ public class ExperimentalAI extends SimpleAI
 
     private static final Logger LOGGER = Logger.getLogger(SimpleAI.class
         .getName());
-    private final static long MAX_EXHAUSTIVE_SEARCH_MOVES = 10000;
+    private final static long MAX_EXHAUSTIVE_SEARCH_MOVES = 15000;
 
     public ExperimentalAI(Client client)
     {
@@ -45,11 +45,11 @@ public class ExperimentalAI extends SimpleAI
         if (realcount < MAX_EXHAUSTIVE_SEARCH_MOVES)
         {
             LOGGER.finer("Less than " + MAX_EXHAUSTIVE_SEARCH_MOVES
-                + ", using exhaustive search.");
+                + ", using exhaustive search (" + realcount + ")");
             return generateLegionMoves(allCritterMoves, true);
         }
         LOGGER.finer("More than " + MAX_EXHAUSTIVE_SEARCH_MOVES
-            + ", using on-the-fly search.");
+            + ", using on-the-fly search (" + realcount + ")");
         return new OnTheFlyLegionMove(allCritterMoves);
     }
 

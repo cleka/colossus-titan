@@ -2,16 +2,13 @@ package net.sf.colossus.tools;
 
 import java.io.*;
 import java.awt.*;
-import java.awt.event.*;
 import java.util.*;
 import java.util.List;
 
 import net.sf.colossus.parser.BattlelandRandomizerLoader;
-import net.sf.colossus.xmlparser.BattlelandLoader;
 import net.sf.colossus.variant.BattleHex;
-import net.sf.colossus.client.GUIBattleHex;
-import net.sf.colossus.client.GUIHex;
 import net.sf.colossus.client.HexMap;
+import net.sf.colossus.gui.GUIBattleHex;
 import net.sf.colossus.variant.HazardTerrain;
 
 /**

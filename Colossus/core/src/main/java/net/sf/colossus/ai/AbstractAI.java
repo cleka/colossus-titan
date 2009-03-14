@@ -455,7 +455,7 @@ abstract public class AbstractAI implements AI
         nestForLoop(indexes, indexes.length, critterMoves, legionMoves,
             forceAll);
 
-        LOGGER.finest("findLegionMoves got " + legionMoves.size()
+        LOGGER.finest("generateLegionMoves got " + legionMoves.size()
             + " legion moves");
         return legionMoves;
     }

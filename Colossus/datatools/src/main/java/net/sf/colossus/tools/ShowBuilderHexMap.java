@@ -28,7 +28,7 @@ import java.util.TreeMap;
 import javax.swing.*;
 
 import net.sf.colossus.variant.BattleHex;
-import net.sf.colossus.client.GUIBattleHex;
+import net.sf.colossus.gui.GUIBattleHex;
 import net.sf.colossus.variant.HazardTerrain;
 import net.sf.colossus.xmlparser.BattlelandLoader;
 import net.sf.colossus.server.VariantSupport;

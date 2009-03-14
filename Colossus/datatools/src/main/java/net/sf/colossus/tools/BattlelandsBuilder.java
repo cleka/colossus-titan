@@ -1,6 +1,6 @@
 package net.sf.colossus.tools;
 
-import net.sf.colossus.client.GUIHex;
+import net.sf.colossus.gui.GUIHex;
 import net.sf.colossus.server.VariantSupport;
 
 /**
