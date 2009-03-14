@@ -274,7 +274,8 @@
     <zip zipfile="${ZIPFILE}" basedir="."
     excludes="**/*.sav, **/*.zip, **/*.bak, **/*javadoc*/*, *Keystore*, *cfg, *properties*, BattlelandsRandomizer.jar, .*, **/*.ps, **/*.aux, **/*.bbl, **/*.bib, **/*.blg, **/*.log, **/*.old libs/build"/>
   </target>
-  <target name="buildInfo" description="Generates property file with some information on the build such as revision and time">
+  <target name="buildInfo" description="Generates property file with some information on the build such as revision and time"
+  	unless="noBuildInfo">
   	<taskdef name="svn"
   	         classname="org.tigris.subversion.svnant.SvnTask">
       <classpath>
@@ -283,7 +284,7 @@
         <pathelement path="${libs.dir}/build/svnkit.jar"/>
   	  </classpath>
   	</taskdef>
-    <svn javahl="false" svnkit="true">
+    <svn javahl="false" svnkit="true" failonerror="false">
       <!-- set @processUnversioned to "true" if new files should show up as modifications -->
       <wcVersion path="${basedir}" prefix="buildInfo.svn." processUnversioned="false"/>
     </svn>
