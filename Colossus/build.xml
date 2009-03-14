@@ -276,6 +276,8 @@
   </target>
   <target name="buildInfo" description="Generates property file with some information on the build such as revision and time"
   	unless="noBuildInfo">
+  	<!-- This task tries to use svnkit, which is normally not there; it will then fall back to a command line svn.
+  	     see libs/build/README.txt for more information -->
   	<taskdef name="svn"
   	         classname="org.tigris.subversion.svnant.SvnTask">
       <classpath>
