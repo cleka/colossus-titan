@@ -417,8 +417,8 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
                 /* check if some of the higher index positions are
                  * incompatible. If yes, try to break the higher index
                  * incompatibility.
-                 * In practice the else branch could be folded into the
-                 * then branch, as they do the same thing
+                 * In practice the then branch could be folded into the
+                 * else branch, as they do the same thing for hr == 0.
                  */
                 count ++;
                 int hr = higherRankIncomp(temp);
