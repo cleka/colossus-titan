@@ -28,7 +28,6 @@ import net.sf.colossus.util.DevRandom;
  * @version $Id$
  * @author Romain Dolbeau
  */
-@SuppressWarnings("boxing")
 class OnTheFlyLegionMove implements Collection<LegionMove>
 {
     /** Maximum number of try before giving up generating a new element.
@@ -229,13 +228,20 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
         private final Random rand = new DevRandom();
         private final int dim;
         private boolean abort = false;
-        private final Map<Integer,Map<Integer,Map<Integer,Set<Integer>>>> incomp =
-                new TreeMap<Integer,Map<Integer,Map<Integer,Set<Integer>>>>();
+        /** The 'incompatibility map'.
+         * first index is which position in the source int[] is checked.
+         * second index is which position in the destination source int[] is checked.
+         * third index is value in the source int[].
+         * The Set is all the incompatible values in the dest int[].
+         */
+        private final Set<Integer>[][][] incomps;
 
+        @SuppressWarnings("unchecked")
         OnTheFlyLegionMoveIterator(OnTheFlyLegionMove d)
         {
             daddy = d;
             dim = daddy.getDim();
+            incomps = (Set<Integer>[][][])new Set[dim][dim][30];//never more than 30 hexes ???
             buildIncompMap();
             firstfill();
         }
@@ -248,22 +254,17 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
             for (int i = 0; i < dim; i++)
             {
                 List<CritterMove> li = daddy.allCritterMoves.get(i);
-                Map<Integer, Map<Integer, Set<Integer>>> jk =
-                        new TreeMap<Integer, Map<Integer, Set<Integer>>>();
-                incomp.put(i, jk);
                 for (int j = 0; j < dim; j++)
                 {
                     if (i != j)
                     {
                         List<CritterMove> lj = daddy.allCritterMoves.get(j);
-                        Map<Integer, Set<Integer>> kl =
-                                new TreeMap<Integer, Set<Integer>>();
-                        jk.put(j, kl);
                         for (int k = 0; k < li.size(); k++)
                         {
                             String a = li.get(k).getEndingHexLabel();
                             Set<Integer> s = new TreeSet<Integer>();
-                            kl.put(k, s);
+                            incomps[i][j][k] = s;
+                            
                             for (int l = 0; l < lj.size(); l++)
                             {
                                 String b = lj.get(l).getEndingHexLabel();
@@ -299,10 +300,10 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
              * checking ?*/
             for (int i = dim - 1; i > 0; i--)
             {
-                for (int k = dim - 1; k > i; k--)
+                for (int j = dim - 1; j > i; j--)
                 {
-                    Set<Integer> inc = incomp.get(i).get(k).get(indexes[i]);
-                    if (inc.contains(indexes[k]))
+                    Set<Integer> inc = incomps[i][j][indexes[i]];
+                    if (inc.contains(indexes[j]))
                     {
                         return i;
                     }
@@ -318,7 +319,7 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
             {
                 for (int k = 0; k < i && !isBad; k++)
                 {
-                    Set<Integer> inc = incomp.get(i).get(k).get(indexes[i]);
+                    Set<Integer> inc = incomps[i][k][indexes[i]];
                     if (inc.contains(indexes[k]))
                     {
                         isBad = true;
