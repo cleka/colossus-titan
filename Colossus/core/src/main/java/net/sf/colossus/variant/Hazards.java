@@ -32,7 +32,6 @@ public abstract class Hazards implements HazardConstants
     /** WiP : instead of a bunch of variables, group them by
      * category so it's easier to recognize them / deal with them.
      */
-    @SuppressWarnings("unused")
     public static class CombatEffect
     {
         public final EffectOnStrike effect;
