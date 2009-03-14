@@ -33,50 +33,29 @@ public abstract class Hazards implements HazardConstants
      * category so it's easier to recognize them / deal with them.
      */
     @SuppressWarnings("unused")
-    private class CombatEffect
+    public static class CombatEffect
     {
-        final EffectOnStrike effect;
-        final ScopeOfEffectOnStrike scope;
-        final int adjustement;
+        public final EffectOnStrike effect;
+        public final ScopeOfEffectOnStrike scope;
+        public final int adjustment;
 
         CombatEffect(EffectOnStrike effect, ScopeOfEffectOnStrike scope,
-            int adjustement)
+            int adjustment)
         {
             this.effect = effect;
             this.scope = scope;
-            this.adjustement = adjustement;
+            this.adjustment = adjustment;
         }
     }
 
     /** Effect to apply when a creature is struck in this terrain.
      */
-    public final EffectOnStrike effectforDefendingInTerrain;
-    /** Scope of {@link effectforDefendingInTerrain}. Note that
-     * the first nativity (first vs. second) aply to the defending
-     * creature in this case.
-     */
-    public final ScopeOfEffectOnStrike scopeForDefenceEffect;
-    /** Amount of {@link effectforDefendingInTerrain} */
-    public final int defenceEffectAdjustment;
-
+    public final CombatEffect defenseEffect;
     /** Effect to apply when a creature strike out from this terrain.
      */
-    public final EffectOnStrike effectforAttackingFromTerrain;
-    /** Scope of {@link effectforAttackingFromTerrain}. Note that
-     * the first nativity (first vs. second) aply to the attacking
-     * creature in this case.
-     */
-    public final ScopeOfEffectOnStrike scopeForAttackEffect;
-    /** Amount of {@link effectforAttackingFromTerrain} */
-    public final int attackEffectAdjustment;
-
-    public final EffectOnStrike effectForBeingRangeStruckInTerrain;
-    public final ScopeOfEffectOnStrike scopeForRangeStruckEffect;
-    public final int rangeStruckEffectAdjustment;
-
-    public final EffectOnStrike effectforRangeStrikeFromTerrain;
-    public final ScopeOfEffectOnStrike scopeForRangeStrikeEffect;
-    public final int rangeStrikeEffectAdjustment;
+    public final CombatEffect attackEffect;
+    public final CombatEffect rangedDefenseEffect;
+    public final CombatEffect rangedAttackEffect;
 
     public final RangeStrikeSpecialEffect rangeStrikeSpecial;
     public final SpecialEffect terrainSpecial;
@@ -84,18 +63,10 @@ public abstract class Hazards implements HazardConstants
     public Hazards(String name, char code,
         EffectOnMovement effectOnGroundMovement,
         EffectOnMovement effectOnFlyerMovement,
-        EffectOnStrike effectforDefendingInTerrain,
-        ScopeOfEffectOnStrike scopeForDefenceEffect,
-        int defenceEffectAdjustment,
-        EffectOnStrike effectforAttackingFromTerrain,
-        ScopeOfEffectOnStrike scopeForAttackEffect,
-        int attackEffectAdjustment,
-        EffectOnStrike effectForBeingRangeSruckInTerrain,
-        ScopeOfEffectOnStrike scopeForRangeStruckEffect,
-        int RangeStruckEffectAdjustment,
-        EffectOnStrike effectforRangeStrikeFromTerrain,
-        ScopeOfEffectOnStrike scopeForRangeStrikeEffect,
-        int RangeStrikeEffectAdjustment,
+        CombatEffect defenseEffect,
+        CombatEffect attackEffect,
+        CombatEffect rangedDefenseEffect,
+        CombatEffect rangedAttackEffect,
         RangeStrikeSpecialEffect RangeStrikeSpecial,
         SpecialEffect terrainSpecial)
     {
@@ -103,20 +74,12 @@ public abstract class Hazards implements HazardConstants
         this.code = code;
         this.effectOnGroundMovement = effectOnGroundMovement;
         this.effectOnFlyerMovement = effectOnFlyerMovement;
+        
+        this.defenseEffect = defenseEffect;
+        this.attackEffect = attackEffect;
+        this.rangedDefenseEffect = rangedDefenseEffect;
+        this.rangedAttackEffect = rangedAttackEffect;
 
-        this.effectforDefendingInTerrain = effectforDefendingInTerrain;
-        this.scopeForDefenceEffect = scopeForDefenceEffect;
-        this.defenceEffectAdjustment = defenceEffectAdjustment;
-
-        this.effectforAttackingFromTerrain = effectforAttackingFromTerrain;
-        this.scopeForAttackEffect = scopeForAttackEffect;
-        this.attackEffectAdjustment = attackEffectAdjustment;
-        this.effectForBeingRangeStruckInTerrain = effectForBeingRangeSruckInTerrain;
-        this.scopeForRangeStruckEffect = scopeForRangeStruckEffect;
-        this.rangeStruckEffectAdjustment = RangeStruckEffectAdjustment;
-        this.effectforRangeStrikeFromTerrain = effectforRangeStrikeFromTerrain;
-        this.scopeForRangeStrikeEffect = scopeForRangeStrikeEffect;
-        this.rangeStrikeEffectAdjustment = RangeStrikeEffectAdjustment;
         this.rangeStrikeSpecial = RangeStrikeSpecial;
         this.terrainSpecial = terrainSpecial;
 

@@ -395,28 +395,21 @@ public class BattleTerrainHazardWindow extends KDialog
     private void addDefenderInfo(Container container, Hazards hazard)
     {
         container.add(makeStrikeEffect("Defending",
-            hazard.effectforAttackingFromTerrain, hazard.scopeForAttackEffect,
-            hazard.attackEffectAdjustment), GBC_NORTHEAST);
+            hazard.defenseEffect), GBC_NORTHEAST);
         container.add(makeStrikeEffect("Being Rangestruck",
-            hazard.effectforRangeStrikeFromTerrain,
-            hazard.scopeForRangeStrikeEffect,
-            hazard.rangeStrikeEffectAdjustment), GBC_NORTHWEST);
+            hazard.rangedDefenseEffect), GBC_NORTHWEST);
     }
 
     private void addStrikeInfo(Container container, Hazards hazard)
     {
         container.add(makeStrikeEffect("Attacking",
-            hazard.effectforAttackingFromTerrain, hazard.scopeForAttackEffect,
-            hazard.attackEffectAdjustment), GBC_NORTHEAST);
+            hazard.attackEffect), GBC_NORTHEAST);
         container.add(makeStrikeEffect("Rangestriking",
-            hazard.effectforRangeStrikeFromTerrain,
-            hazard.scopeForRangeStrikeEffect,
-            hazard.rangeStrikeEffectAdjustment), GBC_NORTHWEST);
+            hazard.rangedAttackEffect), GBC_NORTHWEST);
     }
 
     private Chit makeStrikeEffect(String strike,
-        HazardConstants.EffectOnStrike strikeEffect,
-        HazardConstants.ScopeOfEffectOnStrike scope, int effectAdjustment)
+        Hazards.CombatEffect e)
     {
         String[] overlay;
         if ("Being Rangestruck".equals(strike)
@@ -431,38 +424,38 @@ public class BattleTerrainHazardWindow extends KDialog
         }
 
         Chit strikeSymbol;
-        if (strikeEffect.equals(HazardConstants.EffectOnStrike.BLOCKED))
+        if (e.effect.equals(HazardConstants.EffectOnStrike.BLOCKED))
         {
             strikeSymbol = new Chit(STRIKE_SIZE, "StrikeBlocked", overlay);
             strikeSymbol.setToolTipText(strike
                 + " Across Hazard is not Possible");
         }
-        else if (strikeEffect
+        else if (e.effect
             .equals(HazardConstants.EffectOnStrike.SKILLBONUS)
-            || strikeEffect
+            || e.effect
                 .equals(HazardConstants.EffectOnStrike.SKILLPENALTY))
         {
-            if (strikeEffect
+            if (e.effect
                 .equals(HazardConstants.EffectOnStrike.SKILLPENALTY))
             {
-                strikeSymbol = new StrikeDie(STRIKE_SIZE, effectAdjustment,
+                strikeSymbol = new StrikeDie(STRIKE_SIZE, e.adjustment,
                     "Miss", overlay);
             }
             else
             {
-                strikeSymbol = new StrikeDie(STRIKE_SIZE, effectAdjustment,
+                strikeSymbol = new StrikeDie(STRIKE_SIZE, e.adjustment,
                     "Hit", overlay);
             }
             StringBuilder tip = new StringBuilder();
-            if (scope.equals(HazardConstants.ScopeOfEffectOnStrike.FOREIGNERS)
-                || scope
+            if (e.scope.equals(HazardConstants.ScopeOfEffectOnStrike.FOREIGNERS)
+                || e.scope
                     .equals(HazardConstants.ScopeOfEffectOnStrike.IMPERIALS))
             {
                 tip.append("Non-Natives ");
             }
-            else if (scope
+            else if (e.scope
                 .equals(HazardConstants.ScopeOfEffectOnStrike.NATIVES)
-                || scope
+                || e.scope
                     .equals(HazardConstants.ScopeOfEffectOnStrike.PATRIOTS))
             {
                 tip.append("Natives ");
@@ -472,7 +465,7 @@ public class BattleTerrainHazardWindow extends KDialog
                 tip.append("Everyone ");
             }
             tip.append("have skill ");
-            if (strikeEffect
+            if (e.effect
                 .equals(HazardConstants.EffectOnStrike.SKILLPENALTY))
             {
                 tip.append("decreased by ");
@@ -481,35 +474,35 @@ public class BattleTerrainHazardWindow extends KDialog
             {
                 tip.append("increased by ");
             }
-            tip.append(effectAdjustment);
+            tip.append(e.adjustment);
             tip.append(" when " + strike);
-            if (scope.equals(HazardConstants.ScopeOfEffectOnStrike.IMPERIALS))
+            if (e.scope.equals(HazardConstants.ScopeOfEffectOnStrike.IMPERIALS))
             {
                 tip.append("Natives");
             }
-            else if (scope
+            else if (e.scope
                 .equals(HazardConstants.ScopeOfEffectOnStrike.PATRIOTS))
             {
                 tip.append("Non-Natives");
             }
             strikeSymbol.setToolTipText(tip.toString());
         }
-        else if (strikeEffect
+        else if (e.effect
             .equals(HazardConstants.EffectOnStrike.POWERBONUS)
-            || strikeEffect
+            || e.effect
                 .equals(HazardConstants.EffectOnStrike.POWERPENALTY))
         {
             strikeSymbol = new StrikeDie(STRIKE_SIZE, 1, "RedBlue", overlay);
             StringBuilder tip = new StringBuilder();
-            if (scope.equals(HazardConstants.ScopeOfEffectOnStrike.FOREIGNERS)
-                || scope
+            if (e.scope.equals(HazardConstants.ScopeOfEffectOnStrike.FOREIGNERS)
+                || e.scope
                     .equals(HazardConstants.ScopeOfEffectOnStrike.IMPERIALS))
             {
                 tip.append("Non-Natives ");
             }
-            else if (scope
+            else if (e.scope
                 .equals(HazardConstants.ScopeOfEffectOnStrike.NATIVES)
-                || scope
+                || e.scope
                     .equals(HazardConstants.ScopeOfEffectOnStrike.PATRIOTS))
             {
                 tip.append("Natives ");
@@ -518,7 +511,7 @@ public class BattleTerrainHazardWindow extends KDialog
             {
                 tip.append("Everyone ");
             }
-            if (strikeEffect
+            if (e.effect
                 .equals(HazardConstants.EffectOnStrike.POWERPENALTY))
             {
                 tip.append("loses ");
@@ -527,13 +520,13 @@ public class BattleTerrainHazardWindow extends KDialog
             {
                 tip.append("gains ");
             }
-            tip.append(effectAdjustment);
+            tip.append(e.adjustment);
             tip.append(" dice when " + strike);
-            if (scope.equals(HazardConstants.ScopeOfEffectOnStrike.IMPERIALS))
+            if (e.scope.equals(HazardConstants.ScopeOfEffectOnStrike.IMPERIALS))
             {
                 tip.append("Natives");
             }
-            else if (scope
+            else if (e.scope
                 .equals(HazardConstants.ScopeOfEffectOnStrike.PATRIOTS))
             {
                 tip.append("Non-Natives");

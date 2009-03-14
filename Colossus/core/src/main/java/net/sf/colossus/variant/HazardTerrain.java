@@ -23,28 +23,15 @@ public class HazardTerrain extends Hazards
     public HazardTerrain(String name, char code,
         EffectOnMovement effectOnGroundMovement,
         EffectOnMovement effectOnFlyerMovement,
-        EffectOnStrike effectforDefendingInTerrain,
-        ScopeOfEffectOnStrike scopeForDefenceEffect,
-        int defenceEffectAdjustment,
-        EffectOnStrike effectforAttackingFromTerrain,
-        ScopeOfEffectOnStrike scopeForAttackEffect,
-        int attackEffectAdjustment,
-        EffectOnStrike effectForBeingRangeStruckInTerrain,
-        ScopeOfEffectOnStrike scopeForRangeStruckEffect,
-        int RangeStruckEffectAdjustment,
-        EffectOnStrike effectforRangeStrikeFromTerrain,
-        ScopeOfEffectOnStrike scopeForRangeStrikeEffect,
-        int RangeStrikeEffectAdjustment,
+        CombatEffect defenseEffect,
+        CombatEffect attackEffect,
+        CombatEffect rangedDefenseEffect,
+        CombatEffect rangedAttackEffect,
         RangeStrikeSpecialEffect RangeStrikeSpecial,
         SpecialEffect terrainSpecial)
     {
         super(name, code, effectOnGroundMovement, effectOnFlyerMovement,
-            effectforDefendingInTerrain, scopeForDefenceEffect,
-            defenceEffectAdjustment, effectforAttackingFromTerrain,
-            scopeForAttackEffect, attackEffectAdjustment,
-            effectForBeingRangeStruckInTerrain, scopeForRangeStruckEffect,
-            RangeStruckEffectAdjustment, effectforRangeStrikeFromTerrain,
-            scopeForRangeStrikeEffect, RangeStrikeEffectAdjustment,
+            defenseEffect, attackEffect, rangedDefenseEffect, rangedAttackEffect,
             RangeStrikeSpecial, terrainSpecial);
         TERRAIN_MAP.put(name, this);
         /*
@@ -67,30 +54,30 @@ public class HazardTerrain extends Hazards
 
     public boolean isNativeBonusTerrain()
     {
-        return (scopeForAttackEffect.equals(ScopeOfEffectOnStrike.NATIVES)
-            || scopeForDefenceEffect.equals(ScopeOfEffectOnStrike.NATIVES)
-            || scopeForAttackEffect.equals(ScopeOfEffectOnStrike.PATRIOTS) || scopeForDefenceEffect
+        return (attackEffect.scope.equals(ScopeOfEffectOnStrike.NATIVES)
+            || defenseEffect.scope.equals(ScopeOfEffectOnStrike.NATIVES)
+            || attackEffect.scope.equals(ScopeOfEffectOnStrike.PATRIOTS) || defenseEffect.scope
             .equals(ScopeOfEffectOnStrike.PATRIOTS))
-            && (effectforAttackingFromTerrain
+            && (attackEffect.effect
                 .equals(EffectOnStrike.SKILLBONUS)
-                || effectforAttackingFromTerrain
+                || attackEffect.effect
                     .equals(EffectOnStrike.POWERBONUS)
-                || effectforDefendingInTerrain
-                    .equals(EffectOnStrike.SKILLBONUS) || effectforDefendingInTerrain
+                || defenseEffect.effect
+                    .equals(EffectOnStrike.SKILLBONUS) || defenseEffect.effect
                 .equals(EffectOnStrike.POWERBONUS));
     }
 
     public boolean isNonNativePenaltyTerrain()
     {
-        boolean effectsAttack = scopeForAttackEffect
+        boolean effectsAttack = attackEffect.scope
             .equals(ScopeOfEffectOnStrike.FOREIGNERS)
-            && (effectforAttackingFromTerrain
-                .equals(EffectOnStrike.SKILLPENALTY) || effectforAttackingFromTerrain
+            && (attackEffect.effect
+                .equals(EffectOnStrike.SKILLPENALTY) || attackEffect.effect
                 .equals(EffectOnStrike.POWERPENALTY));
-        boolean effectsDefence = scopeForDefenceEffect
+        boolean effectsDefence = defenseEffect.scope
             .equals(ScopeOfEffectOnStrike.FOREIGNERS)
-            && (effectforDefendingInTerrain
-                .equals(EffectOnStrike.SKILLPENALTY) || effectforDefendingInTerrain
+            && (defenseEffect.effect
+                .equals(EffectOnStrike.SKILLPENALTY) || defenseEffect.effect
                 .equals(EffectOnStrike.POWERPENALTY));
         return (effectsAttack || effectsDefence);
     }
@@ -136,10 +123,10 @@ public class HazardTerrain extends Hazards
     /* genuine Titan Hazard */
     static final HazardTerrain PLAINS = new HazardTerrain("Plains", ' ',
         EffectOnMovement.FREEMOVE, EffectOnMovement.FREEMOVE,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
         RangeStrikeSpecialEffect.RANGESTRIKEFREE, SpecialEffect.NOSPECIAL);
 
     /** Tree is genuine Titan hazard, but the effect on anybody inside is
@@ -149,69 +136,69 @@ public class HazardTerrain extends Hazards
      */
     static final HazardTerrain TREE = new HazardTerrain("Tree", 't',
         EffectOnMovement.BLOCKFOREIGNER, EffectOnMovement.FREEMOVE,
-        EffectOnStrike.SKILLBONUS, ScopeOfEffectOnStrike.PATRIOTS, 1,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
-        EffectOnStrike.BLOCKED, ScopeOfEffectOnStrike.IMPERIALS, 0,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
+        new CombatEffect(EffectOnStrike.SKILLBONUS, ScopeOfEffectOnStrike.PATRIOTS, 1),
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
+        new CombatEffect(EffectOnStrike.BLOCKED, ScopeOfEffectOnStrike.IMPERIALS, 0),
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
         RangeStrikeSpecialEffect.RANGESTRIKEBLOCKED, SpecialEffect.NOSPECIAL);
 
     public static final HazardTerrain BRAMBLES = new HazardTerrain("Brambles",
         'b', EffectOnMovement.SLOWFOREIGNER, EffectOnMovement.SLOWFOREIGNER,
-        EffectOnStrike.SKILLBONUS, ScopeOfEffectOnStrike.PATRIOTS, 1,
-        EffectOnStrike.SKILLPENALTY, ScopeOfEffectOnStrike.FOREIGNERS, 1,
-        EffectOnStrike.SKILLBONUS, ScopeOfEffectOnStrike.PATRIOTS, 1,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
+        new CombatEffect(EffectOnStrike.SKILLBONUS, ScopeOfEffectOnStrike.PATRIOTS, 1),
+        new CombatEffect(EffectOnStrike.SKILLPENALTY, ScopeOfEffectOnStrike.FOREIGNERS, 1),
+        new CombatEffect(EffectOnStrike.SKILLBONUS, ScopeOfEffectOnStrike.PATRIOTS, 1),
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
         RangeStrikeSpecialEffect.RANGESTRIKESKILLPENALTY,
         SpecialEffect.NOSPECIAL);
 
     static final HazardTerrain DRIFT = new HazardTerrain("Drift", 'd',
         EffectOnMovement.SLOWFOREIGNER, EffectOnMovement.SLOWFOREIGNER,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
         RangeStrikeSpecialEffect.RANGESTRIKEFREE, SpecialEffect.HEALTHDRAIN);
 
     public static final HazardTerrain VOLCANO = new HazardTerrain("Volcano",
         'v', EffectOnMovement.BLOCKFOREIGNER, EffectOnMovement.BLOCKFOREIGNER,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
-        EffectOnStrike.POWERBONUS, ScopeOfEffectOnStrike.NATIVES, 2,
-        EffectOnStrike.SKILLBONUS, ScopeOfEffectOnStrike.NATIVES, 1,
-        EffectOnStrike.POWERBONUS, ScopeOfEffectOnStrike.NATIVES, 2,
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
+        new CombatEffect(EffectOnStrike.POWERBONUS, ScopeOfEffectOnStrike.NATIVES, 2),
+        new CombatEffect(EffectOnStrike.SKILLBONUS, ScopeOfEffectOnStrike.NATIVES, 1),
+        new CombatEffect(EffectOnStrike.POWERBONUS, ScopeOfEffectOnStrike.NATIVES, 2),
         RangeStrikeSpecialEffect.RANGESTRIKEFREE, SpecialEffect.NOSPECIAL);
 
     static final HazardTerrain BOG = new HazardTerrain("Bog", 'o',
         EffectOnMovement.BLOCKFOREIGNER, EffectOnMovement.FREEMOVE,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
         RangeStrikeSpecialEffect.RANGESTRIKEFREE, SpecialEffect.NOSPECIAL);
 
     static final HazardTerrain SAND = new HazardTerrain("Sand", 's',
         EffectOnMovement.SLOWFOREIGNER, EffectOnMovement.FREEMOVE,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
         RangeStrikeSpecialEffect.RANGESTRIKEFREE,
         SpecialEffect.HEALTHDRAIN_WATERDWELLER);
 
     static final HazardTerrain TOWER = new HazardTerrain("Tower", 'w',
         EffectOnMovement.FREEMOVE, EffectOnMovement.FREEMOVE,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
         RangeStrikeSpecialEffect.RANGESTRIKEFREE, SpecialEffect.NOSPECIAL);
 
     /* extra standard Colossus hazard */
     static final HazardTerrain LAKE = new HazardTerrain("Lake", 'l',
         EffectOnMovement.BLOCKFOREIGNER, EffectOnMovement.FREEMOVE,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
         RangeStrikeSpecialEffect.RANGESTRIKEFREE, SpecialEffect.NOSPECIAL);
 
     /** Stone native gains 1 skill when defending against non-native ;
@@ -219,10 +206,10 @@ public class HazardTerrain extends Hazards
      */
     public static final HazardTerrain STONE = new HazardTerrain("Stone", 'n',
         EffectOnMovement.BLOCKFOREIGNER, EffectOnMovement.BLOCKALL,
-        EffectOnStrike.SKILLBONUS, ScopeOfEffectOnStrike.PATRIOTS, 1,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
+        new CombatEffect(EffectOnStrike.SKILLBONUS, ScopeOfEffectOnStrike.PATRIOTS, 1),
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
         RangeStrikeSpecialEffect.RANGESTRIKEBLOCKED, SpecialEffect.NOSPECIAL);
 
     @Override
@@ -396,9 +383,9 @@ public class HazardTerrain extends Hazards
         boolean defenderIsNative)
     {
         return computeSkillOrPowerBonus(attackerIsNative, defenderIsNative,
-            effectforAttackingFromTerrain, scopeForAttackEffect,
+            attackEffect.effect, attackEffect.scope,
             EffectOnStrike.SKILLBONUS, EffectOnStrike.SKILLPENALTY,
-            attackEffectAdjustment);
+            attackEffect.adjustment);
     }
 
     /** Return the penalty to apply to the Strike Factor of a creature
@@ -424,9 +411,9 @@ public class HazardTerrain extends Hazards
         boolean defenderIsNative)
     {
         return computeSkillOrPowerBonus(defenderIsNative, attackerIsNative,
-            effectforDefendingInTerrain, scopeForDefenceEffect,
+            defenseEffect.effect, defenseEffect.scope,
             EffectOnStrike.SKILLBONUS, EffectOnStrike.SKILLPENALTY,
-            defenceEffectAdjustment);
+            defenseEffect.adjustment);
     }
 
     /** Return the penalty to apply to the Strike Factor of a creature struck
@@ -452,9 +439,9 @@ public class HazardTerrain extends Hazards
         boolean defenderIsNative)
     {
         return computeSkillOrPowerBonus(attackerIsNative, defenderIsNative,
-            effectforAttackingFromTerrain, scopeForAttackEffect,
+            attackEffect.effect, attackEffect.scope,
             EffectOnStrike.POWERBONUS, EffectOnStrike.POWERPENALTY,
-            attackEffectAdjustment);
+            attackEffect.adjustment);
     }
 
     /** Return the penalty to apply to the Power Factor of a creature
@@ -480,9 +467,9 @@ public class HazardTerrain extends Hazards
         boolean defenderIsNative)
     {
         return computeSkillOrPowerBonus(defenderIsNative, attackerIsNative,
-            effectforDefendingInTerrain, scopeForDefenceEffect,
+            defenseEffect.effect, defenseEffect.scope,
             EffectOnStrike.POWERBONUS, EffectOnStrike.POWERPENALTY,
-            defenceEffectAdjustment);
+            defenseEffect.adjustment);
     }
 
     /** Return the penalty to apply to the Strike Factor of a creature struck
@@ -508,9 +495,9 @@ public class HazardTerrain extends Hazards
         boolean defenderIsNative)
     {
         return computeSkillOrPowerBonus(attackerIsNative, defenderIsNative,
-            effectforRangeStrikeFromTerrain, scopeForRangeStrikeEffect,
+            rangedAttackEffect.effect, rangedAttackEffect.scope,
             EffectOnStrike.SKILLBONUS, EffectOnStrike.SKILLPENALTY,
-            rangeStrikeEffectAdjustment);
+            rangedAttackEffect.adjustment);
     }
 
     /** Return the penalty to apply to the Strike Factor of a creature
@@ -537,9 +524,9 @@ public class HazardTerrain extends Hazards
         boolean defenderIsNative)
     {
         return computeSkillOrPowerBonus(defenderIsNative, attackerIsNative,
-            effectForBeingRangeStruckInTerrain, scopeForRangeStruckEffect,
+            rangedDefenseEffect.effect, rangedDefenseEffect.scope,
             EffectOnStrike.SKILLBONUS, EffectOnStrike.SKILLPENALTY,
-            rangeStruckEffectAdjustment);
+            rangedDefenseEffect.adjustment);
     }
 
     /** Return the penalty to apply to the Strike Factor of a creature Rangestruck
@@ -565,9 +552,9 @@ public class HazardTerrain extends Hazards
         boolean defenderIsNative)
     {
         return computeSkillOrPowerBonus(attackerIsNative, defenderIsNative,
-            effectforRangeStrikeFromTerrain, scopeForRangeStrikeEffect,
+            rangedAttackEffect.effect, rangedAttackEffect.scope,
             EffectOnStrike.POWERBONUS, EffectOnStrike.POWERPENALTY,
-            rangeStrikeEffectAdjustment);
+            rangedAttackEffect.adjustment);
     }
 
     /** Return the penalty to apply to the Power Factor of a creature
@@ -593,9 +580,9 @@ public class HazardTerrain extends Hazards
         boolean defenderIsNative)
     {
         return computeSkillOrPowerBonus(defenderIsNative, attackerIsNative,
-            effectForBeingRangeStruckInTerrain, scopeForRangeStruckEffect,
+            rangedDefenseEffect.effect, rangedDefenseEffect.scope,
             EffectOnStrike.POWERBONUS, EffectOnStrike.POWERPENALTY,
-            rangeStruckEffectAdjustment);
+            rangedDefenseEffect.adjustment);
     }
 
     /** Return the penalty to apply to the Strike Factor of a creature Rangestruck
