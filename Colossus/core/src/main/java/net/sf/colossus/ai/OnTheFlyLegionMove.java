@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +14,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
-import net.sf.colossus.ai.OnTheFlyLegionMove;
 import net.sf.colossus.client.CritterMove;
 import net.sf.colossus.util.DevRandom;
 
@@ -230,7 +228,7 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
         private final Random rand = new DevRandom();
         private final int dim;
         private boolean abort = false;
-        private Map<Integer,Map<Integer,Map<Integer,Set<Integer>>>> incomp =
+        private final Map<Integer,Map<Integer,Map<Integer,Set<Integer>>>> incomp =
                 new TreeMap<Integer,Map<Integer,Map<Integer,Set<Integer>>>>();
 
         OnTheFlyLegionMoveIterator(OnTheFlyLegionMove d)
