@@ -318,9 +318,9 @@ public class HazardTerrain extends Hazards
      * @return The final attacking or defending skill or power
      */
     private int computeSkillOrPowerBonus(final boolean firstIsNative,
-        final boolean secondIsNative, final EffectOnStrike effect,
-        final ScopeOfEffectOnStrike scope, final EffectOnStrike whichIsBonus,
-        final EffectOnStrike whichIsPenalty, final int ovalue)
+        final boolean secondIsNative, final CombatEffect effect,
+        final EffectOnStrike whichIsBonus,
+        final EffectOnStrike whichIsPenalty)
     {
         /*
          * Scope Constants -
@@ -330,42 +330,42 @@ public class HazardTerrain extends Hazards
          * Foreigners are Non-Natives vs anyone
          * Imperials means Non-Natives vs Natives
          */
-        if (effect == EffectOnStrike.NOEFFECT)
+        if (effect.effect == EffectOnStrike.NOEFFECT)
         {
             return 0;
         }
-        int value = ovalue;
-        if ((effect == whichIsPenalty) || (effect == whichIsBonus))
+        int value = effect.adjustment;
+        if ((effect.effect == whichIsPenalty) || (effect.effect == whichIsBonus))
         {
-            if (effect == whichIsPenalty)
+            if (effect.effect == whichIsPenalty)
             {
-                value = -ovalue;
+                value = -effect.adjustment;
             }
-            if (scope == ScopeOfEffectOnStrike.ALL)
-            {
-                return value;
-            }
-            if (firstIsNative && scope == ScopeOfEffectOnStrike.NATIVES)
+            if (effect.scope == ScopeOfEffectOnStrike.ALL)
             {
                 return value;
             }
-            if (!firstIsNative && scope == ScopeOfEffectOnStrike.FOREIGNERS)
+            if (firstIsNative && effect.scope == ScopeOfEffectOnStrike.NATIVES)
+            {
+                return value;
+            }
+            if (!firstIsNative && effect.scope == ScopeOfEffectOnStrike.FOREIGNERS)
             {
                 return value;
             }
             if (firstIsNative && !secondIsNative
-                && scope == ScopeOfEffectOnStrike.PATRIOTS)
+                && effect.scope == ScopeOfEffectOnStrike.PATRIOTS)
             {
                 return value;
             }
             if (!firstIsNative && secondIsNative
-                && scope == ScopeOfEffectOnStrike.IMPERIALS)
+                && effect.scope == ScopeOfEffectOnStrike.IMPERIALS)
             {
                 return value;
             }
             return 0;
         }
-        if (effect == EffectOnStrike.BLOCKED)
+        if (effect.effect == EffectOnStrike.BLOCKED)
         {
             LOGGER.warning("Called with an unlikely effect " + effect);
             return 0;
@@ -383,9 +383,8 @@ public class HazardTerrain extends Hazards
         boolean defenderIsNative)
     {
         return computeSkillOrPowerBonus(attackerIsNative, defenderIsNative,
-            attackEffect.effect, attackEffect.scope,
-            EffectOnStrike.SKILLBONUS, EffectOnStrike.SKILLPENALTY,
-            attackEffect.adjustment);
+                attackEffect,
+                EffectOnStrike.SKILLBONUS, EffectOnStrike.SKILLPENALTY);
     }
 
     /** Return the penalty to apply to the Strike Factor of a creature
@@ -411,9 +410,8 @@ public class HazardTerrain extends Hazards
         boolean defenderIsNative)
     {
         return computeSkillOrPowerBonus(defenderIsNative, attackerIsNative,
-            defenseEffect.effect, defenseEffect.scope,
-            EffectOnStrike.SKILLBONUS, EffectOnStrike.SKILLPENALTY,
-            defenseEffect.adjustment);
+            defenseEffect,
+            EffectOnStrike.SKILLBONUS, EffectOnStrike.SKILLPENALTY);
     }
 
     /** Return the penalty to apply to the Strike Factor of a creature struck
@@ -439,9 +437,8 @@ public class HazardTerrain extends Hazards
         boolean defenderIsNative)
     {
         return computeSkillOrPowerBonus(attackerIsNative, defenderIsNative,
-            attackEffect.effect, attackEffect.scope,
-            EffectOnStrike.POWERBONUS, EffectOnStrike.POWERPENALTY,
-            attackEffect.adjustment);
+            attackEffect,
+            EffectOnStrike.POWERBONUS, EffectOnStrike.POWERPENALTY);
     }
 
     /** Return the penalty to apply to the Power Factor of a creature
@@ -467,9 +464,8 @@ public class HazardTerrain extends Hazards
         boolean defenderIsNative)
     {
         return computeSkillOrPowerBonus(defenderIsNative, attackerIsNative,
-            defenseEffect.effect, defenseEffect.scope,
-            EffectOnStrike.POWERBONUS, EffectOnStrike.POWERPENALTY,
-            defenseEffect.adjustment);
+            defenseEffect,
+            EffectOnStrike.POWERBONUS, EffectOnStrike.POWERPENALTY);
     }
 
     /** Return the penalty to apply to the Strike Factor of a creature struck
@@ -495,9 +491,8 @@ public class HazardTerrain extends Hazards
         boolean defenderIsNative)
     {
         return computeSkillOrPowerBonus(attackerIsNative, defenderIsNative,
-            rangedAttackEffect.effect, rangedAttackEffect.scope,
-            EffectOnStrike.SKILLBONUS, EffectOnStrike.SKILLPENALTY,
-            rangedAttackEffect.adjustment);
+            rangedAttackEffect,
+            EffectOnStrike.SKILLBONUS, EffectOnStrike.SKILLPENALTY);
     }
 
     /** Return the penalty to apply to the Strike Factor of a creature
@@ -524,9 +519,8 @@ public class HazardTerrain extends Hazards
         boolean defenderIsNative)
     {
         return computeSkillOrPowerBonus(defenderIsNative, attackerIsNative,
-            rangedDefenseEffect.effect, rangedDefenseEffect.scope,
-            EffectOnStrike.SKILLBONUS, EffectOnStrike.SKILLPENALTY,
-            rangedDefenseEffect.adjustment);
+            rangedDefenseEffect,
+            EffectOnStrike.SKILLBONUS, EffectOnStrike.SKILLPENALTY);
     }
 
     /** Return the penalty to apply to the Strike Factor of a creature Rangestruck
@@ -552,9 +546,8 @@ public class HazardTerrain extends Hazards
         boolean defenderIsNative)
     {
         return computeSkillOrPowerBonus(attackerIsNative, defenderIsNative,
-            rangedAttackEffect.effect, rangedAttackEffect.scope,
-            EffectOnStrike.POWERBONUS, EffectOnStrike.POWERPENALTY,
-            rangedAttackEffect.adjustment);
+            rangedAttackEffect,
+            EffectOnStrike.POWERBONUS, EffectOnStrike.POWERPENALTY);
     }
 
     /** Return the penalty to apply to the Power Factor of a creature
@@ -580,9 +573,8 @@ public class HazardTerrain extends Hazards
         boolean defenderIsNative)
     {
         return computeSkillOrPowerBonus(defenderIsNative, attackerIsNative,
-            rangedDefenseEffect.effect, rangedDefenseEffect.scope,
-            EffectOnStrike.POWERBONUS, EffectOnStrike.POWERPENALTY,
-            rangedDefenseEffect.adjustment);
+            rangedDefenseEffect,
+            EffectOnStrike.POWERBONUS, EffectOnStrike.POWERPENALTY);
     }
 
     /** Return the penalty to apply to the Strike Factor of a creature Rangestruck
