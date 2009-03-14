@@ -28,6 +28,7 @@ import net.sf.colossus.util.DevRandom;
  * @version $Id$
  * @author Romain Dolbeau
  */
+@SuppressWarnings("boxing")
 class OnTheFlyLegionMove implements Collection<LegionMove>
 {
     /** Maximum number of try before giving up generating a new element.
