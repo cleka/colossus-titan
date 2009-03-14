@@ -65,11 +65,6 @@
     <mkdir dir="${build.classes.dir}" />
     <mkdir dir="${testresults.dir}" />
   </target>
-  <target name="version" depends="init"
-  description="Create a timestamp file">
-    <echo file="${build.classes.dir}/version"
-    message="${DSTAMP}&#10;" />
-  </target>
   <target name="compile" depends="init"
   description="Compiles Colossus without datatools and variants">
     <javac debug="yes" deprecation="yes" target="${target.level}"
@@ -138,7 +133,7 @@
     <javadoc sourcepath="." destdir="./javadoc" access="private"
     packagenames="net.sf.colossus.*" />
   </target>
-  <target name="jar" depends="init,compile,compileVariants,version"
+  <target name="jar" depends="init,compile,compileVariants"
   description="Make jar file">
     <pathconvert property="manifest.classpath" pathsep=" ">
       <path refid="project.class.path" />
@@ -168,7 +163,7 @@
     includes="**" excludes="*.java" update="true" />
     <chmod file="Colossus.jar" perm="755" />
   </target>
-  <target name="webjar" depends="init,compile,version"
+  <target name="webjar" depends="init,compile,buildInfo"
   description="Make WebServer jar file">
     <jar jarfile="ColossusWeb.jar" basedir="${build.classes.dir}"
     includes="**/webcommon/**, **/webserver/**, **/util/Log.class, **/util/Options.class, **/client/IOptions.class, **/server/Constants.class">
@@ -213,7 +208,7 @@
   </target>
   <!-- Tools -->
   <target name="tools" depends="bbjar,brjar" />
-  <target name="bbjar" depends="init,compile,compileVariants,compileDatatools,version"
+  <target name="bbjar" depends="init,compile,compileVariants,compileDatatools,buildInfo"
   description="Make Battlelands Builder jar file">
     <pathconvert property="manifest.classpath" pathsep=" ">
       <path refid="project.class.path" />
@@ -235,7 +230,7 @@
     includes="**" excludes="*.java" update="true" />
     <chmod file="BattlelandsBuilder.jar" perm="755" />
   </target>
-  <target name="brjar" depends="init,compile,compileVariants,compileDatatools,version"
+  <target name="brjar" depends="init,compile,compileVariants,compileDatatools,buildInfo"
   description="Make Battlelands Randomizer jar file">
     <pathconvert property="manifest.classpath" pathsep=" ">
       <path refid="project.class.path" />

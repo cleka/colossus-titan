@@ -12,6 +12,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -504,7 +505,7 @@ public final class Client implements IClient, IOracle
 
         if (summonInfo.noSummoningWanted())
         {
-            // could also use getXXX from object... 
+            // could also use getXXX from object...
             server.doSummon(null, null, null);
         }
         else
@@ -3606,37 +3607,20 @@ public final class Client implements IClient, IOracle
 
     public static String getVersion()
     {
-        byte[] bytes = new byte[8]; // length of an ISO date
-        String version = "unknown";
         try
         {
+            Properties buildInfo = new Properties();
             ClassLoader cl = Client.class.getClassLoader();
-            InputStream is = cl.getResourceAsStream("version");
-            if (is != null)
-            {
-                int got = is.read(bytes);
-                if (got == 8)
-                {
-                    version = new String(bytes, 0, bytes.length);
-                }
-                else
-                {
-                    LOGGER.log(Level.WARNING,
-                        "Did not get 8 byte from version file");
-                    version = "UNKNOWN";
-                }
-            }
-            else
-            {
-                LOGGER.log(Level.WARNING, "Version file not found");
-                version = "UNKNOWN";
-            }
+            InputStream is = cl
+                .getResourceAsStream("META-INF/build.properties");
+            buildInfo.load(is);
+            return buildInfo.getProperty("svn.revision.max-with-flags");
         }
         catch (Exception ex)
         {
-            LOGGER.log(Level.WARNING, "Problem reading version file", ex);
+            LOGGER.log(Level.WARNING, "Problem reading build info file", ex);
         }
-        return version;
+        return "UNKNOWN";
     }
 
     public boolean testBattleMove(BattleChit chit, String hexLabel)
