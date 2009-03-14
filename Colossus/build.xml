@@ -289,9 +289,18 @@
       <wcVersion path="${basedir}" prefix="buildInfo.svn." processUnversioned="false"/>
     </svn>
 
-    <!-- set properties not set by wcVersion to "false" so we get nice output -->
+    <!-- set properties not set by wcVersion to something so we get nice output -->
+  	<!-- the first two are never set unless true, the others should be set unless
+  	     the svn task fails -->
     <property name="buildInfo.svn.modified" value="false"/>
     <property name="buildInfo.svn.mixed" value="false"/>
+    <property name="buildInfo.svn.repository.url" value="UNKNOWN"/>
+    <property name="buildInfo.svn.repository.path" value="UNKNOWN"/>
+    <property name="buildInfo.svn.revision.max" value="UNKNOWN"/>
+    <property name="buildInfo.svn.revision.max-with-flags" value="UNKNOWN"/>
+    <property name="buildInfo.svn.revision.range" value="UNKNOWN"/>
+    <property name="buildInfo.svn.committed.max" value="UNKNOWN"/>
+    <property name="buildInfo.svn.modified" value="UNKNOWN"/>
   
   	<mkdir dir="${build.classes.dir}/META-INF"/>
   	<!-- we copy all information from wcVersion, even if it is redundant -->
