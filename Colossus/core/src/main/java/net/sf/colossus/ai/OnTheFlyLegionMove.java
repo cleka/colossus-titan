@@ -25,6 +25,7 @@ import net.sf.colossus.util.DevRandom;
  * @version $Id$
  * @author Romain Dolbeau
  */
+@SuppressWarnings("boxing")
 class OnTheFlyLegionMove implements Collection<LegionMove>
 {
 
@@ -247,7 +248,7 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
         {
             daddy = d;
             dim = daddy.getDim();
-            incomps = (Set<Integer>[][][]) new Set[dim][dim][30];//never more than 30 hexes ???
+            incomps = new Set[dim][dim][30];//never more than 30 hexes ???
             buildIncompMap();
             firstfill();
         }
