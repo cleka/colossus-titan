@@ -66,6 +66,7 @@ import net.sf.colossus.webcommon.GameInfo;
 import net.sf.colossus.webcommon.IWebClient;
 import net.sf.colossus.webcommon.IWebServer;
 import net.sf.colossus.webcommon.User;
+import net.sf.colossus.webcommon.GameInfo.GameState;
 
 
 /** This is the main class for one user client for the web server.
@@ -2421,36 +2422,48 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
                     while (it.hasNext())
                     {
                         GameInfo game = it.next();
+                        GameState state = game.getGameState();
 
-                        int state = game.getGameState();
-                        if (state == GameInfo.Scheduled)
+                        switch (state)
                         {
-                            // System.out
-                            //    .println("Got a scheduled game, replacing in sched list");
-                            replaceInTable(schedGameTable, game);
-                        }
-                        else if (state == GameInfo.Instant)
-                        {
-                            // System.out
-                            //     .println("Got an instant game, replacing in instant list");
-                            replaceInTable(instGameTable, game);
-                        }
-                        else if (state == GameInfo.Running)
-                        {
-                            // System.out
-                            //     .println("Got a running game, replacing in run game list and remove in inst game list");
-                            replaceInTable(runGameTable, game);
-                            instGameDataModel.removeGame(game.getGameId());
-                        }
-                        else if (state == GameInfo.Ending)
-                        {
-                            runGameDataModel.removeGame(game.getGameId());
-                        }
-                        else
-                        {
-                            LOGGER.log(Level.WARNING,
-                                "Huups, unhandled game state "
-                                    + game.getStateString());
+                            case PROPOSED:
+                                if (game.isScheduledGame())
+                                {
+                                    // System.out
+                                    //    .println("Got a scheduled game, replacing in sched list");
+                                    replaceInTable(schedGameTable, game);
+                                }
+                                else
+                                {
+                                    // System.out
+                                    //     .println("Got an instant game, replacing in instant list");
+                                    replaceInTable(instGameTable, game);
+                                }
+                                break;
+
+                            case DUE:
+                            case ACTIVATED:
+                            case STARTING:
+                            case READY_TO_CONNECT:
+                                // to be done
+                                break;
+
+                            case RUNNING:
+                                // System.out
+                                //     .println("Got a running game, replacing in run game list and remove in inst game list");
+                                replaceInTable(runGameTable, game);
+                                instGameDataModel.removeGame(game.getGameId());
+                                break;
+
+                            case ENDING:
+                                runGameDataModel.removeGame(game.getGameId());
+                                break;
+
+                            default:
+                                LOGGER.log(Level.WARNING,
+                                    "Huups, unhandled game state "
+                                        + game.getStateString());
+
                         }
                     }
                     gamesUpdates.clear();

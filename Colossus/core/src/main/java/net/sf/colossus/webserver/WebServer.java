@@ -18,6 +18,7 @@ import net.sf.colossus.webcommon.IRunWebServer;
 import net.sf.colossus.webcommon.IWebClient;
 import net.sf.colossus.webcommon.IWebServer;
 import net.sf.colossus.webcommon.User;
+import net.sf.colossus.webcommon.GameInfo.GameState;
 
 
 /** The main class for the WebServer
@@ -842,7 +843,7 @@ public class WebServer implements IWebServer, IRunWebServer
         {
             endingGames.add(st);
         }
-        st.setState(GameInfo.Ending);
+        st.setState(GameState.ENDING);
         allTellGameInfo(st);
 
         GameThreadReaper r = new GameThreadReaper();

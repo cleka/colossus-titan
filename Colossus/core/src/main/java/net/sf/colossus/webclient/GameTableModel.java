@@ -12,6 +12,7 @@ import javax.swing.table.AbstractTableModel;
 
 import net.sf.colossus.webcommon.GameInfo;
 import net.sf.colossus.webcommon.User;
+import net.sf.colossus.webcommon.GameInfo.GameState;
 
 
 public class GameTableModel extends AbstractTableModel
@@ -197,7 +198,8 @@ public class GameTableModel extends AbstractTableModel
              break;
              */
             case 1:
-                gi.setState((Integer)value);
+                GameState gameState = GameState.valueOf((String)value);
+                gi.setState(gameState);
                 break;
 
             case 2:

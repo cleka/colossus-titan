@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -21,34 +22,31 @@ import net.sf.colossus.util.Options;
 
 
 /** One object of this this class represents one game run at the server, 
- *  starting from state "potential game", over when it is ready to start,
- *  finds and reserves a port for it, starts it in a separate process, 
- *  and when the process terminates, releases the port.
+ *  starting from state "potential game", over when it is ready to start;
+ *  then either 
+ *  - finds and reserves a port for it, starts it in a separate process
+ *    and when the process terminates, releases the port;
+ *  - or when game runs locally on a players computer and this here handles
+ *    the rendezvous (tell the other players when and where to connect).  
+ *  .
  * 
- *  The same class is also used at client side, but only because
- *  the interface requires it, and only part of the data is used
- *  (e.g. the user has only a name, not a socket).
+ *  The same class is also used at client side, but only part of the data 
+ *  is used there (e.g. the user has only a name, not a socket).
  *
  *  @version $Id$
  *  @author Clemens Katzer
  */
 
-public class GameInfo extends Thread
+public class GameInfo extends Thread implements Serializable
 {
     private static final Logger LOGGER = Logger.getLogger(GameInfo.class
         .getName());
 
-    // the possible states of a game:
-    public final static int Scheduled = 0;
-    public final static int Instant = 1;
-    public final static int Running = 3;
-    public final static int Ending = 5;
-
-    private int state;
-
-    private IRunWebServer server = null;
+    private GameType type;
+    private GameState state;
 
     private int portNr = -1;
+    private String hostingHost = "";
 
     private String gameId;
 
@@ -84,21 +82,28 @@ public class GameInfo extends Thread
 
     private ArrayList<User> players = null;
 
+    private IRunWebServer server = null;
+
     private static int nextFreeGameId = 1;
 
     private File flagFile;
 
     // used on server side, to create a game proposed by client
 
-    public GameInfo(int state)
+    public GameInfo(GameType type)
     {
-        this.gameId = String.valueOf(nextFreeGameId);
-        nextFreeGameId++;
-        this.state = state;
+        this.gameId = String.valueOf(getNextFreeGameId());
+        this.type = type;
+        this.state = GameState.PROPOSED;
 
         this.enrolledPlayers = 0;
         this.players = new ArrayList<User>();
         this.server = null;
+    }
+
+    private synchronized int getNextFreeGameId()
+    {
+        return nextFreeGameId++;
     }
 
     public GameInfo(String initiator, String variant, String viewmode,
@@ -106,7 +111,7 @@ public class GameInfo extends Thread
         boolean unlimitedMulligans, boolean balancedTowers, int min,
         int target, int max)
     {
-        this(startTime == -1 ? Instant : Scheduled);
+        this(startTime == -1 ? GameType.INSTANT : GameType.SCHEDULED);
 
         this.initiator = initiator;
         this.variant = variant;
@@ -133,51 +138,24 @@ public class GameInfo extends Thread
         // System.out.println("NEW GameInfo server side, " + this.toString());
     }
 
-    public void setState(int state)
+    public void setState(GameState state)
     {
         this.state = state;
     }
 
-    public void setState(Integer state)
-    {
-        this.state = state.intValue();
-    }
-
-    public int getGameState()
+    public GameState getGameState()
     {
         return this.state;
     }
 
     public boolean isScheduledGame()
     {
-        return this.state == Scheduled;
+        return this.type == GameType.SCHEDULED;
     }
 
     public String getStateString()
     {
-        String stateString = "<unknown>";
-        switch (this.state)
-        {
-            case Scheduled:
-                stateString = "Scheduled";
-                break;
-
-            case Instant:
-                stateString = "Proposed";
-                break;
-
-            case Running:
-                stateString = "Running";
-                break;
-
-            case Ending:
-                stateString = "Ending";
-                break;
-
-            default:
-                stateString = "<unknown state: " + state + ">";
-        }
-        return stateString;
+        return this.state.toString();
     }
 
     public String getGameId()
@@ -190,17 +168,26 @@ public class GameInfo extends Thread
         this.gameId = val;
     }
 
-    /*    
-     public void setPort(int portNr)
-     {
-     this.portNr = portNr;
-     }
-     
-     public int getPort()
-     {
-     return this.portNr;
-     }
-     */
+    public void setPort(int portNr)
+    {
+        this.portNr = portNr;
+    }
+
+    public int getPort()
+    {
+        return this.portNr;
+    }
+
+    public void setHostingHost(String host)
+    {
+        hostingHost = host;
+    }
+
+    public String getHostingHost()
+    {
+        return hostingHost;
+    }
+
     public String getInitiator()
     {
         return initiator;
@@ -456,11 +443,12 @@ public class GameInfo extends Thread
             playerList.append(user.getName());
         }
 
-        String message = gameId + sep + state + sep + initiator + sep
-            + variant + sep + viewmode + sep + startTime + sep + duration
-            + sep + summary + sep + eventExpiring + sep + unlimitedMulligans
-            + sep + balancedTowers + sep + min + sep + target + sep + max
-            + sep + enrolledPlayers + playerList.toString();
+        String message = gameId + sep + state.toString() + sep + initiator
+            + sep + variant + sep + viewmode + sep + startTime + sep
+            + duration + sep + summary + sep + eventExpiring + sep
+            + unlimitedMulligans + sep + balancedTowers + sep + min + sep
+            + target + sep + max + sep + enrolledPlayers
+            + playerList.toString();
 
         return message;
     }
@@ -521,7 +509,8 @@ public class GameInfo extends Thread
             // System.out.println("Creating a new one");
         }
 
-        gi.state = Integer.parseInt(tokens[2]);
+        GameState gameState = GameState.valueOf(tokens[2]);
+        gi.state = gameState;
         gi.initiator = tokens[3];
 
         // System.out.println("fromString, state=" + gi.state + ")");
@@ -578,7 +567,7 @@ public class GameInfo extends Thread
 
         this.portNr = portNr;
         this.setName("Game at port " + portNr);
-        this.state = Running;
+        this.state = GameInfo.GameState.RUNNING;
         return true;
     }
 
@@ -1080,5 +1069,28 @@ public class GameInfo extends Thread
             }
         }
     } // END Class NullDumper
+
+    /**
+     *  Enum for the possible TYPES of a game 
+     *  (scheduled or instant, perhaps later also template?)
+     */
+    public static enum GameType
+    {
+        SCHEDULED, INSTANT;
+        // TEMPLATE ?
+    }
+
+    /**
+     *  Enum for the possible states of a game:
+     */
+    public static enum GameState
+    {
+        PROPOSED, DUE, ACTIVATED, STARTING, READY_TO_CONNECT, RUNNING, ENDING;
+    }
+
+    public GameState gameStateFromString(String stateString)
+    {
+        return GameState.valueOf(stateString);
+    }
 
 }
