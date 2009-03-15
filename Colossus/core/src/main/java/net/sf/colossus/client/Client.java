@@ -1,6 +1,7 @@
 package net.sf.colossus.client;
 
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -3613,10 +3614,15 @@ public final class Client implements IClient, IOracle
             ClassLoader cl = Client.class.getClassLoader();
             InputStream is = cl
                 .getResourceAsStream("META-INF/build.properties");
+            if (is == null)
+            {
+                LOGGER.log(Level.INFO, "No build information available.");
+                return "UNKNOWN";
+            }
             buildInfo.load(is);
             return buildInfo.getProperty("svn.revision.max-with-flags");
         }
-        catch (Exception ex)
+        catch (IOException ex)
         {
             LOGGER.log(Level.WARNING, "Problem reading build info file", ex);
         }
