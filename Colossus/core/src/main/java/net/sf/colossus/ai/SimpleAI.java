@@ -2735,27 +2735,14 @@ public class SimpleAI extends AbstractAI
         return value;
     }
 
-    @SuppressWarnings("deprecation")
-    /** strikeMap is optional */
-    private int evaluateCritterMove(BattleChit critter,
-        Map<String, Integer> strikeMap, ValueRecorder value)
-    {
+    private void evaluateCritterMove_Terrain(BattleChit critter,  ValueRecorder value) {
         final MasterBoardTerrain terrain = client.getBattleSite().getTerrain();
-        final LegionClientSide legion = (LegionClientSide)client
-            .getMyEngagedLegion();
-        final int skill = critter.getSkill();
-        final int power = critter.getPower();
         final BattleHex hex = client.getBattleHex(critter);
-        final int turn = client.getBattleTurnNumber();
-
-        PowerSkill ps = getNativeTerrainValue(critter.getCreature(), hex
-            .getTerrain(), true);
-
+        final int power = critter.getPower();
+        final int skill = critter.getSkill();
+        PowerSkill ps = getNativeTerrainValue(critter.getCreature(), hex.getTerrain(), true);
         int native_power = ps.getPowerAttack() + (ps.getPowerDefend() + power);
         int native_skill = ps.getSkillAttack() + ps.getSkillDefend();
-
-        //int value = 0;
-
         // Add for sitting in favorable terrain.
         // Subtract for sitting in unfavorable terrain.
         if (hex.isEntrance())
@@ -2822,6 +2809,28 @@ public class SimpleAI extends AbstractAI
         value.add(bec.PENALTY_DAMAGE_TERRAIN
             * hex.damageToCreature(critter.getCreature()),
             "PenaltyDamageTerrain");
+    }
+
+    @SuppressWarnings("deprecation")
+    /** strikeMap is optional */
+    private int evaluateCritterMove(BattleChit critter,
+        Map<String, Integer> strikeMap, ValueRecorder value)
+    {
+        final MasterBoardTerrain terrain = client.getBattleSite().getTerrain();
+        final LegionClientSide legion = (LegionClientSide)client
+            .getMyEngagedLegion();
+        final int skill = critter.getSkill();
+        final int power = critter.getPower();
+        final BattleHex hex = client.getBattleHex(critter);
+        final int turn = client.getBattleTurnNumber();
+
+        PowerSkill ps = getNativeTerrainValue(critter.getCreature(), hex
+            .getTerrain(), true);
+
+        int native_power = ps.getPowerAttack() + (ps.getPowerDefend() + power);
+        int native_skill = ps.getSkillAttack() + ps.getSkillDefend();
+
+        evaluateCritterMove_Terrain(critter, value);
 
         Set<String> targetHexLabels = client.findStrikes(critter.getTag());
         int numTargets = targetHexLabels.size();
