@@ -547,6 +547,9 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
             int ngenetic = 0;
             int nfailover = 0;
             Collections.sort(byValues, byValuesComparator);
+            LOGGER.finest(
+                    "Refill started ; current best score is " +
+                    alreadydone.get(byValues.get(byValues.size() - 1)).getValue());
             for (int k = 0; (k < n) && !abort; k++)
             {
                 int[] indexes;
