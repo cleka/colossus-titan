@@ -235,6 +235,7 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
         private final Random rand = new DevRandom();
         private final int dim;
         private boolean abort = false;
+        private boolean failoverOnly = false;
         /** The 'incompatibility map'.
          * first index is which position in the source int[] is checked.
          * second index is which position in the destination source int[] is checked.
@@ -550,11 +551,32 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
             LOGGER.finest(
                     "Refill started ; current best score is " +
                     alreadydone.get(byValues.get(byValues.size() - 1)).getValue());
+            /* we have n elements to make */
             for (int k = 0; (k < n) && !abort; k++)
             {
                 int[] indexes;
-                int ntry = 0;
                 LegionMove current = null;
+                /* after too many failover, do only failovers */
+                if (failoverOnly) {
+                    indexes = failoverGeneration();
+                    if (indexes != null)
+                    {
+                        current = AbstractAI.makeLegionMove(indexes,
+                                daddy.allCritterMoves);
+                        beingdone.put(indexes, current);
+                        nfailover++;
+                    }
+                    else
+                    {
+                        LOGGER.finest(
+                                "Even failover didn't produce a result");
+                        abort = true;
+                    }
+                }
+                else
+                {
+                int ntry = 0;
+                /* make at most ntry at generating current, using genetic */
                 while ((current == null) && (ntry < RANDOM_MAX_TRY) && (!abort))
                 {
                     boolean genetic;
@@ -593,6 +615,7 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
                     }
                     else
                     {
+                        /* if all else fail, try failover */
                         if (ntry == RANDOM_MAX_TRY)
                         {
                             /*
@@ -600,21 +623,16 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
                             " still hasn't found anything.");
                              */
                             indexes = failoverGeneration();
-                            while ((indexes != null) && isBad(indexes))
-                            {
-                                /*
-                                LOGGER.finest("Next dense (" +
-                                intArrayToString(indexes) +
-                                ") was bad, trying again.");
-                                 */
-                                indexes = failoverGeneration();
-                            }
                             if (indexes != null)
                             {
                                 current = AbstractAI.makeLegionMove(indexes,
                                         daddy.allCritterMoves);
                                 beingdone.put(indexes, current);
                                 nfailover++;
+                                if (nfailover > n/10)
+                                {
+                                    failoverOnly = true;
+                                }
                             }
                             else
                             {
@@ -624,6 +642,7 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
                             }
                         }
                     }
+                }
                 }
             }
             int count = beingdone.keySet().size();
