@@ -34,6 +34,7 @@ import net.sf.colossus.variant.HazardTerrain;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;
+import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
 /**
@@ -323,6 +324,91 @@ abstract public class AbstractAI implements AI
             val += cvc.HAS_NATIVE_COMBAT_BONUS;
         }
         return val;
+    }
+
+    /**
+     * Return true if the legion could recruit or acquire something
+     * better than its worst creature in hexLabel.
+     */
+    final protected boolean couldRecruitUp(Legion legion, MasterHex hex, Legion enemy,
+            MasterBoardTerrain terrain)
+    {
+        CreatureType weakest = client.getGame().getVariant().
+                getCreatureByName(((LegionClientSide) legion).getContents().
+                get((legion).getHeight() - 1));
+        // Consider recruiting.
+        List<CreatureType> recruits = client.findEligibleRecruits(legion, hex);
+        if (!recruits.isEmpty())
+        {
+            CreatureType bestRecruit = recruits.get(recruits.size() - 1);
+            if (bestRecruit != null &&
+                    getHintedRecruitmentValue(bestRecruit, legion,
+                    hintSectionUsed) >
+                    getHintedRecruitmentValue(weakest, legion, hintSectionUsed))
+            {
+                return true;
+            }
+        }
+        // Consider acquiring angels.
+        if (enemy != null)
+        {
+            int pointValue = ((LegionClientSide) enemy).getPointValue();
+            boolean wouldFlee = flee(enemy, legion);
+            if (wouldFlee)
+            {
+                pointValue /= 2;
+            }
+            // should work with all variants
+            int currentScore =
+                    ((PlayerClientSide) legion.getPlayer()).getScore();
+            int arv = TerrainRecruitLoader.getAcquirableRecruitmentsValue();
+            int nextScore = ((currentScore / arv) + 1) * arv;
+            CreatureType bestRecruit = null;
+            while ((currentScore + pointValue) >= nextScore)
+            {
+                List<String> ral =
+                        TerrainRecruitLoader.getRecruitableAcquirableList(terrain,
+                        nextScore);
+                for (String creatureName : ral)
+                {
+                    CreatureType tempRecruit =
+                            client.getGame().getVariant().
+                            getCreatureByName(creatureName);
+                    if ((bestRecruit == null) ||
+                            (getHintedRecruitmentValue(tempRecruit, legion,
+                            hintSectionUsed) >=
+                            getHintedRecruitmentValue(bestRecruit, legion,
+                            hintSectionUsed)))
+                    {
+                        bestRecruit = tempRecruit;
+                    }
+                }
+                nextScore += arv;
+            }
+            if (bestRecruit != null &&
+                    getHintedRecruitmentValue(bestRecruit, legion,
+                    hintSectionUsed) >
+                    getHintedRecruitmentValue(weakest, legion, hintSectionUsed))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected final int getHintedRecruitmentValue(CreatureType creature,
+            Legion legion, String[] section)
+    {
+        if (!(creature).isTitan())
+        {
+            return (creature).getHintedRecruitmentValue(section);
+        }
+        Player player = legion.getPlayer();
+        int power = ((PlayerClientSide) player).getTitanPower();
+        int skill = (creature).getSkill();
+        return power * skill *
+                VariantSupport.getHintedRecruitmentValueOffset(creature.getName(),
+                section);
     }
 
     /** Various constants used by the AIs code for battle evaluation.
