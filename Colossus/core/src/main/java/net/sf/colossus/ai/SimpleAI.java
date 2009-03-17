@@ -2735,12 +2735,15 @@ public class SimpleAI extends AbstractAI
         return value;
     }
 
-    private void evaluateCritterMove_Terrain(BattleChit critter,  ValueRecorder value) {
+    private void evaluateCritterMove_Terrain(BattleChit critter,
+            ValueRecorder value)
+    {
         final MasterBoardTerrain terrain = client.getBattleSite().getTerrain();
         final BattleHex hex = client.getBattleHex(critter);
         final int power = critter.getPower();
         final int skill = critter.getSkill();
-        PowerSkill ps = getNativeTerrainValue(critter.getCreature(), hex.getTerrain(), true);
+        PowerSkill ps = getNativeTerrainValue(critter.getCreature(), hex.
+                getTerrain(), true);
         int native_power = ps.getPowerAttack() + (ps.getPowerDefend() + power);
         int native_skill = ps.getSkillAttack() + ps.getSkillDefend();
         // Add for sitting in favorable terrain.
@@ -2748,11 +2751,11 @@ public class SimpleAI extends AbstractAI
         if (hex.isEntrance())
         {
             // Staying offboard to die is really bad.
-            value.add(bec.OFFBOARD_DEATH_SCALE_FACTOR
-                * getCombatValue(critter, terrain), "StayingOffboard");
+            value.add(bec.OFFBOARD_DEATH_SCALE_FACTOR * getCombatValue(critter,
+                    terrain), "StayingOffboard");
         }
-        else if (hex.isNativeBonusTerrain()
-            && critter.getCreature().isNativeIn(hex.getTerrain()))
+        else if (hex.isNativeBonusTerrain() &&
+                critter.getCreature().isNativeIn(hex.getTerrain()))
         {
             value.add(bec.NATIVE_BONUS_TERRAIN, "NativeBonusTerrain");
 
@@ -2764,8 +2767,8 @@ public class SimpleAI extends AbstractAI
                 native_skill += 1; // guess at bonus
             }
 
-            int bonus = (native_power - 2 * power) * skill
-                + (native_skill - 2 * skill) * power;
+            int bonus = (native_power - 2 * power) * skill + (native_skill -
+                    2 * skill) * power;
 
             value.add(3 * bonus, "More NativeBonusTerrain");
 
@@ -2776,39 +2779,28 @@ public class SimpleAI extends AbstractAI
             {
                 value.add(bec.NATIVE_BOG, "NativeBog");
             }
-
-            /*
-             Log.debug("Native " + critter.getCreature().getName() + " in " +
-             hex.getTerrain() +  " bonus " + bonus);
-             Log.debug("Native SKA " + ps.getSkillAttack() + " SKD " +
-             ps.getSkillDefend());
-             Log.debug("Native PA " + ps.getPowerAttack() + " PD " +
-             ps.getPowerDefend() + power);
-             Log.debug("Native skill " + native_skill + " skill " + 2*skill);
-             Log.debug("Native power " + native_power + " power " + 2*power);
-             **/
         }
         else
         // Critter is not native or the terrain is not beneficial
         {
-            if (hex.isNonNativePenaltyTerrain()
-                && (!critter.getCreature().isNativeIn(hex.getTerrain())))
+            if (hex.isNonNativePenaltyTerrain() && (!critter.getCreature().
+                    isNativeIn(hex.getTerrain())))
             {
                 value.add(bec.NON_NATIVE_PENALTY_TERRAIN, "NonNativePenalty");
 
                 // Above gives a small base value.
                 // Scale remaining bonus to size of benefit
-                int bonus = (native_power - 2 * power) * skill
-                    + (native_skill - 2 * skill) * power;
+                int bonus = (native_power - 2 * power) * skill +
+                        (native_skill - 2 * skill) * power;
 
                 value.add(3 * bonus, "More NonNativePenalty");
             }
         }
 
         /* damage is positive, healing is negative, so we can always add */
-        value.add(bec.PENALTY_DAMAGE_TERRAIN
-            * hex.damageToCreature(critter.getCreature()),
-            "PenaltyDamageTerrain");
+        value.add(bec.PENALTY_DAMAGE_TERRAIN * hex.damageToCreature(critter.
+                getCreature()),
+                "PenaltyDamageTerrain");
     }
 
     @SuppressWarnings("deprecation")
