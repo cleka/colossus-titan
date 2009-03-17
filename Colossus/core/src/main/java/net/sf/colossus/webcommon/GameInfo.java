@@ -94,6 +94,8 @@ public class GameInfo extends Thread implements Serializable
     {
         this.gameId = String.valueOf(getNextFreeGameId());
         this.type = type;
+        // System.out.println("\n ** instantiated a GameInfo of type " + type);
+
         this.state = GameState.PROPOSED;
 
         this.enrolledPlayers = 0;
@@ -150,7 +152,8 @@ public class GameInfo extends Thread implements Serializable
 
     public boolean isScheduledGame()
     {
-        return this.type == GameType.SCHEDULED;
+        boolean isSch = (this.type == GameType.SCHEDULED);
+        return isSch;
     }
 
     public String getStateString()
@@ -443,12 +446,12 @@ public class GameInfo extends Thread implements Serializable
             playerList.append(user.getName());
         }
 
-        String message = gameId + sep + state.toString() + sep + initiator
-            + sep + variant + sep + viewmode + sep + startTime + sep
-            + duration + sep + summary + sep + eventExpiring + sep
-            + unlimitedMulligans + sep + balancedTowers + sep + min + sep
-            + target + sep + max + sep + enrolledPlayers
-            + playerList.toString();
+        String message = gameId + sep + type.toString() + sep
+            + state.toString() + sep + initiator + sep + variant + sep
+            + viewmode + sep + startTime + sep + duration + sep + summary
+            + sep + eventExpiring + sep + unlimitedMulligans + sep
+            + balancedTowers + sep + min + sep + target + sep + max + sep
+            + enrolledPlayers + playerList.toString();
 
         return message;
     }
@@ -506,29 +509,30 @@ public class GameInfo extends Thread implements Serializable
         {
             gi = new GameInfo(gameId);
             games.put(key, gi);
-            // System.out.println("Creating a new one");
+            // System.out.println("Creating a new one GameInfo ");
         }
 
-        GameState gameState = GameState.valueOf(tokens[2]);
-        gi.state = gameState;
-        gi.initiator = tokens[3];
+        int j = 2;
+        gi.type = GameType.valueOf(tokens[j++]);
+        gi.state = GameState.valueOf(tokens[j++]);
+        gi.initiator = tokens[j++];
 
         // System.out.println("fromString, state=" + gi.state + ")");
         // System.out.println("tokens: " + tokens.toString());
 
-        gi.variant = tokens[4];
-        gi.viewmode = tokens[5];
-        gi.startTime = Long.parseLong(tokens[6]);
-        gi.duration = Integer.parseInt(tokens[7]);
-        gi.summary = tokens[8];
-        gi.eventExpiring = tokens[9];
-        gi.unlimitedMulligans = Boolean.valueOf(tokens[10]).booleanValue();
-        gi.balancedTowers = Boolean.valueOf(tokens[11]).booleanValue();
-        gi.min = Integer.parseInt(tokens[12]);
-        gi.target = Integer.parseInt(tokens[13]);
-        gi.max = Integer.parseInt(tokens[14]);
+        gi.variant = tokens[j++];
+        gi.viewmode = tokens[j++];
+        gi.startTime = Long.parseLong(tokens[j++]);
+        gi.duration = Integer.parseInt(tokens[j++]);
+        gi.summary = tokens[j++];
+        gi.eventExpiring = tokens[j++];
+        gi.unlimitedMulligans = Boolean.valueOf(tokens[j++]).booleanValue();
+        gi.balancedTowers = Boolean.valueOf(tokens[j++]).booleanValue();
+        gi.min = Integer.parseInt(tokens[j++]);
+        gi.target = Integer.parseInt(tokens[j++]);
+        gi.max = Integer.parseInt(tokens[j++]);
 
-        int lastIndex = 15;
+        int lastIndex = j;
         gi.enrolledPlayers = Integer.parseInt(tokens[lastIndex]);
 
         ArrayList<User> players = new ArrayList<User>();
@@ -567,7 +571,6 @@ public class GameInfo extends Thread implements Serializable
 
         this.portNr = portNr;
         this.setName("Game at port " + portNr);
-        this.state = GameInfo.GameState.RUNNING;
         return true;
     }
 
@@ -625,7 +628,7 @@ public class GameInfo extends Thread implements Serializable
 
     private void superviseGameStartup()
     {
-
+        // ACTIVATED
         server.tellEnrolledGameStartsSoon(this);
         LOGGER.log(Level.FINEST,
             "Seems starting game went ok, informing enrolled players!");
@@ -635,12 +638,14 @@ public class GameInfo extends Thread implements Serializable
         if (up)
         {
             LOGGER.log(Level.FINEST, "Game is up - informing clients!");
+            // READY_TO_CONNECT
             server.tellEnrolledGameStartsNow(this, portNr);
             server.allTellGameInfo(this);
 
             boolean ok = waitUntilGameStartedSuccessfully(10);
             if (ok)
             {
+                // RUNNING
                 server.tellEnrolledGameStarted(this);
             }
             else
@@ -699,6 +704,7 @@ public class GameInfo extends Thread implements Serializable
             LOGGER.log(Level.FINEST, "Game " + gameId + " ended and flagfile "
                 + flagFile.toString() + " is gone. Fine!");
         }
+        LOGGER.info("Before unregister game " + this.getGameId());
         server.unregisterGame(this, portNr);
     }
 
@@ -774,7 +780,15 @@ public class GameInfo extends Thread implements Serializable
     public void createStartLocallyOptionsObject(Options gameOptions,
         String localPlayer)
     {
+        // FIXME boolean continueHere;
+
+        // xxx get port from gameinfo
         gameOptions.setOption(Options.serveAtPort, Constants.defaultPort);
+
+        // xxx get host from gameinfo
+        // xxxxx set host in gameinfo, send to server/client
+        //gameOptions.setOption(Options.serveAtPort, Constants.defaultPort);
+
         gameOptions.setOption(Options.variant, this.variant);
         gameOptions.setOption(Options.viewMode, this.viewmode);
         gameOptions.setOption(Options.autosave, this.autoSave);

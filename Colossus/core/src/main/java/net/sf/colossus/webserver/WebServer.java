@@ -2,11 +2,19 @@ package net.sf.colossus.webserver;
 
 
 import java.awt.GraphicsEnvironment;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -55,12 +63,18 @@ public class WebServer implements IWebServer, IRunWebServer
 
     private boolean shutdownRequested = false;
 
+    private String proposedGamesFilename;
+    private boolean proposedGamesListModified = false;
+
     private final int maxClients;
 
-    private ArrayList<GameInfo> scheduledGames = null;
-    private ArrayList<GameInfo> instantGames = null;
-    private ArrayList<GameInfo> runningGames = null;
-    private ArrayList<GameInfo> endingGames = null;
+    private final HashMap<String, GameInfo> proposedGames = new HashMap<String, GameInfo>();
+
+    private final ArrayList<GameInfo> runningGames = new ArrayList<GameInfo>();
+    private final ArrayList<GameInfo> endingGames = new ArrayList<GameInfo>();
+
+    // USed also as separator for storing proposed games to file:
+    private final static String sep = net.sf.colossus.server.Constants.protocolTermSeparator;
 
     // Server socket port where we listen for WebClient connections
     private final int port;
@@ -114,11 +128,23 @@ public class WebServer implements IWebServer, IRunWebServer
 
         portBookKeeper = new PortBookKeeper(portRangeFrom, availablePorts);
 
+        // Load users from file:
         String usersFile = options
             .getStringOption(WebServerConstants.optUsersFile);
         int maxUsers = options.getIntOption(WebServerConstants.optMaxUsers);
-
         User.readUsersFromFile(usersFile, maxUsers);
+
+        // Restore proposed games from file:
+        proposedGamesFilename = options
+            .getStringOption(WebServerConstants.optGamesFile);
+        if (proposedGamesFilename == null)
+        {
+            proposedGamesFilename = WebServerConstants.DEFAULT_GAMES_FILE;
+            LOGGER
+                .warning("Filename for storing games not defined in cfg file!"
+                    + " Using default " + proposedGamesFilename);
+        }
+        readGamesFromFile(proposedGamesFilename, proposedGames);
 
         LOGGER.log(Level.INFO, "Server started: port " + port
             + ", maxClients " + maxClients);
@@ -137,11 +163,7 @@ public class WebServer implements IWebServer, IRunWebServer
             this.gui = new NullWebServerGUI();
         }
 
-        scheduledGames = new ArrayList<GameInfo>();
-        instantGames = new ArrayList<GameInfo>();
-        runningGames = new ArrayList<GameInfo>();
-        endingGames = new ArrayList<GameInfo>();
-
+        updateGUI();
         /*
          boolean runGameConsole = false;
          if (runGameConsole)
@@ -379,9 +401,10 @@ public class WebServer implements IWebServer, IRunWebServer
     public void updateGUI()
     {
         assert gui != null;
-        gui.setScheduledGamesInfo(scheduledGames.size()
+        gui.setScheduledGamesInfo(countProposedGames(true)
             + " scheduled games stored");
-        gui.setInstantGamesInfo(instantGames.size() + " instant games stored");
+        gui.setInstantGamesInfo(countProposedGames(false)
+            + " instant games stored");
         gui.setRunningGamesInfo(runningGames.size() + " running games");
         gui.setEndingGamesInfo(endingGames.size() + " games just ending");
     }
@@ -395,15 +418,11 @@ public class WebServer implements IWebServer, IRunWebServer
             duration, summary, expire, unlimitedMulligans, balancedTowers,
             min, target, max);
 
-        if (startAt == -1)
-        {
-            // startAt -1 means: no starttime, i.e. instantly
-            instantGames.add(gi);
-        }
-        else
-        {
-            scheduledGames.add(gi);
-        }
+        proposedGames.put(gi.getGameId(), gi);
+        proposedGamesListModified = true;
+
+        // System.out.println("Game " + gi.getGameId()
+        //     + " was proposed. Adding to list.");
 
         updateGUI();
         allTellGameInfo(gi);
@@ -416,10 +435,8 @@ public class WebServer implements IWebServer, IRunWebServer
         IWebClient client = newCst;
         User newUser = newCst.getUser();
 
-        Iterator<GameInfo> it = instantGames.iterator();
-        while (it.hasNext())
+        for (GameInfo gi : proposedGames.values())
         {
-            GameInfo gi = it.next();
             if (gi.isEnrolled(newUser))
             {
                 LOGGER.log(Level.FINEST, "Telling user " + newUser.getName()
@@ -443,14 +460,11 @@ public class WebServer implements IWebServer, IRunWebServer
         }
     }
 
-    public void tellAllScheduledGamesToOne(WebServerClientSocketThread cst)
+    public void tellAllProposedGamesToOne(WebServerClientSocketThread cst)
     {
-        tellAllGamesFromListToOne(cst, scheduledGames);
-    }
-
-    public void tellAllInstantGamesToOne(WebServerClientSocketThread cst)
-    {
-        tellAllGamesFromListToOne(cst, instantGames);
+        ArrayList<GameInfo> list = new ArrayList<GameInfo>(proposedGames
+            .values());
+        tellAllGamesFromListToOne(cst, list);
     }
 
     public void tellAllRunningGamesToOne(WebServerClientSocketThread cst)
@@ -469,15 +483,10 @@ public class WebServer implements IWebServer, IRunWebServer
         }
     }
 
-    public void gameFailed(GameInfo gi, String reason)
-    {
-        LOGGER.log(Level.WARNING, "GAME starting/running failed!!! Reason: "
-            + reason);
-    }
-
     public void tellEnrolledGameStartsSoon(GameInfo gi)
     {
         String gameId = gi.getGameId();
+        gi.setState(GameState.ACTIVATED);
 
         ArrayList<User> players = gi.getPlayers();
         Iterator<User> it = players.iterator();
@@ -486,6 +495,7 @@ public class WebServer implements IWebServer, IRunWebServer
         {
             User u = it.next();
             IWebClient client = (IWebClient)u.getThread();
+            client.gameInfo(gi);
             client.gameStartsSoon(gameId);
         }
     }
@@ -493,6 +503,7 @@ public class WebServer implements IWebServer, IRunWebServer
     public void tellEnrolledGameStartsNow(GameInfo gi, int port)
     {
         String gameId = gi.getGameId();
+        gi.setState(GameState.READY_TO_CONNECT);
 
         ArrayList<User> players = gi.getPlayers();
         Iterator<User> it = players.iterator();
@@ -501,13 +512,20 @@ public class WebServer implements IWebServer, IRunWebServer
         {
             User u = it.next();
             IWebClient client = (IWebClient)u.getThread();
+            client.gameInfo(gi);
             client.gameStartsNow(gameId, port, null);
         }
     }
 
     public void tellEnrolledGameStarted(GameInfo gi)
     {
+        gi.setState(GameState.RUNNING);
         String gameId = gi.getGameId();
+        // System.out.println("tellEnrolledGameStarted adds it to running");
+        proposedGames.remove(gameId);
+        runningGames.add(gi);
+        // System.out.println("Running: " + runningGames.toString());
+        updateGUI();
 
         for (User u : gi.getPlayers())
         {
@@ -521,6 +539,12 @@ public class WebServer implements IWebServer, IRunWebServer
         }
     }
 
+    public void gameFailed(GameInfo gi, String reason)
+    {
+        LOGGER.log(Level.WARNING, "GAME starting/running failed!!! Reason: "
+            + reason);
+    }
+
     // =========== Client actions ========== 
 
     public void enrollUserToGame(String gameId, String username)
@@ -531,11 +555,13 @@ public class WebServer implements IWebServer, IRunWebServer
         if (gi != null)
         {
             String reasonFail = gi.enroll(user);
+            proposedGamesListModified = true;
             if (reasonFail == null)
             {
                 allTellGameInfo(gi);
                 IWebClient client = (IWebClient)user.getThread();
                 client.didEnroll(gameId, user.getName());
+                proposedGamesListModified = true;
             }
         }
     }
@@ -548,6 +574,7 @@ public class WebServer implements IWebServer, IRunWebServer
         if (gi != null)
         {
             String reasonFail = gi.unenroll(user);
+            proposedGamesListModified = true;
             if (reasonFail == null)
             {
                 allTellGameInfo(gi);
@@ -573,15 +600,8 @@ public class WebServer implements IWebServer, IRunWebServer
                 client.gameCancelled(gameId, byUser);
             }
 
-            boolean scheduled = gi.isScheduledGame();
-            if (scheduled)
-            {
-                scheduledGames.remove(gi);
-            }
-            else
-            {
-                instantGames.remove(gi);
-            }
+            proposedGames.remove(gi.getGameId());
+            proposedGamesListModified = true;
             updateGUI();
         }
     }
@@ -592,6 +612,7 @@ public class WebServer implements IWebServer, IRunWebServer
         if (gi != null)
         {
             boolean success = startOneGame(gi);
+            proposedGamesListModified = true;
 
             LOGGER.log(Level.FINEST, "Found gi, got port " + port);
             if (!success)
@@ -631,6 +652,7 @@ public class WebServer implements IWebServer, IRunWebServer
                 + " to inform the other players to connect to host "
                 + playerHost + " port " + port);
         }
+        proposedGamesListModified = true;
     }
 
     public void informStartedByPlayer(String gameId)
@@ -647,6 +669,7 @@ public class WebServer implements IWebServer, IRunWebServer
             LOGGER.severe("Got request informGameStarted but did not find "
                 + "any game for gameId " + gameId);
         }
+        proposedGamesListModified = true;
     }
 
     public void updateUserCounts()
@@ -760,24 +783,24 @@ public class WebServer implements IWebServer, IRunWebServer
 
     // =========== internal workers ============
 
+    private int countProposedGames(boolean shallBeScheduled)
+    {
+        int count = 0;
+        for (GameInfo gi : proposedGames.values())
+        {
+            if (gi.isScheduledGame() == shallBeScheduled)
+            {
+                count++;
+            }
+        }
+        // System.out.println("proposed for shallbe " + shallBeScheduled
+        //     + " is: " + count);
+        return count;
+    }
+
     private GameInfo findByGameId(String gameId)
     {
-        for (GameInfo gi : instantGames)
-        {
-            if (gi.getGameId().equals(gameId))
-            {
-                return gi;
-            }
-        }
-        for (GameInfo gi : scheduledGames)
-        {
-            if (gi.getGameId().equals(gameId))
-            {
-                return gi;
-            }
-        }
-
-        return null;
+        return proposedGames.get(gameId);
     }
 
     private boolean startOneGame(GameInfo gi)
@@ -807,11 +830,9 @@ public class WebServer implements IWebServer, IRunWebServer
         }
         else
         {
+            // System.out.println("starting gi thread");
             gi.start();
             LOGGER.log(Level.FINEST, "Returned from starter");
-
-            instantGames.remove(gi);
-            runningGames.add(gi);
 
             updateGUI();
         }
@@ -829,14 +850,20 @@ public class WebServer implements IWebServer, IRunWebServer
     public void unregisterGame(GameInfo st, int port)
     {
         portBookKeeper.releasePort(port);
-
+        //        System.out.println("runningGames: " + runningGames.toString());
         synchronized (runningGames)
         {
             LOGGER.log(Level.FINEST, "trying to remove...");
             if (runningGames.contains(st))
             {
+                // System.out.println("removing");
                 LOGGER.log(Level.FINEST, "removing...");
                 runningGames.remove(st);
+            }
+            else
+            {
+                LOGGER.warning("runningGames does not contain game "
+                    + st.getGameId());
             }
         }
         synchronized (endingGames)
@@ -852,6 +879,104 @@ public class WebServer implements IWebServer, IRunWebServer
 
         updateGUI();
 
+    }
+
+    private void readGamesFromFile(String filename,
+        HashMap<String, GameInfo> proposedGames)
+    {
+        try
+        {
+            File gamesFile = new File(filename);
+            if (!gamesFile.exists())
+            {
+                LOGGER.warning("Games file " + filename
+                    + " does not exist yet. I'll create an empty one now.");
+                gamesFile.createNewFile();
+            }
+            else
+            {
+                LOGGER.info("Reading games from file " + filename);
+            }
+            BufferedReader games = new BufferedReader(new InputStreamReader(
+                new FileInputStream(gamesFile)));
+
+            String line = null;
+            while ((line = games.readLine()) != null)
+            {
+                if (line.startsWith("#"))
+                {
+                    // ignore comment line
+                }
+                else if (line.matches("\\s*"))
+                {
+                    // ignore empty line
+                }
+                else
+                {
+                    // GameInfo.fromString expects the token[0]
+                    // to be the command name:
+                    String lineWithCmd = "Dummy" + sep + line;
+                    String[] tokens = lineWithCmd.split(sep);
+                    GameInfo.fromString(tokens, proposedGames);
+
+                }
+            }
+            games.close();
+            LOGGER.info("Restored " + proposedGames.size()
+                + " games from file " + filename);
+        }
+        catch (FileNotFoundException e)
+        {
+            LOGGER.log(Level.SEVERE, "Users file " + filename + " not found!",
+                e);
+            System.exit(1);
+        }
+        catch (IOException e)
+        {
+            LOGGER.log(Level.SEVERE, "IOException while reading users file "
+                + filename + "!", e);
+            System.exit(1);
+        }
+        proposedGamesListModified = false;
+    }
+
+    public void saveGamesIfNeeded()
+    {
+        if (proposedGamesListModified)
+        {
+            storeGamesToFile(proposedGamesFilename);
+        }
+    }
+
+    private void storeGamesToFile(String filename)
+    {
+        if (filename == null)
+        {
+            LOGGER.log(Level.SEVERE, "filename must not be null, but it is!");
+            throw new RuntimeException("gameFile filename is null!");
+        }
+
+        LOGGER.log(Level.FINE, "Storing scheduled games to file " + filename);
+
+        PrintWriter out = null;
+        try
+        {
+            out = new PrintWriter(new FileOutputStream(filename));
+            for (GameInfo gi : proposedGames.values())
+            {
+                String asString = gi.toString(sep);
+                out.println(asString);
+            }
+            out.close();
+        }
+        catch (FileNotFoundException e)
+        {
+            LOGGER.log(Level.SEVERE, "Writing games file " + filename
+                + "failed: FileNotFoundException: ", e);
+            throw new RuntimeException("FileNotFound exception while "
+                + "creating/closing scheduled-Games file!");
+        }
+        proposedGamesListModified = false;
     }
 
     /**
@@ -940,7 +1065,7 @@ public class WebServer implements IWebServer, IRunWebServer
                         it.remove();
                     }
 
-                    LOGGER.log(Level.FINEST, "Reaper ended");
+                    LOGGER.log(Level.INFO, "Reaper ended");
                 }
                 else
                 {

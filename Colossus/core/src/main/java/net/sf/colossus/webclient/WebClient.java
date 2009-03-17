@@ -1982,18 +1982,15 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         // GetPlayersWeb dialog notifies the mutex;
         // when that happens, the runnable starts the game by calling
         // doInitiateStartLocally().
-        this.runGetPlayersWebDialogAndWait(presetOptions, startObject);
+        runGetPlayersWebDialogAndWait(presetOptions, startObject);
 
         return ok;
     }
 
-    /* TODO this description (the network client part) is probably 
-     *      somewhat obsolete...
-     *  
-     * Bring up the getplayers dialog (depending on startObject it starts 
-     * either as GetPlayers or ready switched to Network client),
-     * and then we wait here until is has set startObject to the next 
-     * action to do and notified us to continue.
+    /* 
+     * Bring up the GetPlayersWeb dialog and then we wait,
+     * until is has set startObject to the next action to do  
+     * and notified us to continue.
      */
     void runGetPlayersWebDialogAndWait(Options presetOptions, Start startObject)
     {
@@ -2002,14 +1999,14 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
         // System.out.println("doStartLocally after GetPlayersWeb");
 
-        // TODO
         startObject.setWhatToDoNext(Start.StartWebClient);
 
         Runnable waitForAction = new Runnable()
         {
+            WebClient webClient = WebClient.this;
+
             public void run()
             {
-                WebClient webClient = WebClient.this;
                 Object mutex = webClient.getPlayersDialogMutex();
                 // System.out.println("Runnable-run() before sync");
                 synchronized (mutex)
@@ -2019,6 +2016,8 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
                     {
                         // System.out.println("Runnable-run() now before wait");
                         mutex.wait();
+                        LOGGER.info("GetPlayersWeb dialog notified us "
+                            + "that it is ready.");
                     }
                     catch (InterruptedException e)
                     {
@@ -2030,6 +2029,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
                     }
                 }
                 mutex = null;
+                LOGGER.info("Initiating the local game starting");
                 webClient.doInitiateStartLocally();
             }
         };
@@ -2147,7 +2147,6 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         infoTextLabel.setText(startingText);
     }
 
-    // TODO the below is probably never used?
     public void gameStarted(String gameId)
     {
         startButton.setEnabled(false);
@@ -2443,12 +2442,18 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
                             case DUE:
                             case ACTIVATED:
+                                break;
+
                             case STARTING:
+                                infoTextLabel.setText(startingText);
+                                break;
+
                             case READY_TO_CONNECT:
-                                // to be done
+
                                 break;
 
                             case RUNNING:
+                                infoTextLabel.setText(startedText);
                                 // System.out
                                 //     .println("Got a running game, replacing in run game list and remove in inst game list");
                                 replaceInTable(runGameTable, game);

@@ -22,6 +22,8 @@ public final class WebServerConstants
     public final static String optAvailablePorts = "AvailablePorts";
 
     public final static String optUsersFile = "UsersFile";
+    public final static String optGamesFile = "GamesFile";
+    public final static String DEFAULT_GAMES_FILE = "games.dat";
 
     public final static String optJavaCommand = "JavaCommand";
     public final static String optColossusJar = "ColossusJar";

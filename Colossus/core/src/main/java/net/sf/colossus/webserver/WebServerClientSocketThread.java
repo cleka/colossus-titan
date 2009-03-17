@@ -491,13 +491,14 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             {
                 grantAdminStatus();
             }
-            server.tellAllScheduledGamesToOne(this);
-            server.tellAllInstantGamesToOne(this);
+            server.tellAllProposedGamesToOne(this);
             server.tellAllRunningGamesToOne(this);
             server.tellLastChatMessagesToOne(this, IWebServer.generalChatName);
             server.reEnrollIfNecessary(this);
             server.updateUserCounts();
         }
+
+        server.saveGamesIfNeeded();
 
         return done;
     }
