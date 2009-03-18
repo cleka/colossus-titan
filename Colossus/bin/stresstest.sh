@@ -13,8 +13,8 @@
 # - stops if stop.flag found
 # - if Colossus exits with non-zero exit code, or backup.flag
 #   found, make backup copy of relevant log + autosave files
-# - call Colossus with property ForceViewBoard set, so that one
-#   sees (even if all are AIs) the MasterBoard and StatusScreen.
+# - with -W, call Colossus with property ForceViewBoard set, so that
+#   one sees (even if all are AIs) the MasterBoard and StatusScreen.
 #
 # Perhaps this replace the original stresstest script completely,
 # but I was not sure, perhaps someone would rather like to stay
@@ -131,8 +131,8 @@ do
         delete_snaps=yes
         ;;
     --forcewind*|-W)
-        echo "Setting forceViewWindow to yes"
-        FORCEBOARD=-Dnet.sf.colossus.forceViewBoard=yes
+        echo "Setting forceViewWindow to true"
+        FORCEBOARD=-Dnet.sf.colossus.forceViewBoard=true
         ;;
     --rounds*|-I)
         shift
@@ -152,9 +152,11 @@ do
         ;;
     --remote|-R)
         shift
+        # Number of Remote Clients
         nrc=$1
+        # TODO: this is probably obsolete now since we have -W ?
         # That thing with the remote clients currently works only well if at 
-       # least one human player is there, too (to get a masterboard). 
+        # least one human player is there, too (to get a masterboard). 
         # So, let's add one:
         remoteclients="-n$1 -S -m$MyName -A"
         humans=-u1
