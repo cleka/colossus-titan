@@ -120,7 +120,7 @@ public class ExperimentalAI extends SimpleAI
                         (float) 3.) *
                         (float) bec.TITAN_FORWARD_EARLY_PENALTY *
                         ((float) 6. - (float) rangeToClosestOpponent(hex))),
-                        "Progessive TitanForwardEarlyPenalty");
+                        "Progressive TitanForwardEarlyPenalty");
                 for (int i = 0; i < 6; i++)
                 {
                     BattleHex neighbor = hex.getNeighbor(i);
