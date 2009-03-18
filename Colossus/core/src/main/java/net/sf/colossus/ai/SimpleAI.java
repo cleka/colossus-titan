@@ -2735,10 +2735,15 @@ public class SimpleAI extends AbstractAI
         return value;
     }
 
-    private void evaluateCritterMove_Titan(final BattleChit critter,
+    /** this comput ethe special case of the Titan critter */
+    protected void evaluateCritterMove_Titan(final BattleChit critter,
             ValueRecorder value, final MasterBoardTerrain terrain,
             final BattleHex hex, final LegionClientSide legion, final int turn)
     {
+        // Reward titans sticking to the edges of the back row
+        // surrounded by allies.  We need to relax this in the
+        // last few turns of the battle, so that attacking titans
+        // don't just sit back and wait for a time loss.
         BattleHex entrance = BattleMap.getEntrance(terrain,
                 legion.getEntrySide());
         if (!critter.isTitan())
@@ -2777,7 +2782,8 @@ public class SimpleAI extends AbstractAI
         }
     }
 
-    private void evaluateCritterMove_Terrain(final BattleChit critter,
+    /** This compute the influence of terrain */
+    protected void evaluateCritterMove_Terrain(final BattleChit critter,
             ValueRecorder value, final MasterBoardTerrain terrain,
             final BattleHex hex, final int power, final int skill)
     {
@@ -2842,9 +2848,72 @@ public class SimpleAI extends AbstractAI
                 "PenaltyDamageTerrain");
     }
 
-    @SuppressWarnings("deprecation")
+    /** this compute for non-titan attacking critter */
+    @SuppressWarnings({"unused", "deprecation"})
+    protected void evaluateCritterMove_Attacker(final BattleChit critter,
+            ValueRecorder value, final MasterBoardTerrain terrain,
+            final BattleHex hex, final LegionClientSide legion, final int turn)
+    {
+        // Attacker, non-titan, needs to charge.
+        // Head for enemy creatures.
+        value.add(bec.ATTACKER_DISTANCE_FROM_ENEMY_PENALTY * client.getStrike().
+                minRangeToEnemy(critter),
+                "AttackerDistanceFromEnemyPenalty");
+    }
+
+    /** this compute for non-titan defending critter */
+    @SuppressWarnings("unused")
+    protected void evaluateCritterMove_Defender(final BattleChit critter,
+            ValueRecorder value, final MasterBoardTerrain terrain,
+            final BattleHex hex, final LegionClientSide legion, final int turn)
+    {
+        // Encourage defending critters to hang back.
+        BattleHex entrance = BattleMap.getEntrance(terrain,
+                legion.getEntrySide());
+        if (terrain.isTower())
+        {
+            // Stick to the center of the tower.
+            value.add(
+                    bec.DEFENDER_TOWER_HEIGHT_BONUS * hex.getElevation(),
+                    "DefenderTowerHeightBonus");
+        }
+        else
+        {
+            int range = Battle.getRange(hex, entrance, true);
+
+            // To ensure that defending legions completely enter
+            // the board, prefer the second row to the first.  The
+            // exception is small legions early in the battle,
+            // when trying to survive long enough to recruit.
+            int preferredRange = 3;
+            if (legion.getHeight() <= 3 && turn < 4)
+            {
+                preferredRange = 2;
+            }
+            if (range != preferredRange)
+            {
+                value.add(bec.DEFENDER_FORWARD_EARLY_PENALTY * Math.abs(range -
+                        preferredRange),
+                        "DefenderForwardEarlyPenalty");
+            }
+            for (int i = 0; i < 6; i++)
+            {
+                BattleHex neighbor = hex.getNeighbor(i);
+                if (neighbor == null /* Edge of the map */ || neighbor.
+                        getTerrain().blocksGround() || (neighbor.getTerrain().
+                        isGroundNativeOnly() && !hasOpponentNativeCreature(
+                        neighbor.getTerrain())))
+                {
+                    value.add(
+                            bec.DEFENDER_BY_EDGE_OR_BLOCKINGHAZARD_BONUS,
+                            "DefenderByEdgeOrBlockingHazard (" + i + ")");
+                }
+            }
+        }
+    }
+
     /** strikeMap is optional */
-    private int evaluateCritterMove(BattleChit critter,
+    protected int evaluateCritterMove(BattleChit critter,
         Map<String, Integer> strikeMap, ValueRecorder value)
     {
         final MasterBoardTerrain terrain = client.getBattleSite().getTerrain();
@@ -3060,70 +3129,20 @@ public class SimpleAI extends AbstractAI
             }
         }
 
-        BattleHex entrance = BattleMap.getEntrance(terrain, legion
-            .getEntrySide());
-
-        // Reward titans sticking to the edges of the back row
-        // surrounded by allies.  We need to relax this in the
-        // last few turns of the battle, so that attacking titans
-        // don't just sit back and wait for a time loss.
         if (critter.isTitan())
         {
             evaluateCritterMove_Titan(critter, value, terrain, hex, legion,
                     turn);
         }
-        // Encourage defending critters to hang back.
         else if (legion.equals(client.getDefender()))
         {
-            if (terrain.isTower())
-            {
-                // Stick to the center of the tower.
-                value.add(
-                    bec.DEFENDER_TOWER_HEIGHT_BONUS * hex.getElevation(),
-                    "DefenderTowerHeightBonus");
-            }
-            else
-            {
-                int range = Battle.getRange(hex, entrance, true);
-
-                // To ensure that defending legions completely enter
-                // the board, prefer the second row to the first.  The
-                // exception is small legions early in the battle,
-                // when trying to survive long enough to recruit.
-                int preferredRange = 3;
-                if (legion.getHeight() <= 3 && turn < 4)
-                {
-                    preferredRange = 2;
-                }
-                if (range != preferredRange)
-                {
-                    value.add(bec.DEFENDER_FORWARD_EARLY_PENALTY
-                        * Math.abs(range - preferredRange),
-                        "DefenderForwardEarlyPenalty");
-                }
-                for (int i = 0; i < 6; i++)
-                {
-                    BattleHex neighbor = hex.getNeighbor(i);
-                    if (neighbor == null /* Edge of the map */
-                        || neighbor.getTerrain().blocksGround()
-                        || (neighbor.getTerrain().isGroundNativeOnly() && !hasOpponentNativeCreature(neighbor
-                            .getTerrain())))
-                    {
-                        value.add(
-                            bec.DEFENDER_BY_EDGE_OR_BLOCKINGHAZARD_BONUS,
-                            "DefenderByEdgeOrBlockingHazard (" + i + ")");
-                    }
-                }
-            }
+            evaluateCritterMove_Defender(critter, value, terrain, hex, legion,
+                    turn);
         }
-
         else
-        // Attacker, non-titan, needs to charge.
         {
-            // Head for enemy creatures.
-            value.add(bec.ATTACKER_DISTANCE_FROM_ENEMY_PENALTY
-                * client.getStrike().minRangeToEnemy(critter),
-                "AttackerDistanceFromEnemyPenalty");
+            evaluateCritterMove_Attacker(critter, value, terrain, hex, legion,
+                    turn);
         }
 
         // Adjacent buddies
