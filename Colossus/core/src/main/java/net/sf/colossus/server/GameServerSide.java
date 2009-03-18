@@ -2724,18 +2724,21 @@ public final class GameServerSide extends Game
     }
 
     /**
-     * Return a set of hexes containing summonables.
-     *
-     * TODO rename -- it is not specific for angels
+     * @TODO now duplicate to client side method with same name
+     * 
+     * Return a set of Legions containing creatures that could
+     * be actually summoned (i.e. is not the summoner itself and is
+     * not currently engaged.
+     * @param summoner  The legion that intends to summon
      */
-    Set<MasterHex> findSummonableAngels(Legion legion)
+    Set<Legion> findLegionsWithSummonables(Legion summoner)
     {
-        Set<MasterHex> result = new HashSet<MasterHex>();
-        for (Legion candidate : legion.getPlayer().getLegions())
+        Set<Legion> result = new HashSet<Legion>();
+        for (Legion candidate : summoner.getPlayer().getLegions())
         {
-            if (candidate != legion)
+            if (candidate != summoner
+                && !isEngagement(candidate.getCurrentHex()))
             {
-                MasterHex hex = candidate.getCurrentHex();
                 boolean hasSummonable = false;
                 List<CreatureType> summonableList = getVariant()
                     .getSummonableCreatureTypes();
@@ -2747,9 +2750,9 @@ public final class GameServerSide extends Game
                     hasSummonable = hasSummonable
                         || (((LegionServerSide)candidate).numCreature(c) > 0);
                 }
-                if (hasSummonable && !isEngagement(hex))
+                if (hasSummonable)
                 {
-                    result.add(hex);
+                    result.add(candidate);
                 }
             }
         }
