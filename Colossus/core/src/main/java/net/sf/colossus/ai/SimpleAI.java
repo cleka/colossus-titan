@@ -2708,9 +2708,9 @@ public class SimpleAI extends AbstractAI
             }
         }
         findBestLegionMoveTimer.cancel();
-        LOGGER.finer("Best legion move of " + count + " checked : "
-            + ((best == null) ? "none " : best.getStringWithEvaluation())
-            + " (" + bestScore + ")");
+        LOGGER.finer("Best legion move of " + count + " checked (turn " +
+                client.getBattleTurnNumber() + "): " + ((best == null) ? "none "
+                : best.getStringWithEvaluation()) + " (" + bestScore + ")");
         return best;
     }
 

@@ -12,8 +12,10 @@ import net.sf.colossus.client.CritterMove;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.game.Battle;
 import net.sf.colossus.gui.BattleChit;
+import net.sf.colossus.gui.BattleMap;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.variant.BattleHex;
+import net.sf.colossus.variant.MasterBoardTerrain;
 
 
 /**
@@ -61,6 +63,84 @@ public class ExperimentalAI extends SimpleAI
          */
         Runtime.getRuntime().gc();
         return r;
+    }
+
+
+    /** this comput ethe special case of the Titan critter */
+    @Override
+    protected void evaluateCritterMove_Titan(final BattleChit critter,
+            ValueRecorder value, final MasterBoardTerrain terrain,
+            final BattleHex hex, final LegionClientSide legion, final int turn)
+    {
+        // Reward titans sticking to the edges of the back row
+        // surrounded by allies.  We need to relax this in the
+        // last few turns of the battle, so that attacking titans
+        // don't just sit back and wait for a time loss.
+        BattleHex entrance = BattleMap.getEntrance(terrain,
+                legion.getEntrySide());
+        if (!critter.isTitan())
+        {
+            LOGGER.warning(
+                    "evaluateCritterMove_Titan called on non-Titan critter");
+            return;
+        }
+        if (terrain.isTower() && legion.equals(client.getDefender()))
+        {
+            // Stick to the center of the tower.
+            value.add(bec.TITAN_TOWER_HEIGHT_BONUS * hex.getElevation(),
+                    "TitanTowerHeightBonus");
+        }
+        else
+        {
+            if (legion.equals(client.getDefender()))
+            {
+                // defending titan is a coward.
+                value.add(bec.TITAN_FORWARD_EARLY_PENALTY *
+                        Battle.getRange(hex, entrance, true),
+                        "Defending TitanForwardEarlyPenalty");
+                for (int i = 0; i < 6; i++)
+                {
+                    BattleHex neighbor = hex.getNeighbor(i);
+                    if (neighbor == null /* Edge of the map */ || neighbor.
+                            getTerrain().blocksGround() || (neighbor.getTerrain().
+                            isGroundNativeOnly() && !hasOpponentNativeCreature(
+                            neighbor.getTerrain())))
+                    {
+                        value.add(
+                                bec.TITAN_BY_EDGE_OR_BLOCKINGHAZARD_BONUS,
+                                "Defending TitanByEdgeOrBlockingHazard (" + i +
+                                ")");
+                    }
+                }
+            }
+            else
+            {
+                // attacking titan should progressively involve itself
+                value.add(Math.round((((float) 4. - (float) turn) / (float) 3.) *
+                        (float) bec.TITAN_FORWARD_EARLY_PENALTY *
+                        (float) Battle.getRange(hex, entrance, true)),
+                        "Progessive TitanForwardEarlyPenalty");
+                for (int i = 0; i < 6; i++)
+                {
+                    BattleHex neighbor = hex.getNeighbor(i);
+                    if (neighbor == null /* Edge of the map */ || neighbor.
+                            getTerrain().blocksGround() || (neighbor.getTerrain().
+                            isGroundNativeOnly() && !hasOpponentNativeCreature(
+                            neighbor.getTerrain())))
+                    {
+                        // being close to the edge is not a disavantage, even late
+                        // in the battle, so min is 0 point.
+                        value.add(
+                                Math.round(
+                                (Math.max(((float) 4. - (float) turn) /
+                                (float) 3., (float) 0.) *
+                                (float) bec.TITAN_BY_EDGE_OR_BLOCKINGHAZARD_BONUS)),
+                                "Progressive TitanByEdgeOrBlockingHazard (" + i +
+                                ")");
+                    }
+                }
+            }
+        }
     }
 
     @Override
