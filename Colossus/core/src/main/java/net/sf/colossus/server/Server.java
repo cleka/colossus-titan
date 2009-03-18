@@ -850,6 +850,7 @@ public final class Server extends Thread implements IServer
 
     public void createLocalClients()
     {
+        boolean atLeastOneBoardNeeded = Constants.FORCE_VIEW_BOARD;
         for (PlayerServerSide player : game.getPlayers())
         {
             if (!player.getDeadBeforeSave()
@@ -863,20 +864,29 @@ public final class Server extends Thread implements IServer
                 }
                 else
                 {
+                    boolean createGUI = !player.isAI();
+                    if (atLeastOneBoardNeeded)
+                    {
+                        // Yes, only depending on the atLeast..., no matter
+                        // whether for this player true or not!
+                        // This relies on the fact that for cmdline setup
+                        // Human players are created before AI players.
+                        createGUI = true;
+                        atLeastOneBoardNeeded = false;
+                    }
                     LOGGER.info("Creating local client for player "
                         + player.getName());
-                    createLocalClient(player);
+                    createLocalClient(player, createGUI);
                 }
 
             }
         }
     }
 
-    private void createLocalClient(PlayerServerSide player)
+    private void createLocalClient(PlayerServerSide player, boolean createGUI)
     {
         String playerName = player.getName();
         boolean dontUseOptionsFile = player.isAI();
-        boolean createGUI = !player.isAI();
         LOGGER.finest("Called Server.createLocalClient() for " + playerName);
 
         // a hack to pass something into the Client constructor

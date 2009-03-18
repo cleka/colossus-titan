@@ -128,6 +128,12 @@ public final class Constants
         System.getProperty(END_AFTER_FIRST_BATTLE_PROPERTY, "false")
             .toString()).booleanValue();
 
+    // Special feature for stresstest: force at least one board
+    private static String FORCE_VIEW_BOARD_PROPNAME = "net.sf.colossus.forceViewBoard";
+    public static final boolean FORCE_VIEW_BOARD = Boolean.valueOf(
+        System.getProperty(FORCE_VIEW_BOARD_PROPNAME, "false").toString())
+        .booleanValue();
+
     /** Base path for all external game data files. */
     public static final String GAME_DATA_PATH = System
         .getProperty("user.home")
@@ -190,61 +196,67 @@ public final class Constants
      shortened name directly */
 
     // TODO the colors themselves should be defined in here
-    public static enum PlayerColor {
-        BLACK("Black","Bk",KeyEvent.VK_B),
-        BLUE("Blue","Bu",KeyEvent.VK_L),
-        BROWN("Brown","Br",KeyEvent.VK_O),
-        GOLD("Gold","Gd",KeyEvent.VK_G),
-        GREEN("Green","Gr",KeyEvent.VK_E),
-        RED("Red","Rd",KeyEvent.VK_R),
-        ORANGE("Orange","Or",KeyEvent.VK_A),
-        PURPLE("Purple","Pu",KeyEvent.VK_P),
-        SILVER("Silver","Si",KeyEvent.VK_S),
-        SKY("Sky","Sk",KeyEvent.VK_K),
-        PINE("Pine","Pi",KeyEvent.VK_N),
-        INDIGO("Indigo","In",KeyEvent.VK_I);
+    public static enum PlayerColor
+    {
+        BLACK("Black", "Bk", KeyEvent.VK_B), BLUE("Blue", "Bu", KeyEvent.VK_L), BROWN(
+            "Brown", "Br", KeyEvent.VK_O), GOLD("Gold", "Gd", KeyEvent.VK_G), GREEN(
+            "Green", "Gr", KeyEvent.VK_E), RED("Red", "Rd", KeyEvent.VK_R), ORANGE(
+            "Orange", "Or", KeyEvent.VK_A), PURPLE("Purple", "Pu",
+            KeyEvent.VK_P), SILVER("Silver", "Si", KeyEvent.VK_S), SKY("Sky",
+            "Sk", KeyEvent.VK_K), PINE("Pine", "Pi", KeyEvent.VK_N), INDIGO(
+            "Indigo", "In", KeyEvent.VK_I);
 
         private final String name;
         private final String shortName;
         private final int mnemonic;
 
-        private PlayerColor(String name, String shortName, int mnemonic) {
+        private PlayerColor(String name, String shortName, int mnemonic)
+        {
             this.name = name;
             this.shortName = shortName;
             this.mnemonic = mnemonic;
         }
 
-        public int getMnemonic() {
+        public int getMnemonic()
+        {
             return mnemonic;
         }
 
-        public String getName() {
+        public String getName()
+        {
             return name;
         }
 
-        public String getShortName() {
+        public String getShortName()
+        {
             return shortName;
         }
 
-        public static PlayerColor getByName(String name) {
-            for (PlayerColor color : values()) {
-                if(color.getName().equals(name)) {
+        public static PlayerColor getByName(String name)
+        {
+            for (PlayerColor color : values())
+            {
+                if (color.getName().equals(name))
+                {
                     return color;
                 }
             }
             return null; // seems to happen when game starts
         }
 
-        public static List<PlayerColor> getByName(List<String> names) {
+        public static List<PlayerColor> getByName(List<String> names)
+        {
             List<PlayerColor> retVal = new ArrayList<PlayerColor>();
-            for (String name : names) {
+            for (String name : names)
+            {
                 retVal.add(getByName(name));
             }
             return retVal;
         }
 
         @Override
-        public String toString() {
+        public String toString()
+        {
             return getName(); // important as long as some code might still expect the old strings
         }
     }
