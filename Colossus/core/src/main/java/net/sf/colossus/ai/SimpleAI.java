@@ -2912,6 +2912,208 @@ public class SimpleAI extends AbstractAI
         }
     }
 
+    protected void evaluateCritterMove_Rangestrike(final BattleChit critter,
+            final Map<String, Integer> strikeMap,
+            ValueRecorder value, final MasterBoardTerrain terrain,
+            final BattleHex hex, final int power, final int skill,
+            final LegionClientSide legion, final int turn,
+            final Set<String> targetHexLabels)
+    {
+        int numTargets = targetHexLabels.size();
+        // Rangestrikes.
+        value.add(bec.FIRST_RANGESTRIKE_TARGET,
+                "FirstRangestrikeTarget");
+
+        // Having multiple targets is good, in case someone else
+        // kills one.
+        if (numTargets >= 2)
+        {
+            value.add(bec.EXTRA_RANGESTRIKE_TARGET,
+                    "ExtraRangestrikeTarget");
+        }
+
+        // Non-warlock skill 4 rangestrikers should slightly prefer
+        // range 3 to range 4.  Non-brush rangestrikers should
+        // prefer strikes not through bramble.  Warlocks should
+        // try to rangestrike titans.
+        boolean penalty = true;
+        for (String hexLabel : targetHexLabels)
+        {
+            BattleChit target = client.getBattleChit(hexLabel);
+            if (target.isTitan())
+            {
+                value.add(bec.RANGESTRIKE_TITAN, "RangestrikeTitan");
+            }
+            int strikeNum = client.getStrike().getStrikeNumber(
+                    critter, target);
+            if (strikeNum <= 4 - skill + target.getSkill())
+            {
+                penalty = false;
+            }
+
+            // Reward ganging up on enemies.
+            if (strikeMap != null)
+            {
+                int numAttackingThisTarget = strikeMap.get(hexLabel).intValue();
+                if (numAttackingThisTarget > 1)
+                {
+                    value.add(bec.GANG_UP_ON_CREATURE,
+                            "GangUpOnCreature");
+                }
+            }
+        }
+        if (!penalty)
+        {
+            value.add(bec.RANGESTRIKE_WITHOUT_PENALTY,
+                    "RangestrikeWithoutPenalty");
+        }
+    }
+
+    protected void evaluateCritterMove_Strike(final BattleChit critter,
+            final Map<String, Integer> strikeMap,
+            ValueRecorder value, final MasterBoardTerrain terrain,
+            final BattleHex hex, final int power, final int skill,
+            final LegionClientSide legion, final int turn,
+            final Set<String> targetHexLabels)
+    {
+        // Normal strikes.  If we can strike them, they can strike us.
+
+        // Reward being adjacent to an enemy if attacking.
+        if (legion.equals(client.getAttacker()))
+        {
+            value.add(bec.ATTACKER_ADJACENT_TO_ENEMY,
+                    "AttackerAdjacentToEnemy");
+        }
+        // Slightly penalize being adjacent to an enemy if defending.
+        else
+        {
+            value.add(bec.DEFENDER_ADJACENT_TO_ENEMY,
+                    "DefenderAdjacentToEnemy");
+        }
+
+        int killValue = 0;
+        int numKillableTargets = 0;
+        int hitsExpected = 0;
+
+        for (String hexLabel : targetHexLabels)
+        {
+            BattleChit target = client.getBattleChit(hexLabel);
+
+            // Reward being next to enemy titans.  (Banzai!)
+            if (target.isTitan())
+            {
+                value.add(bec.ADJACENT_TO_ENEMY_TITAN,
+                        "AdjacentToEnemyTitan");
+            }
+
+            // Reward being next to a rangestriker, so it can't hang
+            // back and plink us.
+            if (target.isRangestriker() && !critter.isRangestriker())
+            {
+                value.add(bec.ADJACENT_TO_RANGESTRIKER,
+                        "AdjacenttoRangestriker");
+            }
+
+            // Attack Warlocks so they don't get Titan
+            if (target.getCreatureName().equals("Warlock"))
+            {
+                value.add(bec.ADJACENT_TO_BUDDY_TITAN,
+                        "AdjacentToBuddyTitan");
+            }
+
+            // Reward being next to an enemy that we can probably
+            // kill this turn.
+            int dice = client.getStrike().getDice(critter, target);
+            int strikeNum = client.getStrike().getStrikeNumber(
+                    critter, target);
+            double meanHits = Probs.meanHits(dice, strikeNum);
+            if (meanHits + target.getHits() >= target.getPower())
+            {
+                numKillableTargets++;
+                int targetValue = getKillValue(target, terrain);
+                killValue = Math.max(targetValue, killValue);
+            }
+            else
+            {
+                // reward doing damage to target - esp. titan.
+                int targetValue = getKillValue(target, terrain);
+                killValue = (int) (0.5 * (meanHits / target.getPower()) * Math.
+                        max(targetValue, killValue));
+            }
+
+            // Reward ganging up on enemies.
+            if (strikeMap != null)
+            {
+                int numAttackingThisTarget = strikeMap.get(hexLabel).intValue();
+                if (numAttackingThisTarget > 1)
+                {
+                    value.add(bec.GANG_UP_ON_CREATURE,
+                            "GangUpOnCreature 2");
+                }
+            }
+
+            // Penalize damage that we can take this turn,
+            {
+                dice = client.getStrike().getDice(target, critter);
+                strikeNum = client.getStrike().getStrikeNumber(target,
+                        critter);
+                hitsExpected += Probs.meanHits(dice, strikeNum);
+            }
+        }
+
+        if (legion.equals(client.getAttacker()))
+        {
+            value.add(bec.ATTACKER_KILL_SCALE_FACTOR * killValue +
+                    bec.KILLABLE_TARGETS_SCALE_FACTOR * numKillableTargets,
+                    "Attacker Killable Stuff");
+        }
+        else
+        {
+            value.add(bec.DEFENDER_KILL_SCALE_FACTOR * killValue +
+                    bec.KILLABLE_TARGETS_SCALE_FACTOR * numKillableTargets,
+                    "Defender Killable Stuff");
+        }
+
+        int hits = critter.getHits();
+
+        // XXX Attacking legions late in battle ignore damage.
+        // the isTitan() here should be moved to _Titan function above ?
+        if (legion.equals(client.getDefender()) || critter.isTitan() || turn <=
+                4)
+        {
+            if (hitsExpected + hits >= power)
+            {
+                if (legion.equals(client.getAttacker()))
+                {
+                    value.add(bec.ATTACKER_GET_KILLED_SCALE_FACTOR *
+                            getKillValue(critter, terrain),
+                            "AttackerGetKilled");
+                }
+                else
+                {
+                    value.add(bec.DEFENDER_GET_KILLED_SCALE_FACTOR *
+                            getKillValue(critter, terrain),
+                            "DefenderGetKilled");
+                }
+            }
+            else
+            {
+                if (legion.equals(client.getAttacker()))
+                {
+                    value.add(bec.ATTACKER_GET_HIT_SCALE_FACTOR * getKillValue(
+                            critter, terrain),
+                            "AttackerGetHit");
+                }
+                else
+                {
+                    value.add(bec.DEFENDER_GET_HIT_SCALE_FACTOR * getKillValue(
+                            critter, terrain),
+                            "DefendergetHit");
+                }
+            }
+        }
+    }
+
     /** strikeMap is optional */
     protected int evaluateCritterMove(BattleChit critter,
         Map<String, Integer> strikeMap, ValueRecorder value)
@@ -2939,193 +3141,15 @@ public class SimpleAI extends AbstractAI
         {
             if (!client.isInContact(critter, true))
             {
-                // Rangestrikes.
-                value.add(bec.FIRST_RANGESTRIKE_TARGET,
-                    "FirstRangestrikeTarget");
-
-                // Having multiple targets is good, in case someone else
-                // kills one.
-                if (numTargets >= 2)
-                {
-                    value.add(bec.EXTRA_RANGESTRIKE_TARGET,
-                        "ExtraRangestrikeTarget");
-                }
-
-                // Non-warlock skill 4 rangestrikers should slightly prefer
-                // range 3 to range 4.  Non-brush rangestrikers should
-                // prefer strikes not through bramble.  Warlocks should
-                // try to rangestrike titans.
-                boolean penalty = true;
-                for (String hexLabel : targetHexLabels)
-                {
-                    BattleChit target = client.getBattleChit(hexLabel);
-                    if (target.isTitan())
-                    {
-                        value.add(bec.RANGESTRIKE_TITAN, "RangestrikeTitan");
-                    }
-                    int strikeNum = client.getStrike().getStrikeNumber(
-                        critter, target);
-                    if (strikeNum <= 4 - skill + target.getSkill())
-                    {
-                        penalty = false;
-                    }
-
-                    // Reward ganging up on enemies.
-                    if (strikeMap != null)
-                    {
-                        int numAttackingThisTarget = strikeMap.get(hexLabel)
-                            .intValue();
-                        if (numAttackingThisTarget > 1)
-                        {
-                            value.add(bec.GANG_UP_ON_CREATURE,
-                                "GangUpOnCreature");
-                        }
-                    }
-                }
-                if (!penalty)
-                {
-                    value.add(bec.RANGESTRIKE_WITHOUT_PENALTY,
-                        "RangestrikeWithoutPenalty");
-                }
+                evaluateCritterMove_Rangestrike(critter, strikeMap, value,
+                        terrain, hex, power, skill, legion, turn,
+                        targetHexLabels);
             }
             else
             {
-                // Normal strikes.  If we can strike them, they can strike us.
-
-                // Reward being adjacent to an enemy if attacking.
-                if (legion.equals(client.getAttacker()))
-                {
-                    value.add(bec.ATTACKER_ADJACENT_TO_ENEMY,
-                        "AttackerAdjacentToEnemy");
-                }
-                // Slightly penalize being adjacent to an enemy if defending.
-                else
-                {
-                    value.add(bec.DEFENDER_ADJACENT_TO_ENEMY,
-                        "DefenderAdjacentToEnemy");
-                }
-
-                int killValue = 0;
-                int numKillableTargets = 0;
-                int hitsExpected = 0;
-
-                for (String hexLabel : targetHexLabels)
-                {
-                    BattleChit target = client.getBattleChit(hexLabel);
-
-                    // Reward being next to enemy titans.  (Banzai!)
-                    if (target.isTitan())
-                    {
-                        value.add(bec.ADJACENT_TO_ENEMY_TITAN,
-                            "AdjacentToEnemyTitan");
-                    }
-
-                    // Reward being next to a rangestriker, so it can't hang
-                    // back and plink us.
-                    if (target.isRangestriker() && !critter.isRangestriker())
-                    {
-                        value.add(bec.ADJACENT_TO_RANGESTRIKER,
-                            "AdjacenttoRangestriker");
-                    }
-
-                    // Attack Warlocks so they don't get Titan
-                    if (target.getCreatureName().equals("Warlock"))
-                    {
-                        value.add(bec.ADJACENT_TO_BUDDY_TITAN,
-                            "AdjacentToBuddyTitan");
-                    }
-
-                    // Reward being next to an enemy that we can probably
-                    // kill this turn.
-                    int dice = client.getStrike().getDice(critter, target);
-                    int strikeNum = client.getStrike().getStrikeNumber(
-                        critter, target);
-                    double meanHits = Probs.meanHits(dice, strikeNum);
-                    if (meanHits + target.getHits() >= target.getPower())
-                    {
-                        numKillableTargets++;
-                        int targetValue = getKillValue(target, terrain);
-                        killValue = Math.max(targetValue, killValue);
-                    }
-                    else
-                    {
-                        // reward doing damage to target - esp. titan.
-                        int targetValue = getKillValue(target, terrain);
-                        killValue = (int)(0.5 * (meanHits / target.getPower()) * Math
-                            .max(targetValue, killValue));
-                    }
-
-                    // Reward ganging up on enemies.
-                    if (strikeMap != null)
-                    {
-                        int numAttackingThisTarget = strikeMap.get(hexLabel)
-                            .intValue();
-                        if (numAttackingThisTarget > 1)
-                        {
-                            value.add(bec.GANG_UP_ON_CREATURE,
-                                "GangUpOnCreature 2");
-                        }
-                    }
-
-                    // Penalize damage that we can take this turn,
-                    {
-                        dice = client.getStrike().getDice(target, critter);
-                        strikeNum = client.getStrike().getStrikeNumber(target,
-                            critter);
-                        hitsExpected += Probs.meanHits(dice, strikeNum);
-                    }
-                }
-
-                if (legion.equals(client.getAttacker()))
-                {
-                    value.add(bec.ATTACKER_KILL_SCALE_FACTOR * killValue
-                        + bec.KILLABLE_TARGETS_SCALE_FACTOR
-                        * numKillableTargets, "Attacker Killable Stuff");
-                }
-                else
-                {
-                    value.add(bec.DEFENDER_KILL_SCALE_FACTOR * killValue
-                        + bec.KILLABLE_TARGETS_SCALE_FACTOR
-                        * numKillableTargets, "Defender Killable Stuff");
-                }
-
-                int hits = critter.getHits();
-
-                // XXX Attacking legions late in battle ignore damage.
-                if (legion.equals(client.getDefender()) || critter.isTitan()
-                    || turn <= 4)
-                {
-                    if (hitsExpected + hits >= power)
-                    {
-                        if (legion.equals(client.getAttacker()))
-                        {
-                            value.add(bec.ATTACKER_GET_KILLED_SCALE_FACTOR
-                                * getKillValue(critter, terrain),
-                                "AttackerGetKilled");
-                        }
-                        else
-                        {
-                            value.add(bec.DEFENDER_GET_KILLED_SCALE_FACTOR
-                                * getKillValue(critter, terrain),
-                                "DefenderGetKilled");
-                        }
-                    }
-                    else
-                    {
-                        if (legion.equals(client.getAttacker()))
-                        {
-                            value.add(bec.ATTACKER_GET_HIT_SCALE_FACTOR
-                                * getKillValue(critter, terrain),
-                                "AttackerGetHit");
-                        }
-                        else
-                        {
-                            value.add(bec.DEFENDER_GET_HIT_SCALE_FACTOR
-                                * getKillValue(critter, terrain),
-                                "DefendergetHit");
-                        }
-                    }
-                }
+                evaluateCritterMove_Strike(critter, strikeMap, value,
+                        terrain, hex, power, skill, legion, turn,
+                        targetHexLabels);
             }
         }
 
