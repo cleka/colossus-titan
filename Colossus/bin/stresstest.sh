@@ -23,7 +23,7 @@
 # By default the tests are run with a "nice -19", which means with
 # the least priority. If you use the "-A" option, this will be changed
 # to a "nice -0", which is a pretty high priority (usually the highest
-# avaiable to a normal user)
+# available to a normal user)
 #
 # Usage:
 #
@@ -80,20 +80,14 @@ fi
 
 
 FORCEBOARD=""
-# for stresstest, should always be set, even if 1, so that client
-# does not ask whether to dispose.
+# for stresstest, should always be set, even if 1, 
+# so that client does not ask whether to dispose.
 INTERNALROUNDS="-Dnet.sf.colossus.stressTestRounds=1"
 done=no
 variants=""
 niceness=19
 
-humans=-u0
 AIs=6
-MyName=MyName
-if [ "X$USERNAME" != "X" ]
-then
-  MyName=$USERNAME
-fi
 
 # Colossus log files (Colossus[012].log) will be there:
 if [ "X$TEMP" = "X" ]
@@ -154,15 +148,9 @@ do
         shift
         # Number of Remote Clients
         nrc=$1
-        # TODO: this is probably obsolete now since we have -W ?
-        # That thing with the remote clients currently works only well if at 
-        # least one human player is there, too (to get a masterboard). 
-        # So, let's add one:
-        remoteclients="-n$1 -S -m$MyName -A"
-        humans=-u1
+        remoteclients="-n$1 -A"
         echo "Setting remoteclients to '$remoteclients'"
-        # 5 instead of 6, because of the one human:
-        AIs=`expr 5 - $nrc`
+        AIs=`expr 6 - $nrc`
         echo "Setting AIs then to '$AIs'"
         ;;
     --aggressive|-A)
@@ -281,7 +269,7 @@ do
     echo -e "\n$timestamp: Starting game #$i as variant $variant"
     echo -e "$CR\n$timestamp: Starting game #$i as variant $variant$CR" >> $TEST_WORKDIR/log
     
-    CMD="java -ea -Djava.util.logging.config.file=$LOGCONFIG $FORCEBOARD $INTERNALROUNDS -Xmx128M -jar Colossus.jar $humans -i$AIs $remoteclients -q -g -S -d 1 --variant $variant $1 $2 $3 $4 $5 $6 $7 $8 $9"
+    CMD="java -ea -Djava.util.logging.config.file=$LOGCONFIG $FORCEBOARD $INTERNALROUNDS -Xmx128M -jar Colossus.jar -i$AIs $remoteclients -q -g -S -d 1 --variant $variant $1 $2 $3 $4 $5 $6 $7 $8 $9"
     echo $CMD
     echo -e "$CMD$CR" >> $TEST_WORKDIR/log 2>&1
     nice -$niceness $CMD >> $TEST_WORKDIR/log 2>&1;
