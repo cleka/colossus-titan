@@ -96,7 +96,7 @@ public class ExperimentalAI extends SimpleAI
             {
                 // defending titan is a coward.
                 value.add(bec.TITAN_FORWARD_EARLY_PENALTY *
-                        Battle.getRange(hex, entrance, true),
+                        rangeToClosestOpponent(hex),
                         "Defending TitanForwardEarlyPenalty");
                 for (int i = 0; i < 6; i++)
                 {
@@ -116,9 +116,10 @@ public class ExperimentalAI extends SimpleAI
             else
             {
                 // attacking titan should progressively involve itself
-                value.add(Math.round((((float) 4. - (float) turn) / (float) 3.) *
+                value.add(Math.round((((float) 4. - (float) turn) /
+                        (float) 3.) *
                         (float) bec.TITAN_FORWARD_EARLY_PENALTY *
-                        (float) Battle.getRange(hex, entrance, true)),
+                        (float) rangeToClosestOpponent(hex)),
                         "Progessive TitanForwardEarlyPenalty");
                 for (int i = 0; i < 6; i++)
                 {
