@@ -18,6 +18,7 @@ import net.sf.colossus.client.CritterMove;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.client.PlayerClientSide;
 
+import net.sf.colossus.game.Battle;
 import net.sf.colossus.game.Legion;
 
 import net.sf.colossus.game.Player;
@@ -29,6 +30,7 @@ import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.DevRandom;
 
 import net.sf.colossus.util.Probs;
+import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardTerrain;
 import net.sf.colossus.variant.MasterBoardTerrain;
@@ -510,6 +512,18 @@ abstract public class AbstractAI implements AI
             }
         }
         return honc;
+    }
+
+    final protected int rangeToClosestOpponent(final BattleHex hex) {
+        int range = Constants.BIGNUM;
+        for (BattleChit critter : client.getInactiveBattleChits())
+        {
+            BattleHex hex2 = client.getBattleHex(critter);
+            int r = Battle.getRange(hex, hex2, false);
+            if (r < range)
+                range = r;
+        }
+        return range;
     }
 
     final static private Logger LOGGER = Logger.getLogger(AbstractAI.class
