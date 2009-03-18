@@ -1340,7 +1340,7 @@ public final class Client implements IClient, IOracle
     {
         SummonInfo summonInfo = new SummonInfo();
 
-        SortedSet<Legion> possibleDonors = findLegionsWithSummonableAngels(legion);
+        SortedSet<Legion> possibleDonors = findLegionsWithSummonables(legion);
         if (possibleDonors.size() < 1)
         {
             // Should not happen any more since I fixed it on server side.
@@ -3013,7 +3013,7 @@ public final class Client implements IClient, IOracle
     /** Return a set of all other unengaged legions of the legion's player
      *  that have summonables.
      */
-    public SortedSet<Legion> findLegionsWithSummonableAngels(Legion summoner)
+    public SortedSet<Legion> findLegionsWithSummonables(Legion summoner)
     {
         SortedSet<Legion> result = new TreeSet<Legion>();
         Player player = summoner.getPlayer();
