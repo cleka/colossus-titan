@@ -2735,13 +2735,52 @@ public class SimpleAI extends AbstractAI
         return value;
     }
 
-    private void evaluateCritterMove_Terrain(BattleChit critter,
-            ValueRecorder value)
+    private void evaluateCritterMove_Titan(final BattleChit critter,
+            ValueRecorder value, final MasterBoardTerrain terrain,
+            final BattleHex hex, final LegionClientSide legion, final int turn)
     {
-        final MasterBoardTerrain terrain = client.getBattleSite().getTerrain();
-        final BattleHex hex = client.getBattleHex(critter);
-        final int power = critter.getPower();
-        final int skill = critter.getSkill();
+        BattleHex entrance = BattleMap.getEntrance(terrain,
+                legion.getEntrySide());
+        if (!critter.isTitan())
+        {
+            LOGGER.warning(
+                    "evaluateCritterMove_Titan called on non-Titan critter");
+            return;
+        }
+        if (terrain.isTower() && legion.equals(client.getDefender()))
+        {
+            // Stick to the center of the tower.
+            value.add(bec.TITAN_TOWER_HEIGHT_BONUS * hex.getElevation(),
+                    "TitanTowerHeightBonus");
+        }
+        else
+        {
+            if (turn <= 4)
+            {
+                value.add(bec.TITAN_FORWARD_EARLY_PENALTY *
+                        Battle.getRange(hex, entrance, true),
+                        "TitanForwardEarlyPenalty");
+                for (int i = 0; i < 6; i++)
+                {
+                    BattleHex neighbor = hex.getNeighbor(i);
+                    if (neighbor == null /* Edge of the map */ || neighbor.
+                            getTerrain().blocksGround() || (neighbor.getTerrain().
+                            isGroundNativeOnly() && !hasOpponentNativeCreature(
+                            neighbor.getTerrain())))
+                    {
+                        value.add(
+                                bec.TITAN_BY_EDGE_OR_BLOCKINGHAZARD_BONUS,
+                                "TitanByEdgeOrBlockingHazard (" + i + ")");
+                    }
+                }
+            }
+        }
+    }
+
+    private void evaluateCritterMove_Terrain(final BattleChit critter,
+            ValueRecorder value, final MasterBoardTerrain terrain,
+            final BattleHex hex, final int power, final int skill)
+    {
         PowerSkill ps = getNativeTerrainValue(critter.getCreature(), hex.
                 getTerrain(), true);
         int native_power = ps.getPowerAttack() + (ps.getPowerDefend() + power);
@@ -2822,7 +2861,7 @@ public class SimpleAI extends AbstractAI
         int native_power = ps.getPowerAttack() + (ps.getPowerDefend() + power);
         int native_skill = ps.getSkillAttack() + ps.getSkillDefend();
 
-        evaluateCritterMove_Terrain(critter, value);
+        evaluateCritterMove_Terrain(critter, value, terrain, hex, power, skill);
 
         Set<String> targetHexLabels = client.findStrikes(critter.getTag());
         int numTargets = targetHexLabels.size();
@@ -3030,36 +3069,9 @@ public class SimpleAI extends AbstractAI
         // don't just sit back and wait for a time loss.
         if (critter.isTitan())
         {
-            if (terrain.isTower() && legion.equals(client.getDefender()))
-            {
-                // Stick to the center of the tower.
-                value.add(bec.TITAN_TOWER_HEIGHT_BONUS * hex.getElevation(),
-                    "TitanTowerHeightBonus");
-            }
-            else
-            {
-                if (turn <= 4)
-                {
-                    value.add(bec.TITAN_FORWARD_EARLY_PENALTY
-                        * Battle.getRange(hex, entrance, true),
-                        "TitanForwardEarlyPenalty");
-                    for (int i = 0; i < 6; i++)
-                    {
-                        BattleHex neighbor = hex.getNeighbor(i);
-                        if (neighbor == null /* Edge of the map */
-                            || neighbor.getTerrain().blocksGround()
-                            || (neighbor.getTerrain().isGroundNativeOnly() && !hasOpponentNativeCreature(neighbor
-                                .getTerrain())))
-                        {
-                            value.add(
-                                bec.TITAN_BY_EDGE_OR_BLOCKINGHAZARD_BONUS,
-                                "TitanByEdgeOrBlockingHazard (" + i + ")");
-                        }
-                    }
-                }
-            }
+            evaluateCritterMove_Titan(critter, value, terrain, hex, legion,
+                    turn);
         }
-
         // Encourage defending critters to hang back.
         else if (legion.equals(client.getDefender()))
         {
