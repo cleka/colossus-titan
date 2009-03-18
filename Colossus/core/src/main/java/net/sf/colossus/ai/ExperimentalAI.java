@@ -96,7 +96,7 @@ public class ExperimentalAI extends SimpleAI
             {
                 // defending titan is a coward.
                 value.add(bec.TITAN_FORWARD_EARLY_PENALTY *
-                        rangeToClosestOpponent(hex),
+                        6 - rangeToClosestOpponent(hex),
                         "Defending TitanForwardEarlyPenalty");
                 for (int i = 0; i < 6; i++)
                 {
