@@ -2,19 +2,19 @@
 
 #
 # This is a remote client for network/remote stresstesting.
-# To do network stresstesting, give -R option to fancy_stresstest
+# To do network stresstesting, give -R option to stresstest.sh
 # (e.g. -R 2) and start in additional cmdline prompts as many of
 # this nw_stresstest_clients as the number given to -R was.
 
 # So, this script here will simply start a new client (with -g option)
 # as soon as the previous one finishes (sleeps some second in between).
-# It can, same as fancy_stresstest itself, be stopped by creating
+# It can, same as stresstest.sh itself, be stopped by creating
 # a file stop.flag (although, Ctrl-C would work too... but I think
-# this with the stop.flag file is "nicer".
+# this with the stop.flag file is "nicer").
 #
-# BTW, if fancy_stresstest is started with -N option (e.g. -N 10,
+# BTW, if stresstest.sh is started with -N option (e.g. -N 10,
 # meaning, do 10 rounds and exit then), it will create that stop.flag
-# then by itself so that, if stresstest is run in same machine,
+# then by itself so that, if stresstest.sh is run in same machine,
 # all the remote clients exit, too...
 #
 # @version: $Id$
