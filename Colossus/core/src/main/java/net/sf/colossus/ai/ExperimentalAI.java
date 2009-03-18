@@ -119,7 +119,7 @@ public class ExperimentalAI extends SimpleAI
                 value.add(Math.round((((float) 4. - (float) turn) /
                         (float) 3.) *
                         (float) bec.TITAN_FORWARD_EARLY_PENALTY *
-                        (float) rangeToClosestOpponent(hex)),
+                        ((float) 6. - (float) rangeToClosestOpponent(hex))),
                         "Progessive TitanForwardEarlyPenalty");
                 for (int i = 0; i < 6; i++)
                 {
