@@ -17,7 +17,7 @@ import net.sf.colossus.util.Glob;
  * Originally in SimpleAI, which at the time had the following authors.
  * @author Bruce Sherrod, David Ripton, Romain Dolbeau
 */
-class LegionMove implements Comparable<LegionMove>
+public class LegionMove implements Comparable<LegionMove>
 {
     private final List<CritterMove> critterMoves = new ArrayList<CritterMove>();
     private Map<CritterMove, String> evaluation = null;
