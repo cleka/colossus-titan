@@ -94,7 +94,21 @@ public class CmdLine
                     }
                     else
                     {
-                        throw new RuntimeException("unexpected arg in " + arg);
+                        // Must be valid single-char options without args.
+                        for (int jj = 2; jj < arg.length(); jj++)
+                        {
+                            optch = arg.charAt(jj);
+                            opt = opts.getOpt(optch);
+                            name = opt.getName();
+                            optchSeen.add(new Character(optch));
+                            nameSeen.add(name);
+                            expectingValue = opt.hasArg();
+                            if (expectingValue)
+                            {
+                                throw new RuntimeException(
+                                    "can't clump options that expect arguments");
+                            }
+                        }
                     }
                 }
             }

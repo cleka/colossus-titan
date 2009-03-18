@@ -113,4 +113,18 @@ public class CmdLineTest extends TestCase
         assertEquals(cl.getLeftovers().get(0), "hi");
         assertEquals(cl.getLeftovers().get(1), "mom");
     }
+
+    public void testCombinedNonArgOptions()
+    {
+        Opts opts = new Opts();
+        opts.addOption('v', "verbose", false, "log more stuff");
+        opts.addOption('z', "latest", false, "load latest savegame");
+        String[] args = { "-vz" };
+        CmdLine cl = opts.parse(args);
+        assertTrue(cl.optIsSet('v'));
+        assertTrue(cl.optIsSet("verbose"));
+        assertTrue(cl.optIsSet('z'));
+        assertTrue(cl.optIsSet("latest"));
+        assertEquals(cl.getLeftovers().size(), 0);
+    }
 }
