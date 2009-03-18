@@ -456,7 +456,7 @@ public final class LegionServerSide extends Legion implements
         {
             return false;
         }
-        return !game.findSummonableAngels(markerId).isEmpty();
+        return !game.findSummonableAngels(this).isEmpty();
     }
 
     MasterHex getStartingHex()

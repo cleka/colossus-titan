@@ -6,6 +6,7 @@ import java.awt.GraphicsDevice;
 import java.awt.geom.AffineTransform;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.LegionClientSide;
@@ -243,7 +244,8 @@ public interface IClientGUI
 
     public abstract void setBoardActive(boolean val);
 
-    public abstract SummonInfo doPickSummonAngel(Legion legion);
+    public abstract SummonInfo doPickSummonAngel(Legion legion,
+        SortedSet<Legion> possibleDonors);
 
     public abstract String doPickSplitLegion(Legion parent, String childMarker);
 

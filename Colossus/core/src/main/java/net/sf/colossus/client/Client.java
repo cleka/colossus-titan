@@ -1339,14 +1339,30 @@ public final class Client implements IClient, IOracle
     public void createSummonAngel(Legion legion)
     {
         SummonInfo summonInfo = new SummonInfo();
-        if (options.getOption(Options.autoSummonAngels))
+
+        SortedSet<Legion> possibleDonors = findLegionsWithSummonableAngels(legion);
+        if (possibleDonors.size() < 1)
         {
-            summonInfo = ai.summonAngel(legion);
+            // Should not happen any more since I fixed it on server side.
+            // But, who knows. Better check earlier than somehwere inside
+            // the GUI.
+            LOGGER.warning("Server requested us to createSummonAngel but "
+                + "there are no legions with summonable Angels!");
+            // still, do the summon with the default created summonInfo,
+            // Server might wait for an answer (so, NOT just return without
+            // doing anything).
         }
         else
         {
-            summonInfo = gui.doPickSummonAngel(legion);
+            if (options.getOption(Options.autoSummonAngels))
+            {
+                summonInfo = ai.summonAngel(legion, possibleDonors);
+            }
+            else
+            {
+                summonInfo = gui.doPickSummonAngel(legion, possibleDonors);
 
+            }
         }
 
         doSummon(summonInfo);
@@ -3570,7 +3586,8 @@ public final class Client implements IClient, IOracle
             List<Constants.PlayerColor> favoriteColors = null;
             if (favorites != null)
             {
-                favoriteColors = Constants.PlayerColor.getByName(Split.split(',', favorites));
+                favoriteColors = Constants.PlayerColor.getByName(Split.split(
+                    ',', favorites));
             }
             else
             {

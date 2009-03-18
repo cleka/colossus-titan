@@ -2728,9 +2728,8 @@ public final class GameServerSide extends Game
      *
      * TODO rename -- it is not specific for angels
      */
-    Set<MasterHex> findSummonableAngels(String markerId)
+    Set<MasterHex> findSummonableAngels(Legion legion)
     {
-        Legion legion = getLegionByMarkerId(markerId);
         Set<MasterHex> result = new HashSet<MasterHex>();
         for (Legion candidate : legion.getPlayer().getLegions())
         {
@@ -3339,8 +3338,7 @@ public final class GameServerSide extends Game
             }
             else
             {
-                if (attacker.getHeight() < 7
-                    && !attacker.getPlayer().hasSummoned())
+                if (attacker.canSummonAngel())
                 {
                     // If the attacker won the battle by agreement,
                     // he may summon an angel.

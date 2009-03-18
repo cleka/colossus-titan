@@ -4,6 +4,7 @@ package net.sf.colossus.gui;
 import java.awt.GraphicsDevice;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.IOptions;
@@ -345,7 +346,8 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public Constants.PlayerColor doPickColor(String playerName, List<Constants.PlayerColor> colorsLeft)
+    public Constants.PlayerColor doPickColor(String playerName,
+        List<Constants.PlayerColor> colorsLeft)
     {
         // TODO Auto-generated method stub
         return null;
@@ -400,7 +402,8 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public SummonInfo doPickSummonAngel(Legion legion)
+    public SummonInfo doPickSummonAngel(Legion legion,
+        SortedSet<Legion> possibleDonors)
     {
         // TODO Auto-generated method stub
         return null;

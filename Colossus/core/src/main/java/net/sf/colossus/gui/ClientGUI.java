@@ -11,6 +11,7 @@ import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,6 +42,7 @@ import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.webclient.WebClient;
+
 
 @SuppressWarnings("serial")
 public class ClientGUI implements IClientGUI
@@ -1244,7 +1246,8 @@ public class ClientGUI implements IClientGUI
         dialogOptions[1] = "Move Normally";
         int answer = JOptionPane.showOptionDialog(board, "Teleport?",
             "Teleport?", JOptionPane.YES_NO_OPTION,
-            JOptionPane.QUESTION_MESSAGE, null, dialogOptions, dialogOptions[1]);
+            JOptionPane.QUESTION_MESSAGE, null, dialogOptions,
+            dialogOptions[1]);
 
         return (answer == JOptionPane.YES_OPTION);
     }
@@ -2114,9 +2117,10 @@ public class ClientGUI implements IClientGUI
     /* (non-Javadoc)
      * @see net.sf.colossus.gui.IClientGUI#doPickSummonAngel(net.sf.colossus.game.Legion)
      */
-    public SummonInfo doPickSummonAngel(Legion legion)
+    public SummonInfo doPickSummonAngel(Legion legion,
+        SortedSet<Legion> possibleDonors)
     {
-        return SummonAngel.summonAngel(this, legion);
+        return SummonAngel.summonAngel(this, legion, possibleDonors);
     }
 
     /* (non-Javadoc)
@@ -2151,7 +2155,8 @@ public class ClientGUI implements IClientGUI
         return pickCarryDialog;
     }
 
-    public Constants.PlayerColor doPickColor(String playerName, List<Constants.PlayerColor> colorsLeft)
+    public Constants.PlayerColor doPickColor(String playerName,
+        List<Constants.PlayerColor> colorsLeft)
     {
         Constants.PlayerColor color = null;
         if (board != null)
@@ -2943,8 +2948,8 @@ public class ClientGUI implements IClientGUI
             dialogTitle = "Server closed connection";
         }
 
-        JOptionPane.showMessageDialog(getMapOrBoardFrame(), dialogMessage, dialogTitle,
-            JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(getMapOrBoardFrame(), dialogMessage,
+            dialogTitle, JOptionPane.INFORMATION_MESSAGE);
     }
 
     // XXX TODO may partly belong back to client???

@@ -53,7 +53,8 @@ final class SummonAngel extends KDialog implements MouseListener,
     private static SummonInfo summonInfo = null;
     private final Map<Chit, Legion> chitToDonor = new HashMap<Chit, Legion>();
 
-    private SummonAngel(ClientGUI gui, Legion legion)
+    private SummonAngel(ClientGUI gui, Legion legion,
+        SortedSet<Legion> possibleDonors)
     {
         super(gui.getBoard().getFrame(), gui.getOwningPlayer().getName()
             + baseSummonString + legion, false);
@@ -61,10 +62,11 @@ final class SummonAngel extends KDialog implements MouseListener,
         this.target = legion;
 
         // TODO this should really not happen in a constructor
-        SortedSet<Legion> possibleDonors = gui.getClient()
-            .findLegionsWithSummonableAngels(legion);
+
         if (possibleDonors.size() < 1)
         {
+            LOGGER
+                .warning("SummonAngel constructor still gets empty donor list???");
             cleanup(null, null);
             // trying to keep things final despite awkward exit point
             saveWindow = null;
@@ -171,7 +173,8 @@ final class SummonAngel extends KDialog implements MouseListener,
      * Returns a SummonInfo object, which contains Summoner, Donor legion
      * and the summoned unit, _OR_ the flag noSummoningWanted is set.
      */
-    static SummonInfo summonAngel(ClientGUI gui, Legion legion)
+    static SummonInfo summonAngel(ClientGUI gui, Legion legion,
+        SortedSet<Legion> possibleDonors)
     {
         // Default constructor creates an info with the flag
         // "noSummoningWanted" set to true
@@ -184,7 +187,7 @@ final class SummonAngel extends KDialog implements MouseListener,
             LOGGER.log(Level.FINEST, "creating new SummonAngel dialog for "
                 + legion);
 
-            SummonAngel saDialog = new SummonAngel(gui, legion);
+            SummonAngel saDialog = new SummonAngel(gui, legion, possibleDonors);
 
             synchronized (saDialog)
             {
@@ -222,7 +225,12 @@ final class SummonAngel extends KDialog implements MouseListener,
             // "noSummoningWanted" set to true
             summonInfo = new SummonInfo();
         }
-        saveWindow.saveLocation(getLocation());
+        // Shound not happen any more since I fixed that we can't get
+        // empty donor list. Still, to be sure...
+        if (saveWindow != null)
+        {
+            saveWindow.saveLocation(getLocation());
+        }
         dispose();
         synchronized (this)
         {
