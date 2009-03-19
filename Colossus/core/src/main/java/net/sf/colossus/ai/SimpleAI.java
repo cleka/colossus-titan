@@ -1878,7 +1878,7 @@ public class SimpleAI extends AbstractAI
     }
 
     /** Return a SummonInfo object, contaning summoner, donor and unittype.
-     *  Returns null for no summoning. 
+     *  Returns null for no summoning.
      */
     public SummonInfo summonAngel(Legion summoner, SortedSet<Legion> donors)
     {
@@ -2907,6 +2907,7 @@ public class SimpleAI extends AbstractAI
         }
     }
 
+    @SuppressWarnings("unused")
     protected void evaluateCritterMove_Rangestrike(final BattleChit critter,
         final Map<String, Integer> strikeMap, ValueRecorder value,
         final MasterBoardTerrain terrain, final BattleHex hex,
@@ -2961,6 +2962,7 @@ public class SimpleAI extends AbstractAI
         }
     }
 
+    @SuppressWarnings("unused")
     protected void evaluateCritterMove_Strike(final BattleChit critter,
         final Map<String, Integer> strikeMap, ValueRecorder value,
         final MasterBoardTerrain terrain, final BattleHex hex,

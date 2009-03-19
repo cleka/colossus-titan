@@ -2,14 +2,8 @@ package net.sf.colossus.ai;
 
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.Client;
@@ -17,7 +11,6 @@ import net.sf.colossus.client.CritterMove;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.game.Battle;
 import net.sf.colossus.gui.BattleChit;
-import net.sf.colossus.gui.BattleMap;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.MasterBoardTerrain;
@@ -70,7 +63,7 @@ public class ExperimentalAI extends SimpleAI
             }
         }
 
-        
+
         private final Iterator<LegionMove> iterator;
 
         findBestLegionMoveThread(Iterator<LegionMove> it)
@@ -230,8 +223,10 @@ public class ExperimentalAI extends SimpleAI
         // surrounded by allies.  We need to relax this in the
         // last few turns of the battle, so that attacking titans
         // don't just sit back and wait for a time loss.
-        BattleHex entrance = BattleMap.getEntrance(terrain,
-                legion.getEntrySide());
+        // entrance is never read right now, commented out to get rid
+        // of Eclipse warnings. -Clemens
+        // BattleHex entrance = BattleMap.getEntrance(terrain,
+        //         legion.getEntrySide());
         if (!critter.isTitan())
         {
             LOGGER.warning(
@@ -270,10 +265,10 @@ public class ExperimentalAI extends SimpleAI
             else
             {
                 // attacking titan should progressively involve itself
-                value.add(Math.round((((float) 4. - (float) turn) /
+                value.add(Math.round((((float) 4. - turn) /
                         (float) 3.) *
-                        (float) bec.TITAN_FORWARD_EARLY_PENALTY *
-                        ((float) 6. - (float) rangeToClosestOpponent(hex))),
+                        bec.TITAN_FORWARD_EARLY_PENALTY *
+                        ((float) 6. - rangeToClosestOpponent(hex))),
                         "Progressive TitanForwardEarlyPenalty");
                 for (int i = 0; i < 6; i++)
                 {
@@ -287,9 +282,9 @@ public class ExperimentalAI extends SimpleAI
                         // in the battle, so min is 0 point.
                         value.add(
                                 Math.round(
-                                (Math.max(((float) 4. - (float) turn) /
+                                (Math.max(((float) 4. - turn) /
                                 (float) 3., (float) 0.) *
-                                (float) bec.TITAN_BY_EDGE_OR_BLOCKINGHAZARD_BONUS)),
+                                bec.TITAN_BY_EDGE_OR_BLOCKINGHAZARD_BONUS)),
                                 "Progressive TitanByEdgeOrBlockingHazard (" + i +
                                 ")");
                     }

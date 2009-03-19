@@ -1,14 +1,17 @@
 package net.sf.colossus.tools;
 
-import java.io.*;
-import java.awt.*;
-import java.util.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
-import net.sf.colossus.parser.BattlelandRandomizerLoader;
-import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.gui.GUIBattleHex;
+import net.sf.colossus.parser.BattlelandRandomizerLoader;
+import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.HazardTerrain;
 
 /**
@@ -37,6 +40,7 @@ public class BuilderHexMap extends HexMap
         setupHexes();
     }
 
+    @Override
     protected void setupHexes()
     {
         setupHexesGUI();
@@ -63,16 +67,19 @@ public class BuilderHexMap extends HexMap
         return h2;
     }
 
+    @Override
     public void paintComponent(Graphics g)
     {
         super.paintComponent(g);
     }
 
+    @Override
     public Dimension getMinimumSize()
     {
         return getPreferredSize();
     }
 
+    @Override
     public Dimension getPreferredSize()
     {
         return new Dimension(60 * 15, 55 * 15);
@@ -222,6 +229,7 @@ public class BuilderHexMap extends HexMap
         {
             while (parser.oneArea(h) >= 0)
             {
+                // nothing to do
             }
             parser.resolveAllHexsides(h);
             isTower = parser.isTower();

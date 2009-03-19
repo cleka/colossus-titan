@@ -2,11 +2,15 @@ package net.sf.colossus.tools;
 
 
 // DOM classes.
-import org.w3c.dom.*;
-//JAXP 1.1
-import javax.xml.transform.*;
-import javax.xml.transform.stream.*;
-import javax.xml.transform.dom.*;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 public class MakeBattle {
 
@@ -52,6 +56,7 @@ public class MakeBattle {
                     nc.setAttribute("name", creature);
                     C.appendChild(nc);
                 } else {
+                    // nothing to do
                 }
             }
         }
@@ -72,6 +77,7 @@ public class MakeBattle {
                     C2.appendChild(nc);
                     nc.setTextContent(creature);
                 } else {
+                 // nothing to do
                 }
             }
         }

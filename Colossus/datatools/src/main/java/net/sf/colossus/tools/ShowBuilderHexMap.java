@@ -25,14 +25,22 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import javax.swing.*;
 
-import net.sf.colossus.variant.BattleHex;
+import javax.swing.AbstractAction;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+
 import net.sf.colossus.gui.GUIBattleHex;
-import net.sf.colossus.variant.HazardTerrain;
-import net.sf.colossus.xmlparser.BattlelandLoader;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.ResourceLoader;
+import net.sf.colossus.variant.BattleHex;
+import net.sf.colossus.variant.HazardTerrain;
+import net.sf.colossus.xmlparser.BattlelandLoader;
 
 /**
  * Class ShowBuilderHexMap displays a battle map.
@@ -57,6 +65,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
     class rndFileFilter extends javax.swing.filechooser.FileFilter
     {
 
+        @Override
         public boolean accept(java.io.File f)
         {
             if (f.isDirectory())
@@ -70,6 +79,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
             return (false);
         }
 
+        @Override
         public String getDescription()
         {
             return ("Colossus RaNDom generator files");
@@ -79,6 +89,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
     class xmlFileFilter extends javax.swing.filechooser.FileFilter
     {
 
+        @Override
         public boolean accept(java.io.File f)
         {
             if (f.isDirectory())
@@ -92,12 +103,13 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
             return (false);
         }
 
+        @Override
         public String getDescription()
         {
             return ("XML files");
         }
     }
-    
+
     private void doLoadRandom(BattleHex[][] h)
     {
         javax.swing.JFileChooser loadFileChooser = new JFileChooser(".");
@@ -122,7 +134,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
             }
         }
     }
-     
+
     private void doLoadFile(BattleHex[][] h)
     {
         JFileChooser loadFileChooser = new JFileChooser();
@@ -425,7 +437,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
             GUIBattleHex h = getHexContainingPoint(lastPoint);
             h.getHexModel().setHexside(lastSide, c);
             h.repaint();
-            ((GUIBattleHex) h.getNeighbor(lastSide)).repaint();
+            (h.getNeighbor(lastSide)).repaint();
         }
     }
     private AbstractAction showBattlelandAction;
@@ -517,7 +529,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                 repaint();
             }
         };
-        
+
         randomizeAction = new AbstractAction("Randomize Map from file...")
         {
 
@@ -549,7 +561,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
 
         JMenu specialMenu = new JMenu("Special");
         menuBar.add(specialMenu);
-        
+
         mi = specialMenu.add(eraseAction);
 
         specialMenu.addSeparator();
@@ -585,7 +597,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                 }
             }
         };
-        
+
         mi = specialMenu.add(clearStartListAction);
         specialMenu.addSeparator();
 
@@ -652,7 +664,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
 
         specialMenu.addSeparator();
         specialMenu.add(randomMenu);
-               
+
         frame = new JFrame("BattlelandBuilder");
 
         Container contentPane = frame.getContentPane();
@@ -689,7 +701,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
 
         popupMenuTerrain.add(new CleanAllHexsideAction("Clear my hexsides", true));
         popupMenuTerrain.add(new CleanAllHexsideAction("Clear my neighbors' hexsides", false));
-        
+
         popupMenuTerrain.addSeparator();
         AbstractAction select = new AbstractAction("Select/Unselect (StartList)")
         {
@@ -729,11 +741,12 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
     private void setMapName(String name)
     {
         mapName = name;
-        frame.setTitle("BattlelandBuilder" + 
-            (mapName == null ? "" : ": " + mapName)); 
+        frame.setTitle("BattlelandBuilder" +
+            (mapName == null ? "" : ": " + mapName));
     }
-    
-    
+
+
+    @Override
     public void mousePressed(MouseEvent e)
     {
         lastPoint = e.getPoint();
@@ -789,6 +802,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
         }
     }
 
+    @Override
     public void windowClosing(WindowEvent e)
     {
         System.exit(0);
