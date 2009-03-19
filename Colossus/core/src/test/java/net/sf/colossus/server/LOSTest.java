@@ -96,7 +96,7 @@ public class LOSTest extends TestCase
         game.getPlayer("Red").addLegion(defender);
         game.getPlayer("Blue").addLegion(attacker);
 
-        attacker.setEntrySide(1);
+        attacker.setEntrySide(Constants.EntrySide.values()[1]);
 
         battle = new BattleServerSide(game, attacker, defender,
             Constants.LegionTags.ATTACKER, hex, 1, Constants.BattlePhase.FIGHT);
@@ -138,7 +138,7 @@ public class LOSTest extends TestCase
         game.getPlayer("Green").addLegion(defender);
         game.getPlayer("Black").addLegion(attacker);
 
-        attacker.setEntrySide(5);
+        attacker.setEntrySide(Constants.EntrySide.values()[5]);
 
         battle = new BattleServerSide(game, attacker, defender,
             Constants.LegionTags.ATTACKER, hex, 1, Constants.BattlePhase.FIGHT);
@@ -280,7 +280,7 @@ public class LOSTest extends TestCase
         game.getPlayer("Green").addLegion(defender);
         game.getPlayer("Black").addLegion(attacker);
 
-        attacker.setEntrySide(3);
+        attacker.setEntrySide(Constants.EntrySide.values()[3]);
 
         battle = new BattleServerSide(game, attacker, defender,
             Constants.LegionTags.ATTACKER, hex, 1, Constants.BattlePhase.FIGHT);
@@ -409,7 +409,7 @@ public class LOSTest extends TestCase
         game.getPlayer("Green").addLegion(defender);
         game.getPlayer("Black").addLegion(attacker);
 
-        attacker.setEntrySide(3);
+        attacker.setEntrySide(Constants.EntrySide.values()[3]);
 
         battle = new BattleServerSide(game, attacker, defender,
             Constants.LegionTags.ATTACKER, hex, 1, Constants.BattlePhase.FIGHT);
@@ -523,7 +523,7 @@ public class LOSTest extends TestCase
         game.getPlayer("Green").addLegion(defender);
         game.getPlayer("Black").addLegion(attacker);
 
-        attacker.setEntrySide(5);
+        attacker.setEntrySide(Constants.EntrySide.values()[5]);
 
         battle = new BattleServerSide(game, attacker, defender,
             Constants.LegionTags.ATTACKER, hex, 2, Constants.BattlePhase.FIGHT);
@@ -612,7 +612,7 @@ public class LOSTest extends TestCase
         game.getPlayer("Green").addLegion(defender);
         game.getPlayer("Black").addLegion(attacker);
 
-        attacker.setEntrySide(5);
+        attacker.setEntrySide(Constants.EntrySide.values()[5]);
 
         battle = new BattleServerSide(game, attacker, defender,
             Constants.LegionTags.ATTACKER, hex, 2, Constants.BattlePhase.FIGHT);
@@ -699,7 +699,7 @@ public class LOSTest extends TestCase
         game.getPlayer("Green").addLegion(defender);
         game.getPlayer("Black").addLegion(attacker);
 
-        attacker.setEntrySide(5);
+        attacker.setEntrySide(Constants.EntrySide.values()[5]);
 
         battle = new BattleServerSide(game, attacker, defender,
             Constants.LegionTags.ATTACKER, hex, 1, Constants.BattlePhase.FIGHT);
