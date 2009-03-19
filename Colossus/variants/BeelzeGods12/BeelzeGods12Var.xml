@@ -9,6 +9,7 @@
         <depend variant="Beelzebub" />
         <depend variant="Beelzebub12" />
         <depend variant="Pantheon" />
+	<depend variant="Undead" />
     </depends>
     <max_players num="12" />
 </variant>
