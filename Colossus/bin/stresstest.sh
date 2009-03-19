@@ -227,8 +227,6 @@ fi
 
 # removed variants:
 #   Infinite    - RationalAI move error
-#   Balrog      - not in popup selection in player menu, causes
-#                 errors with "InputStream for file BalrogCre.xml"
 #   Random      - "Recruit-per-terrain loading failed : 
 #                      java.io.FileNotFoundException: RandomTer.xml"
 
@@ -236,7 +234,7 @@ fi
 variantnr=0
 if [ "X$variants" = "X" ]
 then
-  variants="Abyssal3 Abyssal6 Abyssal9 Badlands Beelzebub Default ExtTitan Outlands \
+  variants="Default Abyssal3 Abyssal6 Abyssal9 Badlands Balrog Beelzebub Beelzebub12 BeelzeGods12 ExtTitan Outlands \
             Pantheon TG-Wild TitanPlus Undead Unified"
 fi
 
