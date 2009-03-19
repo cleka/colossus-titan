@@ -5,7 +5,7 @@ package net.sf.colossus.gui;
  * Class StrikeDie displays a die representing the threshold for 
  * a successful hit during the Strike/strike-back phase.
  * --Cloned from David Ripton's MovementDie.--
- * @version $Id: StrikeDie.java 2575 2007-11-05 21:50:28Z Dranathi $
+ * @version $Id$
  * @author Dranathi
  */
 
