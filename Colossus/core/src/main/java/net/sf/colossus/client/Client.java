@@ -42,7 +42,6 @@ import net.sf.colossus.server.Dice;
 import net.sf.colossus.server.GameServerSide;
 import net.sf.colossus.server.IServer;
 import net.sf.colossus.server.Server;
-import net.sf.colossus.server.Start;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.ChildThreadManager;
 import net.sf.colossus.util.CollectionHelper;
@@ -257,13 +256,13 @@ public final class Client implements IClient, IOracle
             sct.start();
             sct = null;
 
-            String title = "Socket initialialization failed!";
-            gui.showErrorMessage(reasonFail, title);
-
-            if (isRemote())
+            LOGGER.warning("Client startup failed: " + reasonFail);
+            if (!Options.isStresstest())
             {
-                Start.setCurrentWhatToDoNext(Start.NetClientDialog);
+                String title = "Socket initialialization failed!";
+                gui.showErrorMessage(reasonFail, title);
             }
+
             failed = true;
             ViableEntityManager.unregister(this);
         }
