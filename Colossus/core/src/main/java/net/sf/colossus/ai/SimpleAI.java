@@ -2655,11 +2655,11 @@ public class SimpleAI extends AbstractAI
         return timer;
     }
 
-    private final static int MIN_ITERATIONS = 50;
+    protected final static int MIN_ITERATIONS = 50;
 
     /** Evaluate all legion moves in the list, and return the best one.
      *  Break out early if the time limit is exceeded. */
-    LegionMove findBestLegionMove(Collection<LegionMove> legionMoves)
+    protected LegionMove findBestLegionMove(Collection<LegionMove> legionMoves)
     {
         int bestScore = Integer.MIN_VALUE;
         LegionMove best = null;
@@ -3186,7 +3186,7 @@ public class SimpleAI extends AbstractAI
         return value.getValue();
     }
 
-    private int evaluateLegionBattleMove(LegionMove lm)
+    protected int evaluateLegionBattleMove(LegionMove lm)
     {
         lm.resetEvaluate();
 
@@ -3227,7 +3227,7 @@ public class SimpleAI extends AbstractAI
         return sum;
     }
 
-    class TriggerTimeIsUp extends TimerTask
+    protected class TriggerTimeIsUp extends TimerTask
     {
         @Override
         public void run()
