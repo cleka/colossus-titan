@@ -550,7 +550,8 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
             Collections.sort(byValues, byValuesComparator);
             LOGGER.finest(
                     "Refill started ; current best score is " +
-                    alreadydone.get(byValues.get(byValues.size() - 1)).getValue());
+                    ((byValues.size() > 0) ? "" + alreadydone.get(byValues.get(
+                    byValues.size() - 1)).getValue() : "(empty!!!!)"));
             /* we have n elements to make */
             for (int k = 0; (k < n) && !abort; k++)
             {
