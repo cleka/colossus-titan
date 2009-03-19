@@ -12,7 +12,6 @@ import net.sf.colossus.game.Caretaker;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
-import net.sf.colossus.gui.BattleMap;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
@@ -344,8 +343,8 @@ public final class LegionServerSide extends Legion implements
         }
     }
 
-    void moveToHex(MasterHex hex, Constants.EntrySide entrySide, boolean teleported,
-        String teleportingLord)
+    void moveToHex(MasterHex hex, Constants.EntrySide entrySide,
+        boolean teleported, String teleportingLord)
     {
         PlayerServerSide player = getPlayer();
 

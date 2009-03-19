@@ -28,7 +28,6 @@ import net.sf.colossus.game.Player;
 import net.sf.colossus.game.Proposal;
 import net.sf.colossus.game.SummonInfo;
 import net.sf.colossus.gui.BattleChit;
-import net.sf.colossus.gui.BattleMap;
 import net.sf.colossus.gui.ClientGUI;
 import net.sf.colossus.gui.GUIMasterHex;
 import net.sf.colossus.gui.IClientGUI;
@@ -1780,7 +1779,8 @@ public final class Client implements IClient, IOracle
         this.defender = defender;
         this.battleSite = hex;
 
-        this.defender.setEntrySide(this.attacker.getEntrySide().getOpposingSide());
+        this.defender.setEntrySide(this.attacker.getEntrySide()
+            .getOpposingSide());
 
         gui.actOnInitBattle();
     }
@@ -2698,7 +2698,8 @@ public final class Client implements IClient, IOracle
             return false;
         }
 
-        Set<Constants.EntrySide> entrySides = listPossibleEntrySides(mover, hex, teleport);
+        Set<Constants.EntrySide> entrySides = listPossibleEntrySides(mover,
+            hex, teleport);
 
         Constants.EntrySide entrySide = null;
         if (options.getOption(Options.autoPickEntrySide))
@@ -3040,8 +3041,8 @@ public final class Client implements IClient, IOracle
             movementRoll);
     }
 
-    public Set<Constants.EntrySide> listPossibleEntrySides(LegionClientSide mover,
-        MasterHex hex, boolean teleport)
+    public Set<Constants.EntrySide> listPossibleEntrySides(
+        LegionClientSide mover, MasterHex hex, boolean teleport)
     {
         return movement.listPossibleEntrySides(mover, hex, teleport);
     }
