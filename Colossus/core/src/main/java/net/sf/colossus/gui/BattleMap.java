@@ -93,9 +93,9 @@ public final class BattleMap extends HexMap implements MouseListener,
     }
 
     public static BattleHex getEntrance(MasterBoardTerrain terrain,
-        int entrySide)
+        Constants.EntrySide entrySide)
     {
-        return HexMap.getHexByLabel(terrain, "X" + entrySide);
+        return HexMap.getHexByLabel(terrain, "X" + entrySide.getId());
     }
 
     // Following four override to make them public because they are needed
@@ -232,48 +232,6 @@ public final class BattleMap extends HexMap implements MouseListener,
         {
             // Let the next repaint clean up.
             LOGGER.log(Level.FINEST, "harmless " + ex.toString());
-        }
-    }
-
-    public static String entrySideName(int side)
-    {
-        switch (side)
-        {
-            case 1:
-                return Constants.right;
-
-            case 3:
-                return Constants.bottom;
-
-            case 5:
-                return Constants.left;
-
-            default:
-                return "";
-        }
-    }
-
-    public static int entrySideNum(String side)
-    {
-        if (side == null)
-        {
-            return -1;
-        }
-        if (side.equals(Constants.right))
-        {
-            return 1;
-        }
-        else if (side.equals(Constants.bottom))
-        {
-            return 3;
-        }
-        else if (side.equals(Constants.left))
-        {
-            return 5;
-        }
-        else
-        {
-            return -1;
         }
     }
 }

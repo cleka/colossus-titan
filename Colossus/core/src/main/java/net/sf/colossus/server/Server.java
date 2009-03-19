@@ -2263,7 +2263,7 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    public void doMove(Legion legion, MasterHex hex, String entrySide,
+    public void doMove(Legion legion, MasterHex hex, Constants.EntrySide entrySide,
         boolean teleport, String teleportingLord)
     {
         IClient client = getClient(getPlayer());
@@ -2290,7 +2290,7 @@ public final class Server extends Thread implements IServer
     }
 
     void allTellDidMove(Legion legion, MasterHex startingHex, MasterHex hex,
-        String entrySide, boolean teleport, String teleportingLord)
+        Constants.EntrySide entrySide, boolean teleport, String teleportingLord)
     {
         PlayerServerSide player = game.getActivePlayer();
         // needed in didMove to decide whether to dis/enable button

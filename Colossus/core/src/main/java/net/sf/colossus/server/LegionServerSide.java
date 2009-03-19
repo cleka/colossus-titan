@@ -344,7 +344,7 @@ public final class LegionServerSide extends Legion implements
         }
     }
 
-    void moveToHex(MasterHex hex, String entrySide, boolean teleported,
+    void moveToHex(MasterHex hex, Constants.EntrySide entrySide, boolean teleported,
         String teleportingLord)
     {
         PlayerServerSide player = getPlayer();
@@ -352,7 +352,7 @@ public final class LegionServerSide extends Legion implements
         setCurrentHex(hex);
         setMoved(true);
 
-        setEntrySide(BattleMap.entrySideNum(entrySide));
+        setEntrySide(entrySide);
 
         // If we teleported, no more teleports are allowed this turn.
         if (teleported)

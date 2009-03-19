@@ -266,8 +266,8 @@ public interface IClientGUI
     public abstract String doPickRecruiter(List<String> recruiters,
         String hexDescription, Legion legion);
 
-    public abstract String doPickEntrySide(MasterHex hex,
-        Set<String> entrySides);
+    public abstract Constants.EntrySide doPickEntrySide(MasterHex hex,
+        Set<Constants.EntrySide> entrySides);
 
     public abstract String doPickLord(List<String> lords);
 

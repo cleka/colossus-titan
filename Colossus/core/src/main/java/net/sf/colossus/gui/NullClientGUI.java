@@ -353,7 +353,7 @@ public class NullClientGUI implements IClientGUI
         return null;
     }
 
-    public String doPickEntrySide(MasterHex hex, Set<String> entrySides)
+    public Constants.EntrySide doPickEntrySide(MasterHex hex, Set<Constants.EntrySide> entrySides)
     {
         // TODO Auto-generated method stub
         return null;

@@ -29,7 +29,6 @@ import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.Proposal;
-import net.sf.colossus.gui.BattleMap;
 import net.sf.colossus.server.Constants.BattlePhase;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
@@ -1819,7 +1818,8 @@ public final class GameServerSide extends Game
         MasterHex startingHex = getVariant().getMasterBoard().getHexByLabel(
             startingHexLabel);
         boolean moved = leg.getAttribute("moved").getBooleanValue();
-        int entrySide = leg.getAttribute("entrySide").getIntValue();
+        Constants.EntrySide entrySide = Constants.EntrySide.fromIntegerId(
+                leg.getAttribute("entrySide").getIntValue());
         String parentId = leg.getAttribute("parent").getValue();
         if (parentId.equals("null"))
         {
@@ -2190,7 +2190,8 @@ public final class GameServerSide extends Game
     }
 
     /** Set the entry side relative to the hex label. */
-    private int findEntrySide(MasterHex hex, int cameFrom)
+    // TODO I've seen this code somewhere else
+    private Constants.EntrySide findEntrySide(MasterHex hex, int cameFrom)
     {
         int entrySide = -1;
         if (cameFrom != -1)
@@ -2204,7 +2205,7 @@ public final class GameServerSide extends Game
                 entrySide = (6 + cameFrom - hex.getLabelSide()) % 6;
             }
         }
-        return entrySide;
+        return Constants.EntrySide.fromIntegerId(entrySide);
     }
 
     /** Recursively find conventional moves from this hex.
@@ -2233,8 +2234,7 @@ public final class GameServerSide extends Game
                 {
                     set.add(hex.getLabel()
                         + ":"
-                        + BattleMap
-                            .entrySideName(findEntrySide(hex, cameFrom)));
+                        + findEntrySide(hex, cameFrom).getLabel());
                 }
             }
             return set;
@@ -2258,7 +2258,7 @@ public final class GameServerSide extends Game
             if (cameFrom != -1)
             {
                 set.add(hex.getLabel() + ":"
-                    + BattleMap.entrySideName(findEntrySide(hex, cameFrom)));
+                    + findEntrySide(hex, cameFrom).getLabel());
                 return set;
             }
         }
@@ -2507,10 +2507,10 @@ public final class GameServerSide extends Game
     /** Return a Set of Strings "Left" "Right" or "Bottom" describing
      *  possible entry sides.  If the hex is unoccupied, just return
      *  one entry side since it doesn't matter. */
-    Set<String> listPossibleEntrySides(Legion legion, MasterHex targetHex,
+    Set<Constants.EntrySide> listPossibleEntrySides(Legion legion, MasterHex targetHex,
         boolean teleport)
     {
-        Set<String> entrySides = new HashSet<String>();
+        Set<Constants.EntrySide> entrySides = new HashSet<Constants.EntrySide>();
         Player player = legion.getPlayer();
         int movementRoll = ((PlayerServerSide)player).getMovementRoll();
         MasterHex currentHex = legion.getCurrentHex();
@@ -2525,14 +2525,14 @@ public final class GameServerSide extends Game
                 if (!isOccupied(targetHex)
                     || targetHex.getTerrain().hasStartList())
                 {
-                    entrySides.add(Constants.bottom);
+                    entrySides.add(Constants.EntrySide.BOTTOM);
                     return entrySides;
                 }
                 else
                 {
-                    entrySides.add(Constants.bottom);
-                    entrySides.add(Constants.left);
-                    entrySides.add(Constants.right);
+                    entrySides.add(Constants.EntrySide.BOTTOM);
+                    entrySides.add(Constants.EntrySide.LEFT);
+                    entrySides.add(Constants.EntrySide.RIGHT);
                     return entrySides;
                 }
             }
@@ -2556,7 +2556,7 @@ public final class GameServerSide extends Game
             {
                 String buf = parts.get(1);
 
-                entrySides.add(buf);
+                entrySides.add(Constants.EntrySide.fromLabel(buf));
 
                 // Clemens 4.10.2007:
                 // This optimization can lead to problems ("Illegal entry side")
@@ -2884,7 +2884,7 @@ public final class GameServerSide extends Game
     /** Move the legion to the hex if legal.  Return a string telling
      *  the reason why it is illegal, or null if ok and move was done.
      */
-    String doMove(Legion legion, MasterHex hex, String entrySide,
+    String doMove(Legion legion, MasterHex hex, Constants.EntrySide entrySide,
         boolean teleport, String teleportingLord)
     {
         assert legion != null : "Legion must not be null";
@@ -2925,7 +2925,7 @@ public final class GameServerSide extends Game
         }
 
         // Verify that the entry side is legal.
-        Set<String> legalSides = listPossibleEntrySides(legion, hex, teleport);
+        Set<Constants.EntrySide> legalSides = listPossibleEntrySides(legion, hex, teleport);
         if (!legalSides.contains(entrySide))
         {
             return "EntrySide '" + entrySide + "' is not valid, valid are: "
@@ -2934,10 +2934,10 @@ public final class GameServerSide extends Game
 
         // If this is a tower hex, the only entry side is the bottom.
         if (hex.getTerrain().hasStartList()
-            && !entrySide.equals(Constants.bottom))
+            && !entrySide.equals(Constants.EntrySide.BOTTOM))
         {
             LOGGER.log(Level.WARNING, "Tried to enter invalid side of tower");
-            entrySide = Constants.bottom;
+            entrySide = Constants.EntrySide.BOTTOM;
         }
 
         // If the legion teleported, reveal a lord.

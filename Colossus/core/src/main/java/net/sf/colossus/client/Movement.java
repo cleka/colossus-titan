@@ -10,7 +10,6 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
-import net.sf.colossus.gui.BattleMap;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.Split;
@@ -38,7 +37,7 @@ public final class Movement
     }
 
     /** Set the entry side relative to the hex label. */
-    private static int findEntrySide(MasterHex hex, int cameFrom)
+    private static Constants.EntrySide findEntrySide(MasterHex hex, int cameFrom)
     {
         int entrySide = -1;
         if (cameFrom != -1)
@@ -52,7 +51,7 @@ public final class Movement
                 entrySide = (6 + cameFrom - hex.getLabelSide()) % 6;
             }
         }
-        return entrySide;
+        return Constants.EntrySide.fromIntegerId(entrySide);
     }
 
     /** Recursively find conventional moves from this hex.
@@ -86,8 +85,7 @@ public final class Movement
                 {
                     result.add(hex.getLabel()
                         + ":"
-                        + BattleMap
-                            .entrySideName(findEntrySide(hex, cameFrom)));
+                        + findEntrySide(hex, cameFrom).getLabel());
                 }
             }
             return result;
@@ -110,7 +108,7 @@ public final class Movement
             if (cameFrom != -1)
             {
                 result.add(hex.getLabel() + ":"
-                    + BattleMap.entrySideName(findEntrySide(hex, cameFrom)));
+                    + findEntrySide(hex, cameFrom).getLabel());
                 return result;
             }
         }
@@ -388,10 +386,10 @@ public final class Movement
     /** Return a Set of Strings "Left" "Right" or "Bottom" describing
      *  possible entry sides.  If the hex is unoccupied, just return
      *  one entry side since it doesn't matter. */
-    Set<String> listPossibleEntrySides(LegionClientSide legion,
+    Set<Constants.EntrySide> listPossibleEntrySides(LegionClientSide legion,
         MasterHex targetHex, boolean teleport)
     {
-        Set<String> entrySides = new HashSet<String>();
+        Set<Constants.EntrySide> entrySides = new HashSet<Constants.EntrySide>();
         int movementRoll = client.getMovementRoll();
         MasterHex currentHex = legion.getCurrentHex();
 
@@ -406,14 +404,14 @@ public final class Movement
                     || targetHex.getTerrain().hasStartList())
 
                 {
-                    entrySides.add(Constants.bottom);
+                    entrySides.add(Constants.EntrySide.BOTTOM);
                     return entrySides;
                 }
                 else
                 {
-                    entrySides.add(Constants.bottom);
-                    entrySides.add(Constants.left);
-                    entrySides.add(Constants.right);
+                    entrySides.add(Constants.EntrySide.BOTTOM);
+                    entrySides.add(Constants.EntrySide.LEFT);
+                    entrySides.add(Constants.EntrySide.RIGHT);
                     return entrySides;
                 }
             }
@@ -435,7 +433,7 @@ public final class Movement
             if (hl.equals(targetHex.getLabel()))
             {
                 String buf = parts.get(1);
-                entrySides.add(buf);
+                entrySides.add(Constants.EntrySide.fromLabel(buf));
                 // Don't bother finding more than one entry side if unoccupied.
                 if (!client.isOccupied(targetHex))
                 {

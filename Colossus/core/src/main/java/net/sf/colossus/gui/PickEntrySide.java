@@ -29,7 +29,7 @@ import net.sf.colossus.variant.MasterHex;
  * @version $Id$
  * @author David Ripton
  */
-
+@SuppressWarnings("serial")
 final class PickEntrySide extends HexMap implements ActionListener,
     WindowListener
 {
@@ -38,10 +38,10 @@ final class PickEntrySide extends HexMap implements ActionListener,
     private static JButton rightButton;
     private static boolean laidOut;
     private final JDialog dialog;
-    private static String entrySide = "";
+    private static Constants.EntrySide entrySide;
 
     private PickEntrySide(JFrame parentFrame, MasterHex masterHex,
-        Set<String> sides)
+        Set<Constants.EntrySide> sides)
     {
         super(masterHex);
         dialog = new JDialog(parentFrame, "Pick entry side", true);
@@ -49,25 +49,26 @@ final class PickEntrySide extends HexMap implements ActionListener,
         Container contentPane = dialog.getContentPane();
         contentPane.setLayout(null);
 
-        if (sides.contains(Constants.left))
+        // TODO refactor with a loop over sides and a switch over the enum
+        if (sides.contains(Constants.EntrySide.LEFT))
         {
-            leftButton = new JButton(Constants.left);
+            leftButton = new JButton(Constants.EntrySide.LEFT.getLabel());
             leftButton.setMnemonic(KeyEvent.VK_L);
             contentPane.add(leftButton);
             leftButton.addActionListener(this);
         }
 
-        if (sides.contains(Constants.bottom))
+        if (sides.contains(Constants.EntrySide.BOTTOM))
         {
-            bottomButton = new JButton(Constants.bottom);
+            bottomButton = new JButton(Constants.EntrySide.BOTTOM.getLabel());
             bottomButton.setMnemonic(KeyEvent.VK_B);
             contentPane.add(bottomButton);
             bottomButton.addActionListener(this);
         }
 
-        if (sides.contains(Constants.right))
+        if (sides.contains(Constants.EntrySide.RIGHT))
         {
-            rightButton = new JButton(Constants.right);
+            rightButton = new JButton(Constants.EntrySide.RIGHT.getLabel());
             rightButton.setMnemonic(KeyEvent.VK_R);
             contentPane.add(rightButton);
             rightButton.addActionListener(this);
@@ -84,8 +85,8 @@ final class PickEntrySide extends HexMap implements ActionListener,
         dialog.setVisible(true);
     }
 
-    static String pickEntrySide(JFrame parentFrame, MasterHex masterHex,
-        Set<String> sides)
+    static Constants.EntrySide pickEntrySide(JFrame parentFrame, MasterHex masterHex,
+        Set<Constants.EntrySide> sides)
     {
         if (sides.size() >= 2)
         {
@@ -93,7 +94,7 @@ final class PickEntrySide extends HexMap implements ActionListener,
         }
         else
         {
-            Iterator<String> it = sides.iterator();
+            Iterator<Constants.EntrySide> it = sides.iterator();
             if (it.hasNext())
             {
                 entrySide = it.next();
@@ -154,7 +155,7 @@ final class PickEntrySide extends HexMap implements ActionListener,
 
     // Set hex's entry side to side, and then exit the dialog.  If side
     // is -1, then do not set an entry side, which will abort the move.
-    private void cleanup(String side)
+    private void cleanup(Constants.EntrySide side)
     {
         entrySide = side;
         dialog.dispose();
@@ -162,13 +163,13 @@ final class PickEntrySide extends HexMap implements ActionListener,
 
     public void actionPerformed(ActionEvent e)
     {
-        cleanup(e.getActionCommand());
+        cleanup(Constants.EntrySide.fromLabel(e.getActionCommand()));
     }
 
     @Override
     public void windowClosing(WindowEvent e)
     {
         // Abort the move.
-        cleanup("");
+        cleanup(null);
     }
 }

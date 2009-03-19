@@ -443,7 +443,7 @@ final class ClientHandler implements IClient
         {
             String markerId = args.remove(0);
             String hexLabel = args.remove(0);
-            String entrySide = args.remove(0);
+            Constants.EntrySide entrySide = Constants.EntrySide.fromLabel(args.remove(0));
             boolean teleport = Boolean.valueOf(args.remove(0)).booleanValue();
             String teleportingLord = args.remove(0);
             server.doMove(resolveLegion(markerId), resolveMasterHex(hexLabel),
@@ -611,10 +611,10 @@ final class ClientHandler implements IClient
     }
 
     public void setLegionStatus(Legion legion, boolean moved,
-        boolean teleported, int entrySide, String lastRecruit)
+        boolean teleported, Constants.EntrySide entrySide, String lastRecruit)
     {
         sendToClient(Constants.setLegionStatus + sep + legion.getMarkerId()
-            + sep + moved + sep + teleported + sep + entrySide + sep
+            + sep + moved + sep + teleported + sep + entrySide.getId() + sep
             + lastRecruit);
     }
 
@@ -856,12 +856,12 @@ final class ClientHandler implements IClient
     }
 
     public void didMove(Legion legion, MasterHex startingHex,
-        MasterHex currentHex, String entrySide, boolean teleport,
+        MasterHex currentHex, Constants.EntrySide entrySide, boolean teleport,
         String teleportingLord, boolean splitLegionHasForcedMove)
     {
         sendToClient(Constants.didMove + sep + legion.getMarkerId() + sep
             + startingHex.getLabel() + sep + currentHex.getLabel() + sep
-            + entrySide + sep + teleport + sep
+            + entrySide.getLabel() + sep + teleport + sep
             + (teleportingLord == null ? "null" : teleportingLord) + sep
             + splitLegionHasForcedMove);
     }

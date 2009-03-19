@@ -40,7 +40,7 @@ public interface IClient
     public void removeLegion(Legion legion);
 
     public void setLegionStatus(Legion legion, boolean moved,
-        boolean teleported, int entrySide, String lastRecruit);
+        boolean teleported, Constants.EntrySide entrySide, String lastRecruit);
 
     public void addCreature(Legion legion, String name, String reason);
 
@@ -133,7 +133,7 @@ public interface IClient
         String endingHexLabel, boolean undo);
 
     public void didMove(Legion legion, MasterHex startingHex, MasterHex hex,
-        String entrySide, boolean teleport, String teleportingLord,
+        Constants.EntrySide entrySide, boolean teleport, String teleportingLord,
         boolean splitLegionHasForcedMove);
 
     public void undidMove(Legion legion, MasterHex formerHex,

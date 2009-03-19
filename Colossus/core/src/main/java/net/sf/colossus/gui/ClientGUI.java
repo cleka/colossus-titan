@@ -2236,7 +2236,7 @@ public class ClientGUI implements IClientGUI
     /* (non-Javadoc)
      * @see net.sf.colossus.gui.IClientGUI#doPickEntrySide(net.sf.colossus.variant.MasterHex, java.util.Set)
      */
-    public String doPickEntrySide(MasterHex hex, Set<String> entrySides)
+    public Constants.EntrySide doPickEntrySide(MasterHex hex, Set<Constants.EntrySide> entrySides)
     {
         return PickEntrySide.pickEntrySide(board.getFrame(), hex, entrySides);
     }

@@ -22,7 +22,7 @@ import net.sf.colossus.util.KDialog;
  * @version $Id$
  * @author Romain Dolbeau
  */
-
+@SuppressWarnings("serial")
 final class ChooseScreen extends KDialog implements ActionListener
 {
     private final Client client;

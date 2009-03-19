@@ -74,16 +74,9 @@ public final class BattleServerSide extends Battle
         this.phase = phase;
 
         // Set defender's entry side opposite attacker's.
-        int side = attacker.getEntrySide();
-        if (side != 1 && side != 3 && side != 5)
-        {
-            LOGGER.log(Level.WARNING, "Fixing bogus entry side: " + side);
-            // If invalid, default to bottom, which is always valid.
-            attacker.setEntrySide(3);
-        }
-        defender.setEntrySide((side + 3) % 6);
+        defender.setEntrySide(attacker.getEntrySide().getOpposingSide());
         // Make sure defender can recruit, even if savegame is off.
-        ((LegionServerSide)defender).setRecruitName(null);
+        defender.setRecruitName(null);
 
         // Make sure donor is null, if it remained set from an earlier battle
         ((LegionServerSide)attacker).getPlayer().setDonor(null);

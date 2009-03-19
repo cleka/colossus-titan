@@ -1598,21 +1598,21 @@ public class SimpleAI extends AbstractAI
     // This is a really dumb placeholder.  TODO Make it smarter.
     // In particular, the AI should pick a side that will let it enter
     // as many creatures as possible.
-    public String pickEntrySide(MasterHex hex, Legion legion,
-        Set<String> entrySides)
+    public Constants.EntrySide pickEntrySide(MasterHex hex, Legion legion,
+        Set<Constants.EntrySide> entrySides)
     {
         // Default to bottom to simplify towers.
-        if (entrySides.contains(Constants.bottom))
+        if (entrySides.contains(Constants.EntrySide.BOTTOM))
         {
-            return Constants.bottom;
+            return Constants.EntrySide.BOTTOM;
         }
-        if (entrySides.contains(Constants.right))
+        if (entrySides.contains(Constants.EntrySide.RIGHT))
         {
-            return Constants.right;
+            return Constants.EntrySide.RIGHT;
         }
-        if (entrySides.contains(Constants.left))
+        if (entrySides.contains(Constants.EntrySide.LEFT))
         {
-            return Constants.left;
+            return Constants.EntrySide.LEFT;
         }
         return null;
     }

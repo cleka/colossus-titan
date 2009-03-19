@@ -246,8 +246,8 @@ public final class BattleBoard extends KFrame
         // so I keep them like that, for now.
         setPhase(client.getBattlePhase());
         setTurn(client.getBattleTurnNumber());
-        setBattleMarkerLocation(false, "X" + attacker.getEntrySide());
-        setBattleMarkerLocation(true, "X" + defender.getEntrySide());
+        setBattleMarkerLocation(false, "X" + attacker.getEntrySide().ordinal());
+        setBattleMarkerLocation(true, "X" + defender.getEntrySide().ordinal());
         reqFocus();
     }
 
@@ -797,48 +797,6 @@ public final class BattleBoard extends KFrame
         setSize(getPreferredSize());
         pack();
         repaint();
-    }
-
-    public static String entrySideName(int side)
-    {
-        switch (side)
-        {
-            case 1:
-                return Constants.right;
-
-            case 3:
-                return Constants.bottom;
-
-            case 5:
-                return Constants.left;
-
-            default:
-                return "";
-        }
-    }
-
-    public static int entrySideNum(String side)
-    {
-        if (side == null)
-        {
-            return -1;
-        }
-        if (side.equals(Constants.right))
-        {
-            return 1;
-        }
-        else if (side.equals(Constants.bottom))
-        {
-            return 3;
-        }
-        else if (side.equals(Constants.left))
-        {
-            return 5;
-        }
-        else
-        {
-            return -1;
-        }
     }
 
     public void reqFocus()

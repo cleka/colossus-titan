@@ -1037,7 +1037,7 @@ public final class Client implements IClient, IOracle
 
     /** Needed when loading a game outside split phase. */
     public void setLegionStatus(Legion legion, boolean moved,
-        boolean teleported, int entrySide, String lastRecruit)
+        boolean teleported, Constants.EntrySide entrySide, String lastRecruit)
     {
         legion.setMoved(moved);
         legion.setTeleported(teleported);
@@ -1780,9 +1780,7 @@ public final class Client implements IClient, IOracle
         this.defender = defender;
         this.battleSite = hex;
 
-        int attackerSide = this.attacker.getEntrySide();
-        int defenderSide = (attackerSide + 3) % 6;
-        this.defender.setEntrySide(defenderSide);
+        this.defender.setEntrySide(this.attacker.getEntrySide().getOpposingSide());
 
         gui.actOnInitBattle();
     }
@@ -2700,9 +2698,9 @@ public final class Client implements IClient, IOracle
             return false;
         }
 
-        Set<String> entrySides = listPossibleEntrySides(mover, hex, teleport);
+        Set<Constants.EntrySide> entrySides = listPossibleEntrySides(mover, hex, teleport);
 
-        String entrySide = null;
+        Constants.EntrySide entrySide = null;
         if (options.getOption(Options.autoPickEntrySide))
         {
             entrySide = ai.pickEntrySide(hex, mover, entrySides);
@@ -2710,11 +2708,6 @@ public final class Client implements IClient, IOracle
         else
         {
             entrySide = gui.doPickEntrySide(hex, entrySides);
-        }
-
-        if (!goodEntrySide(entrySide))
-        {
-            return false;
         }
 
         String teleportingLord = null;
@@ -2747,15 +2740,8 @@ public final class Client implements IClient, IOracle
         return true;
     }
 
-    private boolean goodEntrySide(String entrySide)
-    {
-        return (entrySide != null && (entrySide.equals(Constants.left)
-            || entrySide.equals(Constants.bottom) || entrySide
-            .equals(Constants.right)));
-    }
-
     public void didMove(Legion legion, MasterHex startingHex,
-        MasterHex currentHex, String entrySide, boolean teleport,
+        MasterHex currentHex, Constants.EntrySide entrySide, boolean teleport,
         String teleportingLord, boolean splitLegionHasForcedMove)
     {
         if (isMyLegion(legion))
@@ -2764,8 +2750,7 @@ public final class Client implements IClient, IOracle
         }
         legion.setCurrentHex(currentHex);
         legion.setMoved(true);
-        ((LegionClientSide)legion).setEntrySide(BattleMap
-            .entrySideNum(entrySide));
+        legion.setEntrySide(entrySide);
 
         if (teleport)
         {
@@ -3055,7 +3040,7 @@ public final class Client implements IClient, IOracle
             movementRoll);
     }
 
-    public Set<String> listPossibleEntrySides(LegionClientSide mover,
+    public Set<Constants.EntrySide> listPossibleEntrySides(LegionClientSide mover,
         MasterHex hex, boolean teleport)
     {
         return movement.listPossibleEntrySides(mover, hex, teleport);

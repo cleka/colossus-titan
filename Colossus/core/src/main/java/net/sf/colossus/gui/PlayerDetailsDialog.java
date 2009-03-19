@@ -38,6 +38,7 @@ import net.sf.colossus.variant.CreatureType;
 /**
  * A dialog that displays information about a single player and his legions.
  */
+@SuppressWarnings("serial")
 public final class PlayerDetailsDialog extends KDialog implements
     MouseListener, WindowListener
 {

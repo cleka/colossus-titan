@@ -34,7 +34,7 @@ import net.sf.colossus.util.Options;
  *  @version $Id$
  *  @author David Ripton
  */
-
+@SuppressWarnings("serial")
 public class StartClient extends KFrame implements WindowListener,
     ActionListener
 {

@@ -74,7 +74,7 @@ public interface IServer
 
     public void doSplit(Legion parent, String childMarker, String results);
 
-    public void doMove(Legion legion, MasterHex hex, String entrySide,
+    public void doMove(Legion legion, MasterHex hex, Constants.EntrySide entrySide,
         boolean teleport, String teleportingLord);
 
     public void assignColor(Constants.PlayerColor color);

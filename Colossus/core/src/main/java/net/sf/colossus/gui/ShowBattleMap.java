@@ -19,6 +19,7 @@ import javax.swing.SwingUtilities;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.server.Constants;
+import net.sf.colossus.server.Constants.EntrySide;
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.variant.MasterHex;
 
@@ -36,6 +37,7 @@ import net.sf.colossus.variant.MasterHex;
  * @version $Id$
  * @author David Ripton
  */
+@SuppressWarnings("serial")
 final class ShowBattleMap extends HexMap
 {
     private static final String NoLandText = "--";
@@ -54,8 +56,14 @@ final class ShowBattleMap extends HexMap
 
         assert SwingUtilities.isEventDispatchThread() : "Constructor should be called only on the EDT";
 
-        Map<String, String> neighbors = findOutNeighbors(hex);
-        String neighborsText = neighbors.get("text");
+        Map<EntrySide, String> neighbors = findOutNeighbors(hex);
+        String neighborsText = Constants.EntrySide.RIGHT.getLabel() + ": "
+            + neighbors.get(Constants.EntrySide.RIGHT) + ", "
+            + Constants.EntrySide.BOTTOM.getLabel() + ": "
+            + neighbors.get(Constants.EntrySide.BOTTOM) + ", "
+            + Constants.EntrySide.LEFT.getLabel() + ": "
+            + neighbors.get(Constants.EntrySide.LEFT) + ")";
+
 
         final KDialog dialog = new KDialog(parentFrame, "Battle Map for "
             + hex.getHexModel().getTerrainName() + " " + hex.getHexModel()
@@ -63,31 +71,31 @@ final class ShowBattleMap extends HexMap
         laidOut = false;
 
         final Container contentPane = dialog.getContentPane();
-        // contentPane.setLayout(new BorderLayout());
         contentPane.setLayout(null);
 
-        String text = neighbors.get(Constants.left);
+        //TODO: three or more, use a for (maybe integrating findOutNeighbours code)
+        String text = neighbors.get(Constants.EntrySide.LEFT);
         if (!text.equals(NoLandText))
         {
-            leftButton = new JButton("<HTML>" + Constants.left + ":<BR>"
+            leftButton = new JButton("<HTML>" + Constants.EntrySide.LEFT.getLabel() + ":<BR>"
                 + text + "</HTML>");
             leftButton.setEnabled(false);
             contentPane.add(leftButton);
         }
 
-        text = neighbors.get(Constants.bottom);
+        text = neighbors.get(Constants.EntrySide.BOTTOM);
         if (!text.equals(NoLandText))
         {
-            bottomButton = new JButton("<HTML>" + Constants.bottom + ":<BR>"
+            bottomButton = new JButton("<HTML>" + Constants.EntrySide.BOTTOM.getLabel() + ":<BR>"
                 + text + "</HTML>");
             bottomButton.setEnabled(false);
             contentPane.add(bottomButton);
         }
 
-        text = neighbors.get(Constants.right);
+        text = neighbors.get(Constants.EntrySide.RIGHT);
         if (!text.equals(NoLandText))
         {
-            rightButton = new JButton("<HTML>" + Constants.right + ":<BR>"
+            rightButton = new JButton("<HTML>" + Constants.EntrySide.RIGHT + ":<BR>"
                 + text + "</HTML>");
             rightButton.setEnabled(false);
             contentPane.add(rightButton);
@@ -122,10 +130,8 @@ final class ShowBattleMap extends HexMap
         dialog.setVisible(true);
     }
 
-    private Map<String, String> findOutNeighbors(GUIMasterHex guiHex)
+    private Map<Constants.EntrySide, String> findOutNeighbors(GUIMasterHex guiHex)
     {
-        String neighborsText = "";
-
         boolean inverted = guiHex.isInverted();
         MasterHex model = guiHex.getHexModel();
 
@@ -159,15 +165,10 @@ final class ShowBattleMap extends HexMap
             }
         }
 
-        neighborsText = Constants.right + ": " + right + ", "
-            + Constants.bottom + ": " + bottom + ", " + Constants.left + ": "
-            + left + ")";
-
-        Map<String, String> neighbors = new HashMap<String, String>(4);
-        neighbors.put("text", neighborsText);
-        neighbors.put(Constants.right, right);
-        neighbors.put(Constants.bottom, bottom);
-        neighbors.put(Constants.left, left);
+        Map<Constants.EntrySide, String> neighbors = new HashMap<Constants.EntrySide, String>(4);
+        neighbors.put(Constants.EntrySide.RIGHT, right);
+        neighbors.put(Constants.EntrySide.BOTTOM, bottom);
+        neighbors.put(Constants.EntrySide.LEFT, left);
 
         return neighbors;
     }

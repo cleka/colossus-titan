@@ -526,10 +526,10 @@ final class SocketClientThread extends Thread implements IServer
             boolean moved = Boolean.valueOf(args.remove(0)).booleanValue();
             boolean teleported = Boolean.valueOf(args.remove(0))
                 .booleanValue();
-            int entrySide = Integer.parseInt(args.remove(0));
+            int entrySideId = Integer.parseInt(args.remove(0));
             String lastRecruit = args.remove(0);
             client.setLegionStatus(resolveLegion(markerId), moved, teleported,
-                entrySide, lastRecruit);
+                Constants.EntrySide.fromIntegerId(entrySideId), lastRecruit);
         }
         else if (method.equals(Constants.addCreature))
         {
@@ -821,7 +821,7 @@ final class SocketClientThread extends Thread implements IServer
             String markerId = args.remove(0);
             String startingHexLabel = args.remove(0);
             String currentHexLabel = args.remove(0);
-            String entrySide = args.remove(0);
+            String entrySideLabel = args.remove(0);
             boolean teleport = Boolean.valueOf(args.remove(0)).booleanValue();
             // servers from older versions might not send this arg
             String teleportingLord = null;
@@ -843,7 +843,7 @@ final class SocketClientThread extends Thread implements IServer
             client
                 .didMove(resolveLegion(markerId),
                     resolveHex(startingHexLabel), resolveHex(currentHexLabel),
-                    entrySide, teleport, teleportingLord,
+                    Constants.EntrySide.fromLabel(entrySideLabel), teleport, teleportingLord,
                     splitLegionHasForcedMove);
         }
         else if (method.equals(Constants.undidMove))
@@ -1218,11 +1218,11 @@ final class SocketClientThread extends Thread implements IServer
             + childMarker + sep + results);
     }
 
-    public void doMove(Legion legion, MasterHex hex, String entrySide,
+    public void doMove(Legion legion, MasterHex hex, Constants.EntrySide entrySide,
         boolean teleport, String teleportingLord)
     {
         sendToServer(Constants.doMove + sep + legion.getMarkerId() + sep
-            + hex.getLabel() + sep + entrySide + sep + teleport + sep
+            + hex.getLabel() + sep + entrySide.getLabel() + sep + teleport + sep
             + teleportingLord);
     }
 
