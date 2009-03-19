@@ -274,12 +274,9 @@ public final class Constants
      */
     public static enum EntrySide
     {
-        TOP_DEFENSE("Top defense"),
-        RIGHT("Right"),
-        RIGHT_DEFENSE("Right defense"),
-        BOTTOM("Bottom"),
-        LEFT_DEFENSE("Left defense"),
-        LEFT("Left");
+        TOP_DEFENSE("Top defense"), RIGHT("Right"), RIGHT_DEFENSE(
+            "Right defense"), BOTTOM("Bottom"), LEFT_DEFENSE("Left defense"), LEFT(
+            "Left");
 
         private final String label;
 
@@ -306,22 +303,23 @@ public final class Constants
 
         public EntrySide getOpposingSide()
         {
-            return values()[(ordinal()  + 3) % 6];
+            return values()[(ordinal() + 3) % 6];
         }
-        
+
         public static EntrySide fromLabel(String label)
         {
             for (EntrySide entrySide : values())
             {
                 // the old code relied on the side being one of the attacker sides,
                 // so we keep the restriction
-                if(entrySide.isAttackerSide() && entrySide.getLabel().equals(label))
+                if (entrySide.isAttackerSide()
+                    && entrySide.getLabel().equals(label))
                 {
                     return entrySide;
                 }
             }
-            throw new IllegalArgumentException("No attacker entry side with label '" +
-                    label + "'");
+            throw new IllegalArgumentException(
+                "No attacker entry side with label '" + label + "'");
         }
 
         public static EntrySide fromIntegerId(int id)
@@ -330,12 +328,13 @@ public final class Constants
             {
                 // the old code relied on the side being one of the attacker sides, 
                 // so we keep the restriction
-                if(entrySide.isAttackerSide() && entrySide.getId() == id)
+                if (entrySide.isAttackerSide() && entrySide.getId() == id)
                 {
                     return entrySide;
                 }
             }
-            throw new IllegalArgumentException("No attacker entry side with id " + id);
+            throw new IllegalArgumentException(
+                "No attacker entry side with id " + id);
         }
     }
 
@@ -451,11 +450,11 @@ public final class Constants
     /** Available internal variants  Try to keep this list mostly
      *  alphabetized for easier searching, with Default at the top. */
     public static final String[] variantArray = { "Default", "Abyssal3",
-        "Abyssal6", "Abyssal9", "Badlands", "Badlands-JDG", "Beelzebub",
-        "Beelzebub12", "BeelzeGods12", "ExtTitan", "Infinite", "Outlands",
-        "Pantheon", "SmallTitan", "TG-ConceptI", "TG-ConceptII",
+        "Abyssal6", "Abyssal9", "Badlands", "Badlands-JDG", "Balrog",
+        "Beelzebub", "Beelzebub12", "BeelzeGods12", "ExtTitan", "Infinite",
+        "Outlands", "Pantheon", "SmallTitan", "TG-ConceptI", "TG-ConceptII",
         "TG-ConceptIII", "TG-SetII", "TG-SetIII", "TG-Wild", "TitanPlus",
-        "Undead", "Unified", "Balrog" };
+        "Undead", "Unified" };
 
     public static final int numVariants = variantArray.length;
 
