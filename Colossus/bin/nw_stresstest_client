@@ -47,7 +47,9 @@ do
   shift
 done
 
-LOG=client.$playername.log
+mkdir -p ./tmp/stresstest
+
+LOG=./tmp/stresstest/client.$playername.log
 
 # for stresstest, this should always be set, even if 1, 
 # so that client does not ask whether to dispose.
