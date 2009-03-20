@@ -20,7 +20,6 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 
-import net.sf.colossus.client.Client;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.KDialog;
@@ -42,7 +41,7 @@ final class SplitLegion extends KDialog implements MouseListener,
     private final Marker oldMarker;
     private final Marker newMarker;
 
-    private Client client;
+    private final ClientGUI gui;
     private static boolean active;
 
     /** new marker id,creature1,creature2... */
@@ -60,15 +59,15 @@ final class SplitLegion extends KDialog implements MouseListener,
 
     private final SaveWindow saveWindow;
 
-    private SplitLegion(Client client, Legion parent, String selectedMarkerId)
+    private SplitLegion(ClientGUI gui, Legion parent, String selectedMarkerId)
     {
-        super(client.getBoard().getFrame(), client.getOwningPlayer().getName()
+        super(gui.getBoard().getFrame(), gui.getOwningPlayer().getName()
             + ": Split Legion " + parent, true);
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
 
-        this.client = client;
+        this.gui = gui;
 
         if (selectedMarkerId == null)
         {
@@ -109,7 +108,7 @@ final class SplitLegion extends KDialog implements MouseListener,
         oldBox.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
         oldBox.add(Box.createHorizontalGlue());
 
-        List<String> imageNames = client.getLegionImageNames(parent);
+        List<String> imageNames = gui.getClient().getLegionImageNames(parent);
         totalChits = imageNames.size();
 
         Iterator<String> it = imageNames.iterator();
@@ -145,7 +144,7 @@ final class SplitLegion extends KDialog implements MouseListener,
         buttonBox.add(button2);
 
         pack();
-        saveWindow = new SaveWindow(client.getOptions(), "SplitLegion");
+        saveWindow = new SaveWindow(gui.getOptions(), "SplitLegion");
         Point location = saveWindow.loadLocation();
         if (location == null)
         {
@@ -159,13 +158,13 @@ final class SplitLegion extends KDialog implements MouseListener,
     }
 
     /** Return childMarkerId,splitCreature1,splitCreature2,etc. */
-    static String splitLegion(Client client, Legion parent,
+    static String splitLegion(ClientGUI gui, Legion parent,
         String selectedMarkerId)
     {
         if (!active)
         {
             active = true;
-            new SplitLegion(client, parent, selectedMarkerId);
+            new SplitLegion(gui, parent, selectedMarkerId);
             active = false;
             return results;
         }
@@ -200,7 +199,7 @@ final class SplitLegion extends KDialog implements MouseListener,
         {
             if (showMessage)
             {
-                client.showMessageDialog("Legion too short.");
+                gui.showMessageDialog("Legion too short.");
             }
             return false;
         }
@@ -210,7 +209,7 @@ final class SplitLegion extends KDialog implements MouseListener,
             {
                 if (showMessage)
                 {
-                    client.showMessageDialog("Initial split must be 4-4.");
+                    gui.showMessageDialog("Initial split must be 4-4.");
                 }
                 return false;
             }
@@ -231,7 +230,7 @@ final class SplitLegion extends KDialog implements MouseListener,
             {
                 if (showMessage)
                 {
-                    client.showMessageDialog("Each stack must have one lord.");
+                    gui.showMessageDialog("Each stack must have one lord.");
                 }
                 return false;
             }
@@ -276,7 +275,6 @@ final class SplitLegion extends KDialog implements MouseListener,
         }
         removeMouseListener(this);
         removeWindowListener(this);
-        client = null;
         super.dispose();
     }
 

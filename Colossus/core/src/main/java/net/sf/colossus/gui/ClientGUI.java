@@ -2130,7 +2130,7 @@ public class ClientGUI implements IClientGUI
      */
     public String doPickSplitLegion(Legion parent, String childMarker)
     {
-        return SplitLegion.splitLegion(client, parent, childMarker);
+        return SplitLegion.splitLegion(this, parent, childMarker);
     }
 
     /* (non-Javadoc)

@@ -32,7 +32,6 @@ import net.sf.colossus.gui.ClientGUI;
 import net.sf.colossus.gui.GUIMasterHex;
 import net.sf.colossus.gui.IClientGUI;
 import net.sf.colossus.gui.Marker;
-import net.sf.colossus.gui.MasterBoard;
 import net.sf.colossus.gui.NullClientGUI;
 import net.sf.colossus.gui.Scale;
 import net.sf.colossus.server.Constants;
@@ -1284,13 +1283,6 @@ public final class Client implements IClient, IOracle
     public void setMover(LegionClientSide legion)
     {
         this.mover = legion;
-    }
-
-    // TODO several gui components still need to ask the client for access
-    //      to the board via the gui class ... - can this cleaned up?
-    public MasterBoard getBoard()
-    {
-        return gui.getBoard();
     }
 
     public IClientGUI getGUI()

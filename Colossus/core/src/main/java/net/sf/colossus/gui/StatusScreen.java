@@ -63,7 +63,7 @@ final class StatusScreen extends KDialog implements WindowListener
     private Dimension size;
     private final SaveWindow saveWindow;
 
-    StatusScreen(JFrame frame, IOracle oracle, IOptions options,
+    StatusScreen(final JFrame frame, IOracle oracle, IOptions options,
         final Client client)
     {
         super(frame, "Game Status", false);
@@ -137,8 +137,7 @@ final class StatusScreen extends KDialog implements WindowListener
                 @Override
                 public void mouseClicked(MouseEvent e)
                 {
-                    new PlayerDetailsDialog(client.getBoard().getFrame(),
-                        player, client);
+                    new PlayerDetailsDialog(frame, player, client);
                 }
             });
         }
