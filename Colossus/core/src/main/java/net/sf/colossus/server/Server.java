@@ -52,6 +52,8 @@ public final class Server extends Thread implements IServer
 
     private GameServerSide game;
 
+    private final Start startObject;
+
     /**
      *  Maybe also save things like the originating IP, in case a
      *  connection breaks and we need to authenticate reconnects.
@@ -121,10 +123,11 @@ public final class Server extends Thread implements IServer
     // have been processed).
     private final List<ClientHandler> channelChanges = new ArrayList<ClientHandler>();
 
-    Server(GameServerSide game, int port)
+    Server(GameServerSide game, Start startObj, int port)
     {
         this.game = game;
         this.port = port;
+        this.startObject = startObj;
 
         if (startLog != null)
         {
@@ -889,7 +892,7 @@ public final class Server extends Thread implements IServer
         boolean dontUseOptionsFile = player.isAI();
         LOGGER.finest("Called Server.createLocalClient() for " + playerName);
 
-        new Client("127.0.0.1", port, playerName, this, false,
+        new Client("127.0.0.1", port, playerName, startObject, this, false,
             dontUseOptionsFile, createGUI);
     }
 
@@ -2713,13 +2716,22 @@ public final class Server extends Thread implements IServer
         }
     }
 
+    /*
+     * Called by GameServerSide, to initiate the "Quit All"
+     */
+    public void doSetWhatToDoNext(WhatToDoNext whatToDoNext,
+        boolean triggerQuitTimer)
+    {
+        startObject.setWhatToDoNext(whatToDoNext, triggerQuitTimer);
+    }
+
     /* Called from ServerStartupProgress, if user wants to cancel during load
      * (e.g. one client did not come in). Clean up everything and get
      *  back to the GetPlayers / Game Setup dialog.
      */
     public void startupProgressAbort()
     {
-        Start.setCurrentWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG);
+        startObject.setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
         stopServerRunning();
         if (startLog != null)
         {

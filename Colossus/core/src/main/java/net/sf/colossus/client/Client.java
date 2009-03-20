@@ -42,7 +42,9 @@ import net.sf.colossus.server.Dice;
 import net.sf.colossus.server.GameServerSide;
 import net.sf.colossus.server.IServer;
 import net.sf.colossus.server.Server;
+import net.sf.colossus.server.Start;
 import net.sf.colossus.server.VariantSupport;
+import net.sf.colossus.server.Start.WhatToDoNext;
 import net.sf.colossus.util.ChildThreadManager;
 import net.sf.colossus.util.CollectionHelper;
 import net.sf.colossus.util.Options;
@@ -142,6 +144,10 @@ public final class Client implements IClient, IOracle
     private final Game game;
 
     /**
+     * The "Start" object which created this Client
+     */
+    private final Start startObject;
+    /**
      * Starting marker color of player who owns this client.
      *
      * TODO most likely redundant with owningPlayer.getColor()
@@ -236,10 +242,11 @@ public final class Client implements IClient, IOracle
      *      would be easier to run the local clients without the detour across the
      *      network and the serialization/deserialization of all objects
      */
-    public Client(String host, int port, String playerName, Server theServer,
-        boolean byWebClient, boolean noOptionsFile, boolean createGUI)
+    public Client(String host, int port, String playerName, Start startObj,
+        Server theServer, boolean byWebClient, boolean noOptionsFile,
+        boolean createGUI)
     {
-        this(playerName, noOptionsFile, createGUI);
+        this(startObj, playerName, noOptionsFile, createGUI);
 
         this.localServer = theServer;
 
@@ -288,12 +295,14 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    private Client(String playerName, boolean noOptionsFile, boolean createGUI)
+    private Client(Start startObj, String playerName, boolean noOptionsFile,
+        boolean createGUI)
     {
         assert playerName != null;
 
         // TODO still dummy arguments
         this.game = new GameClientSide(null, new String[0]);
+        this.startObject = startObj;
 
         ((GameClientSide)game).setClient(this);
 
@@ -3748,6 +3757,30 @@ public final class Client implements IClient, IOracle
             }
             return s1.compareTo(s2);
         }
+    }
+
+    /*
+     * Called by ClientGUI, to fulfill the items called in menu 
+     */
+
+    public void doSetWhatToDoNext(WhatToDoNext whatToDoNext,
+        boolean triggerQuitTimer)
+    {
+        startObject.setWhatToDoNext(whatToDoNext, triggerQuitTimer);
+    }
+
+    public void doSetWhatToDoNext(WhatToDoNext whatToDoNext, String loadFile)
+    {
+        startObject.setWhatToDoNext(whatToDoNext, loadFile);
+    }
+
+    /*
+     * ClientGUI needs that when bringing up a new WebClient
+     */
+    public Start getStartObject()
+    {
+        return startObject;
+
     }
 
     public Game getGame()

@@ -686,20 +686,20 @@ public final class GetPlayersWeb extends KFrame implements WindowListener,
             stOptions.setOption(Options.loadGameFileName, filename);
             stOptions.setOption(Options.serveAtPort, serveAtPort);
             options.setOption(Options.serveAtPort, serveAtPort);
-            Start.setCurrentWhatToDoNext(WhatToDoNext.LOAD_GAME);
+            startObject.setWhatToDoNext(WhatToDoNext.LOAD_GAME, false);
             dispose();
         }
     }
 
     private void doClientDialog()
     {
-        startObject.setWhatToDoNext(WhatToDoNext.NET_CLIENT_DIALOG);
+        startObject.setWhatToDoNext(WhatToDoNext.NET_CLIENT_DIALOG, false);
         dispose();
     }
 
     private void doRunWebClient()
     {
-        startObject.setWhatToDoNext(WhatToDoNext.START_WEB_CLIENT);
+        startObject.setWhatToDoNext(WhatToDoNext.START_WEB_CLIENT, false);
         dispose();
     }
 
@@ -724,8 +724,7 @@ public final class GetPlayersWeb extends KFrame implements WindowListener,
             System.exit(1);
         }
         quitAlreadyTried = true;
-        startObject.setWhatToDoNext(WhatToDoNext.QUIT_ALL);
-        Start.triggerTimedQuit();
+        startObject.setWhatToDoNext(WhatToDoNext.QUIT_ALL, true);
         dispose();
     }
 

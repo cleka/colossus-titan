@@ -215,8 +215,7 @@ public class StartClient extends KFrame implements WindowListener,
     {
         if (e.getActionCommand().equals(Constants.quitGame))
         {
-            startObject.setWhatToDoNext(WhatToDoNext.QUIT_ALL);
-            Start.triggerTimedQuit();
+            startObject.setWhatToDoNext(WhatToDoNext.QUIT_ALL, true);
             dispose();
         }
         else if (e.getActionCommand().equals("Go"))
@@ -245,7 +244,7 @@ public class StartClient extends KFrame implements WindowListener,
     @Override
     public void windowClosing(WindowEvent e)
     {
-        startObject.setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG);
+        startObject.setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
         dispose();
     }
 
@@ -271,7 +270,7 @@ public class StartClient extends KFrame implements WindowListener,
         saveWindow.save(this);
         netclientOptions.saveOptions();
 
-        startObject.setWhatToDoNext(WhatToDoNext.START_NET_CLIENT);
+        startObject.setWhatToDoNext(WhatToDoNext.START_NET_CLIENT, false);
         dispose();
     }
 

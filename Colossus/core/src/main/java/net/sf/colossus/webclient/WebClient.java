@@ -92,6 +92,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     final static String TYPE_SCHEDULED = "scheduled";
     final static String TYPE_INSTANTLY = "instantly";
 
+    private final Start startObject;
     private String hostname;
     private int port;
     private String login;
@@ -275,10 +276,12 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     private final static String defaultSummaryText = "Type here a short "
         + "summary what kind of game you would wish to play";
 
-    public WebClient(String hostname, int port, String login, String password)
+    public WebClient(Start startObj, String hostname, int port, String login,
+        String password)
     {
         super(windowTitle);
 
+        startObject = startObj;
         options = new Options(Constants.OPTIONS_WEB_CLIENT_NAME);
         options.loadOptions();
 
@@ -505,8 +508,9 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             @Override
             public void windowClosing(WindowEvent e)
             {
-                Start startObj = Start.getCurrentStartObject();
-                startObj.setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG);
+                Start startObj = WebClient.this.startObject;
+                startObj.setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG,
+                    false);
                 dispose();
             }
         });
@@ -558,8 +562,8 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         }
         else if (whatToDo.equals(AutoGameStartActionClose))
         {
-            Start startObj = Start.getCurrentStartObject();
-            startObj.setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG);
+            Start startObj = WebClient.this.startObject;
+            startObj.setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
             dispose();
         }
         else
@@ -1399,9 +1403,8 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         }
         else
         {
-            Start startObj = Start.getCurrentStartObject();
-            startObj.setWhatToDoNext(WhatToDoNext.QUIT_ALL);
-            Start.triggerTimedQuit();
+            Start startObj = WebClient.this.startObject;
+            startObj.setWhatToDoNext(WhatToDoNext.QUIT_ALL, true);
             dispose();
         }
     }
@@ -1973,7 +1976,6 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
         boolean ok = true;
         GameInfo gi = findGameById(gameId);
-        Start startObject = Start.getCurrentStartObject();
 
         presetOptions = new Options("server", true);
         gi.createStartLocallyOptionsObject(presetOptions, username);
@@ -1999,7 +2001,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
         // System.out.println("doStartLocally after GetPlayersWeb");
 
-        startObject.setWhatToDoNext(WhatToDoNext.START_WEB_CLIENT);
+        startObject.setWhatToDoNext(WhatToDoNext.START_WEB_CLIENT, false);
 
         Runnable waitForAction = new Runnable()
         {
@@ -2070,8 +2072,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         new Thread(informThem).start();
 
         // Start the server process
-        Start.getCurrentStartObject().startWebGameLocally(presetOptions,
-            username, this);
+        startObject.startWebGameLocally(presetOptions, username, this);
 
         // System.out.println("doInitiateStartLocally ENDS");
     }
@@ -2263,8 +2264,8 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             boolean noOptionsFile = false;
             // System.out.println("in webclient, before new Client for username "
             //     + username);
-            gc = new Client(hostingHost, p, username, localServer, true,
-                noOptionsFile, true);
+            gc = new Client(hostingHost, p, username, startObject,
+                localServer, true, noOptionsFile, true);
             boolean failed = gc.getFailed();
             if (failed)
             {

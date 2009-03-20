@@ -31,31 +31,29 @@ public final class Start
     private static final Logger LOGGER = Logger.getLogger(Start.class
         .getName());
 
-    // TODO get rid of this static object at some point also
-    // static, there's always only one valid "what to do next" object:
-    private static Start startObject = null;
-
-    // ===============================================================
-    // First some "startObject" stuff, and object which holds all data
-    // related to "what to do next".
-
     private CmdLine cmdLine;
-
     private WhatToDoNext whatToDoNext;
+    private int howManyGamesLeft = 0;
 
     // Options remembered only inside this running application,
     // related to server/port/name startup settings; initialized
-    // from commandline options, perhaps modified by dialogs.
+    // from command line options, perhaps modified by dialogs.
     // We never save those startOptions, but some of them are copied
     // to the server options in GetPlayers when the user initiates
     // a related action.
     private final Options startOptions;
 
-    private static int howManyGamesLeft = 0;
-
-    public Start()
+    /**
+     * To create the one "Start" object which handles initiates the
+     * "whatToDoNext" action according to what the user wants.
+     * 
+     * Brings up one of the dialogs, or starts a Game, a Network client
+     * or a Web Client.
+     */
+    public Start(String[] args)
     {
         this.startOptions = new Options(Constants.OPTIONS_START);
+        commandLineProcessing(args);
 
     }
 
@@ -69,41 +67,29 @@ public final class Start
         return whatToDoNext;
     }
 
-    public void setWhatToDoNext(WhatToDoNext whatToDoNext)
+    /**
+     * Set in the Start object the action what shall be executed next.
+     * Trigger also the timer for the "Timed Quit", if requested so.
+     * 
+     * @param whatToDoNext
+     * @param triggerQuitTimer
+     */
+    public void setWhatToDoNext(WhatToDoNext whatToDoNext,
+        boolean triggerQuitTimer)
     {
         this.whatToDoNext = whatToDoNext;
         LOGGER.log(Level.FINEST, "Set what to do next to "
             + whatToDoNext.toString());
+        if (triggerQuitTimer)
+        {
+            triggerTimedQuit();
+        }
     }
 
     public void setWhatToDoNext(WhatToDoNext whatToDoNext, String loadFile)
     {
-        setWhatToDoNext(whatToDoNext);
+        setWhatToDoNext(whatToDoNext, false);
         startOptions.setOption(Options.loadGameFileName, loadFile);
-    }
-
-    // ====================================================================
-    // Here starts the static, main() related method stuff:
-
-    // shortcut, used by Client:
-    public static void setCurrentWhatToDoNext(WhatToDoNext whatToDoNext)
-    {
-        Start startObj = Start.getCurrentStartObject();
-        startObj.setWhatToDoNext(whatToDoNext);
-    }
-
-    public static void setCurrentWhatToDoNext(WhatToDoNext whatToDoNext,
-        String loadFile)
-    {
-        Start startObj = Start.getCurrentStartObject();
-        startObj.setWhatToDoNext(whatToDoNext);
-        startObj.getStartOptions().setOption(Options.loadGameFileName,
-            loadFile);
-    }
-
-    public static Start getCurrentStartObject()
-    {
-        return startObject;
     }
 
     /** 
@@ -186,7 +172,7 @@ public final class Start
     }
 
     /**
-     * Based on commandline options -c, -w, possibly -g, set
+     * Based on command line options -c, -w, possibly -g, set
      * startObject to the right "whatToDoNext" action and
      * set in startOptions the related values. 
      * Expects that server (cf) options are already loaded.
@@ -199,11 +185,11 @@ public final class Start
         // just as shortcut...
         CmdLine cl = cmdLine;
 
-        // Host, port and playername are stored back only to the startObject.
+        // Host, port and player name are stored back only to the startObject.
         // They would be copied to the server cf file in GetPlayers, when one
         // starts a client (host, player, and client-connects-to-port),
         // or when runs a game (load or new game) for serve-at-port.
-        // The result is that the cmdline options given to -g do not
+        // The result is that the command line options given to -g do not
         // immediately modify the cf file settings -- unless player
         // "confirms" them by one of the GetPlayers actions.
 
@@ -214,8 +200,8 @@ public final class Start
         }
         else if (cl.optIsSet('g') && cl.optIsSet('c'))
         {
-            // Host empty means for StartClient: no cmdline wish given
-            //  => it will initialize hostname box based on mostly LRU list.
+            // Host empty means for StartClient: no command line wish given
+            //  => it will initialize host name box based on mostly LRU list.
             // If no -s given, but -g, we must here do the same preferredHost
             // evaluation what StartClient would do, so that the automatic
             // Client starting has a host != null.
@@ -241,7 +227,7 @@ public final class Start
         // take from cf file (not set: defaultPort), overridable from cmdline
         int cp = netclientOptions.getIntOption(Options.runClientPort);
         int sp = serverOptions.getIntOption(Options.serveAtPort);
-        // WebPort: only handover the cmdline wish. If none, wEWebClient
+        // WebPort: only hand over the cmdline wish. If none, wEWebClient
         // itself handles the "which one to use (cmdline, cf, default)".
         int wp = -1;
 
@@ -288,7 +274,7 @@ public final class Start
 
         if (cl.optIsSet('l') || cl.optIsSet('z'))
         {
-            setWhatToDoNext(WhatToDoNext.LOAD_GAME);
+            setWhatToDoNext(WhatToDoNext.LOAD_GAME, false);
             String filename = null;
             if (cl.optIsSet('l'))
             {
@@ -310,30 +296,30 @@ public final class Start
         {
             if (cl.optIsSet('c'))
             {
-                setWhatToDoNext(WhatToDoNext.START_NET_CLIENT);
+                setWhatToDoNext(WhatToDoNext.START_NET_CLIENT, false);
             }
             else if (cl.optIsSet('w'))
             {
-                setWhatToDoNext(WhatToDoNext.START_WEB_CLIENT);
+                setWhatToDoNext(WhatToDoNext.START_WEB_CLIENT, false);
             }
             else
             {
-                setWhatToDoNext(WhatToDoNext.START_GAME);
+                setWhatToDoNext(WhatToDoNext.START_GAME, false);
             }
         }
         else
         {
             if (cl.optIsSet('c'))
             {
-                setWhatToDoNext(WhatToDoNext.NET_CLIENT_DIALOG);
+                setWhatToDoNext(WhatToDoNext.NET_CLIENT_DIALOG, false);
             }
             else if (cl.optIsSet('w'))
             {
-                setWhatToDoNext(WhatToDoNext.START_WEB_CLIENT);
+                setWhatToDoNext(WhatToDoNext.START_WEB_CLIENT, false);
             }
             else
             {
-                setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG);
+                setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
             }
         }
     }
@@ -350,7 +336,7 @@ public final class Start
     private void runGetPlayersDialogAndWait(Options options)
     {
         Object mutex = new Object();
-        new GetPlayers(options, mutex, startObject);
+        new GetPlayers(options, mutex, this);
 
         synchronized (mutex)
         {
@@ -363,7 +349,7 @@ public final class Start
                 LOGGER.log(Level.WARNING, "Start waiting for GetPlayers "
                     + "to complete, wait interrupted?");
                 // just to be sure to do something useful there...
-                setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG);
+                setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
             }
         }
         mutex = null;
@@ -590,8 +576,8 @@ public final class Start
             oneClientRunOnly = true;
         }
 
-        // Cmdline arguments have effect only to first game - or
-        // are stored within the options or startOptions.
+        // Command line arguments have effect only to first game
+        // - or are stored within the options or startOptions.
         cmdLine = null;
 
         howManyGamesLeft = Options.getHowManyStresstestRoundsProperty();
@@ -653,19 +639,19 @@ public final class Start
 
             else if (whatToDoNext == WhatToDoNext.START_GAME)
             {
-                setWhatToDoNext(whatToDoNext);
+                setWhatToDoNext(whatToDoNext, false);
                 int port = startOptions.getIntOption(Options.serveAtPort);
                 String webGameFlagFileName = startOptions
                     .getStringOption(Options.webFlagFileName);
                 startOptions.removeOption(Options.webFlagFileName);
 
-                GameServerSide game = new GameServerSide();
+                GameServerSide game = new GameServerSide(this);
                 game.setPort(port);
                 game.setOptions(serverOptions);
                 if (webGameFlagFileName != null
                     && !webGameFlagFileName.equals(""))
                 {
-                    setWhatToDoNext(WhatToDoNext.QUIT_ALL);
+                    setWhatToDoNext(WhatToDoNext.QUIT_ALL, false);
                     game.setFlagFilename(webGameFlagFileName);
                 }
                 game.newGame();
@@ -673,14 +659,14 @@ public final class Start
 
             else if (whatToDoNext == WhatToDoNext.LOAD_GAME)
             {
-                setWhatToDoNext(whatToDoNext);
+                setWhatToDoNext(whatToDoNext, false);
                 int port = startOptions.getIntOption(Options.serveAtPort);
                 String loadFileName = startOptions
                     .getStringOption(Options.loadGameFileName);
 
                 if (loadFileName != null && loadFileName.length() > 0)
                 {
-                    GameServerSide game = new GameServerSide();
+                    GameServerSide game = new GameServerSide(this);
                     game.setPort(port);
                     game.setOptions(serverOptions);
                     serverOptions.clearPlayerInfo();
@@ -704,11 +690,11 @@ public final class Start
                 // after that come back to NetClient dialog.
                 if (oneClientRunOnly)
                 {
-                    setWhatToDoNext(WhatToDoNext.QUIT_ALL);
+                    setWhatToDoNext(WhatToDoNext.QUIT_ALL, false);
                 }
                 else
                 {
-                    setWhatToDoNext(WhatToDoNext.NET_CLIENT_DIALOG);
+                    setWhatToDoNext(WhatToDoNext.NET_CLIENT_DIALOG, false);
                 }
                 dontWait = startNetClient(startOptions);
             }
@@ -716,7 +702,7 @@ public final class Start
             else if (whatToDoNext == WhatToDoNext.START_WEB_CLIENT)
             {
                 // By default get back to Main dialog.
-                setWhatToDoNext(whatToDoNext);
+                setWhatToDoNext(whatToDoNext, false);
 
                 String hostname = startOptions
                     .getStringOption(Options.webServerHost);
@@ -724,7 +710,7 @@ public final class Start
                 String login = startOptions
                     .getStringOption(Options.webClientLogin);
                 String password = null;
-                new WebClient(hostname, port, login, password);
+                new WebClient(this, hostname, port, login, password);
             }
 
             // User clicked Quit in GetPlayers (this loop round), 
@@ -784,11 +770,11 @@ public final class Start
                     .getStringOption(Options.loadGameFileName);
                 if (loadFileName != null)
                 {
-                    setWhatToDoNext(WhatToDoNext.LOAD_GAME);
+                    setWhatToDoNext(WhatToDoNext.LOAD_GAME, false);
                 }
                 else
                 {
-                    setWhatToDoNext(WhatToDoNext.START_GAME);
+                    setWhatToDoNext(WhatToDoNext.START_GAME, false);
                 }
             }
 
@@ -798,7 +784,7 @@ public final class Start
     private void runNetClientDialogAndWait()
     {
         Object mutex = new Object();
-        new StartClient(mutex, startObject);
+        new StartClient(mutex, this);
 
         synchronized (mutex)
         {
@@ -811,7 +797,7 @@ public final class Start
                 LOGGER.log(Level.WARNING, "Start waiting for GetPlayers "
                     + "to complete, wait interrupted?");
                 // just to be sure to do something useful there...
-                setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG);
+                setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
             }
         }
         mutex = null;
@@ -829,8 +815,8 @@ public final class Start
         boolean failed = false;
         try
         {
-            Client c = new Client(hostname, port, playerName, null, false,
-                false, true);
+            Client c = new Client(hostname, port, playerName, this, null,
+                false, false, true);
             failed = c.getFailed();
             c = null;
         }
@@ -855,7 +841,7 @@ public final class Start
     {
         int port = presetOptions.getIntOption(Options.serveAtPort);
 
-        GameServerSide game = new GameServerSide();
+        GameServerSide game = new GameServerSide(this);
         game.setPort(port);
         game.setOptions(presetOptions);
         game.newGame(username, webClient);
@@ -872,9 +858,7 @@ public final class Start
         LOGGER.log(Level.INFO, "Start for Colossus version "
             + Client.getVersion() + " at " + new Date().getTime());
 
-        startObject = new Start();
-
-        startObject.commandLineProcessing(args);
+        Start startObject = new Start(args);
 
         // Setup the various options objects, and loop until user
         // requests quitting the application
@@ -931,8 +915,9 @@ public final class Start
      * - unless the JVM has quit already anyway because cleanup has
      * succeeded as planned.
      */
-    public static void triggerTimedQuit()
+    public void triggerTimedQuit()
     {
+        LOGGER.log(Level.FINEST, "triggerTimedQuit called.");
         if (howManyGamesLeft > 0)
         {
             LOGGER.info("HowManyGamesLeft not zero yet - ignoring the "
@@ -948,7 +933,7 @@ public final class Start
      * A demon thread which is started by triggerTimedQuit.
      * It will then (currently) sleep 10 seconds, and if it is then
      * still alive, do a System.exit(1) to terminate the JVM.
-     * If, however, the game shutdown proceeded successdully as planned,
+     * If, however, the game shutdown proceeded successfully as planned,
      * Start.main() will already have reached it's end and there should
      * not be any other non-demon threads alive, so the JVM *should*
      * terminate by itself cleanly.
@@ -1016,7 +1001,7 @@ public final class Start
         }
 
         /**
-         * Returns a non-localized UI string for the phase.
+         * Returns a non-localized UI string for the "whatToDoNext" activity.
          */
         @Override
         public String toString()

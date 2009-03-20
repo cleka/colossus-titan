@@ -34,7 +34,6 @@ import net.sf.colossus.game.Player;
 import net.sf.colossus.game.Proposal;
 import net.sf.colossus.game.SummonInfo;
 import net.sf.colossus.server.Constants;
-import net.sf.colossus.server.Start;
 import net.sf.colossus.server.Start.WhatToDoNext;
 import net.sf.colossus.util.KFrame;
 import net.sf.colossus.util.LogWindow;
@@ -249,7 +248,8 @@ public class ClientGUI implements IClientGUI
     {
         if (this.webClient == null)
         {
-            this.webClient = new WebClient(null, -1, null, null);
+            this.webClient = new WebClient(client.getStartObject(), null, -1,
+                null, null);
             this.webClient.setGameClient(client);
         }
         else
@@ -468,7 +468,7 @@ public class ClientGUI implements IClientGUI
     public void menuCloseBoard()
     {
         clearUndoStack();
-        Start.setCurrentWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG);
+        client.doSetWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
         client.disposeClientOriginated();
     }
 
@@ -499,8 +499,7 @@ public class ClientGUI implements IClientGUI
         }
         quitAlreadyTried = true;
 
-        Start.setCurrentWhatToDoNext(WhatToDoNext.QUIT_ALL);
-        Start.triggerTimedQuit();
+        client.doSetWhatToDoNext(WhatToDoNext.QUIT_ALL, true);
         client.notifyServer();
     }
 
@@ -637,16 +636,16 @@ public class ClientGUI implements IClientGUI
     {
         if (startedByWebClient)
         {
-            Start.setCurrentWhatToDoNext(WhatToDoNext.START_WEB_CLIENT);
+            client.doSetWhatToDoNext(WhatToDoNext.START_WEB_CLIENT, false);
         }
         else if (client.isRemote())
         {
             // Remote clients get back to Network Client dialog
-            Start.setCurrentWhatToDoNext(WhatToDoNext.NET_CLIENT_DIALOG);
+            client.doSetWhatToDoNext(WhatToDoNext.NET_CLIENT_DIALOG, false);
         }
         else
         {
-            Start.setCurrentWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG);
+            client.doSetWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
         }
     }
 
@@ -674,7 +673,7 @@ public class ClientGUI implements IClientGUI
             webClient.dispose();
             webClient = null;
         }
-        Start.setCurrentWhatToDoNext(WhatToDoNext.LOAD_GAME, filename);
+        client.doSetWhatToDoNext(WhatToDoNext.LOAD_GAME, filename);
         client.notifyServer();
     }
 

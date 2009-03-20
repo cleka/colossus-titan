@@ -56,7 +56,9 @@ public class LOSTest extends TestCase
     @Override
     protected void setUp()
     {
-        game = new GameServerSide();
+        String[] dummyArgs = new String[0];
+        Start startObject = new Start(dummyArgs);
+        game = new GameServerSide(startObject);
         VariantSupport.loadVariantByName("Default", true);
 
         black = game.addPlayer("Black", "SimpleAI");
@@ -99,7 +101,8 @@ public class LOSTest extends TestCase
         attacker.setEntrySide(Constants.EntrySide.values()[1]);
 
         battle = new BattleServerSide(game, attacker, defender,
-            BattleServerSide.LegionTags.ATTACKER, hex, 1, Constants.BattlePhase.FIGHT);
+            BattleServerSide.LegionTags.ATTACKER, hex, 1,
+            Constants.BattlePhase.FIGHT);
 
         CreatureServerSide centaur1 = defender.getCritter(0);
         CreatureServerSide gargoyle1 = defender.getCritter(1);
@@ -141,7 +144,8 @@ public class LOSTest extends TestCase
         attacker.setEntrySide(Constants.EntrySide.values()[5]);
 
         battle = new BattleServerSide(game, attacker, defender,
-            BattleServerSide.LegionTags.ATTACKER, hex, 1, Constants.BattlePhase.FIGHT);
+            BattleServerSide.LegionTags.ATTACKER, hex, 1,
+            Constants.BattlePhase.FIGHT);
 
         CreatureServerSide centaur1 = defender.getCritter(0);
         CreatureServerSide centaur2 = defender.getCritter(1);
@@ -283,7 +287,8 @@ public class LOSTest extends TestCase
         attacker.setEntrySide(Constants.EntrySide.values()[3]);
 
         battle = new BattleServerSide(game, attacker, defender,
-            BattleServerSide.LegionTags.ATTACKER, hex, 1, Constants.BattlePhase.FIGHT);
+            BattleServerSide.LegionTags.ATTACKER, hex, 1,
+            Constants.BattlePhase.FIGHT);
 
         CreatureServerSide centaur1 = defender.getCritter(0);
         CreatureServerSide lion1 = defender.getCritter(1);
@@ -412,7 +417,8 @@ public class LOSTest extends TestCase
         attacker.setEntrySide(Constants.EntrySide.values()[3]);
 
         battle = new BattleServerSide(game, attacker, defender,
-            BattleServerSide.LegionTags.ATTACKER, hex, 1, Constants.BattlePhase.FIGHT);
+            BattleServerSide.LegionTags.ATTACKER, hex, 1,
+            Constants.BattlePhase.FIGHT);
 
         CreatureServerSide centaur1 = defender.getCritter(0);
         CreatureServerSide centaur2 = defender.getCritter(1);
@@ -526,7 +532,8 @@ public class LOSTest extends TestCase
         attacker.setEntrySide(Constants.EntrySide.values()[5]);
 
         battle = new BattleServerSide(game, attacker, defender,
-            BattleServerSide.LegionTags.ATTACKER, hex, 2, Constants.BattlePhase.FIGHT);
+            BattleServerSide.LegionTags.ATTACKER, hex, 2,
+            Constants.BattlePhase.FIGHT);
 
         CreatureServerSide troll1 = defender.getCritter(0);
         CreatureServerSide troll2 = defender.getCritter(1);
@@ -615,7 +622,8 @@ public class LOSTest extends TestCase
         attacker.setEntrySide(Constants.EntrySide.values()[5]);
 
         battle = new BattleServerSide(game, attacker, defender,
-            BattleServerSide.LegionTags.ATTACKER, hex, 2, Constants.BattlePhase.FIGHT);
+            BattleServerSide.LegionTags.ATTACKER, hex, 2,
+            Constants.BattlePhase.FIGHT);
 
         CreatureServerSide dragon1 = defender.getCritter(0);
         CreatureServerSide dragon2 = defender.getCritter(1);
@@ -702,7 +710,8 @@ public class LOSTest extends TestCase
         attacker.setEntrySide(Constants.EntrySide.values()[5]);
 
         battle = new BattleServerSide(game, attacker, defender,
-            BattleServerSide.LegionTags.ATTACKER, hex, 1, Constants.BattlePhase.FIGHT);
+            BattleServerSide.LegionTags.ATTACKER, hex, 1,
+            Constants.BattlePhase.FIGHT);
 
         CreatureServerSide hydra1 = defender.getCritter(0);
         CreatureServerSide hydra2 = attacker.getCritter(0);
