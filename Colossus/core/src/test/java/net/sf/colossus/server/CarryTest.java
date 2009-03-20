@@ -83,7 +83,7 @@ public class CarryTest extends TestCase
         attacker.setEntrySide(Constants.EntrySide.values()[5]);
 
         battle = new BattleServerSide(game, attacker, defender,
-            Constants.LegionTags.DEFENDER, hex, 2, Constants.BattlePhase.FIGHT);
+            BattleServerSide.LegionTags.DEFENDER, hex, 2, Constants.BattlePhase.FIGHT);
 
         CreatureServerSide centaur1 = attacker.getCritter(0);
         CreatureServerSide centaur2 = attacker.getCritter(1);
@@ -154,7 +154,7 @@ public class CarryTest extends TestCase
         attacker.setEntrySide(Constants.EntrySide.values()[5]);
 
         battle = new BattleServerSide(game, attacker, defender,
-            Constants.LegionTags.ATTACKER, hex, 3, Constants.BattlePhase.FIGHT);
+            BattleServerSide.LegionTags.ATTACKER, hex, 3, Constants.BattlePhase.FIGHT);
 
         CreatureServerSide warlock1 = attacker.getCritter(0);
         CreatureServerSide warlock2 = attacker.getCritter(1);

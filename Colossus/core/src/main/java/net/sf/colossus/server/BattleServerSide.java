@@ -36,15 +36,25 @@ import net.sf.colossus.variant.MasterHex;
 
 public final class BattleServerSide extends Battle
 {
+    public static enum AngelSummoningStates
+    {
+        NO_KILLS, FIRST_BLOOD, TOO_LATE
+    }
+
+    public static enum LegionTags
+    {
+        DEFENDER, ATTACKER
+    }
+
     private static final Logger LOGGER = Logger
         .getLogger(BattleServerSide.class.getName());
 
     private Server server;
-    private Constants.LegionTags activeLegionTag;
+    private LegionTags activeLegionTag;
     private final MasterHex masterHex;
     private int turnNumber;
     private Constants.BattlePhase phase;
-    private Constants.AngelSummoningStates summonState = Constants.AngelSummoningStates.NO_KILLS;
+    private AngelSummoningStates summonState = AngelSummoningStates.NO_KILLS;
     private int carryDamage;
     private boolean attackerElim;
     private boolean defenderElim;
@@ -63,7 +73,7 @@ public final class BattleServerSide extends Battle
     private int pointsScored = 0;
 
     BattleServerSide(GameServerSide game, Legion attacker, Legion defender,
-        Constants.LegionTags activeLegionTag, MasterHex masterHex,
+        LegionTags activeLegionTag, MasterHex masterHex,
         int turnNumber, Constants.BattlePhase phase)
     {
         super(game, attacker, defender, null);
@@ -200,24 +210,20 @@ public final class BattleServerSide extends Battle
 
     private LegionServerSide getInactiveLegion()
     {
-        return getLegion((activeLegionTag == Constants.LegionTags.ATTACKER) ? Constants.LegionTags.DEFENDER
-            : Constants.LegionTags.ATTACKER);
+        return getLegion((activeLegionTag == LegionTags.ATTACKER) ? LegionTags.DEFENDER
+            : LegionTags.ATTACKER);
     }
 
-    private LegionServerSide getLegion(Constants.LegionTags legionTag)
+    private LegionServerSide getLegion(LegionTags legionTag)
     {
-        if (legionTag == Constants.LegionTags.DEFENDER)
+        switch (legionTag)
         {
-            return getDefender();
+            case DEFENDER:
+                return getDefender();
+            case ATTACKER:
+                return getAttacker();
         }
-        else if (legionTag == Constants.LegionTags.ATTACKER)
-        {
-            return getAttacker();
-        }
-        else
-        {
-            throw new IllegalArgumentException("Parameter out of range");
-        }
+        throw new IllegalArgumentException("Parameter out of range");
     }
 
     private Legion getLegionByPlayer(Player player)
@@ -294,7 +300,7 @@ public final class BattleServerSide extends Battle
                 // IF the attacker makes it to the end of his first movement
                 // phase without conceding, even if he left all legions
                 // off-board, the defender can recruit.
-                if (activeLegionTag == Constants.LegionTags.ATTACKER
+                if (activeLegionTag == LegionTags.ATTACKER
                     && !conceded)
                 {
                     attackerEntered = true;
@@ -308,8 +314,8 @@ public final class BattleServerSide extends Battle
             {
                 // We switch the active legion between the fight and strikeback
                 // phases, not at the end of the player turn.
-                activeLegionTag = (activeLegionTag == Constants.LegionTags.ATTACKER) ? Constants.LegionTags.DEFENDER
-                    : Constants.LegionTags.ATTACKER;
+                activeLegionTag = (activeLegionTag == LegionTags.ATTACKER) ? LegionTags.DEFENDER
+                    : LegionTags.ATTACKER;
                 driftDamageApplied = false;
                 phase = Constants.BattlePhase.STRIKEBACK;
                 LOGGER.log(Level.INFO, "Battle phase advances to " + phase);
@@ -337,7 +343,7 @@ public final class BattleServerSide extends Battle
             }
 
             // Active legion is the one that was striking back.
-            if (activeLegionTag == Constants.LegionTags.ATTACKER)
+            if (activeLegionTag == LegionTags.ATTACKER)
             {
                 phase = Constants.BattlePhase.SUMMON;
                 LOGGER.log(Level.INFO, getActivePlayer()
@@ -391,7 +397,7 @@ public final class BattleServerSide extends Battle
     {
         server.allSetupBattleSummon();
         boolean advance = true;
-        if (summonState == Constants.AngelSummoningStates.FIRST_BLOOD)
+        if (summonState == AngelSummoningStates.FIRST_BLOOD)
         {
             if (getAttacker().canSummonAngel())
             {
@@ -401,7 +407,7 @@ public final class BattleServerSide extends Battle
 
             // This is the last chance to summon an angel until the
             // battle is over.
-            summonState = Constants.AngelSummoningStates.TOO_LATE;
+            summonState = AngelSummoningStates.TOO_LATE;
         }
         return advance;
     }
@@ -425,12 +431,12 @@ public final class BattleServerSide extends Battle
         return false;
     }
 
-    Constants.AngelSummoningStates getSummonState()
+    AngelSummoningStates getSummonState()
     {
         return summonState;
     }
 
-    void setSummonState(Constants.AngelSummoningStates summonState)
+    void setSummonState(AngelSummoningStates summonState)
     {
         this.summonState = summonState;
     }
@@ -590,7 +596,7 @@ public final class BattleServerSide extends Battle
         if (!critter.hasMoved() && !critter.isInContact(false))
         {
             if (masterHex.getTerrain().hasStartList() && (turnNumber == 1)
-                && activeLegionTag == Constants.LegionTags.DEFENDER)
+                && activeLegionTag == LegionTags.DEFENDER)
             {
                 set = findUnoccupiedStartlistHexes(ignoreMobileAllies,
                     masterHex.getTerrain());
@@ -788,7 +794,7 @@ public final class BattleServerSide extends Battle
 
         PlayerServerSide player = (PlayerServerSide)legion.getPlayer();
 
-        // After turn 1, offboard creatures are returned to the
+        // After turn 1, off-board creatures are returned to the
         // stacks or the legion they were summoned from, with
         // no points awarded.
         if (critter.getCurrentHex().isEntrance() && getTurnNumber() > 1)
@@ -832,12 +838,12 @@ public final class BattleServerSide extends Battle
         {
             getAttacker().addToBattleTally(critter.getPointValue());
 
-            // Creatures left offboard do not trigger angel
+            // Creatures left off board do not trigger angel
             // summoning.
-            if (summonState == Constants.AngelSummoningStates.NO_KILLS
+            if (summonState == AngelSummoningStates.NO_KILLS
                 && !critter.getCurrentHex().isEntrance())
             {
-                summonState = Constants.AngelSummoningStates.FIRST_BLOOD;
+                summonState = AngelSummoningStates.FIRST_BLOOD;
             }
         }
 

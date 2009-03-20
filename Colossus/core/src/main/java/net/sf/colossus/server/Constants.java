@@ -166,16 +166,6 @@ public final class Constants
     /** Fake striker id for drift and other hex damage. */
     public static final int HEX_DAMAGE = -1;
 
-    public static enum AngelSummoningStates
-    {
-        NO_KILLS, FIRST_BLOOD, TOO_LATE
-    }
-
-    public static enum LegionTags
-    {
-        DEFENDER, ATTACKER
-    }
-
     public static enum HexsideGates
     {
         NONE, BLOCK, ARCH, ARROW, ARROWS

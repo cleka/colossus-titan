@@ -1722,6 +1722,9 @@ public final class GameServerSide extends Game
             }
 
             // Battle stuff
+            // TODO if the loading of a battle would be moved into the BattleServerSide class, then
+            // the AngelSummoningStates and LegionTags enums could be private (possibly with some holes
+            // for testing)
             Element bat = root.getChild("Battle");
             if (bat != null)
             {
@@ -1735,7 +1738,7 @@ public final class GameServerSide extends Game
                     "activePlayer").getValue();
                 Constants.BattlePhase battlePhase = BattlePhase.values()[bat
                     .getAttribute("phase").getIntValue()];
-                Constants.AngelSummoningStates summonState = Constants.AngelSummoningStates
+                BattleServerSide.AngelSummoningStates summonState = BattleServerSide.AngelSummoningStates
                     .values()[bat.getAttribute("summonState").getIntValue()];
                 int carryDamage = bat.getAttribute("carryDamage")
                     .getIntValue();
@@ -1757,14 +1760,14 @@ public final class GameServerSide extends Game
                 Legion defender = getFirstEnemyLegion(engagementHex,
                     attackingPlayer);
 
-                Constants.LegionTags activeLegionTag;
+                BattleServerSide.LegionTags activeLegionTag;
                 if (battleActivePlayerName.equals(attackingPlayer.getName()))
                 {
-                    activeLegionTag = Constants.LegionTags.ATTACKER;
+                    activeLegionTag = BattleServerSide.LegionTags.ATTACKER;
                 }
                 else
                 {
-                    activeLegionTag = Constants.LegionTags.DEFENDER;
+                    activeLegionTag = BattleServerSide.LegionTags.DEFENDER;
                 }
 
                 battle = new BattleServerSide(this, attacker, defender,
@@ -2725,7 +2728,7 @@ public final class GameServerSide extends Game
 
     /**
      * @TODO now duplicate to client side method with same name
-     * 
+     *
      * Return a set of Legions containing creatures that could
      * be actually summoned (i.e. is not the summoner itself and is
      * not currently engaged.
@@ -3149,7 +3152,7 @@ public final class GameServerSide extends Game
                 Constants.reasonBattleStarts);
 
             battle = new BattleServerSide(this, attacker, defender,
-                Constants.LegionTags.DEFENDER, hex, 1,
+                BattleServerSide.LegionTags.DEFENDER, hex, 1,
                 Constants.BattlePhase.MOVE);
             battle.init();
         }
