@@ -30,6 +30,7 @@ import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.Proposal;
 import net.sf.colossus.server.Constants.BattlePhase;
+import net.sf.colossus.server.Start.WhatToDoNext;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Split;
@@ -1821,8 +1822,8 @@ public final class GameServerSide extends Game
         MasterHex startingHex = getVariant().getMasterBoard().getHexByLabel(
             startingHexLabel);
         boolean moved = leg.getAttribute("moved").getBooleanValue();
-        Constants.EntrySide entrySide = Constants.EntrySide.fromIntegerId(
-                leg.getAttribute("entrySide").getIntValue());
+        Constants.EntrySide entrySide = Constants.EntrySide.fromIntegerId(leg
+            .getAttribute("entrySide").getIntValue());
         String parentId = leg.getAttribute("parent").getValue();
         if (parentId.equals("null"))
         {
@@ -2235,8 +2236,7 @@ public final class GameServerSide extends Game
                 // Set the entry side relative to the hex label.
                 if (cameFrom != -1)
                 {
-                    set.add(hex.getLabel()
-                        + ":"
+                    set.add(hex.getLabel() + ":"
                         + findEntrySide(hex, cameFrom).getLabel());
                 }
             }
@@ -2510,8 +2510,8 @@ public final class GameServerSide extends Game
     /** Return a Set of Strings "Left" "Right" or "Bottom" describing
      *  possible entry sides.  If the hex is unoccupied, just return
      *  one entry side since it doesn't matter. */
-    Set<Constants.EntrySide> listPossibleEntrySides(Legion legion, MasterHex targetHex,
-        boolean teleport)
+    Set<Constants.EntrySide> listPossibleEntrySides(Legion legion,
+        MasterHex targetHex, boolean teleport)
     {
         Set<Constants.EntrySide> entrySides = new HashSet<Constants.EntrySide>();
         Player player = legion.getPlayer();
@@ -2928,7 +2928,8 @@ public final class GameServerSide extends Game
         }
 
         // Verify that the entry side is legal.
-        Set<Constants.EntrySide> legalSides = listPossibleEntrySides(legion, hex, teleport);
+        Set<Constants.EntrySide> legalSides = listPossibleEntrySides(legion,
+            hex, teleport);
         if (!legalSides.contains(entrySide))
         {
             return "EntrySide '" + entrySide + "' is not valid, valid are: "
@@ -3414,7 +3415,7 @@ public final class GameServerSide extends Game
         {
             // System.err.println("Battle completed, result: " + result);
             LOGGER.info("endAfterFirstBattle is set, terminating game.");
-            Start.setCurrentWhatToDoNext(Start.QuitAll);
+            Start.setCurrentWhatToDoNext(WhatToDoNext.QUIT_ALL);
             Start.triggerTimedQuit();
             server.triggerDispose();
             return;
@@ -3437,7 +3438,7 @@ public final class GameServerSide extends Game
             {
                 LOGGER.info("Reached Game Over - announce and quit");
                 announceGameOver(true);
-                Start.setCurrentWhatToDoNext(Start.QuitAll);
+                Start.setCurrentWhatToDoNext(WhatToDoNext.QUIT_ALL);
                 Start.triggerTimedQuit();
                 LOGGER
                     .info("Reached Game Over, AutoQuit - trigger Game Dispose");

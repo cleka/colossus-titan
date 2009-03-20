@@ -35,6 +35,7 @@ import net.sf.colossus.game.Proposal;
 import net.sf.colossus.game.SummonInfo;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Start;
+import net.sf.colossus.server.Start.WhatToDoNext;
 import net.sf.colossus.util.KFrame;
 import net.sf.colossus.util.LogWindow;
 import net.sf.colossus.util.Options;
@@ -467,7 +468,7 @@ public class ClientGUI implements IClientGUI
     public void menuCloseBoard()
     {
         clearUndoStack();
-        Start.setCurrentWhatToDoNext(Start.GetPlayersDialog);
+        Start.setCurrentWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG);
         client.disposeClientOriginated();
     }
 
@@ -498,7 +499,7 @@ public class ClientGUI implements IClientGUI
         }
         quitAlreadyTried = true;
 
-        Start.setCurrentWhatToDoNext(Start.QuitAll);
+        Start.setCurrentWhatToDoNext(WhatToDoNext.QUIT_ALL);
         Start.triggerTimedQuit();
         client.notifyServer();
     }
@@ -636,16 +637,16 @@ public class ClientGUI implements IClientGUI
     {
         if (startedByWebClient)
         {
-            Start.setCurrentWhatToDoNext(Start.StartWebClient);
+            Start.setCurrentWhatToDoNext(WhatToDoNext.START_WEB_CLIENT);
         }
         else if (client.isRemote())
         {
             // Remote clients get back to Network Client dialog
-            Start.setCurrentWhatToDoNext(Start.NetClientDialog);
+            Start.setCurrentWhatToDoNext(WhatToDoNext.NET_CLIENT_DIALOG);
         }
         else
         {
-            Start.setCurrentWhatToDoNext(Start.GetPlayersDialog);
+            Start.setCurrentWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG);
         }
     }
 
@@ -673,7 +674,7 @@ public class ClientGUI implements IClientGUI
             webClient.dispose();
             webClient = null;
         }
-        Start.setCurrentWhatToDoNext(Start.LoadGame, filename);
+        Start.setCurrentWhatToDoNext(WhatToDoNext.LOAD_GAME, filename);
         client.notifyServer();
     }
 
@@ -2236,7 +2237,8 @@ public class ClientGUI implements IClientGUI
     /* (non-Javadoc)
      * @see net.sf.colossus.gui.IClientGUI#doPickEntrySide(net.sf.colossus.variant.MasterHex, java.util.Set)
      */
-    public Constants.EntrySide doPickEntrySide(MasterHex hex, Set<Constants.EntrySide> entrySides)
+    public Constants.EntrySide doPickEntrySide(MasterHex hex,
+        Set<Constants.EntrySide> entrySides)
     {
         return PickEntrySide.pickEntrySide(board.getFrame(), hex, entrySides);
     }

@@ -32,123 +32,69 @@ public final class Start
     private static final Logger LOGGER = Logger.getLogger(Start.class
         .getName());
 
-    // game static, so that (a local) Client can ask from Start for 
-    // current game, to end it (before perhaps starting a new one).
-    private static GameServerSide game = null;
-
+    // TODO get rid of this static object at some point also
     // static, there's always only one valid "what to do next" object:
     private static Start startObject = null;
-
-    // Numeric values for the different activities that could
-    // be "what to do next":
-    public final static int StartGame = 1;
-    public final static int StartNetClient = 2;
-    public final static int StartWebClient = 3;
-    public final static int LoadGame = 4;
-    public final static int GetPlayersDialog = 5;
-    public final static int NetClientDialog = 6;
-    public final static int QuitAll = 7;
 
     // ===============================================================
     // First some "startObject" stuff, and object which holds all data
     // related to "what to do next".
 
-    private int whatToDoNext;
-    private final Options stOptions;
+    private CmdLine cmdLine;
+
+    private WhatToDoNext whatToDoNext;
+
+    // Options remembered only inside this running application,
+    // related to server/port/name startup settings; initialized
+    // from commandline options, perhaps modified by dialogs.
+    // We never save those startOptions, but some of them are copied
+    // to the server options in GetPlayers when the user initiates
+    // a related action.
+    private final Options startOptions;
+
     private static int howManyGamesLeft = 0;
 
-    public Start(int whatToDoNext, Options stOptions)
+    public Start()
     {
-        this.whatToDoNext = whatToDoNext;
-        this.stOptions = stOptions;
-    }
+        this.startOptions = new Options(Constants.OPTIONS_START);
 
-    public static String valToString(int whatToDoNext)
-    {
-        String text = "";
-        switch (whatToDoNext)
-        {
-            case StartGame:
-                text = "Start Game";
-                break;
-
-            case StartNetClient:
-                text = "Start Net Client";
-                break;
-
-            case StartWebClient:
-                text = "Start Web Client";
-                break;
-
-            case LoadGame:
-                text = "Load Game";
-                break;
-
-            case GetPlayersDialog:
-                text = "GetPlayers dialog";
-                break;
-
-            case NetClientDialog:
-                text = "NetClient dialog";
-                break;
-
-            case QuitAll:
-                text = "Quit all";
-                break;
-
-            default:
-                text = "<unknown>";
-                break;
-        }
-        return text;
-    }
-
-    public int getWhatToDoNext()
-    {
-        return this.whatToDoNext;
-    }
-
-    public void setWhatToDoNext(int whatToDoNext)
-    {
-        this.whatToDoNext = whatToDoNext;
-        LOGGER.log(Level.FINEST, "Set what to do next to " + whatToDoNext
-            + " (" + Start.valToString(whatToDoNext) + ")");
-    }
-
-    public void setWhatToDoNext(int whatToDoNext, String loadFile)
-    {
-        setWhatToDoNext(whatToDoNext);
-        this.stOptions.setOption(Options.loadGameFileName, loadFile);
     }
 
     public Options getStartOptions()
     {
-        return this.stOptions;
+        return startOptions;
     }
 
-    public static void startWebGameLocally(Options presetOptions,
-        String username, WebClient webClient)
+    public WhatToDoNext getWhatToDoNext()
     {
-        int port = presetOptions.getIntOption(Options.serveAtPort);
+        return whatToDoNext;
+    }
 
-        game = new GameServerSide();
-        game.setPort(port);
-        game.setOptions(presetOptions);
+    public void setWhatToDoNext(WhatToDoNext whatToDoNext)
+    {
+        this.whatToDoNext = whatToDoNext;
+        LOGGER.log(Level.FINEST, "Set what to do next to "
+            + whatToDoNext.toString());
+    }
 
-        game.newGame(username, webClient);
+    public void setWhatToDoNext(WhatToDoNext whatToDoNext, String loadFile)
+    {
+        setWhatToDoNext(whatToDoNext);
+        startOptions.setOption(Options.loadGameFileName, loadFile);
     }
 
     // ====================================================================
     // Here starts the static, main() related method stuff:
 
     // shortcut, used by Client:
-    public static void setCurrentWhatToDoNext(int whatToDoNext)
+    public static void setCurrentWhatToDoNext(WhatToDoNext whatToDoNext)
     {
         Start startObj = Start.getCurrentStartObject();
         startObj.setWhatToDoNext(whatToDoNext);
     }
 
-    public static void setCurrentWhatToDoNext(int whatToDoNext, String loadFile)
+    public static void setCurrentWhatToDoNext(WhatToDoNext whatToDoNext,
+        String loadFile)
     {
         Start startObj = Start.getCurrentStartObject();
         startObj.setWhatToDoNext(whatToDoNext);
@@ -177,105 +123,83 @@ public final class Start
         }
     }
 
-    /* TODO this description (the network client part) is probably 
-     *      somewhat obsolete...
-     *  
-     * Bring up the getplayers dialog (depending on startObject it starts 
-     * either as GetPlayers or ready switched to Network client),
-     * and then we wait here until is has set startObject to the next 
-     * action to do and notified us to continue.
+    /**
+     * Prepare the "Opts" object to parse all options from command line.
+     * As result, creates/sets the instance variable CmdLine object "cmdLine"
+     * from which one can then query which options were set, and their value
+     * if they require one.
+     * 
+     * @param args The String-Array given to main()
+     * @return   
      */
-    static void runGetPlayersDialogAndWait(Options options, Start startObject)
+    private void commandLineProcessing(String[] args)
     {
-        Object mutex = new Object();
-        new GetPlayers(options, mutex, startObject);
+        Opts opts = new Opts();
 
-        synchronized (mutex)
-        {
-            try
-            {
-                mutex.wait();
-            }
-            catch (InterruptedException e)
-            {
-                LOGGER.log(Level.WARNING, "Start waiting for GetPlayers "
-                    + "to complete, wait interrupted?");
-                // just to be sure to do something useful there...
-                startObject.setWhatToDoNext(Start.GetPlayersDialog);
-            }
-        }
-        mutex = null;
-    }
-
-    static void runNetClientDialogAndWait(Start startObject)
-    {
-        Object mutex = new Object();
-        new StartClient(mutex, startObject);
-
-        synchronized (mutex)
-        {
-            try
-            {
-                mutex.wait();
-            }
-            catch (InterruptedException e)
-            {
-                LOGGER.log(Level.WARNING, "Start waiting for GetPlayers "
-                    + "to complete, wait interrupted?");
-                // just to be sure to do something useful there...
-                startObject.setWhatToDoNext(Start.GetPlayersDialog);
-            }
-        }
-        mutex = null;
-    }
-
-    private static boolean startNetClient(Options startOptions)
-    {
-        boolean dontWait = false;
-
-        String playerName = startOptions
-            .getStringOption(Options.runClientPlayer);
-        String hostname = startOptions.getStringOption(Options.runClientHost);
-        int port = startOptions.getIntOption(Options.runClientPort);
-
-        boolean failed = false;
+        // Catch-all block so we can log fatal exceptions.
         try
         {
-            // a hack to pass something into the Client constructor
-            // TODO needs to be constructed properly
-            GameClientSide dummyGame = new GameClientSide(null, new String[0]);
+            opts.addOption('h', "help", false, "Show options help");
+            opts.addOption('l', "load", true, "Load savegame");
+            opts.addOption('z', "latest", false, "Load latest savegame");
+            opts.addOption('g', "go", false, "Skip startup dialogs");
+            opts.addOption('v', "variant", true, "Set variant");
+            opts.addOption('u', "nhuman", true, "Number of humans");
+            opts
+                .addOption('i', "nai", true, "Number of AIs (default: random)");
+            opts.addOption('Z', "simpleai", true, "Number of SimpleAIs");
+            opts.addOption('r', "rationalai", true, "Number of RationalAIs");
+            opts.addOption('M', "milvangai", true, "Number of MilvangAIs");
+            opts.addOption('n', "nnetwork", true, "Number of network slots");
+            opts.addOption('q', "quit", false, "Quit JVM when game ends");
+            opts.addOption('p', "port", true, "Server port number");
+            opts.addOption('d', "delay", true, "AI delay in ms");
+            opts.addOption('t', "timelimit", true, "AI time limit in s");
+            opts.addOption('c', "client", false, "Run network client instead");
+            opts.addOption('w', "webclient", false, "Run web client instead");
+            opts.addOption('F', "flagfile", true,
+                "Create flagfile when socket up");
+            opts.addOption('s', "server", true, "Server name or IP");
+            opts.addOption('S', "autosave", false, "Autosave");
+            opts.addOption('A', "autoplay", false, "Autoplay");
+            opts.addOption('N', "non-random-battle-dice", false,
+                "Use non-random battle dice");
+            opts.addOption('R', "resetOptions", false, "Reset options");
+            opts.addOption('m', "myname", true, "My player name");
+            opts.addOption('O', "noobserver", false, "Go on without observer");
 
-            Client c = new Client(hostname, port, dummyGame, playerName, null,
-                false, false, true);
-            failed = c.getFailed();
-            c = null;
+            cmdLine = opts.parse(args);
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            failed = true;
-        }
-        if (failed)
-        {
-            // client startup failed for some reason
-            dontWait = true;
+            LOGGER.log(Level.SEVERE,
+                "Exception during commandline processing: " + ex.toString(),
+                ex);
+            System.exit(1);
+            return; // just to avoid the warning "cl might be null" ...
         }
 
-        // If starting net client succeeded, main() shall wait until
-        // it ends. But if it fails, main() shall not wait, so that user
-        // gets a new dialog immediately.
-        return dontWait;
+        if (cmdLine.optIsSet('h'))
+        {
+            usage(opts);
+            System.exit(0);
+        }
     }
 
-    /*
+    /**
      * Based on commandline options -c, -w, possibly -g, set
      * startObject to the right "whatToDoNext" action and
      * set in startOptions the related values. 
      * Expects that server (cf) options are already loaded.
      * 
+     * 
      */
-    public static void setInitialAction(CmdLine cl, Options netclientOptions,
-        Options serverOptions, Options startOptions, Start startObject)
+    public void setInitialAction(Options serverOptions,
+        Options netclientOptions)
     {
+        // just as shortcut...
+        CmdLine cl = cmdLine;
+
         // Host, port and playername are stored back only to the startObject.
         // They would be copied to the server cf file in GetPlayers, when one
         // starts a client (host, player, and client-connects-to-port),
@@ -365,7 +289,7 @@ public final class Start
 
         if (cl.optIsSet('l') || cl.optIsSet('z'))
         {
-            startObject.setWhatToDoNext(LoadGame);
+            setWhatToDoNext(WhatToDoNext.LOAD_GAME);
             String filename = null;
             if (cl.optIsSet('l'))
             {
@@ -387,39 +311,70 @@ public final class Start
         {
             if (cl.optIsSet('c'))
             {
-                startObject.setWhatToDoNext(StartNetClient);
+                setWhatToDoNext(WhatToDoNext.START_NET_CLIENT);
             }
             else if (cl.optIsSet('w'))
             {
-                startObject.setWhatToDoNext(StartWebClient);
+                setWhatToDoNext(WhatToDoNext.START_WEB_CLIENT);
             }
             else
             {
-                startObject.setWhatToDoNext(StartGame);
+                setWhatToDoNext(WhatToDoNext.START_GAME);
             }
         }
         else
         {
             if (cl.optIsSet('c'))
             {
-                startObject.setWhatToDoNext(NetClientDialog);
+                setWhatToDoNext(WhatToDoNext.NET_CLIENT_DIALOG);
             }
             else if (cl.optIsSet('w'))
             {
-                startObject.setWhatToDoNext(StartWebClient);
+                setWhatToDoNext(WhatToDoNext.START_WEB_CLIENT);
             }
             else
             {
-                startObject.setWhatToDoNext(GetPlayersDialog);
+                setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG);
             }
         }
+    }
+
+    /**
+     * Bring up the GetPlayers dialog, and then wait until is has set
+     * startObject to the next action to do and notified us to continue.
+     * 
+     * @param options The "server side" main options Object which holds the 
+     *    information what kind of game to play next (variant, which players)
+     *    and the "Game options" for the to-be-started game, like 
+     *    unlimitedMulligans, viewmode, balancedTowers, ...)
+     */
+    private void runGetPlayersDialogAndWait(Options options)
+    {
+        Object mutex = new Object();
+        new GetPlayers(options, mutex, startObject);
+
+        synchronized (mutex)
+        {
+            try
+            {
+                mutex.wait();
+            }
+            catch (InterruptedException e)
+            {
+                LOGGER.log(Level.WARNING, "Start waiting for GetPlayers "
+                    + "to complete, wait interrupted?");
+                // just to be sure to do something useful there...
+                setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG);
+            }
+        }
+        mutex = null;
     }
 
     /*
      * Modify options from command-line args if possible.
      * Return false if something is wrong.  
      */
-    private static boolean setupOptionsFromCommandLine(CmdLine cl,
+    private boolean setupOptionsFromCommandLine(CmdLine cl,
         Options startOptions, Options options)
     {
         if (cl == null)
@@ -595,63 +550,18 @@ public final class Start
         return true;
     }
 
-    public static void main(String[] args)
+    /**
+     * Do the setup of the various Options objects (server, netclient),
+     * some more preparations, and then it stays in the loop which
+     * - waits for user input what to do next
+     * - initiates that action and waits until it completes (or if canceled,
+     *   like closing the network client dialog, bring up back the main 
+     *   (=GetPlayers) dialog, or if user requests Quit, exit the loop;
+     * and when it exited the loop control will return back to main()
+     * and the JVM should terminate sooner or later ;-)  
+     */
+    private void setupAndLoop()
     {
-        LOGGER.log(Level.INFO, "Start for Colossus version "
-            + Client.getVersion() + " at " + new Date().getTime());
-
-        Opts opts = new Opts();
-        CmdLine cl = null;
-
-        // Catch-all block so we can log fatal exceptions.
-        try
-        {
-            opts.addOption('h', "help", false, "Show options help");
-            opts.addOption('l', "load", true, "Load savegame");
-            opts.addOption('z', "latest", false, "Load latest savegame");
-            opts.addOption('g', "go", false, "Skip startup dialogs");
-            opts.addOption('v', "variant", true, "Set variant");
-            opts.addOption('u', "nhuman", true, "Number of humans");
-            opts
-                .addOption('i', "nai", true, "Number of AIs (default: random)");
-            opts.addOption('Z', "simpleai", true, "Number of SimpleAIs");
-            opts.addOption('r', "rationalai", true, "Number of RationalAIs");
-            opts.addOption('M', "milvangai", true, "Number of MilvangAIs");
-            opts.addOption('n', "nnetwork", true, "Number of network slots");
-            opts.addOption('q', "quit", false, "Quit JVM when game ends");
-            opts.addOption('p', "port", true, "Server port number");
-            opts.addOption('d', "delay", true, "AI delay in ms");
-            opts.addOption('t', "timelimit", true, "AI time limit in s");
-            opts.addOption('c', "client", false, "Run network client instead");
-            opts.addOption('w', "webclient", false, "Run web client instead");
-            opts.addOption('F', "flagfile", true,
-                "Create flagfile when socket up");
-            opts.addOption('s', "server", true, "Server name or IP");
-            opts.addOption('S', "autosave", false, "Autosave");
-            opts.addOption('A', "autoplay", false, "Autoplay");
-            opts.addOption('N', "non-random-battle-dice", false,
-                "Use non-random battle dice");
-            opts.addOption('R', "resetOptions", false, "Reset options");
-            opts.addOption('m', "myname", true, "My player name");
-            opts.addOption('O', "noobserver", false, "Go on without observer");
-
-            cl = opts.parse(args);
-        }
-        catch (Exception ex)
-        {
-            LOGGER.log(Level.SEVERE,
-                "Exception during commandline processing: " + ex.toString(),
-                ex);
-            System.exit(1);
-            return; // just to avoid the warning "cl might be null" ...
-        }
-
-        if (cl.optIsSet('h'))
-        {
-            usage(opts);
-            System.exit(0);
-        }
-
         // Read option settings (from Server cf file)
         Options serverOptions = new Options(Constants.OPTIONS_SERVER_NAME);
         serverOptions.loadOptions();
@@ -661,26 +571,13 @@ public final class Start
             Constants.OPTIONS_NET_CLIENT_NAME);
         netclientOptions.loadOptions();
 
-        // Options remembered only inside this running application,
-        // related to server/port/name startup settings; initialized
-        // from commandline options, perhaps modified by dialogs.
-        // We never save those startOptions, but some of them are copied
-        // to the server options in GetPlayers when the user initiates
-        // a related action.
-        Options startOptions = new Options(Constants.OPTIONS_START);
-
-        // The static startObject represents/stores the action we 
-        // have to do next; default action: GetPlayers dialog.
-        startObject = new Start(GetPlayersDialog, startOptions);
-
         // set in startObject and startOptions the values related to
-        // what-to-do, host, port, playername:
-        setInitialAction(cl, serverOptions, netclientOptions, startOptions,
-            startObject);
+        // what-to-do, host, port, playerName:
+        setInitialAction(serverOptions, netclientOptions);
 
         // Set in options the remaining options
-        // Needs startOptions only to get the playername to use in some cases.
-        if (!setupOptionsFromCommandLine(cl, startOptions, serverOptions))
+        // Needs startOptions only to get the player name to use in some cases.
+        if (!setupOptionsFromCommandLine(cmdLine, startOptions, serverOptions))
         {
             LOGGER.log(Level.SEVERE,
                 "setupOptionsFromCommandLine signalled error, "
@@ -688,26 +585,26 @@ public final class Start
         }
 
         boolean oneClientRunOnly = false;
-        if (cl.optIsSet('c') && cl.optIsSet('g') && cl.optIsSet('q'))
+        if (cmdLine.optIsSet('c') && cmdLine.optIsSet('g')
+            && cmdLine.optIsSet('q'))
         {
             oneClientRunOnly = true;
         }
 
         // Cmdline arguments have effect only to first game - or
         // are stored within the options or startOptions.
-        cl = null;
+        cmdLine = null;
 
         howManyGamesLeft = Options.getHowManyStresstestRoundsProperty();
 
         boolean dontWait = false;
-        int whatToDoNext;
 
         // Now loop until user requested Quitting the whole application: 
-        while ((whatToDoNext = startObject.getWhatToDoNext()) != Start.QuitAll)
+        while (whatToDoNext != WhatToDoNext.QUIT_ALL)
         {
             // re-initialize options, except in first loop round,
             // there they have been loaded already and modified 
-            // according to cmdline options
+            // according to command line options
             if (serverOptions == null)
             {
                 serverOptions = new Options(Constants.OPTIONS_SERVER_NAME);
@@ -717,6 +614,7 @@ public final class Start
                     serverOptions.setOption(Options.autoPlay, true);
                 }
             }
+
             if (netclientOptions == null)
             {
                 netclientOptions = new Options(
@@ -725,65 +623,65 @@ public final class Start
             }
 
             // Unless there is already something selected what to do
-            // (e.g. in in first round on commandline, or user ended 
+            // (e.g. in in first round on command line, or user ended 
             // a game/closed board with selecting Load Game etc.), 
             // as first thing come up with the dialog to ask what to do:
 
-            if (whatToDoNext == GetPlayersDialog)
+            if (whatToDoNext == WhatToDoNext.GET_PLAYERS_DIALOG)
             {
-                runGetPlayersDialogAndWait(serverOptions, startObject);
-                whatToDoNext = startObject.getWhatToDoNext();
+                runGetPlayersDialogAndWait(serverOptions);
             }
 
             // intentionally not else if - short way if user selected
             // in GetPlayers dialog the "Run network client" button. 
-            if (whatToDoNext == NetClientDialog)
+            if (whatToDoNext == WhatToDoNext.NET_CLIENT_DIALOG)
             {
-                runNetClientDialogAndWait(startObject);
-                whatToDoNext = startObject.getWhatToDoNext();
+                runNetClientDialogAndWait();
             }
 
             // ----------------------------------------------------------------
             // Longish if-elseif-else - now we do the thing user wants:
 
-            if (whatToDoNext == GetPlayersDialog
-                || whatToDoNext == NetClientDialog)
+            // TODO change to switch statement
+
+            if (whatToDoNext == WhatToDoNext.GET_PLAYERS_DIALOG
+                || whatToDoNext == WhatToDoNext.NET_CLIENT_DIALOG)
             {
                 // ok, just done. Need if also in this else-if chain
                 // otherwise the "else" would complain...
                 dontWait = true;
             }
 
-            else if (whatToDoNext == StartGame)
+            else if (whatToDoNext == WhatToDoNext.START_GAME)
             {
-                startObject.setWhatToDoNext(GetPlayersDialog);
+                setWhatToDoNext(whatToDoNext);
                 int port = startOptions.getIntOption(Options.serveAtPort);
                 String webGameFlagFileName = startOptions
                     .getStringOption(Options.webFlagFileName);
                 startOptions.removeOption(Options.webFlagFileName);
 
-                game = new GameServerSide();
+                GameServerSide game = new GameServerSide();
                 game.setPort(port);
                 game.setOptions(serverOptions);
                 if (webGameFlagFileName != null
                     && !webGameFlagFileName.equals(""))
                 {
-                    startObject.setWhatToDoNext(Start.QuitAll);
+                    setWhatToDoNext(WhatToDoNext.QUIT_ALL);
                     game.setFlagFilename(webGameFlagFileName);
                 }
                 game.newGame();
             }
 
-            else if (whatToDoNext == LoadGame)
+            else if (whatToDoNext == WhatToDoNext.LOAD_GAME)
             {
-                startObject.setWhatToDoNext(GetPlayersDialog);
+                setWhatToDoNext(whatToDoNext);
                 int port = startOptions.getIntOption(Options.serveAtPort);
                 String loadFileName = startOptions
                     .getStringOption(Options.loadGameFileName);
 
                 if (loadFileName != null && loadFileName.length() > 0)
                 {
-                    game = new GameServerSide();
+                    GameServerSide game = new GameServerSide();
                     game.setPort(port);
                     game.setOptions(serverOptions);
                     serverOptions.clearPlayerInfo();
@@ -801,25 +699,25 @@ public final class Start
             // User clicked "Go" button in the Network Client tab of
             // GetPlayers - GUI stores values in options
             // @TODO: get via startObject instead?
-            else if (whatToDoNext == StartNetClient)
+            else if (whatToDoNext == WhatToDoNext.START_NET_CLIENT)
             {
                 // by default (if user does not say anything other when ending), 
                 // after that come back to NetClient dialog.
                 if (oneClientRunOnly)
                 {
-                    startObject.setWhatToDoNext(QuitAll);
+                    setWhatToDoNext(WhatToDoNext.QUIT_ALL);
                 }
                 else
                 {
-                    startObject.setWhatToDoNext(NetClientDialog);
+                    setWhatToDoNext(WhatToDoNext.NET_CLIENT_DIALOG);
                 }
                 dontWait = startNetClient(startOptions);
             }
 
-            else if (whatToDoNext == StartWebClient)
+            else if (whatToDoNext == WhatToDoNext.START_WEB_CLIENT)
             {
                 // By default get back to Main dialog.
-                startObject.setWhatToDoNext(GetPlayersDialog);
+                setWhatToDoNext(whatToDoNext);
 
                 String hostname = startOptions
                     .getStringOption(Options.webServerHost);
@@ -834,7 +732,7 @@ public final class Start
             //  --or--
             // User selected File=>Quit in the game started from previous
             //  loop round.
-            else if (whatToDoNext == QuitAll)
+            else if (whatToDoNext == WhatToDoNext.QUIT_ALL)
             {
                 // Nothing to do, loop will end.
                 dontWait = true;
@@ -863,7 +761,6 @@ public final class Start
                 ViableEntityManager.waitUntilAllGone();
             }
 
-            game = null;
             serverOptions = null;
             netclientOptions = null;
 
@@ -888,15 +785,112 @@ public final class Start
                     .getStringOption(Options.loadGameFileName);
                 if (loadFileName != null)
                 {
-                    startObject.setWhatToDoNext(Start.LoadGame);
+                    setWhatToDoNext(WhatToDoNext.LOAD_GAME);
                 }
                 else
                 {
-                    startObject.setWhatToDoNext(Start.StartGame);
+                    setWhatToDoNext(WhatToDoNext.START_GAME);
                 }
             }
 
         } // end WHILE not QuitAll
+    }
+
+    private void runNetClientDialogAndWait()
+    {
+        Object mutex = new Object();
+        new StartClient(mutex, startObject);
+
+        synchronized (mutex)
+        {
+            try
+            {
+                mutex.wait();
+            }
+            catch (InterruptedException e)
+            {
+                LOGGER.log(Level.WARNING, "Start waiting for GetPlayers "
+                    + "to complete, wait interrupted?");
+                // just to be sure to do something useful there...
+                setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG);
+            }
+        }
+        mutex = null;
+    }
+
+    private boolean startNetClient(Options startOptions)
+    {
+        boolean dontWait = false;
+
+        String playerName = startOptions
+            .getStringOption(Options.runClientPlayer);
+        String hostname = startOptions.getStringOption(Options.runClientHost);
+        int port = startOptions.getIntOption(Options.runClientPort);
+
+        boolean failed = false;
+        try
+        {
+            // a hack to pass something into the Client constructor
+            // TODO needs to be constructed properly
+            GameClientSide dummyGame = new GameClientSide(null, new String[0]);
+
+            Client c = new Client(hostname, port, dummyGame, playerName, null,
+                false, false, true);
+            failed = c.getFailed();
+            c = null;
+        }
+        catch (Exception e)
+        {
+            failed = true;
+        }
+        if (failed)
+        {
+            // client startup failed for some reason
+            dontWait = true;
+        }
+
+        // If starting net client succeeded, main() shall wait until
+        // it ends. But if it fails, main() shall not wait, so that user
+        // gets a new dialog immediately.
+        return dontWait;
+    }
+
+    public void startWebGameLocally(Options presetOptions, String username,
+        WebClient webClient)
+    {
+        int port = presetOptions.getIntOption(Options.serveAtPort);
+
+        GameServerSide game = new GameServerSide();
+        game.setPort(port);
+        game.setOptions(presetOptions);
+        game.newGame(username, webClient);
+    }
+
+    /* **********************************************************************
+     * 
+     *                 The  m a i n ()  of the Start Class
+     * 
+     * **********************************************************************
+     */
+    public static void main(String[] args)
+    {
+        LOGGER.log(Level.INFO, "Start for Colossus version "
+            + Client.getVersion() + " at " + new Date().getTime());
+
+        startObject = new Start();
+
+        startObject.commandLineProcessing(args);
+
+        // Setup the various options objects, and loop until user
+        // requests quitting the application
+        startObject.setupAndLoop();
+
+        // After there is no reference to the startObject, the GC should
+        // be able to clean up the while object tree. We will see :)
+        startObject = null;
+
+        // ==================================================================
+        // Application-ending related processing, mostly for debug purposes
 
         // Probably this could be totally deleted, but...
         // DebugMethods.doCleanupStuff(true);
@@ -1007,4 +1001,33 @@ public final class Start
             }
         }
     }
+
+    /**
+     * The various constants for activities what the Start class should do
+     * as next thing, typically when a dialog is closed or a games ended.
+     */
+    public static enum WhatToDoNext
+    {
+        START_GAME("Start Game"), START_NET_CLIENT("Start network client"), START_WEB_CLIENT(
+            "Start Web Client"), LOAD_GAME("Load Game"), GET_PLAYERS_DIALOG(
+            "GetPlayers dialog"), NET_CLIENT_DIALOG("Network Client dialog"), QUIT_ALL(
+            "Quit All");
+
+        private final String activity;
+
+        private WhatToDoNext(String act)
+        {
+            this.activity = act;
+        }
+
+        /**
+         * Returns a non-localized UI string for the phase.
+         */
+        @Override
+        public String toString()
+        {
+            return activity;
+        }
+    }
+
 }

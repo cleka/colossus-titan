@@ -59,6 +59,7 @@ import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.GetPlayersWeb;
 import net.sf.colossus.server.Server;
 import net.sf.colossus.server.Start;
+import net.sf.colossus.server.Start.WhatToDoNext;
 import net.sf.colossus.util.KFrame;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ViableEntityManager;
@@ -506,7 +507,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             public void windowClosing(WindowEvent e)
             {
                 Start startObj = Start.getCurrentStartObject();
-                startObj.setWhatToDoNext(Start.GetPlayersDialog);
+                startObj.setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG);
                 dispose();
             }
         });
@@ -559,7 +560,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         else if (whatToDo.equals(AutoGameStartActionClose))
         {
             Start startObj = Start.getCurrentStartObject();
-            startObj.setWhatToDoNext(Start.GetPlayersDialog);
+            startObj.setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG);
             dispose();
         }
         else
@@ -1400,7 +1401,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         else
         {
             Start startObj = Start.getCurrentStartObject();
-            startObj.setWhatToDoNext(Start.QuitAll);
+            startObj.setWhatToDoNext(WhatToDoNext.QUIT_ALL);
             Start.triggerTimedQuit();
             dispose();
         }
@@ -1999,7 +2000,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
         // System.out.println("doStartLocally after GetPlayersWeb");
 
-        startObject.setWhatToDoNext(Start.StartWebClient);
+        startObject.setWhatToDoNext(WhatToDoNext.START_WEB_CLIENT);
 
         Runnable waitForAction = new Runnable()
         {
@@ -2070,7 +2071,8 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         new Thread(informThem).start();
 
         // Start the server process
-        Start.startWebGameLocally(presetOptions, username, this);
+        Start.getCurrentStartObject().startWebGameLocally(presetOptions,
+            username, this);
 
         // System.out.println("doInitiateStartLocally ENDS");
     }

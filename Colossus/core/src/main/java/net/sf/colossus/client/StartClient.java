@@ -25,6 +25,7 @@ import javax.swing.JLabel;
 import net.sf.colossus.gui.SaveWindow;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Start;
+import net.sf.colossus.server.Start.WhatToDoNext;
 import net.sf.colossus.util.KFrame;
 import net.sf.colossus.util.Options;
 
@@ -214,7 +215,7 @@ public class StartClient extends KFrame implements WindowListener,
     {
         if (e.getActionCommand().equals(Constants.quitGame))
         {
-            startObject.setWhatToDoNext(Start.QuitAll);
+            startObject.setWhatToDoNext(WhatToDoNext.QUIT_ALL);
             Start.triggerTimedQuit();
             dispose();
         }
@@ -244,7 +245,7 @@ public class StartClient extends KFrame implements WindowListener,
     @Override
     public void windowClosing(WindowEvent e)
     {
-        startObject.setWhatToDoNext(Start.GetPlayersDialog);
+        startObject.setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG);
         dispose();
     }
 
@@ -270,7 +271,7 @@ public class StartClient extends KFrame implements WindowListener,
         saveWindow.save(this);
         netclientOptions.saveOptions();
 
-        startObject.setWhatToDoNext(Start.StartNetClient);
+        startObject.setWhatToDoNext(WhatToDoNext.START_NET_CLIENT);
         dispose();
     }
 

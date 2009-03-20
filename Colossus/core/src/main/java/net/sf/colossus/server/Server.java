@@ -30,6 +30,7 @@ import net.sf.colossus.client.IClient;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.Proposal;
+import net.sf.colossus.server.Start.WhatToDoNext;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
@@ -2263,8 +2264,8 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    public void doMove(Legion legion, MasterHex hex, Constants.EntrySide entrySide,
-        boolean teleport, String teleportingLord)
+    public void doMove(Legion legion, MasterHex hex,
+        Constants.EntrySide entrySide, boolean teleport, String teleportingLord)
     {
         IClient client = getClient(getPlayer());
         if (!isActivePlayer())
@@ -2723,7 +2724,7 @@ public final class Server extends Thread implements IServer
      */
     public void startupProgressAbort()
     {
-        Start.setCurrentWhatToDoNext(Start.GetPlayersDialog);
+        Start.setCurrentWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG);
         stopServerRunning();
         if (startLog != null)
         {

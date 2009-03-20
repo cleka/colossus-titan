@@ -45,6 +45,7 @@ import javax.swing.text.Document;
 import net.sf.colossus.gui.PickIntValue;
 import net.sf.colossus.gui.SaveWindow;
 import net.sf.colossus.gui.ShowReadme;
+import net.sf.colossus.server.Start.WhatToDoNext;
 import net.sf.colossus.util.KFrame;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
@@ -675,20 +676,20 @@ public final class GetPlayers extends KFrame implements WindowListener,
             stOptions.setOption(Options.loadGameFileName, filename);
             stOptions.setOption(Options.serveAtPort, serveAtPort);
             options.setOption(Options.serveAtPort, serveAtPort);
-            Start.setCurrentWhatToDoNext(Start.LoadGame);
+            Start.setCurrentWhatToDoNext(WhatToDoNext.LOAD_GAME);
             dispose();
         }
     }
 
     private void doClientDialog()
     {
-        startObject.setWhatToDoNext(Start.NetClientDialog);
+        startObject.setWhatToDoNext(WhatToDoNext.NET_CLIENT_DIALOG);
         dispose();
     }
 
     private void doRunWebClient()
     {
-        startObject.setWhatToDoNext(Start.StartWebClient);
+        startObject.setWhatToDoNext(WhatToDoNext.START_WEB_CLIENT);
         dispose();
     }
 
@@ -713,7 +714,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
             System.exit(1);
         }
         quitAlreadyTried = true;
-        startObject.setWhatToDoNext(Start.QuitAll);
+        startObject.setWhatToDoNext(WhatToDoNext.QUIT_ALL);
         Start.triggerTimedQuit();
         dispose();
     }
@@ -723,7 +724,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
         boolean ok = validateInputs();
         if (ok)
         {
-            startObject.setWhatToDoNext(Start.StartGame);
+            startObject.setWhatToDoNext(WhatToDoNext.START_GAME);
             stOptions.setOption(Options.serveAtPort, serveAtPort);
             options.setOption(Options.serveAtPort, serveAtPort);
             dispose();
