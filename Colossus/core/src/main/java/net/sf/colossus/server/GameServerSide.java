@@ -88,7 +88,7 @@ public final class GameServerSide extends Game
     private boolean pendingAdvancePhase;
     private boolean loadingGame;
     private boolean replayOngoing = false;
-    private boolean gameOver;
+    private boolean gameOver = false;
     private String gameOverMessage = null;
     private BattleServerSide battle;
     private Constants.Phase phase;
@@ -323,10 +323,6 @@ public final class GameServerSide extends Game
     void newGame()
     {
         clearFlags();
-        // TODO are they really still needed to set? Nowadays we do not
-        // always re-use same game, so they could be initialized in top...
-        gameOver = false;
-        gameOverMessage = null;
 
         turnNumber = 1;
         lastRecruitTurnNumber = -1;
