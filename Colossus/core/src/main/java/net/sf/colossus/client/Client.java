@@ -29,7 +29,6 @@ import net.sf.colossus.game.Proposal;
 import net.sf.colossus.game.SummonInfo;
 import net.sf.colossus.gui.BattleChit;
 import net.sf.colossus.gui.ClientGUI;
-import net.sf.colossus.gui.GUIMasterHex;
 import net.sf.colossus.gui.IClientGUI;
 import net.sf.colossus.gui.Marker;
 import net.sf.colossus.gui.NullClientGUI;
@@ -496,14 +495,6 @@ public final class Client implements IClient, IOracle
         this.battleSite = null;
         this.attacker = null;
         this.defender = null;
-    }
-
-    /**
-     * Displays the recruit tree of the hex if possible.
-     */
-    public void showHexRecruitTree(GUIMasterHex hex)
-    {
-        gui.showHexRecruitTree(hex);
     }
 
     /** Legion target summons unit from legion donor. */
