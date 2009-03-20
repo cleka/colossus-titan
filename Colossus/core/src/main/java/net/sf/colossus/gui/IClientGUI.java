@@ -117,8 +117,8 @@ public interface IClientGUI
 
     public abstract void boardActOnUndidSplit(Legion survivor, int turn);
 
-    public abstract void actOnUndidRecruitPart2(Legion legion, int eventType,
-        int turnNumber);
+    public abstract void actOnUndidRecruitPart2(Legion legion,
+        boolean wasReinforcement, int turnNumber);
 
     /** Present a dialog allowing the player to enter via land or teleport.
      *  Return true if the player chooses to teleport. */

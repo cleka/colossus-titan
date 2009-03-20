@@ -34,7 +34,6 @@ import net.sf.colossus.gui.IClientGUI;
 import net.sf.colossus.gui.Marker;
 import net.sf.colossus.gui.MasterBoard;
 import net.sf.colossus.gui.NullClientGUI;
-import net.sf.colossus.gui.RevealEvent;
 import net.sf.colossus.gui.Scale;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.CustomRecruitBase;
@@ -1948,25 +1947,21 @@ public final class Client implements IClient, IOracle
 
     public void undidRecruit(Legion legion, String recruitName)
     {
-        int eventType;
+        boolean wasReinforcement;
         if (battlePhase != null)
         {
-            eventType = RevealEvent.eventReinforce;
-
+            wasReinforcement = true;
             gui.eventViewerCancelReinforcement(recruitName, getTurnNumber());
-
         }
         else
         {
             // normal undoRecruit
-            eventType = RevealEvent.eventRecruit;
+            wasReinforcement = false;
             ((LegionClientSide)legion).removeCreature(recruitName);
         }
 
         ((LegionClientSide)legion).setRecruitName(null);
-
-        gui.actOnUndidRecruitPart2(legion, eventType, turnNumber);
-
+        gui.actOnUndidRecruitPart2(legion, wasReinforcement, turnNumber);
     }
 
     /** null means cancel.  "none" means no recruiter (tower creature). */

@@ -235,8 +235,8 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public void actOnUndidRecruitPart2(Legion legion, int eventType,
-        int turnNumber)
+    public void actOnUndidRecruitPart2(Legion legion,
+        boolean wasReinforcement, int turnNumber)
     {
         // TODO Auto-generated method stub
 
@@ -353,7 +353,8 @@ public class NullClientGUI implements IClientGUI
         return null;
     }
 
-    public Constants.EntrySide doPickEntrySide(MasterHex hex, Set<Constants.EntrySide> entrySides)
+    public Constants.EntrySide doPickEntrySide(MasterHex hex,
+        Set<Constants.EntrySide> entrySides)
     {
         // TODO Auto-generated method stub
         return null;

@@ -1220,9 +1220,11 @@ public class ClientGUI implements IClientGUI
     /* (non-Javadoc)
      * @see net.sf.colossus.gui.IClientGUI#actOnUndidRecruitPart2(net.sf.colossus.game.Legion, int, int)
      */
-    public void actOnUndidRecruitPart2(Legion legion, int eventType,
-        int turnNumber)
+    public void actOnUndidRecruitPart2(Legion legion,
+        boolean wasReinforcement, int turnNumber)
     {
+        int eventType = wasReinforcement ? RevealEvent.eventReinforce
+            : RevealEvent.eventRecruit;
         if (board != null)
         {
             board.cleanRecruitedChit((LegionClientSide)legion);
