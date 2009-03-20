@@ -54,7 +54,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import net.sf.colossus.client.Client;
-import net.sf.colossus.client.GameClientSide;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.GetPlayersWeb;
 import net.sf.colossus.server.Server;
@@ -2261,14 +2260,11 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
                 // Runs on a players computer
             }
 
-            // a hack to pass something into the Client constructor
-            // TODO needs to be constructed properly
-            GameClientSide dummyGame = new GameClientSide(null, new String[0]);
             boolean noOptionsFile = false;
             // System.out.println("in webclient, before new Client for username "
             //     + username);
-            gc = new Client(hostingHost, p, dummyGame, username, localServer,
-                true, noOptionsFile, true);
+            gc = new Client(hostingHost, p, username, localServer, true,
+                noOptionsFile, true);
             boolean failed = gc.getFailed();
             if (failed)
             {

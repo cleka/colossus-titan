@@ -60,21 +60,19 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 /**
  *  Lives on the client side and handles all communication
- *  with the server.  It talks to the client classes locally, and to
- *  Server via the network protocol.  There is one client per player.
+ *  with the server.  It talks to the Server via the network protocol  
+ *  and to Client side classes locally, but to all GUI related classes
+ *  it should only communicate via ClientGUI class.
+ *  There is one client per player.
+ *  
+ *  TODO Handle GUI related issues purely via ClientGUI
+ *       All GUI classes should talk to the server purely through
+ *       ClientGUI which handles it via the Client.
  *
  *  TODO the logic for the battles could probably be separated from the
  *  rest of this code. At the moment the battle logic seems to bounce
  *  back and forth between BattleBoard (which is really a GUI class) and
  *  this class.
- *
- *  TODO there are quite a few spots where the existence of GUI elements
- *  is checked, e.g. "board == null" or "getPreferredParent() == null".
- *  Having a GUI class whose GUI may not be initialized seems utterly
- *  wrong -- it probably relates to the todo above about splitting the
- *  game logic out. AIs without visible GUI should not use GUI classes.
- *  And if someone wants to watch AIs play it might be a better idea to
- *  create a notion of a passive observer of a game.
  *
  *  TODO this class also has the functionality of a GameClientSide class,
  *  which should be separated and ideally moved up into the {@link Game}
@@ -83,7 +81,8 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  *  up into {@link Game} and then reuse it here in the matching methods,
  *  then inlining it into the calling code. Another one would be creating
  *  the GameClientSide for now and relocating code there.
- *
+ *  ==> Clemens march 2009: I started the GameClientSide approach :)
+ *   
  *  TODO there are a few places where an Iterator is used to remove all elements
  *  of a list -- an enhanced for loop with a Collection.clear() would probably
  *  look better and be more efficient (not that the latter would be significant
@@ -224,20 +223,23 @@ public final class Client implements IClient, IOracle
     private boolean disposeInProgress = false;
 
     /**
-     * TODO since Client is currently still the equivalent of GameClientSide it should
-     *      create the Game instance instead of getting it passed in. The problem is
-     *      getting all the player names to begin with.
+     * TODO Now Client creates the Game (GameClientSide) instance.
+     *      So far it creates it mostly with dummy info; should do better.
+     *      - for example, create first SocketClientThread, and as first
+     *      answer to connect gets the Variant name, and use that
+     *      for game creation. So when Client constructor is completed
+     *      also Game and Variant are proper.
+     *      (problem would still be ... player cound and names...) 
      *
      * TODO try to make the Client class agnostic of the network or not question by
      *      having the SCT outside and behaving like a normal server -- that way it
      *      would be easier to run the local clients without the detour across the
      *      network and the serialization/deserialization of all objects
      */
-    public Client(String host, int port, Game game, String playerName,
-        Server theServer, boolean byWebClient, boolean noOptionsFile,
-        boolean createGUI)
+    public Client(String host, int port, String playerName, Server theServer,
+        boolean byWebClient, boolean noOptionsFile, boolean createGUI)
     {
-        this(game, playerName, noOptionsFile, createGUI);
+        this(playerName, noOptionsFile, createGUI);
 
         this.localServer = theServer;
 
@@ -286,12 +288,12 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    private Client(Game game, String playerName, boolean noOptionsFile,
-        boolean createGUI)
+    private Client(String playerName, boolean noOptionsFile, boolean createGUI)
     {
         assert playerName != null;
 
-        this.game = game;
+        // TODO still dummy arguments
+        this.game = new GameClientSide(null, new String[0]);
 
         ((GameClientSide)game).setClient(this);
 

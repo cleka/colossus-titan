@@ -9,7 +9,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.Client;
-import net.sf.colossus.client.GameClientSide;
 import net.sf.colossus.client.StartClient;
 import net.sf.colossus.cmdline.CmdLine;
 import net.sf.colossus.cmdline.Opt;
@@ -830,12 +829,8 @@ public final class Start
         boolean failed = false;
         try
         {
-            // a hack to pass something into the Client constructor
-            // TODO needs to be constructed properly
-            GameClientSide dummyGame = new GameClientSide(null, new String[0]);
-
-            Client c = new Client(hostname, port, dummyGame, playerName, null,
-                false, false, true);
+            Client c = new Client(hostname, port, playerName, null, false,
+                false, true);
             failed = c.getFailed();
             c = null;
         }

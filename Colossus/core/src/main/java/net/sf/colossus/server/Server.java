@@ -25,7 +25,6 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 import net.sf.colossus.client.Client;
-import net.sf.colossus.client.GameClientSide;
 import net.sf.colossus.client.IClient;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
@@ -890,11 +889,7 @@ public final class Server extends Thread implements IServer
         boolean dontUseOptionsFile = player.isAI();
         LOGGER.finest("Called Server.createLocalClient() for " + playerName);
 
-        // a hack to pass something into the Client constructor
-        // TODO needs to be constructed properly
-        GameClientSide dummyGame = new GameClientSide(null, new String[0]);
-
-        new Client("127.0.0.1", port, dummyGame, playerName, this, false,
+        new Client("127.0.0.1", port, playerName, this, false,
             dontUseOptionsFile, createGUI);
     }
 
