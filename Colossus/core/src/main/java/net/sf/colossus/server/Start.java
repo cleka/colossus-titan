@@ -336,7 +336,7 @@ public final class Start
     private void runGetPlayersDialogAndWait(Options options)
     {
         Object mutex = new Object();
-        new GetPlayers(options, mutex, this);
+        new GetPlayers(options, mutex, this, false);
 
         synchronized (mutex)
         {

@@ -91,6 +91,8 @@ public final class GetPlayers extends KFrame implements WindowListener,
     private final Options stOptions;
     private final Start startObject;
 
+    private final boolean byWebClient;
+
     private int oldDelay;
     private final JLabel delayLabel;
     private int oldLimit;
@@ -98,7 +100,8 @@ public final class GetPlayers extends KFrame implements WindowListener,
     private final SaveWindow saveWindow;
 
     /** Clear options to abort */
-    public GetPlayers(Options options, Object mutex, Start startObject)
+    public GetPlayers(Options options, Object mutex, Start startObject,
+        boolean byWebClient)
     {
         super("Game Setup");
 
@@ -108,6 +111,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
         this.mutex = mutex;
         this.startObject = startObject;
         this.stOptions = startObject.getStartOptions();
+        this.byWebClient = byWebClient;
 
         setupTypeChoices();
 
@@ -723,9 +727,12 @@ public final class GetPlayers extends KFrame implements WindowListener,
         boolean ok = validateInputs();
         if (ok)
         {
-            startObject.setWhatToDoNext(WhatToDoNext.START_GAME, false);
-            stOptions.setOption(Options.serveAtPort, serveAtPort);
-            options.setOption(Options.serveAtPort, serveAtPort);
+            if (!byWebClient)
+            {
+                startObject.setWhatToDoNext(WhatToDoNext.START_GAME, false);
+                stOptions.setOption(Options.serveAtPort, serveAtPort);
+                options.setOption(Options.serveAtPort, serveAtPort);
+            }
             dispose();
         }
         else

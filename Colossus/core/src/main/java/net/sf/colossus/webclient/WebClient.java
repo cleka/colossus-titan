@@ -55,7 +55,7 @@ import javax.swing.event.ListSelectionListener;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.server.Constants;
-import net.sf.colossus.server.GetPlayersWeb;
+import net.sf.colossus.server.GetPlayers;
 import net.sf.colossus.server.Server;
 import net.sf.colossus.server.Start;
 import net.sf.colossus.server.Start.WhatToDoNext;
@@ -1984,7 +1984,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         // GetPlayersWeb dialog notifies the mutex;
         // when that happens, the runnable starts the game by calling
         // doInitiateStartLocally().
-        runGetPlayersWebDialogAndWait(presetOptions, startObject);
+        runGetPlayersDialogAndWait(presetOptions, startObject);
 
         return ok;
     }
@@ -1994,10 +1994,10 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
      * until is has set startObject to the next action to do  
      * and notified us to continue.
      */
-    void runGetPlayersWebDialogAndWait(Options presetOptions, Start startObject)
+    void runGetPlayersDialogAndWait(Options presetOptions, Start startObject)
     {
         playersDialogMutex = new Object();
-        new GetPlayersWeb(presetOptions, playersDialogMutex, startObject);
+        new GetPlayers(presetOptions, playersDialogMutex, startObject, true);
 
         // System.out.println("doStartLocally after GetPlayersWeb");
 
