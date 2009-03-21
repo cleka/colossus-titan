@@ -1455,7 +1455,7 @@ public final class GameServerSide extends Game
         leg.setAttribute("currentHex", legion.getCurrentHex().getLabel());
         leg.setAttribute("startingHex", legion.getStartingHex().getLabel());
         leg.setAttribute("moved", "" + legion.hasMoved());
-        leg.setAttribute("entrySide", "" + legion.getEntrySide());
+        leg.setAttribute("entrySide", "" + legion.getEntrySide().ordinal());
         leg.setAttribute("parent", notnull(legion.getParentId()));
         leg.setAttribute("recruitName", notnull(legion.getRecruitName()));
         leg.setAttribute("battleTally", "" + legion.getBattleTally());
