@@ -1455,14 +1455,17 @@ public final class GameServerSide extends Game
         leg.setAttribute("currentHex", legion.getCurrentHex().getLabel());
         leg.setAttribute("startingHex", legion.getStartingHex().getLabel());
         leg.setAttribute("moved", "" + legion.hasMoved());
-        try
+        Constants.EntrySide entrySide = legion.getEntrySide();
+        if (entrySide == null)
         {
-            leg.setAttribute("entrySide", "" + legion.getEntrySide().ordinal());
+            // This should never happen. Let's follow it for a while
+            // TODO This try-catch checking code can probably be removed
+            // at some point.
+            LOGGER.warning("EntrySide of Legion " + legion.getMarkerId()
+                + " is null!?!");
+            entrySide = Constants.EntrySide.NOT_SET;
         }
-        catch (NullPointerException ex)
-        {
-            leg.setAttribute("entrySide", "");
-        }
+        leg.setAttribute("entrySide", "" + entrySide.ordinal());
         leg.setAttribute("parent", notnull(legion.getParentId()));
         leg.setAttribute("recruitName", notnull(legion.getRecruitName()));
         leg.setAttribute("battleTally", "" + legion.getBattleTally());

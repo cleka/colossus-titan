@@ -52,7 +52,7 @@ public abstract class Legion
     /**
      * The side this legion entered a battle in.
      */
-    private Constants.EntrySide entrySide;
+    private Constants.EntrySide entrySide = Constants.EntrySide.NOT_SET;
 
     protected List<AcquirableDecision> decisions = null;
     protected int angelsToAcquire;
