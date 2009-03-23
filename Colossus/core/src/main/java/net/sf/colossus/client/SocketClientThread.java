@@ -840,11 +840,10 @@ final class SocketClientThread extends Thread implements IServer
                 splitLegionHasForcedMove = Boolean.valueOf(args.remove(0))
                     .booleanValue();
             }
-            client
-                .didMove(resolveLegion(markerId),
-                    resolveHex(startingHexLabel), resolveHex(currentHexLabel),
-                    Constants.EntrySide.fromLabel(entrySideLabel), teleport, teleportingLord,
-                    splitLegionHasForcedMove);
+            client.didMove(resolveLegion(markerId),
+                resolveHex(startingHexLabel), resolveHex(currentHexLabel),
+                Constants.EntrySide.fromLabel(entrySideLabel), teleport,
+                teleportingLord, splitLegionHasForcedMove);
         }
         else if (method.equals(Constants.undidMove))
         {
@@ -903,7 +902,8 @@ final class SocketClientThread extends Thread implements IServer
         {
             List<String> clList = Split.split(Glob.sep, args.remove(0));
             List<Constants.PlayerColor> colorsLeft = new ArrayList<Constants.PlayerColor>();
-            for (String colorName : clList) {
+            for (String colorName : clList)
+            {
                 colorsLeft.add(Constants.PlayerColor.getByName(colorName));
             }
             client.askPickColor(colorsLeft);
@@ -1034,6 +1034,15 @@ final class SocketClientThread extends Thread implements IServer
             LOGGER.finer("Message to server from '"
                 + client.getOwningPlayer().getName() + "':" + message);
             out.println(message);
+            if (client.isSuspended())
+            {
+                LOGGER.info("Game in suspended state - "
+                    + "sending message anyway.");
+                client.showMessageDialog("NOTE: Game is suspended "
+                    + "- server will not confirm/react to any of\n"
+                    + "your GUI activities (move, split, ...), and thus "
+                    + "they will not show effect on the Board yet!");
+            }
         }
         else
         {
@@ -1218,12 +1227,12 @@ final class SocketClientThread extends Thread implements IServer
             + childMarker + sep + results);
     }
 
-    public void doMove(Legion legion, MasterHex hex, Constants.EntrySide entrySide,
-        boolean teleport, String teleportingLord)
+    public void doMove(Legion legion, MasterHex hex,
+        Constants.EntrySide entrySide, boolean teleport, String teleportingLord)
     {
         sendToServer(Constants.doMove + sep + legion.getMarkerId() + sep
-            + hex.getLabel() + sep + entrySide.getLabel() + sep + teleport + sep
-            + teleportingLord);
+            + hex.getLabel() + sep + entrySide.getLabel() + sep + teleport
+            + sep + teleportingLord);
     }
 
     public void assignColor(Constants.PlayerColor color)

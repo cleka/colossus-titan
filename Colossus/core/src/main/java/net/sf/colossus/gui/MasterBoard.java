@@ -12,6 +12,7 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -2284,6 +2285,8 @@ public final class MasterBoard extends JPanel
          */
         private final JButton doneButton;
 
+        private final JButton suspendButton;
+
         /** display the current phase in the bottom bar */
         private final JLabel phaseLabel;
 
@@ -2318,6 +2321,18 @@ public final class MasterBoard extends JPanel
 
             setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
+            String text = gui.getClient().isSuspended() ? "Resume" : "Suspend";
+            suspendButton = new JButton(text);
+            suspendButton.addActionListener(new ActionListener()
+            {
+                public void actionPerformed(ActionEvent e)
+                {
+                    MasterBoard.this.bottomBar.toggleSuspend();
+                }
+            });
+
+            add(suspendButton);
+
             playerLabel = new JLabel("- player -");
             add(playerLabel);
 
@@ -2341,6 +2356,15 @@ public final class MasterBoard extends JPanel
 
             todoLabel = new JLabel();
             add(todoLabel);
+        }
+
+        public void toggleSuspend()
+        {
+            boolean oldState = gui.getClient().isSuspended();
+            boolean newState = !oldState;
+            gui.getClient().setGuiSuspendOngoing(newState);
+            String text = gui.getClient().isSuspended() ? "Resume" : "Suspend";
+            suspendButton.setText(text);
         }
     }
 

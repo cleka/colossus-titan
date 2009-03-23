@@ -379,6 +379,26 @@ public final class Client implements IClient, IOracle
         return playerAlive;
     }
 
+    boolean suspended = false;
+
+    public boolean isSuspended()
+    {
+        return suspended;
+    }
+
+    public void setGuiSuspendOngoing(boolean newState)
+    {
+        if (isRemote())
+        {
+            LOGGER.info("setGuiSuspendOngoing ignored in remote client");
+        }
+        else
+        {
+            suspended = newState;
+            localServer.setGuiSuspendOngoing(suspended);
+        }
+    }
+
     public void doCheckServerConnection()
     {
         server.checkServerConnection();
@@ -3224,6 +3244,7 @@ public final class Client implements IClient, IOracle
         gui.clearUndoStack();
         if (!isRemote())
         {
+            localServer.setGuiSuspendOngoing(false);
             server.stopGame();
         }
         disposeClientOriginated();
