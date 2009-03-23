@@ -22,9 +22,13 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.ai.AI;
 import net.sf.colossus.ai.SimpleAI;
+import net.sf.colossus.game.BattlePhase;
+import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
+import net.sf.colossus.game.Phase;
 import net.sf.colossus.game.Player;
+import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.Proposal;
 import net.sf.colossus.game.SummonInfo;
 import net.sf.colossus.gui.BattleChit;
@@ -149,7 +153,7 @@ public final class Client implements IClient, IOracle
      *
      * TODO most likely redundant with owningPlayer.getColor()
      */
-    private Constants.PlayerColor color;
+    private PlayerColor color;
 
     /** Last movement roll for any player. */
     private int movementRoll = -1;
@@ -172,11 +176,11 @@ public final class Client implements IClient, IOracle
 
     private int turnNumber = -1;
     private PlayerClientSide activePlayer;
-    private Constants.Phase phase;
+    private Phase phase;
 
     private int battleTurnNumber = -1;
     private Player battleActivePlayer;
-    private Constants.BattlePhase battlePhase;
+    private BattlePhase battlePhase;
 
     /** If the game is over, then quitting does not require confirmation. */
     private boolean gameOver;
@@ -715,7 +719,7 @@ public final class Client implements IClient, IOracle
     }
 
     // TODO probably unnecessary?
-    public void setColor(Constants.PlayerColor color)
+    public void setColor(PlayerColor color)
     {
         this.color = color;
     }
@@ -1055,7 +1059,7 @@ public final class Client implements IClient, IOracle
 
     /** Needed when loading a game outside split phase. */
     public void setLegionStatus(Legion legion, boolean moved,
-        boolean teleported, Constants.EntrySide entrySide, String lastRecruit)
+        boolean teleported, EntrySide entrySide, String lastRecruit)
     {
         legion.setMoved(moved);
         legion.setTeleported(teleported);
@@ -1263,7 +1267,7 @@ public final class Client implements IClient, IOracle
                 imageName = getTitanBasename(attacker);
             }
         }
-        Constants.PlayerColor playerColor;
+        PlayerColor playerColor;
         if (inverted)
         {
             Player player = defender.getPlayer();
@@ -1777,7 +1781,7 @@ public final class Client implements IClient, IOracle
     }
 
     public void initBattle(MasterHex hex, int battleTurnNumber,
-        Player battleActivePlayer, Constants.BattlePhase battlePhase,
+        Player battleActivePlayer, BattlePhase battlePhase,
         Legion attacker, Legion defender)
     {
         gui.cleanupNegotiationDialogs();
@@ -2036,7 +2040,7 @@ public final class Client implements IClient, IOracle
         gui.actOnSetupSplit(this, turnNumber, this.activePlayer.getNumber());
 
         numSplitsThisTurn = 0;
-        this.phase = Constants.Phase.SPLIT;
+        this.phase = Phase.SPLIT;
 
         resetAllMoves();
 
@@ -2072,14 +2076,14 @@ public final class Client implements IClient, IOracle
 
     public void setupMove()
     {
-        this.phase = Constants.Phase.MOVE;
+        this.phase = Phase.MOVE;
 
         gui.actOnSetupMove();
     }
 
     public void setupFight()
     {
-        this.phase = Constants.Phase.FIGHT;
+        this.phase = Phase.FIGHT;
 
         gui.actOnSetupFight();
 
@@ -2103,7 +2107,7 @@ public final class Client implements IClient, IOracle
 
     public void setupMuster()
     {
-        this.phase = Constants.Phase.MUSTER;
+        this.phase = Phase.MUSTER;
 
         gui.actOnSetupMuster();
 
@@ -2112,7 +2116,7 @@ public final class Client implements IClient, IOracle
         // when they won against all others and continue playing
         // (just for growing bigger creatures ;-)
         if (options.getOption(Options.autoRecruit) && playerAlive
-            && isMyTurn() && this.phase == Constants.Phase.MUSTER)
+            && isMyTurn() && this.phase == Phase.MUSTER)
         {
             ai.muster();
             // Do not automatically say we are done.
@@ -2127,7 +2131,7 @@ public final class Client implements IClient, IOracle
     public void setupBattleSummon(Player battleActivePlayer,
         int battleTurnNumber)
     {
-        this.battlePhase = Constants.BattlePhase.SUMMON;
+        this.battlePhase = BattlePhase.SUMMON;
         setBattleActivePlayer(battleActivePlayer);
         this.battleTurnNumber = battleTurnNumber;
 
@@ -2138,7 +2142,7 @@ public final class Client implements IClient, IOracle
     public void setupBattleRecruit(Player battleActivePlayer,
         int battleTurnNumber)
     {
-        this.battlePhase = Constants.BattlePhase.RECRUIT;
+        this.battlePhase = BattlePhase.RECRUIT;
         setBattleActivePlayer(battleActivePlayer);
         this.battleTurnNumber = battleTurnNumber;
 
@@ -2164,7 +2168,7 @@ public final class Client implements IClient, IOracle
         // really quickly.
         gui.cleanupNegotiationDialogs();
         resetAllBattleMoves();
-        this.battlePhase = Constants.BattlePhase.MOVE;
+        this.battlePhase = BattlePhase.MOVE;
 
         gui.actOnSetupBattleMove();
 
@@ -2213,12 +2217,12 @@ public final class Client implements IClient, IOracle
     }
 
     /** Used for both strike and strikeback. */
-    public void setupBattleFight(Constants.BattlePhase battlePhase,
+    public void setupBattleFight(BattlePhase battlePhase,
         Player battleActivePlayer)
     {
         this.battlePhase = battlePhase;
         setBattleActivePlayer(battleActivePlayer);
-        if (battlePhase == Constants.BattlePhase.FIGHT)
+        if (battlePhase == BattlePhase.FIGHT)
         {
             markOffboardCreaturesDead();
         }
@@ -2236,7 +2240,7 @@ public final class Client implements IClient, IOracle
         gui.actOnTellLegionLocation(legion, hex);
     }
 
-    public Constants.PlayerColor getColor()
+    public PlayerColor getColor()
     {
         return color;
     }
@@ -2302,7 +2306,7 @@ public final class Client implements IClient, IOracle
         return attacker;
     }
 
-    public Constants.BattlePhase getBattlePhase()
+    public BattlePhase getBattlePhase()
     {
         return battlePhase;
     }
@@ -2310,7 +2314,7 @@ public final class Client implements IClient, IOracle
     // public for IOracle
     public String getBattlePhaseName()
     {
-        if (phase == Constants.Phase.FIGHT)
+        if (phase == Phase.FIGHT)
         {
             if (battlePhase != null)
             {
@@ -2570,7 +2574,7 @@ public final class Client implements IClient, IOracle
         return activePlayer;
     }
 
-    public Constants.Phase getPhase()
+    public Phase getPhase()
     {
         return phase;
     }
@@ -2706,10 +2710,10 @@ public final class Client implements IClient, IOracle
             return false;
         }
 
-        Set<Constants.EntrySide> entrySides = listPossibleEntrySides(mover,
+        Set<EntrySide> entrySides = listPossibleEntrySides(mover,
             hex, teleport);
 
-        Constants.EntrySide entrySide = null;
+        EntrySide entrySide = null;
         if (options.getOption(Options.autoPickEntrySide))
         {
             entrySide = ai.pickEntrySide(hex, mover, entrySides);
@@ -2750,7 +2754,7 @@ public final class Client implements IClient, IOracle
     }
 
     public void didMove(Legion legion, MasterHex startingHex,
-        MasterHex currentHex, Constants.EntrySide entrySide, boolean teleport,
+        MasterHex currentHex, EntrySide entrySide, boolean teleport,
         String teleportingLord, boolean splitLegionHasForcedMove)
     {
         if (isMyLegion(legion))
@@ -3049,7 +3053,7 @@ public final class Client implements IClient, IOracle
             movementRoll);
     }
 
-    public Set<Constants.EntrySide> listPossibleEntrySides(
+    public Set<EntrySide> listPossibleEntrySides(
         LegionClientSide mover, MasterHex hex, boolean teleport)
     {
         return movement.listPossibleEntrySides(mover, hex, teleport);
@@ -3270,7 +3274,7 @@ public final class Client implements IClient, IOracle
 
         gui.boardActOnUndidSplit(survivor, turn);
 
-        if (isMyTurn() && this.phase == Constants.Phase.SPLIT
+        if (isMyTurn() && this.phase == Phase.SPLIT
             && !replayOngoing && options.getOption(Options.autoSplit)
             && !isGameOver())
         {
@@ -3302,19 +3306,19 @@ public final class Client implements IClient, IOracle
      */
     public void doneWithPhase()
     {
-        if (phase == Constants.Phase.SPLIT)
+        if (phase == Phase.SPLIT)
         {
             doneWithSplits();
         }
-        else if (phase == Constants.Phase.MOVE)
+        else if (phase == Phase.MOVE)
         {
             doneWithMoves();
         }
-        else if (phase == Constants.Phase.FIGHT)
+        else if (phase == Phase.FIGHT)
         {
             doneWithEngagements();
         }
-        else if (phase == Constants.Phase.MUSTER)
+        else if (phase == Phase.MUSTER)
         {
             doneWithRecruits();
         }
@@ -3429,7 +3433,7 @@ public final class Client implements IClient, IOracle
         // check also for phase, because delayed callbacks could come
         // after our phase is over but activePlayerName not updated yet
         return playerAlive && owningPlayer.equals(getBattleActivePlayer())
-            && this.phase == Constants.Phase.FIGHT;
+            && this.phase == Phase.FIGHT;
     }
 
     public int getMovementRoll()
@@ -3560,7 +3564,7 @@ public final class Client implements IClient, IOracle
 
         // check also for phase, because delayed callbacks could come
         // after our phase is over but activePlayerName not updated yet.
-        if (isMyTurn() && this.phase == Constants.Phase.SPLIT
+        if (isMyTurn() && this.phase == Phase.SPLIT
             && !replayOngoing && options.getOption(Options.autoSplit)
             && !isGameOver())
         {
@@ -3572,21 +3576,21 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    public void askPickColor(List<Constants.PlayerColor> colorsLeft)
+    public void askPickColor(List<PlayerColor> colorsLeft)
     {
         if (options.getOption(Options.autoPickColor))
         {
             // Convert favorite colors from a comma-separated string to a list.
             String favorites = options.getStringOption(Options.favoriteColors);
-            List<Constants.PlayerColor> favoriteColors = null;
+            List<PlayerColor> favoriteColors = null;
             if (favorites != null)
             {
-                favoriteColors = Constants.PlayerColor.getByName(Split.split(
+                favoriteColors = PlayerColor.getByName(Split.split(
                     ',', favorites));
             }
             else
             {
-                favoriteColors = new ArrayList<Constants.PlayerColor>();
+                favoriteColors = new ArrayList<PlayerColor>();
             }
             color = ai.pickColor(colorsLeft, favoriteColors);
         }

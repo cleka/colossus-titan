@@ -75,9 +75,9 @@ public class StrategicMapLoader
 
         MasterBoardTerrain terrain = TerrainRecruitLoader
             .getTerrainById(terrainId);
-        if ((terrain == null) || (terrain.equals("")))
+        if (terrain == null)
         {
-            LOGGER.warning("Null/empty terrain in " + label
+            LOGGER.warning("Null terrain in " + label
                 + ", trying Plains");
             terrain = TerrainRecruitLoader.getTerrainById("Plains");
         }

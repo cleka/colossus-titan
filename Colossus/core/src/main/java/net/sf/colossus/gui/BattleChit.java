@@ -13,6 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.Client;
+import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.variant.CreatureType;
@@ -59,7 +60,7 @@ public final class BattleChit extends Chit
     private static boolean useColoredBorders = false;
 
     public BattleChit(int scale, String id, boolean inverted, int tag,
-        String currentHexLabel, Constants.PlayerColor playerColor, Client client)
+        String currentHexLabel, PlayerColor playerColor, Client client)
     {
         super(scale, id, inverted);
         if (id == null)

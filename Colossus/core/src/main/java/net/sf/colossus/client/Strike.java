@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.game.Battle;
+import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.gui.BattleChit;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.CompareDoubles;
@@ -160,7 +161,7 @@ public final class Strike
         // if the creature can strike normally, so only look for them if
         // no targets have yet been found.
         if (rangestrike && !adjacentEnemy && creature.isRangestriker()
-            && client.getBattlePhase() != Constants.BattlePhase.STRIKEBACK)
+            && client.getBattlePhase() != BattlePhase.STRIKEBACK)
         {
             Iterator<BattleChit> it = client.getInactiveBattleChits()
                 .iterator();

@@ -535,7 +535,7 @@ public class TerrainRecruitLoader
      * Give the name of the random filename to use to generate this terrain,
      * or null if it's a static Battlelands.
      *
-     * @param masterBoardTerrain A mastre board terrain.
+     * @param masterBoardTerrain A master board terrain.
      * @return The name of the random source file as a String
      */
     public static String getTerrainRandomName(
@@ -695,7 +695,7 @@ public class TerrainRecruitLoader
 
     /**
      * Used internally to record the Acquirable name, points needed for
-     * recruitment, and the list of terrains in which the Acquirable dwells.
+     * recruiting, and the list of terrains in which the Acquirable dwells.
      * @author Romain Dolbeau
      * @version $Id$
      */
@@ -887,8 +887,8 @@ public class TerrainRecruitLoader
     }
 
     /**
-     * To obtain the amount of points needed for Titan Teleport.
-     * @return The amount of points needed for Titan Teleport.
+     * To obtain the amount of points needed for Titan teleport.
+     * @return The amount of points needed for Titan teleport.
      */
     public static int getTitanTeleportValue()
     {

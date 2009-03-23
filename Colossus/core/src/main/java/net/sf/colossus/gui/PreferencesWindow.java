@@ -39,7 +39,7 @@ import javax.swing.event.ChangeListener;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.IOptions;
-import net.sf.colossus.server.Constants;
+import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.util.KFrame;
 import net.sf.colossus.util.Options;
@@ -100,8 +100,8 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
     private Box rcModes; // Recruit Chit modes
     private JPanel favColorPane;
     private int activePaneIndex;
-    private List<Constants.PlayerColor> favoriteColors;
-    private List<Constants.PlayerColor> colorsLeft;
+    private List<PlayerColor> favoriteColors;
+    private List<PlayerColor> colorsLeft;
 
     PreferencesWindow(IOptions options, Client client)
     {
@@ -357,18 +357,18 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
             .createTitledBorder("Favorite Colors"));
         String favorites = options.getStringOption(Options.favoriteColors);
         favoriteColors = null;
-        colorsLeft = new ArrayList<Constants.PlayerColor>();
-        for (Constants.PlayerColor playerColor : Constants.PlayerColor.values())
+        colorsLeft = new ArrayList<PlayerColor>();
+        for (PlayerColor playerColor : PlayerColor.values())
         {
             colorsLeft.add(playerColor);
         }
         if (favorites != null)
         {
-            favoriteColors = Constants.PlayerColor.getByName(Split.split(',', favorites));
+            favoriteColors = PlayerColor.getByName(Split.split(',', favorites));
         }
         else
         {
-            favoriteColors = new ArrayList<Constants.PlayerColor>();
+            favoriteColors = new ArrayList<PlayerColor>();
         }
         ActionListener selectColorAL = new ActionListener()
         {
@@ -391,7 +391,7 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
         colorPane.add(favColorPane, BorderLayout.CENTER);
         for (int i = 0; i < favoriteColors.size(); i++)
         {
-            Constants.PlayerColor color = favoriteColors.get(i);
+            PlayerColor color = favoriteColors.get(i);
             addColor(color);
             colorsLeft.remove(color);
         }
@@ -470,7 +470,7 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
         if (favoriteColors.size() > 0)
         {
             StringBuilder favorites = new StringBuilder();
-            for (Constants.PlayerColor color : favoriteColors)
+            for (PlayerColor color : favoriteColors)
             {
                 if (favorites.length() > 0)
                 {
@@ -489,10 +489,10 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
 
     private void clearColor()
     {
-        favoriteColors = new ArrayList<Constants.PlayerColor>();
+        favoriteColors = new ArrayList<PlayerColor>();
         favColorPane.removeAll();
-        colorsLeft = new ArrayList<Constants.PlayerColor>();
-        for (Constants.PlayerColor color : Constants.PlayerColor.values())
+        colorsLeft = new ArrayList<PlayerColor>();
+        for (PlayerColor color : PlayerColor.values())
         {
             colorsLeft.add(color);
         }
@@ -504,14 +504,14 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
     {
         String colorName = button.getText();
         favColorPane.remove(button);
-        final Constants.PlayerColor color = Constants.PlayerColor.getByName(colorName);
+        final PlayerColor color = PlayerColor.getByName(colorName);
         colorsLeft.add(color);
         this.repaint();
         favoriteColors.remove(color);
         saveFavColor();
     }
 
-    private void addColor(Constants.PlayerColor color)
+    private void addColor(PlayerColor color)
     {
         Color realColor = HTMLColor.stringToColor(color.getName() + "Colossus");
         JButton button = new JButton(color.getName());
@@ -532,7 +532,7 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
 
     private void selectColor()
     {
-        Constants.PlayerColor c = PickColor.pickColor(this, "You", colorsLeft, options);
+        PlayerColor c = PickColor.pickColor(this, "You", colorsLeft, options);
         if (c != null)
         {
             addColor(c);

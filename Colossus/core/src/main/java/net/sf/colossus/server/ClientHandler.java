@@ -16,8 +16,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.IClient;
+import net.sf.colossus.game.BattlePhase;
+import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
+import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.variant.CreatureType;
@@ -443,7 +446,7 @@ final class ClientHandler implements IClient
         {
             String markerId = args.remove(0);
             String hexLabel = args.remove(0);
-            Constants.EntrySide entrySide = Constants.EntrySide.fromLabel(args.remove(0));
+            EntrySide entrySide = EntrySide.fromLabel(args.remove(0));
             boolean teleport = Boolean.valueOf(args.remove(0)).booleanValue();
             String teleportingLord = args.remove(0);
             server.doMove(resolveLegion(markerId), resolveMasterHex(hexLabel),
@@ -452,7 +455,7 @@ final class ClientHandler implements IClient
         else if (method.equals(Constants.assignColor))
         {
             String color = args.remove(0);
-            server.assignColor(Constants.PlayerColor.getByName(color));
+            server.assignColor(PlayerColor.getByName(color));
         }
         else if (method.equals(Constants.assignFirstMarker))
         {
@@ -594,7 +597,7 @@ final class ClientHandler implements IClient
         sendToClient(Constants.updatePlayerInfo + sep + Glob.glob(infoStrings));
     }
 
-    public void setColor(Constants.PlayerColor color)
+    public void setColor(PlayerColor color)
     {
         sendToClient(Constants.setColor + sep + color.getName());
     }
@@ -611,7 +614,7 @@ final class ClientHandler implements IClient
     }
 
     public void setLegionStatus(Legion legion, boolean moved,
-        boolean teleported, Constants.EntrySide entrySide, String lastRecruit)
+        boolean teleported, EntrySide entrySide, String lastRecruit)
     {
         sendToClient(Constants.setLegionStatus + sep + legion.getMarkerId()
             + sep + moved + sep + teleported + sep + entrySide.getId() + sep
@@ -751,7 +754,7 @@ final class ClientHandler implements IClient
     }
 
     public void initBattle(MasterHex hex, int battleTurnNumber,
-        Player battleActivePlayer, Constants.BattlePhase battlePhase,
+        Player battleActivePlayer, BattlePhase battlePhase,
         Legion attacker, Legion defender)
     {
         sendToClient(Constants.initBattle + sep + hex.getLabel() + sep
@@ -835,7 +838,7 @@ final class ClientHandler implements IClient
             + battleActivePlayer.getName() + sep + battleTurnNumber);
     }
 
-    public void setupBattleFight(Constants.BattlePhase battlePhase,
+    public void setupBattleFight(BattlePhase battlePhase,
         Player battleActivePlayer)
     {
         sendToClient(Constants.setupBattleFight + sep + battlePhase.ordinal()
@@ -856,7 +859,7 @@ final class ClientHandler implements IClient
     }
 
     public void didMove(Legion legion, MasterHex startingHex,
-        MasterHex currentHex, Constants.EntrySide entrySide, boolean teleport,
+        MasterHex currentHex, EntrySide entrySide, boolean teleport,
         String teleportingLord, boolean splitLegionHasForcedMove)
     {
         sendToClient(Constants.didMove + sep + legion.getMarkerId() + sep
@@ -899,7 +902,7 @@ final class ClientHandler implements IClient
             + childHeight + sep + Glob.glob(splitoffs) + sep + turn);
     }
 
-    public void askPickColor(List<Constants.PlayerColor> colorsLeft)
+    public void askPickColor(List<PlayerColor> colorsLeft)
     {
         sendToClient(Constants.askPickColor + sep + Glob.glob(colorsLeft));
     }

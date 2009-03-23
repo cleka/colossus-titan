@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
+import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.gui.Marker;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.VariantSupport;
@@ -217,7 +218,7 @@ public final class LegionClientSide extends Legion implements
         try
         {
             PlayerClientSide info = getPlayer();
-            Constants.PlayerColor color = info.getColor();
+            PlayerColor color = info.getColor();
             int power = info.getTitanPower();
             return "Titan-" + power + "-" + color.getName();
         }

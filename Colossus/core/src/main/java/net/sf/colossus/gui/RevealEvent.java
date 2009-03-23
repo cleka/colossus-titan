@@ -18,6 +18,7 @@ import javax.swing.border.TitledBorder;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.PlayerClientSide;
 import net.sf.colossus.game.Player;
+import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.server.Constants;
 
 
@@ -532,7 +533,7 @@ public class RevealEvent
     {
         try
         {
-            Constants.PlayerColor color = info.getColor();
+            PlayerColor color = info.getColor();
             int power = info.getTitanPower();
             return "Titan-" + power + "-" + color.getName();
         }

@@ -26,8 +26,11 @@ import javax.swing.JOptionPane;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.IClient;
+import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
+import net.sf.colossus.game.Phase;
 import net.sf.colossus.game.Player;
+import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.Proposal;
 import net.sf.colossus.server.Start.WhatToDoNext;
 import net.sf.colossus.util.Options;
@@ -1525,7 +1528,7 @@ public final class Server extends Thread implements IServer
         }
 
         else if (((LegionServerSide)legion).hasMoved()
-            || game.getPhase() == Constants.Phase.FIGHT)
+            || game.getPhase() == Phase.FIGHT)
         {
             ((LegionServerSide)legion).sortCritters();
             CreatureType recruit = null;
@@ -1558,7 +1561,7 @@ public final class Server extends Thread implements IServer
         }
 
         // Need to always call this to keep game from hanging.
-        if (game.getPhase() == Constants.Phase.FIGHT)
+        if (game.getPhase() == Phase.FIGHT)
         {
             if (game.getBattle() != null)
             {
@@ -2041,7 +2044,7 @@ public final class Server extends Thread implements IServer
         }
         else
         {
-            game.advancePhase(Constants.Phase.SPLIT, getPlayer());
+            game.advancePhase(Phase.SPLIT, getPlayer());
         }
     }
 
@@ -2076,7 +2079,7 @@ public final class Server extends Thread implements IServer
         else
         {
             player.recombineIllegalSplits();
-            game.advancePhase(Constants.Phase.MOVE, getPlayer());
+            game.advancePhase(Phase.MOVE, getPlayer());
         }
     }
 
@@ -2097,7 +2100,7 @@ public final class Server extends Thread implements IServer
         }
         else
         {
-            game.advancePhase(Constants.Phase.FIGHT, getPlayer());
+            game.advancePhase(Phase.FIGHT, getPlayer());
         }
     }
 
@@ -2121,7 +2124,7 @@ public final class Server extends Thread implements IServer
                 player.setMulligansLeft(0);
             }
 
-            game.advancePhase(Constants.Phase.MUSTER, getPlayer());
+            game.advancePhase(Phase.MUSTER, getPlayer());
         }
     }
 
@@ -2264,7 +2267,7 @@ public final class Server extends Thread implements IServer
     }
 
     public void doMove(Legion legion, MasterHex hex,
-        Constants.EntrySide entrySide, boolean teleport, String teleportingLord)
+        EntrySide entrySide, boolean teleport, String teleportingLord)
     {
         IClient client = getClient(getPlayer());
         if (!isActivePlayer())
@@ -2290,7 +2293,7 @@ public final class Server extends Thread implements IServer
     }
 
     void allTellDidMove(Legion legion, MasterHex startingHex, MasterHex hex,
-        Constants.EntrySide entrySide, boolean teleport, String teleportingLord)
+        EntrySide entrySide, boolean teleport, String teleportingLord)
     {
         PlayerServerSide player = game.getActivePlayer();
         // needed in didMove to decide whether to dis/enable button
@@ -2612,7 +2615,7 @@ public final class Server extends Thread implements IServer
     }
 
     void askPickColor(Player player,
-        final List<Constants.PlayerColor> colorsLeft)
+        final List<PlayerColor> colorsLeft)
     {
         IClient activeClient = getClient(player);
         for (IClient client : clients)
@@ -2631,7 +2634,7 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    public void assignColor(Constants.PlayerColor color)
+    public void assignColor(PlayerColor color)
     {
         Player p = getPlayer();
         assert p != null : "getPlayer returned null player (in thread "
@@ -2683,7 +2686,7 @@ public final class Server extends Thread implements IServer
         while (it.hasNext())
         {
             PlayerServerSide player = it.next();
-            Constants.PlayerColor color = player.getColor();
+            PlayerColor color = player.getColor();
             IClient client = getClient(player);
             if (client != null)
             {

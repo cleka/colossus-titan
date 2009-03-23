@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.game.Caretaker;
 import net.sf.colossus.game.Creature;
+import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.variant.CreatureType;
@@ -343,7 +344,7 @@ public final class LegionServerSide extends Legion implements
         }
     }
 
-    void moveToHex(MasterHex hex, Constants.EntrySide entrySide,
+    void moveToHex(MasterHex hex, EntrySide entrySide,
         boolean teleported, String teleportingLord)
     {
         PlayerServerSide player = getPlayer();

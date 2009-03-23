@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.HexMap;
-import net.sf.colossus.server.Constants;
+import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
@@ -93,7 +93,7 @@ public final class BattleMap extends HexMap implements MouseListener,
     }
 
     public static BattleHex getEntrance(MasterBoardTerrain terrain,
-        Constants.EntrySide entrySide)
+        EntrySide entrySide)
     {
         return HexMap.getHexByLabel(terrain, "X" + entrySide.getId());
     }

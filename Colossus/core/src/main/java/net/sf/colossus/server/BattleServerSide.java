@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.game.Battle;
+import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
@@ -53,7 +54,7 @@ public final class BattleServerSide extends Battle
     private LegionTags activeLegionTag;
     private final MasterHex masterHex;
     private int turnNumber;
-    private Constants.BattlePhase phase;
+    private BattlePhase phase;
     private AngelSummoningStates summonState = AngelSummoningStates.NO_KILLS;
     private int carryDamage;
     private boolean attackerElim;
@@ -74,7 +75,7 @@ public final class BattleServerSide extends Battle
 
     BattleServerSide(GameServerSide game, Legion attacker, Legion defender,
         LegionTags activeLegionTag, MasterHex masterHex,
-        int turnNumber, Constants.BattlePhase phase)
+        int turnNumber, BattlePhase phase)
     {
         super(game, attacker, defender, null);
         server = game.getServer();
@@ -246,7 +247,7 @@ public final class BattleServerSide extends Battle
         return masterHex;
     }
 
-    Constants.BattlePhase getBattlePhase()
+    BattlePhase getBattlePhase()
     {
         return phase;
     }
@@ -281,21 +282,21 @@ public final class BattleServerSide extends Battle
 
         public void advancePhaseInternal()
         {
-            if (phase == Constants.BattlePhase.SUMMON)
+            if (phase == BattlePhase.SUMMON)
             {
-                phase = Constants.BattlePhase.MOVE;
+                phase = BattlePhase.MOVE;
                 LOGGER.log(Level.INFO, "Battle phase advances to " + phase);
                 again = setupMove();
             }
 
-            else if (phase == Constants.BattlePhase.RECRUIT)
+            else if (phase == BattlePhase.RECRUIT)
             {
-                phase = Constants.BattlePhase.MOVE;
+                phase = BattlePhase.MOVE;
                 LOGGER.log(Level.INFO, "Battle phase advances to " + phase);
                 again = setupMove();
             }
 
-            else if (phase == Constants.BattlePhase.MOVE)
+            else if (phase == BattlePhase.MOVE)
             {
                 // IF the attacker makes it to the end of his first movement
                 // phase without conceding, even if he left all legions
@@ -305,24 +306,24 @@ public final class BattleServerSide extends Battle
                 {
                     attackerEntered = true;
                 }
-                phase = Constants.BattlePhase.FIGHT;
+                phase = BattlePhase.FIGHT;
                 LOGGER.log(Level.INFO, "Battle phase advances to " + phase);
                 again = setupFight();
             }
 
-            else if (phase == Constants.BattlePhase.FIGHT)
+            else if (phase == BattlePhase.FIGHT)
             {
                 // We switch the active legion between the fight and strikeback
                 // phases, not at the end of the player turn.
                 activeLegionTag = (activeLegionTag == LegionTags.ATTACKER) ? LegionTags.DEFENDER
                     : LegionTags.ATTACKER;
                 driftDamageApplied = false;
-                phase = Constants.BattlePhase.STRIKEBACK;
+                phase = BattlePhase.STRIKEBACK;
                 LOGGER.log(Level.INFO, "Battle phase advances to " + phase);
                 again = setupFight();
             }
 
-            else if (phase == Constants.BattlePhase.STRIKEBACK)
+            else if (phase == BattlePhase.STRIKEBACK)
             {
                 removeDeadCreatures();
                 checkForElimination();
@@ -345,7 +346,7 @@ public final class BattleServerSide extends Battle
             // Active legion is the one that was striking back.
             if (activeLegionTag == LegionTags.ATTACKER)
             {
-                phase = Constants.BattlePhase.SUMMON;
+                phase = BattlePhase.SUMMON;
                 LOGGER.log(Level.INFO, getActivePlayer()
                     + "'s battle turn, number " + turnNumber);
                 again = setupSummon();
@@ -359,7 +360,7 @@ public final class BattleServerSide extends Battle
                 }
                 else
                 {
-                    phase = Constants.BattlePhase.RECRUIT;
+                    phase = BattlePhase.RECRUIT;
                     again = setupRecruit();
                     if (getActivePlayer() != null)
                     {
@@ -451,7 +452,7 @@ public final class BattleServerSide extends Battle
                 .getHeight() - 1);
             placeCritter(critter);
         }
-        if (phase == Constants.BattlePhase.SUMMON)
+        if (phase == BattlePhase.SUMMON)
         {
             advancePhase();
         }
@@ -683,7 +684,7 @@ public final class BattleServerSide extends Battle
     {
         // Drift damage is applied only once per player turn,
         //    during the strike phase.
-        if (phase == Constants.BattlePhase.FIGHT && !driftDamageApplied)
+        if (phase == BattlePhase.FIGHT && !driftDamageApplied)
         {
             Iterator<CreatureServerSide> it = getAllCritters().iterator();
             driftDamageApplied = true;
@@ -1032,7 +1033,7 @@ public final class BattleServerSide extends Battle
         // if the creature can strike normally, so only look for them if
         // no targets have yet been found.
         if (rangestrike && !adjacentEnemy && critter.isRangestriker()
-            && getBattlePhase() != Constants.BattlePhase.STRIKEBACK
+            && getBattlePhase() != BattlePhase.STRIKEBACK
             && critter.getLegion() == getActiveLegion())
         {
             Iterator<CreatureServerSide> it = getInactiveLegion()

@@ -4,9 +4,11 @@ package net.sf.colossus.client;
 import java.util.List;
 import java.util.Set;
 
+import net.sf.colossus.game.BattlePhase;
+import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
-import net.sf.colossus.server.Constants;
+import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
 
@@ -31,7 +33,7 @@ public interface IClient
 
     public void updatePlayerInfo(List<String> infoStrings);
 
-    public void setColor(Constants.PlayerColor color);
+    public void setColor(PlayerColor color);
 
     public void updateCreatureCount(CreatureType type, int count, int deadCount);
 
@@ -40,7 +42,7 @@ public interface IClient
     public void removeLegion(Legion legion);
 
     public void setLegionStatus(Legion legion, boolean moved,
-        boolean teleported, Constants.EntrySide entrySide, String lastRecruit);
+        boolean teleported, EntrySide entrySide, String lastRecruit);
 
     public void addCreature(Legion legion, String name, String reason);
 
@@ -91,7 +93,7 @@ public interface IClient
         Set<String> carryTargetDescriptions);
 
     public void initBattle(MasterHex masterHex, int battleTurnNumber,
-        Player battleActivePlayer, Constants.BattlePhase battlePhase,
+        Player battleActivePlayer, BattlePhase battlePhase,
         Legion attacker, Legion defender);
 
     public void cleanupBattle();
@@ -123,7 +125,7 @@ public interface IClient
 
     public void setupBattleMove(Player battleActivePlayer, int battleTurnNumber);
 
-    public void setupBattleFight(Constants.BattlePhase battlePhase,
+    public void setupBattleFight(BattlePhase battlePhase,
         Player battleActivePlayer);
 
     // TODO the extra hex parameter is probably not needed anymore
@@ -133,7 +135,7 @@ public interface IClient
         String endingHexLabel, boolean undo);
 
     public void didMove(Legion legion, MasterHex startingHex, MasterHex hex,
-        Constants.EntrySide entrySide, boolean teleport, String teleportingLord,
+        EntrySide entrySide, boolean teleport, String teleportingLord,
         boolean splitLegionHasForcedMove);
 
     public void undidMove(Legion legion, MasterHex formerHex,
@@ -147,7 +149,7 @@ public interface IClient
     public void didSplit(MasterHex hex, Legion parent, Legion child,
         int childHeight, List<String> splitoffs, int turn);
 
-    public void askPickColor(List<Constants.PlayerColor> colorsLeft);
+    public void askPickColor(List<PlayerColor> colorsLeft);
 
     public void askPickFirstMarker();
 

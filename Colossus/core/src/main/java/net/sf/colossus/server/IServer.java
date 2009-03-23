@@ -1,7 +1,9 @@
 package net.sf.colossus.server;
 
 
+import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
+import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.variant.MasterHex;
 
 
@@ -74,10 +76,10 @@ public interface IServer
 
     public void doSplit(Legion parent, String childMarker, String results);
 
-    public void doMove(Legion legion, MasterHex hex, Constants.EntrySide entrySide,
+    public void doMove(Legion legion, MasterHex hex, EntrySide entrySide,
         boolean teleport, String teleportingLord);
 
-    public void assignColor(Constants.PlayerColor color);
+    public void assignColor(PlayerColor color);
 
     public void assignFirstMarker(String markerId);
 

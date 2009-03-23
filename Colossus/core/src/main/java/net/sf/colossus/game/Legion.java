@@ -4,7 +4,6 @@ package net.sf.colossus.game;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.colossus.server.Constants;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
@@ -52,7 +51,7 @@ public abstract class Legion
     /**
      * The side this legion entered a battle in.
      */
-    private Constants.EntrySide entrySide = Constants.EntrySide.NOT_SET;
+    private EntrySide entrySide = EntrySide.NOT_SET;
 
     protected List<AcquirableDecision> decisions = null;
     protected int angelsToAcquire;
@@ -170,12 +169,12 @@ public abstract class Legion
         return getCreatures().contains(type);
     }
 
-    public void setEntrySide(Constants.EntrySide entrySide)
+    public void setEntrySide(EntrySide entrySide)
     {
         this.entrySide = entrySide;
     }
 
-    public Constants.EntrySide getEntrySide()
+    public EntrySide getEntrySide()
     {
         return entrySide;
     }

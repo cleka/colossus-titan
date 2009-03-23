@@ -7,9 +7,10 @@ import java.util.SortedSet;
 
 import net.sf.colossus.client.CritterMove;
 import net.sf.colossus.client.LegionClientSide;
+import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
+import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.SummonInfo;
-import net.sf.colossus.server.Constants;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
 
@@ -55,7 +56,7 @@ public interface AI
     void retryFailedBattleMoves(List<CritterMove> bestMoveOrder);
 
     /** pick an entry side */
-    Constants.EntrySide pickEntrySide(MasterHex hex, Legion legion, Set<Constants.EntrySide> entrySides);
+    EntrySide pickEntrySide(MasterHex hex, Legion legion, Set<EntrySide> entrySides);
 
     /** pick an engagement to resolve */
     MasterHex pickEngagement();
@@ -67,8 +68,8 @@ public interface AI
     SummonInfo summonAngel(Legion summoner, SortedSet<Legion> possibleDonors);
 
     /** pick a color of legion markers */
-    Constants.PlayerColor pickColor(List<Constants.PlayerColor> colors,
-        List<Constants.PlayerColor> favoriteColors);
+    PlayerColor pickColor(List<PlayerColor> colors,
+        List<PlayerColor> favoriteColors);
 
     /** pick a legion marker */
     String pickMarker(Set<String> markerIds, String preferredShortColor);

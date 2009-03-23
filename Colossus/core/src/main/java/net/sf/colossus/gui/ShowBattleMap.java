@@ -18,8 +18,7 @@ import javax.swing.SwingUtilities;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.HexMap;
-import net.sf.colossus.server.Constants;
-import net.sf.colossus.server.Constants.EntrySide;
+import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.variant.MasterHex;
 
@@ -57,12 +56,12 @@ final class ShowBattleMap extends HexMap
         assert SwingUtilities.isEventDispatchThread() : "Constructor should be called only on the EDT";
 
         Map<EntrySide, String> neighbors = findOutNeighbors(hex);
-        String neighborsText = Constants.EntrySide.RIGHT.getLabel() + ": "
-            + neighbors.get(Constants.EntrySide.RIGHT) + ", "
-            + Constants.EntrySide.BOTTOM.getLabel() + ": "
-            + neighbors.get(Constants.EntrySide.BOTTOM) + ", "
-            + Constants.EntrySide.LEFT.getLabel() + ": "
-            + neighbors.get(Constants.EntrySide.LEFT) + ")";
+        String neighborsText = EntrySide.RIGHT.getLabel() + ": "
+            + neighbors.get(EntrySide.RIGHT) + ", "
+            + EntrySide.BOTTOM.getLabel() + ": "
+            + neighbors.get(EntrySide.BOTTOM) + ", "
+            + EntrySide.LEFT.getLabel() + ": "
+            + neighbors.get(EntrySide.LEFT) + ")";
 
 
         final KDialog dialog = new KDialog(parentFrame, "Battle Map for "
@@ -74,28 +73,28 @@ final class ShowBattleMap extends HexMap
         contentPane.setLayout(null);
 
         //TODO: three or more, use a for (maybe integrating findOutNeighbours code)
-        String text = neighbors.get(Constants.EntrySide.LEFT);
+        String text = neighbors.get(EntrySide.LEFT);
         if (!text.equals(NoLandText))
         {
-            leftButton = new JButton("<HTML>" + Constants.EntrySide.LEFT.getLabel() + ":<BR>"
+            leftButton = new JButton("<HTML>" + EntrySide.LEFT.getLabel() + ":<BR>"
                 + text + "</HTML>");
             leftButton.setEnabled(false);
             contentPane.add(leftButton);
         }
 
-        text = neighbors.get(Constants.EntrySide.BOTTOM);
+        text = neighbors.get(EntrySide.BOTTOM);
         if (!text.equals(NoLandText))
         {
-            bottomButton = new JButton("<HTML>" + Constants.EntrySide.BOTTOM.getLabel() + ":<BR>"
+            bottomButton = new JButton("<HTML>" + EntrySide.BOTTOM.getLabel() + ":<BR>"
                 + text + "</HTML>");
             bottomButton.setEnabled(false);
             contentPane.add(bottomButton);
         }
 
-        text = neighbors.get(Constants.EntrySide.RIGHT);
+        text = neighbors.get(EntrySide.RIGHT);
         if (!text.equals(NoLandText))
         {
-            rightButton = new JButton("<HTML>" + Constants.EntrySide.RIGHT + ":<BR>"
+            rightButton = new JButton("<HTML>" + EntrySide.RIGHT + ":<BR>"
                 + text + "</HTML>");
             rightButton.setEnabled(false);
             contentPane.add(rightButton);
@@ -130,7 +129,7 @@ final class ShowBattleMap extends HexMap
         dialog.setVisible(true);
     }
 
-    private Map<Constants.EntrySide, String> findOutNeighbors(GUIMasterHex guiHex)
+    private Map<EntrySide, String> findOutNeighbors(GUIMasterHex guiHex)
     {
         boolean inverted = guiHex.isInverted();
         MasterHex model = guiHex.getHexModel();
@@ -165,10 +164,10 @@ final class ShowBattleMap extends HexMap
             }
         }
 
-        Map<Constants.EntrySide, String> neighbors = new HashMap<Constants.EntrySide, String>(4);
-        neighbors.put(Constants.EntrySide.RIGHT, right);
-        neighbors.put(Constants.EntrySide.BOTTOM, bottom);
-        neighbors.put(Constants.EntrySide.LEFT, left);
+        Map<EntrySide, String> neighbors = new HashMap<EntrySide, String>(4);
+        neighbors.put(EntrySide.RIGHT, right);
+        neighbors.put(EntrySide.BOTTOM, bottom);
+        neighbors.put(EntrySide.LEFT, left);
 
         return neighbors;
     }

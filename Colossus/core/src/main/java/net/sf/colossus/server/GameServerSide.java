@@ -23,13 +23,16 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 import net.sf.colossus.client.HexMap;
+import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.Caretaker;
 import net.sf.colossus.game.Creature;
+import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
+import net.sf.colossus.game.Phase;
 import net.sf.colossus.game.Player;
+import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.Proposal;
-import net.sf.colossus.server.Constants.BattlePhase;
 import net.sf.colossus.server.Start.WhatToDoNext;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
@@ -91,14 +94,14 @@ public final class GameServerSide extends Game
     private boolean gameOver = false;
     private String gameOverMessage = null;
     private BattleServerSide battle;
-    private Constants.Phase phase;
+    private Phase phase;
     private Server server;
     // Negotiation
     private final Set<Proposal> attackerProposals = new HashSet<Proposal>();
     private final Set<Proposal> defenderProposals = new HashSet<Proposal>();
 
     private final LinkedList<Player> colorPickOrder = new LinkedList<Player>();
-    private List<Constants.PlayerColor> colorsLeft;
+    private List<PlayerColor> colorsLeft;
     private final PhaseAdvancer phaseAdvancer = new GamePhaseAdvancer();
     private Options options = null;
 
@@ -326,7 +329,7 @@ public final class GameServerSide extends Game
 
         turnNumber = 1;
         lastRecruitTurnNumber = -1;
-        phase = Constants.Phase.SPLIT;
+        phase = Phase.SPLIT;
         players.clear();
 
         VariantSupport.loadVariantByName(options
@@ -465,10 +468,10 @@ public final class GameServerSide extends Game
 
     private void assignColors()
     {
-        List<Constants.PlayerColor> cli = new ArrayList<Constants.PlayerColor>(
-            Arrays.asList(Constants.PlayerColor.values()));
+        List<PlayerColor> cli = new ArrayList<PlayerColor>(
+            Arrays.asList(PlayerColor.values()));
 
-        colorsLeft = new ArrayList<Constants.PlayerColor>();
+        colorsLeft = new ArrayList<PlayerColor>();
 
         /* Add the first 6 colors in random order, ... */
         for (int i = 0; i < Constants.DEFAULT_MAX_PLAYERS; i++)
@@ -572,7 +575,7 @@ public final class GameServerSide extends Game
         return newName;
     }
 
-    void assignColor(Player player, Constants.PlayerColor color)
+    void assignColor(Player player, PlayerColor color)
     {
         colorPickOrder.remove(player);
         colorsLeft.remove(color);
@@ -968,7 +971,7 @@ public final class GameServerSide extends Game
         setupPhase();
     }
 
-    Constants.Phase getPhase()
+    Phase getPhase()
     {
         return phase;
     }
@@ -977,7 +980,7 @@ public final class GameServerSide extends Game
      * Advance to the next phase, only if the passed oldPhase and playerName
      * are current.
      */
-    void advancePhase(final Constants.Phase oldPhase, final Player player)
+    void advancePhase(final Phase oldPhase, final Player player)
     {
         if (oldPhase != phase)
         {
@@ -1030,21 +1033,21 @@ public final class GameServerSide extends Game
         /** Advance to the next phase, with no error checking. */
         public void advancePhaseInternal()
         {
-            Constants.Phase oldPhase = phase;
-            if (oldPhase == Constants.Phase.SPLIT)
+            Phase oldPhase = phase;
+            if (oldPhase == Phase.SPLIT)
             {
-                phase = Constants.Phase.MOVE;
+                phase = Phase.MOVE;
             }
-            else if (oldPhase == Constants.Phase.MOVE)
+            else if (oldPhase == Phase.MOVE)
             {
-                phase = Constants.Phase.FIGHT;
+                phase = Phase.FIGHT;
             }
-            else if (oldPhase == Constants.Phase.FIGHT)
+            else if (oldPhase == Phase.FIGHT)
             {
-                phase = Constants.Phase.MUSTER;
+                phase = Phase.MUSTER;
             }
 
-            if (oldPhase == Constants.Phase.MUSTER
+            if (oldPhase == Phase.MUSTER
                 || (getActivePlayer().isDead() && getNumLivingPlayers() > 0))
             {
                 advanceTurn();
@@ -1080,7 +1083,7 @@ public final class GameServerSide extends Game
              active player, for bookkeeping purpose */
             CustomRecruitBase.everyoneAdvanceTurn(activePlayerNum);
 
-            phase = Constants.Phase.SPLIT;
+            phase = Phase.SPLIT;
             if (getActivePlayer().isDead() && getNumLivingPlayers() > 0)
             {
                 advanceTurn();
@@ -1096,19 +1099,19 @@ public final class GameServerSide extends Game
 
     private void setupPhase()
     {
-        if (phase == Constants.Phase.SPLIT)
+        if (phase == Phase.SPLIT)
         {
             setupSplit();
         }
-        else if (phase == Constants.Phase.MOVE)
+        else if (phase == Phase.MOVE)
         {
             setupMove();
         }
-        else if (phase == Constants.Phase.FIGHT)
+        else if (phase == Phase.FIGHT)
         {
             setupFight();
         }
-        else if (phase == Constants.Phase.MUSTER)
+        else if (phase == Phase.MUSTER)
         {
             setupMuster();
         }
@@ -1198,7 +1201,7 @@ public final class GameServerSide extends Game
         // still being around to advance the turn.
         if (player.isDead())
         {
-            advancePhase(Constants.Phase.MUSTER, player);
+            advancePhase(Phase.MUSTER, player);
         }
         else
         {
@@ -1455,7 +1458,7 @@ public final class GameServerSide extends Game
         leg.setAttribute("currentHex", legion.getCurrentHex().getLabel());
         leg.setAttribute("startingHex", legion.getStartingHex().getLabel());
         leg.setAttribute("moved", "" + legion.hasMoved());
-        Constants.EntrySide entrySide = legion.getEntrySide();
+        EntrySide entrySide = legion.getEntrySide();
         if (entrySide == null)
         {
             // This should never happen. Let's follow it for a while
@@ -1463,7 +1466,7 @@ public final class GameServerSide extends Game
             // at some point.
             LOGGER.warning("EntrySide of Legion " + legion.getMarkerId()
                 + " is null!?!");
-            entrySide = Constants.EntrySide.NOT_SET;
+            entrySide = EntrySide.NOT_SET;
         }
         leg.setAttribute("entrySide", "" + entrySide.ordinal());
         leg.setAttribute("parent", notnull(legion.getParentId()));
@@ -1640,7 +1643,7 @@ public final class GameServerSide extends Game
             activePlayerNum = Integer.parseInt(el.getTextTrim());
 
             el = root.getChild("CurrentPhase");
-            phase = Constants.Phase
+            phase = Phase
                 .fromInt(Integer.parseInt(el.getTextTrim()));
 
             Element ct = root.getChild("Caretaker");
@@ -1680,7 +1683,7 @@ public final class GameServerSide extends Game
                 PlayerServerSide player = addPlayer(name, type);
 
                 String colorName = pla.getAttribute("color").getValue();
-                player.setColor(Constants.PlayerColor.getByName(colorName));
+                player.setColor(PlayerColor.getByName(colorName));
 
                 String towerLabel = pla.getAttribute("startingTower")
                     .getValue();
@@ -1746,7 +1749,7 @@ public final class GameServerSide extends Game
                     .getIntValue();
                 String battleActivePlayerName = bat.getAttribute(
                     "activePlayer").getValue();
-                Constants.BattlePhase battlePhase = BattlePhase.values()[bat
+                BattlePhase battlePhase = BattlePhase.values()[bat
                     .getAttribute("phase").getIntValue()];
                 BattleServerSide.AngelSummoningStates summonState = BattleServerSide.AngelSummoningStates
                     .values()[bat.getAttribute("summonState").getIntValue()];
@@ -1831,7 +1834,7 @@ public final class GameServerSide extends Game
         MasterHex startingHex = getVariant().getMasterBoard().getHexByLabel(
             startingHexLabel);
         boolean moved = leg.getAttribute("moved").getBooleanValue();
-        Constants.EntrySide entrySide = Constants.EntrySide.fromIntegerId(leg
+        EntrySide entrySide = EntrySide.fromIntegerId(leg
             .getAttribute("entrySide").getIntValue());
         String parentId = leg.getAttribute("parent").getValue();
         if (parentId.equals("null"))
@@ -2204,7 +2207,7 @@ public final class GameServerSide extends Game
 
     /** Set the entry side relative to the hex label. */
     // TODO I've seen this code somewhere else
-    private Constants.EntrySide findEntrySide(MasterHex hex, int cameFrom)
+    private EntrySide findEntrySide(MasterHex hex, int cameFrom)
     {
         int entrySide = -1;
         if (cameFrom != -1)
@@ -2218,7 +2221,7 @@ public final class GameServerSide extends Game
                 entrySide = (6 + cameFrom - hex.getLabelSide()) % 6;
             }
         }
-        return Constants.EntrySide.fromIntegerId(entrySide);
+        return EntrySide.fromIntegerId(entrySide);
     }
 
     /** Recursively find conventional moves from this hex.
@@ -2519,10 +2522,10 @@ public final class GameServerSide extends Game
     /** Return a Set of Strings "Left" "Right" or "Bottom" describing
      *  possible entry sides.  If the hex is unoccupied, just return
      *  one entry side since it doesn't matter. */
-    Set<Constants.EntrySide> listPossibleEntrySides(Legion legion,
+    Set<EntrySide> listPossibleEntrySides(Legion legion,
         MasterHex targetHex, boolean teleport)
     {
-        Set<Constants.EntrySide> entrySides = new HashSet<Constants.EntrySide>();
+        Set<EntrySide> entrySides = new HashSet<EntrySide>();
         Player player = legion.getPlayer();
         int movementRoll = ((PlayerServerSide)player).getMovementRoll();
         MasterHex currentHex = legion.getCurrentHex();
@@ -2537,14 +2540,14 @@ public final class GameServerSide extends Game
                 if (!isOccupied(targetHex)
                     || targetHex.getTerrain().hasStartList())
                 {
-                    entrySides.add(Constants.EntrySide.BOTTOM);
+                    entrySides.add(EntrySide.BOTTOM);
                     return entrySides;
                 }
                 else
                 {
-                    entrySides.add(Constants.EntrySide.BOTTOM);
-                    entrySides.add(Constants.EntrySide.LEFT);
-                    entrySides.add(Constants.EntrySide.RIGHT);
+                    entrySides.add(EntrySide.BOTTOM);
+                    entrySides.add(EntrySide.LEFT);
+                    entrySides.add(EntrySide.RIGHT);
                     return entrySides;
                 }
             }
@@ -2568,7 +2571,7 @@ public final class GameServerSide extends Game
             {
                 String buf = parts.get(1);
 
-                entrySides.add(Constants.EntrySide.fromLabel(buf));
+                entrySides.add(EntrySide.fromLabel(buf));
 
                 // Clemens 4.10.2007:
                 // This optimization can lead to problems ("Illegal entry side")
@@ -2896,7 +2899,7 @@ public final class GameServerSide extends Game
     /** Move the legion to the hex if legal.  Return a string telling
      *  the reason why it is illegal, or null if ok and move was done.
      */
-    String doMove(Legion legion, MasterHex hex, Constants.EntrySide entrySide,
+    String doMove(Legion legion, MasterHex hex, EntrySide entrySide,
         boolean teleport, String teleportingLord)
     {
         assert legion != null : "Legion must not be null";
@@ -2937,7 +2940,7 @@ public final class GameServerSide extends Game
         }
 
         // Verify that the entry side is legal.
-        Set<Constants.EntrySide> legalSides = listPossibleEntrySides(legion,
+        Set<EntrySide> legalSides = listPossibleEntrySides(legion,
             hex, teleport);
         if (!legalSides.contains(entrySide))
         {
@@ -2947,10 +2950,10 @@ public final class GameServerSide extends Game
 
         // If this is a tower hex, the only entry side is the bottom.
         if (hex.getTerrain().hasStartList()
-            && !entrySide.equals(Constants.EntrySide.BOTTOM))
+            && !entrySide.equals(EntrySide.BOTTOM))
         {
             LOGGER.log(Level.WARNING, "Tried to enter invalid side of tower");
-            entrySide = Constants.EntrySide.BOTTOM;
+            entrySide = EntrySide.BOTTOM;
         }
 
         // If the legion teleported, reveal a lord.
@@ -3163,7 +3166,7 @@ public final class GameServerSide extends Game
 
             battle = new BattleServerSide(this, attacker, defender,
                 BattleServerSide.LegionTags.DEFENDER, hex, 1,
-                Constants.BattlePhase.MOVE);
+                BattlePhase.MOVE);
             battle.init();
         }
     }
@@ -3690,7 +3693,7 @@ public final class GameServerSide extends Game
 
     int mulligan()
     {
-        if (getPhase() != Constants.Phase.MOVE)
+        if (getPhase() != Phase.MOVE)
         {
             return -1;
         }

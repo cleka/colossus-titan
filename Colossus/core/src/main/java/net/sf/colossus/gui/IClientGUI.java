@@ -10,9 +10,11 @@ import java.util.SortedSet;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.LegionClientSide;
+import net.sf.colossus.game.BattlePhase;
+import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
+import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.SummonInfo;
-import net.sf.colossus.server.Constants;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.webclient.WebClient;
 
@@ -254,8 +256,8 @@ public interface IClientGUI
 
     public abstract PickCarry getPickCarryDialog();
 
-    public abstract Constants.PlayerColor doPickColor(String playerName,
-        List<Constants.PlayerColor> colorsLeft);
+    public abstract PlayerColor doPickColor(String playerName,
+        List<PlayerColor> colorsLeft);
 
     public abstract String doPickMarker(Set<String> markersAvailable);
 
@@ -266,8 +268,8 @@ public interface IClientGUI
     public abstract String doPickRecruiter(List<String> recruiters,
         String hexDescription, Legion legion);
 
-    public abstract Constants.EntrySide doPickEntrySide(MasterHex hex,
-        Set<Constants.EntrySide> entrySides);
+    public abstract EntrySide doPickEntrySide(MasterHex hex,
+        Set<EntrySide> entrySides);
 
     public abstract String doPickLord(List<String> lords);
 
@@ -291,7 +293,7 @@ public interface IClientGUI
     public abstract void actOnSetupFight();
 
     public abstract void actOnSetupBattleFight(
-        Constants.BattlePhase battlePhase, int battleTurnNumber);
+        BattlePhase battlePhase, int battleTurnNumber);
 
     public abstract void actOnSetupBattleMove();
 

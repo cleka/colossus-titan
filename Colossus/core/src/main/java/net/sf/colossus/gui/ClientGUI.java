@@ -28,9 +28,12 @@ import net.sf.colossus.client.Client;
 import net.sf.colossus.client.IOptions;
 import net.sf.colossus.client.IOracle;
 import net.sf.colossus.client.LegionClientSide;
+import net.sf.colossus.game.BattlePhase;
+import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
+import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.Proposal;
 import net.sf.colossus.game.SummonInfo;
 import net.sf.colossus.server.Constants;
@@ -2157,10 +2160,10 @@ public class ClientGUI implements IClientGUI
         return pickCarryDialog;
     }
 
-    public Constants.PlayerColor doPickColor(String playerName,
-        List<Constants.PlayerColor> colorsLeft)
+    public PlayerColor doPickColor(String playerName,
+        List<PlayerColor> colorsLeft)
     {
-        Constants.PlayerColor color = null;
+        PlayerColor color = null;
         if (board != null)
         {
             board.setPhaseInfo("Pick a color!");
@@ -2238,8 +2241,8 @@ public class ClientGUI implements IClientGUI
     /* (non-Javadoc)
      * @see net.sf.colossus.gui.IClientGUI#doPickEntrySide(net.sf.colossus.variant.MasterHex, java.util.Set)
      */
-    public Constants.EntrySide doPickEntrySide(MasterHex hex,
-        Set<Constants.EntrySide> entrySides)
+    public EntrySide doPickEntrySide(MasterHex hex,
+        Set<EntrySide> entrySides)
     {
         return PickEntrySide.pickEntrySide(board.getFrame(), hex, entrySides);
     }
@@ -2434,7 +2437,7 @@ public class ClientGUI implements IClientGUI
     /* (non-Javadoc)
      * @see net.sf.colossus.gui.IClientGUI#actOnSetupBattleFight(net.sf.colossus.server.Constants.BattlePhase, int)
      */
-    public void actOnSetupBattleFight(Constants.BattlePhase battlePhase,
+    public void actOnSetupBattleFight(BattlePhase battlePhase,
         int battleTurnNumber)
     {
         if (battleBoard != null)

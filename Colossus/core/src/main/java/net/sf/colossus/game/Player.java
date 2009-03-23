@@ -73,7 +73,7 @@ public class Player
      * TODO similar to {@link #startingTower} this should be set only once but probably
      *      can't be set in the constructor.
      */
-    private Constants.PlayerColor color;
+    private PlayerColor color;
 
     /**
      * The type of player: local human, AI or network.
@@ -185,12 +185,12 @@ public class Player
         return startingTower;
     }
 
-    public void setColor(Constants.PlayerColor color)
+    public void setColor(PlayerColor color)
     {
         this.color = color;
     }
 
-    public Constants.PlayerColor getColor()
+    public PlayerColor getColor()
     {
         return color;
     }

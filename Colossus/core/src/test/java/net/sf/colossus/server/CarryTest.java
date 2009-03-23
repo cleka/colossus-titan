@@ -5,6 +5,8 @@ import java.util.Iterator;
 
 import junit.framework.TestCase;
 import net.sf.colossus.client.HexMap;
+import net.sf.colossus.game.BattlePhase;
+import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
@@ -82,11 +84,11 @@ public class CarryTest extends TestCase
         game.getPlayer("Red").addLegion(attacker);
         game.getPlayer("Blue").addLegion(defender);
 
-        attacker.setEntrySide(Constants.EntrySide.values()[5]);
+        attacker.setEntrySide(EntrySide.values()[5]);
 
         battle = new BattleServerSide(game, attacker, defender,
             BattleServerSide.LegionTags.DEFENDER, hex, 2,
-            Constants.BattlePhase.FIGHT);
+            BattlePhase.FIGHT);
 
         CreatureServerSide centaur1 = attacker.getCritter(0);
         CreatureServerSide centaur2 = attacker.getCritter(1);
@@ -154,11 +156,11 @@ public class CarryTest extends TestCase
         game.getPlayer("Red").addLegion(attacker);
         game.getPlayer("Blue").addLegion(defender);
 
-        attacker.setEntrySide(Constants.EntrySide.values()[5]);
+        attacker.setEntrySide(EntrySide.values()[5]);
 
         battle = new BattleServerSide(game, attacker, defender,
             BattleServerSide.LegionTags.ATTACKER, hex, 3,
-            Constants.BattlePhase.FIGHT);
+            BattlePhase.FIGHT);
 
         CreatureServerSide warlock1 = attacker.getCritter(0);
         CreatureServerSide warlock2 = attacker.getCritter(1);

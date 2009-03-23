@@ -17,11 +17,13 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.game.BattlePhase;
+import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
+import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.IServer;
-import net.sf.colossus.server.Constants.BattlePhase;
 import net.sf.colossus.util.ChildThreadManager;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.Split;
@@ -500,7 +502,7 @@ final class SocketClientThread extends Thread implements IServer
         else if (method.equals(Constants.setColor))
         {
             String colorName = args.remove(0);
-            client.setColor(Constants.PlayerColor.getByName(colorName));
+            client.setColor(PlayerColor.getByName(colorName));
         }
         else if (method.equals(Constants.updateCreatureCount))
         {
@@ -529,7 +531,7 @@ final class SocketClientThread extends Thread implements IServer
             int entrySideId = Integer.parseInt(args.remove(0));
             String lastRecruit = args.remove(0);
             client.setLegionStatus(resolveLegion(markerId), moved, teleported,
-                Constants.EntrySide.fromIntegerId(entrySideId), lastRecruit);
+                EntrySide.fromIntegerId(entrySideId), lastRecruit);
         }
         else if (method.equals(Constants.addCreature))
         {
@@ -709,7 +711,7 @@ final class SocketClientThread extends Thread implements IServer
             String masterHexLabel = args.remove(0);
             int battleTurnNumber = Integer.parseInt(args.remove(0));
             String battleActivePlayerName = args.remove(0);
-            Constants.BattlePhase battlePhase = BattlePhase.values()[Integer
+            BattlePhase battlePhase = BattlePhase.values()[Integer
                 .parseInt(args.remove(0))];
             String attackerMarkerId = args.remove(0);
             String defenderMarkerId = args.remove(0);
@@ -795,7 +797,7 @@ final class SocketClientThread extends Thread implements IServer
         }
         else if (method.equals(Constants.setupBattleFight))
         {
-            Constants.BattlePhase battlePhase = BattlePhase.values()[Integer
+            BattlePhase battlePhase = BattlePhase.values()[Integer
                 .parseInt(args.remove(0))];
             String battleActivePlayerName = args.remove(0);
             client.setupBattleFight(battlePhase, client
@@ -842,7 +844,7 @@ final class SocketClientThread extends Thread implements IServer
             }
             client.didMove(resolveLegion(markerId),
                 resolveHex(startingHexLabel), resolveHex(currentHexLabel),
-                Constants.EntrySide.fromLabel(entrySideLabel), teleport,
+                EntrySide.fromLabel(entrySideLabel), teleport,
                 teleportingLord, splitLegionHasForcedMove);
         }
         else if (method.equals(Constants.undidMove))
@@ -901,10 +903,10 @@ final class SocketClientThread extends Thread implements IServer
         else if (method.equals(Constants.askPickColor))
         {
             List<String> clList = Split.split(Glob.sep, args.remove(0));
-            List<Constants.PlayerColor> colorsLeft = new ArrayList<Constants.PlayerColor>();
+            List<PlayerColor> colorsLeft = new ArrayList<PlayerColor>();
             for (String colorName : clList)
             {
-                colorsLeft.add(Constants.PlayerColor.getByName(colorName));
+                colorsLeft.add(PlayerColor.getByName(colorName));
             }
             client.askPickColor(colorsLeft);
         }
@@ -1228,14 +1230,14 @@ final class SocketClientThread extends Thread implements IServer
     }
 
     public void doMove(Legion legion, MasterHex hex,
-        Constants.EntrySide entrySide, boolean teleport, String teleportingLord)
+        EntrySide entrySide, boolean teleport, String teleportingLord)
     {
         sendToServer(Constants.doMove + sep + legion.getMarkerId() + sep
             + hex.getLabel() + sep + entrySide.getLabel() + sep + teleport
             + sep + teleportingLord);
     }
 
-    public void assignColor(Constants.PlayerColor color)
+    public void assignColor(PlayerColor color)
     {
         sendToServer(Constants.assignColor + sep + color.getName());
     }

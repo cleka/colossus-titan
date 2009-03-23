@@ -22,8 +22,10 @@ import net.sf.colossus.client.CritterMove;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.client.PlayerClientSide;
 import net.sf.colossus.game.Battle;
+import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
+import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.SummonInfo;
 import net.sf.colossus.gui.BattleChit;
 import net.sf.colossus.gui.BattleMap;
@@ -139,10 +141,10 @@ public class SimpleAI extends AbstractAI
         InstanceTracker.register(this, client.getOwningPlayer().getName());
     }
 
-    public Constants.PlayerColor pickColor(List<Constants.PlayerColor> colors,
-        List<Constants.PlayerColor> favoriteColors)
+    public PlayerColor pickColor(List<PlayerColor> colors,
+        List<PlayerColor> favoriteColors)
     {
-        for (Constants.PlayerColor preferredColor : favoriteColors)
+        for (PlayerColor preferredColor : favoriteColors)
         {
             if (colors.contains(preferredColor))
             {
@@ -150,7 +152,7 @@ public class SimpleAI extends AbstractAI
             }
         }
         // Can't have one of our favorites, so take what's there.
-        for (Constants.PlayerColor color : colors)
+        for (PlayerColor color : colors)
         {
             return color;
         }
@@ -1598,21 +1600,21 @@ public class SimpleAI extends AbstractAI
     // This is a really dumb placeholder.  TODO Make it smarter.
     // In particular, the AI should pick a side that will let it enter
     // as many creatures as possible.
-    public Constants.EntrySide pickEntrySide(MasterHex hex, Legion legion,
-        Set<Constants.EntrySide> entrySides)
+    public EntrySide pickEntrySide(MasterHex hex, Legion legion,
+        Set<EntrySide> entrySides)
     {
         // Default to bottom to simplify towers.
-        if (entrySides.contains(Constants.EntrySide.BOTTOM))
+        if (entrySides.contains(EntrySide.BOTTOM))
         {
-            return Constants.EntrySide.BOTTOM;
+            return EntrySide.BOTTOM;
         }
-        if (entrySides.contains(Constants.EntrySide.RIGHT))
+        if (entrySides.contains(EntrySide.RIGHT))
         {
-            return Constants.EntrySide.RIGHT;
+            return EntrySide.RIGHT;
         }
-        if (entrySides.contains(Constants.EntrySide.LEFT))
+        if (entrySides.contains(EntrySide.LEFT))
         {
-            return Constants.EntrySide.LEFT;
+            return EntrySide.LEFT;
         }
         return null;
     }

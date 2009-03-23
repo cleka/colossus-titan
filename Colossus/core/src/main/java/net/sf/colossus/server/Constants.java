@@ -1,9 +1,7 @@
 package net.sf.colossus.server;
 
 
-import java.awt.event.KeyEvent;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -13,114 +11,9 @@ import java.util.List;
  * Class Constants just holds constants.
  * @version $Id$
  * @author David Ripton
- *
- * TODO some of this would probably have a decent place somewhere else, e.g.
- * the Phase and BattlePhase enums could be in the game package.
  */
-
 public final class Constants
 {
-    // TODO this should probably start numbering with zero as does the BattlePhase and
-    // as does any other Java enum -- currently SPLIT is serialized as "1"
-    public static enum Phase
-    {
-        SPLIT("Split"), MOVE("Move"), FIGHT("Fight"), MUSTER("Muster");
-
-        /**
-         * Deserialize enum from integer value.
-         *
-         * @param i The number for the phase.
-         * @return The matching Phase instance.
-         *
-         * @throws ArrayOutOfBoundsException iff the number is not valid.
-         */
-        public static Phase fromInt(int i)
-        {
-            return values()[i - 1];
-        }
-
-        /**
-         * Serialize the object to an integer code.
-         *
-         * Used for savegames.
-         *
-         * @return An integer code representing the phase.
-         */
-        public int toInt()
-        {
-            return ordinal() + 1;
-        }
-
-        /**
-         * Returns a non-localized UI string for the phase.
-         */
-        @Override
-        public String toString()
-        {
-            return name;
-        }
-
-        private final String name;
-
-        private Phase(String name)
-        {
-            this.name = name;
-        }
-    }
-
-    public static enum BattlePhase
-    {
-        SUMMON("Summon", true, false), RECRUIT("Recruit", true, false), MOVE(
-            "Move", true, false), FIGHT("Fight", false, true), STRIKEBACK(
-            "Strikeback", false, true);
-
-        /**
-         * Determine if the phase is part of the fighting.
-         *
-         * @return true iff the phase is either FIGHT or STRIKEBACK.
-         */
-        public boolean isFightPhase()
-        {
-            return isFightPhase;
-        }
-
-        /**
-         * Determine if the phase is part of the fighting.
-         * Right now we consider also SUMMON or RECRUT as move phase
-         * (currently they are own phases; I would like those actions
-         *  to happen as part of the move phase instead, then this here
-         *  can be changed).
-         *
-         * @return true iff the phase is a move phase;
-         *
-         */
-        public boolean isMovePhase()
-        {
-            return isMovePhase;
-        }
-
-        /**
-         * Returns a non-localized UI string for the phase.
-         */
-        @Override
-        public String toString()
-        {
-            return name;
-        }
-
-        private final String name;
-        private final boolean isMovePhase;
-        private final boolean isFightPhase;
-
-        private BattlePhase(String name, boolean isMovePhase,
-            boolean isFightPhase)
-        {
-            this.name = name;
-            this.isMovePhase = isMovePhase;
-            this.isFightPhase = isFightPhase;
-        }
-    }
-
     // Special feature to end the game after one battle is completed,
     // for tuning the AI
     private static String END_AFTER_FIRST_BATTLE_PROPERTY = "net.sf.colossus.endAfterFirstBattle";
@@ -170,7 +63,7 @@ public final class Constants
     {
         NONE, BLOCK, ARCH, ARROW, ARROWS
     }
-
+    // TODO the next three constants should probably be part of the HexsideGates enum
     public static final int ARCHES_AND_ARROWS = -1;
     public static final int ARROWS_ONLY = -2;
     public static final int NOWHERE = -1;
@@ -181,72 +74,6 @@ public final class Constants
     public static final int MAX_HORIZ_SIZE = 60;
     public static final int MAX_VERT_SIZE = 32;
 
-    // TODO the colors themselves should be defined in here
-    public static enum PlayerColor
-    {
-        BLACK("Black", "Bk", KeyEvent.VK_B), BLUE("Blue", "Bu", KeyEvent.VK_L), BROWN(
-            "Brown", "Br", KeyEvent.VK_O), GOLD("Gold", "Gd", KeyEvent.VK_G), GREEN(
-            "Green", "Gr", KeyEvent.VK_E), RED("Red", "Rd", KeyEvent.VK_R), ORANGE(
-            "Orange", "Or", KeyEvent.VK_A), PURPLE("Purple", "Pu",
-            KeyEvent.VK_P), SILVER("Silver", "Si", KeyEvent.VK_S), SKY("Sky",
-            "Sk", KeyEvent.VK_K), PINE("Pine", "Pi", KeyEvent.VK_N), INDIGO(
-            "Indigo", "In", KeyEvent.VK_I);
-
-        private final String name;
-        private final String shortName;
-        private final int mnemonic;
-
-        private PlayerColor(String name, String shortName, int mnemonic)
-        {
-            this.name = name;
-            this.shortName = shortName;
-            this.mnemonic = mnemonic;
-        }
-
-        public int getMnemonic()
-        {
-            return mnemonic;
-        }
-
-        public String getName()
-        {
-            return name;
-        }
-
-        public String getShortName()
-        {
-            return shortName;
-        }
-
-        public static PlayerColor getByName(String name)
-        {
-            for (PlayerColor color : values())
-            {
-                if (color.getName().equals(name))
-                {
-                    return color;
-                }
-            }
-            return null; // seems to happen when game starts
-        }
-
-        public static List<PlayerColor> getByName(List<String> names)
-        {
-            List<PlayerColor> retVal = new ArrayList<PlayerColor>();
-            for (String name : names)
-            {
-                retVal.add(getByName(name));
-            }
-            return retVal;
-        }
-
-        @Override
-        public String toString()
-        {
-            return getName(); // important as long as some code might still expect the old strings
-        }
-    }
-
     public static final int MIN_AI_DELAY = 0; //in ms
     public static final int MAX_AI_DELAY = 3000;
     public static final int DEFAULT_AI_DELAY = 300;
@@ -254,93 +81,6 @@ public final class Constants
     public static final int MIN_AI_TIME_LIMIT = 1; //in s
     public static final int MAX_AI_TIME_LIMIT = 200;
     public static final int DEFAULT_AI_TIME_LIMIT = 30;
-
-    /**
-     * The entry side for a battle.
-     */
-    public static enum EntrySide
-    {
-        TOP_DEFENSE("Top defense"), RIGHT("Right"), RIGHT_DEFENSE(
-            "Right defense"), BOTTOM("Bottom"), LEFT_DEFENSE("Left defense"), LEFT(
-            "Left"), NOT_SET("Not set");
-
-        private final String label;
-
-        private EntrySide(String label)
-        {
-            this.label = label;
-        }
-
-        public String getLabel()
-        {
-            return label;
-        }
-
-        public int getId()
-        {
-            // TODO: inline
-            return ordinal();
-        }
-
-        public boolean isAttackerSide()
-        {
-            return ordinal() % 2 == 1;
-        }
-
-        public EntrySide getOpposingSide()
-        {
-            return values()[(ordinal() + 3) % 6];
-        }
-
-        public static EntrySide fromLabel(String label)
-        {
-            for (EntrySide entrySide : values())
-            {
-                // the old code relied on the side being one of the attacker sides,
-                // so we keep the restriction
-                if (entrySide.isAttackerSide()
-                    && entrySide.getLabel().equals(label))
-                {
-                    return entrySide;
-                }
-            }
-            throw new IllegalArgumentException(
-                "No attacker entry side with label '" + label + "'");
-        }
-
-        public static EntrySide fromIntegerId(int id)
-        {
-            for (EntrySide entrySide : values())
-            {
-                // the old code relied on the side being one of the attacker sides,
-                // so we keep the restriction
-                // Clemens: I didn't find anything which restricts the entry sides
-                // to be attackers only. Defender is set and stored also, and never
-                // re-set/cleared, so there will be defender sides remaining.
-                //  ==> letting everything trough as long as it is a valid value,
-                // including NOT_SET.
-                if (entrySide.getId() == id)
-                {
-                    return entrySide;
-                    /*                    
-                    if (entrySide.isAttackerSide())
-                    {
-                        return entrySide;
-                    }
-                    else if (entrySide == EntrySide.NOT_SET)
-                    {
-                        return entrySide;
-                    }
-                    else
-                    {
-                        return entrySide;
-                    }
-                    */
-                }
-            }
-            throw new IllegalArgumentException("No entry side with id " + id);
-        }
-    }
 
     /** all variants are subdirectories of this dir.
      /*  the default dir name can is not prepended by this. */

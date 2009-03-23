@@ -58,7 +58,9 @@ import javax.swing.SwingUtilities;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.game.Legion;
+import net.sf.colossus.game.Phase;
 import net.sf.colossus.game.Player;
+import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.XMLSnapshotFilter;
 import net.sf.colossus.util.ArrayHelper;
@@ -394,26 +396,26 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                Constants.Phase phase = client.getPhase();
-                if (phase == Constants.Phase.SPLIT)
+                Phase phase = client.getPhase();
+                if (phase == Phase.SPLIT)
                 {
                     gui.undoLastSplit();
                     alignAllLegions();
                     highlightTallLegions();
                     repaint();
                 }
-                else if (phase == Constants.Phase.MOVE)
+                else if (phase == Phase.MOVE)
                 {
                     clearRecruitedChits();
                     clearPossibleRecruitChits();
                     gui.undoLastMove();
                     highlightUnmovedLegions();
                 }
-                else if (phase == Constants.Phase.FIGHT)
+                else if (phase == Phase.FIGHT)
                 {
                     LOGGER.log(Level.SEVERE, "called undoLastAction in FIGHT");
                 }
-                else if (phase == Constants.Phase.MUSTER)
+                else if (phase == Phase.MUSTER)
                 {
                     gui.undoLastRecruit();
                     highlightPossibleRecruitLegionHexes();
@@ -429,24 +431,24 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                Constants.Phase phase = client.getPhase();
-                if (phase == Constants.Phase.SPLIT)
+                Phase phase = client.getPhase();
+                if (phase == Phase.SPLIT)
                 {
                     gui.undoAllSplits();
                     alignAllLegions();
                     highlightTallLegions();
                     repaint();
                 }
-                else if (phase == Constants.Phase.MOVE)
+                else if (phase == Phase.MOVE)
                 {
                     gui.undoAllMoves();
                     highlightUnmovedLegions();
                 }
-                else if (phase == Constants.Phase.FIGHT)
+                else if (phase == Phase.FIGHT)
                 {
                     LOGGER.log(Level.SEVERE, "called undoAllAction in FIGHT");
                 }
-                else if (phase == Constants.Phase.MUSTER)
+                else if (phase == Phase.MUSTER)
                 {
                     gui.undoAllRecruits();
                     highlightPossibleRecruitLegionHexes();
@@ -990,7 +992,7 @@ public final class MasterBoard extends JPanel
         }
         bottomBar.setPlayerName(playerName);
 
-        Constants.PlayerColor clientColor = client.getColor();
+        PlayerColor clientColor = client.getColor();
         // If we call this before player colors are chosen, just use
         // the defaults.
         if (clientColor != null)
@@ -1690,22 +1692,22 @@ public final class MasterBoard extends JPanel
 
     void actOnMisclick()
     {
-        Constants.Phase phase = client.getPhase();
-        if (phase == Constants.Phase.SPLIT)
+        Phase phase = client.getPhase();
+        if (phase == Phase.SPLIT)
         {
             highlightTallLegions();
         }
-        else if (phase == Constants.Phase.MOVE)
+        else if (phase == Phase.MOVE)
         {
             clearPossibleRecruitChits();
             client.setMover(null);
             highlightUnmovedLegions();
         }
-        else if (phase == Constants.Phase.FIGHT)
+        else if (phase == Phase.FIGHT)
         {
             highlightEngagements();
         }
-        else if (phase == Constants.Phase.MUSTER)
+        else if (phase == Phase.MUSTER)
         {
             highlightPossibleRecruitLegionHexes();
         }
@@ -1823,12 +1825,12 @@ public final class MasterBoard extends JPanel
             return;
         }
 
-        Constants.Phase phase = client.getPhase();
-        if (phase == Constants.Phase.SPLIT)
+        Phase phase = client.getPhase();
+        if (phase == Phase.SPLIT)
         {
             client.doSplit(legion);
         }
-        else if (phase == Constants.Phase.MOVE)
+        else if (phase == Phase.MOVE)
         {
             // Allow spin cycle by clicking on chit again.
             if (legion.equals(client.getMover()))
@@ -1842,11 +1844,11 @@ public final class MasterBoard extends JPanel
                 highlightMoves(legion);
             }
         }
-        else if (phase == Constants.Phase.FIGHT)
+        else if (phase == Phase.FIGHT)
         {
             client.doFight(hex);
         }
-        else if (phase == Constants.Phase.MUSTER)
+        else if (phase == Phase.MUSTER)
         {
             client.doRecruit(legion);
         }
@@ -1854,12 +1856,12 @@ public final class MasterBoard extends JPanel
 
     private void actOnHex(MasterHex hex)
     {
-        Constants.Phase phase = client.getPhase();
-        if (phase == Constants.Phase.SPLIT)
+        Phase phase = client.getPhase();
+        if (phase == Phase.SPLIT)
         {
             highlightTallLegions();
         }
-        else if (phase == Constants.Phase.MOVE)
+        else if (phase == Phase.MOVE)
         {
             // If we're moving, and have selected a legion which
             // has not yet moved, and this hex is a legal
@@ -1869,7 +1871,7 @@ public final class MasterBoard extends JPanel
             client.doMove(hex);
             actOnMisclick(); // Yes, even if the move was good.
         }
-        else if (phase == Constants.Phase.FIGHT)
+        else if (phase == Phase.FIGHT)
         {
             // If we're fighting and there is an engagement here,
             // resolve it.  If an angel is being summoned, mark

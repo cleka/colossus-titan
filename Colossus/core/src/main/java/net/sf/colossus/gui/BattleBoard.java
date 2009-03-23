@@ -39,7 +39,9 @@ import javax.swing.WindowConstants;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.HexMap;
+import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.Legion;
+import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.LegionServerSide;
 import net.sf.colossus.util.KFrame;
@@ -214,7 +216,7 @@ public final class BattleBoard extends KFrame
         infoPanel = new InfoPanel();
         contentPane.add(infoPanel, BorderLayout.NORTH);
 
-        Constants.PlayerColor color = client.getColor();
+        PlayerColor color = client.getColor();
         if (color != null)
         {
             Color bgColor = PickColor.getBackgroundColor(color);
@@ -348,7 +350,7 @@ public final class BattleBoard extends KFrame
                 {
                     return;
                 }
-                if (client.getBattlePhase() == Constants.BattlePhase.MOVE)
+                if (client.getBattlePhase() == BattlePhase.MOVE)
                 {
                     selectedCritterTag = -1;
                     getGUI().undoLastBattleMove();
@@ -366,7 +368,7 @@ public final class BattleBoard extends KFrame
                 {
                     return;
                 }
-                if (client.getBattlePhase() == Constants.BattlePhase.MOVE)
+                if (client.getBattlePhase() == BattlePhase.MOVE)
                 {
                     selectedCritterTag = -1;
                     getGUI().undoAllBattleMoves();
@@ -385,8 +387,8 @@ public final class BattleBoard extends KFrame
                     return;
                 }
 
-                Constants.BattlePhase phase = client.getBattlePhase();
-                if (phase == Constants.BattlePhase.MOVE)
+                BattlePhase phase = client.getBattlePhase();
+                if (phase == BattlePhase.MOVE)
                 {
                     if (!client.getOptions().getOption(Options.autoPlay)
                         && client.anyOffboardCreatures()
@@ -536,7 +538,7 @@ public final class BattleBoard extends KFrame
         }
     }
 
-    public void setPhase(Constants.BattlePhase newBattlePhase)
+    public void setPhase(BattlePhase newBattlePhase)
     {
         if (client.getOwningPlayer().equals(client.getBattleActivePlayer()))
         {
@@ -728,8 +730,8 @@ public final class BattleBoard extends KFrame
 
         // XXX Put selected chit at the top of the z-order.
         // Then getGUIHexByLabel(hexLabel).repaint();
-        Constants.BattlePhase phase = client.getBattlePhase();
-        if (phase == Constants.BattlePhase.MOVE)
+        BattlePhase phase = client.getBattlePhase();
+        if (phase == BattlePhase.MOVE)
         {
             highlightMoves(tag);
         }
@@ -742,8 +744,8 @@ public final class BattleBoard extends KFrame
 
     private void actOnHex(String hexLabel)
     {
-        Constants.BattlePhase phase = client.getBattlePhase();
-        if (phase == Constants.BattlePhase.MOVE)
+        BattlePhase phase = client.getBattlePhase();
+        if (phase == BattlePhase.MOVE)
         {
             if (selectedCritterTag != -1)
             {
@@ -764,8 +766,8 @@ public final class BattleBoard extends KFrame
 
     private void actOnMisclick()
     {
-        Constants.BattlePhase phase = client.getBattlePhase();
-        if (phase == Constants.BattlePhase.MOVE)
+        BattlePhase phase = client.getBattlePhase();
+        if (phase == BattlePhase.MOVE)
         {
             selectedCritterTag = -1;
             highlightMobileCritters();
