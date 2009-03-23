@@ -181,10 +181,6 @@ public final class Constants
     public static final int MAX_HORIZ_SIZE = 60;
     public static final int MAX_VERT_SIZE = 32;
 
-    /* the three arrays below must match ; see also
-     net.sf.colossus.server.Legion, it uses the
-     shortened name directly */
-
     // TODO the colors themselves should be defined in here
     public static enum PlayerColor
     {
@@ -316,7 +312,7 @@ public final class Constants
         {
             for (EntrySide entrySide : values())
             {
-                // the old code relied on the side being one of the attacker sides, 
+                // the old code relied on the side being one of the attacker sides,
                 // so we keep the restriction
                 // Clemens: I didn't find anything which restricts the entry sides
                 // to be attackers only. Defender is set and stored also, and never
@@ -353,7 +349,6 @@ public final class Constants
     /** Default directory for datafiles, can be outside variants,
      * but should be there.
      */
-    //public static final String defaultDirName = "variants/Default";
     public static final String defaultDirName = "Default";
     public static final String defaultVarName = "Default";
 
@@ -452,7 +447,7 @@ public final class Constants
     public static final String runWebClient = "Run web client";
 
     // Used as prompt, and as the string for "strike penalty" send to server
-    // for cancelling the strike.
+    // for canceling the strike.
     public static final String cancelStrike = "Cancel";
 
     /** Available internal variants  Try to keep this list mostly
