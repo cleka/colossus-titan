@@ -468,8 +468,8 @@ public final class GameServerSide extends Game
 
     private void assignColors()
     {
-        List<PlayerColor> cli = new ArrayList<PlayerColor>(
-            Arrays.asList(PlayerColor.values()));
+        List<PlayerColor> cli = new ArrayList<PlayerColor>(Arrays
+            .asList(PlayerColor.values()));
 
         colorsLeft = new ArrayList<PlayerColor>();
 
@@ -848,6 +848,8 @@ public final class GameServerSide extends Game
     /**
      * Returns the number of real players (Human or Network)
      * which are still alive.
+     * 
+     * TODO compare on client side "onlyAIsRemain()" and pull up
      */
     int getNumHumansRemaining()
     {
@@ -1643,8 +1645,7 @@ public final class GameServerSide extends Game
             activePlayerNum = Integer.parseInt(el.getTextTrim());
 
             el = root.getChild("CurrentPhase");
-            phase = Phase
-                .fromInt(Integer.parseInt(el.getTextTrim()));
+            phase = Phase.fromInt(Integer.parseInt(el.getTextTrim()));
 
             Element ct = root.getChild("Caretaker");
             List<Element> kids = ct.getChildren();
@@ -1834,8 +1835,8 @@ public final class GameServerSide extends Game
         MasterHex startingHex = getVariant().getMasterBoard().getHexByLabel(
             startingHexLabel);
         boolean moved = leg.getAttribute("moved").getBooleanValue();
-        EntrySide entrySide = EntrySide.fromIntegerId(leg
-            .getAttribute("entrySide").getIntValue());
+        EntrySide entrySide = EntrySide.fromIntegerId(leg.getAttribute(
+            "entrySide").getIntValue());
         String parentId = leg.getAttribute("parent").getValue();
         if (parentId.equals("null"))
         {
@@ -2522,8 +2523,8 @@ public final class GameServerSide extends Game
     /** Return a Set of Strings "Left" "Right" or "Bottom" describing
      *  possible entry sides.  If the hex is unoccupied, just return
      *  one entry side since it doesn't matter. */
-    Set<EntrySide> listPossibleEntrySides(Legion legion,
-        MasterHex targetHex, boolean teleport)
+    Set<EntrySide> listPossibleEntrySides(Legion legion, MasterHex targetHex,
+        boolean teleport)
     {
         Set<EntrySide> entrySides = new HashSet<EntrySide>();
         Player player = legion.getPlayer();
@@ -2940,8 +2941,8 @@ public final class GameServerSide extends Game
         }
 
         // Verify that the entry side is legal.
-        Set<EntrySide> legalSides = listPossibleEntrySides(legion,
-            hex, teleport);
+        Set<EntrySide> legalSides = listPossibleEntrySides(legion, hex,
+            teleport);
         if (!legalSides.contains(entrySide))
         {
             return "EntrySide '" + entrySide + "' is not valid, valid are: "
@@ -3165,8 +3166,7 @@ public final class GameServerSide extends Game
                 Constants.reasonBattleStarts);
 
             battle = new BattleServerSide(this, attacker, defender,
-                BattleServerSide.LegionTags.DEFENDER, hex, 1,
-                BattlePhase.MOVE);
+                BattleServerSide.LegionTags.DEFENDER, hex, 1, BattlePhase.MOVE);
             battle.init();
         }
     }

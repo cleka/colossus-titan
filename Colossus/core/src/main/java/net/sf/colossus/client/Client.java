@@ -2033,6 +2033,8 @@ public final class Client implements IClient, IOracle
         kickSplit();
     }
 
+    // TODO compare with GameServerSide.getNumHumansRemaining()
+    // and pull up
     public boolean onlyAIsRemain()
     {
         for (Player p : players)
