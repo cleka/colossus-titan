@@ -13,6 +13,7 @@ import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
+import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.SummonInfo;
 import net.sf.colossus.variant.MasterHex;
@@ -21,8 +22,6 @@ import net.sf.colossus.webclient.WebClient;
 
 public interface IClientGUI
 {
-
-    public abstract void setupClientGUI();
 
     public abstract void setStartedByWebClient(boolean byWebClient);
 
@@ -220,9 +219,6 @@ public interface IClientGUI
 
     public abstract void tellWhatsHappening(String message);
 
-    public abstract void turnOrPlayerChange(Client client, int turnNumber,
-        int playerNr);
-
     public abstract void tellMovementRoll(int roll);
 
     /* pass revealed info to EventViewer and
@@ -281,10 +277,9 @@ public interface IClientGUI
 
     public abstract void cleanupNegotiationDialogs();
 
-    public abstract void actOnSetupSplit(Client client, int turnNr,
-        int playerNr);
+    public abstract void actOnTurnOrPlayerChange(Client c, int turnNr, Player p);
 
-    public abstract void actOnSetupSplitPart2();
+    public abstract void actOnSetupSplit();
 
     public abstract void actOnSetupMuster();
 
@@ -292,8 +287,8 @@ public interface IClientGUI
 
     public abstract void actOnSetupFight();
 
-    public abstract void actOnSetupBattleFight(
-        BattlePhase battlePhase, int battleTurnNumber);
+    public abstract void actOnSetupBattleFight(BattlePhase battlePhase,
+        int battleTurnNumber);
 
     public abstract void actOnSetupBattleMove();
 

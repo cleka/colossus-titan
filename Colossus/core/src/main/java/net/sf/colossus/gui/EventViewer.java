@@ -42,6 +42,7 @@ import net.sf.colossus.client.IOptions;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.client.PlayerClientSide;
 import net.sf.colossus.game.Legion;
+import net.sf.colossus.game.Player;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Options;
@@ -677,8 +678,10 @@ final class EventViewer extends KDialog implements WindowListener,
     }
 
     // Now come the methods with which Client can add/modify event data:
-    public void turnOrPlayerChange(Client client, int turnNr, int playerNr)
+    public void turnOrPlayerChange(Client client, int turnNr, Player player)
     {
+        int playerNr = player.getNumber();
+
         setMulliganOldRoll(-2);
         if (turnNr != this.turnNr)
         {

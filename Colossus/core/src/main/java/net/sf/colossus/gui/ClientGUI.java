@@ -740,7 +740,7 @@ public class ClientGUI implements IClientGUI
     {
         if (board != null)
         {
-            if (client.isMyTurn())
+            if (isMyTurn())
             {
                 focusBoard();
             }
@@ -1087,7 +1087,7 @@ public class ClientGUI implements IClientGUI
      */
     public void actOnDidSplitPart2(MasterHex hex)
     {
-        if (client.getTurnNumber() == 1 && board != null && client.isMyTurn())
+        if (client.getTurnNumber() == 1 && board != null && isMyTurn())
         {
             board.enableDoneAction();
         }
@@ -1309,7 +1309,7 @@ public class ClientGUI implements IClientGUI
             board.alignLegions(currentHex);
             board.highlightUnmovedLegions();
             board.repaint();
-            if (client.isMyTurn())
+            if (isMyTurn())
             {
                 if (isUndoStackEmpty())
                 {
@@ -1979,17 +1979,6 @@ public class ClientGUI implements IClientGUI
     }
 
     /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#turnOrPlayerChange(net.sf.colossus.client.Client, int, int)
-     */
-    public void turnOrPlayerChange(Client client, int turnNumber, int playerNr)
-    {
-        if (eventViewer != null)
-        {
-            eventViewer.turnOrPlayerChange(client, turnNumber, playerNr);
-        }
-    }
-
-    /* (non-Javadoc)
      * @see net.sf.colossus.gui.IClientGUI#tellMovementRoll(int)
      */
     public void tellMovementRoll(int roll)
@@ -2241,8 +2230,7 @@ public class ClientGUI implements IClientGUI
     /* (non-Javadoc)
      * @see net.sf.colossus.gui.IClientGUI#doPickEntrySide(net.sf.colossus.variant.MasterHex, java.util.Set)
      */
-    public EntrySide doPickEntrySide(MasterHex hex,
-        Set<EntrySide> entrySides)
+    public EntrySide doPickEntrySide(MasterHex hex, Set<EntrySide> entrySides)
     {
         return PickEntrySide.pickEntrySide(board.getFrame(), hex, entrySides);
     }
@@ -2297,27 +2285,29 @@ public class ClientGUI implements IClientGUI
     }
 
     /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#actOnSetupSplit(net.sf.colossus.client.Client, int, int)
+     * @see net.sf.colossus.gui.IClientGUI#actOnTurnOrPlayerChange(net.sf.colossus.client.Client, int, int)
      */
-    public void actOnSetupSplit(Client client, int turnNr, int playerNr)
+    public void actOnTurnOrPlayerChange(Client client, int turnNr,
+        Player player)
     {
         clearUndoStack();
         cleanupNegotiationDialogs();
 
         if (eventViewer != null)
         {
-            eventViewer.turnOrPlayerChange(client, turnNr, playerNr);
+            eventViewer.turnOrPlayerChange(client, turnNr, player);
         }
     }
 
     /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#actOnSetupSplitPart2()
+     * @see net.sf.colossus.gui.IClientGUI#actOnSetupSplit()
      */
-    public void actOnSetupSplitPart2()
+    public void actOnSetupSplit()
     {
         if (board != null)
         {
-            if (client.isMyTurn())
+            // TODO probably this can be removed?
+            if (isMyTurn())
             {
                 // for debug purposes. We had a bug where legions remain
                 // on the board even if player is dead. So, let's check
@@ -2328,7 +2318,7 @@ public class ClientGUI implements IClientGUI
             disposeMovementDie();
             board.setupSplitMenu();
             board.fullRepaint(); // Ensure that movement die goes away
-            if (client.isMyTurn())
+            if (isMyTurn())
             {
                 if (client.getTurnNumber() == 1)
                 {
@@ -2336,9 +2326,17 @@ public class ClientGUI implements IClientGUI
                 }
                 focusBoard();
                 defaultCursor();
-                if (!options.getOption(Options.autoSplit)
-                    && (getOwningPlayer().getMarkersAvailable().size() < 1 || client
-                        .findTallLegionHexes(4).isEmpty()))
+
+                // TODO I believe the code below is meant for the purpose:
+                // "If no legions can be split, directly be done with Split
+                //  phase, except if that is the result of the autoSplit"
+                //  - so that one can review and undo.
+                // But that does not make so much sense, as this is in the 
+                // "setupSplit" call, so the AI can't have done anything yet?
+
+                if ((getOwningPlayer().getMarkersAvailable().size() < 1 || client
+                    .findTallLegionHexes(4).isEmpty())
+                    && !options.getOption(Options.autoSplit))
                 {
                     client.doneWithSplits();
                 }
@@ -2390,7 +2388,7 @@ public class ClientGUI implements IClientGUI
         if (board != null)
         {
             board.setupMusterMenu();
-            if (client.isMyTurn())
+            if (isMyTurn())
             {
                 focusBoard();
                 defaultCursor();
@@ -2413,8 +2411,10 @@ public class ClientGUI implements IClientGUI
         if (board != null)
         {
             board.setupMoveMenu();
+            // Force showing the updated movement die.
+            board.repaint();
         }
-        if (client.isMyTurn())
+        if (isMyTurn())
         {
             defaultCursor();
         }
@@ -2653,7 +2653,7 @@ public class ClientGUI implements IClientGUI
     public void informSplitRequiredFirstRound()
     {
         // must split in first turn - Done not allowed now
-        if (board != null && client.isMyTurn())
+        if (board != null && isMyTurn())
         {
             board.disableDoneAction("Split required in first round");
         }
@@ -3031,6 +3031,16 @@ public class ClientGUI implements IClientGUI
     public Player getOwningPlayer()
     {
         return client.getOwningPlayer();
+    }
+
+    public String getOwningPlayerName()
+    {
+        return getOwningPlayer().getName();
+    }
+
+    public boolean isMyTurn()
+    {
+        return client.isMyTurn();
     }
 
     // Called e.g. by SummonAngel

@@ -12,6 +12,7 @@ import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
+import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.SummonInfo;
 import net.sf.colossus.variant.MasterHex;
@@ -177,13 +178,13 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public void actOnSetupSplit(Client client, int turnNr, int playerNr)
+    public void actOnTurnOrPlayerChange(Client client, int turnNr, Player p)
     {
         // TODO Auto-generated method stub
 
     }
 
-    public void actOnSetupSplitPart2()
+    public void actOnSetupSplit()
     {
         // TODO Auto-generated method stub
 
@@ -354,8 +355,7 @@ public class NullClientGUI implements IClientGUI
         return null;
     }
 
-    public EntrySide doPickEntrySide(MasterHex hex,
-        Set<EntrySide> entrySides)
+    public EntrySide doPickEntrySide(MasterHex hex, Set<EntrySide> entrySides)
     {
         // TODO Auto-generated method stub
         return null;
@@ -677,12 +677,6 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public void setupClientGUI()
-    {
-        // TODO Auto-generated method stub
-
-    }
-
     public void setupGUIOptionListeners()
     {
         // TODO Auto-generated method stub
@@ -774,12 +768,6 @@ public class NullClientGUI implements IClientGUI
     }
 
     public void timeoutAbortsConnectionCheck()
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void turnOrPlayerChange(Client client, int turnNumber, int playerNr)
     {
         // TODO Auto-generated method stub
 

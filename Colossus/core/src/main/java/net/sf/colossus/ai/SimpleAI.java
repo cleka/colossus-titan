@@ -739,8 +739,11 @@ public class SimpleAI extends AbstractAI
         return splitoffs;
     }
 
-    /** Return true if we need to run this method again after the server
-     *  updates the client with the results of a move or mulligan. */
+    /** Do a masterboard move (or consider taking mulligan, if feasible).
+     * 
+     *  Returns true if we need to run this method again after the server
+     *  updates the client with the results of a move or mulligan.
+     */
     public boolean masterMove()
     {
         boolean moved = false;
@@ -792,7 +795,11 @@ public class SimpleAI extends AbstractAI
         return false;
     }
 
-    /** Return true if AI took a mulligan. */
+    /**
+     * Take a mulligan if roll is 2 or 5 in first turn, and can still take 
+     * a mulligan.
+     * Returns true if AI took a mulligan, false otherwise.
+     */
     boolean handleMulligans(Player player)
     {
         // TODO: This is really stupid.  Do something smart here.

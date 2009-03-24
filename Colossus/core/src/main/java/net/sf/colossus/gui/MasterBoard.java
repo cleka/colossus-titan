@@ -167,12 +167,10 @@ public final class MasterBoard extends JPanel
     private AbstractAction checkConnectionAction;
 
     private AbstractAction clearRecruitChitsAction;
-
     private AbstractAction undoLastAction;
     private AbstractAction undoAllAction;
     private AbstractAction doneWithPhaseAction;
     private AbstractAction forcedDoneWithPhaseAction;
-
     private AbstractAction takeMulliganAction;
     private AbstractAction withdrawFromGameAction;
 
@@ -208,7 +206,7 @@ public final class MasterBoard extends JPanel
         {
             super();
             this.clientRef = new WeakReference<Client>(client);
-            net.sf.colossus.webcommon.InstanceTracker.register(this, client
+            net.sf.colossus.webcommon.InstanceTracker.register(this, gui
                 .getOwningPlayer().getName());
         }
 
@@ -313,15 +311,15 @@ public final class MasterBoard extends JPanel
         this.client = client;
         this.gui = gui;
 
-        net.sf.colossus.webcommon.InstanceTracker.register(this, client
-            .getOwningPlayer().getName());
+        net.sf.colossus.webcommon.InstanceTracker.register(this, gui
+            .getOwningPlayerName());
 
-        String pname = client.getOwningPlayer().getName();
-        if (pname == null)
+        String playerName = gui.getOwningPlayerName();
+        if (playerName == null)
         {
-            pname = "unknown";
+            playerName = "unknown";
         }
-        masterFrame = new KFrame("MasterBoard " + pname);
+        masterFrame = new KFrame("MasterBoard " + playerName);
         masterFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         contentPane = masterFrame.getContentPane();
         contentPane.setLayout(new BorderLayout());
@@ -900,10 +898,43 @@ public final class MasterBoard extends JPanel
         mi = fileMenu.add(quitGameAction);
         mi.setMnemonic(KeyEvent.VK_Q);
 
-        // Phase menu items change by phase and will be set up later.
+        // Phase menu 
+
         phaseMenu = new JMenu("Phase");
         phaseMenu.setMnemonic(KeyEvent.VK_P);
         menuBar.add(phaseMenu);
+
+        mi = phaseMenu.add(clearRecruitChitsAction);
+        mi.setMnemonic(KeyEvent.VK_C);
+        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0));
+
+        phaseMenu.addSeparator();
+
+        mi = phaseMenu.add(undoLastAction);
+        mi.setMnemonic(KeyEvent.VK_U);
+        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0));
+
+        mi = phaseMenu.add(undoAllAction);
+        mi.setMnemonic(KeyEvent.VK_A);
+        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0));
+
+        mi = phaseMenu.add(doneWithPhaseAction);
+        mi.setMnemonic(KeyEvent.VK_D);
+        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
+
+        mi = phaseMenu.add(forcedDoneWithPhaseAction);
+        mi.setMnemonic(KeyEvent.VK_F);
+
+        phaseMenu.addSeparator();
+
+        mi = phaseMenu.add(takeMulliganAction);
+        mi.setMnemonic(KeyEvent.VK_M);
+        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, 0));
+
+        phaseMenu.addSeparator();
+
+        mi = phaseMenu.add(withdrawFromGameAction);
+        mi.setMnemonic(KeyEvent.VK_W);
 
         // Window menu: menu for the "window-related"
         // (satellite windows and graphic actions effecting whole "windows"),
@@ -979,7 +1010,7 @@ public final class MasterBoard extends JPanel
         {
             return;
         }
-        String playerName = client.getOwningPlayer().getName();
+        String playerName = gui.getOwningPlayerName();
         cachedPlayerName = playerName;
         if (bottomBar == null)
         {
@@ -1058,229 +1089,121 @@ public final class MasterBoard extends JPanel
         }
     }
 
-    void setupSplitMenu()
+    private void setupPhasePreparations(String titleText)
     {
         unselectAllHexes();
-        reqFocus();
+        setTitleInfoText(titleText);
+    }
 
-        Player activePlayer = client.getActivePlayer();
+    /**
+     * Do the setup needed for an inactive player:
+     * set the actions which are allowed only for active player to inactive,
+     * and update the bottomBar info why "Done" is disabled accordingly
+     *  
+     * @param text What the active player is doing right now
+     */
+    private void setupAsInactivePlayer(String text)
+    {
+        undoLastAction.setEnabled(false);
+        undoAllAction.setEnabled(false);
+        forcedDoneWithPhaseAction.setEnabled(false);
+        takeMulliganAction.setEnabled(false);
+        disableDoneActionActivePlayerDoes(text);
+    }
 
-        masterFrame.setTitle(activePlayer.getName() + " Turn "
-            + client.getTurnNumber() + " : Split stacks");
+    void setupSplitMenu()
+    {
+        setupPhasePreparations("Split stacks");
 
-        phaseMenu.removeAll();
-
-        if (client.getOwningPlayer().equals(activePlayer))
+        if (gui.isMyTurn())
         {
-            bottomBar.setPhase("Split stacks");
+            undoLastAction.setEnabled(true);
+            undoAllAction.setEnabled(true);
+            forcedDoneWithPhaseAction.setEnabled(true);
+            takeMulliganAction.setEnabled(false);
             enableDoneAction();
 
-            JMenuItem mi;
-
-            mi = phaseMenu.add(clearRecruitChitsAction);
-            mi.setMnemonic(KeyEvent.VK_C);
-            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0));
-
-            phaseMenu.addSeparator();
-
-            mi = phaseMenu.add(undoLastAction);
-            mi.setMnemonic(KeyEvent.VK_U);
-            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0));
-
-            mi = phaseMenu.add(undoAllAction);
-            mi.setMnemonic(KeyEvent.VK_A);
-            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0));
-
-            mi = phaseMenu.add(doneWithPhaseAction);
-            mi.setMnemonic(KeyEvent.VK_D);
-            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
-
-            mi = phaseMenu.add(forcedDoneWithPhaseAction);
-            mi.setMnemonic(KeyEvent.VK_F);
-            // mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
-
-            phaseMenu.addSeparator();
-
-            mi = phaseMenu.add(withdrawFromGameAction);
-            mi.setMnemonic(KeyEvent.VK_W);
-
+            bottomBar.setPhase("Split stacks");
             highlightTallLegions();
+            requestFocus();
         }
         else
         {
-            bottomBar.setPhase("");
-            disableDoneAction(activePlayer.getName() + " splits");
+            setupAsInactivePlayer("splits");
         }
     }
 
     void setupMoveMenu()
     {
-        unselectAllHexes();
-        reqFocus();
+        setupPhasePreparations("Movement Roll: " + client.getMovementRoll());
 
-        Player activePlayer = client.getActivePlayer();
-        String activePlayerName = activePlayer.getName();
-        masterFrame.setTitle(activePlayerName + " Turn "
-            + client.getTurnNumber() + " : Movement Roll: "
-            + client.getMovementRoll());
-
-        phaseMenu.removeAll();
-
-        if (client.getOwningPlayer().equals(activePlayer))
+        if (gui.isMyTurn())
         {
-            bottomBar.setPhase("Movement");
-
-            JMenuItem mi;
-
-            mi = phaseMenu.add(clearRecruitChitsAction);
-            mi.setMnemonic(KeyEvent.VK_C);
-            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0));
-
-            phaseMenu.addSeparator();
-
-            mi = phaseMenu.add(undoLastAction);
-            mi.setMnemonic(KeyEvent.VK_U);
-            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0));
-
-            mi = phaseMenu.add(undoAllAction);
-            mi.setMnemonic(KeyEvent.VK_A);
-            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0));
-
-            mi = phaseMenu.add(doneWithPhaseAction);
-            mi.setMnemonic(KeyEvent.VK_D);
-            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
-
-            mi = phaseMenu.add(forcedDoneWithPhaseAction);
-            mi.setMnemonic(KeyEvent.VK_F);
-            // mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
-
-            if (client.getMulligansLeft() > 0)
-            {
-                phaseMenu.addSeparator();
-                mi = phaseMenu.add(takeMulliganAction);
-                mi.setMnemonic(KeyEvent.VK_M);
-                mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, 0));
-            }
-
-            phaseMenu.addSeparator();
-
-            mi = phaseMenu.add(withdrawFromGameAction);
-            mi.setMnemonic(KeyEvent.VK_W);
-
-            highlightUnmovedLegions();
-
+            undoLastAction.setEnabled(true);
+            undoAllAction.setEnabled(true);
+            forcedDoneWithPhaseAction.setEnabled(true);
+            takeMulliganAction.setEnabled(client.getMulligansLeft() > 0 ? true
+                : false);
             disableDoneAction("At least one legion must move");
+
+            bottomBar.setPhase("Movement");
+            highlightUnmovedLegions();
+            reqFocus();
         }
         else
         {
-            bottomBar.setPhase("");
-            disableDoneAction(activePlayerName + " moves");
+            setupAsInactivePlayer("moves");
         }
-
-        // Force showing the updated movement die.
-        repaint();
     }
 
     void setupFightMenu()
     {
-        unselectAllHexes();
-        reqFocus();
+        setupPhasePreparations("Resolve Engagements");
 
-        Player activePlayer = client.getActivePlayer();
-        String activePlayerName = activePlayer.getName();
-
-        masterFrame.setTitle(activePlayerName + " Turn "
-            + client.getTurnNumber() + " : Resolve Engagements ");
-
-        phaseMenu.removeAll();
-
-        if (client.getOwningPlayer().equals(activePlayer))
+        if (gui.isMyTurn())
         {
+            undoLastAction.setEnabled(false);
+            undoAllAction.setEnabled(false);
+            forcedDoneWithPhaseAction.setEnabled(true);
+            takeMulliganAction.setEnabled(false);
+            // if there are no engagements, we are kicked to next phase
+            // automatically anyway.
+            disableDoneAction("still engagements to resolve");
+
             bottomBar.setPhase("Resolve Engagements");
-
-            JMenuItem mi;
-
-            mi = phaseMenu.add(clearRecruitChitsAction);
-            mi.setMnemonic(KeyEvent.VK_C);
-            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0));
-
-            phaseMenu.addSeparator();
-
-            mi = phaseMenu.add(doneWithPhaseAction);
-            mi.setMnemonic(KeyEvent.VK_D);
-            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
-
-            mi = phaseMenu.add(forcedDoneWithPhaseAction);
-            mi.setMnemonic(KeyEvent.VK_F);
-            // mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
-
-            phaseMenu.addSeparator();
-
-            mi = phaseMenu.add(withdrawFromGameAction);
-            mi.setMnemonic(KeyEvent.VK_W);
-
             highlightEngagements();
+            reqFocus();
         }
         else
         {
-            bottomBar.setPhase("");
-            disableDoneAction(activePlayerName + " fights");
+            setupAsInactivePlayer("fights");
         }
     }
 
     void setupMusterMenu()
     {
-        unselectAllHexes();
-        reqFocus();
+        setupPhasePreparations("Muster Recruits");
 
-        Player activePlayer = client.getActivePlayer();
-        String activePlayerName = activePlayer.getName();
-
-        masterFrame.setTitle(activePlayerName + " Turn "
-            + client.getTurnNumber() + " : Muster Recruits ");
-
-        phaseMenu.removeAll();
-
-        if (client.getOwningPlayer().equals(activePlayer))
+        if (gui.isMyTurn())
         {
-            bottomBar.setPhase("Muster Recruits");
+            // TODO actually it's not a good idea that the ClearRecruitChits
+            // action is also allowed in Muster phase - the chit will be
+            // cleared from display, but not unrecruited. Might lead to
+            // confusion. But then, if one uses that action then it's 
+            // his own fault ;-)
+            undoLastAction.setEnabled(true);
+            undoAllAction.setEnabled(true);
+            forcedDoneWithPhaseAction.setEnabled(true);
+            takeMulliganAction.setEnabled(false);
             enableDoneAction();
 
-            JMenuItem mi;
-
-            mi = phaseMenu.add(clearRecruitChitsAction);
-            mi.setMnemonic(KeyEvent.VK_C);
-            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0));
-
-            phaseMenu.addSeparator();
-
-            mi = phaseMenu.add(undoLastAction);
-            mi.setMnemonic(KeyEvent.VK_U);
-            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0));
-
-            mi = phaseMenu.add(undoAllAction);
-            mi.setMnemonic(KeyEvent.VK_A);
-            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0));
-
-            mi = phaseMenu.add(doneWithPhaseAction);
-            mi.setMnemonic(KeyEvent.VK_D);
-            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
-
-            mi = phaseMenu.add(forcedDoneWithPhaseAction);
-            mi.setMnemonic(KeyEvent.VK_F);
-            // mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
-
-            phaseMenu.addSeparator();
-
-            mi = phaseMenu.add(withdrawFromGameAction);
-            mi.setMnemonic(KeyEvent.VK_W);
-
+            bottomBar.setPhase("Muster Recruits");
             highlightPossibleRecruitLegionHexes();
+            reqFocus();
         }
         else
         {
-            bottomBar.setPhase("");
-            disableDoneAction(activePlayerName + " musters");
+            setupAsInactivePlayer("musters");
         }
     }
 
@@ -1780,7 +1703,7 @@ public final class MasterBoard extends JPanel
 
                 // Otherwise, the action to take depends on the phase.
                 // Only the current player can manipulate game state.
-                if (client.getOwningPlayer().equals(client.getActivePlayer()))
+                if (gui.isMyTurn())
                 {
                     actOnHex(hex.getHexModel());
                     hex.repaint();
@@ -1789,7 +1712,7 @@ public final class MasterBoard extends JPanel
             }
 
             // No hits on chits or map, so re-highlight.
-            if (client.getOwningPlayer().equals(client.getActivePlayer()))
+            if (gui.isMyTurn())
             {
                 actOnMisclick();
             }
@@ -1820,7 +1743,7 @@ public final class MasterBoard extends JPanel
 
     private void actOnLegion(LegionClientSide legion, MasterHex hex)
     {
-        if (!client.isMyTurn())
+        if (!gui.isMyTurn())
         {
             return;
         }
@@ -1869,13 +1792,13 @@ public final class MasterBoard extends JPanel
             clearRecruitedChits();
             clearPossibleRecruitChits();
             client.doMove(hex);
+            // Would a simple highlightUnmovedLegions() be good enough?
+            // Right now its needed also to set mover null 
             actOnMisclick(); // Yes, even if the move was good.
         }
         else if (phase == Phase.FIGHT)
         {
-            // If we're fighting and there is an engagement here,
-            // resolve it.  If an angel is being summoned, mark
-            // the donor legion instead.
+            // If we're fighting and there is an engagement here, resolve it.
             client.engage(hex);
         }
     }
@@ -2375,17 +2298,34 @@ public final class MasterBoard extends JPanel
         doneWithPhaseAction.setEnabled(true);
     }
 
+    /**
+     * Disable the Done action, and update the reason text in bottomBar
+     * 
+     * @param reason Information why one is not ready to be Done
+     */
     public void disableDoneAction(String reason)
     {
         doneWithPhaseAction.setEnabled(false);
         bottomBar.setReasonForDisabledDone(reason);
     }
 
+    /**
+     * Clear bottomBar phase text and call disableDoneAction, as reason the 
+     * standard text "<activer player> doesWhat"
+     *  
+     * @param doesWhat Information what the active player currently does
+     */
+    public void disableDoneActionActivePlayerDoes(String doesWhat)
+    {
+        bottomBar.setPhase("");
+        String name = gui.getClient().getActivePlayer().getName();
+        disableDoneAction(name + " " + doesWhat);
+    }
+
     private void makeDoneCloseWindow()
     {
         gameOverStateReached = true;
         enableDoneAction();
-
     }
 
     public void setServerClosedMessage(boolean gameOver)
@@ -2414,10 +2354,15 @@ public final class MasterBoard extends JPanel
             + " turns processed");
     }
 
-    public void setGameOverState(String message)
+    private void setTitleInfoText(String text)
     {
         masterFrame.setTitle(client.getActivePlayer() + " Turn "
-            + client.getTurnNumber() + " : Game Over -- " + message);
+            + client.getTurnNumber() + " : " + text);
+    }
+
+    public void setGameOverState(String message)
+    {
+        setTitleInfoText("Game Over -- " + message);
         bottomBar.setPhase("Game Over: " + message);
         disableDoneAction("connection closed from server side");
         makeDoneCloseWindow();

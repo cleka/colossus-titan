@@ -1333,11 +1333,6 @@ public final class Client implements IClient, IOracle
         gui.initBoard();
     }
 
-    public void setupClientGUI()
-    {
-        gui.setupClientGUI();
-    }
-
     public void setPlayerName(String playerName)
     {
         this.owningPlayer.setName(playerName);
@@ -1781,8 +1776,8 @@ public final class Client implements IClient, IOracle
     }
 
     public void initBattle(MasterHex hex, int battleTurnNumber,
-        Player battleActivePlayer, BattlePhase battlePhase,
-        Legion attacker, Legion defender)
+        Player battleActivePlayer, BattlePhase battlePhase, Legion attacker,
+        Legion defender)
     {
         gui.cleanupNegotiationDialogs();
 
@@ -2001,20 +1996,7 @@ public final class Client implements IClient, IOracle
         return recruiterName;
     }
 
-    /** Needed if we load a game outside the split phase, where
-     *  active player and turn are usually set. */
-    public void setupTurnState(Player activePlayer, int turnNumber)
-    {
-        this.activePlayer = (PlayerClientSide)activePlayer;
-        this.turnNumber = turnNumber;
-
-        gui
-            .turnOrPlayerChange(this, turnNumber, this.activePlayer
-                .getNumber());
-
-    }
-
-    private void resetAllMoves()
+    private void resetLegionMovesAndRecruitData()
     {
         for (PlayerClientSide player : players)
         {
@@ -2032,20 +2014,35 @@ public final class Client implements IClient, IOracle
         gui.setBoardActive(val);
     }
 
-    public void setupSplit(Player activePlayer, int turnNumber)
+    /**
+     * Currently called by SetupSplit, because this implies also
+     * a player and perhaps turn change.
+     *
+     * Additionally might be called by server if we load a game outside the 
+     * split phase, where active player and turn are usually set.
+     * 
+     * TODO call always by server explicitly?
+     */
+    public void setupTurnState(Player activePlayer, int turnNumber)
     {
         this.activePlayer = (PlayerClientSide)activePlayer;
         this.turnNumber = turnNumber;
 
-        gui.actOnSetupSplit(this, turnNumber, this.activePlayer.getNumber());
+        gui.actOnTurnOrPlayerChange(this, turnNumber, this.activePlayer);
+    }
 
-        numSplitsThisTurn = 0;
+    public void setupSplit(Player activePlayer, int turnNumber)
+    {
+        // This implies also Player and perhaps Turn change
+        // TODO perhaps server should send this explicitly?
+        setupTurnState(activePlayer, turnNumber);
+        resetLegionMovesAndRecruitData();
+
+        // Now the actual setup split stuff 
         this.phase = Phase.SPLIT;
+        numSplitsThisTurn = 0;
 
-        resetAllMoves();
-
-        gui.actOnSetupSplitPart2();
-
+        gui.actOnSetupSplit();
         kickSplit();
     }
 
@@ -2112,15 +2109,15 @@ public final class Client implements IClient, IOracle
         gui.actOnSetupMuster();
 
         // I changed the "&& !isGameOver()" to "&& I am not dead";
-        // before, this makes autorecruit stop working also for human
-        // when they won against all others and continue playing
+        // before, this makes auto-recruit stop working also for human
+        // when they did win against all others and continue playing
         // (just for growing bigger creatures ;-)
         if (options.getOption(Options.autoRecruit) && playerAlive
             && isMyTurn() && this.phase == Phase.MUSTER)
         {
             ai.muster();
-            // Do not automatically say we are done.
-            // Allow humans to override.
+            // For autoRecruit alone, do not automatically say we are done.
+            // Allow humans to override. But full autoPlay be done.
             if (options.getOption(Options.autoPlay))
             {
                 doneWithRecruits();
@@ -2710,8 +2707,8 @@ public final class Client implements IClient, IOracle
             return false;
         }
 
-        Set<EntrySide> entrySides = listPossibleEntrySides(mover,
-            hex, teleport);
+        Set<EntrySide> entrySides = listPossibleEntrySides(mover, hex,
+            teleport);
 
         EntrySide entrySide = null;
         if (options.getOption(Options.autoPickEntrySide))
@@ -3053,8 +3050,8 @@ public final class Client implements IClient, IOracle
             movementRoll);
     }
 
-    public Set<EntrySide> listPossibleEntrySides(
-        LegionClientSide mover, MasterHex hex, boolean teleport)
+    public Set<EntrySide> listPossibleEntrySides(LegionClientSide mover,
+        MasterHex hex, boolean teleport)
     {
         return movement.listPossibleEntrySides(mover, hex, teleport);
     }
@@ -3274,9 +3271,8 @@ public final class Client implements IClient, IOracle
 
         gui.boardActOnUndidSplit(survivor, turn);
 
-        if (isMyTurn() && this.phase == Phase.SPLIT
-            && !replayOngoing && options.getOption(Options.autoSplit)
-            && !isGameOver())
+        if (isMyTurn() && this.phase == Phase.SPLIT && !replayOngoing
+            && options.getOption(Options.autoSplit) && !isGameOver())
         {
             boolean done = ai.splitCallback(null, null);
             if (done)
@@ -3481,8 +3477,6 @@ public final class Client implements IClient, IOracle
             return;
         }
 
-        // TODO Questionable: why does this depend on numSplitsThisTurn?
-        //      is that modified at all when there is no GUI ?
         // Enforce only one split on turn 1.
         if (getTurnNumber() == 1 && numSplitsThisTurn > 0)
         {
@@ -3564,9 +3558,8 @@ public final class Client implements IClient, IOracle
 
         // check also for phase, because delayed callbacks could come
         // after our phase is over but activePlayerName not updated yet.
-        if (isMyTurn() && this.phase == Phase.SPLIT
-            && !replayOngoing && options.getOption(Options.autoSplit)
-            && !isGameOver())
+        if (isMyTurn() && this.phase == Phase.SPLIT && !replayOngoing
+            && options.getOption(Options.autoSplit) && !isGameOver())
         {
             boolean done = ai.splitCallback(parent, child);
             if (done)
@@ -3585,8 +3578,8 @@ public final class Client implements IClient, IOracle
             List<PlayerColor> favoriteColors = null;
             if (favorites != null)
             {
-                favoriteColors = PlayerColor.getByName(Split.split(
-                    ',', favorites));
+                favoriteColors = PlayerColor.getByName(Split.split(',',
+                    favorites));
             }
             else
             {
@@ -3712,6 +3705,7 @@ public final class Client implements IClient, IOracle
     /** Wait for aiDelay. */
     void aiPause()
     {
+        // TODO why is this not set up once, when Client is created?
         if (delay < 0)
         {
             setupDelay();
@@ -3730,6 +3724,7 @@ public final class Client implements IClient, IOracle
     private void setupDelay()
     {
         delay = options.getIntOption(Options.aiDelay);
+        // TODO why is this set to MIN_AI_DELAY, if called when not in autoPlay?
         if (!options.getOption(Options.autoPlay)
             || delay < Constants.MIN_AI_DELAY)
         {
