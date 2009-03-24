@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.variant.MasterBoardTerrain;
+import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
@@ -42,6 +43,13 @@ public class Game
     /** Last movement roll for any player. */
     private int movementRoll = -1;
 
+    /**
+     *  If a battle is ongoing, the masterBoard hex, attacker and defender
+     */
+    private Legion attacker;
+    private Legion defender;
+    private MasterHex battleSite;
+
     public Game(Variant variant, String[] playerNames)
     {
         this.variant = variant;
@@ -75,6 +83,29 @@ public class Game
     public void setMovementRoll(int roll)
     {
         movementRoll = roll;
+    }
+
+    public void setEngagementData(MasterHex hex, Legion attacker,
+        Legion defender)
+    {
+        this.battleSite = hex;
+        this.attacker = attacker;
+        this.defender = defender;
+    }
+
+    public MasterHex getBattleSite()
+    {
+        return battleSite;
+    }
+
+    public Legion getDefender()
+    {
+        return defender;
+    }
+
+    public Legion getAttacker()
+    {
+        return attacker;
     }
 
     /** 

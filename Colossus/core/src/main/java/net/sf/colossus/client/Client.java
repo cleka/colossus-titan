@@ -113,12 +113,6 @@ public final class Client implements IClient, IOracle
 
     private IClientGUI gui;
 
-    // TODO TODO TODO : CHECK !!
-    // this is possibly updated (at least reset to null) only properly if GUI is there!!!
-    private Legion attacker;
-    private Legion defender;
-    private MasterHex battleSite;
-
     private final List<BattleChit> battleChits = new ArrayList<BattleChit>();
 
     // Per-client and per-player options.
@@ -462,13 +456,13 @@ public final class Client implements IClient, IOracle
 
     public Legion getMyEngagedLegion()
     {
-        if (isMyLegion(attacker))
+        if (isMyLegion(getAttacker()))
         {
-            return attacker;
+            return getAttacker();
         }
-        else if (isMyLegion(defender))
+        else if (isMyLegion(getDefender()))
         {
-            return defender;
+            return getDefender();
         }
         return null;
     }
@@ -499,10 +493,7 @@ public final class Client implements IClient, IOracle
 
     public void tellEngagement(MasterHex hex, Legion attacker, Legion defender)
     {
-        this.battleSite = hex;
-        this.attacker = attacker;
-        this.defender = defender;
-
+        game.setEngagementData(hex, attacker, defender);
         gui.tellEngagement(attacker, defender, turnNumber);
     }
 
@@ -510,9 +501,7 @@ public final class Client implements IClient, IOracle
         int points, int turns)
     {
         gui.actOnTellEngagementResults(winner, method, points, turns);
-        this.battleSite = null;
-        this.attacker = null;
-        this.defender = null;
+        game.setEngagementData(null, null, null);
     }
 
     /** Legion target summons unit from legion donor. */
@@ -1215,7 +1204,7 @@ public final class Client implements IClient, IOracle
                 String name = chit.getId();
                 if (chit.isInverted())
                 {
-                    Legion legion = defender;
+                    Legion legion = getDefender();
                     ((LegionClientSide)legion).removeCreature(name);
                     gui.eventViewerDefenderSetCreatureDead(name, legion
                         .getHeight());
@@ -1223,7 +1212,7 @@ public final class Client implements IClient, IOracle
                 }
                 else
                 {
-                    Legion info = attacker;
+                    Legion info = getAttacker();
                     ((LegionClientSide)info).removeCreature(name);
 
                     gui.eventViewerAttackerSetCreatureDead(name, info
@@ -1254,22 +1243,22 @@ public final class Client implements IClient, IOracle
         {
             if (inverted)
             {
-                imageName = getTitanBasename(defender);
+                imageName = getTitanBasename(getDefender());
             }
             else
             {
-                imageName = getTitanBasename(attacker);
+                imageName = getTitanBasename(getAttacker());
             }
         }
         PlayerColor playerColor;
         if (inverted)
         {
-            Player player = defender.getPlayer();
+            Player player = getDefender().getPlayer();
             playerColor = player.getColor();
         }
         else
         {
-            Player player = attacker.getPlayer();
+            Player player = getAttacker().getPlayer();
             playerColor = player.getColor();
         }
         BattleChit chit = new BattleChit(5 * Scale.get(), imageName, inverted,
@@ -1519,20 +1508,28 @@ public final class Client implements IClient, IOracle
 
     public void askNegotiate(Legion attacker, Legion defender)
     {
-        this.attacker = attacker;
-        this.defender = defender;
+        if (getAttacker() != attacker)
+        {
+            LOGGER
+                .severe("Attacker in game differs from attacker given in askNegotiate!");
+        }
+        if (getAttacker() != attacker)
+        {
+            LOGGER
+                .severe("Defender in game differs from defender given in askNegotiate!");
+        }
 
         if (options.getOption(Options.autoNegotiate))
         {
             // XXX AI players just fight for now.
-            Proposal proposal = new Proposal(attacker, defender, true, false,
-                null, null);
+            Proposal proposal = new Proposal(getAttacker(), getDefender(),
+                true, false, null, null);
 
             makeProposal(proposal);
         }
         else
         {
-            gui.showNegotiate(attacker, defender);
+            gui.showNegotiate(getAttacker(), getDefender());
         }
     }
 
@@ -1547,7 +1544,7 @@ public final class Client implements IClient, IOracle
     {
         if (proposal != null && proposal.isFight())
         {
-            fight(attacker.getCurrentHex());
+            fight(getAttacker().getCurrentHex());
             return;
         }
         else if (proposal != null)
@@ -1768,14 +1765,8 @@ public final class Client implements IClient, IOracle
         this.battleTurnNumber = battleTurnNumber;
         setBattleActivePlayer(battleActivePlayer);
         this.battlePhase = battlePhase;
-        // TODO the following three are probably not needed,
-        //      they are already set during tellEngagement()
-        this.attacker = attacker;
-        this.defender = defender;
-        this.battleSite = hex;
-
-        this.defender.setEntrySide(this.attacker.getEntrySide()
-            .getOpposingSide());
+        this.getDefender().setEntrySide(
+            this.getAttacker().getEntrySide().getOpposingSide());
 
         gui.actOnInitBattle();
     }
@@ -1921,7 +1912,7 @@ public final class Client implements IClient, IOracle
             }
             revealCreatures(legion, recruiters, Constants.reasonRecruiter);
         }
-        String reason = (battleSite != null ? Constants.reasonReinforced
+        String reason = (getBattleSite() != null ? Constants.reasonReinforced
             : Constants.reasonRecruited);
 
         addCreature(legion, recruitName, reason);
@@ -2255,38 +2246,46 @@ public final class Client implements IClient, IOracle
 
     Legion getBattleActiveLegion()
     {
-        if (battleActivePlayer.equals(defender.getPlayer()))
+        if (battleActivePlayer.equals(getDefender().getPlayer()))
         {
-            return defender;
+            return getDefender();
         }
         else
         {
-            return attacker;
+            return getAttacker();
         }
     }
 
     Legion getBattleInactiveLegion()
     {
-        if (battleActivePlayer.equals(defender.getPlayer()))
+        if (battleActivePlayer.equals(getDefender().getPlayer()))
         {
-            return attacker;
+            return getAttacker();
         }
         else
         {
-            return defender;
+            return getDefender();
         }
     }
 
     // public for IOracle
+    // TODO placeholder, move at some point fully to Game ?
     public Legion getDefender()
     {
-        return defender;
+        return game.getDefender();
     }
 
     // public for IOracle
+    // TODO placeholder, move at some point fully to Game ?
     public Legion getAttacker()
     {
-        return attacker;
+        return game.getAttacker();
+    }
+
+    // public for IOracle
+    public MasterHex getBattleSite()
+    {
+        return game.getBattleSite();
     }
 
     public BattlePhase getBattlePhase()
@@ -2392,12 +2391,6 @@ public final class Client implements IClient, IOracle
     {
         server.applyCarries(hexLabel);
         gui.actOnAppliyCarries(hexLabel);
-    }
-
-    // public for IOracle
-    public MasterHex getBattleSite()
-    {
-        return battleSite;
     }
 
     /** Return true if there are any enemies adjacent to this chit.
@@ -2538,11 +2531,11 @@ public final class Client implements IClient, IOracle
 
         if (chit.isInverted())
         {
-            return defender.getPlayer();
+            return getDefender().getPlayer();
         }
         else
         {
-            return attacker.getPlayer();
+            return getAttacker().getPlayer();
         }
     }
 
