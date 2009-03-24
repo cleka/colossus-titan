@@ -3423,12 +3423,6 @@ public final class Client implements IClient, IOracle
         return movementRoll;
     }
 
-    // TODO inline
-    public int getMulligansLeft()
-    {
-        return owningPlayer.getMulligansLeft();
-    }
-
     public void doSplit(Legion legion)
     {
         LOGGER.log(Level.FINER, "Client.doSplit " + legion);

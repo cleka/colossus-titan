@@ -1142,8 +1142,8 @@ public final class MasterBoard extends JPanel
             undoLastAction.setEnabled(true);
             undoAllAction.setEnabled(true);
             forcedDoneWithPhaseAction.setEnabled(true);
-            takeMulliganAction.setEnabled(client.getMulligansLeft() > 0 ? true
-                : false);
+            boolean mullLeft = (gui.getOwningPlayer().getMulligansLeft() > 0);
+            takeMulliganAction.setEnabled(mullLeft ? true : false);
             disableDoneAction("At least one legion must move");
 
             bottomBar.setPhase("Movement");
