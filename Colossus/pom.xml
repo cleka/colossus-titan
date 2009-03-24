@@ -128,10 +128,10 @@
   <name>Colossus</name>
   <description>Colossus</description>
   <url>http://colossus.sf.net</url>
-  <inceptionYear>2000</inceptionYear>
+  <inceptionYear>1997</inceptionYear>
   <licenses>
     <license>
-      <name>GNU General Public License (GPL)</name>
+      <name>GNU General Public License (GPL) v2</name>
     </license>
   </licenses>
   
