@@ -1623,7 +1623,7 @@ public final class MasterBoard extends JPanel
         else if (phase == Phase.MOVE)
         {
             clearPossibleRecruitChits();
-            client.setMover(null);
+            gui.setMover(null);
             highlightUnmovedLegions();
         }
         else if (phase == Phase.FIGHT)
@@ -1756,13 +1756,13 @@ public final class MasterBoard extends JPanel
         else if (phase == Phase.MOVE)
         {
             // Allow spin cycle by clicking on chit again.
-            if (legion.equals(client.getMover()))
+            if (legion.equals(gui.getMover()))
             {
                 actOnHex(hex);
             }
             else
             {
-                client.setMover(legion);
+                gui.setMover(legion);
                 getGUIHexByMasterHex(hex).repaint();
                 highlightMoves(legion);
             }
@@ -1791,7 +1791,9 @@ public final class MasterBoard extends JPanel
             // destination, move the legion here.
             clearRecruitedChits();
             clearPossibleRecruitChits();
-            client.doMove(hex);
+            gui.doMove(hex);
+            // Would a simple highlightUnmovedLegions() be good enough?
+            // Right now its needed also to set mover null... 
             // Would a simple highlightUnmovedLegions() be good enough?
             // Right now its needed also to set mover null 
             actOnMisclick(); // Yes, even if the move was good.

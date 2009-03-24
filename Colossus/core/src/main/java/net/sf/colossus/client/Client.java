@@ -121,9 +121,6 @@ public final class Client implements IClient, IOracle
 
     private final List<BattleChit> battleChits = new ArrayList<BattleChit>();
 
-    // Information on the current moving legion.
-    private LegionClientSide mover;
-
     // Per-client and per-player options.
     private final Options options;
 
@@ -1288,16 +1285,6 @@ public final class Client implements IClient, IOracle
     {
         CreatureType recruit = ai.getVariantRecruitHint(legion, hex, recruits);
         return recruit;
-    }
-
-    public Legion getMover()
-    {
-        return mover;
-    }
-
-    public void setMover(LegionClientSide legion)
-    {
-        this.mover = legion;
     }
 
     public IClientGUI getGUI()
@@ -2673,12 +2660,9 @@ public final class Client implements IClient, IOracle
         return lords;
     }
 
-    public boolean doMove(MasterHex hex)
-    {
-        return doMove(mover, hex);
-    }
-
-    /** Return true if the move looks legal. */
+    /** If the move looks legal, forward it to server and return true;
+     *  otherwise returns false.
+     */
     public boolean doMove(LegionClientSide mover, MasterHex hex)
     {
         if (mover == null)

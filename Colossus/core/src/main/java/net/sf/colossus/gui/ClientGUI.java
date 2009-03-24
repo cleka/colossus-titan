@@ -96,6 +96,9 @@ public class ClientGUI implements IClientGUI
      */
     private final LinkedList<Object> undoStack = new LinkedList<Object>();
 
+    /** Information on the current moving legion. */
+    private LegionClientSide mover;
+
     /** the parent frame for secondary windows */
     private JFrame secondaryParent = null;
 
@@ -3047,6 +3050,21 @@ public class ClientGUI implements IClientGUI
     public String getTitanBaseName(Legion legion)
     {
         return ((LegionClientSide)legion).getTitanBasename();
+    }
+
+    public Legion getMover()
+    {
+        return mover;
+    }
+
+    public void setMover(LegionClientSide legion)
+    {
+        this.mover = legion;
+    }
+
+    public boolean doMove(MasterHex hex)
+    {
+        return client.doMove(mover, hex);
     }
 
 }
