@@ -105,6 +105,7 @@ public class ClientGUI implements IClientGUI
     private int replayLastTurn = -1;
     private int replayMaxTurn = 0;
 
+    // TODO change to enums...
     private int viewMode;
     private int recruitChitMode;
 
@@ -125,39 +126,6 @@ public class ClientGUI implements IClientGUI
         this.client = client;
         this.oracle = client;
         this.options = options;
-    }
-
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#setupClientGUI()
-     */
-    public void setupClientGUI()
-    {
-        disposeEventViewer();
-        disposePreferencesWindow();
-        disposeEngagementResults();
-        disposeInspector();
-        disposeCaretakerDisplay();
-        disposeLogWindow();
-        disposeMasterBoard();
-
-        int scale = options.getIntOption(Options.scale);
-        if (scale == -1)
-        {
-            scale = 15;
-            options.setOption(Options.scale, scale);
-            options.saveOptions();
-        }
-        Scale.set(scale);
-
-        board = new MasterBoard(client, this);
-        initEventViewer();
-        initShowEngagementResults();
-        initPreferencesWindow();
-        showOrHideAutoInspector(options.getOption(Options.showAutoInspector));
-        showOrHideLogWindow(client, options.getOption(Options.showLogWindow));
-        showOrHideCaretaker(options.getOption(Options.showCaretaker));
-
-        focusBoard();
     }
 
     /* (non-Javadoc)
@@ -274,6 +242,8 @@ public class ClientGUI implements IClientGUI
 
         String rcMode = options
             .getStringOption(Options.showRecruitChitsSubmenu);
+
+        // TODO this can probably be dropped by now.
         if (rcMode == null || rcMode.equals(""))
         {
             // not set: convert from old "showAllRecruitChits" option
@@ -306,6 +276,8 @@ public class ClientGUI implements IClientGUI
 
     /* (non-Javadoc)
      * @see net.sf.colossus.gui.IClientGUI#ensureEdtSetupClientGUI()
+     * 
+     * Ensure that setupClientGUI() is run inside the EDT
      */
     public void ensureEdtSetupClientGUI()
     {
@@ -337,6 +309,42 @@ public class ClientGUI implements IClientGUI
             }
 
         }
+    }
+
+    /* (non-Javadoc)
+     * @see net.sf.colossus.gui.IClientGUI#setupClientGUI()
+     * 
+     * Called via ensureEdtSetupClientGUI() when server sends all clients
+     * the initBoard command.
+     */
+    public void setupClientGUI()
+    {
+        disposeEventViewer();
+        disposePreferencesWindow();
+        disposeEngagementResults();
+        disposeInspector();
+        disposeCaretakerDisplay();
+        disposeLogWindow();
+        disposeMasterBoard();
+
+        int scale = options.getIntOption(Options.scale);
+        if (scale == -1)
+        {
+            scale = 15;
+            options.setOption(Options.scale, scale);
+            options.saveOptions();
+        }
+        Scale.set(scale);
+
+        board = new MasterBoard(client, this);
+        initEventViewer();
+        initShowEngagementResults();
+        initPreferencesWindow();
+        showOrHideAutoInspector(options.getOption(Options.showAutoInspector));
+        showOrHideLogWindow(client, options.getOption(Options.showLogWindow));
+        showOrHideCaretaker(options.getOption(Options.showCaretaker));
+
+        focusBoard();
     }
 
     public void setChosenDevice(GraphicsDevice chosen)
