@@ -24,33 +24,42 @@
 -->
 <project name="Colossus" default="jar" basedir=".">
   <property environment="env" />
+	
+  <!-- inputs -->
   <property name="core.src.dir" value="core/src/main/java" />
   <property name="tests.src.dir" value="core/src/test/java" />
   <property name="core.resource.dir"
-  value="core/src/main/resource" />
+	  value="core/src/main/resource" />
+  <property name="datatools.src.dir"
+      value="datatools/src/main/java" />
+  <property name="datatoolsparser.src.dir"
+      value="datatools/src/main/javacc" />
   <property name="libs.dir" value="libs" />
   <property name="variants.dir" value="variants" />
+	
+  <!-- outputs -->
   <property name="build.dir" value="build/ant" />
   <property name="build.classes.dir"
   value="${build.dir}/classes" />
   <property name="testresults.dir"
   value="${build.dir}/testresults" />
-  <property name="datatools.src.dir"
-  value="datatools/src/main/java" />
-  <property name="datatoolsparser.src.dir"
-  value="datatools/src/main/javacc" />
+  <property name="build.javadoc.dir"
+	  value="${build.dir}/javadoc" />
+  
+  <!-- settings -->
   <property name="source.level" value="1.5" />
   <property name="target.level" value="1.5" />
+	
+  <!-- classpaths -->
   <path id="project.class.path">
     <pathelement path="${build.classes.dir}" />
     <pathelement path="${variants.dir}" />
     <fileset dir="${libs.dir}">
       <include name="**/*.jar" />
     </fileset>
-    <fileset dir="${libs.dir}">
-      <include name="**/*.zip" />
-    </fileset>
   </path>
+	
+  <!-- targets -->
   <target name="init" description="Initialization">
     <tstamp />
     <!-- Set this to jikes or kjc to use those instead of javac -->
@@ -99,6 +108,9 @@
       <compilerarg value="-Xlint:unchecked" />
     </javac>
   </target>
+  <!-- TODO compiling the test cases into the same folder as the
+       main source means that we have a danger of including the
+       test classes in the JAR or other artifcats -->
   <target name="compileTests" depends="compile"
   description="Compiles the JUnit tests">
     <javac debug="yes" deprecation="yes" target="${target.level}"
@@ -121,7 +133,6 @@
   </target>
   <target name="failOnBrokenTest"
   description="Fails the build if a previously run 'test' target has any failures or errors">
-
     <fail if="junit.testFailed"
     message="Failing build since a unit test failed" />
     <fail if="junit.testError"
@@ -129,9 +140,8 @@
   </target>
   <target name="javadoc" depends="compile"
   description="Make javadoc files">
-    <mkdir dir="javadoc" />
-    <javadoc sourcepath="." destdir="./javadoc" access="private"
-    packagenames="net.sf.colossus.*" />
+    <mkdir dir="${build.javadoc.dir}" />
+    <javadoc sourcepath="${core.src.dir}" destdir="${build.javadoc.dir}" access="private"/>
   </target>
   <target name="jar" depends="init,compile,compileVariants"
   description="Make jar file">
@@ -269,13 +279,27 @@
     storepass="${env.JARPASSWORD}" />
   </target>
   <!-- Tasks from here down are only needed for installation on the web site. -->
+  <!-- TODO: picking selectively from the base directory is a bit messy, particularly in respect
+       to cleaning up and ignoring files in the VCS. It would be better to collect all generated
+       artifacts somewhere in the build directories and then zip those together with sources that
+       need to be deployed. -->
   <target name="dist" depends="clean,buildInfo,init,sign"
   description="Make zip file for user download">
     <zip zipfile="${ZIPFILE}" basedir="."
     excludes="**/*.sav, **/*.zip, **/*.bak, **/*javadoc*/*, *Keystore*, *cfg, *properties*, BattlelandsRandomizer.jar, .*, **/*.ps, **/*.aux, **/*.bbl, **/*.bib, **/*.blg, **/*.log, **/*.old libs/build"/>
   </target>
+  <!-- Internal: tests if we have a Subversion copy to avoid running the Ant task if we don't -
+       the svn task throws NullPointerExceptions if there's no ".svn" folder -->
+  <target name="checkForSvn">
+  	<condition property="doSvnCheck">
+  	  <available file="${basedir}/.svn"/>
+  	</condition>
+  </target>
+  <!-- Build information will only be available if we have a SVN working copy, otherwise it will
+       be skipped completely. While some of that information is available without SVN we assume
+       that any official build will be done from a working copy and thus not split the target. -->
   <target name="buildInfo" description="Generates property file with some information on the build such as revision and time"
-  	unless="noBuildInfo">
+  	if="doSvnCheck" depends="checkForSvn">
   	<!-- This task tries to use svnkit, which is normally not there; it will then fall back to a command line svn.
   	     see libs/build/README.txt for more information -->
   	<taskdef name="svn"
@@ -320,6 +344,14 @@
              type="date"
              pattern="yyyy-MM-dd'T'HH:mm:ss"
              value="now"/>
+      <entry key="ant.java.version" value="${ant.java.version}"/>
+      <entry key="build.compiler" value="${build.compiler}"/>
+      <entry key="username" value="${env.USERNAME}"/>
+      <entry key="java.runtime.name" value="${java.runtime.name}"/>
+      <entry key="java.runtime.version" value="${java.runtime.version}"/>
+      <entry key="os.name" value="${os.name}"/>
+      <entry key="os.arch" value="${os.arch}"/>
+      <entry key="os.version" value="${os.version}"/>
     </propertyfile>
   </target>
   <target name="inst" depends="clean,init,sign,dist"
