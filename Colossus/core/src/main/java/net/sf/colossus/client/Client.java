@@ -152,9 +152,6 @@ public final class Client implements IClient, IOracle
      */
     private PlayerColor color;
 
-    /** Last movement roll for any player. */
-    private int movementRoll = -1;
-
     private Legion parent;
 
     // This ai is either the actual ai player for an AI player, but is also
@@ -554,7 +551,7 @@ public final class Client implements IClient, IOracle
 
     public void tellMovementRoll(int roll)
     {
-        movementRoll = roll;
+        game.setMovementRoll(roll);
         gui.tellMovementRoll(roll);
         kickMoves();
     }
@@ -3026,14 +3023,14 @@ public final class Client implements IClient, IOracle
     public Set<MasterHex> listTeleportMoves(Legion legion)
     {
         MasterHex hex = legion.getCurrentHex();
-        return movement.listTeleportMoves(legion, hex, movementRoll);
+        return movement.listTeleportMoves(legion, hex, getMovementRoll());
     }
 
     /** Return a set of hexLabels. */
     public Set<MasterHex> listNormalMoves(LegionClientSide legion)
     {
         return movement.listNormalMoves(legion, legion.getCurrentHex(),
-            movementRoll);
+            getMovementRoll());
     }
 
     public Set<EntrySide> listPossibleEntrySides(LegionClientSide mover,
@@ -3418,9 +3415,10 @@ public final class Client implements IClient, IOracle
             && this.phase == Phase.FIGHT;
     }
 
+    // TODO move to some kind of Oracle
     public int getMovementRoll()
     {
-        return movementRoll;
+        return game.getMovementRoll();
     }
 
     public void doSplit(Legion legion)

@@ -39,6 +39,9 @@ public class Game
      */
     private final Caretaker caretaker;
 
+    /** Last movement roll for any player. */
+    private int movementRoll = -1;
+
     public Game(Variant variant, String[] playerNames)
     {
         this.variant = variant;
@@ -62,6 +65,16 @@ public class Game
             // properly
             return VariantSupport.getCurrentVariant();
         }
+    }
+
+    public int getMovementRoll()
+    {
+        return movementRoll;
+    }
+
+    public void setMovementRoll(int roll)
+    {
+        movementRoll = roll;
     }
 
     /** 
