@@ -12,7 +12,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -31,7 +30,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JToggleButton;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
@@ -63,31 +61,30 @@ import net.sf.colossus.util.Options;
  * @IMPORTANT
  * - Check compatibility with previous version
  * - History: make history events carry the "reason" tag so that reloaded
- *    games have same event view as in running game     
+ *    games have same event view as in running game
  *  "TODO: investigate, why does server gives us different turn numbers
  *         in those Split/undoSplit events?" (=> see undoEvent)
- *  
+ *
  * @Nice to have:
  * - Player dead events
  * - Legion eliminated (when player dead) events
  * - Game over, who wins event :)
  * - scale change: own setting, relative to main board scale or absolut?
- *       react more quickly when scale changed? 
+ *       react more quickly when scale changed?
  * - checkbox "don't show Dead creatures"
  * - RevealedCreature could cache the panels
  * - combined "battle event" - one bordered panel, containing
  *    all relevant events ( [teleport?], summon, acquire, won, lost)
- *     plus text info what now in Engagement result window 
+ *     plus text info what now in Engagement result window
  * - interface for inspector & Co: for viewMode return info revealed during
  *     one last turn
- * - Engagement won (fled...), instead of "not revealed" show contents 
+ * - Engagement won (fled...), instead of "not revealed" show contents
  *     depending on what the viewMode says
  * - "SolidMarker" instead of Titan for mulligan
- * 
+ *
  */
 
-final class EventViewer extends KDialog implements WindowListener,
-    ItemListener, ActionListener
+final class EventViewer extends KDialog
 {
     private static final Logger LOGGER = Logger.getLogger(EventViewer.class
         .getName());
@@ -160,12 +157,12 @@ final class EventViewer extends KDialog implements WindowListener,
     private RevealEvent winnerLegion = null;
     private RevealEvent loserLegion = null;
 
-    /** 
+    /**
      * Inits the dialog, not necessarily displays it.
-     * 
+     *
      * @param frame is the parent window frame (MasterBoard)
      * @param options IOptions reference to the client
-     * @param client The client, needed to ask all kind of info  
+     * @param client The client, needed to ask all kind of info
      */
 
     EventViewer(final JFrame frame, final IOptions options, Client client)
@@ -278,14 +275,75 @@ final class EventViewer extends KDialog implements WindowListener,
         return bVal;
     }
 
-    private void addCheckbox(String optname, Container pane)
+    private void addCheckbox(final String optname, Container pane)
     {
         JCheckBox cb = new JCheckBox(optname);
         boolean selected = getBoolOption(optname, true);
         cb.setSelected(selected);
         cb.setAlignmentX(Component.LEFT_ALIGNMENT);
         cb.setAlignmentY(Component.TOP_ALIGNMENT);
-        cb.addItemListener(this);
+        cb.addItemListener(new ItemListener(){
+            public void itemStateChanged(ItemEvent e)
+            {
+                boolean selected = (e.getStateChange() == ItemEvent.SELECTED);
+                options.setOption(optname, selected);
+
+                if (optname.equals(evAutoScroll))
+                {
+                    autoScroll = selected;
+                }
+                else if (optname.equals(evHideUndone))
+                {
+                    hideUndoneEvents = selected;
+                }
+
+                else if (optname.equals(evfRecruit))
+                {
+                    showEventType[RevealEvent.eventRecruit] = selected;
+                }
+                else if (optname.equals(evfSplit))
+                {
+                    showEventType[RevealEvent.eventSplit] = selected;
+                }
+                else if (optname.equals(evfTeleport))
+                {
+                    showEventType[RevealEvent.eventTeleport] = selected;
+                }
+                else if (optname.equals(evfSummon))
+                {
+                    showEventType[RevealEvent.eventSummon] = selected;
+                }
+                else if (optname.equals(evfWon))
+                {
+                    showEventType[RevealEvent.eventWon] = selected;
+                }
+                else if (optname.equals(evfLoser))
+                {
+                    showEventType[RevealEvent.eventLost] = selected;
+                }
+                else if (optname.equals(evfAcquire))
+                {
+                    showEventType[RevealEvent.eventAcquire] = selected;
+                }
+                else if (optname.equals(evfTurnChange))
+                {
+                    showEventType[RevealEvent.eventTurnChange] = selected;
+                }
+                else if (optname.equals(evfMulligan))
+                {
+                    showEventType[RevealEvent.eventMulligan] = selected;
+                }
+                else if (optname.equals(evfMoveRoll))
+                {
+                    showEventType[RevealEvent.eventMoveRoll] = selected;
+                }
+                else if (optname.equals(evfPlayerChange))
+                {
+                    showEventType[RevealEvent.eventPlayerChange] = selected;
+                }
+
+                updatePanels(false);
+            }});
         pane.add(cb);
     }
 
@@ -361,7 +419,7 @@ final class EventViewer extends KDialog implements WindowListener,
         int i;
         for (i = 1; i <= maxVal; i++)
         {
-            // 1, 2, 3, 4, 5, 
+            // 1, 2, 3, 4, 5,
             if (i <= 5 || i == maxVal)
             {
                 alChoices.add(String.valueOf(i));
@@ -433,7 +491,22 @@ final class EventViewer extends KDialog implements WindowListener,
         }
 
         maxTurnsDisplayExpiringBox = new JComboBox(Choices);
-        maxTurnsDisplayExpiringBox.addActionListener(this);
+        maxTurnsDisplayExpiringBox.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+        {
+                String value = (String)maxTurnsDisplayExpiringBox
+                    .getSelectedItem();
+                options.setOption(evMaxTurns, value);
+                if (value.equals("all") || value.equals(maxString))
+                {
+                    maxTurns = -1;
+                }
+                else
+                {
+                    maxTurns = Integer.parseInt(value);
+                }
+                updatePanels(true);
+                }});
         maxTurnsDisplayExpiringBox.setSelectedItem(maxTurnsOptString);
         miscPane.add(new JLabel("Display max. (turns):"));
         miscPane.add(maxTurnsDisplayExpiringBox);
@@ -602,7 +675,7 @@ final class EventViewer extends KDialog implements WindowListener,
     /*
      * Remove all, and add those again which are still in the eventList
      * @param forceAll: reset the bookmark, start from begin of list.
-     *                  => if not set, can start searching from last 
+     *                  => if not set, can start searching from last
      *                  remembered position.
      */
     private void updatePanels(boolean forceAll)
@@ -613,7 +686,7 @@ final class EventViewer extends KDialog implements WindowListener,
         {
             // if never expires, we never delete, so bookmark stays ok.
             // But if expiring is happening (!= -1) or force is given
-            // (e.g. when maxTurns changed) then need to start searching 
+            // (e.g. when maxTurns changed) then need to start searching
             // from start.
             if (this.expireTurns != -1 || forceAll)
             {
@@ -707,7 +780,7 @@ final class EventViewer extends KDialog implements WindowListener,
             }
         }
         else
-        // expire turns -1 ==> no purging. 
+        // expire turns -1 ==> no purging.
         {
             if (this.maxTurns != -1)
             {
@@ -788,8 +861,8 @@ final class EventViewer extends KDialog implements WindowListener,
         if (winner == null)
         {
             // null value = normal mutual
-            // string with content "null": one legion contained titan, 
-            // titan killed, some others survived, 
+            // string with content "null": one legion contained titan,
+            // titan killed, some others survived,
             // titan-killing-legion eliminated.
             // The above is for normal game. What if load from history??
             LOGGER
@@ -901,7 +974,7 @@ final class EventViewer extends KDialog implements WindowListener,
         // engagements in which we are envolved.
         // E.g. recruit info is handled by separate didRecruit...
 
-        // If this player is involved in an engagement, then server reveals 
+        // If this player is involved in an engagement, then server reveals
         // us the opponent, and our own legion we know anyway.
         // Thus, update the knownCreatures info in the events so that both
         // the attacker and defender are known in EventViewer (in THIS client)
@@ -956,7 +1029,7 @@ final class EventViewer extends KDialog implements WindowListener,
     public void revealEngagedCreatures(final List<String> names,
         boolean isAttacker, String reason)
     {
-        // can't do anything if (old) server or history do not provide 
+        // can't do anything if (old) server or history do not provide
         // us the reason
         if (reason == null || reason.equals("<Unknown>"))
         {
@@ -1132,7 +1205,7 @@ final class EventViewer extends KDialog implements WindowListener,
 
     /*
      * User undid one action. Event is just marked as undone, but not deleted
-     * - information once revealed is known to the public, as in real life :) 
+     * - information once revealed is known to the public, as in real life :)
      */
     public void undoEvent(int type, String parentId, String childId, int turn)
     {
@@ -1159,12 +1232,12 @@ final class EventViewer extends KDialog implements WindowListener,
 
             // HACK: if not found, search split event also from previous round
             // Sometimes server/game gives us wrong (different) turn number for
-            // the split and the unsplit event. For now, if this happens, 
+            // the split and the unsplit event. For now, if this happens,
             // search also in the previous round.
             // TODO: investigate, why does server gives us different turn numbers
             //       in those events?
-            // TODO: Now newSplitEvent does not do client.getTurn() any more, 
-            //       which might have been the reason for the misfit; 
+            // TODO: Now newSplitEvent does not do client.getTurn() any more,
+            //       which might have been the reason for the misfit;
             //       does this here still happen?
             assert found != 0 : "Mismatch for turnNr of SplitEvent still happens.";
             if (found == 0)
@@ -1329,100 +1402,14 @@ final class EventViewer extends KDialog implements WindowListener,
             if (this.isVisible())
             {
                 // do not save when not visible - in particular this
-                // would be run when a new user first time creates a 
+                // would be run when a new user first time creates a
                 // board - Inspector option not selected, but EventViewer
-                // gets created anyway and "setVisibleMaybe()" - that 
+                // gets created anyway and "setVisibleMaybe()" - that
                 // would save (0, 0) as initial location...
                 saveWindow.save(this);
             }
             this.visible = false;
         }
         super.setVisible(visible);
-    }
-
-    public synchronized void actionPerformed(ActionEvent e)
-    {
-        // A combo box was changed.
-        Object source = e.getSource();
-        if (source == maxTurnsDisplayExpiringBox)
-        {
-            String value = (String)maxTurnsDisplayExpiringBox
-                .getSelectedItem();
-            options.setOption(evMaxTurns, value);
-            if (value.equals("all") || value.equals(maxString))
-            {
-                maxTurns = -1;
-            }
-            else
-            {
-                maxTurns = Integer.parseInt(value);
-            }
-            updatePanels(true);
-        }
-    }
-
-    public void itemStateChanged(ItemEvent e)
-    {
-        // one of the checkboxes was changed.
-        JToggleButton source = (JToggleButton)e.getSource();
-        String text = source.getText();
-        boolean selected = (e.getStateChange() == ItemEvent.SELECTED);
-        options.setOption(text, selected);
-
-        if (text.equals(evAutoScroll))
-        {
-            this.autoScroll = selected;
-        }
-        else if (text.equals(evHideUndone))
-        {
-            this.hideUndoneEvents = selected;
-        }
-
-        else if (text.equals(evfRecruit))
-        {
-            this.showEventType[RevealEvent.eventRecruit] = selected;
-        }
-        else if (text.equals(evfSplit))
-        {
-            this.showEventType[RevealEvent.eventSplit] = selected;
-        }
-        else if (text.equals(evfTeleport))
-        {
-            this.showEventType[RevealEvent.eventTeleport] = selected;
-        }
-        else if (text.equals(evfSummon))
-        {
-            this.showEventType[RevealEvent.eventSummon] = selected;
-        }
-        else if (text.equals(evfWon))
-        {
-            this.showEventType[RevealEvent.eventWon] = selected;
-        }
-        else if (text.equals(evfLoser))
-        {
-            this.showEventType[RevealEvent.eventLost] = selected;
-        }
-        else if (text.equals(evfAcquire))
-        {
-            this.showEventType[RevealEvent.eventAcquire] = selected;
-        }
-        else if (text.equals(evfTurnChange))
-        {
-            this.showEventType[RevealEvent.eventTurnChange] = selected;
-        }
-        else if (text.equals(evfMulligan))
-        {
-            this.showEventType[RevealEvent.eventMulligan] = selected;
-        }
-        else if (text.equals(evfMoveRoll))
-        {
-            this.showEventType[RevealEvent.eventMoveRoll] = selected;
-        }
-        else if (text.equals(evfPlayerChange))
-        {
-            this.showEventType[RevealEvent.eventPlayerChange] = selected;
-        }
-
-        updatePanels(false);
     }
 }

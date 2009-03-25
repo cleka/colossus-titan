@@ -5,33 +5,30 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Point;
 import java.awt.Toolkit;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
-
 import javax.swing.SwingUtilities;
+
 import net.sf.colossus.client.IOptions;
 import net.sf.colossus.gui.SaveWindow;
 import net.sf.colossus.webcommon.InstanceTracker;
 
 
-/** KDialog adds some generally useful functions to JDialog.
- * 
+/**
+ * KDialog adds some generally useful functions to JDialog.
+ *
  *  @version $Id$
  *  @author David Ripton
  */
 @SuppressWarnings("serial")
-public class KDialog extends JDialog implements MouseListener, WindowListener
+public class KDialog extends JDialog
 {
     private SaveWindow kSaveWindow;
 
-    /** 
+    /**
      * Only support one of JDialog's many constructor forms.
      */
     public KDialog(Frame owner, String title, boolean modal)
@@ -51,8 +48,8 @@ public class KDialog extends JDialog implements MouseListener, WindowListener
         assert SwingUtilities.isEventDispatchThread() : "GUI code should only run on the EDT";
     }
 
-    /** 
-     * Place dialog relative to parentFrame's origin, offset by 
+    /**
+     * Place dialog relative to parentFrame's origin, offset by
      * point, and fully on-screen.
      */
     public void placeRelative(JFrame parentFrame, Point point, JScrollPane pane)
@@ -74,7 +71,7 @@ public class KDialog extends JDialog implements MouseListener, WindowListener
 
     /**
      * Center this dialog on the screen.
-     * 
+     *
      * Must be called after the dialog size has been set.
      */
     public void centerOnScreen()
@@ -85,9 +82,9 @@ public class KDialog extends JDialog implements MouseListener, WindowListener
     }
 
     /**
-     * 
+     *
      * Center this dialog on the screen, with an additional offset.
-     * 
+     *
      * Must be called after the dialog size has been set.
      */
     public void centerOnScreen(int xoffset, int yoffset)
@@ -125,15 +122,15 @@ public class KDialog extends JDialog implements MouseListener, WindowListener
      * creating it when useSaveWindow is called, and saving back
      * always when setVisible(false) is called (and useSaveWindow was
      * called before, of course).
-     * 
-     * TODO maybe we should enforce this by calling it through the 
+     *
+     * TODO maybe we should enforce this by calling it through the
      *      constructor
-     * 
-     * @param options IOptions reference to the client for saving window 
+     *
+     * @param options IOptions reference to the client for saving window
      *        size+pos in the Options data
-     * @param windowName name/title of the window, 
-     *        window size+pos are stored for that name 
-     * @param defaultLocation to be used if no location was earlier stored: 
+     * @param windowName name/title of the window,
+     *        window size+pos are stored for that name
+     * @param defaultLocation to be used if no location was earlier stored:
      *        place there; give null to center on screen.
      */
     public void useSaveWindow(IOptions options, String windowName,
@@ -169,74 +166,5 @@ public class KDialog extends JDialog implements MouseListener, WindowListener
         }
         super.dispose();
         kSaveWindow = null;
-    }
-
-    // Add the do-nothing mouse and window listener methods here, rather 
-    // than using Adapters, to reduce the number of useless little inner
-    // class files we generate.
-
-    // Note the potential for error if a subclass tries to override
-    // one of these methods, but fails due to a typo, and the compiler
-    // no longer flags the error because the interface is legally implemented.
-    // (Adapters have the same problem.)
-
-    public void mouseClicked(MouseEvent e)
-    {
-        // nothing to do
-    }
-
-    public void mouseEntered(MouseEvent e)
-    {
-        // nothing to do
-    }
-
-    public void mouseExited(MouseEvent e)
-    {
-        // nothing to do
-    }
-
-    public void mousePressed(MouseEvent e)
-    {
-        // nothing to do
-    }
-
-    public void mouseReleased(MouseEvent e)
-    {
-        // nothing to do
-    }
-
-    public void windowClosed(WindowEvent e)
-    {
-        // nothing to do
-    }
-
-    public void windowActivated(WindowEvent e)
-    {
-        // nothing to do
-    }
-
-    public void windowClosing(WindowEvent e)
-    {
-        // nothing to do
-    }
-
-    public void windowDeactivated(WindowEvent e)
-    {
-        // nothing to do
-    }
-
-    public void windowDeiconified(WindowEvent e)
-    {
-        // nothing to do
-    }
-
-    public void windowIconified(WindowEvent e)
-    {
-        // nothing to do
-    }
-
-    public void windowOpened(WindowEvent e)
-    {
-        // nothing to do
     }
 }

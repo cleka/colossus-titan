@@ -8,10 +8,10 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,8 +38,7 @@ import net.sf.colossus.util.KDialog;
  * @author Romain Dolbeau
  */
 
-final class SummonAngel extends KDialog implements MouseListener,
-    ActionListener, WindowListener
+final class SummonAngel extends KDialog
 {
     private static final Logger LOGGER = Logger.getLogger(SummonAngel.class
         .getName());
@@ -74,8 +73,14 @@ final class SummonAngel extends KDialog implements MouseListener,
             return;
         }
 
-        addMouseListener(this);
-        addWindowListener(this);
+        addWindowListener(new WindowAdapter()
+        {
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+                cleanup(null, null);
+            }
+        });
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
@@ -111,13 +116,24 @@ final class SummonAngel extends KDialog implements MouseListener,
                 {
                     name = gui.getTitanBaseName(legion);
                 }
-                Chit chit = new Chit(scale, name);
+                final Chit chit = new Chit(scale, name);
                 box.add(chit);
                 if (creature.getType().isSummonable())
                 {
                     chit.setBorder(true);
                     chit.setBorderColor(Color.red);
-                    chit.addMouseListener(this);
+                    chit.addMouseListener(new MouseAdapter()
+                    {
+                        @Override
+                        public void mousePressed(MouseEvent e)
+                        {
+                            if (!chit.isDead())
+                            {
+                                Legion donor = chitToDonor.get(chit);
+                                cleanup(donor, chit.getId());
+                            }
+                        }
+                    });
                     sumChitList.add(chit);
                     chitToDonor.put(chit, donor);
                 }
@@ -138,7 +154,13 @@ final class SummonAngel extends KDialog implements MouseListener,
 
         cancelButton = new JButton("Cancel");
         cancelButton.setMnemonic(KeyEvent.VK_C);
-        cancelButton.addActionListener(this);
+        cancelButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                cleanup(null, null);
+            }
+        });
 
         Box btnBox = new Box(BoxLayout.X_AXIS);
         btnBox.add(Box.createHorizontalGlue());
@@ -169,7 +191,7 @@ final class SummonAngel extends KDialog implements MouseListener,
     // a summoning, and then this could be part of the move phase,
     // instead of the "do it now or never" style as it is now.
 
-    /** 
+    /**
      * Returns a SummonInfo object, which contains Summoner, Donor legion
      * and the summoned unit, _OR_ the flag noSummoningWanted is set.
      */
@@ -225,45 +247,10 @@ final class SummonAngel extends KDialog implements MouseListener,
             // "noSummoningWanted" set to true
             summonInfo = new SummonInfo();
         }
-        // Shound not happen any more since I fixed that we can't get
-        // empty donor list. Still, to be sure...
-        if (saveWindow != null)
-        {
-            saveWindow.saveLocation(getLocation());
-        }
         dispose();
         synchronized (this)
         {
             this.notify();
-        }
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e)
-    {
-        Object source = e.getSource();
-        for (Chit c : sumChitList)
-        {
-            if ((source == c) && !(c.isDead()))
-            {
-                Legion donor = chitToDonor.get(c);
-                cleanup(donor, c.getId());
-                return;
-            }
-        }
-    }
-
-    @Override
-    public void windowClosing(WindowEvent e)
-    {
-        cleanup(null, null);
-    }
-
-    public void actionPerformed(ActionEvent e)
-    {
-        if (e.getActionCommand().equals("Cancel"))
-        {
-            cleanup(null, null);
         }
     }
 }

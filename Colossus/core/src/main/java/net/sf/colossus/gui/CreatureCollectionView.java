@@ -9,6 +9,7 @@ import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +32,7 @@ import net.sf.colossus.util.Options;
 import net.sf.colossus.variant.CreatureType;
 
 
-/** 
+/**
  *  Viewer for a collection, say the graveyard or the creature keeper
  *  @version $Id$
  *  @author Tom Fruchterman
@@ -101,7 +102,15 @@ class CreatureCollectionView extends KDialog
         getContentPane().add(scrollPane, BorderLayout.CENTER);
         getContentPane().add(legendLabel, BorderLayout.SOUTH);
 
-        addWindowListener(this);
+        addWindowListener(new WindowAdapter()
+        {
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+                CreatureCollectionView.this.client.getOptions().setOption(
+                    Options.showCaretaker, false);
+            }
+        });
 
         pack();
 
@@ -296,7 +305,7 @@ class CreatureCollectionView extends KDialog
 
         setVisible(false);
 
-        // We MUST remove this. Otherwise the object does not get 
+        // We MUST remove this. Otherwise the object does not get
         // garbage-collected.
         getContentPane().remove(legendLabel);
 
@@ -315,18 +324,11 @@ class CreatureCollectionView extends KDialog
     }
 
     @Override
-    public void windowClosing(WindowEvent e)
-    {
-        CreatureCollectionView.this.client.getOptions().setOption(
-            Options.showCaretaker, false);
-    }
-
-    @Override
     public Dimension getMinimumSize()
     {
         List<CreatureType> creatures = client.getGame().getVariant()
             .getCreatureTypes();
-        // default : 5 creatures wide 
+        // default : 5 creatures wide
 
         int minSingleX = CHIT_SIZE + 8;
         if (minSingleX < (int)baseLabel.getPreferredSize().getWidth() + 8)

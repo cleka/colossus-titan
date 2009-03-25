@@ -13,8 +13,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -37,7 +37,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JToggleButton;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.text.Document;
@@ -52,15 +51,14 @@ import net.sf.colossus.util.ResourceLoader;
 
 
 /**
- * Class GetPlayers is a dialog used to enter players' 
+ * Class GetPlayers is a dialog used to enter players'
  *   names, types, variant, etc.
  * @version $Id$
  * @author David Ripton
  * @author Romain Dolbeau
  */
 @SuppressWarnings("serial")
-public final class GetPlayers extends KFrame implements WindowListener,
-    ActionListener, ItemListener
+public final class GetPlayers extends KFrame
 {
     private static final Logger LOGGER = Logger.getLogger(GetPlayers.class
         .getName());
@@ -100,7 +98,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
     private final SaveWindow saveWindow;
 
     /** Clear options to abort */
-    public GetPlayers(Options options, Object mutex, Start startObject,
+    public GetPlayers(final Options options, Object mutex, Start startObject,
         boolean byWebClient)
     {
         super("Game Setup");
@@ -167,7 +165,13 @@ public final class GetPlayers extends KFrame implements WindowListener,
             .toArray(new String[sPortChoices.size()]));
         serveAtPortBox.setEditable(true);
         serveAtPortBox.setSelectedItem("" + stPort);
-        serveAtPortBox.addActionListener(this);
+        serveAtPortBox.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+                String portString = (String)serveAtPortBox.getSelectedItem();
+                serveAtPort = Integer.parseInt(portString);
+                setRunningOnLabel(serveAtPort);
+            }});
         serveAtPort = stPort;
         portPane.add(serveAtPortBox);
         optionPane.add(portPane);
@@ -192,7 +196,13 @@ public final class GetPlayers extends KFrame implements WindowListener,
         optionPane.add(viewModePane);
 
         viewModeBox = new JComboBox(Options.viewModeArray);
-        viewModeBox.addActionListener(this);
+        viewModeBox.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+                String value = (String)viewModeBox.getSelectedItem();
+                options.setOption(Options.viewMode, value);
+            }
+        });
         viewModeBox.setSelectedItem(viewmodeName);
         viewModePane.add(new JLabel("Viewable legion content:"));
         viewModePane.add(viewModeBox);
@@ -200,7 +210,13 @@ public final class GetPlayers extends KFrame implements WindowListener,
         String eventExpiringVal = options.getStringOption(
             Options.eventExpiring, "5");
         eventExpiringBox = new JComboBox(Options.eventExpiringChoices);
-        eventExpiringBox.addActionListener(this);
+        eventExpiringBox.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+                String value = (String)eventExpiringBox.getSelectedItem();
+                options.setOption(Options.eventExpiring, value);
+            }
+        });
         eventExpiringBox.setSelectedItem(eventExpiringVal);
         viewModePane.add(new JLabel("Events expire after (turns):"));
         viewModePane.add(eventExpiringBox);
@@ -240,7 +256,19 @@ public final class GetPlayers extends KFrame implements WindowListener,
         setDelayLabel(oldDelay);
         aiTimePane.add(delayLabel);
         JButton delayButton = new JButton(Options.aiDelay);
-        delayButton.addActionListener(this);
+        delayButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                final int newDelay = PickIntValue.pickIntValue(GetPlayers.this, oldDelay,
+                    "Pick AI Delay (in ms)", Constants.MIN_AI_DELAY,
+                    Constants.MAX_AI_DELAY, 100, options);
+                if (newDelay != oldDelay)
+                {
+                    options.setOption(Options.aiDelay, newDelay);
+                    oldDelay = newDelay;
+                }
+                setDelayLabel(newDelay);
+
+            }});
         aiTimePane.add(delayButton);
 
         oldLimit = options.getIntOption(Options.aiTimeLimit);
@@ -253,7 +281,19 @@ public final class GetPlayers extends KFrame implements WindowListener,
         setTimeLimitLabel(oldLimit);
         aiTimePane.add(timeLimitLabel);
         JButton timeLimitButton = new JButton(Options.aiTimeLimit);
-        timeLimitButton.addActionListener(this);
+        timeLimitButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+                final int newLimit = PickIntValue.pickIntValue(GetPlayers.this, oldLimit,
+                    "Pick AI Time Limit (in s)", Constants.MIN_AI_TIME_LIMIT,
+                    Constants.MAX_AI_TIME_LIMIT, 1, options);
+                if (newLimit != oldLimit)
+                {
+                    options.setOption(Options.aiTimeLimit, newLimit);
+                    oldLimit = newLimit;
+                }
+                setTimeLimitLabel(newLimit);
+            }});
         aiTimePane.add(timeLimitButton);
 
         JPanel variantPane = new JPanel();
@@ -311,7 +351,41 @@ public final class GetPlayers extends KFrame implements WindowListener,
         }
 
         variantBox = new JComboBox(variantVector);
-        variantBox.addActionListener(this);
+        variantBox.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+                int maxPlayers = VariantSupport.getMaxPlayers();
+                String varName = (String)variantBox.getSelectedItem();
+
+                if (VariantSupport.getVariantName().equals(varName))
+                {
+                    // re-selecting the same ; do nothing
+                }
+                else
+                {
+                    Document doc = VariantSupport.loadVariantByName(varName,
+                        true);
+                    options.setOption(Options.variant, varName);
+                    String varFileWithFullPath = VariantSupport
+                        .getFullPathFileForVariantName(varName);
+                    if (varFileWithFullPath == null)
+                    {
+                        varFileWithFullPath = "null";
+                    }
+                    options.setOption(Options.variantFileWithFullPath,
+                        varFileWithFullPath);
+
+                    String prop = (String)doc
+                        .getProperty(ResourceLoader.keyContentType);
+                    readme.setContentType(prop);
+                    readme.setDocument(doc);
+                    if (maxPlayers != VariantSupport.getMaxPlayers())
+                    {
+                        enablePlayers();
+                    }
+                }
+            }
+        });
         if (isBuiltinVariant)
         {
             variantBox.setSelectedItem(variantName);
@@ -341,10 +415,21 @@ public final class GetPlayers extends KFrame implements WindowListener,
         variantPane.add(variantBox);
         JButton buttonVariant = new JButton(loadVariant);
         variantPane.add(buttonVariant);
-        buttonVariant.addActionListener(this);
+        buttonVariant.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+                doLoadVariant();
+                String varName = VariantSupport.getVariantName();
+                if (!(Constants.getVariantList().contains(varName)))
+                {
+                    addVariantToBoxIfNeeded(varName);
+                    variantBox.setSelectedItem(varName);
+                }
+            }
+        });
 
         // ================== Variant README tab =====================
-        // if we don't pass the JEditorPane ("readme"), 
+        // if we don't pass the JEditorPane ("readme"),
         // it won't be updated when Variant changes.
 
         Document doc;
@@ -371,12 +456,21 @@ public final class GetPlayers extends KFrame implements WindowListener,
         JButton button3 = new JButton(Constants.runClient);
         button3.setMnemonic(KeyEvent.VK_C);
         clientPane.add(button3);
-        button3.addActionListener(this);
+        button3.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+                doClientDialog();
+            }
+        });
 
         JButton button5 = new JButton(Constants.runWebClient);
         button5.setMnemonic(KeyEvent.VK_W);
         clientPane.add(button5);
-        button5.addActionListener(this);
+        button5.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+                doRunWebClient();
+            }});
 
         JPanel gamePane = new JPanel();
         gamePane.setBorder(new TitledBorder("Game Startup"));
@@ -386,17 +480,29 @@ public final class GetPlayers extends KFrame implements WindowListener,
         JButton button1 = new JButton(Constants.newGame);
         button1.setMnemonic(KeyEvent.VK_N);
         gamePane.add(button1);
-        button1.addActionListener(this);
+        button1.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+                doNewGame();
+            }});
 
         JButton button2 = new JButton(Constants.loadGame);
         button2.setMnemonic(KeyEvent.VK_L);
         gamePane.add(button2);
-        button2.addActionListener(this);
+        button2.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+                doLoadGame();
+            }});
 
         JButton button4 = new JButton(Constants.quitGame);
         button4.setMnemonic(KeyEvent.VK_Q);
         gamePane.add(button4);
-        button4.addActionListener(this);
+        button4.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+                doQuit();
+            }});
 
         enablePlayers();
 
@@ -416,7 +522,13 @@ public final class GetPlayers extends KFrame implements WindowListener,
             setLocation(loadLocation);
         }
 
-        addWindowListener(this);
+        addWindowListener(new WindowAdapter(){
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+                doQuit();
+            }
+        });
         setVisible(true);
     }
 
@@ -478,7 +590,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
         String s = "Player " + (i + 1);
         onePlayerPane.add(new JLabel(s));
 
-        JComboBox playerType = new JComboBox(typeChoices);
+        final JComboBox playerType = new JComboBox(typeChoices);
 
         // Avoid scrolling (otherwise "Human" might not be visible directly)
         // the number is chosen to be larger then the current choices but not
@@ -490,7 +602,41 @@ public final class GetPlayers extends KFrame implements WindowListener,
         playerType.setSelectedItem(type);
 
         onePlayerPane.add(playerType);
-        playerType.addActionListener(this);
+        playerType.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+                for (int i = 0; i < Constants.MAX_MAX_PLAYERS; i++)
+                {
+                    // If player type was changed to none, also change
+                    // player name to none.
+                    String value = (String)playerType.getSelectedItem();
+                    if (value.equals(Constants.none))
+                    {
+                        playerNames[i].setSelectedItem(Constants.none);
+                    }
+                    else if (value.equals(Constants.network))
+                    {
+                        playerNames[i].setSelectedItem(Constants.byClient);
+                    }
+                    else if (value.endsWith(Constants.ai))
+                    {
+                        playerNames[i].setSelectedItem(Constants.byColor);
+                    }
+                    else if (value.endsWith(Constants.human))
+                    {
+                        String uniqueHuman = makeUniqueName(
+                            Constants.username, i);
+                        playerNames[i].setSelectedItem(uniqueHuman);
+                    }
+                    // If player type was changed away from none, also
+                    // change player name to something else.
+                    else if (playerNames[i].getSelectedItem().equals(
+                        Constants.none))
+                    {
+                        playerNames[i].setSelectedItem(Constants.byColor);
+                    }
+                }
+            }});
         playerType.setEnabled(false);
         playerTypes[i] = playerType;
 
@@ -535,10 +681,27 @@ public final class GetPlayers extends KFrame implements WindowListener,
             nameChoices.add(Constants.none);
         }
 
-        JComboBox playerName = new JComboBox(nameChoices);
+        final JComboBox playerName = new JComboBox(nameChoices);
         playerName.setEditable(true);
         onePlayerPane.add(playerName);
-        playerName.addActionListener(this);
+        playerName.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+                // If player name was changed to none, also change
+                // player type to none.
+                String value = (String)playerName.getSelectedItem();
+                if (value.equals(Constants.none))
+                {
+                    playerTypes[i].setSelectedItem(Constants.none);
+                }
+                // If player type was changed away from none, also
+                // change player name to something else.
+                else if (playerTypes[i].getSelectedItem().equals(
+                    Constants.none))
+                {
+                    playerTypes[i].setSelectedItem(Constants.anyAI);
+                }
+            }});
         playerName.setEnabled(false);
         playerNames[i] = playerName;
     }
@@ -553,11 +716,18 @@ public final class GetPlayers extends KFrame implements WindowListener,
         }
     }
 
-    private void addCheckbox(String optname, Container pane)
+    private void addCheckbox(final String optname, Container pane)
     {
         JCheckBox cb = new JCheckBox(optname);
         cb.setSelected(options.getOption(optname));
-        cb.addItemListener(this);
+        cb.addItemListener(new ItemListener()
+        {
+            public void itemStateChanged(ItemEvent e)
+            {
+                boolean selected = (e.getStateChange() == ItemEvent.SELECTED);
+                options.setOption(optname, selected);
+            }
+        });
         pane.add(cb);
     }
 
@@ -695,12 +865,6 @@ public final class GetPlayers extends KFrame implements WindowListener,
     {
         startObject.setWhatToDoNext(WhatToDoNext.START_WEB_CLIENT, false);
         dispose();
-    }
-
-    @Override
-    public void windowClosing(WindowEvent e)
-    {
-        doQuit();
     }
 
     private boolean quitAlreadyTried = false;
@@ -850,175 +1014,6 @@ public final class GetPlayers extends KFrame implements WindowListener,
         variantBox.addItem(varName);
     }
 
-    public synchronized void actionPerformed(ActionEvent e)
-    {
-        if (e.getActionCommand().equals(Constants.quitGame))
-        {
-            doQuit();
-        }
-        else if (e.getActionCommand().equals(Constants.newGame))
-        {
-            doNewGame();
-        }
-        else if (e.getActionCommand().equals(Constants.loadGame))
-        {
-            doLoadGame();
-        }
-        else if (e.getActionCommand().equals(Constants.runClient))
-        {
-            doClientDialog();
-        }
-        else if (e.getActionCommand().equals(Constants.runWebClient))
-        {
-            doRunWebClient();
-        }
-        else if (e.getActionCommand().equals(Options.aiDelay))
-        {
-            final int newDelay = PickIntValue.pickIntValue(this, oldDelay,
-                "Pick AI Delay (in ms)", Constants.MIN_AI_DELAY,
-                Constants.MAX_AI_DELAY, 100, options);
-            if (newDelay != oldDelay)
-            {
-                options.setOption(Options.aiDelay, newDelay);
-                oldDelay = newDelay;
-            }
-            setDelayLabel(newDelay);
-        }
-        else if (e.getActionCommand().equals(Options.aiTimeLimit))
-        {
-            final int newLimit = PickIntValue.pickIntValue(this, oldLimit,
-                "Pick AI Time Limit (in s)", Constants.MIN_AI_TIME_LIMIT,
-                Constants.MAX_AI_TIME_LIMIT, 1, options);
-            if (newLimit != oldLimit)
-            {
-                options.setOption(Options.aiTimeLimit, newLimit);
-                oldLimit = newLimit;
-            }
-            setTimeLimitLabel(newLimit);
-        }
-        else if (e.getActionCommand().startsWith(loadVariant))
-        {
-            doLoadVariant();
-            String varName = VariantSupport.getVariantName();
-            if (!(Constants.getVariantList().contains(varName)))
-            {
-                addVariantToBoxIfNeeded(varName);
-                variantBox.setSelectedItem(varName);
-            }
-        }
-        else
-        {
-            // A combo box was changed.
-            Object source = e.getSource();
-            if (source == variantBox)
-            {
-                int maxPlayers = VariantSupport.getMaxPlayers();
-                String varName = (String)variantBox.getSelectedItem();
-
-                if (VariantSupport.getVariantName().equals(varName))
-                {
-                    // re-selecting the same ; do nothing
-                }
-                else
-                {
-                    Document doc = VariantSupport.loadVariantByName(varName,
-                        true);
-                    options.setOption(Options.variant, varName);
-                    String varFileWithFullPath = VariantSupport
-                        .getFullPathFileForVariantName(varName);
-                    if (varFileWithFullPath == null)
-                    {
-                        varFileWithFullPath = "null";
-                    }
-                    options.setOption(Options.variantFileWithFullPath,
-                        varFileWithFullPath);
-
-                    String prop = (String)doc
-                        .getProperty(ResourceLoader.keyContentType);
-                    readme.setContentType(prop);
-                    readme.setDocument(doc);
-                    if (maxPlayers != VariantSupport.getMaxPlayers())
-                    {
-                        enablePlayers();
-                    }
-                }
-            }
-            else if (source == viewModeBox)
-            {
-                String value = (String)viewModeBox.getSelectedItem();
-                options.setOption(Options.viewMode, value);
-            }
-            else if (source == eventExpiringBox)
-            {
-                String value = (String)eventExpiringBox.getSelectedItem();
-                options.setOption(Options.eventExpiring, value);
-            }
-            else if (source == serveAtPortBox)
-            {
-                String portString = (String)serveAtPortBox.getSelectedItem();
-                serveAtPort = Integer.parseInt(portString);
-                setRunningOnLabel(serveAtPort);
-            }
-            else
-            {
-                for (int i = 0; i < Constants.MAX_MAX_PLAYERS; i++)
-                {
-                    JComboBox box = playerTypes[i];
-                    if (box == source)
-                    {
-                        // If player type was changed to none, also change
-                        // player name to none.
-                        String value = (String)box.getSelectedItem();
-                        if (value.equals(Constants.none))
-                        {
-                            playerNames[i].setSelectedItem(Constants.none);
-                        }
-                        else if (value.equals(Constants.network))
-                        {
-                            playerNames[i].setSelectedItem(Constants.byClient);
-                        }
-                        else if (value.endsWith(Constants.ai))
-                        {
-                            playerNames[i].setSelectedItem(Constants.byColor);
-                        }
-                        else if (value.endsWith(Constants.human))
-                        {
-                            String uniqueHuman = makeUniqueName(
-                                Constants.username, i);
-                            playerNames[i].setSelectedItem(uniqueHuman);
-                        }
-                        // If player type was changed away from none, also
-                        // change player name to something else.
-                        else if (playerNames[i].getSelectedItem().equals(
-                            Constants.none))
-                        {
-                            playerNames[i].setSelectedItem(Constants.byColor);
-                        }
-                    }
-
-                    box = playerNames[i];
-                    if (box == source)
-                    {
-                        // If player name was changed to none, also change
-                        // player type to none.
-                        String value = (String)box.getSelectedItem();
-                        if (value.equals(Constants.none))
-                        {
-                            playerTypes[i].setSelectedItem(Constants.none);
-                        }
-                        // If player type was changed away from none, also
-                        // change player name to something else.
-                        else if (playerTypes[i].getSelectedItem().equals(
-                            Constants.none))
-                        {
-                            playerTypes[i].setSelectedItem(Constants.anyAI);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     @Override
     public Dimension getMinimumSize()
     {
@@ -1029,14 +1024,6 @@ public final class GetPlayers extends KFrame implements WindowListener,
     public Dimension getPreferredSize()
     {
         return new Dimension(640, 768);
-    }
-
-    public void itemStateChanged(ItemEvent e)
-    {
-        JToggleButton source = (JToggleButton)e.getSource();
-        String text = source.getText();
-        boolean selected = (e.getStateChange() == ItemEvent.SELECTED);
-        options.setOption(text, selected);
     }
 
     /*
@@ -1063,41 +1050,5 @@ public final class GetPlayers extends KFrame implements WindowListener,
         {
             mutex.notify();
         }
-    }
-
-    @Override
-    public void windowActivated(WindowEvent e)
-    {
-        // nothing to do
-    }
-
-    @Override
-    public void windowClosed(WindowEvent e)
-    {
-        // nothing to do
-    }
-
-    @Override
-    public void windowDeactivated(WindowEvent e)
-    {
-        // nothing to do
-    }
-
-    @Override
-    public void windowDeiconified(WindowEvent e)
-    {
-        // nothing to do
-    }
-
-    @Override
-    public void windowIconified(WindowEvent e)
-    {
-        // nothing to do
-    }
-
-    @Override
-    public void windowOpened(WindowEvent e)
-    {
-        // nothing to do
     }
 }

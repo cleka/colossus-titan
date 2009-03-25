@@ -30,7 +30,6 @@ public abstract class AbstractShowRecruits extends KDialog
         assert SwingUtilities.isEventDispatchThread() : "GUI code should only run on the EDT";
 
         setBackground(Color.lightGray);
-        addWindowListener(this);
         getContentPane().setLayout(
             new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
 

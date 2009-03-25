@@ -4,10 +4,6 @@ package net.sf.colossus.util;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 
 import javax.swing.JFrame;
 
@@ -17,13 +13,13 @@ import net.sf.colossus.webcommon.InstanceTracker;
 
 
 /** KFrame adds some generally useful functions to JFrame.
- * 
+ *
  * TODO SaveWindow handling should be on this level
- * 
+ *
  *  @version $Id$
  *  @author Clemens Katzer */
 
-public class KFrame extends JFrame implements MouseListener, WindowListener
+public class KFrame extends JFrame
 {
     private SaveWindow kSaveWindow;
 
@@ -47,15 +43,15 @@ public class KFrame extends JFrame implements MouseListener, WindowListener
      * creating it when useSaveWindow is called, and saving back
      * always when setVisible(false) is called (and useSaveWindow was
      * called before, of course).
-     * 
-     * TODO maybe we should enforce this by calling it through the 
+     *
+     * TODO maybe we should enforce this by calling it through the
      *      constructor
-     * 
-     * @param options IOptions reference to the client for saving window 
+     *
+     * @param options IOptions reference to the client for saving window
      *        size+pos in the Options data
-     * @param windowName name/title of the window, 
-     *        window size+pos are stored for that name 
-     * @param defaultLocation to be used if no location was earlier stored: 
+     * @param windowName name/title of the window,
+     *        window size+pos are stored for that name
+     * @param defaultLocation to be used if no location was earlier stored:
      *        place there; give null to center on screen.
      */
     public void useSaveWindow(IOptions options, String windowName,
@@ -100,74 +96,5 @@ public class KFrame extends JFrame implements MouseListener, WindowListener
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(new Point(d.width / 2 - getSize().width / 2, d.height / 2
             - getSize().height / 2));
-    }
-
-    // Add the do-nothing mouse and window listener methods here, rather 
-    // than using Adapters, to reduce the number of useless little inner
-    // class files we generate.
-
-    // Note the potential for error if a subclass tries to override
-    // one of these methods, but fails due to a typo, and the compiler
-    // no longer flags the error because the interface is legally implemented.
-    // (Adapters have the same problem.)
-
-    public void mouseClicked(MouseEvent e)
-    {
-        // nothing to do
-    }
-
-    public void mouseEntered(MouseEvent e)
-    {
-        // nothing to do
-    }
-
-    public void mouseExited(MouseEvent e)
-    {
-        // nothing to do
-    }
-
-    public void mousePressed(MouseEvent e)
-    {
-        // nothing to do
-    }
-
-    public void mouseReleased(MouseEvent e)
-    {
-        // nothing to do
-    }
-
-    public void windowClosed(WindowEvent e)
-    {
-        // nothing to do
-    }
-
-    public void windowActivated(WindowEvent e)
-    {
-        // nothing to do
-    }
-
-    public void windowClosing(WindowEvent e)
-    {
-        // nothing to do
-    }
-
-    public void windowDeactivated(WindowEvent e)
-    {
-        // nothing to do
-    }
-
-    public void windowDeiconified(WindowEvent e)
-    {
-        // nothing to do
-    }
-
-    public void windowIconified(WindowEvent e)
-    {
-        // nothing to do
-    }
-
-    public void windowOpened(WindowEvent e)
-    {
-        // nothing to do
     }
 }

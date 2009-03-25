@@ -11,8 +11,6 @@ import java.awt.Insets;
 import java.awt.SystemColor;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.WindowListener;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -39,8 +37,7 @@ import net.sf.colossus.variant.CreatureType;
  * A dialog that displays information about a single player and his legions.
  */
 @SuppressWarnings("serial")
-public final class PlayerDetailsDialog extends KDialog implements
-    MouseListener, WindowListener
+public final class PlayerDetailsDialog extends KDialog
 {
     private final PlayerClientSide player;
     private final Client client;

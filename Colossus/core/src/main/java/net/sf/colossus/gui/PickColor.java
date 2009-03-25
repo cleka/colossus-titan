@@ -8,7 +8,6 @@ import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowListener;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
@@ -30,8 +29,7 @@ import net.sf.colossus.util.Options;
  * @author David Ripton
  */
 @SuppressWarnings("serial")
-final class PickColor extends KDialog implements WindowListener,
-    ActionListener
+final class PickColor extends KDialog
 {
     // TODO the next two arrays should be members in Constants.PlayerColor
     private static final Color[] background;
@@ -79,7 +77,15 @@ final class PickColor extends KDialog implements WindowListener,
                 button.setMnemonic(curColor.getMnemonic());
                 button.setBackground(background[i]);
                 button.setForeground(foreground[i]);
-                button.addActionListener(this);
+                button.addActionListener(new ActionListener()
+                {
+                    public void actionPerformed(ActionEvent e)
+                    {
+                        color = PlayerColor.getByName(e.getActionCommand());
+                        saveWindow.saveLocation(getLocation());
+                        dispose();
+                    }
+                });
                 contentPane.add(button);
             }
         }
@@ -95,7 +101,6 @@ final class PickColor extends KDialog implements WindowListener,
         {
             setLocation(location);
         }
-        addWindowListener(this);
         setVisible(true);
     }
 
@@ -143,13 +148,6 @@ final class PickColor extends KDialog implements WindowListener,
             }
         }
         return null;
-    }
-
-    public void actionPerformed(ActionEvent e)
-    {
-        color = PlayerColor.getByName(e.getActionCommand());
-        saveWindow.saveLocation(getLocation());
-        dispose();
     }
 
     public static void main(String[] args)

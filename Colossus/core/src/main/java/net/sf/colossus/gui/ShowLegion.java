@@ -3,10 +3,10 @@ package net.sf.colossus.gui;
 
 import java.awt.Color;
 import java.awt.Point;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -21,8 +21,7 @@ import net.sf.colossus.util.KDialog;
  * @author David Ripton
  */
 
-final class ShowLegion extends KDialog implements MouseListener,
-    WindowListener
+final class ShowLegion extends KDialog
 {
     ShowLegion(JFrame parentFrame, LegionClientSide legion, Point point,
         JScrollPane pane, int scale, int viewMode, boolean dubiousAsBlanks)
@@ -36,7 +35,14 @@ final class ShowLegion extends KDialog implements MouseListener,
         }
 
         setBackground(Color.lightGray);
-        addWindowListener(this);
+        addWindowListener(new WindowAdapter()
+        {
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+                dispose();
+            }
+        });
 
         LegionInfoPanel liPanel = new LegionInfoPanel(legion, scale, 5, 2,
             false, viewMode, dubiousAsBlanks, false);
@@ -52,32 +58,15 @@ final class ShowLegion extends KDialog implements MouseListener,
         placeRelative(parentFrame, point, pane);
 
         pack();
-        addMouseListener(this);
+        addMouseListener(new MouseAdapter()
+        {
+            @Override
+            public void mouseClicked(MouseEvent e)
+            {
+                dispose();
+            }
+        });
         setVisible(true);
         repaint();
-    }
-
-    @Override
-    public void mouseClicked(MouseEvent e)
-    {
-        dispose();
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e)
-    {
-        dispose();
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e)
-    {
-        dispose();
-    }
-
-    @Override
-    public void windowClosing(WindowEvent e)
-    {
-        dispose();
     }
 }

@@ -6,8 +6,8 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -36,8 +36,7 @@ import net.sf.colossus.util.Options;
  *  @author David Ripton
  */
 @SuppressWarnings("serial")
-public class StartClient extends KFrame implements WindowListener,
-    ActionListener
+public class StartClient extends KFrame
 {
     private static final Logger LOGGER = Logger.getLogger(StartClient.class
         .getName());
@@ -56,7 +55,7 @@ public class StartClient extends KFrame implements WindowListener,
     private final JComboBox hostBox;
     private final JComboBox portBox;
 
-    public StartClient(Object mutex, Start startObject)
+    public StartClient(Object mutex, final Start startObject)
     {
         super("Client startup options");
         getContentPane().setLayout(new GridLayout(0, 2));
@@ -67,7 +66,7 @@ public class StartClient extends KFrame implements WindowListener,
         this.startObject = startObject;
         this.stOptions = startObject.getStartOptions();
 
-        // player, preferred host (or null) and port from main() / cmdline 
+        // player, preferred host (or null) and port from main() / cmdline
         this.playerName = stOptions.getStringOption(Options.runClientPlayer);
         this.hostname = stOptions.getStringOption(Options.runClientHost);
         this.port = stOptions.getIntOption(Options.runClientPort);
@@ -84,7 +83,13 @@ public class StartClient extends KFrame implements WindowListener,
         nameChoices.add(Constants.username);
         nameBox = new JComboBox(new Vector<String>(nameChoices));
         nameBox.setEditable(true);
-        nameBox.addActionListener(this);
+        nameBox.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                playerName = (String)nameBox.getSelectedItem();
+            }
+        });
         nameBox.setSelectedItem(playerName);
         panel.add(nameBox);
 
@@ -96,7 +101,13 @@ public class StartClient extends KFrame implements WindowListener,
         hostBox = new JComboBox(new Vector<String>(hostChoices));
         hostBox.setEditable(true);
         hostBox.setSelectedItem(preferred);
-        hostBox.addActionListener(this);
+        hostBox.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                hostname = (String)hostBox.getSelectedItem();
+            }
+        });
         panel.add(hostBox);
 
         panel.add(new JLabel("Server port"));
@@ -106,18 +117,46 @@ public class StartClient extends KFrame implements WindowListener,
         portBox = new JComboBox(portChoices.toArray(new String[portChoices
             .size()]));
         portBox.setEditable(true);
-        portBox.addActionListener(this);
+        portBox.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                port = Integer.parseInt((String)portBox.getSelectedItem());
+            }
+        });
         panel.add(portBox);
 
         JButton goButton = new JButton("Go");
-        goButton.addActionListener(this);
+        goButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                doRunNetClient();
+            }
+        });
         panel.add(goButton);
 
         JButton quitButton = new JButton(Constants.quitGame);
-        quitButton.addActionListener(this);
+        quitButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                startObject.setWhatToDoNext(WhatToDoNext.QUIT_ALL, true);
+                dispose();
+            }
+        });
         panel.add(quitButton);
 
-        addWindowListener(this);
+        addWindowListener(new WindowAdapter()
+        {
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+                startObject.setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG,
+                    false);
+                dispose();
+            }
+        });
         pack();
         saveWindow = new SaveWindow(netclientOptions, "StartClient");
         saveWindow.restoreOrCenter(this);
@@ -128,12 +167,12 @@ public class StartClient extends KFrame implements WindowListener,
     /* Public and static for Start.java.
      * Initializes the hostChoices set for the ComboBox with
      * - current running host name and IP
-     * - wantedHost hostname got as parameter (got from cmdline), 
+     * - wantedHost hostname got as parameter (got from cmdline),
      *   can be null
      * - LRU list from cf file
      * Returns the "preferred" servername, i.e. the one that shall be
-     * set as preselected item in the hostbox. The preferred one is 
-     * server name the one given as parameter, or if none, then the 
+     * set as preselected item in the hostbox. The preferred one is
+     * server name the one given as parameter, or if none, then the
      * one last used from LRU list (or if even that is empty, defaults
      * to current hostname).
      */
@@ -192,7 +231,7 @@ public class StartClient extends KFrame implements WindowListener,
         {
             // no name given - default to what we otherwise decided
             // to be the "preferred" one.
-            // No asignment here - caller will assing his "hostname" 
+            // No asignment here - caller will assing his "hostname"
             // be become what we give back
         }
 
@@ -209,43 +248,6 @@ public class StartClient extends KFrame implements WindowListener,
     public Dimension getPreferredSize()
     {
         return getMinimumSize();
-    }
-
-    public void actionPerformed(ActionEvent e)
-    {
-        if (e.getActionCommand().equals(Constants.quitGame))
-        {
-            startObject.setWhatToDoNext(WhatToDoNext.QUIT_ALL, true);
-            dispose();
-        }
-        else if (e.getActionCommand().equals("Go"))
-        {
-            doRunNetClient();
-        }
-        else
-        // A combo box was changed.
-        {
-            Object source = e.getSource();
-            if (source == nameBox)
-            {
-                playerName = (String)nameBox.getSelectedItem();
-            }
-            else if (source == hostBox)
-            {
-                hostname = (String)hostBox.getSelectedItem();
-            }
-            else if (source == portBox)
-            {
-                port = Integer.parseInt((String)portBox.getSelectedItem());
-            }
-        }
-    }
-
-    @Override
-    public void windowClosing(WindowEvent e)
-    {
-        startObject.setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
-        dispose();
     }
 
     @Override
@@ -274,9 +276,9 @@ public class StartClient extends KFrame implements WindowListener,
         dispose();
     }
 
-    /** 
+    /**
      *  Put the chosen hostname as first to the LRU sorted list
-     *  in NetClient cf file. 
+     *  in NetClient cf file.
      */
     private void saveHostname(Options netclientOptions)
     {

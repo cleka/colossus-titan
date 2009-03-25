@@ -9,10 +9,10 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.text.MessageFormat;
 import java.util.Iterator;
 import java.util.List;
@@ -62,12 +62,11 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  *
  *
  * TODO this dialog should have a SaveWindow attached to it.
- * 
+ *
  * @author Towi, copied from ShowRecruitTree
  * @version $Id$
  */
-public final class ShowCreatureDetails extends KDialog implements
-    MouseListener, WindowListener
+public final class ShowCreatureDetails extends KDialog
 {
 
     /** pops up the non-modal dialog. info can be updated if needed.
@@ -82,13 +81,29 @@ public final class ShowCreatureDetails extends KDialog implements
         super(parentFrame, "Creature Info: " + creature.getName(), false);
 
         setBackground(Color.lightGray);
-        addWindowListener(this);
+        addWindowListener(new WindowAdapter()
+        {
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+                dispose();
+            }
+
+        });
         Container cnt = getContentPane();
 
         showCreatureDetails(cnt, creature);
 
         pack();
-        addMouseListener(this);
+        addMouseListener(new MouseAdapter()
+        {
+            @Override
+            public void mouseClicked(MouseEvent e)
+            {
+                dispose();
+            }
+
+        });
         if (point != null)
         {
             placeRelative(parentFrame, point, pane);
@@ -127,7 +142,7 @@ public final class ShowCreatureDetails extends KDialog implements
             + (creature.useMagicMissile() ? " <b>(magic missiles)</b>" : ""));
         _trSpan(s, "Flier", creature.isFlier() ? "yes" : "no");
         _trSpan(s, "Summonable", creature.isSummonable() ? "yes" : "no");
-        // TODO Instead show full list of "where and for each multiple of X 
+        // TODO Instead show full list of "where and for each multiple of X
         _trSpan(s, "Acquirable",
             TerrainRecruitLoader.isAcquirable(creature) ? "yes" : "no");
         _trSpan(s, _low("Lord"), creature.isLordOrDemiLord() ? (creature
@@ -429,15 +444,15 @@ public final class ShowCreatureDetails extends KDialog implements
     /** helper class to simulate a battle of the creature in question against
      * an other creature. especially distance and hazard must be simulated.
      * very fragile class, i suppose. but it might be worth it.
-     * 
+     *
      * TODO this gets harder and harder to maintain the more typesafe the model gets.
      * Figure out what it is really good for and solve the actual problem. Currently
      * it even causes assertion errors since it passes nulls where nulls aren't allowed.
-     * 
+     *
      * TODO this is the only reference to {@link CreatureServerSide} left in the client
      * code and it probably doesn't need the specific model. If this should stay, it
      * should probably changed to use {@link net.sf.colossus.game.Creature} instead.
-     * 
+     *
      * @author Towi
      */
     final class SimulatedCritter extends CreatureServerSide
@@ -514,36 +529,4 @@ public final class ShowCreatureDetails extends KDialog implements
             return 0;
         }
     }
-
-    //
-    // mouse and window events
-    //
-    /** disposes. */
-    @Override
-    public void mouseClicked(MouseEvent e)
-    {
-        dispose();
-    }
-
-    /** disposes. */
-    @Override
-    public void mousePressed(MouseEvent e)
-    {
-        dispose();
-    }
-
-    /** disposes. */
-    @Override
-    public void mouseReleased(MouseEvent e)
-    {
-        dispose();
-    }
-
-    /** disposes. */
-    @Override
-    public void windowClosing(WindowEvent e)
-    {
-        dispose();
-    }
-
 }

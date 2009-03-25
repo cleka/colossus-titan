@@ -8,8 +8,8 @@ import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -32,7 +32,7 @@ import net.sf.colossus.util.Options;
  * @author David Ripton
  */
 @SuppressWarnings("serial")
-final class StatusScreen extends KDialog implements WindowListener
+final class StatusScreen extends KDialog
 {
     private final int numPlayers;
 
@@ -56,14 +56,13 @@ final class StatusScreen extends KDialog implements WindowListener
     private final JLabel battlePhaseLabel;
 
     private IOracle oracle;
-    private IOptions options;
     private Client client;
 
     private Point location;
     private Dimension size;
     private final SaveWindow saveWindow;
 
-    StatusScreen(final JFrame frame, IOracle oracle, IOptions options,
+    StatusScreen(final JFrame frame, IOracle oracle, final IOptions options,
         final Client client)
     {
         super(frame, "Game Status", false);
@@ -72,13 +71,19 @@ final class StatusScreen extends KDialog implements WindowListener
         setFocusable(false);
 
         this.oracle = oracle;
-        this.options = options;
         this.client = client;
 
         // Needs to be set up before calling this.
         numPlayers = oracle.getNumPlayers();
 
-        addWindowListener(this);
+        addWindowListener(new WindowAdapter()
+        {
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+                options.setOption(Options.showStatusScreen, false);
+            }
+        });
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
@@ -337,15 +342,8 @@ final class StatusScreen extends KDialog implements WindowListener
         saveWindow.saveSize(size);
         location = getLocation();
         saveWindow.saveLocation(location);
-        this.options = null;
         this.client = null;
         this.oracle = null;
-    }
-
-    @Override
-    public void windowClosing(WindowEvent e)
-    {
-        options.setOption(Options.showStatusScreen, false);
     }
 
     @Override

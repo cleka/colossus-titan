@@ -5,10 +5,10 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.Point;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -27,8 +27,7 @@ import net.sf.colossus.util.KDialog;
  * @author David Ripton
  */
 
-final class PickMarker extends KDialog implements MouseListener,
-    WindowListener
+final class PickMarker extends KDialog
 {
     private final List<Marker> markers = new ArrayList<Marker>();
     private final SaveWindow saveWindow;
@@ -46,8 +45,15 @@ final class PickMarker extends KDialog implements MouseListener,
             cleanup(null);
         }
 
-        addMouseListener(this);
-        addWindowListener(this);
+        addWindowListener(new WindowAdapter()
+        {
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+                cleanup(null);
+            }
+
+        });
         Container contentPane = getContentPane();
 
         int numAvailable = markerIds.size();
@@ -60,10 +66,17 @@ final class PickMarker extends KDialog implements MouseListener,
         while (it.hasNext())
         {
             String markerId = it.next();
-            Marker marker = new Marker(4 * Scale.get(), markerId);
+            final Marker marker = new Marker(4 * Scale.get(), markerId);
             markers.add(marker);
             contentPane.add(marker);
-            marker.addMouseListener(this);
+            marker.addMouseListener(new MouseAdapter()
+            {
+                @Override
+                public void mousePressed(MouseEvent e)
+                {
+                    cleanup(marker.getId());
+                }
+            });
         }
 
         pack();
@@ -97,27 +110,7 @@ final class PickMarker extends KDialog implements MouseListener,
     private void cleanup(String pickedMarkerId)
     {
         saveWindow.saveLocation(getLocation());
-        removeMouseListener(this);
-        removeWindowListener(this);
         markerId = pickedMarkerId;
         dispose();
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e)
-    {
-        Object source = e.getSource();
-        int i = markers.indexOf(source);
-        if (i != -1)
-        {
-            Chit chit = markers.get(i);
-            cleanup(chit.getId());
-        }
-    }
-
-    @Override
-    public void windowClosing(WindowEvent e)
-    {
-        cleanup(null);
     }
 }

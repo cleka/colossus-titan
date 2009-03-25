@@ -9,10 +9,8 @@ import java.awt.FlowLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -37,10 +35,8 @@ import net.sf.colossus.variant.CreatureType;
  * @author David Ripton
  */
 
-final class PickRecruit extends KDialog implements MouseListener,
-    WindowListener, ActionListener
+final class PickRecruit extends KDialog
 {
-    private final List<CreatureType> recruits;
     private final List<Chit> recruitChits = new ArrayList<Chit>();
     private final Marker legionMarker;
     private final List<Chit> legionChits = new ArrayList<Chit>();
@@ -54,10 +50,7 @@ final class PickRecruit extends KDialog implements MouseListener,
         super(parentFrame, client.getOwningPlayer().getName()
             + ": Pick Recruit in " + hexDescription, true);
 
-        this.recruits = recruits;
-
-        addMouseListener(this);
-        addWindowListener(this);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         Container contentPane = getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
         setBackground(Color.lightGray);
@@ -93,7 +86,7 @@ final class PickRecruit extends KDialog implements MouseListener,
         contentPane.add(recruitPane);
 
         int i = 0;
-        for (CreatureType recruit : recruits)
+        for (final CreatureType recruit : recruits)
         {
             Box vertPane = new Box(BoxLayout.Y_AXIS);
             vertPane.setAlignmentY(0);
@@ -103,7 +96,16 @@ final class PickRecruit extends KDialog implements MouseListener,
             recruitChits.add(chit);
 
             vertPane.add(chit);
-            chit.addMouseListener(this);
+            chit.addMouseListener(new MouseAdapter()
+            {
+                @Override
+                public void mousePressed(MouseEvent e)
+                {
+                    // Recruit the chosen creature.
+                    PickRecruit.this.recruit = recruit.getName();
+                    dispose();
+                }
+            });
 
             int count = client.getGame().getCaretaker().getAvailableCount(
                 recruit);
@@ -114,7 +116,14 @@ final class PickRecruit extends KDialog implements MouseListener,
         }
 
         JButton cancelButton = new JButton("Cancel");
-        cancelButton.addActionListener(this);
+        cancelButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                // Only action is cancel.
+                dispose();
+            }
+        });
         recruitPane.add(cancelButton);
 
         pack();
@@ -152,37 +161,5 @@ final class PickRecruit extends KDialog implements MouseListener,
             active = false;
         }
         return recruit;
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e)
-    {
-        Object source = e.getSource();
-        int i = recruitChits.indexOf(source);
-        if (i != -1)
-        {
-            // Recruit the chosen creature.
-            recruit = (recruits.get(i)).getName();
-            dispose();
-        }
-    }
-
-    public void actionPerformed(ActionEvent e)
-    {
-        // Only action is cancel.
-        dispose();
-    }
-
-    @Override
-    public void windowClosing(WindowEvent e)
-    {
-        dispose();
-    }
-
-    @Override
-    public void dispose()
-    {
-        saveWindow.saveLocation(getLocation());
-        super.dispose();
     }
 }

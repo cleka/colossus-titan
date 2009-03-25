@@ -8,8 +8,8 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -31,7 +31,7 @@ import net.sf.colossus.util.KDialog;
  * @author David Ripton
  */
 
-final class Negotiate extends KDialog implements MouseListener, ActionListener
+final class Negotiate extends KDialog
 {
     private final Legion attacker;
     private final Legion defender;
@@ -57,10 +57,25 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
 
         setBackground(Color.lightGray);
-        addMouseListener(this);
 
         attackerMarker = showLegion(attacker, attackerChits);
+        attackerMarker.addMouseListener(new MouseAdapter()
+        {
+            @Override
+            public void mousePressed(MouseEvent e)
+            {
+                toggleAllDead(attackerChits);
+            }
+        });
         defenderMarker = showLegion(defender, defenderChits);
+        defenderMarker.addMouseListener(new MouseAdapter()
+        {
+            @Override
+            public void mousePressed(MouseEvent e)
+            {
+                toggleAllDead(defenderChits);
+            }
+        });
 
         JButton button1 = new JButton("Offer");
         button1.setMnemonic(KeyEvent.VK_O);
@@ -70,9 +85,24 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
         JPanel buttonPane = new JPanel();
         contentPane.add(buttonPane);
         buttonPane.add(button1);
-        button1.addActionListener(this);
+        button1.addActionListener(new ActionListener()
+        {
+
+            public void actionPerformed(ActionEvent e)
+            {
+                doOffer();
+            }
+
+        });
         buttonPane.add(button2);
-        button2.addActionListener(this);
+        button2.addActionListener(new ActionListener()
+        {
+
+            public void actionPerformed(ActionEvent e)
+            {
+                doFight();
+            }
+        });
 
         pack();
 
@@ -101,7 +131,6 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
         int scale = 4 * Scale.get();
 
         Marker marker = new Marker(scale, legion.getMarkerId());
-        marker.addMouseListener(this);
         pane.add(marker);
         pane.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
 
@@ -111,8 +140,16 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
         while (it.hasNext())
         {
             String imageName = it.next();
-            Chit chit = new Chit(scale, imageName);
-            chit.addMouseListener(this);
+            final Chit chit = new Chit(scale, imageName);
+            chit.addMouseListener(new MouseAdapter()
+            {
+                @Override
+                public void mousePressed(MouseEvent e)
+                {
+                    chit.toggleDead();
+                    chit.repaint();
+                }
+            });
             chits.add(chit);
             pane.add(chit);
         }
@@ -129,7 +166,7 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
 
     /*
      * If not all are dead yet, mark all as dead;
-     * but if all are dead, unmark all 
+     * but if all are dead, unmark all
      */
     private void toggleAllDead(List<Chit> chits)
     {
@@ -147,132 +184,106 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
         }
     }
 
-    @Override
-    public void mousePressed(MouseEvent e)
+    private void doOffer()
     {
-        Object source = e.getSource();
-        if (source == attackerMarker)
+        // Count remaining chits.
+        boolean attackersLeft = false;
+        Iterator<Chit> it = attackerChits.iterator();
+        while (it.hasNext())
         {
-            toggleAllDead(attackerChits);
-        }
-        else if (source == defenderMarker)
-        {
-            toggleAllDead(defenderChits);
-        }
-        else if (attackerChits.contains(source)
-            || defenderChits.contains(source))
-        {
-            Chit chit = (Chit)source;
-            chit.toggleDead();
-            chit.repaint();
-        }
-    }
-
-    public void actionPerformed(ActionEvent e)
-    {
-        if (e.getActionCommand().equals("Offer"))
-        {
-            // Count remaining chits.
-            boolean attackersLeft = false;
-            Iterator<Chit> it = attackerChits.iterator();
-            while (it.hasNext())
+            Chit chit = it.next();
+            if (!chit.isDead())
             {
-                Chit chit = it.next();
-                if (!chit.isDead())
-                {
-                    attackersLeft = true;
-                    break;
-                }
+                attackersLeft = true;
+                break;
             }
+        }
 
-            boolean defendersLeft = false;
-            it = defenderChits.iterator();
-            while (it.hasNext())
+        boolean defendersLeft = false;
+        it = defenderChits.iterator();
+        while (it.hasNext())
+        {
+            Chit chit = it.next();
+            if (!chit.isDead())
             {
-                Chit chit = it.next();
-                if (!chit.isDead())
-                {
-                    defendersLeft = true;
-                    break;
-                }
+                defendersLeft = true;
+                break;
             }
+        }
 
-            // Ensure that at least one legion is completely eliminated.
-            if (attackersLeft && defendersLeft)
-            {
-                gui.showMessageDialog("At least one legion must"
-                    + " be eliminated.");
-                return;
-            }
+        // Ensure that at least one legion is completely eliminated.
+        if (attackersLeft && defendersLeft)
+        {
+            gui.showMessageDialog("At least one legion must"
+                + " be eliminated.");
+            return;
+        }
 
-            if (!attackersLeft && !defendersLeft)
+        if (!attackersLeft && !defendersLeft)
+        {
+            // Mutual destruction.
+            proposal = new Proposal(attacker, defender, false, true, null,
+                null);
+        }
+        else
+        {
+            Legion winnerLegion;
+            List<Chit> winnerChits;
+
+            if (!defendersLeft)
             {
-                // Mutual destruction.
-                proposal = new Proposal(attacker, defender, false, true, null,
-                    null);
+                winnerLegion = attacker;
+                winnerChits = attackerChits;
             }
             else
             {
-                Legion winnerLegion;
-                List<Chit> winnerChits;
-
-                if (!defendersLeft)
-                {
-                    winnerLegion = attacker;
-                    winnerChits = attackerChits;
-                }
-                else
-                {
-                    winnerLegion = defender;
-                    winnerChits = defenderChits;
-                }
-
-                // Ensure that the winning legion doesn't contain a dead
-                // Titan.
-                it = winnerChits.iterator();
-                while (it.hasNext())
-                {
-                    Chit chit = it.next();
-                    if (chit.isDead()
-                        && chit.getId().startsWith(Constants.titan))
-                    {
-                        gui.showMessageDialog("Titan cannot die unless his"
-                            + " whole stack dies.");
-                        return;
-                    }
-                }
-
-                // Remove all dead creatures from the winning legion.
-                List<String> winnerLosses = new ArrayList<String>();
-                it = winnerChits.iterator();
-                while (it.hasNext())
-                {
-                    Chit chit = it.next();
-                    if (chit.isDead())
-                    {
-                        String name = chit.getId();
-                        if (name.startsWith(Constants.titan))
-                        {
-                            name = Constants.titan;
-                        }
-                        winnerLosses.add(name);
-                    }
-                }
-                proposal = new Proposal(attacker, defender, false, false,
-                    winnerLegion, winnerLosses);
+                winnerLegion = defender;
+                winnerChits = defenderChits;
             }
 
-            // Exit this dialog.
-            cleanup();
+            // Ensure that the winning legion doesn't contain a dead
+            // Titan.
+            it = winnerChits.iterator();
+            while (it.hasNext())
+            {
+                Chit chit = it.next();
+                if (chit.isDead() && chit.getId().startsWith(Constants.titan))
+                {
+                    gui.showMessageDialog("Titan cannot die unless his"
+                        + " whole stack dies.");
+                    return;
+                }
+            }
+
+            // Remove all dead creatures from the winning legion.
+            List<String> winnerLosses = new ArrayList<String>();
+            it = winnerChits.iterator();
+            while (it.hasNext())
+            {
+                Chit chit = it.next();
+                if (chit.isDead())
+                {
+                    String name = chit.getId();
+                    if (name.startsWith(Constants.titan))
+                    {
+                        name = Constants.titan;
+                    }
+                    winnerLosses.add(name);
+                }
+            }
+            proposal = new Proposal(attacker, defender, false, false,
+                winnerLegion, winnerLosses);
         }
 
-        else if (e.getActionCommand().equals("Fight"))
-        {
-            proposal = new Proposal(attacker, defender, true, false, null,
-                null);
+        // Exit this dialog.
+        cleanup();
+    }
 
-            // Exit this dialog.
-            cleanup();
-        }
+    private void doFight()
+    {
+        proposal = new Proposal(attacker, defender, true, false, null, null);
+
+        // Exit this dialog.
+        cleanup();
     }
 }

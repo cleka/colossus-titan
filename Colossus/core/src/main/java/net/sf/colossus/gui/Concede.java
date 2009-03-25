@@ -8,8 +8,8 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.util.Iterator;
 import java.util.List;
 
@@ -33,7 +33,7 @@ import net.sf.colossus.util.KDialog;
  * @author David Ripton
  */
 
-final class Concede extends KDialog implements ActionListener, WindowListener
+final class Concede extends KDialog
 {
     private final boolean flee;
     private Point location;
@@ -51,7 +51,14 @@ final class Concede extends KDialog implements ActionListener, WindowListener
         Container contentPane = getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
 
-        addWindowListener(this);
+        addWindowListener(new WindowAdapter()
+        {
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+                cleanup(false);
+            }
+        });
 
         this.flee = flee;
         this.client = client;
@@ -68,12 +75,27 @@ final class Concede extends KDialog implements ActionListener, WindowListener
         JButton button1 = new JButton(flee ? "Flee" : "Concede");
         button1.setMnemonic(flee ? KeyEvent.VK_F : KeyEvent.VK_C);
         buttonPane.add(button1);
-        button1.addActionListener(this);
+        button1.addActionListener(new ActionListener()
+        {
+
+            public void actionPerformed(ActionEvent e)
+            {
+                cleanup(true);
+            }
+        });
 
         JButton button2 = new JButton(flee ? "Don't Flee" : "Don't Concede");
         button2.setMnemonic(KeyEvent.VK_D);
         buttonPane.add(button2);
-        button2.addActionListener(this);
+        button2.addActionListener(new ActionListener()
+        {
+
+            public void actionPerformed(ActionEvent e)
+            {
+                cleanup(false);
+
+            }
+        });
 
         pack();
 
@@ -151,24 +173,5 @@ final class Concede extends KDialog implements ActionListener, WindowListener
         {
             client.answerConcede(ally, answer);
         }
-    }
-
-    public void actionPerformed(ActionEvent e)
-    {
-        if (e.getActionCommand().equals("Flee")
-            || e.getActionCommand().equals("Concede"))
-        {
-            cleanup(true);
-        }
-        else
-        {
-            cleanup(false);
-        }
-    }
-
-    @Override
-    public void windowClosing(WindowEvent e)
-    {
-        cleanup(false);
     }
 }

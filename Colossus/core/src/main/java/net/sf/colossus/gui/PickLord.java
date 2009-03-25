@@ -5,9 +5,8 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.Point;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -25,11 +24,10 @@ import net.sf.colossus.util.KDialog;
  * @author David Ripton
  */
 
-final class PickLord extends KDialog implements MouseListener, WindowListener
+final class PickLord extends KDialog
 {
     private final List<Chit> chits = new ArrayList<Chit>();
     private String lordType;
-    private final List<String> imageNames;
     private final SaveWindow saveWindow;
 
     private PickLord(IOptions options, JFrame parentFrame,
@@ -37,11 +35,7 @@ final class PickLord extends KDialog implements MouseListener, WindowListener
     {
         super(parentFrame, "Reveal Which Lord?", true);
 
-        this.imageNames = imageNames;
         lordType = null;
-
-        addMouseListener(this);
-        addWindowListener(this);
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new FlowLayout());
@@ -51,11 +45,24 @@ final class PickLord extends KDialog implements MouseListener, WindowListener
         Iterator<String> it = imageNames.iterator();
         while (it.hasNext())
         {
-            String imageName = it.next();
+            final String imageName = it.next();
             Chit chit = new Chit(4 * Scale.get(), imageName);
             chits.add(chit);
             contentPane.add(chit);
-            chit.addMouseListener(this);
+            chit.addMouseListener(new MouseAdapter()
+            {
+                @Override
+                public void mousePressed(MouseEvent e)
+                {
+                    lordType = imageName;
+                    if (lordType.startsWith(Constants.titan))
+                    {
+                        lordType = Constants.titan;
+                    }
+                    saveWindow.saveLocation(getLocation());
+                    dispose();
+                }
+            });
         }
 
         pack();
@@ -83,22 +90,5 @@ final class PickLord extends KDialog implements MouseListener, WindowListener
     {
         PickLord pl = new PickLord(options, parentFrame, imageNames);
         return pl.getLordType();
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e)
-    {
-        Object source = e.getSource();
-        int i = chits.indexOf(source);
-        if (i != -1)
-        {
-            lordType = imageNames.get(i);
-            if (lordType.startsWith(Constants.titan))
-            {
-                lordType = Constants.titan;
-            }
-            saveWindow.saveLocation(getLocation());
-            dispose();
-        }
     }
 }

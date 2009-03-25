@@ -6,7 +6,6 @@ import java.awt.Container;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowListener;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -21,32 +20,27 @@ import net.sf.colossus.client.IOptions;
 import net.sf.colossus.util.KDialog;
 
 
-/** 
+/**
  *  Allows picking any integer value
  *  @version $Id$
  *  @author David Ripton
  */
 
-public final class PickIntValue extends KDialog implements WindowListener,
-    ChangeListener, ActionListener
+public final class PickIntValue extends KDialog
 {
     private int newValue;
-    private int oldValue;
 
-    private JSpinner spinner;
-    private SpinnerNumberModel model;
-    private SaveWindow saveWindow;
+    private final JSpinner spinner;
+    private final SpinnerNumberModel model;
+    private final SaveWindow saveWindow;
 
-    private PickIntValue(JFrame parentFrame, int oldValue, String title,
+    private PickIntValue(JFrame parentFrame, final int oldValue, String title,
         int min, int max, int step, IOptions options)
     {
         super(parentFrame, title, true);
         this.newValue = oldValue; // oldValue is also the new unless changed
-        this.oldValue = oldValue;
 
         setBackground(Color.lightGray);
-
-        addWindowListener(this);
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
@@ -54,18 +48,37 @@ public final class PickIntValue extends KDialog implements WindowListener,
         model = new SpinnerNumberModel(oldValue, min, max, step);
         spinner = new JSpinner(model);
         contentPane.add(spinner);
-        spinner.addChangeListener(this);
+        spinner.addChangeListener(new ChangeListener()
+        {
+            public void stateChanged(ChangeEvent e)
+            {
+                newValue = ((Integer)spinner.getValue()).intValue();
+            }
+        });
 
         // Need another BoxLayout to place buttons horizontally.
         Box buttonBar = new Box(BoxLayout.X_AXIS);
         contentPane.add(buttonBar);
 
         JButton accept = new JButton("Accept");
-        accept.addActionListener(this);
+        accept.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                dispose();
+            }
+        });
         buttonBar.add(accept);
 
         JButton cancel = new JButton("Cancel");
-        cancel.addActionListener(this);
+        cancel.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                newValue = oldValue;
+                dispose();
+            }
+        });
         buttonBar.add(cancel);
 
         pack();
@@ -91,30 +104,5 @@ public final class PickIntValue extends KDialog implements WindowListener,
         PickIntValue dialog = new PickIntValue(parentFrame, oldValue, title,
             min, max, step, options);
         return dialog.newValue;
-    }
-
-    public void stateChanged(ChangeEvent e)
-    {
-        newValue = ((Integer)spinner.getValue()).intValue();
-    }
-
-    public void actionPerformed(ActionEvent e)
-    {
-        if (e.getActionCommand().equals("Accept"))
-        {
-            dispose();
-        }
-        else if (e.getActionCommand().equals("Cancel"))
-        {
-            newValue = oldValue;
-            dispose();
-        }
-    }
-
-    @Override
-    public void dispose()
-    {
-        saveWindow.saveLocation(getLocation());
-        super.dispose();
     }
 }

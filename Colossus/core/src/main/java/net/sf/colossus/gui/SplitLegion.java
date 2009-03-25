@@ -8,10 +8,10 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -32,8 +32,7 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  * @author David Ripton
  */
 
-final class SplitLegion extends KDialog implements MouseListener,
-    ActionListener, WindowListener
+final class SplitLegion extends KDialog
 {
     private final List<Chit> oldChits = new ArrayList<Chit>(8);
     private final List<Chit> newChits = new ArrayList<Chit>(8);
@@ -89,8 +88,13 @@ final class SplitLegion extends KDialog implements MouseListener,
 
         setBackground(Color.lightGray);
 
-        addMouseListener(this);
-        addWindowListener(this);
+        addWindowListener(new WindowAdapter(){
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+                cancel();
+            }
+        });
 
         scale = 4 * Scale.get();
 
@@ -115,10 +119,28 @@ final class SplitLegion extends KDialog implements MouseListener,
         while (it.hasNext())
         {
             String imageName = it.next();
-            Chit chit = new Chit(scale, imageName);
+            final Chit chit = new Chit(scale, imageName);
             oldChits.add(chit);
             oldBox.add(chit);
-            chit.addMouseListener(this);
+            chit.addMouseListener(new MouseAdapter(){
+                @Override
+                public void mousePressed(MouseEvent e)
+                {
+                    int i = oldChits.indexOf(chit);
+                    if (i != -1)
+                    {
+                        moveChitToOtherLine(oldChits, newChits, oldBox,
+                            newBox, i);
+                    }
+                    else
+                    {
+                        i = newChits.indexOf(chit);
+                        assert i != -1 : "Chit should be either in list of old or new chits.";
+                        moveChitToOtherLine(newChits, oldChits, newBox,
+                            oldBox, i);
+                    }
+                }
+            });
         }
 
         newMarker = new Marker(scale, selectedMarkerId);
@@ -135,12 +157,26 @@ final class SplitLegion extends KDialog implements MouseListener,
         button1 = new JButton("Done");
         button1.setEnabled(false);
         button1.setMnemonic(KeyEvent.VK_D);
-        button1.addActionListener(this);
+        button1.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+                if (!isSplitLegal(true))
+                {
+                    return;
+                }
+                returnSplitResults();
+          }
+        });
         buttonBox.add(button1);
 
         button2 = new JButton("Cancel");
         button2.setMnemonic(KeyEvent.VK_C);
-        button2.addActionListener(this);
+        button2.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+                cancel();
+            }
+        });
         buttonBox.add(button2);
 
         pack();
@@ -264,60 +300,5 @@ final class SplitLegion extends KDialog implements MouseListener,
         }
         results = buf.toString();
         dispose();
-    }
-
-    @Override
-    public void dispose()
-    {
-        if (saveWindow != null)
-        {
-            saveWindow.saveLocation(getLocation());
-        }
-        removeMouseListener(this);
-        removeWindowListener(this);
-        super.dispose();
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e)
-    {
-        Object source = e.getSource();
-        int i = oldChits.indexOf(source);
-        if (i != -1)
-        {
-            moveChitToOtherLine(oldChits, newChits, oldBox, newBox, i);
-            return;
-        }
-        else
-        {
-            i = newChits.indexOf(source);
-            if (i != -1)
-            {
-                moveChitToOtherLine(newChits, oldChits, newBox, oldBox, i);
-                return;
-            }
-        }
-    }
-
-    @Override
-    public void windowClosing(WindowEvent e)
-    {
-        cancel();
-    }
-
-    public void actionPerformed(ActionEvent e)
-    {
-        if (e.getActionCommand().equals("Done"))
-        {
-            if (!isSplitLegal(true))
-            {
-                return;
-            }
-            returnSplitResults();
-        }
-        else if (e.getActionCommand().equals("Cancel"))
-        {
-            cancel();
-        }
     }
 }
