@@ -898,7 +898,7 @@ public final class MasterBoard extends JPanel
         mi = fileMenu.add(quitGameAction);
         mi.setMnemonic(KeyEvent.VK_Q);
 
-        // Phase menu 
+        // Phase menu
 
         phaseMenu = new JMenu("Phase");
         phaseMenu.setMnemonic(KeyEvent.VK_P);
@@ -1099,7 +1099,7 @@ public final class MasterBoard extends JPanel
      * Do the setup needed for an inactive player:
      * set the actions which are allowed only for active player to inactive,
      * and update the bottomBar info why "Done" is disabled accordingly
-     *  
+     *
      * @param text What the active player is doing right now
      */
     private void setupAsInactivePlayer(String text)
@@ -1189,7 +1189,7 @@ public final class MasterBoard extends JPanel
             // TODO actually it's not a good idea that the ClearRecruitChits
             // action is also allowed in Muster phase - the chit will be
             // cleared from display, but not unrecruited. Might lead to
-            // confusion. But then, if one uses that action then it's 
+            // confusion. But then, if one uses that action then it's
             // his own fault ;-)
             undoLastAction.setEnabled(true);
             undoAllAction.setEnabled(true);
@@ -1793,9 +1793,9 @@ public final class MasterBoard extends JPanel
             clearPossibleRecruitChits();
             gui.doMove(hex);
             // Would a simple highlightUnmovedLegions() be good enough?
-            // Right now its needed also to set mover null... 
+            // Right now its needed also to set mover null...
             // Would a simple highlightUnmovedLegions() be good enough?
-            // Right now its needed also to set mover null 
+            // Right now its needed also to set mover null
             actOnMisclick(); // Yes, even if the move was good.
         }
         else if (phase == Phase.FIGHT)
@@ -2302,7 +2302,7 @@ public final class MasterBoard extends JPanel
 
     /**
      * Disable the Done action, and update the reason text in bottomBar
-     * 
+     *
      * @param reason Information why one is not ready to be Done
      */
     public void disableDoneAction(String reason)
@@ -2312,9 +2312,9 @@ public final class MasterBoard extends JPanel
     }
 
     /**
-     * Clear bottomBar phase text and call disableDoneAction, as reason the 
-     * standard text "<activer player> doesWhat"
-     *  
+     * Clear bottomBar phase text and call disableDoneAction, as reason the
+     * standard text "&lt;active player> doesWhat"
+     *
      * @param doesWhat Information what the active player currently does
      */
     public void disableDoneActionActivePlayerDoes(String doesWhat)
