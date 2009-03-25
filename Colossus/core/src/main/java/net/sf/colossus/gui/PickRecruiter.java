@@ -20,7 +20,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.sf.colossus.client.Client;
-import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.KDialog;
@@ -97,7 +96,7 @@ final class PickRecruiter extends KDialog
             String potentialRecruiterName = it.next();
             if (potentialRecruiterName.equals(Constants.titan))
             {
-                potentialRecruiterName = ((LegionClientSide)legion)
+                potentialRecruiterName = legion.getPlayer()
                     .getTitanBasename();
             }
             final String realRecruiterName = recruiterName;

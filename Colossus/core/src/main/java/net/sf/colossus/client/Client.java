@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 import net.sf.colossus.ai.AI;
 import net.sf.colossus.ai.SimpleAI;
 import net.sf.colossus.game.BattlePhase;
+import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
@@ -63,11 +64,11 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 /**
  *  Lives on the client side and handles all communication
- *  with the server.  It talks to the Server via the network protocol  
+ *  with the server.  It talks to the Server via the network protocol
  *  and to Client side classes locally, but to all GUI related classes
  *  it should only communicate via ClientGUI class.
  *  There is one client per player.
- *  
+ *
  *  TODO Handle GUI related issues purely via ClientGUI
  *       All GUI classes should talk to the server purely through
  *       ClientGUI which handles it via the Client.
@@ -85,7 +86,7 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  *  then inlining it into the calling code. Another one would be creating
  *  the GameClientSide for now and relocating code there.
  *  ==> Clemens march 2009: I started the GameClientSide approach :)
- *   
+ *
  *  TODO there are a few places where an Iterator is used to remove all elements
  *  of a list -- an enhanced for loop with a Collection.clear() would probably
  *  look better and be more efficient (not that the latter would be significant
@@ -224,7 +225,7 @@ public final class Client implements IClient, IOracle
      *      answer to connect gets the Variant name, and use that
      *      for game creation. So when Client constructor is completed
      *      also Game and Variant are proper.
-     *      (problem would still be ... player cound and names...) 
+     *      (problem would still be ... player cound and names...)
      *
      * TODO try to make the Client class agnostic of the network or not question by
      *      having the SCT outside and behaving like a normal server -- that way it
@@ -1050,14 +1051,6 @@ public final class Client implements IClient, IOracle
         ((LegionClientSide)legion).setRecruitName(lastRecruit);
     }
 
-    /** Return the full basename for a titan in legion,
-     *  first finding that legion's player, player color, and titan size.
-     */
-    String getTitanBasename(Legion legion)
-    {
-        return ((LegionClientSide)legion).getTitanBasename();
-    }
-
     /** Return a list of Strings.  Use the proper string for titans and
      *  unknown creatures. */
     // public for IOracle
@@ -1243,11 +1236,11 @@ public final class Client implements IClient, IOracle
         {
             if (inverted)
             {
-                imageName = getTitanBasename(getDefender());
+                imageName = getDefender().getPlayer().getTitanBasename();
             }
             else
             {
-                imageName = getTitanBasename(getAttacker());
+                imageName = getAttacker().getPlayer().getTitanBasename();
             }
         }
         PlayerColor playerColor;
@@ -1993,9 +1986,9 @@ public final class Client implements IClient, IOracle
      * Currently called by SetupSplit, because this implies also
      * a player and perhaps turn change.
      *
-     * Additionally might be called by server if we load a game outside the 
+     * Additionally might be called by server if we load a game outside the
      * split phase, where active player and turn are usually set.
-     * 
+     *
      * TODO call always by server explicitly?
      */
     public void setupTurnState(Player activePlayer, int turnNumber)
@@ -2013,7 +2006,7 @@ public final class Client implements IClient, IOracle
         setupTurnState(activePlayer, turnNumber);
         resetLegionMovesAndRecruitData();
 
-        // Now the actual setup split stuff 
+        // Now the actual setup split stuff
         this.phase = Phase.SPLIT;
         numSplitsThisTurn = 0;
 
@@ -2571,7 +2564,7 @@ public final class Client implements IClient, IOracle
         return turnNumber;
     }
 
-    private String figureTeleportingLord(LegionClientSide legion, MasterHex hex)
+    private String figureTeleportingLord(Legion legion, MasterHex hex)
     {
         List<String> lords = listTeleportingLords(legion, hex);
         String lordName = null;
@@ -2610,7 +2603,7 @@ public final class Client implements IClient, IOracle
      *
      *  TODO return value should be List<Creature> or List<CreatureType>
      */
-    private List<String> listTeleportingLords(LegionClientSide legion,
+    private List<String> listTeleportingLords(Legion legion,
         MasterHex hex)
     {
         // Needs to be a List not a Set so that it can be passed as
@@ -2624,27 +2617,26 @@ public final class Client implements IClient, IOracle
             Legion legion0 = legions.get(0);
             if (legion0 != null && !isMyLegion(legion0) && legion.hasTitan())
             {
-                lords.add(legion.getTitanBasename());
+                lords.add(legion.getPlayer().getTitanBasename());
             }
         }
 
         // Tower teleport
         else
         {
-            for (String name : legion.getContents())
+            for (Creature creature : legion.getCreatures())
             {
-                CreatureType creature = game.getVariant().getCreatureByName(
-                    name);
-                if (creature != null && creature.isLord()
-                    && !lords.contains(name))
+                CreatureType creatureType = creature.getType();
+                if (creatureType != null && creatureType.isLord()
+                    && !lords.contains(creatureType.getName()))
                 {
-                    if (creature.isTitan())
+                    if (creatureType.isTitan())
                     {
-                        lords.add(legion.getTitanBasename());
+                        lords.add(legion.getPlayer().getTitanBasename());
                     }
                     else
                     {
-                        lords.add(name);
+                        lords.add(creatureType.getName());
                     }
                 }
             }
@@ -2655,7 +2647,7 @@ public final class Client implements IClient, IOracle
     /** If the move looks legal, forward it to server and return true;
      *  otherwise returns false.
      */
-    public boolean doMove(LegionClientSide mover, MasterHex hex)
+    public boolean doMove(Legion mover, MasterHex hex)
     {
         if (mover == null)
         {
@@ -3020,13 +3012,13 @@ public final class Client implements IClient, IOracle
     }
 
     /** Return a set of hexLabels. */
-    public Set<MasterHex> listNormalMoves(LegionClientSide legion)
+    public Set<MasterHex> listNormalMoves(Legion legion)
     {
         return movement.listNormalMoves(legion, legion.getCurrentHex(),
             getMovementRoll());
     }
 
-    public Set<EntrySide> listPossibleEntrySides(LegionClientSide mover,
+    public Set<EntrySide> listPossibleEntrySides(Legion mover,
         MasterHex hex, boolean teleport)
     {
         return movement.listPossibleEntrySides(mover, hex, teleport);
@@ -3191,13 +3183,13 @@ public final class Client implements IClient, IOracle
         return null;
     }
 
-    public List<LegionClientSide> getFriendlyLegions(final MasterHex hex,
-        final PlayerClientSide player)
+    public List<Legion> getFriendlyLegions(final MasterHex hex,
+        final Player player)
     {
         return CollectionHelper.selectAsList(player.getLegions(),
-            new Predicate<LegionClientSide>()
+            new Predicate<Legion>()
             {
-                public boolean matches(LegionClientSide legion)
+                public boolean matches(Legion legion)
                 {
                     return legion.getCurrentHex().equals(hex);
                 }
@@ -3729,7 +3721,7 @@ public final class Client implements IClient, IOracle
     }
 
     /*
-     * Called by ClientGUI, to fulfill the items called in menu 
+     * Called by ClientGUI, to fulfill the items called in menu
      */
 
     public void doSetWhatToDoNext(WhatToDoNext whatToDoNext,

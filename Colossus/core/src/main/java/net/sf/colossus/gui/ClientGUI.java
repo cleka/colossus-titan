@@ -97,7 +97,7 @@ public class ClientGUI implements IClientGUI
     private final LinkedList<Object> undoStack = new LinkedList<Object>();
 
     /** Information on the current moving legion. */
-    private LegionClientSide mover;
+    private Legion mover;
 
     /** the parent frame for secondary windows */
     private JFrame secondaryParent = null;
@@ -276,7 +276,7 @@ public class ClientGUI implements IClientGUI
 
     /* (non-Javadoc)
      * @see net.sf.colossus.gui.IClientGUI#ensureEdtSetupClientGUI()
-     * 
+     *
      * Ensure that setupClientGUI() is run inside the EDT
      */
     public void ensureEdtSetupClientGUI()
@@ -313,7 +313,7 @@ public class ClientGUI implements IClientGUI
 
     /* (non-Javadoc)
      * @see net.sf.colossus.gui.IClientGUI#setupClientGUI()
-     * 
+     *
      * Called via ensureEdtSetupClientGUI() when server sends all clients
      * the initBoard command.
      */
@@ -2342,7 +2342,7 @@ public class ClientGUI implements IClientGUI
                 // "If no legions can be split, directly be done with Split
                 //  phase, except if that is the result of the autoSplit"
                 //  - so that one can review and undo.
-                // But that does not make so much sense, as this is in the 
+                // But that does not make so much sense, as this is in the
                 // "setupSplit" call, so the AI can't have done anything yet?
 
                 if ((getOwningPlayer().getMarkersAvailable().size() < 1 || client
@@ -3054,18 +3054,12 @@ public class ClientGUI implements IClientGUI
         return client.isMyTurn();
     }
 
-    // Called e.g. by SummonAngel
-    public String getTitanBaseName(Legion legion)
-    {
-        return ((LegionClientSide)legion).getTitanBasename();
-    }
-
     public Legion getMover()
     {
         return mover;
     }
 
-    public void setMover(LegionClientSide legion)
+    public void setMover(Legion legion)
     {
         this.mover = legion;
     }

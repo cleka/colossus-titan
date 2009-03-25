@@ -17,11 +17,11 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 /**
  * A player in a game.
- * 
+ *
  * This class holds all information describing a player in a game, such
  * as the current legions and the score. Instances of this class are always bound to
  * an instance of {@link Game}.
- * 
+ *
  * TODO there is an excessive amount of methods around the markersAvailable list.
  */
 public class Player
@@ -43,7 +43,7 @@ public class Player
 
     /**
      * The number of the player in the game.
-     * 
+     *
      * TODO clarify if this is just an arbitrary number (in which case we might want
      * to get rid of it) or the actual turn sequence
      */
@@ -51,14 +51,14 @@ public class Player
 
     /**
      * Set to true if the player is dead.
-     * 
+     *
      * TODO check if that isn't equivalent to not having legions anymore
      */
     private boolean dead;
 
     /**
      * The starting tower of the player.
-     * 
+     *
      * TODO this should be kind-of final: once a tower has been assigned, it shouldn't
      *      change anymore -- but assigning the towers has probably to happen a while
      *      after all players are created. We could at least at an assertion into the
@@ -68,7 +68,7 @@ public class Player
 
     /**
      * The label of the color we use.
-     * 
+     *
      * TODO this should really be an object representing a markerset
      * TODO similar to {@link #startingTower} this should be set only once but probably
      *      can't be set in the constructor.
@@ -77,7 +77,7 @@ public class Player
 
     /**
      * The type of player: local human, AI or network.
-     * 
+     *
      * TODO make typesafe version
      * TODO shouldn't this be final? It should be possible to set that in the constructor.
      *      Unless we have to allow changes e.g. for humans dropping out of the game (in
@@ -87,10 +87,10 @@ public class Player
 
     /**
      * A string representing all players eliminated by this player.
-     * 
+     *
      * The format is just a sequence of the short, two-character versions
      * of the colors, e.g. "BkRd".
-     * 
+     *
      * TODO this should really be a List<Player>
      */
     private String playersEliminated = "";
@@ -100,7 +100,7 @@ public class Player
     private int score;
 
     /**
-     * Sorted set of available legion markers for this player. 
+     * Sorted set of available legion markers for this player.
      */
     private final SortedSet<String> markersAvailable = new TreeSet<String>(
         new MarkerComparator(getShortColor()));
@@ -379,8 +379,8 @@ public class Player
         return getScore() >= TerrainRecruitLoader.getTitanTeleportValue();
     }
 
-    /** 
-     * Return the total value of all of this player's creatures. 
+    /**
+     * Return the total value of all of this player's creatures.
      */
     public int getTotalPointValue()
     {
@@ -406,7 +406,7 @@ public class Player
 
     /**
      * Check if the player has already moved.
-     * 
+     *
      * @return true iff at least one legion of the player has been moved
      */
     public boolean hasMoved()
@@ -424,5 +424,20 @@ public class Player
     public int getNumLegions()
     {
         return getLegions().size();
+    }
+
+    /**
+     * Return the full basename for the titan of this player.
+     */
+    public String getTitanBasename()
+    {
+        try
+        {
+            return "Titan-" + getTitanPower() + "-" + getColor().getName();
+        }
+        catch (Exception ex)
+        {
+            return Constants.titan;
+        }
     }
 }

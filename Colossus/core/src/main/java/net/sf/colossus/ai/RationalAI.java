@@ -739,7 +739,7 @@ public class RationalAI extends SimpleAI
         {
             bestMoveList = null;
 
-            // ForcedSplit and ForcedSingle implementations here are perhaps 
+            // ForcedSplit and ForcedSingle implementations here are perhaps
             // quite poor solutions, but better than getting NAKs...
 
             boolean moved = handleForcedSplitMoves(player);
@@ -752,13 +752,13 @@ public class RationalAI extends SimpleAI
             {
                 moved = handleForcedSingleMove(player);
 
-                // Earlier here was a comment: 
+                // Earlier here was a comment:
                 // "always need to retry" and hardcoded returned true.
                 // In [ 1748718 ] Game halt in Abyssal9 this lead to a deadlock;
                 // - so, if here is returned "false" as for "I won't do any more
-                // move", that problem does not occur (server recognizes that 
+                // move", that problem does not occur (server recognizes that
                 // there is no legal move and accepts it)
-                // -- does this cause negative side effects elsewhere?? 
+                // -- does this cause negative side effects elsewhere??
                 // Let's try ;-)
 
                 return moved;
@@ -933,18 +933,18 @@ public class RationalAI extends SimpleAI
 
     /*
      * Returns true if it did one move, i.e. client needs to call us again
-     * (after that move was done), to check whether there is still something 
+     * (after that move was done), to check whether there is still something
      * to do.
      * Returns false also if something goes wrong (should never happen, but...)
      * so that it does not endlessly redoes that and hangs forever.
      * TODO: not very fancy or clever. All it does is:
      * if there is a hex remaining with forced moves after split,
      * pick the smallest one and move it to the hex with best value.
-     * 
+     *
      * However, I still prefer this over the SimpleAI approach, which chooses
      * based on "Legionvalue * ChangeValue", because I'd rather sacrifice weaker
      * legions and spare good ones, and not make "unnecessary" damage to good
-     * one and spare weak ones...  
+     * one and spare weak ones...
      */
 
     private boolean handleForcedSplitMoves(PlayerClientSide player)
@@ -963,7 +963,7 @@ public class RationalAI extends SimpleAI
          */
         for (Legion legion : player.getLegions())
         {
-            List<LegionClientSide> friendlyLegions = client
+            List<Legion> friendlyLegions = client
                 .getFriendlyLegions(legion.getCurrentHex(), player);
 
             if (friendlyLegions.size() > 1)
@@ -973,11 +973,11 @@ public class RationalAI extends SimpleAI
         }
         for (MasterHex hex : unsplitHexes)
         {
-            List<LegionClientSide> friendlyLegions = client
+            List<Legion> friendlyLegions = client
                 .getFriendlyLegions(hex, player);
 
             // pick just any legion for asking the getMovement
-            LegionClientSide anyLegion = friendlyLegions.get(0);
+            Legion anyLegion = friendlyLegions.get(0);
 
             if (!client.getMovement().listNormalMoves(anyLegion,
                 anyLegion.getCurrentHex(), roll).isEmpty())
@@ -991,10 +991,10 @@ public class RationalAI extends SimpleAI
                 // But this happens very rarely, this whole forcedSplitMoves
                 // in games with 6 AIs perhaps one out of 100 games...
 
-                LegionClientSide minLegion = anyLegion;
+                Legion minLegion = anyLegion;
                 int minSize = minLegion.getHeight();
 
-                for (LegionClientSide l : friendlyLegions)
+                for (Legion l : friendlyLegions)
                 {
                     int size = l.getHeight();
                     if (size < minSize)
@@ -1023,8 +1023,8 @@ public class RationalAI extends SimpleAI
 
                     for (MasterHex targetHex : set)
                     {
-                        // The set of moves includes still hexes occupied by our own legions. 
-                        List<LegionClientSide> targetOwnLegions = client
+                        // The set of moves includes still hexes occupied by our own legions.
+                        List<Legion> targetOwnLegions = client
                             .getFriendlyLegions(targetHex, player);
                         if (targetOwnLegions.size() == 0)
                         {
@@ -1071,7 +1071,7 @@ public class RationalAI extends SimpleAI
     }
 
     /*
-     * Simply move the legion which has the lowest value 
+     * Simply move the legion which has the lowest value
      * (except Titan legion) to the place which is best for it.
      * Moves Titan legion only if no other choice.
      */
@@ -1093,8 +1093,8 @@ public class RationalAI extends SimpleAI
                 boolean couldMove = false;
                 for (MasterHex targetHex : set)
                 {
-                    // The set of moves includes still hexes occupied by our own legions. 
-                    List<LegionClientSide> targetOwnLegions = client
+                    // The set of moves includes still hexes occupied by our own legions.
+                    List<Legion> targetOwnLegions = client
                         .getFriendlyLegions(targetHex, player);
                     if (targetOwnLegions.size() == 0)
                     {
@@ -1159,7 +1159,7 @@ public class RationalAI extends SimpleAI
         MasterHex bestHex = null;
         for (MasterHex targetHex : minValueMoves)
         {
-            List<LegionClientSide> targetOwnLegions = client
+            List<Legion> targetOwnLegions = client
                 .getFriendlyLegions(targetHex, player);
             if (targetOwnLegions.size() == 0)
             {
@@ -1397,7 +1397,7 @@ public class RationalAI extends SimpleAI
                 else
                 {
 
-                    /*                logger.log(Level.FINEST, 
+                    /*                logger.log(Level.FINEST,
                      "Illigal move: ("
                      + currentValue
                      + " : "
@@ -1753,7 +1753,7 @@ public class RationalAI extends SimpleAI
     }
 
     /** Memoizing wrapper for evaluateMoveInner */
-    private int evaluateMove(LegionClientSide legion, MasterHex hex,
+    private int evaluateMove(Legion legion, MasterHex hex,
         int canRecruitHere, int depth, boolean addHexRisk)
     {
         String sep = "~";
@@ -1779,7 +1779,7 @@ public class RationalAI extends SimpleAI
     // cheap, inaccurate evaluation function.  Returns an expected value for
     // moving this legion to this hex.  The value defines a distance
     // metric over the set of all possible moves.
-    private int evaluateMoveInner(LegionClientSide legion, MasterHex hex,
+    private int evaluateMoveInner(Legion legion, MasterHex hex,
         int canRecruitHere, int depth, boolean normalHexRisk)
     {
 

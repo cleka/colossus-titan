@@ -65,11 +65,12 @@ public final class Movement
      *       structure
      */
     private Set<String> findNormalMoves(MasterHex hex,
-        LegionClientSide legion, int roll, int block, int cameFrom,
+        Legion legion,
+        int roll, int block, int cameFrom,
         MasterHex fromHex)
     {
         Set<String> result = new HashSet<String>();
-        PlayerClientSide player = legion.getPlayer();
+        Player player = legion.getPlayer();
 
         // If there are enemy legions in this hex, mark it
         // as a legal move and stop recursing.  If there is
@@ -225,7 +226,7 @@ public final class Movement
         return listNormalMoves(legion, hex, movementRoll, false, fromHex);
     }
 
-    public Set<MasterHex> listNormalMoves(LegionClientSide legion,
+    public Set<MasterHex> listNormalMoves(Legion legion,
         MasterHex hex, int movementRoll)
     {
         return listNormalMoves(legion, hex, movementRoll, false, null);
@@ -233,7 +234,7 @@ public final class Movement
 
     /** Return set of hexLabels describing where this legion can move
      *  without teleporting. */
-    public Set<MasterHex> listNormalMoves(LegionClientSide legion,
+    public Set<MasterHex> listNormalMoves(Legion legion,
         MasterHex hex, int movementRoll, boolean inAdvance, MasterHex fromHex)
     {
         if (hex == null || (legion.hasMoved() && !inAdvance))
@@ -387,7 +388,7 @@ public final class Movement
     /** Return a Set of Strings "Left" "Right" or "Bottom" describing
      *  possible entry sides.  If the hex is unoccupied, just return
      *  one entry side since it doesn't matter. */
-    Set<EntrySide> listPossibleEntrySides(LegionClientSide legion,
+    Set<EntrySide> listPossibleEntrySides(Legion legion,
         MasterHex targetHex, boolean teleport)
     {
         Set<EntrySide> entrySides = new HashSet<EntrySide>();

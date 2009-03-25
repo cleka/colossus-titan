@@ -14,8 +14,8 @@ import net.sf.colossus.webcommon.InstanceTracker;
 
 /**
  * This class holds client-side version of a player.
- * 
- * @version $Id$ 
+ *
+ * @version $Id$
  * @author David Ripton
  */
 
@@ -23,10 +23,10 @@ public final class PlayerClientSide extends Player
 {
     private PredictSplits predictSplits;
 
-    /** 
+    /**
      * Two-stage initialization at the moment, only some data here, the rest comes
      * through {@link #update(String)}.
-     * 
+     *
      * TODO: the object should be properly initialized in the constructor
      */
     PlayerClientSide(Game game, String playerName, int number)
@@ -45,7 +45,7 @@ public final class PlayerClientSide extends Player
 
     /** Takes a colon-separated string of form
      *  dead:name:tower:color:elim:legions:markers:creatures:value:titan:score
-     *  
+     *
      *  TODO this is part of the network protocol and should be somewhere in there
      */
     void update(String infoString)
@@ -70,7 +70,7 @@ public final class PlayerClientSide extends Player
         {
             // When loading a game in remote client, in beginning variant is
             // not loaded yes, so that may cause NPE which we ignore here.
-            // After syncOptions variant name is known,  
+            // After syncOptions variant name is known,
             // and in initBoard it is loaded, so all future updates go fine.
         }
 

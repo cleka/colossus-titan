@@ -740,7 +740,7 @@ public class SimpleAI extends AbstractAI
     }
 
     /** Do a masterboard move (or consider taking mulligan, if feasible).
-     * 
+     *
      *  Returns true if we need to run this method again after the server
      *  updates the client with the results of a move or mulligan.
      */
@@ -796,7 +796,7 @@ public class SimpleAI extends AbstractAI
     }
 
     /**
-     * Take a mulligan if roll is 2 or 5 in first turn, and can still take 
+     * Take a mulligan if roll is 2 or 5 in first turn, and can still take
      * a mulligan.
      * Returns true if AI took a mulligan, false otherwise.
      */
@@ -911,7 +911,7 @@ public class SimpleAI extends AbstractAI
     {
         for (LegionClientSide legion : player.getLegions())
         {
-            List<LegionClientSide> friendlyLegions = client
+            List<Legion> friendlyLegions = client
                 .getFriendlyLegions(legion.getCurrentHex(), player);
 
             if (friendlyLegions.size() > 1
