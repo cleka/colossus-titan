@@ -641,13 +641,12 @@ public final class Start
             {
                 setWhatToDoNext(whatToDoNext, false);
                 int port = startOptions.getIntOption(Options.serveAtPort);
+                serverOptions.setOption(Options.serveAtPort, port);
                 String webGameFlagFileName = startOptions
                     .getStringOption(Options.webFlagFileName);
                 startOptions.removeOption(Options.webFlagFileName);
 
-                GameServerSide game = new GameServerSide(this);
-                game.setPort(port);
-                game.setOptions(serverOptions);
+                GameServerSide game = new GameServerSide(this, serverOptions);
                 if (webGameFlagFileName != null
                     && !webGameFlagFileName.equals(""))
                 {
@@ -661,14 +660,14 @@ public final class Start
             {
                 setWhatToDoNext(whatToDoNext, false);
                 int port = startOptions.getIntOption(Options.serveAtPort);
+                serverOptions.setOption(Options.serveAtPort, port);
                 String loadFileName = startOptions
                     .getStringOption(Options.loadGameFileName);
 
                 if (loadFileName != null && loadFileName.length() > 0)
                 {
-                    GameServerSide game = new GameServerSide(this);
-                    game.setPort(port);
-                    game.setOptions(serverOptions);
+                    GameServerSide game = new GameServerSide(this,
+                        serverOptions);
                     serverOptions.clearPlayerInfo();
                     game.loadGame(loadFileName);
                 }
@@ -839,11 +838,7 @@ public final class Start
     public void startWebGameLocally(Options presetOptions, String username,
         WebClient webClient)
     {
-        int port = presetOptions.getIntOption(Options.serveAtPort);
-
-        GameServerSide game = new GameServerSide(this);
-        game.setPort(port);
-        game.setOptions(presetOptions);
+        GameServerSide game = new GameServerSide(this, presetOptions);
         game.newGame(username, webClient);
     }
 

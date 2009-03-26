@@ -50,9 +50,7 @@ public class CarryTest extends TestCase
     @Override
     protected void setUp()
     {
-        String[] dummyArgs = new String[0];
-        Start startObject = new Start(dummyArgs);
-        game = new GameServerSide(startObject);
+        game = GameServerSide.makeNewGameServerSide();
         VariantSupport.loadVariantByName("Default", true);
 
         red = game.addPlayer("Red", "SimpleAI");
