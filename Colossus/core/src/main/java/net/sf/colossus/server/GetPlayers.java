@@ -165,13 +165,15 @@ public final class GetPlayers extends KFrame
             .toArray(new String[sPortChoices.size()]));
         serveAtPortBox.setEditable(true);
         serveAtPortBox.setSelectedItem("" + stPort);
-        serveAtPortBox.addActionListener(new ActionListener(){
+        serveAtPortBox.addActionListener(new ActionListener()
+        {
             public void actionPerformed(ActionEvent e)
             {
                 String portString = (String)serveAtPortBox.getSelectedItem();
                 serveAtPort = Integer.parseInt(portString);
                 setRunningOnLabel(serveAtPort);
-            }});
+            }
+        });
         serveAtPort = stPort;
         portPane.add(serveAtPortBox);
         optionPane.add(portPane);
@@ -196,7 +198,8 @@ public final class GetPlayers extends KFrame
         optionPane.add(viewModePane);
 
         viewModeBox = new JComboBox(Options.viewModeArray);
-        viewModeBox.addActionListener(new ActionListener(){
+        viewModeBox.addActionListener(new ActionListener()
+        {
             public void actionPerformed(ActionEvent e)
             {
                 String value = (String)viewModeBox.getSelectedItem();
@@ -210,7 +213,8 @@ public final class GetPlayers extends KFrame
         String eventExpiringVal = options.getStringOption(
             Options.eventExpiring, "5");
         eventExpiringBox = new JComboBox(Options.eventExpiringChoices);
-        eventExpiringBox.addActionListener(new ActionListener(){
+        eventExpiringBox.addActionListener(new ActionListener()
+        {
             public void actionPerformed(ActionEvent e)
             {
                 String value = (String)eventExpiringBox.getSelectedItem();
@@ -256,11 +260,14 @@ public final class GetPlayers extends KFrame
         setDelayLabel(oldDelay);
         aiTimePane.add(delayLabel);
         JButton delayButton = new JButton(Options.aiDelay);
-        delayButton.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent e) {
-                final int newDelay = PickIntValue.pickIntValue(GetPlayers.this, oldDelay,
-                    "Pick AI Delay (in ms)", Constants.MIN_AI_DELAY,
-                    Constants.MAX_AI_DELAY, 100, options);
+        delayButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                final int newDelay = PickIntValue.pickIntValue(
+                    GetPlayers.this, oldDelay, "Pick AI Delay (in ms)",
+                    Constants.MIN_AI_DELAY, Constants.MAX_AI_DELAY, 100,
+                    options);
                 if (newDelay != oldDelay)
                 {
                     options.setOption(Options.aiDelay, newDelay);
@@ -268,7 +275,8 @@ public final class GetPlayers extends KFrame
                 }
                 setDelayLabel(newDelay);
 
-            }});
+            }
+        });
         aiTimePane.add(delayButton);
 
         oldLimit = options.getIntOption(Options.aiTimeLimit);
@@ -281,19 +289,22 @@ public final class GetPlayers extends KFrame
         setTimeLimitLabel(oldLimit);
         aiTimePane.add(timeLimitLabel);
         JButton timeLimitButton = new JButton(Options.aiTimeLimit);
-        timeLimitButton.addActionListener(new ActionListener(){
+        timeLimitButton.addActionListener(new ActionListener()
+        {
             public void actionPerformed(ActionEvent e)
             {
-                final int newLimit = PickIntValue.pickIntValue(GetPlayers.this, oldLimit,
-                    "Pick AI Time Limit (in s)", Constants.MIN_AI_TIME_LIMIT,
-                    Constants.MAX_AI_TIME_LIMIT, 1, options);
+                final int newLimit = PickIntValue.pickIntValue(
+                    GetPlayers.this, oldLimit, "Pick AI Time Limit (in s)",
+                    Constants.MIN_AI_TIME_LIMIT, Constants.MAX_AI_TIME_LIMIT,
+                    1, options);
                 if (newLimit != oldLimit)
                 {
                     options.setOption(Options.aiTimeLimit, newLimit);
                     oldLimit = newLimit;
                 }
                 setTimeLimitLabel(newLimit);
-            }});
+            }
+        });
         aiTimePane.add(timeLimitButton);
 
         JPanel variantPane = new JPanel();
@@ -351,7 +362,8 @@ public final class GetPlayers extends KFrame
         }
 
         variantBox = new JComboBox(variantVector);
-        variantBox.addActionListener(new ActionListener(){
+        variantBox.addActionListener(new ActionListener()
+        {
             public void actionPerformed(ActionEvent e)
             {
                 int maxPlayers = VariantSupport.getMaxPlayers();
@@ -415,7 +427,8 @@ public final class GetPlayers extends KFrame
         variantPane.add(variantBox);
         JButton buttonVariant = new JButton(loadVariant);
         variantPane.add(buttonVariant);
-        buttonVariant.addActionListener(new ActionListener(){
+        buttonVariant.addActionListener(new ActionListener()
+        {
             public void actionPerformed(ActionEvent e)
             {
                 doLoadVariant();
@@ -456,7 +469,8 @@ public final class GetPlayers extends KFrame
         JButton button3 = new JButton(Constants.runClient);
         button3.setMnemonic(KeyEvent.VK_C);
         clientPane.add(button3);
-        button3.addActionListener(new ActionListener(){
+        button3.addActionListener(new ActionListener()
+        {
             public void actionPerformed(ActionEvent e)
             {
                 doClientDialog();
@@ -466,11 +480,13 @@ public final class GetPlayers extends KFrame
         JButton button5 = new JButton(Constants.runWebClient);
         button5.setMnemonic(KeyEvent.VK_W);
         clientPane.add(button5);
-        button5.addActionListener(new ActionListener(){
+        button5.addActionListener(new ActionListener()
+        {
             public void actionPerformed(ActionEvent e)
             {
                 doRunWebClient();
-            }});
+            }
+        });
 
         JPanel gamePane = new JPanel();
         gamePane.setBorder(new TitledBorder("Game Startup"));
@@ -480,29 +496,35 @@ public final class GetPlayers extends KFrame
         JButton button1 = new JButton(Constants.newGame);
         button1.setMnemonic(KeyEvent.VK_N);
         gamePane.add(button1);
-        button1.addActionListener(new ActionListener(){
+        button1.addActionListener(new ActionListener()
+        {
             public void actionPerformed(ActionEvent e)
             {
                 doNewGame();
-            }});
+            }
+        });
 
         JButton button2 = new JButton(Constants.loadGame);
         button2.setMnemonic(KeyEvent.VK_L);
         gamePane.add(button2);
-        button2.addActionListener(new ActionListener(){
+        button2.addActionListener(new ActionListener()
+        {
             public void actionPerformed(ActionEvent e)
             {
                 doLoadGame();
-            }});
+            }
+        });
 
         JButton button4 = new JButton(Constants.quitGame);
         button4.setMnemonic(KeyEvent.VK_Q);
         gamePane.add(button4);
-        button4.addActionListener(new ActionListener(){
+        button4.addActionListener(new ActionListener()
+        {
             public void actionPerformed(ActionEvent e)
             {
                 doQuit();
-            }});
+            }
+        });
 
         enablePlayers();
 
@@ -522,7 +544,8 @@ public final class GetPlayers extends KFrame
             setLocation(loadLocation);
         }
 
-        addWindowListener(new WindowAdapter(){
+        addWindowListener(new WindowAdapter()
+        {
             @Override
             public void windowClosing(WindowEvent e)
             {
@@ -608,36 +631,36 @@ public final class GetPlayers extends KFrame
 
             public void actionPerformed(ActionEvent e)
             {
-                    // If player type was changed to none, also change
-                    // player name to none.
-                    String value = (String)playerType.getSelectedItem();
-                    if (value.equals(Constants.none))
-                    {
-                        playerNames[row].setSelectedItem(Constants.none);
-                    }
-                    else if (value.equals(Constants.network))
-                    {
-                        playerNames[row].setSelectedItem(Constants.byClient);
-                    }
-                    else if (value.endsWith(Constants.ai))
-                    {
-                        playerNames[row].setSelectedItem(Constants.byColor);
-                    }
-                    else if (value.endsWith(Constants.human))
-                    {
-                        String uniqueHuman = makeUniqueName(
-                            Constants.username, row);
-                        playerNames[row].setSelectedItem(uniqueHuman);
-                    }
-                    // If player type was changed away from none, also
-                    // change player name to something else.
-                    else if (playerNames[row].getSelectedItem().equals(
-                        Constants.none))
-                    {
-                        playerNames[row].setSelectedItem(Constants.byColor);
-                    }
+                // If player type was changed to none, also change
+                // player name to none.
+                String value = (String)playerType.getSelectedItem();
+                if (value.equals(Constants.none))
+                {
+                    playerNames[row].setSelectedItem(Constants.none);
                 }
-            });
+                else if (value.equals(Constants.network))
+                {
+                    playerNames[row].setSelectedItem(Constants.byClient);
+                }
+                else if (value.endsWith(Constants.ai))
+                {
+                    playerNames[row].setSelectedItem(Constants.byColor);
+                }
+                else if (value.endsWith(Constants.human))
+                {
+                    String uniqueHuman = makeUniqueName(Constants.username,
+                        row);
+                    playerNames[row].setSelectedItem(uniqueHuman);
+                }
+                // If player type was changed away from none, also
+                // change player name to something else.
+                else if (playerNames[row].getSelectedItem().equals(
+                    Constants.none))
+                {
+                    playerNames[row].setSelectedItem(Constants.byColor);
+                }
+            }
+        });
         playerType.setEnabled(false);
         playerTypes[i] = playerType;
 
@@ -705,7 +728,8 @@ public final class GetPlayers extends KFrame
                 {
                     playerTypes[row].setSelectedItem(Constants.anyAI);
                 }
-            }});
+            }
+        });
         playerName.setEnabled(false);
         playerNames[i] = playerName;
     }
