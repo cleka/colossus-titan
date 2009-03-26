@@ -188,14 +188,14 @@ public final class Movement
     }
 
     /** Return set of hexLabels describing where this legion can move. */
-    public Set<MasterHex> listAllMoves(LegionClientSide legion, MasterHex hex,
+    public Set<MasterHex> listAllMoves(Legion legion, MasterHex hex,
         int movementRoll)
     {
         return listAllMoves(legion, hex, movementRoll, false);
     }
 
     /** Return set of hexLabels describing where this legion can move. */
-    public Set<MasterHex> listAllMoves(LegionClientSide legion, MasterHex hex,
+    public Set<MasterHex> listAllMoves(Legion legion, MasterHex hex,
         int movementRoll, boolean inAdvance)
     {
         Set<MasterHex> set = listNormalMoves(legion, hex, movementRoll,

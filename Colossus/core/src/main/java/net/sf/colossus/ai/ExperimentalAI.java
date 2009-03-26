@@ -8,8 +8,8 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.CritterMove;
-import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.game.Battle;
+import net.sf.colossus.game.Legion;
 import net.sf.colossus.gui.BattleChit;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.variant.BattleHex;
@@ -213,11 +213,11 @@ public class ExperimentalAI extends SimpleAI
     }
 
 
-    /** this comput ethe special case of the Titan critter */
+    /** this computes the special case of the Titan critter */
     @Override
     protected void evaluateCritterMove_Titan(final BattleChit critter,
             ValueRecorder value, final MasterBoardTerrain terrain,
-            final BattleHex hex, final LegionClientSide legion, final int turn)
+            final BattleHex hex, final Legion legion, final int turn)
     {
         // Reward titans sticking to the edges of the back row
         // surrounded by allies.  We need to relax this in the
@@ -298,8 +298,7 @@ public class ExperimentalAI extends SimpleAI
         Map<String, Integer> strikeMap, StringBuffer why)
     {
         int value = 0;
-        final LegionClientSide legion = (LegionClientSide)client
-            .getMyEngagedLegion();
+        final Legion legion = client.getMyEngagedLegion();
         if (legion.equals(client.getAttacker()))
         {
             // TODO, something

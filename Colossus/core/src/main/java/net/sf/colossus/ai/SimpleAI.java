@@ -1036,7 +1036,7 @@ public class SimpleAI extends AbstractAI
         return false;
     }
 
-    private boolean doMove(LegionClientSide legion, MasterHex hex)
+    private boolean doMove(Legion legion, MasterHex hex)
     {
         return client.doMove(legion, hex);
     }
@@ -2742,10 +2742,10 @@ public class SimpleAI extends AbstractAI
         return value;
     }
 
-    /** this comput ethe special case of the Titan critter */
+    /** this compute the special case of the Titan critter */
     protected void evaluateCritterMove_Titan(final BattleChit critter,
         ValueRecorder value, final MasterBoardTerrain terrain,
-        final BattleHex hex, final LegionClientSide legion, final int turn)
+        final BattleHex hex, final Legion legion, final int turn)
     {
         // Reward titans sticking to the edges of the back row
         // surrounded by allies.  We need to relax this in the

@@ -1047,8 +1047,8 @@ public final class Client implements IClient, IOracle
     {
         legion.setMoved(moved);
         legion.setTeleported(teleported);
-        ((LegionClientSide)legion).setEntrySide(entrySide);
-        ((LegionClientSide)legion).setRecruitName(lastRecruit);
+        legion.setEntrySide(entrySide);
+        legion.setRecruitName(lastRecruit);
     }
 
     /** Return a list of Strings.  Use the proper string for titans and

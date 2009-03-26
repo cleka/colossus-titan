@@ -10,25 +10,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.CritterMove;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.client.PlayerClientSide;
-
 import net.sf.colossus.game.Battle;
 import net.sf.colossus.game.Legion;
-
 import net.sf.colossus.game.Player;
 import net.sf.colossus.gui.BattleChit;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.HintOracleInterface;
 import net.sf.colossus.server.VariantSupport;
-
 import net.sf.colossus.util.DevRandom;
-
 import net.sf.colossus.util.Probs;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
@@ -46,7 +41,7 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  * should be here, mostly as "final protected". AIs should mostly
  * only use information gathered from here to make decisions.
  * There's still a LOT of work to do...
- * 
+ *
  * @version $Id$
  * @author Romain Dolbeau
  * Also contains extracted code from SimpleAI:
@@ -121,7 +116,7 @@ abstract public class AbstractAI implements AI
                 continue;
             }
             // for each legion that player controls
-            for (LegionClientSide legion : enemyPlayer.getLegions())
+            for (Legion legion : enemyPlayer.getLegions())
             {
                 // for each movement roll he might make
                 for (int roll = 1; roll <= 6; roll++)
@@ -167,7 +162,7 @@ abstract public class AbstractAI implements AI
         return enemyMap;
     }
 
-    final protected int getNumberOfWaysToTerrain(LegionClientSide legion,
+    final protected int getNumberOfWaysToTerrain(Legion legion,
         MasterHex hex, String terrainTypeName)
     {
         int total = 0;
@@ -337,7 +332,8 @@ abstract public class AbstractAI implements AI
     {
         CreatureType weakest = client.getGame().getVariant().
                 getCreatureByName(((LegionClientSide) legion).getContents().
-                get((legion).getHeight() - 1));
+                get(
+                    legion.getHeight() - 1));
         // Consider recruiting.
         List<CreatureType> recruits = client.findEligibleRecruits(legion, hex);
         if (!recruits.isEmpty())
@@ -361,8 +357,7 @@ abstract public class AbstractAI implements AI
                 pointValue /= 2;
             }
             // should work with all variants
-            int currentScore =
-                    ((PlayerClientSide) legion.getPlayer()).getScore();
+            int currentScore = legion.getPlayer().getScore();
             int arv = TerrainRecruitLoader.getAcquirableRecruitmentsValue();
             int nextScore = ((currentScore / arv) + 1) * arv;
             CreatureType bestRecruit = null;
@@ -401,13 +396,13 @@ abstract public class AbstractAI implements AI
     protected final int getHintedRecruitmentValue(CreatureType creature,
             Legion legion, String[] section)
     {
-        if (!(creature).isTitan())
+        if (!creature.isTitan())
         {
-            return (creature).getHintedRecruitmentValue(section);
+            return creature.getHintedRecruitmentValue(section);
         }
         Player player = legion.getPlayer();
-        int power = ((PlayerClientSide) player).getTitanPower();
-        int skill = (creature).getSkill();
+        int power = player.getTitanPower();
+        int skill = creature.getSkill();
         return power * skill *
                 VariantSupport.getHintedRecruitmentValueOffset(creature.getName(),
                 section);
@@ -485,13 +480,13 @@ abstract public class AbstractAI implements AI
     /** Test whether a Legion belongs to a Human player */
     final protected boolean isHumanLegion(Legion legion)
     {
-        return !((PlayerClientSide)legion.getPlayer()).isAI();
+        return !legion.getPlayer().isAI();
     }
 
     /** Test whether a Legion belongs to an AI player */
     final protected boolean isAILegion(Legion legion)
     {
-        return ((PlayerClientSide)legion.getPlayer()).isAI();
+        return legion.getPlayer().isAI();
     }
 
     /** Get the variant played */
@@ -830,14 +825,14 @@ abstract public class AbstractAI implements AI
     protected class MoveInfo
     {
 
-        final LegionClientSide legion;
+        final Legion legion;
         /** hex to move to.  if hex == null, then this means sit still. */
         final MasterHex hex;
         final int value;
         final int difference; // difference from sitting still
         final ValueRecorder why; // explain value
 
-        MoveInfo(LegionClientSide legion, MasterHex hex, int value,
+        MoveInfo(Legion legion, MasterHex hex, int value,
             int difference, ValueRecorder why)
         {
             this.legion = legion;
@@ -852,7 +847,7 @@ abstract public class AbstractAI implements AI
     {
 
         private int value = 0;
-        private StringBuffer why = new StringBuffer();
+        private final StringBuffer why = new StringBuffer();
 
         public void add(int v, String r)
         {

@@ -20,7 +20,9 @@ import java.util.logging.Logger;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.client.PlayerClientSide;
+import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
+import net.sf.colossus.game.Player;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.MultiSet;
 import net.sf.colossus.variant.CreatureType;
@@ -511,18 +513,14 @@ public class RationalAI extends SimpleAI
 
     // Sort creatures first by value then by name.
     // Exclude titan.
-    List<CreatureType> sortCreaturesByValueName(List<String> Creatures,
-        Legion legion)
+    List<CreatureType> sortCreaturesByValueName(Legion legion)
     {
         List<CreatureType> sortedCreatures = new ArrayList<CreatureType>();
-        Iterator<String> critterIt = Creatures.iterator();
 
         // copy list excluding titan
-        while (critterIt.hasNext())
+        for (Creature creature : legion.getCreatures())
         {
-            String name = critterIt.next();
-            CreatureType critter = client.getGame().getVariant()
-                .getCreatureByName(name);
+            CreatureType critter = creature.getType();
 
             // Never split out the titan.
             if (critter.isTitan())
@@ -537,10 +535,9 @@ public class RationalAI extends SimpleAI
     }
 
     // Count number of creatures in the stack that have mustered
-    int countMustered(LegionClientSide legion)
+    int countMustered(Legion legion)
     {
-        List<CreatureType> sortedCreatures = sortCreaturesByValueName(legion
-            .getContents(), legion);
+        List<CreatureType> sortedCreatures = sortCreaturesByValueName(legion);
         List<CreatureType> creaturesThatHaveMustered = removeMustered(sortedCreatures);
 
         return creaturesThatHaveMustered.size();
@@ -587,8 +584,7 @@ public class RationalAI extends SimpleAI
         logger.log(Level.FINEST,
             "sortCreaturesByValueName() in chooseCreaturesToSplitOut");
 
-        List<CreatureType> sortedCreatures = sortCreaturesByValueName(
-            ((LegionClientSide)legion).getContents(), legion);
+        List<CreatureType> sortedCreatures = sortCreaturesByValueName(legion);
 
         logger.log(Level.FINEST, "Sorted stack - minus titan: "
             + sortedCreatures);
@@ -683,13 +679,13 @@ public class RationalAI extends SimpleAI
     // little helper class to store possible moves by legion
     private class LegionBoardMove
     {
-        final LegionClientSide legion;
+        final Legion legion;
         final MasterHex fromHex;
         final MasterHex toHex;
         final double val;
         final boolean noMove;
 
-        LegionBoardMove(LegionClientSide legion, MasterHex fromHex,
+        LegionBoardMove(Legion legion, MasterHex fromHex,
             MasterHex toHex, double val, boolean noMove)
         {
             this.legion = legion;
@@ -712,11 +708,11 @@ public class RationalAI extends SimpleAI
     public boolean masterMove()
     {
         logger.log(Level.FINEST, "This is RationalAI.");
-        PlayerClientSide player = client.getOwningPlayer();
+        Player player = client.getOwningPlayer();
 
         if (enemyAttackMap == null)
         {
-            // special code to allow game to reload prperly if saved
+            // special code to allow game to reload properly if saved
             // during AI move
             enemyAttackMap = buildEnemyAttackMap(client.getOwningPlayer());
         }
@@ -783,12 +779,12 @@ public class RationalAI extends SimpleAI
         return true;
     }
 
-    private boolean findMoveList(List<LegionClientSide> legions,
+    private boolean findMoveList(List<? extends Legion> legions,
         List<List<LegionBoardMove>> all_legionMoves,
         MultiSet<MasterHex> occupiedHexes, boolean teleportsOnly)
     {
         boolean moved = false;
-        for (LegionClientSide legion : legions)
+        for (Legion legion : legions)
         {
             if (legion.hasMoved())
             {
@@ -856,12 +852,12 @@ public class RationalAI extends SimpleAI
     }
 
     /** Return true if we moved something and need to be called again. */
-    private boolean handleVoluntaryMoves(PlayerClientSide player)
+    private boolean handleVoluntaryMoves(Player player)
     {
         logger.log(Level.FINEST, "handleVoluntaryMoves()");
 
         boolean moved = false;
-        List<LegionClientSide> legions = player.getLegions();
+        List<? extends Legion> legions = player.getLegions();
         List<List<LegionBoardMove>> all_legionMoves = new ArrayList<List<LegionBoardMove>>();
 
         MultiSet<MasterHex> occupiedHexes = new MultiSet<MasterHex>();
@@ -947,7 +943,7 @@ public class RationalAI extends SimpleAI
      * one and spare weak ones...
      */
 
-    private boolean handleForcedSplitMoves(PlayerClientSide player)
+    private boolean handleForcedSplitMoves(Player player)
     {
         int roll = client.getMovementRoll();
         ArrayList<MasterHex> unsplitHexes = new ArrayList<MasterHex>();
@@ -1075,15 +1071,15 @@ public class RationalAI extends SimpleAI
      * (except Titan legion) to the place which is best for it.
      * Moves Titan legion only if no other choice.
      */
-    private boolean handleForcedSingleMove(PlayerClientSide player)
+    private boolean handleForcedSingleMove(Player player)
     {
         int roll = client.getMovementRoll();
 
         // first we have to find out those that can move at all:
 
-        ArrayList<LegionClientSide> movableLegions = new ArrayList<LegionClientSide>();
+        ArrayList<Legion> movableLegions = new ArrayList<Legion>();
 
-        for (LegionClientSide legion : player.getLegions())
+        for (Legion legion : player.getLegions())
         {
             Set<MasterHex> set = client.getMovement().listNormalMoves(legion,
                 legion.getCurrentHex(), roll);
@@ -1117,10 +1113,10 @@ public class RationalAI extends SimpleAI
         // OK, now decide which of them to move - the smallest one.
 
         int minValue = 0;
-        LegionClientSide minValueLegion = null;
-        LegionClientSide titanLegion = null;
+        Legion minValueLegion = null;
+        Legion titanLegion = null;
 
-        for (LegionClientSide legion : movableLegions)
+        for (Legion legion : movableLegions)
         {
             int value = legion.getPointValue();
 

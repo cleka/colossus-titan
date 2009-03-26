@@ -14,7 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.Client;
-import net.sf.colossus.client.LegionClientSide;
+import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.util.Combos;
 import net.sf.colossus.variant.CreatureType;
@@ -98,13 +98,12 @@ public class MilvangAI extends RationalAI
         LOGGER.log(Level.FINEST,
             "sortCreaturesByValueName() in chooseCreaturesToSplitOut");
 
-        boolean hasTitan = ((LegionClientSide)legion).contains("Titan");
+        boolean hasTitan = legion.hasTitan();
 
         List<CreatureType> critters = new ArrayList<CreatureType>();
-        for (String name : ((LegionClientSide)legion).getContents())
+        for (Creature creature : legion.getCreatures())
         {
-            critters
-                .add(client.getGame().getVariant().getCreatureByName(name));
+            critters.add(creature.getType());
         }
 
         double bestValue = 0;
