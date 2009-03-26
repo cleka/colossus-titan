@@ -604,6 +604,8 @@ public final class GetPlayers extends KFrame
         onePlayerPane.add(playerType);
         playerType.addActionListener(new ActionListener()
         {
+            private final int row = i;
+
             public void actionPerformed(ActionEvent e)
             {
                     // If player type was changed to none, also change
@@ -611,28 +613,28 @@ public final class GetPlayers extends KFrame
                     String value = (String)playerType.getSelectedItem();
                     if (value.equals(Constants.none))
                     {
-                        playerNames[i].setSelectedItem(Constants.none);
+                        playerNames[row].setSelectedItem(Constants.none);
                     }
                     else if (value.equals(Constants.network))
                     {
-                        playerNames[i].setSelectedItem(Constants.byClient);
+                        playerNames[row].setSelectedItem(Constants.byClient);
                     }
                     else if (value.endsWith(Constants.ai))
                     {
-                        playerNames[i].setSelectedItem(Constants.byColor);
+                        playerNames[row].setSelectedItem(Constants.byColor);
                     }
                     else if (value.endsWith(Constants.human))
                     {
                         String uniqueHuman = makeUniqueName(
-                            Constants.username, i);
-                        playerNames[i].setSelectedItem(uniqueHuman);
+                            Constants.username, row);
+                        playerNames[row].setSelectedItem(uniqueHuman);
                     }
                     // If player type was changed away from none, also
                     // change player name to something else.
-                    else if (playerNames[i].getSelectedItem().equals(
+                    else if (playerNames[row].getSelectedItem().equals(
                         Constants.none))
                     {
-                        playerNames[i].setSelectedItem(Constants.byColor);
+                        playerNames[row].setSelectedItem(Constants.byColor);
                     }
                 }
             });
@@ -683,7 +685,10 @@ public final class GetPlayers extends KFrame
         final JComboBox playerName = new JComboBox(nameChoices);
         playerName.setEditable(true);
         onePlayerPane.add(playerName);
-        playerName.addActionListener(new ActionListener(){
+        playerName.addActionListener(new ActionListener()
+        {
+            int row = i;
+
             public void actionPerformed(ActionEvent e)
             {
                 // If player name was changed to none, also change
@@ -691,14 +696,14 @@ public final class GetPlayers extends KFrame
                 String value = (String)playerName.getSelectedItem();
                 if (value.equals(Constants.none))
                 {
-                    playerTypes[i].setSelectedItem(Constants.none);
+                    playerTypes[row].setSelectedItem(Constants.none);
                 }
                 // If player type was changed away from none, also
                 // change player name to something else.
-                else if (playerTypes[i].getSelectedItem().equals(
+                else if (playerTypes[row].getSelectedItem().equals(
                     Constants.none))
                 {
-                    playerTypes[i].setSelectedItem(Constants.anyAI);
+                    playerTypes[row].setSelectedItem(Constants.anyAI);
                 }
             }});
         playerName.setEnabled(false);
