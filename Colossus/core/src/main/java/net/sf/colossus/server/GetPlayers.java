@@ -66,6 +66,7 @@ public final class GetPlayers extends KFrame
     public static final String loadVariant = "Load External Variant";
 
     private final Object mutex;
+    private boolean mutexNotified = false;
     private final JLabel runningOnLabel;
     private final JComboBox serveAtPortBox;
     private final TreeSet<String> sPortChoices;
@@ -914,7 +915,8 @@ public final class GetPlayers extends KFrame
         dispose();
     }
 
-    private void doNewGame()
+    /** package privat for unit test case */
+    void doNewGame()
     {
         boolean ok = validateInputs();
         if (ok)
@@ -1076,7 +1078,19 @@ public final class GetPlayers extends KFrame
         super.dispose();
         synchronized (mutex)
         {
+            mutexNotified = true;
             mutex.notify();
         }
+    }
+
+    /** Only meant for unit tests */
+    void setPlayerType(int i, String type)
+    {
+        playerTypes[i].setSelectedItem(type);
+    }
+
+    public boolean getMutexNotified()
+    {
+        return mutexNotified;
     }
 }
