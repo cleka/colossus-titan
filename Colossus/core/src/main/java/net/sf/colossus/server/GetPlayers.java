@@ -602,11 +602,10 @@ public final class GetPlayers extends KFrame
         playerType.setSelectedItem(type);
 
         onePlayerPane.add(playerType);
-        playerType.addActionListener(new ActionListener(){
+        playerType.addActionListener(new ActionListener()
+        {
             public void actionPerformed(ActionEvent e)
             {
-                for (int i = 0; i < Constants.MAX_MAX_PLAYERS; i++)
-                {
                     // If player type was changed to none, also change
                     // player name to none.
                     String value = (String)playerType.getSelectedItem();
@@ -636,7 +635,7 @@ public final class GetPlayers extends KFrame
                         playerNames[i].setSelectedItem(Constants.byColor);
                     }
                 }
-            }});
+            });
         playerType.setEnabled(false);
         playerTypes[i] = playerType;
 
