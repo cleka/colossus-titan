@@ -62,7 +62,7 @@ public class GetPlayersTest extends TestCase
             };
 
             // Start a runnable that clicks the "New Game" button
-            // and by that (hopefully) does dispose, which again 
+            // and by that (hopefully) does dispose, which again
             // will notify us in the wait below.
             // Note that it can't notify us before we are in wait()
             // below because we still own the mutex monitor :)
@@ -74,13 +74,13 @@ public class GetPlayersTest extends TestCase
             }
             catch (InterruptedException e)
             {
-                // 
+                //
             }
         }
 
         // Only true if notify was done; would be false if wait() in our
         // Runnable came back because of the timeout.
-        // 
+        //
         boolean wasProperlyNotified = gp.getMutexNotified();
         System.err.println("wasProperlyNotified " + wasProperlyNotified);
 
