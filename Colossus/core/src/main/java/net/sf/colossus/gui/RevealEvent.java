@@ -25,7 +25,7 @@ import net.sf.colossus.server.Constants;
 /**
  * Contains info about one event that revealed some interestng information,
  * stored in EventViewer.
- * 
+ *
  * @version $Id$
  * @author Clemens Katzer
  */
@@ -59,7 +59,7 @@ public class RevealEvent
 
     private String info;
     // set for losing battle events, because if Titan killed the
-    // marker does already belong to slayer when we ask. 
+    // marker does already belong to slayer when we ask.
     private PlayerClientSide realPlayer;
 
     public final static int eventSplit = 0;
@@ -102,6 +102,9 @@ public class RevealEvent
 
     /**
      * TODO replace marker/height combos with Legion objects
+     * NOTE Can replace only for input, need to store marker and height
+     *      from here on, because Legion content will change but we
+     *      want to record the original state!
      */
     public RevealEvent(Client client, int turnNumber, int playerNr,
         int eventType, String markerId, int height,
@@ -147,7 +150,7 @@ public class RevealEvent
     }
 
     /*
-     * if there is a Titan in this legion, then nail down it's 
+     * if there is a Titan in this legion, then nail down it's
      * titanBaseName of the time when this happened.
      * Called also after battle to update to new power after
      * points were rewarded.
@@ -328,7 +331,7 @@ public class RevealEvent
             if (rc.matches(name) && rc.wasSummoned())
             {
                 rc.setDead(true);
-                // remember it so that RemoveDeadBattleChits does not 
+                // remember it so that RemoveDeadBattleChits does not
                 // strikeout one of the original creatures
                 readyToDie = rc;
                 it.remove();
@@ -357,7 +360,7 @@ public class RevealEvent
             if (rc.matches(name) && rc.wasReinforced())
             {
                 rc.setDead(true);
-                // remember it so that RemoveDeadBattleChits does not 
+                // remember it so that RemoveDeadBattleChits does not
                 // strikeout one of the original creatures
                 readyToDie = rc;
                 it.remove();
@@ -544,14 +547,14 @@ public class RevealEvent
         }
     }
 
-    // NOTE: this assumes that this event is for the player in whose 
+    // NOTE: this assumes that this event is for the player in whose
     // turn this happens:
     private Chit getSolidMarker()
     {
         Chit solidMarker;
         // I would have liked to paint a solid marker with color of that
         // player, instead of the Titan picture (or any individual marker),
-        // because this is for the "player as such", not related to any 
+        // because this is for the "player as such", not related to any
         // single marker or the Titan creature.
         // But even if I had created BrSolid.gif (or even copied
         // Br01.gif to that name), did compileVariants, and the gif image
@@ -577,7 +580,7 @@ public class RevealEvent
         }
         else
         {
-            // NOTE: this assumes that this event is for the player in whose 
+            // NOTE: this assumes that this event is for the player in whose
             //       turn this happens:
             solidMarker = new Chit(scale, mulliganTitanBaseName);
             solidMarker.setAlignmentX(Component.LEFT_ALIGNMENT);
