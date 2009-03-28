@@ -7,6 +7,8 @@
     <hint classname="Beelzebub12.Beelzebub12Hint" />
     <depends>
         <depend variant="Beelzebub" />
+	<!-- for battlelands Ruins.xml -->
+	<depend variant="Undead" />
     </depends>
     <max_players num="12" />
 </variant>
