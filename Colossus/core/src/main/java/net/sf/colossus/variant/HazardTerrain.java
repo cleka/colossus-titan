@@ -280,14 +280,14 @@ public class HazardTerrain extends Hazards
         }
         if (effectOnFlyerMovement == EffectOnMovement.BLOCKALL)
         {
-            LOGGER.warning("Can't be slowed if everybody is blocked.");
+            LOGGER.warning("Flyers can't be slowed if flyers are blocked.");
             return false;
         }
         if (effectOnFlyerMovement == EffectOnMovement.BLOCKFOREIGNER)
         {
             if (!isNative)
             {
-                LOGGER.warning("Can't be slowed if foreigner is blocked.");
+                LOGGER.warning("Foreign flyers can't be slowed if foreign flyers are blocked.");
             }
             return false;
         }
