@@ -534,6 +534,9 @@ public final class LegionServerSide extends Legion implements
         Creature critter = getCritter(creature);
         if (critter == null)
         {
+            LOGGER.warning("Attempt to remove creature type "
+                + creature.getName() + " from legion " + this.getMarkerId()
+                + " but no such critter can be found!");
             return null;
         }
         else

@@ -34,30 +34,30 @@ public class History
 
     /**
      * Stores the surviving legions (this variable is not needed any more)
-     * 
+     *
      * While the history should contain all information to reproduce the game
      * state, the last set of legions is currently still loaded upfront since
-     * they contain the battle-specific information. This collides with 
+     * they contain the battle-specific information. This collides with
      * replaying the game from history...
      * Now, since 08/2008, they are not stored as "survivorlegions" any more.
      * Instead, they are backed up internally (done inside PlayerServerSide),
      * all the history is replayed. This creates proper split prediction data
-     * in all clients. After that, backup data is compared with result of 
+     * in all clients. After that, backup data is compared with result of
      * replay.
      * E.g. Legion count, their content, players eliminated must be in sync.
      * Then the replayed ones are discarded and the backedup ones restored
-     * - which have the right legion state (moved, donor, summoned, ...) 
-     * 
-     * TODO align the history replay more with the original gameplay so we 
+     * - which have the right legion state (moved, donor, summoned, ...)
+     *
+     * TODO align the history replay more with the original gameplay so we
      *      don't need this anymore;
      *      08/2008:==> this is now to some part done. Still replay
      *      events could be closer to original events (split, summon,
      *      acquire, teleport, ...) , not just the "result" of that
      *      event (reveal,add,remove effects).
-     *       
+     *
      * TODO instead: model the actual events instead of just result,
      * or at least add relevant info to history elements, so that all
-     * replayed events carry all needed data so that they could also be 
+     * replayed events carry all needed data so that they could also be
      * processed by event viewer (currently EV does not process anything
      * during replay).
      */
@@ -143,7 +143,7 @@ public class History
             // angel was called out of legion which was then empty,
             // and in the final updateAllLegionContents there is then
             // this empty legion...
-            // TODO if this case can happen in a regular game no warning 
+            // TODO if this case can happen in a regular game no warning
             // should be logged
             LOGGER.log(Level.WARNING, "Called revealEvent(" + allPlayers
                 + ", "
@@ -410,11 +410,15 @@ public class History
             }
 
             // don't use disbandIfEmpty parameter since that'll fire another history event
-            legion.removeCreature(game.getVariant().getCreatureByName(
-                creatureName), false, false);
+            CreatureType removedCritter = legion.removeCreature(game.
+                getVariant().getCreatureByName(creatureName), false, false);
 
             // Skip for players that will be dead by end of replay
-            if (!legion.getPlayer().getDeadBeforeSave())
+            // Skip if removedCritter is null => removeCreature did not find it,
+            // so there is something wrong with the save game. No use to bother
+            // all the clients with it.
+            if (removedCritter != null
+                && !legion.getPlayer().getDeadBeforeSave())
             {
                 server.allTellRemoveCreature(legion, creatureName, false,
                     reason);
