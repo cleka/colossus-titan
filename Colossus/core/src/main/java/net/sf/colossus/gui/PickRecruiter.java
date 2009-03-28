@@ -89,18 +89,15 @@ final class PickRecruiter extends KDialog
         JPanel recruiterPane = new JPanel();
         contentPane.add(recruiterPane);
 
-        int i = 0;
-        it = recruiters.iterator();
-        while (it.hasNext())
+        for (String potentialRecruiterName : recruiters)
         {
-            String potentialRecruiterName = it.next();
             if (potentialRecruiterName.equals(Constants.titan))
             {
                 potentialRecruiterName = legion.getPlayer()
                     .getTitanBasename();
             }
-            final String realRecruiterName = recruiterName;
-            Chit chit = new Chit(scale, recruiterName);
+            final String realRecruiterName = potentialRecruiterName;
+            Chit chit = new Chit(scale, realRecruiterName);
             recruiterChits.add(chit);
             recruiterPane.add(chit);
             chit.addMouseListener(new MouseAdapter()
@@ -117,7 +114,6 @@ final class PickRecruiter extends KDialog
                     dispose();
                 }
             });
-            i++;
         }
 
         pack();
