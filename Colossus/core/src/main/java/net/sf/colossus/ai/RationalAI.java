@@ -4,7 +4,6 @@ package net.sf.colossus.ai;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -44,7 +43,7 @@ public class RationalAI extends SimpleAI
         .getName());
 
     boolean I_HATE_HUMANS = false;
-    private final Deque<Legion> legionsToSplit = new LinkedList<Legion>();
+    private final List<Legion> legionsToSplit = new LinkedList<Legion>();
     private Map<MasterHex, List<Legion>>[] enemyAttackMap;
     private final Map<String, Integer> evaluateMoveMap = new HashMap<String, Integer>();
     private List<LegionBoardMove> bestMoveList;
@@ -93,7 +92,7 @@ public class RationalAI extends SimpleAI
                 return true; //early exit, out of markers
             }
 
-            Legion legion = legionsToSplit.removeFirst();
+            Legion legion = legionsToSplit.remove(0);
             if (!splitOneLegion(player, legion))
             {
                 return false; //early exit, we've decided we won't finish
