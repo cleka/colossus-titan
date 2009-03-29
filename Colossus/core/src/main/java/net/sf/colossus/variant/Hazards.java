@@ -29,8 +29,9 @@ public abstract class Hazards implements HazardConstants
      */
     public final EffectOnMovement effectOnFlyerMovement;
 
-    /** WiP : instead of a bunch of variables, group them by
-     * category so it's easier to recognize them / deal with them.
+    /** The effect on a combat category (strike|rangestrike, defense|attack),
+     * including the effect (what), the scope (who), and the adjustement
+     * (how much).
      */
     public static class CombatEffect
     {
@@ -47,13 +48,17 @@ public abstract class Hazards implements HazardConstants
         }
     }
 
-    /** Effect to apply when a creature is struck in this terrain.
+    /** CombatEffect to apply when a creature is struck in this terrain.
      */
     public final CombatEffect defenseEffect;
-    /** Effect to apply when a creature strike out from this terrain.
+    /** CombatEffect to apply when a creature strike out from this terrain.
      */
     public final CombatEffect attackEffect;
+    /** CombatEffect to apply when a creature is rangestruck in this terrain.
+     */
     public final CombatEffect rangedDefenseEffect;
+    /** CombatEffect to apply when a creature rangestrike out from this terrain.
+     */
     public final CombatEffect rangedAttackEffect;
 
     public final RangeStrikeSpecialEffect rangeStrikeSpecial;

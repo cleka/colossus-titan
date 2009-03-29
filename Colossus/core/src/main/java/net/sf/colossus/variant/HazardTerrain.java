@@ -127,7 +127,7 @@ public class HazardTerrain extends Hazards
      * 2) The Color in BattleHex. it should be moved here.
      */
 
-    /* genuine Titan Hazard */
+    /* genuine Titan Hazard, with no effect whatsoever */
     static final HazardTerrain PLAINS = new HazardTerrain("Plains", ' ',
         EffectOnMovement.FREEMOVE, EffectOnMovement.FREEMOVE,
         new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
@@ -136,7 +136,7 @@ public class HazardTerrain extends Hazards
         new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
         RangeStrikeSpecialEffect.RANGESTRIKEFREE, SpecialEffect.NOSPECIAL);
 
-    /** Tree is genuine Titan hazard, but the effect on anybody inside is
+    /** Tree is a genuine Titan hazard, but the effect on anybody inside is
      * custom, as noone can enter a tree in Titan.
      * For Colossus, native defending in a Tree against a non-native
      * gains 1 Skill. It blocks rangestrike through it, but not to it.
@@ -200,6 +200,9 @@ public class HazardTerrain extends Hazards
         RangeStrikeSpecialEffect.RANGESTRIKEFREE, SpecialEffect.NOSPECIAL);
 
     /* extra standard Colossus hazard */
+    /** Only waterdweller can enter a lake, but anybody can fly over it.
+     * No effect on combat.
+     */
     static final HazardTerrain LAKE = new HazardTerrain("Lake", 'l',
         EffectOnMovement.BLOCKFOREIGNER, EffectOnMovement.FREEMOVE,
         new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
@@ -208,8 +211,10 @@ public class HazardTerrain extends Hazards
         new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
         RangeStrikeSpecialEffect.RANGESTRIKEFREE, SpecialEffect.NOSPECIAL);
 
+    /* extra standard Colossus hazard */
     /** Stone native gains 1 skill when defending against non-native ;
-     * Stone cannot be entered by non-native.
+     * Stone cannot be entered by non-native. No rangestrike can traverse a
+     * Stone.
      */
     public static final HazardTerrain STONE = new HazardTerrain("Stone", 'n',
         EffectOnMovement.BLOCKFOREIGNER, EffectOnMovement.BLOCKFOREIGNER,
