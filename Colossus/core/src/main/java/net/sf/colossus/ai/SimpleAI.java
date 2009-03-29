@@ -129,7 +129,7 @@ public class SimpleAI extends AbstractAI
     boolean timeIsUp;
     int splitsDone = 0;
     int splitsAcked = 0;
-    ArrayList<String> remainingMarkers = null;
+    List<String> remainingMarkers = null;
 
     public SimpleAI(Client client)
     {
@@ -166,12 +166,12 @@ public class SimpleAI extends AbstractAI
      * @param preferredShortColor thos with this color first
      * @returns list of markers
      */
-    private ArrayList<String> prepareMarkers(Set<String> markerIds,
+    private List<String> prepareMarkers(Set<String> markerIds,
         String preferredShortColor)
     {
         List<String> myMarkerIds = new ArrayList<String>();
         List<String> otherMarkerIds = new ArrayList<String>();
-        ArrayList<String> allMarkerIds = new ArrayList<String>();
+        List<String> allMarkerIds = new ArrayList<String>();
 
         // split between own / other
         for (String markerId : markerIds)
@@ -2391,7 +2391,7 @@ public class SimpleAI extends AbstractAI
 
         int perfectScore = 0;
 
-        ArrayList<CritterMove> critterMoves = new ArrayList<CritterMove>();
+        List<CritterMove> critterMoves = new ArrayList<CritterMove>();
         critterMoves.addAll(lm.getCritterMoves());
 
         Iterator<CritterMove> itCrit = critterMoves.iterator();
@@ -2475,7 +2475,7 @@ public class SimpleAI extends AbstractAI
         findMoveTimer.cancel();
         if (!bestAllOK)
         {
-            ArrayList<CritterMove> newOrder = new ArrayList<CritterMove>();
+            List<CritterMove> newOrder = new ArrayList<CritterMove>();
             testMoveOrder(bestOrder, newOrder);
             bestOrder = new ArrayList<CritterMove>(newOrder);
         }
@@ -2562,9 +2562,7 @@ public class SimpleAI extends AbstractAI
         // has room to enter.
 
         // The caller is responsible for actually making the moves.
-
-        // allCritterMoves is an ArrayList (for clone()) of moveLists.
-        final ArrayList<List<CritterMove>> allCritterMoves = new ArrayList<List<CritterMove>>();
+        final List<List<CritterMove>> allCritterMoves = new ArrayList<List<CritterMove>>();
 
         for (BattleChit critter : client.getActiveBattleChits())
         {
