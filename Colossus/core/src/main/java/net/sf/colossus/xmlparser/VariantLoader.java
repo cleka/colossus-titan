@@ -4,6 +4,7 @@ package net.sf.colossus.xmlparser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,7 +30,7 @@ public class VariantLoader
     final private List<String> cre = new ArrayList<String>();
     private String hintName;
     private int maxPlayers = 0;
-    private final ArrayList<String> depends = new ArrayList<String>();
+    private final List<String> depends = new ArrayList<String>();
 
     // no generics in JDOM
     @SuppressWarnings("unchecked")
@@ -101,7 +102,7 @@ public class VariantLoader
 
     public List<String> getCre()
     {
-        return cre;
+        return Collections.unmodifiableList(cre);
     }
 
     public String getHintName()
@@ -114,11 +115,9 @@ public class VariantLoader
         return maxPlayers;
     }
 
-    // ArrayList.clone() not covariant in return type
-    @SuppressWarnings("unchecked")
     public List<String> getDepends()
     {
-        return (List<String>)depends.clone();
+        return Collections.unmodifiableList(depends);
     }
 
 }
