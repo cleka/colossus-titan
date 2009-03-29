@@ -88,7 +88,7 @@ public class TerrainRecruitLoader
 
     /** support for the custom recruiting functions ; map the class name to an
      instance of the class. */
-    private static HashMap<String, CustomRecruitBase> nameToInstance = new HashMap<String, CustomRecruitBase>();
+    private static Map<String, CustomRecruitBase> nameToInstance = new HashMap<String, CustomRecruitBase>();
 
     /**
      * Representation of the Recruiting Graph (for use)
