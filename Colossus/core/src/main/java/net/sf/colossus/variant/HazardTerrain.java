@@ -50,6 +50,13 @@ public class HazardTerrain extends Hazards
                 "\n\tslowsFlyer(true) = " + slowsFlyer(true) +
                 "\n\tslowsFlyer(false) = " + slowsFlyer(false));
          */
+        if ((effectOnGroundMovement == EffectOnMovement.BLOCKFOREIGNER) &&
+                (effectOnFlyerMovement == EffectOnMovement.BLOCKALL))
+        {
+            LOGGER.warning("Flyers are all blocked, but ground only block" +
+                    " non-natives in Hazardterrain " + name +
+                    ". This combinations might cause trouble.");
+        }
     }
 
     public boolean isNativeBonusTerrain()
@@ -205,7 +212,7 @@ public class HazardTerrain extends Hazards
      * Stone cannot be entered by Flyer or non-native.
      */
     public static final HazardTerrain STONE = new HazardTerrain("Stone", 'n',
-        EffectOnMovement.BLOCKFOREIGNER, EffectOnMovement.BLOCKALL,
+        EffectOnMovement.BLOCKFOREIGNER, EffectOnMovement.BLOCKFOREIGNER,
         new CombatEffect(EffectOnStrike.SKILLBONUS, ScopeOfEffectOnStrike.PATRIOTS, 1),
         new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
         new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
