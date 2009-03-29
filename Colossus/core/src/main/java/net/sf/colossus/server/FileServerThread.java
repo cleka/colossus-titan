@@ -30,7 +30,8 @@ final class FileServerThread extends Thread
 
     private ServerSocket fileServer;
 
-    private static final String sep = Constants.protocolTermSeparator;
+    private static final String separator = 
+        ResourceLoader.REQUEST_TOKEN_SEPARATOR; 
 
     private final Server server;
     private final int port;
@@ -123,7 +124,7 @@ final class FileServerThread extends Thread
 
                         boolean ignoreFail = false;
 
-                        List<String> li = Split.split(sep, request);
+                        List<String> li = Split.split(separator, request);
 
                         String filename = li.remove(0);
 

@@ -42,8 +42,6 @@ import javax.swing.text.StyledDocument;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
-import net.sf.colossus.server.Constants;
-
 import org.jdom.Element;
 
 
@@ -142,7 +140,11 @@ public final class ResourceLoader
     private static final Map<String, byte[]> fileCache = Collections
         .synchronizedMap(new HashMap<String, byte[]>());
 
-    private final static String sep = Constants.protocolTermSeparator;
+    // We used to use the normal separator from Constants, but that 
+    // does not need to be like that. Now introduced own constant
+    // for that purpose to get in ResourceLoader rid of dependency 
+    // to server.Constants.
+    public final static String REQUEST_TOKEN_SEPARATOR = " ~ ";
 
     private static String server = null;
     private static int serverPort = 0;
@@ -519,7 +521,7 @@ public final class ResourceLoader
                             Iterator<String> it = directories.iterator();
                             while (it.hasNext())
                             {
-                                out.print(sep + it.next());
+                                out.print(REQUEST_TOKEN_SEPARATOR + it.next());
                             }
                             out.println();
                             data = getBytesFromInputStream(is);
