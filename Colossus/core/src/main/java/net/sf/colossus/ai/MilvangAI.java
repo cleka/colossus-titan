@@ -46,7 +46,9 @@ public class MilvangAI extends RationalAI
         int recruitNow = 0;
         int recruitLater = 0;
 
-        // TODO why do we pass null here?
+        // TODO why do we pass null here? RD/ it's (not quite) a bug, the Hex
+        // is required only for special recruiting. This will only miss
+        // Balrogs in variant Balrogs.
         List<CreatureType> tempRecruits = TerrainRecruitLoader
             .getPossibleRecruits(terrain, null);
         List<CreatureType> recruiters = TerrainRecruitLoader
@@ -62,7 +64,8 @@ public class MilvangAI extends RationalAI
             while (liter.hasNext())
             {
                 CreatureType lesser = liter.next();
-                // TODO another null for the TerranRecruitLoader -> why?
+                // TODO another null for the TerranRecruitLoader -> why? Same
+                // reason: it's required for custom recruiting.
                 int numNeeded = TerrainRecruitLoader.numberOfRecruiterNeeded(
                     lesser, creature, terrain, null);
                 int hintValue = creature.getHintedRecruitmentValue();
