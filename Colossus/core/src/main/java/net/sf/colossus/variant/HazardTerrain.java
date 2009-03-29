@@ -209,7 +209,7 @@ public class HazardTerrain extends Hazards
         RangeStrikeSpecialEffect.RANGESTRIKEFREE, SpecialEffect.NOSPECIAL);
 
     /** Stone native gains 1 skill when defending against non-native ;
-     * Stone cannot be entered by Flyer or non-native.
+     * Stone cannot be entered by non-native.
      */
     public static final HazardTerrain STONE = new HazardTerrain("Stone", 'n',
         EffectOnMovement.BLOCKFOREIGNER, EffectOnMovement.BLOCKFOREIGNER,
