@@ -483,15 +483,15 @@ public class TerrainRecruitLoader
      * turn and in a particular kind of Tower.
      * @todo FIXME: this heuristic (first 3 creatures in the tower) should
      * be replaced by a real entry in the Tower terrain (similar to startlist).
-     * @param terrain The kind of Tower considered.
+     * @param hex The specific Tower considered.
      * @return an array of Creature representing the starting creatures.
      * @see net.sf.colossus.server.CreatureType
      */
     public static CreatureType[] getStartingCreatures(
-        MasterBoardTerrain terrain)
+        MasterHex hex)
     {
         CreatureType[] bc = new CreatureType[3];
-        List<CreatureType> to = getPossibleRecruits(terrain, null);
+        List<CreatureType> to = getPossibleRecruits(hex.getTerrain(), hex);
         bc[0] = to.get(0);
         bc[1] = to.get(1);
         bc[2] = to.get(2);
@@ -518,8 +518,8 @@ public class TerrainRecruitLoader
         for (MasterBoardTerrain terrain : getTerrains())
         {
             if (terrain.isTower())
-            {
-                CreatureType[] bc = getStartingCreatures(terrain);
+            {/* temporarily broken, it needs a MasteHex now ... */
+                CreatureType[] bc = getStartingCreatures(null/*terrain*/);
                 if (type.equals(bc[0]) || type.equals(bc[1])
                     || type.equals(bc[2]))
                 {
@@ -546,7 +546,10 @@ public class TerrainRecruitLoader
 
     /**
      * Give a modifiable list of the possible recruits in a terrain.
-     * @param terrain String representing a terrain.
+     * @param terrain The terrain to consider.
+     * @param hex The specific hex to consider. It shouldn't be null during
+     * the actual recruiting, but it can be null when doing evaluation (it's
+     * only used for special recruiting in custom variants).
      * @return List of Creatures that can be recruited in the terrain.
      * @see net.sf.colossus.server.CreatureType
      */

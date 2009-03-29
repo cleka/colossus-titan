@@ -32,6 +32,8 @@ public class MasterBoardTerrain implements Comparable<MasterBoardTerrain>
      * even if it' backed by several different Battlelands. This would also
      * remove a lot of duplicated entries in the Full Recruit Tree.
      * WIP.
+     * ADDITIONAL WARNING: What about variant such as Balrog? The recruitment
+     * is Hex-specific, not Terrain-specific...
      */
     private final String displayName;
     /** Subtitle, for the Battlelands. Cosmetic only, but nice */

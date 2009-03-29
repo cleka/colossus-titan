@@ -580,7 +580,7 @@ public class SimpleAI extends AbstractAI
         }
 
         CreatureType[] startCre = TerrainRecruitLoader
-            .getStartingCreatures(hex.getTerrain());
+            .getStartingCreatures(hex);
         // in CMU style splitting, we split centaurs in even towers,
         // ogres in odd towers.
         final boolean oddTower = "100".equals(hex.getLabel())
@@ -628,7 +628,7 @@ public class SimpleAI extends AbstractAI
         MasterHex hex)
     {
         CreatureType[] startCre = TerrainRecruitLoader
-            .getStartingCreatures(hex.getTerrain());
+            .getStartingCreatures(hex);
         List<CreatureType> splitoffs = new LinkedList<CreatureType>();
 
         if (favorTitan)
@@ -686,7 +686,7 @@ public class SimpleAI extends AbstractAI
         MasterHex hex)
     {
         CreatureType[] startCre = TerrainRecruitLoader
-            .getStartingCreatures(hex.getTerrain());
+            .getStartingCreatures(hex);
         List<CreatureType> splitoffs = new LinkedList<CreatureType>();
 
         if (favorTitan)
