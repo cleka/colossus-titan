@@ -309,7 +309,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             /* count all hazards & hazard sides */
 
             /* slow & inefficient... */
-            HashMap<HazardTerrain, Integer> t2n = new HashMap<HazardTerrain, Integer>();
+            Map<HazardTerrain, Integer> t2n = new HashMap<HazardTerrain, Integer>();
             for (HazardTerrain hTerrain : HazardTerrain.getAllHazardTerrains())
             {
                 int count = 0;
@@ -330,7 +330,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             }
             masterBoardTerrain.setHazardNumberMap(t2n);
             char[] hazardSides = BattleHex.getHexsides();
-            HashMap<Character, Integer> s2n = new HashMap<Character, Integer>();
+            Map<Character, Integer> s2n = new HashMap<Character, Integer>();
             for (char side : hazardSides)
             {
                 int count = 0;

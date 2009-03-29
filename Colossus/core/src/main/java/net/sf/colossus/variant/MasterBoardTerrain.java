@@ -3,7 +3,6 @@ package net.sf.colossus.variant;
 
 import java.awt.Color;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -197,7 +196,7 @@ public class MasterBoardTerrain implements Comparable<MasterBoardTerrain>
     }
 
     public void setHazardNumberMap(
-        HashMap<HazardTerrain, Integer> hazardNumberMap)
+        Map<HazardTerrain, Integer> hazardNumberMap)
     {
         this.hazardNumberMap = hazardNumberMap;
     }
@@ -208,7 +207,7 @@ public class MasterBoardTerrain implements Comparable<MasterBoardTerrain>
     }
 
     public void setHazardSideNumberMap(
-        HashMap<Character, Integer> hazardSideNumberMap)
+        Map<Character, Integer> hazardSideNumberMap)
     {
         this.hazardSideNumberMap = hazardSideNumberMap;
     }
