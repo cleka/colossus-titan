@@ -1,4 +1,4 @@
-package net.sf.colossus.util;
+package net.sf.colossus.gui;
 
 
 import java.awt.Color;
@@ -15,7 +15,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import net.sf.colossus.client.Client;
-import net.sf.colossus.gui.SaveWindow;
+import net.sf.colossus.util.Options;
+import net.sf.colossus.util.SwingDocumentLogHandler;
 
 
 /** 

@@ -39,7 +39,6 @@ import net.sf.colossus.game.SummonInfo;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Start.WhatToDoNext;
 import net.sf.colossus.util.KFrame;
-import net.sf.colossus.util.LogWindow;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
