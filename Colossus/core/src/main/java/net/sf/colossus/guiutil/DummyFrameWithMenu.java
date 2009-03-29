@@ -1,4 +1,4 @@
-package net.sf.colossus.util;
+package net.sf.colossus.guiutil;
 
 
 
@@ -12,7 +12,8 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
-import net.sf.colossus.guiutil.KFrame;
+import net.sf.colossus.util.InstanceTracker;
+
 
 
 /**
@@ -144,7 +145,7 @@ public class DummyFrameWithMenu extends KFrame
 
         DebugMethods.waitReturn();
 
-        net.sf.colossus.util.InstanceTracker.printStatistics();
+        InstanceTracker.printStatistics();
 
         Logger LOGGER = Logger.getLogger(DummyFrameWithMenu.class.getName());
         LOGGER.log(Level.FINEST,

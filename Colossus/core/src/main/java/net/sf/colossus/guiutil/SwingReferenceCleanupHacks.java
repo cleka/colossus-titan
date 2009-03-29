@@ -1,4 +1,4 @@
-package net.sf.colossus.util;
+package net.sf.colossus.guiutil;
 
 
 import java.lang.reflect.Field;

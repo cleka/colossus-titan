@@ -1,9 +1,11 @@
-package net.sf.colossus.util;
+package net.sf.colossus.guiutil;
 
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+
+import net.sf.colossus.util.InstanceTracker;
 
 
 
@@ -30,13 +32,13 @@ public class DebugMethods
         System.gc();
         System.runFinalization();
 
-        net.sf.colossus.util.DummyFrameWithMenu.doOneDummyFrame("exitDummy");
-        net.sf.colossus.util.DummyFrameWithMenu.doOneDummyFrame("exitDummy2");
+        DummyFrameWithMenu.doOneDummyFrame("exitDummy");
+        DummyFrameWithMenu.doOneDummyFrame("exitDummy2");
 
         if (doSwingCleanup)
         {
             // Should be only done once, the very last time in main()
-            net.sf.colossus.util.DummyFrameWithMenu.swingCleanup();
+            DummyFrameWithMenu.swingCleanup();
         }
 
         System.gc();
@@ -118,7 +120,7 @@ public class DebugMethods
 
                 if (line.equals("f"))
                 {
-                    net.sf.colossus.util.DummyFrameWithMenu f1 = new net.sf.colossus.util.DummyFrameWithMenu(
+                    DummyFrameWithMenu f1 = new DummyFrameWithMenu(
                         "" + cnt);
                     cnt++;
 
