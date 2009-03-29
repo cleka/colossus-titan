@@ -1,6 +1,8 @@
 package net.sf.colossus.gui;
 
 
+import guiutil.KDialog;
+
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -19,7 +21,6 @@ import net.sf.colossus.client.IOptions;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.HTMLColor;
-import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Options;
 
 

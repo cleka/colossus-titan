@@ -1,6 +1,8 @@
 package net.sf.colossus.util;
 
 
+import guiutil.KFrame;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.logging.Level;

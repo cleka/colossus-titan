@@ -1,6 +1,8 @@
 package net.sf.colossus.gui;
 
 
+import guiutil.KDialog;
+
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -28,7 +30,6 @@ import javax.swing.JLabel;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.SummonInfo;
-import net.sf.colossus.util.KDialog;
 
 
 /**

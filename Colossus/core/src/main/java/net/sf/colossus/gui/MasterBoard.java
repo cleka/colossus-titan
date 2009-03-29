@@ -1,6 +1,8 @@
 package net.sf.colossus.gui;
 
 
+import guiutil.KFrame;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -65,7 +67,6 @@ import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.XMLSnapshotFilter;
 import net.sf.colossus.util.ArrayHelper;
 import net.sf.colossus.util.HTMLColor;
-import net.sf.colossus.util.KFrame;
 import net.sf.colossus.util.NullCheckPredicate;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;

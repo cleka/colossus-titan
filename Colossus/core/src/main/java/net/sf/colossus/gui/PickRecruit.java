@@ -1,6 +1,8 @@
 package net.sf.colossus.gui;
 
 
+import guiutil.KDialog;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -25,7 +27,6 @@ import javax.swing.JPanel;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.game.Legion;
-import net.sf.colossus.util.KDialog;
 import net.sf.colossus.variant.CreatureType;
 
 

@@ -1,6 +1,8 @@
 package net.sf.colossus.webclient;
 
 
+import guiutil.KFrame;
+
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -59,7 +61,6 @@ import net.sf.colossus.server.GetPlayers;
 import net.sf.colossus.server.Server;
 import net.sf.colossus.server.Start;
 import net.sf.colossus.server.Start.WhatToDoNext;
-import net.sf.colossus.util.KFrame;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ViableEntityManager;
 import net.sf.colossus.webcommon.GameInfo;

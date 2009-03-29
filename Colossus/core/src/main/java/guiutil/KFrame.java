@@ -1,4 +1,4 @@
-package net.sf.colossus.util;
+package guiutil;
 
 
 import java.awt.Dimension;
@@ -9,6 +9,7 @@ import javax.swing.JFrame;
 
 import net.sf.colossus.client.IOptions;
 import net.sf.colossus.gui.SaveWindow;
+import net.sf.colossus.util.InstanceTracker;
 
 
 /** KFrame adds some generally useful functions to JFrame.

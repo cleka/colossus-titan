@@ -1,6 +1,8 @@
 package net.sf.colossus.gui;
 
 
+import guiutil.KFrame;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -44,7 +46,6 @@ import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.LegionServerSide;
-import net.sf.colossus.util.KFrame;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.variant.BattleHex;

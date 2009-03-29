@@ -1,6 +1,8 @@
 package net.sf.colossus.gui;
 
 
+import guiutil.KDialog;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -27,7 +29,6 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
 import net.sf.colossus.client.Client;
-import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.variant.CreatureType;
 

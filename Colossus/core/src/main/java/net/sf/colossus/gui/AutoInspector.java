@@ -1,6 +1,8 @@
 package net.sf.colossus.gui;
 
 
+import guiutil.KDialog;
+
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -17,7 +19,6 @@ import javax.swing.WindowConstants;
 
 import net.sf.colossus.client.IOptions;
 import net.sf.colossus.client.LegionClientSide;
-import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.variant.MasterHex;
 

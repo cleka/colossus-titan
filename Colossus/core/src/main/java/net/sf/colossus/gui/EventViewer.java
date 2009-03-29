@@ -1,6 +1,8 @@
 package net.sf.colossus.gui;
 
 
+import guiutil.KDialog;
+
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -41,7 +43,6 @@ import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.server.Constants;
-import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Options;
 
 

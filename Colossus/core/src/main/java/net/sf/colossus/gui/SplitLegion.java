@@ -1,6 +1,8 @@
 package net.sf.colossus.gui;
 
 
+import guiutil.KDialog;
+
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -22,7 +24,6 @@ import javax.swing.JButton;
 
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.server.Constants;
-import net.sf.colossus.util.KDialog;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 

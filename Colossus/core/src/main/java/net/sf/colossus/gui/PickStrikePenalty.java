@@ -1,6 +1,8 @@
 package net.sf.colossus.gui;
 
 
+import guiutil.KDialog;
+
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -12,7 +14,6 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
-import net.sf.colossus.util.KDialog;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.server.Constants;
 

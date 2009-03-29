@@ -1,6 +1,8 @@
 package net.sf.colossus.gui;
 
 
+import guiutil.KDialog;
+
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
@@ -12,7 +14,6 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 
 import net.sf.colossus.client.LegionClientSide;
-import net.sf.colossus.util.KDialog;
 
 
 /**

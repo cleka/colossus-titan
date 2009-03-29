@@ -1,6 +1,8 @@
 package net.sf.colossus.server;
 
 
+import guiutil.KFrame;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -45,7 +47,6 @@ import net.sf.colossus.gui.PickIntValue;
 import net.sf.colossus.gui.SaveWindow;
 import net.sf.colossus.gui.ShowReadme;
 import net.sf.colossus.server.Start.WhatToDoNext;
-import net.sf.colossus.util.KFrame;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
 

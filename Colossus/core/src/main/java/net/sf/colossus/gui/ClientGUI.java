@@ -1,6 +1,8 @@
 package net.sf.colossus.gui;
 
 
+import guiutil.KFrame;
+
 import java.awt.Cursor;
 import java.awt.GraphicsDevice;
 import java.awt.Window;
@@ -38,7 +40,6 @@ import net.sf.colossus.game.Proposal;
 import net.sf.colossus.game.SummonInfo;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Start.WhatToDoNext;
-import net.sf.colossus.util.KFrame;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;

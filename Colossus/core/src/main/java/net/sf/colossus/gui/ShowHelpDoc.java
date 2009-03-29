@@ -1,9 +1,10 @@
 package net.sf.colossus.gui;
 
 
+import guiutil.KFrame;
+
 import javax.swing.JTextArea;
 
-import net.sf.colossus.util.KFrame;
 
 
 /**

@@ -4,6 +4,8 @@
 package net.sf.colossus.gui;
 
 
+import guiutil.KDialog;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -27,7 +29,6 @@ import net.sf.colossus.server.CreatureServerSide;
 import net.sf.colossus.server.LegionServerSide;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.HTMLColor;
-import net.sf.colossus.util.KDialog;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardTerrain;
