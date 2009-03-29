@@ -4,7 +4,6 @@
 package net.sf.colossus.gui;
 
 
-import guiutil.KDialog;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -25,6 +24,7 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
 import net.sf.colossus.game.RecruitGraph;
+import net.sf.colossus.guiutil.KDialog;
 import net.sf.colossus.server.CreatureServerSide;
 import net.sf.colossus.server.LegionServerSide;
 import net.sf.colossus.server.VariantSupport;

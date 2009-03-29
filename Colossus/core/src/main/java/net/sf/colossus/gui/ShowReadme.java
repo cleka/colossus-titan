@@ -1,7 +1,6 @@
 package net.sf.colossus.gui;
 
 
-import guiutil.KFrame;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -12,6 +11,7 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.text.Document;
 
+import net.sf.colossus.guiutil.KFrame;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.variant.Variant;
 

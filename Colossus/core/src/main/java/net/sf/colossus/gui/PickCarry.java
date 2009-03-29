@@ -1,7 +1,6 @@
 package net.sf.colossus.gui;
 
 
-import guiutil.KDialog;
 
 import java.awt.GridLayout;
 import java.awt.Point;
@@ -16,6 +15,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 
 import net.sf.colossus.client.Client;
+import net.sf.colossus.guiutil.KDialog;
 
 
 /** Chooses between multiple carry options.

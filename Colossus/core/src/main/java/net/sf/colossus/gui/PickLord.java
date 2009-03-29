@@ -1,7 +1,6 @@
 package net.sf.colossus.gui;
 
 
-import guiutil.KDialog;
 
 import java.awt.Color;
 import java.awt.Container;
@@ -16,6 +15,7 @@ import java.util.List;
 import javax.swing.JFrame;
 
 import net.sf.colossus.client.IOptions;
+import net.sf.colossus.guiutil.KDialog;
 import net.sf.colossus.server.Constants;
 
 

@@ -1,4 +1,4 @@
-package guiutil;
+package net.sf.colossus.guiutil;
 
 
 import java.awt.Dimension;

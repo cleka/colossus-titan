@@ -1,7 +1,6 @@
 package net.sf.colossus.util;
 
 
-import guiutil.KFrame;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -12,6 +11,8 @@ import javax.swing.AbstractAction;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+
+import net.sf.colossus.guiutil.KFrame;
 
 
 /**

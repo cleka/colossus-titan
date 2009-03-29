@@ -1,7 +1,6 @@
 package net.sf.colossus.gui;
 
 
-import guiutil.KFrame;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -42,6 +41,7 @@ import javax.swing.event.ChangeListener;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.IOptions;
 import net.sf.colossus.game.PlayerColor;
+import net.sf.colossus.guiutil.KFrame;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.Split;

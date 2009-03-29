@@ -1,7 +1,6 @@
 package net.sf.colossus.server;
 
 
-import guiutil.KFrame;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -16,6 +15,8 @@ import javax.swing.JFrame;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import javax.swing.WindowConstants;
+
+import net.sf.colossus.guiutil.KFrame;
 
 
 

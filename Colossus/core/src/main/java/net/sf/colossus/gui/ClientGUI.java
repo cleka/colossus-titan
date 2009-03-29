@@ -1,7 +1,6 @@
 package net.sf.colossus.gui;
 
 
-import guiutil.KFrame;
 
 import java.awt.Cursor;
 import java.awt.GraphicsDevice;
@@ -38,6 +37,7 @@ import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.Proposal;
 import net.sf.colossus.game.SummonInfo;
+import net.sf.colossus.guiutil.KFrame;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Start.WhatToDoNext;
 import net.sf.colossus.util.Options;

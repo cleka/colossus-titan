@@ -1,7 +1,6 @@
 package net.sf.colossus.gui;
 
 
-import guiutil.KFrame;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -63,6 +62,7 @@ import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Phase;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
+import net.sf.colossus.guiutil.KFrame;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.XMLSnapshotFilter;
 import net.sf.colossus.util.ArrayHelper;

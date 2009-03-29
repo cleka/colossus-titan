@@ -1,7 +1,6 @@
 package net.sf.colossus.gui;
 
 
-import guiutil.KDialog;
 
 import java.awt.Color;
 import java.awt.Container;
@@ -21,6 +20,7 @@ import javax.swing.SwingUtilities;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.game.EntrySide;
+import net.sf.colossus.guiutil.KDialog;
 import net.sf.colossus.variant.MasterHex;
 
 

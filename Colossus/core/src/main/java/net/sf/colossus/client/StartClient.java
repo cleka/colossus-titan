@@ -1,7 +1,6 @@
 package net.sf.colossus.client;
 
 
-import guiutil.KFrame;
 
 import java.awt.Container;
 import java.awt.Dimension;
@@ -25,6 +24,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 
 import net.sf.colossus.gui.SaveWindow;
+import net.sf.colossus.guiutil.KFrame;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Start;
 import net.sf.colossus.server.Start.WhatToDoNext;

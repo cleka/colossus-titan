@@ -4,7 +4,6 @@
 package net.sf.colossus.gui;
 
 
-import guiutil.KDialog;
 
 import java.awt.Color;
 import java.awt.GridBagConstraints;
@@ -30,6 +29,7 @@ import net.sf.colossus.client.PlayerClientSide;
 import net.sf.colossus.client.PredictSplitNode;
 import net.sf.colossus.client.PredictSplits;
 import net.sf.colossus.game.Creature;
+import net.sf.colossus.guiutil.KDialog;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.variant.CreatureType;
 

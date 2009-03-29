@@ -1,7 +1,6 @@
 package net.sf.colossus.webclient;
 
 
-import guiutil.KFrame;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -56,6 +55,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import net.sf.colossus.client.Client;
+import net.sf.colossus.guiutil.KFrame;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.GetPlayers;
 import net.sf.colossus.server.Server;
