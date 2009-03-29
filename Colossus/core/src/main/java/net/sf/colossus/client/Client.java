@@ -47,7 +47,6 @@ import net.sf.colossus.server.Server;
 import net.sf.colossus.server.Start;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.server.Start.WhatToDoNext;
-import net.sf.colossus.util.ChildThreadManager;
 import net.sf.colossus.util.CollectionHelper;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.Predicate;
@@ -105,7 +104,6 @@ public final class Client implements IClient, IOracle
     /** This will eventually be a network interface rather than a
      *  direct reference.  So don't share this reference. */
     private IServer server;
-    private ChildThreadManager threadMgr;
 
     public boolean failed = false;
 
@@ -306,8 +304,6 @@ public final class Client implements IClient, IOracle
         this.activePlayer = noone;
         this.battleActivePlayer = noone;
 
-        this.threadMgr = new ChildThreadManager("Client " + playerName);
-
         this.ai = new SimpleAI(this);
 
         this.movement = new Movement(this);
@@ -355,11 +351,6 @@ public final class Client implements IClient, IOracle
         setupOptionListeners();
         // Need to load options early so they don't overwrite server options.
         loadOptions();
-    }
-
-    public ChildThreadManager getThreadMgr()
-    {
-        return threadMgr;
     }
 
     public boolean isRemote()
@@ -844,11 +835,7 @@ public final class Client implements IClient, IOracle
         sct = null;
         server = null;
 
-        threadMgr.cleanup();
-        threadMgr = null;
-
         gui.doCleanupGUI();
-
     }
 
     /* This was earlier done at end of cleanupGUI inside client.

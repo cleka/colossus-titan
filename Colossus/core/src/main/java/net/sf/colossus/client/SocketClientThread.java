@@ -24,7 +24,6 @@ import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.IServer;
-import net.sf.colossus.util.ChildThreadManager;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.variant.CreatureType;
@@ -44,7 +43,6 @@ final class SocketClientThread extends Thread implements IServer
         .getLogger(SocketClientThread.class.getName());
 
     private Client client;
-    private ChildThreadManager threadMgr;
     private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
@@ -65,7 +63,6 @@ final class SocketClientThread extends Thread implements IServer
         super("Client " + client.getOwningPlayer().getName());
 
         this.client = client;
-        this.threadMgr = client.getThreadMgr();
         InstanceTracker.register(this, "SCT "
             + client.getOwningPlayer().getName());
 
@@ -190,8 +187,6 @@ final class SocketClientThread extends Thread implements IServer
             return;
         }
 
-        threadMgr.registerToThreadManager(this);
-
         return;
     }
 
@@ -258,9 +253,6 @@ final class SocketClientThread extends Thread implements IServer
             LOGGER.log(Level.WARNING, "SCT run() " + getName()
                 + ": after loop, client already null??");
         }
-
-        threadMgr.unregisterFromThreadManager(this);
-        threadMgr = null;
 
         LOGGER.log(Level.FINEST, "SCT run() ending " + getName());
     }
