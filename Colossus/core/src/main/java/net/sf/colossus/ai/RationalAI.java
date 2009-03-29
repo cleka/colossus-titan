@@ -19,7 +19,6 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.LegionClientSide;
-import net.sf.colossus.client.PlayerClientSide;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
@@ -69,7 +68,7 @@ public class RationalAI extends SimpleAI
 
         legionsToSplit.clear();
 
-        PlayerClientSide player = client.getOwningPlayer();
+        Player player = client.getOwningPlayer();
         for (Legion legion : player.getLegions())
         {
             legionsToSplit.add(legion);
@@ -83,7 +82,7 @@ public class RationalAI extends SimpleAI
         logger.log(Level.FINEST, "RationalAI.fireSplits " + legionsToSplit);
 
         //safe to cache the player out of the loop, ref to mutable object
-        PlayerClientSide player = client.getOwningPlayer();
+        Player player = client.getOwningPlayer();
 
         while (!legionsToSplit.isEmpty())
         {
@@ -230,7 +229,7 @@ public class RationalAI extends SimpleAI
     }
 
     /** Return true if done, false if waiting for callback. */
-    boolean splitOneLegion(PlayerClientSide player, Legion legion)
+    boolean splitOneLegion(Player player, Legion legion)
     {
         logger.log(Level.FINEST, "splitOneLegion()");
 
@@ -405,8 +404,7 @@ public class RationalAI extends SimpleAI
             }
 
             // should work with all variants
-            int currentScore = ((PlayerClientSide)legion.getPlayer())
-                .getScore();
+            int currentScore = legion.getPlayer().getScore();
             int arv = TerrainRecruitLoader.getAcquirableRecruitmentsValue();
             int nextScore = ((currentScore / arv) + 1) * arv;
 
@@ -1675,8 +1673,7 @@ public class RationalAI extends SimpleAI
 
         // apply penalty to attacks if we have few legions
         // Don't reward titan attacks with few stacks
-        int attackerLegions = ((PlayerClientSide)attacker.getPlayer())
-            .getNumLegions();
+        int attackerLegions = attacker.getPlayer().getNumLegions();
         if (attackerLegions < 5 && !I_HATE_HUMANS)
         {
             return value - (result.getAttackerDead() / attackerPointValue)
@@ -2272,7 +2269,7 @@ public class RationalAI extends SimpleAI
             deniedMuster = bestRecruit.getPointValue();
         }
 
-        int currentScore = ((PlayerClientSide)enemy.getPlayer()).getScore();
+        int currentScore = enemy.getPlayer().getScore();
         int pointValue = ((LegionClientSide)legion).getPointValue();
         boolean canAcquireAngel = ((currentScore + pointValue)
             / TerrainRecruitLoader.getAcquirableRecruitmentsValue() > (currentScore / TerrainRecruitLoader
@@ -2373,8 +2370,7 @@ public class RationalAI extends SimpleAI
         if (br.getDefenderDead() < ((LegionClientSide)enemy).getPointValue() * 2 / 7
             && height >= 6)
         {
-            int currentScore = ((PlayerClientSide)enemy.getPlayer())
-                .getScore();
+            int currentScore = enemy.getPlayer().getScore();
             int pointValue = ((LegionClientSide)legion).getPointValue();
             boolean canAcquireAngel = ((currentScore + pointValue)
                 / TerrainRecruitLoader.getAcquirableRecruitmentsValue() > (currentScore / TerrainRecruitLoader
@@ -2409,8 +2405,7 @@ public class RationalAI extends SimpleAI
             if (name.startsWith(Constants.titan))
             {
                 PowerSkill ps;
-                int titanPower = ((PlayerClientSide)legion.getPlayer())
-                    .getTitanPower();
+                int titanPower = legion.getPlayer().getTitanPower();
 
                 // Assume that Titans
                 // take only a minimal part in the combat.

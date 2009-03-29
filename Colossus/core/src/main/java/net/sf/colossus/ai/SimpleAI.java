@@ -312,13 +312,13 @@ public class SimpleAI extends AbstractAI
 
     public boolean split()
     {
-        PlayerClientSide player = client.getOwningPlayer();
+        Player player = client.getOwningPlayer();
         remainingMarkers = prepareMarkers(player.getMarkersAvailable(), player
             .getShortColor());
 
         splitsDone = 0;
         splitsAcked = 0;
-        for (LegionClientSide legion : player.getLegions())
+        for (Legion legion : player.getLegions())
         {
             if (remainingMarkers.isEmpty())
             {
@@ -343,8 +343,7 @@ public class SimpleAI extends AbstractAI
         return splitsAcked >= splitsDone;
     }
 
-    private void splitOneLegion(PlayerClientSide player,
-        LegionClientSide legion)
+    private void splitOneLegion(Player player, Legion legion)
     {
         if (legion.getHeight() < 7)
         {
@@ -906,10 +905,10 @@ public class SimpleAI extends AbstractAI
     }
 
     /** Return true if we moved something. */
-    private boolean handleForcedSplitMoves(PlayerClientSide player,
+    private boolean handleForcedSplitMoves(Player player,
         Map<Legion, List<MoveInfo>> moveMap)
     {
-        for (LegionClientSide legion : player.getLegions())
+        for (Legion legion : player.getLegions())
         {
             List<Legion> friendlyLegions = client
                 .getFriendlyLegions(legion.getCurrentHex(), player);
@@ -1684,7 +1683,7 @@ public class SimpleAI extends AbstractAI
         boolean wouldFlee = flee(defender, attacker);
         if (wouldFlee)
         {
-            int currentScore = ((PlayerClientSide)player).getScore();
+            int currentScore = player.getScore();
             int fleeValue = ((LegionClientSide)defender).getPointValue() / 2;
             if (((currentScore + fleeValue) / TerrainRecruitLoader
                 .getAcquirableRecruitmentsValue()) > (currentScore / TerrainRecruitLoader
@@ -1813,8 +1812,7 @@ public class SimpleAI extends AbstractAI
             terrain)
             && height >= 6)
         {
-            int currentScore = ((PlayerClientSide)enemy.getPlayer())
-                .getScore();
+            int currentScore = enemy.getPlayer().getScore();
             int pointValue = ((LegionClientSide)legion).getPointValue();
             boolean canAcquireAngel = ((currentScore + pointValue)
                 / TerrainRecruitLoader.getAcquirableRecruitmentsValue() > (currentScore / TerrainRecruitLoader
@@ -2144,8 +2142,7 @@ public class SimpleAI extends AbstractAI
         {
             if (name.startsWith(Constants.titan))
             {
-                val += getTitanCombatValue(((PlayerClientSide)legion
-                    .getPlayer()).getTitanPower());
+                val += getTitanCombatValue(legion.getPlayer().getTitanPower());
             }
             else
             {

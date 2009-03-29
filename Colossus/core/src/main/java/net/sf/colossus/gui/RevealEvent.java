@@ -16,9 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
 import net.sf.colossus.client.Client;
-import net.sf.colossus.client.PlayerClientSide;
 import net.sf.colossus.game.Player;
-import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.server.Constants;
 
 
@@ -60,7 +58,7 @@ public class RevealEvent
     private String info;
     // set for losing battle events, because if Titan killed the
     // marker does already belong to slayer when we ask.
-    private PlayerClientSide realPlayer;
+    private Player realPlayer;
 
     public final static int eventSplit = 0;
     public final static int eventRecruit = 1;
@@ -145,8 +143,8 @@ public class RevealEvent
         this.oldRoll = oldRoll;
         this.newRoll = newRoll;
 
-        PlayerClientSide info = client.getPlayer(playerNr);
-        this.mulliganTitanBaseName = getTitanBasename(info);
+        Player player = client.getPlayer(playerNr);
+        this.mulliganTitanBaseName = player.getTitanBasename();
     }
 
     /*
@@ -169,7 +167,7 @@ public class RevealEvent
             if (rc != null && rc.getPlainName() != null
                 && rc.getPlainName().equals(Constants.titan))
             {
-                PlayerClientSide player = (realPlayer != null ? realPlayer
+                Player player = (realPlayer != null ? realPlayer
                     : client.getPlayerByMarkerId(markerId));
 
                 if (player == null)
@@ -179,7 +177,7 @@ public class RevealEvent
                 }
                 else
                 {
-                    String tbName = getTitanBasename(player);
+                    String tbName = player.getTitanBasename();
                     rc.setTitanBaseName(tbName);
                 }
             }
@@ -203,7 +201,7 @@ public class RevealEvent
         this.info = info;
     }
 
-    public void setRealPlayer(PlayerClientSide realPlayer)
+    public void setRealPlayer(Player realPlayer)
     {
         assert realPlayer != null;
         this.realPlayer = realPlayer;
@@ -528,25 +526,6 @@ public class RevealEvent
         addLabel("(" + height + ")");
     }
 
-    // TODO duplicated from LegionInfo.java:
-    /** Return the full basename for a titan in legion markerId,
-     *  first finding that legion's player, player color, and titan size.
-     *  Default to Constants.titan if the info is not there. */
-    String getTitanBasename(PlayerClientSide info)
-    {
-        try
-        {
-            PlayerColor color = info.getColor();
-            int power = info.getTitanPower();
-            return "Titan-" + power + "-" + color.getName();
-        }
-        catch (Exception ex)
-        {
-            LOGGER.log(Level.SEVERE, "PlayerInfo threw an exception.", ex);
-            return Constants.titan;
-        }
-    }
-
     // NOTE: this assumes that this event is for the player in whose
     // turn this happens:
     private Chit getSolidMarker()
@@ -574,8 +553,8 @@ public class RevealEvent
                 LOGGER.log(Level.SEVERE, "While trying to get chit: ", e);
                 // if solid marker does not exist for this color,
                 // use as fallback the Titan chit.
-                PlayerClientSide info = client.getPlayer(playerNr);
-                solidMarker = new Chit(scale, getTitanBasename(info));
+                Player player = client.getPlayer(playerNr);
+                solidMarker = new Chit(scale, player.getTitanBasename());
             }
         }
         else

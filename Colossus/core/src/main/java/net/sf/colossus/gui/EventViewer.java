@@ -38,7 +38,6 @@ import javax.swing.border.TitledBorder;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.IOptions;
 import net.sf.colossus.client.LegionClientSide;
-import net.sf.colossus.client.PlayerClientSide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.server.Constants;
@@ -823,8 +822,7 @@ final class EventViewer extends KDialog
                 .getMarkerId(), attacker.getHeight(),
             new ArrayList<RevealedCreature>(), null, 0);
         attackerEventLegion.setEventInfo(Constants.reasonBattleStarts);
-        attackerEventLegion.setRealPlayer((PlayerClientSide)attacker
-            .getPlayer());
+        attackerEventLegion.setRealPlayer(attacker.getPlayer());
 
         defenderEventLegion = new RevealEvent(client, turnNumber,
             getActivePlayerNum(), RevealEvent.eventBattle, defender
@@ -832,8 +830,7 @@ final class EventViewer extends KDialog
             new ArrayList<RevealedCreature>(), null, 0);
 
         defenderEventLegion.setEventInfo(Constants.reasonBattleStarts);
-        defenderEventLegion.setRealPlayer((PlayerClientSide)defender
-            .getPlayer());
+        defenderEventLegion.setRealPlayer(defender.getPlayer());
     }
 
     public void tellEngagementResults(Legion winner, String method, int turns)

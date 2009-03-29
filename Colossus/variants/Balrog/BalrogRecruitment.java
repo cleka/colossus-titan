@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import net.sf.colossus.client.PlayerClientSide;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.server.VariantSupport;
@@ -154,7 +153,7 @@ public class BalrogRecruitment extends CustomRecruitBase
             {
                 oldscore = score.intValue();
             }
-            newscore = ((PlayerClientSide)pi).getScore();
+            newscore = pi.getScore();
 
             playerToOldScore.put(pi, Integer.valueOf(newscore));
 
