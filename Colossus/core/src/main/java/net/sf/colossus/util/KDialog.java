@@ -14,7 +14,6 @@ import javax.swing.SwingUtilities;
 
 import net.sf.colossus.client.IOptions;
 import net.sf.colossus.gui.SaveWindow;
-import net.sf.colossus.webcommon.InstanceTracker;
 
 
 /**

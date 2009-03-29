@@ -22,10 +22,10 @@ import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.util.Glob;
+import net.sf.colossus.util.InstanceTracker;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
-import net.sf.colossus.webcommon.InstanceTracker;
 
 
 /**

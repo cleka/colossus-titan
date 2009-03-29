@@ -238,7 +238,7 @@ public final class BattleBoard extends KFrame
         String instanceId = client.getOwningPlayer().getName() + ": "
             + attackerMarkerId + "/" + defenderMarkerId + " (" + count + ")";
         count++;
-        net.sf.colossus.webcommon.InstanceTracker.setId(this, instanceId);
+        net.sf.colossus.util.InstanceTracker.setId(this, instanceId);
 
         pack();
         setVisible(true);

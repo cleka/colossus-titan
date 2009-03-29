@@ -38,7 +38,7 @@ public final class ShowReadme extends KFrame
         setTitle(title);
 
         // KFrame does the registration:
-        net.sf.colossus.webcommon.InstanceTracker.setId(this, title);
+        net.sf.colossus.util.InstanceTracker.setId(this, title);
 
         myReadme = new JEditorPane();
         JScrollPane content = readmeContentScrollPane(myReadme, doc);

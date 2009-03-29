@@ -60,7 +60,7 @@ public class StartClient extends KFrame
         super("Client startup options");
         getContentPane().setLayout(new GridLayout(0, 2));
 
-        net.sf.colossus.webcommon.InstanceTracker.register(this, "only one");
+        net.sf.colossus.util.InstanceTracker.register(this, "only one");
 
         this.mutex = mutex;
         this.startObject = startObject;

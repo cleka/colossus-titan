@@ -104,7 +104,7 @@ public final class GetPlayers extends KFrame
     {
         super("Game Setup");
 
-        net.sf.colossus.webcommon.InstanceTracker.register(this, "only one");
+        net.sf.colossus.util.InstanceTracker.register(this, "only one");
 
         this.options = options;
         this.mutex = mutex;

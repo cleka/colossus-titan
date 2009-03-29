@@ -1,4 +1,4 @@
-package net.sf.colossus.webcommon;
+package net.sf.colossus.util;
 
 
 import java.util.HashSet;

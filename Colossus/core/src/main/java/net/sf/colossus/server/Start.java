@@ -882,7 +882,7 @@ public final class Start
         final boolean printObjectStatistics = false;
         if (printObjectStatistics)
         {
-            net.sf.colossus.webcommon.InstanceTracker.printStatistics();
+            net.sf.colossus.util.InstanceTracker.printStatistics();
         }
 
         // If want to have a way to prevent it from straight exit,

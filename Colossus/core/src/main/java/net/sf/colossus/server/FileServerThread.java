@@ -85,7 +85,7 @@ final class FileServerThread extends Thread
     @Override
     public void run()
     {
-        net.sf.colossus.webcommon.InstanceTracker.register(this, "only 1");
+        net.sf.colossus.util.InstanceTracker.register(this, "only 1");
         try
         {
             while (keepGoingOn)

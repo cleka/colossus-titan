@@ -8,8 +8,8 @@ import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.server.CustomRecruitBase;
+import net.sf.colossus.util.InstanceTracker;
 import net.sf.colossus.util.Split;
-import net.sf.colossus.webcommon.InstanceTracker;
 
 
 /**

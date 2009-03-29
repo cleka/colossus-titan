@@ -141,7 +141,7 @@ public class DummyFrameWithMenu extends KFrame
 
         DebugMethods.waitReturn();
 
-        net.sf.colossus.webcommon.InstanceTracker.printStatistics();
+        net.sf.colossus.util.InstanceTracker.printStatistics();
 
         Logger LOGGER = Logger.getLogger(DummyFrameWithMenu.class.getName());
         LOGGER.log(Level.FINEST,
