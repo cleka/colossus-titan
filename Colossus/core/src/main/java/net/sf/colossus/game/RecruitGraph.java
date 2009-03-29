@@ -11,12 +11,12 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
-import net.sf.colossus.variant.Variant;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
@@ -315,20 +315,13 @@ public class RecruitGraph
             List<RecruitEdge> oe = s.getOutgoingEdges();
             Iterator<RecruitEdge> it = oe.iterator();
 
-            // TODO get rid of this Variant dependencies
-            // introduced here right now only to resolve creatureName to type
-            // to get rid of LegionClientSide dependency.
-            Variant variant = legion.getPlayer().getGame().getVariant();
-            
             while (it.hasNext())
             {
                 RecruitEdge e = it.next();
                 RecruitVertex v = e.getDestination();
                 String creName = s.getCreatureName();
-                
-                
-                CreatureType ct = variant.getCreatureByName(creName); 
-                int already = (legion == null ? 0 : legion.numCreature(ct));
+                 
+                int already = (legion == null ? 0 : ((LegionClientSide)legion).numCreature(creName));
 
                 /* only explore if
                  (1) not already visited
