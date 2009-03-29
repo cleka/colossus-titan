@@ -78,6 +78,9 @@
         <recruit name="Knight" number="5" />
         <recruit name="Titan" number="-1" />
         <recruit name="Warlock" number="1" />
+        <starting name="Centaur" number="2" />
+        <starting name="Gargoyle" number="2" />
+        <starting name="Ogre" number="2" />
     </terrain>
     <terrain name="Abyss" color="purple" regular_recruit="True" >
         <recruit name="Titan" number="-1" />

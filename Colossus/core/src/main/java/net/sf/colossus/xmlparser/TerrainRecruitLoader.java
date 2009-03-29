@@ -58,6 +58,12 @@ public class TerrainRecruitLoader
      * TODO integrate into {@link MasterBoardTerrain}
      */
     private static Map<MasterBoardTerrain, List<RecruitNumber>> strToRecruits = new HashMap<MasterBoardTerrain, List<RecruitNumber>>();
+    /**
+     * Map a terrain to a list of recruits.
+     *
+     * TODO integrate into {@link MasterBoardTerrain}
+     */
+    private static Map<MasterBoardTerrain, List<StartingNumber>> strToStarters = new HashMap<MasterBoardTerrain, List<StartingNumber>>();
 
     /**
      * Map a terrain to a boolean,
@@ -281,8 +287,11 @@ public class TerrainRecruitLoader
             displayName = name;
         }
         String color = el.getAttributeValue("color");
-        ArrayList<RecruitNumber> rl = new ArrayList<RecruitNumber>();
 
+        MasterBoardTerrain terrain = new MasterBoardTerrain(name, displayName,
+                HTMLColor.stringToColor(color));
+
+        ArrayList<RecruitNumber> rl = new ArrayList<RecruitNumber>();
         boolean regularRecruit = el.getAttribute("regular_recruit")
             .getBooleanValue();
         List<Element> recruits = el.getChildren("recruit");
@@ -294,8 +303,32 @@ public class TerrainRecruitLoader
             rl.add(rn);
         }
 
-        MasterBoardTerrain terrain = new MasterBoardTerrain(name, displayName,
-            HTMLColor.stringToColor(color));
+        ArrayList<StartingNumber> sl = new ArrayList<StartingNumber>();
+        List<Element> starters = el.getChildren("starting");
+        int total = 0;
+        for (Element starter : starters)
+        {
+            String starterName = starter.getAttributeValue("name");
+            int starterNum = starter.getAttribute("number").getIntValue();
+            if (starterNum != 2)
+            {
+                LOGGER.warning("Only '2' is a supported value for starting" +
+                        " creatures at the moment ...");
+            }
+            StartingNumber rn = new StartingNumber(starterName, starterNum);
+            sl.add(rn);
+            total += starterNum;
+        }
+        if (!sl.isEmpty())
+        {
+            if (total != 6)
+            {
+                LOGGER.warning("There isn't exactly 6 starting creatures in" +
+                        " this terrain ! " + total + " were found in " + name);
+            }
+            TerrainRecruitLoader.strToStarters.put(terrain, sl);
+        }
+
         TerrainRecruitLoader.strToRecruits.put(terrain, rl);
         TerrainRecruitLoader.strToBelow.put(terrain, Boolean
             .valueOf(regularRecruit));
@@ -406,31 +439,37 @@ public class TerrainRecruitLoader
         return terrains.get(id);
     }
 
-    /**
-     * Used internally to associate a creature name and the number of
-     * creatures needed to recruit it.
+    /** Helper class, associating a Creature and a Number
+     * The basic identification is the name (because of the hack of using
+     * special name for special stuff...) but the CreatureType is there to
+     * avoid reloading from the Variant all the time.
+     * We can't look-up at creation time, because the variant isn't available
+     * yet, so we delay until the first call to getCreature.
      * @author Romain Dolbeau
      * @version $Id$
      */
-    private class RecruitNumber
-    {
-
+    private abstract class CreatureAndNumber {
         /**
-         * Name of the creature
+         * The Creature in the pair (if it exists)
+         */
+        private CreatureType creature = null;
+        /**
+         * The Name
          */
         private final String name;
 
         /**
-         * Number of creatures needed to recruit it, depend on the terrain.
+         * The Number in the pair
          */
         private final int number;
 
+        private boolean checked = false;
+
         /**
-         * @param n Name of the creature
-         * @param i Number of creatures needed to recruit it in the
-         * terrain considered.
+         * @param n The Name of the creature
+         * @param i The Number
          */
-        public RecruitNumber(String n, int i)
+        public CreatureAndNumber(String n, int i)
         {
             name = n;
             number = i;
@@ -439,6 +478,26 @@ public class TerrainRecruitLoader
         String getName()
         {
             return name;
+        }
+
+        CreatureType getCreature()
+        {
+            if (!checked)
+            {
+                checked = true;
+                if (isConcreteCreature(name))
+                {
+                    creature =
+                            VariantSupport.getCurrentVariant().
+                            getCreatureByName(name);
+                }
+                else
+                {
+                    creature = null;
+                }
+            }
+            assert (creature != null);
+            return creature;
         }
 
         int getNumber()
@@ -453,9 +512,49 @@ public class TerrainRecruitLoader
         @Override
         public String toString()
         {
-            return ("(" + number + "," + name + ")");
+            return ("(" + getNumber() + "," + getName() + ")");
         }
     }
+
+    /**
+     * Used internally to associate a creature name and the number of
+     * creatures needed to recruit it.
+     * @author Romain Dolbeau
+     * @version $Id$
+     */
+    private class RecruitNumber extends CreatureAndNumber
+    {
+
+        /**
+         * @param n Name of the creature
+         * @param i Number of creatures needed to recruit it in the
+         * terrain considered.
+         */
+        public RecruitNumber(String n, int i)
+        {
+            super(n, i);
+        }
+    }
+
+    /**
+     * Used internally to associate a creature name and the number received
+     * when starting a game.
+     * @author Romain Dolbeau
+     * @version $Id$
+     */
+    private class StartingNumber extends CreatureAndNumber
+    {
+
+        /**
+         * @param n Name of the creature
+         * @param i Number of creatures when starting.
+         */
+        public StartingNumber(String n, int i)
+        {
+            super(n, i);
+        }
+    }
+
 
     public static CustomRecruitBase getCustomRecruitBase(String specialString)
     {
@@ -490,17 +589,38 @@ public class TerrainRecruitLoader
     public static CreatureType[] getStartingCreatures(
         MasterHex hex)
     {
-        CreatureType[] bc = new CreatureType[3];
-        List<CreatureType> to = getPossibleRecruits(hex.getTerrain(), hex);
-        bc[0] = to.get(0);
-        bc[1] = to.get(1);
-        bc[2] = to.get(2);
-        return (bc);
+        List<StartingNumber> sl = strToStarters.get(hex.getTerrain());
+        if ((sl == null) || sl.isEmpty())
+        {
+            if (!hex.getTerrain().isTower())
+            {
+                LOGGER.warning("getStartingCreatures should not be called"+
+                        " on a terrain that is'nt a Tower and hasn't a list " +
+                        "of starting creatures.");
+                return null;
+            }
+            LOGGER.warning(
+                    "No starting creatures found in Tower " + hex.getLabel() +
+                    ", please fix the variant. Using first three creatures in" +
+                    " the recruiting tree instead.");
+            CreatureType[] bc = new CreatureType[3];
+            List<CreatureType> to = getPossibleRecruits(hex.getTerrain(), hex);
+            bc[0] = to.get(0);
+            bc[1] = to.get(1);
+            bc[2] = to.get(2);
+            return (bc);
+        }
+        CreatureType[] bc = new CreatureType[sl.size()];
+        for (int i = 0 ; i < bc.length ; i++) {
+            bc[i] = sl.get(i).getCreature();
+        }
+        return bc;
     }
 
     /**
      * Tell whether given type is in the loaded variant a start creature,
-     * i.e. one of those one gets in the initial legion in the tower.
+     * i.e. one of those one gets in the initial legion in the tower (any
+     * tower).
      *
      * I plan to use this for e.g. HexRecruitTreePanel, to show there
      * how one can get to have a certain creature:
@@ -514,21 +634,15 @@ public class TerrainRecruitLoader
      */
     public static boolean isStartCreature(CreatureType type)
     {
-        boolean isSC = false;
-        for (MasterBoardTerrain terrain : getTerrains())
-        {
-            if (terrain.isTower())
-            {/* temporarily broken, it needs a MasteHex now ... */
-                CreatureType[] bc = getStartingCreatures(null/*terrain*/);
-                if (type.equals(bc[0]) || type.equals(bc[1])
-                    || type.equals(bc[2]))
-                {
-                    isSC = true;
-                    return isSC;
+        String name = type.getName();
+        for (List<StartingNumber> sl : strToStarters.values()) {
+            for (StartingNumber sn : sl) {
+                if (sn.getName().equals(name)) {
+                    return true;
                 }
             }
         }
-        return isSC;
+        return false;
     }
 
     /**
@@ -565,8 +679,7 @@ public class TerrainRecruitLoader
             if ((tr.getNumber() >= 0) && isConcreteCreature(tr.getName())
                 && !tr.getName().equals("Titan"))
             {
-                result.add(VariantSupport.getCurrentVariant()
-                    .getCreatureByName(tr.getName()));
+                result.add(tr.getCreature());
             }
             if (tr.getName().startsWith(Keyword_Special))
             {
@@ -603,8 +716,7 @@ public class TerrainRecruitLoader
             RecruitNumber tr = it.next();
             if (isConcreteCreature(tr.getName()))
             {
-                re.add(VariantSupport.getCurrentVariant().getCreatureByName(
-                    tr.getName()));
+                re.add(tr.getCreature());
             }
             else
             {

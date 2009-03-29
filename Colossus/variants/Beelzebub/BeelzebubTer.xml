@@ -78,6 +78,9 @@
         <recruit name="Goblin" number="0" />
         <recruit name="AnyNonLord" number="0" />
         <recruit name="Golem" number="3" />
+        <starting name="Centaur" number="2" />
+        <starting name="Skeleton" number="2" />
+        <starting name="Goblin" number="2" />
     </terrain>
     <terrain name="Hellmouth" color="purple" regular_recruit="True" >
         <recruit name="Anything" number="0" />

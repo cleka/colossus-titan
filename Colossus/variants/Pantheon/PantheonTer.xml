@@ -65,6 +65,9 @@
         <recruit name="Guardian" number="3" />
         <recruit name="Titan" number="-1" />
         <recruit name="Warlock" number="1" />
+        <starting name="Centaur" number="2" />
+        <starting name="Gargoyle" number="2" />
+        <starting name="Ogre" number="2" />
     </terrain>
     <terrain name="Mantio" color="pink" regular_recruit="False" >
         <recruit name="Titan" number="-1" />

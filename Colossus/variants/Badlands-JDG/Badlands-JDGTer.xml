@@ -65,6 +65,9 @@
         <recruit name="Guardian" number="3" />
         <recruit name="Titan" number="-1" />
         <recruit name="Warlock" number="1" />
+        <starting name="Centaur" number="2" />
+        <starting name="Gargoyle" number="2" />
+        <starting name="Ogre" number="2" />
     </terrain>
 <!--  Alternate (Badlands) Battlelands -->
     <alias name="BrushAlt" source="Brush" display_name="Brush" color="green" />

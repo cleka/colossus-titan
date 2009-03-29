@@ -78,6 +78,9 @@
         <recruit name="Goblin" number="0" />
         <recruit name="AnyNonLord" number="0" />
         <recruit name="Golem" number="3" />
+        <starting name="Centaur" number="2" />
+        <starting name="Skeleton" number="2" />
+        <starting name="Goblin" number="2" />
     </terrain>
     <!-- In BB regular_recruit is True, in Pantheon Mantio r_r is False 
          - which one should we take? I try it with false ;-)            -->

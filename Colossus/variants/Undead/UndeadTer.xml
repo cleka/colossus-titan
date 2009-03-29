@@ -78,6 +78,9 @@
         <recruit name="Beholder" number="5" />
         <recruit name="Titan" number="-1" />
         <recruit name="Wizard" number="1" />
+        <starting name="Paladin" number="2" />
+        <starting name="Skeleton" number="2" />
+        <starting name="Troglodyte" number="2" />
     </terrain>
     <titan_improve points="75" />
     <titan_teleport points="700" />
