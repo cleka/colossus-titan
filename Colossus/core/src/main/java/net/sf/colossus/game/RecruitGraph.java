@@ -1,4 +1,4 @@
-package net.sf.colossus.util;
+package net.sf.colossus.game;
 
 
 import java.util.ArrayList;
@@ -11,8 +11,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.game.Caretaker;
-import net.sf.colossus.game.Legion;
 import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.variant.CreatureType;
@@ -26,11 +24,8 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  * Implementation of a graph dedicated to the Recruit "Tree" (it's a directed
  * graph, not a tree, as we can have cycle in theory).
  * 
- * TODO this has a dependency of {@link LegionClientSide}, which means it
- * should probably not be in the util package. The dependency should be
- * pulled up to {@link Legion}, which would move the class into the game
- * package.
- * 
+ * Moved into game package. Does it belong more to game or variant package?
+ *  
  * TODO this is still string-based, see comment in {@link TerrainRecruitLoader}
  * 
  * @version $Id$
