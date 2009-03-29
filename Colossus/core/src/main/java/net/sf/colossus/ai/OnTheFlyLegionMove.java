@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.logging.Logger;
@@ -220,16 +221,16 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
             }
         }
         /** map from indexes to LegionMove, what we have already sent to the AI */
-        private final TreeMap<int[], LegionMove> alreadydone = new TreeMap<int[], LegionMove>(
+        private final SortedMap<int[], LegionMove> alreadydone = new TreeMap<int[], LegionMove>(
                 new myIntArrayComparator());
         /** already done & evaluated, sorted by legion value */
-        private final ArrayList<int[]> byValues = new ArrayList<int[]>();
+        private final List<int[]> byValues = new ArrayList<int[]>();
         private final myIntArrayLegionValueComparator byValuesComparator =
                 new myIntArrayLegionValueComparator();
         /** the previously returned object */
         private int[] lastone = null;
         /** map from indexes to LegionMove, the next batch to send to the AI */
-        private final TreeMap<int[], LegionMove> beingdone = new TreeMap<int[], LegionMove>(
+        private final SortedMap<int[], LegionMove> beingdone = new TreeMap<int[], LegionMove>(
                 new myIntArrayComparator());
         private final OnTheFlyLegionMove daddy;
         private final Random rand = new DevRandom();
