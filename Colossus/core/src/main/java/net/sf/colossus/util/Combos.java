@@ -7,14 +7,14 @@ import java.util.List;
 
 
 /**
- * Returns all possible combinations of n elements of an ArrayList.
+ * Returns all possible combinations of n elements of a List.
  * 
  * @version $Id$
  * @author David Ripton
  */
 public final class Combos<T>
 {
-    private final ArrayList<List<T>> retlist;
+    private final List<List<T>> retlist;
 
     public Combos(List<T> list, int n)
     {
@@ -22,7 +22,7 @@ public final class Combos<T>
         findCombinations(list, n, new ArrayList<T>());
     }
 
-    void findCombinations(List<T> alist, int n, List<T> blist)
+    private void findCombinations(List<T> alist, int n, List<T> blist)
     {
         if (n < 0 || n > alist.size())
         {
