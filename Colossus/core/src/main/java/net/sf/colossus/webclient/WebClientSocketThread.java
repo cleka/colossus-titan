@@ -51,7 +51,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
     private PrintWriter out;
     private boolean stillNeedsRun = true;
 
-    private final static String sep = net.sf.colossus.server.Constants.protocolTermSeparator;
+    private final static String sep = IWebServer.WebProtocolSeparator;
 
     private boolean loggedIn = false;
     private AckWaiter ackWaiter;

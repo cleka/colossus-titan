@@ -126,7 +126,9 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     private final static int minPort = 1;
     private final static int maxPort = 65535;
 
-    private final static String sep = net.sf.colossus.server.Constants.protocolTermSeparator;
+    // needed basically only to validate field contents (they must not contain
+    // the separator)
+    private final static String sep = IWebServer.WebProtocolSeparator;
 
     private boolean failedDueToDuplicateLogin = false;
 

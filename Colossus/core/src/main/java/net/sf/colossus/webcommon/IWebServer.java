@@ -26,6 +26,10 @@ public interface IWebServer
 
     public static String generalChatName = "#general";
 
+    // For historical reasons this is the same as for normal Colossus
+    // network traffic, but this is not mandatory.
+    public static final String WebProtocolSeparator = " ~ ";
+
     // login() is treated specially
 
     // register is treated specially, too:

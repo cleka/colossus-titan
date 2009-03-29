@@ -73,8 +73,8 @@ public class WebServer implements IWebServer, IRunWebServer
     private final ArrayList<GameInfo> runningGames = new ArrayList<GameInfo>();
     private final ArrayList<GameInfo> endingGames = new ArrayList<GameInfo>();
 
-    // USed also as separator for storing proposed games to file:
-    private final static String sep = net.sf.colossus.server.Constants.protocolTermSeparator;
+    // Used also as separator for storing proposed games to file:
+    private final static String sep = IWebServer.WebProtocolSeparator;
 
     // Server socket port where we listen for WebClient connections
     private final int port;

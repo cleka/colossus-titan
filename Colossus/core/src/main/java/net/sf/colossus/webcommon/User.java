@@ -36,6 +36,8 @@ public class User
     private static HashMap<String, User> userMap = new HashMap<String, User>();
     private static HashMap<String, User> loggedInUserMap = new HashMap<String, User>();
 
+    private final static String sep = IWebServer.WebProtocolSeparator;
+    
     private static String usersFile = null;
 
     private final static String typeUser = "user";
@@ -367,8 +369,6 @@ public class User
 
     public static void parseUserLine(String line)
     {
-        String sep = net.sf.colossus.server.Constants.protocolTermSeparator;
-
         String[] tokens = line.split(sep);
         if (tokens.length != 5)
         {

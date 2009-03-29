@@ -43,7 +43,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
 
     private boolean loggedIn = false;
 
-    private final static String sep = net.sf.colossus.server.Constants.protocolTermSeparator;
+    private final static String sep = IWebServer.WebProtocolSeparator;
 
     private Thread stopper = null;
 
