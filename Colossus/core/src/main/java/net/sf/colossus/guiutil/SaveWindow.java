@@ -1,4 +1,4 @@
-package net.sf.colossus.gui;
+package net.sf.colossus.guiutil;
 
 
 
@@ -7,8 +7,6 @@ import java.awt.Point;
 import java.awt.Window;
 
 import net.sf.colossus.client.IOptions;
-import net.sf.colossus.guiutil.KDialog;
-import net.sf.colossus.guiutil.KFrame;
 import net.sf.colossus.util.Options;
 
 

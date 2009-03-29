@@ -63,6 +63,7 @@ import net.sf.colossus.game.Phase;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.guiutil.KFrame;
+import net.sf.colossus.guiutil.SaveWindow;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.XMLSnapshotFilter;
 import net.sf.colossus.util.ArrayHelper;

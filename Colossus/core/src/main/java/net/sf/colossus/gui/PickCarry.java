@@ -16,6 +16,7 @@ import javax.swing.JFrame;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.guiutil.KDialog;
+import net.sf.colossus.guiutil.SaveWindow;
 
 
 /** Chooses between multiple carry options.

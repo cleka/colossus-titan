@@ -13,7 +13,6 @@ import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 
 import net.sf.colossus.client.IOptions;
-import net.sf.colossus.gui.SaveWindow;
 import net.sf.colossus.util.InstanceTracker;
 
 

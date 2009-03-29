@@ -8,7 +8,6 @@ import java.awt.Toolkit;
 import javax.swing.JFrame;
 
 import net.sf.colossus.client.IOptions;
-import net.sf.colossus.gui.SaveWindow;
 import net.sf.colossus.util.InstanceTracker;
 
 

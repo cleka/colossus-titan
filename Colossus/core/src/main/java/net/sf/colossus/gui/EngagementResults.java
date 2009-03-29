@@ -28,6 +28,7 @@ import net.sf.colossus.client.IOptions;
 import net.sf.colossus.client.IOracle;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.guiutil.KDialog;
+import net.sf.colossus.guiutil.SaveWindow;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.Options;

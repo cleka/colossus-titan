@@ -16,6 +16,7 @@ import javax.swing.JFrame;
 
 import net.sf.colossus.client.IOptions;
 import net.sf.colossus.guiutil.KDialog;
+import net.sf.colossus.guiutil.SaveWindow;
 import net.sf.colossus.server.Constants;
 
 

@@ -30,6 +30,7 @@ import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.SummonInfo;
 import net.sf.colossus.guiutil.KDialog;
+import net.sf.colossus.guiutil.SaveWindow;
 
 
 /**

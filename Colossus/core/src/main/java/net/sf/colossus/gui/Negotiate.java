@@ -23,6 +23,7 @@ import javax.swing.JPanel;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Proposal;
 import net.sf.colossus.guiutil.KDialog;
+import net.sf.colossus.guiutil.SaveWindow;
 import net.sf.colossus.server.Constants;
 
 

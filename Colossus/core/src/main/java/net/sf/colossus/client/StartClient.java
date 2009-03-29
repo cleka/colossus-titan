@@ -23,8 +23,8 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 
-import net.sf.colossus.gui.SaveWindow;
 import net.sf.colossus.guiutil.KFrame;
+import net.sf.colossus.guiutil.SaveWindow;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Start;
 import net.sf.colossus.server.Start.WhatToDoNext;

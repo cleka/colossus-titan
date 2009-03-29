@@ -19,6 +19,7 @@ import javax.swing.event.ChangeListener;
 
 import net.sf.colossus.client.IOptions;
 import net.sf.colossus.guiutil.KDialog;
+import net.sf.colossus.guiutil.SaveWindow;
 
 
 /**

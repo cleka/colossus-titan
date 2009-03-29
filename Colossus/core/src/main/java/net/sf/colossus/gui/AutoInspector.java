@@ -19,6 +19,7 @@ import javax.swing.WindowConstants;
 import net.sf.colossus.client.IOptions;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.guiutil.KDialog;
+import net.sf.colossus.guiutil.SaveWindow;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.variant.MasterHex;
 
