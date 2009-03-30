@@ -14,6 +14,7 @@ MaxUsers=500
 PortRangeFrom=26767
 AvailablePorts=20
 UsersFile=users.dat
+GamesFile=games.dat
 JavaCommand=C:\\apps\\j2sdk_1.5.0_07\\bin\\java.exe
 ColossusJar=C:\\workspace\\colossus\\Colossus.jar
 LogPropTemplate=C:\\workspace\\colossus\\logging.properties
