@@ -7,7 +7,7 @@ import java.awt.Toolkit;
 
 import javax.swing.JFrame;
 
-import net.sf.colossus.client.IOptions;
+import net.sf.colossus.common.IOptions;
 import net.sf.colossus.util.InstanceTracker;
 
 

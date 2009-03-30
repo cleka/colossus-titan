@@ -7,8 +7,8 @@ import java.util.Set;
 import java.util.SortedSet;
 
 import net.sf.colossus.client.Client;
-import net.sf.colossus.client.IOptions;
 import net.sf.colossus.client.LegionClientSide;
+import net.sf.colossus.common.IOptions;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;

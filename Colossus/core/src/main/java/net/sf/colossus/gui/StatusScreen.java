@@ -19,9 +19,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.sf.colossus.client.Client;
-import net.sf.colossus.client.IOptions;
 import net.sf.colossus.client.IOracle;
 import net.sf.colossus.client.PlayerClientSide;
+import net.sf.colossus.common.IOptions;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.guiutil.KDialog;

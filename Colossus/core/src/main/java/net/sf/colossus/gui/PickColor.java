@@ -16,8 +16,8 @@ import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
-import net.sf.colossus.client.IOptions;
 import net.sf.colossus.common.Constants;
+import net.sf.colossus.common.IOptions;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.guiutil.KDialog;

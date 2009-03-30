@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 import net.sf.colossus.ai.AI;
 import net.sf.colossus.ai.SimpleAI;
 import net.sf.colossus.common.Constants;
+import net.sf.colossus.common.IOptions;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.Creature;

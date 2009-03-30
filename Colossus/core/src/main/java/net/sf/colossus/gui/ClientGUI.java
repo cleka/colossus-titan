@@ -26,10 +26,10 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.undo.UndoManager;
 
 import net.sf.colossus.client.Client;
-import net.sf.colossus.client.IOptions;
 import net.sf.colossus.client.IOracle;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.common.Constants;
+import net.sf.colossus.common.IOptions;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.EntrySide;

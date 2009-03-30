@@ -12,7 +12,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 
-import net.sf.colossus.client.IOptions;
+import net.sf.colossus.common.IOptions;
 import net.sf.colossus.util.InstanceTracker;
 
 

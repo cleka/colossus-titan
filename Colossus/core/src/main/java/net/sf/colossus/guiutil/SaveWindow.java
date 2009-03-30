@@ -6,7 +6,7 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Window;
 
-import net.sf.colossus.client.IOptions;
+import net.sf.colossus.common.IOptions;
 import net.sf.colossus.common.Options;
 
 

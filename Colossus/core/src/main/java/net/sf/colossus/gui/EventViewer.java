@@ -37,9 +37,9 @@ import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
 
 import net.sf.colossus.client.Client;
-import net.sf.colossus.client.IOptions;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.common.Constants;
+import net.sf.colossus.common.IOptions;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;

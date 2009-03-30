@@ -14,7 +14,6 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.client.IOptions;
 
 
 /** Class Options lists game options for Colossus.
