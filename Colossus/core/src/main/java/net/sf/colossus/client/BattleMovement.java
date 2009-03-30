@@ -4,8 +4,8 @@ package net.sf.colossus.client;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.sf.colossus.common.Options;
 import net.sf.colossus.gui.BattleChit;
-import net.sf.colossus.util.Options;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterBoardTerrain;

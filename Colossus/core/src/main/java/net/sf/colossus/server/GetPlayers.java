@@ -43,12 +43,12 @@ import javax.swing.border.TitledBorder;
 import javax.swing.text.Document;
 
 import net.sf.colossus.common.Constants;
+import net.sf.colossus.common.Options;
 import net.sf.colossus.gui.PickIntValue;
 import net.sf.colossus.gui.ShowReadme;
 import net.sf.colossus.guiutil.KFrame;
 import net.sf.colossus.guiutil.SaveWindow;
 import net.sf.colossus.server.Start.WhatToDoNext;
-import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
 
 

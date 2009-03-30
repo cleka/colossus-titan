@@ -28,8 +28,8 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
 import net.sf.colossus.client.Client;
+import net.sf.colossus.common.Options;
 import net.sf.colossus.guiutil.KDialog;
-import net.sf.colossus.util.Options;
 import net.sf.colossus.variant.CreatureType;
 
 

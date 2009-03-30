@@ -14,8 +14,8 @@ import net.sf.colossus.cmdline.CmdLine;
 import net.sf.colossus.cmdline.Opt;
 import net.sf.colossus.cmdline.Opts;
 import net.sf.colossus.common.Constants;
+import net.sf.colossus.common.Options;
 import net.sf.colossus.guiutil.DebugMethods;
-import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ViableEntityManager;
 import net.sf.colossus.webclient.WebClient;
 

@@ -9,12 +9,12 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.client.PlayerClientSide;
 import net.sf.colossus.common.Constants;
+import net.sf.colossus.common.Options;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.InstanceTracker;
-import net.sf.colossus.util.Options;
 
 
 /**

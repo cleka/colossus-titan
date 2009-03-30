@@ -28,9 +28,9 @@ import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.client.PlayerClientSide;
 import net.sf.colossus.client.PredictSplitNode;
 import net.sf.colossus.client.PredictSplits;
+import net.sf.colossus.common.Options;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.guiutil.KDialog;
-import net.sf.colossus.util.Options;
 import net.sf.colossus.variant.CreatureType;
 
 

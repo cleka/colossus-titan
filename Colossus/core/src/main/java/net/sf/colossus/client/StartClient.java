@@ -24,11 +24,11 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 
 import net.sf.colossus.common.Constants;
+import net.sf.colossus.common.Options;
 import net.sf.colossus.guiutil.KFrame;
 import net.sf.colossus.guiutil.SaveWindow;
 import net.sf.colossus.server.Start;
 import net.sf.colossus.server.Start.WhatToDoNext;
-import net.sf.colossus.util.Options;
 
 
 /**

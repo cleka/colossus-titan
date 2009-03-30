@@ -12,8 +12,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.sf.colossus.client.LegionClientSide;
+import net.sf.colossus.common.Options;
 import net.sf.colossus.util.HTMLColor;
-import net.sf.colossus.util.Options;
 
 
 /** 

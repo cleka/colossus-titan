@@ -8,7 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.common.Constants;
-import net.sf.colossus.util.Options;
+import net.sf.colossus.common.Options;
 import net.sf.colossus.webserver.RunGameInOwnJVM;
 
 

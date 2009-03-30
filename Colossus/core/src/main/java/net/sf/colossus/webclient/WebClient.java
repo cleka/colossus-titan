@@ -56,12 +56,12 @@ import javax.swing.event.ListSelectionListener;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.common.Constants;
+import net.sf.colossus.common.Options;
 import net.sf.colossus.guiutil.KFrame;
 import net.sf.colossus.server.GetPlayers;
 import net.sf.colossus.server.Server;
 import net.sf.colossus.server.Start;
 import net.sf.colossus.server.Start.WhatToDoNext;
-import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ViableEntityManager;
 import net.sf.colossus.webcommon.GameInfo;
 import net.sf.colossus.webcommon.IWebClient;

@@ -21,8 +21,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
 import net.sf.colossus.client.Client;
+import net.sf.colossus.common.Options;
 import net.sf.colossus.server.VariantSupport;
-import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.variant.CreatureType;
 

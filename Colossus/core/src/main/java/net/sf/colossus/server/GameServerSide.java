@@ -24,6 +24,7 @@ import javax.swing.JOptionPane;
 
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.common.Constants;
+import net.sf.colossus.common.Options;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.Caretaker;
 import net.sf.colossus.game.Creature;
@@ -36,7 +37,6 @@ import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.Proposal;
 import net.sf.colossus.server.Start.WhatToDoNext;
 import net.sf.colossus.util.InstanceTracker;
-import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.util.ViableEntityManager;
