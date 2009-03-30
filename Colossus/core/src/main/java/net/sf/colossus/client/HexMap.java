@@ -10,10 +10,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.awt.geom.Rectangle2D;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -50,7 +46,7 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  * @author David Ripton
  * @author Romain Dolbeau
  */
-public class HexMap extends JPanel implements MouseListener, WindowListener
+public class HexMap extends JPanel
 {
     private static final Logger LOGGER = Logger.getLogger(HexMap.class
         .getName());
@@ -649,66 +645,6 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             set.add(hex.getHexModel());
         }
         return set;
-    }
-
-    public void mousePressed(MouseEvent e)
-    {
-        // necessary to implement interface
-    }
-
-    public void mouseReleased(MouseEvent e)
-    {
-        // necessary to implement interface
-    }
-
-    public void mouseClicked(MouseEvent e)
-    {
-        // necessary to implement interface
-    }
-
-    public void mouseEntered(MouseEvent e)
-    {
-        // necessary to implement interface
-    }
-
-    public void mouseExited(MouseEvent e)
-    {
-        // necessary to implement interface
-    }
-
-    public void windowActivated(WindowEvent e)
-    {
-        // necessary to implement interface
-    }
-
-    public void windowClosed(WindowEvent e)
-    {
-        // necessary to implement interface
-    }
-
-    public void windowClosing(WindowEvent e)
-    {
-        // necessary to implement interface
-    }
-
-    public void windowDeactivated(WindowEvent e)
-    {
-        // necessary to implement interface
-    }
-
-    public void windowDeiconified(WindowEvent e)
-    {
-        // necessary to implement interface
-    }
-
-    public void windowIconified(WindowEvent e)
-    {
-        // necessary to implement interface
-    }
-
-    public void windowOpened(WindowEvent e)
-    {
-        // necessary to implement interface
     }
 
     @Override

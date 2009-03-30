@@ -9,8 +9,8 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -30,8 +30,7 @@ import net.sf.colossus.variant.MasterHex;
  * @author David Ripton
  */
 @SuppressWarnings("serial")
-final class PickEntrySide extends HexMap implements ActionListener,
-    WindowListener
+final class PickEntrySide extends HexMap
 {
     private static JButton leftButton;
     private static JButton bottomButton;
@@ -55,7 +54,12 @@ final class PickEntrySide extends HexMap implements ActionListener,
             leftButton = new JButton(EntrySide.LEFT.getLabel());
             leftButton.setMnemonic(KeyEvent.VK_L);
             contentPane.add(leftButton);
-            leftButton.addActionListener(this);
+            leftButton.addActionListener(new ActionListener(){
+                public void actionPerformed(ActionEvent e)
+                {
+                    cleanup(EntrySide.LEFT);
+                }
+            });
         }
 
         if (sides.contains(EntrySide.BOTTOM))
@@ -63,7 +67,12 @@ final class PickEntrySide extends HexMap implements ActionListener,
             bottomButton = new JButton(EntrySide.BOTTOM.getLabel());
             bottomButton.setMnemonic(KeyEvent.VK_B);
             contentPane.add(bottomButton);
-            bottomButton.addActionListener(this);
+            bottomButton.addActionListener(new ActionListener(){
+                public void actionPerformed(ActionEvent e)
+                {
+                    cleanup(EntrySide.BOTTOM);
+                }
+            });
         }
 
         if (sides.contains(EntrySide.RIGHT))
@@ -71,10 +80,22 @@ final class PickEntrySide extends HexMap implements ActionListener,
             rightButton = new JButton(EntrySide.RIGHT.getLabel());
             rightButton.setMnemonic(KeyEvent.VK_R);
             contentPane.add(rightButton);
-            rightButton.addActionListener(this);
+            rightButton.addActionListener(new ActionListener(){
+                public void actionPerformed(ActionEvent e)
+                {
+                    cleanup(EntrySide.RIGHT);
+                }
+            });
         }
 
-        dialog.addWindowListener(this);
+        dialog.addWindowListener(new WindowAdapter(){
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+                // Abort the move.
+                cleanup(null);
+            }
+        });
 
         setSize(getPreferredSize());
         contentPane.add(this);
@@ -159,17 +180,5 @@ final class PickEntrySide extends HexMap implements ActionListener,
     {
         entrySide = side;
         dialog.dispose();
-    }
-
-    public void actionPerformed(ActionEvent e)
-    {
-        cleanup(EntrySide.fromLabel(e.getActionCommand()));
-    }
-
-    @Override
-    public void windowClosing(WindowEvent e)
-    {
-        // Abort the move.
-        cleanup(null);
     }
 }

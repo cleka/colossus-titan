@@ -7,10 +7,10 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.awt.print.Book;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
@@ -49,8 +49,7 @@ import net.sf.colossus.xmlparser.BattlelandLoader;
  * @author David Ripton
  * @author Romain Dolbeau
  */
-final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
-        MouseListener, Printable
+final class ShowBuilderHexMap extends BuilderHexMap implements Printable
 {
 
     private JFrame frame;
@@ -665,7 +664,6 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
         }
         randomMenu.addSeparator();
 
-
         mi = randomMenu.add(randomizeAction);
 
         specialMenu.addSeparator();
@@ -677,8 +675,71 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
         contentPane.setLayout(new BorderLayout());
         contentPane.add(menuBar, BorderLayout.NORTH);
 
-        addMouseListener(this);
-        frame.addWindowListener(this);
+        addMouseListener(new MouseAdapter(){
+            @Override
+            public void mousePressed(MouseEvent e)
+            {
+                lastPoint = e.getPoint();
+                GUIBattleHex h = getHexContainingPoint(lastPoint);
+                if (h != null)
+                {
+                    Point c = h.findCenter();
+                    if (c.y >= lastPoint.y)
+                    { // uppper half
+                        if (lastPoint.x >=
+                                ((c.x) + (h.getBounds().x + h.getBounds().width)) / 2)
+                        {
+                            lastSide = 1;
+                        }
+                        else if (lastPoint.x <= ((c.x) + (h.getBounds().x)) / 2)
+                        {
+                            lastSide = 5;
+                        }
+                        else
+                        {
+                            lastSide = 0;
+                        }
+                    }
+                    else
+                    { // lower half
+                        if (lastPoint.x >=
+                                ((c.x) + (h.getBounds().x + h.getBounds().width)) / 2)
+                        {
+                            lastSide = 2;
+                        }
+                        else if (lastPoint.x <= ((c.x) + (h.getBounds().x)) / 2)
+                        {
+                            lastSide = 4;
+                        }
+                        else
+                        {
+                            lastSide = 3;
+                        }
+                    }
+                    if (h.innerContains(lastPoint) ||
+                            (h.getNeighbor(lastSide) == null))
+                    { // change content
+                        popupMenuTerrain.show(e.getComponent(),
+                                lastPoint.x,
+                                lastPoint.y);
+                    }
+                    else
+                    { // change border
+                        popupMenuBorder.show(e.getComponent(),
+                                lastPoint.x,
+                                lastPoint.y);
+                    }
+                }
+            }
+        });
+        frame.addWindowListener(new WindowAdapter(){
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+                // TODO: we should exit cleanly
+                System.exit(0);
+            }
+        });
 
         contentPane.add(this, BorderLayout.CENTER);
         frame.pack();
@@ -749,68 +810,5 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
         mapName = name;
         frame.setTitle("BattlelandBuilder" +
             (mapName == null ? "" : ": " + mapName));
-    }
-
-
-    @Override
-    public void mousePressed(MouseEvent e)
-    {
-        lastPoint = e.getPoint();
-        GUIBattleHex h = getHexContainingPoint(lastPoint);
-        if (h != null)
-        {
-            Point c = h.findCenter();
-            if (c.y >= lastPoint.y)
-            { // uppper half
-                if (lastPoint.x >=
-                        ((c.x) + (h.getBounds().x + h.getBounds().width)) / 2)
-                {
-                    lastSide = 1;
-                }
-                else if (lastPoint.x <= ((c.x) + (h.getBounds().x)) / 2)
-                {
-                    lastSide = 5;
-                }
-                else
-                {
-                    lastSide = 0;
-                }
-            }
-            else
-            { // lower half
-                if (lastPoint.x >=
-                        ((c.x) + (h.getBounds().x + h.getBounds().width)) / 2)
-                {
-                    lastSide = 2;
-                }
-                else if (lastPoint.x <= ((c.x) + (h.getBounds().x)) / 2)
-                {
-                    lastSide = 4;
-                }
-                else
-                {
-                    lastSide = 3;
-                }
-            }
-            if (h.innerContains(lastPoint) ||
-                    (h.getNeighbor(lastSide) == null))
-            { // change content
-                popupMenuTerrain.show(e.getComponent(),
-                        lastPoint.x,
-                        lastPoint.y);
-            }
-            else
-            { // change border
-                popupMenuBorder.show(e.getComponent(),
-                        lastPoint.x,
-                        lastPoint.y);
-            }
-        }
-    }
-
-    @Override
-    public void windowClosing(WindowEvent e)
-    {
-        System.exit(0);
     }
 }
