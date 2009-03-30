@@ -36,7 +36,8 @@ public class User
     private static HashMap<String, User> userMap = new HashMap<String, User>();
     private static HashMap<String, User> loggedInUserMap = new HashMap<String, User>();
 
-    private final static String sep = IWebServer.WebProtocolSeparator;
+    // Use the same sepatator as for Web Protocol also for UserLines in user file:
+    private final static String ulSep = IWebServer.WebProtocolSeparator;
     
     private static String usersFile = null;
 
@@ -369,7 +370,7 @@ public class User
 
     public static void parseUserLine(String line)
     {
-        String[] tokens = line.split(sep);
+        String[] tokens = line.split(ulSep);
         if (tokens.length != 5)
         {
             LOGGER.log(Level.WARNING, "invalid line '" + line
@@ -443,11 +444,10 @@ public class User
 
     public String makeLine()
     {
-        String sep = net.sf.colossus.server.Constants.protocolTermSeparator;
         String type = (isAdmin ? typeAdmin : typeUser);
 
-        String line = this.name + sep + password + sep + email + sep + type
-            + sep + created;
+        String line = this.name + ulSep + password + ulSep + email + ulSep + type
+            + ulSep + created;
         return line;
     }
 

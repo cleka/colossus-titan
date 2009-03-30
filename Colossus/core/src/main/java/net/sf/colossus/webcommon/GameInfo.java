@@ -1,16 +1,6 @@
 package net.sf.colossus.webcommon;
 
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -19,6 +9,7 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.Options;
+import net.sf.colossus.webserver.GameOnServer;
 
 
 /** One object of this this class represents one game run at the server, 
@@ -37,30 +28,34 @@ import net.sf.colossus.util.Options;
  *  @author Clemens Katzer
  */
 
-public class GameInfo extends Thread implements Serializable
+public class GameInfo
 {
     private static final Logger LOGGER = Logger.getLogger(GameInfo.class
         .getName());
+
+    private static int nextFreeGameId = 1;
+
+    private String gameId;
 
     private GameType type;
     private GameState state;
 
     private int portNr = -1;
     private String hostingHost = "";
-
-    private String gameId;
+    
+    // TODO: also needed for GameOnClient ?
+    // The GameOnServer object that will run/supervise this game:
+    private GameOnServer gameOnServer = null;
 
     private String initiator;
     private String variant;
     private String viewmode;
+    private boolean autosave = true;
 
     // those 3 should still be added at client side:
     private String eventExpiring;
     private boolean unlimitedMulligans;
     private boolean balancedTowers;
-
-    // this 2 statically set like this:
-    private final boolean autoSave = true;
 
     private int min;
     private int target;
@@ -72,22 +67,11 @@ public class GameInfo extends Thread implements Serializable
     private String summary = "";
     // private String infoText = "";
 
-    private int AIplayers;
     private int enrolledPlayers;
-
-    private String workFilesBaseDir;
-    private String template;
-    private String javaCommand;
-    private String colossusJar;
 
     private ArrayList<User> players = null;
 
-    private IRunWebServer server = null;
-
-    private static int nextFreeGameId = 1;
-
-    private File flagFile;
-
+    
     // used on server side, to create a game proposed by client
 
     public GameInfo(GameType type)
@@ -100,7 +84,6 @@ public class GameInfo extends Thread implements Serializable
 
         this.enrolledPlayers = 0;
         this.players = new ArrayList<User>();
-        this.server = null;
     }
 
     private synchronized int getNextFreeGameId()
@@ -132,7 +115,6 @@ public class GameInfo extends Thread implements Serializable
         this.enrolledPlayers = 0;
         this.players = new ArrayList<User>();
 
-        this.server = null;
         LOGGER.log(Level.FINEST,
             "A new potential game was created!! - variant " + variant
                 + " viewmode " + viewmode);
@@ -171,11 +153,16 @@ public class GameInfo extends Thread implements Serializable
         this.gameId = val;
     }
 
-    public void setPort(int portNr)
+    public void setGameOnServer(GameOnServer gos)
     {
-        this.portNr = portNr;
+        this.gameOnServer = gos;
     }
 
+    public GameOnServer getGameOnServer()
+    {
+        return gameOnServer;
+    }
+    
     public int getPort()
     {
         return this.portNr;
@@ -246,6 +233,11 @@ public class GameInfo extends Thread implements Serializable
         return viewmode;
     }
 
+    public boolean getAutosave()
+    {
+        return autosave;
+    }
+
     public void setViewmode(String val)
     {
         viewmode = val;
@@ -291,9 +283,14 @@ public class GameInfo extends Thread implements Serializable
         min = val.intValue();
     }
 
-    public Integer getTarget()
+    public Integer getTargetInteger()
     {
         return Integer.valueOf(target);
+    }
+
+    public int getTarget()
+    {
+        return target;
     }
 
     public void setTarget(Integer val)
@@ -435,6 +432,67 @@ public class GameInfo extends Thread implements Serializable
         return reason;
     }
 
+    
+    public void createStartLocallyOptionsObject(Options gameOptions,
+        String localPlayer)
+    {
+        // FIXME boolean continueHere;
+
+        // xxx get port from gameinfo
+        gameOptions.setOption(Options.serveAtPort, Constants.defaultPort);
+
+        // xxx get host from gameinfo
+        // xxxxx set host in gameinfo, send to server/client
+        //gameOptions.setOption(Options.serveAtPort, Constants.defaultPort);
+        
+        gameOptions.setOption(Options.variant, getVariant());
+        gameOptions.setOption(Options.viewMode, getViewmode());
+        gameOptions.setOption(Options.autosave, getAutosave());
+        gameOptions.setOption(Options.eventExpiring, getEventExpiring());
+        gameOptions.setOption(Options.unlimitedMulligans,
+            getUnlimitedMulligans());
+        gameOptions.setOption(Options.balancedTowers, getBalancedTowers());
+
+        // gameOptions.setOption(Options.autoQuit, true);
+        String name;
+        String type;
+        Iterator<User> it = getPlayers().iterator();
+
+        for (int i = 0; i < getTarget(); i++)
+        {
+            if (it.hasNext())
+            {
+                User u = it.next();
+
+                name = u.getName();
+                if (name.equals(localPlayer))
+                {
+                    type = Constants.human;
+                    // use user real name;
+                }
+                else
+                {
+                    type = Constants.network;
+                    name = Constants.byClient;
+
+                }
+            }
+            else
+            {
+                type = Constants.anyAI;
+                name = Constants.byColor;
+            }
+            gameOptions.setOption(Options.playerName + i, name);
+            gameOptions.setOption(Options.playerType + i, type);
+        }
+
+        gameOptions.setOption(Options.autoStop, true);
+
+        return;
+    }
+ 
+    
+    
     public String toString(String sep)
     {
         StringBuilder playerList = new StringBuilder();
@@ -454,30 +512,6 @@ public class GameInfo extends Thread implements Serializable
             + enrolledPlayers + playerList.toString();
 
         return message;
-    }
-
-    @Override
-    public void run()
-    {
-        if (server != null)
-        {
-            run_on_server();
-        }
-        else
-        {
-            run_on_client();
-        }
-    }
-
-    // used when cancelling: set to null and then start(),
-    // then the run() method calls only the client dummy which is a 
-    // do-nothing operation.
-    // If start() is not run, the GameInfo object will never get 
-    // garbage collected and finalized.
-
-    public void setServerNull()
-    {
-        this.server = null;
     }
 
     // ================= now the stuff for running the game on client side ===============
@@ -555,534 +589,6 @@ public class GameInfo extends Thread implements Serializable
     {
         // dummy
     }
-
-    // ================= now the stuff for running the game on server side ===============
-
-    public boolean makeRunningGame(IRunWebServer server, String baseDir,
-        String template, String javaCommand, String colossusJar, int portNr)
-    {
-        this.server = server;
-        this.AIplayers = 0; // not supported yet
-
-        this.workFilesBaseDir = baseDir;
-        this.template = template;
-        this.javaCommand = javaCommand;
-        this.colossusJar = colossusJar;
-
-        this.portNr = portNr;
-        this.setName("Game at port " + portNr);
-        return true;
-    }
-
-    public void run_on_server()
-    {
-        File gameDir = new File(workFilesBaseDir, gameId);
-        gameDir.mkdirs();
-
-        String fileName = "Game." + gameId + ".running.flag";
-
-        this.flagFile = new File(gameDir, fileName);
-        if (flagFile.exists())
-        {
-            flagFile.delete();
-        }
-
-        File logPropFile = new File(gameDir, "logging.properties");
-        File logPropTemplate = new File(template);
-        boolean propFileOk = createLoggingPropertiesFromTemplate(
-            logPropTemplate, logPropFile);
-
-        createServerCfgFile(gameDir);
-
-        Runtime rt = Runtime.getRuntime();
-
-        String loggingFileArg = propFileOk ? "-Djava.util.logging.config.file="
-            + logPropFile
-            : "";
-
-        String command = javaCommand + " " + loggingFileArg + " -Duser.home="
-            + gameDir + " -jar " + colossusJar + " -p " + portNr + " -n "
-            + this.enrolledPlayers + " -i " + this.AIplayers
-            + " -g --flagfile " + fileName;
-
-        try
-        {
-            Process p = rt.exec(command, null, gameDir);
-            p.getOutputStream().close();
-            NullDumper ndout = new NullDumper(p, false, p.getInputStream(),
-                gameId + "_OUT: ").start();
-            NullDumper nderr = new NullDumper(p, false, p.getErrorStream(),
-                gameId + "_ERR: ").start();
-
-            superviseGameStartup();
-
-            waitForGameShutdown(p, ndout, nderr);
-
-        }
-        catch (Exception e)
-        {
-            LOGGER.log(Level.SEVERE, "Executing\n  " + command
-                + "\ndid throw exception", e);
-        }
-    }
-
-    private void superviseGameStartup()
-    {
-        // ACTIVATED
-        server.tellEnrolledGameStartsSoon(this);
-        LOGGER.log(Level.FINEST,
-            "Seems starting game went ok, informing enrolled players!");
-
-        int timeout = 30; // seconds
-        boolean up = waitUntilReadyToAcceptClients(timeout);
-        if (up)
-        {
-            LOGGER.log(Level.FINEST, "Game is up - informing clients!");
-            // READY_TO_CONNECT
-            server.tellEnrolledGameStartsNow(this, portNr);
-            server.allTellGameInfo(this);
-
-            boolean ok = waitUntilGameStartedSuccessfully(10);
-            if (ok)
-            {
-                // RUNNING
-                server.tellEnrolledGameStarted(this);
-            }
-            else
-            {
-                LOGGER.log(Level.SEVERE,
-                    "  !!! game started but not all clients came in!!!");
-            }
-        }
-        else
-        {
-            LOGGER.log(Level.SEVERE, "game did not came up!!!");
-        }
-
-    }
-
-    private void waitForGameShutdown(Process p, NullDumper ndout,
-        NullDumper nderr)
-    {
-        try
-        {
-            p.waitFor();
-            ndout.done();
-            nderr.done();
-        }
-        catch (Exception e)
-        {
-            LOGGER
-                .log(Level.SEVERE, "Exception durimg waitForGameShutdown", e);
-        }
-
-        try
-        {
-            int exitCode = p.waitFor();
-
-            if (exitCode != 0)
-            {
-                LOGGER.log(Level.FINEST, "After waitFor... - exit code is "
-                    + exitCode);
-            }
-        }
-        catch (InterruptedException e)
-        {
-            String reason = "InterruptedException";
-            server.gameFailed(this, reason);
-        }
-
-        if (flagFile.exists())
-        {
-            LOGGER.log(Level.WARNING, "Game " + gameId
-                + " ended but flagfile " + flagFile.toString()
-                + " does still exist...? Deleting it...");
-            flagFile.delete();
-        }
-        else
-        {
-            LOGGER.log(Level.FINEST, "Game " + gameId + " ended and flagfile "
-                + flagFile.toString() + " is gone. Fine!");
-        }
-        LOGGER.info("Before unregister game " + this.getGameId());
-        server.unregisterGame(this, portNr);
-    }
-
-    private boolean createLoggingPropertiesFromTemplate(File logPropTemplate,
-        File logPropFile)
-    {
-        boolean ok = true;
-        String patternLine = "java.util.logging.FileHandler.pattern=";
-        try
-        {
-            String line;
-            BufferedReader in = new BufferedReader(new InputStreamReader(
-                new FileInputStream(logPropTemplate)));
-
-            PrintWriter out = new PrintWriter(
-                new FileOutputStream(logPropFile));
-
-            while ((line = in.readLine()) != null)
-            {
-                if (line.startsWith(patternLine))
-                {
-                    // String dirSep = File.separator;
-                    // if there is no path, it seems it uses current working
-                    // directory.
-                    // When we put path there, we would have to hard-coded
-                    // replace the \ of a Windows directory to /'es,
-                    // because as it looks the java logger only accepts those,
-                    // and uses backslashes just as quote character...
-                    line = patternLine + "Colossus%g.log";
-                }
-                out.println(line);
-            }
-
-            in.close();
-            out.close();
-        }
-        catch (FileNotFoundException e)
-        {
-            ok = false;
-        }
-        catch (IOException e)
-        {
-            ok = false;
-        }
-
-        return ok;
-    }
-
-    private boolean createServerCfgFile(File gameDir)
-    {
-        boolean ok = true;
-
-        String gameDirPath = gameDir.getPath();
-        Options gameOptions = new Options("server", gameDirPath
-            + "/.colossus/", false);
-
-        gameOptions.setOption(Options.variant, this.variant);
-        gameOptions.setOption(Options.viewMode, this.viewmode);
-        gameOptions.setOption(Options.autosave, this.autoSave);
-        gameOptions.setOption(Options.eventExpiring, this.eventExpiring);
-        gameOptions.setOption(Options.unlimitedMulligans,
-            this.unlimitedMulligans);
-        gameOptions.setOption(Options.balancedTowers, this.balancedTowers);
-
-        gameOptions.setOption(Options.autoQuit, true);
-        gameOptions.setOption(Options.autoStop, true);
-
-        gameOptions.saveOptions();
-
-        return ok;
-    }
-
-    public void createStartLocallyOptionsObject(Options gameOptions,
-        String localPlayer)
-    {
-        // FIXME boolean continueHere;
-
-        // xxx get port from gameinfo
-        gameOptions.setOption(Options.serveAtPort, Constants.defaultPort);
-
-        // xxx get host from gameinfo
-        // xxxxx set host in gameinfo, send to server/client
-        //gameOptions.setOption(Options.serveAtPort, Constants.defaultPort);
-
-        gameOptions.setOption(Options.variant, this.variant);
-        gameOptions.setOption(Options.viewMode, this.viewmode);
-        gameOptions.setOption(Options.autosave, this.autoSave);
-        gameOptions.setOption(Options.eventExpiring, this.eventExpiring);
-        gameOptions.setOption(Options.unlimitedMulligans,
-            this.unlimitedMulligans);
-        gameOptions.setOption(Options.balancedTowers, this.balancedTowers);
-
-        // gameOptions.setOption(Options.autoQuit, true);
-        String name;
-        String type;
-        Iterator<User> it = this.players.iterator();
-
-        for (int i = 0; i < this.target; i++)
-        {
-            if (it.hasNext())
-            {
-                User u = it.next();
-
-                name = u.getName();
-                if (name.equals(localPlayer))
-                {
-                    type = Constants.human;
-                    // use user real name;
-                }
-                else
-                {
-                    type = Constants.network;
-                    name = Constants.byClient;
-
-                }
-            }
-            else
-            {
-                type = Constants.anyAI;
-                name = Constants.byColor;
-            }
-            gameOptions.setOption(Options.playerName + i, name);
-            gameOptions.setOption(Options.playerType + i, type);
-        }
-
-        gameOptions.setOption(Options.autoStop, true);
-
-        return;
-    }
-
-    /*
-     * Checks whether the game is already started "far enough", i.e.
-     * that the serverSocket is ready to accept clients.
-     * Game started with --webserver flag will create the flag file
-     * after it created the socket.
-     */
-
-    public boolean isSocketUp()
-    {
-        if (flagFile == null)
-        {
-            return false;
-        }
-        if (flagFile.exists())
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    /* Waits until socket is up, i.e. game is ready to accept clients.
-     */
-    public boolean waitUntilReadyToAcceptClients(int timeout)
-    {
-        boolean up = false;
-
-        for (int i = 0; !up && i < timeout; i++)
-        {
-            up = isSocketUp();
-            if (!up)
-            {
-                sleepFor(1000);
-            }
-            i++;
-        }
-        return up;
-    }
-
-    private String waitForLine(BufferedReader in, int checkInterval)
-    {
-        String line = null;
-
-        try
-        {
-            line = in.readLine();
-            if (line == null)
-            {
-                sleepFor(checkInterval);
-            }
-        }
-        catch (IOException e1)
-        {
-            LOGGER
-                .log(Level.SEVERE, "during wait for line: IOException: ", e1);
-        }
-        catch (RuntimeException e2)
-        {
-            LOGGER.log(Level.SEVERE,
-                "during wait for line: RuntimeException: ", e2);
-        }
-        catch (Exception e3)
-        {
-            LOGGER.log(Level.SEVERE,
-                "during wait for line: Whatever Exception: ", e3);
-        }
-
-        return line;
-    }
-
-    public boolean waitUntilGameStartedSuccessfully(int timeout)
-    {
-        boolean ok = false;
-
-        String line;
-
-        BufferedReader in = null;
-        try
-        {
-            in = new BufferedReader(new InputStreamReader(new FileInputStream(
-                flagFile)));
-        }
-        catch (FileNotFoundException ef)
-        {
-            LOGGER.log(Level.SEVERE,
-                "while waiting until game started successfully: ", ef);
-        }
-
-        if (in == null)
-        {
-            LOGGER.log(Level.SEVERE, "could not open flagfile for reading!!");
-            return false;
-        }
-
-        int connected = 0;
-        int checkInterval = 1000; // every second
-
-        for (int i = 0; !ok && i < timeout; i++)
-        {
-            line = waitForLine(in, checkInterval);
-            if (line == null)
-            {
-                // Wait til next round. If case is only needed to prevent
-                // the else-ifs to check against null pointer.
-            }
-            else if (line.startsWith("Client connected: "))
-            {
-                connected++;
-            }
-            else if (line.startsWith("All clients connected"))
-            {
-                ok = true;
-            }
-
-            if (connected >= players.size())
-            {
-                ok = true;
-            }
-        }
-
-        if (ok)
-        {
-            LOGGER.log(Level.FINEST, "Game started ok - fine!");
-        }
-        else
-        {
-            LOGGER.log(Level.WARNING,
-                "RESULT: game started, but not all clients did connect\n"
-                    + "Got only " + connected + " players");
-        }
-
-        try
-        {
-            in.close();
-        }
-        catch (IOException e)
-        {
-            // ignore
-        }
-        return ok;
-    }
-
-    public void sleepFor(long millis)
-    {
-        try
-        {
-            Thread.sleep(millis);
-        }
-        catch (InterruptedException e)
-        {
-            LOGGER.log(Level.FINEST,
-                "sleepFor: InterruptException caught... ignoring it...");
-        }
-    }
-
-    /*
-     * We have to take care to read all what comes on the Game's processes
-     * stdout and stderr, otherwise the game would block at some point
-     */
-
-    static class NullDumper implements Runnable
-    {
-        Process process;
-        boolean toNull;
-        BufferedReader reader;
-        String prefix;
-        Thread thread;
-
-        public NullDumper(Process p, boolean toNull, InputStream is,
-            String prefix)
-        {
-            this.process = p;
-            this.toNull = toNull;
-            this.reader = new BufferedReader(new InputStreamReader(is));
-            this.prefix = prefix;
-        }
-
-        public NullDumper start()
-        {
-            thread = new Thread(this);
-            thread.setDaemon(true);
-            thread.setPriority(Thread.NORM_PRIORITY);
-            thread.start();
-            return this;
-        }
-
-        public void run()
-        {
-            synchronized (this)
-            {
-                if (thread == null)
-                {
-                    thread = Thread.currentThread();
-                }
-                if (process == null)
-                {
-                    return;
-                }
-            }
-            String line;
-            while (true)
-            {
-                synchronized (this)
-                {
-                    if (process == null)
-                    {
-                        return;
-                    }
-                }
-                try
-                {
-                    line = reader.readLine();
-                }
-                catch (IOException e)
-                {
-                    // ignore & end
-                    return;
-                }
-                if (line != null && !this.toNull)
-                {
-                    LOGGER.log(Level.INFO, prefix + line);
-                }
-            }
-        }
-
-        public void done()
-        {
-            synchronized (this)
-            {
-                process = null;
-                if (thread != null)
-                {
-                    thread.interrupt();
-                }
-                thread = null;
-            }
-            try
-            {
-                this.reader.close();
-            }
-            catch (IOException e)
-            {
-                LOGGER.log(Level.WARNING, "Nulldumper reader.close got " + e);
-            }
-        }
-    } // END Class NullDumper
 
     /**
      *  Enum for the possible TYPES of a game 

@@ -113,7 +113,7 @@ public class GameTableModel extends AbstractTableModel
                 break;
 
             case 12:
-                o = gi.getTarget();
+                o = gi.getTargetInteger();
                 break;
 
             case 13:

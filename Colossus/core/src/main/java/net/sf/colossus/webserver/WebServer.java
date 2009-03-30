@@ -500,7 +500,7 @@ public class WebServer implements IWebServer, IRunWebServer
         }
     }
 
-    public void tellEnrolledGameStartsNow(GameInfo gi, int port)
+    public void tellEnrolledGameStartsNow(GameInfo gi, String host, int port)
     {
         String gameId = gi.getGameId();
         gi.setState(GameState.READY_TO_CONNECT);
@@ -513,7 +513,7 @@ public class WebServer implements IWebServer, IRunWebServer
             User u = it.next();
             IWebClient client = (IWebClient)u.getThread();
             client.gameInfo(gi);
-            client.gameStartsNow(gameId, port, null);
+            client.gameStartsNow(gameId, port, host);
         }
     }
 
@@ -587,10 +587,13 @@ public class WebServer implements IWebServer, IRunWebServer
     public void cancelGame(String gameId, String byUser)
     {
         GameInfo gi = findByGameId(gameId);
-        if (gi != null)
+        
+        GameOnServer gos;
+        
+        if (gi != null && (gos = gi.getGameOnServer()) != null)
         {
-            gi.setServerNull();
-            gi.start(); // does nothing, just to get it GC'd and finalized
+            gos.setServerNull();
+            gos.start(); // does nothing, just to get it GC'd and finalized
 
             Iterator<User> it = User.getLoggedInUsersIterator();
             while (it.hasNext())
@@ -815,13 +818,9 @@ public class WebServer implements IWebServer, IRunWebServer
         }
 
         LOGGER.log(Level.FINEST, "startOneGame, id " + gi.getGameId());
-        String workFilesBaseDir = getStringOption(WebServerConstants.optWorkFilesBaseDir);
-        String template = getStringOption(WebServerConstants.optLogPropTemplate);
-        String javaCommand = getStringOption(WebServerConstants.optJavaCommand);
-        String colossusJar = getStringOption(WebServerConstants.optColossusJar);
 
-        boolean ok = gi.makeRunningGame(this, workFilesBaseDir, template,
-            javaCommand, colossusJar, port);
+        GameOnServer gos = new GameOnServer(this, options, gi);
+        boolean ok = gos.makeRunningGame();
 
         if (!ok)
         {
@@ -830,8 +829,8 @@ public class WebServer implements IWebServer, IRunWebServer
         }
         else
         {
-            // System.out.println("starting gi thread");
-            gi.start();
+            // System.out.println("starting gos thread");
+            gos.start();
             LOGGER.log(Level.FINEST, "Returned from starter");
 
             updateGUI();
@@ -1049,12 +1048,14 @@ public class WebServer implements IWebServer, IRunWebServer
                     while (it.hasNext())
                     {
                         GameInfo game = it.next();
-                        String name = game.getName();
+                        GameOnServer gos = game.getGameOnServer();
+                        
+                        String name = gos.getName();
                         LOGGER.log(Level.FINE, "REAPER: wait for '" + name
                             + "' to end...");
                         try
                         {
-                            game.join();
+                            gos.join();
                             LOGGER.log(Level.FINE, "        ok, ended...");
                         }
                         catch (InterruptedException e)

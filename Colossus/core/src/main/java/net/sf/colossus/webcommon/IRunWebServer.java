@@ -17,7 +17,7 @@ public interface IRunWebServer
 {
     public void tellEnrolledGameStartsSoon(GameInfo gi);
 
-    public void tellEnrolledGameStartsNow(GameInfo gi, int port);
+    public void tellEnrolledGameStartsNow(GameInfo gi, String host, int port);
 
     public void tellEnrolledGameStarted(GameInfo gi);
 
