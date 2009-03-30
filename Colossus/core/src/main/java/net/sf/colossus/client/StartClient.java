@@ -25,10 +25,10 @@ import javax.swing.JLabel;
 
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
+import net.sf.colossus.common.WhatNextManager;
+import net.sf.colossus.common.WhatNextManager.WhatToDoNext;
 import net.sf.colossus.guiutil.KFrame;
 import net.sf.colossus.guiutil.SaveWindow;
-import net.sf.colossus.server.Start;
-import net.sf.colossus.server.Start.WhatToDoNext;
 
 
 /**
@@ -45,7 +45,7 @@ public class StartClient extends KFrame
     private final Object mutex;
     private final Options netclientOptions;
     private final Options stOptions;
-    private final Start startObject;
+    private final WhatNextManager whatNextManager;
 
     private String playerName;
     private String hostname;
@@ -56,7 +56,7 @@ public class StartClient extends KFrame
     private final JComboBox hostBox;
     private final JComboBox portBox;
 
-    public StartClient(Object mutex, final Start startObject)
+    public StartClient(Object mutex, final WhatNextManager whatNextMgr)
     {
         super("Client startup options");
         getContentPane().setLayout(new GridLayout(0, 2));
@@ -64,8 +64,8 @@ public class StartClient extends KFrame
         net.sf.colossus.util.InstanceTracker.register(this, "only one");
 
         this.mutex = mutex;
-        this.startObject = startObject;
-        this.stOptions = startObject.getStartOptions();
+        this.whatNextManager = whatNextMgr;
+        this.stOptions = whatNextMgr.getStartOptions();
 
         // player, preferred host (or null) and port from main() / cmdline
         this.playerName = stOptions.getStringOption(Options.runClientPlayer);
@@ -142,7 +142,7 @@ public class StartClient extends KFrame
         {
             public void actionPerformed(ActionEvent e)
             {
-                startObject.setWhatToDoNext(WhatToDoNext.QUIT_ALL, true);
+                whatNextMgr.setWhatToDoNext(WhatToDoNext.QUIT_ALL, true);
                 dispose();
             }
         });
@@ -153,7 +153,7 @@ public class StartClient extends KFrame
             @Override
             public void windowClosing(WindowEvent e)
             {
-                startObject.setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG,
+                whatNextMgr.setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG,
                     false);
                 dispose();
             }
@@ -273,7 +273,7 @@ public class StartClient extends KFrame
         saveWindow.save(this);
         netclientOptions.saveOptions();
 
-        startObject.setWhatToDoNext(WhatToDoNext.START_NET_CLIENT, false);
+        whatNextManager.setWhatToDoNext(WhatToDoNext.START_NET_CLIENT, false);
         dispose();
     }
 

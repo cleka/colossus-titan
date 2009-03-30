@@ -15,6 +15,9 @@ import net.sf.colossus.cmdline.Opt;
 import net.sf.colossus.cmdline.Opts;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
+import net.sf.colossus.common.WhatNextManager;
+import net.sf.colossus.common.WhatNextManager.WhatToDoNext;
+import net.sf.colossus.common.IStartHandler;
 import net.sf.colossus.guiutil.DebugMethods;
 import net.sf.colossus.util.ViableEntityManager;
 import net.sf.colossus.webclient.WebClient;
@@ -27,15 +30,16 @@ import net.sf.colossus.webclient.WebClient;
  *  @author Clemens Katzer (rewritten big parts of the main() method)
  */
 
-public final class Start
+public final class Start implements IStartHandler
 {
     private static final Logger LOGGER = Logger.getLogger(Start.class
         .getName());
 
     private CmdLine cmdLine;
-    private WhatToDoNext whatToDoNext;
     private int howManyGamesLeft = 0;
 
+    private final WhatNextManager whatNextManager;
+    
     // Options remembered only inside this running application,
     // related to server/port/name startup settings; initialized
     // from command line options, perhaps modified by dialogs.
@@ -54,8 +58,8 @@ public final class Start
     public Start(String[] args)
     {
         this.startOptions = new Options(Constants.OPTIONS_START);
+        this.whatNextManager = new WhatNextManager(startOptions);
         commandLineProcessing(args);
-
     }
 
     public Options getStartOptions()
@@ -63,36 +67,20 @@ public final class Start
         return startOptions;
     }
 
+    public WhatNextManager getWhatNextManager()
+    {
+        return whatNextManager;
+    }
     public WhatToDoNext getWhatToDoNext()
     {
-        return whatToDoNext;
+        return whatNextManager.getWhatToDoNext();
     }
-
-    /**
-     * Set in the Start object the action what shall be executed next.
-     * Trigger also the timer for the "Timed Quit", if requested so.
-     * 
-     * @param whatToDoNext
-     * @param triggerQuitTimer
-     */
-    public void setWhatToDoNext(WhatToDoNext whatToDoNext,
-        boolean triggerQuitTimer)
+    
+    // TODO inline
+    public void setWhatToDoNext(WhatToDoNext whatToDoNext, boolean triggerQuit)
     {
-        this.whatToDoNext = whatToDoNext;
-        LOGGER.log(Level.FINEST, "Set what to do next to "
-            + whatToDoNext.toString());
-        if (triggerQuitTimer)
-        {
-            triggerTimedQuit();
-        }
+        whatNextManager.setWhatToDoNext(whatToDoNext, triggerQuit);
     }
-
-    public void setWhatToDoNext(WhatToDoNext whatToDoNext, String loadFile)
-    {
-        setWhatToDoNext(whatToDoNext, false);
-        startOptions.setOption(Options.loadGameFileName, loadFile);
-    }
-
     /** 
      *  Print a usage string to stdout.  (*Not* to the logfile, where casual
      *  users will miss it.)
@@ -337,7 +325,7 @@ public final class Start
     private void runGetPlayersDialogAndWait(Options options)
     {
         Object mutex = new Object();
-        new GetPlayers(options, mutex, this, false);
+        new GetPlayers(options, mutex, getWhatNextManager(), false);
 
         synchronized (mutex)
         {
@@ -582,11 +570,12 @@ public final class Start
         cmdLine = null;
 
         howManyGamesLeft = Options.getHowManyStresstestRoundsProperty();
+        whatNextManager.updateHowManyGamesLeft(howManyGamesLeft);
 
         boolean dontWait = false;
 
         // Now loop until user requested Quitting the whole application: 
-        while (whatToDoNext != WhatToDoNext.QUIT_ALL)
+        while (getWhatToDoNext() != WhatToDoNext.QUIT_ALL)
         {
             // re-initialize options, except in first loop round,
             // there they have been loaded already and modified 
@@ -613,14 +602,14 @@ public final class Start
             // a game/closed board with selecting Load Game etc.), 
             // as first thing come up with the dialog to ask what to do:
 
-            if (whatToDoNext == WhatToDoNext.GET_PLAYERS_DIALOG)
+            if (getWhatToDoNext() == WhatToDoNext.GET_PLAYERS_DIALOG)
             {
                 runGetPlayersDialogAndWait(serverOptions);
             }
 
             // intentionally not else if - short way if user selected
             // in GetPlayers dialog the "Run network client" button. 
-            if (whatToDoNext == WhatToDoNext.NET_CLIENT_DIALOG)
+            if (getWhatToDoNext() == WhatToDoNext.NET_CLIENT_DIALOG)
             {
                 runNetClientDialogAndWait();
             }
@@ -630,36 +619,38 @@ public final class Start
 
             // TODO change to switch statement
 
-            if (whatToDoNext == WhatToDoNext.GET_PLAYERS_DIALOG
-                || whatToDoNext == WhatToDoNext.NET_CLIENT_DIALOG)
+            if (getWhatToDoNext() == WhatToDoNext.GET_PLAYERS_DIALOG
+                || getWhatToDoNext() == WhatToDoNext.NET_CLIENT_DIALOG)
             {
                 // ok, just done. Need if also in this else-if chain
                 // otherwise the "else" would complain...
                 dontWait = true;
             }
 
-            else if (whatToDoNext == WhatToDoNext.START_GAME)
+            else if (getWhatToDoNext() == WhatToDoNext.START_GAME)
             {
-                setWhatToDoNext(whatToDoNext, false);
+                // TODO is this re-setting it needed?
+                setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
                 int port = startOptions.getIntOption(Options.serveAtPort);
                 serverOptions.setOption(Options.serveAtPort, port);
                 String webGameFlagFileName = startOptions
                     .getStringOption(Options.webFlagFileName);
                 startOptions.removeOption(Options.webFlagFileName);
 
-                GameServerSide game = new GameServerSide(this, serverOptions);
+                GameServerSide game = new GameServerSide(getWhatNextManager(), serverOptions);
                 if (webGameFlagFileName != null
                     && !webGameFlagFileName.equals(""))
                 {
                     setWhatToDoNext(WhatToDoNext.QUIT_ALL, false);
                     game.setFlagFilename(webGameFlagFileName);
                 }
-                game.newGame();
+                game.newGame(null, null);
             }
 
-            else if (whatToDoNext == WhatToDoNext.LOAD_GAME)
+            else if (getWhatToDoNext() == WhatToDoNext.LOAD_GAME)
             {
-                setWhatToDoNext(whatToDoNext, false);
+                // TODO is this re-setting it needed?
+                setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
                 int port = startOptions.getIntOption(Options.serveAtPort);
                 serverOptions.setOption(Options.serveAtPort, port);
                 String loadFileName = startOptions
@@ -667,7 +658,7 @@ public final class Start
 
                 if (loadFileName != null && loadFileName.length() > 0)
                 {
-                    GameServerSide game = new GameServerSide(this,
+                    GameServerSide game = new GameServerSide(getWhatNextManager(),
                         serverOptions);
                     serverOptions.clearPlayerInfo();
                     game.loadGame(loadFileName);
@@ -684,7 +675,7 @@ public final class Start
             // User clicked "Go" button in the Network Client tab of
             // GetPlayers - GUI stores values in options
             // @TODO: get via startObject instead?
-            else if (whatToDoNext == WhatToDoNext.START_NET_CLIENT)
+            else if (getWhatToDoNext() == WhatToDoNext.START_NET_CLIENT)
             {
                 // by default (if user does not say anything other when ending), 
                 // after that come back to NetClient dialog.
@@ -699,10 +690,10 @@ public final class Start
                 dontWait = startNetClient(startOptions);
             }
 
-            else if (whatToDoNext == WhatToDoNext.START_WEB_CLIENT)
+            else if (getWhatToDoNext() == WhatToDoNext.START_WEB_CLIENT)
             {
                 // By default get back to Main dialog.
-                setWhatToDoNext(whatToDoNext, false);
+                setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
 
                 String hostname = startOptions
                     .getStringOption(Options.webServerHost);
@@ -710,14 +701,14 @@ public final class Start
                 String login = startOptions
                     .getStringOption(Options.webClientLogin);
                 String password = null;
-                new WebClient(this, hostname, port, login, password);
+                new WebClient(getWhatNextManager(), hostname, port, login, password);
             }
 
             // User clicked Quit in GetPlayers (this loop round), 
             //  --or--
             // User selected File=>Quit in the game started from previous
             //  loop round.
-            else if (whatToDoNext == WhatToDoNext.QUIT_ALL)
+            else if (getWhatToDoNext() == WhatToDoNext.QUIT_ALL)
             {
                 // Nothing to do, loop will end.
                 dontWait = true;
@@ -726,7 +717,7 @@ public final class Start
             // What else??
             else
             {
-                LOGGER.log(Level.SEVERE, "Unknown value '" + whatToDoNext
+                LOGGER.log(Level.SEVERE, "Unknown value '" + getWhatToDoNext()
                     + "' in main() loop???", (Throwable)null);
             }
 
@@ -763,6 +754,7 @@ public final class Start
                 // Decrement in here, not in if, otherwise we decrement it
                 // until negative infinity ;-)
                 howManyGamesLeft--;
+                whatNextManager.updateHowManyGamesLeft(howManyGamesLeft);
                 LOGGER.log(Level.ALL, "howManyGamesLeft now "
                     + howManyGamesLeft + "\n");
 
@@ -784,7 +776,7 @@ public final class Start
     private void runNetClientDialogAndWait()
     {
         Object mutex = new Object();
-        new StartClient(mutex, this);
+        new StartClient(mutex, getWhatNextManager());
 
         synchronized (mutex)
         {
@@ -815,7 +807,7 @@ public final class Start
         boolean failed = false;
         try
         {
-            Client c = new Client(hostname, port, playerName, this, null,
+            Client c = new Client(hostname, port, playerName, whatNextManager, null,
                 false, false, true);
             failed = c.getFailed();
             c = null;
@@ -836,11 +828,11 @@ public final class Start
         return dontWait;
     }
 
-    public void startWebGameLocally(Options presetOptions, String username,
-        WebClient webClient)
+    public void startWebGameLocally(Options presetOptions, String username)
     {
-        GameServerSide game = new GameServerSide(this, presetOptions);
-        game.newGame(username, webClient);
+        GameServerSide game = new GameServerSide(getWhatNextManager(),
+            presetOptions);
+        game.newGame(username, null);
     }
 
     /* **********************************************************************
@@ -903,107 +895,6 @@ public final class Start
         // To be sure, at all places where user selects "Quit", a demon 
         // thread is started that does the System.exit() after a certain
         // delay (currently 10 secs - see class TimedJvmQuit).
-    }
-
-    /**
-     * Trigger a timed Quit, which will (by using a demon thread) terminate
-     * the JVM after a timeout (currently 10 seconds)  
-     * - unless the JVM has quit already anyway because cleanup has
-     * succeeded as planned.
-     */
-    public void triggerTimedQuit()
-    {
-        LOGGER.log(Level.FINEST, "triggerTimedQuit called.");
-        if (howManyGamesLeft > 0)
-        {
-            LOGGER.info("HowManyGamesLeft not zero yet - ignoring the "
-                + "request to trigger a timed quit.");
-        }
-        else
-        {
-            new TimedJvmQuit().start();
-        }
-    }
-
-    /**
-     * A demon thread which is started by triggerTimedQuit.
-     * It will then (currently) sleep 10 seconds, and if it is then
-     * still alive, do a System.exit(1) to terminate the JVM.
-     * If, however, the game shutdown proceeded successfully as planned,
-     * Start.main() will already have reached it's end and there should
-     * not be any other non-demon threads alive, so the JVM *should*
-     * terminate by itself cleanly.
-     * So, if this TimedJvmQuit strikes, it means the "clean shutdown"
-     * has somehow failed. 
-     */
-    public static class TimedJvmQuit extends Thread
-    {
-        private static final Logger LOGGER = Logger.getLogger(Start.class
-            .getName());
-
-        private static final String defaultName = "TimedJvmQuit thread";
-        private final String name;
-
-        private final long timeOutInSecs = 10;
-
-        public TimedJvmQuit()
-        {
-            super();
-            this.setDaemon(true);
-            this.name = defaultName;
-        }
-
-        @Override
-        public void run()
-        {
-            LOGGER.info(this.name + ": started... (sleeping " + timeOutInSecs
-                + " seconds)");
-            sleepFor(this.timeOutInSecs * 1000);
-            LOGGER.warning(this.name + ": JVM still alive? "
-                + "Ok, it's time to do System.exit()...");
-            System.exit(1);
-        }
-
-        public static void sleepFor(long millis)
-        {
-            try
-            {
-                Thread.sleep(millis);
-            }
-            catch (InterruptedException e)
-            {
-                LOGGER.log(Level.FINEST,
-                    "InterruptException caught... ignoring it...");
-            }
-        }
-    }
-
-    /**
-     * The various constants for activities what the Start class should do
-     * as next thing, typically when a dialog is closed or a games ended.
-     */
-    public static enum WhatToDoNext
-    {
-        START_GAME("Start Game"), START_NET_CLIENT("Start network client"), START_WEB_CLIENT(
-            "Start Web Client"), LOAD_GAME("Load Game"), GET_PLAYERS_DIALOG(
-            "GetPlayers dialog"), NET_CLIENT_DIALOG("Network Client dialog"), QUIT_ALL(
-            "Quit All");
-
-        private final String activity;
-
-        private WhatToDoNext(String act)
-        {
-            this.activity = act;
-        }
-
-        /**
-         * Returns a non-localized UI string for the "whatToDoNext" activity.
-         */
-        @Override
-        public String toString()
-        {
-            return activity;
-        }
     }
 
 }

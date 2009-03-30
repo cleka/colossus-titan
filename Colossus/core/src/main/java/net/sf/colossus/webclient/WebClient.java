@@ -56,12 +56,13 @@ import javax.swing.event.ListSelectionListener;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.common.Constants;
+import net.sf.colossus.common.IStartHandler;
 import net.sf.colossus.common.Options;
+import net.sf.colossus.common.WhatNextManager;
+import net.sf.colossus.common.WhatNextManager.WhatToDoNext;
 import net.sf.colossus.guiutil.KFrame;
 import net.sf.colossus.server.GetPlayers;
 import net.sf.colossus.server.Server;
-import net.sf.colossus.server.Start;
-import net.sf.colossus.server.Start.WhatToDoNext;
 import net.sf.colossus.util.ViableEntityManager;
 import net.sf.colossus.webcommon.GameInfo;
 import net.sf.colossus.webcommon.IWebClient;
@@ -93,7 +94,9 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     final static String TYPE_SCHEDULED = "scheduled";
     final static String TYPE_INSTANTLY = "instantly";
 
-    private final Start startObject;
+    private final WhatNextManager whatNextManager;
+    private IStartHandler startHandler;
+    
     private String hostname;
     private int port;
     private String login;
@@ -279,12 +282,13 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     private final static String defaultSummaryText = "Type here a short "
         + "summary what kind of game you would wish to play";
 
-    public WebClient(Start startObj, String hostname, int port, String login,
+    public WebClient(WhatNextManager whatNextManager, String hostname, int port, String login,
         String password)
     {
         super(windowTitle);
-
-        startObject = startObj;
+        
+        this.whatNextManager = whatNextManager;
+        
         options = new Options(Constants.OPTIONS_WEB_CLIENT_NAME);
         options.loadOptions();
 
@@ -511,8 +515,8 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             @Override
             public void windowClosing(WindowEvent e)
             {
-                Start startObj = WebClient.this.startObject;
-                startObj.setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG,
+                WhatNextManager whatNextManager = WebClient.this.whatNextManager;
+                whatNextManager.setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG,
                     false);
                 dispose();
             }
@@ -565,8 +569,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         }
         else if (whatToDo.equals(AutoGameStartActionClose))
         {
-            Start startObj = WebClient.this.startObject;
-            startObj.setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
+            WebClient.this.whatNextManager.setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
             dispose();
         }
         else
@@ -1406,8 +1409,8 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         }
         else
         {
-            Start startObj = WebClient.this.startObject;
-            startObj.setWhatToDoNext(WhatToDoNext.QUIT_ALL, true);
+            
+            whatNextManager.setWhatToDoNext(WhatToDoNext.QUIT_ALL, true);
             dispose();
         }
     }
@@ -1987,7 +1990,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         // GetPlayersWeb dialog notifies the mutex;
         // when that happens, the runnable starts the game by calling
         // doInitiateStartLocally().
-        runGetPlayersDialogAndWait(presetOptions, startObject);
+        runGetPlayersDialogAndWait(presetOptions, whatNextManager);
 
         return ok;
     }
@@ -1997,14 +2000,15 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
      * until is has set startObject to the next action to do  
      * and notified us to continue.
      */
-    void runGetPlayersDialogAndWait(Options presetOptions, Start startObject)
+    void runGetPlayersDialogAndWait(Options presetOptions, WhatNextManager whatNextManager)
     {
         playersDialogMutex = new Object();
-        new GetPlayers(presetOptions, playersDialogMutex, startObject, true);
+        
+        new GetPlayers(presetOptions, playersDialogMutex, whatNextManager, true);
 
         // System.out.println("doStartLocally after GetPlayersWeb");
 
-        startObject.setWhatToDoNext(WhatToDoNext.START_WEB_CLIENT, false);
+        whatNextManager.setWhatToDoNext(WhatToDoNext.START_WEB_CLIENT, false);
 
         Runnable waitForAction = new Runnable()
         {
@@ -2075,11 +2079,25 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         new Thread(informThem).start();
 
         // Start the server process
-        startObject.startWebGameLocally(presetOptions, username, this);
+        initiatingWebClient = this;
+        startHandler.startWebGameLocally(presetOptions, username);
 
         // System.out.println("doInitiateStartLocally ENDS");
     }
 
+    private static WebClient initiatingWebClient = null;
+    
+    /**
+     * GameServerSide queries the starting web client from here, 
+     * if a Game Server game was started locally on players computer.
+     * @return The last WebClient that initiated a game start.
+     */
+    public static synchronized WebClient getInitiatingWebClient()
+    {
+        WebClient wc = initiatingWebClient;
+        initiatingWebClient = null;
+        return wc;
+    }
     public void setLocalServer(Server server)
     {
         localServer = server;
@@ -2267,7 +2285,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             boolean noOptionsFile = false;
             // System.out.println("in webclient, before new Client for username "
             //     + username);
-            gc = new Client(hostingHost, p, username, startObject,
+            gc = new Client(hostingHost, p, username, whatNextManager,
                 localServer, true, noOptionsFile, true);
             boolean failed = gc.getFailed();
             if (failed)

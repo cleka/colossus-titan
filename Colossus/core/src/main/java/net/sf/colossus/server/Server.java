@@ -28,13 +28,14 @@ import net.sf.colossus.client.Client;
 import net.sf.colossus.client.IClient;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
+import net.sf.colossus.common.WhatNextManager;
+import net.sf.colossus.common.WhatNextManager.WhatToDoNext;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Phase;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.Proposal;
-import net.sf.colossus.server.Start.WhatToDoNext;
 import net.sf.colossus.util.InstanceTracker;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
@@ -57,7 +58,7 @@ public final class Server extends Thread implements IServer
 
     private GameServerSide game;
 
-    private final Start startObject;
+    private final WhatNextManager whatNextManager;
 
     /**
      *  Maybe also save things like the originating IP, in case a
@@ -129,11 +130,11 @@ public final class Server extends Thread implements IServer
     // have been processed).
     private final List<ClientHandler> channelChanges = new ArrayList<ClientHandler>();
 
-    Server(GameServerSide game, Start startObj, int port)
+    Server(GameServerSide game, WhatNextManager whatNextMgr, int port)
     {
         this.game = game;
         this.port = port;
-        this.startObject = startObj;
+        this.whatNextManager = whatNextMgr;
 
         if (startLog != null)
         {
@@ -898,7 +899,7 @@ public final class Server extends Thread implements IServer
         boolean dontUseOptionsFile = player.isAI();
         LOGGER.finest("Called Server.createLocalClient() for " + playerName);
 
-        new Client("127.0.0.1", port, playerName, startObject, this, false,
+        new Client("127.0.0.1", port, playerName, whatNextManager, this, false,
             dontUseOptionsFile, createGUI);
     }
 
@@ -2766,7 +2767,7 @@ public final class Server extends Thread implements IServer
     public void doSetWhatToDoNext(WhatToDoNext whatToDoNext,
         boolean triggerQuitTimer)
     {
-        startObject.setWhatToDoNext(whatToDoNext, triggerQuitTimer);
+        whatNextManager.setWhatToDoNext(whatToDoNext, triggerQuitTimer);
     }
 
     /* Called from ServerStartupProgress, if user wants to cancel during load
@@ -2775,7 +2776,7 @@ public final class Server extends Thread implements IServer
      */
     public void startupProgressAbort()
     {
-        startObject.setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
+        whatNextManager.setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
         stopServerRunning();
         if (startLog != null)
         {

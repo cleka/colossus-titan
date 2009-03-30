@@ -31,6 +31,7 @@ import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.IOptions;
 import net.sf.colossus.common.Options;
+import net.sf.colossus.common.WhatNextManager.WhatToDoNext;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Game;
@@ -40,7 +41,6 @@ import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.Proposal;
 import net.sf.colossus.game.SummonInfo;
 import net.sf.colossus.guiutil.KFrame;
-import net.sf.colossus.server.Start.WhatToDoNext;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
@@ -222,7 +222,7 @@ public class ClientGUI implements IClientGUI
     {
         if (this.webClient == null)
         {
-            this.webClient = new WebClient(client.getStartObject(), null, -1,
+            this.webClient = new WebClient(client.getWhatNextManager(), null, -1,
                 null, null);
             this.webClient.setGameClient(client);
         }

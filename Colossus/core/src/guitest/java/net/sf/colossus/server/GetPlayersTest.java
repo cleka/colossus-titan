@@ -10,6 +10,7 @@ import javax.swing.SwingUtilities;
 import junit.framework.TestCase;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
+import net.sf.colossus.common.WhatNextManager;
 
 
 public class GetPlayersTest extends TestCase
@@ -144,11 +145,12 @@ public class GetPlayersTest extends TestCase
     {
         VariantSupport.loadVariantByName("Default", true);
 
-        String[] dummyArgs = new String[0];
-        Start startObj = new Start(dummyArgs);
+        Options startOptions = new Options(Constants.OPTIONS_START);
+        WhatNextManager whatNextMgr = new WhatNextManager(startOptions);
+
         options = new Options("UnitTest", true);
         mutex = new Object();
 
-        gp = new GetPlayers(options, mutex, startObj, false);
+        gp = new GetPlayers(options, mutex, whatNextMgr, false);
     }
 }

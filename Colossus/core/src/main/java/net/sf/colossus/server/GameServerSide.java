@@ -25,6 +25,7 @@ import javax.swing.JOptionPane;
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
+import net.sf.colossus.common.WhatNextManager;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.Caretaker;
 import net.sf.colossus.game.Creature;
@@ -35,7 +36,7 @@ import net.sf.colossus.game.Phase;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.Proposal;
-import net.sf.colossus.server.Start.WhatToDoNext;
+import net.sf.colossus.common.WhatNextManager.WhatToDoNext;
 import net.sf.colossus.util.InstanceTracker;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Split;
@@ -111,7 +112,7 @@ public final class GameServerSide extends Game
     private NotifyWebServer notifyWebServer = null;
     private WebClient startingWebClient = null;
 
-    private final Start startObject;
+    private final WhatNextManager whatNextManager;
     private History history;
 
     private static int gameCounter = 1;
@@ -128,11 +129,11 @@ public final class GameServerSide extends Game
      */
     static GameServerSide makeNewGameServerSide()
     {
-        String[] dummyArgs = new String[0];
-        Start startObject = new Start(dummyArgs);
+        Options startOptions = new Options(Constants.OPTIONS_START);
+        WhatNextManager whatNextManager = new WhatNextManager(startOptions);
 
         Options serverOptions = new Options("UnitTest", true);
-        return new GameServerSide(startObject, serverOptions);
+        return new GameServerSide(whatNextManager, serverOptions);
     }
 
     /** The normal constructor to be used everywhere
@@ -143,12 +144,12 @@ public final class GameServerSide extends Game
      * @param serverOptions The server side options, initialized from the
      * GetPlayers dialog and/or command line options.
      */
-    GameServerSide(Start startObj, Options serverOptions)
+    GameServerSide(WhatNextManager whatNextMgr, Options serverOptions)
     {
         super(null, new String[0]);
         // later perhaps from command line, GUI, or WebServer set it?
         gameId = "#" + (gameCounter++);
-        this.startObject = startObj;
+        this.whatNextManager = whatNextMgr;
         this.options = serverOptions;
 
         InstanceTracker.register(this, "Game at port " + getPort());
@@ -208,7 +209,7 @@ public final class GameServerSide extends Game
             server.setObsolete();
             server.disposeAllClients();
         }
-        server = new Server(this, startObject, getPort());
+        server = new Server(this, whatNextManager, getPort());
         if (startingWebClient != null)
         {
             startingWebClient.setLocalServer(server);
@@ -335,16 +336,25 @@ public final class GameServerSide extends Game
         getVariant().getCreatureByName("Titan").setMaxCount(getNumPlayers());
     }
 
+    /** Start a new game. */
     void newGame(String hostingPlayer, WebClient webClient)
     {
         hostingPlayerName = hostingPlayer;
-        startingWebClient = webClient;
-        newGame();
-    }
+        if (webClient != null)
+        {
+            startingWebClient = webClient;
+        }
+        else
+        {
+            // In case game was started by WebClient locally on user's
+            // computer, WebClient cannot be passed into the GameServerSide
+            // (to do so, the IStartHandler interfact would need to import the
+            // WebClient class, and then we would have a cyclic dependency).
+            // So, the initiating WebClient stores itself into a static 
+            // variable which we query here.
+            startingWebClient = WebClient.getInitiatingWebClient();
+        }
 
-    /** Start a new game. */
-    void newGame()
-    {
         clearFlags();
 
         turnNumber = 1;

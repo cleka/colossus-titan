@@ -185,7 +185,7 @@
   <target name="webjar" depends="init,compile,buildInfo"
   description="Make WebServer jar file">
     <jar jarfile="ColossusWeb.jar" basedir="${build.classes.dir}"
-    includes="**/webcommon/**, **/webserver/**, **/util/Log.class, **/util/Options.class, **/client/IOptions.class, **/server/Constants.class">
+    includes="**/webcommon/**, **/webserver/**, **/common/Options.class, **/common/IOptions.class, **/common/Constants.class">
       <manifest>
         <attribute name="Main-Class"
         value="net.sf.colossus.webserver.WebServer" />

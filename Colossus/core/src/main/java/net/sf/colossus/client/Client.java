@@ -46,9 +46,9 @@ import net.sf.colossus.server.Dice;
 import net.sf.colossus.server.GameServerSide;
 import net.sf.colossus.server.IServer;
 import net.sf.colossus.server.Server;
-import net.sf.colossus.server.Start;
 import net.sf.colossus.server.VariantSupport;
-import net.sf.colossus.server.Start.WhatToDoNext;
+import net.sf.colossus.common.WhatNextManager;
+import net.sf.colossus.common.WhatNextManager.WhatToDoNext;
 import net.sf.colossus.util.CollectionHelper;
 import net.sf.colossus.util.InstanceTracker;
 import net.sf.colossus.util.Predicate;
@@ -138,7 +138,7 @@ public final class Client implements IClient, IOracle
     /**
      * The "Start" object which created this Client
      */
-    private final Start startObject;
+    private final WhatNextManager whatNextManager;
     /**
      * Starting marker color of player who owns this client.
      *
@@ -231,11 +231,11 @@ public final class Client implements IClient, IOracle
      *      would be easier to run the local clients without the detour across the
      *      network and the serialization/deserialization of all objects
      */
-    public Client(String host, int port, String playerName, Start startObj,
+    public Client(String host, int port, String playerName, WhatNextManager whatNextMgr,
         Server theServer, boolean byWebClient, boolean noOptionsFile,
         boolean createGUI)
     {
-        this(startObj, playerName, noOptionsFile, createGUI);
+        this(whatNextMgr, playerName, noOptionsFile, createGUI);
 
         this.localServer = theServer;
 
@@ -284,14 +284,14 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    private Client(Start startObj, String playerName, boolean noOptionsFile,
+    private Client(WhatNextManager whatNextMgr, String playerName, boolean noOptionsFile,
         boolean createGUI)
     {
         assert playerName != null;
 
         // TODO still dummy arguments
         this.game = new GameClientSide(null, new String[0]);
-        this.startObject = startObj;
+        this.whatNextManager = whatNextMgr;
 
         ((GameClientSide)game).setClient(this);
 
@@ -3700,20 +3700,20 @@ public final class Client implements IClient, IOracle
     public void doSetWhatToDoNext(WhatToDoNext whatToDoNext,
         boolean triggerQuitTimer)
     {
-        startObject.setWhatToDoNext(whatToDoNext, triggerQuitTimer);
+        whatNextManager.setWhatToDoNext(whatToDoNext, triggerQuitTimer);
     }
 
     public void doSetWhatToDoNext(WhatToDoNext whatToDoNext, String loadFile)
     {
-        startObject.setWhatToDoNext(whatToDoNext, loadFile);
+        whatNextManager.setWhatToDoNext(whatToDoNext, loadFile);
     }
 
     /*
      * ClientGUI needs that when bringing up a new WebClient
      */
-    public Start getStartObject()
+    public WhatNextManager getWhatNextManager()
     {
-        return startObject;
+        return whatNextManager;
 
     }
 

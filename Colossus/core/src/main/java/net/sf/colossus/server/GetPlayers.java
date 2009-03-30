@@ -44,11 +44,12 @@ import javax.swing.text.Document;
 
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
+import net.sf.colossus.common.WhatNextManager;
+import net.sf.colossus.common.WhatNextManager.WhatToDoNext;
 import net.sf.colossus.gui.PickIntValue;
 import net.sf.colossus.gui.ShowReadme;
 import net.sf.colossus.guiutil.KFrame;
 import net.sf.colossus.guiutil.SaveWindow;
-import net.sf.colossus.server.Start.WhatToDoNext;
 import net.sf.colossus.util.ResourceLoader;
 
 
@@ -90,7 +91,7 @@ public final class GetPlayers extends KFrame
     /** This is Game's options, which we will modify directly. */
     private final Options options;
     private final Options stOptions;
-    private final Start startObject;
+    private final WhatNextManager whatNextManager;
 
     private final boolean byWebClient;
 
@@ -101,7 +102,7 @@ public final class GetPlayers extends KFrame
     private final SaveWindow saveWindow;
 
     /** Clear options to abort */
-    public GetPlayers(final Options options, Object mutex, Start startObject,
+    public GetPlayers(final Options options, Object mutex, WhatNextManager whatNextMgr,
         boolean byWebClient)
     {
         super("Game Setup");
@@ -110,8 +111,9 @@ public final class GetPlayers extends KFrame
 
         this.options = options;
         this.mutex = mutex;
-        this.startObject = startObject;
-        this.stOptions = startObject.getStartOptions();
+        this.whatNextManager = whatNextMgr;
+
+        this.stOptions = whatNextMgr.getStartOptions();
         this.byWebClient = byWebClient;
 
         setupTypeChoices();
@@ -881,20 +883,20 @@ public final class GetPlayers extends KFrame
             stOptions.setOption(Options.loadGameFileName, filename);
             stOptions.setOption(Options.serveAtPort, serveAtPort);
             options.setOption(Options.serveAtPort, serveAtPort);
-            startObject.setWhatToDoNext(WhatToDoNext.LOAD_GAME, false);
+            whatNextManager.setWhatToDoNext(WhatToDoNext.LOAD_GAME, false);
             dispose();
         }
     }
 
     private void doClientDialog()
     {
-        startObject.setWhatToDoNext(WhatToDoNext.NET_CLIENT_DIALOG, false);
+        whatNextManager.setWhatToDoNext(WhatToDoNext.NET_CLIENT_DIALOG, false);
         dispose();
     }
 
     private void doRunWebClient()
     {
-        startObject.setWhatToDoNext(WhatToDoNext.START_WEB_CLIENT, false);
+        whatNextManager.setWhatToDoNext(WhatToDoNext.START_WEB_CLIENT, false);
         dispose();
     }
 
@@ -913,7 +915,7 @@ public final class GetPlayers extends KFrame
             System.exit(1);
         }
         quitAlreadyTried = true;
-        startObject.setWhatToDoNext(WhatToDoNext.QUIT_ALL, true);
+        whatNextManager.setWhatToDoNext(WhatToDoNext.QUIT_ALL, true);
         dispose();
     }
 
@@ -925,7 +927,7 @@ public final class GetPlayers extends KFrame
         {
             if (!byWebClient)
             {
-                startObject.setWhatToDoNext(WhatToDoNext.START_GAME, false);
+                whatNextManager.setWhatToDoNext(WhatToDoNext.START_GAME, false);
                 stOptions.setOption(Options.serveAtPort, serveAtPort);
                 options.setOption(Options.serveAtPort, serveAtPort);
             }
