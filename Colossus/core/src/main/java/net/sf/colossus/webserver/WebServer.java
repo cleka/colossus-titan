@@ -817,6 +817,7 @@ public class WebServer implements IWebServer, IRunWebServer
             return false;
         }
 
+        gi.setPort(port);
         LOGGER.log(Level.FINEST, "startOneGame, id " + gi.getGameId());
 
         RunGameInOwnJVM gos = new RunGameInOwnJVM(this, options, gi);

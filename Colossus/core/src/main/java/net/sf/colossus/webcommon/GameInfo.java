@@ -263,6 +263,11 @@ public class GameInfo
         return this.portNr;
     }
 
+    public void setPort(int nr)
+    {
+        this.portNr = nr;
+    }
+
     public void setHostingHost(String host)
     {
         hostingHost = host;
@@ -530,9 +535,12 @@ public class GameInfo
     public void storeToOptionsObject(Options gameOptions,
         String localPlayerName, boolean noAIs)
     {
-
+        if (this.portNr == -1)
+        {
+            this.portNr = Constants.defaultPort;
+        }
         // XXX get port from gameinfo
-        gameOptions.setOption(Options.serveAtPort, Constants.defaultPort);
+        gameOptions.setOption(Options.serveAtPort, this.portNr);
 
         // XXX get host from gameinfo
         // XXX set host in gameinfo, send to server/client
