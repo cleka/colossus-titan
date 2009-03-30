@@ -4,10 +4,7 @@ package net.sf.colossus.gui;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.event.MouseListener;
-import java.awt.event.WindowListener;
 import java.util.ConcurrentModificationException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
@@ -33,8 +30,7 @@ import net.sf.colossus.variant.MasterHex;
  * @author David Ripton
  */
 @SuppressWarnings("serial")
-public final class BattleMap extends HexMap implements MouseListener,
-    WindowListener
+public final class BattleMap extends HexMap
 {
     private static final Logger LOGGER = Logger.getLogger(BattleMap.class
         .getName());
@@ -69,12 +65,12 @@ public final class BattleMap extends HexMap implements MouseListener,
         InstanceTracker.setId(this, instanceId);
     }
 
-    public void setBattleMarkerLocation(boolean isDefender, String hexLabel)
+    public void setBattleMarkerLocation(boolean isDefender, BattleHex battleHex)
     {
-        GUIBattleHex hex = getGUIHexByLabel(hexLabel);
+        GUIBattleHex hex = getGUIHexByModelHex(battleHex);
         Rectangle rect = hex.getBounds();
         Point point;
-        if ("X1".equals(hexLabel) || "X4".equals(hexLabel))
+        if ("X1".equals(battleHex.getLabel()) || "X4".equals(battleHex.getLabel()))
         {
             point = new Point(rect.x, rect.height + rect.y);
         }
@@ -84,11 +80,11 @@ public final class BattleMap extends HexMap implements MouseListener,
         }
         if (isDefender)
         {
-            defenderMarker.setLocation(point, hexLabel);
+            defenderMarker.setLocation(point, battleHex.getLabel());
         }
         else
         {
-            attackerMarker.setLocation(point, hexLabel);
+            attackerMarker.setLocation(point, battleHex.getLabel());
         }
     }
 
@@ -107,15 +103,15 @@ public final class BattleMap extends HexMap implements MouseListener,
     }
 
     @Override
-    public void selectHexesByLabels(Set<String> set)
+    public void selectHexes(Set<BattleHex> set)
     {
-        super.selectHexesByLabels(set);
+        super.selectHexes(set);
     }
 
     @Override
-    public void unselectHexByLabel(String hexLabel)
+    public void unselectHex(BattleHex hex)
     {
-        super.unselectHexByLabel(hexLabel);
+        super.unselectHex(hex);
     }
 
     @Override
@@ -125,9 +121,9 @@ public final class BattleMap extends HexMap implements MouseListener,
     }
 
     @Override
-    public Set<String> getAllHexLabels()
+    public Set<BattleHex> getAllHexes()
     {
-        return super.getAllHexLabels();
+        return super.getAllHexes();
     }
 
     @Override
@@ -137,9 +133,9 @@ public final class BattleMap extends HexMap implements MouseListener,
     }
 
     @Override
-    public GUIBattleHex getGUIHexByLabel(String hexLabel)
+    public GUIBattleHex getGUIHexByModelHex(BattleHex battleHex)
     {
-        return super.getGUIHexByLabel(hexLabel);
+        return super.getGUIHexByModelHex(battleHex);
     }
 
     @Override
@@ -151,29 +147,28 @@ public final class BattleMap extends HexMap implements MouseListener,
     /** Select all hexes containing critters eligible to move. */
     public void highlightMobileCritters()
     {
-        Set<String> set = client.findMobileCritterHexes();
+        Set<BattleHex> set = client.findMobileCritterHexes();
         unselectAllHexes();
         unselectEntranceHexes();
-        selectHexesByLabels(set);
+        selectHexes(set);
         selectEntranceHexes(set);
     }
 
     /** Select hexes containing critters that have valid strike targets. */
     public void highlightCrittersWithTargets()
     {
-        Set<String> set = client.findCrittersWithTargets();
+        Set<BattleHex> set = client.findCrittersWithTargets();
         unselectAllHexes();
-        selectHexesByLabels(set);
+        selectHexes(set);
         // XXX Needed?
         repaint();
     }
 
-    public void selectEntranceHexes(Set<String> labels)
+    public void selectEntranceHexes(Set<BattleHex> modelHexes)
     {
-        Iterator<String> it = labels.iterator();
-        while (it.hasNext())
+        for (BattleHex battleHex : modelHexes)
         {
-            String hexLabel = it.next();
+            String hexLabel = battleHex.getLabel();
             if (hexLabel.startsWith("X"))
             {
                 if (hexLabel.equals(defenderMarker.hexLabel))

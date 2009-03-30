@@ -9,6 +9,7 @@ import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
+import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
 
@@ -57,7 +58,7 @@ public interface IClient
     public void removeDeadBattleChits();
 
     public void placeNewChit(String imageName, boolean inverted, int tag,
-        String hexLabel);
+        BattleHex hex);
 
     public void initBoard();
 
@@ -87,6 +88,7 @@ public interface IClient
 
     public void tellProposal(String proposalString);
 
+    // TODO the last parameter could probably be a list of Creatures
     public void tellStrikeResults(int strikerTag, int targetTag,
         int strikeNumber, List<String> rolls, int damage, boolean killed,
         boolean wasCarry, int carryDamageLeft,
@@ -131,8 +133,8 @@ public interface IClient
     // TODO the extra hex parameter is probably not needed anymore
     public void tellLegionLocation(Legion legion, MasterHex hex);
 
-    public void tellBattleMove(int tag, String startingHexLabel,
-        String endingHexLabel, boolean undo);
+    public void tellBattleMove(int tag, BattleHex startingHex,
+        BattleHex endingHex, boolean undo);
 
     public void didMove(Legion legion, MasterHex startingHex, MasterHex hex,
         EntrySide entrySide, boolean teleport, String teleportingLord,

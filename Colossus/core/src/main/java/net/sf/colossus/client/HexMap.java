@@ -491,11 +491,11 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         }
     }
 
-    protected void unselectHexByLabel(String label)
+    protected void unselectHex(BattleHex battleHex)
     {
         for (GUIBattleHex hex : hexes)
         {
-            if (hex.isSelected() && label.equals(hex.getHexModel().getLabel()))
+            if (hex.isSelected() && battleHex.equals(hex.getHexModel()))
             {
                 hex.unselect();
                 hex.repaint();
@@ -504,12 +504,12 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         }
     }
 
-    protected void unselectHexesByLabels(Set<String> labels)
+    protected void unselectHexes(Set<BattleHex> battleHexes)
     {
         for (GUIBattleHex hex : hexes)
         {
             if (hex.isSelected()
-                && labels.contains(hex.getHexModel().getLabel()))
+                && battleHexes.contains(hex.getHexModel()))
             {
                 hex.unselect();
                 hex.repaint();
@@ -517,12 +517,12 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         }
     }
 
-    protected void selectHexByLabel(String label)
+    protected void selectHex(BattleHex battleHex)
     {
         for (GUIBattleHex hex : hexes)
         {
             if (!hex.isSelected()
-                && label.equals(hex.getHexModel().getLabel()))
+                && battleHex.equals(hex.getHexModel()))
             {
                 hex.select();
                 hex.repaint();
@@ -531,12 +531,12 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         }
     }
 
-    protected void selectHexesByLabels(Set<String> labels)
+    protected void selectHexes(Set<BattleHex> battleHexes)
     {
         for (GUIBattleHex hex : hexes)
         {
             if (!hex.isSelected()
-                && labels.contains(hex.getHexModel().getLabel()))
+                && battleHexes.contains(hex.getHexModel()))
             {
                 hex.select();
                 hex.repaint();
@@ -546,19 +546,17 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
     /** Do a brute-force search through the hex array, looking for
      *  a match.  Return the hex, or null. */
-    protected GUIBattleHex getGUIHexByLabel(String label)
+    protected GUIBattleHex getGUIHexByModelHex(BattleHex battleHex)
     {
-        Iterator<GUIBattleHex> it = hexes.iterator();
-        while (it.hasNext())
-        {
-            GUIBattleHex hex = it.next();
-            if (hex.getHexModel().getLabel().equals(label))
+        for(GUIBattleHex hex: hexes){
+            if (hex.getHexModel().getLabel().equals(battleHex.getLabel()))
             {
                 return hex;
             }
         }
 
-        LOGGER.log(Level.SEVERE, "Could not find GUIBattleHex " + label);
+        assert false: "Could not find GUIBattleHex for " + battleHex.getLabel();
+        LOGGER.log(Level.SEVERE, "Could not find GUIBattleHex " + battleHex.getLabel());
         return null;
     }
 
@@ -566,6 +564,8 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     public static BattleHex getHexByLabel(MasterBoardTerrain terrain,
         String label)
     {
+        assert terrain != null: "We must have a terrain";
+        assert label != null: "We must have a label";
         int x = 0;
         int y = Integer.parseInt(label.substring(1));
         switch (label.charAt(0))
@@ -608,11 +608,18 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                 return gameEntrances[y].getHexModel();
 
             default:
-                LOGGER.log(Level.SEVERE, "Label " + label + " is invalid");
+                String message = "Label " + label + " is invalid";
+                LOGGER.log(Level.SEVERE, message);
+                assert false: message;
         }
         y = 6 - y - Math.abs((x - 3) / 2);
         GUIBattleHex[][] correctHexes = terrainH.get(terrain);
         return correctHexes[x][y].getHexModel();
+    }
+    
+    public BattleHex getHexByLabel(String hexLabel) 
+    {
+        return getHexByLabel(masterHex.getTerrain(), hexLabel);
     }
 
     /** Return the GUIBattleHex that contains the given point, or
@@ -632,14 +639,14 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         return null;
     }
 
-    protected Set<String> getAllHexLabels()
+    protected Set<BattleHex> getAllHexes()
     {
-        Set<String> set = new HashSet<String>();
+        Set<BattleHex> set = new HashSet<BattleHex>();
         Iterator<GUIBattleHex> it = hexes.iterator();
         while (it.hasNext())
         {
             GUIBattleHex hex = it.next();
-            set.add(hex.getHexModel().getLabel());
+            set.add(hex.getHexModel());
         }
         return set;
     }

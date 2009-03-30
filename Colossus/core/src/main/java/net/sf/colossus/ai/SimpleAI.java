@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.CritterMove;
+import net.sf.colossus.client.HexMap;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.client.PlayerClientSide;
 import net.sf.colossus.game.Battle;
@@ -1984,7 +1985,8 @@ public class SimpleAI extends AbstractAI
         for (String desc : carryTargets)
         {
             String targetHexLabel = desc.substring(desc.length() - 2);
-            BattleChit target = client.getBattleChit(targetHexLabel);
+            BattleHex targetHex = HexMap.getHexByLabel(terrain, targetHexLabel);
+            BattleChit target = client.getBattleChit(targetHex);
 
             if (target.wouldDieFrom(carryDamage))
             {
@@ -2016,7 +2018,7 @@ public class SimpleAI extends AbstractAI
         {
             LOGGER.finest("Best carry target is "
                 + bestTarget.getDescription());
-            client.applyCarries(bestTarget.getCurrentHexLabel());
+            client.applyCarries(bestTarget.getCurrentHex());
         }
     }
 
@@ -2065,7 +2067,7 @@ public class SimpleAI extends AbstractAI
         // Having found the target and attacker, strike.
         // Take a carry penalty if there is still a 95%
         // chance of killing this target.
-        client.strike(bestAttacker.getTag(), bestTarget.getCurrentHexLabel());
+        client.strike(bestAttacker.getTag(), bestTarget.getCurrentHex());
         return true;
     }
 
@@ -2367,7 +2369,7 @@ public class SimpleAI extends AbstractAI
         for (CritterMove cm : bestMoveOrder)
         {
             BattleChit critter = cm.getCritter();
-            String startingHexLabel = cm.getStartingHexLabel();
+            BattleHex startingHex = cm.getStartingHex();
 
             LOGGER.finest(critter.getDescription() + " failed to move");
             List<CritterMove> moveList = findBattleMovesOneCritter(critter);
@@ -2375,8 +2377,8 @@ public class SimpleAI extends AbstractAI
             {
                 CritterMove cm2 = moveList.get(0);
                 LOGGER.finest("Moving " + critter.getDescription() + " to "
-                    + cm2.getEndingHexLabel() + " (startingHexLabel was "
-                    + startingHexLabel + ")");
+                    + cm2.getEndingHex().getLabel() + " (startingHexLabel was "
+                    + startingHex.getLabel() + ")");
                 client.tryBattleMove(cm2);
             }
         }
@@ -2398,7 +2400,7 @@ public class SimpleAI extends AbstractAI
         while (itCrit.hasNext())
         {
             CritterMove cm = itCrit.next();
-            if (cm.getStartingHexLabel().equals(cm.getEndingHexLabel()))
+            if (cm.getStartingHex().equals(cm.getEndingHex()))
             {
                 // Prune non-movers
                 itCrit.remove();
@@ -2496,8 +2498,8 @@ public class SimpleAI extends AbstractAI
         for (CritterMove cm : order)
         {
             BattleChit critter = cm.getCritter();
-            String hexLabel = cm.getEndingHexLabel();
-            if (client.testBattleMove(critter, hexLabel))
+            BattleHex hex = cm.getEndingHex();
+            if (client.testBattleMove(critter, hex))
             {
                 // XXX Use kill value instead?
                 val += critter.getPointValue();
@@ -2516,8 +2518,8 @@ public class SimpleAI extends AbstractAI
         for (CritterMove cm : order)
         {
             BattleChit critter = cm.getCritter();
-            String hexLabel = cm.getStartingHexLabel();
-            critter.setHexLabel(hexLabel);
+            BattleHex hex = cm.getStartingHex();
+            critter.setHex(hex);
         }
 
         if (!allOK)
@@ -2578,7 +2580,7 @@ public class SimpleAI extends AbstractAI
                 moveList = it2.next();
                 CritterMove cm = moveList.get(0);
                 BattleChit critter2 = cm.getCritter();
-                critter2.moveToHex(cm.getStartingHexLabel());
+                critter2.moveToHex(cm.getStartingHex());
             }
         }
 
@@ -2588,7 +2590,7 @@ public class SimpleAI extends AbstractAI
 
     private List<CritterMove> findBattleMovesOneCritter(BattleChit critter)
     {
-        String currentHexLabel = critter.getCurrentHexLabel();
+        BattleHex currentHex = critter.getCurrentHex();
 
         // moves is a list of hex labels where one critter can move.
 
@@ -2597,29 +2599,29 @@ public class SimpleAI extends AbstractAI
         // moves that the critter could make, disregarding mobile allies.
 
         // XXX Should show moves including moving through mobile allies.
-        Set<String> moves = client.showBattleMoves(critter.getTag());
+        Set<BattleHex> moves = client.showBattleMoves(critter.getTag());
 
         // TODO Make less important creatures get out of the way.
 
         // Not moving is also an option.
-        moves.add(currentHexLabel);
+        moves.add(currentHex);
 
         List<CritterMove> moveList = new ArrayList<CritterMove>();
 
-        for (String hexLabel : moves)
+        for (BattleHex hex : moves)
         {
             ValueRecorder why = new ValueRecorder();
-            CritterMove cm = new CritterMove(critter, currentHexLabel,
-                hexLabel);
+            CritterMove cm = new CritterMove(critter, currentHex,
+                hex);
 
             // Need to move the critter to evaluate.
-            critter.moveToHex(hexLabel);
+            critter.moveToHex(hex);
 
             // Compute and save the value for each CritterMove.
             cm.setValue(evaluateCritterMove(critter, null, why));
             moveList.add(cm);
             // Move the critter back where it started.
-            critter.moveToHex(critter.getStartingHexLabel());
+            critter.moveToHex(critter.getStartingHex());
         }
 
         // Sort critter moves in descending order of score.
@@ -2634,10 +2636,10 @@ public class SimpleAI extends AbstractAI
         // Show the moves considered.
         StringBuilder buf = new StringBuilder("Considered " + moveList.size()
             + " moves for " + critter.getTag() + " "
-            + critter.getCreatureName() + " in " + currentHexLabel + ":");
+            + critter.getCreatureName() + " in " + currentHex.getLabel() + ":");
         for (CritterMove cm : moveList)
         {
-            buf.append(" " + cm.getEndingHexLabel());
+            buf.append(" " + cm.getEndingHex().getLabel());
         }
         LOGGER.finest(buf.toString());
 
@@ -2730,11 +2732,10 @@ public class SimpleAI extends AbstractAI
 
     @SuppressWarnings("unused")
     protected int evaluateLegionBattleMoveAsAWhole(LegionMove lm,
-        Map<String, Integer> strikeMap, StringBuffer why)
+        Map<BattleHex, Integer> strikeMap, StringBuffer why)
     {
-        int value = 0;
         // This is empty, to be overidden by subclasses.
-        return value;
+        return 0;
     }
 
     /** this compute the special case of the Titan critter */
@@ -2913,12 +2914,12 @@ public class SimpleAI extends AbstractAI
 
     @SuppressWarnings("unused")
     protected void evaluateCritterMove_Rangestrike(final BattleChit critter,
-        final Map<String, Integer> strikeMap, ValueRecorder value,
+        final Map<BattleHex, Integer> strikeMap, ValueRecorder value,
         final MasterBoardTerrain terrain, final BattleHex hex,
         final int power, final int skill, final LegionClientSide legion,
-        final int turn, final Set<String> targetHexLabels)
+        final int turn, final Set<BattleHex> targetHexes)
     {
-        int numTargets = targetHexLabels.size();
+        int numTargets = targetHexes.size();
         // Rangestrikes.
         value.add(bec.FIRST_RANGESTRIKE_TARGET, "FirstRangestrikeTarget");
 
@@ -2934,9 +2935,9 @@ public class SimpleAI extends AbstractAI
         // prefer strikes not through bramble.  Warlocks should
         // try to rangestrike titans.
         boolean penalty = true;
-        for (String hexLabel : targetHexLabels)
+        for (BattleHex targetHex : targetHexes)
         {
-            BattleChit target = client.getBattleChit(hexLabel);
+            BattleChit target = client.getBattleChit(targetHex);
             if (target.isTitan())
             {
                 value.add(bec.RANGESTRIKE_TITAN, "RangestrikeTitan");
@@ -2951,7 +2952,7 @@ public class SimpleAI extends AbstractAI
             // Reward ganging up on enemies.
             if (strikeMap != null)
             {
-                int numAttackingThisTarget = strikeMap.get(hexLabel)
+                int numAttackingThisTarget = strikeMap.get(targetHex)
                     .intValue();
                 if (numAttackingThisTarget > 1)
                 {
@@ -2968,10 +2969,10 @@ public class SimpleAI extends AbstractAI
 
     @SuppressWarnings("unused")
     protected void evaluateCritterMove_Strike(final BattleChit critter,
-        final Map<String, Integer> strikeMap, ValueRecorder value,
+        final Map<BattleHex, Integer> strikeMap, ValueRecorder value,
         final MasterBoardTerrain terrain, final BattleHex hex,
         final int power, final int skill, final LegionClientSide legion,
-        final int turn, final Set<String> targetHexLabels)
+        final int turn, final Set<BattleHex> targetHexes)
     {
         // Normal strikes.  If we can strike them, they can strike us.
 
@@ -2992,9 +2993,9 @@ public class SimpleAI extends AbstractAI
         int numKillableTargets = 0;
         int hitsExpected = 0;
 
-        for (String hexLabel : targetHexLabels)
+        for (BattleHex targetHex : targetHexes)
         {
-            BattleChit target = client.getBattleChit(hexLabel);
+            BattleChit target = client.getBattleChit(targetHex);
 
             // Reward being next to enemy titans.  (Banzai!)
             if (target.isTitan())
@@ -3039,7 +3040,7 @@ public class SimpleAI extends AbstractAI
             // Reward ganging up on enemies.
             if (strikeMap != null)
             {
-                int numAttackingThisTarget = strikeMap.get(hexLabel)
+                int numAttackingThisTarget = strikeMap.get(targetHex)
                     .intValue();
                 if (numAttackingThisTarget > 1)
                 {
@@ -3107,14 +3108,14 @@ public class SimpleAI extends AbstractAI
 
     /** strikeMap is optional */
     protected int evaluateCritterMove(BattleChit critter,
-        Map<String, Integer> strikeMap, ValueRecorder value)
+        Map<BattleHex, Integer> strikeMap, ValueRecorder value)
     {
         final MasterBoardTerrain terrain = client.getBattleSite().getTerrain();
         final LegionClientSide legion = (LegionClientSide)client
             .getMyEngagedLegion();
         final int skill = critter.getSkill();
         final int power = critter.getPower();
-        final BattleHex hex = client.getBattleHex(critter);
+        final BattleHex hex = critter.getCurrentHex();
         final int turn = client.getBattleTurnNumber();
 
         PowerSkill ps = getNativeTerrainValue(critter.getCreature(), hex
@@ -3125,20 +3126,20 @@ public class SimpleAI extends AbstractAI
 
         evaluateCritterMove_Terrain(critter, value, terrain, hex, power, skill);
 
-        Set<String> targetHexLabels = client.findStrikes(critter.getTag());
-        int numTargets = targetHexLabels.size();
+        Set<BattleHex> targetHexes = client.findStrikes(critter.getTag());
+        int numTargets = targetHexes.size();
 
         if (numTargets >= 1)
         {
             if (!client.isInContact(critter, true))
             {
                 evaluateCritterMove_Rangestrike(critter, strikeMap, value,
-                    terrain, hex, power, skill, legion, turn, targetHexLabels);
+                    terrain, hex, power, skill, legion, turn, targetHexes);
             }
             else
             {
                 evaluateCritterMove_Strike(critter, strikeMap, value, terrain,
-                    hex, power, skill, legion, turn, targetHexLabels);
+                    hex, power, skill, legion, turn, targetHexes);
             }
         }
 
@@ -3166,8 +3167,7 @@ public class SimpleAI extends AbstractAI
                 BattleHex neighbor = hex.getNeighbor(i);
                 if (neighbor != null && client.isOccupied(neighbor))
                 {
-                    BattleChit other = client.getBattleChit(neighbor
-                        .getLabel());
+                    BattleChit other = client.getBattleChit(neighbor);
                     if (other.isInverted() == critter.isInverted())
                     {
                         // Buddy
@@ -3199,10 +3199,10 @@ public class SimpleAI extends AbstractAI
         // First we need to move all critters into position.
         for (CritterMove cm : lm.getCritterMoves())
         {
-            cm.getCritter().moveToHex(cm.getEndingHexLabel());
+            cm.getCritter().moveToHex(cm.getEndingHex());
         }
 
-        Map<String, Integer> strikeMap = findStrikeMap();
+        Map<BattleHex, Integer> strikeMap = findStrikeMap();
 
         // Then find the sum of all critter evals.
         int sum = 0;
@@ -3225,7 +3225,7 @@ public class SimpleAI extends AbstractAI
         // Then move them all back.
         for (CritterMove cm : lm.getCritterMoves())
         {
-            cm.getCritter().moveToHex(cm.getStartingHexLabel());
+            cm.getCritter().moveToHex(cm.getStartingHex());
         }
 
         lm.setValue(sum);

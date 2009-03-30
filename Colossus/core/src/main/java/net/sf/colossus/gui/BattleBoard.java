@@ -298,7 +298,7 @@ public final class BattleBoard extends KFrame
         // No hits on friendly chits, so check map.
         else if (hex != null && hex.isSelected())
         {
-            actOnHex(hexLabel);
+            actOnHex(hex.getHexModel());
         }
 
         // No hits on selected hexes, so clean up.
@@ -310,7 +310,8 @@ public final class BattleBoard extends KFrame
 
     private void setBattleMarkerLocation(boolean isDefender, String hexLabel)
     {
-        battleMap.setBattleMarkerLocation(isDefender, hexLabel);
+        BattleHex hex = battleMap.getHexByLabel(hexLabel);
+        battleMap.setBattleMarkerLocation(isDefender, hex);
     }
 
     // TODO perhaps this is not needed at all, 
@@ -597,10 +598,8 @@ public final class BattleBoard extends KFrame
     private BattleChit getBattleChitAtPoint(Point point)
     {
         List<BattleChit> battleChits = client.getBattleChits();
-        Iterator<BattleChit> it = battleChits.iterator();
-        while (it.hasNext())
+        for (BattleChit chit : battleChits)
         {
-            BattleChit chit = it.next();
             if (chit.contains(point))
             {
                 return chit;
@@ -609,10 +608,10 @@ public final class BattleBoard extends KFrame
         return null;
     }
 
-    public void alignChits(String hexLabel)
+    public void alignChits(BattleHex battleHex)
     {
-        GUIBattleHex hex = battleMap.getGUIHexByLabel(hexLabel);
-        List<BattleChit> chits = client.getBattleChits(hexLabel);
+        GUIBattleHex hex = battleMap.getGUIHexByModelHex(battleHex);
+        List<BattleChit> chits = client.getBattleChits(battleHex);
         int numChits = chits.size();
         if (numChits < 1)
         {
@@ -643,40 +642,38 @@ public final class BattleBoard extends KFrame
         hex.repaint();
     }
 
-    public void alignChits(Set<String> hexLabels)
+    public void alignChits(Set<BattleHex> battleHexes)
     {
-        Iterator<String> it = hexLabels.iterator();
-        while (it.hasNext())
+        for (BattleHex battleHex : battleHexes)
         {
-            String hexLabel = it.next();
-            alignChits(hexLabel);
+            alignChits(battleHex);
         }
     }
 
     /** Select all hexes containing critters eligible to move. */
     public void highlightMobileCritters()
     {
-        Set<String> set = client.findMobileCritterHexes();
+        Set<BattleHex> set = client.findMobileCritterHexes();
         unselectAllHexes();
         battleMap.unselectEntranceHexes();
-        battleMap.selectHexesByLabels(set);
+        battleMap.selectHexes(set);
         battleMap.selectEntranceHexes(set);
     }
 
     private void highlightMoves(int tag)
     {
-        Set<String> set = client.showBattleMoves(tag);
+        Set<BattleHex> set = client.showBattleMoves(tag);
         battleMap.unselectAllHexes();
         battleMap.unselectEntranceHexes();
-        battleMap.selectHexesByLabels(set);
+        battleMap.selectHexes(set);
     }
 
     /** Select hexes containing critters that have valid strike targets. */
     public void highlightCrittersWithTargets()
     {
-        Set<String> set = client.findCrittersWithTargets();
+        Set<BattleHex> set = client.findCrittersWithTargets();
         unselectAllHexes();
-        battleMap.selectHexesByLabels(set);
+        battleMap.selectHexes(set);
         // XXX Needed?
         repaint();
     }
@@ -684,22 +681,21 @@ public final class BattleBoard extends KFrame
     /** Highlight all hexes with targets that the critter can strike. */
     private void highlightStrikes(int tag)
     {
-        Set<String> set = client.findStrikes(tag);
+        Set<BattleHex> set = client.findStrikes(tag);
         unselectAllHexes();
         client.resetStrikeNumbers();
-        battleMap.selectHexesByLabels(set);
+        battleMap.selectHexes(set);
         client.setStrikeNumbers(tag, set);
         // XXX Needed?
         repaint();
     }
 
     /** Highlight all hexes to which carries could be applied */
-    public void highlightPossibleCarries(Set<String> set)
+    public void highlightPossibleCarries(Set<BattleHex> set)
     {
         unselectAllHexes();
         client.resetStrikeNumbers();
-        battleMap.selectHexesByLabels(set);
-        // client.setStrikeNumbers(tag, set);
+        battleMap.selectHexes(set);
         // XXX Needed?
         repaint();
     }
@@ -744,14 +740,14 @@ public final class BattleBoard extends KFrame
         }
     }
 
-    private void actOnHex(String hexLabel)
+    private void actOnHex(BattleHex hex)
     {
         BattlePhase phase = client.getBattlePhase();
         if (phase == BattlePhase.MOVE)
         {
             if (selectedCritterTag != -1)
             {
-                client.doBattleMove(selectedCritterTag, hexLabel);
+                client.doBattleMove(selectedCritterTag, hex);
                 selectedCritterTag = -1;
                 highlightMobileCritters();
             }
@@ -760,7 +756,7 @@ public final class BattleBoard extends KFrame
         {
             if (selectedCritterTag != -1)
             {
-                client.strike(selectedCritterTag, hexLabel);
+                client.strike(selectedCritterTag, hex);
                 selectedCritterTag = -1;
             }
         }
@@ -794,7 +790,7 @@ public final class BattleBoard extends KFrame
             BattleChit chit = it.next();
             chit.rescale(chitScale);
         }
-        alignChits(battleMap.getAllHexLabels());
+        alignChits(battleMap.getAllHexes());
 
         dicePanel.rescale();
 
@@ -965,9 +961,9 @@ public final class BattleBoard extends KFrame
         battleMap.unselectAllHexes();
     }
 
-    public void unselectHexByLabel(String hexLabel)
+    public void unselectHex(BattleHex hex)
     {
-        battleMap.unselectHexByLabel(hexLabel);
+        battleMap.unselectHex(hex);
     }
 
     public void addDiceResults(String strikerDesc, String targetDesc,
@@ -984,6 +980,11 @@ public final class BattleBoard extends KFrame
         dicePanel.showLastRoll();
     }
 
+    // TODO get rid of this, is is only introduced for refactoring purposes
+    public BattleHex getBattleHexByLabel(String hexLabel) {
+        return battleMap.getHexByLabel(hexLabel);
+    }
+    
     @Override
     public String toString()
     {

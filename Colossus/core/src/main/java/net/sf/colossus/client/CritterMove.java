@@ -2,6 +2,7 @@ package net.sf.colossus.client;
 
 
 import net.sf.colossus.gui.BattleChit;
+import net.sf.colossus.variant.BattleHex;
 
 
 /**
@@ -14,16 +15,16 @@ public class CritterMove
 {
     private int value;
     private final BattleChit critter;
-    private final String startingHexLabel;
-    private final String endingHexLabel;
+    private final BattleHex startingHex;
+    private final BattleHex endingHex;
 
-    public CritterMove(BattleChit critter, String startingHexLabel,
-        String endingHexLabel)
+    public CritterMove(BattleChit critter, BattleHex startingHex,
+        BattleHex endingHex)
     {
         super();
         this.critter = critter;
-        this.startingHexLabel = startingHexLabel;
-        this.endingHexLabel = endingHexLabel;
+        this.startingHex = startingHex;
+        this.endingHex = endingHex;
     }
 
     public void setValue(int value)
@@ -46,19 +47,19 @@ public class CritterMove
         return critter.getTag();
     }
 
-    public String getStartingHexLabel()
+    public BattleHex getStartingHex()
     {
-        return startingHexLabel;
+        return startingHex;
     }
 
-    public String getEndingHexLabel()
+    public BattleHex getEndingHex()
     {
-        return endingHexLabel;
+        return endingHex;
     }
 
     @Override
     public String toString()
     {
-        return critter.getDescription() + " to " + getEndingHexLabel();
+        return critter.getDescription() + " to " + getEndingHex().getLabel();
     }
 }

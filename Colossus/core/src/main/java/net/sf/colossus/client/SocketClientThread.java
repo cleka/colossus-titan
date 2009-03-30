@@ -27,6 +27,7 @@ import net.sf.colossus.server.IServer;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.InstanceTracker;
 import net.sf.colossus.util.Split;
+import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
 
@@ -592,7 +593,9 @@ final class SocketClientThread extends Thread implements IServer
             boolean inverted = Boolean.valueOf(args.remove(0)).booleanValue();
             int tag = Integer.parseInt(args.remove(0));
             String hexLabel = args.remove(0);
-            client.placeNewChit(imageName, inverted, tag, hexLabel);
+            BattleHex hex = HexMap.getHexByLabel(client.getGame().getBattleSite().getTerrain(),
+                hexLabel);
+            client.placeNewChit(imageName, inverted, tag, hex);
         }
         else if (method.equals(Constants.replayOngoing))
         {
@@ -808,7 +811,11 @@ final class SocketClientThread extends Thread implements IServer
             String startingHexLabel = args.remove(0);
             String endingHexLabel = args.remove(0);
             boolean undo = Boolean.valueOf(args.remove(0)).booleanValue();
-            client.tellBattleMove(tag, startingHexLabel, endingHexLabel, undo);
+            BattleHex startingHex = HexMap.getHexByLabel(client.getGame().getBattleSite().getTerrain(),
+                startingHexLabel);
+            BattleHex endingHex = HexMap.getHexByLabel(client.getGame().getBattleSite().getTerrain(),
+                endingHexLabel);
+            client.tellBattleMove(tag, startingHex, endingHex, undo);
         }
         else if (method.equals(Constants.didMove))
         {
@@ -1132,24 +1139,24 @@ final class SocketClientThread extends Thread implements IServer
         sendToServer(Constants.fight + sep + hex.getLabel());
     }
 
-    public void doBattleMove(int tag, String hexLabel)
+    public void doBattleMove(int tag, BattleHex hex)
     {
-        sendToServer(Constants.doBattleMove + sep + tag + sep + hexLabel);
+        sendToServer(Constants.doBattleMove + sep + tag + sep + hex.getLabel());
     }
 
-    public synchronized void strike(int tag, String hexLabel)
+    public synchronized void strike(int tag, BattleHex hex)
     {
-        sendToServer(Constants.strike + sep + tag + sep + hexLabel);
+        sendToServer(Constants.strike + sep + tag + sep + hex.getLabel());
     }
 
-    public synchronized void applyCarries(String hexLabel)
+    public synchronized void applyCarries(BattleHex hex)
     {
-        sendToServer(Constants.applyCarries + sep + hexLabel);
+        sendToServer(Constants.applyCarries + sep + hex.getLabel());
     }
 
-    public void undoBattleMove(String hexLabel)
+    public void undoBattleMove(BattleHex hex)
     {
-        sendToServer(Constants.undoBattleMove + sep + hexLabel);
+        sendToServer(Constants.undoBattleMove + sep + hex.getLabel());
     }
 
     public void assignStrikePenalty(String prompt)

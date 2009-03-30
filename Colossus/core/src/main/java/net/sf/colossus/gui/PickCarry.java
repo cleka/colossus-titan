@@ -15,8 +15,10 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 
 import net.sf.colossus.client.Client;
+import net.sf.colossus.client.HexMap;
 import net.sf.colossus.guiutil.KDialog;
 import net.sf.colossus.guiutil.SaveWindow;
+import net.sf.colossus.variant.BattleHex;
 
 
 /** Chooses between multiple carry options.
@@ -112,8 +114,8 @@ final class PickCarry extends KDialog implements ActionListener
      * Called by click on one one of the buttons
      * (from actionPerformed) or, from battleMap via Client,
      * if a chit was clicked which is a potential carry target.
-     * @param desc String denoting a carry target choice
      * 
+     * @param desc String denoting a carry target choice
      */
     public void handleCarryToDescription(String desc)
     {
@@ -123,7 +125,8 @@ final class PickCarry extends KDialog implements ActionListener
         }
         else
         {
-            String targetHex = desc.substring(desc.length() - 2);
+            String targetHexLabel = desc.substring(desc.length() - 2);
+            BattleHex targetHex = HexMap.getHexByLabel(client.getBattleSite().getTerrain(), targetHexLabel);
             client.applyCarries(targetHex);
         }
         saveWindow.saveLocation(getLocation());

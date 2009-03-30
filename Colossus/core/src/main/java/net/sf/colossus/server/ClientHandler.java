@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.client.HexMap;
 import net.sf.colossus.client.IClient;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.EntrySide;
@@ -24,6 +25,7 @@ import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.InstanceTracker;
 import net.sf.colossus.util.Split;
+import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
 
@@ -358,23 +360,31 @@ final class ClientHandler implements IClient
         {
             int tag = Integer.parseInt(args.remove(0));
             String hexLabel = args.remove(0);
-            server.doBattleMove(tag, hexLabel);
+            BattleHex hex = HexMap.getHexByLabel(server.getGame().getBattle().getLand(),
+                hexLabel);
+            server.doBattleMove(tag, hex);
         }
         else if (method.equals(Constants.strike))
         {
             int tag = Integer.parseInt(args.remove(0));
             String hexLabel = args.remove(0);
-            server.strike(tag, hexLabel);
+            BattleHex hex = HexMap.getHexByLabel(server.getGame().getBattle().getLand(),
+                hexLabel);
+            server.strike(tag, hex);
         }
         else if (method.equals(Constants.applyCarries))
         {
             String hexLabel = args.remove(0);
-            server.applyCarries(hexLabel);
+            BattleHex hex = HexMap.getHexByLabel(server.getGame().getBattle().getLand(),
+                hexLabel);
+            server.applyCarries(hex);
         }
         else if (method.equals(Constants.undoBattleMove))
         {
             String hexLabel = args.remove(0);
-            server.undoBattleMove(hexLabel);
+            BattleHex hex = HexMap.getHexByLabel(server.getGame().getBattle().getLand(),
+                hexLabel);
+            server.undoBattleMove(hex);
         }
         else if (method.equals(Constants.assignStrikePenalty))
         {
@@ -662,10 +672,10 @@ final class ClientHandler implements IClient
     }
 
     public void placeNewChit(String imageName, boolean inverted, int tag,
-        String hexLabel)
+        BattleHex hex)
     {
         sendToClient(Constants.placeNewChit + sep + imageName + sep + inverted
-            + sep + tag + sep + hexLabel);
+            + sep + tag + sep + hex.getLabel());
     }
 
     public void tellReplay(boolean val, int maxTurn)
@@ -851,11 +861,11 @@ final class ClientHandler implements IClient
             + sep + hex.getLabel());
     }
 
-    public void tellBattleMove(int tag, String startingHexLabel,
-        String endingHexLabel, boolean undo)
+    public void tellBattleMove(int tag, BattleHex startingHex,
+        BattleHex endingHex, boolean undo)
     {
         sendToClient(Constants.tellBattleMove + sep + tag + sep
-            + startingHexLabel + sep + endingHexLabel + sep + undo);
+            + startingHex.getLabel() + sep + endingHex.getLabel() + sep + undo);
     }
 
     public void didMove(Legion legion, MasterHex startingHex,

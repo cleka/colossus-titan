@@ -353,7 +353,7 @@ public class CreatureServerSide extends Creature
         if (tellClients)
         {
             battle.getGame().getServer().allTellBattleMove(tag,
-                startingHex.getLabel(), currentHex.getLabel(), false);
+                startingHex, currentHex, false);
         }
     }
 
@@ -364,7 +364,7 @@ public class CreatureServerSide extends Creature
         LOGGER.log(Level.INFO, getName() + " undoes move and returns to "
             + startingHex);
         battle.getGame().getServer().allTellBattleMove(tag,
-            formerHexLabel.getLabel(), currentHex.getLabel(), true);
+            formerHexLabel, currentHex, true);
     }
 
     boolean canStrike(CreatureServerSide target)
@@ -809,7 +809,7 @@ public class CreatureServerSide extends Creature
         if (tmpStrikeNumber == strikeNumber && tmpDice == dice)
         {
             // Can carry with no need for a penalty.
-            battle.addCarryTarget(neighbor.getLabel());
+            battle.addCarryTarget(neighbor);
         }
 
         else
@@ -823,14 +823,14 @@ public class CreatureServerSide extends Creature
                 if (po.getDice() == tmpDice
                     && po.getStrikeNumber() == tmpStrikeNumber)
                 {
-                    po.addCarryTarget(neighbor.getLabel());
+                    po.addCarryTarget(neighbor);
                     return;
                 }
             }
             // No match, so create a new PenaltyOption.
             PenaltyOption po = new PenaltyOption(this, target, tmpDice,
                 tmpStrikeNumber);
-            po.addCarryTarget(neighbor.getLabel());
+            po.addCarryTarget(neighbor);
             penaltyOptions.add(po);
         }
     }

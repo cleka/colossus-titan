@@ -35,6 +35,7 @@ import net.sf.colossus.game.Proposal;
 import net.sf.colossus.server.Start.WhatToDoNext;
 import net.sf.colossus.util.InstanceTracker;
 import net.sf.colossus.util.Options;
+import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
@@ -1407,7 +1408,7 @@ public final class Server extends Thread implements IServer
         {
             client.placeNewChit(critter.getName(), critter.getLegion().equals(
                 game.getBattle().getDefendingLegion()), critter.getTag(),
-                critter.getCurrentHex().getLabel());
+                critter.getCurrentHex());
         }
     }
 
@@ -1725,7 +1726,7 @@ public final class Server extends Thread implements IServer
         game.fight(hex);
     }
 
-    public void doBattleMove(int tag, String hexLabel)
+    public void doBattleMove(int tag, BattleHex hex)
     {
         IClient client = getClient(getPlayer());
         if (!isBattleActivePlayer())
@@ -1735,7 +1736,7 @@ public final class Server extends Thread implements IServer
             client.nak(Constants.doBattleMove, "Wrong player");
             return;
         }
-        boolean moved = game.getBattle().doMove(tag, hexLabel);
+        boolean moved = game.getBattle().doMove(tag, hex);
         if (!moved)
         {
             LOGGER.severe("Battle move failed");
@@ -1743,7 +1744,7 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    void allTellBattleMove(int tag, String startingHex, String endingHex,
+    void allTellBattleMove(int tag, BattleHex startingHex, BattleHex endingHex,
         boolean undo)
     {
         Iterator<IClient> it = clients.iterator();
@@ -1754,7 +1755,7 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    public void strike(int tag, String hexLabel)
+    public void strike(int tag, BattleHex hex)
     {
         IClient client = getClient(getPlayer());
         if (!isBattleActivePlayer())
@@ -1785,10 +1786,10 @@ public final class Server extends Thread implements IServer
             client.nak(Constants.strike, "No critter with that tag");
             return;
         }
-        CreatureServerSide strikeTarget = battle.getCritter(hexLabel);
+        CreatureServerSide strikeTarget = battle.getCritter(hex);
         if (strikeTarget == null)
         {
-            LOGGER.severe("No target in hex " + hexLabel
+            LOGGER.severe("No target in hex " + hex.getLabel()
                 + " in Server.strike()");
             client.nak(Constants.strike, "No target in that hex");
             return;
@@ -1809,7 +1810,7 @@ public final class Server extends Thread implements IServer
         critter.strike(strikeTarget);
     }
 
-    public void applyCarries(String hexLabel)
+    public void applyCarries(BattleHex hex)
     {
         if (!isBattleActivePlayer())
         {
@@ -1818,11 +1819,11 @@ public final class Server extends Thread implements IServer
             return;
         }
         BattleServerSide battle = game.getBattle();
-        CreatureServerSide ourTarget = battle.getCritter(hexLabel);
+        CreatureServerSide ourTarget = battle.getCritter(hex);
         battle.applyCarries(ourTarget);
     }
 
-    public void undoBattleMove(String hexLabel)
+    public void undoBattleMove(BattleHex hex)
     {
         if (!isBattleActivePlayer())
         {
@@ -1830,7 +1831,7 @@ public final class Server extends Thread implements IServer
                 + " illegally called undoBattleMove()");
             return;
         }
-        game.getBattle().undoMove(hexLabel);
+        game.getBattle().undoMove(hex);
     }
 
     void allTellStrikeResults(CreatureServerSide striker,

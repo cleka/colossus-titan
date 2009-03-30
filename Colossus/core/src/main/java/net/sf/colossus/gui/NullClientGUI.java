@@ -15,6 +15,7 @@ import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.SummonInfo;
+import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.webclient.WebClient;
 
@@ -41,7 +42,7 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public void actOnAppliyCarries(String hexLabel)
+    public void actOnApplyCarries(BattleHex hex)
     {
         // TODO Auto-generated method stub
 
@@ -111,7 +112,7 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public void actOnPlaceNewChit(String hexLabel)
+    public void actOnPlaceNewChit(BattleHex hex)
     {
         // TODO Auto-generated method stub
 
@@ -190,8 +191,8 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public void actOnTellBattleMove(String startingHexLabel,
-        String endingHexLabel)
+    public void actOnTellBattleMove(BattleHex startingHex,
+        BattleHex endingHex)
     {
         // TODO Auto-generated method stub
 

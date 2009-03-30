@@ -1426,13 +1426,10 @@ public final class GameServerSide extends Game
                 bat.setAttribute("driftDamageApplied", ""
                     + battle.isDriftDamageApplied());
 
-                Iterator<String> itCT = battle.getCarryTargets().iterator();
-                while (itCT.hasNext())
+                for (BattleHex hex : battle.getCarryTargets())
                 {
                     Element ct = new Element("CarryTarget");
-                    String carryTarget = itCT.next();
-
-                    ct.addContent(carryTarget);
+                    ct.addContent(hex.getLabel());
                     bat.addContent(ct);
                 }
                 root.addContent(bat);
@@ -1779,12 +1776,13 @@ public final class GameServerSide extends Game
                     "driftDamageApplied").getBooleanValue();
 
                 List<Element> cts = bat.getChildren("CarryTarget");
-                Set<String> carryTargets = new HashSet<String>();
+                Set<BattleHex> carryTargets = new HashSet<BattleHex>();
                 Iterator<Element> it2 = cts.iterator();
                 while (it2.hasNext())
                 {
                     Element cart = it2.next();
-                    carryTargets.add(cart.getTextTrim());
+                    carryTargets.add(HexMap.getHexByLabel(engagementHex.getTerrain(), 
+                        cart.getTextTrim()));
                 }
 
                 Player attackingPlayer = getActivePlayer();

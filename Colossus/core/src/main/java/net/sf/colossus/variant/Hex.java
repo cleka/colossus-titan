@@ -62,4 +62,37 @@ public abstract class Hex
     {
         return yCoord;
     }
+
+    @Override
+    public int hashCode()
+    {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + xCoord;
+        result = prime * result + yCoord;
+        return result;
+    }
+
+    /**
+     * We consider two hexes equal if their x/y coordinates are the same.
+     * 
+     * This gives equality within the context of a HexMap, since we don't know to
+     * which map the Hex belongs we can't do any better.
+     */
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Hex other = (Hex)obj;
+        if (xCoord != other.xCoord)
+            return false;
+        if (yCoord != other.yCoord)
+            return false;
+        return true;
+    }    
 }

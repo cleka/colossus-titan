@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import net.sf.colossus.gui.BattleChit;
-import net.sf.colossus.server.BattleServerSide;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
@@ -30,12 +29,12 @@ final class BattleMovement
         this.client = client;
     }
 
-    /** Recursively find moves from this hex.  Return a set of string hex IDs 
-     *  for all legal destinations.  Do not double back.  */
-    private Set<String> findMoves(BattleHex hex, CreatureType creature,
+    /** Recursively find moves from this hex.  Return a set of all
+     * legal destinations.  Do not double back.  */
+    private Set<BattleHex> findMoves(BattleHex hex, CreatureType creature,
         boolean flies, int movesLeft, int cameFrom, boolean first)
     {
-        Set<String> set = new HashSet<String>();
+        Set<BattleHex> set = new HashSet<BattleHex>();
         for (int i = 0; i < 6; i++)
         {
             // Do not double back.
@@ -47,8 +46,7 @@ final class BattleMovement
                     int reverseDir = (i + 3) % 6;
                     int entryCost;
 
-                    BattleChit bogey = client.getBattleChit(neighbor
-                        .getLabel());
+                    BattleChit bogey = client.getBattleChit(neighbor);
                     if (bogey == null)
                     {
                         entryCost = neighbor.getEntryCost(creature,
@@ -65,7 +63,7 @@ final class BattleMovement
                             .getOptions().getOption(Options.oneHexAllowed))))
                     {
                         // Mark that hex as a legal move.
-                        set.add(neighbor.getLabel());
+                        set.add(neighbor);
 
                         // If there are movement points remaining, continue
                         // checking moves from there.  Fliers skip this
@@ -95,40 +93,37 @@ final class BattleMovement
      *  Startlisted Terrain,
      *  so we know that there are no enemies on board, and all allies
      *  are mobile.
-     *  
-     * TODO same as {@link BattleServerSide#findUnoccupiedStartlistHexes()}
      */
-    private Set<String> findUnoccupiedStartlistHexes()
+    private Set<BattleHex> findUnoccupiedStartlistHexes()
     {
         MasterBoardTerrain terrain = client.getBattleSite().getTerrain();
-        Set<String> set = new HashSet<String>();
+        Set<BattleHex> set = new HashSet<BattleHex>();
         for (String hexLabel : terrain.getStartList())
         {
             BattleHex hex = HexMap.getHexByLabel(terrain, hexLabel);
-            if (!isOccupied(hexLabel))
+            if (!isOccupied(hex))
             {
-                set.add(hex.getLabel());
+                set.add(hex);
             }
         }
         return set;
     }
 
-    private boolean isOccupied(String hexLabel)
+    private boolean isOccupied(BattleHex hex)
     {
-        return !client.getBattleChits(hexLabel).isEmpty();
+        return !client.getBattleChits(hex).isEmpty();
     }
 
-    Set<String> showMoves(int tag)
+    Set<BattleHex> showMoves(int tag)
     {
         BattleChit chit = client.getBattleChit(tag);
         return showMoves(chit);
     }
 
-    /** Find all legal moves for this critter. The returned list
-     *  contains hex IDs, not hexes. */
-    Set<String> showMoves(BattleChit chit)
+    /** Find all legal moves for this critter.*/
+    Set<BattleHex> showMoves(BattleChit chit)
     {
-        Set<String> set = new HashSet<String>();
+        Set<BattleHex> set = new HashSet<BattleHex>();
         if (!chit.hasMoved() && !client.isInContact(chit, false))
         {
             if (client.getBattleSite().getTerrain().hasStartList()
@@ -141,7 +136,7 @@ final class BattleMovement
             {
                 CreatureType creature = client.getGame().getVariant()
                     .getCreatureByName(chit.getCreatureName());
-                BattleHex hex = client.getBattleHex(chit);
+                BattleHex hex = chit.getCurrentHex();
                 set = findMoves(hex, creature, creature.isFlier(), creature
                     .getSkill(), -1, true);
             }

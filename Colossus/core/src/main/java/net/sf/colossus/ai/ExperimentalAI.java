@@ -295,7 +295,7 @@ public class ExperimentalAI extends SimpleAI
 
     @Override
     protected int evaluateLegionBattleMoveAsAWhole(LegionMove lm,
-        Map<String, Integer> strikeMap, StringBuffer why)
+        Map<BattleHex, Integer> strikeMap, StringBuffer why)
     {
         int value = 0;
         final Legion legion = client.getMyEngagedLegion();
@@ -308,16 +308,14 @@ public class ExperimentalAI extends SimpleAI
             boolean nobodyGetsHurt = true;
             int numCanBeReached = 0;
             int maxThatCanReach = 0;
-            //for (CritterMove cm : lm.getCritterMoves())
             for (BattleChit critter : client.getActiveBattleChits())
             {
                 int canReachMe = 0;
-                //BattleChit critter = cm.getCritter();
-                BattleHex myHex = client.getBattleHex(critter);
+                BattleHex myHex = critter.getCurrentHex();
                 List<BattleChit> foes = client.getInactiveBattleChits();
                 for (BattleChit foe : foes)
                 {
-                    BattleHex foeHex = client.getBattleHex(foe);
+                    BattleHex foeHex = foe.getCurrentHex();
                     int range = Battle.getRange(foeHex, myHex, true);
                     if ((range != Constants.OUT_OF_RANGE)
                         && ((range - 2) <= foe.getSkill()))

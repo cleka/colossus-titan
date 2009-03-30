@@ -16,6 +16,7 @@ import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.SummonInfo;
+import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.webclient.WebClient;
 
@@ -292,14 +293,14 @@ public interface IClientGUI
 
     public abstract void actOnSetupBattleMove();
 
-    public abstract void actOnTellBattleMove(String startingHexLabel,
-        String endingHexLabel);
+    public abstract void actOnTellBattleMove(BattleHex startingHex,
+        BattleHex endingHex);
 
     public abstract void actOnSetupBattleRecruit();
 
     public abstract void actOnSetupBattleSummon();
 
-    public abstract void actOnPlaceNewChit(String hexLabel);
+    public abstract void actOnPlaceNewChit(BattleHex hex);
 
     public abstract void actOnTellStrikeResults(boolean wasCarry,
         int strikeNumber, List<String> rolls, BattleChit striker,
@@ -307,7 +308,7 @@ public interface IClientGUI
 
     public abstract void highlightCrittersWithTargets();
 
-    public abstract void actOnAppliyCarries(String hexLabel);
+    public abstract void actOnApplyCarries(BattleHex hex);
 
     public abstract void actOnCleanupBattle();
 

@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import javax.swing.AbstractAction;
@@ -164,7 +165,12 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                     List<String> startList = parser.getStartList();
                     if (startList != null)
                     {
-                        selectHexesByLabels(new HashSet<String>(startList));
+                        Set<BattleHex> startHexes = new HashSet<BattleHex>();
+                        for (String string : startList)
+                        {
+                            startHexes.add(getHexByLabel(string));
+                        }
+                        selectHexes(startHexes);
                     }
                     setSubtitle(parser.getSubtitle());
                     String lMapName = temploadFileName.replaceAll(".xml", "");

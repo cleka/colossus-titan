@@ -1646,9 +1646,6 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#showHexRecruitTree(net.sf.colossus.gui.GUIMasterHex)
-     */
     public void showHexRecruitTree(GUIMasterHex hex)
     {
         if (autoInspector != null)
@@ -1657,9 +1654,6 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#didSummon(net.sf.colossus.game.Legion, net.sf.colossus.game.Legion, java.lang.String)
-     */
     public void didSummon(Legion summoner, Legion donor, String summon)
     {
         if (eventViewer != null)
@@ -1670,9 +1664,6 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#repaintBattleBoard()
-     */
     public void repaintBattleBoard()
     {
         if (battleBoard != null)
@@ -1681,9 +1672,6 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#repaintAllWindows()
-     */
     public void repaintAllWindows()
     {
         if (statusScreen != null)
@@ -1704,9 +1692,6 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#rescaleAllWindows()
-     */
     public void rescaleAllWindows()
     {
         if (statusScreen != null)
@@ -1726,9 +1711,6 @@ public class ClientGUI implements IClientGUI
         repaintAllWindows();
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#disposeInspector()
-     */
     public void disposeInspector()
     {
         if (autoInspector != null)
@@ -1739,9 +1721,6 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#updateCreatureCountDisplay()
-     */
     public void updateCreatureCountDisplay()
     {
         if (board == null)
@@ -1772,9 +1751,6 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#disposePickCarryDialog()
-     */
     public void disposePickCarryDialog()
     {
         if (pickCarryDialog != null)
@@ -1843,17 +1819,11 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#showNegotiate(net.sf.colossus.game.Legion, net.sf.colossus.game.Legion)
-     */
     public void showNegotiate(Legion attacker, Legion defender)
     {
         negotiate = new Negotiate(this, attacker, defender);
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#respawnNegotiate()
-     */
     public void respawnNegotiate()
     {
         if (negotiate != null)
@@ -1864,9 +1834,6 @@ public class ClientGUI implements IClientGUI
             .getDefender());
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#showConcede(net.sf.colossus.client.Client, net.sf.colossus.game.Legion, net.sf.colossus.game.Legion)
-     */
     public void showConcede(Client client, Legion ally, Legion enemy)
     {
         Concede.concede(client, board.getFrame(), ally, enemy);
@@ -1896,9 +1863,6 @@ public class ClientGUI implements IClientGUI
         engagementResults.maybeShow();
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#tellEngagement(net.sf.colossus.game.Legion, net.sf.colossus.game.Legion, int)
-     */
     public void tellEngagement(Legion attacker, Legion defender, int turnNumber)
     {
         // remember for end of battle.
@@ -1931,9 +1895,6 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#actOnTellEngagementResults(net.sf.colossus.game.Legion, java.lang.String, int, int)
-     */
     public void actOnTellEngagementResults(Legion winner, String method,
         int points, int turns)
     {
@@ -1967,9 +1928,6 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#setMulliganOldRoll(int)
-     */
     public void setMulliganOldRoll(int movementRoll)
     {
         if (eventViewer != null)
@@ -1978,9 +1936,6 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#tellWhatsHappening(java.lang.String)
-     */
     public void tellWhatsHappening(String message)
     {
         if (board != null)
@@ -1989,9 +1944,6 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#tellMovementRoll(int)
-     */
     public void tellMovementRoll(int roll)
     {
         if (eventViewer != null)
@@ -2055,9 +2007,6 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#eventViewerRevealCreatures(net.sf.colossus.game.Legion, java.util.List, java.lang.String)
-     */
     public void eventViewerRevealCreatures(Legion legion,
         final List<String> names, String reason)
     {
@@ -2084,9 +2033,6 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#syncCheckboxes()
-     */
     public void syncCheckboxes()
     {
         if (board == null)
@@ -2102,59 +2048,41 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#doAcquireAngel(net.sf.colossus.game.Legion, java.util.List)
-     */
     public void doAcquireAngel(Legion legion, List<String> recruits)
     {
         board.deiconify();
         new AcquireAngel(board.getFrame(), client, legion, recruits);
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#setBoardActive(boolean)
-     */
     public void setBoardActive(boolean val)
     {
         board.setBoardActive(val);
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#doPickSummonAngel(net.sf.colossus.game.Legion)
-     */
     public SummonInfo doPickSummonAngel(Legion legion,
         SortedSet<Legion> possibleDonors)
     {
         return SummonAngel.summonAngel(this, legion, possibleDonors);
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#doPickSplitLegion(net.sf.colossus.game.Legion, java.lang.String)
-     */
     public String doPickSplitLegion(Legion parent, String childMarker)
     {
         return SplitLegion.splitLegion(this, parent, childMarker);
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#doPickCarries(net.sf.colossus.client.Client, int, java.util.Set)
-     */
     public void doPickCarries(Client client, int carryDamage,
         Set<String> carryTargetDescriptions)
     {
-        Set<String> carryTargetHexes = new TreeSet<String>();
+        Set<BattleHex> carryTargetHexes = new TreeSet<BattleHex>();
         for (String desc : carryTargetDescriptions)
         {
-            carryTargetHexes.add(desc.substring(desc.length() - 2));
+            carryTargetHexes.add(battleBoard.getBattleHexByLabel(desc.substring(desc.length() - 2)));
         }
         battleBoard.highlightPossibleCarries(carryTargetHexes);
         pickCarryDialog = new PickCarry(battleBoard, client, carryDamage,
             carryTargetDescriptions);
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#getPickCarryDialog()
-     */
     public PickCarry getPickCarryDialog()
     {
         return pickCarryDialog;
@@ -2177,18 +2105,12 @@ public class ClientGUI implements IClientGUI
         return color;
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#doPickMarker(java.util.Set)
-     */
     public String doPickMarker(Set<String> markersAvailable)
     {
         return PickMarker.pickMarker(board.getFrame(), client
             .getOwningPlayer(), markersAvailable, options);
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#doPickMarkerUntilGotOne(java.util.Set)
-     */
     public String doPickMarkerUntilGotOne(Set<String> markersAvailable)
     {
         String markerId = null;
@@ -2205,9 +2127,6 @@ public class ClientGUI implements IClientGUI
         return markerId;
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#doPickRecruit(net.sf.colossus.game.Legion, java.lang.String)
-     */
     public String doPickRecruit(Legion legion, String hexDescription)
     {
         List<CreatureType> recruits = client.findEligibleRecruits(legion,
@@ -2217,9 +2136,6 @@ public class ClientGUI implements IClientGUI
             hexDescription, legion, client);
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#doPickRecruiter(java.util.List, java.lang.String, net.sf.colossus.game.Legion)
-     */
     public String doPickRecruiter(List<String> recruiters,
         String hexDescription, Legion legion)
     {
@@ -2238,33 +2154,21 @@ public class ClientGUI implements IClientGUI
         return recruiterName;
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#doPickEntrySide(net.sf.colossus.variant.MasterHex, java.util.Set)
-     */
     public EntrySide doPickEntrySide(MasterHex hex, Set<EntrySide> entrySides)
     {
         return PickEntrySide.pickEntrySide(board.getFrame(), hex, entrySides);
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#doPickLord(java.util.List)
-     */
     public String doPickLord(List<String> lords)
     {
         return PickLord.pickLord(options, board.getFrame(), lords);
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#doPickStrikePenalty(net.sf.colossus.client.Client, java.util.List)
-     */
     public void doPickStrikePenalty(Client client, List<String> choices)
     {
         new PickStrikePenalty(battleBoard, client, choices);
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#tellProposal(java.lang.String)
-     */
     public void tellProposal(String proposalString)
     {
         Proposal proposal = Proposal.makeFromString(proposalString, client
@@ -2278,9 +2182,6 @@ public class ClientGUI implements IClientGUI
 
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#cleanupNegotiationDialogs()
-     */
     public void cleanupNegotiationDialogs()
     {
         if (negotiate != null)
@@ -2295,9 +2196,6 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#actOnTurnOrPlayerChange(net.sf.colossus.client.Client, int, int)
-     */
     public void actOnTurnOrPlayerChange(Client client, int turnNr,
         Player player)
     {
@@ -2310,9 +2208,6 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#actOnSetupSplit()
-     */
     public void actOnSetupSplit()
     {
         if (board != null)
@@ -2488,24 +2383,18 @@ public class ClientGUI implements IClientGUI
         updateStatusScreen();
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#actOnTellBattleMove(java.lang.String, java.lang.String)
-     */
-    public void actOnTellBattleMove(String startingHexLabel,
-        String endingHexLabel)
+    public void actOnTellBattleMove(BattleHex startingHex,
+        BattleHex endingHex)
     {
         if (battleBoard != null)
         {
-            battleBoard.alignChits(startingHexLabel);
-            battleBoard.alignChits(endingHexLabel);
+            battleBoard.alignChits(startingHex);
+            battleBoard.alignChits(endingHex);
             battleBoard.repaint();
             battleBoard.highlightMobileCritters();
         }
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#actOnSetupBattleRecruit()
-     */
     public void actOnSetupBattleRecruit()
     {
         if (battleBoard != null)
@@ -2545,14 +2434,11 @@ public class ClientGUI implements IClientGUI
         updateStatusScreen();
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#actOnPlaceNewChit(java.lang.String)
-     */
-    public void actOnPlaceNewChit(String hexLabel)
+    public void actOnPlaceNewChit(BattleHex hex)
     {
         if (battleBoard != null)
         {
-            battleBoard.alignChits(hexLabel);
+            battleBoard.alignChits(hex);
             // Make sure map is visible after summon or muster.
             focusMap();
         }
@@ -2564,7 +2450,7 @@ public class ClientGUI implements IClientGUI
         {
             return "";
         }
-        BattleHex hex = client.getBattleHex(chit);
+        BattleHex hex = chit.getCurrentHex();
         return chit.getCreatureName() + " in " + hex.getDescription();
     }
 
@@ -2596,21 +2482,15 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#actOnAppliyCarries(java.lang.String)
-     */
-    public void actOnAppliyCarries(String hexLabel)
+    public void actOnApplyCarries(BattleHex hex)
     {
         if (battleBoard != null)
         {
-            battleBoard.unselectHexByLabel(hexLabel);
+            battleBoard.unselectHex(hex);
             battleBoard.repaint();
         }
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#actOnCleanupBattle()
-     */
     public void actOnCleanupBattle()
     {
         if (battleBoard != null)
@@ -2679,21 +2559,16 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#undoLastBattleMove()
-     */
     public void undoLastBattleMove()
     {
         if (!isUndoStackEmpty())
         {
             String hexLabel = (String)popUndoStack();
-            client.getServer().undoBattleMove(hexLabel);
+            BattleHex hex = battleBoard.getBattleHexByLabel(hexLabel);
+            client.getServer().undoBattleMove(hex);
         }
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#undoAllBattleMoves()
-     */
     public void undoAllBattleMoves()
     {
         while (!isUndoStackEmpty())
@@ -2702,9 +2577,6 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#undoAllMoves()
-     */
     public void undoAllMoves()
     {
         if (board != null)
@@ -2718,9 +2590,6 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#undoAllRecruits()
-     */
     public void undoAllRecruits()
     {
         while (!isUndoStackEmpty())
@@ -2729,9 +2598,6 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#defaultCursor()
-     */
     public void defaultCursor()
     {
         if (board != null)
@@ -2740,9 +2606,6 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#waitCursor()
-     */
     public void waitCursor()
     {
         if (board != null)
@@ -2751,9 +2614,6 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#doCleanupGUI()
-     */
     public void doCleanupGUI()
     {
         if (SwingUtilities.isEventDispatchThread())

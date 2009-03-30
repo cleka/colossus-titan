@@ -16,6 +16,7 @@ import net.sf.colossus.client.Client;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.HTMLColor;
+import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 
 
@@ -25,7 +26,7 @@ import net.sf.colossus.variant.CreatureType;
  *
  * TODO this is a pretty wild mixture of GUI code with game logic -- there
  * is no representation of the creature in battle in the model, so this GUI
- * class does all that work, too.
+ * class does all that work, too. ==> move part of it into the game package
  *
  * @version $Id$
  * @author David Ripton
@@ -41,8 +42,8 @@ public final class BattleChit extends Chit
     private static Font oldFont;
     private static int fontHeight;
     private int hits = 0;
-    private String currentHexLabel;
-    private String startingHexLabel;
+    private BattleHex currentHex;
+    private BattleHex startingHex;
     private boolean moved;
     private boolean struck;
     private final Color color;
@@ -60,7 +61,7 @@ public final class BattleChit extends Chit
     private static boolean useColoredBorders = false;
 
     public BattleChit(int scale, String id, boolean inverted, int tag,
-        String currentHexLabel, PlayerColor playerColor, Client client)
+        BattleHex currentHex, PlayerColor playerColor, Client client)
     {
         super(scale, id, inverted);
         if (id == null)
@@ -69,7 +70,7 @@ public final class BattleChit extends Chit
         }
         this.scale = scale;
         this.tag = tag;
-        this.currentHexLabel = currentHexLabel;
+        this.currentHex = currentHex;
         this.client = client;
         this.color = HTMLColor.stringToColor(playerColor.getName() + "Colossus");
         setBackground(Color.WHITE);
@@ -106,33 +107,30 @@ public final class BattleChit extends Chit
         }
     }
 
-    public String getCurrentHexLabel()
+    public BattleHex getCurrentHex()
     {
-        return currentHexLabel;
+        return currentHex;
     }
 
-    public String getStartingHexLabel()
+    public BattleHex getStartingHex()
     {
-        return startingHexLabel;
+        return startingHex;
     }
 
-    public void setHexLabel(String hexLabel)
+    public void setHex(BattleHex hex)
     {
-        this.currentHexLabel = hexLabel;
+        this.currentHex = hex;
     }
 
-    void setCurrentHexLabel(String hexLabel)
+    void setCurrentHex(BattleHex hex)
     {
-        this.currentHexLabel = hexLabel;
+        this.currentHex = hex;
     }
 
-    public void moveToHex(String hexLabel)
+    public void moveToHex(BattleHex hex)
     {
-        if (!hexLabel.equals(startingHexLabel))
-        {
-            startingHexLabel = currentHexLabel;
-        }
-        currentHexLabel = hexLabel;
+        startingHex = currentHex;
+        currentHex = hex;
     }
 
     // TODO make package private
@@ -333,7 +331,7 @@ public final class BattleChit extends Chit
 
     public String getDescription()
     {
-        return getCreatureName() + " in " + getCurrentHexLabel();
+        return getCreatureName() + " in " + getCurrentHex().getLabel();
     }
 
     @Override

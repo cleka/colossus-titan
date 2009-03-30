@@ -194,22 +194,22 @@ abstract public class AbstractAI implements AI
      * Return a map of target hex label to number
      * of friendly creatures that can strike it
      */
-    final protected Map<String, Integer> findStrikeMap()
+    final protected Map<BattleHex, Integer> findStrikeMap()
     {
-        Map<String, Integer> map = new HashMap<String, Integer>();
+        Map<BattleHex, Integer> map = new HashMap<BattleHex, Integer>();
         for (BattleChit critter : client.getActiveBattleChits())
         {
-            Set<String> targets = client.findStrikes(critter.getTag());
-            for (String hexLabel : targets)
+            Set<BattleHex> targets = client.findStrikes(critter.getTag());
+            for (BattleHex targetHex : targets)
             {
-                Integer old = map.get(hexLabel);
+                Integer old = map.get(targetHex);
                 if (old == null)
                 {
-                    map.put(hexLabel, Integer.valueOf(1));
+                    map.put(targetHex, Integer.valueOf(1));
                 }
                 else
                 {
-                    map.put(hexLabel, Integer.valueOf(old.intValue() + 1));
+                    map.put(targetHex, Integer.valueOf(old.intValue() + 1));
                 }
             }
         }
@@ -226,14 +226,14 @@ abstract public class AbstractAI implements AI
         for (BattleChit critter : client.getActiveBattleChits())
         {
             // Offboard critters can't strike.
-            if (critter.getCurrentHexLabel().startsWith("X"))
+            if (critter.getCurrentHex().getLabel().startsWith("X"))
             {
                 continue;
             }
-            Set<String> set = client.findStrikes(critter.getTag());
-            for (String hexLabel : set)
+            Set<BattleHex> set = client.findStrikes(critter.getTag());
+            for (BattleHex targetHex: set)
             {
-                BattleChit target = client.getBattleChit(hexLabel);
+                BattleChit target = client.getBattleChit(targetHex);
                 int dice = client.getStrike().getDice(critter, target);
                 int strikeNumber = client.getStrike().getStrikeNumber(critter,
                     target);
@@ -512,7 +512,7 @@ abstract public class AbstractAI implements AI
         int range = Constants.BIGNUM;
         for (BattleChit critter : client.getInactiveBattleChits())
         {
-            BattleHex hex2 = client.getBattleHex(critter);
+            BattleHex hex2 = critter.getCurrentHex();
             int r = Battle.getRange(hex, hex2, false);
             if (r < range)
                 range = r;
@@ -558,7 +558,7 @@ abstract public class AbstractAI implements AI
      * I assume the reason it is a class variable and not a local variable
      * inside the function is performance (avoiding creation/recreation).
      */
-    final private Set<String> duplicateHexChecker = new HashSet<String>();
+    final private Set<BattleHex> duplicateHexChecker = new HashSet<BattleHex>();
 
     /** Private helper for generateLegionMoves
      *  If forceAll is true, generate all possible moves. Otherwise,
@@ -588,18 +588,18 @@ abstract public class AbstractAI implements AI
                     return;
                 }
                 CritterMove cm = moveList.get(indexes[j]);
-                String endingHexLabel = cm.getEndingHexLabel();
-                if (endingHexLabel.startsWith("X"))
+                BattleHex endingHex = cm.getEndingHex();
+                if (endingHex.getLabel().startsWith("X"))
                 {
                     offboard = true;
                 }
-                else if (duplicateHexChecker.contains(endingHexLabel))
+                else if (duplicateHexChecker.contains(endingHex))
                 {
                     // Need to allow duplicate offboard moves, in case 2 or
                     // more creatures cannot enter.
                     return;
                 }
-                duplicateHexChecker.add(cm.getEndingHexLabel());
+                duplicateHexChecker.add(cm.getEndingHex());
             }
 
             LegionMove lm = makeLegionMove(indexes, critterMoves);
@@ -674,11 +674,11 @@ abstract public class AbstractAI implements AI
     final protected boolean trimCritterMoves(
         List<List<CritterMove>> allCritterMoves)
     {
-        Set<String> takenHexLabels = new HashSet<String>(); // XXX reuse?
+        Set<BattleHex> takenHexes = new HashSet<BattleHex>(); // XXX reuse?
         boolean changed = false;
 
         // First trim immobile creatures from the list, and add their
-        // hexes to takenHexLabels.
+        // hexes to takenHexes.
         Iterator<List<CritterMove>> it = allCritterMoves.iterator();
         while (it.hasNext())
         {
@@ -687,7 +687,7 @@ abstract public class AbstractAI implements AI
             {
                 // This critter is not mobile, and its hex is taken.
                 CritterMove cm = moveList.get(0);
-                takenHexLabels.add(cm.getStartingHexLabel());
+                takenHexes.add(cm.getStartingHex());
                 it.remove();
                 changed = true;
             }
@@ -700,7 +700,7 @@ abstract public class AbstractAI implements AI
             List<CritterMove> moveList = it.next();
             for (CritterMove cm : moveList)
             {
-                if (takenHexLabels.contains(cm.getEndingHexLabel()))
+                if (takenHexes.contains(cm.getEndingHex()))
                 {
                     it.remove();
                     changed = true;

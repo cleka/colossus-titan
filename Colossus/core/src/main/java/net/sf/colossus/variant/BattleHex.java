@@ -23,6 +23,7 @@ public class BattleHex extends Hex
     /** Valid elevations are 0, 1, and 2.  Also 3 for JDG Badlands. */
     private int elevation;
 
+    // TODO the hexsides could/should be an enum
     // Hexside terrain types are:
     // d, c, s, w, space
     // dune, cliff, slope, wall, no obstacle
@@ -123,6 +124,7 @@ public class BattleHex extends Hex
         }
     }
 
+    // TODO this probably should rather be HazardTerrain.getColor(int elevation)
     public Color getTerrainColor()
     {
         if (terrain.equals(HazardTerrain.PLAINS))

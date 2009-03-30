@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.gui.GUIBattleHex;
@@ -236,7 +237,12 @@ public class BuilderHexMap extends HexMap
             List<String> startList = parser.getStartList();
             if (startList != null)
             {
-                selectHexesByLabels(new HashSet<String>(startList));
+                Set<BattleHex> startHexes = new HashSet<BattleHex>();
+                for (String string : startList)
+                {
+                    startHexes.add(getHexByLabel(string));
+                }
+                selectHexes(startHexes);
             }
             setBasicName(parser.getTitle());
             setDisplayName(parser.getTitle());

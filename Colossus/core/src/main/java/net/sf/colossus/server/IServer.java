@@ -4,6 +4,7 @@ package net.sf.colossus.server;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.PlayerColor;
+import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.MasterHex;
 
 
@@ -42,13 +43,13 @@ public interface IServer
 
     public void fight(MasterHex hex);
 
-    public void doBattleMove(int tag, String hexLabel);
+    public void doBattleMove(int tag, BattleHex hex);
 
-    public void strike(int tag, String hexLabel);
+    public void strike(int tag, BattleHex hex);
 
-    public void applyCarries(String hexLabel);
+    public void applyCarries(BattleHex hex);
 
-    public void undoBattleMove(String hexLabel);
+    public void undoBattleMove(BattleHex hex);
 
     public void assignStrikePenalty(String prompt);
 

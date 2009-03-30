@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.client.CritterMove;
 import net.sf.colossus.util.DevRandom;
+import net.sf.colossus.variant.BattleHex;
 
 /**
  * On-the-fly generation of the Collection of all possible LegionMove.
@@ -268,13 +269,13 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
                         List<CritterMove> lj = daddy.allCritterMoves.get(j);
                         for (int k = 0; k < li.size(); k++)
                         {
-                            String a = li.get(k).getEndingHexLabel();
+                            BattleHex a = li.get(k).getEndingHex();
                             Set<Integer> s = new TreeSet<Integer>();
                             incomps[i][j][k] = s;
 
                             for (int l = 0; l < lj.size(); l++)
                             {
-                                String b = lj.get(l).getEndingHexLabel();
+                                BattleHex b = lj.get(l).getEndingHex();
                                 if (a.equals(b))
                                 {
                                     s.add(l);

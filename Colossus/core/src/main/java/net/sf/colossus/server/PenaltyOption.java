@@ -3,10 +3,11 @@ package net.sf.colossus.server;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import net.sf.colossus.variant.BattleHex;
 
 
 /**
@@ -22,7 +23,7 @@ final class PenaltyOption implements Comparable<PenaltyOption>
 
     private final CreatureServerSide striker;
     private final CreatureServerSide target;
-    private final Set<String> carryTargets = new HashSet<String>(); // of hexLabels
+    private final Set<BattleHex> carryTargets = new HashSet<BattleHex>();
     private final int dice;
     private final int strikeNumber;
 
@@ -60,19 +61,17 @@ final class PenaltyOption implements Comparable<PenaltyOption>
         return strikeNumber;
     }
 
-    /** Add a hexLabel String to carry targets list. */
-    void addCarryTarget(String carryTarget)
+    void addCarryTarget(BattleHex carryTarget)
     {
         carryTargets.add(carryTarget);
     }
 
-    /** Add all hexLabel Strings in Set to carry targets list. */
-    void addCarryTargets(Set<String> targets)
+    void addCarryTargets(Set<BattleHex> targets)
     {
         carryTargets.addAll(targets);
     }
 
-    Set<String> getCarryTargets()
+    Set<BattleHex> getCarryTargets()
     {
         return Collections.unmodifiableSet(carryTargets);
     }
@@ -149,18 +148,16 @@ final class PenaltyOption implements Comparable<PenaltyOption>
         if (!carryTargets.isEmpty())
         {
             sb.append(", able to carry to ");
-            Iterator<String> it = carryTargets.iterator();
             boolean first = true;
-            while (it.hasNext())
+            for (BattleHex hex : carryTargets)
             {
                 if (!first)
                 {
                     sb.append(", ");
                 }
                 first = false;
-                String hexLabel = it.next();
                 CreatureServerSide critter = striker.getBattle().getCritter(
-                    hexLabel);
+                    hex);
                 sb.append(critter.getDescription());
             }
         }

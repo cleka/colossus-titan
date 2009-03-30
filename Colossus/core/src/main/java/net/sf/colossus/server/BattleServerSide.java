@@ -65,11 +65,9 @@ public final class BattleServerSide extends Battle
     private boolean driftDamageApplied = false;
 
     /**
-     * Set of hexLabels for valid carry targets
-     *
-     * TODO storing the hexes themselves would be better
+     * Set of hexes for valid carry targets
      */
-    private final Set<String> carryTargets = new HashSet<String>();
+    private final Set<BattleHex> carryTargets = new HashSet<BattleHex>();
     private final PhaseAdvancer phaseAdvancer = new BattlePhaseAdvancer();
     private int pointsScored = 0;
 
@@ -77,7 +75,7 @@ public final class BattleServerSide extends Battle
         LegionTags activeLegionTag, MasterHex masterHex,
         int turnNumber, BattlePhase phase)
     {
-        super(game, attacker, defender, null);
+        super(game, attacker, defender, masterHex.getTerrain());
         server = game.getServer();
         this.masterHex = masterHex;
         this.activeLegionTag = activeLegionTag;
@@ -500,11 +498,11 @@ public final class BattleServerSide extends Battle
      *  for all legal destinations.  Do not double back.  If ignoreMobileAllies
      *  is true, pretend that allied creatures that can move out of the
      *  way are not there. */
-    private Set<String> findMoves(BattleHex hex, CreatureServerSide critter,
+    private Set<BattleHex> findMoves(BattleHex hex, CreatureServerSide critter,
         boolean flies, int movesLeft, int cameFrom,
         boolean ignoreMobileAllies, boolean first)
     {
-        Set<String> set = new HashSet<String>();
+        Set<BattleHex> set = new HashSet<BattleHex>();
         for (int i = 0; i < 6; i++)
         {
             // Do not double back.
@@ -537,7 +535,7 @@ public final class BattleServerSide extends Battle
                             .getOption(Options.oneHexAllowed))))
                     {
                         // Mark that hex as a legal move.
-                        set.add(neighbor.getLabel());
+                        set.add(neighbor);
 
                         // If there are movement points remaining, continue
                         // checking moves from there.  Fliers skip this
@@ -569,31 +567,30 @@ public final class BattleServerSide extends Battle
      *  Startlisted Terrain,
      *  so we know that there are no enemies on board, and all allies
      *  are mobile.
-     *
-     * TODO same as {@link BattleMovement#findUnoccupiedStartlistHexes()}.
      */
-    private Set<String> findUnoccupiedStartlistHexes(
+    private Set<BattleHex> findUnoccupiedStartlistHexes(
         boolean ignoreMobileAllies, MasterBoardTerrain terrain)
     {
         assert terrain != null;
-        Set<String> set = new HashSet<String>();
+        Set<BattleHex> set = new HashSet<BattleHex>();
         for (String hexLabel : terrain.getStartList())
         {
             BattleHex hex = HexMap.getHexByLabel(terrain, hexLabel);
             if (ignoreMobileAllies || !isOccupied(hex))
             {
-                set.add(hex.getLabel());
+                set.add(hex);
             }
         }
         return set;
     }
 
-    /** Find all legal moves for this critter. The returned list
-     *  contains hex IDs, not hexes. */
-    private Set<String> showMoves(CreatureServerSide critter,
+    /** 
+     * Find all legal moves for this critter.
+     */
+    private Set<BattleHex> showMoves(CreatureServerSide critter,
         boolean ignoreMobileAllies)
     {
-        Set<String> set = new HashSet<String>();
+        Set<BattleHex> set = new HashSet<BattleHex>();
         if (!critter.hasMoved() && !critter.isInContact(false))
         {
             if (masterHex.getTerrain().hasStartList() && (turnNumber == 1)
@@ -612,9 +609,9 @@ public final class BattleServerSide extends Battle
         return set;
     }
 
-    void undoMove(String hexLabel)
+    void undoMove(BattleHex hex)
     {
-        CreatureServerSide critter = getCritter(hexLabel);
+        CreatureServerSide critter = getCritter(hex);
         if (critter != null)
         {
             critter.undoMove();
@@ -622,7 +619,7 @@ public final class BattleServerSide extends Battle
         else
         {
             LOGGER.log(Level.SEVERE, "Undo move error: no critter in "
-                + hexLabel);
+                + hex.getLabel());
         }
     }
 
@@ -1055,8 +1052,8 @@ public final class BattleServerSide extends Battle
         return set;
     }
 
-    /** Return the set of hex labels for hexes with valid carry targets. */
-    Set<String> getCarryTargets()
+    /** Return the set of hexes with valid carry targets. */
+    Set<BattleHex> getCarryTargets()
     {
         return Collections.unmodifiableSet(carryTargets);
     }
@@ -1064,11 +1061,9 @@ public final class BattleServerSide extends Battle
     Set<String> getCarryTargetDescriptions()
     {
         Set<String> set = new HashSet<String>();
-        Iterator<String> it = getCarryTargets().iterator();
-        while (it.hasNext())
+        for (BattleHex hex : getCarryTargets())
         {
-            String hexLabel = it.next();
-            CreatureServerSide critter = getCritter(hexLabel);
+            CreatureServerSide critter = getCritter(hex);
             set.add(critter.getDescription());
         }
         return set;
@@ -1079,20 +1074,20 @@ public final class BattleServerSide extends Battle
         carryTargets.clear();
     }
 
-    void setCarryTargets(Set<String> carryTargets)
+    void setCarryTargets(Set<BattleHex> carryTargets)
     {
         this.carryTargets.clear();
         this.carryTargets.addAll(carryTargets);
     }
 
-    void addCarryTarget(String hexLabel)
+    void addCarryTarget(BattleHex hex)
     {
-        carryTargets.add(hexLabel);
+        carryTargets.add(hex);
     }
 
     void applyCarries(CreatureServerSide target)
     {
-        if (!carryTargets.contains(target.getCurrentHex().getLabel()))
+        if (!carryTargets.contains(target.getCurrentHex()))
         {
             LOGGER.log(Level.WARNING, "Tried illegal carry to "
                 + target.getDescription());
@@ -1101,7 +1096,7 @@ public final class BattleServerSide extends Battle
         int dealt = carryDamage;
         carryDamage = target.wound(carryDamage);
         dealt -= carryDamage;
-        carryTargets.remove(target.getCurrentHex().getLabel());
+        carryTargets.remove(target.getCurrentHex());
 
         LOGGER.log(Level.INFO, dealt
             + (dealt == 1 ? " hit carries to " : " hits carry to ")
@@ -1118,7 +1113,7 @@ public final class BattleServerSide extends Battle
                     : " carries available"));
         }
         server.allTellCarryResults(target, dealt, carryDamage,
-            getCarryTargets());
+            getCarryTargetDescriptions());
     }
 
     /** Return the number of intervening bramble hexes.  If LOS is along a
@@ -1229,14 +1224,12 @@ public final class BattleServerSide extends Battle
     }
 
     /** If legal, move critter to hex and return true. Else return false. */
-    boolean doMove(int tag, String hexLabel)
+    boolean doMove(int tag, BattleHex hex)
     {
         CreatureServerSide critter = getActiveLegion().getCritterByTag(tag);
-        BattleHex hex = BattleMap.getHexByLabel(masterHex.getTerrain(),
-            hexLabel);
         if (critter == null)
         {
-            return false;
+            return false; // TODO shouldn't this be an error?
         }
 
         // Allow null moves.
@@ -1248,10 +1241,10 @@ public final class BattleServerSide extends Battle
             critter.moveToHex(hex, true);
             return true;
         }
-        else if (showMoves(critter, false).contains(hexLabel))
+        else if (showMoves(critter, false).contains(hex))
         {
             LOGGER.log(Level.INFO, critter.getName() + " moves from "
-                + critter.getCurrentHex().getLabel() + " to " + hexLabel);
+                + critter.getCurrentHex().getLabel() + " to " + hex.getLabel());
             critter.moveToHex(hex, true);
             return true;
         }
@@ -1261,7 +1254,7 @@ public final class BattleServerSide extends Battle
             String markerId = legion.getMarkerId();
             LOGGER.log(Level.WARNING, critter.getName() + " in "
                 + critter.getCurrentHex().getLabel()
-                + " tried to illegally move to " + hexLabel + " in "
+                + " tried to illegally move to " + hex.getLabel() + " in "
                 + masterHex.getTerrain() + " (" + getAttacker().getMarkerId()
                 + " attacking " + getDefender().getMarkerId() + ", active: "
                 + markerId + ")");
@@ -1310,20 +1303,13 @@ public final class BattleServerSide extends Battle
 
     CreatureServerSide getCritter(BattleHex hex)
     {
-        return getCritter(hex.getLabel());
-    }
-
-    CreatureServerSide getCritter(String hexLabel)
-    {
-        Iterator<CreatureServerSide> it = getAllCritters().iterator();
-        while (it.hasNext())
-        {
-            CreatureServerSide critter = it.next();
-            if (hexLabel.equals(critter.getCurrentHex().getLabel()))
-            {
-                return critter;
+        assert hex != null;
+        for(CreatureServerSide creature: getAllCritters()) {
+            if(hex.equals(creature.getCurrentHex())) {
+                return creature;
             }
         }
+        // TODO check if this is feasible, otherwise assert false here
         return null;
     }
 }

@@ -39,18 +39,15 @@ public final class Strike
         this.client = client;
     }
 
-    /** Return the set of hex labels for hexes with critters that have
+    /** Return the set of hexes with critters that have
      *  valid strike targets. */
-    Set<String> findCrittersWithTargets()
+    Set<BattleHex> findCrittersWithTargets()
     {
-        Set<String> set = new HashSet<String>();
-        Iterator<BattleChit> it = client.getActiveBattleChits().iterator();
-        while (it.hasNext())
-        {
-            BattleChit chit = it.next();
+        Set<BattleHex> set = new HashSet<BattleHex>();
+        for(BattleChit chit : client.getActiveBattleChits()) {
             if (countStrikes(chit, true) > 0)
             {
-                set.add(chit.getCurrentHexLabel());
+                set.add(chit.getCurrentHex());
             }
         }
 
@@ -83,11 +80,11 @@ public final class Strike
             BattleChit chit = it.next();
             if (!chit.hasStruck())
             {
-                Set<String> set = findStrikes(chit, rangestrike);
+                Set<BattleHex> set = findStrikes(chit, rangestrike);
                 if (set.size() == 1)
                 {
-                    String hexLabel = (set.iterator().next());
-                    client.strike(chit.getTag(), hexLabel);
+                    BattleHex hex = set.iterator().next();
+                    client.strike(chit.getTag(), hex);
                     return true;
                 }
             }
@@ -97,22 +94,22 @@ public final class Strike
 
     public boolean canStrike(BattleChit striker, BattleChit target)
     {
-        String targetHexLabel = target.getCurrentHexLabel();
-        return findStrikes(striker, true).contains(targetHexLabel);
+        BattleHex targetHex = target.getCurrentHex();
+        return findStrikes(striker, true).contains(targetHex);
     }
 
-    Set<String> findStrikes(int tag)
+    Set<BattleHex> findStrikes(int tag)
     {
         BattleChit chit = client.getBattleChit(tag);
         return findStrikes(chit, true);
     }
 
-    /** Return a set of hex labels for hexes containing targets that the
+    /** Return a set of hexes containing targets that the
      *  critter may strike.  Only include rangestrikes if rangestrike
      *  is true. */
-    private Set<String> findStrikes(BattleChit chit, boolean rangestrike)
+    private Set<BattleHex> findStrikes(BattleChit chit, boolean rangestrike)
     {
-        Set<String> set = new HashSet<String>();
+        Set<BattleHex> set = new HashSet<BattleHex>();
 
         // Each creature may strike only once per turn.
         if (chit.hasStruck())
@@ -120,13 +117,13 @@ public final class Strike
             return set;
         }
         // Offboard creatures can't strike.
-        if (chit.getCurrentHexLabel().startsWith("X"))
+        if (chit.getCurrentHex().getLabel().startsWith("X"))
         {
             return set;
         }
 
         boolean inverted = chit.isInverted();
-        BattleHex currentHex = client.getBattleHex(chit);
+        BattleHex currentHex = chit.getCurrentHex();
 
         boolean adjacentEnemy = false;
 
@@ -140,14 +137,13 @@ public final class Strike
                 if (targetHex != null && client.isOccupied(targetHex)
                     && !targetHex.isEntrance())
                 {
-                    BattleChit target = client.getBattleChit(targetHex
-                        .getLabel());
+                    BattleChit target = client.getBattleChit(targetHex);
                     if (target.isInverted() != inverted)
                     {
                         adjacentEnemy = true;
                         if (!target.isDead())
                         {
-                            set.add(targetHex.getLabel());
+                            set.add(targetHex);
                         }
                     }
                 }
@@ -170,10 +166,10 @@ public final class Strike
                 BattleChit target = it.next();
                 if (!target.isDead())
                 {
-                    BattleHex targetHex = client.getBattleHex(target);
+                    BattleHex targetHex = target.getCurrentHex();
                     if (isRangestrikePossible(chit, target))
                     {
-                        set.add(targetHex.getLabel());
+                        set.add(targetHex);
                     }
                 }
             }
@@ -195,7 +191,7 @@ public final class Strike
     @Deprecated
     public int minRangeToEnemy(BattleChit chit)
     {
-        BattleHex hex = client.getBattleHex(chit);
+        BattleHex hex = chit.getCurrentHex();
         int min = Constants.OUT_OF_RANGE;
 
         List<BattleChit> battleChits = client.getBattleChits();
@@ -205,7 +201,7 @@ public final class Strike
             BattleChit target = it.next();
             if (chit.isInverted() != target.isInverted())
             {
-                BattleHex targetHex = client.getBattleHex(target);
+                BattleHex targetHex = target.getCurrentHex();
                 int range = Battle.getRange(hex, targetHex, false);
                 // Exit early if adjacent.
                 if (range == 2)
@@ -489,8 +485,8 @@ public final class Strike
         CreatureType targetCreature = client.getGame().getVariant()
             .getCreatureByName(target.getCreatureName());
 
-        BattleHex currentHex = client.getBattleHex(chit);
-        BattleHex targetHex = client.getBattleHex(target);
+        BattleHex currentHex = chit.getCurrentHex();
+        BattleHex targetHex = target.getCurrentHex();
 
         if (currentHex.isEntrance() || targetHex.isEntrance())
         {
@@ -789,8 +785,8 @@ public final class Strike
      */
     public int getDice(BattleChit chit, BattleChit target)
     {
-        BattleHex hex = client.getBattleHex(chit);
-        BattleHex targetHex = client.getBattleHex(target);
+        BattleHex hex = chit.getCurrentHex();
+        BattleHex targetHex = target.getCurrentHex();
         CreatureType striker = client.getGame().getVariant()
             .getCreatureByName(chit.getCreatureName());
 
@@ -856,8 +852,8 @@ public final class Strike
     /** WARNING: this is duplicated in CreatureServerSide */
     private int getAttackerSkill(BattleChit striker, BattleChit target)
     {
-        BattleHex hex = client.getBattleHex(striker);
-        BattleHex targetHex = client.getBattleHex(target);
+        BattleHex hex = striker.getCurrentHex();
+        BattleHex targetHex = target.getCurrentHex();
 
         int attackerSkill = striker.getSkill();
 
@@ -946,7 +942,7 @@ public final class Strike
 
         int strikeNumber = 4 - attackerSkill + defenderSkill;
 
-        HazardTerrain terrain = client.getBattleHex(target).getTerrain();
+        HazardTerrain terrain = target.getCurrentHex().getTerrain();
 
         if (!rangestrike)
         {
