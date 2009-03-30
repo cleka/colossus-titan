@@ -39,11 +39,11 @@ import javax.swing.border.TitledBorder;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.IOptions;
 import net.sf.colossus.client.LegionClientSide;
+import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.guiutil.KDialog;
 import net.sf.colossus.guiutil.SaveWindow;
-import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.Options;
 
 

@@ -17,12 +17,12 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
-import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.IServer;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.InstanceTracker;

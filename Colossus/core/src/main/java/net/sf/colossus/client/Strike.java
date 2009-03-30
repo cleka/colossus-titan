@@ -8,10 +8,10 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.Battle;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.gui.BattleChit;
-import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.CompareDoubles;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;

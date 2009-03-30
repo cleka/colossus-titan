@@ -22,6 +22,7 @@ import javax.swing.text.StyledDocument;
 
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.client.LegionClientSide;
+import net.sf.colossus.common.Constants;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterBoard;

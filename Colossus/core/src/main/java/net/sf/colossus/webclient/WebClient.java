@@ -55,8 +55,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import net.sf.colossus.client.Client;
+import net.sf.colossus.common.Constants;
 import net.sf.colossus.guiutil.KFrame;
-import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.GetPlayers;
 import net.sf.colossus.server.Server;
 import net.sf.colossus.server.Start;

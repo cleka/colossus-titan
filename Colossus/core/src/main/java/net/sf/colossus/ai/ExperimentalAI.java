@@ -8,10 +8,10 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.CritterMove;
+import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.Battle;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.gui.BattleChit;
-import net.sf.colossus.server.Constants;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.MasterBoardTerrain;
 

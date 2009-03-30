@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.gui.Marker;
-import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;

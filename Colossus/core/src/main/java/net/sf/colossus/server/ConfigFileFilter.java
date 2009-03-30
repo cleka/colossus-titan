@@ -4,6 +4,8 @@ package net.sf.colossus.server;
 import java.io.File;
 import java.io.FilenameFilter;
 
+import net.sf.colossus.common.Constants;
+
 
 /**
  * Class ConfigFileFilter implements a FilenameFilter for cfg files.

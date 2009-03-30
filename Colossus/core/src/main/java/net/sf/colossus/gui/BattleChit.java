@@ -13,8 +13,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.Client;
+import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.PlayerColor;
-import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;

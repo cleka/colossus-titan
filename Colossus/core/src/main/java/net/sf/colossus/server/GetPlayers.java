@@ -42,6 +42,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.text.Document;
 
+import net.sf.colossus.common.Constants;
 import net.sf.colossus.gui.PickIntValue;
 import net.sf.colossus.gui.ShowReadme;
 import net.sf.colossus.guiutil.KFrame;

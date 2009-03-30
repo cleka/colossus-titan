@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 
 import junit.framework.TestCase;
+import net.sf.colossus.common.Constants;
 import net.sf.colossus.util.Options;
 
 

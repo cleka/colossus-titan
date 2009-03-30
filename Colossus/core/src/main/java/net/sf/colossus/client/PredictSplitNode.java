@@ -8,8 +8,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.Legion;
-import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.Combos;
 import net.sf.colossus.variant.CreatureType;

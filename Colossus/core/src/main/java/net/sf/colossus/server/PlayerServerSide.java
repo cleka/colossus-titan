@@ -8,6 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.PlayerClientSide;
+import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;

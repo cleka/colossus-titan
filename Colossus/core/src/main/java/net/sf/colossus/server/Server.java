@@ -26,6 +26,7 @@ import javax.swing.JOptionPane;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.IClient;
+import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Phase;

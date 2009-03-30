@@ -15,7 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.IOptions;
-import net.sf.colossus.server.Constants;
+import net.sf.colossus.common.Constants;
 
 
 /** Class Options lists game options for Colossus.

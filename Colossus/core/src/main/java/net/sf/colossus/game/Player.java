@@ -9,7 +9,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import net.sf.colossus.client.MarkerComparator;
-import net.sf.colossus.server.Constants;
+import net.sf.colossus.common.Constants;
 import net.sf.colossus.server.PlayerServerSide;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;

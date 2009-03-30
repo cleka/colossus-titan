@@ -5,7 +5,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.server.Constants;
+import net.sf.colossus.common.Constants;
 import net.sf.colossus.server.PlayerServerSide;
 
 

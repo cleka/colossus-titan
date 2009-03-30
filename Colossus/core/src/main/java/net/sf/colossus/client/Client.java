@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.ai.AI;
 import net.sf.colossus.ai.SimpleAI;
+import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.EntrySide;
@@ -38,7 +39,6 @@ import net.sf.colossus.gui.IClientGUI;
 import net.sf.colossus.gui.Marker;
 import net.sf.colossus.gui.NullClientGUI;
 import net.sf.colossus.gui.Scale;
-import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.server.Dice;
 import net.sf.colossus.server.GameServerSide;

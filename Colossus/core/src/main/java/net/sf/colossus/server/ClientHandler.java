@@ -17,6 +17,7 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.client.IClient;
+import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;

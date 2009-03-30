@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import net.sf.colossus.client.LegionClientSide;
-import net.sf.colossus.server.Constants;
+import net.sf.colossus.common.Constants;
 import net.sf.colossus.server.HintInterface;
 import net.sf.colossus.server.HintOracleInterface;
 import net.sf.colossus.util.DevRandom;

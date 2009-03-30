@@ -4,7 +4,7 @@ package net.sf.colossus.gui;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.server.Constants;
+import net.sf.colossus.common.Constants;
 
 
 /**

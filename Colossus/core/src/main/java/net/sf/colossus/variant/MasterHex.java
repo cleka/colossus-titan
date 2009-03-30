@@ -3,7 +3,7 @@ package net.sf.colossus.variant;
 
 import java.awt.Color;
 
-import net.sf.colossus.server.Constants;
+import net.sf.colossus.common.Constants;
 
 
 /**

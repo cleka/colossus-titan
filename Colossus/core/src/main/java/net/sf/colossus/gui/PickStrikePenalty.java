@@ -14,9 +14,9 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 
 import net.sf.colossus.client.Client;
+import net.sf.colossus.common.Constants;
 import net.sf.colossus.guiutil.KDialog;
 import net.sf.colossus.guiutil.SaveWindow;
-import net.sf.colossus.server.Constants;
 
 
 /** Chooses between multiple strike penalty options.
