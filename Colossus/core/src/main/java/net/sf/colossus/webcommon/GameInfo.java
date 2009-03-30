@@ -526,19 +526,16 @@ public class GameInfo
         return reason;
     }
 
-    // TODO moved to GameClientSide ?
-    
-    public void createStartLocallyOptionsObject(Options gameOptions,
-        String localPlayer)
+   
+    public void storeToOptionsObject(Options gameOptions,
+        String localPlayerName)
     {
-        // FIXME boolean continueHere;
 
-        // xxx get port from gameinfo
+        // XXX get port from gameinfo
         gameOptions.setOption(Options.serveAtPort, Constants.defaultPort);
 
-        // xxx get host from gameinfo
-        // xxxxx set host in gameinfo, send to server/client
-        //gameOptions.setOption(Options.serveAtPort, Constants.defaultPort);
+        // XXX get host from gameinfo
+        // XXX set host in gameinfo, send to server/client
         
         gameOptions.setOption(Options.variant, getVariant());
         gameOptions.setOption(Options.viewMode, getViewmode());
@@ -547,7 +544,8 @@ public class GameInfo
         gameOptions.setOption(Options.unlimitedMulligans,
             getUnlimitedMulligans());
         gameOptions.setOption(Options.balancedTowers, getBalancedTowers());
-
+     
+                
         // gameOptions.setOption(Options.autoQuit, true);
         String name;
         String type;
@@ -560,7 +558,8 @@ public class GameInfo
                 User u = it.next();
 
                 name = u.getName();
-                if (name.equals(localPlayer))
+                if (localPlayerName != null 
+                    && name.equals(localPlayerName))
                 {
                     type = Constants.human;
                     // use user real name;

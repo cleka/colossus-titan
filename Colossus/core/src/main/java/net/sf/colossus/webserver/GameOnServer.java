@@ -48,8 +48,6 @@ public class GameOnServer extends Thread
     private String colossusJar;
 
     private int AIplayers = 0;
-    private final boolean autoSave = true;
-
     
     private File flagFile;
 
@@ -92,6 +90,8 @@ public class GameOnServer extends Thread
     public void run()
     {
         // TODO FIXME  This still needs to be done...!!!
+        System.out.println("GOS.run() here ...");
+        runInOwnJVM();
     }
     
     // used when cancelling: set to null and then start(),
@@ -106,7 +106,7 @@ public class GameOnServer extends Thread
     }
 
     
-    public void run_on_server()
+    public void runInOwnJVM()
     {
         File gameDir = new File(workFilesBaseDir, gameId);
         gameDir.mkdirs();
@@ -124,6 +124,8 @@ public class GameOnServer extends Thread
         boolean propFileOk = createLoggingPropertiesFromTemplate(
             logPropTemplate, logPropFile);
 
+        // Stores data from GameInfo into an options object and saves
+        // the options to file on disk in the special game directory.
         createServerCfgFile(gameDir);
 
         Runtime rt = Runtime.getRuntime();
@@ -133,8 +135,7 @@ public class GameOnServer extends Thread
             : "";
 
         String command = javaCommand + " " + loggingFileArg + " -Duser.home="
-            + gameDir + " -jar " + colossusJar + " -p " + hostingPort + " -n "
-            + gi.getEnrolledCount()+ " -i " + this.AIplayers
+            + gameDir + " -jar " + colossusJar + " -p " + hostingPort 
             + " -g --flagfile " + fileName;
 
         try
@@ -166,17 +167,12 @@ public class GameOnServer extends Thread
         Options gameOptions = new Options("server", gameDirPath
             + "/.colossus/", false);
 
-        gameOptions.setOption(Options.variant, gi.getVariant());
-        gameOptions.setOption(Options.viewMode, gi.getViewmode());
-        gameOptions.setOption(Options.autosave, this.autoSave);
-        gameOptions.setOption(Options.eventExpiring, gi.getEventExpiring());
-        gameOptions.setOption(Options.unlimitedMulligans,
-            gi.getUnlimitedMulligans());
-        gameOptions.setOption(Options.balancedTowers, gi.getBalancedTowers());
-
+        // No local player if run on Webserver...
+        String localPlayerName = null;
+        gi.storeToOptionsObject(gameOptions, localPlayerName);
+        
         gameOptions.setOption(Options.autoQuit, true);
-        gameOptions.setOption(Options.autoStop, true);
-
+        
         gameOptions.saveOptions();
 
         return ok;
