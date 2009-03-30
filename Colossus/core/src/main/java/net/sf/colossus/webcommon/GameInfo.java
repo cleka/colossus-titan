@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.Options;
-import net.sf.colossus.webserver.GameOnServer;
+import net.sf.colossus.webserver.RunGameInOwnJVM;
 
 
 /** One object of this this class represents a game for which players/users
@@ -46,7 +46,7 @@ public class GameInfo
     
     // TODO: also needed for GameOnClient ?
     // The GameOnServer object that will run/supervise this game:
-    private GameOnServer gameOnServer = null;
+    private RunGameInOwnJVM gameOnServer = null;
 
     private String initiator;
     private String variant;
@@ -248,12 +248,12 @@ public class GameInfo
         this.gameId = val;
     }
 
-    public void setGameOnServer(GameOnServer gos)
+    public void setGameOnServer(RunGameInOwnJVM gos)
     {
         this.gameOnServer = gos;
     }
 
-    public GameOnServer getGameOnServer()
+    public RunGameInOwnJVM getGameOnServer()
     {
         return gameOnServer;
     }
@@ -528,7 +528,7 @@ public class GameInfo
 
    
     public void storeToOptionsObject(Options gameOptions,
-        String localPlayerName)
+        String localPlayerName, boolean noAIs)
     {
 
         // XXX get port from gameinfo
@@ -551,7 +551,13 @@ public class GameInfo
         String type;
         Iterator<User> it = getPlayers().iterator();
 
-        for (int i = 0; i < getTarget(); i++)
+        int numPlayers = getTarget();
+        if (noAIs)
+        {
+            numPlayers = getPlayers().size();
+        }
+        
+        for (int i = 0; i < numPlayers; i++)
         {
             if (it.hasNext())
             {

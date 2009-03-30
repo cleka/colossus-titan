@@ -1981,7 +1981,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         GameInfo gi = findGameById(gameId);
 
         presetOptions = new Options("server", true);
-        gi.storeToOptionsObject(presetOptions, username);
+        gi.storeToOptionsObject(presetOptions, username, false);
 
         // starts a runnable which waits on a mutex until 
         // GetPlayersWeb dialog notifies the mutex;

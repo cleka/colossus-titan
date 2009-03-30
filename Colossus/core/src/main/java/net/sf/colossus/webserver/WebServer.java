@@ -588,7 +588,7 @@ public class WebServer implements IWebServer, IRunWebServer
     {
         GameInfo gi = findByGameId(gameId);
         
-        GameOnServer gos;
+        RunGameInOwnJVM gos;
         
         if (gi != null && (gos = gi.getGameOnServer()) != null)
         {
@@ -819,7 +819,7 @@ public class WebServer implements IWebServer, IRunWebServer
 
         LOGGER.log(Level.FINEST, "startOneGame, id " + gi.getGameId());
 
-        GameOnServer gos = new GameOnServer(this, options, gi);
+        RunGameInOwnJVM gos = new RunGameInOwnJVM(this, options, gi);
         boolean ok = gos.makeRunningGame();
 
         if (!ok)
@@ -1048,7 +1048,7 @@ public class WebServer implements IWebServer, IRunWebServer
                     while (it.hasNext())
                     {
                         GameInfo game = it.next();
-                        GameOnServer gos = game.getGameOnServer();
+                        RunGameInOwnJVM gos = game.getGameOnServer();
                         
                         String name = gos.getName();
                         LOGGER.log(Level.FINE, "REAPER: wait for '" + name

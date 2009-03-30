@@ -29,9 +29,9 @@ import net.sf.colossus.webcommon.IRunWebServer;
  *  ( or when game runs locally on a players computer and this here handles
  *    the rendezvous (tell the other players when and where to connect) )  
  */
-public class GameOnServer extends Thread
+public class RunGameInOwnJVM extends Thread
 {
-    private static final Logger LOGGER = Logger.getLogger(GameOnServer.class
+    private static final Logger LOGGER = Logger.getLogger(RunGameInOwnJVM.class
         .getName());
 
     private int hostingPort;
@@ -46,12 +46,10 @@ public class GameOnServer extends Thread
     private String template;
     private String javaCommand;
     private String colossusJar;
-
-    private int AIplayers = 0;
     
     private File flagFile;
 
-    public GameOnServer(IRunWebServer server, WebServerOptions options, GameInfo gi)
+    public RunGameInOwnJVM(IRunWebServer server, WebServerOptions options, GameInfo gi)
     {
         this.server = server;
         this.options = options;
@@ -85,15 +83,7 @@ public class GameOnServer extends Thread
     {
         return hostingHost;
     }
-    
-    @Override
-    public void run()
-    {
-        // TODO FIXME  This still needs to be done...!!!
-        System.out.println("GOS.run() here ...");
-        runInOwnJVM();
-    }
-    
+
     // used when cancelling: set to null and then start(),
     // then the run() method calls only the client dummy which is a 
     // do-nothing operation.
@@ -105,6 +95,13 @@ public class GameOnServer extends Thread
         this.server = null;
     }
 
+    @Override
+    public void run()
+    {
+        // TODO FIXME  This still needs to be done...!!!
+        System.out.println("GOS.run() here ...");
+        runInOwnJVM();
+    }
     
     public void runInOwnJVM()
     {
@@ -169,11 +166,57 @@ public class GameOnServer extends Thread
 
         // No local player if run on Webserver...
         String localPlayerName = null;
-        gi.storeToOptionsObject(gameOptions, localPlayerName);
+        boolean noAIs = true;
+        gi.storeToOptionsObject(gameOptions, localPlayerName, noAIs);
         
         gameOptions.setOption(Options.autoQuit, true);
         
         gameOptions.saveOptions();
+
+        return ok;
+    }
+
+    private boolean createLoggingPropertiesFromTemplate(File logPropTemplate,
+        File logPropFile)
+    {
+        boolean ok = true;
+        String patternLine = "java.util.logging.FileHandler.pattern=";
+        try
+        {
+            String line;
+            BufferedReader in = new BufferedReader(new InputStreamReader(
+                new FileInputStream(logPropTemplate)));
+
+            PrintWriter out = new PrintWriter(
+                new FileOutputStream(logPropFile));
+
+            while ((line = in.readLine()) != null)
+            {
+                if (line.startsWith(patternLine))
+                {
+                    // String dirSep = File.separator;
+                    // if there is no path, it seems it uses current working
+                    // directory.
+                    // When we put path there, we would have to hard-coded
+                    // replace the \ of a Windows directory to /'es,
+                    // because as it looks the java logger only accepts those,
+                    // and uses backslashes just as quote character...
+                    line = patternLine + "Colossus%g.log";
+                }
+                out.println(line);
+            }
+
+            in.close();
+            out.close();
+        }
+        catch (FileNotFoundException e)
+        {
+            ok = false;
+        }
+        catch (IOException e)
+        {
+            ok = false;
+        }
 
         return ok;
     }
@@ -266,51 +309,6 @@ public class GameOnServer extends Thread
         }
         LOGGER.info("Before unregister game " + gi.getGameId());
         server.unregisterGame(gi, hostingPort);
-    }
-
-    private boolean createLoggingPropertiesFromTemplate(File logPropTemplate,
-        File logPropFile)
-    {
-        boolean ok = true;
-        String patternLine = "java.util.logging.FileHandler.pattern=";
-        try
-        {
-            String line;
-            BufferedReader in = new BufferedReader(new InputStreamReader(
-                new FileInputStream(logPropTemplate)));
-
-            PrintWriter out = new PrintWriter(
-                new FileOutputStream(logPropFile));
-
-            while ((line = in.readLine()) != null)
-            {
-                if (line.startsWith(patternLine))
-                {
-                    // String dirSep = File.separator;
-                    // if there is no path, it seems it uses current working
-                    // directory.
-                    // When we put path there, we would have to hard-coded
-                    // replace the \ of a Windows directory to /'es,
-                    // because as it looks the java logger only accepts those,
-                    // and uses backslashes just as quote character...
-                    line = patternLine + "Colossus%g.log";
-                }
-                out.println(line);
-            }
-
-            in.close();
-            out.close();
-        }
-        catch (FileNotFoundException e)
-        {
-            ok = false;
-        }
-        catch (IOException e)
-        {
-            ok = false;
-        }
-
-        return ok;
     }
 
     /*
