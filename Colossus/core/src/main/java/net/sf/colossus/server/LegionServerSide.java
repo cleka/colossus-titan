@@ -33,10 +33,7 @@ public final class LegionServerSide extends Legion implements
     private static final Logger LOGGER = Logger
         .getLogger(LegionServerSide.class.getName());
 
-    /**
-     * TODO this should be a {@link Legion}
-     */
-    private final String parentId;
+    private final Legion parent;
 
     /**
      * The label of the starting hex of the last move.
@@ -59,18 +56,19 @@ public final class LegionServerSide extends Legion implements
      * TODO the game parameter should be redundant since it should be the same
      *      as player.getGame()
      */
-    public LegionServerSide(String markerId, String parentId,
+    public LegionServerSide(String markerId, Legion parent,
         MasterHex currentHex, MasterHex startingHex, Player player,
         GameServerSide game, CreatureType... creatureTypes)
     {
         super(player, markerId, currentHex);
         assert markerId != null : "MarkerId must not be null";
-        assert !markerId.equals(parentId) : "Parent can not have the same markerId as we have";
+        assert (parent == null) || !markerId.equals(parent.getMarkerId()) : 
+            "Parent can not have the same markerId as we have";
         assert startingHex != null : "Legion needs to start on some hex";
         assert game != null : "Legion needs to be part of some game";
         assert game == player.getGame() : "Legion needs to be part of the same game as its player";
 
-        this.parentId = parentId;
+        this.parent = parent;
         this.startingHex = startingHex;
         this.game = game;
 
@@ -236,14 +234,9 @@ public final class LegionServerSide extends Legion implements
         return getLongMarkerName(markerId);
     }
 
-    public String getParentId()
+    public Legion getParent()
     {
-        return parentId;
-    }
-
-    Legion getParent()
-    {
-        return getPlayer().getLegionByMarkerId(parentId);
+        return parent;
     }
 
     @Override
@@ -698,7 +691,7 @@ public final class LegionServerSide extends Legion implements
 
         player.selectMarkerId(newMarkerId);
         LegionServerSide newLegion = new LegionServerSide(newMarkerId,
-            markerId, getCurrentHex(), getCurrentHex(), getPlayer(), game);
+            this, getCurrentHex(), getCurrentHex(), getPlayer(), game);
 
         Iterator<CreatureType> it = creatures.iterator();
         while (it.hasNext())

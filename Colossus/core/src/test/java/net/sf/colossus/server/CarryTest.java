@@ -74,9 +74,9 @@ public class CarryTest extends TestCase
     {
         MasterHex hex = game.getVariant().getMasterBoard().getHexByLabel("35"); // Desert
 
-        attacker = new LegionServerSide("Rd03", "Rd01", hex, hex, red, game,
+        attacker = new LegionServerSide("Rd03", null, hex, hex, red, game,
             centaur, centaur, lion, colossus);
-        defender = new LegionServerSide("Bu03", "Bu01", hex, hex, blue, game,
+        defender = new LegionServerSide("Bu03", null, hex, hex, blue, game,
             hydra);
 
         game.getPlayer("Red").addLegion(attacker);
@@ -146,9 +146,9 @@ public class CarryTest extends TestCase
     {
         MasterHex hex = game.getVariant().getMasterBoard().getHexByLabel("1"); // Plains
 
-        attacker = new LegionServerSide("Rd03", "Rd01", hex, hex, red, game,
+        attacker = new LegionServerSide("Rd03", null, hex, hex, red, game,
             warlock, warlock, colossus);
-        defender = new LegionServerSide("Bu03", "Bu01", hex, hex, blue, game,
+        defender = new LegionServerSide("Bu03", null, hex, hex, blue, game,
             gargoyle, ogre, ogre);
 
         game.getPlayer("Red").addLegion(attacker);

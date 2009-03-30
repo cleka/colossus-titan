@@ -1498,7 +1498,7 @@ public final class GameServerSide extends Game
             entrySide = EntrySide.NOT_SET;
         }
         leg.setAttribute("entrySide", "" + entrySide.ordinal());
-        leg.setAttribute("parent", notnull(legion.getParentId()));
+        leg.setAttribute("parent", notnull(legion.getParent().getMarkerId()));
         leg.setAttribute("recruitName", notnull(legion.getRecruitName()));
         leg.setAttribute("battleTally", "" + legion.getBattleTally());
 
@@ -1886,7 +1886,8 @@ public final class GameServerSide extends Game
         {
             // TODO can there ever be a legion before? If not: collect all data
             // first (including critters) and then create the legion in one go
-            legion = new LegionServerSide(markerId, parentId, currentHex,
+            Legion parentLegion = player.getLegionByMarkerId(parentId);
+            legion = new LegionServerSide(markerId, parentLegion, currentHex,
                 startingHex, player, this);
             player.addLegion(legion);
         }

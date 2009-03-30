@@ -467,7 +467,7 @@ public final class ShowCreatureDetails extends KDialog
         SimulatedCritter(final CreatureType creature,
             final HazardTerrain hazard)
         {
-            super(creature, new LegionServerSide("dummy", "dummy", null, null,
+            super(creature, new LegionServerSide("dummy", null, null, null,
                 null, null), null);
             setNewHazardHex(hazard);
         }
