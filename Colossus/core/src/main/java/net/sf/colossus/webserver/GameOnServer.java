@@ -18,6 +18,17 @@ import net.sf.colossus.webcommon.GameInfo;
 import net.sf.colossus.webcommon.IRunWebServer;
 
 
+/**
+ *  This class runs (starts and supervises) a Game on the Game Server
+ *  (as opposed to: on the User's PC).
+ *  It finds and reserves a port for it, starts it in a separate process
+ *  and when the process terminates, join()s it and releases the port.
+ *  
+ *  If the game is run on a user's PC, the class for that needs still 
+ *  to be done...
+ *  ( or when game runs locally on a players computer and this here handles
+ *    the rendezvous (tell the other players when and where to connect) )  
+ */
 public class GameOnServer extends Thread
 {
     private static final Logger LOGGER = Logger.getLogger(GameOnServer.class
@@ -51,7 +62,6 @@ public class GameOnServer extends Thread
         gi.setGameOnServer(this);
     }
     
-    // ================= now the stuff for running the game on server side ===============
 
     public boolean makeRunningGame()
     {

@@ -12,14 +12,15 @@ import net.sf.colossus.util.Options;
 import net.sf.colossus.webserver.GameOnServer;
 
 
-/** One object of this this class represents one game run at the server, 
- *  starting from state "potential game", over when it is ready to start;
- *  then either 
- *  - finds and reserves a port for it, starts it in a separate process
- *    and when the process terminates, releases the port;
- *  - or when game runs locally on a players computer and this here handles
- *    the rendezvous (tell the other players when and where to connect).  
- *  .
+/** One object of this this class represents a game for which players/users
+ *  have enrolled to play it together. 
+ *  It starts in state "PROPOSED" as type either instantly or scheduled.
+ *  Then it's state will change along the sequence of states
+ *  PROPOSED, DUE, ACTIVATED, STARTING, READY_TO_CONNECT, RUNNING, ENDING
+ *  as denoted in the GameState enum.
+ *  
+ *  The actual running/starting of the game will be handled by different
+ *  classes, namely GameOnServer and (to be done) GameOnClient.
  * 
  *  The same class is also used at client side, but only part of the data 
  *  is used there (e.g. the user has only a name, not a socket).
@@ -122,6 +123,100 @@ public class GameInfo
         // System.out.println("NEW GameInfo server side, " + this.toString());
     }
 
+    // ================= now the stuff for the client side ===============
+
+    // used on client side, to restore a proposed game sent by server
+    public GameInfo(String gameId)
+    {
+        this.gameId = gameId;
+        this.players = new ArrayList<User>();
+    }
+
+    public static GameInfo fromString(String[] tokens,
+        HashMap<String, GameInfo> games)
+    {
+        GameInfo gi;
+
+        // tokens[0] is the command
+        String gameId = tokens[1];
+        String key = gameId;
+
+        if (games.containsKey(gameId))
+        {
+            // use the object webclient has created earlier
+            gi = games.get(key);
+            // System.out.println("Found already, updating");
+        }
+        else
+        {
+            gi = new GameInfo(gameId);
+            games.put(key, gi);
+            // System.out.println("Creating a new one GameInfo ");
+        }
+
+        int j = 2;
+        gi.type = GameType.valueOf(tokens[j++]);
+        gi.state = GameState.valueOf(tokens[j++]);
+        gi.initiator = tokens[j++];
+
+        // System.out.println("fromString, state=" + gi.state + ")");
+        // System.out.println("tokens: " + tokens.toString());
+
+        gi.variant = tokens[j++];
+        gi.viewmode = tokens[j++];
+        gi.startTime = Long.parseLong(tokens[j++]);
+        gi.duration = Integer.parseInt(tokens[j++]);
+        gi.summary = tokens[j++];
+        gi.eventExpiring = tokens[j++];
+        gi.unlimitedMulligans = Boolean.valueOf(tokens[j++]).booleanValue();
+        gi.balancedTowers = Boolean.valueOf(tokens[j++]).booleanValue();
+        gi.min = Integer.parseInt(tokens[j++]);
+        gi.target = Integer.parseInt(tokens[j++]);
+        gi.max = Integer.parseInt(tokens[j++]);
+
+        int lastIndex = j;
+        gi.enrolledPlayers = Integer.parseInt(tokens[lastIndex]);
+
+        ArrayList<User> players = new ArrayList<User>();
+        int i = 1;
+        while (i <= gi.enrolledPlayers)
+        {
+            String name = tokens[lastIndex + i];
+            User user = new User(name);
+            players.add(user);
+            i++;
+        }
+        gi.players = players;
+        // System.out.println("players: " + players.toString());
+
+        // System.out.println("RESTORED GameInfo client side, " + gi.toString());
+        return gi;
+    }
+    
+    public String toString(String sep)
+    {
+        StringBuilder playerList = new StringBuilder();
+        Iterator<User> it = players.iterator();
+        while (it.hasNext())
+        {
+            playerList.append(sep);
+            User user = it.next();
+            playerList.append(user.getName());
+        }
+
+        String message = gameId + sep + type.toString() + sep
+            + state.toString() + sep + initiator + sep + variant + sep
+            + viewmode + sep + startTime + sep + duration + sep + summary
+            + sep + eventExpiring + sep + unlimitedMulligans + sep
+            + balancedTowers + sep + min + sep + target + sep + max + sep
+            + enrolledPlayers + playerList.toString();
+
+        return message;
+    }
+
+
+    
+    
     public void setState(GameState state)
     {
         this.state = state;
@@ -379,7 +474,6 @@ public class GameInfo
     public void setPlayerList(ArrayList<User> playerlist)
     {
         players = playerlist;
-
     }
 
     /*
@@ -432,6 +526,7 @@ public class GameInfo
         return reason;
     }
 
+    // TODO moved to GameClientSide ?
     
     public void createStartLocallyOptionsObject(Options gameOptions,
         String localPlayer)
@@ -490,105 +585,7 @@ public class GameInfo
 
         return;
     }
- 
-    
-    
-    public String toString(String sep)
-    {
-        StringBuilder playerList = new StringBuilder();
-        Iterator<User> it = players.iterator();
-        while (it.hasNext())
-        {
-            playerList.append(sep);
-            User user = it.next();
-            playerList.append(user.getName());
-        }
 
-        String message = gameId + sep + type.toString() + sep
-            + state.toString() + sep + initiator + sep + variant + sep
-            + viewmode + sep + startTime + sep + duration + sep + summary
-            + sep + eventExpiring + sep + unlimitedMulligans + sep
-            + balancedTowers + sep + min + sep + target + sep + max + sep
-            + enrolledPlayers + playerList.toString();
-
-        return message;
-    }
-
-    // ================= now the stuff for running the game on client side ===============
-
-    // used on client side, to restore a proposed game sent
-    // by server
-    public GameInfo(String gameId)
-    {
-        this.gameId = gameId;
-        this.players = new ArrayList<User>();
-    }
-
-    public static GameInfo fromString(String[] tokens,
-        HashMap<String, GameInfo> games)
-    {
-        GameInfo gi;
-
-        // tokens[0] is the command
-        String gameId = tokens[1];
-        String key = gameId;
-
-        if (games.containsKey(gameId))
-        {
-            // use the object webclient has created earlier
-            gi = games.get(key);
-            // System.out.println("Found already, updating");
-        }
-        else
-        {
-            gi = new GameInfo(gameId);
-            games.put(key, gi);
-            // System.out.println("Creating a new one GameInfo ");
-        }
-
-        int j = 2;
-        gi.type = GameType.valueOf(tokens[j++]);
-        gi.state = GameState.valueOf(tokens[j++]);
-        gi.initiator = tokens[j++];
-
-        // System.out.println("fromString, state=" + gi.state + ")");
-        // System.out.println("tokens: " + tokens.toString());
-
-        gi.variant = tokens[j++];
-        gi.viewmode = tokens[j++];
-        gi.startTime = Long.parseLong(tokens[j++]);
-        gi.duration = Integer.parseInt(tokens[j++]);
-        gi.summary = tokens[j++];
-        gi.eventExpiring = tokens[j++];
-        gi.unlimitedMulligans = Boolean.valueOf(tokens[j++]).booleanValue();
-        gi.balancedTowers = Boolean.valueOf(tokens[j++]).booleanValue();
-        gi.min = Integer.parseInt(tokens[j++]);
-        gi.target = Integer.parseInt(tokens[j++]);
-        gi.max = Integer.parseInt(tokens[j++]);
-
-        int lastIndex = j;
-        gi.enrolledPlayers = Integer.parseInt(tokens[lastIndex]);
-
-        ArrayList<User> players = new ArrayList<User>();
-        int i = 1;
-        while (i <= gi.enrolledPlayers)
-        {
-            String name = tokens[lastIndex + i];
-            User user = new User(name);
-            players.add(user);
-            i++;
-        }
-        gi.players = players;
-        // System.out.println("players: " + players.toString());
-
-        // System.out.println("RESTORED GameInfo client side, " + gi.toString());
-        return gi;
-    }
-
-    public void run_on_client()
-    {
-        // dummy
-    }
 
     /**
      *  Enum for the possible TYPES of a game 
