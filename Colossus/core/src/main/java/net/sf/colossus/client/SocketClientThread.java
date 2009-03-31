@@ -567,7 +567,7 @@ final class SocketClientThread extends Thread implements IServer
                 // TODO try to make this less implicit
                 assert client.getTurnNumber() == -1 : "Implicit legion creation should happen only "
                     + "before the first round";
-                legion = new LegionClientSide(markerId, client, player
+                legion = new LegionClientSide(player, markerId, client, player
                     .getStartingTower());
                 player.addLegion(legion);
             }
@@ -894,8 +894,9 @@ final class SocketClientThread extends Thread implements IServer
             // create client-side copy of new legion
             MasterHex hex = resolveHex(hexLabel);
             Legion parentLegion = resolveLegion(parentId);
-            Legion newLegion = new LegionClientSide(childId, client, hex);
-            parentLegion.getPlayer().addLegion(newLegion);
+            Player player = parentLegion.getPlayer();
+            Legion newLegion = new LegionClientSide(player, childId, client, hex);
+            player.addLegion(newLegion);
             client.didSplit(hex, parentLegion, newLegion, childHeight,
                 splitoffs, turn);
         }

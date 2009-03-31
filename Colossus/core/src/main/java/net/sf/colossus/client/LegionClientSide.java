@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
+import net.sf.colossus.game.Player;
 import net.sf.colossus.gui.Marker;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.variant.CreatureType;
@@ -43,9 +44,9 @@ public final class LegionClientSide extends Legion
     private final boolean isMyLegion;
 
     // TODO the Client parameter should be a Game(ClientSide), which doesn't exist yet
-    public LegionClientSide(String markerId, Client client, MasterHex hex)
+    public LegionClientSide(Player player, String markerId, Client client, MasterHex hex)
     {
-        super(client.getPlayerByMarkerId(markerId), markerId, hex);
+        super(player, markerId, hex);
         this.client = client;
         myNode = null;
         isMyLegion = getPlayer().equals(client.getOwningPlayer());

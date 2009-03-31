@@ -47,6 +47,10 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 /**
  * Simple implementation of a Titan AI
+ * 
+ * TODO somehow we call client.getOwningPlayer() a lot -- there should probably be a better
+ * link between AI and player, after all the AI either IS_A player or PLAYS_FOR a player
+ * 
  * @version $Id$
  * @author Bruce Sherrod, David Ripton
  * @author Romain Dolbeau
@@ -1922,8 +1926,8 @@ public class SimpleAI extends AbstractAI
 
         for (Legion legion : donors)
         {
-            LegionClientSide lcs = new LegionClientSide(legion.getMarkerId(),
-                client, legion.getCurrentHex());
+            LegionClientSide lcs = new LegionClientSide(client.getOwningPlayer(),
+                legion.getMarkerId(), client, legion.getCurrentHex());
 
             String myAngel = lcs.bestSummonable();
             if (bestAngel == null
