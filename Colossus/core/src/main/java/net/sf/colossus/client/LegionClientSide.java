@@ -21,9 +21,6 @@ import net.sf.colossus.variant.MasterHex;
 /**
  * Client-side version of a legion.
  *
- * TODO Comparable is implemented only for AI purposes, it might be better to have
- *      a Comparator there.
- *
  * TODO candidates to pull up:
  * -canRecruit()
  *    requires Game.findEligibleRecruits() on both sides, might be better as method in Game
@@ -34,9 +31,7 @@ import net.sf.colossus.variant.MasterHex;
  * @version $Id$
  * @author David Ripton
  */
-
-public final class LegionClientSide extends Legion implements
-    Comparable<LegionClientSide>
+public final class LegionClientSide extends Legion
 {
     private static final Logger LOGGER = Logger
         .getLogger(LegionClientSide.class.getName());
@@ -333,31 +328,6 @@ public final class LegionClientSide extends Legion implements
     public int numUncertainCreatures()
     {
         return getNode().numUncertainCreatures();
-    }
-
-    /**
-     * Legions are sorted in descending order of known total point value,
-     * with the titan legion always coming first.
-     *
-     * TODO This is inconsistent with equals() and thus not a proper implementation
-     *      of Comparable.
-     *
-     * Really only useful for comparing own legions.
-     */
-    public int compareTo(LegionClientSide other)
-    {
-        if (hasTitan())
-        {
-            return Integer.MIN_VALUE;
-        }
-        else if (other.hasTitan())
-        {
-            return Integer.MAX_VALUE;
-        }
-        else
-        {
-            return (other.getPointValue() - this.getPointValue());
-        }
     }
 
     // TODO Not exact -- does not verify that other legion is enemy.

@@ -126,6 +126,30 @@ public class SimpleAI extends AbstractAI
         // the other types have only movement bonuses
     }
 
+    protected static final Comparator<Legion> LEGION_COMPARATOR = new Comparator<Legion>() {
+        /**
+         * Legions are sorted in descending order of known total point value,
+         * with the titan legion always coming first.
+         *
+         * Really only useful for comparing own legions.
+         */
+        public int compare(Legion o1, Legion o2)
+        {
+            if (o1.hasTitan())
+            {
+                return Integer.MIN_VALUE;
+            }
+            else if (o2.hasTitan())
+            {
+                return Integer.MAX_VALUE;
+            }
+            else
+            {
+                return (o2.getPointValue() - o1.getPointValue());
+            }
+        }
+    };
+
     int timeLimit = Constants.DEFAULT_AI_TIME_LIMIT; // in s
     boolean timeIsUp;
     int splitsDone = 0;
@@ -824,7 +848,7 @@ public class SimpleAI extends AbstractAI
         List<LegionClientSide> legions = player.getLegions();
 
         // Sort markerIds in descending order of legion importance.
-        Collections.sort(legions);
+        Collections.sort(legions, LEGION_COMPARATOR);
 
         for (LegionClientSide legion : legions)
         {
@@ -1907,7 +1931,7 @@ public class SimpleAI extends AbstractAI
                 || (client.getGame().getVariant().getCreatureByName(myAngel))
                     .getPointValue() > (client.getGame().getVariant()
                     .getCreatureByName(bestAngel)).getPointValue()
-                || lcs.compareTo(bestLegion) > 0
+                || LEGION_COMPARATOR.compare(lcs,bestLegion) > 0
                 && ((client.getGame().getVariant().getCreatureByName(myAngel))
                     .getPointValue() == (client.getGame().getVariant()
                     .getCreatureByName(bestAngel)).getPointValue()))
