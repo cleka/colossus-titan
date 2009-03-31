@@ -2230,8 +2230,8 @@ public final class GameServerSide extends Game
 
         // Lookup coords for chit starting from player[i].getTower()
         MasterHex hex = player.getStartingTower();
-        LegionServerSide legion = LegionServerSide.getStartingLegion(markerId,
-            hex, player, this);
+        LegionServerSide legion = getStartingLegion(markerId,
+            hex, player);
         player.addLegion(legion);
     }
 
@@ -3718,6 +3718,25 @@ public final class GameServerSide extends Game
             }
         }
         return null;
+    }
+    
+    private LegionServerSide getStartingLegion(String markerId, MasterHex hex,
+        Player player)
+    {
+        CreatureType[] startCre = TerrainRecruitLoader
+            .getStartingCreatures(hex);
+        LegionServerSide legion = new LegionServerSide(markerId, null, hex,
+            hex, player, this, VariantSupport.getCurrentVariant()
+                .getCreatureByName(Constants.titan), VariantSupport
+                .getCurrentVariant().getCreatureByName(
+                    TerrainRecruitLoader.getPrimaryAcquirable()), startCre[2],
+            startCre[2], startCre[0], startCre[0], startCre[1], startCre[1]);
+
+        for (Creature critter : legion.getCreatures())
+        {
+            getCaretaker().takeOne(critter.getType());
+        }
+        return legion;
     }
 
     int mulligan()

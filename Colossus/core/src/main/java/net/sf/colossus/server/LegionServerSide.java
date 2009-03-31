@@ -16,7 +16,6 @@ import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
-import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
 /**
@@ -77,26 +76,6 @@ public final class LegionServerSide extends Legion implements
             assert creature != null : "Null creature not allowed";
             getCreatures().add(new CreatureServerSide(creature, this, game));
         }
-    }
-
-    // TODO this method should be somewhere else, e.g. on Game
-    static LegionServerSide getStartingLegion(String markerId, MasterHex hex,
-        Player player, GameServerSide game)
-    {
-        CreatureType[] startCre = TerrainRecruitLoader
-            .getStartingCreatures(hex);
-        LegionServerSide legion = new LegionServerSide(markerId, null, hex,
-            hex, player, game, VariantSupport.getCurrentVariant()
-                .getCreatureByName(Constants.titan), VariantSupport
-                .getCurrentVariant().getCreatureByName(
-                    TerrainRecruitLoader.getPrimaryAcquirable()), startCre[2],
-            startCre[2], startCre[0], startCre[0], startCre[1], startCre[1]);
-
-        for (Creature critter : legion.getCreatures())
-        {
-            game.getCaretaker().takeOne(critter.getType());
-        }
-        return legion;
     }
 
     @Override
