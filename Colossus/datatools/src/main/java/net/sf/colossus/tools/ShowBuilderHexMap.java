@@ -259,7 +259,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
         return Printable.PAGE_EXISTS;
     }
 
-    private void doFillDune(BattleHex[][] h)
+    private void doFillEdge(BattleHex[][] h, char hazard)
     {
         for (int i = 0; i < h.length; i++)
         {
@@ -269,75 +269,40 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
                 {
                     for (int k = 0; k < 6; k++)
                     {
-                        if ((h[i][j].getHexside(k) == ' ') &&
-                                (h[i][j].getOppositeHexside(k) == ' '))
+                        if ((h[i][j].getHexside(k) == ' ')
+                            && (h[i][j].getOppositeHexside(k) == ' '))
                         {
                             BattleHex n = h[i][j].getNeighbor(k);
                             if (n != null)
                             {
-                                if (h[i][j].getTerrain().getName().equals("Sand")
-                                    &&
-                                    n.getTerrain().getName().equals("Plains"))
+                                switch (hazard)
                                 {
-                                    h[i][j].setHexside(k, 'd');
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+                                    case ('c'):
+                                        if (h[i][j].getElevation() > (n
+                                            .getElevation() + 1))
+                                        {
+                                            h[i][j].setHexside(k, 'c');
+                                        }
+                                        break;
 
-    private void doFillCliff(BattleHex[][] h)
-    {
-        for (int i = 0; i < h.length; i++)
-        {
-            for (int j = 0; j < h[i].length; j++)
-            {
-                if (h[i][j] != null)
-                {
-                    for (int k = 0; k < 6; k++)
-                    {
-                        if ((h[i][j].getHexside(k) == ' ') &&
-                                (h[i][j].getOppositeHexside(k) == ' '))
-                        {
-                            BattleHex n = h[i][j].getNeighbor(k);
-                            if (n != null)
-                            {
-                                if (h[i][j].getElevation() >
-                                        (n.getElevation()+1))
-                                {
-                                    h[i][j].setHexside(k, 'c');
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+                                    case ('d'):
+                                        if (h[i][j].getTerrain().getName()
+                                            .equals("Sand")
+                                            && n.getTerrain().getName()
+                                                .equals("Plains"))
+                                        {
+                                            h[i][j].setHexside(k, 'd');
+                                        }
+                                        break;
 
-    private void doFillSlope(BattleHex[][] h)
-    {
-        for (int i = 0; i < h.length; i++)
-        {
-            for (int j = 0; j < h[i].length; j++)
-            {
-                if (h[i][j] != null)
-                {
-                    for (int k = 0; k < 6; k++)
-                    {
-                        if ((h[i][j].getHexside(k) == ' ') &&
-                                (h[i][j].getOppositeHexside(k) == ' '))
-                        {
-                            BattleHex n = h[i][j].getNeighbor(k);
-                            if (n != null)
-                            {
-                                if (h[i][j].getElevation() ==
-                                        (n.getElevation()+1))
-                                {
-                                    h[i][j].setHexside(k, 's');
+                                    case ('s'):
+                                        if (h[i][j].getElevation() == (n
+                                            .getElevation() + 1))
+                                        {
+                                            h[i][j].setHexside(k, 's');
+                                        }
+                                        break;
+
                                 }
                             }
                         }
@@ -611,7 +576,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
 
             public void actionPerformed(ActionEvent e)
             {
-                doFillSlope(getBattleHexArray());
+                doFillEdge(getBattleHexArray(), 's');
                 repaint();
             }
         };
@@ -620,7 +585,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
 
             public void actionPerformed(ActionEvent e)
             {
-                doFillCliff(getBattleHexArray());
+                doFillEdge(getBattleHexArray(), 'c');
                 repaint();
             }
         };
@@ -629,7 +594,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
 
             public void actionPerformed(ActionEvent e)
             {
-                doFillDune(getBattleHexArray());
+                doFillEdge(getBattleHexArray(), 'd');
                 repaint();
             }
         };
