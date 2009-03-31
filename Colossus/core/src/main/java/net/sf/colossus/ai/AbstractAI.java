@@ -326,13 +326,11 @@ abstract public class AbstractAI implements AI
      * Return true if the legion could recruit or acquire something
      * better than its worst creature in hexLabel.
      */
-    final protected boolean couldRecruitUp(Legion legion, MasterHex hex, Legion enemy,
-            MasterBoardTerrain terrain)
+    final protected boolean couldRecruitUp(Legion legion, MasterHex hex, Legion enemy)
     {
         CreatureType weakest = client.getGame().getVariant().
                 getCreatureByName(((LegionClientSide) legion).getContents().
-                get(
-                    legion.getHeight() - 1));
+                get(legion.getHeight() - 1));
         // Consider recruiting.
         List<CreatureType> recruits = client.findEligibleRecruits(legion, hex);
         if (!recruits.isEmpty())
@@ -349,7 +347,7 @@ abstract public class AbstractAI implements AI
         // Consider acquiring angels.
         if (enemy != null)
         {
-            int pointValue = ((LegionClientSide) enemy).getPointValue();
+            int pointValue = enemy.getPointValue();
             boolean wouldFlee = flee(enemy, legion);
             if (wouldFlee)
             {
@@ -363,7 +361,7 @@ abstract public class AbstractAI implements AI
             while ((currentScore + pointValue) >= nextScore)
             {
                 List<String> ral =
-                        TerrainRecruitLoader.getRecruitableAcquirableList(terrain,
+                        TerrainRecruitLoader.getRecruitableAcquirableList(hex.getTerrain(),
                         nextScore);
                 for (String creatureName : ral)
                 {

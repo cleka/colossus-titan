@@ -376,8 +376,7 @@ public class SimpleAI extends AbstractAI
                     {
                         safeMoves++;
                         if (!goodRecruit
-                            && couldRecruitUp(legion, hex, null, hex
-                                .getTerrain()))
+                            && couldRecruitUp(legion, hex, null))
                         {
                             goodRecruit = true;
                         }
@@ -397,8 +396,7 @@ public class SimpleAI extends AbstractAI
 
                             // Also consider acquiring angel.
                             if (!goodRecruit
-                                && couldRecruitUp(legion, hex, enemy, hex
-                                    .getTerrain()))
+                                && couldRecruitUp(legion, hex, enemy))
                             {
                                 goodRecruit = true;
                             }
