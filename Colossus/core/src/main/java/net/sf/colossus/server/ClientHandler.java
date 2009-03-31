@@ -25,6 +25,7 @@ import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.InstanceTracker;
+import net.sf.colossus.util.ExceptionUtils;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
@@ -145,7 +146,7 @@ final class ClientHandler implements IClient
                     }
                     else
                     {
-                        callMethod(method, li);
+                        doCallMethodInTryBlock(line, method, li);
                     }
                     LOGGER.finest("after  processing line '" + line + "'");
                     processed++;
@@ -253,6 +254,26 @@ final class ClientHandler implements IClient
         Thread.yield();
     }
 
+    private void doCallMethodInTryBlock(String line, String method, List<String> li)
+    {
+        try
+        {
+            callMethod(method, li);
+        }
+        catch(Exception e)
+        {
+            String message = "Woooah! An exception was caught while "
+                + "processing from client " + getPlayerName()
+                + " the input line:\n    === " + line + " ===\n"
+                + "\nStack trace:\n" + ExceptionUtils.makeStackTraceString(e)
+                + "\n\nGame might be unstable or hang from now on...";
+            LOGGER.severe(message);
+            ExceptionUtils.showMessageDialog(null, message, "Exception caught!",
+                true);
+            
+        }
+    }
+    
     private void callMethod(String method, List<String> args)
     {
         if (method.equals(Constants.signOn))

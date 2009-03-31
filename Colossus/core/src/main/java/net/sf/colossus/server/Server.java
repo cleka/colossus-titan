@@ -36,6 +36,7 @@ import net.sf.colossus.game.Phase;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.Proposal;
+import net.sf.colossus.util.ExceptionUtils;
 import net.sf.colossus.util.InstanceTracker;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
@@ -460,7 +461,9 @@ public final class Server extends Thread implements IServer
         catch (Exception e)
         {
             LOGGER.log(Level.SEVERE, "Exception while waiting on selector", e);
-
+            String message = "Woooah. An exception was caught while "
+                + "waiting on Selector";
+            ExceptionUtils.showMessageDialog(null, "Exception caught!", message, false);
         }
     }
 
@@ -2483,7 +2486,7 @@ public final class Server extends Thread implements IServer
 
     public void saveGame(String filename, boolean autoSave)
     {
-        game.saveGame(filename, autoSave);
+        game.saveGameInTry(filename, autoSave);
     }
 
     // User has requested to save game via File=>Save Game or Save Game as...
@@ -2532,7 +2535,7 @@ public final class Server extends Thread implements IServer
         {
             if (guiRequestSaveFlag)
             {
-                game.saveGame(guiRequestSaveFilename, false);
+                game.saveGameInTry(guiRequestSaveFilename, false);
                 guiRequestSaveFlag = false;
                 guiRequestSaveFilename = null;
                 didSomething = true;

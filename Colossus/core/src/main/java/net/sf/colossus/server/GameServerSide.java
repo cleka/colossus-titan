@@ -38,6 +38,7 @@ import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.Proposal;
 import net.sf.colossus.common.WhatNextManager.WhatToDoNext;
 import net.sf.colossus.util.InstanceTracker;
+import net.sf.colossus.util.ExceptionUtils;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.util.ViableEntityManager;
@@ -1264,7 +1265,36 @@ public final class GameServerSide extends Game
         return name;
     }
 
-    synchronized void saveGame(final String filename, boolean autoSave)
+    void saveGameInTry(final String filename, boolean autoSave)
+    {
+        try
+        {
+            saveGame(filename, autoSave);
+        }
+        catch(Exception e)
+        {
+            String asNowOffMmessage = "";
+            if (autoSave)
+            {
+                options.setOption(Options.autosave, false);
+                asNowOffMmessage = " (autosave now disabled)";
+            }
+
+            String doWhat = autoSave ? "auto-save" : "save";
+            String toWhere = filename == null ?
+                "<automatically generated filename>" : (" file " + filename);
+            String message = "Woooah! An exception was caught while "
+                + "trying to " + doWhat + " game to " + toWhere
+                + "\nStack trace:\n" + ExceptionUtils.makeStackTraceString(e)
+                + "\nSaving the game did probably not succeed"
+                + asNowOffMmessage + ".\n";
+            LOGGER.warning(message);
+            ExceptionUtils.showMessageDialog(null, message,
+                "Exception caught during saving!", false);
+        }
+    }
+
+    private synchronized void saveGame(final String filename, boolean autoSave)
     {
         int keep = options.getIntOption(Options.autosaveMaxKeep);
         String fn = null;
@@ -1529,7 +1559,7 @@ public final class GameServerSide extends Game
     {
         if (getOption(Options.autosave) && !isOver())
         {
-            saveGame(null, true);
+            saveGameInTry(null, true);
         }
     }
 
