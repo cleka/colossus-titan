@@ -76,11 +76,6 @@ public final class Start implements IStartHandler
         return whatNextManager.getWhatToDoNext();
     }
     
-    // TODO inline
-    public void setWhatToDoNext(WhatToDoNext whatToDoNext, boolean triggerQuit)
-    {
-        whatNextManager.setWhatToDoNext(whatToDoNext, triggerQuit);
-    }
     /** 
      *  Print a usage string to stdout.  (*Not* to the logfile, where casual
      *  users will miss it.)
@@ -263,7 +258,7 @@ public final class Start implements IStartHandler
 
         if (cl.optIsSet('l') || cl.optIsSet('z'))
         {
-            setWhatToDoNext(WhatToDoNext.LOAD_GAME, false);
+            whatNextManager.setWhatToDoNext(WhatToDoNext.LOAD_GAME, false);
             String filename = null;
             if (cl.optIsSet('l'))
             {
@@ -285,30 +280,30 @@ public final class Start implements IStartHandler
         {
             if (cl.optIsSet('c'))
             {
-                setWhatToDoNext(WhatToDoNext.START_NET_CLIENT, false);
+                whatNextManager.setWhatToDoNext(WhatToDoNext.START_NET_CLIENT, false);
             }
             else if (cl.optIsSet('w'))
             {
-                setWhatToDoNext(WhatToDoNext.START_WEB_CLIENT, false);
+                whatNextManager.setWhatToDoNext(WhatToDoNext.START_WEB_CLIENT, false);
             }
             else
             {
-                setWhatToDoNext(WhatToDoNext.START_GAME, false);
+                whatNextManager.setWhatToDoNext(WhatToDoNext.START_GAME, false);
             }
         }
         else
         {
             if (cl.optIsSet('c'))
             {
-                setWhatToDoNext(WhatToDoNext.NET_CLIENT_DIALOG, false);
+                whatNextManager.setWhatToDoNext(WhatToDoNext.NET_CLIENT_DIALOG, false);
             }
             else if (cl.optIsSet('w'))
             {
-                setWhatToDoNext(WhatToDoNext.START_WEB_CLIENT, false);
+                whatNextManager.setWhatToDoNext(WhatToDoNext.START_WEB_CLIENT, false);
             }
             else
             {
-                setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
+                whatNextManager.setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
             }
         }
     }
@@ -338,7 +333,7 @@ public final class Start implements IStartHandler
                 LOGGER.log(Level.WARNING, "Start waiting for GetPlayers "
                     + "to complete, wait interrupted?");
                 // just to be sure to do something useful there...
-                setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
+                whatNextManager.setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
             }
         }
         mutex = null;
@@ -630,7 +625,7 @@ public final class Start implements IStartHandler
             else if (getWhatToDoNext() == WhatToDoNext.START_GAME)
             {
                 // TODO is this re-setting it needed?
-                setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
+                whatNextManager.setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
                 int port = startOptions.getIntOption(Options.serveAtPort);
                 serverOptions.setOption(Options.serveAtPort, port);
                 String webGameFlagFileName = startOptions
@@ -641,7 +636,7 @@ public final class Start implements IStartHandler
                 if (webGameFlagFileName != null
                     && !webGameFlagFileName.equals(""))
                 {
-                    setWhatToDoNext(WhatToDoNext.QUIT_ALL, false);
+                    whatNextManager.setWhatToDoNext(WhatToDoNext.QUIT_ALL, false);
                     game.setFlagFilename(webGameFlagFileName);
                 }
                 game.newGame(null, null);
@@ -650,7 +645,7 @@ public final class Start implements IStartHandler
             else if (getWhatToDoNext() == WhatToDoNext.LOAD_GAME)
             {
                 // TODO is this re-setting it needed?
-                setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
+                whatNextManager.setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
                 int port = startOptions.getIntOption(Options.serveAtPort);
                 serverOptions.setOption(Options.serveAtPort, port);
                 String loadFileName = startOptions
@@ -681,11 +676,11 @@ public final class Start implements IStartHandler
                 // after that come back to NetClient dialog.
                 if (oneClientRunOnly)
                 {
-                    setWhatToDoNext(WhatToDoNext.QUIT_ALL, false);
+                    whatNextManager.setWhatToDoNext(WhatToDoNext.QUIT_ALL, false);
                 }
                 else
                 {
-                    setWhatToDoNext(WhatToDoNext.NET_CLIENT_DIALOG, false);
+                    whatNextManager.setWhatToDoNext(WhatToDoNext.NET_CLIENT_DIALOG, false);
                 }
                 dontWait = startNetClient(startOptions);
             }
@@ -693,7 +688,7 @@ public final class Start implements IStartHandler
             else if (getWhatToDoNext() == WhatToDoNext.START_WEB_CLIENT)
             {
                 // By default get back to Main dialog.
-                setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
+                whatNextManager.setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
 
                 String hostname = startOptions
                     .getStringOption(Options.webServerHost);
@@ -762,11 +757,11 @@ public final class Start implements IStartHandler
                     .getStringOption(Options.loadGameFileName);
                 if (loadFileName != null)
                 {
-                    setWhatToDoNext(WhatToDoNext.LOAD_GAME, false);
+                    whatNextManager.setWhatToDoNext(WhatToDoNext.LOAD_GAME, false);
                 }
                 else
                 {
-                    setWhatToDoNext(WhatToDoNext.START_GAME, false);
+                    whatNextManager.setWhatToDoNext(WhatToDoNext.START_GAME, false);
                 }
             }
 
@@ -789,7 +784,7 @@ public final class Start implements IStartHandler
                 LOGGER.log(Level.WARNING, "Start waiting for GetPlayers "
                     + "to complete, wait interrupted?");
                 // just to be sure to do something useful there...
-                setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
+                whatNextManager.setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
             }
         }
         mutex = null;
