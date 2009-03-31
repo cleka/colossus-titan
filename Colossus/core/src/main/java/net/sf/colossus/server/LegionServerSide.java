@@ -92,10 +92,8 @@ public final class LegionServerSide extends Legion implements
                     TerrainRecruitLoader.getPrimaryAcquirable()), startCre[2],
             startCre[2], startCre[0], startCre[0], startCre[1], startCre[1]);
 
-        Iterator<CreatureServerSide> it = legion.getCreatures().iterator();
-        while (it.hasNext())
+        for (Creature critter : legion.getCreatures())
         {
-            CreatureServerSide critter = it.next();
             game.getCaretaker().takeOne(critter.getType());
         }
         return legion;
