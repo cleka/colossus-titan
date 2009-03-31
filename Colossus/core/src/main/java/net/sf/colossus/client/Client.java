@@ -25,6 +25,8 @@ import net.sf.colossus.ai.SimpleAI;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.IOptions;
 import net.sf.colossus.common.Options;
+import net.sf.colossus.common.WhatNextManager;
+import net.sf.colossus.common.WhatNextManager.WhatToDoNext;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.EntrySide;
@@ -47,8 +49,6 @@ import net.sf.colossus.server.GameServerSide;
 import net.sf.colossus.server.IServer;
 import net.sf.colossus.server.Server;
 import net.sf.colossus.server.VariantSupport;
-import net.sf.colossus.common.WhatNextManager;
-import net.sf.colossus.common.WhatNextManager.WhatToDoNext;
 import net.sf.colossus.util.CollectionHelper;
 import net.sf.colossus.util.InstanceTracker;
 import net.sf.colossus.util.Predicate;
@@ -2814,7 +2814,7 @@ public final class Client implements IClient, IOracle
         return remain;
     }
 
-    /** 
+    /**
      * Return a list of Creatures (ignore reservations).
      */
     public List<CreatureType> findEligibleRecruits(Legion legion, MasterHex hex)
@@ -2822,9 +2822,9 @@ public final class Client implements IClient, IOracle
         return findEligibleRecruits(legion, hex, false);
     }
 
-    /** 
+    /**
      * Return a list of Creatures and consider reservations if wanted.
-     * 
+     *
      * @param legion The legion to recruit with.
      * @param hex The hex in which to recruit (not necessarily the same as the legion's position). Not null.
      * @param considerReservations Flag to determine if reservations should be considered.
@@ -2950,12 +2950,14 @@ public final class Client implements IClient, IOracle
         return result;
     }
 
-    /** Return a set of all other unengaged legions of the legion's player
-     *  that have summonables.
+    /**
+     * Return a set of all other unengaged legions of the legion's player
+     * that have summonables.
      */
     public SortedSet<Legion> findLegionsWithSummonables(Legion summoner)
     {
-        SortedSet<Legion> result = new TreeSet<Legion>();
+        SortedSet<Legion> result = new TreeSet<Legion>(
+            Legion.ORDER_TITAN_THEN_POINTS);
         Player player = summoner.getPlayer();
         for (Legion legion : player.getLegions())
         {

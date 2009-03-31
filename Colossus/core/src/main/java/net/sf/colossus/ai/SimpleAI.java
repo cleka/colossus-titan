@@ -47,10 +47,10 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 /**
  * Simple implementation of a Titan AI
- * 
+ *
  * TODO somehow we call client.getOwningPlayer() a lot -- there should probably be a better
  * link between AI and player, after all the AI either IS_A player or PLAYS_FOR a player
- * 
+ *
  * @version $Id$
  * @author Bruce Sherrod, David Ripton
  * @author Romain Dolbeau
@@ -129,30 +129,6 @@ public class SimpleAI extends AbstractAI
         TERRAIN_BONUSES.put("Volcano", new TerrainBonuses(1, 0, 0, 1));
         // the other types have only movement bonuses
     }
-
-    protected static final Comparator<Legion> LEGION_COMPARATOR = new Comparator<Legion>() {
-        /**
-         * Legions are sorted in descending order of known total point value,
-         * with the titan legion always coming first.
-         *
-         * Really only useful for comparing own legions.
-         */
-        public int compare(Legion o1, Legion o2)
-        {
-            if (o1.hasTitan())
-            {
-                return Integer.MIN_VALUE;
-            }
-            else if (o2.hasTitan())
-            {
-                return Integer.MAX_VALUE;
-            }
-            else
-            {
-                return (o2.getPointValue() - o1.getPointValue());
-            }
-        }
-    };
 
     int timeLimit = Constants.DEFAULT_AI_TIME_LIMIT; // in s
     boolean timeIsUp;
@@ -852,7 +828,7 @@ public class SimpleAI extends AbstractAI
         List<LegionClientSide> legions = player.getLegions();
 
         // Sort markerIds in descending order of legion importance.
-        Collections.sort(legions, LEGION_COMPARATOR);
+        Collections.sort(legions, Legion.ORDER_TITAN_THEN_POINTS);
 
         for (LegionClientSide legion : legions)
         {
@@ -1935,7 +1911,7 @@ public class SimpleAI extends AbstractAI
                 || (client.getGame().getVariant().getCreatureByName(myAngel))
                     .getPointValue() > (client.getGame().getVariant()
                     .getCreatureByName(bestAngel)).getPointValue()
-                || LEGION_COMPARATOR.compare(lcs,bestLegion) > 0
+                || Legion.ORDER_TITAN_THEN_POINTS.compare(lcs, bestLegion) > 0
                 && ((client.getGame().getVariant().getCreatureByName(myAngel))
                     .getPointValue() == (client.getGame().getVariant()
                     .getCreatureByName(bestAngel)).getPointValue()))

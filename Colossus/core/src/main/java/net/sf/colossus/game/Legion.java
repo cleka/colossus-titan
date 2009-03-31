@@ -2,6 +2,7 @@ package net.sf.colossus.game;
 
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import net.sf.colossus.variant.CreatureType;
@@ -13,15 +14,46 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 public abstract class Legion
 {
     /**
+     * A comparator to order legions by points, with Titan armies first.
+     *
+     * This only works properly if all legions are owned by the same player. The case of two
+     * legions with titans is not handled.
+     */
+    public static final Comparator<Legion> ORDER_TITAN_THEN_POINTS = new Comparator<Legion>()
+    {
+        /**
+         * Legions are sorted in descending order of known total point value,
+         * with the titan legion always coming first.
+         *
+         * Really only useful for comparing legions of one player.
+         */
+        public int compare(Legion o1, Legion o2)
+        {
+            if (o1.hasTitan())
+            {
+                return Integer.MIN_VALUE;
+            }
+            else if (o2.hasTitan())
+            {
+                return Integer.MAX_VALUE;
+            }
+            else
+            {
+                return (o2.getPointValue() - o1.getPointValue());
+            }
+        }
+    };
+
+    /**
      * The player/game combination owning this Legion.
-     * 
+     *
      * Never null.
      */
     private final Player player;
 
     /**
      * The current position of the legion on the masterboard.
-     * 
+     *
      * Never null.
      */
     private MasterHex currentHex;
@@ -33,7 +65,7 @@ public abstract class Legion
 
     /**
      * The ID of the marker of this legion.
-     * 
+     *
      * Used as identifier for serialization purposes. Never null.
      */
     protected final String markerId;
@@ -74,7 +106,7 @@ public abstract class Legion
 
     /**
      * Retrieves the player this legion belongs to.
-     * 
+     *
      * @return The matching player. Never null.
      */
     public Player getPlayer()
@@ -84,7 +116,7 @@ public abstract class Legion
 
     /**
      * Places the legion into the new position.
-     * 
+     *
      * @param newPosition the hex that will be the new position. Not null.
      * @see #getCurrentHex()
      */
@@ -96,9 +128,9 @@ public abstract class Legion
 
     /**
      * Returns the current position of the legion.
-     * 
+     *
      * @return the hex the legion currently is on.
-     * 
+     *
      * @see #setCurrentHex(MasterHex)
      */
     public MasterHex getCurrentHex()
@@ -109,7 +141,7 @@ public abstract class Legion
 
     /**
      * TODO should be an unmodifiable List, but can't at the moment since both
-     * derived classes and users might still expect to change it 
+     * derived classes and users might still expect to change it
      * TODO should be List<Creature>, but subtypes are still covariant
      */
     public List<? extends Creature> getCreatures()
@@ -136,7 +168,7 @@ public abstract class Legion
 
     /**
      * Returns the number of creatures in this legion.
-     * 
+     *
      * @return the number of creatures in the legion
      */
     public int getHeight()
@@ -181,7 +213,7 @@ public abstract class Legion
 
     /**
      * TODO unify between the two derived classes or even better: replace with code
-     *      for getting the image 
+     *      for getting the image
      */
     public abstract List<String> getImageNames();
 
@@ -291,17 +323,17 @@ public abstract class Legion
 
     /**
      * From the given score, awarding given points, calculate the choices for
-     * each threshold that will be crossed. E.g. 375+150 => 525 will cross 
-     * 400 and 500, so one has to make two decisions:  
+     * each threshold that will be crossed. E.g. 375+150 => 525 will cross
+     * 400 and 500, so one has to make two decisions:
      *  400: take angel (or not);
      *  500: take angel, archangel (or nothing).
      * This only calculates them, does not set them in the legion yet; so a client
-     * or AI could use this for theoretical calculations "how much / which angels 
+     * or AI could use this for theoretical calculations "how much / which angels
      * would I get if..." without modifying the legions state itself.
      * The limits for "which one can get" due to legion height, creatures left count
      * and terrain are considered (implicitly, because findEligibleAngels(tmpScore)
      * checks them).
-     *  
+     *
      * @param score Current score of player
      * @param points Points to be added which entitle to acquiring
      * @return List of decisions
@@ -328,7 +360,7 @@ public abstract class Legion
         // @TODO: the constraint by height would make only sense, if askAquire's
         // would be fired sequentially - 2nd not before decision response for 1st
         // from client did arrive. Right now they are fired all at same time
-        // (and have to), because client (e.g. human player) should get all of the 
+        // (and have to), because client (e.g. human player) should get all of the
         // choices at once, to take e.g. the 500 archangel and skip the 400 angel.
         // AI does not handle that well yet, and humans get several modal dialogs.
         // Should be improved generally...
@@ -354,10 +386,10 @@ public abstract class Legion
     }
 
     /**
-     * Calculate which angels this legion can get in its current land 
+     * Calculate which angels this legion can get in its current land
      * when crossing the given points threshold
-     * 
-     * @param points Score threshold (100, ..., 400, 500) for which to get angel 
+     *
+     * @param points Score threshold (100, ..., 400, 500) for which to get angel
      * @return list of creatures that can be get at that threshold
      */
     public List<String> findEligibleAngels(int points)
@@ -367,7 +399,7 @@ public abstract class Legion
     }
 
     /**
-     * Data for one pending decision. For example, for crossing the 500 
+     * Data for one pending decision. For example, for crossing the 500
      * there will be a decision, whether the player takes for this legion
      * an angel or an archangel.
      */
