@@ -1498,7 +1498,7 @@ public final class GameServerSide extends Game
             entrySide = EntrySide.NOT_SET;
         }
         leg.setAttribute("entrySide", "" + entrySide.ordinal());
-        leg.setAttribute("parent", notnull(legion.getParent().getMarkerId()));
+        leg.setAttribute("parent", legion.getParent() != null?notnull(legion.getParent().getMarkerId()):"null");
         leg.setAttribute("recruitName", notnull(legion.getRecruitName()));
         leg.setAttribute("battleTally", "" + legion.getBattleTally());
 
