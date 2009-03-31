@@ -2814,22 +2814,26 @@ public final class Client implements IClient, IOracle
         return remain;
     }
 
-    /** Return a list of Creatures (ignore reservations).
-     *
-     * TODO the extra hexLabel parameter is probably not needed anymore
+    /** 
+     * Return a list of Creatures (ignore reservations).
      */
     public List<CreatureType> findEligibleRecruits(Legion legion, MasterHex hex)
     {
         return findEligibleRecruits(legion, hex, false);
     }
 
-    /** Return a list of Creatures. Consider reservations if wanted
-     *
-     * TODO the extra hexLabel parameter is probably not needed anymore
+    /** 
+     * Return a list of Creatures and consider reservations if wanted.
+     * 
+     * @param legion The legion to recruit with.
+     * @param hex The hex in which to recruit (not necessarily the same as the legion's position). Not null.
+     * @param considerReservations Flag to determine if reservations should be considered.
+     * @return A list of possible recruits for the legion in the hex.
      */
     public List<CreatureType> findEligibleRecruits(Legion legion,
         MasterHex hex, boolean considerReservations)
     {
+        // TODO why not: assert legion != null;
         assert hex != null : "Null hex given to find recruits in";
 
         List<CreatureType> recruits = new ArrayList<CreatureType>();
