@@ -102,6 +102,7 @@ public class VariantLoader
 
     public List<String> getCre()
     {
+        assert !cre.isEmpty() : "No Creatures file listed in variant.";
         return Collections.unmodifiableList(cre);
     }
 

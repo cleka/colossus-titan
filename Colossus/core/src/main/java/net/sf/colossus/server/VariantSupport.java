@@ -272,10 +272,6 @@ public final class VariantSupport
                 LOGGER.log(Level.FINEST, "Variant using MAP " + mapName);
 
                 lCreaturesName = vl.getCre();
-                if (lCreaturesName.isEmpty())
-                {
-                    lCreaturesName.add(Constants.defaultCREFile);
-                }
                 for (String creaturesName : lCreaturesName)
                 {
                     LOGGER.log(Level.FINEST, "Variant using CRE "
