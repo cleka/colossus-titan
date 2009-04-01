@@ -1033,8 +1033,6 @@ public class ClientGUI implements IClientGUI
                 client);
             setMarker(legion, marker);
 
-            client.setMarkerForLegion(legion, marker);
-
             if (!isReplayOngoing())
             {
                 board.alignLegions(hex);
@@ -1048,9 +1046,8 @@ public class ClientGUI implements IClientGUI
     {
         if (board != null)
         {
-            board.markerToTop(marker);
+            board.setMarkerForLegion(legion, marker);
         }
-        client.setMarkerForLegion(legion, marker);
     }
 
     /* (non-Javadoc)

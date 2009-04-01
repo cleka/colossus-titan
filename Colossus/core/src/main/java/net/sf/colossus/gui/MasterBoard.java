@@ -29,14 +29,16 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -121,7 +123,8 @@ public final class MasterBoard extends JPanel
      *  @TODO: Perhaps the whole list should be legions instead
      *         of markers.
      */
-    private final List<Marker> markersOnBoard = new ArrayList<Marker>();
+    //private final List<Marker> markersOnBoard = new ArrayList<Marker>();
+    private final LinkedHashMap<Legion, Marker> legionToMarkerMap = new LinkedHashMap<Legion, Marker>();
 
     private final Map<Legion, Chit> recruitedChits = new HashMap<Legion, Chit>();
     private final Map<MasterHex, List<Chit>> possibleRecruitChits = new HashMap<MasterHex, List<Chit>>();
@@ -224,9 +227,9 @@ public final class MasterBoard extends JPanel
             {
                 if (legionFlyouts == null)
                 {
-                    synchronized (markersOnBoard)
+                    synchronized (legionToMarkerMap)
                     {
-                        createLegionFlyouts(markersOnBoard);
+                        createLegionFlyouts(legionToMarkerMap.values());
                     }
                 }
             }
@@ -236,14 +239,15 @@ public final class MasterBoard extends JPanel
                 {
                     // copy only local players markers
                     List<Marker> myMarkers = new ArrayList<Marker>();
-                    synchronized (markersOnBoard)
+                    synchronized (legionToMarkerMap)
                     {
-                        for (Marker marker : markersOnBoard)
+                        for (Entry<Legion, Marker> entry : legionToMarkerMap
+                            .entrySet())
                         {
-                            Legion legion = client.getLegion(marker.getId());
+                            Legion legion = entry.getKey();
                             if (((LegionClientSide)legion).isMyLegion())
                             {
-                                myMarkers.add(marker);
+                                myMarkers.add(entry.getValue());
                             }
                         }
                         createLegionFlyouts(myMarkers);
@@ -256,7 +260,7 @@ public final class MasterBoard extends JPanel
             }
         }
 
-        private void createLegionFlyouts(List<Marker> markers)
+        private void createLegionFlyouts(Collection<Marker> markers)
         {
             // copy to array so we don't get concurrent modification
             // exceptions when iterating
@@ -1255,7 +1259,7 @@ public final class MasterBoard extends JPanel
         }
 
         LegionClientSide legion = legions.get(0);
-        Marker marker = legion.getMarker();
+        Marker marker = legionToMarkerMap.get(legion);
         if (marker == null)
         {
             hex.repaint();
@@ -1286,7 +1290,7 @@ public final class MasterBoard extends JPanel
             point.x -= chitScale4;
             point.y -= chitScale4;
             legion = legions.get(1);
-            marker = (legion).getMarker();
+            marker = legionToMarkerMap.get(legion);
             if (marker != null)
             {
                 // Second marker can be null when loading during
@@ -1306,14 +1310,14 @@ public final class MasterBoard extends JPanel
             point.x -= chitScale4;
             point.y -= chitScale4;
             legion = legions.get(1);
-            marker = (legion).getMarker();
+            marker = legionToMarkerMap.get(legion);
             marker.setLocation(point);
 
             point = new Point(startingPoint);
             point.x -= chitScale4;
             point.y -= chitScale;
             legion = legions.get(2);
-            marker = (legion).getMarker();
+            marker = legionToMarkerMap.get(legion);
             marker.setLocation(point);
         }
 
@@ -1422,27 +1426,20 @@ public final class MasterBoard extends JPanel
             });
     }
 
-    List<Marker> getMarkers()
+    void setMarkerForLegion(Legion legion, Marker marker)
     {
-        // Note: whoever uses this, should access it in synchronized way!
-        return markersOnBoard;
-    }
-
-    void markerToTop(Marker marker)
-    {
-        synchronized (markersOnBoard)
+        synchronized (legionToMarkerMap)
         {
-            markersOnBoard.remove(marker);
-            markersOnBoard.add(marker);
+            legionToMarkerMap.remove(legion);
+            legionToMarkerMap.put(legion, marker);
         }
     }
 
     void removeMarkerForLegion(Legion legion)
     {
-        Marker marker = ((LegionClientSide)legion).getMarker();
-        synchronized (markersOnBoard)
+        synchronized (legionToMarkerMap)
         {
-            markersOnBoard.remove(marker);
+            legionToMarkerMap.remove(legion);
             recruitedChits.remove(legion);
         }
     }
@@ -1451,9 +1448,9 @@ public final class MasterBoard extends JPanel
     public void recreateMarkers()
     {
         Set<MasterHex> hexesNeedAligning = new HashSet<MasterHex>();
-        synchronized (markersOnBoard)
+        synchronized (legionToMarkerMap)
         {
-            markersOnBoard.clear();
+            legionToMarkerMap.clear();
             for (Player player : client.getPlayers())
             {
                 for (Legion legion : player.getLegions())
@@ -1461,8 +1458,7 @@ public final class MasterBoard extends JPanel
                     String markerId = legion.getMarkerId();
                     Marker marker = new Marker(3 * Scale.get(), markerId,
                         client);
-                    client.setMarkerForLegion(legion, marker);
-                    markersOnBoard.add(marker);
+                    legionToMarkerMap.put(legion, marker);
                     hexesNeedAligning.add(legion.getCurrentHex());
                 }
             }
@@ -1474,20 +1470,18 @@ public final class MasterBoard extends JPanel
      *  null if none does. */
     private Marker getMarkerAtPoint(Point point)
     {
-        synchronized (markersOnBoard)
+        synchronized (legionToMarkerMap)
         {
-            ListIterator<Marker> lit = markersOnBoard
-                .listIterator(markersOnBoard.size());
-            while (lit.hasPrevious())
+            Marker marker = null;
+            for (Entry<Legion, Marker> entry : legionToMarkerMap.entrySet())
             {
-                Marker marker = lit.previous();
-                if (marker != null && marker.getBounds().contains(point))
+                if (entry.getValue().getBounds().contains(point))
                 {
-                    return marker;
+                    marker = entry.getValue();
                 }
             }
+            return marker;
         }
-        return null;
     }
 
     // TODO the next couple of methods iterate through all elements of an array
@@ -1920,9 +1914,9 @@ public final class MasterBoard extends JPanel
     /** Paint markers in z-order. */
     private void paintMarkers(Graphics g)
     {
-        synchronized (markersOnBoard)
+        synchronized (legionToMarkerMap)
         {
-            for (Marker marker : markersOnBoard)
+            for (Marker marker : legionToMarkerMap.values())
             {
                 if (g.getClipBounds().intersects(marker.getBounds()))
                 {

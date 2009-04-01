@@ -13,7 +13,6 @@ import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
-import net.sf.colossus.gui.Marker;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
@@ -39,8 +38,10 @@ public final class LegionClientSide extends Legion
 
     private final Client client;
 
-    private Marker marker;
     private PredictSplitNode myNode;
+    /*
+     * TODO this is not intrinsic to the Legion, it is a Player feature
+     */
     private final boolean isMyLegion;
 
     // TODO the Client parameter should be a Game(ClientSide), which doesn't exist yet
@@ -66,16 +67,6 @@ public final class LegionClientSide extends Legion
             myNode = getNode(this.markerId);
         }
         return myNode;
-    }
-
-    void setMarker(Marker marker)
-    {
-        this.marker = marker;
-    }
-
-    public Marker getMarker()
-    {
-        return marker;
     }
 
     public boolean isMyLegion()

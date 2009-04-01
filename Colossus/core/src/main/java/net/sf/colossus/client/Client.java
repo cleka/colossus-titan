@@ -40,7 +40,6 @@ import net.sf.colossus.game.SummonInfo;
 import net.sf.colossus.gui.BattleChit;
 import net.sf.colossus.gui.ClientGUI;
 import net.sf.colossus.gui.IClientGUI;
-import net.sf.colossus.gui.Marker;
 import net.sf.colossus.gui.NullClientGUI;
 import net.sf.colossus.gui.Scale;
 import net.sf.colossus.server.CustomRecruitBase;
@@ -995,12 +994,6 @@ public final class Client implements IClient, IOracle
     {
         Player player = getPlayerByMarkerId(markerId);
         return player.hasLegion(markerId);
-    }
-
-    public void setMarkerForLegion(Legion legion, Marker marker)
-    {
-        // TODO next line seems redundant since setMarker(..) does set the marker on the legion
-        ((LegionClientSide)legion).setMarker(marker);
     }
 
     /** Remove this eliminated legion, and clean up related stuff. */
