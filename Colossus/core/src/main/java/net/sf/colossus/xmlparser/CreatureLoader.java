@@ -35,7 +35,7 @@ public class CreatureLoader
     private static final Logger LOGGER = Logger.getLogger(CreatureLoader.class
         .getName());
     private static final String currentVersion = "2";
-    private final ArrayList<CreatureType> creatures;
+    private final List<CreatureType> creatures;
 
     // we need to cast since JDOM is not generified
     @SuppressWarnings("unchecked")
