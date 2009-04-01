@@ -323,8 +323,8 @@ public class GUIBattleHex extends GUIHex<BattleHex>
             case 's': // slope -- lines
                 for (int j = 0; j < 3; j++)
                 {
-                    x = getWallOrSlopePositionXArray(j, vx1, vx2, theta);
-                    y = getWallOrSlopePositionYArray(j, vy1, vy2, theta);
+                    x = getWallOrSlopePositionXArray(j, vx1, vx2, theta, 3);
+                    y = getWallOrSlopePositionYArray(j, vy1, vy2, theta, 3);
 
                     g2.setColor(Color.black);
                     g2.draw(new Line2D.Double(x[0], y[0], x[1], y[1]));
@@ -335,8 +335,8 @@ public class GUIBattleHex extends GUIHex<BattleHex>
             case 'w': // wall --  blocks
                 for (int j = 0; j < 3; j++)
                 {
-                    x = getWallOrSlopePositionXArray(j, vx1, vx2, theta);
-                    y = getWallOrSlopePositionYArray(j, vy1, vy2, theta);
+                    x = getWallOrSlopePositionXArray(j, vx1, vx2, theta, 2);
+                    y = getWallOrSlopePositionYArray(j, vy1, vy2, theta, 2);
 
                     GeneralPath polygon = makePolygon(4, x, y, false);
 

@@ -167,7 +167,7 @@ public abstract class GUIHex<H extends Hex> extends JComponent
     }
 
     protected double[] getWallOrSlopePositionXArray(int j, double vx1, double vx2,
-            double theta)
+            double theta, int size)
     {
         double[] x = new double[4];
         double x0; // first focus point
@@ -175,15 +175,15 @@ public abstract class GUIHex<H extends Hex> extends JComponent
         x0 = vx1 + (vx2 - vx1) * (2 + 3 * j) / 12;
         x1 = vx1 + (vx2 - vx1) * (4 + 3 * j) / 12;
 
-        x[0] = x0 - len / 3 * Math.sin(theta);
-        x[1] = x0 + len / 3 * Math.sin(theta);
-        x[2] = x1 + len / 3 * Math.sin(theta);
-        x[3] = x1 - len / 3 * Math.sin(theta);
+        x[0] = x0 - len / size * Math.sin(theta);
+        x[1] = x0 + len / size * Math.sin(theta);
+        x[2] = x1 + len / size * Math.sin(theta);
+        x[3] = x1 - len / size * Math.sin(theta);
         return x;
     }
 
     protected double[] getWallOrSlopePositionYArray(int j, double vy1, double vy2,
-            double theta)
+            double theta, int size)
     {
         double[] y = new double[4];
         double y0; // first focus point
@@ -191,10 +191,10 @@ public abstract class GUIHex<H extends Hex> extends JComponent
         y0 = vy1 + (vy2 - vy1) * (2 + 3 * j) / 12;
         y1 = vy1 + (vy2 - vy1) * (4 + 3 * j) / 12;
 
-        y[0] = y0 + len / 3 * Math.cos(theta);
-        y[1] = y0 - len / 3 * Math.cos(theta);
-        y[2] = y1 - len / 3 * Math.cos(theta);
-        y[3] = y1 + len / 3 * Math.cos(theta);
+        y[0] = y0 + len / size * Math.cos(theta);
+        y[1] = y0 - len / size * Math.cos(theta);
+        y[2] = y1 - len / size * Math.cos(theta);
+        y[3] = y1 + len / size * Math.cos(theta);
         return y;
     }
 }

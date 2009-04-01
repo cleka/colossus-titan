@@ -322,14 +322,8 @@ public final class GUIMasterHex extends GUIHex<MasterHex>
         switch (gateType)
         {
             case BLOCK:
-                x[0] = x0 - len * Math.sin(theta);
-                y[0] = y0 + len * Math.cos(theta);
-                x[1] = x0 + len * Math.sin(theta);
-                y[1] = y0 - len * Math.cos(theta);
-                x[2] = x1 + len * Math.sin(theta);
-                y[2] = y1 - len * Math.cos(theta);
-                x[3] = x1 - len * Math.sin(theta);
-                y[3] = y1 + len * Math.cos(theta);
+                x = getWallOrSlopePositionXArray(0, vx1, vx2, theta, 1);
+                y = getWallOrSlopePositionYArray(0, vy1, vy2, theta, 1);
 
                 GeneralPath polygon = makePolygon(4, x, y, false);
 
@@ -340,14 +334,8 @@ public final class GUIMasterHex extends GUIHex<MasterHex>
                 break;
 
             case ARCH:
-                x[0] = x0 - len * Math.sin(theta);
-                y[0] = y0 + len * Math.cos(theta);
-                x[1] = x0 + len * Math.sin(theta);
-                y[1] = y0 - len * Math.cos(theta);
-                x[2] = x1 + len * Math.sin(theta);
-                y[2] = y1 - len * Math.cos(theta);
-                x[3] = x1 - len * Math.sin(theta);
-                y[3] = y1 + len * Math.cos(theta);
+                x = getWallOrSlopePositionXArray(0, vx1, vx2, theta, 1);
+                y = getWallOrSlopePositionYArray(0, vy1, vy2, theta, 1);
 
                 x2 = (x0 + x1) / 2;
                 y2 = (y0 + y1) / 2;
