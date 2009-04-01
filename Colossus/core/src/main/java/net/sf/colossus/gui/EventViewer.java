@@ -524,7 +524,7 @@ final class EventViewer extends KDialog
     private boolean isEventTooOld(RevealEvent e)
     {
         int oldEventTurn = e.getTurn();
-        int oldPlayerNr = e.getPlayerNr();
+        int oldPlayerNr = e.getPlayer().getNumber();
 
         if (maxTurns != -1
             && turnNr - oldEventTurn > maxTurns
@@ -723,9 +723,9 @@ final class EventViewer extends KDialog
     }
 
     // Helper methods to ask something from client:
-    private int getActivePlayerNum()
+    private Player getActivePlayer()
     {
-        return client.getActivePlayer().getNumber();
+        return client.getActivePlayer();
     }
 
     private Legion getLegion(String marker)
@@ -737,7 +737,7 @@ final class EventViewer extends KDialog
     private void newRollEvent(int eventType, int roll1, int roll2)
     {
         RevealEvent e = new RevealEvent(client, client.getTurnNumber(),
-            getActivePlayerNum(), eventType, roll1, roll2);
+            getActivePlayer(), eventType, roll1, roll2);
         addEvent(e);
     }
 
@@ -746,7 +746,7 @@ final class EventViewer extends KDialog
         ArrayList<RevealedCreature> rcList, String markerId2, int height2)
     {
         RevealEvent e = new RevealEvent(client, client.getTurnNumber(),
-            getActivePlayerNum(), eventType, markerId1, height1, rcList,
+            getActivePlayer(), eventType, markerId1, height1, rcList,
             markerId2, height2);
         addEvent(e);
     }
@@ -759,13 +759,13 @@ final class EventViewer extends KDialog
         setMulliganOldRoll(-2);
         if (turnNr != this.turnNr)
         {
-            RevealEvent e = new RevealEvent(client, turnNr, playerNr,
+            RevealEvent e = new RevealEvent(client, turnNr, player,
                 RevealEvent.eventTurnChange, null, 0, null, null, 0);
             addEvent(e);
         }
         if (playerNr != this.playerNr || turnNr != this.turnNr)
         {
-            RevealEvent e = new RevealEvent(client, turnNr, playerNr,
+            RevealEvent e = new RevealEvent(client, turnNr, player,
                 RevealEvent.eventPlayerChange, null, 0, null, null, 0);
             addEvent(e);
         }
@@ -820,14 +820,16 @@ final class EventViewer extends KDialog
         this.defender = defender;
 
         attackerEventLegion = new RevealEvent(client, turnNumber,
-            getActivePlayerNum(), RevealEvent.eventBattle, attacker
+            getActivePlayer(), RevealEvent.eventBattle,
+            attacker
                 .getMarkerId(), attacker.getHeight(),
             new ArrayList<RevealedCreature>(), null, 0);
         attackerEventLegion.setEventInfo(Constants.reasonBattleStarts);
         attackerEventLegion.setRealPlayer(attacker.getPlayer());
 
         defenderEventLegion = new RevealEvent(client, turnNumber,
-            getActivePlayerNum(), RevealEvent.eventBattle, defender
+            getActivePlayer(), RevealEvent.eventBattle,
+            defender
                 .getMarkerId(), defender.getHeight(),
             new ArrayList<RevealedCreature>(), null, 0);
 
@@ -959,7 +961,7 @@ final class EventViewer extends KDialog
     public void newSplitEvent(int turnNr, String markerId1, int height1,
         ArrayList<RevealedCreature> rcList, String markerId2, int height2)
     {
-        RevealEvent e = new RevealEvent(client, turnNr, getActivePlayerNum(),
+        RevealEvent e = new RevealEvent(client, turnNr, getActivePlayer(),
             RevealEvent.eventSplit, markerId1, height1, rcList, markerId2,
             height2);
         addEvent(e);
@@ -1326,7 +1328,7 @@ final class EventViewer extends KDialog
             {
                 RevealEvent e = it.next();
                 int oldEventTurn = e.getTurn();
-                int oldPlayerNr = e.getPlayerNr();
+                int oldPlayerNr = e.getPlayer().getNumber();
 
                 if (turnNr - oldEventTurn > expireTurns
                     - (playerNr >= oldPlayerNr ? 1 : 0))

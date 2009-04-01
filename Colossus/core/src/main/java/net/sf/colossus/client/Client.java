@@ -2186,14 +2186,6 @@ public final class Client implements IClient, IOracle
         return color.getShortName();
     }
 
-    // public for RevealEvent
-    public String getShortColor(int playerNum)
-    {
-        PlayerClientSide player = getPlayer(playerNum);
-        return player.getShortColor();
-    }
-
-    // TODO this would probably work better as state in PlayerState
     // TODO Comment Clemens I think this would be better a variable
     //      in GameClientSide...
     public Player getBattleActivePlayer()

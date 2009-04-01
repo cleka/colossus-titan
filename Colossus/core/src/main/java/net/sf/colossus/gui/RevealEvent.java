@@ -35,7 +35,7 @@ public class RevealEvent
 
     private final Client client;
     private final int turnNumber;
-    private final int playerNr;
+    private final Player player;
     private int eventType;
     private String markerId;
     private int height;
@@ -104,7 +104,7 @@ public class RevealEvent
      *      from here on, because Legion content will change but we
      *      want to record the original state!
      */
-    public RevealEvent(Client client, int turnNumber, int playerNr,
+    public RevealEvent(Client client, int turnNumber, Player player,
         int eventType, String markerId, int height,
         List<RevealedCreature> knownCreatures, String markerId2, int height2)
     {
@@ -117,8 +117,8 @@ public class RevealEvent
         }
         this.client = client;
         this.turnNumber = turnNumber;
-        // Number of the player in whose turn this event happens.
-        this.playerNr = playerNr;
+        // player in whose turn this event happens.
+        this.player = player;
         this.eventType = eventType;
         // affected legion; split: parent; summon: donor
         this.markerId = markerId;
@@ -132,18 +132,17 @@ public class RevealEvent
     }
 
     // mulligan and movement roll
-    public RevealEvent(Client client, int turnNumber, int playerNr,
+    public RevealEvent(Client client, int turnNumber, Player player,
         int eventType, int oldRoll, int newRoll)
     {
         this.client = client;
         this.turnNumber = turnNumber;
-        this.playerNr = playerNr;
+        this.player = player;
         this.eventType = eventType;
 
         this.oldRoll = oldRoll;
         this.newRoll = newRoll;
 
-        Player player = client.getPlayer(playerNr);
         this.mulliganTitanBaseName = player.getTitanBasename();
     }
 
@@ -406,12 +405,7 @@ public class RevealEvent
 
     public Player getPlayer()
     {
-        return client.getPlayer(playerNr);
-    }
-
-    public int getPlayerNr()
-    {
-        return playerNr;
+        return player;
     }
 
     @Override
@@ -452,24 +446,27 @@ public class RevealEvent
 
         else if (eventType == eventTurnChange)
         {
-            msg = "Revealing event: Turn change, now player " + getPlayerNr()
-                + " (" + getPlayer() + "), Turn " + getTurn();
+            msg = "Revealing event: Turn change, now player "
+                + getPlayer().getName() + ", Turn " + getTurn();
         }
         else if (eventType == eventPlayerChange)
         {
             msg = "Revealing event: Player change, now player "
-                + getPlayerNr() + " (" + getPlayer() + "), Turn " + getTurn();
+                + getPlayer().getName()
+                + ", Turn " + getTurn();
         }
         else if (eventType == eventMulligan)
         {
-            msg = "Revealing event: Player " + getPlayerNr() + " ("
-                + getPlayer() + "), Turn " + getTurn() + " took mulligan;"
+            msg = "Revealing event: Player " + getPlayer().getName()
+                + ", Turn "
+                + getTurn() + " took mulligan;"
                 + " old=" + oldRoll + ", new=" + newRoll;
         }
         else if (eventType == eventMoveRoll)
         {
-            msg = "Revealing event: Player " + getPlayerNr() + " ("
-                + getPlayer() + "), Turn " + getTurn()
+            msg = "Revealing event: Player " + getPlayer().getName()
+                + ", Turn "
+                + getTurn()
                 + " had movement roll: " + " old=" + oldRoll;
         }
 
@@ -545,7 +542,7 @@ public class RevealEvent
         {
             try
             {
-                String color = client.getShortColor(playerNr);
+                String color = player.getShortColor();
                 solidMarker = new Chit(scale, color + "Solid");
             }
             catch (Exception e)
@@ -553,7 +550,6 @@ public class RevealEvent
                 LOGGER.log(Level.SEVERE, "While trying to get chit: ", e);
                 // if solid marker does not exist for this color,
                 // use as fallback the Titan chit.
-                Player player = client.getPlayer(playerNr);
                 solidMarker = new Chit(scale, player.getTitanBasename());
             }
         }
