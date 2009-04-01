@@ -3,7 +3,6 @@ package net.sf.colossus.client;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -13,7 +12,6 @@ import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
-import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
 
@@ -341,39 +339,5 @@ public final class LegionClientSide extends Legion
     public String toString()
     {
         return markerId;
-    }
-
-    /** Sorts Titans first, then decreasing order of kill value, then
-     *  Unknowns last */
-    class CreatureNameComparator implements Comparator<String>
-    {
-        public int compare(String s1, String s2)
-        {
-            if (s1.equals(s2))
-            {
-                return 0;
-            }
-            if (s1.equals("Unknown"))
-            {
-                return 1;
-            }
-            if (s2.equals("Unknown"))
-            {
-                return -1;
-            }
-            if (s1.startsWith(Constants.titan))
-            {
-                return -1;
-            }
-            if (s2.startsWith(Constants.titan))
-            {
-                return 1;
-            }
-            CreatureType c1 = VariantSupport.getCurrentVariant()
-                .getCreatureByName(s1);
-            CreatureType c2 = VariantSupport.getCurrentVariant()
-                .getCreatureByName(s2);
-            return c2.getKillValue() - c1.getKillValue();
-        }
     }
 }

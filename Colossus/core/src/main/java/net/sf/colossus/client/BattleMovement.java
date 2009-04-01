@@ -121,7 +121,7 @@ final class BattleMovement
     }
 
     /** Find all legal moves for this critter.*/
-    Set<BattleHex> showMoves(BattleChit chit)
+    private Set<BattleHex> showMoves(BattleChit chit)
     {
         Set<BattleHex> set = new HashSet<BattleHex>();
         if (!chit.hasMoved() && !client.isInContact(chit, false))

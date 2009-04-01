@@ -10,13 +10,13 @@ import java.util.logging.LogRecord;
 
 /**
  * This is a logging formatter doing not much more than the bare minimum.
- * 
+ *
  * We don't log the source class/method, we log the level only if WARNING
  * or SEVERE. Exceptions are logged if given, but otherwise it is more like
  * printing to stdout, just that it is configurable and it is possible to have
- * a more verbose log in parallel. 
+ * a more verbose log in parallel.
  */
-public class VerySimpleFormatter extends Formatter
+public class VerySimpleFormatter extends Formatter // NO_UCD
 {
     public static final String LINE_SEPARATOR = System
         .getProperty("line.separator");

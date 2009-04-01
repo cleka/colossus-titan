@@ -13,7 +13,7 @@ import java.util.logging.Logger;
  *  @author David Ripton
  */
 
-public final class HTMLColor
+public final class HTMLColor // NO_UCD
 {
     private static final Logger LOGGER = Logger.getLogger(HTMLColor.class
         .getName());
@@ -211,7 +211,7 @@ public final class HTMLColor
     /** returns "#rrggbb" string that JTextPane can display */
     public static String colorToCode(Color c)
     {
-        // mask alpha out, fill with zeros to length 7, cut rightmost 6. 
+        // mask alpha out, fill with zeros to length 7, cut rightmost 6.
         return ("#" + Integer.toHexString((c.getRGB() & 0xffffff) + 0x1000000)
             .substring(1));
     }

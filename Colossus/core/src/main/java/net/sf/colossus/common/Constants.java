@@ -33,7 +33,6 @@ public final class Constants
         + File.separator + ".colossus" + File.separator;
 
     // Constants related to the options config files
-    public static final String OPTIONS_PATH = GAME_DATA_PATH;
     public static final String OPTIONS_BASE = "Colossus-";
     public static final String OPTIONS_SERVER_NAME = "server";
     public static final String OPTIONS_NET_CLIENT_NAME = "netclient";
@@ -67,12 +66,6 @@ public final class Constants
     public static final int ARCHES_AND_ARROWS = -1;
     public static final int ARROWS_ONLY = -2;
     public static final int NOWHERE = -1;
-
-    // MasterBoard size
-    public static final int MIN_HORIZ_SIZE = 15;
-    public static final int MIN_VERT_SIZE = 8;
-    public static final int MAX_HORIZ_SIZE = 60;
-    public static final int MAX_VERT_SIZE = 32;
 
     public static final int MIN_AI_DELAY = 0; //in ms
     public static final int MAX_AI_DELAY = 3000;
@@ -141,7 +134,6 @@ public final class Constants
     public static final String human = "Human";
     public static final String network = "Network";
     public static final String none = "None";
-    public static final String observer = "Observer";
     public static final String ai = "AI";
     public static final String anyAI = "A Random AI";
     public static final String defaultAI = anyAI;
@@ -149,7 +141,6 @@ public final class Constants
         "RationalAI", "HumanHaterRationalAI", "MilvangAI", "ExperimentalAI" };
 
     public static final int numAITypes = aiArray.length;
-    public static final String all = "All";
     public static final String aiPackage = "net.sf.colossus.ai.";
     public static final String oldAiPackage = "net.sf.colossus.client.";
 
@@ -169,9 +160,6 @@ public final class Constants
     // Web clients:
     public static final String defaultWebServer = "localhost";
     public static final int defaultWebPort = 26766;
-    public static final String defaultWebLogin = System.getProperty(
-        "user.name", "webuser");
-    public static final String defaultWebPassword = "webpassword";
 
     public static final int numSavedServerNames = 10;
 
@@ -253,10 +241,6 @@ public final class Constants
     public static final String assignColor = "assignColor";
     public static final String assignFirstMarker = "assignFirstMarker";
     public static final String askPickFirstMarker = "askPickFirstMarker";
-    //public static final String newGame = "newGame";
-    //public static final String loadGame = "loadGame";
-    //public static final String saveGame = "saveGame";
-    public static final String processedCtr = "processedCtr";
     public static final String catchupConfirmation = "catchupConfirmation";
     public static final String serverConnectionOK = "serverConnectionOK";
 

@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -105,7 +104,7 @@ public final class Client implements IClient, IOracle
      *  direct reference.  So don't share this reference. */
     private IServer server;
 
-    public boolean failed = false;
+    private boolean failed = false;
 
     // TODO keep in sync with GUI
     private boolean replayOngoing = false;
@@ -185,18 +184,16 @@ public final class Client implements IClient, IOracle
     private SocketClientThread sct;
 
     /**
-     * Constants modeling the party who closed this client.
-     *
-     * TODO the CLOSED_BY_WEBCLIENT seems unused
+     * Constants modelling the party who closed this client.
      */
     private enum ClosedByConstant
     {
-        NOT_CLOSED, CLOSED_BY_SERVER, CLOSED_BY_CLIENT, CLOSED_BY_WEBCLIENT
+        NOT_CLOSED, CLOSED_BY_SERVER, CLOSED_BY_CLIENT
     }
 
-    public ClosedByConstant closedBy = ClosedByConstant.NOT_CLOSED;
+    private ClosedByConstant closedBy = ClosedByConstant.NOT_CLOSED;
 
-    // XXX temporary until things are synched
+    // XXX temporary until things are synchronized
     private boolean tookMulligan;
 
     private int numSplitsThisTurn;
@@ -363,7 +360,7 @@ public final class Client implements IClient, IOracle
         return playerAlive;
     }
 
-    boolean suspended = false;
+    private boolean suspended = false;
 
     public boolean isSuspended()
     {
@@ -478,7 +475,7 @@ public final class Client implements IClient, IOracle
     }
 
     /** Cease negotiations and fight a battle in land. */
-    void fight(MasterHex hex)
+    private void fight(MasterHex hex)
     {
         server.fight(hex);
     }
@@ -497,7 +494,7 @@ public final class Client implements IClient, IOracle
     }
 
     /** Legion target summons unit from legion donor. */
-    void doSummon(SummonInfo summonInfo)
+    private void doSummon(SummonInfo summonInfo)
     {
         assert summonInfo != null : "SummonInfo object must not be null!";
 
@@ -656,7 +653,7 @@ public final class Client implements IClient, IOracle
         return players[playerNum];
     }
 
-    public PlayerClientSide getPlayerInfo(String playerName)
+    PlayerClientSide getPlayerInfo(String playerName)
     {
         for (PlayerClientSide info : players)
         {
@@ -706,7 +703,7 @@ public final class Client implements IClient, IOracle
         gui.updateCreatureCountDisplay();
     }
 
-    public void setClosedByServer()
+    void setClosedByServer()
     {
         closedBy = ClosedByConstant.CLOSED_BY_SERVER;
     }
@@ -749,7 +746,7 @@ public final class Client implements IClient, IOracle
 
     // Clean up everything related to _this_ client:
 
-    public void disposeWholeClient()
+    private void disposeWholeClient()
     {
         gui.handleWebClientRestore();
 
@@ -925,7 +922,7 @@ public final class Client implements IClient, IOracle
     }
 
     /** Return true if any strikes were taken. */
-    boolean makeForcedStrikes()
+    private boolean makeForcedStrikes()
     {
         if (isMyBattlePhase() && options.getOption(Options.autoForcedStrike))
         {
@@ -936,7 +933,7 @@ public final class Client implements IClient, IOracle
     }
 
     /** Handle both forced strikes and AI strikes. */
-    void doAutoStrikes()
+    private void doAutoStrikes()
     {
         if (isMyBattlePhase())
         {
@@ -988,12 +985,6 @@ public final class Client implements IClient, IOracle
             + " (for player " + player + "), turn = " + turnNumber
             + " in client " + getOwningPlayer();
         return legion;
-    }
-
-    public boolean legionExists(String markerId)
-    {
-        Player player = getPlayerByMarkerId(markerId);
-        return player.hasLegion(markerId);
     }
 
     /** Remove this eliminated legion, and clean up related stuff. */
@@ -1537,11 +1528,6 @@ public final class Client implements IClient, IOracle
         server.makeProposal(proposal.toString());
     }
 
-    public void doTellProposal(String proposalString)
-    {
-        gui.tellProposal(proposalString);
-    }
-
     public boolean isOccupied(BattleHex hex)
     {
         return !getBattleChits(hex).isEmpty();
@@ -1725,7 +1711,7 @@ public final class Client implements IClient, IOracle
         gui.cleanupNegotiationDialogs();
 
         this.battleTurnNumber = battleTurnNumber;
-        setBattleActivePlayer(battleActivePlayer);
+        this.battleActivePlayer = battleActivePlayer;
         this.battlePhase = battlePhase;
         this.getDefender().setEntrySide(
             this.getAttacker().getEntrySide().getOpposingSide());
@@ -2068,7 +2054,7 @@ public final class Client implements IClient, IOracle
         int battleTurnNumber)
     {
         this.battlePhase = BattlePhase.SUMMON;
-        setBattleActivePlayer(battleActivePlayer);
+        this.battleActivePlayer = battleActivePlayer;
         this.battleTurnNumber = battleTurnNumber;
 
         gui.actOnSetupBattleSummon();
@@ -2079,7 +2065,7 @@ public final class Client implements IClient, IOracle
         int battleTurnNumber)
     {
         this.battlePhase = BattlePhase.RECRUIT;
-        setBattleActivePlayer(battleActivePlayer);
+        this.battleActivePlayer = battleActivePlayer;
         this.battleTurnNumber = battleTurnNumber;
 
         gui.actOnSetupBattleRecruit();
@@ -2097,7 +2083,7 @@ public final class Client implements IClient, IOracle
 
     public void setupBattleMove(Player battleActivePlayer, int battleTurnNumber)
     {
-        setBattleActivePlayer(battleActivePlayer);
+        this.battleActivePlayer = battleActivePlayer;
         this.battleTurnNumber = battleTurnNumber;
 
         // Just in case the other player started the battle
@@ -2157,7 +2143,7 @@ public final class Client implements IClient, IOracle
         Player battleActivePlayer)
     {
         this.battlePhase = battlePhase;
-        setBattleActivePlayer(battleActivePlayer);
+        this.battleActivePlayer = battleActivePlayer;
         if (battlePhase == BattlePhase.FIGHT)
         {
             markOffboardCreaturesDead();
@@ -2193,11 +2179,6 @@ public final class Client implements IClient, IOracle
         return battleActivePlayer;
     }
 
-    void setBattleActivePlayer(Player player)
-    {
-        this.battleActivePlayer = player;
-    }
-
     Legion getBattleActiveLegion()
     {
         if (battleActivePlayer.equals(getDefender().getPlayer()))
@@ -2207,18 +2188,6 @@ public final class Client implements IClient, IOracle
         else
         {
             return getAttacker();
-        }
-    }
-
-    Legion getBattleInactiveLegion()
-    {
-        if (battleActivePlayer.equals(getDefender().getPlayer()))
-        {
-            return getAttacker();
-        }
-        else
-        {
-            return getDefender();
         }
     }
 
@@ -2381,11 +2350,6 @@ public final class Client implements IClient, IOracle
         return false;
     }
 
-    boolean isActive(BattleChit chit)
-    {
-        return battleActivePlayer.equals(getPlayerByTag(chit.getTag()));
-    }
-
     /** Return a set of hexLabels. */
     public Set<BattleHex> findMobileCritterHexes()
     {
@@ -2490,9 +2454,9 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    boolean isMyCritter(int tag)
+    private boolean isMyCritter(int tag)
     {
-        return (owningPlayer.equals(getPlayerByTag(tag)));
+        return owningPlayer.equals(getPlayerByTag(tag));
     }
 
     // TODO active or not would probably work better as state in PlayerState
@@ -2633,8 +2597,8 @@ public final class Client implements IClient, IOracle
             return false;
         }
 
-        Set<EntrySide> entrySides = listPossibleEntrySides(mover, hex,
-            teleport);
+        Set<EntrySide> entrySides = movement.listPossibleEntrySides(mover,
+            hex, teleport);
 
         EntrySide entrySide = null;
         if (options.getOption(Options.autoPickEntrySide))
@@ -2939,7 +2903,7 @@ public final class Client implements IClient, IOracle
      * Return a set of all other unengaged legions of the legion's player
      * that have summonables.
      */
-    public SortedSet<Legion> findLegionsWithSummonables(Legion summoner)
+    private SortedSet<Legion> findLegionsWithSummonables(Legion summoner)
     {
         SortedSet<Legion> result = new TreeSet<Legion>(
             Legion.ORDER_TITAN_THEN_POINTS);
@@ -2980,12 +2944,6 @@ public final class Client implements IClient, IOracle
     {
         return movement.listNormalMoves(legion, legion.getCurrentHex(),
             getMovementRoll());
-    }
-
-    public Set<EntrySide> listPossibleEntrySides(Legion mover,
-        MasterHex hex, boolean teleport)
-    {
-        return movement.listPossibleEntrySides(mover, hex, teleport);
     }
 
     public List<LegionClientSide> getLegionsByHex(MasterHex hex)
@@ -3096,7 +3054,7 @@ public final class Client implements IClient, IOracle
         return false;
     }
 
-    public List<Legion> getEnemyLegions(final Player player)
+    protected List<Legion> getEnemyLegions(final Player player)
     {
         List<Legion> result = new ArrayList<Legion>();
         for (Player otherPlayer : players)
@@ -3268,7 +3226,7 @@ public final class Client implements IClient, IOracle
 
     }
 
-    void doneWithMoves()
+    private void doneWithMoves()
     {
         if (!isMyTurn())
         {
@@ -3280,7 +3238,7 @@ public final class Client implements IClient, IOracle
         server.doneWithMoves();
     }
 
-    void doneWithEngagements()
+    private void doneWithEngagements()
     {
         if (!isMyTurn())
         {
@@ -3339,11 +3297,6 @@ public final class Client implements IClient, IOracle
             }
         }
         return null;
-    }
-
-    public boolean isMyLegion(String markerId)
-    {
-        return owningPlayer.equals(getPlayerByMarkerId(markerId));
     }
 
     public boolean isMyLegion(Legion legion)
@@ -3429,7 +3382,7 @@ public final class Client implements IClient, IOracle
     // TODO whole method to gui ?
 
     /** Called after a marker is picked, either first marker or split. */
-    void pickMarkerCallback(String childMarker)
+    private void pickMarkerCallback(String childMarker)
     {
         if (childMarker == null)
         {
@@ -3630,7 +3583,7 @@ public final class Client implements IClient, IOracle
     }
 
     /** Wait for aiDelay. */
-    void aiPause()
+    private void aiPause()
     {
         // TODO why is this not set up once, when Client is created?
         if (delay < 0)
@@ -3660,27 +3613,6 @@ public final class Client implements IClient, IOracle
         else if (delay > Constants.MAX_AI_DELAY)
         {
             delay = Constants.MAX_AI_DELAY;
-        }
-    }
-
-    class MarkerComparator implements Comparator<String>
-    {
-        public int compare(String s1, String s2)
-        {
-            String shortColor = "None"; // In case not initialized yet.
-            if (color != null)
-            {
-                shortColor = getShortColor();
-            }
-            if (s1.startsWith(shortColor) && !s2.startsWith(shortColor))
-            {
-                return -1;
-            }
-            if (!s1.startsWith(shortColor) && s2.startsWith(shortColor))
-            {
-                return 1;
-            }
-            return s1.compareTo(s2);
         }
     }
 

@@ -11,7 +11,7 @@ import net.sf.colossus.common.Constants;
  * @author Romain Dolbeau
  */
 
-public class CowardSimpleAI extends SimpleAI
+public class CowardSimpleAI extends SimpleAI // NO_UCD
 {
     public CowardSimpleAI(Client client)
     {

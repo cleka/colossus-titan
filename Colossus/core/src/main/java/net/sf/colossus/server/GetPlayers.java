@@ -66,7 +66,7 @@ public final class GetPlayers extends KFrame
     private static final Logger LOGGER = Logger.getLogger(GetPlayers.class
         .getName());
 
-    public static final String loadVariant = "Load External Variant";
+    private static final String loadVariant = "Load External Variant";
 
     private final Object mutex;
     private boolean mutexNotified = false;
@@ -762,25 +762,6 @@ public final class GetPlayers extends KFrame
             }
         });
         pane.add(cb);
-    }
-
-    public void addItemToBox(JComboBox box, String port)
-    {
-        int cnt = box.getItemCount();
-        int found = -1;
-        int i;
-        for (i = 0; i < cnt; i++)
-        {
-            String p = (String)box.getItemAt(i);
-            if (p.equals(port))
-            {
-                found = i;
-            }
-        }
-        if (found == -1)
-        {
-            box.addItem(port);
-        }
     }
 
     /** Check if values are legal; if yes, caller can start the game. */

@@ -21,7 +21,7 @@ import net.sf.colossus.variant.MasterBoardTerrain;
  * @version $Id$
  * @author Romain Dolbeau
  */
-public class ExperimentalAI extends SimpleAI
+public class ExperimentalAI extends SimpleAI // NO_UCD
 {
 
     private static final Logger LOGGER = Logger.getLogger(SimpleAI.class

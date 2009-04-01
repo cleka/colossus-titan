@@ -57,7 +57,7 @@ public final class BattleChit extends Chit
     private final int scale;
 
     // inner scale divided by border thickness
-    static final int borderRatio = 20;
+    private static final int borderRatio = 20;
     private static boolean useColoredBorders = false;
 
     public BattleChit(int scale, String id, boolean inverted, int tag,
@@ -118,11 +118,6 @@ public final class BattleChit extends Chit
     }
 
     public void setHex(BattleHex hex)
-    {
-        this.currentHex = hex;
-    }
-
-    void setCurrentHex(BattleHex hex)
     {
         this.currentHex = hex;
     }
@@ -340,7 +335,7 @@ public final class BattleChit extends Chit
         return getDescription();
     }
 
-    public static void setUseColoredBorders(boolean bval)
+    protected static void setUseColoredBorders(boolean bval)
     {
         useColoredBorders = bval;
     }

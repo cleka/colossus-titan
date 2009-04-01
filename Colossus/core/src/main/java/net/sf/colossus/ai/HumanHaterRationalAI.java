@@ -11,7 +11,7 @@ import net.sf.colossus.common.Constants;
  * @author Romain Dolbeau
  */
 
-public class HumanHaterRationalAI extends RationalAI
+public class HumanHaterRationalAI extends RationalAI // NO_UCD
 {
     public HumanHaterRationalAI(Client client)
     {
