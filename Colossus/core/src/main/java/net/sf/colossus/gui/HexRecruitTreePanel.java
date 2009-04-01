@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.BorderFactory;
@@ -36,9 +37,9 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 public class HexRecruitTreePanel extends Box
 {
-    private HashMap<Chit, CreatureType> chitToCreatureMap = new HashMap<Chit, CreatureType>();
+    private Map<Chit, CreatureType> chitToCreatureMap = new HashMap<Chit, CreatureType>();
 
-    private ArrayList<ShowCreatureDetails> creatureWindows = new ArrayList<ShowCreatureDetails>();
+    private List<ShowCreatureDetails> creatureWindows = new ArrayList<ShowCreatureDetails>();
 
     private JFrame parentFrame;
 
