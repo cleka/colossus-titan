@@ -104,7 +104,7 @@ final class EventViewer extends KDialog
     final private ArrayList<JPanel> displayQueue = new ArrayList<JPanel>();
 
     private int turnNr;
-    private int playerNr;
+    private Player currentPlayer;
 
     // how long back are they kept (from global settings)
     private int expireTurns;
@@ -528,7 +528,7 @@ final class EventViewer extends KDialog
 
         if (maxTurns != -1
             && turnNr - oldEventTurn > maxTurns
-                - (playerNr >= oldPlayerNr ? 1 : 0))
+                - (currentPlayer.getNumber() >= oldPlayerNr ? 1 : 0))
         {
             // Log.debug("Not displaying event "+e.getEventTypeText()+" "+
             //     e.getMarkerId() + " - older than max turns value!");
@@ -754,8 +754,6 @@ final class EventViewer extends KDialog
     // Now come the methods with which Client can add/modify event data:
     public void turnOrPlayerChange(Client client, int turnNr, Player player)
     {
-        int playerNr = player.getNumber();
-
         setMulliganOldRoll(-2);
         if (turnNr != this.turnNr)
         {
@@ -763,7 +761,7 @@ final class EventViewer extends KDialog
                 RevealEvent.eventTurnChange, null, 0, null, null, 0);
             addEvent(e);
         }
-        if (playerNr != this.playerNr || turnNr != this.turnNr)
+        if (player != this.currentPlayer || turnNr != this.turnNr)
         {
             RevealEvent e = new RevealEvent(client, turnNr, player,
                 RevealEvent.eventPlayerChange, null, 0, null, null, 0);
@@ -771,7 +769,7 @@ final class EventViewer extends KDialog
         }
 
         this.turnNr = turnNr;
-        this.playerNr = playerNr;
+        this.currentPlayer = player;
         if (this.expireTurns != -1)
         {
             purgeOldEvents();
@@ -1331,7 +1329,7 @@ final class EventViewer extends KDialog
                 int oldPlayerNr = e.getPlayer().getNumber();
 
                 if (turnNr - oldEventTurn > expireTurns
-                    - (playerNr >= oldPlayerNr ? 1 : 0))
+                    - (currentPlayer.getNumber() >= oldPlayerNr ? 1 : 0))
                 {
                     it.remove();
                     purged++;
