@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -85,7 +86,7 @@ public final class VariantSupport
         }
     }
 
-    private static HashMap<String, String> rememberCustomDirs = new HashMap<String, String>();
+    private static Map<String, String> rememberCustomDirs = new HashMap<String, String>();
 
     public static void rememberFullPathFileForVariantName(String varName,
         String varFullPathFilename)
