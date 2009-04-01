@@ -1,7 +1,6 @@
 package net.sf.colossus.gui;
 
 
-
 import java.awt.Cursor;
 import java.awt.GraphicsDevice;
 import java.awt.Window;
@@ -222,8 +221,8 @@ public class ClientGUI implements IClientGUI
     {
         if (this.webClient == null)
         {
-            this.webClient = new WebClient(client.getWhatNextManager(), null, -1,
-                null, null);
+            this.webClient = new WebClient(client.getWhatNextManager(), null,
+                -1, null, null);
             this.webClient.setGameClient(client);
         }
         else
@@ -2073,7 +2072,8 @@ public class ClientGUI implements IClientGUI
         Set<BattleHex> carryTargetHexes = new HashSet<BattleHex>();
         for (String desc : carryTargetDescriptions)
         {
-            carryTargetHexes.add(battleBoard.getBattleHexByLabel(desc.substring(desc.length() - 2)));
+            carryTargetHexes.add(battleBoard.getBattleHexByLabel(desc
+                .substring(desc.length() - 2)));
         }
         battleBoard.highlightPossibleCarries(carryTargetHexes);
         pickCarryDialog = new PickCarry(battleBoard, client, carryDamage,
@@ -2163,7 +2163,7 @@ public class ClientGUI implements IClientGUI
 
     public void doPickStrikePenalty(Client client, List<String> choices)
     {
-        new PickStrikePenalty(battleBoard, client, choices);
+        new PickStrikePenalty(battleBoard, this, choices);
     }
 
     public void tellProposal(String proposalString)
@@ -2380,8 +2380,7 @@ public class ClientGUI implements IClientGUI
         updateStatusScreen();
     }
 
-    public void actOnTellBattleMove(BattleHex startingHex,
-        BattleHex endingHex)
+    public void actOnTellBattleMove(BattleHex startingHex, BattleHex endingHex)
     {
         if (battleBoard != null)
         {
