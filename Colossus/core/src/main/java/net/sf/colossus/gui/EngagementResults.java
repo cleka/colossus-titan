@@ -54,7 +54,7 @@ final class EngagementResults extends KDialog
     private int current = -1;
     private int lastSeen = -1;
 
-    private final ArrayList<Engagement> engagementLog = new ArrayList<Engagement>();
+    private final List<Engagement> engagementLog = new ArrayList<Engagement>();
     private final SaveWindow saveWindow;
 
     private JButton firstButton;
