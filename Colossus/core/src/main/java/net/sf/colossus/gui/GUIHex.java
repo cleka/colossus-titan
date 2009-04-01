@@ -137,4 +137,32 @@ public abstract class GUIHex<H extends Hex> extends JComponent
         return new Point2D.Double((xVertex[2] + xVertex[5]) / 2.0,
             (yVertex[0] + yVertex[3]) / 2.0);
     }
+
+    protected double[] getCliffOrArrowsPositionXArray(int j, double vx1,
+            double vx2, double theta)
+    {
+        double[] x = new double[3];
+        double x0; // first focus point
+        double x1; // second focus point
+        x0 = vx1 + (vx2 - vx1) * (2 + 3 * j) / 12;
+        x1 = vx1 + (vx2 - vx1) * (4 + 3 * j) / 12;
+        x[0] = x0 - len * Math.sin(theta);
+        x[1] = (x0 + x1) / 2 + len * Math.sin(theta);
+        x[2] = x1 - len * Math.sin(theta);
+        return x;
+    }
+
+    protected double[] getCliffOrArrowsPositionYArray(int j, double vy1,
+            double vy2, double theta)
+    {
+        double[] y = new double[3];
+        double y0; // first focus point
+        double y1; // second focus point
+        y0 = vy1 + (vy2 - vy1) * (2 + 3 * j) / 12;
+        y1 = vy1 + (vy2 - vy1) * (4 + 3 * j) / 12;
+        y[0] = y0 + len * Math.cos(theta);
+        y[1] = (y0 + y1) / 2 - len * Math.cos(theta);
+        y[2] = y1 + len * Math.cos(theta);
+        return y;
+    }
 }

@@ -282,17 +282,8 @@ public class GUIBattleHex extends GUIHex<BattleHex>
             case 'c': // cliff -- triangles
                 for (int j = 0; j < 3; j++)
                 {
-                    x0 = vx1 + (vx2 - vx1) * (2 + 3 * j) / 12;
-                    y0 = vy1 + (vy2 - vy1) * (2 + 3 * j) / 12;
-                    x1 = vx1 + (vx2 - vx1) * (4 + 3 * j) / 12;
-                    y1 = vy1 + (vy2 - vy1) * (4 + 3 * j) / 12;
-
-                    x[0] = x0 - len * Math.sin(theta);
-                    y[0] = y0 + len * Math.cos(theta);
-                    x[1] = (x0 + x1) / 2 + len * Math.sin(theta);
-                    y[1] = (y0 + y1) / 2 - len * Math.cos(theta);
-                    x[2] = x1 - len * Math.sin(theta);
-                    y[2] = y1 + len * Math.cos(theta);
+                    x = getCliffOrArrowsPositionXArray(j, vx1, vx2, theta);
+                    y = getCliffOrArrowsPositionYArray(j, vy1, vy2, theta);
 
                     GeneralPath polygon = makePolygon(3, x, y, false);
 
