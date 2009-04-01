@@ -112,7 +112,8 @@ public final class MasterBoard extends JPanel
     /** Last point clicked is needed for popup menus. */
     private Point lastPoint;
 
-    /** List of markers which are currently on the board,
+    /**
+     *  List of markers which are currently on the board,
      *  for painting in z-order => the end of the list is on top.
      *
      *  Now synchronized access to prevent NPEs when EDT wants to
@@ -120,10 +121,7 @@ public final class MasterBoard extends JPanel
      *  legion has just been removed.
      *  I don't use a synchronizedList, because then I get into
      *  trouble in the recreateMarkers method.
-     *  @TODO: Perhaps the whole list should be legions instead
-     *         of markers.
      */
-    //private final List<Marker> markersOnBoard = new ArrayList<Marker>();
     private final LinkedHashMap<Legion, Marker> legionToMarkerMap = new LinkedHashMap<Legion, Marker>();
 
     private final Map<Legion, Chit> recruitedChits = new HashMap<Legion, Chit>();
