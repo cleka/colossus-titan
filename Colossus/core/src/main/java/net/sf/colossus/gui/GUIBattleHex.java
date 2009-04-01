@@ -323,19 +323,8 @@ public class GUIBattleHex extends GUIHex<BattleHex>
             case 's': // slope -- lines
                 for (int j = 0; j < 3; j++)
                 {
-                    x0 = vx1 + (vx2 - vx1) * (2 + 3 * j) / 12;
-                    y0 = vy1 + (vy2 - vy1) * (2 + 3 * j) / 12;
-                    x1 = vx1 + (vx2 - vx1) * (4 + 3 * j) / 12;
-                    y1 = vy1 + (vy2 - vy1) * (4 + 3 * j) / 12;
-
-                    x[0] = x0 - len / 3 * Math.sin(theta);
-                    y[0] = y0 + len / 3 * Math.cos(theta);
-                    x[1] = x0 + len / 3 * Math.sin(theta);
-                    y[1] = y0 - len / 3 * Math.cos(theta);
-                    x[2] = x1 + len / 3 * Math.sin(theta);
-                    y[2] = y1 - len / 3 * Math.cos(theta);
-                    x[3] = x1 - len / 3 * Math.sin(theta);
-                    y[3] = y1 + len / 3 * Math.cos(theta);
+                    x = getWallOrSlopePositionXArray(j, vx1, vx2, theta);
+                    y = getWallOrSlopePositionYArray(j, vy1, vy2, theta);
 
                     g2.setColor(Color.black);
                     g2.draw(new Line2D.Double(x[0], y[0], x[1], y[1]));
@@ -346,19 +335,8 @@ public class GUIBattleHex extends GUIHex<BattleHex>
             case 'w': // wall --  blocks
                 for (int j = 0; j < 3; j++)
                 {
-                    x0 = vx1 + (vx2 - vx1) * (2 + 3 * j) / 12;
-                    y0 = vy1 + (vy2 - vy1) * (2 + 3 * j) / 12;
-                    x1 = vx1 + (vx2 - vx1) * (4 + 3 * j) / 12;
-                    y1 = vy1 + (vy2 - vy1) * (4 + 3 * j) / 12;
-
-                    x[0] = x0 - len * Math.sin(theta);
-                    y[0] = y0 + len * Math.cos(theta);
-                    x[1] = x0 + len * Math.sin(theta);
-                    y[1] = y0 - len * Math.cos(theta);
-                    x[2] = x1 + len * Math.sin(theta);
-                    y[2] = y1 - len * Math.cos(theta);
-                    x[3] = x1 - len * Math.sin(theta);
-                    y[3] = y1 + len * Math.cos(theta);
+                    x = getWallOrSlopePositionXArray(j, vx1, vx2, theta);
+                    y = getWallOrSlopePositionYArray(j, vy1, vy2, theta);
 
                     GeneralPath polygon = makePolygon(4, x, y, false);
 
