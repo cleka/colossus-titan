@@ -9,11 +9,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -2070,7 +2070,7 @@ public class ClientGUI implements IClientGUI
     public void doPickCarries(Client client, int carryDamage,
         Set<String> carryTargetDescriptions)
     {
-        Set<BattleHex> carryTargetHexes = new TreeSet<BattleHex>();
+        Set<BattleHex> carryTargetHexes = new HashSet<BattleHex>();
         for (String desc : carryTargetDescriptions)
         {
             carryTargetHexes.add(battleBoard.getBattleHexByLabel(desc.substring(desc.length() - 2)));
