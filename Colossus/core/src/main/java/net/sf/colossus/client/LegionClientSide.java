@@ -310,13 +310,6 @@ public final class LegionClientSide extends Legion
         return getNode().numUncertainCreatures();
     }
 
-    // TODO Not exact -- does not verify that other legion is enemy.
-    boolean isEngaged()
-    {
-        int numInHex = client.getLegionsByHex(getCurrentHex()).size();
-        return (numInHex == 2);
-    }
-
     /** Return true if the legion has moved and can recruit. */
     public boolean canRecruit()
     {

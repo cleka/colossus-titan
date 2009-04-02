@@ -2912,11 +2912,15 @@ public final class Client implements IClient, IOracle
         {
             if (!legion.equals(summoner))
             {
-                if (legion.hasSummonable()
-                    && !(((LegionClientSide)legion).isEngaged()))
+                if (legion.hasSummonable()) {
+                    // check for engagement -- > 1 legion is good enough since
+                    // it is not split phase
+                    int numInHex = getLegionsByHex(legion.getCurrentHex())
+                        .size();
+                    if (numInHex == 1)
                 {
                     result.add(legion);
-                }
+                }}
             }
         }
         return result;
