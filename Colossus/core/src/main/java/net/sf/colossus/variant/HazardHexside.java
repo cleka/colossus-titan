@@ -40,7 +40,8 @@ public class HazardHexside extends Hazards
         return HEXSIDE_MAP.get(name);
     }
 
-    /** @deprecated, helper function, we want to get rid of the single char stuff */
+    /** deprecated because we want to get rid of the single char stuff */
+    @Deprecated
     public static HazardHexside getHexsideByCode(char code)
     {
         return HEXSIDE_MAP_UGLY.get(new Character(code));

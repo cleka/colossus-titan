@@ -404,7 +404,9 @@ public class HazardTerrain extends Hazards
      * @param attackerIsNative Whether the attacker is native from this HazardTerrain
      * @param defenderIsNative Whether the defender is native from this HazardTerrain
      * @return The amount of penalty to apply (negative if it's a bonus).
-     * @see getSkillBonusStrikeFrom, getPowerBonusStrikeFrom, getPowerPenaltyStrikeFrom
+     * @see #getSkillBonusStrikeFrom(boolean, boolean) 
+     *      #getPowerBonusStrikeFrom(boolean, boolean)
+     *      #getPowerPenaltyStrikeFrom(boolean, boolean)
      */
     public int getSkillPenaltyStrikeFrom(boolean attackerIsNative,
         boolean defenderIsNative)
@@ -512,7 +514,9 @@ public class HazardTerrain extends Hazards
      * @param attackerIsNative Whether the attacker is native from this HazardTerrain
      * @param defenderIsNative Whether the defender is native from this HazardTerrain
      * @return The amount of penalty to apply (negative if it's a bonus).
-     * @see getSkillBonusRangestrikeFrom, getPowerBonusRangestrikeFrom, getPowerPenaltyRangestrikeFrom
+     * @see #getSkillBonusRangestrikeFrom(boolean, boolean)
+     *      #getPowerBonusRangestrikeFrom(boolean, boolean)
+     *      #getPowerPenaltyRangestrikeFrom(boolean, boolean)
      */
     public int getSkillPenaltyRangestrikeFrom(boolean attackerIsNative,
         boolean defenderIsNative)
