@@ -434,7 +434,7 @@ public class TerrainRecruitLoader
         return Collections.unmodifiableCollection(terrains.values());
     }
 
-    public static MasterBoardTerrain getTerrainById(String id)
+    protected static MasterBoardTerrain getTerrainById(String id)
     {
         return terrains.get(id);
     }
@@ -958,7 +958,7 @@ public class TerrainRecruitLoader
      * @param name The name of the Creature inquired.
      * @return If the creature is Acquirable.
      */
-    public static boolean isAcquirable(String name)
+    private static boolean isAcquirable(String name)
     {
         Iterator<AcquirableData> it = acquirableList.iterator();
         while (it.hasNext())
