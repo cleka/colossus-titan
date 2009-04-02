@@ -746,45 +746,10 @@ abstract public class AbstractAI implements AI
             return count;
         }
 
-        public boolean otherFriendlyStackHasCreature(List<String> allNames)
-        {
-            for (Legion other : client.getOwningPlayer().getLegions())
-            {
-                if (!(legion.equals(other)))
-                {
-                    boolean hasAll = true;
-
-                    for (String name : allNames)
-                    {
-                        if (((LegionClientSide)other).numCreature(name) <= 0)
-                        {
-                            hasAll = false;
-                        }
-                    }
-                    if (hasAll)
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
-        public boolean hasCreature(String name)
-        {
-            int num = legion.numCreature(name);
-            return num > 0;
-        }
-
         public boolean canRecruit(String name)
         {
             return recruits.contains(client.getGame().getVariant()
                 .getCreatureByName(name));
-        }
-
-        public int stackHeight()
-        {
-            return legion.getHeight();
         }
 
         public String hexLabel()

@@ -1,7 +1,6 @@
 package net.sf.colossus.server;
 
 
-import java.util.List;
 
 
 /**
@@ -11,13 +10,6 @@ import java.util.List;
  */
 public interface HintOracleInterface
 {
-
-    /** in the Stack/Legion */
-    public boolean hasCreature(String name);
-
-    /** in a different Stack/Legion */
-    public boolean otherFriendlyStackHasCreature(List<String> allNames);
-
     /** name could be recruited */
     public boolean canRecruit(String name);
 
@@ -27,10 +19,7 @@ public interface HintOracleInterface
     /** how many in caretaker */
     public int creatureAvailable(String name);
 
-    /** height of the Stack/Legion */
-    public int stackHeight();
-
-    /** height of the bigger [height-wise] legion that can attack 
+    /** height of the bigger [height-wise] legion that can attack
      * the Stack/Legion - 0 if none can attack.
      */
     public int biggestAttackerHeight();
