@@ -1,29 +1,46 @@
 package net.sf.colossus.server;
 
 
+import net.sf.colossus.ai.AbstractAI;
 
 
 /**
  * Interface for an Oracle used for AI Hints.
+ *
+ * These methods are to be used in the context of a given legion,
+ * on a given master board hex and with a list of recruit options.
+ * This is currently implemented by {@linkplain AbstractAI}.
+ *
  * @version $Id$
  * @author Romain Dolbeau
  */
 public interface HintOracleInterface
 {
-    /** name could be recruited */
+    /**
+     * A creature with the given name could be recruited.
+     */
     public boolean canRecruit(String name);
 
-    /** terrain can be reached by the Stack/Legion */
+    /**
+     * A terrain can be reached by the legion with one move.
+     */
     public boolean canReach(String terrain);
 
-    /** how many in caretaker */
+    /**
+     * The number of currently available creatures of the given type.
+     */
     public int creatureAvailable(String name);
 
-    /** height of the bigger [height-wise] legion that can attack
-     * the Stack/Legion - 0 if none can attack.
+    /**
+     * The height of the tallest legion that can attack
+     * the legion we consider.
+     *
+     * 0 if none can attack.
      */
     public int biggestAttackerHeight();
 
-    /** label of the (master)hex */
+    /**
+     * The label of the master board hex under consideration.
+     */
     public String hexLabel();
 }
