@@ -14,9 +14,8 @@ import java.util.logging.Logger;
  *  Predicts splits for one enemy player, and adjusts predictions as 
  *  creatures are revealed.
  *  
- *  @version $Id$
  *  @author David Ripton
- *  @see SplitPrediction.txt
+ *  See docs/SplitPrediction.txt
  */
 
 public final class PredictSplits

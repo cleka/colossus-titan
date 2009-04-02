@@ -18,11 +18,10 @@ import net.sf.colossus.variant.CreatureType;
 /**
  *  Predicts splits for one enemy player, and adjusts predictions as 
  *  creatures are revealed.
- *  @version $Id$
  *  @author David Ripton
  *  @author Kim Milvang-Jensen
- *  @see SplitPrediction.txt
- * 
+ *
+ *  See docs/SplitPrediction.txt
  */
 
 public class PredictSplitNode implements Comparable<PredictSplitNode>
