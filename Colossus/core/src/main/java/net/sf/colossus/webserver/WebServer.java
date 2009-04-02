@@ -20,8 +20,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.webcommon.ColossusMail;
 import net.sf.colossus.webcommon.GameInfo;
+import net.sf.colossus.webcommon.IColossusMail;
+import net.sf.colossus.webcommon.IGameRunner;
 import net.sf.colossus.webcommon.IRunWebServer;
 import net.sf.colossus.webcommon.IWebClient;
 import net.sf.colossus.webcommon.IWebServer;
@@ -49,7 +50,7 @@ public class WebServer implements IWebServer, IRunWebServer
     private PortBookKeeper portBookKeeper = null;
     private IWebServerGUI gui = null;
 
-    private final ColossusMail mailObject;
+    private final IColossusMail mailObject;
 
     /**
      * Controls whether the GUI is shown or not.
@@ -587,13 +588,19 @@ public class WebServer implements IWebServer, IRunWebServer
     public void cancelGame(String gameId, String byUser)
     {
         GameInfo gi = findByGameId(gameId);
-        
-        RunGameInOwnJVM gos;
-        
-        if (gi != null && (gos = gi.getGameOnServer()) != null)
+
+        if (gi == null)
         {
-            gos.setServerNull();
-            gos.start(); // does nothing, just to get it GC'd and finalized
+            LOGGER.warning("Attempt to cancel game with id " + gameId
+                + " but no GameInfo found for that id.");
+            return;
+        }
+
+        IGameRunner gr = gi.getGameRunner();
+        if (gr != null)
+        {
+            gr.setServerNull();
+            gr.start(); // does nothing, just to get it GC'd and finalized
 
             Iterator<User> it = User.getLoggedInUsersIterator();
             while (it.hasNext())
@@ -606,6 +613,11 @@ public class WebServer implements IWebServer, IRunWebServer
             proposedGames.remove(gi.getGameId());
             proposedGamesListModified = true;
             updateGUI();
+        }
+        else
+        {
+            LOGGER.info("For Cancel: no GameRunner for GameInfo with gameId "
+                + gameId);
         }
     }
 
@@ -806,6 +818,19 @@ public class WebServer implements IWebServer, IRunWebServer
         return proposedGames.get(gameId);
     }
 
+    private IGameRunner getGameOnServer(GameInfo gi)
+    {
+        assert gi != null : "Cannot find GameOnServer for GameInfo that is null!";
+
+        IGameRunner gr = gi.getGameRunner();
+        if (gr == null)
+        {
+            LOGGER.severe("GameInfo with GameId returned null as GameRunner"
+                + gi.getGameId());
+        }
+        return gr;
+    }
+
     private boolean startOneGame(GameInfo gi)
     {
         boolean success = false;
@@ -820,8 +845,9 @@ public class WebServer implements IWebServer, IRunWebServer
         gi.setPort(port);
         LOGGER.log(Level.FINEST, "startOneGame, id " + gi.getGameId());
 
-        RunGameInOwnJVM gos = new RunGameInOwnJVM(this, options, gi);
-        boolean ok = gos.makeRunningGame();
+        RunGameInOwnJVM gr = new RunGameInOwnJVM(this, options, gi);
+        gi.setGameRunner(gr);
+        boolean ok = gr.makeRunningGame();
 
         if (!ok)
         {
@@ -830,8 +856,8 @@ public class WebServer implements IWebServer, IRunWebServer
         }
         else
         {
-            // System.out.println("starting gos thread");
-            gos.start();
+            // System.out.println("starting GameRunner thread");
+            gr.start();
             LOGGER.log(Level.FINEST, "Returned from starter");
 
             updateGUI();
@@ -1048,21 +1074,35 @@ public class WebServer implements IWebServer, IRunWebServer
                     Iterator<GameInfo> it = endingGames.iterator();
                     while (it.hasNext())
                     {
-                        GameInfo game = it.next();
-                        RunGameInOwnJVM gos = game.getGameOnServer();
-                        
-                        String name = gos.getName();
-                        LOGGER.log(Level.FINE, "REAPER: wait for '" + name
-                            + "' to end...");
-                        try
+                        GameInfo gi = it.next();
+                        IGameRunner gos = getGameOnServer(gi);
+                        if (gos == null)
                         {
-                            gos.join();
-                            LOGGER.log(Level.FINE, "        ok, ended...");
+                            LOGGER.warning("No GameRunner found for GameInfo"
+                                + " with id " + gi.getGameId()
+                                + " to reap it's process.");
                         }
-                        catch (InterruptedException e)
+                        else if (gos instanceof RunGameInOwnJVM)
                         {
-                            LOGGER.log(Level.WARNING,
-                                "Ups??? Caught exception ", e);
+                            String name = ((RunGameInOwnJVM)gos).getName();
+                            LOGGER.log(Level.FINE, "REAPER: wait for '" + name
+                                + "' to end...");
+                            try
+                            {
+                                ((RunGameInOwnJVM)gos).join();
+                                LOGGER.log(Level.FINE, "        ok, ended...");
+                            }
+                            catch (InterruptedException e)
+                            {
+                                LOGGER.log(Level.WARNING,
+                                    "Ups??? Caught exception ", e);
+                            }
+                        }
+                        else
+                        {
+                            LOGGER.warning("GameThreadReaper can handle only "
+                                + "GameRunners of type RunGameInOwnJVM, "
+                                + "but we got something else!");
                         }
                         it.remove();
                     }

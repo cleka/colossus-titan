@@ -1,4 +1,4 @@
-package net.sf.colossus.webcommon;
+package net.sf.colossus.webserver;
 
 
 import java.io.File;
@@ -7,9 +7,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.logging.Logger;
 
-import net.sf.colossus.webserver.SmtpSimple;
-import net.sf.colossus.webserver.WebServerConstants;
-import net.sf.colossus.webserver.WebServerOptions;
+import net.sf.colossus.webcommon.IColossusMail;
 
 
 /** Encapsulates the way how the web server sends mail in some situations,
@@ -25,7 +23,7 @@ import net.sf.colossus.webserver.WebServerOptions;
  *  on the PC where I do the development). 
  */
 
-public class ColossusMail
+public class ColossusMail implements IColossusMail
 {
     private static final Logger LOGGER = Logger.getLogger(ColossusMail.class
         .getName());

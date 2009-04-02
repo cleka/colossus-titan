@@ -38,7 +38,7 @@ public class User
 
     // Use the same sepatator as for Web Protocol also for UserLines in user file:
     private final static String ulSep = IWebServer.WebProtocolSeparator;
-    
+
     private static String usersFile = null;
 
     private final static String typeUser = "user";
@@ -218,7 +218,7 @@ public class User
     }
 
     public static String registerUser(String username, String password,
-        String email, ColossusMail mailObject)
+        String email, IColossusMail mailObject)
     {
         boolean isAdmin = false;
         User alreadyExisting = findUserByName(username);
@@ -261,7 +261,7 @@ public class User
     }
 
     public static String sendConfirmationMail(String username, String email,
-        String confCode, ColossusMail mailObject)
+        String confCode, IColossusMail mailObject)
     {
         // this is in webcommon package:
         return mailObject.sendConfirmationMail(username, email, confCode);
@@ -446,8 +446,8 @@ public class User
     {
         String type = (isAdmin ? typeAdmin : typeUser);
 
-        String line = this.name + ulSep + password + ulSep + email + ulSep + type
-            + ulSep + created;
+        String line = this.name + ulSep + password + ulSep + email + ulSep
+            + type + ulSep + created;
         return line;
     }
 

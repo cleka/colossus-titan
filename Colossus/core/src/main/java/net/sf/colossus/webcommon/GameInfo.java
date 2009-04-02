@@ -9,7 +9,6 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
-import net.sf.colossus.webserver.RunGameInOwnJVM;
 
 
 /** One object of this this class represents a game for which players/users
@@ -43,15 +42,12 @@ public class GameInfo
 
     private int portNr = -1;
     private String hostingHost = "";
-    
-    // TODO: also needed for GameOnClient ?
-    // The GameOnServer object that will run/supervise this game:
-    private RunGameInOwnJVM gameOnServer = null;
+    private IGameRunner gameRunner;
 
     private String initiator;
     private String variant;
     private String viewmode;
-    private boolean autosave = true;
+    private final boolean autosave = true;
 
     // those 3 should still be added at client side:
     private String eventExpiring;
@@ -72,7 +68,6 @@ public class GameInfo
 
     private ArrayList<User> players = null;
 
-    
     // used on server side, to create a game proposed by client
 
     public GameInfo(GameType type)
@@ -186,13 +181,11 @@ public class GameInfo
             players.add(user);
             i++;
         }
-        gi.players = players;
-        // System.out.println("players: " + players.toString());
 
-        // System.out.println("RESTORED GameInfo client side, " + gi.toString());
+        gi.players = players;
         return gi;
     }
-    
+
     public String toString(String sep)
     {
         StringBuilder playerList = new StringBuilder();
@@ -214,9 +207,6 @@ public class GameInfo
         return message;
     }
 
-
-    
-    
     public void setState(GameState state)
     {
         this.state = state;
@@ -248,16 +238,16 @@ public class GameInfo
         this.gameId = val;
     }
 
-    public void setGameOnServer(RunGameInOwnJVM gos)
+    public void setGameRunner(IGameRunner gr)
     {
-        this.gameOnServer = gos;
+        this.gameRunner = gr;
     }
 
-    public RunGameInOwnJVM getGameOnServer()
+    public IGameRunner getGameRunner()
     {
-        return gameOnServer;
+        return gameRunner;
     }
-    
+
     public int getPort()
     {
         return this.portNr;
@@ -531,7 +521,6 @@ public class GameInfo
         return reason;
     }
 
-   
     public void storeToOptionsObject(Options gameOptions,
         String localPlayerName, boolean noAIs)
     {
@@ -544,7 +533,7 @@ public class GameInfo
 
         // XXX get host from gameinfo
         // XXX set host in gameinfo, send to server/client
-        
+
         gameOptions.setOption(Options.variant, getVariant());
         gameOptions.setOption(Options.viewMode, getViewmode());
         gameOptions.setOption(Options.autosave, getAutosave());
@@ -552,8 +541,7 @@ public class GameInfo
         gameOptions.setOption(Options.unlimitedMulligans,
             getUnlimitedMulligans());
         gameOptions.setOption(Options.balancedTowers, getBalancedTowers());
-     
-                
+
         // gameOptions.setOption(Options.autoQuit, true);
         String name;
         String type;
@@ -564,7 +552,7 @@ public class GameInfo
         {
             numPlayers = getPlayers().size();
         }
-        
+
         for (int i = 0; i < numPlayers; i++)
         {
             if (it.hasNext())
@@ -572,8 +560,7 @@ public class GameInfo
                 User u = it.next();
 
                 name = u.getName();
-                if (localPlayerName != null 
-                    && name.equals(localPlayerName))
+                if (localPlayerName != null && name.equals(localPlayerName))
                 {
                     type = Constants.human;
                     // use user real name;
@@ -598,7 +585,6 @@ public class GameInfo
 
         return;
     }
-
 
     /**
      *  Enum for the possible TYPES of a game 

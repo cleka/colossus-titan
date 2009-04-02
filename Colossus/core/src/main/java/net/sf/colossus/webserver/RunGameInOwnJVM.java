@@ -1,5 +1,6 @@
 package net.sf.colossus.webserver;
 
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,9 +13,9 @@ import java.io.PrintWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 import net.sf.colossus.common.Options;
 import net.sf.colossus.webcommon.GameInfo;
+import net.sf.colossus.webcommon.IGameRunner;
 import net.sf.colossus.webcommon.IRunWebServer;
 
 
@@ -29,56 +30,67 @@ import net.sf.colossus.webcommon.IRunWebServer;
  *  ( or when game runs locally on a players computer and this here handles
  *    the rendezvous (tell the other players when and where to connect) )  
  */
-public class RunGameInOwnJVM extends Thread
+public class RunGameInOwnJVM extends Thread implements IGameRunner
 {
-    private static final Logger LOGGER = Logger.getLogger(RunGameInOwnJVM.class
-        .getName());
+    private static final Logger LOGGER = Logger
+        .getLogger(RunGameInOwnJVM.class.getName());
 
     private int hostingPort;
     private String hostingHost;
-    
+
     private IRunWebServer server;
-    private WebServerOptions options;
-    private GameInfo gi;
-    private String gameId;
+    private final WebServerOptions options;
+    private final GameInfo gi;
+    private final String gameId;
 
     private String workFilesBaseDir;
     private String template;
     private String javaCommand;
     private String colossusJar;
-    
+
     private File flagFile;
 
-    public RunGameInOwnJVM(IRunWebServer server, WebServerOptions options, GameInfo gi)
+    public RunGameInOwnJVM(IRunWebServer server, WebServerOptions options,
+        GameInfo gi)
     {
         this.server = server;
         this.options = options;
         this.gi = gi;
         this.gameId = gi.getGameId();
-        gi.setGameOnServer(this);
     }
-    
 
+    /* (non-Javadoc)
+     * @see net.sf.colossus.webserver.GameRunner#makeRunningGame()
+     */
     public boolean makeRunningGame()
     {
-        workFilesBaseDir = options.getStringOption(WebServerConstants.optWorkFilesBaseDir);
-        template = options.getStringOption(WebServerConstants.optLogPropTemplate);
-        javaCommand = options.getStringOption(WebServerConstants.optJavaCommand);
-        colossusJar = options.getStringOption(WebServerConstants.optColossusJar);
+        workFilesBaseDir = options
+            .getStringOption(WebServerConstants.optWorkFilesBaseDir);
+        template = options
+            .getStringOption(WebServerConstants.optLogPropTemplate);
+        javaCommand = options
+            .getStringOption(WebServerConstants.optJavaCommand);
+        colossusJar = options
+            .getStringOption(WebServerConstants.optColossusJar);
 
-                
         hostingPort = gi.getPort();
         hostingHost = gi.getHostingHost();
-        
+
         this.setName("Game at port " + hostingPort);
         return true;
     }
 
+    /* (non-Javadoc)
+     * @see net.sf.colossus.webserver.GameRunner#getHostingPort()
+     */
     public int getHostingPort()
     {
         return hostingPort;
     }
-    
+
+    /* (non-Javadoc)
+     * @see net.sf.colossus.webserver.GameRunner#getHostingHost()
+     */
     public String getHostingHost()
     {
         return hostingHost;
@@ -90,19 +102,27 @@ public class RunGameInOwnJVM extends Thread
     // If start() is not run, the GameInfo object will never get 
     // garbage collected and finalized.
 
+    /* (non-Javadoc)
+     * @see net.sf.colossus.webserver.GameRunner#setServerNull()
+     */
     public void setServerNull()
     {
         this.server = null;
     }
 
+    /* (non-Javadoc)
+     * @see net.sf.colossus.webserver.GameRunner#run()
+     */
     @Override
     public void run()
     {
         // TODO FIXME  This still needs to be done...!!!
-        System.out.println("GOS.run() here ...");
         runInOwnJVM();
     }
-    
+
+    /* (non-Javadoc)
+     * @see net.sf.colossus.webserver.GameRunner#runInOwnJVM()
+     */
     public void runInOwnJVM()
     {
         File gameDir = new File(workFilesBaseDir, gameId);
@@ -132,7 +152,7 @@ public class RunGameInOwnJVM extends Thread
             : "";
 
         String command = javaCommand + " " + loggingFileArg + " -Duser.home="
-            + gameDir + " -jar " + colossusJar + " -p " + hostingPort 
+            + gameDir + " -jar " + colossusJar + " -p " + hostingPort
             + " -g --flagfile " + fileName;
 
         try
@@ -168,9 +188,9 @@ public class RunGameInOwnJVM extends Thread
         String localPlayerName = null;
         boolean noAIs = true;
         gi.storeToOptionsObject(gameOptions, localPlayerName, noAIs);
-        
+
         gameOptions.setOption(Options.autoQuit, true);
-        
+
         gameOptions.saveOptions();
 
         return ok;
@@ -221,7 +241,6 @@ public class RunGameInOwnJVM extends Thread
         return ok;
     }
 
-    
     private void superviseGameStartup()
     {
         // ACTIVATED
@@ -235,13 +254,12 @@ public class RunGameInOwnJVM extends Thread
         {
             LOGGER.log(Level.FINEST, "Game is up - informing clients!");
             // READY_TO_CONNECT
-            
+
             int port = gi.getPort();
             // if run on GameServer, null.
             // TODO: real remote host there, when runs on players PC
             String hostingHost = null;
 
-            
             server.tellEnrolledGameStartsNow(gi, hostingHost, port);
             server.allTellGameInfo(gi);
 
@@ -318,6 +336,9 @@ public class RunGameInOwnJVM extends Thread
      * after it created the socket.
      */
 
+    /* (non-Javadoc)
+     * @see net.sf.colossus.webserver.GameRunner#isSocketUp()
+     */
     public boolean isSocketUp()
     {
         if (flagFile == null)
@@ -335,6 +356,9 @@ public class RunGameInOwnJVM extends Thread
     }
 
     /* Waits until socket is up, i.e. game is ready to accept clients.
+     */
+    /* (non-Javadoc)
+     * @see net.sf.colossus.webserver.GameRunner#waitUntilReadyToAcceptClients(int)
      */
     public boolean waitUntilReadyToAcceptClients(int timeout)
     {
@@ -383,6 +407,9 @@ public class RunGameInOwnJVM extends Thread
         return line;
     }
 
+    /* (non-Javadoc)
+     * @see net.sf.colossus.webserver.GameRunner#waitUntilGameStartedSuccessfully(int)
+     */
     public boolean waitUntilGameStartedSuccessfully(int timeout)
     {
         boolean ok = false;
@@ -559,5 +586,5 @@ public class RunGameInOwnJVM extends Thread
             }
         }
     } // END Class NullDumper
-    
+
 }
