@@ -136,30 +136,29 @@ public final class MasterBoard extends JPanel
     private BottomBar bottomBar;
     private boolean gameOverStateReached = false;
 
-    public static final String saveGameAs = "Save game as";
+    private static final String saveGameAs = "Save game as";
 
-    public static final String clearRecruitChits = "Clear recruit chits";
+    private static final String clearRecruitChits = "Clear recruit chits";
 
-    public static final String undoLast = "Undo";
-    public static final String undoAll = "Undo All";
-    public static final String doneWithPhase = "Done";
-    public static final String forcedDoneWithPhase = "Forced Done";
+    private static final String undoLast = "Undo";
+    private static final String undoAll = "Undo All";
+    private static final String doneWithPhase = "Done";
+    private static final String forcedDoneWithPhase = "Forced Done";
 
-    public static final String takeMulligan = "Take Mulligan";
-    public static final String concedeBattle = "Concede battle";
-    public static final String withdrawFromGame = "Withdraw from Game";
+    private static final String takeMulligan = "Take Mulligan";
+    private static final String withdrawFromGame = "Withdraw from Game";
 
-    public static final String viewWebClient = "View Web Client";
-    public static final String viewFullRecruitTree = "View Full Recruit Tree";
-    public static final String viewHexRecruitTree = "View Hex Recruit Tree";
-    public static final String viewBattleMap = "View Battle Map";
+    private static final String viewWebClient = "View Web Client";
+    private static final String viewFullRecruitTree = "View Full Recruit Tree";
+    private static final String viewHexRecruitTree = "View Hex Recruit Tree";
+    private static final String viewBattleMap = "View Battle Map";
 
-    public static final String chooseScreen = "Choose Screen For Info Windows";
-    public static final String preferences = "Preferences...";
+    private static final String chooseScreen = "Choose Screen For Info Windows";
+    private static final String preferences = "Preferences...";
 
-    public static final String about = "About";
-    public static final String viewReadme = "Show Variant Readme";
-    public static final String viewHelpDoc = "Options Documentation";
+    private static final String about = "About";
+    private static final String viewReadme = "Show Variant Readme";
+    private static final String viewHelpDoc = "Options Documentation";
 
     private AbstractAction newGameAction;
     private AbstractAction loadGameAction;
@@ -1218,7 +1217,7 @@ public final class MasterBoard extends JPanel
     void highlightPossibleRecruitLegionHexes()
     {
         unselectAllHexes();
-        selectHexesByLabels(client.getPossibleRecruitHexes());
+        selectHexes(client.getPossibleRecruitHexes());
     }
 
     KFrame getFrame()
@@ -1323,7 +1322,7 @@ public final class MasterBoard extends JPanel
         hex.repaint();
     }
 
-    void alignLegions(Set<MasterHex> hexes)
+    private void alignLegions(Set<MasterHex> hexes)
     {
         for (MasterHex masterHex : hexes)
         {
@@ -1334,13 +1333,13 @@ public final class MasterBoard extends JPanel
     void highlightTallLegions()
     {
         unselectAllHexes();
-        selectHexesByLabels(client.findTallLegionHexes());
+        selectHexes(client.findTallLegionHexes());
     }
 
     void highlightUnmovedLegions()
     {
         unselectAllHexes();
-        selectHexesByLabels(client.findUnmovedLegionHexes());
+        selectHexes(client.findUnmovedLegionHexes());
         repaint();
     }
 
@@ -1350,10 +1349,10 @@ public final class MasterBoard extends JPanel
         unselectAllHexes();
 
         Set<MasterHex> teleport = client.listTeleportMoves(legion);
-        selectHexesByLabels(teleport, HTMLColor.purple);
+        selectHexes(teleport, HTMLColor.purple);
 
         Set<MasterHex> normal = client.listNormalMoves(legion);
-        selectHexesByLabels(normal, Color.white);
+        selectHexes(normal, Color.white);
 
         Set<MasterHex> combo = new HashSet<MasterHex>();
         combo.addAll(teleport);
@@ -1366,7 +1365,7 @@ public final class MasterBoard extends JPanel
     {
         Set<MasterHex> set = client.findEngagements();
         unselectAllHexes();
-        selectHexesByLabels(set);
+        selectHexes(set);
     }
 
     private void setupIcon()
@@ -1507,47 +1506,6 @@ public final class MasterBoard extends JPanel
             });
     }
 
-    void unselectHexByLabel(final String label)
-    {
-        ArrayHelper.findFirstMatch(guiHexArray,
-            new NullCheckPredicate<GUIMasterHex>(false)
-            {
-                @Override
-                public boolean matchesNonNullValue(GUIMasterHex hex)
-
-                {
-                    if (hex.isSelected()
-                        && label.equals(hex.getHexModel().getLabel()))
-                    {
-                        hex.unselect();
-                        hex.repaint();
-                        return true;
-                    }
-                    return false; // keep going
-                }
-            });
-    }
-
-    void unselectHexesByLabels(final Set<String> labels)
-    {
-        ArrayHelper.findFirstMatch(guiHexArray,
-            new NullCheckPredicate<GUIMasterHex>(false)
-            {
-                @Override
-                public boolean matchesNonNullValue(GUIMasterHex hex)
-
-                {
-                    if (hex.isSelected()
-                        && labels.contains(hex.getHexModel().getLabel()))
-                    {
-                        hex.unselect();
-                        hex.repaint();
-                    }
-                    return false; // keep going
-                }
-            });
-    }
-
     // TODO make typesafe
     void selectHexByLabel(final String label)
     {
@@ -1568,8 +1526,7 @@ public final class MasterBoard extends JPanel
             });
     }
 
-    // TODO rename since we don't use labels anymore
-    void selectHexesByLabels(final Set<MasterHex> hexes)
+    private void selectHexes(final Set<MasterHex> hexes)
     {
         ArrayHelper.findFirstMatch(guiHexArray,
             new NullCheckPredicate<GUIMasterHex>(false)
@@ -1587,8 +1544,7 @@ public final class MasterBoard extends JPanel
             });
     }
 
-    // TODO rename since we don't use labels anymore
-    void selectHexesByLabels(final Set<MasterHex> hexes, final Color color)
+    private void selectHexes(final Set<MasterHex> hexes, final Color color)
     {
         ArrayHelper.findFirstMatch(guiHexArray,
             new NullCheckPredicate<GUIMasterHex>(false)
@@ -2000,24 +1956,8 @@ public final class MasterBoard extends JPanel
         repaint();
     }
 
-    // one single chit, one hex
-    void addPossibleRecruitChit(String imageName, MasterHex masterHex)
-    {
-        int scale = 2 * Scale.get();
-        GUIMasterHex hex = getGUIHexByMasterHex(masterHex);
-        Chit chit = new Chit(scale, imageName);
-        Point startingPoint = hex.getOffCenter();
-        Point point = new Point(startingPoint);
-        point.x -= scale / 2;
-        point.y -= scale / 2;
-        chit.setLocation(point);
-        List<Chit> list = new ArrayList<Chit>();
-        list.add(chit);
-        possibleRecruitChits.put(masterHex, list);
-    }
-
     // all possible recruit chits, one hex
-    void addPossibleRecruitChits(List<CreatureType> imageNameList,
+    private void addPossibleRecruitChits(List<CreatureType> imageNameList,
         MasterHex masterHex)
     {
         List<Chit> list = new ArrayList<Chit>();
@@ -2168,11 +2108,6 @@ public final class MasterBoard extends JPanel
         this.client = null;
     }
 
-    JScrollPane getScrollPane()
-    {
-        return scrollPane;
-    }
-
     void pack()
     {
         masterFrame.pack();
@@ -2313,7 +2248,7 @@ public final class MasterBoard extends JPanel
      *
      * @param doesWhat Information what the active player currently does
      */
-    public void disableDoneActionActivePlayerDoes(String doesWhat)
+    private void disableDoneActionActivePlayerDoes(String doesWhat)
     {
         bottomBar.setPhase("");
         String name = gui.getClient().getActivePlayer().getName();
