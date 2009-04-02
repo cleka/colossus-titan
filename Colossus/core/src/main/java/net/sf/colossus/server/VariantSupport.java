@@ -25,6 +25,7 @@ import net.sf.colossus.client.HexMap;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.util.ResourceLoader;
+import net.sf.colossus.variant.AllCreatureType;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterBoard;
 import net.sf.colossus.variant.MasterBoardTerrain;
@@ -404,7 +405,7 @@ public final class VariantSupport
                 {
                     throw new FileNotFoundException(creaturesName);
                 }
-                CreatureLoader creatureLoader = new CreatureLoader(creIS);
+                AllCreatureType creatureLoader = new CreatureLoader(creIS);
                 creatures.addAll(creatureLoader.getCreatures());
             }
         }
@@ -511,8 +512,6 @@ public final class VariantSupport
         return getVarDirectoriesList(Constants.battlelandsDirName);
     }
 
-    /** TerrainRecruitLoader is needed by many classes, so load it
-     *  immediately after loading the variant. */
     public synchronized static void loadTerrainsAndRecruits(boolean serverSide)
     {
         // remove all old stuff in the custom recruitments system

@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.server.VariantSupport;
@@ -104,7 +105,11 @@ public class BalrogRecruitment extends CustomRecruitBase
     public int numberOfRecruiterNeeded(CreatureType recruiter,
         CreatureType recruit, MasterBoardTerrain terrain, MasterHex hex)
     {
-        return 0;
+        LOGGER.finest("Called with recruiter " + recruiter + " and recruit " + recruit);
+        if ((recruit == null) || (recruit instanceof CreatureBalrog))
+            return 1;
+        LOGGER.finest("Recruit " + recruit + " isn't a Balrog");
+        return Constants.BIGNUM;
     }
 
     @Override

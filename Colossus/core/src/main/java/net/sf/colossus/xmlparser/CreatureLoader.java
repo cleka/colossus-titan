@@ -7,12 +7,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.ResourceLoader;
+import net.sf.colossus.variant.AllCreatureType;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.CreatureTypeTitan;
 import net.sf.colossus.variant.HazardTerrain;
@@ -30,12 +33,13 @@ import org.jdom.input.SAXBuilder;
  * @version $Id$
  * @see net.sf.colossus.variant.CreatureType
  */
-public class CreatureLoader
+public class CreatureLoader implements AllCreatureType
 {
     private static final Logger LOGGER = Logger.getLogger(CreatureLoader.class
         .getName());
     private static final String currentVersion = "2";
     private final List<CreatureType> creatures;
+    private final Map<String,CreatureType> byName = new TreeMap<String,CreatureType>();
 
     // we need to cast since JDOM is not generified
     @SuppressWarnings("unchecked")
@@ -161,10 +165,16 @@ public class CreatureLoader
                 VariantSupport.getVarDirectoriesList(), parameters);
         }
         this.creatures.add(creature);
+        this.byName.put(name, creature);
     }
 
     public List<CreatureType> getCreatures()
     {
         return Collections.unmodifiableList(this.creatures);
+    }
+
+    public CreatureType getCreatureByName(String name)
+    {
+        return this.byName.get(name);
     }
 }
