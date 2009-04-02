@@ -628,9 +628,11 @@ public class HazardTerrain extends Hazards
 
     /** Return the bonus to apply to the Strike Factor of a Creature whose
      * line-of-fire cross this hex.
-     * @todo there should be an effect variable (instead of 1), and we also
-     * might add the other variants (skillbonus, powerpenalty, powerbonus).
-     * @return The bonus to apply to the Strike Factor, negative if it's a penalty.
+     * TODO there should be an effect variable (instead of 1), and we also
+     * might add the other variants (skillbonus, powerpenalty, powerbonus)
+     * 
+     * @return The bonus to apply to the Strike Factor, 
+     *         negative if it's a penalty.
      */
     public int getSkillBonusRangestrikeThrough(boolean rangestrikerIsNative)
     {
