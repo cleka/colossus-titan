@@ -1,6 +1,7 @@
 package net.sf.colossus.gui;
 
 
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -65,7 +66,12 @@ final class PickStrikePenalty extends KDialog
         });
 
         pack();
+        // useSaveWindow remembers and restores both size and location
+        // Size should be based on needed size, so re-setSize() it afterwards
+        // again:
+        Dimension preferredSize = getPreferredSize();
         useSaveWindow(gui.getOptions(), "PickStrikePenalty", null);
+        setSize(preferredSize);
         setVisible(true);
     }
 }
