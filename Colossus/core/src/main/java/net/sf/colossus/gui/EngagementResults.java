@@ -39,9 +39,7 @@ import net.sf.colossus.server.VariantSupport;
  *
  * It collects the results of all battles that are send by 'addData()`.
  *
- * @todo fix layout so the empty dialog can be shown 
  *
- * @version $Id$
  * @author Towi
  * @author David Ripton
  */
@@ -511,7 +509,8 @@ final class EngagementResults extends KDialog
                 }
                 else
                 {
-                    this.winner = null; // @todo is this case possible at all? What does it mean?
+                    // TODO is this case possible at all? What does it mean?
+                    this.winner = null;
                 }
             }
         }
