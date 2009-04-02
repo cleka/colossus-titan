@@ -1592,7 +1592,8 @@ public class ClientGUI implements IClientGUI
         {
             String markerId = marker.getId();
             Legion legion = client.getLegion(markerId);
-            autoInspector.showLegion((LegionClientSide)legion);
+            autoInspector.showLegion((LegionClientSide)legion, client
+                .isMyLegion(legion));
         }
     }
 

@@ -89,17 +89,17 @@ class AutoInspector extends KDialog
         return new Dimension(550, 110);
     }
 
-    public void showLegion(LegionClientSide legion)
+    public void showLegion(LegionClientSide legion, boolean isMyLegion)
     {
         assertEDT();
         scrollPane.getViewport().removeAll();
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         LegionInfoPanel liPanel = new LegionInfoPanel(legion, 4 * Scale.get(),
-            5, 2, false, viewMode, dubiousAsBlanks, false);
+            5, 2, false, viewMode, isMyLegion, dubiousAsBlanks, false);
         panel.add(liPanel);
         String valueText = liPanel.getValueText();
-        String ownerText = legion.isMyLegion() ? "" : " ["
+        String ownerText = isMyLegion ? "" : " ["
             + legion.getPlayer().getName() + "]";
         setTitle("Inspector: Legion " + legion.getMarkerId() + valueText
             + ownerText);

@@ -37,10 +37,6 @@ public final class LegionClientSide extends Legion
     private final Client client;
 
     private PredictSplitNode myNode;
-    /*
-     * TODO this is not intrinsic to the Legion, it is a Player feature
-     */
-    private final boolean isMyLegion;
 
     // TODO the Client parameter should be a Game(ClientSide), which doesn't exist yet
     public LegionClientSide(Player player, String markerId, Client client, MasterHex hex)
@@ -48,7 +44,6 @@ public final class LegionClientSide extends Legion
         super(player, markerId, hex);
         this.client = client;
         myNode = null;
-        isMyLegion = getPlayer().equals(client.getOwningPlayer());
     }
 
     private PredictSplitNode getNode(String markerId)
@@ -65,11 +60,6 @@ public final class LegionClientSide extends Legion
             myNode = getNode(this.markerId);
         }
         return myNode;
-    }
-
-    public boolean isMyLegion()
-    {
-        return isMyLegion;
     }
 
     @Override

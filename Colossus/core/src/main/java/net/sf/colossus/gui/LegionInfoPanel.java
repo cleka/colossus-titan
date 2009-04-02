@@ -16,8 +16,8 @@ import net.sf.colossus.common.Options;
 import net.sf.colossus.util.HTMLColor;
 
 
-/** 
- * Creates a JPanel displaying one legion, 
+/**
+ * Creates a JPanel displaying one legion,
  * used by AutoInspector and ShowLegion (right-click on legion)
  */
 public final class LegionInfoPanel extends JPanel
@@ -25,7 +25,7 @@ public final class LegionInfoPanel extends JPanel
     private String valueText = "";
 
     public LegionInfoPanel(LegionClientSide legion, int scale, int margin,
-        int padding, boolean usePlayerColor, int viewMode,
+        int padding, boolean usePlayerColor, int viewMode, boolean isMyLegion,
         boolean dubiousAsBlanks, boolean showLegionValue)
     {
         boolean contentCertain = false;
@@ -39,7 +39,7 @@ public final class LegionInfoPanel extends JPanel
         }
         else if (viewMode == Options.viewableOwnNum)
         {
-            if (legion.isMyLegion())
+            if (isMyLegion)
             {
                 contentCertain = true;
                 viewAll(legion, usePlayerColor, scale, margin, padding,
@@ -129,7 +129,7 @@ public final class LegionInfoPanel extends JPanel
         }
 
         int i = 0;
-        int effectiveChitSize = 0; // Chit treats scale as a hint, 
+        int effectiveChitSize = 0; // Chit treats scale as a hint,
         // actual size might differ
 
         // We could add the marker, if we want:
@@ -153,7 +153,7 @@ public final class LegionInfoPanel extends JPanel
         List<Boolean> certain = legion.getCertainties();
         boolean allCertain = !hideAll;
 
-        // if uncertain shall be shown ones only as blanks, then 
+        // if uncertain shall be shown ones only as blanks, then
         // also sort the blanks all to the end:
         // (just unnecessary work if hideAll is set.)
         if (dubiousAsBlanks && !hideAll)
