@@ -34,15 +34,11 @@ public final class LegionClientSide extends Legion
     private static final Logger LOGGER = Logger
         .getLogger(LegionClientSide.class.getName());
 
-    private final Client client;
-
     private PredictSplitNode myNode;
 
-    // TODO the Client parameter should be a Game(ClientSide), which doesn't exist yet
-    public LegionClientSide(Player player, String markerId, Client client, MasterHex hex)
+    public LegionClientSide(Player player, String markerId, MasterHex hex)
     {
         super(player, markerId, hex);
-        this.client = client;
         myNode = null;
     }
 
@@ -308,14 +304,6 @@ public final class LegionClientSide extends Legion
     public int numUncertainCreatures()
     {
         return getNode().numUncertainCreatures();
-    }
-
-    /** Return true if the legion has moved and can recruit. */
-    public boolean canRecruit()
-    {
-        return hasMoved() && getHeight() < 7 && !hasRecruited()
-            && !getPlayer().isDead()
-            && !client.findEligibleRecruits(this, getCurrentHex()).isEmpty();
     }
 
     @Override

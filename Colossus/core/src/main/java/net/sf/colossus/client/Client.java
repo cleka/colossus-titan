@@ -1775,6 +1775,13 @@ public final class Client implements IClient, IOracle
         }
     }
 
+    public boolean canRecruit(Legion legion)
+    {
+        return legion.hasMoved() && legion.getHeight() < 7
+            && !legion.hasRecruited() && !legion.getPlayer().isDead()
+            && !findEligibleRecruits(legion, legion.getCurrentHex()).isEmpty();
+    }
+
     /** Used for human players only.  */
     public void doRecruit(Legion legion)
     {
@@ -1785,9 +1792,11 @@ public final class Client implements IClient, IOracle
             return;
         }
 
-        if (legion == null || !((LegionClientSide)legion).canRecruit()
+        if (legion == null || !canRecruit(legion)
             || !isMyTurn() || !isMyLegion(legion))
         {
+            // TODO is it good to return quietly here? It seems the method should
+            // not have been called in the first place
             return;
         }
 
@@ -2891,7 +2900,7 @@ public final class Client implements IClient, IOracle
 
         for (Legion legion : activePlayer.getLegions())
         {
-            if (((LegionClientSide)legion).canRecruit())
+            if (canRecruit(legion))
             {
                 result.add(legion.getCurrentHex());
             }

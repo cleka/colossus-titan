@@ -248,8 +248,7 @@ public class SimpleAI extends AbstractAI
             .getAverageLegionPointValue());
         for (LegionClientSide legion : client.getOwningPlayer().getLegions())
         {
-            if (legion.hasMoved()
-                && legion.canRecruit()
+            if (client.canRecruit(legion)
                 && (legion.hasTitan() || legion.getPointValue() >= minimumSizeToRecruit))
             {
                 CreatureType recruit = chooseRecruit(legion, legion
@@ -1692,8 +1691,8 @@ public class SimpleAI extends AbstractAI
                 .getAcquirableRecruitmentsValue()) > (currentScore / TerrainRecruitLoader
                 .getAcquirableRecruitmentsValue()))
             {
-                if ((attacker).getHeight() == 7 || (attacker).getHeight() == 6
-                    && ((LegionClientSide)attacker).canRecruit())
+                if (attacker.getHeight() == 7 || attacker.getHeight() == 6
+                    && client.canRecruit(attacker))
                 {
                     value -= 10;
                 }
@@ -1850,8 +1849,7 @@ public class SimpleAI extends AbstractAI
 
         // Don't take an angel if 6 high and a better recruit is available.
         // TODO Make this also work for post-battle reinforcements
-        if ((legion).getHeight() == 6
-            && ((LegionClientSide)legion).canRecruit())
+        if (legion.getHeight() == 6 && client.canRecruit(legion))
         {
             List<CreatureType> recruits = client.findEligibleRecruits(legion,
                 legion.getCurrentHex());
@@ -1903,7 +1901,7 @@ public class SimpleAI extends AbstractAI
         for (Legion legion : donors)
         {
             LegionClientSide lcs = new LegionClientSide(client.getOwningPlayer(),
-                legion.getMarkerId(), client, legion.getCurrentHex());
+                legion.getMarkerId(), legion.getCurrentHex());
 
             String myAngel = lcs.bestSummonable();
             if (bestAngel == null
