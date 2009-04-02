@@ -1506,8 +1506,7 @@ public final class MasterBoard extends JPanel
             });
     }
 
-    // TODO make typesafe
-    void selectHexByLabel(final String label)
+    void selectHex(final MasterHex modelHex)
     {
         ArrayHelper.findFirstMatch(guiHexArray,
             new NullCheckPredicate<GUIMasterHex>(false)
@@ -1516,7 +1515,7 @@ public final class MasterBoard extends JPanel
                 public boolean matchesNonNullValue(GUIMasterHex hex)
                 {
                     if (!hex.isSelected()
-                        && label.equals(hex.getHexModel().getLabel()))
+                        && modelHex.equals(hex.getHexModel()))
                     {
                         hex.select();
                         hex.repaint();
@@ -2012,11 +2011,7 @@ public final class MasterBoard extends JPanel
         {
             for (Chit chit : chits)
             {
-                // TODO is this != null needed?
-                if (chit != null)
-                {
-                    chit.paintComponent(g);
-                }
+                chit.paintComponent(g);
             }
         }
     }

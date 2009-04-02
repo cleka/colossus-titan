@@ -1888,7 +1888,7 @@ public class ClientGUI implements IClientGUI
         if (board != null && battleSite != null)
         {
             board.unselectAllHexes();
-            board.selectHexByLabel(battleSite.getLabel());
+            board.selectHex(battleSite);
         }
     }
 
