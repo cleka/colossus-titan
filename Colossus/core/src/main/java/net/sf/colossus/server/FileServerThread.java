@@ -129,31 +129,35 @@ final class FileServerThread extends Thread
 
                         String filename = li.remove(0);
 
-                        // right now (05/2007) clients should not send this -
-                        // take into use somewhat later.
+                        // TODO Remove this comment if nothing happened :)
+                        // 2009-03 Now clients sends it. Let's see.
+                        
                         if (filename
-                            .equals(Constants.fileServerIgnoreFailSignal))
+                            .equals(ResourceLoader.FILESERVER_IGNOREFAIL_SIGNAL))
                         {
                             ignoreFail = true;
                             filename = li.remove(0);
                         }
 
+                        // TODO Currently only commented out, remove whole 
+                        //      stuff below at some point.
                         // Meanwhile, suppress the warnings at least for the
                         // README and the markersFile...
                         // we know that they usually print warnings for other
-                        // than "Default" dir.
+                        // than "Default" directory.
 
-                        // @TODO: e.g. when the overnext public build is out
+                        // @TODO: e.g. when the over-next public build is out
                         // (the one right now (20.4.2007) does not contain
                         // this yet), make the client one day submit the 
-                        // ignorefail signal, and remove this
+                        // ignore-fail signal, and remove this
                         //  markersFileName/README temporary hack.
+/*                        
                         if (filename.startsWith(Constants.markersNameFile)
                             || filename.startsWith("README"))
                         {
                             ignoreFail = true;
                         }
-
+*/
                         byte[] data = ResourceLoader.getBytesFromFile(
                             filename, li, true, ignoreFail);
 

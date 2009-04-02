@@ -201,7 +201,6 @@ public final class Constants
     /** XXX If any of the args in the protocol contain this string, then
      *  the protocol will break. */
     public static final String protocolTermSeparator = " ~ ";
-    public static final String fileServerIgnoreFailSignal = "~/~Ignore-Fail~/~";
 
     // From client to server
     public static final String signOn = "signOn";

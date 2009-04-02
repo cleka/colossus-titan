@@ -58,6 +58,8 @@ public final class ResourceLoader
     private static final Logger LOGGER = Logger.getLogger(ResourceLoader.class
         .getName());
 
+    public static final String FILESERVER_IGNOREFAIL_SIGNAL = "~/~Ignore-Fail~/~";
+
     /**
      * Class ColossusClassLoader allows for class loading outside the
      * CLASSPATH, i.e. from the various variant directories.
@@ -511,11 +513,8 @@ public final class ResourceLoader
 
                             if (ignoreFail)
                             {
-                                // Not in this version yet (05/2007).
-                                // New clients could not talk with old server.
-                                // Take this into full use somewhat later.
-                                //out.print(
-                                //   Constants.fileServerIgnoreFailSignal + sep);
+                                out.print(FILESERVER_IGNOREFAIL_SIGNAL
+                                    + REQUEST_TOKEN_SEPARATOR);
                             }
                             out.print(filename);
                             Iterator<String> it = directories.iterator();
