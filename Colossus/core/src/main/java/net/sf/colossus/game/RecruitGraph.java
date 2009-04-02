@@ -395,7 +395,6 @@ public class RecruitGraph
      * @param dst Name of the recruited creature
      * @param number Number of recruiters
      * @param terrain Terrain where the recruiting occurs
-     * @return The new RecruitEdge.
      */
     public void addEdge(String src, String dst, int number,
         MasterBoardTerrain terrain)
@@ -461,7 +460,7 @@ public class RecruitGraph
 
     /**
      * Set the Caretaker to use for availability of creatures.
-     * @param The caretaker to use subsequently.
+     * @param caretaker The caretaker to use subsequently.
      */
     public void setCaretaker(Caretaker caretaker)
     {

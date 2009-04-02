@@ -460,7 +460,7 @@ public final class ResourceLoader
                         // same way.
                         // Right now, the remote-requesting is not able to
                         // submit the "ignore-fail" property...
-                        // @TODO: submit that properly?
+                        // TODO: submit that properly?
                         // fileCacheIgnoreFail.put(mapKey, new Boolean(true));
                     }
                     if (!ignoreFail)
@@ -469,7 +469,7 @@ public final class ResourceLoader
                             + " Couldn't get InputStream for file " + filename
                             + " in " + directories
                             + (cachedOnly ? " (cached only)" : ""));
-                        // @TODO this sounds more serious than just a warning in the logs
+                        // TODO this sounds more serious than just a warning in the logs
                         // Anyway now at least MarkersLoader does not complain any more...
                     }
                 }
@@ -502,7 +502,7 @@ public final class ResourceLoader
                                 + " for file " + filename + " in "
                                 + directories
                                 + (cachedOnly ? " (cached only)" : ""));
-                            // @TODO this sounds more serious than just a warning in the logs
+                            // TODO this sounds more serious than just a warning in the logs
                         }
                         else
                         {
@@ -1281,9 +1281,9 @@ public final class ResourceLoader
      *
      * If no parameters are given, the default constructor is used.
      *
-     * @TODO this is full of catch(Exception) blocks, which all return null.
-     *       Esp. returning null seems a rather bad idea, since it will most
-     *       likely turn out to be NPEs somewhere later.
+     * TODO this is full of catch(Exception) blocks, which all return null.
+     *      Esp. returning null seems a rather bad idea, since it will most
+     *      likely turn out to be NPEs somewhere later.
      *
      * @param className The name of the class to use, must not be null.
      * @param directories List of directories to search (in order), must not be null.

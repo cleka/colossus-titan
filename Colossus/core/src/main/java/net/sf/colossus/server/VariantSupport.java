@@ -70,7 +70,7 @@ public final class VariantSupport
 
     /**
      * Clean-up the ResourceLoader caches to make room for a variant.
-     * @param tempVarFiel The name of the file holding the
+     * @param tempVarFilename The name of the file holding the
      *     soon-to-be-loaded Variant definition.
      * @param tempVarDirectory The path to the directory holding the
      *     soon-to-be-loaded Variant.

@@ -49,7 +49,7 @@ public class GUIBattleHex extends GUIHex<BattleHex>
      *
      * This parallels the neighbors field in BattleHex, just on the view side. 
      * 
-     * @todo check if we can avoid this
+     * TODO check if we can avoid this
      */
     private final GUIBattleHex[] neighbors = new GUIBattleHex[6];
 
