@@ -39,7 +39,7 @@ import org.jdom.input.SAXBuilder;
  *
  * @author Romain Dolbeau
  * @version $Id$
- * @see net.sf.colossus.server.CreatureType
+ * @see net.sf.colossus.variant.CreatureType
  */
 public class TerrainRecruitLoader
 {
@@ -289,7 +289,7 @@ public class TerrainRecruitLoader
         String color = el.getAttributeValue("color");
 
         MasterBoardTerrain terrain = new MasterBoardTerrain(name, displayName,
-                HTMLColor.stringToColor(color));
+            HTMLColor.stringToColor(color));
 
         ArrayList<RecruitNumber> rl = new ArrayList<RecruitNumber>();
         boolean regularRecruit = el.getAttribute("regular_recruit")
@@ -312,8 +312,8 @@ public class TerrainRecruitLoader
             int starterNum = starter.getAttribute("number").getIntValue();
             if (starterNum != 2)
             {
-                LOGGER.warning("Only '2' is a supported value for starting" +
-                        " creatures at the moment ...");
+                LOGGER.warning("Only '2' is a supported value for starting"
+                    + " creatures at the moment ...");
             }
             StartingNumber rn = new StartingNumber(starterName, starterNum);
             sl.add(rn);
@@ -323,8 +323,8 @@ public class TerrainRecruitLoader
         {
             if (total != 6)
             {
-                LOGGER.warning("There isn't exactly 6 starting creatures in" +
-                        " this terrain ! " + total + " were found in " + name);
+                LOGGER.warning("There isn't exactly 6 starting creatures in"
+                    + " this terrain ! " + total + " were found in " + name);
             }
             TerrainRecruitLoader.strToStarters.put(terrain, sl);
         }
@@ -448,7 +448,8 @@ public class TerrainRecruitLoader
      * @author Romain Dolbeau
      * @version $Id$
      */
-    private abstract class CreatureAndNumber {
+    private abstract class CreatureAndNumber
+    {
         /**
          * The Creature in the pair (if it exists)
          */
@@ -487,9 +488,8 @@ public class TerrainRecruitLoader
                 checked = true;
                 if (isConcreteCreature(name))
                 {
-                    creature =
-                            VariantSupport.getCurrentVariant().
-                            getCreatureByName(name);
+                    creature = VariantSupport.getCurrentVariant()
+                        .getCreatureByName(name);
                 }
                 else
                 {
@@ -555,7 +555,6 @@ public class TerrainRecruitLoader
         }
     }
 
-
     public static CustomRecruitBase getCustomRecruitBase(String specialString)
     {
         CustomRecruitBase cri = nameToInstance.get(specialString);
@@ -580,29 +579,28 @@ public class TerrainRecruitLoader
     /**
      * Give an array of the starting creatures, those available in the first
      * turn and in a particular kind of Tower.
-     * @todo FIXME: this heuristic (first 3 creatures in the tower) should
+     * TODO this heuristic (first 3 creatures in the tower) should
      * be replaced by a real entry in the Tower terrain (similar to startlist).
      * @param hex The specific Tower considered.
      * @return an array of Creature representing the starting creatures.
-     * @see net.sf.colossus.server.CreatureType
+     * @see net.sf.colossus.variant.CreatureType
      */
-    public static CreatureType[] getStartingCreatures(
-        MasterHex hex)
+    public static CreatureType[] getStartingCreatures(MasterHex hex)
     {
         List<StartingNumber> sl = strToStarters.get(hex.getTerrain());
         if ((sl == null) || sl.isEmpty())
         {
             if (!hex.getTerrain().isTower())
             {
-                LOGGER.warning("getStartingCreatures should not be called"+
-                        " on a terrain that is'nt a Tower and hasn't a list " +
-                        "of starting creatures.");
+                LOGGER.warning("getStartingCreatures should not be called"
+                    + " on a terrain that is'nt a Tower and hasn't a list "
+                    + "of starting creatures.");
                 return null;
             }
-            LOGGER.warning(
-                    "No starting creatures found in Tower " + hex.getLabel() +
-                    ", please fix the variant. Using first three creatures in" +
-                    " the recruiting tree instead.");
+            LOGGER.warning("No starting creatures found in Tower "
+                + hex.getLabel()
+                + ", please fix the variant. Using first three creatures in"
+                + " the recruiting tree instead.");
             CreatureType[] bc = new CreatureType[3];
             List<CreatureType> to = getPossibleRecruits(hex.getTerrain(), hex);
             bc[0] = to.get(0);
@@ -611,7 +609,8 @@ public class TerrainRecruitLoader
             return (bc);
         }
         CreatureType[] bc = new CreatureType[sl.size()];
-        for (int i = 0 ; i < bc.length ; i++) {
+        for (int i = 0; i < bc.length; i++)
+        {
             bc[i] = sl.get(i).getCreature();
         }
         return bc;
@@ -635,9 +634,12 @@ public class TerrainRecruitLoader
     public static boolean isStartCreature(CreatureType type)
     {
         String name = type.getName();
-        for (List<StartingNumber> sl : strToStarters.values()) {
-            for (StartingNumber sn : sl) {
-                if (sn.getName().equals(name)) {
+        for (List<StartingNumber> sl : strToStarters.values())
+        {
+            for (StartingNumber sn : sl)
+            {
+                if (sn.getName().equals(name))
+                {
                     return true;
                 }
             }
@@ -665,7 +667,7 @@ public class TerrainRecruitLoader
      * the actual recruiting, but it can be null when doing evaluation (it's
      * only used for special recruiting in custom variants).
      * @return List of Creatures that can be recruited in the terrain.
-     * @see net.sf.colossus.server.CreatureType
+     * @see net.sf.colossus.variant.CreatureType
      */
     public static List<CreatureType> getPossibleRecruits(
         MasterBoardTerrain terrain, MasterHex hex)
@@ -703,7 +705,7 @@ public class TerrainRecruitLoader
      *
      * @param terrain String representing a terrain.
      * @return List of Creatures that can recruit in the terrain.
-     * @see net.sf.colossus.server.CreatureType
+     * @see net.sf.colossus.variant.CreatureType
      */
     public static List<CreatureType> getPossibleRecruiters(
         MasterBoardTerrain terrain, MasterHex hex)
@@ -785,7 +787,7 @@ public class TerrainRecruitLoader
      * @param terrain String representing a terrain, in which the
      * recruiting occurs.
      * @return Number of recruiter needed.
-     * @see net.sf.colossus.server.CreatureType
+     * @see net.sf.colossus.variant.CreatureType
      */
     public static int numberOfRecruiterNeeded(CreatureType recruiter,
         CreatureType recruit, MasterBoardTerrain terrain, MasterHex hex)

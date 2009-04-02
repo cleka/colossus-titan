@@ -13,8 +13,8 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.ResourceLoader;
-import net.sf.colossus.variant.CreatureTypeTitan;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.CreatureTypeTitan;
 import net.sf.colossus.variant.HazardTerrain;
 
 import org.jdom.Attribute;
@@ -28,7 +28,7 @@ import org.jdom.input.SAXBuilder;
  * CreatureLoader loads the creature descriptions.
  * @author Romain Dolbeau
  * @version $Id$
- * @see net.sf.colossus.server.CreatureType
+ * @see net.sf.colossus.variant.CreatureType
  */
 public class CreatureLoader
 {
