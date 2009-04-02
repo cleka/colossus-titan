@@ -45,7 +45,7 @@ public class BattlelandLoader
         {
             Document doc = builder.build(batIS);
             Element root = doc.getRootElement();
-            // @todo check XML definition, here was: root.getAttributeValue("terrain");
+            // TODO check XML definition, here was: root.getAttributeValue("terrain");
             isTower = root.getAttribute("tower").getBooleanValue();
             subtitle = root.getAttributeValue("subtitle");
 
@@ -57,8 +57,6 @@ public class BattlelandLoader
             Element startlistEl = root.getChild("startlist");
             if (startlistEl != null)
             {
-                // towi: the DTD "battlehex" definitions clashed.
-                //    renamed to "battlehexref"
                 List<Element> startlistHexes = startlistEl
                     .getChildren("battlehexref");
                 if (startlistHexes.size() == 0)

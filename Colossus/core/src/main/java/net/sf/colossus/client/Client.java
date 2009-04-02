@@ -1636,7 +1636,7 @@ public final class Client implements IClient, IOracle
         }
         else if (reason.equals(Constants.doneWithBattleMoves))
         {
-            // @todo: why can we ignore this?
+            // TODO why can we ignore this?
         }
         else if (reason.equals(Constants.assignStrikePenalty))
         {
@@ -1656,11 +1656,11 @@ public final class Client implements IClient, IOracle
         }
         else if (reason.equals(Constants.doRecruit))
         {
-            // @todo: why can we ignore this?
+            // TODO why can we ignore this?
         }
         else if (reason.equals(Constants.doneWithRecruits))
         {
-            // @todo: why can we ignore this?
+            // TODO why can we ignore this?
         }
         else
         {

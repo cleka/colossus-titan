@@ -41,7 +41,7 @@ public class VariantLoader
         {
             Document doc = builder.build(varIS);
             Element root = doc.getRootElement();
-            // @todo check XML definition, here was: root.getAttributeValue("name");
+            // TODO check XML definition, here was: root.getAttributeValue("name");
 
             Element deps = root.getChild("depends");
             if (deps != null)

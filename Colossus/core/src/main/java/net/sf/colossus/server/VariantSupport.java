@@ -526,7 +526,8 @@ public final class VariantSupport
             {
                 throw new FileNotFoundException(getRecruitName());
             }
-            // @todo parsing into static fields is a side effect of this constructor
+            // TODO parsing into static fields is a side effect of this 
+            // constructor - that's somehow not the right way...
             new TerrainRecruitLoader(terIS);
 
             /* now initialize the static bits of the Battlelands */
