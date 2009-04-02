@@ -1287,8 +1287,7 @@ public final class BattleServerSide extends Battle
         return critters;
     }
 
-    @Override
-    protected boolean isOccupied(String hexLabel)
+    private boolean isOccupied(String hexLabel)
     {
         Iterator<CreatureServerSide> it = getAllCritters().iterator();
         while (it.hasNext())
@@ -1300,6 +1299,11 @@ public final class BattleServerSide extends Battle
             }
         }
         return false;
+    }
+    @Override
+    protected boolean isOccupied(BattleHex hex)
+    {
+        return isOccupied(hex.getLabel());
     }
 
     CreatureServerSide getCritter(BattleHex hex)
