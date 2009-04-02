@@ -5,20 +5,21 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Logger;
+
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardTerrain;
 
 
 /**
- * Custom class implementing the Balrog Creature. 
- * 
+ * Custom class implementing the Balrog Creature.
+ *
  * It is a DemiLord yet isn't immortal, and it's Image Name is Balrog no matter
  * what is it's Creature Name.
  *
  * One becomes available in a Player home Tower for every 300 points earned
  * by the Player. This means the maximum number of aailable Balrog changes,
  * which is why we need a custom CreatureType.
- * 
+ *
  * @version $Id$
  * @author Romain Dolbeau
  */
@@ -29,16 +30,20 @@ public class CreatureBalrog extends CreatureType
     private int localMaxCount;
     private final static List<CreatureType> allBalrogs = new ArrayList<CreatureType>();
 
-    /** The protortype of the constructor must be exactly what is tried
+    /**
+     * Constructor to be called via reflection.
+     *
+     * The signature of the constructor must be exactly what is tried
      * in the Loader, otherwise creation fails (no superclass or interface
      * allowed, only cold, hard implementation).
      */
-    public CreatureBalrog(String name, Integer power, Integer skill,
+    public CreatureBalrog(
+        String name, Integer power, Integer skill,
         Boolean rangestrikes, Boolean flies,
         HashSet<HazardTerrain> nativeTerrrains, Boolean nativeSlope,
         Boolean nativeRiver, Boolean nativeDune, Boolean waterDwelling,
         Boolean magicMissile, Boolean summonable, Boolean lord,
-        Boolean demilord, Integer maxCount, String pluralName, String baseColor)
+        Boolean demilord, Integer maxCount, String pluralName, String baseColor) // NO_UCD
     {
         super(name, power.intValue(), skill.intValue(), rangestrikes
             .booleanValue(), flies.booleanValue(), nativeTerrrains,
@@ -51,11 +56,6 @@ public class CreatureBalrog extends CreatureType
         LOGGER.finest("Successfully created custom CreatureType " + name
             + " (class " + CreatureBalrog.class.getName() + ")");
         allBalrogs.add(this);
-    }
-
-    final static void removeAllBalrogs()
-    {
-        allBalrogs.clear();
     }
 
     final static List<CreatureType> getAllBalrogs()
