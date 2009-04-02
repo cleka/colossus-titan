@@ -233,8 +233,8 @@ public class TerrainRecruitLoader
             Document doc = builder.build(terIS);
             Element root = doc.getRootElement();
 
-            List<Element> terrains = root.getChildren("terrain");
-            for (Element el : terrains)
+            List<Element> lterrains = root.getChildren("terrain");
+            for (Element el : lterrains)
             {
                 handleTerrain(el);
             }
