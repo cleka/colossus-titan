@@ -51,21 +51,25 @@ public class RecruitingSubTree
                 number));
     }
 
+    @SuppressWarnings("boxing")
     public void addAny(CreatureType recruit, int number)
     {
         any.put(recruit, number);
     }
 
+    @SuppressWarnings("boxing")
     public void addNonLord(CreatureType recruit, int number)
     {
         anyNonLord.put(recruit, number);
     }
 
+    @SuppressWarnings("boxing")
     public void addLord(CreatureType recruit, int number)
     {
         anyLord.put(recruit, number);
     }
 
+    @SuppressWarnings("boxing")
     public void addDemiLord(CreatureType recruit, int number)
     {
         anyDemiLord.put(recruit, number);
