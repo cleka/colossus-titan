@@ -24,11 +24,11 @@ import net.sf.colossus.webcommon.IRunWebServer;
  *  (as opposed to: on the User's PC).
  *  It finds and reserves a port for it, starts it in a separate process
  *  and when the process terminates, join()s it and releases the port.
- *  
- *  If the game is run on a user's PC, the class for that needs still 
+ *
+ *  If the game is run on a user's PC, the class for that needs still
  *  to be done...
  *  ( or when game runs locally on a players computer and this here handles
- *    the rendezvous (tell the other players when and where to connect) )  
+ *    the rendezvous (tell the other players when and where to connect) )
  */
 public class RunGameInOwnJVM extends Thread implements IGameRunner
 {
@@ -59,9 +59,6 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
         this.gameId = gi.getGameId();
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.webserver.GameRunner#makeRunningGame()
-     */
     public boolean makeRunningGame()
     {
         workFilesBaseDir = options
@@ -80,49 +77,33 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
         return true;
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.webserver.GameRunner#getHostingPort()
-     */
     public int getHostingPort()
     {
         return hostingPort;
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.webserver.GameRunner#getHostingHost()
-     */
     public String getHostingHost()
     {
         return hostingHost;
     }
 
     // used when cancelling: set to null and then start(),
-    // then the run() method calls only the client dummy which is a 
-    // do-nothing operation.
-    // If start() is not run, the GameInfo object will never get 
+    // then the run() method calls only the client dummy which
+    // is a do-nothing operation.
+    // If start() is not run, the GameInfo object will never get
     // garbage collected and finalized.
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.webserver.GameRunner#setServerNull()
-     */
     public void setServerNull()
     {
         this.server = null;
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.webserver.GameRunner#run()
-     */
     @Override
     public void run()
     {
-        // TODO FIXME  This still needs to be done...!!!
         runInOwnJVM();
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.webserver.GameRunner#runInOwnJVM()
-     */
     public void runInOwnJVM()
     {
         File gameDir = new File(workFilesBaseDir, gameId);
@@ -336,9 +317,6 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
      * after it created the socket.
      */
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.webserver.GameRunner#isSocketUp()
-     */
     public boolean isSocketUp()
     {
         if (flagFile == null)
@@ -356,9 +334,6 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
     }
 
     /* Waits until socket is up, i.e. game is ready to accept clients.
-     */
-    /* (non-Javadoc)
-     * @see net.sf.colossus.webserver.GameRunner#waitUntilReadyToAcceptClients(int)
      */
     public boolean waitUntilReadyToAcceptClients(int timeout)
     {
@@ -407,9 +382,6 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
         return line;
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.webserver.GameRunner#waitUntilGameStartedSuccessfully(int)
-     */
     public boolean waitUntilGameStartedSuccessfully(int timeout)
     {
         boolean ok = false;
@@ -586,5 +558,5 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
             }
         }
     } // END Class NullDumper
-
 }
+
