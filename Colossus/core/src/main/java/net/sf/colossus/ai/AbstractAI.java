@@ -29,7 +29,6 @@ import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardTerrain;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
-import net.sf.colossus.variant.Variant;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
@@ -51,8 +50,8 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 abstract public class AbstractAI implements AI
 {
 
-    protected BattleEvalConstants bec = new BattleEvalConstants();
-    protected CreatureValueConstants cvc = new CreatureValueConstants();
+    protected final BattleEvalConstants bec = new BattleEvalConstants();
+    protected final CreatureValueConstants cvc = new CreatureValueConstants();
     /** The Client we're working for. */
     final protected Client client;
     /** Our random source. */
@@ -60,7 +59,7 @@ abstract public class AbstractAI implements AI
     /** for the Oracle Hint tuff, the section we use.
      * This can be replaced by AI implementation.
      */
-    protected String[] hintSectionUsed = { Constants.sectionOffensiveAI };
+    protected final String[] hintSectionUsed = { Constants.sectionOffensiveAI };
 
     protected AbstractAI(Client client)
     {
@@ -169,7 +168,7 @@ abstract public class AbstractAI implements AI
         {
             Set<MasterHex> tempset = client.getMovement().listAllMoves(legion,
                 hex, roll, true);
-            if (doesSetContainsHexWithTerrain(tempset, terrainTypeName))
+            if (doesSetContainHexWithTerrain(tempset, terrainTypeName))
             {
                 total++;
             }
@@ -177,7 +176,7 @@ abstract public class AbstractAI implements AI
         return total;
     }
 
-    final protected boolean doesSetContainsHexWithTerrain(Set<MasterHex> set,
+    final private boolean doesSetContainHexWithTerrain(Set<MasterHex> set,
         String terrainTypeName)
     {
         for (MasterHex hex : set)
@@ -413,49 +412,49 @@ abstract public class AbstractAI implements AI
     {
         /* per critter */
 
-        int OFFBOARD_DEATH_SCALE_FACTOR = -150;
-        int NATIVE_BONUS_TERRAIN = 40; // 50 -- old value
-        int NATIVE_BOG = 20;
-        int NON_NATIVE_PENALTY_TERRAIN = -100;
-        int PENALTY_DAMAGE_TERRAIN = -200;
-        int FIRST_RANGESTRIKE_TARGET = 300;
-        int EXTRA_RANGESTRIKE_TARGET = 100;
-        int RANGESTRIKE_TITAN = 500;
-        int RANGESTRIKE_WITHOUT_PENALTY = 100;
-        int ATTACKER_ADJACENT_TO_ENEMY = 400;
-        int DEFENDER_ADJACENT_TO_ENEMY = -20;
-        int ADJACENT_TO_ENEMY_TITAN = 1300;
-        int ADJACENT_TO_RANGESTRIKER = 500;
-        int ATTACKER_KILL_SCALE_FACTOR = 25; // 100
-        int DEFENDER_KILL_SCALE_FACTOR = 1; // 100
-        int KILLABLE_TARGETS_SCALE_FACTOR = 0; // 10
-        int ATTACKER_GET_KILLED_SCALE_FACTOR = -20;
-        int DEFENDER_GET_KILLED_SCALE_FACTOR = -40;
-        int ATTACKER_GET_HIT_SCALE_FACTOR = -1;
-        int DEFENDER_GET_HIT_SCALE_FACTOR = -2;
-        int TITAN_TOWER_HEIGHT_BONUS = 2000;
-        int DEFENDER_TOWER_HEIGHT_BONUS = 80;
-        int TITAN_FORWARD_EARLY_PENALTY = -10000;
-        int TITAN_BY_EDGE_OR_BLOCKINGHAZARD_BONUS = 400;
-        int DEFENDER_BY_EDGE_OR_BLOCKINGHAZARD_BONUS = 1;
-        int DEFENDER_FORWARD_EARLY_PENALTY = -60;
-        int ATTACKER_DISTANCE_FROM_ENEMY_PENALTY = -300;
-        int ADJACENT_TO_BUDDY = 100;
-        int ADJACENT_TO_BUDDY_TITAN = 600; // 200
-        int GANG_UP_ON_CREATURE = 50;
+        final int OFFBOARD_DEATH_SCALE_FACTOR = -150;
+        final int NATIVE_BONUS_TERRAIN = 40; // 50 -- old value
+        final int NATIVE_BOG = 20;
+        final int NON_NATIVE_PENALTY_TERRAIN = -100;
+        final int PENALTY_DAMAGE_TERRAIN = -200;
+        final int FIRST_RANGESTRIKE_TARGET = 300;
+        final int EXTRA_RANGESTRIKE_TARGET = 100;
+        final int RANGESTRIKE_TITAN = 500;
+        final int RANGESTRIKE_WITHOUT_PENALTY = 100;
+        final int ATTACKER_ADJACENT_TO_ENEMY = 400;
+        final int DEFENDER_ADJACENT_TO_ENEMY = -20;
+        final int ADJACENT_TO_ENEMY_TITAN = 1300;
+        final int ADJACENT_TO_RANGESTRIKER = 500;
+        final int ATTACKER_KILL_SCALE_FACTOR = 25; // 100
+        final int DEFENDER_KILL_SCALE_FACTOR = 1; // 100
+        final int KILLABLE_TARGETS_SCALE_FACTOR = 0; // 10
+        final int ATTACKER_GET_KILLED_SCALE_FACTOR = -20;
+        final int DEFENDER_GET_KILLED_SCALE_FACTOR = -40;
+        final int ATTACKER_GET_HIT_SCALE_FACTOR = -1;
+        final int DEFENDER_GET_HIT_SCALE_FACTOR = -2;
+        final int TITAN_TOWER_HEIGHT_BONUS = 2000;
+        final int DEFENDER_TOWER_HEIGHT_BONUS = 80;
+        final int TITAN_FORWARD_EARLY_PENALTY = -10000;
+        final int TITAN_BY_EDGE_OR_BLOCKINGHAZARD_BONUS = 400;
+        final int DEFENDER_BY_EDGE_OR_BLOCKINGHAZARD_BONUS = 1;
+        final int DEFENDER_FORWARD_EARLY_PENALTY = -60;
+        final int ATTACKER_DISTANCE_FROM_ENEMY_PENALTY = -300;
+        final int ADJACENT_TO_BUDDY = 100;
+        final int ADJACENT_TO_BUDDY_TITAN = 600; // 200
+        final int GANG_UP_ON_CREATURE = 50;
         /* per legion */
         /** Bonus when no defender will be reachable by the attacker
          * next half-turn.
          */
-        int DEF__NOBODY_GETS_HURT = 2000;
+        final int DEF__NOBODY_GETS_HURT = 2000;
         /** Bonus when no defender will be reachable by more than one
          * attacker next half-turn.
          */
-        int DEF__NOONE_IS_GANGBANGED = 200;
+        final int DEF__NOONE_IS_GANGBANGED = 200;
         /** Bonus when at most one defender will be reachable by the
          * attacker next half-turn.
          */
-        int DEF__AT_MOST_ONE_IS_REACHABLE = 100;
+        final int DEF__AT_MOST_ONE_IS_REACHABLE = 100;
     }
 
     /** Various constants used by the AIs code for creature evaluation.
@@ -478,18 +477,6 @@ abstract public class AbstractAI implements AI
     final protected boolean isHumanLegion(Legion legion)
     {
         return !legion.getPlayer().isAI();
-    }
-
-    /** Test whether a Legion belongs to an AI player */
-    final protected boolean isAILegion(Legion legion)
-    {
-        return legion.getPlayer().isAI();
-    }
-
-    /** Get the variant played */
-    final protected Variant getVariantPlayed()
-    {
-        return this.client.getGame().getVariant();
     }
 
     final protected boolean hasOpponentNativeCreature(HazardTerrain terrain)
@@ -669,7 +656,7 @@ abstract public class AbstractAI implements AI
     }
 
     /** Modify allCritterMoves in place, and return true if it changed. */
-    final protected boolean trimCritterMoves(
+    final private boolean trimCritterMoves(
         List<List<CritterMove>> allCritterMoves)
     {
         Set<BattleHex> takenHexes = new HashSet<BattleHex>(); // XXX reuse?
@@ -712,10 +699,10 @@ abstract public class AbstractAI implements AI
     protected class AbstractAIOracle implements HintOracleInterface
     {
 
-        LegionClientSide legion;
-        MasterHex hex;
-        List<CreatureType> recruits;
-        Map<MasterHex, List<Legion>>[] enemyAttackMap = null;
+        private final LegionClientSide legion;
+        private final MasterHex hex;
+        private final List<CreatureType> recruits;
+        private Map<MasterHex, List<Legion>>[] enemyAttackMap = null;
 
         AbstractAIOracle(LegionClientSide legion, MasterHex hex,
             List<CreatureType> recruits2)
