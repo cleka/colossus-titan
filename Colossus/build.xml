@@ -210,7 +210,7 @@
   description="Delete derived files">
     <delete verbose="yes" quiet="yes" includeemptydirs="yes">
       <fileset dir="."
-      includes="version, log, fixcrlf*, **/core, **/javacore.txt, **/*~, **/*.bak, **/*.old, **/*.class, **/Colossus.*.zip, TEST-*Test.txt, javadoc/**" />
+      includes="version, log, fixcrlf*, **/core, **/javacore.txt, **/*~, **/*.bak, **/*.old, build/ant/**/*.class, **/Colossus.*.zip, TEST-*Test.txt, javadoc/**" />
     </delete>
     <delete dir="${build.dir}" />
   </target>
