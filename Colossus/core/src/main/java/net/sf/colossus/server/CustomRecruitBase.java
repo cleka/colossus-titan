@@ -243,8 +243,9 @@ abstract public class CustomRecruitBase
      * List creatures that can be recruited in this terrain 
      * in a special way now.
      * @param terrain The MasterBoardTerrain considered for recruiting
-     * @param hex The specific MasterHex considered for recruiting (for
-     * instance see {@link BalrogRecruitment#getPossibleSpecialRecruits()}
+     * @param hex The specific MasterHex considered for recruiting 
+     * (for an example, see getPossibleSpecialRecruits() in 
+     * BalrogRecruitment.java in Balrog variant directory)
      * @return A List of possible special Recruits in this hex.
      */
     abstract public List<CreatureType> getPossibleSpecialRecruits(
