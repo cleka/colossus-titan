@@ -32,8 +32,8 @@ import net.sf.colossus.variant.Variant;
 
 
 /**
- * Class BattleTerrainHazardWindow shows a GUI representation of the 
- * Hazard Chart 
+ * Class BattleTerrainHazardWindow shows a GUI representation of the
+ * Hazard Chart
  * This is still ALPHA.
  * @version $Id: BattleTerrainHazardWindow.java 2975 2008-01-06 10:34:55Z peterbecker $
  * @author Dranathi
@@ -149,7 +149,7 @@ public class BattleTerrainHazardWindow extends KDialog
         {
             if ("nothing".equalsIgnoreCase(hazard.getName())
                 || hexsidesDisplayed.containsKey(hazard.getName())
-                || hex.getTerrain().getHazardSideCount(hazard.getCode()) == 0)
+                || hex.getTerrain().getHazardHexsideCount(hazard) == 0)
             {
                 // Ignore
             }
@@ -192,7 +192,7 @@ public class BattleTerrainHazardWindow extends KDialog
 
     }
 
-    // Create GUI representation of Terrain 
+    // Create GUI representation of Terrain
     private void addHexImage(Container container, Hazards hazard)
     {
         GUIBattleHex hex = new GUIBattleHex(HEX_SIZE, 0, HEX_SIZE, container,
@@ -205,7 +205,7 @@ public class BattleTerrainHazardWindow extends KDialog
         else
         {
             model.setTerrain(HazardTerrain.getDefaultTerrain());
-            // to see the hexsides (or at least most of them) we have to configure 
+            // to see the hexsides (or at least most of them) we have to configure
             // them on the neighbors
             // TODO top is broken, three are still missing
             // TODO for a full drawn one we would have to draw two hexes at least
@@ -239,7 +239,7 @@ public class BattleTerrainHazardWindow extends KDialog
         model.setTerrain(HazardTerrain.getDefaultTerrain());
         for (int i = 0; i <= 5; i++)
         {
-            model.setHexside(i, hazard.getCode());
+            model.setHexsideHazard(i, hazard);
         }
     }
 

@@ -37,10 +37,11 @@ public class BattleHex extends Hex
     //{ "Nothing", "Dune", "Cliff", "Slope", "Wall", "River"};
 
     /**
-     * Hold the type of the six side of the BattleHex.
+     * Hold the HazardHexside type of the six side of the BattleHex
+     * (e.g. Slope, Dune, River...).
      * The hexside is marked only in the higher hex.
      */
-    private final char[] hexsides = new char[6];
+    private final HazardHexside[] hexsideHazards = new HazardHexside[6];
 
     /**
      * Links to the neighbors of the BattleHex.
@@ -70,7 +71,7 @@ public class BattleHex extends Hex
 
         for (int i = 0; i < 6; i++)
         {
-            hexsides[i] = ' ';
+            setHexsideHazard(i, HazardHexside.NOTHING);
         }
 
         terrain = HazardTerrain.PLAINS;
@@ -223,15 +224,6 @@ public class BattleHex extends Hex
         }
     }
 
-    public static boolean isNativeBonusHexside(char h)
-    {
-        if (h == 'w' || h == 's' || h == 'd')
-        {
-            return true;
-        }
-        return false;
-    }
-
     public boolean isNativeBonusTerrain()
     {
         boolean result;
@@ -239,19 +231,10 @@ public class BattleHex extends Hex
 
         for (int i = 0; i < 6; i++)
         {
-            char h = getHexside(i);
-            result = result || isNativeBonusHexside(h);
+            HazardHexside hazard = getHexsideHazard(i);
+            result = result || hazard.isNativeBonusHexside();
         }
         return result;
-    }
-
-    public static boolean isNonNativePenaltyHexside(char h)
-    {
-        if (h == 'w' || h == 's' || h == 'd')
-        {
-            return true;
-        }
-        return false;
     }
 
     public boolean isNonNativePenaltyTerrain()
@@ -260,68 +243,88 @@ public class BattleHex extends Hex
         result = terrain.isNonNativePenaltyTerrain();
         for (int i = 0; i < 6; i++)
         {
-            char h = getOppositeHexside(i);
-            result = result || isNonNativePenaltyHexside(h);
+            HazardHexside hazard = getOppositeHazard(i);
+            result = result || hazard.isNonNativePenaltyHexside();
         }
         return result;
     }
 
-    public void setHexside(int i, char hexside)
+    public void setHexsideHazard(int i, HazardHexside hazard)
     {
-        this.hexsides[i] = hexside;
+        this.hexsideHazards[i] = hazard;
     }
 
-    public char getHexside(int i)
+    // TODO Fix the sources from which BattlelandRandomizerLoader is generated
+    //      so that they use the HazardHexside version instead of the character
+    //      based version of the setter
+    @SuppressWarnings("deprecation")
+    public void setHexsideAsChar(int i, char hexsideChar)
+    {
+        HazardHexside hazard = HazardHexside.getHexsideByCode(hexsideChar);
+        setHexsideHazard(i, hazard);
+    }
+
+    /**
+     * TODO use side enumeration types instead of integers
+     * Return the HazardHexside (enumType) at the hex' side number i
+     * @param i The side number, from 0 to 5
+     * @return The HazardHexside type at that side
+     */
+    public HazardHexside getHexsideHazard(int i)
     {
         if (i >= 0 && i <= 5)
         {
-            return hexsides[i];
+            return hexsideHazards[i];
         }
         else
         {
-            LOGGER.log(Level.WARNING, "Called BattleHex.getHexside() with "
-                + i);
-            return '?';
+            LOGGER.log(Level.WARNING, "Called BattleHex.getHexsideHazard() "
+                + "with illegal hexside number " + i);
+            return HazardHexside.NOTHING;
         }
     }
 
-    public String getHexsideName(int i)
+    // The hexside hazard of a tower is a wall, and previously this code
+    // returned Wall in this case, so I keep it like that for now.
+    // This method is nowadays used only by the painting code to
+    // derive the image name.
+    // TODO get rid of this, when HazardHexside uses correct text.
+    //
+    public String getHexsideImageName(int i)
     {
-        switch (hexsides[i])
+        HazardHexside hazard = hexsideHazards[i];
+
+        if (hazard == HazardHexside.TOWER)
         {
-            default:
-            case ' ':
-                return ("Nothing");
-
-            case 'd':
-                return ("Dune");
-
-            case 'c':
-                return ("Cliff");
-
-            case 's':
-                return ("Slope");
-
-            case 'w':
-                return ("Wall");
-
-            case 'r':
-                return ("River");
+            return "Wall";
+        }
+        else
+        {
+            return hazard.getName();
         }
     }
 
-    /** Return the flip side of hexside i. */
-    public char getOppositeHexside(int i)
+    /** Return the hazard type of opposite side of side i. */
+    public HazardHexside getOppositeHazard(int i)
     {
-        char hexside = ' ';
+        HazardHexside hazard = HazardHexside.NOTHING;
 
         BattleHex neighbor = getNeighbor(i);
         if (neighbor != null)
         {
-            hexside = neighbor.getHexside((i + 3) % 6);
+            hazard = neighbor.getHexsideHazard((i + 3) % 6);
         }
 
-        return hexside;
+        return hazard;
+    }
+
+    /** TODO get rid of this char based one
+     *  Return the character code of the hazard type
+     *  of opposite side of side i.
+     */
+    public char getOppositeHexside(int i)
+    {
+        return getOppositeHazard(i).getCode();
     }
 
     public int getElevation()
@@ -355,7 +358,7 @@ public class BattleHex extends Hex
     {
         for (int i = 0; i < 6; i++)
         {
-            if (hexsides[i] == 'w')
+            if (hexsideHazards[i] == HazardHexside.TOWER)
             {
                 return true;
             }
@@ -393,10 +396,10 @@ public class BattleHex extends Hex
         }
         else
         {
-            char hexside = getHexside(cameFrom);
+            HazardHexside hazard = getHexsideHazard(cameFrom);
 
             // Non-fliers may not cross cliffs.
-            if ((hexside == 'c' || getOppositeHexside(cameFrom) == 'c')
+            if ((hazard == HazardHexside.CLIFF || getOppositeHazard(cameFrom) == HazardHexside.CLIFF)
                 && !creature.isFlier())
             {
                 cost += IMPASSIBLE_COST;
@@ -405,15 +408,16 @@ public class BattleHex extends Hex
             {
 
                 // river slows both way, except native & water dwellers
-                if ((hexside == 'r' || getOppositeHexside(cameFrom) == 'r')
-                    && !creature.isFlier() && !creature.isWaterDwelling()
+                if ((hazard == HazardHexside.RIVER || getOppositeHazard(cameFrom) == HazardHexside.RIVER)
+                    && !creature.isFlier()
+                    && !creature.isWaterDwelling()
                     && !creature.isNativeRiver())
                 {
                     cost += SLOW_INCREMENT_COST;
                 }
 
                 // Check for a slowing hexside.
-                if ((hexside == 'w' || (hexside == 's' && !creature
+                if ((hazard == HazardHexside.TOWER || (hazard == HazardHexside.SLOPE && !creature
                     .isNativeSlope()))
                     && !creature.isFlier()
                     && elevation > getNeighbor(cameFrom).getElevation())
@@ -436,7 +440,7 @@ public class BattleHex extends Hex
         }
 
         if ((cost < IMPASSIBLE_COST) && (cost > SLOW_COST) && (!cumul))
-        { // don't cumul Slow
+        { // No cumulation of slowing:
             cost = SLOW_COST;
         }
 
@@ -486,8 +490,8 @@ public class BattleHex extends Hex
 
     public boolean isCliff(int hexside)
     {
-        return getHexside(hexside) == 'c'
-            || getOppositeHexside(hexside) == 'c';
+        return getHexsideHazard(hexside) == HazardHexside.CLIFF
+            || getOppositeHazard(hexside) == HazardHexside.CLIFF;
     }
 
     public static char[] getHexsides()

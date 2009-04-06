@@ -40,6 +40,7 @@ import net.sf.colossus.gui.GUIBattleHex;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.variant.BattleHex;
+import net.sf.colossus.variant.HazardHexside;
 import net.sf.colossus.variant.HazardTerrain;
 import net.sf.colossus.xmlparser.BattlelandLoader;
 
@@ -52,14 +53,14 @@ import net.sf.colossus.xmlparser.BattlelandLoader;
 final class ShowBuilderHexMap extends BuilderHexMap implements Printable
 {
 
-    private JFrame frame;
-    private JPopupMenu popupMenuTerrain;
-    private JPopupMenu popupMenuBorder;
+    private final JFrame frame;
+    private final JPopupMenu popupMenuTerrain;
+    private final JPopupMenu popupMenuBorder;
     private Point lastPoint;
     private int lastSide;
-    private JCheckBoxMenuItem towerItem;
-    private AbstractAction towerAction;
-    private AbstractAction clearStartListAction;
+    private final JCheckBoxMenuItem towerItem;
+    private final AbstractAction towerAction;
+    private final AbstractAction clearStartListAction;
     private String mapName = null;
 
     class rndFileFilter extends javax.swing.filechooser.FileFilter
@@ -259,7 +260,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
         return Printable.PAGE_EXISTS;
     }
 
-    private void doFillEdge(BattleHex[][] h, char hazard)
+    private void doFillEdge(BattleHex[][] h, HazardHexside hazard)
     {
         for (int i = 0; i < h.length; i++)
         {
@@ -269,40 +270,38 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
                 {
                     for (int k = 0; k < 6; k++)
                     {
-                        if ((h[i][j].getHexside(k) == ' ')
-                            && (h[i][j].getOppositeHexside(k) == ' '))
+                        if ((h[i][j].getHexsideHazard(k) == HazardHexside.NOTHING)
+                            && (h[i][j].getOppositeHazard(k) == HazardHexside.NOTHING))
                         {
                             BattleHex n = h[i][j].getNeighbor(k);
                             if (n != null)
                             {
-                                switch (hazard)
+                                if (hazard == HazardHexside.CLIFF)
                                 {
-                                    case ('c'):
-                                        if (h[i][j].getElevation() > (n
-                                            .getElevation() + 1))
-                                        {
-                                            h[i][j].setHexside(k, 'c');
-                                        }
-                                        break;
-
-                                    case ('d'):
-                                        if (h[i][j].getTerrain().getName()
-                                            .equals("Sand")
-                                            && n.getTerrain().getName()
-                                                .equals("Plains"))
-                                        {
-                                            h[i][j].setHexside(k, 'd');
-                                        }
-                                        break;
-
-                                    case ('s'):
-                                        if (h[i][j].getElevation() == (n
-                                            .getElevation() + 1))
-                                        {
-                                            h[i][j].setHexside(k, 's');
-                                        }
-                                        break;
-
+                                    if (h[i][j].getElevation() > (n
+                                        .getElevation() + 1))
+                                    {
+                                        h[i][j].setHexsideHazard(k,
+                                            HazardHexside.CLIFF);
+                                    }
+                                }
+                                else if (hazard == HazardHexside.DUNE)
+                                {
+                                    if (h[i][j].getTerrain().isSand()
+                                        && n.getTerrain().isPlains())
+                                    {
+                                        h[i][j].setHexsideHazard(k,
+                                            HazardHexside.DUNE);
+                                    }
+                                }
+                                else if (hazard == HazardHexside.SLOPE)
+                                {
+                                    if (h[i][j].getElevation() == (n
+                                        .getElevation() + 1))
+                                    {
+                                        h[i][j].setHexsideHazard(k,
+                                            HazardHexside.SLOPE);
+                                    }
                                 }
                             }
                         }
@@ -348,7 +347,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
             {
                 for (int i = 0; i < 6; i++)
                 {
-                    h.getHexModel().setHexside(i, ' ');
+                    h.getHexModel().setHexsideHazard(i, HazardHexside.NOTHING);
                     GUIBattleHex n = h.getNeighbor(i);
                     if (n != null)
                     {
@@ -363,7 +362,8 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
                     GUIBattleHex n = h.getNeighbor(i);
                     if (n != null)
                     {
-                        n.getHexModel().setHexside((i + 3) % 6, ' ');
+                        n.getHexModel().setHexsideHazard((i + 3) % 6,
+                            HazardHexside.NOTHING);
                         n.repaint();
                     }
                 }
@@ -394,32 +394,32 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
     class HexsideAction extends AbstractAction
     {
 
-        char c;
+        HazardHexside hazard;
 
-        HexsideAction(String t, char c)
+        HexsideAction(String t, HazardHexside h)
         {
             super(t);
-            this.c = c;
+            this.hazard = h;
         }
 
         public void actionPerformed(ActionEvent e)
         {
             GUIBattleHex h = getHexContainingPoint(lastPoint);
-            h.getHexModel().setHexside(lastSide, c);
+            h.getHexModel().setHexsideHazard(lastSide, hazard);
             h.repaint();
             (h.getNeighbor(lastSide)).repaint();
         }
     }
-    private AbstractAction showBattlelandAction;
-    private AbstractAction saveBattlelandAsAction;
-    private AbstractAction printBattlelandAction;
-    private AbstractAction quitAction;
-    private AbstractAction eraseAction;
-    private AbstractAction randomizeAction;
-    private AbstractAction fillWithSlopeAction;
-    private AbstractAction fillWithCliffAction;
-    private AbstractAction fillWithDuneAction;
-    private AbstractAction loadFileAction;
+    private final AbstractAction showBattlelandAction;
+    private final AbstractAction saveBattlelandAsAction;
+    private final AbstractAction printBattlelandAction;
+    private final AbstractAction quitAction;
+    private final AbstractAction eraseAction;
+    private final AbstractAction randomizeAction;
+    private final AbstractAction fillWithSlopeAction;
+    private final AbstractAction fillWithCliffAction;
+    private final AbstractAction fillWithDuneAction;
+    private final AbstractAction loadFileAction;
     JMenuBar menuBar;
 
     private class randomizeActionPredef extends AbstractAction
@@ -576,7 +576,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
 
             public void actionPerformed(ActionEvent e)
             {
-                doFillEdge(getBattleHexArray(), 's');
+                doFillEdge(getBattleHexArray(), HazardHexside.SLOPE);
                 repaint();
             }
         };
@@ -585,7 +585,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
 
             public void actionPerformed(ActionEvent e)
             {
-                doFillEdge(getBattleHexArray(), 'c');
+                doFillEdge(getBattleHexArray(), HazardHexside.CLIFF);
                 repaint();
             }
         };
@@ -594,7 +594,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
 
             public void actionPerformed(ActionEvent e)
             {
-                doFillEdge(getBattleHexArray(), 'd');
+                doFillEdge(getBattleHexArray(), HazardHexside.DUNE);
                 repaint();
             }
         };
@@ -756,14 +756,13 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
 
         popupMenuBorder = new JPopupMenu("Choose Border");
         contentPane.add(popupMenuBorder);
-        char[] hexsides = BattleHex.getHexsides();
-
-        for (int i = 0; i < hexsides.length; i++)
+        Collection<HazardHexside> hazardTypes = HazardHexside
+            .getAllHazardHexsides();
+        for (HazardHexside hazard : hazardTypes)
         {
-            tempH.getHexModel().setHexside(0, hexsides[i]);
+            tempH.getHexModel().setHexsideHazard(0, hazard);
             mi = popupMenuBorder.add(new HexsideAction(tempH.getHexModel().
-                    getHexsideName(0),
-                    hexsides[i]));
+                    getHexsideHazard(0).getName(), hazard));
         }
 
         lastPoint = new Point(0, 0);

@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-/** 
+/**
  * This is a typesafe enumeration of all hazard Hexsides, i.e. the
  * Hexsides used in the battle maps.
  */
@@ -49,10 +49,10 @@ public class HazardHexside extends Hazards
 
     /**
      * Returns all available hazard hexsides.
-     * 
+     *
      * This is not variant-specific, any hexside known to the program is listed even
      * if it is not available in the current variant.
-     * 
+     *
      * TODO this should really be a question to ask a variant instance
      */
     public static final Collection<HazardHexside> getAllHazardHexsides()
@@ -117,5 +117,36 @@ public class HazardHexside extends Hazards
         builder.append(getName());
         builder.append(":\n");
         return builder.toString();
+    }
+
+    // TODO use combat bonus tables instead of hardcoded those three
+    //      (created as result of char-to-HazardHexside refactoring)
+    public boolean isNativeBonusHexside()
+    {
+        if (this == HazardHexside.TOWER || this == HazardHexside.SLOPE
+            || this == HazardHexside.DUNE)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    // TODO use combat bonus tables instead of hardcoded those three
+    //      (created as result of char-to-HazardHexside refactoring)
+    // TODO right now, this is identical behavior as "isNativeBonusHexside()"
+    public boolean isNonNativePenaltyHexside()
+    {
+        if (this == HazardHexside.TOWER || this == HazardHexside.SLOPE
+            || this == HazardHexside.DUNE)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 }

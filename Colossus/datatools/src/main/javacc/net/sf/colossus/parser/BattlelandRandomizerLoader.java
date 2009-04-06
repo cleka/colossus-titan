@@ -411,7 +411,7 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
                                         rhs.getProb())
                                     {
                                         attributed = true;
-                                        h[i][j].setHexside(k,rhs.getHexside());
+                                        h[i][j].setHexsideAsChar(k,rhs.getHexside());
                                     }
                                 }
                             }

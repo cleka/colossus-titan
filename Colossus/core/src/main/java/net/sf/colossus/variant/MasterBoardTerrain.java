@@ -2,25 +2,30 @@ package net.sf.colossus.variant;
 
 
 import java.awt.Color;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.logging.Logger;
 
 
 /**
  * A master board terrain.
- * 
- * This class describes a terrain on the master board, including its name, color and the 
+ *
+ * This class describes a terrain on the master board, including its name, color and the
  * layout of a generic battle land. It can occur multiple times on a master board layout
  * attached to the {@link MasterHex} class.
- * 
+ *
  * Battle land information could probably split out into another class, which could then
  * be immutable.
  */
 public class MasterBoardTerrain implements Comparable<MasterBoardTerrain>
 {
+    private static final Logger LOGGER = Logger
+        .getLogger(MasterBoardTerrain.class.getName());
+
     /** The (unique) identifier of this terrain.
      * Should also be used for all Battlelands purpose.
      */
@@ -52,6 +57,9 @@ public class MasterBoardTerrain implements Comparable<MasterBoardTerrain>
     private Map<HazardTerrain, Integer> hazardNumberMap;
     // TODO this should be a Map<HazardHexside, Integer>
     private Map<Character, Integer> hazardSideNumberMap;
+
+    // TODO right now we set up both, until all queries can use the new form
+    private Map<HazardHexside, Integer> hexsideHazardNumberMap;
 
     /** The other MasterBoardTerrain using the same recruit tree */
     private final Set<MasterBoardTerrain> aliases = new TreeSet<MasterBoardTerrain>();
@@ -141,20 +149,23 @@ public class MasterBoardTerrain implements Comparable<MasterBoardTerrain>
                 }
             }
         }
-        final char[] hazardSide = BattleHex.getHexsides();
 
-        for (int i = 0; i < hazardSide.length; i++)
+        final Collection<HazardHexside> hazardTypes = HazardHexside
+            .getAllHazardHexsides();
+
+        for (HazardHexside hazard : hazardTypes)
         {
-            int count = this.getHazardSideCount(hazardSide[i]);
-            if (BattleHex.isNativeBonusHexside(hazardSide[i])
-                && (creature).isNativeHexside(hazardSide[i]))
+            int count = this.getHazardHexsideCount(hazard);
+
+            if (hazard.isNativeBonusHexside()
+                && (creature).isNativeHexsideHazard(hazard))
             {
                 bonusHazardSideCount += count;
             }
             else
             {
-                if (BattleHex.isNonNativePenaltyHexside(hazardSide[i])
-                    && !(creature).isNativeHexside(hazardSide[i]))
+                if (hazard.isNonNativePenaltyHexside()
+                    && !(creature).isNativeHexsideHazard(hazard))
                 {
                     bonusHazardSideCount -= count;
                 }
@@ -219,4 +230,27 @@ public class MasterBoardTerrain implements Comparable<MasterBoardTerrain>
         return hazardSideNumberMap.get(Character.valueOf(hazardSide))
             .intValue();
     }
+
+    public void setHexsideHazardNumberMap(
+        Map<HazardHexside, Integer> hexsideHazardNumberMap)
+    {
+        this.hexsideHazardNumberMap = hexsideHazardNumberMap;
+    }
+
+    // TODO Keep the old style as paranoid counterCheck and compare results.
+    //      If this does now show up problems, the old way can be eliminated
+    //      (refactored 2009-04-06 by Clemens)
+    public int getHazardHexsideCount(HazardHexside hazard)
+    {
+        int oldCount = getHazardSideCount(hazard.getCode());
+        int newCount = hexsideHazardNumberMap.get(hazard).intValue();
+        if (oldCount != newCount)
+        {
+            LOGGER.warning("Refactored getCount for hexside hazard types "
+                + "returns different value (" + newCount + ") than old "
+                + "one does (" + oldCount + ")");
+        }
+        return newCount;
+    }
+
 }

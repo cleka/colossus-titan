@@ -27,6 +27,7 @@ import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.variant.BattleHex;
+import net.sf.colossus.variant.HazardHexside;
 
 
 /**
@@ -47,8 +48,8 @@ public class GUIBattleHex extends GUIHex<BattleHex>
     /**
      * Stores the neighboring views.
      *
-     * This parallels the neighbors field in BattleHex, just on the view side. 
-     * 
+     * This parallels the neighbors field in BattleHex, just on the view side.
+     *
      * TODO check if we can avoid this
      */
     private final GUIBattleHex[] neighbors = new GUIBattleHex[6];
@@ -199,22 +200,23 @@ public class GUIBattleHex extends GUIHex<BattleHex>
             // Draw hexside features.
             for (int i = 0; i < 6; i++)
             {
-                char hexside = getHexModel().getHexside(i);
+                HazardHexside hazard = getHexModel().getHexsideHazard(i);
                 int n;
-                if (hexside != ' ')
+                if (hazard != HazardHexside.NOTHING)
                 {
                     n = (i + 1) % 6;
                     drawHexside(g2, xVertex[i], yVertex[i], xVertex[n],
-                        yVertex[n], hexside);
+                        yVertex[n], hazard.getCode());
                 }
 
                 // Draw them again from the other side.
-                hexside = getHexModel().getOppositeHexside(i);
-                if (hexside != ' ')
+                hazard = getHexModel().getOppositeHazard(i);
+
+                if (hazard != HazardHexside.NOTHING)
                 {
                     n = (i + 1) % 6;
                     drawHexside(g2, xVertex[n], yVertex[n], xVertex[i],
-                        yVertex[i], hexside);
+                        yVertex[i], hazard.getCode());
                 }
             }
         }
@@ -395,8 +397,8 @@ public class GUIBattleHex extends GUIHex<BattleHex>
         for (int i = 0; i < 6; i++)
         {
             BattleHex model = getHexModel();
-            char op = model.getOppositeHexside(i);
-            if (op != ' ')
+            HazardHexside hazard = model.getOppositeHazard(i);
+            if (hazard != HazardHexside.NOTHING)
             {
                 GUIBattleHex neighbor = getNeighbor(i);
 
@@ -424,7 +426,7 @@ public class GUIBattleHex extends GUIHex<BattleHex>
                 dy2 = (int)yi;
 
                 Image sideOverlay = loadOneOverlay(neighbor.getHexModel()
-                    .getHexsideName((i + 3) % 6), dx2 - dx1, dy2 - dy1);
+                    .getHexsideImageName((i + 3) % 6), dx2 - dx1, dy2 - dy1);
 
                 if (sideOverlay != null)
                 {

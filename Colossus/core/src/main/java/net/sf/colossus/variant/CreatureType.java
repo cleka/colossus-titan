@@ -11,7 +11,7 @@ import net.sf.colossus.server.VariantSupport;
 
 /**
  * A type of creature in a variant.
- * 
+ *
  * This class models a generic creature type, i.e. all features that are common
  * through all creatures of a specific type.
  */
@@ -133,8 +133,8 @@ public class CreatureType
 
     /**
      * A display name.
-     * 
-     * This is overridden by CreatureBalrog at the moment -- not sure why this 
+     *
+     * This is overridden by CreatureBalrog at the moment -- not sure why this
      * is necessary. TODO check need for this method
      */
     public String getDisplayName()
@@ -152,7 +152,7 @@ public class CreatureType
 
     /**
      * Checks if the type of creature is native in a terrain type.
-     * 
+     *
      * @param terrain The terrain to check. Not null.
      * @return true iff creatures of this type are native in the terrain.
      */
@@ -169,10 +169,10 @@ public class CreatureType
 
     /**
      * Returns true if this is a Titan.
-     * 
+     *
      * The default implementation is a constant false, to be overridden in classes
      * representing Titans.
-     * 
+     *
      * @return true iff this creature type is a Titan.
      */
     public boolean isTitan()
@@ -311,6 +311,11 @@ public class CreatureType
         return flies;
     }
 
+    public boolean isNativeHexsideHazard(HazardHexside hazard)
+    {
+        return isNativeHexside(hazard.getCode());
+    }
+
     public boolean isNativeHexside(char h)
     {
         switch (h)
@@ -381,11 +386,11 @@ public class CreatureType
         }
     }
 
-    /** 
+    /**
      * Get the non-terrainified part of the kill-value.
-     * 
+     *
      * TODO this is not model, but AI related (but also used in client for
-     * sorting creatures -- the client uses the AI for recruit hints, too) 
+     * sorting creatures -- the client uses the AI for recruit hints, too)
      */
     public int getKillValue()
     {

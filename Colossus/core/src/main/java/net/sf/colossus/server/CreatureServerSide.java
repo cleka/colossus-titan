@@ -26,16 +26,16 @@ import net.sf.colossus.variant.HazardTerrain;
 
 /**
  * Class Critter represents an individual Titan Character.
- * 
+ *
  * TODO this duplicates functionality from the {@link CreatureType} class,
  * mostly due to the fact that the latter doesn't handle the Titans
  * properly
- * 
+ *
  * TODO a lot of the code in here is about the battle rules, often
  * implemented in combination with the Battle class. It would be much
  * easier if this class was just a dumb critter and the rules of battles
  * are all in the Battle class.
- * 
+ *
  * @version $Id$
  * @author David Ripton
  * @author Romain Dolbeau
@@ -45,14 +45,14 @@ public class CreatureServerSide extends Creature
 {
     /**
      * Implements an order on Critters by some definition of importance.
-     * 
+     *
      * The order is:
      * - titans first
      * - then sorted by points value
      * - then sorted by rangestriker or not
      * - then sorted by flyer or not
      * - then by name
-     * 
+     *
      * TODO this is actually applicable on the CreatureType level
      */
     public static final Comparator<CreatureServerSide> IMPORTANCE_ORDER = new Comparator<CreatureServerSide>()
@@ -107,7 +107,7 @@ public class CreatureServerSide extends Creature
 
     /**
      * The game this creature belongs to.
-     * 
+     *
      * Never null.
      */
     private final GameServerSide game;
@@ -410,21 +410,21 @@ public class CreatureServerSide extends Creature
 
             // Adjacent hex, so only one possible direction.
             int direction = Battle.getDirection(hex, targetHex, false);
-            char hexside = hex.getHexside(direction);
+            HazardHexside hazard = hex.getHexsideHazard(direction);
 
             // Native striking down a dune hexside: +2
-            if (hexside == 'd' && isNativeDune())
+            if (hazard == HazardHexside.DUNE && isNativeDune())
             {
                 dice += 2;
             }
             // Native striking down a slope hexside: +1
-            else if (hexside == 's' && isNativeSlope())
+            else if (hazard == HazardHexside.SLOPE && isNativeSlope())
             {
                 dice++;
             }
             // Non-native striking up a dune hexside: -1
             else if (!isNativeDune()
-                && hex.getOppositeHexside(direction) == 'd')
+                && hex.getOppositeHazard(direction) == HazardHexside.DUNE)
             {
                 dice--;
             }
@@ -456,9 +456,10 @@ public class CreatureServerSide extends Creature
                 // Adjacent hex, so only one possible direction.
                 int direction = BattleServerSide.getDirection(hex, targetHex,
                     false);
-                char hexside = hex.getHexside(direction);
+                HazardHexside hazard = hex.getHexsideHazard(direction);
+
                 // Striking down across wall: +1
-                if (hexside == 'w')
+                if (hazard == HazardHexside.TOWER)
                 {
                     attackerSkill++;
                 }
@@ -468,10 +469,11 @@ public class CreatureServerSide extends Creature
                 // Adjacent hex, so only one possible direction.
                 int direction = BattleServerSide.getDirection(targetHex, hex,
                     false);
-                char hexside = targetHex.getHexside(direction);
+                HazardHexside hazard = hex.getHexsideHazard(direction);
                 // Non-native striking up slope: -1
                 // Striking up across wall: -1
-                if ((hexside == 's' && !isNativeSlope()) || hexside == 'w')
+                if ((hazard == HazardHexside.SLOPE && !isNativeSlope())
+                    || hazard == HazardHexside.TOWER)
                 {
                     attackerSkill--;
                 }
@@ -484,12 +486,13 @@ public class CreatureServerSide extends Creature
              * below in your logfile, then it isn't correct ;-)
              */
             int checkStrikingSkill = getStrikingSkill(target, hex
-                .getElevation(), targetHex.getElevation(), hex.getTerrain(),
-                targetHex.getTerrain(), HazardHexside.getHexsideByCode(hex
-                    .getHexside(BattleServerSide.getDirection(hex, targetHex,
-                        false))), HazardHexside.getHexsideByCode(targetHex
-                    .getHexside(BattleServerSide.getDirection(targetHex, hex,
-                        false))));
+                .getElevation(), targetHex.getElevation(),
+                hex.getTerrain(), targetHex.getTerrain(),
+                hex.getHexsideHazard(BattleServerSide.getDirection(hex,
+                    targetHex, false)),
+                targetHex.getHexsideHazard(BattleServerSide.getDirection(
+                    targetHex, hex, false)));
+
             if (checkStrikingSkill != attackerSkill)
             {
                 LOGGER.warning("attackerSkill says " + attackerSkill
@@ -763,11 +766,11 @@ public class CreatureServerSide extends Creature
         {
             return false;
         }
-        // Strikes not up across dune hexsides cannot carry up across 
+        // Strikes not up across dune hexsides cannot carry up across
         // dune hexsides.
-        if (hex.getOppositeHexside(dir) == 'd'
-            && targetHex.getHexside(BattleServerSide.getDirection(targetHex,
-                hex, false)) != 'd')
+        int targDir = BattleServerSide.getDirection(targetHex, hex, false);
+        if (hex.getOppositeHazard(dir) == HazardHexside.DUNE
+            && targetHex.getHexsideHazard(targDir) != HazardHexside.DUNE)
         {
             return false;
         }
@@ -1000,9 +1003,9 @@ public class CreatureServerSide extends Creature
         return getType().isNativeIn(t);
     }
 
-    public boolean isNativeHexside(char h)
+    public boolean isNativeHexside(HazardHexside hazard)
     {
-        return getType().isNativeHexside(h);
+        return getType().isNativeHexside(hazard.getCode());
     }
 
     /** @deprecated all isNative<HazardTerrain> are obsolete, one should use

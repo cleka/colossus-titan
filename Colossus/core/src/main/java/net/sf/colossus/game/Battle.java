@@ -389,8 +389,8 @@ abstract public class Battle
         {
             return true;
         }
-        char hexside = currentHex.getHexside(direction);
-        char hexside2 = currentHex.getOppositeHexside(direction);
+        char hexside = currentHex.getHexsideHazard(direction).getCode();
+        char hexside2 = currentHex.getOppositeHazard(direction).getCode();
         if (currentHex == initialHex)
         {
             if (isObstacle(hexside))

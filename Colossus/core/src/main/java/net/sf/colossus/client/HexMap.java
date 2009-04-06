@@ -13,6 +13,7 @@ import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -30,6 +31,7 @@ import net.sf.colossus.gui.Scale;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.variant.BattleHex;
+import net.sf.colossus.variant.HazardHexside;
 import net.sf.colossus.variant.HazardTerrain;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
@@ -39,9 +41,9 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 /**
  * Class HexMap displays a basic battle map.
- * 
+ *
  * TODO it also contains model information, particularly in the static members
- * 
+ *
  * @version $Id$
  * @author David Ripton
  * @author Romain Dolbeau
@@ -299,7 +301,7 @@ public class HexMap extends JPanel
                  }
                  ResourceLoader.putIntoFileCache(terrain, directories,
                  (new String(buf)).getBytes());
-                 
+
             }
             */
             /* count all hazards & hazard sides */
@@ -326,8 +328,15 @@ public class HexMap extends JPanel
             }
             masterBoardTerrain.setHazardNumberMap(t2n);
             char[] hazardSides = BattleHex.getHexsides();
+            Collection<HazardHexside> hazardTypes = HazardHexside
+                .getAllHazardHexsides();
+
+            // old way
             Map<Character, Integer> s2n = new HashMap<Character, Integer>();
-            for (char side : hazardSides)
+            // new way
+            Map<HazardHexside, Integer> h2n = new HashMap<HazardHexside, Integer>();
+
+            for (HazardHexside hazard : hazardTypes)
             {
                 int count = 0;
                 for (int x = 0; x < 6; x++)
@@ -338,7 +347,7 @@ public class HexMap extends JPanel
                         {
                             for (int k = 0; k < 6; k++)
                             {
-                                if (hexModel[x][y].getHexside(k) == side)
+                                if (hexModel[x][y].getHexsideHazard(k) == hazard)
                                 {
                                     count++;
                                 }
@@ -346,9 +355,14 @@ public class HexMap extends JPanel
                         }
                     }
                 }
+                char side = hazard.getCode();
+                // old way
                 s2n.put(Character.valueOf(side), Integer.valueOf(count));
+                // new way
+                h2n.put(hazard, Integer.valueOf(count));
             }
             masterBoardTerrain.setHazardSideNumberMap(s2n);
+            masterBoardTerrain.setHexsideHazardNumberMap(h2n);
             // map model into GUI
             for (int i = 0; i < hexModel.length; i++)
             {
@@ -612,8 +626,8 @@ public class HexMap extends JPanel
         GUIBattleHex[][] correctHexes = terrainH.get(terrain);
         return correctHexes[x][y].getHexModel();
     }
-    
-    public BattleHex getHexByLabel(String hexLabel) 
+
+    public BattleHex getHexByLabel(String hexLabel)
     {
         return getHexByLabel(masterHex.getTerrain(), hexLabel);
     }
@@ -690,7 +704,7 @@ public class HexMap extends JPanel
             fm = g.getFontMetrics();
             int tma = fm.getMaxAscent();
 
-            // calculate needed space, set xPos so that it's drawn 
+            // calculate needed space, set xPos so that it's drawn
             // right-aligned 80 away from right window border.
             Rectangle2D bounds = fm.getStringBounds(getDisplayName(), g);
             int width = (int)bounds.getWidth();

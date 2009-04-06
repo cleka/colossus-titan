@@ -15,6 +15,7 @@ import net.sf.colossus.gui.BattleChit;
 import net.sf.colossus.util.CompareDoubles;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.HazardHexside;
 import net.sf.colossus.variant.HazardTerrain;
 
 
@@ -61,7 +62,7 @@ public final class Strike
      *  creatures with only one target, even though they're not
      *  technically forced.  Return after one strike, so the
      *  client can wait for status from the server.
-     *  XXX This method does stuff, rather than just returning 
+     *  XXX This method does stuff, rather than just returning
      *  information, unlike the rest of the Strike class.
      *  Returns true if a strike was made. */
     boolean makeForcedStrikes(boolean rangestrike)
@@ -285,8 +286,8 @@ public final class Strike
             return true;
         }
 
-        char hexside = currentHex.getHexside(direction);
-        char hexside2 = currentHex.getOppositeHexside(direction);
+        char hexside = currentHex.getHexsideHazard(direction).getCode();
+        char hexside2 = currentHex.getOppositeHazard(direction).getCode();
 
         if (currentHex == initialHex)
         {
@@ -826,21 +827,21 @@ public final class Strike
 
             // Adjacent hex, so only one possible direction.
             int direction = getDirection(hex, targetHex, false);
-            char hexside = hex.getHexside(direction);
+            HazardHexside hazard = hex.getHexsideHazard(direction);
 
             // Native striking down a dune hexside: +2
-            if (hexside == 'd' && striker.isNativeDune())
+            if (hazard == HazardHexside.DUNE && striker.isNativeDune())
             {
                 dice += 2;
             }
             // Native striking down a slope hexside: +1
-            else if (hexside == 's' && striker.isNativeSlope())
+            else if (hazard == HazardHexside.SLOPE && striker.isNativeSlope())
             {
                 dice++;
             }
             // Non-native striking up a dune hexside: -1
             else if (!striker.isNativeDune()
-                && hex.getOppositeHexside(direction) == 'd')
+                && hex.getOppositeHazard(direction) == HazardHexside.DUNE)
             {
                 dice--;
             }
@@ -872,9 +873,9 @@ public final class Strike
             {
                 // Adjacent hex, so only one possible direction.
                 int direction = getDirection(hex, targetHex, false);
-                char hexside = hex.getHexside(direction);
+                // TODO the hexside should be called WALL...
                 // Striking down across wall: +1
-                if (hexside == 'w')
+                if (hex.getHexsideHazard(direction) == HazardHexside.TOWER)
                 {
                     attackerSkill++;
                 }
@@ -883,11 +884,13 @@ public final class Strike
             {
                 // Adjacent hex, so only one possible direction.
                 int direction = getDirection(targetHex, hex, false);
-                char hexside = targetHex.getHexside(direction);
+                HazardHexside hazard = targetHex.getHexsideHazard(direction);
                 // Non-native striking up slope: -1
                 // Striking up across wall: -1
-                if ((hexside == 's' && !striker.getCreature().isNativeSlope())
-                    || hexside == 'w')
+                // TODO Tower vs. Wall ...
+                if ((hazard == HazardHexside.SLOPE && !striker.getCreature()
+                    .isNativeSlope())
+                    || hazard == HazardHexside.TOWER)
                 {
                     attackerSkill--;
                 }

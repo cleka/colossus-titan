@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.variant.BattleHex;
+import net.sf.colossus.variant.HazardHexside;
 import net.sf.colossus.variant.HazardTerrain;
 
 import org.jdom.Document;
@@ -79,18 +80,20 @@ public class BattlelandLoader
         }
         catch (JDOMException ex)
         {
-            // towi TODO : is it really good to swallow the exception? 
+            // towi TODO : is it really good to swallow the exception?
             LOGGER.log(Level.SEVERE, "JDOM exception caught", ex);
         }
         catch (IOException ex)
         {
-            // towi TODO: is it really good to swallow the exception? 
+            // towi TODO: is it really good to swallow the exception?
             LOGGER.log(Level.SEVERE, "IO exception caught", ex);
         }
     }
 
     // we need to cast since JDOM is not generified
-    @SuppressWarnings("unchecked")
+    // deprecation because the existing Battlelands files still only have
+    // the character for the hexside hazard type
+    @SuppressWarnings( { "unchecked", "deprecation" })
     private void handleHex(Element el, BattleHex[][] h) throws JDOMException
     {
         int xpos = el.getAttribute("x").getIntValue();
@@ -108,7 +111,8 @@ public class BattlelandLoader
         {
             int number = border.getAttribute("number").getIntValue();
             char type = border.getAttributeValue("type").charAt(0);
-            hex.setHexside(number, type);
+            HazardHexside hazard = HazardHexside.getHexsideByCode(type);
+            hex.setHexsideHazard(number, hazard);
         }
     }
 

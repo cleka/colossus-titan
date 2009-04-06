@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 
-/** 
+/**
  * This is a typesafe enumeration of all hazard terrains, i.e. the
  * terrains used in the battle maps.
  */
@@ -107,10 +107,10 @@ public class HazardTerrain extends Hazards
 
     /**
      * Returns all available hazard terrains.
-     * 
+     *
      * This is not variant-specific, any terrain known to the program is listed even
      * if it is not available in the current variant.
-     * 
+     *
      * TODO this should really be a question to ask a variant instance
      */
     public static final Collection<HazardTerrain> getAllHazardTerrains()
@@ -404,7 +404,7 @@ public class HazardTerrain extends Hazards
      * @param attackerIsNative Whether the attacker is native from this HazardTerrain
      * @param defenderIsNative Whether the defender is native from this HazardTerrain
      * @return The amount of penalty to apply (negative if it's a bonus).
-     * @see #getSkillBonusStrikeFrom(boolean, boolean) 
+     * @see #getSkillBonusStrikeFrom(boolean, boolean)
      *      #getPowerBonusStrikeFrom(boolean, boolean)
      *      #getPowerPenaltyStrikeFrom(boolean, boolean)
      */
@@ -634,8 +634,8 @@ public class HazardTerrain extends Hazards
      * line-of-fire cross this hex.
      * TODO there should be an effect variable (instead of 1), and we also
      * might add the other variants (skillbonus, powerpenalty, powerbonus)
-     * 
-     * @return The bonus to apply to the Strike Factor, 
+     *
+     * @return The bonus to apply to the Strike Factor,
      *         negative if it's a penalty.
      */
     public int getSkillBonusRangestrikeThrough(boolean rangestrikerIsNative)
@@ -655,5 +655,17 @@ public class HazardTerrain extends Hazards
     public int getSkillPenaltyRangestrikeThrough(boolean rangestrikerIsNative)
     {
         return -(this.getSkillBonusRangestrikeThrough(rangestrikerIsNative));
+    }
+
+    /** USE ONLY FOR BATTLELANDBUILDER! */
+    public boolean isSand()
+    {
+        return this == SAND;
+    }
+
+    /** USE ONLY FOR BATTLELANDBUILDER! */
+    public boolean isPlains()
+    {
+        return this == PLAINS;
     }
 }

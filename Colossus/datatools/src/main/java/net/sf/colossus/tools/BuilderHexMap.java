@@ -13,6 +13,7 @@ import net.sf.colossus.client.HexMap;
 import net.sf.colossus.gui.GUIBattleHex;
 import net.sf.colossus.parser.BattlelandRandomizerLoader;
 import net.sf.colossus.variant.BattleHex;
+import net.sf.colossus.variant.HazardHexside;
 import net.sf.colossus.variant.HazardTerrain;
 
 /**
@@ -90,7 +91,6 @@ public class BuilderHexMap extends HexMap
     {
         StringBuilder buf = new StringBuilder();
         HazardTerrain terrain;
-        char s;
         int e;
         List<GUIBattleHex> localStartList = new ArrayList<GUIBattleHex>();
 
@@ -124,20 +124,27 @@ public class BuilderHexMap extends HexMap
 
                     for (int k = 0; k < 6; k++)
                     {
-                        s = h[i][j].getHexModel().getHexside(k);
-                        if (s != ' ')
+                        HazardHexside hazard;
+                        hazard = h[i][j].getHexModel().getHexsideHazard(k);
+                        if (hazard != HazardHexside.NOTHING)
                         {
                             doDumpSides = true;
                         }
-                        if (s == 's')
+                        if (hazard == HazardHexside.SLOPE)
                         {
                             hasSlope = true;
                         }
-                        if (s == 'w')
+                        // TODO Tower vs. Wall
+                        if (hazard == HazardHexside.TOWER)
                         {
                             hasWall = true;
                         }
+                        // TODO what about Ciff ???
+
                     }
+
+                    // TODO I think instead of "e < 1" it should check on the
+                    // difference in elevation between hex and neighbor...
                     if (doDumpSides ||
                             (!terrain.equals(HazardTerrain.getTerrainByName(
                             "Plains"))) ||
@@ -179,11 +186,16 @@ public class BuilderHexMap extends HexMap
                         {
                             for (int k = 0; k < 6; k++)
                             {
-                                if (h[i][j].getHexModel().getHexside(k) != ' ')
+                                HazardHexside hazard = h[i][j].getHexModel()
+                                    .getHexsideHazard(k);
+                                if (hazard != HazardHexside.NOTHING)
                                 {
+                                    // HexsideHazard as character or as string
+                                    char hshChar = hazard.getCode();
+                                    // TODO use the String form in future instead?
+                                    // String hshName = hazard.getName();
                                     buf.append("<border number=\"" + k +
-                                            "\" type=\"" + h[i][j].getHexModel().
-                                            getHexside(k) + "\" />\n");
+                                            "\" type=\"" + hshChar + "\" />\n");
                                 }
                             }
                         }
@@ -217,7 +229,7 @@ public class BuilderHexMap extends HexMap
             hex.getHexModel().setElevation(0);
             for (int i = 0; i < 6; i++)
             {
-                hex.getHexModel().setHexside(i, ' ');
+                hex.getHexModel().setHexsideHazard(i, HazardHexside.NOTHING);
             }
         }
     }
