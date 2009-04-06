@@ -37,6 +37,7 @@ import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.Proposal;
 import net.sf.colossus.common.WhatNextManager.WhatToDoNext;
+import net.sf.colossus.server.BattleServerSide.AngelSummoningStates;
 import net.sf.colossus.util.InstanceTracker;
 import net.sf.colossus.util.ExceptionUtils;
 import net.sf.colossus.util.ResourceLoader;
@@ -1809,8 +1810,8 @@ public final class GameServerSide extends Game
                     "activePlayer").getValue();
                 BattlePhase battlePhase = BattlePhase.values()[bat
                     .getAttribute("phase").getIntValue()];
-                BattleServerSide.AngelSummoningStates summonState = BattleServerSide.AngelSummoningStates
-                    .values()[bat.getAttribute("summonState").getIntValue()];
+                AngelSummoningStates summonState = AngelSummoningStates
+                    .valueOf(bat.getAttribute("summonState").getValue());
                 int carryDamage = bat.getAttribute("carryDamage")
                     .getIntValue();
                 boolean driftDamageApplied = bat.getAttribute(
