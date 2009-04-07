@@ -469,7 +469,7 @@ public class CreatureServerSide extends Creature
                 // Adjacent hex, so only one possible direction.
                 int direction = BattleServerSide.getDirection(targetHex, hex,
                     false);
-                HazardHexside hazard = hex.getHexsideHazard(direction);
+                HazardHexside hazard = targetHex.getHexsideHazard(direction);
                 // Non-native striking up slope: -1
                 // Striking up across wall: -1
                 if ((hazard == HazardHexside.SLOPE && !isNativeSlope())
