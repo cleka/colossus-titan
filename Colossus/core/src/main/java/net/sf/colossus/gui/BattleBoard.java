@@ -39,7 +39,6 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
 import net.sf.colossus.client.Client;
-import net.sf.colossus.client.HexMap;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.game.BattlePhase;
@@ -50,13 +49,12 @@ import net.sf.colossus.guiutil.SaveWindow;
 import net.sf.colossus.server.LegionServerSide;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.variant.BattleHex;
-import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 
 
 /**
  * A GUI representation of a battle in the game.
- * 
+ *
  * TODO this is split of the former BattleMap which did everything by itself. The
  * split is not really completed, there is still code which potentially belongs into
  * the other class.
@@ -69,7 +67,6 @@ public final class BattleBoard extends KFrame
 
     private static int count = 1;
 
-    private Point location;
     private JMenuBar menuBar;
     private JMenu phaseMenu;
     private JMenu helpMenu;
@@ -78,7 +75,6 @@ public final class BattleBoard extends KFrame
     private final Client client;
     private final ClientGUI gui;
     private final String infoText;
-    private final Cursor defaultCursor;
 
     /** tag of the selected critter, or -1 if no critter is selected. */
     private int selectedCritterTag = -1;
@@ -181,10 +177,7 @@ public final class BattleBoard extends KFrame
 
         saveWindow = new SaveWindow(gui.getOptions(), "BattleMap");
 
-        if (location == null)
-        {
-            location = saveWindow.loadLocation();
-        }
+        Point location = saveWindow.loadLocation();
         if (location == null)
         {
             location = new Point(0, 4 * Scale.get());
@@ -224,7 +217,6 @@ public final class BattleBoard extends KFrame
             Color bgColor = PickColor.getBackgroundColor(color);
             contentPane.setBorder(BorderFactory.createLineBorder(bgColor));
         }
-        defaultCursor = getCursor();
 
         dicePanel = new DicePanel();
         getContentPane().add(dicePanel, BorderLayout.SOUTH);
@@ -314,7 +306,7 @@ public final class BattleBoard extends KFrame
         battleMap.setBattleMarkerLocation(isDefender, hex);
     }
 
-    // TODO perhaps this is not needed at all, 
+    // TODO perhaps this is not needed at all,
     //      - use the instance variable everywhere?
     private IClientGUI getGUI()
     {
@@ -454,7 +446,7 @@ public final class BattleBoard extends KFrame
         menuBar.add(helpMenu);
     }
 
-    public void setupHelpMenu()
+    private void setupHelpMenu()
     {
         JMenuItem mi;
 
@@ -587,12 +579,6 @@ public final class BattleBoard extends KFrame
         }
     }
 
-    public static BattleHex getEntrance(MasterBoardTerrain terrain,
-        int entrySide)
-    {
-        return HexMap.getHexByLabel(terrain, "X" + entrySide);
-    }
-
     /** Return the BattleChit containing the given point,
      *  or null if none does. */
     private BattleChit getBattleChitAtPoint(Point point)
@@ -642,7 +628,7 @@ public final class BattleBoard extends KFrame
         hex.repaint();
     }
 
-    public void alignChits(Set<BattleHex> battleHexes)
+    private void alignChits(Set<BattleHex> battleHexes)
     {
         for (BattleHex battleHex : battleHexes)
         {
@@ -698,11 +684,6 @@ public final class BattleBoard extends KFrame
         battleMap.selectHexes(set);
         // XXX Needed?
         repaint();
-    }
-
-    public void setDefaultCursor()
-    {
-        setCursor(defaultCursor);
     }
 
     public void setWaitCursor()
@@ -946,12 +927,12 @@ public final class BattleBoard extends KFrame
         }
     }
 
-    public void enableDoneButton()
+    private void enableDoneButton()
     {
         infoPanel.enableDoneButton();
     }
 
-    public void disableDoneButton()
+    private void disableDoneButton()
     {
         infoPanel.disableDoneButton();
     }
@@ -984,7 +965,7 @@ public final class BattleBoard extends KFrame
     public BattleHex getBattleHexByLabel(String hexLabel) {
         return battleMap.getHexByLabel(hexLabel);
     }
-    
+
     @Override
     public String toString()
     {

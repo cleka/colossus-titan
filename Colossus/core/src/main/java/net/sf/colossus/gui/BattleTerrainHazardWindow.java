@@ -45,20 +45,20 @@ public class BattleTerrainHazardWindow extends KDialog
     private static final int CREATURE_SIZE = 30;
     private static final int STRIKE_SIZE = 15;
 
-    private static GridBagConstraints GBC_DEFAULT = new GridBagConstraints();
+    private final static GridBagConstraints GBC_DEFAULT = new GridBagConstraints();
     static
     {
         GBC_DEFAULT.anchor = GridBagConstraints.NORTH;
         GBC_DEFAULT.insets = new Insets(2, 2, 5, 2);
         GBC_DEFAULT.weightx = 0.01;
     }
-    private static GridBagConstraints GBC_NORTHWEST = (GridBagConstraints)GBC_DEFAULT
+    private final static GridBagConstraints GBC_NORTHWEST = (GridBagConstraints)GBC_DEFAULT
         .clone();
     static
     {
         GBC_NORTHWEST.anchor = GridBagConstraints.NORTHWEST;
     }
-    private static GridBagConstraints GBC_NORTHEAST = (GridBagConstraints)GBC_DEFAULT
+    private final static GridBagConstraints GBC_NORTHEAST = (GridBagConstraints)GBC_DEFAULT
         .clone();
     static
     {
