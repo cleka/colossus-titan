@@ -3,7 +3,7 @@ package net.sf.colossus.client;
 
 /**
  *  Basic information about one creature, for split prediction.
- *  @version $Id$
+ *
  *  @author David Ripton
  */
 class CreatureInfo implements Cloneable

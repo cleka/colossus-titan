@@ -18,15 +18,15 @@ import net.sf.colossus.variant.Variant;
 
 /**
  * Provides a JScrollPane to display the Variant README,
- * either within GetPlayer selection tab, 
- * or from main boards help (then in own KFrame). 
+ * either within GetPlayer selection tab,
+ * or from main boards help (then in own KFrame).
  * @version $Id$
  * @author Clemens Katzer
  */
 
 public final class ShowReadme extends KFrame
 {
-    JEditorPane myReadme;
+    private JEditorPane myReadme;
 
     ShowReadme(Variant variant)
     {
@@ -85,7 +85,7 @@ public final class ShowReadme extends KFrame
         readmePane.add(readme);
 
         readme.setContentType((String)doc
-            .getProperty(ResourceLoader.keyContentType));
+            .getProperty(ResourceLoader.KEY_CONTENT_TYPE));
         readme.setDocument(doc);
 
         return readmeScrollPane;

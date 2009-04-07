@@ -7,7 +7,7 @@ import java.util.Comparator;
 
 /**
  *  Compare markers.
- *  @version $Id$
+ *
  *  @author David Ripton
  */
 public class MarkerComparator implements Comparator<String>, Serializable

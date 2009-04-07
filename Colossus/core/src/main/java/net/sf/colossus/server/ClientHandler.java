@@ -23,9 +23,9 @@ import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
+import net.sf.colossus.util.ExceptionUtils;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.InstanceTracker;
-import net.sf.colossus.util.ExceptionUtils;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
@@ -36,13 +36,13 @@ import net.sf.colossus.variant.MasterHex;
  *  Holds all data specific to one client connection.
  *  (Earlier this was the class ServerSocketThread, but since changing
  *   to NIO it's not an own thread any more.)
- *   
+ *
  *  The code in here is (should be) executed exclusively by the server
  *  thread as reaction to something happening on the selector
  *  - first the client connection being accepted, and then later always
  *  when data from client was received (usually from THIS client, but
  *  there might be other cases).
- *    
+ *
  *  @version $Id$
  *  @author David Ripton
  */
@@ -67,15 +67,17 @@ final class ClientHandler implements IClient
     private String incompleteInput = "";
     private String incompleteText = "";
 
-    // Charset and encoder: by default according to the property, 
+    // Charset and encoder: by default according to the property,
     // fallback US-ASCII
-    String defaultCharSet = System.getProperty("file.encoding");
-    String charsetName = defaultCharSet != null ? defaultCharSet : "US-ASCII";
-    private final Charset charset = Charset.forName(charsetName);
+    private static final String DEFAULT_CHAR_SET = System
+        .getProperty("file.encoding");
+    private final String CHARSET_NAME = DEFAULT_CHAR_SET != null ? DEFAULT_CHAR_SET
+        : "US-ASCII";
+    private final Charset charset = Charset.forName(CHARSET_NAME);
     private final CharsetEncoder encoder = charset.newEncoder();
     private final CharsetDecoder decoder = charset.newDecoder();
 
-    // Note that the client (SocketClientThread) sends ack every 
+    // Note that the client (SocketClientThread) sends ack every
     // CLIENT_CTR_ACK_EVERY messages (currently 20)
     // The two values above and the client value must fit together
     // that it does not cause a deadlock.
@@ -101,7 +103,7 @@ final class ClientHandler implements IClient
     }
 
     // if "isGone" is true, connection to this client is gone
-    // Server uses this to decide whether any nonAI player is 
+    // Server uses this to decide whether any nonAI player is
     // (even if perhaps dead) still connected (= watching).
     public boolean isGone()
     {
@@ -178,7 +180,7 @@ final class ClientHandler implements IClient
         }
     }
 
-    public void sleepFor(long millis)
+    private void sleepFor(long millis)
     {
         try
         {
@@ -243,9 +245,9 @@ final class ClientHandler implements IClient
                 + " to channel for player " + playerName);
 
             // TODO Would like to do withdraw and disconnect here, but they
-            // can't be used because they wd/disconn. the processingPlayer, 
+            // can't be used because they wd/disconn. the processingPlayer,
             // i.e. the player for which data was just read from socket.
-            //  
+            //
             isGone = true;
             // TODO take care that also withdraw is done for player "this"
             //withdrawIfNeeded();
@@ -270,10 +272,10 @@ final class ClientHandler implements IClient
             LOGGER.severe(message);
             ExceptionUtils.showMessageDialog(null, message, "Exception caught!",
                 true);
-            
+
         }
     }
-    
+
     private void callMethod(String method, List<String> args)
     {
         if (method.equals(Constants.signOn))
@@ -286,7 +288,7 @@ final class ClientHandler implements IClient
                 // this setPlayerName is only send for the reason that the client
                 // expects a response quickly
                 setPlayerName(tmpPlayerName);
-                // @TODO: move to outside Select loop 
+                // @TODO: move to outside Select loop
                 //   => notify main thread to so this?
                 server.startGameIfAllPlayers();
             }
@@ -563,8 +565,8 @@ final class ClientHandler implements IClient
         {
             // do not send any more
             /*
-             LOGGER.log(Level.WARNING, 
-             "Attempt to send to player " + playerName + 
+             LOGGER.log(Level.WARNING,
+             "Attempt to send to player " + playerName +
              " when client connection already gone - message: " + message);
              */
         }

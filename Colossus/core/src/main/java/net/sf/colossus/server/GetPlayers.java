@@ -393,7 +393,7 @@ public final class GetPlayers extends KFrame
                         varFileWithFullPath);
 
                     String prop = (String)doc
-                        .getProperty(ResourceLoader.keyContentType);
+                        .getProperty(ResourceLoader.KEY_CONTENT_TYPE);
                     readme.setContentType(prop);
                     readme.setDocument(doc);
                     if (maxPlayers != VariantSupport.getMaxPlayers())
@@ -715,7 +715,7 @@ public final class GetPlayers extends KFrame
         onePlayerPane.add(playerName);
         playerName.addActionListener(new ActionListener()
         {
-            int row = i;
+            final int row = i;
 
             public void actionPerformed(ActionEvent e)
             {
@@ -965,7 +965,7 @@ public final class GetPlayers extends KFrame
                 options.setOption(Options.variant, name);
                 options.setOption(Options.variantFileWithFullPath, fullPath);
                 readme.setContentType((String)doc
-                    .getProperty(ResourceLoader.keyContentType));
+                    .getProperty(ResourceLoader.KEY_CONTENT_TYPE));
                 readme.setDocument(doc);
                 if (maxPlayers != VariantSupport.getMaxPlayers())
                 {

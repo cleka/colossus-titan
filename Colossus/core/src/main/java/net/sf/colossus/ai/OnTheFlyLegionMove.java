@@ -17,6 +17,7 @@ import net.sf.colossus.client.CritterMove;
 import net.sf.colossus.util.DevRandom;
 import net.sf.colossus.variant.BattleHex;
 
+
 /**
  * On-the-fly generation of the Collection of all possible LegionMove.
  * This doesn't full respect the Collection interface:
@@ -24,7 +25,7 @@ import net.sf.colossus.variant.BattleHex;
  * so to iterators may return different subsets of the entire collection.
  * Also, this may cause size() to return a value higher than what is really
  * accessible.
- * @version $Id$
+ *
  * @author Romain Dolbeau
  */
 @SuppressWarnings("boxing")

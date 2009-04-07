@@ -32,7 +32,7 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 /**
  * Simple implementation of a Titan AI
- * @version $Id$
+ *
  * @author Bruce Sherrod, David Ripton
  * @author Romain Dolbeau
  * @author Corwin Joy, extensively rewritten on 02-Oct-2003
@@ -373,7 +373,7 @@ public class RationalAI extends SimpleAI
 
     /** Find value of recruiting, including possibly attacking an enemy
      set enemy = null to indicate no enemy */
-    double recruitValue(Legion legion, MasterHex hex, Legion enemy,
+    private double recruitValue(Legion legion, MasterHex hex, Legion enemy,
         MasterBoardTerrain terrain)
     {
         int value = 0;
@@ -446,7 +446,8 @@ public class RationalAI extends SimpleAI
     // Given a list of creatures sorted by value, figure out which ones are
     // redundant / have mustered.
     // Removes any creatures that have mustered from the original sorted list
-    List<CreatureType> removeMustered(List<CreatureType> sortedCreatures)
+    private List<CreatureType> removeMustered(
+        List<CreatureType> sortedCreatures)
     {
         // Look at 4 lowest valued creatures
         // Try to pull out pair that has already mustered.
@@ -511,7 +512,7 @@ public class RationalAI extends SimpleAI
 
     // Sort creatures first by value then by name.
     // Exclude titan.
-    List<CreatureType> sortCreaturesByValueName(Legion legion)
+    private List<CreatureType> sortCreaturesByValueName(Legion legion)
     {
         List<CreatureType> sortedCreatures = new ArrayList<CreatureType>();
 
@@ -530,15 +531,6 @@ public class RationalAI extends SimpleAI
         Collections
             .sort(sortedCreatures, new CompCreaturesByValueName(legion));
         return sortedCreatures;
-    }
-
-    // Count number of creatures in the stack that have mustered
-    int countMustered(Legion legion)
-    {
-        List<CreatureType> sortedCreatures = sortCreaturesByValueName(legion);
-        List<CreatureType> creaturesThatHaveMustered = removeMustered(sortedCreatures);
-
-        return creaturesThatHaveMustered.size();
     }
 
     class MusteredCreatures
@@ -1510,7 +1502,7 @@ public class RationalAI extends SimpleAI
 
     // Compute risk of being attacked
     // Value returned is expected point value cost
-    double hexRisk(Legion legion, MasterHex hex, boolean invert)
+    private double hexRisk(Legion legion, MasterHex hex, boolean invert)
     {
         double risk = 0.0;
 
@@ -1562,7 +1554,7 @@ public class RationalAI extends SimpleAI
         return risk;
     }
 
-    int evaluateCombat(Legion attacker, Legion defender, MasterHex hex)
+    private int evaluateCombat(Legion attacker, Legion defender, MasterHex hex)
     {
         if (attacker.getPlayer().equals(defender.getPlayer()))
         {
@@ -1691,7 +1683,8 @@ public class RationalAI extends SimpleAI
     static final int RECRUIT_TRUE = 1; // allow recruiting by attacker
     static final int RECRUIT_AT_7 = 2; // allow recruiting by attacker 7 high
 
-    int evaluateHexAttack(Legion attacker, MasterHex hex, int canRecruitHere)
+    private int evaluateHexAttack(Legion attacker, MasterHex hex,
+        int canRecruitHere)
     {
         int value = 0;
         // consider making an attack

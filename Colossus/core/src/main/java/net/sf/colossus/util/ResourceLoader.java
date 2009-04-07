@@ -66,7 +66,7 @@ public final class ResourceLoader
      */
     private static class ColossusClassLoader extends ClassLoader
     {
-        List<String> directories = null;
+        private List<String> directories = null;
 
         ColossusClassLoader(ClassLoader parent)
         {
@@ -123,12 +123,12 @@ public final class ResourceLoader
         }
     }
 
-    public static final String keyContentType = "ResourceLoaderContentType";
-    public static final String defaultFontName = "Lucida Sans Bold";
-    public static final int defaultFontStyle = Font.PLAIN;
-    public static final int defaultFontSize = 12;
-    public static final Font defaultFont = new Font(defaultFontName,
-        defaultFontStyle, defaultFontSize);
+    public static final String KEY_CONTENT_TYPE = "ResourceLoaderContentType";
+    private static final String DEFAULT_FONT_NAME = "Lucida Sans Bold";
+    private static final int DEFAULT_FONT_STYLE = Font.PLAIN;
+    private static final int DEFAULT_FONT_SIZE = 12;
+    public static final Font DEFAULT_FONT = new Font(DEFAULT_FONT_NAME,
+        DEFAULT_FONT_STYLE, DEFAULT_FONT_SIZE);
     // File.separator does not work in jar files, except in Unix.
     // A hardcoded '/' works in Unix, Windows, MacOS X, and jar files.
     private static final String pathSeparator = "/";
@@ -142,9 +142,9 @@ public final class ResourceLoader
     private static final Map<String, byte[]> fileCache = Collections
         .synchronizedMap(new HashMap<String, byte[]>());
 
-    // We used to use the normal separator from Constants, but that 
+    // We used to use the normal separator from Constants, but that
     // does not need to be like that. Now introduced own constant
-    // for that purpose to get in ResourceLoader rid of dependency 
+    // for that purpose to get in ResourceLoader rid of dependency
     // to server.Constants.
     public final static String REQUEST_TOKEN_SEPARATOR = " ~ ";
 
@@ -414,7 +414,7 @@ public final class ResourceLoader
      * @param ignoreFail (=don't complain) if file not found
      * @return The InputStream, or null if it was not found.
      */
-    public static InputStream getInputStream(String filename,
+    private static InputStream getInputStream(String filename,
         List<String> directories, boolean remote, boolean cachedOnly,
         boolean ignoreFail)
     {
@@ -680,7 +680,7 @@ public final class ResourceLoader
             {
                 HTMLEditorKit htedk = new HTMLEditorKit();
                 HTMLDocument htdoc = new HTMLDocument(htedk.getStyleSheet());
-                htdoc.putProperty(keyContentType, "text/html");
+                htdoc.putProperty(KEY_CONTENT_TYPE, "text/html");
                 htedk.read(htmlIS, htdoc, 0);
                 return htdoc;
             }
@@ -719,7 +719,7 @@ public final class ResourceLoader
                         offset += read;
                     }
                 }
-                txtdoc.putProperty(keyContentType, "text/plain");
+                txtdoc.putProperty(KEY_CONTENT_TYPE, "text/plain");
                 textISR.close();
                 return txtdoc;
             }
@@ -919,7 +919,7 @@ public final class ResourceLoader
         biContext.fillRect(0, 0, width, height);
         biContext.setColor(color);
         int fontsize = (width + height) / 10;
-        biContext.setFont(defaultFont.deriveFont((float)fontsize));
+        biContext.setFont(DEFAULT_FONT.deriveFont((float)fontsize));
         FontMetrics fm = biContext.getFontMetrics();
         Rectangle2D sb = fm.getStringBounds("" + value, biContext);
         int sw = (int)sb.getWidth();
@@ -958,7 +958,7 @@ public final class ResourceLoader
         biContext.fillRect(0, 0, width, height);
         biContext.setColor(color);
         int fontsize = (width + height) / 10;
-        biContext.setFont(defaultFont.deriveFont((float)fontsize));
+        biContext.setFont(DEFAULT_FONT.deriveFont((float)fontsize));
         Font font = biContext.getFont();
         int size = font.getSize();
         FontMetrics fm = biContext.getFontMetrics();
@@ -1344,20 +1344,6 @@ public final class ResourceLoader
                 return null;
             }
         }
-    }
-
-    /**
-     * Force adding the given data as belonging to the given filename
-     * in the file cache.
-     * @param filename Name of the Image file to add.
-     * @param directories List of directories to search (in order).
-     * @param data File content to add.
-     */
-    public static void putIntoFileCache(String filename,
-        List<String> directories, byte[] data)
-    {
-        String mapKey = getMapKey(filename, directories);
-        fileCache.put(mapKey, data);
     }
 
     /**

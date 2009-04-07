@@ -7,7 +7,7 @@ import net.sf.colossus.common.Constants;
 
 /**
  * Simple implementation of a Titan AI - a bit more coward the regular SimpleAI
- * @version $Id$
+ *
  * @author Romain Dolbeau
  */
 

@@ -12,16 +12,16 @@ import net.sf.colossus.common.Options;
 
 
 /** One object of this this class represents a game for which players/users
- *  have enrolled to play it together. 
+ *  have enrolled to play it together.
  *  It starts in state "PROPOSED" as type either instantly or scheduled.
  *  Then it's state will change along the sequence of states
  *  PROPOSED, DUE, ACTIVATED, STARTING, READY_TO_CONNECT, RUNNING, ENDING
  *  as denoted in the GameState enum.
- *  
+ *
  *  The actual running/starting of the game will be handled by different
  *  classes, namely GameOnServer and (to be done) GameOnClient.
- * 
- *  The same class is also used at client side, but only part of the data 
+ *
+ *  The same class is also used at client side, but only part of the data
  *  is used there (e.g. the user has only a name, not a socket).
  *
  *  @version $Id$
@@ -70,11 +70,10 @@ public class GameInfo
 
     // used on server side, to create a game proposed by client
 
-    public GameInfo(GameType type)
+    private GameInfo(GameType type)
     {
         this.gameId = String.valueOf(getNextFreeGameId());
         this.type = type;
-        // System.out.println("\n ** instantiated a GameInfo of type " + type);
 
         this.state = GameState.PROPOSED;
 
@@ -587,7 +586,7 @@ public class GameInfo
     }
 
     /**
-     *  Enum for the possible TYPES of a game 
+     *  Enum for the possible TYPES of a game
      *  (scheduled or instant, perhaps later also template?)
      */
     public static enum GameType
@@ -602,11 +601,6 @@ public class GameInfo
     public static enum GameState
     {
         PROPOSED, DUE, ACTIVATED, STARTING, READY_TO_CONNECT, RUNNING, ENDING;
-    }
-
-    public GameState gameStateFromString(String stateString)
-    {
-        return GameState.valueOf(stateString);
     }
 
 }

@@ -51,7 +51,7 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  * TODO somehow we call client.getOwningPlayer() a lot -- there should probably be a better
  * link between AI and player, after all the AI either IS_A player or PLAYS_FOR a player
  *
- * @version $Id$
+ *
  * @author Bruce Sherrod, David Ripton
  * @author Romain Dolbeau
  */
@@ -2535,7 +2535,7 @@ public class SimpleAI extends AbstractAI
      *  numMobileCreaturesInLegion ^ N <= LEGION_MOVE_LIMIT, but we must
      *  have at least as many moves as mobile creatures to ensure that
      *  every creature has somewhere to go. */
-    int getCreatureMoveLimit()
+    protected int getCreatureMoveLimit() // NO_UCD
     {
         int mobileCritters = client.findMobileBattleChits().size();
         if (mobileCritters <= 1)
@@ -2549,7 +2549,7 @@ public class SimpleAI extends AbstractAI
         return (Math.min(max, mobileCritters));
     }
 
-    Collection<LegionMove> findBattleMoves()
+    protected Collection<LegionMove> findBattleMoves()
     {
         LOGGER.finest("Called findBattleMoves()");
 
@@ -2785,7 +2785,8 @@ public class SimpleAI extends AbstractAI
     }
 
     /** This compute the influence of terrain */
-    protected void evaluateCritterMove_Terrain(final BattleChit critter,
+    protected void evaluateCritterMove_Terrain(
+        final BattleChit critter, // NO_UCD
         ValueRecorder value, final MasterBoardTerrain terrain,
         final BattleHex hex, final int power, final int skill)
     {
@@ -2852,7 +2853,8 @@ public class SimpleAI extends AbstractAI
 
     /** this compute for non-titan attacking critter */
     @SuppressWarnings( { "unused", "deprecation" })
-    protected void evaluateCritterMove_Attacker(final BattleChit critter,
+    protected void evaluateCritterMove_Attacker(
+        final BattleChit critter, // NO_UCD
         ValueRecorder value, final MasterBoardTerrain terrain,
         final BattleHex hex, final LegionClientSide legion, final int turn)
     {

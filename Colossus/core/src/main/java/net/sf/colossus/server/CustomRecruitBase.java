@@ -8,7 +8,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.game.Caretaker;
-import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterBoardTerrain;
@@ -16,9 +15,9 @@ import net.sf.colossus.variant.MasterHex;
 
 
 /**
- * Base class to implement custom recruiting functions 
+ * Base class to implement custom recruiting functions
  *   (i.e. anything that is not a-number-of-creature to another creature)
- *   
+ *
  * @version $Id$
  * @author Romain Dolbeau
  */
@@ -30,9 +29,9 @@ abstract public class CustomRecruitBase
     final protected static List<Player> allPlayers = new ArrayList<Player>();
     // TODO consider storing the Game instances instead, which would give access to both Caretaker and Player
     // instances
-    private static List<Caretaker> allCaretakerInfo = new ArrayList<Caretaker>();
+    private final static List<Caretaker> allCaretakerInfo = new ArrayList<Caretaker>();
     private static GameServerSide serverGame = null;
-    private static List<CustomRecruitBase> allCustomRecruitBase = new ArrayList<CustomRecruitBase>();
+    private final static List<CustomRecruitBase> allCustomRecruitBase = new ArrayList<CustomRecruitBase>();
 
     public CustomRecruitBase()
     {
@@ -140,24 +139,6 @@ abstract public class CustomRecruitBase
         return count;
     }
 
-    synchronized protected final void setDeadCount(CreatureType type,
-        int newDeadCount)
-    {
-        // first update all known CaretakerInfo (if we're client(s))
-        Iterator<Caretaker> it = allCaretakerInfo.iterator();
-        while (it.hasNext())
-        {
-            Caretaker ci = it.next();
-            ci.setDeadCount(type, newDeadCount);
-        }
-        // second, update the Caretaker if we're server
-        if (serverGame != null)
-        {
-            // same comments as setCount() above
-            serverGame.getCaretaker().setDeadCount(type, newDeadCount);
-        }
-    }
-
     synchronized protected final int getDeadCount(CreatureType type)
     {
         int count = -1;
@@ -190,47 +171,20 @@ abstract public class CustomRecruitBase
         return count;
     }
 
-    synchronized protected final Legion getRecruitingLegion(MasterHex hex)
-    {
-        if (serverGame == null)
-        {
-            return null;
-        }
-        int num = serverGame.getNumLegions(hex);
-        if (num == 0)
-        {
-            return null;
-        }
-        if (num == 1)
-        { // only one Legion, it is the recruiting Legion
-            Legion l = serverGame.getFirstLegion(hex);
-            return l;
-        }
-        if (num == 2)
-        { // 2 legions, so we're in a Battle. Only the defender can recruit.
-            return serverGame.getBattle().getDefender();
-        }
-        // num > 2 this should not happen during recruiting, 
-        //   as only a three-way split can do that.
-        LOGGER.log(Level.WARNING, "CUSTOM: 3 legions in recruiting hex " + hex
-            + " ?!?");
-        return null;
-    }
-
-    /** 
+    /**
      * List all creatures that can recruit in this terrain in a special way.
      */
     abstract public List<CreatureType> getAllPossibleSpecialRecruiters(
         MasterBoardTerrain terrain);
 
-    /** 
-     * List all creatures that can be recruited in this terrain 
+    /**
+     * List all creatures that can be recruited in this terrain
      * in a special way.
      */
     abstract public List<CreatureType> getAllPossibleSpecialRecruits(
         MasterBoardTerrain terrain);
 
-    /** 
+    /**
      * List creatures that can recruit in this terrain in a special way now.
      * @param terrain The MasterBoardTerrain considered for recruiting
      * @param hex The specific MasterHex considered for recruiting.
@@ -239,12 +193,12 @@ abstract public class CustomRecruitBase
     abstract public List<CreatureType> getPossibleSpecialRecruiters(
         MasterBoardTerrain terrain, MasterHex hex);
 
-    /** 
-     * List creatures that can be recruited in this terrain 
+    /**
+     * List creatures that can be recruited in this terrain
      * in a special way now.
      * @param terrain The MasterBoardTerrain considered for recruiting
-     * @param hex The specific MasterHex considered for recruiting 
-     * (for an example, see getPossibleSpecialRecruits() in 
+     * @param hex The specific MasterHex considered for recruiting
+     * (for an example, see getPossibleSpecialRecruits() in
      * BalrogRecruitment.java in Balrog variant directory)
      * @return A List of possible special Recruits in this hex.
      */
@@ -252,15 +206,15 @@ abstract public class CustomRecruitBase
         MasterBoardTerrain terrain, MasterHex hex);
 
     /**
-     * Number of recruiters needed to get a recruit 
+     * Number of recruiters needed to get a recruit
      * in a special way in this terrain now.
      */
     abstract public int numberOfRecruiterNeeded(CreatureType recruiter,
         CreatureType recruit, MasterBoardTerrain terrain, MasterHex hex);
 
-    /** 
+    /**
      * Bookkeeping function, called once after every player turn.
-     * 
+     *
      * Protected as it should only be called from everyoneAdvanceTurn().
      */
     abstract protected void changeOfTurn(int newActivePlayer);

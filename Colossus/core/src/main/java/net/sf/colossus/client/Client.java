@@ -90,7 +90,6 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  *  look better and be more efficient (not that the latter would be significant
  *  in any of the cases)
  *
- *  @version $Id$
  *  @author David Ripton
  *  @author Romain Dolbeau
  */
@@ -109,7 +108,7 @@ public final class Client implements IClient, IOracle
     // TODO keep in sync with GUI
     private boolean replayOngoing = false;
 
-    private IClientGUI gui;
+    private final IClientGUI gui;
 
     private final List<BattleChit> battleChits = new ArrayList<BattleChit>();
 

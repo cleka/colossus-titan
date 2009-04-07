@@ -40,7 +40,6 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  * only use information gathered from here to make decisions.
  * There's still a LOT of work to do...
  *
- * @version $Id$
  * @author Romain Dolbeau
  * Also contains extracted code from SimpleAI:
  * @author Bruce Sherrod, David Ripton, Romain Dolbeau

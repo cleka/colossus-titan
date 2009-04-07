@@ -44,7 +44,6 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  *
  * TODO it also contains model information, particularly in the static members
  *
- * @version $Id$
  * @author David Ripton
  * @author Romain Dolbeau
  */
@@ -60,11 +59,11 @@ public class HexMap extends JPanel
     protected final List<GUIBattleHex> hexes = new ArrayList<GUIBattleHex>(33);
 
     // The game state hexes can be set up once for each terrain type.
-    private static Map<MasterBoardTerrain, GUIBattleHex[][]> terrainH = new HashMap<MasterBoardTerrain, GUIBattleHex[][]>();
-    private static Map<MasterBoardTerrain, GUIBattleHex[]> entranceHexes = new HashMap<MasterBoardTerrain, GUIBattleHex[]>();
+    private final static Map<MasterBoardTerrain, GUIBattleHex[][]> terrainH = new HashMap<MasterBoardTerrain, GUIBattleHex[][]>();
+    private final static Map<MasterBoardTerrain, GUIBattleHex[]> entranceHexes = new HashMap<MasterBoardTerrain, GUIBattleHex[]>();
 
     /** ne, e, se, sw, w, nw */
-    protected final GUIBattleHex[] entrances = new GUIBattleHex[6];
+    private final GUIBattleHex[] entrances = new GUIBattleHex[6];
 
     protected static final boolean[][] show = {
         { false, false, true, true, true, false },
@@ -74,9 +73,9 @@ public class HexMap extends JPanel
         { false, true, true, true, true, true },
         { false, true, true, true, true, false } };
 
-    int scale = 2 * Scale.get();
-    protected int cx = 6 * scale;
-    protected int cy = 2 * scale;
+    private final int scale = 2 * Scale.get();
+    protected final int cx = 6 * scale;
+    protected final int cy = 2 * scale;
 
     /* not just a cache of the MasterHex info,
      * but also a way for MasterHex-less subclass
@@ -428,13 +427,13 @@ public class HexMap extends JPanel
         }
     }
 
-    protected void setupEntrances()
+    private void setupEntrances()
     {
         setupEntrancesGUI();
         setupEntrancesGameState(entrances, h);
     }
 
-    protected void setupEntrancesGUI()
+    private void setupEntrancesGUI()
     {
         // Initialize entrances.
         entrances[0] = new GUIBattleHex(cx + 15 * scale, cy + 1 * scale,
@@ -458,7 +457,7 @@ public class HexMap extends JPanel
         hexes.add(entrances[5]);
     }
 
-    protected static void setupEntrancesGameState(GUIBattleHex[] entrances,
+    private static void setupEntrancesGameState(GUIBattleHex[] entrances,
         GUIBattleHex[][] h)
     {
         entrances[0].setNeighbor(3, h[3][0]);
@@ -510,19 +509,6 @@ public class HexMap extends JPanel
                 hex.unselect();
                 hex.repaint();
                 return;
-            }
-        }
-    }
-
-    protected void unselectHexes(Set<BattleHex> battleHexes)
-    {
-        for (GUIBattleHex hex : hexes)
-        {
-            if (hex.isSelected()
-                && battleHexes.contains(hex.getHexModel()))
-            {
-                hex.unselect();
-                hex.repaint();
             }
         }
     }
@@ -700,7 +686,7 @@ public class HexMap extends JPanel
             Font oldFont = g.getFont();
             FontMetrics fm;
 
-            g.setFont(ResourceLoader.defaultFont.deriveFont((float)48));
+            g.setFont(ResourceLoader.DEFAULT_FONT.deriveFont((float)48));
             fm = g.getFontMetrics();
             int tma = fm.getMaxAscent();
 
@@ -714,7 +700,7 @@ public class HexMap extends JPanel
 
             if (getSubtitle() != null)
             {
-                g.setFont(ResourceLoader.defaultFont.deriveFont((float)24));
+                g.setFont(ResourceLoader.DEFAULT_FONT.deriveFont((float)24));
                 fm = g.getFontMetrics();
                 int tma2 = fm.getMaxAscent();
                 bounds = fm.getStringBounds(getSubtitle(), g);

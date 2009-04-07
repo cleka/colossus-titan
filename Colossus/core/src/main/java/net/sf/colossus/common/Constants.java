@@ -16,13 +16,13 @@ public final class Constants
 {
     // Special feature to end the game after one battle is completed,
     // for tuning the AI
-    private static String END_AFTER_FIRST_BATTLE_PROPERTY = "net.sf.colossus.endAfterFirstBattle";
+    private static final String END_AFTER_FIRST_BATTLE_PROPERTY = "net.sf.colossus.endAfterFirstBattle";
     public static final boolean END_AFTER_FIRST_BATTLE = Boolean.valueOf(
         System.getProperty(END_AFTER_FIRST_BATTLE_PROPERTY, "false")
             .toString()).booleanValue();
 
     // Special feature for stresstest: force at least one board
-    private static String FORCE_VIEW_BOARD_PROPNAME = "net.sf.colossus.forceViewBoard";
+    private static final String FORCE_VIEW_BOARD_PROPNAME = "net.sf.colossus.forceViewBoard";
     public static final boolean FORCE_VIEW_BOARD = Boolean.valueOf(
         System.getProperty(FORCE_VIEW_BOARD_PROPNAME, "false").toString())
         .booleanValue();

@@ -11,11 +11,11 @@ import java.util.logging.Logger;
 
 
 /**
- * Class DevRandom generates random bits (same interface as class Random). 
- * Which random data source to use can be specified by providing a 
- * property called "net.sf.colossus.randomFile" (see randomPropertyName) 
+ * Class DevRandom generates random bits (same interface as class Random).
+ * Which random data source to use can be specified by providing a
+ * property called "net.sf.colossus.randomFile" (see randomPropertyName)
  * or as argument to the constructor.
- * If no special source is specified or the specified source is unreachable 
+ * If no special source is specified or the specified source is unreachable
  * then it falls back on the regular java Random class.
  * @version $Id$
  * @author Romain Dolbeau
@@ -26,12 +26,12 @@ public class DevRandom extends Random
     private static final Logger LOGGER = Logger.getLogger(DevRandom.class
         .getName());
 
-    final static String PRNG = "PRNG";
+    private final static String PRNG = "PRNG";
     private String source = null;
     private File randomSource = null;
     private FileInputStream randStream = null;
 
-    private static String randomPropertyName = "net.sf.colossus.randomFile";
+    private static final String randomPropertyName = "net.sf.colossus.randomFile";
     private static String randomPropertySource = null;
 
     public DevRandom()
@@ -49,8 +49,8 @@ public class DevRandom extends Random
     }
 
     /* Returns the source to use.
-     * If set in a property (see randomPropertyName above), 
-     * then try it and remember whether set, or or not, 
+     * If set in a property (see randomPropertyName above),
+     * then try it and remember whether set, or or not,
      * and subsequent calls return same source then without checking again.
      * If not set at all, return PRNG which makes the class using the default
      * random device.

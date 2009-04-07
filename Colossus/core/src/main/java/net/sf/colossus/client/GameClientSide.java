@@ -8,9 +8,6 @@ import net.sf.colossus.variant.Variant;
 
 public class GameClientSide extends Game
 {
-    //    private static final Logger LOGGER = Logger.getLogger(GameClientSide.class
-    //        .getName());
-
     private Client client;
 
     public GameClientSide(Variant variant, String[] playerNames)

@@ -67,9 +67,9 @@ final class EngagementResults extends KDialog
     private boolean moveNext;
     private boolean advanceToLast = false;
 
-    /** 
+    /**
      * Inits the dialog, not opens it.
-     * 
+     *
      * @param frame is the parent window
      * @param oracle gives us information
      */
@@ -101,13 +101,13 @@ final class EngagementResults extends KDialog
 
     /**
      * Adds a log record to the list of logged engagements.
-     * 
+     *
      * Now the dialog moves to the new engagement if either
      * - the engagement happens in the attacker's turn
      * - it is the first one after the attacker's turn
-     * The idea behind this design is that the dialog content moves along with 
+     * The idea behind this design is that the dialog content moves along with
      * the player when the player is in charge of the game tempo, but if the player
-     * is only passive the engagements stop moving until the player takes control 
+     * is only passive the engagements stop moving until the player takes control
      * by either continuing to play or by clicking the next button.
      *
      * TODO: see if xxxStartingCertainities can somehow get values
@@ -336,8 +336,8 @@ final class EngagementResults extends KDialog
         if (engagementLog.size() == 0)
         {
             // TODO: this shrinks the dialog to a tiny size.
-            //   for this reason we disallowed dropping 
-            //   the last in the action handler. 
+            //   for this reason we disallowed dropping
+            //   the last in the action handler.
             //            Container contentPane = getContentPane();
             //            contentPane.removeAll();
             this.setTitle("no Engagements");
@@ -427,28 +427,28 @@ final class EngagementResults extends KDialog
 
     /**
      * Stores information about an engagement.
-     * 
+     *
      * TODO this should probably be a class in the game package
      */
     private class Engagement
     {
         Legion winner; // null on mutual elim, flee, concede, negotiate
-        Legion loser;
-        Legion attacker;
-        Legion defender;
-        String method;
-        int points;
-        int turns;
-        List<String> attackerStartingContents;
-        List<String> defenderStartingContents;
-        List<Boolean> attackerStartingCertainities;
-        List<Boolean> defenderStartingCertainities;
-        String hexLabel;
-        int gameTurn;
-        List<String> attackerEndingContents;
-        List<String> defenderEndingContents;
-        List<Boolean> attackerEndingCertainties;
-        List<Boolean> defenderEndingCertainties;
+        private Legion loser;
+        final Legion attacker;
+        private final Legion defender;
+        private final String method;
+        private final int points;
+        private final int turns;
+        private final List<String> attackerStartingContents;
+        private final List<String> defenderStartingContents;
+        final List<Boolean> attackerStartingCertainities;
+        final List<Boolean> defenderStartingCertainities;
+        private final String hexLabel;
+        private final int gameTurn;
+        private final List<String> attackerEndingContents;
+        private final List<String> defenderEndingContents;
+        final List<Boolean> attackerEndingCertainties;
+        final List<Boolean> defenderEndingCertainties;
 
         public Engagement(Legion winner, String method, int points, int turns,
             List<String> attackerStartingContents,

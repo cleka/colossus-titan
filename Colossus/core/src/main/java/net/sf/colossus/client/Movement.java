@@ -30,7 +30,7 @@ public final class Movement
     private static final Logger LOGGER = Logger.getLogger(Movement.class
         .getName());
 
-    Client client;
+    private Client client;
 
     Movement(Client client)
     {
@@ -218,14 +218,6 @@ public final class Movement
         return block;
     }
 
-    /** Return set of hexLabels describing where this legion can move
-     *  without teleporting. */
-    public Set<MasterHex> listNormalMoves(LegionClientSide legion,
-        MasterHex hex, int movementRoll, MasterHex fromHex)
-    {
-        return listNormalMoves(legion, hex, movementRoll, false, fromHex);
-    }
-
     public Set<MasterHex> listNormalMoves(Legion legion,
         MasterHex hex, int movementRoll)
     {
@@ -234,7 +226,7 @@ public final class Movement
 
     /** Return set of hexLabels describing where this legion can move
      *  without teleporting. */
-    public Set<MasterHex> listNormalMoves(Legion legion,
+    private Set<MasterHex> listNormalMoves(Legion legion,
         MasterHex hex, int movementRoll, boolean inAdvance, MasterHex fromHex)
     {
         if (hex == null || (legion.hasMoved() && !inAdvance))
@@ -322,7 +314,7 @@ public final class Movement
     }
 
     /** Return set of hexLabels describing where this legion can teleport. */
-    Set<MasterHex> listTeleportMoves(Legion legion, MasterHex hex,
+    private Set<MasterHex> listTeleportMoves(Legion legion, MasterHex hex,
         int movementRoll, boolean inAdvance)
     {
         Player player = legion.getPlayer();

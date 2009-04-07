@@ -18,8 +18,6 @@ import net.sf.colossus.variant.MasterBoardTerrain;
 
 /**
  * Yet Another AI, to test some stuff.
- * @version $Id$
- * @author Romain Dolbeau
  */
 public class ExperimentalAI extends SimpleAI // NO_UCD
 {

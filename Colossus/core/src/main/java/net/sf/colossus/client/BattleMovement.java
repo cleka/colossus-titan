@@ -14,7 +14,6 @@ import net.sf.colossus.variant.MasterBoardTerrain;
 /**
  * Class BattleMovement does client-side battle move calculations.
  *
- * @version $Id$
  * @author David Ripton
  * @author Romain Dolbeau
  */

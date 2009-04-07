@@ -24,7 +24,6 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 /**
  * @author kmilvangjens
- * @version $Id$
  */
 public class MilvangAI extends RationalAI // NO_UCD
 {

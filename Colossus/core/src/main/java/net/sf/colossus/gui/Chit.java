@@ -40,7 +40,7 @@ class Chit extends JPanel
     private static final Logger LOGGER = Logger
         .getLogger(Chit.class.getName());
 
-    private Image bufferedImage;
+    private final Image bufferedImage;
     private Image bufferedInvertedImage;
     Rectangle rect;
     Client client; // may be null; set for some subclasses
@@ -49,8 +49,8 @@ class Chit extends JPanel
     private boolean dead;
 
     /** Flag to paint a border around the chit. */
-    boolean border = true;
-    Color borderColor = Color.black;
+    private boolean border = true;
+    private Color borderColor = Color.black;
 
     /** Flag to paint the chit upside-down. */
     protected boolean inverted = false;
@@ -58,8 +58,8 @@ class Chit extends JPanel
     // Initialize early to avoid NullPointerException with GTK L&F
     private final String id;
 
-    static BasicStroke oneWide = new BasicStroke(1);
-    static BasicStroke threeWide = new BasicStroke(3);
+    final static BasicStroke oneWide = new BasicStroke(1);
+    private final static BasicStroke threeWide = new BasicStroke(3);
 
     Chit(int scale, String id)
     {
@@ -90,7 +90,7 @@ class Chit extends JPanel
     // TODO this is a bit confusing: the id parameter can be either the name of a
     //      creature type or a markerId (maybe more?). Good thing markerIds have no
     //      overlap with creature names
-    Chit(int scale, String id, boolean inverted, boolean dubious,
+    private Chit(int scale, String id, boolean inverted, boolean dubious,
         boolean dubiousAsBlank, String[] overlays)
     {
         // LayoutManager null - we want to place things ourselves
@@ -190,7 +190,7 @@ class Chit extends JPanel
         return power;
     }
 
-    static Image getImage(String imageFilename, int scale)
+    private static Image getImage(String imageFilename, int scale)
     {
         ImageIcon tempIcon = null;
         List<String> directories = VariantSupport.getImagesDirectoriesList();
@@ -207,7 +207,7 @@ class Chit extends JPanel
         return tempIcon.getImage();
     }
 
-    static Image getImage(String[] imageFilenames, int scale)
+    private static Image getImage(String[] imageFilenames, int scale)
     {
         List<String> directories = VariantSupport.getImagesDirectoriesList();
         Image composite = ResourceLoader.getCompositeImage(imageFilenames,

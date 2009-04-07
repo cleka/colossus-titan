@@ -31,8 +31,8 @@ final class FileServerThread extends Thread
 
     private ServerSocket fileServer;
 
-    private static final String separator = 
-        ResourceLoader.REQUEST_TOKEN_SEPARATOR; 
+    private static final String separator =
+        ResourceLoader.REQUEST_TOKEN_SEPARATOR;
 
     private final Server server;
     private final int port;
@@ -51,6 +51,7 @@ final class FileServerThread extends Thread
         catch (Exception e)
         {
             LOGGER.log(Level.SEVERE, "Can not open server socket", e);
+            // TODO don't do a System.exit in code outside main()
             System.exit(1);
         }
     }
@@ -65,7 +66,7 @@ final class FileServerThread extends Thread
         makeDummyConnection();
     }
 
-    public void makeDummyConnection()
+    private void makeDummyConnection()
     {
         // make a dummy connection, to get the thread out of the
         // accept().
@@ -131,7 +132,7 @@ final class FileServerThread extends Thread
 
                         // TODO Remove this comment if nothing happened :)
                         // 2009-03 Now clients sends it. Let's see.
-                        
+
                         if (filename
                             .equals(ResourceLoader.FILESERVER_IGNOREFAIL_SIGNAL))
                         {
@@ -139,7 +140,7 @@ final class FileServerThread extends Thread
                             filename = li.remove(0);
                         }
 
-                        // TODO Currently only commented out, remove whole 
+                        // TODO Currently only commented out, remove whole
                         //      stuff below at some point.
                         // Meanwhile, suppress the warnings at least for the
                         // README and the markersFile...
@@ -148,10 +149,10 @@ final class FileServerThread extends Thread
 
                         // @TODO: e.g. when the over-next public build is out
                         // (the one right now (20.4.2007) does not contain
-                        // this yet), make the client one day submit the 
+                        // this yet), make the client one day submit the
                         // ignore-fail signal, and remove this
                         //  markersFileName/README temporary hack.
-/*                        
+/*
                         if (filename.startsWith(Constants.markersNameFile)
                             || filename.startsWith("README"))
                         {

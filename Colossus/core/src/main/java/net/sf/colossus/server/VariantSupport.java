@@ -38,13 +38,12 @@ import net.sf.colossus.xmlparser.VariantLoader;
 
 
 /**
- * Class VariantSupport hold the members and functions 
+ * Class VariantSupport hold the members and functions
  * required to support Variants in Colossus
- * 
+ *
  * TODO this should probably move into the variant package sooner or later, possibly
  *      into the {@link Variant} class itself
- * 
- * @version $Id$
+ *
  * @author Romain Dolbeau
  */
 
@@ -110,7 +109,7 @@ public final class VariantSupport
     public static Document loadVariantByName(String variantName,
         boolean serverSide)
     {
-        // if it's a variant earlier loaded with Load Extern Variant, find out the 
+        // if it's a variant earlier loaded with Load Extern Variant, find out the
         // directory path for it:
         String fullPathFileName = getFullPathFileForVariantName(variantName);
         String variantDir;
@@ -181,7 +180,7 @@ public final class VariantSupport
             /* Seems the filename is not <variantname>VAR.xml
              *  - then we cannot conclude the name.
              * TODO every loading of a variant should get the
-             * variant name as argument and also set the 
+             * variant name as argument and also set the
              * variantName variable from that, and saving a game
              * it should store a 3rd property to hold the variant
              * name (not just file and dir).
@@ -200,7 +199,7 @@ public final class VariantSupport
      * @param tempVariantName The actual plain name of the variant
      * @param serverSide We're loading on a server.
      * @return A Document describing the variant.
-     * 
+     *
      * TODO right now variant name might sometimes be null, then we try a hack
      * to retrieve the variant name from the variant file name.
      */
@@ -438,7 +437,7 @@ public final class VariantSupport
                     "Failed to insert warning about missing readme into Document object",
                     e);
         }
-        txtdoc.putProperty(ResourceLoader.keyContentType, "text/plain");
+        txtdoc.putProperty(ResourceLoader.KEY_CONTENT_TYPE, "text/plain");
         return txtdoc;
     }
 
@@ -526,7 +525,7 @@ public final class VariantSupport
             {
                 throw new FileNotFoundException(getRecruitName());
             }
-            // TODO parsing into static fields is a side effect of this 
+            // TODO parsing into static fields is a side effect of this
             // constructor - that's somehow not the right way...
             new TerrainRecruitLoader(terIS);
 
@@ -672,7 +671,7 @@ public final class VariantSupport
 
     /**
      * Retrieves the currently loaded variant.
-     * 
+     *
      * TODO this is a helper method to introduce the Variant objects into the code,
      * in the long run they should be passed around instead of being in a static
      * member here.

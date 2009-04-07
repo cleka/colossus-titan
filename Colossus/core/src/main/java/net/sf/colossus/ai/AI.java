@@ -20,7 +20,6 @@ import net.sf.colossus.variant.MasterHex;
  *
  * @author Bruce Sherrod
  * @author David Ripton
- * @version $Id$
  */
 public interface AI
 {

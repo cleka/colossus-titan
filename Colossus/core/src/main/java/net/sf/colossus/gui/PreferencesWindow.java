@@ -178,7 +178,7 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
         battlePane.add(new JPanel(), FILL_CONSTRAINTS);
 
         // Autoplay tab:
-        /* 
+        /*
         In menu it was like that (saved here for the used key shortcuts)
         JMenu playerMenu = new JMenu("Autoplay");
         playerMenu.setMnemonic(KeyEvent.VK_A);
@@ -249,13 +249,13 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
         addRadioButton(rcModes, group, Options.showRecruitChitsAll, "",
             current);
 
-        //   -- misc. Panel in Graphics tab: 
+        //   -- misc. Panel in Graphics tab:
         //        so far only dubious as blanks
         Box miscPane = new Box(BoxLayout.Y_AXIS);
         viewPane.add(miscPane, SUBPANEL_CONSTRAINTS);
         miscPane.setBorder(new TitledBorder("Misc."));
         miscPane.setAlignmentX(LEFT_ALIGNMENT);
-        //  The "dubious as blanks" option makes only sense with the 
+        //  The "dubious as blanks" option makes only sense with the
         //    "view what SplitPrediction tells us" mode => otherwise inactive.
         boolean avail = (client.getGUI().getViewMode() == Options.viewableEverNum);
         addCheckBox(miscPane, Options.dubiousAsBlanks, avail, false);
@@ -466,7 +466,7 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
         }
     }
 
-    public void saveFavColor()
+    private void saveFavColor()
     {
         if (favoriteColors.size() > 0)
         {
@@ -546,10 +546,10 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
 
     class ScaleValue extends JPanel implements ChangeListener, ActionListener
     {
-        SpinnerNumberModel model;
-        JSpinner spinner;
-        int newValue;
-        int oldValue;
+        private final SpinnerNumberModel model;
+        private final JSpinner spinner;
+        private int newValue;
+        private int oldValue;
 
         ScaleValue(int oldValue, int min, int max, int step)
         {
