@@ -14,10 +14,10 @@ import net.sf.colossus.cmdline.CmdLine;
 import net.sf.colossus.cmdline.Opt;
 import net.sf.colossus.cmdline.Opts;
 import net.sf.colossus.common.Constants;
+import net.sf.colossus.common.IStartHandler;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.common.WhatNextManager;
 import net.sf.colossus.common.WhatNextManager.WhatToDoNext;
-import net.sf.colossus.common.IStartHandler;
 import net.sf.colossus.guiutil.DebugMethods;
 import net.sf.colossus.util.ViableEntityManager;
 import net.sf.colossus.webclient.WebClient;
@@ -39,7 +39,7 @@ public final class Start implements IStartHandler
     private int howManyGamesLeft = 0;
 
     private final WhatNextManager whatNextManager;
-    
+
     // Options remembered only inside this running application,
     // related to server/port/name startup settings; initialized
     // from command line options, perhaps modified by dialogs.
@@ -51,7 +51,7 @@ public final class Start implements IStartHandler
     /**
      * To create the one "Start" object which handles initiates the
      * "whatToDoNext" action according to what the user wants.
-     * 
+     *
      * Brings up one of the dialogs, or starts a Game, a Network client
      * or a Web Client.
      */
@@ -75,8 +75,8 @@ public final class Start implements IStartHandler
     {
         return whatNextManager.getWhatToDoNext();
     }
-    
-    /** 
+
+    /**
      *  Print a usage string to stdout.  (*Not* to the logfile, where casual
      *  users will miss it.)
      */
@@ -97,9 +97,9 @@ public final class Start implements IStartHandler
      * As result, creates/sets the instance variable CmdLine object "cmdLine"
      * from which one can then query which options were set, and their value
      * if they require one.
-     * 
+     *
      * @param args The String-Array given to main()
-     * @return   
+     * @return
      */
     private void commandLineProcessing(String[] args)
     {
@@ -158,10 +158,10 @@ public final class Start implements IStartHandler
     /**
      * Based on command line options -c, -w, possibly -g, set
      * startObject to the right "whatToDoNext" action and
-     * set in startOptions the related values. 
+     * set in startOptions the related values.
      * Expects that server (cf) options are already loaded.
-     * 
-     * 
+     *
+     *
      */
     public void setInitialAction(Options serverOptions,
         Options netclientOptions)
@@ -311,10 +311,10 @@ public final class Start implements IStartHandler
     /**
      * Bring up the GetPlayers dialog, and then wait until is has set
      * startObject to the next action to do and notified us to continue.
-     * 
-     * @param options The "server side" main options Object which holds the 
+     *
+     * @param options The "server side" main options Object which holds the
      *    information what kind of game to play next (variant, which players)
-     *    and the "Game options" for the to-be-started game, like 
+     *    and the "Game options" for the to-be-started game, like
      *    unlimitedMulligans, viewmode, balancedTowers, ...)
      */
     private void runGetPlayersDialogAndWait(Options options)
@@ -341,7 +341,7 @@ public final class Start implements IStartHandler
 
     /*
      * Modify options from command-line args if possible.
-     * Return false if something is wrong.  
+     * Return false if something is wrong.
      */
     private boolean setupOptionsFromCommandLine(CmdLine cl,
         Options startOptions, Options options)
@@ -524,10 +524,10 @@ public final class Start implements IStartHandler
      * some more preparations, and then it stays in the loop which
      * - waits for user input what to do next
      * - initiates that action and waits until it completes (or if canceled,
-     *   like closing the network client dialog, bring up back the main 
+     *   like closing the network client dialog, bring up back the main
      *   (=GetPlayers) dialog, or if user requests Quit, exit the loop;
      * and when it exited the loop control will return back to main()
-     * and the JVM should terminate sooner or later ;-)  
+     * and the JVM should terminate sooner or later ;-)
      */
     private void setupAndLoop()
     {
@@ -567,13 +567,19 @@ public final class Start implements IStartHandler
         howManyGamesLeft = Options.getHowManyStresstestRoundsProperty();
         whatNextManager.updateHowManyGamesLeft(howManyGamesLeft);
 
+        // Make sure "AIs stop when no humans left" is off when stresstesting
+        if (Options.isStresstest())
+        {
+            startOptions.setOption(Options.autoStop, false);
+            serverOptions.setOption(Options.autoStop, false);
+        }
         boolean dontWait = false;
 
-        // Now loop until user requested Quitting the whole application: 
+        // Now loop until user requested Quitting the whole application:
         while (getWhatToDoNext() != WhatToDoNext.QUIT_ALL)
         {
             // re-initialize options, except in first loop round,
-            // there they have been loaded already and modified 
+            // there they have been loaded already and modified
             // according to command line options
             if (serverOptions == null)
             {
@@ -593,8 +599,8 @@ public final class Start implements IStartHandler
             }
 
             // Unless there is already something selected what to do
-            // (e.g. in in first round on command line, or user ended 
-            // a game/closed board with selecting Load Game etc.), 
+            // (e.g. in in first round on command line, or user ended
+            // a game/closed board with selecting Load Game etc.),
             // as first thing come up with the dialog to ask what to do:
 
             if (getWhatToDoNext() == WhatToDoNext.GET_PLAYERS_DIALOG)
@@ -603,7 +609,7 @@ public final class Start implements IStartHandler
             }
 
             // intentionally not else if - short way if user selected
-            // in GetPlayers dialog the "Run network client" button. 
+            // in GetPlayers dialog the "Run network client" button.
             if (getWhatToDoNext() == WhatToDoNext.NET_CLIENT_DIALOG)
             {
                 runNetClientDialogAndWait();
@@ -672,7 +678,7 @@ public final class Start implements IStartHandler
             // @TODO: get via startObject instead?
             else if (getWhatToDoNext() == WhatToDoNext.START_NET_CLIENT)
             {
-                // by default (if user does not say anything other when ending), 
+                // by default (if user does not say anything other when ending),
                 // after that come back to NetClient dialog.
                 if (oneClientRunOnly)
                 {
@@ -699,7 +705,7 @@ public final class Start implements IStartHandler
                 new WebClient(getWhatNextManager(), hostname, port, login, password);
             }
 
-            // User clicked Quit in GetPlayers (this loop round), 
+            // User clicked Quit in GetPlayers (this loop round),
             //  --or--
             // User selected File=>Quit in the game started from previous
             //  loop round.
@@ -718,7 +724,7 @@ public final class Start implements IStartHandler
 
             // ----------------------------------------------------------
             // Activity initiated ... or at least attempted to do so.
-            // Wait for it to end, except if it was a failed netclient start 
+            // Wait for it to end, except if it was a failed netclient start
             // or the activity "Quit" from main menu anyway.
 
             if (dontWait)
@@ -736,7 +742,7 @@ public final class Start implements IStartHandler
             netclientOptions = null;
 
             // ResourceLoader has static String telling the server; if not reset,
-            // for a remote client closing while game is not over, he set next 
+            // for a remote client closing while game is not over, he set next
             // to do to GetPlayers dialog, dialog wants to load Variant Readme,
             // resourceloader would fail.
             net.sf.colossus.util.ResourceLoader.resetDataServer();
@@ -831,9 +837,9 @@ public final class Start implements IStartHandler
     }
 
     /* **********************************************************************
-     * 
+     *
      *                 The  m a i n ()  of the Start Class
-     * 
+     *
      * **********************************************************************
      */
     public static void main(String[] args)
@@ -860,8 +866,8 @@ public final class Start implements IStartHandler
         final boolean doWaitReturnLoop = false;
         if (doWaitReturnLoop)
         {
-            // if this is used, make sure you have debug level for 
-            // Root logger and InstanceTracker at least to INFO, 
+            // if this is used, make sure you have debug level for
+            // Root logger and InstanceTracker at least to INFO,
             // otherwise you won't see any statistics...
             final boolean forceLoopAnyway = false;
             DebugMethods.waitReturnLoop(forceLoopAnyway);
@@ -887,7 +893,7 @@ public final class Start implements IStartHandler
             + "- JVM should exit now by itself.");
 
         // JVM should do a clean exit now, no System.exit() needed.
-        // To be sure, at all places where user selects "Quit", a demon 
+        // To be sure, at all places where user selects "Quit", a demon
         // thread is started that does the System.exit() after a certain
         // delay (currently 10 secs - see class TimedJvmQuit).
     }
