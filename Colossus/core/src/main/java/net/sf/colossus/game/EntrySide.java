@@ -3,7 +3,7 @@ package net.sf.colossus.game;
 /**
  * The entry side for a battle.
  */
-public enum EntrySide
+public enum EntrySide // NO_UCD
 {
     TOP_DEFENSE("Top defense"), RIGHT("Right"), RIGHT_DEFENSE(
         "Right defense"), BOTTOM("Bottom"), LEFT_DEFENSE("Left defense"), LEFT(
@@ -67,7 +67,7 @@ public enum EntrySide
             if (entrySide.getId() == id)
             {
                 return entrySide;
-                /*                    
+                /*
                 if (entrySide.isAttackerSide())
                 {
                     return entrySide;

@@ -129,7 +129,7 @@ class CreatureCollectionView extends KDialog
     {
         private final JLabel label;
         private final JLabel topLabel;
-        private Chit chit;
+        private final Chit chit;
 
         CreatureCount(final CreatureType type)
         {
