@@ -33,7 +33,7 @@ public class SimpleCharStream
   protected int tabSize = 8;
 
   protected void setTabSize(int i) { tabSize = i; }
-  protected int getTabSize() { return tabSize; }
+  protected int getTabSize(int i) { return tabSize; }
 
 
   protected void ExpandBuff(boolean wrapAround)
@@ -206,8 +206,7 @@ public class SimpleCharStream
    * @see #getEndColumn
    */
 
-  @Deprecated
-public int getColumn() {
+  public int getColumn() {
     return bufcolumn[bufpos];
   }
 
@@ -216,8 +215,7 @@ public int getColumn() {
    * @see #getEndLine
    */
 
-  @Deprecated
-public int getLine() {
+  public int getLine() {
     return bufline[bufpos];
   }
 

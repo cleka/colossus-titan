@@ -333,7 +333,7 @@ public class BattlelandRandomizerLoader
                 return 100.;
             return val;
         }
-        randomHexside(HazardHexside hChar, double p)
+        randomHexside(char hChar, double p)
         {
         	HazardHexside hObj = HazardHexside.getHexsideByCode(hChar);
             hazard = hObj;
@@ -408,7 +408,7 @@ public class BattlelandRandomizerLoader
                                         rhs.getProb())
                                     {
                                         attributed = true;
-                                        h[i][j].setHexside(k,rhs.getHexside());
+                                        h[i][j].setHexsideHazard(k,rhs.getHexsideHazard());
                                     }
                                 }
                             }

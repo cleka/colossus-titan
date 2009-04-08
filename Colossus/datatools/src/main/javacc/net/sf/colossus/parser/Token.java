@@ -75,10 +75,7 @@ public class Token implements java.io.Serializable {
   /**
    * No-argument constructor
    */
-  public Token()
-  {
-      // nothing to do
-  }
+  public Token() {}
 
   /**
    * Constructs a new token for the specified Image.
@@ -100,8 +97,7 @@ public class Token implements java.io.Serializable {
   /**
    * Returns the image.
    */
-  @Override
-public String toString()
+  public String toString()
   {
     return image;
   }
