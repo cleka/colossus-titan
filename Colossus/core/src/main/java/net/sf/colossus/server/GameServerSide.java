@@ -3713,7 +3713,7 @@ public final class GameServerSide extends Game
             hex, player, this, VariantSupport.getCurrentVariant()
                 .getCreatureByName(Constants.titan), VariantSupport
                 .getCurrentVariant().getCreatureByName(
-                    TerrainRecruitLoader.getPrimaryAcquirable()), startCre[2],
+                    getVariant().getPrimaryAcquirable()), startCre[2],
             startCre[2], startCre[0], startCre[0], startCre[1], startCre[1]);
 
         for (Creature critter : legion.getCreatures())

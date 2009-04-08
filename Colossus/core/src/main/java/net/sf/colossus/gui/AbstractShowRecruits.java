@@ -11,9 +11,11 @@ import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
+import net.sf.colossus.common.IVariant;
 import net.sf.colossus.guiutil.KDialog;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
+import net.sf.colossus.variant.Variant;
 
 
 /**
@@ -24,6 +26,7 @@ import net.sf.colossus.variant.MasterHex;
  */
 public abstract class AbstractShowRecruits extends KDialog
 {
+
     AbstractShowRecruits(JFrame parentFrame)
     {
         super(parentFrame, "Recruits", false);
@@ -45,14 +48,15 @@ public abstract class AbstractShowRecruits extends KDialog
         });
     }
 
-    void doOneTerrain(MasterBoardTerrain terrain, MasterHex hex)
+    void doOneTerrain(MasterBoardTerrain terrain, MasterHex hex,
+        Variant variant, IVariant ivariant)
     {
         assert SwingUtilities.isEventDispatchThread() : "GUI code should only run on the EDT";
 
         JFrame frame = (JFrame)this.getParent();
         getContentPane().add(
             new HexRecruitTreePanel(BoxLayout.Y_AXIS, terrain, hex, frame,
-                true));
+                true, variant, ivariant));
     }
 
     @Override

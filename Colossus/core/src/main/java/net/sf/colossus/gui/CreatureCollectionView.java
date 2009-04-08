@@ -28,6 +28,7 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
 import net.sf.colossus.client.Client;
+import net.sf.colossus.common.IVariant;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.guiutil.KDialog;
 import net.sf.colossus.variant.CreatureType;
@@ -160,9 +161,13 @@ class CreatureCollectionView extends KDialog
                 {
                     if (e.getButton() == MouseEvent.BUTTON1)
                     {
+                        // TODO ivariant can be removed when Variant itself
+                        //      is able to provide that information
+                        IVariant ivariant = client;
                         new ShowCreatureDetails(
                             CreatureCollectionView.this.parentFrame, type,
-                            null, CreatureCollectionView.this.scrollPane);
+                            null, CreatureCollectionView.this.scrollPane,
+                            client.getGame().getVariant(), ivariant);
                     }
                 }
             });

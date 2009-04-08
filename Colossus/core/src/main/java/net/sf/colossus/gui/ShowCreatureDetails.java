@@ -23,6 +23,7 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
+import net.sf.colossus.common.IVariant;
 import net.sf.colossus.game.RecruitGraph;
 import net.sf.colossus.guiutil.KDialog;
 import net.sf.colossus.server.CreatureServerSide;
@@ -33,7 +34,7 @@ import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardTerrain;
 import net.sf.colossus.variant.MasterBoardTerrain;
-import net.sf.colossus.xmlparser.TerrainRecruitLoader;
+import net.sf.colossus.variant.Variant;
 
 
 /**
@@ -70,16 +71,25 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 public final class ShowCreatureDetails extends KDialog
 {
 
+    // Client acting as placeholder for Variant
+    private final IVariant ivariant;
+
     /** pops up the non-modal dialog. info can be updated if needed.
      * @param parentFrame parent frame, i.e. the master board
      * @param creature creature to show detailed info for.
      * @param point coordinate on screen to display windows, or null.
      * @param pane if 'point' is not null it is relative to this.
+     * @param variant the current Variant
+     * @param for now, the Client acting as deputy to answer Variant
+     *        questions variant cannot answer yet.
      */
     public ShowCreatureDetails(final JFrame parentFrame,
-        final CreatureType creature, final Point point, final JScrollPane pane)
+        final CreatureType creature, final Point point,
+        final JScrollPane pane, Variant variant, IVariant ivariant)
     {
         super(parentFrame, "Creature Info: " + creature.getName(), false);
+
+        this.ivariant = ivariant;
 
         setBackground(Color.lightGray);
         addWindowListener(new WindowAdapter()
@@ -93,7 +103,7 @@ public final class ShowCreatureDetails extends KDialog
         });
         Container cnt = getContentPane();
 
-        showCreatureDetails(cnt, creature);
+        showCreatureDetails(cnt, creature, variant);
 
         pack();
         addMouseListener(new MouseAdapter()
@@ -119,9 +129,9 @@ public final class ShowCreatureDetails extends KDialog
      * @param creature the creature that details you want to show
      */
     public void showCreatureDetails(final Container cnt,
-        final CreatureType creature)
+        final CreatureType creature, Variant variant)
     {
-        // claear all the elements
+        // clear all the elements
         cnt.removeAll();
         cnt.setLayout(new BorderLayout());
         // prepare main pane
@@ -145,7 +155,7 @@ public final class ShowCreatureDetails extends KDialog
         _trSpan(s, "Summonable", creature.isSummonable() ? "yes" : "no");
         // TODO Instead show full list of "where and for each multiple of X
         _trSpan(s, "Acquirable",
-            TerrainRecruitLoader.isAcquirable(creature) ? "yes" : "no");
+            variant.isAcquirable(creature) ? "yes" : "no");
         _trSpan(s, _low("Lord"), creature.isLordOrDemiLord() ? (creature
             .isLord() ? "<u><b>Lord</b></u>" : "<b>Demi-Lord</b>")
             : _low("no"));
@@ -177,7 +187,7 @@ public final class ShowCreatureDetails extends KDialog
         //
         _section(s, "Recruit");
         //   in
-        for (MasterBoardTerrain terrain : TerrainRecruitLoader.getTerrains())
+        for (MasterBoardTerrain terrain : ivariant.getTerrains())
         {
             buf = new StringBuilder();
             List<CreatureType> recruiters = VariantSupport.getCurrentVariant()
@@ -186,7 +196,7 @@ public final class ShowCreatureDetails extends KDialog
             for (int ri = 0; ri < recruiters.size(); ri++)
             {
                 final CreatureType recruiter = recruiters.get(ri);
-                int num = TerrainRecruitLoader.numberOfRecruiterNeeded(
+                int num = ivariant.numberOfRecruiterNeeded(
                     recruiter, creature, terrain, null);
                 if (num == 1 && creature.getMaxCount() == 1
                     && recruiter.getName().equals(creature.getName()))
@@ -227,7 +237,7 @@ public final class ShowCreatureDetails extends KDialog
             }
         }
         //   out
-        for (MasterBoardTerrain terrain : TerrainRecruitLoader.getTerrains())
+        for (MasterBoardTerrain terrain : ivariant.getTerrains())
         {
             buf = new StringBuilder();
             List<CreatureType> recruits = VariantSupport.getCurrentVariant()
@@ -236,7 +246,7 @@ public final class ShowCreatureDetails extends KDialog
             for (int ri = 0; ri < recruits.size(); ri++)
             {
                 final CreatureType recruit = recruits.get(ri);
-                int num = TerrainRecruitLoader.numberOfRecruiterNeeded(
+                int num = ivariant.numberOfRecruiterNeeded(
                     creature, recruit, terrain, null);
                 if (num == 1 && creature.getMaxCount() == 1
                     && recruit.getName().equals(creature.getName()))

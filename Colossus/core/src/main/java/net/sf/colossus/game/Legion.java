@@ -8,7 +8,6 @@ import java.util.List;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
-import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
 public abstract class Legion
@@ -344,7 +343,8 @@ public abstract class Legion
 
         // Example: Start with (score) 375, earn (points) 150 => 525
 
-        int value = TerrainRecruitLoader.getAcquirableRecruitmentsValue();
+        int value = player.getGame().getVariant()
+            .getAcquirableRecruitmentsValue();
         // 100
         int tmpScore = score; // 375
         int tmpPoints = points; // 150

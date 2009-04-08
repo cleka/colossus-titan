@@ -29,6 +29,7 @@ import net.sf.colossus.client.IOracle;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.IOptions;
+import net.sf.colossus.common.IVariant;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.common.WhatNextManager.WhatToDoNext;
 import net.sf.colossus.game.BattlePhase;
@@ -43,6 +44,7 @@ import net.sf.colossus.guiutil.KFrame;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
+import net.sf.colossus.variant.Variant;
 import net.sf.colossus.webclient.WebClient;
 
 
@@ -1633,8 +1635,12 @@ public class ClientGUI implements IClientGUI
         {
             if (autoInspector == null)
             {
+                Variant variant = getGame().getVariant();
+                IVariant ivariant = getClient();
+
                 autoInspector = new AutoInspector(parent, options, viewMode,
-                    options.getOption(Options.dubiousAsBlanks));
+                    options.getOption(Options.dubiousAsBlanks), variant,
+                    ivariant);
             }
         }
         else

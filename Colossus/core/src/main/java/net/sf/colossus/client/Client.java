@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,6 +24,7 @@ import net.sf.colossus.ai.AI;
 import net.sf.colossus.ai.SimpleAI;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.IOptions;
+import net.sf.colossus.common.IVariant;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.common.WhatNextManager;
 import net.sf.colossus.common.WhatNextManager.WhatToDoNext;
@@ -94,7 +96,7 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  *  @author Romain Dolbeau
  */
 @SuppressWarnings("serial")
-public final class Client implements IClient, IOracle
+public final class Client implements IClient, IOracle, IVariant
 {
     private static final Logger LOGGER = Logger.getLogger(Client.class
         .getName());
@@ -3666,4 +3668,44 @@ public final class Client implements IClient, IOracle
     {
         return options;
     }
+
+    /** TODO get from Variant instead of static TerrainRecruitLoader access
+     *  Just forwarding the query, to get at least the GUI classes get rid of
+     *  dependency to static TerrainRecruitLoader access.
+     *
+     * {@link TerrainRecruitLoader#getPossibleRecruits(MasterBoardTerrain, MasterHex)}
+     */
+    public List<CreatureType> getPossibleRecruits(MasterBoardTerrain terrain,
+        MasterHex hex)
+    {
+        return TerrainRecruitLoader.getPossibleRecruits(terrain, hex);
+
+    }
+
+    /** TODO get from Variant instead of static TerrainRecruitLoader access
+     *  Just forwarding the query, to get at least the GUI classes get rid of
+     *  dependency to static TerrainRecruitLoader access.
+     *
+     * {@link TerrainRecruitLoader#numberOfRecruiterNeeded(CreatureType,
+        CreatureType, MasterBoardTerrain, MasterHex)}
+     */
+    public int numberOfRecruiterNeeded(CreatureType recruiter,
+        CreatureType recruit, MasterBoardTerrain terrain, MasterHex hex)
+    {
+        return TerrainRecruitLoader.numberOfRecruiterNeeded(recruiter,
+            recruit, terrain, hex);
+    }
+
+    /**
+     * Return a collection of all possible terrains.
+     *
+     * @return A collection containing all instances of {@link MasterBoardTerrain}.
+     */
+    public Collection<MasterBoardTerrain> getTerrains()
+    {
+        return TerrainRecruitLoader.getTerrains();
+    }
+
+
 }
+

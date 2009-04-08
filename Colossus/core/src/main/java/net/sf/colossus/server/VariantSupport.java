@@ -27,6 +27,7 @@ import net.sf.colossus.common.Constants;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.variant.AllCreatureType;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.IVariantInitializer;
 import net.sf.colossus.variant.MasterBoard;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
@@ -35,6 +36,7 @@ import net.sf.colossus.xmlparser.CreatureLoader;
 import net.sf.colossus.xmlparser.StrategicMapLoader;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 import net.sf.colossus.xmlparser.VariantLoader;
+import net.sf.colossus.xmlparser.TerrainRecruitLoader.NullTerrainRecruitLoader;
 
 
 /**
@@ -308,7 +310,8 @@ public final class VariantSupport
              */
 
             List<CreatureType> creatureTypes = loadCreatures();
-            loadTerrainsAndRecruits(serverSide);
+
+            IVariantInitializer trl = loadTerrainsAndRecruits(serverSide);
             // TODO add things as the variant package gets fleshed out
             List<MasterBoardTerrain> battleLands = new ArrayList<MasterBoardTerrain>();
 
@@ -333,7 +336,7 @@ public final class VariantSupport
                 varREADME = getMissingReadmeNotification();
             }
 
-            CURRENT_VARIANT = new Variant(creatureTypes, battleLands,
+            CURRENT_VARIANT = new Variant(trl, creatureTypes, battleLands,
                 masterBoard, varREADME, variantName);
         }
         catch (Exception e)
@@ -511,10 +514,14 @@ public final class VariantSupport
         return getVarDirectoriesList(Constants.battlelandsDirName);
     }
 
-    public synchronized static void loadTerrainsAndRecruits(boolean serverSide)
+    public synchronized static IVariantInitializer loadTerrainsAndRecruits(
+        boolean serverSide)
     {
         // remove all old stuff in the custom recruitments system
         CustomRecruitBase.reset();
+
+        IVariantInitializer terrainRecruitLoader = new NullTerrainRecruitLoader(
+            true);
 
         try
         {
@@ -527,7 +534,10 @@ public final class VariantSupport
             }
             // TODO parsing into static fields is a side effect of this
             // constructor - that's somehow not the right way...
-            new TerrainRecruitLoader(terIS);
+
+            // Clemens: started working on that.
+            //  =>  partly now done via the IVariantInitializer
+            terrainRecruitLoader = new TerrainRecruitLoader(terIS);
 
             /* now initialize the static bits of the Battlelands */
             HexMap.staticBattlelandsInit(serverSide);
@@ -539,6 +549,7 @@ public final class VariantSupport
             LOGGER.log(Level.SEVERE, "Recruit-per-terrain loading failed.", e);
             System.exit(1);
         }
+        return terrainRecruitLoader;
     }
 
     private static Properties loadMarkerNamesProperties()

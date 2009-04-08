@@ -405,14 +405,14 @@ public class RationalAI extends SimpleAI
 
             // should work with all variants
             int currentScore = legion.getPlayer().getScore();
-            int arv = TerrainRecruitLoader.getAcquirableRecruitmentsValue();
+            int arv = getAcqStepValue();
             int nextScore = ((currentScore / arv) + 1) * arv;
 
             CreatureType bestRecruit = null;
 
             while ((currentScore + pointValue) >= nextScore)
             {
-                List<String> ral = TerrainRecruitLoader
+                List<String> ral = variant
                     .getRecruitableAcquirableList(terrain, nextScore);
                 Iterator<String> it = ral.iterator();
 
@@ -2265,8 +2265,7 @@ public class RationalAI extends SimpleAI
         int currentScore = enemy.getPlayer().getScore();
         int pointValue = ((LegionClientSide)legion).getPointValue();
         boolean canAcquireAngel = ((currentScore + pointValue)
-            / TerrainRecruitLoader.getAcquirableRecruitmentsValue() > (currentScore / TerrainRecruitLoader
-            .getAcquirableRecruitmentsValue()));
+            / getAcqStepValue() > (currentScore / getAcqStepValue()));
 
         if (canAcquireAngel)
         {
@@ -2366,8 +2365,7 @@ public class RationalAI extends SimpleAI
             int currentScore = enemy.getPlayer().getScore();
             int pointValue = ((LegionClientSide)legion).getPointValue();
             boolean canAcquireAngel = ((currentScore + pointValue)
-                / TerrainRecruitLoader.getAcquirableRecruitmentsValue() > (currentScore / TerrainRecruitLoader
-                .getAcquirableRecruitmentsValue()));
+                / getAcqStepValue() > (currentScore / getAcqStepValue()));
             // Can't use Legion.getRecruit() because it checks for
             // 7-high legions.
             boolean canRecruit = !client.findEligibleRecruits(enemy,

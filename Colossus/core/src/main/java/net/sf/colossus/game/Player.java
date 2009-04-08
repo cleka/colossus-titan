@@ -12,7 +12,6 @@ import net.sf.colossus.client.MarkerComparator;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.server.PlayerServerSide;
 import net.sf.colossus.variant.MasterHex;
-import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
 /**
@@ -371,12 +370,12 @@ public class Player
     public int getTitanPower()
     {
         return 6 + getScore()
-            / TerrainRecruitLoader.getTitanImprovementValue();
+            / getGame().getVariant().getTitanImprovementValue();
     }
 
     public boolean canTitanTeleport()
     {
-        return getScore() >= TerrainRecruitLoader.getTitanTeleportValue();
+        return getScore() >= getGame().getVariant().getTitanTeleportValue();
     }
 
     /**

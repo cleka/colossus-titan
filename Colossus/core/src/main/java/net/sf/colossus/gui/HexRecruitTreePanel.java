@@ -4,7 +4,7 @@ package net.sf.colossus.gui;
 /**
  *  Arranges the recruit tree for one hex in a panel, which can be
  *  displayed e.g. in Autoinspector or right-click popup.
- *  
+ *
  *  @version $Id$
  */
 
@@ -17,37 +17,44 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 import net.sf.colossus.common.Constants;
+import net.sf.colossus.common.IVariant;
 import net.sf.colossus.game.RecruitGraph;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
-import net.sf.colossus.xmlparser.TerrainRecruitLoader;
+import net.sf.colossus.variant.Variant;
 
 
 public class HexRecruitTreePanel extends Box
 {
-    private Map<Chit, CreatureType> chitToCreatureMap = new HashMap<Chit, CreatureType>();
+    private final Map<Chit, CreatureType> chitToCreatureMap = new HashMap<Chit, CreatureType>();
 
-    private List<ShowCreatureDetails> creatureWindows = new ArrayList<ShowCreatureDetails>();
+    private final List<ShowCreatureDetails> creatureWindows = new ArrayList<ShowCreatureDetails>();
 
-    private JFrame parentFrame;
+    private final JFrame parentFrame;
+    private final Variant variant;
+    private final IVariant ivariant;
 
     public HexRecruitTreePanel(int direction, MasterBoardTerrain terrain,
-        MasterHex hex, JFrame parent, boolean clickable)
+        MasterHex hex, JFrame parent, boolean clickable, Variant variant,
+        IVariant ivariant)
     {
         super(direction);
         this.parentFrame = parent;
+        this.variant = variant;
+        this.ivariant = ivariant; // in reality, right now that is the client...
+
         setAlignmentY(0);
         setBorder(BorderFactory.createLineBorder(Color.black));
         setBackground(terrain.getColor());
@@ -89,8 +96,8 @@ public class HexRecruitTreePanel extends Box
         terrainLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         add(terrainLabel);
 
-        List<CreatureType> creatures = TerrainRecruitLoader
-            .getPossibleRecruits(terrain, hex);
+        List<CreatureType> creatures = ivariant.getPossibleRecruits(
+            terrain, hex);
         Iterator<CreatureType> it = creatures.iterator();
         boolean firstTime = true;
         int scale = 4 * Scale.get();
@@ -108,7 +115,7 @@ public class HexRecruitTreePanel extends Box
             }
             else
             {
-                numToRecruit = TerrainRecruitLoader.numberOfRecruiterNeeded(
+                numToRecruit = ivariant.numberOfRecruiterNeeded(
                     prevCreature, creature, terrain, hex);
             }
 
@@ -154,7 +161,8 @@ public class HexRecruitTreePanel extends Box
         {
             CreatureType type = chitToCreatureMap.get(source);
             ShowCreatureDetails creatureWindow = new ShowCreatureDetails(
-                this.parentFrame, type, null, null);
+                this.parentFrame, type, null, null, this.variant,
+                this.ivariant);
             creatureWindows.add(creatureWindow);
         }
         else

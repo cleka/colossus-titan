@@ -29,7 +29,7 @@ import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardTerrain;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
-import net.sf.colossus.xmlparser.TerrainRecruitLoader;
+import net.sf.colossus.variant.Variant;
 
 
 /**
@@ -53,6 +53,8 @@ abstract public class AbstractAI implements AI
     protected final CreatureValueConstants cvc = new CreatureValueConstants();
     /** The Client we're working for. */
     final protected Client client;
+    final protected Variant variant;
+
     /** Our random source. */
     final protected Random random = new DevRandom();
     /** for the Oracle Hint tuff, the section we use.
@@ -63,6 +65,7 @@ abstract public class AbstractAI implements AI
     protected AbstractAI(Client client)
     {
         this.client = client;
+        this.variant = client.getGame().getVariant();
     }
 
     final public CreatureType getVariantRecruitHint(LegionClientSide legion,
@@ -321,6 +324,17 @@ abstract public class AbstractAI implements AI
     }
 
     /**
+     * Shortcut to ask for the acquirables basic value from the variant
+     * @link #Variant.getAcquirableRecruitmentsValue()
+     *
+     * @return The acquirableRecruitmentsValue
+     */
+    protected int getAcqStepValue()
+    {
+        return variant.getAcquirableRecruitmentsValue();
+    }
+
+    /**
      * Return true if the legion could recruit or acquire something
      * better than its worst creature in hexLabel.
      */
@@ -353,13 +367,14 @@ abstract public class AbstractAI implements AI
             }
             // should work with all variants
             int currentScore = legion.getPlayer().getScore();
-            int arv = TerrainRecruitLoader.getAcquirableRecruitmentsValue();
+            int arv = getAcqStepValue();
             int nextScore = ((currentScore / arv) + 1) * arv;
             CreatureType bestRecruit = null;
             while ((currentScore + pointValue) >= nextScore)
             {
                 List<String> ral =
-                        TerrainRecruitLoader.getRecruitableAcquirableList(hex.getTerrain(),
+                        variant.getRecruitableAcquirableList(hex
+                    .getTerrain(),
                         nextScore);
                 for (String creatureName : ral)
                 {

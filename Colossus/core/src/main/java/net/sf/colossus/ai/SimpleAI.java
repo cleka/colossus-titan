@@ -646,7 +646,7 @@ public class SimpleAI extends AbstractAI
             else
             {
                 splitoffs.add(client.getGame().getVariant().getCreatureByName(
-                    TerrainRecruitLoader.getPrimaryAcquirable()));
+                    variant.getPrimaryAcquirable()));
                 splitoffs.add(nonsplitCreature);
                 splitoffs.add(nonsplitCreature);
                 splitoffs.add(splitCreature);
@@ -662,7 +662,7 @@ public class SimpleAI extends AbstractAI
             else
             {
                 splitoffs.add(client.getGame().getVariant().getCreatureByName(
-                    TerrainRecruitLoader.getPrimaryAcquirable()));
+                    variant.getPrimaryAcquirable()));
             }
 
             if (Dice.rollDie() <= 3)
@@ -704,7 +704,7 @@ public class SimpleAI extends AbstractAI
             else
             {
                 splitoffs.add(client.getGame().getVariant().getCreatureByName(
-                    TerrainRecruitLoader.getPrimaryAcquirable()));
+                    variant.getPrimaryAcquirable()));
                 splitoffs.add(splitCreature);
                 splitoffs.add(splitCreature);
                 splitoffs.add(startCre[1]);
@@ -720,7 +720,7 @@ public class SimpleAI extends AbstractAI
             else
             {
                 splitoffs.add(client.getGame().getVariant().getCreatureByName(
-                    TerrainRecruitLoader.getPrimaryAcquirable()));
+                    variant.getPrimaryAcquirable()));
             }
 
             if (Dice.rollDie() <= 3)
@@ -1080,15 +1080,14 @@ public class SimpleAI extends AbstractAI
                     value
                         .add(
                             ((client.getGame().getVariant()
-                                .getCreatureByName(TerrainRecruitLoader
-                                    .getPrimaryAcquirable())).getPointValue() * enemyPointValue)
-                                / TerrainRecruitLoader
-                                    .getAcquirableRecruitmentsValue(),
+                                .getCreatureByName(variant.getPrimaryAcquirable()))
+                        .getPointValue() * enemyPointValue)
+                        / getAcqStepValue(),
                             "Fraction Basic Acquirable");
                     // plus a fraction of a titan strength
                     // TODO Should be by variant
                     value.add((6 * enemyPointValue)
-                        / TerrainRecruitLoader.getTitanImprovementValue(),
+                        / variant.getTitanImprovementValue(),
                         "Fraction Titan Strength");
                     // plus some more for killing a group (this is arbitrary)
                     value.add((10 * enemyPointValue) / 100,
@@ -1143,8 +1142,7 @@ public class SimpleAI extends AbstractAI
                     // and won't score enough points to make up for it
                     else if (legion.hasSummonable()
                         && !haveOtherSummonables
-                        && enemyPointValue < TerrainRecruitLoader
-                            .getAcquirableRecruitmentsValue() * .88)
+                        && enemyPointValue < getAcqStepValue() * .88)
                     {
                         value.add(LOSE_LEGION + 5, "Lose Legion");
                     }
@@ -1154,15 +1152,14 @@ public class SimpleAI extends AbstractAI
                         value
                             .add(
                                 ((client.getGame().getVariant()
-                                    .getCreatureByName(TerrainRecruitLoader
+                                    .getCreatureByName(variant
                                         .getPrimaryAcquirable()))
                                     .getPointValue() * enemyPointValue)
-                                    / TerrainRecruitLoader
-                                        .getAcquirableRecruitmentsValue(),
+                                    / getAcqStepValue(),
                                 "Fraction Basic Acquirable 2");
                         // plus a fraction of a titan strength
                         value.add((6 * enemyPointValue)
-                            / TerrainRecruitLoader.getTitanImprovementValue(),
+                            / variant.getTitanImprovementValue(),
                             "Fraction Titan Strength 2");
                         // but we lose this group
                         value.add(-(20 * legion.getPointValue()) / 100,
@@ -1687,9 +1684,7 @@ public class SimpleAI extends AbstractAI
         {
             int currentScore = player.getScore();
             int fleeValue = ((LegionClientSide)defender).getPointValue() / 2;
-            if (((currentScore + fleeValue) / TerrainRecruitLoader
-                .getAcquirableRecruitmentsValue()) > (currentScore / TerrainRecruitLoader
-                .getAcquirableRecruitmentsValue()))
+            if (((currentScore + fleeValue) / getAcqStepValue()) > (currentScore / getAcqStepValue()))
             {
                 if (attacker.getHeight() == 7 || attacker.getHeight() == 6
                     && client.canRecruit(attacker))
@@ -1817,8 +1812,7 @@ public class SimpleAI extends AbstractAI
             int currentScore = enemy.getPlayer().getScore();
             int pointValue = ((LegionClientSide)legion).getPointValue();
             boolean canAcquireAngel = ((currentScore + pointValue)
-                / TerrainRecruitLoader.getAcquirableRecruitmentsValue() > (currentScore / TerrainRecruitLoader
-                .getAcquirableRecruitmentsValue()));
+                / getAcqStepValue() > (currentScore / getAcqStepValue()));
             // Can't use Legion.getRecruit() because it checks for
             // 7-high legions.
             boolean canRecruit = !client.findEligibleRecruits(enemy,

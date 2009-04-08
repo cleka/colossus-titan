@@ -61,6 +61,7 @@ import javax.swing.SwingUtilities;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.common.Constants;
+import net.sf.colossus.common.IVariant;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Phase;
@@ -75,7 +76,7 @@ import net.sf.colossus.util.NullCheckPredicate;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
-import net.sf.colossus.xmlparser.TerrainRecruitLoader;
+import net.sf.colossus.variant.Variant;
 
 
 /**
@@ -524,8 +525,13 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
+                // TODO replace with actual ...getVariant() when Variant is
+                //      ready to provide the needed data
+                IVariant ivariant = client;
+                Variant variant = client.getGame().getVariant();
                 new ShowAllRecruits(masterFrame, client.getOptions(),
-                    TerrainRecruitLoader.getTerrains());
+                    variant,
+                    ivariant);
             }
         };
 
@@ -544,9 +550,13 @@ public final class MasterBoard extends JPanel
                 GUIMasterHex hex = getHexContainingPoint(lastPoint);
                 if (hex != null)
                 {
+                    // TODO replace with actual ...getVariant() when Variant is
+                    //      ready to provide the needed data
+                    Variant variant = client.getGame().getVariant();
+                    IVariant ivariant = client;
                     MasterHex hexModel = hex.getHexModel();
                     new ShowRecruits(masterFrame, lastPoint, hexModel,
-                        scrollPane);
+                        scrollPane, variant, ivariant);
                 }
             }
         };

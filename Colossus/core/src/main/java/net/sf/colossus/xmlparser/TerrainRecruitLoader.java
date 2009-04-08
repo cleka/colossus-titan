@@ -19,8 +19,10 @@ import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.IVariantInitializer;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
+import net.sf.colossus.variant.Variant.AcquirableData;
 
 import org.jdom.Document;
 import org.jdom.Element;
@@ -41,7 +43,7 @@ import org.jdom.input.SAXBuilder;
  * @version $Id$
  * @see net.sf.colossus.variant.CreatureType
  */
-public class TerrainRecruitLoader
+public class TerrainRecruitLoader implements IVariantInitializer
 {
     private static final Logger LOGGER = Logger
         .getLogger(TerrainRecruitLoader.class.getName());
@@ -51,6 +53,18 @@ public class TerrainRecruitLoader
     public static final String Keyword_Lord = "Lord";
     public static final String Keyword_DemiLord = "DemiLord";
     public static final String Keyword_Special = "Special:";
+
+    /* Only needed during loaded. During game time, this should be
+     * queried from the Variant.
+     */
+    private int aquirableRecruitmentsValue;
+
+    /** Base amount of points needed for Titan improvement. */
+    private int titanImprove = 100;
+
+    /** Amount of points needed for Titan Teleport. */
+    private int titanTeleport = 400;
+
 
     /**
      * Map a terrain to a list of recruits.
@@ -88,7 +102,7 @@ public class TerrainRecruitLoader
 
     /**
      * The list of Acquirable Creature, as acquirableData.
-     * @see net.sf.colossus.xmlparser.TerrainRecruitLoader.AcquirableData
+     * @see net.sf.colossus.variant.Variant.AcquirableData
      */
     private static List<AcquirableData> acquirableList = null;
 
@@ -244,6 +258,10 @@ public class TerrainRecruitLoader
                 handleAlias(el);
             }
 
+            if (acquirableList == null)
+            {
+                acquirableList = new ArrayList<AcquirableData>();
+            }
             List<Element> acquirables = root.getChildren("acquirable");
             for (Element el : acquirables)
             {
@@ -253,13 +271,13 @@ public class TerrainRecruitLoader
             Element el = root.getChild("titan_improve");
             if (el != null)
             {
-                handleTitanImprove(el);
+                titanImprove = el.getAttribute("points").getIntValue();
             }
 
             el = root.getChild("titan_teleport");
             if (el != null)
             {
-                handleTitanTeleport(el);
+                titanTeleport = el.getAttribute("points").getIntValue();
             }
         }
         catch (JDOMException ex)
@@ -396,32 +414,36 @@ public class TerrainRecruitLoader
             throw new ParseException("Acquirable '" + name
                 + "' has invalid points");
         }
-        AcquirableData ad = new AcquirableData(name, points);
+
+        List<MasterBoardTerrain> terrains = new ArrayList<MasterBoardTerrain>();
+
         String terrainId = el.getAttributeValue("terrain");
         if (terrainId != null)
         {
-            MasterBoardTerrain terrain = TerrainRecruitLoader
-                .getTerrainById(terrainId);
+            MasterBoardTerrain terrain = getTerrainById(terrainId);
             if (terrain == null)
             {
                 throw new ParseException("Illegal terrainId '" + terrainId
                     + "' in variant for aquirable '" + name + "'");
             }
-            ad.addTerrain(terrain);
+            terrains.add(terrain);
         }
-        addAcquirable(ad);
-    }
 
-    private void handleTitanImprove(Element el) throws JDOMException
-    {
-        TerrainRecruitLoader.titanImprove = el.getAttribute("points")
-            .getIntValue();
-    }
+        if (acquirableList.size() == 0)
+        { // First acquirable - initialize the base value
+            aquirableRecruitmentsValue = points;
+        }
 
-    private void handleTitanTeleport(Element el) throws JDOMException
-    {
-        TerrainRecruitLoader.titanTeleport = el.getAttribute("points")
-            .getIntValue();
+        if ((points % aquirableRecruitmentsValue) != 0)
+        {
+            throw new ParseException("Wrong point value " + points
+                + " for Acquirable with name=" + name + " in terrain="
+                + terrainId + " : should be multiple of "
+                + aquirableRecruitmentsValue);
+        }
+
+        AcquirableData ad = new AcquirableData(name, points, terrains);
+        acquirableList.add(ad);
     }
 
     /**
@@ -811,194 +833,10 @@ public class TerrainRecruitLoader
     }
 
     /**
-     * Used internally to record the Acquirable name, points needed for
-     * recruiting, and the list of terrains in which the Acquirable dwells.
-     * @author Romain Dolbeau
-     * @version $Id$
-     */
-    private class AcquirableData
-    {
-        private final String name;
-        private final int value;
-        private final List<MasterBoardTerrain> where;
-
-        AcquirableData(String n, int v)
-        {
-            name = n;
-            value = v;
-            where = new ArrayList<MasterBoardTerrain>();
-        }
-
-        String getName()
-        {
-            return name;
-        }
-
-        int getValue()
-        {
-            return value;
-        }
-
-        void addTerrain(MasterBoardTerrain t)
-        {
-            where.add(t);
-        }
-
-        /**
-         * Tell if the Acquirable can be Acquired in the terrain.
-         * @param t The terrain in which the Acquirements occurs.
-         * @return True if the Acquirable can be acquired here,
-         * false otherwise.
-         */
-        boolean isAvailable(MasterBoardTerrain t)
-        {
-            if (where.isEmpty() || ((where.indexOf(t)) != -1))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        @Override
-        public String toString()
-        {
-            return ("Acquirable by name of " + name + ", available every "
-                + value + (where.isEmpty() ? "" : ", in terrain " + where));
-        }
-    }
-
-    private void addAcquirable(AcquirableData ad) throws ParseException
-    {
-        if (acquirableList == null)
-        {
-            acquirableList = new ArrayList<AcquirableData>();
-        }
-        acquirableList.add(ad);
-        if ((ad.getValue() % getAcquirableRecruitmentsValue()) != 0)
-        {
-            throw new ParseException("Wrong Value for an Acquirable : " + ad
-                + " ; should multiple of " + getAcquirableRecruitmentsValue());
-        }
-    }
-
-    /**
-     * To obtain all the Creature that can be Acquired.
-     * @return The list of name (as String) that can be Acquired
-     */
-    public static List<String> getAcquirableList()
-    {
-        List<String> al = new ArrayList<String>();
-        Iterator<AcquirableData> it = acquirableList.iterator();
-        while (it.hasNext())
-        {
-            AcquirableData ad = it.next();
-            al.add(ad.getName());
-        }
-        return al;
-    }
-
-    /**
-     * To obtain the base amount of points needed for Acquirement.
-     * All Acquirements must occur at integer multiple of this.
-     * @return The base amount of points needed for Acquirement.
-     */
-    public static int getAcquirableRecruitmentsValue()
-    {
-        AcquirableData ad = acquirableList.get(0);
-        return ad.getValue();
-    }
-
-    /**
-     * To obtain the first Acquirable (aka 'primary') Creature name.
-     * This one is the starting Lord with the Titan.
-     * @return The name of the primary Acquirable Creature.
-     */
-    public static String getPrimaryAcquirable()
-    {
-        AcquirableData ad = acquirableList.get(0);
-        return ad.getName();
-    }
-
-    /**
-     * To obtain all the Creature that can be acquired at the given amount of
-     * points in the given terrain.
-     * @param t The Terrain in which the recruitment occurs.
-     * @param value The number of points at which the recruitment occurs.
-     * Valid values are constrained.
-     * @return The list of name (as String) that can be acquired in this
-     * terrain, for this amount of points.
-     * @see #getAcquirableRecruitmentsValue()
-     */
-    public static List<String> getRecruitableAcquirableList(
-        MasterBoardTerrain t, int value)
-    {
-        List<String> al = new ArrayList<String>();
-        if ((value % getAcquirableRecruitmentsValue()) != 0)
-        {
-            return al;
-        }
-        Iterator<AcquirableData> it = acquirableList.iterator();
-        while (it.hasNext())
-        {
-            AcquirableData ad = it.next();
-            if (ad.isAvailable(t) && ((value % ad.getValue()) == 0))
-            {
-                al.add(ad.getName());
-            }
-        }
-        return al;
-    }
-
-    /**
-     * Check if the Creature whose name is in parameter is an Acquirable
-     * creature or not.
-     * @param name The name of the Creature inquired.
-     * @return If the creature is Acquirable.
-     */
-    private static boolean isAcquirable(String name)
-    {
-        Iterator<AcquirableData> it = acquirableList.iterator();
-        while (it.hasNext())
-        {
-            AcquirableData ad = it.next();
-            if (name.equals(ad.getName()))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Check if the Creature in parameter is an Acquirable creature or not.
-     * @param c The Creature inquired.
-     * @return If the creature is Acquirable.
-     */
-    public static boolean isAcquirable(CreatureType c)
-    {
-        return isAcquirable(c.getName());
-    }
-
-    /** Base amount of points needed for Titan improvement. */
-    private static int titanImprove = 100;
-
-    /** Amount of points needed for Titan Teleport. */
-    private static int titanTeleport = 400;
-
-    /* re-set the default values each time a new TER file is loaded */
-    {
-        titanImprove = 100;
-        titanTeleport = 400;
-    }
-
-    /**
      * To obtain the base amount of points needed for Titan improvement.
      * @return The base amount of points needed for Titan improvement.
      */
-    public static int getTitanImprovementValue()
+    public int getTitanImprovementValue()
     {
         return titanImprove;
     }
@@ -1007,7 +845,7 @@ public class TerrainRecruitLoader
      * To obtain the amount of points needed for Titan teleport.
      * @return The amount of points needed for Titan teleport.
      */
-    public static int getTitanTeleportValue()
+    public int getTitanTeleportValue()
     {
         return titanTeleport;
     }
@@ -1018,5 +856,76 @@ public class TerrainRecruitLoader
     public static RecruitGraph getRecruitGraph()
     {
         return graph;
+    }
+
+    public List<AcquirableData> getAcquirablesList()
+    {
+        return acquirableList;
+    }
+
+
+    public static class NullTerrainRecruitLoader implements
+        IVariantInitializer
+    {
+        private static final Logger LOGGER = Logger
+            .getLogger(TerrainRecruitLoader.NullTerrainRecruitLoader.class
+                .getName());
+
+        private final boolean showNullWarning;
+
+        /**
+         * Create an do-basically-Nothing TerrainRecruitLoader that can
+         * be used as TerrainInitialiser e.g. during Unit Testing.
+         * In real games normally a real TerrainRecruitLoader should be used,
+         * accessed via the IVariantInitializer interface.
+         * But the variable to hold the trl should be initialized with
+         * something to avoid NPEs...
+         * This one here serves that purpose, but it will then show warnings
+         * when querying values from it.
+         *
+         * @param showNullWarning Set to true if you really want to use the
+         * defaults and not get warnings about querying them.
+         * Intended for unit testing setup.
+         */
+        public NullTerrainRecruitLoader(boolean showNullWarning)
+        {
+            this.showNullWarning = showNullWarning;
+        }
+
+        public NullTerrainRecruitLoader()
+        {
+            this(true);
+        }
+
+        public List<AcquirableData> getAcquirablesList()
+        {
+            // TODO Auto-generated method stub
+            return new ArrayList<AcquirableData>();
+        }
+
+        public int getTitanImprovementValue()
+        {
+            // TODO Auto-generated method stub
+            warnThatNullTerrainRecruitLoader("getTitanImprovementValue");
+            return 100;
+        }
+
+        public int getTitanTeleportValue()
+        {
+            // TODO Auto-generated method stub
+            return 400;
+        }
+
+        private void warnThatNullTerrainRecruitLoader(String message)
+        {
+            if (showNullWarning)
+            {
+                LOGGER
+                    .warning("You are querying the value for "
+                        + message
+                        + " from a NullTerrainRecruitLoader. Are you sure this is what you want?");
+            }
+        }
+
     }
 }

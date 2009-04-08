@@ -25,7 +25,6 @@ import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.guiutil.KDialog;
 import net.sf.colossus.guiutil.SaveWindow;
-import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
 /**
@@ -259,7 +258,8 @@ final class SplitLegion extends KDialog
                 Chit chit = it.next();
                 String id = chit.getId();
                 if (id.startsWith(Constants.titan)
-                    || id.equals(TerrainRecruitLoader.getPrimaryAcquirable()))
+                    || id.equals(gui.getGame().getVariant()
+                        .getPrimaryAcquirable()))
                 {
                     numLords++;
                 }

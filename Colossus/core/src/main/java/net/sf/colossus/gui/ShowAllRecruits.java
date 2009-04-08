@@ -7,8 +7,10 @@ import java.util.Collection;
 import javax.swing.JFrame;
 
 import net.sf.colossus.common.IOptions;
+import net.sf.colossus.common.IVariant;
 import net.sf.colossus.guiutil.SaveWindow;
 import net.sf.colossus.variant.MasterBoardTerrain;
+import net.sf.colossus.variant.Variant;
 
 
 /**
@@ -26,7 +28,8 @@ final class ShowAllRecruits extends AbstractShowRecruits
     private static boolean allTerrainsDisplayActive = false;
 
     ShowAllRecruits(JFrame parentFrame, IOptions options,
-        Collection<MasterBoardTerrain> terrains)
+        Variant variant,
+        IVariant ivariant)
     {
         super(parentFrame);
 
@@ -39,11 +42,12 @@ final class ShowAllRecruits extends AbstractShowRecruits
         }
         allTerrainsDisplayActive = true;
 
+        Collection<MasterBoardTerrain> terrains = ivariant.getTerrains();
         for (MasterBoardTerrain terrain : terrains)
         {
             if (!terrain.isAlias())
             {
-                doOneTerrain(terrain, null);
+                doOneTerrain(terrain, null, variant, ivariant);
             }
         }
 
