@@ -1267,7 +1267,7 @@ public final class Client implements IClient, IOracle, IVariant
             VariantSupport.loadVariantByName(options
                 .getStringOption(Options.variant), false);
         }
-
+        ai.setVariant(VariantSupport.getCurrentVariant());
         gui.initBoard();
     }
 

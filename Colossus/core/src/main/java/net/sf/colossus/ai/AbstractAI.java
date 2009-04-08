@@ -53,7 +53,7 @@ abstract public class AbstractAI implements AI
     protected final CreatureValueConstants cvc = new CreatureValueConstants();
     /** The Client we're working for. */
     final protected Client client;
-    final protected Variant variant;
+    protected Variant variant;
 
     /** Our random source. */
     final protected Random random = new DevRandom();
@@ -65,9 +65,12 @@ abstract public class AbstractAI implements AI
     protected AbstractAI(Client client)
     {
         this.client = client;
-        this.variant = client.getGame().getVariant();
     }
 
+    public void setVariant(Variant v)
+    {
+        this.variant = v;
+    }
     final public CreatureType getVariantRecruitHint(LegionClientSide legion,
         MasterHex hex, List<CreatureType> recruits)
     {

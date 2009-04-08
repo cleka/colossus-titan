@@ -13,6 +13,7 @@ import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.SummonInfo;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
+import net.sf.colossus.variant.Variant;
 
 
 /**
@@ -23,6 +24,8 @@ import net.sf.colossus.variant.MasterHex;
  */
 public interface AI
 {
+
+    public void setVariant(Variant variant);
 
     /** make masterboard moves for current player in the Game */
     boolean masterMove();
