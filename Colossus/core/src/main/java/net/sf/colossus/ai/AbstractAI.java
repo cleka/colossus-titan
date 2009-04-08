@@ -83,8 +83,7 @@ abstract public class AbstractAI implements AI
             // suggest recruiting nothing
             return null;
         }
-        CreatureType recruit = client.getGame().getVariant()
-            .getCreatureByName(recruitName);
+        CreatureType recruit = variant.getCreatureByName(recruitName);
         if (!(recruits.contains(recruit)))
         {
             LOGGER.warning("HINT: Invalid Hint for this variant !"
@@ -266,7 +265,7 @@ abstract public class AbstractAI implements AI
         List<CreatureType> byCreature = new ArrayList<CreatureType>();
         for (String name : byName)
         {
-            CreatureType cre = client.getGame().getVariant()
+            CreatureType cre = variant
                 .getCreatureByName(name);
             if (cre == null)
             {
@@ -340,7 +339,8 @@ abstract public class AbstractAI implements AI
      */
     final protected boolean couldRecruitUp(Legion legion, MasterHex hex, Legion enemy)
     {
-        CreatureType weakest = client.getGame().getVariant().
+        CreatureType weakest = variant
+            .
                 getCreatureByName(((LegionClientSide) legion).getContents().
                 get(legion.getHeight() - 1));
         // Consider recruiting.
@@ -372,17 +372,14 @@ abstract public class AbstractAI implements AI
             CreatureType bestRecruit = null;
             while ((currentScore + pointValue) >= nextScore)
             {
-                List<String> ral =
-                        variant.getRecruitableAcquirableList(hex
-                    .getTerrain(),
-                        nextScore);
+                List<String> ral = variant.getRecruitableAcquirableList(hex
+                    .getTerrain(), nextScore);
                 for (String creatureName : ral)
                 {
-                    CreatureType tempRecruit =
-                            client.getGame().getVariant().
-                            getCreatureByName(creatureName);
-                    if ((bestRecruit == null) ||
-                            (getHintedRecruitmentValue(tempRecruit, legion,
+                    CreatureType tempRecruit = variant
+                        .getCreatureByName(creatureName);
+                    if ((bestRecruit == null)
+                        || (getHintedRecruitmentValue(tempRecruit, legion,
                             hintSectionUsed) >=
                             getHintedRecruitmentValue(bestRecruit, legion,
                             hintSectionUsed)))
@@ -393,9 +390,10 @@ abstract public class AbstractAI implements AI
                 nextScore += arv;
             }
             if (bestRecruit != null &&
-                    getHintedRecruitmentValue(bestRecruit, legion,
+                getHintedRecruitmentValue(bestRecruit, legion,
                     hintSectionUsed) >
-                    getHintedRecruitmentValue(weakest, legion, hintSectionUsed))
+                getHintedRecruitmentValue(weakest,
+                    legion, hintSectionUsed))
             {
                 return true;
             }
@@ -741,7 +739,7 @@ abstract public class AbstractAI implements AI
             // Still TODO ?
             //      Fixed "Griffon vs. Griffin" in Undead, which was the
             //      reason in all cases I got that exception (Clemens).
-            CreatureType type = client.getGame().getVariant()
+            CreatureType type = variant
                 .getCreatureByName(name);
             int count = client.getReservedRemain(type);
             return count;
@@ -749,8 +747,7 @@ abstract public class AbstractAI implements AI
 
         public boolean canRecruit(String name)
         {
-            return recruits.contains(client.getGame().getVariant()
-                .getCreatureByName(name));
+            return recruits.contains(variant.getCreatureByName(name));
         }
 
         public String hexLabel()

@@ -418,8 +418,8 @@ public class RationalAI extends SimpleAI
 
                 while (it.hasNext())
                 {
-                    CreatureType tempRecruit = client.getGame().getVariant()
-                        .getCreatureByName(it.next());
+                    CreatureType tempRecruit = variant.getCreatureByName(it
+                        .next());
 
                     if ((bestRecruit == null)
                         || (getHintedRecruitmentValue(tempRecruit, legion,
@@ -2404,15 +2404,13 @@ public class RationalAI extends SimpleAI
                 // of creatures so that the AI knows to jump
                 // titan singletons
                 ps = new PowerSkill("Titan", Math.max(titanPower - 5, 1),
-                    (client.getGame().getVariant().getCreatureByName("Titan"))
-                        .getSkill());
+                    (variant.getCreatureByName("Titan")).getSkill());
                 powerskills.add(ps);
 
             }
             else
             {
-                CreatureType creature = client.getGame().getVariant()
-                    .getCreatureByName(name);
+                CreatureType creature = variant.getCreatureByName(name);
                 PowerSkill ps = getNativeValue(creature, terrain, defender);
                 powerskills.add(ps);
             }

@@ -510,7 +510,7 @@ public class SimpleAI extends AbstractAI
 
         for (String name : legion.getContents())
         {
-            CreatureType critter = client.getGame().getVariant()
+            CreatureType critter = variant
                 .getCreatureByName(name);
 
             // Never split out the titan.
@@ -650,7 +650,7 @@ public class SimpleAI extends AbstractAI
         {
             if (Dice.rollDie() <= 3)
             {
-                splitoffs.add(client.getGame().getVariant().getCreatureByName(
+                splitoffs.add(variant.getCreatureByName(
                     Constants.titan));
                 splitoffs.add(startCre[1]);
                 splitoffs.add(startCre[1]);
@@ -658,7 +658,7 @@ public class SimpleAI extends AbstractAI
             }
             else
             {
-                splitoffs.add(client.getGame().getVariant().getCreatureByName(
+                splitoffs.add(variant.getCreatureByName(
                     variant.getPrimaryAcquirable()));
                 splitoffs.add(nonsplitCreature);
                 splitoffs.add(nonsplitCreature);
@@ -669,12 +669,12 @@ public class SimpleAI extends AbstractAI
         {
             if (Dice.rollDie() <= 3)
             {
-                splitoffs.add(client.getGame().getVariant().getCreatureByName(
+                splitoffs.add(variant.getCreatureByName(
                     Constants.titan));
             }
             else
             {
-                splitoffs.add(client.getGame().getVariant().getCreatureByName(
+                splitoffs.add(variant.getCreatureByName(
                     variant.getPrimaryAcquirable()));
             }
 
@@ -708,7 +708,7 @@ public class SimpleAI extends AbstractAI
         {
             if (Dice.rollDie() <= 3)
             {
-                splitoffs.add(client.getGame().getVariant().getCreatureByName(
+                splitoffs.add(variant.getCreatureByName(
                     Constants.titan));
                 splitoffs.add(nonsplitCreature);
                 splitoffs.add(nonsplitCreature);
@@ -716,7 +716,7 @@ public class SimpleAI extends AbstractAI
             }
             else
             {
-                splitoffs.add(client.getGame().getVariant().getCreatureByName(
+                splitoffs.add(variant.getCreatureByName(
                     variant.getPrimaryAcquirable()));
                 splitoffs.add(splitCreature);
                 splitoffs.add(splitCreature);
@@ -727,12 +727,12 @@ public class SimpleAI extends AbstractAI
         {
             if (Dice.rollDie() <= 3)
             {
-                splitoffs.add(client.getGame().getVariant().getCreatureByName(
+                splitoffs.add(variant.getCreatureByName(
                     Constants.titan));
             }
             else
             {
-                splitoffs.add(client.getGame().getVariant().getCreatureByName(
+                splitoffs.add(variant.getCreatureByName(
                     variant.getPrimaryAcquirable()));
             }
 
@@ -1092,7 +1092,7 @@ public class SimpleAI extends AbstractAI
                     // we score a fraction of a basic acquirable
                     value
                         .add(
-                            ((client.getGame().getVariant()
+                            ((variant
                                 .getCreatureByName(variant.getPrimaryAcquirable()))
                         .getPointValue() * enemyPointValue)
                         / getAcqStepValue(),
@@ -1164,7 +1164,7 @@ public class SimpleAI extends AbstractAI
                         // we score a fraction of a basic acquirable
                         value
                             .add(
-                                ((client.getGame().getVariant()
+                                ((variant
                                     .getCreatureByName(variant
                                         .getPrimaryAcquirable()))
                                     .getPointValue() * enemyPointValue)
@@ -1839,7 +1839,7 @@ public class SimpleAI extends AbstractAI
         CreatureType best = null;
         for (String creatureName : creatures)
         {
-            CreatureType creature = client.getGame().getVariant()
+            CreatureType creature = variant
                 .getCreatureByName(creatureName);
             if (best == null || getKillValue(creature) > getKillValue(best))
             {
@@ -1870,12 +1870,10 @@ public class SimpleAI extends AbstractAI
             String myAngel = lcs.bestSummonable();
             if (bestAngel == null
                 || bestLegion == null
-                || (client.getGame().getVariant().getCreatureByName(myAngel))
-                    .getPointValue() > (client.getGame().getVariant()
+                || (variant.getCreatureByName(myAngel)).getPointValue() > (variant
                     .getCreatureByName(bestAngel)).getPointValue()
                 || Legion.ORDER_TITAN_THEN_POINTS.compare(lcs, bestLegion) > 0
-                && ((client.getGame().getVariant().getCreatureByName(myAngel))
-                    .getPointValue() == (client.getGame().getVariant()
+                && ((variant.getCreatureByName(myAngel)).getPointValue() == (variant
                     .getCreatureByName(bestAngel)).getPointValue()))
             {
                 bestLegion = lcs;
@@ -2065,7 +2063,7 @@ public class SimpleAI extends AbstractAI
         {
             // Don't know the power, so just estimate.
             LOGGER.warning("Called SimpleAI.getCombatValue() for Titan");
-            return 6 * client.getGame().getVariant()
+            return 6 * variant
                 .getCreatureByName("Titan").getSkill();
         }
 
@@ -2092,7 +2090,7 @@ public class SimpleAI extends AbstractAI
     int getTitanCombatValue(int power)
     {
         int val = power
-            * client.getGame().getVariant().getCreatureByName("Titan")
+            * variant.getCreatureByName("Titan")
                 .getSkill();
         if (power < 9)
         {
@@ -2112,7 +2110,7 @@ public class SimpleAI extends AbstractAI
             }
             else
             {
-                CreatureType creature = client.getGame().getVariant()
+                CreatureType creature = variant
                     .getCreatureByName(name);
                 val += getCombatValue(creature, terrain);
             }
