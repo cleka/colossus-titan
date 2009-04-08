@@ -15,6 +15,7 @@ import java.util.logging.*;
 
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.HazardTerrain;
+import net.sf.colossus.variant.HazardHexside;
 
 /**
  * BattlelandRandomizerLoader create a randomized Battleland from a description file.
@@ -322,7 +323,7 @@ public class BattlelandRandomizerLoader
     }
     private class randomHexside
     {
-        private final char hexside;
+        private final HazardHexside hazard;
         private final double prob;
         private double percent(double val)
         {
@@ -332,14 +333,15 @@ public class BattlelandRandomizerLoader
                 return 100.;
             return val;
         }
-        randomHexside(char h, double p)
+        randomHexside(HazardHexside hChar, double p)
         {
-            hexside = h;
+        	HazardHexside hObj = HazardHexside.getHexsideByCode(hChar);
+            hazard = hObj;
             prob = percent(p);
         }
-        char getHexside()
+        HazardHexside getHexside()
         {
-            return hexside;
+            return hazard;
         }
         double getProb()
         {
@@ -347,9 +349,9 @@ public class BattlelandRandomizerLoader
         }
         public String toString()
         {
-            return("Hexside " + hexside + " " + (prob < 100. ?
-                                                 prob + " %" :
-                                                 ""));
+            return("HexsideHazard " + hazard + " " + (prob < 100. ?
+                                                      prob + " %" :
+                                                      ""));
         }
     }
     
