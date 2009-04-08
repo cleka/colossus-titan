@@ -57,8 +57,8 @@ abstract public class AbstractAI implements AI
 
     /** Our random source. */
     final protected Random random = new DevRandom();
-    /** for the Oracle Hint tuff, the section we use.
-     * This can be replaced by AI implementation.
+    /** for the Oracle Hint stuff, the section we use.
+     *  This can be replaced by AI implementation.
      */
     protected final String[] hintSectionUsed = { Constants.sectionOffensiveAI };
 
