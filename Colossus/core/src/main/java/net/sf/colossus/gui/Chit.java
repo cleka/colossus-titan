@@ -43,7 +43,7 @@ class Chit extends JPanel
     private final Image bufferedImage;
     private Image bufferedInvertedImage;
     Rectangle rect;
-    Client client; // may be null; set for some subclasses
+    final Client client; // may be null; set for some subclasses
 
     /** Flag to mark chit as dead and paint it with an "X" through it. */
     private boolean dead;
@@ -53,7 +53,7 @@ class Chit extends JPanel
     private Color borderColor = Color.black;
 
     /** Flag to paint the chit upside-down. */
-    protected boolean inverted = false;
+    protected final boolean inverted;
 
     // Initialize early to avoid NullPointerException with GTK L&F
     private final String id;
@@ -68,30 +68,30 @@ class Chit extends JPanel
 
     Chit(int scale, String id, String[] overlays)
     {
-        this(scale, id, false, false, false, overlays);
+        this(scale, id, false, false, false, overlays, null);
     }
 
-    Chit(int scale, String id, boolean inverted)
+    Chit(int scale, String id, boolean inverted, Client client)
     {
-        this(scale, id, inverted, false, false);
+        this(scale, id, inverted, false, false, client);
     }
 
     Chit(int scale, String id, boolean inverted, boolean dubious)
     {
-        this(scale, id, inverted, dubious, false);
+        this(scale, id, inverted, dubious, false, null);
     }
 
     Chit(int scale, String id, boolean inverted, boolean dubious,
-        boolean dubiousAsBlank)
+        boolean dubiousAsBlank, Client client)
     {
-        this(scale, id, inverted, dubious, dubiousAsBlank, null);
+        this(scale, id, inverted, dubious, dubiousAsBlank, null, client);
     }
 
     // TODO this is a bit confusing: the id parameter can be either the name of a
     //      creature type or a markerId (maybe more?). Good thing markerIds have no
     //      overlap with creature names
     private Chit(int scale, String id, boolean inverted, boolean dubious,
-        boolean dubiousAsBlank, String[] overlays)
+        boolean dubiousAsBlank, String[] overlays, Client client)
     {
         // LayoutManager null - we want to place things ourselves
         super((LayoutManager)null);
@@ -99,6 +99,7 @@ class Chit extends JPanel
         assert id != null : "Each chit must have an ID set";
         this.id = id;
         this.inverted = inverted;
+        this.client = client;
         Point point = getLocation();
 
         // Images are 60x60, so if scale is close to that, avoid

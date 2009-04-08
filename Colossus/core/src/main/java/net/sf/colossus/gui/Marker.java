@@ -16,12 +16,12 @@ import net.sf.colossus.client.Client;
 
 /**
  * Class Marker implements the GUI for a legion marker.
- * 
+ *
  * TODO this really represents a whole legion (since it shows the height), so
  *      it probably should store a Legion object instead of the marker ID
  * TODO after carve out of GUI stuff Marker should probably not be accessed
  *      by client at all - need cleanup with Legion ?
- * 
+ *
  * @version $Id$
  * @author David Ripton
  */
@@ -62,17 +62,16 @@ public final class Marker extends Chit
     }
 
     /**
-     * Construct a marker 
-     * Scale is Scale of chit 
-     * id is the marker label (aka BK05) 
-     * Client != null will add the height of the stack 
+     * Construct a marker
+     * Scale is Scale of chit
+     * id is the marker label (aka BK05)
+     * Client != null will add the height of the stack
      * inverted == true will invert the marker
      */
-    Marker(int scale, String id, Client client, boolean inverted)
+    private Marker(int scale, String id, Client client, boolean inverted)
     {
-        super(scale, id, inverted);
+        super(scale, id, inverted, client);
         setBackground(Color.BLACK);
-        this.client = client;
 
         if (getId().startsWith("Bk"))
         {

@@ -137,7 +137,7 @@ public final class LegionInfoPanel extends JPanel
         if (showMarker)
         {
             Chit marker = new Chit(scale, legion.getMarkerId(), false, true,
-                false);
+                false, null);
             if (effectiveChitSize == 0)
             {
                 // they should be all the same size
@@ -208,12 +208,13 @@ public final class LegionInfoPanel extends JPanel
             }
             if (hideAll)
             {
-                chit = new Chit(scale, "QuestionMarkMask", false, true, false);
+                chit = new Chit(scale, "QuestionMarkMask", false, true, false,
+                    null);
             }
             else
             {
                 chit = new Chit(scale, imageName, false, !sure,
-                    dubiousAsBlanks);
+                    dubiousAsBlanks, null);
             }
             if (effectiveChitSize == 0)
             {

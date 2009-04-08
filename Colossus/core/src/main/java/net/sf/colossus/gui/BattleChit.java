@@ -63,7 +63,7 @@ public final class BattleChit extends Chit
     public BattleChit(int scale, String id, boolean inverted, int tag,
         BattleHex currentHex, PlayerColor playerColor, Client client)
     {
-        super(scale, id, inverted);
+        super(scale, id, inverted, client);
         if (id == null)
         {
             LOGGER.log(Level.WARNING, "Created BattleChit with null id!");
@@ -71,7 +71,6 @@ public final class BattleChit extends Chit
         this.scale = scale;
         this.tag = tag;
         this.currentHex = currentHex;
-        this.client = client;
         this.color = HTMLColor.stringToColor(playerColor.getName() + "Colossus");
         setBackground(Color.WHITE);
     }
