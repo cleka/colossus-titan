@@ -493,10 +493,22 @@ public class SimpleAI extends AbstractAI
             return doInitialGameSplit(legion.getCurrentHex());
         }
 
+        return findWeakestTwoCritters((LegionClientSide)legion);
+    }
+
+    /**
+     * Find the two weakest creatures in a legion according to
+     * @link {@link #chooseCreaturesToSplitOut(Legion)}
+     *
+     * @param legion
+     * @return List containing the CreatureTypes of the two weakest critters
+     */
+    List<CreatureType> findWeakestTwoCritters(LegionClientSide legion)
+    {
         CreatureType weakest1 = null;
         CreatureType weakest2 = null;
 
-        for (String name : ((LegionClientSide)legion).getContents())
+        for (String name : legion.getContents())
         {
             CreatureType critter = client.getGame().getVariant()
                 .getCreatureByName(name);
@@ -544,13 +556,14 @@ public class SimpleAI extends AbstractAI
             }
         }
 
-        List<CreatureType> creaturesToRemove = new ArrayList<CreatureType>();
+        List<CreatureType> weakestTwoCritters = new ArrayList<CreatureType>();
 
-        creaturesToRemove.add(weakest1);
-        creaturesToRemove.add(weakest2);
+        weakestTwoCritters.add(weakest1);
+        weakestTwoCritters.add(weakest2);
 
-        return creaturesToRemove;
+        return weakestTwoCritters;
     }
+
 
     // From Hugh Moore:
     //
@@ -1254,53 +1267,10 @@ public class SimpleAI extends AbstractAI
                     // too much. So the effect has been reduced.
                     LOGGER.finest("--- 6-HIGH SPECIAL CASE");
 
-                    CreatureType weakest1 = null;
-                    CreatureType weakest2 = null;
+                    List<CreatureType> weakestTwo = findWeakestTwoCritters(legion);
 
-                    for (String name : legion.getContents())
-                    {
-                        // XXX Titan
-                        CreatureType critter = client.getGame().getVariant()
-                            .getCreatureByName(name);
-
-                        if (weakest1 == null)
-                        {
-                            weakest1 = critter;
-                        }
-                        else if (weakest2 == null)
-                        {
-                            weakest2 = critter;
-                        }
-                        else if (getHintedRecruitmentValue(critter, legion,
-                            hintSectionUsed) < getHintedRecruitmentValue(
-                            weakest1, legion, hintSectionUsed))
-                        {
-                            weakest1 = critter;
-                        }
-                        else if (getHintedRecruitmentValue(critter, legion,
-                            hintSectionUsed) < getHintedRecruitmentValue(
-                            weakest2, legion, hintSectionUsed))
-                        {
-                            weakest2 = critter;
-                        }
-                        else if (getHintedRecruitmentValue(critter, legion,
-                            hintSectionUsed) == getHintedRecruitmentValue(
-                            weakest1, legion, hintSectionUsed)
-                            && getHintedRecruitmentValue(critter, legion,
-                                hintSectionUsed) == getHintedRecruitmentValue(
-                                weakest2, legion, hintSectionUsed))
-                        {
-                            if (critter.getName().equals(weakest1.getName()))
-                            {
-                                weakest2 = critter;
-                            }
-                            else if (critter.getName().equals(
-                                weakest2.getName()))
-                            {
-                                weakest1 = critter;
-                            }
-                        }
-                    }
+                    CreatureType weakest1 = weakestTwo.get(0);
+                    CreatureType weakest2 = weakestTwo.get(1);
 
                     int minCreaturePV = Math.min(getHintedRecruitmentValue(
                         weakest1, legion, hintSectionUsed),
