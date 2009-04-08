@@ -254,16 +254,6 @@ public class BattleHex extends Hex
         this.hexsideHazards[i] = hazard;
     }
 
-    // TODO Fix the sources from which BattlelandRandomizerLoader is generated
-    //      so that they use the HazardHexside version instead of the character
-    //      based version of the setter
-    @SuppressWarnings("deprecation")
-    public void setHexsideAsChar(int i, char hexsideChar)
-    {
-        HazardHexside hazard = HazardHexside.getHexsideByCode(hexsideChar);
-        setHexsideHazard(i, hazard);
-    }
-
     /**
      * TODO use side enumeration types instead of integers
      * Return the HazardHexside (enumType) at the hex' side number i

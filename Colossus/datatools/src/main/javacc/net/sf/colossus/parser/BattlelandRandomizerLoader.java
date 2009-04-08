@@ -13,6 +13,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import net.sf.colossus.variant.BattleHex;
+import net.sf.colossus.variant.HazardHexside;
 import net.sf.colossus.variant.HazardTerrain;
 
 /**
@@ -271,7 +272,7 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
         leftover = al;
     }
 
-    private Map<hazardPair,List<randomHexside>> hexsideRandomness = new TreeMap<hazardPair,List<randomHexside>>();
+    private final Map<hazardPair,List<randomHexside>> hexsideRandomness = new TreeMap<hazardPair,List<randomHexside>>();
     @SuppressWarnings("unchecked")
     private class hazardPair implements Comparable
     {
@@ -341,9 +342,10 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
             hexside = h;
             prob = percent(p);
         }
-        char getHexside()
+        @SuppressWarnings("deprecation")
+        HazardHexside getHexsideHazard()
         {
-            return hexside;
+            return HazardHexside.getHexsideByCode(hexside);
         }
         double getProb()
         {
@@ -411,7 +413,8 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
                                         rhs.getProb())
                                     {
                                         attributed = true;
-                                        h[i][j].setHexsideAsChar(k,rhs.getHexside());
+                                        h[i][j].setHexsideHazard(k, rhs
+                                            .getHexsideHazard());
                                     }
                                 }
                             }
@@ -1736,10 +1739,10 @@ public class BattlelandRandomizerLoader implements BattlelandRandomizerLoaderCon
   }
 
 
-  private java.util.List<int[]> jj_expentries = new java.util.ArrayList<int[]>();
+  private final java.util.List<int[]> jj_expentries = new java.util.ArrayList<int[]>();
   private int[] jj_expentry;
   private int jj_kind = -1;
-  private int[] jj_lasttokens = new int[100];
+  private final int[] jj_lasttokens = new int[100];
   private int jj_endpos;
 
   private void jj_add_error_token(int kind, int pos) {

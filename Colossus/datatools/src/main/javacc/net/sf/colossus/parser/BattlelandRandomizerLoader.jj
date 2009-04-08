@@ -339,7 +339,7 @@ public class BattlelandRandomizerLoader
             hazard = hObj;
             prob = percent(p);
         }
-        HazardHexside getHexside()
+        HazardHexside getHexsideHazard()
         {
             return hazard;
         }
