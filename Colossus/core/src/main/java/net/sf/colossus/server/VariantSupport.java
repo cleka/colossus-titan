@@ -58,7 +58,7 @@ public final class VariantSupport
     private static String varFilename = "";
     private static String variantName = "";
     private static String mapName = "";
-    private static String recruitName = "";
+    private static String recruitsFileName = "";
     private static String hintName = "";
     private static List<String> lCreaturesName;
     private static Document varREADME = null;
@@ -281,12 +281,12 @@ public final class VariantSupport
                         + creaturesName);
                 }
 
-                recruitName = vl.getTer();
-                if (recruitName == null)
+                recruitsFileName = vl.getTer();
+                if (recruitsFileName == null)
                 {
-                    recruitName = Constants.defaultTERFile;
+                    recruitsFileName = Constants.defaultTERFile;
                 }
-                LOGGER.log(Level.FINEST, "Variant using TER " + recruitName);
+                LOGGER.log(Level.FINEST, "Variant using TER " + recruitsFileName);
 
                 hintName = vl.getHintName();
                 LOGGER.log(Level.FINEST, "Variant using hint " + hintName);
@@ -350,7 +350,7 @@ public final class VariantSupport
             varFilename = Constants.defaultVARFile;
             variantName = Constants.defaultVarName;
             mapName = Constants.defaultMAPFile;
-            recruitName = Constants.defaultTERFile;
+            recruitsFileName = Constants.defaultTERFile;
             hintName = Constants.defaultHINTFile;
             lCreaturesName.clear();
             lCreaturesName.add(Constants.defaultCREFile);
@@ -464,11 +464,6 @@ public final class VariantSupport
         return mapName;
     }
 
-    public static String getRecruitName()
-    {
-        return recruitName;
-    }
-
     public static List<String> getCreaturesNames()
     {
         return lCreaturesName;
@@ -527,10 +522,10 @@ public final class VariantSupport
         {
             List<String> directories = getVarDirectoriesList();
             InputStream terIS = ResourceLoader.getInputStream(
-                getRecruitName(), directories);
+                recruitsFileName, directories);
             if (terIS == null)
             {
-                throw new FileNotFoundException(getRecruitName());
+                throw new FileNotFoundException(recruitsFileName);
             }
             // TODO parsing into static fields is a side effect of this
             // constructor - that's somehow not the right way...
