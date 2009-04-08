@@ -67,10 +67,10 @@ public class SimpleAI extends AbstractAI
      */
     private static class TerrainBonuses
     {
-        int attackerPower;
-        int defenderPower;
-        int attackerSkill;
-        int defenderSkill;
+        final int attackerPower;
+        final int defenderPower;
+        final int attackerSkill;
+        final int defenderSkill;
 
         TerrainBonuses(int attackerPower, int defenderPower,
             int attackerSkill, int defenderSkill)
@@ -130,11 +130,11 @@ public class SimpleAI extends AbstractAI
         // the other types have only movement bonuses
     }
 
-    int timeLimit = Constants.DEFAULT_AI_TIME_LIMIT; // in s
+    private int timeLimit = Constants.DEFAULT_AI_TIME_LIMIT; // in s
     boolean timeIsUp;
-    int splitsDone = 0;
-    int splitsAcked = 0;
-    List<String> remainingMarkers = null;
+    private int splitsDone = 0;
+    private int splitsAcked = 0;
+    private List<String> remainingMarkers = null;
 
     public SimpleAI(Client client)
     {
@@ -274,8 +274,8 @@ public class SimpleAI extends AbstractAI
 
     public void reinforce(Legion legion)
     {
-        CreatureType recruit = chooseRecruit((LegionClientSide)legion, legion
-            .getCurrentHex());
+        CreatureType recruit = chooseRecruit(((LegionClientSide)legion), legion
+        .getCurrentHex(), false);
         String recruitName = null;
         String recruiterName = null;
         if (recruit != null)
@@ -290,12 +290,6 @@ public class SimpleAI extends AbstractAI
         }
         // Call regardless to advance past recruiting.
         client.doRecruit(legion, recruitName, recruiterName);
-    }
-
-    // support old interface without reserve feature
-    CreatureType chooseRecruit(LegionClientSide legion, MasterHex hex)
-    {
-        return chooseRecruit(legion, hex, false);
     }
 
     CreatureType chooseRecruit(LegionClientSide legion, MasterHex hex,
@@ -468,7 +462,7 @@ public class SimpleAI extends AbstractAI
 
     /** Decide how to split this legion, and return a list of
      *  Creatures to remove.  */
-    List<CreatureType> chooseCreaturesToSplitOut(Legion legion)
+    private List<CreatureType> chooseCreaturesToSplitOut(Legion legion)
     {
         //
         // split a 7 or 8 high legion somehow
@@ -638,7 +632,7 @@ public class SimpleAI extends AbstractAI
     }
 
     /** Keep the gargoyles together. */
-    List<CreatureType> CMUsplit(boolean favorTitan,
+    private List<CreatureType> CMUsplit(boolean favorTitan,
         CreatureType splitCreature, CreatureType nonsplitCreature,
         MasterHex hex)
     {
@@ -696,7 +690,7 @@ public class SimpleAI extends AbstractAI
     }
 
     /** Split the gargoyles. */
-    List<CreatureType> MITsplit(boolean favorTitan,
+    private List<CreatureType> MITsplit(boolean favorTitan,
         CreatureType splitCreature, CreatureType nonsplitCreature,
         MasterHex hex)
     {
@@ -1065,7 +1059,8 @@ public class SimpleAI extends AbstractAI
      * handleVoluntaryMove sees to call this one with several different
      * hexes, so we probably can't remove it]
      */
-    int evaluateMove(LegionClientSide legion, MasterHex hex, boolean moved,
+    private int evaluateMove(LegionClientSide legion, MasterHex hex,
+        boolean moved,
         Map<MasterHex, List<Legion>>[] enemyAttackMap, ValueRecorder value)
     {
         // Avoid using MIN_VALUE and MAX_VALUE because of possible overflow.
@@ -1238,7 +1233,7 @@ public class SimpleAI extends AbstractAI
 
         if (moved)
         {
-            recruit = chooseRecruit(legion, hex);
+            recruit = chooseRecruit(legion, hex, false);
 
             if (recruit != null)
             {
@@ -1466,14 +1461,15 @@ public class SimpleAI extends AbstractAI
         return value.getValue();
     }
 
-    static final int WIN_WITH_MINIMAL_LOSSES = 0;
-    static final int WIN_WITH_HEAVY_LOSSES = 1;
-    static final int DRAW = 2;
-    static final int LOSE_BUT_INFLICT_HEAVY_LOSSES = 3;
-    static final int LOSE = 4;
+    private static final int WIN_WITH_MINIMAL_LOSSES = 0;
+    private static final int WIN_WITH_HEAVY_LOSSES = 1;
+    private static final int DRAW = 2;
+    private static final int LOSE_BUT_INFLICT_HEAVY_LOSSES = 3;
+    private static final int LOSE = 4;
 
     /* can be overloaded by subclass -> not final */
-
+    // TODO turn into some more Javaish code, particularly in terms of naming conventions,
+    // ideally this should be all encapsulated in a configuration object
     double RATIO_WIN_MINIMAL_LOSS()
     {
         return 1.30;
@@ -1830,7 +1826,7 @@ public class SimpleAI extends AbstractAI
 
     /** Return the most important Creature in the list of Creatures or
      * creature name strings.. */
-    CreatureType getBestCreature(List<String> creatures)
+    private CreatureType getBestCreature(List<String> creatures)
     {
         if (creatures == null || creatures.isEmpty())
         {
@@ -2033,7 +2029,8 @@ public class SimpleAI extends AbstractAI
         return true;
     }
 
-    static int getCombatValue(BattleChit chit, MasterBoardTerrain terrain)
+    private static int getCombatValue(BattleChit chit,
+        MasterBoardTerrain terrain)
     {
         int val = chit.getPointValue();
         CreatureType creature = chit.getCreature();
@@ -2057,7 +2054,8 @@ public class SimpleAI extends AbstractAI
     }
 
     /** XXX Inaccurate for titans. */
-    int getCombatValue(CreatureType creature, MasterBoardTerrain terrain)
+    private int getCombatValue(CreatureType creature,
+        MasterBoardTerrain terrain)
     {
         if (creature.isTitan())
         {
@@ -2087,7 +2085,7 @@ public class SimpleAI extends AbstractAI
         return val;
     }
 
-    int getTitanCombatValue(int power)
+    private int getTitanCombatValue(int power)
     {
         int val = power
             * variant.getCreatureByName("Titan")
@@ -2099,7 +2097,7 @@ public class SimpleAI extends AbstractAI
         return val;
     }
 
-    int getCombatValue(Legion legion, MasterBoardTerrain terrain)
+    private int getCombatValue(Legion legion, MasterBoardTerrain terrain)
     {
         int val = 0;
         for (String name : ((LegionClientSide)legion).getContents())
@@ -2254,49 +2252,6 @@ public class SimpleAI extends AbstractAI
 
     }
 
-    // return power and skill of a given creature given
-    // a hazard terrain
-    protected PowerSkill getNativeTerrainValue(CreatureType creature,
-        HazardTerrain terrain, boolean defender)
-    {
-        return calcBonus(creature, terrain.getName(), defender);
-    }
-
-    ////////////////////////////////////////////////////////////////
-    // Battle move stuff
-    ////////////////////////////////////////////////////////////////
-
-    /*
-     Battles are 2-player games within the multiplayer titan game.
-     They must be evaluated within that context.  So not all
-     winning positions are equally good, and not all losing
-     positions are equally bad, since the surviving contents of
-     the winning stack matter. All results that kill the last
-     enemy titan while leaving ours alive are equally good, though,
-     and all results that get our titan killed are equally bad.
-
-     We can greatly simplify analysis by assuming that every strike
-     will score the average number of hits.  This may or may not
-     be good enough.  In particular, exposing a titan in a situation
-     where a slightly above average number of hits will kill it is
-     probably unwise, so we need to hack in some extra caution for
-     titans.
-
-     There are 27 hexes on each battle map.  A fast creature starting
-     near the middle of the map can move to all of them, terrain and
-     other creatures permitting.  So the possible number of different
-     positions after one move is huge.  So we can't really iterate over
-     all possible moves.  We need to consider one creature at a time.
-     But we also need to use team tactics.
-
-     When finding all possible moves, we need to take into account
-     that friendly creatures can block one another's moves.  That
-     gets really complex, so instead assume that they don't when
-     computing all possible moves, and then try to ensure that
-     less important creatures get out of the way of more important
-     ones.
-     */
-
     /** Return a list of critter moves, in best move order. */
     public List<CritterMove> battleMove()
     {
@@ -2346,7 +2301,7 @@ public class SimpleAI extends AbstractAI
         }
     }
 
-    List<CritterMove> findMoveOrder(LegionMove lm)
+    private List<CritterMove> findMoveOrder(LegionMove lm)
     {
         if (lm == null)
         {
@@ -2511,7 +2466,7 @@ public class SimpleAI extends AbstractAI
         return (Math.min(max, mobileCritters));
     }
 
-    protected Collection<LegionMove> findBattleMoves()
+    private Collection<LegionMove> findBattleMoves()
     {
         LOGGER.finest("Called findBattleMoves()");
 
@@ -2623,11 +2578,11 @@ public class SimpleAI extends AbstractAI
         return timer;
     }
 
-    protected final static int MIN_ITERATIONS = 50;
+    private final static int MIN_ITERATIONS = 50;
 
     /** Evaluate all legion moves in the list, and return the best one.
      *  Break out early if the time limit is exceeded. */
-    protected LegionMove findBestLegionMove(Collection<LegionMove> legionMoves)
+    private LegionMove findBestLegionMove(Collection<LegionMove> legionMoves)
     {
         int bestScore = Integer.MIN_VALUE;
         LegionMove best = null;
@@ -2747,13 +2702,13 @@ public class SimpleAI extends AbstractAI
     }
 
     /** This compute the influence of terrain */
-    protected void evaluateCritterMove_Terrain(
+    private void evaluateCritterMove_Terrain(
         final BattleChit critter, // NO_UCD
         ValueRecorder value, final MasterBoardTerrain terrain,
         final BattleHex hex, final int power, final int skill)
     {
-        PowerSkill ps = getNativeTerrainValue(critter.getCreature(), hex
-            .getTerrain(), true);
+        PowerSkill ps = calcBonus(critter.getCreature(), hex
+        .getTerrain().getName(), true);
         int native_power = ps.getPowerAttack() + (ps.getPowerDefend() + power);
         int native_skill = ps.getSkillAttack() + ps.getSkillDefend();
         // Add for sitting in favorable terrain.
@@ -2815,7 +2770,7 @@ public class SimpleAI extends AbstractAI
 
     /** this compute for non-titan attacking critter */
     @SuppressWarnings( { "unused", "deprecation" })
-    protected void evaluateCritterMove_Attacker(
+    private void evaluateCritterMove_Attacker(
         final BattleChit critter, // NO_UCD
         ValueRecorder value, final MasterBoardTerrain terrain,
         final BattleHex hex, final LegionClientSide legion, final int turn)
@@ -2829,7 +2784,7 @@ public class SimpleAI extends AbstractAI
 
     /** this compute for non-titan defending critter */
     @SuppressWarnings("unused")
-    protected void evaluateCritterMove_Defender(final BattleChit critter,
+    private void evaluateCritterMove_Defender(final BattleChit critter,
         ValueRecorder value, final MasterBoardTerrain terrain,
         final BattleHex hex, final LegionClientSide legion, final int turn)
     {
@@ -2877,7 +2832,7 @@ public class SimpleAI extends AbstractAI
     }
 
     @SuppressWarnings("unused")
-    protected void evaluateCritterMove_Rangestrike(final BattleChit critter,
+    private void evaluateCritterMove_Rangestrike(final BattleChit critter,
         final Map<BattleHex, Integer> strikeMap, ValueRecorder value,
         final MasterBoardTerrain terrain, final BattleHex hex,
         final int power, final int skill, final LegionClientSide legion,
@@ -2932,7 +2887,7 @@ public class SimpleAI extends AbstractAI
     }
 
     @SuppressWarnings("unused")
-    protected void evaluateCritterMove_Strike(final BattleChit critter,
+    private void evaluateCritterMove_Strike(final BattleChit critter,
         final Map<BattleHex, Integer> strikeMap, ValueRecorder value,
         final MasterBoardTerrain terrain, final BattleHex hex,
         final int power, final int skill, final LegionClientSide legion,
@@ -3071,7 +3026,7 @@ public class SimpleAI extends AbstractAI
     }
 
     /** strikeMap is optional */
-    protected int evaluateCritterMove(BattleChit critter,
+    private int evaluateCritterMove(BattleChit critter,
         Map<BattleHex, Integer> strikeMap, ValueRecorder value)
     {
         final MasterBoardTerrain terrain = client.getBattleSite().getTerrain();
@@ -3082,8 +3037,8 @@ public class SimpleAI extends AbstractAI
         final BattleHex hex = critter.getCurrentHex();
         final int turn = client.getBattleTurnNumber();
 
-        PowerSkill ps = getNativeTerrainValue(critter.getCreature(), hex
-            .getTerrain(), true);
+        PowerSkill ps = calcBonus(critter.getCreature(), hex
+        .getTerrain().getName(), true);
 
         int native_power = ps.getPowerAttack() + (ps.getPowerDefend() + power);
         int native_skill = ps.getSkillAttack() + ps.getSkillDefend();
@@ -3156,7 +3111,7 @@ public class SimpleAI extends AbstractAI
         return value.getValue();
     }
 
-    protected int evaluateLegionBattleMove(LegionMove lm)
+    private int evaluateLegionBattleMove(LegionMove lm)
     {
         lm.resetEvaluate();
 
