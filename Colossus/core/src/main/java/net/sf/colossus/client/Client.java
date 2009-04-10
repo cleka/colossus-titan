@@ -400,7 +400,7 @@ public final class Client implements IClient, IOracle, IVariant
     // yet in the client UndoStack
     public void undoSplit(Legion splitoff)
     {
-        getServer().undoSplit(splitoff);
+        server.undoSplit(splitoff);
         getOwningPlayer().addMarkerAvailable(splitoff.getMarkerId());
 
         numSplitsThisTurn++;
