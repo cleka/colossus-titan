@@ -594,8 +594,8 @@ final class SocketClientThread extends Thread implements IServer
             boolean inverted = Boolean.valueOf(args.remove(0)).booleanValue();
             int tag = Integer.parseInt(args.remove(0));
             String hexLabel = args.remove(0);
-            BattleHex hex = HexMap.getHexByLabel(client.getGame().getBattleSite().getTerrain(),
-                hexLabel);
+            BattleHex hex = HexMap.getHexByLabel(client.getGame()
+                .getBattleSite().getTerrain(), hexLabel);
             client.placeNewChit(imageName, inverted, tag, hex);
         }
         else if (method.equals(Constants.replayOngoing))
@@ -646,8 +646,7 @@ final class SocketClientThread extends Thread implements IServer
         {
             String playerName = args.remove(0);
             String slayerName = args.remove(0);
-            client.tellPlayerElim(client.getPlayerByName(playerName),
-                (client
+            client.tellPlayerElim(client.getPlayerByName(playerName), (client
                 .getGameClientSide().getPlayerByNameIgnoreNull(slayerName)));
         }
         else if (method.equals(Constants.askConcede))
@@ -812,10 +811,10 @@ final class SocketClientThread extends Thread implements IServer
             String startingHexLabel = args.remove(0);
             String endingHexLabel = args.remove(0);
             boolean undo = Boolean.valueOf(args.remove(0)).booleanValue();
-            BattleHex startingHex = HexMap.getHexByLabel(client.getGame().getBattleSite().getTerrain(),
-                startingHexLabel);
-            BattleHex endingHex = HexMap.getHexByLabel(client.getGame().getBattleSite().getTerrain(),
-                endingHexLabel);
+            BattleHex startingHex = HexMap.getHexByLabel(client.getGame()
+                .getBattleSite().getTerrain(), startingHexLabel);
+            BattleHex endingHex = HexMap.getHexByLabel(client.getGame()
+                .getBattleSite().getTerrain(), endingHexLabel);
             client.tellBattleMove(tag, startingHex, endingHex, undo);
         }
         else if (method.equals(Constants.didMove))
@@ -1230,8 +1229,8 @@ final class SocketClientThread extends Thread implements IServer
             + childMarker + sep + results);
     }
 
-    public void doMove(Legion legion, MasterHex hex,
-        EntrySide entrySide, boolean teleport, String teleportingLord)
+    public void doMove(Legion legion, MasterHex hex, EntrySide entrySide,
+        boolean teleport, String teleportingLord)
     {
         sendToServer(Constants.doMove + sep + legion.getMarkerId() + sep
             + hex.getLabel() + sep + entrySide.getLabel() + sep + teleport

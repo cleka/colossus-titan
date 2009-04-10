@@ -1,7 +1,6 @@
 package net.sf.colossus.client;
 
 
-
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;

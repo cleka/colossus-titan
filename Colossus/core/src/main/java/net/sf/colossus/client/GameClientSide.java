@@ -25,7 +25,6 @@ public class GameClientSide extends Game
 
     private final List<Player> players = new ArrayList<Player>();
 
-
     public GameClientSide(Variant variant, String[] playerNames)
     {
         super(variant, playerNames);
@@ -71,8 +70,7 @@ public class GameClientSide extends Game
         {
             List<String> data = Split.split(":", infoStrings.get(i));
             String playerName = data.get(1);
-            PlayerClientSide info = new PlayerClientSide(this,
-                playerName, i);
+            PlayerClientSide info = new PlayerClientSide(this, playerName, i);
             players.add(info);
             if (playerName.equals(searchedName))
             {
@@ -90,7 +88,6 @@ public class GameClientSide extends Game
             player.update(infoStrings.get(i));
         }
     }
-
 
     protected List<Legion> getEnemyLegions(final Player player)
     {
@@ -168,7 +165,6 @@ public class GameClientSide extends Game
             });
     }
 
-
     public List<LegionClientSide> getLegionsByHex(MasterHex hex)
     {
         assert hex != null : "No hex given to find legions on.";
@@ -219,8 +215,6 @@ public class GameClientSide extends Game
         }
         return null;
     }
-
-
 
     /**
      * Resolve playerName into Player object. Name might be null,
@@ -295,7 +289,6 @@ public class GameClientSide extends Game
         return true;
     }
 
-
     /**
      * Return a set of all hexes with engagements.
      *
@@ -351,7 +344,6 @@ public class GameClientSide extends Game
         return false;
     }
 
-
     public Player getPlayerByMarkerId(String markerId)
     {
         assert markerId != null : "Parameter must not be null";
@@ -359,9 +351,6 @@ public class GameClientSide extends Game
         String shortColor = markerId.substring(0, 2);
         return getPlayerUsingColor(shortColor);
     }
-
-
-
 
     // TODO: move method from Client to here, or even to game.Game?
     @Override

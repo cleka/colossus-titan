@@ -45,7 +45,8 @@ public final class Strike
     Set<BattleHex> findCrittersWithTargets()
     {
         Set<BattleHex> set = new HashSet<BattleHex>();
-        for(BattleChit chit : client.getActiveBattleChits()) {
+        for (BattleChit chit : client.getActiveBattleChits())
+        {
             if (countStrikes(chit, true) > 0)
             {
                 set.add(chit.getCurrentHex());

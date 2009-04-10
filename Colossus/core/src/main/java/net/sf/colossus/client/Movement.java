@@ -64,10 +64,8 @@ public final class Movement
      *  TODO get rid of this String serialization and return a proper data
      *       structure
      */
-    private Set<String> findNormalMoves(MasterHex hex,
-        Legion legion,
-        int roll, int block, int cameFrom,
-        MasterHex fromHex)
+    private Set<String> findNormalMoves(MasterHex hex, Legion legion,
+        int roll, int block, int cameFrom, MasterHex fromHex)
     {
         Set<String> result = new HashSet<String>();
         Player player = legion.getPlayer();
@@ -86,8 +84,7 @@ public final class Movement
                 // Set the entry side relative to the hex label.
                 if (cameFrom != -1)
                 {
-                    result.add(hex.getLabel()
-                        + ":"
+                    result.add(hex.getLabel() + ":"
                         + findEntrySide(hex, cameFrom).getLabel());
                 }
             }
@@ -221,16 +218,16 @@ public final class Movement
         return block;
     }
 
-    public Set<MasterHex> listNormalMoves(Legion legion,
-        MasterHex hex, int movementRoll)
+    public Set<MasterHex> listNormalMoves(Legion legion, MasterHex hex,
+        int movementRoll)
     {
         return listNormalMoves(legion, hex, movementRoll, false, null);
     }
 
     /** Return set of hexLabels describing where this legion can move
      *  without teleporting. */
-    private Set<MasterHex> listNormalMoves(Legion legion,
-        MasterHex hex, int movementRoll, boolean inAdvance, MasterHex fromHex)
+    private Set<MasterHex> listNormalMoves(Legion legion, MasterHex hex,
+        int movementRoll, boolean inAdvance, MasterHex fromHex)
     {
         if (hex == null || (legion.hasMoved() && !inAdvance))
         {
@@ -385,8 +382,8 @@ public final class Movement
     /** Return a Set of Strings "Left" "Right" or "Bottom" describing
      *  possible entry sides.  If the hex is unoccupied, just return
      *  one entry side since it doesn't matter. */
-    Set<EntrySide> listPossibleEntrySides(Legion legion,
-        MasterHex targetHex, boolean teleport)
+    Set<EntrySide> listPossibleEntrySides(Legion legion, MasterHex targetHex,
+        boolean teleport)
     {
         Set<EntrySide> entrySides = new HashSet<EntrySide>();
         int movementRoll = client.getGame().getMovementRoll();

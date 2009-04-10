@@ -214,9 +214,9 @@ public final class Client implements IClient, IOracle, IVariant
      *      would be easier to run the local clients without the detour across the
      *      network and the serialization/deserialization of all objects
      */
-    public Client(String host, int port, String playerName, WhatNextManager whatNextMgr,
-        Server theServer, boolean byWebClient, boolean noOptionsFile,
-        boolean createGUI)
+    public Client(String host, int port, String playerName,
+        WhatNextManager whatNextMgr, Server theServer, boolean byWebClient,
+        boolean noOptionsFile, boolean createGUI)
     {
         this(whatNextMgr, playerName, noOptionsFile, createGUI);
 
@@ -267,8 +267,8 @@ public final class Client implements IClient, IOracle, IVariant
         }
     }
 
-    private Client(WhatNextManager whatNextMgr, String playerName, boolean noOptionsFile,
-        boolean createGUI)
+    private Client(WhatNextManager whatNextMgr, String playerName,
+        boolean noOptionsFile, boolean createGUI)
     {
         assert playerName != null;
 
@@ -586,13 +586,11 @@ public final class Client implements IClient, IOracle, IVariant
         gui.syncCheckboxes();
     }
 
-
     // public for IOracle
     public int getNumPlayers()
     {
         return game.GetNumPlayers();
     }
-
 
     public void updatePlayerInfo(List<String> infoStrings)
     {
@@ -605,7 +603,6 @@ public final class Client implements IClient, IOracle, IVariant
         game.updatePlayerInfo(infoStrings);
         gui.updateStatusScreen();
     }
-
 
     public PlayerClientSide getOwningPlayer()
     {
@@ -1605,7 +1602,8 @@ public final class Client implements IClient, IOracle, IVariant
             Iterator<String> it = carryTargetDescriptions.iterator();
             String desc = it.next();
             String targetHexLabel = desc.substring(desc.length() - 2);
-            BattleHex targetHex = HexMap.getHexByLabel(game.getBattleSite().getTerrain(), targetHexLabel);
+            BattleHex targetHex = HexMap.getHexByLabel(game.getBattleSite()
+                .getTerrain(), targetHexLabel);
             applyCarries(targetHex);
         }
         else
@@ -1710,8 +1708,8 @@ public final class Client implements IClient, IOracle, IVariant
             return;
         }
 
-        if (legion == null || !canRecruit(legion)
-            || !isMyTurn() || !isMyLegion(legion))
+        if (legion == null || !canRecruit(legion) || !isMyTurn()
+            || !isMyLegion(legion))
         {
             // TODO is it good to return quietly here? It seems the method should
             // not have been called in the first place
@@ -2173,8 +2171,7 @@ public final class Client implements IClient, IOracle, IVariant
             while (it.hasNext())
             {
                 CritterMove cm = it.next();
-                if (tag == cm.getTag()
-                    && endingHex.equals(cm.getEndingHex()))
+                if (tag == cm.getTag() && endingHex.equals(cm.getEndingHex()))
                 {
                     // Remove this CritterMove from the list to show
                     // that it doesn't need to be retried.
@@ -2456,8 +2453,7 @@ public final class Client implements IClient, IOracle, IVariant
      *
      *  TODO return value should be List<Creature> or List<CreatureType>
      */
-    private List<String> listTeleportingLords(Legion legion,
-        MasterHex hex)
+    private List<String> listTeleportingLords(Legion legion, MasterHex hex)
     {
         // Needs to be a List not a Set so that it can be passed as
         // an imageList.
@@ -2849,16 +2845,17 @@ public final class Client implements IClient, IOracle, IVariant
         {
             if (!legion.equals(summoner))
             {
-                if (legion.hasSummonable()) {
+                if (legion.hasSummonable())
+                {
                     // check for engagement -- > 1 legion is good enough since
                     // it is not split phase
                     int numInHex = getGameClientSide().getLegionsByHex(
-                        legion.getCurrentHex())
-                        .size();
+                        legion.getCurrentHex()).size();
                     if (numInHex == 1)
-                {
-                    result.add(legion);
-                }}
+                    {
+                        result.add(legion);
+                    }
+                }
             }
         }
         return result;
@@ -2923,7 +2920,6 @@ public final class Client implements IClient, IOracle, IVariant
         }
         return result;
     }
-
 
     public void notifyServer()
     {
@@ -3046,7 +3042,6 @@ public final class Client implements IClient, IOracle, IVariant
         server.doneWithRecruits();
     }
 
-
     public boolean isMyLegion(Legion legion)
     {
         return owningPlayer.equals(legion.getPlayer());
@@ -3102,7 +3097,8 @@ public final class Client implements IClient, IOracle, IVariant
         // Enforce only one split on turn 1.
         if (getTurnNumber() == 1 && numSplitsThisTurn > 0)
         {
-            gui.showMessageDialogAndWait("Can only split once on the first turn");
+            gui
+                .showMessageDialogAndWait("Can only split once on the first turn");
             kickSplit();
             return;
         }
@@ -3410,6 +3406,4 @@ public final class Client implements IClient, IOracle, IVariant
         return TerrainRecruitLoader.getTerrains();
     }
 
-
 }
-

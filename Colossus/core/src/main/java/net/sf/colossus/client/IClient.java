@@ -95,8 +95,8 @@ public interface IClient
         Set<String> carryTargetDescriptions);
 
     public void initBattle(MasterHex masterHex, int battleTurnNumber,
-        Player battleActivePlayer, BattlePhase battlePhase,
-        Legion attacker, Legion defender);
+        Player battleActivePlayer, BattlePhase battlePhase, Legion attacker,
+        Legion defender);
 
     public void cleanupBattle();
 

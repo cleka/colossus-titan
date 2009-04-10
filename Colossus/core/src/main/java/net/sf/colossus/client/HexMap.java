@@ -517,8 +517,7 @@ public class HexMap extends JPanel
     {
         for (GUIBattleHex hex : hexes)
         {
-            if (!hex.isSelected()
-                && battleHex.equals(hex.getHexModel()))
+            if (!hex.isSelected() && battleHex.equals(hex.getHexModel()))
             {
                 hex.select();
                 hex.repaint();
@@ -531,8 +530,7 @@ public class HexMap extends JPanel
     {
         for (GUIBattleHex hex : hexes)
         {
-            if (!hex.isSelected()
-                && battleHexes.contains(hex.getHexModel()))
+            if (!hex.isSelected() && battleHexes.contains(hex.getHexModel()))
             {
                 hex.select();
                 hex.repaint();
@@ -544,15 +542,18 @@ public class HexMap extends JPanel
      *  a match.  Return the hex, or null. */
     protected GUIBattleHex getGUIHexByModelHex(BattleHex battleHex)
     {
-        for(GUIBattleHex hex: hexes){
+        for (GUIBattleHex hex : hexes)
+        {
             if (hex.getHexModel().getLabel().equals(battleHex.getLabel()))
             {
                 return hex;
             }
         }
 
-        assert false: "Could not find GUIBattleHex for " + battleHex.getLabel();
-        LOGGER.log(Level.SEVERE, "Could not find GUIBattleHex " + battleHex.getLabel());
+        assert false : "Could not find GUIBattleHex for "
+            + battleHex.getLabel();
+        LOGGER.log(Level.SEVERE, "Could not find GUIBattleHex "
+            + battleHex.getLabel());
         return null;
     }
 
@@ -560,8 +561,8 @@ public class HexMap extends JPanel
     public static BattleHex getHexByLabel(MasterBoardTerrain terrain,
         String label)
     {
-        assert terrain != null: "We must have a terrain";
-        assert label != null: "We must have a label";
+        assert terrain != null : "We must have a terrain";
+        assert label != null : "We must have a label";
         int x = 0;
         int y = Integer.parseInt(label.substring(1));
         switch (label.charAt(0))
@@ -606,7 +607,7 @@ public class HexMap extends JPanel
             default:
                 String message = "Label " + label + " is invalid";
                 LOGGER.log(Level.SEVERE, message);
-                assert false: message;
+                assert false : message;
         }
         y = 6 - y - Math.abs((x - 3) / 2);
         GUIBattleHex[][] correctHexes = terrainH.get(terrain);
