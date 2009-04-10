@@ -333,7 +333,7 @@ final class SocketClientThread extends Thread implements IServer
             line = initialLine;
             initialLine = null;
         }
-        // if client did set it while we were doing parseLine or 
+        // if client did set it while we were doing parseLine or
         // waited in line above we can skip the next read.
         else if (!goingDown)
         {
@@ -420,7 +420,7 @@ final class SocketClientThread extends Thread implements IServer
         }
         catch (IOException e)
         {
-            // quietly close  
+            // quietly close
         }
         catch (Exception e)
         {
@@ -442,8 +442,8 @@ final class SocketClientThread extends Thread implements IServer
 
         synchronized (isWaitingLock)
         {
-            // If socketReader is currently waiting on the socket, 
-            // we need to interrupt it. 
+            // If socketReader is currently waiting on the socket,
+            // we need to interrupt it.
             if (isWaiting)
             {
                 selfInterrupted = true;
@@ -645,9 +645,9 @@ final class SocketClientThread extends Thread implements IServer
         {
             String playerName = args.remove(0);
             String slayerName = args.remove(0);
-            client.tellPlayerElim(client.getPlayerInfo(playerName),
-                (slayerName.equals("null") ? null : client
-                    .getPlayerInfo(slayerName)));
+            client.tellPlayerElim(client.getPlayerByName(playerName),
+                (client
+                .getPlayerByNameIgnoreNull(slayerName)));
         }
         else if (method.equals(Constants.askConcede))
         {
@@ -711,7 +711,7 @@ final class SocketClientThread extends Thread implements IServer
             String attackerMarkerId = args.remove(0);
             String defenderMarkerId = args.remove(0);
             client.initBattle(resolveHex(masterHexLabel), battleTurnNumber,
-                client.getPlayerInfo(battleActivePlayerName), battlePhase,
+                client.getPlayerByName(battleActivePlayerName), battlePhase,
                 resolveLegion(attackerMarkerId),
                 resolveLegion(defenderMarkerId));
         }
@@ -747,14 +747,14 @@ final class SocketClientThread extends Thread implements IServer
         {
             String activePlayerName = args.remove(0);
             int turnNumber = Integer.parseInt(args.remove(0));
-            client.setupTurnState(client.getPlayerInfo(activePlayerName),
+            client.setupTurnState(client.getPlayerByName(activePlayerName),
                 turnNumber);
         }
         else if (method.equals(Constants.setupSplit))
         {
             String activePlayerName = args.remove(0);
             int turnNumber = Integer.parseInt(args.remove(0));
-            client.setupSplit(client.getPlayerInfo(activePlayerName),
+            client.setupSplit(client.getPlayerByName(activePlayerName),
                 turnNumber);
         }
         else if (method.equals(Constants.setupMove))
@@ -774,21 +774,21 @@ final class SocketClientThread extends Thread implements IServer
             String battleActivePlayerName = args.remove(0);
             int battleTurnNumber = Integer.parseInt(args.remove(0));
             client.setupBattleSummon(client
-                .getPlayerInfo(battleActivePlayerName), battleTurnNumber);
+                .getPlayerByName(battleActivePlayerName), battleTurnNumber);
         }
         else if (method.equals(Constants.setupBattleRecruit))
         {
             String battleActivePlayerName = args.remove(0);
             int battleTurnNumber = Integer.parseInt(args.remove(0));
             client.setupBattleRecruit(client
-                .getPlayerInfo(battleActivePlayerName), battleTurnNumber);
+                .getPlayerByName(battleActivePlayerName), battleTurnNumber);
         }
         else if (method.equals(Constants.setupBattleMove))
         {
             String battleActivePlayerName = args.remove(0);
             int battleTurnNumber = Integer.parseInt(args.remove(0));
             client.setupBattleMove(client
-                .getPlayerInfo(battleActivePlayerName), battleTurnNumber);
+                .getPlayerByName(battleActivePlayerName), battleTurnNumber);
         }
         else if (method.equals(Constants.setupBattleFight))
         {
@@ -796,7 +796,7 @@ final class SocketClientThread extends Thread implements IServer
                 .parseInt(args.remove(0))];
             String battleActivePlayerName = args.remove(0);
             client.setupBattleFight(battlePhase, client
-                .getPlayerInfo(battleActivePlayerName));
+                .getPlayerByName(battleActivePlayerName));
         }
         else if (method.equals(Constants.tellLegionLocation))
         {
@@ -1015,8 +1015,8 @@ final class SocketClientThread extends Thread implements IServer
         {
             // If such a thing happens, there is something seriously wrong,
             // so I don't see a use in continuing the game.
-            // This I call it severe, and log it always, 
-            // not just an assertion. 
+            // This I call it severe, and log it always,
+            // not just an assertion.
             LOGGER.severe("SCT ResolveLegion for " + markerId + " in client "
                 + client.getOwningPlayer().getName() + " gave null!");
         }

@@ -163,10 +163,7 @@ public final class Client implements IClient, IOracle, IVariant
     private Player battleActivePlayer;
     private BattlePhase battlePhase;
 
-    /** One per player. */
     private List<PlayerClientSide> players = new ArrayList<PlayerClientSide>();
-
-    private int numPlayers;
 
     private Movement movement;
     private BattleMovement battleMovement;
@@ -594,7 +591,8 @@ public final class Client implements IClient, IOracle, IVariant
     // public for IOracle
     public int getNumPlayers()
     {
-        return numPlayers;
+        assert players.size() != 0 : "getNumPlayers called before player info set (size==0)!";
+        return players.size();
     }
 
     // TODO cannot pull up yet because client and server side
@@ -614,7 +612,7 @@ public final class Client implements IClient, IOracle, IVariant
 
     public void updatePlayerInfo(List<String> infoStrings)
     {
-        numPlayers = infoStrings.size();
+        int numPlayers = infoStrings.size();
         if (players.size() == 0)
         {
             // first time we get the player infos, store them locally and set our
@@ -639,16 +637,43 @@ public final class Client implements IClient, IOracle, IVariant
         gui.updateStatusScreen();
     }
 
-    PlayerClientSide getPlayerInfo(String playerName)
+    /**
+     * Resolve playerName into Player object. Name might be null,
+     * then returns null.
+     * @param playerName
+     * @return The player object for given player name, null if name was null
+     */
+    PlayerClientSide getPlayerByNameIgnoreNull(String playerName)
     {
-        for (PlayerClientSide info : players)
+        if (playerName == null)
         {
-            if (info.getName().equals(playerName))
+            return null;
+        }
+        else
+        {
+            return getPlayerByName(playerName);
+        }
+    }
+
+    /**
+     * Resolve playerName into Player object.
+     * Name must not be null. If no player for given name found,
+     * it would throw IllegalArgumentException
+     * @param playerName
+     * @return Player object for given name.
+     */
+    PlayerClientSide getPlayerByName(String playerName)
+    {
+        assert playerName != null : "Name for player to find must not be null!";
+
+        for (PlayerClientSide player : players)
+        {
+            if (player.getName().equals(playerName))
             {
-                return info;
+                return player;
             }
         }
-        throw new IllegalArgumentException("No player info found for player '"
+        throw new IllegalArgumentException("No player object found for name '"
             + playerName + "'");
     }
 
