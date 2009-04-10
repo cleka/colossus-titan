@@ -115,9 +115,6 @@ public final class Client implements IClient, IOracle, IVariant
 
     private boolean playersNotInitialized = true;
 
-    // TODO move to Constants?
-    // private static String propNameForceViewBoard = "net.sf.colossus.forceViewBoard";
-
     /**
      * Player who owns this client.
      *
@@ -297,30 +294,6 @@ public final class Client implements IClient, IOracle, IVariant
         InstanceTracker.register(this, "Client " + playerName);
 
         options = new Options(playerName, noOptionsFile);
-
-        /*
-                // Intended for stresstest, to see whats happening, and that graphics
-                // stuff is there done, too.
-                // This here works only if name setting is done "by-type", so that
-                // at least one AI gets a name ending with "1".
-                boolean forceViewBoard = false;
-                String propViewBoard = System.getProperty(propNameForceViewBoard);
-                if (propViewBoard != null && propViewBoard.equalsIgnoreCase("yes"))
-                {
-                    forceViewBoard = true;
-                    options.setOption(Options.showEventViewer, "true");
-                    options.setOption(Options.showStatusScreen, "true");
-                }
-
-                if (!options.getOption(Options.autoPlay)
-                    || (forceViewBoard && (getOwningPlayer().getName().endsWith("1")
-                        || options.getStringOption(Options.playerType).endsWith(
-                            "Human") || options.getStringOption(Options.playerType)
-                        .endsWith("Network"))))
-                {
-                    createGUI = true;
-                }
-        */
 
         if (createGUI)
         {
