@@ -110,7 +110,7 @@ public class ClientGUI implements IClientGUI
     private int viewMode;
     private int recruitChitMode;
 
-    private String gameOverMessage;
+    private boolean gameOverMessageAlreadyShown = false;
 
     protected final Client client;
 
@@ -2688,8 +2688,15 @@ public class ClientGUI implements IClientGUI
         client.doAdditionalCleanup();
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.colossus.gui.IClientGUI#actOnTellGameOver(java.lang.String, boolean)
+    /**
+     *  Update Board and Status screen to reflect the new game over state.
+     *  Show the game over message, or store it to be shown later.
+     *  If dispose will follow soon, don't show message immediately
+     *  (to avoid having the user to have click two boxes), instead store
+     *  it for later to be shown then together with the dispose dialog.
+     *
+     *  @param message         The message ("XXXX wins", or "Draw")
+     *  @param disposeFollows  If true, server will send a dispose message soon
      */
     public void actOnTellGameOver(String message, boolean disposeFollows)
     {
@@ -2710,7 +2717,6 @@ public class ClientGUI implements IClientGUI
             {
                 // tell it later, together with the immediately following
                 // server closed connection message
-                gameOverMessage = message;
             }
             else
             {
@@ -2801,19 +2807,20 @@ public class ClientGUI implements IClientGUI
     {
 
         defaultCursor();
-        board.setServerClosedMessage(client.isGameOver());
+        board.setServerClosedMessage(client.getGame().isGameOver());
 
         String dialogMessage = null;
         String dialogTitle = null;
 
-        if (client.isGameOver())
+        if (client.getGame().isGameOver())
         {
             // don't show again!
-            if (gameOverMessage != null)
+            if (!gameOverMessageAlreadyShown)
             {
-                dialogMessage = "Game over: " + gameOverMessage + "!\n\n"
+                dialogMessage = "Game over: "
+                    + client.getGame().getGameOverMessage() + "!\n\n"
                     + "(connection closed from server side)";
-                gameOverMessage = null;
+                gameOverMessageAlreadyShown = true;
                 dialogTitle = "Game Over: Server closed connection";
             }
             else

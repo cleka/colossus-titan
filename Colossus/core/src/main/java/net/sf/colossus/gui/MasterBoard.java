@@ -584,7 +584,7 @@ public final class MasterBoard extends JPanel
             public void actionPerformed(ActionEvent e)
             {
                 boolean quitAll = false;
-                if (client.isGameOver())
+                if (client.getGame().isGameOver())
                 {
                     quitAll = true;
                 }
@@ -616,7 +616,7 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                if (!client.isGameOver())
+                if (!client.getGame().isGameOver())
                 {
                     String[] options = new String[2];
                     options[0] = "Yes";
@@ -728,7 +728,7 @@ public final class MasterBoard extends JPanel
             public void actionPerformed(ActionEvent e)
             {
                 boolean closeBoard = false;
-                if (client.isGameOver() || !client.isAlive())
+                if (client.getGame().isGameOver() || !client.isAlive())
                 {
                     closeBoard = true;
                 }

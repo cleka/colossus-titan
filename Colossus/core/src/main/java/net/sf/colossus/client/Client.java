@@ -519,7 +519,7 @@ public final class Client implements IClient, IOracle, IVariant
      *  connections when they want to quit in a hurry. */
     public void withdrawFromGame()
     {
-        if (!isGameOver())
+        if (!game.isGameOver())
         {
             server.withdrawFromGame();
         }
@@ -540,7 +540,7 @@ public final class Client implements IClient, IOracle, IVariant
     private void kickMoves()
     {
         if (isMyTurn() && options.getOption(Options.autoMasterMove)
-            && !isGameOver() && !replayOngoing)
+            && !game.isGameOver() && !replayOngoing)
         {
             doAutoMoves();
         }
@@ -1406,11 +1406,6 @@ public final class Client implements IClient, IOracle, IVariant
         gui.actOnTellGameOver(message, disposeFollows);
     }
 
-    public boolean isGameOver()
-    {
-        return game.isGameOver();
-    }
-
     public void doFight(MasterHex hex)
     {
         if (!isMyTurn())
@@ -1600,7 +1595,7 @@ public final class Client implements IClient, IOracle, IVariant
             // if AI just got NAK for split, there's no point for
             // kickSplit again. Instead, let's just be DoneWithSplits.
             if (isMyTurn() && options.getOption(Options.autoSplit)
-                && !isGameOver())
+                && !game.isGameOver())
             {
                 // XXX This may cause advancePhance illegally messages,
                 // if e.g. SimpleAI fires two splits, both gets rejected,
@@ -1993,7 +1988,7 @@ public final class Client implements IClient, IOracle, IVariant
     private void kickSplit()
     {
         if (isMyTurn() && options.getOption(Options.autoSplit)
-            && !isGameOver())
+            && !game.isGameOver())
         {
             boolean done = ai.split();
             if (done)
@@ -2040,7 +2035,7 @@ public final class Client implements IClient, IOracle, IVariant
 
         gui.actOnSetupMuster();
 
-        // I changed the "&& !isGameOver()" to "&& I am not dead";
+        // I changed the "&& !game.isGameOver()" to "&& I am not dead";
         // before, this makes auto-recruit stop working also for human
         // when they did win against all others and continue playing
         // (just for growing bigger creatures ;-)
@@ -3173,7 +3168,7 @@ public final class Client implements IClient, IOracle, IVariant
         gui.boardActOnUndidSplit(survivor, turn);
 
         if (isMyTurn() && this.phase == Phase.SPLIT && !replayOngoing
-            && options.getOption(Options.autoSplit) && !isGameOver())
+            && options.getOption(Options.autoSplit) && !game.isGameOver())
         {
             boolean done = ai.splitCallback(null, null);
             if (done)
@@ -3450,7 +3445,7 @@ public final class Client implements IClient, IOracle, IVariant
         // check also for phase, because delayed callbacks could come
         // after our phase is over but activePlayerName not updated yet.
         if (isMyTurn() && this.phase == Phase.SPLIT && !replayOngoing
-            && options.getOption(Options.autoSplit) && !isGameOver())
+            && options.getOption(Options.autoSplit) && !game.isGameOver())
         {
             boolean done = ai.splitCallback(parent, child);
             if (done)
