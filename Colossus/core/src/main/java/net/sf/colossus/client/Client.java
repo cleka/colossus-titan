@@ -1866,6 +1866,11 @@ public final class Client implements IClient, IOracle, IVariant
 
     }
 
+    public void undoRecruit(Legion legion)
+    {
+        server.undoRecruit(legion);
+    }
+
     public void undidRecruit(Legion legion, String recruitName)
     {
         boolean wasReinforcement;
@@ -2234,6 +2239,11 @@ public final class Client implements IClient, IOracle, IVariant
     public void doBattleMove(int tag, BattleHex hex)
     {
         server.doBattleMove(tag, hex);
+    }
+
+    public void undoBattleMove(BattleHex hex)
+    {
+        server.undoBattleMove(hex);
     }
 
     private void markBattleMoveSuccessful(int tag, BattleHex endingHex)
@@ -2657,6 +2667,11 @@ public final class Client implements IClient, IOracle, IVariant
             teleportingLord, splitLegionHasForcedMove);
 
         kickMoves();
+    }
+
+    public void undoMove(Legion legion)
+    {
+        server.undoMove(legion);
     }
 
     public void undidMove(Legion legion, MasterHex formerHex,
@@ -3170,13 +3185,6 @@ public final class Client implements IClient, IOracle, IVariant
                 doneWithSplits();
             }
         }
-    }
-
-    // TODO HACK to reduce work...
-
-    public IServer getServer()
-    {
-        return server;
     }
 
     /**

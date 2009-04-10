@@ -2314,7 +2314,7 @@ public class ClientGUI implements IClientGUI
         if (!isUndoStackEmpty())
         {
             String markerId = (String)popUndoStack();
-            client.getServer().undoRecruit(client.getLegion(markerId));
+            getClient().undoRecruit(client.getLegion(markerId));
         }
     }
 
@@ -2324,7 +2324,7 @@ public class ClientGUI implements IClientGUI
         {
             undoStack.remove(legion.getMarkerId());
         }
-        client.getServer().undoRecruit(legion);
+        getClient().undoRecruit(legion);
     }
 
     void undoAllSplits()
@@ -2358,7 +2358,7 @@ public class ClientGUI implements IClientGUI
         if (!isUndoStackEmpty())
         {
             String markerId = (String)popUndoStack();
-            client.getServer().undoMove(client.getLegion(markerId));
+            getClient().undoMove(client.getLegion(markerId));
         }
     }
 
@@ -2368,7 +2368,7 @@ public class ClientGUI implements IClientGUI
         {
             String hexLabel = (String)popUndoStack();
             BattleHex hex = battleBoard.getBattleHexByLabel(hexLabel);
-            client.getServer().undoBattleMove(hex);
+            getClient().undoBattleMove(hex);
         }
     }
 
