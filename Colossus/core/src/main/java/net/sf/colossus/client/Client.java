@@ -1708,7 +1708,7 @@ public final class Client implements IClient, IOracle, IVariant
 
     public void showMessageDialog(String message)
     {
-        gui.showMessageDialog(message);
+        gui.showMessageDialogAndWait(message);
     }
 
     public void cleanupBattle()
@@ -3347,14 +3347,14 @@ public final class Client implements IClient, IOracle, IVariant
         // Need a legion marker to split.
         if (markersAvailable.size() < 1)
         {
-            gui.showMessageDialog("No legion markers");
+            gui.showMessageDialogAndWait("No legion markers");
             kickSplit();
             return;
         }
         // Legion must be tall enough to split.
         if (legion.getHeight() < 4)
         {
-            gui.showMessageDialog("Legion is too short to split");
+            gui.showMessageDialogAndWait("Legion is too short to split");
             kickSplit();
             return;
         }
@@ -3362,7 +3362,7 @@ public final class Client implements IClient, IOracle, IVariant
         // Enforce only one split on turn 1.
         if (getTurnNumber() == 1 && numSplitsThisTurn > 0)
         {
-            gui.showMessageDialog("Can only split once on the first turn");
+            gui.showMessageDialogAndWait("Can only split once on the first turn");
             kickSplit();
             return;
         }

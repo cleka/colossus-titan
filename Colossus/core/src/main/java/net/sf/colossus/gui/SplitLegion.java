@@ -236,7 +236,7 @@ final class SplitLegion extends KDialog
         {
             if (showMessage)
             {
-                gui.showMessageDialog("Legion too short.");
+                gui.showMessageDialogAndWait("Legion too short.");
             }
             return false;
         }
@@ -246,7 +246,7 @@ final class SplitLegion extends KDialog
             {
                 if (showMessage)
                 {
-                    gui.showMessageDialog("Initial split must be 4-4.");
+                    gui.showMessageDialogAndWait("Initial split must be 4-4.");
                 }
                 return false;
             }
@@ -268,7 +268,7 @@ final class SplitLegion extends KDialog
             {
                 if (showMessage)
                 {
-                    gui.showMessageDialog("Each stack must have one lord.");
+                    gui.showMessageDialogAndWait("Each stack must have one lord.");
                 }
                 return false;
             }

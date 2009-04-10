@@ -2521,7 +2521,7 @@ public class ClientGUI implements IClientGUI
             else
             {
                 // show right away. Connection closed might come or not.
-                showMessageDialog(message);
+                showMessageDialogAndWait(message);
             }
         }
     }
@@ -2533,8 +2533,16 @@ public class ClientGUI implements IClientGUI
 
     String message = "";
 
-    public void showMessageDialog(String message)
+    public void showMessageDialogAndWait(String message)
     {
+        // Don't bother showing messages to AI players.
+        if (getOwningPlayer().isAI())
+        {
+            LOGGER.info("Message for AI player "
+                + getOwningPlayer().getName() + ": " + message);
+            return;
+        }
+
         if (SwingUtilities.isEventDispatchThread())
         {
             doShowMessageDialog(message);
@@ -2561,22 +2569,30 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    public void showNonModalMessageDialog(String message)
+    void doShowMessageDialog(String message)
     {
-        if (SwingUtilities.isEventDispatchThread())
+        // For humans in autoplay do not show messages...
+        if (options.getOption(Options.autoPlay))
         {
-            doShowMessageDialog(message);
-        }
-        else
-        {
-            this.message = message;
-            SwingUtilities.invokeLater(new Runnable()
+            // ... suppress any other messages than the game over message ...
+            String goMessage = getClient().getGame().getGameOverMessage();
+            if ((goMessage != null && message.contains(goMessage))
+            // but suppress even that if autoQuit is on
+                // (=> remote stresstest)
+                && !options.getOption(Options.autoQuit))
             {
-                public void run()
-                {
-                    doShowMessageDialog(getMessage());
-                }
-            });
+                // go on to showing
+            }
+            else
+            {
+                // do not show it, return instead.
+                return;
+            }
+        }
+        JFrame frame = getMapOrBoardFrame();
+        if (frame != null)
+        {
+            JOptionPane.showMessageDialog(frame, message);
         }
     }
 
@@ -2593,7 +2609,6 @@ public class ClientGUI implements IClientGUI
 
     public void closePerhapsWithMessage()
     {
-
         defaultCursor();
         board.setServerClosedMessage(client.getGame().isGameOver());
 
@@ -2602,9 +2617,9 @@ public class ClientGUI implements IClientGUI
 
         if (client.getGame().isGameOver())
         {
-            // don't show again!
             if (!gameOverMessageAlreadyShown)
             {
+                // don't show again!
                 dialogMessage = "Game over: "
                     + client.getGame().getGameOverMessage() + "!\n\n"
                     + "(connection closed from server side)";
@@ -2625,32 +2640,6 @@ public class ClientGUI implements IClientGUI
 
         JOptionPane.showMessageDialog(getMapOrBoardFrame(), dialogMessage,
             dialogTitle, JOptionPane.INFORMATION_MESSAGE);
-    }
-
-    // XXX TODO may partly belong back to client???
-    void doShowMessageDialog(String message)
-    {
-        // Don't bother showing messages to AI players.  Perhaps we
-        // should log them.
-        if (options.getOption(Options.autoPlay))
-        {
-            boolean isAI = getOwningPlayer().isAI();
-            if ((message.equals("Draw") || message.endsWith(" wins")) && !isAI
-                && !options.getOption(Options.autoQuit))
-            {
-                // show it for humans, even in autoplay,
-                //  but not when autoQuit set (=> remote stresstest)
-            }
-            else
-            {
-                return;
-            }
-        }
-        JFrame frame = getMapOrBoardFrame();
-        if (frame != null)
-        {
-            JOptionPane.showMessageDialog(frame, message);
-        }
     }
 
     private JFrame getMapOrBoardFrame()

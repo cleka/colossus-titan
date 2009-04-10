@@ -716,19 +716,13 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public void showMessageDialog(String message)
+    public void showMessageDialogAndWait(String message)
     {
         // TODO Auto-generated method stub
 
     }
 
     public void showNegotiate(Legion attacker, Legion defender)
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void showNonModalMessageDialog(String message)
     {
         // TODO Auto-generated method stub
 

@@ -329,9 +329,7 @@ public interface IClientGUI
     public abstract void actOnTellGameOver(String message,
         boolean disposeFollows);
 
-    public abstract void showMessageDialog(String message);
-
-    public abstract void showNonModalMessageDialog(String message);
+    public abstract void showMessageDialogAndWait(String message);
 
     // called by WebClient
     public abstract void doConfirmAndQuit();

@@ -216,7 +216,7 @@ final class Negotiate extends KDialog
         // Ensure that at least one legion is completely eliminated.
         if (attackersLeft && defendersLeft)
         {
-            gui.showMessageDialog("At least one legion must"
+            gui.showMessageDialogAndWait("At least one legion must"
                 + " be eliminated.");
             return;
         }
@@ -251,7 +251,7 @@ final class Negotiate extends KDialog
                 Chit chit = it.next();
                 if (chit.isDead() && chit.getId().startsWith(Constants.titan))
                 {
-                    gui.showMessageDialog("Titan cannot die unless his"
+                    gui.showMessageDialogAndWait("Titan cannot die unless his"
                         + " whole stack dies.");
                     return;
                 }
