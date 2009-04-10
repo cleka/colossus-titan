@@ -245,7 +245,7 @@ public class SimpleAI extends AbstractAI
         // Do not recruit if this legion is a scooby snack.
         double scoobySnackFactor = 0.15;
         int minimumSizeToRecruit = (int)(scoobySnackFactor * client
-            .getAverageLegionPointValue());
+            .getGameClientSide().getAverageLegionPointValue());
         for (LegionClientSide legion : client.getOwningPlayer().getLegions())
         {
             if (client.canRecruit(legion)
@@ -369,7 +369,8 @@ public class SimpleAI extends AbstractAI
                 int safeMoves = 0;
                 for (MasterHex hex : moves)
                 {
-                    if (client.getEnemyLegions(hex, player).size() == 0)
+                    if (client.getGameClientSide()
+                        .getEnemyLegions(hex, player).size() == 0)
                     {
                         safeMoves++;
                         if (!goodRecruit
@@ -380,7 +381,8 @@ public class SimpleAI extends AbstractAI
                     }
                     else
                     {
-                        Legion enemy = client.getFirstEnemyLegion(hex, player);
+                        Legion enemy = client.getGameClientSide()
+                            .getFirstEnemyLegion(hex, player);
                         int result = estimateBattleResults(legion, true,
                             enemy, hex);
 
@@ -867,7 +869,8 @@ public class SimpleAI extends AbstractAI
                 // Do not consider moves onto hexes where we already have a
                 // legion. This is sub-optimal since the legion in this hex
                 // may be able to move and "get out of the way"
-                if (client.getFriendlyLegions(hex, player).size() > 0)
+                if (client.getGameClientSide().getFriendlyLegions(hex, player)
+                    .size() > 0)
                 {
                     continue;
                 }
@@ -921,6 +924,7 @@ public class SimpleAI extends AbstractAI
         for (Legion legion : player.getLegions())
         {
             List<Legion> friendlyLegions = client
+                .getGameClientSide()
                 .getFriendlyLegions(legion.getCurrentHex(), player);
 
             if (friendlyLegions.size() > 1
@@ -1071,7 +1075,8 @@ public class SimpleAI extends AbstractAI
 
         //int value = 0;
         // consider making an attack
-        final Legion enemyLegion = client.getFirstEnemyLegion(hex, legion
+        final Legion enemyLegion = client.getGameClientSide()
+            .getFirstEnemyLegion(hex, legion
             .getPlayer());
 
         if (enemyLegion != null)
@@ -1135,7 +1140,8 @@ public class SimpleAI extends AbstractAI
                     {
                         // unless we can win the game with this attack
                         if ((enemyLegion).hasTitan()
-                            && client.getNumLivingPlayers() == 2)
+                            && client.getGameClientSide()
+                                .getNumLivingPlayers() == 2)
                         {
                             // do it and win the game
                             value.add(enemyPointValue,
@@ -1192,7 +1198,7 @@ public class SimpleAI extends AbstractAI
                         // Arbitrary value for killing a player but
                         // scoring no points: it's worth a little
                         // If there are only 2 players, we should do this.
-                        if (client.getNumLivingPlayers() == 2)
+                        if (client.getGameClientSide().getNumLivingPlayers() == 2)
                         {
                             value.resetTo(WIN_GAME, "WinGame");
                         }
@@ -1350,7 +1356,8 @@ public class SimpleAI extends AbstractAI
                 // maximize over choices and average over die rolls.
                 // this would be essentially minimax but ignoring the
                 // others players ability to move.
-                Legion enemy = client.getFirstEnemyLegion(nextHex, legion
+                Legion enemy = client.getGameClientSide().getFirstEnemyLegion(
+                    nextHex, legion
                     .getPlayer());
 
                 if (enemy != null
@@ -1594,7 +1601,7 @@ public class SimpleAI extends AbstractAI
 
     public MasterHex pickEngagement()
     {
-        Set<MasterHex> hexes = client.findEngagements();
+        Set<MasterHex> hexes = client.getGameClientSide().findEngagements();
 
         // Bail out early if we have no real choice.
         int numChoices = hexes.size();
@@ -1634,8 +1641,10 @@ public class SimpleAI extends AbstractAI
         //    over 100-point boundaries.
 
         Player player = client.getActivePlayer();
-        Legion attacker = client.getFirstFriendlyLegion(hex, player);
-        Legion defender = client.getFirstEnemyLegion(hex, player);
+        Legion attacker = client.getGameClientSide().getFirstFriendlyLegion(
+            hex, player);
+        Legion defender = client.getGameClientSide().getFirstEnemyLegion(hex,
+            player);
         int value = 0;
 
         final int result = estimateBattleResults(attacker, defender, hex);

@@ -167,7 +167,8 @@ public class RevealEvent
                 && rc.getPlainName().equals(Constants.titan))
             {
                 Player player = (realPlayer != null ? realPlayer
-                    : client.getPlayerByMarkerId(markerId));
+                    : client
+                    .getGameClientSide().getPlayerByMarkerId(markerId));
 
                 if (player == null)
                 {

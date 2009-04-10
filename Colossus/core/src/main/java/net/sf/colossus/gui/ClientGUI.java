@@ -1230,7 +1230,8 @@ public class ClientGUI implements IClientGUI
 
     public void actOnNextEngagement()
     {
-        if (client.findEngagements().isEmpty() && board != null)
+        if (client.getGameClientSide().findEngagements().isEmpty()
+            && board != null)
         {
             board.enableDoneAction();
         }
@@ -2094,7 +2095,7 @@ public class ClientGUI implements IClientGUI
     {
         boolean foundProblem = false;
 
-        for (Player p : client.getPlayers())
+        for (Player p : client.getGameClientSide().getPlayers())
         {
             if (p.isDead())
             {

@@ -1258,7 +1258,8 @@ public final class MasterBoard extends JPanel
         {
             return;
         }
-        List<LegionClientSide> legions = client.getLegionsByHex(masterHex);
+        List<LegionClientSide> legions = client.getGameClientSide()
+            .getLegionsByHex(masterHex);
 
         int numLegions = legions.size();
         if (numLegions == 0)
@@ -1374,7 +1375,7 @@ public final class MasterBoard extends JPanel
 
     void highlightEngagements()
     {
-        Set<MasterHex> set = client.findEngagements();
+        Set<MasterHex> set = client.getGameClientSide().findEngagements();
         unselectAllHexes();
         selectHexes(set);
     }
@@ -1460,7 +1461,7 @@ public final class MasterBoard extends JPanel
         synchronized (legionToMarkerMap)
         {
             legionToMarkerMap.clear();
-            for (Player player : client.getPlayers())
+            for (Player player : client.getGameClientSide().getPlayers())
             {
                 for (Legion legion : player.getLegions())
                 {

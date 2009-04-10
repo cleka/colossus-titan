@@ -111,7 +111,7 @@ abstract public class AbstractAI implements AI
             enemyMap[i] = new HashMap<MasterHex, List<Legion>>();
         }
         // for each enemy player
-        for (Player enemyPlayer : client.getPlayers())
+        for (Player enemyPlayer : client.getGameClientSide().getPlayers())
         {
             if (enemyPlayer == player)
             {

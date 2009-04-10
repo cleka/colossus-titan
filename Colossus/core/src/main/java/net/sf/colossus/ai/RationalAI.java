@@ -950,6 +950,7 @@ public class RationalAI extends SimpleAI
         for (Legion legion : player.getLegions())
         {
             List<Legion> friendlyLegions = client
+                .getGameClientSide()
                 .getFriendlyLegions(legion.getCurrentHex(), player);
 
             if (friendlyLegions.size() > 1)
@@ -960,6 +961,7 @@ public class RationalAI extends SimpleAI
         for (MasterHex hex : unsplitHexes)
         {
             List<Legion> friendlyLegions = client
+                .getGameClientSide()
                 .getFriendlyLegions(hex, player);
 
             // pick just any legion for asking the getMovement
@@ -1011,7 +1013,8 @@ public class RationalAI extends SimpleAI
                     {
                         // The set of moves includes still hexes occupied by our own legions.
                         List<Legion> targetOwnLegions = client
-                            .getFriendlyLegions(targetHex, player);
+                            .getGameClientSide().getFriendlyLegions(targetHex,
+                                player);
                         if (targetOwnLegions.size() == 0)
                         {
                             int value = evaluateMove(minLegion, targetHex,
@@ -1081,6 +1084,7 @@ public class RationalAI extends SimpleAI
                 {
                     // The set of moves includes still hexes occupied by our own legions.
                     List<Legion> targetOwnLegions = client
+                        .getGameClientSide()
                         .getFriendlyLegions(targetHex, player);
                     if (targetOwnLegions.size() == 0)
                     {
@@ -1146,6 +1150,7 @@ public class RationalAI extends SimpleAI
         for (MasterHex targetHex : minValueMoves)
         {
             List<Legion> targetOwnLegions = client
+                .getGameClientSide()
                 .getFriendlyLegions(targetHex, player);
             if (targetOwnLegions.size() == 0)
             {
@@ -1593,7 +1598,7 @@ public class RationalAI extends SimpleAI
                         // do it and win the game, there is only 1 human
                         value = 1000 + (int)result.getExpectedValue() * 1000;
                     }
-                    else if (client.getNumLivingPlayers() == 2
+                    else if (client.getGameClientSide().getNumLivingPlayers() == 2
                         && (attackerPointValue - result.getAttackerDead()) > TITAN_SURVIVAL)
                     {
                         // do it and win the game
@@ -1632,7 +1637,7 @@ public class RationalAI extends SimpleAI
             else if (defenderTitan)
             {
                 value = (1000 + (int)result.getExpectedValue() * 1000)
-                    / client.getNumLivingPlayers();
+                    / client.getGameClientSide().getNumLivingPlayers();
             }
         }
         else
@@ -1649,7 +1654,7 @@ public class RationalAI extends SimpleAI
                     // killed since we may be able to attack with more
                     // than one legion
                     value = result.getDefenderDead() * 100
-                        / client.getNumLivingPlayers() / 2;
+                        / client.getGameClientSide().getNumLivingPlayers() / 2;
                 }
             }
             else if (attacker.hasTitan())
@@ -1659,7 +1664,7 @@ public class RationalAI extends SimpleAI
                 // we pick the least losing battle
 
                 value = (-1000 + (int)result.getExpectedValue() * 1000)
-                    / client.getNumLivingPlayers();
+                    / client.getGameClientSide().getNumLivingPlayers();
             }
         }
 
@@ -1688,7 +1693,8 @@ public class RationalAI extends SimpleAI
     {
         int value = 0;
         // consider making an attack
-        final Legion defender = client.getFirstEnemyLegion(hex, attacker
+        final Legion defender = client.getGameClientSide()
+            .getFirstEnemyLegion(hex, attacker
             .getPlayer());
 
         if (defender != null)
@@ -2179,7 +2185,7 @@ public class RationalAI extends SimpleAI
 
         // tally results
         // divide value of enemy killed legions by # of other players
-        int numOtherPlayers = client.getNumLivingPlayers() - 1;
+        int numOtherPlayers = client.getGameClientSide().getNumLivingPlayers() - 1;
 
         if (I_HATE_HUMANS)
         {

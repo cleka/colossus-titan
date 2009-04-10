@@ -6,12 +6,10 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
@@ -116,8 +114,6 @@ public final class Client implements IClient, IOracle, IVariant
     private final Options options;
 
     private boolean playersNotInitialized = true;
-
-    private final List<Player> players = new ArrayList<Player>();
 
     // TODO move to Constants?
     // private static String propNameForceViewBoard = "net.sf.colossus.forceViewBoard";
@@ -590,142 +586,30 @@ public final class Client implements IClient, IOracle, IVariant
         gui.syncCheckboxes();
     }
 
-    // to be moved to GameClientSide soon
-    public int gameGetNumPlayers()
-    {
-        assert players.size() != 0 : "getNumPlayers called before player info set (size==0)!";
-        return players.size();
-    }
 
     // public for IOracle
     public int getNumPlayers()
     {
-        return gameGetNumPlayers();
+        return game.GetNumPlayers();
     }
 
-    // TODO cannot pull up yet because client and server side
-    // have different (own) data structures overriding the one in game.Game
-    public int getNumLivingPlayers()
-    {
-        int alive = 0;
-        for (Player info : players)
-        {
-            if (!info.isDead())
-            {
-                alive++;
-            }
-        }
-        return alive;
-    }
 
     public void updatePlayerInfo(List<String> infoStrings)
     {
         if (playersNotInitialized)
         {
             String searchName = this.owningPlayer.getName();
-            this.owningPlayer = gameInitPlayerInfo(infoStrings, searchName);
+            this.owningPlayer = game.initPlayerInfo(infoStrings, searchName);
+            playersNotInitialized = false;
         }
-        gameUpdatePlayerInfo(infoStrings);
-    }
-
-    // to be moved to GameClientSide soon
-    public PlayerClientSide gameInitPlayerInfo(List<String> infoStrings,
-        String searchedName)
-    {
-        int numPlayers = infoStrings.size();
-        PlayerClientSide owningPlayer = null;
-
-        // first time we get the player infos, store them locally and set our
-        // own, too -- which has been a fake until now
-        for (int i = 0; i < numPlayers; i++)
-        {
-            List<String> data = Split.split(":", infoStrings.get(i));
-            String playerName = data.get(1);
-            PlayerClientSide info = new PlayerClientSide(getGame(),
-                playerName, i);
-            players.add(info);
-            if (playerName.equals(searchedName))
-            {
-                owningPlayer = info;
-            }
-        }
-        playersNotInitialized = false;
-        return owningPlayer;
-    }
-
-    // to be moved to GameClientSide soon
-    public void gameUpdatePlayerInfo(List<String> infoStrings)
-    {
-        for (int i = 0; i < infoStrings.size(); i++)
-        {
-            PlayerClientSide player = (PlayerClientSide)players.get(i);
-            player.update(infoStrings.get(i));
-        }
+        game.updatePlayerInfo(infoStrings);
         gui.updateStatusScreen();
     }
 
-    /**
-     * Resolve playerName into Player object. Name might be null,
-     * then returns null.
-     * @param playerName
-     * @return The player object for given player name, null if name was null
-     */
-    Player getPlayerByNameIgnoreNull(String playerName)
-    {
-        if (playerName == null)
-        {
-            return null;
-        }
-        else
-        {
-            return getPlayerByName(playerName);
-        }
-    }
-
-    /**
-     * Resolve playerName into Player object.
-     * Name must not be null. If no player for given name found,
-     * it would throw IllegalArgumentException
-     * @param playerName
-     * @return Player object for given name.
-     */
-    Player getPlayerByName(String playerName)
-    {
-        assert playerName != null : "Name for player to find must not be null!";
-
-        for (Player player : players)
-        {
-            if (player.getName().equals(playerName))
-            {
-                return player;
-            }
-        }
-        throw new IllegalArgumentException("No player object found for name '"
-            + playerName + "'");
-    }
 
     public PlayerClientSide getOwningPlayer()
     {
         return owningPlayer;
-    }
-
-    public List<Player> getPlayers()
-    {
-        return Collections.unmodifiableList(players);
-    }
-
-    /** Return the average point value of all legions in the game. */
-    public int getAverageLegionPointValue()
-    {
-        int totalValue = 0;
-        int totalLegions = 0;
-
-        for (Player player : players)
-        {
-            totalLegions += player.getLegions().size();
-            totalValue += player.getTotalPointValue();
-        }
-        return (int)(Math.round((double)totalValue / totalLegions));
     }
 
     // TODO probably unnecessary?
@@ -883,7 +767,6 @@ public final class Client implements IClient, IOracle, IVariant
         this.movement = null;
         this.battleMovement = null;
         this.strike = null;
-        players.clear();
         playersNotInitialized = true;
 
         net.sf.colossus.server.CustomRecruitBase.reset();
@@ -1008,7 +891,8 @@ public final class Client implements IClient, IOracle, IVariant
      */
     public LegionClientSide getLegion(String markerId)
     {
-        PlayerClientSide player = (PlayerClientSide)getPlayerByMarkerId(markerId);
+        PlayerClientSide player = (PlayerClientSide)game
+            .getPlayerByMarkerId(markerId);
         LegionClientSide legion = player.getLegionByMarkerId(markerId);
         // Added this logging only for the purpose that one gets a clue
         // when during the game this happened - the assertion appears only
@@ -1388,7 +1272,7 @@ public final class Client implements IClient, IOracle, IVariant
         }
 
         // No point in teleporting if entry side is moot.
-        if (!isOccupied(hex))
+        if (!game.isOccupied(hex))
         {
             return false;
         }
@@ -1967,9 +1851,10 @@ public final class Client implements IClient, IOracle, IVariant
         return recruiterName;
     }
 
+    // TODO move to GameClientSide
     private void resetLegionMovesAndRecruitData()
     {
-        for (Player player : players)
+        for (Player player : game.getPlayers())
         {
             for (LegionClientSide legion : ((PlayerClientSide)player)
                 .getLegions())
@@ -2018,20 +1903,6 @@ public final class Client implements IClient, IOracle, IVariant
         kickSplit();
     }
 
-    // TODO compare with GameServerSide.getNumHumansRemaining()
-    // and pull up
-    public boolean onlyAIsRemain()
-    {
-        for (Player p : players)
-        {
-            if (!p.isAI() && !p.isDead())
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-
     private void kickSplit()
     {
         if (isMyTurn() && options.getOption(Options.autoSplit)
@@ -2068,7 +1939,7 @@ public final class Client implements IClient, IOracle, IVariant
             }
             else
             {
-                if (findEngagements().isEmpty())
+                if (game.findEngagements().isEmpty())
                 {
                     doneWithEngagements();
                 }
@@ -2493,6 +2364,12 @@ public final class Client implements IClient, IOracle, IVariant
         }
     }
 
+    // Mostly for SocketClientThread
+    public Player getPlayerByName(String name)
+    {
+        return game.getPlayerByName(name);
+    }
+
     public Player getPlayerByTag(int tag)
     {
         BattleChit chit = getBattleChit(tag);
@@ -2587,7 +2464,8 @@ public final class Client implements IClient, IOracle, IVariant
         List<String> lords = new ArrayList<String>();
 
         // Titan teleport
-        List<LegionClientSide> legions = getLegionsByHex(hex);
+        List<LegionClientSide> legions = getGameClientSide().getLegionsByHex(
+            hex);
         if (!legions.isEmpty())
         {
             Legion legion0 = legions.get(0);
@@ -2671,7 +2549,7 @@ public final class Client implements IClient, IOracle, IVariant
         }
 
         // if this hex is already occupied, return false
-        int friendlyLegions = getFriendlyLegions(hex, getActivePlayer())
+        int friendlyLegions = game.getFriendlyLegions(hex, getActivePlayer())
             .size();
         if (hex.equals(mover.getCurrentHex()))
         {
@@ -2974,7 +2852,8 @@ public final class Client implements IClient, IOracle, IVariant
                 if (legion.hasSummonable()) {
                     // check for engagement -- > 1 legion is good enough since
                     // it is not split phase
-                    int numInHex = getLegionsByHex(legion.getCurrentHex())
+                    int numInHex = getGameClientSide().getLegionsByHex(
+                        legion.getCurrentHex())
                         .size();
                     if (numInHex == 1)
                 {
@@ -3007,24 +2886,6 @@ public final class Client implements IClient, IOracle, IVariant
     {
         return movement.listNormalMoves(legion, legion.getCurrentHex(), game
             .getMovementRoll());
-    }
-
-    public List<LegionClientSide> getLegionsByHex(MasterHex hex)
-    {
-        assert hex != null : "No hex given to find legions on.";
-        List<LegionClientSide> legions = new ArrayList<LegionClientSide>();
-        for (Player player : players)
-        {
-            for (LegionClientSide legion : ((PlayerClientSide)player)
-                .getLegions())
-            {
-                if (hex.equals(legion.getCurrentHex()))
-                {
-                    legions.add(legion);
-                }
-            }
-        }
-        return legions;
     }
 
     public Set<MasterHex> findUnmovedLegionHexes()
@@ -3063,136 +2924,6 @@ public final class Client implements IClient, IOracle, IVariant
         return result;
     }
 
-    /**
-     * Return a set of all hexes with engagements.
-     *
-     * TODO if we can be sure that the activePlayer is set properly, we could
-     *      just create a set of all hexes he is on and then check if someone
-     *      else occupies any of the same
-     */
-    public Set<MasterHex> findEngagements()
-    {
-        Set<MasterHex> result = new HashSet<MasterHex>();
-        Map<MasterHex, Player> playersOnHex = new HashMap<MasterHex, Player>();
-        for (Player player : players)
-        {
-            for (Legion legion : player.getLegions())
-            {
-                MasterHex hex = legion.getCurrentHex();
-                if (playersOnHex.get(hex) == null)
-                {
-                    // no player on that hex found yet, set this one
-                    playersOnHex.put(hex, player);
-                }
-                else
-                {
-                    if (!playersOnHex.get(hex).equals(player))
-                    {
-                        // someone else already on the hex -> engagement
-                        result.add(hex);
-                    }
-                }
-            }
-        }
-        return result;
-    }
-
-    boolean isOccupied(MasterHex hex)
-    {
-        return !getLegionsByHex(hex).isEmpty();
-    }
-
-    boolean isEngagement(MasterHex hex)
-    {
-        List<LegionClientSide> legions = getLegionsByHex(hex);
-        if (legions.size() == 2)
-        {
-            Legion info0 = legions.get(0);
-            Player player0 = info0.getPlayer();
-
-            Legion info1 = legions.get(1);
-            Player player1 = info1.getPlayer();
-
-            return !player0.equals(player1);
-        }
-        return false;
-    }
-
-    protected List<Legion> getEnemyLegions(final Player player)
-    {
-        List<Legion> result = new ArrayList<Legion>();
-        for (Player otherPlayer : players)
-        {
-            if (!otherPlayer.equals(player))
-            {
-                result.addAll(otherPlayer.getLegions());
-            }
-        }
-        return result;
-    }
-
-    public List<Legion> getEnemyLegions(final MasterHex hex,
-        final Player player)
-    {
-        List<Legion> result = new ArrayList<Legion>();
-        for (Player otherPlayer : players)
-        {
-            if (!otherPlayer.equals(player))
-            {
-                for (Legion legion : otherPlayer.getLegions())
-                {
-                    if (legion.getCurrentHex().equals(hex))
-                    {
-                        result.add(legion);
-                    }
-                }
-            }
-        }
-        return result;
-    }
-
-    public Legion getFirstEnemyLegion(MasterHex hex, Player player)
-    {
-        for (Player otherPlayer : players)
-        {
-            if (!otherPlayer.equals(player))
-            {
-                for (Legion legion : otherPlayer.getLegions())
-                {
-                    if (legion.getCurrentHex().equals(hex))
-                    {
-                        return legion;
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    public List<Legion> getFriendlyLegions(final MasterHex hex,
-        final Player player)
-    {
-        return CollectionHelper.selectAsList(player.getLegions(),
-            new Predicate<Legion>()
-            {
-                public boolean matches(Legion legion)
-                {
-                    return legion.getCurrentHex().equals(hex);
-                }
-            });
-    }
-
-    public Legion getFirstFriendlyLegion(final MasterHex hex, Player player)
-    {
-        return CollectionHelper.selectFirst(player.getLegions(),
-            new Predicate<Legion>()
-            {
-                public boolean matches(Legion legion)
-                {
-                    return legion.getCurrentHex().equals(hex);
-                }
-            });
-    }
 
     public void notifyServer()
     {
@@ -3315,46 +3046,6 @@ public final class Client implements IClient, IOracle, IVariant
         server.doneWithRecruits();
     }
 
-    public Player getPlayerByMarkerId(String markerId)
-    {
-        assert markerId != null : "Parameter must not be null";
-
-        String shortColor = markerId.substring(0, 2);
-        return getPlayerUsingColor(shortColor);
-    }
-
-    private Player getPlayerUsingColor(String shortColor)
-    {
-        assert this.players != null : "Client not yet initialized";
-        assert shortColor != null : "Parameter must not be null";
-
-        // Stage 1: See if the player who started with this color is alive.
-        for (Player info : players)
-        {
-            if (shortColor.equals(info.getShortColor()) && !info.isDead())
-            {
-                return info;
-            }
-        }
-
-        // Stage 2: He's dead.  Find who killed him and see if he's alive.
-        for (Player info : players)
-        {
-            if (info.getPlayersElim().indexOf(shortColor) != -1)
-            {
-                // We have the killer.
-                if (!info.isDead())
-                {
-                    return info;
-                }
-                else
-                {
-                    return getPlayerUsingColor(info.getShortColor());
-                }
-            }
-        }
-        return null;
-    }
 
     public boolean isMyLegion(Legion legion)
     {
