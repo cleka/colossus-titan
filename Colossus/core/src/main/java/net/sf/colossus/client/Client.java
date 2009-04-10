@@ -115,6 +115,10 @@ public final class Client implements IClient, IOracle, IVariant
     // Per-client and per-player options.
     private final Options options;
 
+    private boolean playersNotInitialized = true;
+
+    private final List<Player> players = new ArrayList<Player>();
+
     // TODO move to Constants?
     // private static String propNameForceViewBoard = "net.sf.colossus.forceViewBoard";
 
@@ -130,7 +134,7 @@ public final class Client implements IClient, IOracle, IVariant
     /**
      * The game in progress.
      */
-    private final Game game;
+    private final GameClientSide game;
 
     /**
      * Starting marker color of player who owns this client.
@@ -162,8 +166,6 @@ public final class Client implements IClient, IOracle, IVariant
     private int battleTurnNumber = -1;
     private Player battleActivePlayer;
     private BattlePhase battlePhase;
-
-    private List<Player> players = new ArrayList<Player>();
 
     private Movement movement;
     private BattleMovement battleMovement;
@@ -277,7 +279,7 @@ public final class Client implements IClient, IOracle, IVariant
         // TODO still dummy arguments
         this.game = new GameClientSide(null, new String[0]);
 
-        ((GameClientSide)game).setClient(this);
+        (game).setClient(this);
 
         // TODO this is currently not set properly straight away, it is fixed in
         // updatePlayerInfo(..) when the PlayerInfos are initialized. Should really
@@ -588,11 +590,17 @@ public final class Client implements IClient, IOracle, IVariant
         gui.syncCheckboxes();
     }
 
-    // public for IOracle
-    public int getNumPlayers()
+    // to be moved to GameClientSide soon
+    public int gameGetNumPlayers()
     {
         assert players.size() != 0 : "getNumPlayers called before player info set (size==0)!";
         return players.size();
+    }
+
+    // public for IOracle
+    public int getNumPlayers()
+    {
+        return gameGetNumPlayers();
     }
 
     // TODO cannot pull up yet because client and server side
@@ -612,25 +620,43 @@ public final class Client implements IClient, IOracle, IVariant
 
     public void updatePlayerInfo(List<String> infoStrings)
     {
-        int numPlayers = infoStrings.size();
-        if (players.size() == 0)
+        if (playersNotInitialized)
         {
-            // first time we get the player infos, store them locally and set our
-            // own, too -- which has been a fake until now
-            for (int i = 0; i < numPlayers; i++)
+            String searchName = this.owningPlayer.getName();
+            this.owningPlayer = gameInitPlayerInfo(infoStrings, searchName);
+        }
+        gameUpdatePlayerInfo(infoStrings);
+    }
+
+    // to be moved to GameClientSide soon
+    public PlayerClientSide gameInitPlayerInfo(List<String> infoStrings,
+        String searchedName)
+    {
+        int numPlayers = infoStrings.size();
+        PlayerClientSide owningPlayer = null;
+
+        // first time we get the player infos, store them locally and set our
+        // own, too -- which has been a fake until now
+        for (int i = 0; i < numPlayers; i++)
+        {
+            List<String> data = Split.split(":", infoStrings.get(i));
+            String playerName = data.get(1);
+            PlayerClientSide info = new PlayerClientSide(getGame(),
+                playerName, i);
+            players.add(info);
+            if (playerName.equals(searchedName))
             {
-                List<String> data = Split.split(":", infoStrings.get(i));
-                String playerName = data.get(1);
-                PlayerClientSide info = new PlayerClientSide(getGame(),
-                    playerName, i);
-                players.add(info);
-                if (playerName.equals(this.owningPlayer.getName()))
-                {
-                    this.owningPlayer = info;
-                }
+                owningPlayer = info;
             }
         }
-        for (int i = 0; i < numPlayers; i++)
+        playersNotInitialized = false;
+        return owningPlayer;
+    }
+
+    // to be moved to GameClientSide soon
+    public void gameUpdatePlayerInfo(List<String> infoStrings)
+    {
+        for (int i = 0; i < infoStrings.size(); i++)
         {
             PlayerClientSide player = (PlayerClientSide)players.get(i);
             player.update(infoStrings.get(i));
@@ -857,7 +883,8 @@ public final class Client implements IClient, IOracle, IVariant
         this.movement = null;
         this.battleMovement = null;
         this.strike = null;
-        this.players = null;
+        players.clear();
+        playersNotInitialized = true;
 
         net.sf.colossus.server.CustomRecruitBase.reset();
     }
@@ -3647,7 +3674,7 @@ public final class Client implements IClient, IOracle, IVariant
 
     public GameClientSide getGameClientSide()
     {
-        return (GameClientSide)game;
+        return game;
     }
 
     public Options getOptions()
