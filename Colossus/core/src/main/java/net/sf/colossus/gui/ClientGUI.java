@@ -31,6 +31,7 @@ import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.IOptions;
 import net.sf.colossus.common.IVariant;
 import net.sf.colossus.common.Options;
+import net.sf.colossus.common.WhatNextManager;
 import net.sf.colossus.common.WhatNextManager.WhatToDoNext;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.EntrySide;
@@ -84,6 +85,12 @@ public class ClientGUI implements IClientGUI
     private WebClient webClient = null;
     private boolean startedByWebClient = false;
 
+
+    /**
+     * The object which handles what to do next when a game is going to end
+     */
+    private final WhatNextManager whatNextManager;
+
     /**
      * Stack of legion marker ID's, to allow multiple levels of undo for
      * splits, moves, and recruits.
@@ -122,11 +129,13 @@ public class ClientGUI implements IClientGUI
     // Per-client and per-player options.
     private final Options options;
 
-    public ClientGUI(Client client, Options options)
+    public ClientGUI(Client client, Options options,
+        WhatNextManager whatNextMgr)
     {
         this.client = client;
         this.oracle = client;
         this.options = options;
+        this.whatNextManager = whatNextMgr;
     }
 
     /* (non-Javadoc)
@@ -223,7 +232,7 @@ public class ClientGUI implements IClientGUI
     {
         if (this.webClient == null)
         {
-            this.webClient = new WebClient(client.getWhatNextManager(), null,
+            this.webClient = new WebClient(whatNextManager, null,
                 -1, null, null);
             this.webClient.setGameClient(client);
         }
@@ -483,7 +492,7 @@ public class ClientGUI implements IClientGUI
     public void menuCloseBoard()
     {
         clearUndoStack();
-        client.doSetWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
+        doSetWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
         client.disposeClientOriginated();
     }
 
@@ -514,7 +523,7 @@ public class ClientGUI implements IClientGUI
         }
         quitAlreadyTried = true;
 
-        client.doSetWhatToDoNext(WhatToDoNext.QUIT_ALL, true);
+        doSetWhatToDoNext(WhatToDoNext.QUIT_ALL, true);
         client.notifyServer();
     }
 
@@ -643,24 +652,35 @@ public class ClientGUI implements IClientGUI
         }
     }
 
+    private void doSetWhatToDoNext(WhatToDoNext whatToDoNext,
+        boolean triggerQuitTimer)
+    {
+        whatNextManager.setWhatToDoNext(whatToDoNext, triggerQuitTimer);
+    }
+
+    private void doSetWhatToDoNext(WhatToDoNext whatToDoNext, String loadFile)
+    {
+        whatNextManager.setWhatToDoNext(whatToDoNext, loadFile);
+    }
+
     // Used by File=>Close and Window closing
     /* (non-Javadoc)
      * @see net.sf.colossus.gui.IClientGUI#setWhatToDoNextForClose()
      */
-    public void setWhatToDoNextForClose()
+    private void setWhatToDoNextForClose()
     {
         if (startedByWebClient)
         {
-            client.doSetWhatToDoNext(WhatToDoNext.START_WEB_CLIENT, false);
+            doSetWhatToDoNext(WhatToDoNext.START_WEB_CLIENT, false);
         }
         else if (client.isRemote())
         {
             // Remote clients get back to Network Client dialog
-            client.doSetWhatToDoNext(WhatToDoNext.NET_CLIENT_DIALOG, false);
+            doSetWhatToDoNext(WhatToDoNext.NET_CLIENT_DIALOG, false);
         }
         else
         {
-            client.doSetWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
+            doSetWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
         }
     }
 
@@ -688,7 +708,7 @@ public class ClientGUI implements IClientGUI
             webClient.dispose();
             webClient = null;
         }
-        client.doSetWhatToDoNext(WhatToDoNext.LOAD_GAME, filename);
+        doSetWhatToDoNext(WhatToDoNext.LOAD_GAME, filename);
         client.notifyServer();
     }
 

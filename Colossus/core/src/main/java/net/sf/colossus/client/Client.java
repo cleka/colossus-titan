@@ -27,7 +27,6 @@ import net.sf.colossus.common.IOptions;
 import net.sf.colossus.common.IVariant;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.common.WhatNextManager;
-import net.sf.colossus.common.WhatNextManager.WhatToDoNext;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.EntrySide;
@@ -134,10 +133,6 @@ public final class Client implements IClient, IOracle, IVariant
      */
     private final Game game;
 
-    /**
-     * The "Start" object which created this Client
-     */
-    private final WhatNextManager whatNextManager;
     /**
      * Starting marker color of player who owns this client.
      *
@@ -285,7 +280,6 @@ public final class Client implements IClient, IOracle, IVariant
 
         // TODO still dummy arguments
         this.game = new GameClientSide(null, new String[0]);
-        this.whatNextManager = whatNextMgr;
 
         ((GameClientSide)game).setClient(this);
 
@@ -336,11 +330,11 @@ public final class Client implements IClient, IOracle, IVariant
 
         if (createGUI)
         {
-            this.gui = new ClientGUI(this, options);
+            this.gui = new ClientGUI(this, options, whatNextMgr);
         }
         else
         {
-            this.gui = new NullClientGUI(this, options);
+            this.gui = new NullClientGUI(this, options, whatNextMgr);
         }
 
         setupOptionListeners();
@@ -3620,30 +3614,6 @@ public final class Client implements IClient, IOracle, IVariant
         {
             delay = Constants.MAX_AI_DELAY;
         }
-    }
-
-    /*
-     * Called by ClientGUI, to fulfill the items called in menu
-     */
-
-    public void doSetWhatToDoNext(WhatToDoNext whatToDoNext,
-        boolean triggerQuitTimer)
-    {
-        whatNextManager.setWhatToDoNext(whatToDoNext, triggerQuitTimer);
-    }
-
-    public void doSetWhatToDoNext(WhatToDoNext whatToDoNext, String loadFile)
-    {
-        whatNextManager.setWhatToDoNext(whatToDoNext, loadFile);
-    }
-
-    /*
-     * ClientGUI needs that when bringing up a new WebClient
-     */
-    public WhatNextManager getWhatNextManager()
-    {
-        return whatNextManager;
-
     }
 
     public Game getGame()

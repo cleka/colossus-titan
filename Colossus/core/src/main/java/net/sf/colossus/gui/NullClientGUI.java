@@ -9,6 +9,7 @@ import java.util.SortedSet;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.common.IOptions;
+import net.sf.colossus.common.WhatNextManager;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
@@ -25,13 +26,14 @@ import net.sf.colossus.webclient.WebClient;
  * so that client can simply call it same way as the real
  * GUI but just nothing happens.
  * I.e. we get rid of all the "if (board != null)" stuff.
- * 
+ *
  */
 public class NullClientGUI implements IClientGUI
 {
 
     @SuppressWarnings("unused")
-    public NullClientGUI(Client client, IOptions options)
+    public NullClientGUI(Client client, IOptions options,
+        WhatNextManager whatNextMgr)
     {
         // Nothing to do...
     }

@@ -30,7 +30,6 @@ public interface IClientGUI
 
     public abstract void setClientInWebClientNull();
 
-    // TODO still needed?
     public abstract MasterBoard getBoard();
 
     /*
@@ -66,9 +65,6 @@ public interface IClientGUI
     /** Timeout reached. Cancel timer and show error message
      */
     public abstract void timeoutAbortsConnectionCheck();
-
-    // Used by File=>Close and Window closing
-    public abstract void setWhatToDoNextForClose();
 
     public abstract void menuNewGame();
 
