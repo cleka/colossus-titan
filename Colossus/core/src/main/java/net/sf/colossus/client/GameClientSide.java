@@ -35,29 +35,6 @@ public class GameClientSide extends Game
         this.client = client;
     }
 
-    // to be moved to GameClientSide soon
-    public int GetNumPlayers()
-    {
-        assert players.size() != 0 : "getNumPlayers called before player info set (size==0)!";
-        return players.size();
-    }
-
-    // TODO cannot pull up yet because client and server side
-    // have different (own) data structures overriding the one in game.Game
-    public int getNumLivingPlayers()
-    {
-        int alive = 0;
-        for (Player info : players)
-        {
-            if (!info.isDead())
-            {
-                alive++;
-            }
-        }
-        return alive;
-    }
-
-    // to be moved to GameClientSide soon
     public PlayerClientSide initPlayerInfo(List<String> infoStrings,
         String searchedName)
     {
@@ -87,6 +64,124 @@ public class GameClientSide extends Game
             PlayerClientSide player = (PlayerClientSide)players.get(i);
             player.update(infoStrings.get(i));
         }
+    }
+
+    public List<Player> getPlayers()
+    {
+        return Collections.unmodifiableList(players);
+    }
+
+    public int GetNumPlayers()
+    {
+        assert players.size() != 0 : "getNumPlayers called before player info set (size==0)!";
+        return players.size();
+    }
+
+    public int getNumLivingPlayers()
+    {
+        int alive = 0;
+        for (Player info : players)
+        {
+            if (!info.isDead())
+            {
+                alive++;
+            }
+        }
+        return alive;
+    }
+
+    // TODO compare with GameServerSide.getNumHumansRemaining() and pull up
+    public boolean onlyAIsRemain()
+    {
+        for (Player p : players)
+        {
+            if (!p.isAI() && !p.isDead())
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Resolve playerName into Player object. Name might be null,
+     * then returns null.
+     * @param playerName
+     * @return The player object for given player name, null if name was null
+     */
+    Player getPlayerByNameIgnoreNull(String playerName)
+    {
+        if (playerName == null)
+        {
+            return null;
+        }
+        else
+        {
+            return getPlayerByName(playerName);
+        }
+    }
+
+    /**
+     * Resolve playerName into Player object.
+     * Name must not be null. If no player for given name found,
+     * it would throw IllegalArgumentException
+     * @param playerName
+     * @return Player object for given name.
+     */
+    Player getPlayerByName(String playerName)
+    {
+        assert playerName != null : "Name for player to find must not be null!";
+
+        for (Player player : players)
+        {
+            if (player.getName().equals(playerName))
+            {
+                return player;
+            }
+        }
+        throw new IllegalArgumentException("No player object found for name '"
+            + playerName + "'");
+    }
+
+    private Player getPlayerUsingColor(String shortColor)
+    {
+        assert this.players.size() > 0 : "Client side player list not yet initialized";
+        assert shortColor != null : "Parameter must not be null";
+
+        // Stage 1: See if the player who started with this color is alive.
+        for (Player info : players)
+        {
+            if (shortColor.equals(info.getShortColor()) && !info.isDead())
+            {
+                return info;
+            }
+        }
+
+        // Stage 2: He's dead.  Find who killed him and see if he's alive.
+        for (Player info : players)
+        {
+            if (info.getPlayersElim().indexOf(shortColor) != -1)
+            {
+                // We have the killer.
+                if (!info.isDead())
+                {
+                    return info;
+                }
+                else
+                {
+                    return getPlayerUsingColor(info.getShortColor());
+                }
+            }
+        }
+        return null;
+    }
+
+    public Player getPlayerByMarkerId(String markerId)
+    {
+        assert markerId != null : "Parameter must not be null";
+
+        String shortColor = markerId.substring(0, 2);
+        return getPlayerUsingColor(shortColor);
     }
 
     protected List<Legion> getEnemyLegions(final Player player)
@@ -183,82 +278,9 @@ public class GameClientSide extends Game
         return legions;
     }
 
-    private Player getPlayerUsingColor(String shortColor)
+    boolean isOccupied(MasterHex hex)
     {
-        assert this.players.size() > 0 : "Client side player list not yet initialized";
-        assert shortColor != null : "Parameter must not be null";
-
-        // Stage 1: See if the player who started with this color is alive.
-        for (Player info : players)
-        {
-            if (shortColor.equals(info.getShortColor()) && !info.isDead())
-            {
-                return info;
-            }
-        }
-
-        // Stage 2: He's dead.  Find who killed him and see if he's alive.
-        for (Player info : players)
-        {
-            if (info.getPlayersElim().indexOf(shortColor) != -1)
-            {
-                // We have the killer.
-                if (!info.isDead())
-                {
-                    return info;
-                }
-                else
-                {
-                    return getPlayerUsingColor(info.getShortColor());
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Resolve playerName into Player object. Name might be null,
-     * then returns null.
-     * @param playerName
-     * @return The player object for given player name, null if name was null
-     */
-    Player getPlayerByNameIgnoreNull(String playerName)
-    {
-        if (playerName == null)
-        {
-            return null;
-        }
-        else
-        {
-            return getPlayerByName(playerName);
-        }
-    }
-
-    /**
-     * Resolve playerName into Player object.
-     * Name must not be null. If no player for given name found,
-     * it would throw IllegalArgumentException
-     * @param playerName
-     * @return Player object for given name.
-     */
-    Player getPlayerByName(String playerName)
-    {
-        assert playerName != null : "Name for player to find must not be null!";
-
-        for (Player player : players)
-        {
-            if (player.getName().equals(playerName))
-            {
-                return player;
-            }
-        }
-        throw new IllegalArgumentException("No player object found for name '"
-            + playerName + "'");
-    }
-
-    public List<Player> getPlayers()
-    {
-        return Collections.unmodifiableList(players);
+        return !getLegionsByHex(hex).isEmpty();
     }
 
     /** Return the average point value of all legions in the game. */
@@ -273,20 +295,6 @@ public class GameClientSide extends Game
             totalValue += player.getTotalPointValue();
         }
         return (int)(Math.round((double)totalValue / totalLegions));
-    }
-
-    // TODO compare with GameServerSide.getNumHumansRemaining()
-    // and pull up
-    public boolean onlyAIsRemain()
-    {
-        for (Player p : players)
-        {
-            if (!p.isAI() && !p.isDead())
-            {
-                return false;
-            }
-        }
-        return true;
     }
 
     /**
@@ -323,11 +331,6 @@ public class GameClientSide extends Game
         return result;
     }
 
-    boolean isOccupied(MasterHex hex)
-    {
-        return !getLegionsByHex(hex).isEmpty();
-    }
-
     boolean isEngagement(MasterHex hex)
     {
         List<LegionClientSide> legions = getLegionsByHex(hex);
@@ -342,14 +345,6 @@ public class GameClientSide extends Game
             return !player0.equals(player1);
         }
         return false;
-    }
-
-    public Player getPlayerByMarkerId(String markerId)
-    {
-        assert markerId != null : "Parameter must not be null";
-
-        String shortColor = markerId.substring(0, 2);
-        return getPlayerUsingColor(shortColor);
     }
 
     // TODO: move method from Client to here, or even to game.Game?
