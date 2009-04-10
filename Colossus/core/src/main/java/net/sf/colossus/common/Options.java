@@ -350,7 +350,8 @@ public final class Options implements IOptions
     {
         // return true for all Auto-* options if autoplay is on
         // ... and not for autoQuit either!
-        if (optname.startsWith("Auto") && !optname.equals(Options.autoPlay)
+        // ... trailing space otherwise autoSave would be on always, too
+        if (optname.startsWith("Auto ") && !optname.equals(Options.autoPlay)
             && !optname.equals(Options.autoQuit))
         {
             if (getOption(Options.autoPlay))
