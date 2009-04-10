@@ -163,7 +163,7 @@ public final class Client implements IClient, IOracle, IVariant
     private Player battleActivePlayer;
     private BattlePhase battlePhase;
 
-    private List<PlayerClientSide> players = new ArrayList<PlayerClientSide>();
+    private List<Player> players = new ArrayList<Player>();
 
     private Movement movement;
     private BattleMovement battleMovement;
@@ -632,7 +632,8 @@ public final class Client implements IClient, IOracle, IVariant
         }
         for (int i = 0; i < numPlayers; i++)
         {
-            players.get(i).update(infoStrings.get(i));
+            PlayerClientSide player = (PlayerClientSide)players.get(i);
+            player.update(infoStrings.get(i));
         }
         gui.updateStatusScreen();
     }
@@ -666,7 +667,7 @@ public final class Client implements IClient, IOracle, IVariant
     {
         assert playerName != null : "Name for player to find must not be null!";
 
-        for (PlayerClientSide player : players)
+        for (Player player : players)
         {
             if (player.getName().equals(playerName))
             {
@@ -682,7 +683,7 @@ public final class Client implements IClient, IOracle, IVariant
         return owningPlayer;
     }
 
-    public List<PlayerClientSide> getPlayers()
+    public List<Player> getPlayers()
     {
         return Collections.unmodifiableList(players);
     }
@@ -980,7 +981,7 @@ public final class Client implements IClient, IOracle, IVariant
      */
     public LegionClientSide getLegion(String markerId)
     {
-        PlayerClientSide player = getPlayerByMarkerId(markerId);
+        PlayerClientSide player = (PlayerClientSide)getPlayerByMarkerId(markerId);
         LegionClientSide legion = player.getLegionByMarkerId(markerId);
         // Added this logging only for the purpose that one gets a clue
         // when during the game this happened - the assertion appears only
@@ -1941,9 +1942,10 @@ public final class Client implements IClient, IOracle, IVariant
 
     private void resetLegionMovesAndRecruitData()
     {
-        for (PlayerClientSide player : players)
+        for (Player player : players)
         {
-            for (LegionClientSide legion : player.getLegions())
+            for (LegionClientSide legion : ((PlayerClientSide)player)
+                .getLegions())
             {
                 legion.setMoved(false);
                 legion.setTeleported(false);
@@ -2984,9 +2986,10 @@ public final class Client implements IClient, IOracle, IVariant
     {
         assert hex != null : "No hex given to find legions on.";
         List<LegionClientSide> legions = new ArrayList<LegionClientSide>();
-        for (PlayerClientSide player : players)
+        for (Player player : players)
         {
-            for (LegionClientSide legion : player.getLegions())
+            for (LegionClientSide legion : ((PlayerClientSide)player)
+                .getLegions())
             {
                 if (hex.equals(legion.getCurrentHex()))
                 {
@@ -3285,7 +3288,7 @@ public final class Client implements IClient, IOracle, IVariant
         server.doneWithRecruits();
     }
 
-    public PlayerClientSide getPlayerByMarkerId(String markerId)
+    public Player getPlayerByMarkerId(String markerId)
     {
         assert markerId != null : "Parameter must not be null";
 
@@ -3293,13 +3296,13 @@ public final class Client implements IClient, IOracle, IVariant
         return getPlayerUsingColor(shortColor);
     }
 
-    private PlayerClientSide getPlayerUsingColor(String shortColor)
+    private Player getPlayerUsingColor(String shortColor)
     {
         assert this.players != null : "Client not yet initialized";
         assert shortColor != null : "Parameter must not be null";
 
         // Stage 1: See if the player who started with this color is alive.
-        for (PlayerClientSide info : players)
+        for (Player info : players)
         {
             if (shortColor.equals(info.getShortColor()) && !info.isDead())
             {
@@ -3308,7 +3311,7 @@ public final class Client implements IClient, IOracle, IVariant
         }
 
         // Stage 2: He's dead.  Find who killed him and see if he's alive.
-        for (PlayerClientSide info : players)
+        for (Player info : players)
         {
             if (info.getPlayersElim().indexOf(shortColor) != -1)
             {

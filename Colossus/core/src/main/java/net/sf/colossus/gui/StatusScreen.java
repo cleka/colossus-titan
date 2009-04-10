@@ -134,13 +134,13 @@ final class StatusScreen extends KDialog
         gridPane.add(new JLabel("Player"));
 
         int j = 0;
-        for (PlayerClientSide player : client.getPlayers())
+        for (Player player : client.getPlayers())
         {
             nameLabel[j] = new JLabel();
             nameLabel[j].setOpaque(true);
             gridPane.add(nameLabel[j]);
 
-            final PlayerClientSide thePlayer = player;
+            final PlayerClientSide thePlayer = (PlayerClientSide)player;
             nameLabel[j].addMouseListener(new MouseAdapter()
             {
                 @Override
