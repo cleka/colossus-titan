@@ -813,23 +813,44 @@ public final class GameServerSide extends Game
         return Collections.unmodifiableCollection(players);
     }
 
-    PlayerServerSide getPlayer(String name)
+    /**
+     * Resolve playerName into Player object. Name might be null,
+     * then returns null.
+     * @param playerName
+     * @return The player object for given player name, null if name was null
+     */
+    Player getPlayerByNameIgnoreNull(String playerName)
     {
-        if (name != null)
+        if (playerName == null)
         {
-            Iterator<PlayerServerSide> it = players.iterator();
+            return null;
+        }
+        else
+        {
+            return getPlayerByName(playerName);
+        }
+    }
 
-            while (it.hasNext())
+    /**
+     * Resolve playerName into Player object.
+     * Name must not be null. If no player for given name found,
+     * it would throw IllegalArgumentException
+     * @param playerName
+     * @return Player object for given name.
+     */
+    Player getPlayerByName(String playerName)
+    {
+        assert playerName != null : "Name for player to find must not be null!";
+
+        for (Player player : players)
+        {
+            if (player.getName().equals(playerName))
             {
-                PlayerServerSide player = it.next();
-
-                if (name.equals(player.getName()))
-                {
-                    return player;
-                }
+                return player;
             }
         }
-        return null;
+        throw new IllegalArgumentException("No player object found for name '"
+            + playerName + "'");
     }
 
     PlayerServerSide getPlayerByShortColor(String shortColor)

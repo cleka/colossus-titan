@@ -95,8 +95,8 @@ public class LOSTest extends TestCase
         attacker = new LegionServerSide("Bl03", null, hex, hex, black, game,
             hydra);
 
-        game.getPlayer("Red").addLegion(defender);
-        game.getPlayer("Blue").addLegion(attacker);
+        game.getPlayerByName("Red").addLegion(defender);
+        game.getPlayerByName("Blue").addLegion(attacker);
 
         attacker.setEntrySide(EntrySide.values()[1]);
 
@@ -138,8 +138,8 @@ public class LOSTest extends TestCase
         attacker = new LegionServerSide("Bk03", null, hex, hex, black, game,
             gargoyle, cyclops, cyclops, cyclops, gorgon, gorgon, ranger);
 
-        game.getPlayer("Green").addLegion(defender);
-        game.getPlayer("Black").addLegion(attacker);
+        game.getPlayerByName("Green").addLegion(defender);
+        game.getPlayerByName("Black").addLegion(attacker);
 
         attacker.setEntrySide(EntrySide.values()[5]);
 
@@ -281,8 +281,8 @@ public class LOSTest extends TestCase
         attacker = new LegionServerSide("Bk03", null, hex, hex, black, game,
             cyclops, gorgon, gorgon, gorgon, gorgon, ranger, ranger);
 
-        game.getPlayer("Green").addLegion(defender);
-        game.getPlayer("Black").addLegion(attacker);
+        game.getPlayerByName("Green").addLegion(defender);
+        game.getPlayerByName("Black").addLegion(attacker);
 
         attacker.setEntrySide(EntrySide.values()[3]);
 
@@ -411,8 +411,8 @@ public class LOSTest extends TestCase
         attacker = new LegionServerSide("Bk03", null, hex, hex, black, game,
             gorgon, gorgon, ranger, ranger);
 
-        game.getPlayer("Green").addLegion(defender);
-        game.getPlayer("Black").addLegion(attacker);
+        game.getPlayerByName("Green").addLegion(defender);
+        game.getPlayerByName("Black").addLegion(attacker);
 
         attacker.setEntrySide(EntrySide.values()[3]);
 
@@ -526,8 +526,8 @@ public class LOSTest extends TestCase
         attacker = new LegionServerSide("Bk03", null, hex, hex, black, game,
             ranger, ranger, ranger);
 
-        game.getPlayer("Green").addLegion(defender);
-        game.getPlayer("Black").addLegion(attacker);
+        game.getPlayerByName("Green").addLegion(defender);
+        game.getPlayerByName("Black").addLegion(attacker);
 
         attacker.setEntrySide(EntrySide.values()[5]);
 
@@ -616,8 +616,8 @@ public class LOSTest extends TestCase
         attacker = new LegionServerSide("Bk03", null, hex, hex, black, game,
             ranger, ranger, ranger);
 
-        game.getPlayer("Green").addLegion(defender);
-        game.getPlayer("Black").addLegion(attacker);
+        game.getPlayerByName("Green").addLegion(defender);
+        game.getPlayerByName("Black").addLegion(attacker);
 
         attacker.setEntrySide(EntrySide.values()[5]);
 
@@ -704,8 +704,8 @@ public class LOSTest extends TestCase
         attacker = new LegionServerSide("Bk03", null, hex, hex, black, game,
             hydra, guardian);
 
-        game.getPlayer("Green").addLegion(defender);
-        game.getPlayer("Black").addLegion(attacker);
+        game.getPlayerByName("Green").addLegion(defender);
+        game.getPlayerByName("Black").addLegion(attacker);
 
         attacker.setEntrySide(EntrySide.values()[5]);
 

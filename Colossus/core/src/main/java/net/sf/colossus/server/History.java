@@ -284,7 +284,7 @@ public class History
             }
             else
             {
-                server.oneRevealLegion(game.getPlayer(playerName), legion,
+                server.oneRevealLegion(game.getPlayerByName(playerName), legion,
                     creatureNames, reason);
             }
         }
@@ -435,12 +435,12 @@ public class History
         {
             String playerName = el.getAttributeValue("name");
             String slayerName = el.getAttributeValue("slayer");
-            PlayerServerSide player = game.getPlayer(playerName);
-            PlayerServerSide slayer = game.getPlayer(slayerName);
+            Player player = game.getPlayerByName(playerName);
+            Player slayer = game.getPlayerByNameIgnoreNull(slayerName);
             // Record the slayer and give him this player's legion markers.
             if (slayer != null)
             {
-                player.handleSlaying(slayer);
+                ((PlayerServerSide)player).handleSlaying(slayer);
             }
             player.setDead(true);
             server.allUpdatePlayerInfo();

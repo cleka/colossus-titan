@@ -643,7 +643,7 @@ public final class Client implements IClient, IOracle, IVariant
      * @param playerName
      * @return The player object for given player name, null if name was null
      */
-    PlayerClientSide getPlayerByNameIgnoreNull(String playerName)
+    Player getPlayerByNameIgnoreNull(String playerName)
     {
         if (playerName == null)
         {
@@ -662,7 +662,7 @@ public final class Client implements IClient, IOracle, IVariant
      * @param playerName
      * @return Player object for given name.
      */
-    PlayerClientSide getPlayerByName(String playerName)
+    Player getPlayerByName(String playerName)
     {
         assert playerName != null : "Name for player to find must not be null!";
 

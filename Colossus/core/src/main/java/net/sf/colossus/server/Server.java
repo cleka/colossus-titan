@@ -114,7 +114,7 @@ public final class Server extends Thread implements IServer
     private final int timeoutDuringGame = 0;
     private final int timeoutDuringShutdown = 1000;
 
-    // Earlier I have locked on an Boolean object itself, 
+    // Earlier I have locked on an Boolean object itself,
     // which I modify... and when this is done too often,
     // e.g. in ClientSocketThread every read, it caused
     // StockOverflowException... :-/
@@ -174,7 +174,7 @@ public final class Server extends Thread implements IServer
                         + " to catch up...");
                     timeout = timeoutDuringShutdown;
                     // Requesting all clients to confirm that they have caught
-                    // up with the processing of all the messages at game end. 
+                    // up with the processing of all the messages at game end.
                     // When all caught up, this will triger game.dispose(),
                     //   which which do stopServerRunning,
                     //     which will do stopFileServer, disposeAllClients,
@@ -217,7 +217,7 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    // FileServerThread asks this 
+    // FileServerThread asks this
     public boolean isKnownClient(InetAddress requester)
     {
         boolean knownIP = false;
@@ -566,14 +566,14 @@ public final class Server extends Thread implements IServer
             }
             catch (IOException e)
             {
-                // set isGone first, to prevent from sending log info to 
+                // set isGone first, to prevent from sending log info to
                 // client channel - channel is gone anyway...
                 processingCH.setIsGone(true);
                 LOGGER.log(Level.WARNING, "IOException '" + e.getMessage()
                     + "' while reading from channel for player "
                     + getPlayerName(), e);
 
-                // The remote forcibly/unexpectedly closed the connection, 
+                // The remote forcibly/unexpectedly closed the connection,
                 // cancel the selection key and close the channel.
                 withdrawFromGame();
                 disconnectChannel(sc, key);
@@ -594,7 +594,7 @@ public final class Server extends Thread implements IServer
         if (currentThread().equals(this))
         {
             // OK, activity which is originated by client, so we will
-            // come to the "after select loop" point when this was 
+            // come to the "after select loop" point when this was
             // completely processed
             synchronized (channelChanges)
             {
@@ -603,7 +603,7 @@ public final class Server extends Thread implements IServer
         }
         else
         {
-            // some other thread wants to tell the ServerThread to 
+            // some other thread wants to tell the ServerThread to
             // dispose one client - for example EDT when user pressed
             // "Abort" button in StartupProgress dialog.
             synchronized (channelChanges)
@@ -643,7 +643,7 @@ public final class Server extends Thread implements IServer
     }
 
     /*
-     * Stops the file server (closes FileServerSocket), 
+     * Stops the file server (closes FileServerSocket),
      * disposes all clients, and closes ServerSockets
      */
     public void stopServerRunning()
@@ -748,8 +748,8 @@ public final class Server extends Thread implements IServer
                 LOGGER.finest("\n==========\nOne socket went away, "
                     + "but we go on because goOnWithoutObserver is set...\n");
             }
-            // or, if only AI player clients left as "observers", 
-            // then close everything, too 
+            // or, if only AI player clients left as "observers",
+            // then close everything, too
             else if (!anyNonAiSocketsLeft())
             {
                 LOGGER.finest("Server.unregisterSocket(): "
@@ -818,7 +818,7 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    /** 
+    /**
      * Name of the player, for which data from socket is currently processed.
      */
     String getPlayerName()
@@ -833,19 +833,19 @@ public final class Server extends Thread implements IServer
         return processingCH.getPlayerName();
     }
 
-    /** 
+    /**
      * The player, for which data from socket is currently processed.
      */
-    private PlayerServerSide getPlayer()
+    private Player getPlayer()
     {
-        PlayerServerSide p = game.getPlayer(getPlayerName());
+        Player p = game.getPlayerByName(getPlayerName());
         assert p != null : "game.getPlayer returned null player for name "
             + getPlayerName();
 
         return p;
     }
 
-    /** 
+    /**
      * returns true if the active player is the player owning the connection
      * from which data is currently processed
      */
@@ -922,7 +922,7 @@ public final class Server extends Thread implements IServer
         }
         else
         {
-            player = game.getPlayer(playerName);
+            player = game.getPlayerByNameIgnoreNull(playerName);
         }
 
         String name = "<undefined>";
@@ -1058,7 +1058,7 @@ public final class Server extends Thread implements IServer
                 // set in player
                 player.setName(uName);
             }
-            // set playerName + thread name in ClientHandler, and send 
+            // set playerName + thread name in ClientHandler, and send
             // playerName to client:
             // It's necessary to send to client only for that reason, that
             // it otherwise might time out if it does not get quick response
@@ -1081,8 +1081,8 @@ public final class Server extends Thread implements IServer
         LOGGER.info("BEGIN disposing all clients...");
         for (IClient client : clients)
         {
-            // This sends the dispose message, and queues ClientHandler's 
-            // channel for being removed from selector. 
+            // This sends the dispose message, and queues ClientHandler's
+            // channel for being removed from selector.
             // Actual removal happens after all selector-keys are processed.
             // @TODO: does that make even sense? shuttingDown is set true,
             // so the selector loop does not even reach the removal part...
@@ -1262,7 +1262,7 @@ public final class Server extends Thread implements IServer
             }
 
             /* better to do the sending not inside the notify. It *might*
-             * happen that the sendTo goes an extra way around the wait on 
+             * happen that the sendTo goes an extra way around the wait on
              * selector if the queue is just full and if that reply would
              * want to e.g. remove already from waitingToCatchup list
              * (which is blocked by the sync. up here) we have a deadlock...
@@ -2148,7 +2148,7 @@ public final class Server extends Thread implements IServer
             return;
         }
 
-        PlayerServerSide player = getPlayer();
+        Player player = getPlayer();
 
         String name = player.getName();
         LOGGER.log(Level.FINE, "Player " + name + " withdraws from the game.");
@@ -2166,7 +2166,7 @@ public final class Server extends Thread implements IServer
             slayer = game.getFirstEnemyLegion(legion.getCurrentHex(), player)
                 .getPlayer();
         }
-        player.die(slayer);
+        ((PlayerServerSide)player).die(slayer);
         game.checkForVictory();
 
         // checks if game over state is reached, and if yes, announces so;
@@ -2181,7 +2181,7 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    // client will dispose itself soon, 
+    // client will dispose itself soon,
     // do not attempt to further read from there.
     public void disconnect()
     {
@@ -2515,7 +2515,7 @@ public final class Server extends Thread implements IServer
             guiSuspendOngoing = newState;
             if (guiSuspendOngoing)
             {
-                // Just did set it to true, get the selector thread out of 
+                // Just did set it to true, get the selector thread out of
                 // select(), if necessary
                 selector.wakeup();
             }
@@ -2678,10 +2678,10 @@ public final class Server extends Thread implements IServer
 
     public void assignFirstMarker(String markerId)
     {
-        PlayerServerSide player = game.getPlayer(getPlayerName());
+        Player player = game.getPlayerByName(getPlayerName());
         assert player.getMarkersAvailable().contains(markerId) : getPlayerName()
             + " illegally called assignFirstMarker()";
-        player.setFirstMarker(markerId);
+        ((PlayerServerSide)player).setFirstMarker(markerId);
         game.nextPickColor();
     }
 
