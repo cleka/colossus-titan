@@ -30,9 +30,9 @@ public class Game
     /**
      * The state of the different players in the game.
      *
-     * TODO use List instead
+     *
      */
-    private final Player[] players;
+    private final List<Player> players = new ArrayList<Player>();
 
     /**
      * The caretaker takes care of managing the available and dead creatures.
@@ -57,14 +57,10 @@ public class Game
     private Legion defender;
     private MasterHex battleSite;
 
+    @SuppressWarnings("unused")
     public Game(Variant variant, String[] playerNames)
     {
         this.variant = variant;
-        this.players = new Player[playerNames.length];
-        for (int i = 0; i < playerNames.length; i++)
-        {
-            players[i] = new Player(this, playerNames[i], i);
-        }
         this.caretaker = new Caretaker(this);
     }
 
@@ -80,6 +76,18 @@ public class Game
             // properly
             return VariantSupport.getCurrentVariant();
         }
+    }
+
+    // just a dummy to silence the warning
+    public int getNumPlayersDummy()
+    {
+        return players.size();
+    }
+
+
+    public Caretaker getCaretaker()
+    {
+        return caretaker;
     }
 
     public int getMovementRoll()
@@ -159,11 +167,6 @@ public class Game
             }
         }
         return recruits;
-    }
-
-    public Caretaker getCaretaker()
-    {
-        return caretaker;
     }
 
     // For making Proposals needed both client and server side
