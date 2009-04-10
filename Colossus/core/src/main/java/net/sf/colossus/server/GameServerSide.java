@@ -93,10 +93,9 @@ public final class GameServerSide extends Game
     private Legion winner;
     private String engagementResult;
     private boolean pendingAdvancePhase;
+
     private boolean loadingGame;
     private boolean replayOngoing = false;
-    private boolean gameOver = false;
-    private String gameOverMessage = null;
     private BattleServerSide battle;
     private Phase phase;
     private Server server;
@@ -314,7 +313,6 @@ public final class GameServerSide extends Game
         reinforcing = false;
         acquiring = false;
         pendingAdvancePhase = false;
-        // gameOver = false;  // Nope. Because advanceTurn calls this.
         loadingGame = false;
         engagementResult = null;
     }
@@ -941,7 +939,7 @@ public final class GameServerSide extends Game
 
     void checkForVictory()
     {
-        if (gameOver)
+        if (isGameOver())
         {
             LOGGER
                 .severe("checkForVictory called although game is already over!!");
@@ -970,22 +968,11 @@ public final class GameServerSide extends Game
         }
     }
 
-    boolean isOver()
-    {
-        return gameOver;
-    }
-
-    public void setGameOver(boolean gameOver, String message)
-    {
-        this.gameOver = gameOver;
-        this.gameOverMessage = message;
-    }
-
     private void announceGameOver(boolean disposeFollows)
     {
         server.allFullyUpdateAllLegionContents(Constants.reasonGameOver);
-        LOGGER.info("Announcing: Game over -- " + gameOverMessage);
-        server.allTellGameOver(gameOverMessage, disposeFollows);
+        LOGGER.info("Announcing: Game over -- " + getGameOverMessage());
+        server.allTellGameOver(getGameOverMessage(), disposeFollows);
     }
 
     boolean isLoadingGame()
@@ -1035,7 +1022,7 @@ public final class GameServerSide extends Game
             return;
         }
         if (getOption(Options.autoStop) && getNumHumansRemaining() < 1
-            && !gameOver)
+            && !isGameOver())
         {
             LOGGER.info("Not advancing because no humans remain");
             setGameOver(true, "All humans eliminated");
@@ -1553,7 +1540,7 @@ public final class GameServerSide extends Game
 
     void autoSave()
     {
-        if (getOption(Options.autosave) && !isOver())
+        if (getOption(Options.autosave) && !isGameOver())
         {
             saveGameInTry(null, true);
         }
@@ -2674,7 +2661,7 @@ public final class GameServerSide extends Game
 
     void createSummonAngel(Legion attacker)
     {
-        if (!isOver())
+        if (!isGameOver())
         {
             summoning = true;
             server.createSummonAngel(attacker);
@@ -3384,7 +3371,7 @@ public final class GameServerSide extends Game
                 checkForVictory();
             }
 
-            if (gameOver)
+            if (isGameOver())
             {
                 LOGGER.info("Negotiation (non-mutual) causes Game Over - "
                     + "skipping summon/reinforce procedures.");
@@ -3487,7 +3474,7 @@ public final class GameServerSide extends Game
      */
     public boolean gameShouldContinue()
     {
-        if (gameOver)
+        if (isGameOver())
         {
             if (getOption(Options.autoQuit))
             {

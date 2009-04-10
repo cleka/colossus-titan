@@ -43,6 +43,14 @@ public class Game
     private int movementRoll = -1;
 
     /**
+     *  Status for Game is over and message for it
+     *  On client side this also implies:
+     *      If the game is over, then quitting does not require confirmation.
+     */
+    private boolean gameOver = false;
+    private String gameOverMessage = null;
+
+    /**
      *  If a battle is ongoing, the masterBoard hex, attacker and defender
      */
     private Legion attacker;
@@ -83,6 +91,23 @@ public class Game
     {
         movementRoll = roll;
     }
+
+    public boolean isGameOver()
+    {
+        return gameOver;
+    }
+
+    public String getGameOverMessage()
+    {
+        return this.gameOverMessage;
+    }
+
+    public void setGameOver(boolean gameOver, String message)
+    {
+        this.gameOver = gameOver;
+        this.gameOverMessage = message;
+    }
+
 
     public void setEngagementData(MasterHex hex, Legion attacker,
         Legion defender)

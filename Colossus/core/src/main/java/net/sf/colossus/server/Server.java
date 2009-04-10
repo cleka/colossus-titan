@@ -648,7 +648,7 @@ public final class Server extends Thread implements IServer
      */
     public void stopServerRunning()
     {
-        if (!game.isOver())
+        if (!game.isGameOver())
         {
             LOGGER
                 .info("stopServerRunning called when game was not over yet.");
@@ -2137,7 +2137,7 @@ public final class Server extends Thread implements IServer
     // XXX Notify all players.
     public void withdrawFromGame()
     {
-        if (obsolete || game == null || game.isOver())
+        if (obsolete || game == null || game.isGameOver())
         {
             return;
         }

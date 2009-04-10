@@ -169,9 +169,6 @@ public final class Client implements IClient, IOracle, IVariant
     private Player battleActivePlayer;
     private BattlePhase battlePhase;
 
-    /** If the game is over, then quitting does not require confirmation. */
-    private boolean gameOver;
-
     /** One per player. */
     private PlayerClientSide[] players;
 
@@ -1404,14 +1401,14 @@ public final class Client implements IClient, IOracle, IVariant
     {
         LOGGER.info("Client " + getOwningPlayer()
             + " received from server game over message: " + message);
-        gameOver = true;
+        game.setGameOver(true, message);
 
         gui.actOnTellGameOver(message, disposeFollows);
     }
 
     public boolean isGameOver()
     {
-        return gameOver;
+        return game.isGameOver();
     }
 
     public void doFight(MasterHex hex)
