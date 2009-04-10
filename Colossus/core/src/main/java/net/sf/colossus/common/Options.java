@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 /** Class Options lists game options for Colossus.
  *  @version $Id$
  *  @author David Ripton
- *  
+ *
  *  TODO constants should be all uppercase
  */
 
@@ -349,7 +349,9 @@ public final class Options implements IOptions
     synchronized public boolean getOption(String optname)
     {
         // return true for all Auto-* options if autoplay is on
-        if (optname.startsWith("Auto") && !optname.equals(Options.autoPlay))
+        // ... and not for autoQuit either!
+        if (optname.startsWith("Auto") && !optname.equals(Options.autoPlay)
+            && !optname.equals(Options.autoQuit))
         {
             if (getOption(Options.autoPlay))
             {
@@ -470,7 +472,7 @@ public final class Options implements IOptions
          case Options.viewableOwnNum: text = Options.viewableOwn; break;
          default: text = Options.viewableAll; break;
          }
-     
+
          return text;
      }
      */
