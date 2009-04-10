@@ -22,11 +22,11 @@ import net.sf.colossus.webcommon.IWebServer;
  *  i.e. something server wanted to execute for a client, is read
  *  from the client socket input stream, parsed, and executed
  *  by the (WebClient)SocketThread.
- *  
- *  This also contains the methods which are called by the client 
+ *
+ *  This also contains the methods which are called by the client
  *  (WebClient's GUI) and are sent over the socket to the server
  *  (note that those calls mostly happen in the EDT).
- *  
+ *
  *  @version $Id$
  *  @author Clemens Katzer
  */
@@ -55,7 +55,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
 
     private boolean loggedIn = false;
     private AckWaiter ackWaiter;
-    private WebClientSocketThreadException failedException = null;
+    private WcstException failedException = null;
 
     public WebClientSocketThread(WebClient wcGUI, String hostname, int port,
         String username, String password, boolean force, String email,
@@ -79,11 +79,11 @@ public class WebClientSocketThread extends Thread implements IWebServer
 
         try
         {
-            // connect, as well as any of the three below 
+            // connect, as well as any of the three below
             // might throw an exception if they fail:
             connect();
 
-            // If client GUI provided a confirmation code, then in is a 
+            // If client GUI provided a confirmation code, then in is a
             // confirmation for a previously sent registration; otherwise:
             // If client GUI provided an email, it's a registration attempt,
             // otherwise just a normal login.
@@ -103,7 +103,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
                 login();
             }
         }
-        catch (WebClientSocketThreadException e)
+        catch (WcstException e)
         {
             this.failedException = e;
         }
@@ -125,12 +125,12 @@ public class WebClientSocketThread extends Thread implements IWebServer
         return line;
     }
 
-    public WebClientSocketThreadException getException()
+    public WcstException getException()
     {
         return failedException;
     }
 
-    private void connect() throws WebClientSocketThreadException
+    private void connect() throws WcstException
     {
         String info = null;
         writeLog("About to connect client socket to " + hostname + ":" + port);
@@ -160,16 +160,16 @@ public class WebClientSocketThread extends Thread implements IWebServer
         if (info != null)
         {
             String message = info;
-            throw new WebClientSocketThreadException(message);
+            throw new WcstException(message);
         }
     }
 
     /**
      * Initial registration attempt
-     * 
-     * @throws WebClientSocketThreadException
+     *
+     * @throws WcstException
      */
-    private void register() throws WebClientSocketThreadException
+    private void register() throws WcstException
     {
         String info = null;
 
@@ -217,16 +217,15 @@ public class WebClientSocketThread extends Thread implements IWebServer
             LOGGER.info("register() : info != null, info: " + info);
             String message = info;
 
-            throw new WebClientSocketThreadException(message);
+            throw new WcstException(message);
         }
     }
 
     /**
-     * Send the confirmation code 
-     * @throws WebClientSocketThreadException
+     * Send the confirmation code
+     * @throws WcstException
      */
-    private void confirm(String confCode)
-        throws WebClientSocketThreadException
+    private void confirm(String confCode) throws WcstException
     {
         String info = null;
 
@@ -271,11 +270,11 @@ public class WebClientSocketThread extends Thread implements IWebServer
 
         if (info != null)
         {
-            throw new WebClientSocketThreadException(info);
+            throw new WcstException(info);
         }
     }
 
-    private void login() throws WebClientSocketThreadException
+    private void login() throws WcstException
     {
         String info = null;
         boolean duplicateLogin = false;
@@ -326,7 +325,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
         if (info != null)
         {
             String message = "Login failed: " + info;
-            throw new WebClientSocketThreadException(message, duplicateLogin);
+            throw new WcstException(message, duplicateLogin);
         }
     }
 
@@ -342,7 +341,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
         if (this.socket == null)
         {
             // All right. We were just called to get the run()
-            // done, even if the constructor threw exception. 
+            // done, even if the constructor threw exception.
             // Otherwise the GC won't clean up this thread.
             cleanup();
             return;
@@ -688,17 +687,17 @@ public class WebClientSocketThread extends Thread implements IWebServer
         }
     }
 
-    public class WebClientSocketThreadException extends Exception
+    public class WcstException extends Exception
     {
         boolean failedBecauseAlreadyLoggedIn = false;
 
-        public WebClientSocketThreadException(String message, boolean dupl)
+        public WcstException(String message, boolean dupl)
         {
             super(message);
             failedBecauseAlreadyLoggedIn = dupl;
         }
 
-        public WebClientSocketThreadException(String message)
+        public WcstException(String message)
         {
             super(message);
             failedBecauseAlreadyLoggedIn = false;

@@ -64,6 +64,7 @@ import net.sf.colossus.guiutil.KFrame;
 import net.sf.colossus.server.GetPlayers;
 import net.sf.colossus.server.Server;
 import net.sf.colossus.util.ViableEntityManager;
+import net.sf.colossus.webclient.WebClientSocketThread.WcstException;
 import net.sf.colossus.webcommon.GameInfo;
 import net.sf.colossus.webcommon.IWebClient;
 import net.sf.colossus.webcommon.IWebServer;
@@ -74,9 +75,9 @@ import net.sf.colossus.webcommon.GameInfo.GameState;
 /** This is the main class for one user client for the web server.
  *  One such client can register and/or login to the web server,
  *  propose a game, browse proposed games and enroll to such a game.
- *  When a game has enough players, it can be started, and this 
+ *  When a game has enough players, it can be started, and this
  *  brings up the MasterBoard like the network client would do.
- *  
+ *
  *  @version $Id$
  *  @author Clemens Katzer
  */
@@ -96,7 +97,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
     private final WhatNextManager whatNextManager;
     private IStartHandler startHandler;
-    
+
     private String hostname;
     private int port;
     private String login;
@@ -147,7 +148,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     private String usersText = "";
 
     private IWebServer server = null;
-    private WebClientSocketThread cst = null;
+    private WebClientSocketThread wcst = null;
 
     private JTabbedPane tabbedPane;
     private Box serverTab;
@@ -286,9 +287,9 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         String password)
     {
         super(windowTitle);
-        
+
         this.whatNextManager = whatNextManager;
-        
+
         options = new Options(Constants.OPTIONS_WEB_CLIENT_NAME);
         options.loadOptions();
 
@@ -525,7 +526,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         // TODO read from preferences?
         // setScheduledGamesMode(getScheduledGamesMode());
 
-        // now finish all 
+        // now finish all
         pack();
 
         useSaveWindow(options, "WebClient", defaultLocation);
@@ -714,7 +715,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         loginPane.add(autoGamePaneCB);
         loginPane.add(new JLabel(""));
 
-        // Label can show: registerLabelText or chgPasswordLabelText 
+        // Label can show: registerLabelText or chgPasswordLabelText
         registerOrPasswordLabel = new JLabel(createAccountLabelText);
         // Button can show: createAccountButtonText or chgPasswordButtonText
         registerOrPasswordButton = new JButton(createAccountButtonText);
@@ -860,7 +861,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         gamesTablesPanel = new JPanel(new BorderLayout());
         createGamesTab.add(gamesTablesPanel);
 
-        // One panel, either the one for instant games, or the one for 
+        // One panel, either the one for instant games, or the one for
         // scheduled games, will be added later based on the "current"
         // value of the radiobutton.
         startButton = new JButton(StartButtonText);
@@ -945,7 +946,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
         // Now that we have the scheduling fields and the tables,
         // we can add the buttons; because now the fields and tables
-        // can be enabled or disabled based on "current" (initial) state 
+        // can be enabled or disabled based on "current" (initial) state
         // of the radio buttons:
         String current = TYPE_INSTANTLY;
         ItemListener iListener = new ItemListener()
@@ -1053,7 +1054,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         preferencesPane.add(new JLabel("Select view mode:"));
         preferencesPane.add(viewmodeBox);
 
-        // event expiring policy: 
+        // event expiring policy:
         String eventExpiringVal = options
             .getStringOption(Options.eventExpiring);
         if (eventExpiringVal == null)
@@ -1270,14 +1271,13 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         failedDueToDuplicateLogin = false;
 
         // email is null: WCST does login
-        cst = new WebClientSocketThread(this, hostname, port, username,
+        wcst = new WebClientSocketThread(this, hostname, port, username,
             password, force, null, null);
-        WebClientSocketThread.WebClientSocketThreadException e = cst
-            .getException();
+        WcstException e = wcst.getException();
         if (e == null)
         {
-            cst.start();
-            server = cst;
+            wcst.start();
+            server = wcst;
 
             updateStatus("Logged in", Color.green);
         }
@@ -1289,12 +1289,12 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             // so GC did not clean it up. Sooo... let's do it this way,
             // a little bit clumsy...
 
-            if (cst.stillNeedsRun())
+            if (wcst.stillNeedsRun())
             {
-                cst.start();
+                wcst.start();
             }
 
-            cst = null;
+            wcst = null;
             server = null;
 
             reason = e.getMessage();
@@ -1333,17 +1333,16 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         // 1) confCode is not null: WCST does the confirmation
         // 2) email is NOT null: WCST does register first instead
         // 3) otherwise: normal login
-        cst = new WebClientSocketThread(this, hostname, port, username,
+        wcst = new WebClientSocketThread(this, hostname, port, username,
             password, force, email, confCode);
 
-        WebClientSocketThread.WebClientSocketThreadException e = cst
-            .getException();
+        WcstException e = wcst.getException();
         if (e == null)
         {
             LOGGER.info("Account for user" + username
                 + " created successfully!");
-            cst.start();
-            server = cst;
+            wcst.start();
+            server = wcst;
             updateStatus("Successfully registered", Color.green);
             JOptionPane.showMessageDialog(registerPanel,
                 "Account was created successfully!\nYou can Login now.",
@@ -1389,7 +1388,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
         server.logout();
         server = null;
-        cst = null;
+        wcst = null;
 
         updateStatus("Not connected", Color.red);
         return success;
@@ -1401,7 +1400,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
         if (gc != null)
         {
-            // Game client handles confirmation if necessary, 
+            // Game client handles confirmation if necessary,
             // asks what to do next, and sets startObj accordingly,
             // and it also disposes this WebClient window.
             gc.getGUI().doConfirmAndQuit();
@@ -1409,7 +1408,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         }
         else
         {
-            
+
             whatNextManager.setWhatToDoNext(WhatToDoNext.QUIT_ALL, true);
             dispose();
         }
@@ -1418,7 +1417,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     @Override
     public void dispose()
     {
-        // we have a server ( = a WebClientSocketThread) 
+        // we have a server ( = a WebClientSocketThread)
         // if and only if we are logged in.
         if (server != null)
         {
@@ -1674,11 +1673,11 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
     /* Validate that the given field does not contain any substring which
      * could cause a wrong splitting it by separator at the recipients side.
-     * 
+     *
      * As the separator currently is " ~ ", in practice this means
      * the userName and password must not start or end with whitespaces
      * or the '~' character, nor contain the separator as a whole.
-     * 
+     *
      * If invalid, displays a message box telling what is wrong and returns
      * false; if valid, returns true.
      */
@@ -1962,7 +1961,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         return true;
     }
 
-    // Called when user presses the "Start" button in 
+    // Called when user presses the "Start" button in
     // "Create or Join" tab
     boolean doStart(String gameId)
     {
@@ -1973,7 +1972,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         return true;
     }
 
-    // Called when user presses the "Start Locally" button in 
+    // Called when user presses the "Start Locally" button in
     // "Create or Join" tab
     private boolean doStartLocally(String gameId)
     {
@@ -1986,7 +1985,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         presetOptions = new Options("server", true);
         gi.storeToOptionsObject(presetOptions, username, false);
 
-        // starts a runnable which waits on a mutex until 
+        // starts a runnable which waits on a mutex until
         // GetPlayersWeb dialog notifies the mutex;
         // when that happens, the runnable starts the game by calling
         // doInitiateStartLocally().
@@ -1995,15 +1994,15 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         return ok;
     }
 
-    /* 
+    /*
      * Bring up the GetPlayersWeb dialog and then we wait,
-     * until is has set startObject to the next action to do  
+     * until is has set startObject to the next action to do
      * and notified us to continue.
      */
     void runGetPlayersDialogAndWait(Options presetOptions, WhatNextManager whatNextManager)
     {
         playersDialogMutex = new Object();
-        
+
         new GetPlayers(presetOptions, playersDialogMutex, whatNextManager, true);
 
         // System.out.println("doStartLocally after GetPlayersWeb");
@@ -2046,7 +2045,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         new Thread(waitForAction).start();
     }
 
-    // TODO move to GameInfo instead, 
+    // TODO move to GameInfo instead,
     // TODO use the gi thread instead of own Runnable,
     // TODO is the sleep 5000  needed?
     public void doInitiateStartLocally()
@@ -2086,9 +2085,9 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     }
 
     private static WebClient initiatingWebClient = null;
-    
+
     /**
-     * GameServerSide queries the starting web client from here, 
+     * GameServerSide queries the starting web client from here,
      * if a Game Server game was started locally on players computer.
      * @return The last WebClient that initiated a game start.
      */
@@ -2152,7 +2151,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
     public void didUnenroll(String gameId, String user)
     {
-        // do not set it back to LoggedIn if this didUnenroll is the 
+        // do not set it back to LoggedIn if this didUnenroll is the
         // result of a automatic unenroll before logout
         if (state != NotLoggedIn)
         {
@@ -2421,8 +2420,8 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     /*
      * Server tells us news about games in "proposed" state
      * - created ones, enrolled player count changed, or
-     *   when it is removed (cancelled or started) 
-     * 
+     *   when it is removed (cancelled or started)
+     *
      **/
     public void gameInfo(GameInfo gi)
     {
