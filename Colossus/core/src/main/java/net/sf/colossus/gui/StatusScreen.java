@@ -132,21 +132,25 @@ final class StatusScreen extends KDialog
         scoreLabel = new JLabel[numPlayers];
 
         gridPane.add(new JLabel("Player"));
-        for (int i = 0; i < numPlayers; i++)
-        {
-            nameLabel[i] = new JLabel();
-            nameLabel[i].setOpaque(true);
-            gridPane.add(nameLabel[i]);
 
-            final PlayerClientSide player = client.getPlayer(i);
-            nameLabel[i].addMouseListener(new MouseAdapter()
+        int j = 0;
+        for (PlayerClientSide player : client.getPlayers())
+        {
+            nameLabel[j] = new JLabel();
+            nameLabel[j].setOpaque(true);
+            gridPane.add(nameLabel[j]);
+
+            final PlayerClientSide thePlayer = player;
+            nameLabel[j].addMouseListener(new MouseAdapter()
             {
                 @Override
                 public void mouseClicked(MouseEvent e)
                 {
-                    new PlayerDetailsDialog(frame, player, client);
+                    new PlayerDetailsDialog(frame, thePlayer, client);
                 }
             });
+
+            j++;
         }
 
         gridPane.add(new JLabel("Tower"));
@@ -286,10 +290,9 @@ final class StatusScreen extends KDialog
         battleTurnLabel.setText(battleTurn);
         battlePhaseLabel.setText(oracle.getBattlePhaseName());
 
-        for (int i = 0; i < numPlayers; i++)
+        int i = 0;
+        for (Player player : client.getPlayers())
         {
-            Player player = client.getPlayer(i);
-
             if (player.isDead())
             {
                 setPlayerLabelBackground(i, Color.RED);
@@ -331,6 +334,8 @@ final class StatusScreen extends KDialog
             creaturesLabel[i].setText("" + player.getNumCreatures());
             titanLabel[i].setText("" + player.getTitanPower());
             scoreLabel[i].setText("" + player.getScore());
+
+            i++;
         }
 
         repaint();

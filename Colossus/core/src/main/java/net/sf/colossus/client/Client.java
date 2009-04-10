@@ -4,7 +4,6 @@ package net.sf.colossus.client;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -165,7 +164,7 @@ public final class Client implements IClient, IOracle, IVariant
     private BattlePhase battlePhase;
 
     /** One per player. */
-    private PlayerClientSide[] players;
+    private List<PlayerClientSide> players = new ArrayList<PlayerClientSide>();
 
     private int numPlayers;
 
@@ -616,18 +615,17 @@ public final class Client implements IClient, IOracle, IVariant
     public void updatePlayerInfo(List<String> infoStrings)
     {
         numPlayers = infoStrings.size();
-        if (players == null)
+        if (players.size() == 0)
         {
             // first time we get the player infos, store them locally and set our
             // own, too -- which has been a fake until now
-            players = new PlayerClientSide[numPlayers];
             for (int i = 0; i < numPlayers; i++)
             {
                 List<String> data = Split.split(":", infoStrings.get(i));
                 String playerName = data.get(1);
                 PlayerClientSide info = new PlayerClientSide(getGame(),
                     playerName, i);
-                players[i] = info;
+                players.add(info);
                 if (playerName.equals(this.owningPlayer.getName()))
                 {
                     this.owningPlayer = info;
@@ -636,15 +634,9 @@ public final class Client implements IClient, IOracle, IVariant
         }
         for (int i = 0; i < numPlayers; i++)
         {
-            players[i].update(infoStrings.get(i));
+            players.get(i).update(infoStrings.get(i));
         }
         gui.updateStatusScreen();
-    }
-
-    // TODO fix this mess with lots of different methods for retrieving Player[Info]s
-    public PlayerClientSide getPlayer(int playerNum)
-    {
-        return players[playerNum];
     }
 
     PlayerClientSide getPlayerInfo(String playerName)
@@ -667,7 +659,7 @@ public final class Client implements IClient, IOracle, IVariant
 
     public List<PlayerClientSide> getPlayers()
     {
-        return Collections.unmodifiableList(Arrays.asList(players));
+        return Collections.unmodifiableList(players);
     }
 
     /** Return the average point value of all legions in the game. */
