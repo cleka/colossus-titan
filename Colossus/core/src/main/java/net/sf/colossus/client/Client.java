@@ -598,17 +598,19 @@ public final class Client implements IClient, IOracle, IVariant
         return numPlayers;
     }
 
+    // TODO cannot pull up yet because client and server side
+    // have different (own) data structures overriding the one in game.Game
     public int getNumLivingPlayers()
     {
-        int total = 0;
-        for (PlayerClientSide info : players)
+        int alive = 0;
+        for (Player info : players)
         {
             if (!info.isDead())
             {
-                total++;
+                alive++;
             }
         }
-        return total;
+        return alive;
     }
 
     public void updatePlayerInfo(List<String> infoStrings)

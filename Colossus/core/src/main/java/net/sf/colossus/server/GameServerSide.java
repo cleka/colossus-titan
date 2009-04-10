@@ -780,21 +780,19 @@ public final class GameServerSide extends Game
         return players.size();
     }
 
-    int getNumLivingPlayers()
+    // TODO cannot pull up yet because client and server side
+    // have different (own) data structures overriding the one in game.Game
+    public int getNumLivingPlayers()
     {
-        int count = 0;
-        Iterator<PlayerServerSide> it = players.iterator();
-
-        while (it.hasNext())
+        int alive = 0;
+        for (Player info : players)
         {
-            PlayerServerSide player = it.next();
-
-            if (!player.isDead() && !player.getDeadBeforeSave())
+            if (!info.isDead())
             {
-                count++;
+                alive++;
             }
         }
-        return count;
+        return alive;
     }
 
     PlayerServerSide getActivePlayer()
