@@ -384,7 +384,7 @@ public final class Movement
         MasterHex targetHex, boolean teleport)
     {
         Set<EntrySide> entrySides = new HashSet<EntrySide>();
-        int movementRoll = client.getMovementRoll();
+        int movementRoll = client.getGame().getMovementRoll();
         MasterHex currentHex = legion.getCurrentHex();
 
         if (teleport)

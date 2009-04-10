@@ -2951,14 +2951,14 @@ public final class Client implements IClient, IOracle, IVariant
     public Set<MasterHex> listTeleportMoves(Legion legion)
     {
         MasterHex hex = legion.getCurrentHex();
-        return movement.listTeleportMoves(legion, hex, getMovementRoll());
+        return movement.listTeleportMoves(legion, hex, game.getMovementRoll());
     }
 
     /** Return a set of hexLabels. */
     public Set<MasterHex> listNormalMoves(Legion legion)
     {
-        return movement.listNormalMoves(legion, legion.getCurrentHex(),
-            getMovementRoll());
+        return movement.listNormalMoves(legion, legion.getCurrentHex(), game
+            .getMovementRoll());
     }
 
     public List<LegionClientSide> getLegionsByHex(MasterHex hex)
@@ -3323,12 +3323,6 @@ public final class Client implements IClient, IOracle, IVariant
         // after our phase is over but activePlayerName not updated yet
         return playerAlive && owningPlayer.equals(getBattleActivePlayer())
             && this.phase == Phase.FIGHT;
-    }
-
-    // TODO move to some kind of Oracle
-    public int getMovementRoll()
-    {
-        return game.getMovementRoll();
     }
 
     public void doSplit(Legion legion)

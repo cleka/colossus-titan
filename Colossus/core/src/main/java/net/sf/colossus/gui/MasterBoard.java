@@ -1149,7 +1149,8 @@ public final class MasterBoard extends JPanel
 
     void setupMoveMenu()
     {
-        setupPhasePreparations("Movement Roll: " + client.getMovementRoll());
+        setupPhasePreparations("Movement Roll: "
+            + client.getGame().getMovementRoll());
 
         if (gui.isMyTurn())
         {

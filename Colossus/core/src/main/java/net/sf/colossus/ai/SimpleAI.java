@@ -813,7 +813,8 @@ public class SimpleAI extends AbstractAI
         // TODO: This is really stupid.  Do something smart here.
         if (client.getTurnNumber() == 1
             && player.getMulligansLeft() > 0
-            && (client.getMovementRoll() == 2 || client.getMovementRoll() == 5)
+            && (client.getGame().getMovementRoll() == 2 || client.getGame()
+                .getMovementRoll() == 5)
             && !client.tookMulligan())
         {
             client.mulligan();
@@ -858,7 +859,7 @@ public class SimpleAI extends AbstractAI
             MoveInfo bestMove = null;
             int bestValue = Integer.MIN_VALUE;
             Set<MasterHex> set = client.getMovement().listAllMoves(legion,
-                legion.getCurrentHex(), client.getMovementRoll());
+                legion.getCurrentHex(), client.getGame().getMovementRoll());
 
             for (MasterHex hex : set)
             {
@@ -924,7 +925,8 @@ public class SimpleAI extends AbstractAI
 
             if (friendlyLegions.size() > 1
                 && !client.getMovement().listNormalMoves(legion,
-                    legion.getCurrentHex(), client.getMovementRoll())
+                    legion.getCurrentHex(),
+                        client.getGame().getMovementRoll())
                     .isEmpty())
             {
                 // Pick the legion in this hex whose best move has the

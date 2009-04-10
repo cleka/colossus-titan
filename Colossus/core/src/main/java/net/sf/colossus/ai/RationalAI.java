@@ -806,13 +806,13 @@ public class RationalAI extends SimpleAI
             {
                 // exclude teleport moves
                 set = client.getMovement().listNormalMoves(legion, hex,
-                    client.getMovementRoll());
+                    client.getGame().getMovementRoll());
             }
             else
             {
                 // only teleport moves
                 set = client.getMovement().listTeleportMoves(legion, hex,
-                    client.getMovementRoll());
+                    client.getGame().getMovementRoll());
             }
 
             for (MasterHex masterHex : set)
@@ -870,7 +870,7 @@ public class RationalAI extends SimpleAI
         // since it may stick the legion that does not get to
         // teleport with a really bad move.  it is not easy
         // to figure this out though.
-        if (client.getMovementRoll() == 6)
+        if (client.getGame().getMovementRoll() == 6)
         {
             List<List<LegionBoardMove>> teleport_legionMoves = new ArrayList<List<LegionBoardMove>>();
             findMoveList(legions, teleport_legionMoves,
@@ -935,7 +935,7 @@ public class RationalAI extends SimpleAI
 
     private boolean handleForcedSplitMoves(Player player)
     {
-        int roll = client.getMovementRoll();
+        int roll = client.getGame().getMovementRoll();
         ArrayList<MasterHex> unsplitHexes = new ArrayList<MasterHex>();
 
         /* Consider one hex after another. It is not necessary to look at
@@ -1063,7 +1063,7 @@ public class RationalAI extends SimpleAI
      */
     private boolean handleForcedSingleMove(Player player)
     {
-        int roll = client.getMovementRoll();
+        int roll = client.getGame().getMovementRoll();
 
         // first we have to find out those that can move at all:
 
@@ -1328,7 +1328,7 @@ public class RationalAI extends SimpleAI
                 // that is the only way to have a noMove conflict
                 Set<MasterHex> moves = client.getMovement().listNormalMoves(
                     lm.legion, lm.legion.getCurrentHex(),
-                    client.getMovementRoll());
+                    client.getGame().getMovementRoll());
                 for (MasterHex dest : moves)
                 {
                     if (!(newOccupiedHexes.contains(dest) || occupiedHexes
