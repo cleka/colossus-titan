@@ -463,7 +463,8 @@ public final class Server extends Thread implements IServer
             LOGGER.log(Level.SEVERE, "Exception while waiting on selector", e);
             String message = "Woooah. An exception was caught while "
                 + "waiting on Selector";
-            ExceptionUtils.showMessageDialog(null, "Exception caught!", message, false);
+            ExceptionUtils.showMessageDialog(null, "Exception caught!",
+                message, false);
         }
     }
 
@@ -789,11 +790,9 @@ public final class Server extends Thread implements IServer
             return false;
         }
 
-        Iterator<PlayerServerSide> it = game.getPlayers().iterator();
-        while (it.hasNext())
+        for (Player player : game.getPlayers())
         {
-            PlayerServerSide p = it.next();
-            if (!p.isAI() && !isClientGone(p))
+            if (!player.isAI() && !isClientGone(player))
             {
                 return true;
             }
@@ -854,6 +853,11 @@ public final class Server extends Thread implements IServer
         return getPlayer().equals(game.getActivePlayer());
     }
 
+    private PlayerServerSide getActivePlayerSS()
+    {
+        return (PlayerServerSide)game.getActivePlayer();
+    }
+
     private boolean isBattleActivePlayer()
     {
         return game.getBattle() != null
@@ -864,9 +868,10 @@ public final class Server extends Thread implements IServer
     public void createLocalClients()
     {
         boolean atLeastOneBoardNeeded = Constants.FORCE_VIEW_BOARD;
-        for (PlayerServerSide player : game.getPlayers())
+        for (Player player : game.getPlayers())
         {
-            if (!player.getDeadBeforeSave()
+            // getDeadBeforeSave to Game instead?
+            if (!((PlayerServerSide)player).getDeadBeforeSave()
                 && !player.getType().endsWith(Constants.network))
             {
 
@@ -889,9 +894,8 @@ public final class Server extends Thread implements IServer
                     }
                     LOGGER.info("Creating local client for player "
                         + player.getName());
-                    createLocalClient(player, createGUI);
+                    createLocalClient((PlayerServerSide)player, createGUI);
                 }
-
             }
         }
     }
@@ -902,8 +906,8 @@ public final class Server extends Thread implements IServer
         boolean dontUseOptionsFile = player.isAI();
         LOGGER.finest("Called Server.createLocalClient() for " + playerName);
 
-        new Client("127.0.0.1", port, playerName, whatNextManager, this, false,
-            dontUseOptionsFile, createGUI);
+        new Client("127.0.0.1", port, playerName, whatNextManager, this,
+            false, dontUseOptionsFile, createGUI);
     }
 
     boolean addClient(final IClient client, final String playerName,
@@ -1749,8 +1753,8 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    void allTellBattleMove(int tag, BattleHex startingHex, BattleHex endingHex,
-        boolean undo)
+    void allTellBattleMove(int tag, BattleHex startingHex,
+        BattleHex endingHex, boolean undo)
     {
         Iterator<IClient> it = clients.iterator();
         while (it.hasNext())
@@ -1981,7 +1985,7 @@ public final class Server extends Thread implements IServer
         {
             return;
         }
-        game.getActivePlayer().undoSplit(splitoff);
+        getActivePlayerSS().undoSplit(splitoff);
     }
 
     void undidSplit(Legion splitoff, Legion survivor, boolean updateHistory,
@@ -2006,12 +2010,15 @@ public final class Server extends Thread implements IServer
             return;
         }
         MasterHex formerHex = legion.getCurrentHex();
-        game.getActivePlayer().undoMove(legion);
+
+        PlayerServerSide activePlayer = (PlayerServerSide)game
+            .getActivePlayer();
+        activePlayer.undoMove(legion);
         MasterHex currentHex = legion.getCurrentHex();
 
-        PlayerServerSide player = game.getActivePlayer();
         // needed in undidMove to decide whether to dis/enable button
-        boolean splitLegionHasForcedMove = player.splitLegionHasForcedMove();
+        boolean splitLegionHasForcedMove = activePlayer
+            .splitLegionHasForcedMove();
 
         Iterator<IClient> it = clients.iterator();
         while (it.hasNext())
@@ -2028,7 +2035,7 @@ public final class Server extends Thread implements IServer
         {
             return;
         }
-        game.getActivePlayer().undoRecruit(legion);
+        getActivePlayerSS().undoRecruit(legion);
     }
 
     public void doneWithSplits()
@@ -2056,7 +2063,7 @@ public final class Server extends Thread implements IServer
 
     public void doneWithMoves()
     {
-        PlayerServerSide player = game.getActivePlayer();
+        PlayerServerSide player = getActivePlayerSS();
         if (!isActivePlayer())
         {
             LOGGER.severe(getPlayerName()
@@ -2121,7 +2128,7 @@ public final class Server extends Thread implements IServer
         }
         else
         {
-            PlayerServerSide player = game.getActivePlayer();
+            PlayerServerSide player = getActivePlayerSS();
             player.commitMoves();
 
             // Mulligans are only allowed on turn 1.
@@ -2205,11 +2212,10 @@ public final class Server extends Thread implements IServer
     private List<String> getPlayerInfo(boolean treatDeadAsAlive)
     {
         List<String> info = new ArrayList<String>(game.getNumPlayers());
-        Iterator<PlayerServerSide> it = game.getPlayers().iterator();
-        while (it.hasNext())
+        for (Player player : game.getPlayers())
         {
-            PlayerServerSide player = it.next();
-            info.add(player.getStatusInfo(treatDeadAsAlive));
+            info.add(((PlayerServerSide)player)
+                .getStatusInfo(treatDeadAsAlive));
         }
         return info;
     }
@@ -2272,8 +2278,8 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    public void doMove(Legion legion, MasterHex hex,
-        EntrySide entrySide, boolean teleport, String teleportingLord)
+    public void doMove(Legion legion, MasterHex hex, EntrySide entrySide,
+        boolean teleport, String teleportingLord)
     {
         IClient client = getClient(getPlayer());
         if (!isActivePlayer())
@@ -2301,7 +2307,7 @@ public final class Server extends Thread implements IServer
     void allTellDidMove(Legion legion, MasterHex startingHex, MasterHex hex,
         EntrySide entrySide, boolean teleport, String teleportingLord)
     {
-        PlayerServerSide player = game.getActivePlayer();
+        PlayerServerSide player = getActivePlayerSS();
         // needed in didMove to decide whether to dis/enable button
         boolean splitLegionHasForcedMove = player.splitLegionHasForcedMove();
 
@@ -2620,8 +2626,7 @@ public final class Server extends Thread implements IServer
         client.setPlayerName(newName);
     }
 
-    void askPickColor(Player player,
-        final List<PlayerColor> colorsLeft)
+    void askPickColor(Player player, final List<PlayerColor> colorsLeft)
     {
         IClient activeClient = getClient(player);
         for (IClient client : clients)
@@ -2688,10 +2693,8 @@ public final class Server extends Thread implements IServer
     /** Hack to set color on load game. */
     void allSetColor()
     {
-        Iterator<PlayerServerSide> it = game.getPlayers().iterator();
-        while (it.hasNext())
+        for (Player player : game.getPlayers())
         {
-            PlayerServerSide player = it.next();
             PlayerColor color = player.getColor();
             IClient client = getClient(player);
             if (client != null)
@@ -2779,7 +2782,8 @@ public final class Server extends Thread implements IServer
      */
     public void startupProgressAbort()
     {
-        whatNextManager.setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
+        whatNextManager
+            .setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
         stopServerRunning();
         if (startLog != null)
         {

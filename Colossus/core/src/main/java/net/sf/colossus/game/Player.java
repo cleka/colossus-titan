@@ -169,6 +169,26 @@ public class Player
         return type;
     }
 
+    public boolean isHuman()
+    {
+        return isLocalHuman() || isNetwork();
+    }
+
+    public boolean isLocalHuman()
+    {
+        return getType().endsWith(Constants.human);
+    }
+
+    public boolean isNetwork()
+    {
+        return getType().endsWith(Constants.network);
+    }
+
+    public boolean isNone()
+    {
+        return getType().endsWith(Constants.none);
+    }
+
     public boolean isAI()
     {
         return type.endsWith(Constants.ai);

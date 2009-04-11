@@ -19,7 +19,7 @@ import net.sf.colossus.util.InstanceTracker;
 
 /**
  * Class Player holds the data for one player in a Titan game.
- * 
+ *
  * @version $Id$
  * @author David Ripton
  */
@@ -73,32 +73,12 @@ public final class PlayerServerSide extends Player implements
     }
 
     /**
-     * Overridden to return specific flavor of Game until the upper class is sufficient. 
+     * Overridden to return specific flavor of Game until the upper class is sufficient.
      */
     @Override
     public GameServerSide getGame()
     {
         return (GameServerSide)super.getGame();
-    }
-
-    boolean isHuman()
-    {
-        return isLocalHuman() || isNetwork();
-    }
-
-    boolean isLocalHuman()
-    {
-        return getType().endsWith(Constants.human);
-    }
-
-    boolean isNetwork()
-    {
-        return getType().endsWith(Constants.network);
-    }
-
-    boolean isNone()
-    {
-        return getType().endsWith(Constants.none);
     }
 
     // TODO strong redundancy with Client.setType(String)
@@ -160,8 +140,7 @@ public final class PlayerServerSide extends Player implements
             {
                 String shortColor = allVictims.substring(i, i + 2);
                 initMarkersAvailable(shortColor);
-                PlayerServerSide victim = getGame().getPlayerByShortColor(
-                    shortColor);
+                Player victim = getGame().getPlayerByShortColor(shortColor);
                 allVictims.append(victim.getPlayersElim());
             }
             for (Legion legion : getLegions())
@@ -502,10 +481,10 @@ public final class PlayerServerSide extends Player implements
 
     /**
      * Award points and handle all acquiring related issues.
-     * 
+     *
      * Note that this is not used for adding points for cleaning up legions
      * of a dead player!
-     * 
+     *
      * @param points the points to award
      * @param legion the legion which is entitled to acquire due to that
      * @param halfPoints this are already halfPoints (from fleeing)
@@ -520,17 +499,17 @@ public final class PlayerServerSide extends Player implements
 
     /**
      * Turns the player dead.
-     * 
+     *
      * This method calculates the points other players get, adds them to their score and
      * then cleans up this player and marks him dead.
-     * 
+     *
      * TODO is it really the Player's role to assign points? I'd rather see that responsibility
      * with the Game object
-     * 
+     *
      * TODO the slayer could be non-null if we introduce a null object (some object called
      * e.g. "NOONE" that behaves like a Player as far as possible, giving a name and swallowing
      * points)
-     * 
+     *
      * @param slayer The player who killed us. May be null if we just gave up or it is a draw.
      */
     void die(Player slayer)
@@ -571,9 +550,9 @@ public final class PlayerServerSide extends Player implements
         }
 
         // Truncate every player's score to an integer value.
-        for (PlayerServerSide player : getGame().getPlayers())
+        for (Player player : getGame().getPlayers())
         {
-            player.truncScore();
+            ((PlayerServerSide)player).truncScore();
         }
 
         // Mark this player as dead.
@@ -621,7 +600,7 @@ public final class PlayerServerSide extends Player implements
         li.add(Boolean.toString(!treatDeadAsAlive && isDead()));
         li.add(getName());
         li.add(getStartingTower().getLabel());
-        li.add((getColor()!=null)?getColor().getName():null);
+        li.add((getColor() != null) ? getColor().getName() : null);
         li.add(getType());
         li.add(getPlayersElim());
         li.add(Integer.toString(getLegions().size()));
@@ -637,7 +616,7 @@ public final class PlayerServerSide extends Player implements
      * might be totally mismatching esp. after player elimination.
      * Reconstruct creation, deceasing, surviving legions, player elimination
      * and slayer-setting and markerTransfer from history;
-     * After that, synchronize state info like location, hasMoved etc 
+     * After that, synchronize state info like location, hasMoved etc
      * from the backup.
      */
 

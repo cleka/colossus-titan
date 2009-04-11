@@ -78,8 +78,7 @@ public final class GameServerSide extends Game
     private static final Logger LOGGER = Logger.getLogger(GameServerSide.class
         .getName());
 
-    private final List<PlayerServerSide> players = new ArrayList<PlayerServerSide>(
-        6);
+    private final List<Player> players = new ArrayList<Player>();
     private int activePlayerNum;
     private int turnNumber; // Advance when every player has a turn
     private int lastRecruitTurnNumber;
@@ -408,9 +407,30 @@ public final class GameServerSide extends Game
         assignTowers();
 
         // Renumber players in descending tower order.
-        Collections.sort(players);
+        sortPlayersDescendingTower();
         activePlayerNum = 0;
         assignColors();
+    }
+
+    /**
+     * Temporary solution ... I do not know a better way how to do the
+     * sorting on players (type List<Player>) itself.
+     * I don't want to pull up the Comparator predicate, because
+     * ClientSide might have totally different idea of the right "order"...
+     */
+    private void sortPlayersDescendingTower()
+    {
+        List<PlayerServerSide> playersSS = new ArrayList<PlayerServerSide>();
+        for (Player p : getPlayers())
+        {
+            playersSS.add((PlayerServerSide)p);
+        }
+        Collections.sort(playersSS);
+        players.clear();
+        for (PlayerServerSide p : playersSS)
+        {
+            players.add(p);
+        }
     }
 
     private boolean nameIsTaken(String name, Player checkedPlayer)
@@ -418,7 +438,6 @@ public final class GameServerSide extends Game
         for (int i = 0; i < getNumPlayers(); i++)
         {
             Player player = players.get(i);
-
             if (player.getName().equals(name) && !player.equals(checkedPlayer))
             {
                 return true;
@@ -445,7 +464,7 @@ public final class GameServerSide extends Game
     {
         for (int i = 0; i < getNumPlayers(); i++)
         {
-            PlayerServerSide curPlayer = players.get(i);
+            Player curPlayer = players.get(i);
 
             if (curPlayer.getType().endsWith(Constants.network))
             {
@@ -471,12 +490,8 @@ public final class GameServerSide extends Game
 
     private void syncAutoPlay()
     {
-        Iterator<PlayerServerSide> it = players.iterator();
-
-        while (it.hasNext())
+        for (Player player : getPlayers())
         {
-            PlayerServerSide player = it.next();
-
             server.oneSetOption(player, Options.autoPlay, player.isAI());
             server.oneSetOption(player, Options.playerType, player.getType());
         }
@@ -524,7 +539,7 @@ public final class GameServerSide extends Game
 
         for (int i = getNumPlayers() - 1; i >= 0; i--)
         {
-            PlayerServerSide player = players.get(i);
+            Player player = players.get(i);
 
             if (player.isHuman())
             {
@@ -533,7 +548,7 @@ public final class GameServerSide extends Game
         }
         for (int i = getNumPlayers() - 1; i >= 0; i--)
         {
-            PlayerServerSide player = players.get(i);
+            Player player = players.get(i);
 
             if (player.isAI())
             {
@@ -651,10 +666,9 @@ public final class GameServerSide extends Game
     {
         server.allUpdatePlayerInfo();
 
-        Iterator<PlayerServerSide> it = players.iterator();
-        while (it.hasNext())
+        for (Player p : getPlayers())
         {
-            PlayerServerSide player = it.next();
+            PlayerServerSide player = (PlayerServerSide)p;
             placeInitialLegion(player, player.getFirstMarker());
             server.allRevealLegion(player.getLegions().get(0),
                 Constants.reasonInitial);
@@ -693,7 +707,7 @@ public final class GameServerSide extends Game
 
         for (int i = 0; i < numPlayers; i++)
         {
-            PlayerServerSide player = players.get(i);
+            Player player = players.get(i);
             LOGGER.info(player + " gets tower " + playerTower[i]);
             player.setStartingTower(playerTower[i]);
         }
@@ -785,9 +799,9 @@ public final class GameServerSide extends Game
     public int getNumLivingPlayers()
     {
         int alive = 0;
-        for (Player info : players)
+        for (Player player : players)
         {
-            if (!info.isDead())
+            if (!player.isDead())
             {
                 alive++;
             }
@@ -795,7 +809,7 @@ public final class GameServerSide extends Game
         return alive;
     }
 
-    PlayerServerSide getActivePlayer()
+    Player getActivePlayer()
     {
         // Sanity check in case called before all players are loaded.
         if (activePlayerNum < players.size())
@@ -808,7 +822,7 @@ public final class GameServerSide extends Game
         }
     }
 
-    Collection<PlayerServerSide> getPlayers()
+    Collection<Player> getPlayers()
     {
         return Collections.unmodifiableCollection(players);
     }
@@ -853,16 +867,12 @@ public final class GameServerSide extends Game
             + playerName + "'");
     }
 
-    PlayerServerSide getPlayerByShortColor(String shortColor)
+    Player getPlayerByShortColor(String shortColor)
     {
         if (shortColor != null)
         {
-            Iterator<PlayerServerSide> it = players.iterator();
-
-            while (it.hasNext())
+            for (Player player : getPlayers())
             {
-                PlayerServerSide player = it.next();
-
                 if (shortColor.equals(player.getShortColor()))
                 {
                     return player;
@@ -875,12 +885,8 @@ public final class GameServerSide extends Game
     private int getNumPlayersRemaining()
     {
         int remaining = 0;
-        Iterator<PlayerServerSide> it = players.iterator();
-
-        while (it.hasNext())
+        for (Player player : getPlayers())
         {
-            Player player = it.next();
-
             if (!player.isDead())
             {
                 remaining++;
@@ -898,12 +904,8 @@ public final class GameServerSide extends Game
     private int getNumHumansRemaining()
     {
         int remaining = 0;
-        Iterator<PlayerServerSide> it = players.iterator();
-
-        while (it.hasNext())
+        for (Player player : getPlayers())
         {
-            PlayerServerSide player = it.next();
-
             if (player.isHuman() && !player.isDead())
             {
                 remaining++;
@@ -916,12 +918,8 @@ public final class GameServerSide extends Game
     int getNumRemoteRemaining()
     {
         int remaining = 0;
-        Iterator<PlayerServerSide> it = players.iterator();
-
-        while (it.hasNext())
+        for (Player player : getPlayers())
         {
-            PlayerServerSide player = it.next();
-
             if (player.isNetwork() && !player.isDead())
             {
                 remaining++;
@@ -934,12 +932,8 @@ public final class GameServerSide extends Game
     {
         int remaining = 0;
         Player result = null;
-        Iterator<PlayerServerSide> it = players.iterator();
-
-        while (it.hasNext())
+        for (Player player : getPlayers())
         {
-            Player player = it.next();
-
             if (!player.isDead())
             {
                 remaining++;
@@ -1158,7 +1152,7 @@ public final class GameServerSide extends Game
 
     private void setupSplit()
     {
-        PlayerServerSide player = getActivePlayer();
+        Player player = getActivePlayer();
 
         if (player == null)
         {
@@ -1166,7 +1160,7 @@ public final class GameServerSide extends Game
             dispose();
             return;
         }
-        player.resetTurnState();
+        ((PlayerServerSide)player).resetTurnState();
         server.allSetupSplit();
         if (hotSeatMode)
         {
@@ -1176,7 +1170,7 @@ public final class GameServerSide extends Game
 
     private void hotSeatModeChangeBoards()
     {
-        PlayerServerSide activePlayer = getActivePlayer();
+        Player activePlayer = getActivePlayer();
 
         // game just started - find the local player which shall
         // get the board first, and hide all other local ones.
@@ -1185,7 +1179,7 @@ public final class GameServerSide extends Game
             int i;
             for (i = 0; i < getNumPlayers(); i++)
             {
-                PlayerServerSide iPlayer = players.get(i);
+                Player iPlayer = players.get(i);
                 if (iPlayer.isLocalHuman() && !server.isClientGone(iPlayer))
                 {
                     // This is a local alive player.
@@ -1216,9 +1210,9 @@ public final class GameServerSide extends Game
 
     private void setupMove()
     {
-        PlayerServerSide player = getActivePlayer();
+        Player player = getActivePlayer();
 
-        player.rollMovement();
+        ((PlayerServerSide)player).rollMovement();
         server.allSetupMove();
     }
 
@@ -1230,8 +1224,8 @@ public final class GameServerSide extends Game
 
     private void setupMuster()
     {
-        PlayerServerSide player = getActivePlayer();
-        player.removeEmptyLegions();
+        Player player = getActivePlayer();
+        ((PlayerServerSide)player).removeEmptyLegions();
         // If a player has been eliminated we can't count on his client
         // still being around to advance the turn.
         if (player.isDead())
@@ -1273,7 +1267,7 @@ public final class GameServerSide extends Game
         {
             saveGame(filename, autoSave);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             String asNowOffMmessage = "";
             if (autoSave)
@@ -1283,8 +1277,8 @@ public final class GameServerSide extends Game
             }
 
             String doWhat = autoSave ? "auto-save" : "save";
-            String toWhere = filename == null ?
-                "<automatically generated filename>" : (" file " + filename);
+            String toWhere = filename == null ? "<automatically generated filename>"
+                : (" file " + filename);
             String message = "Woooah! An exception was caught while "
                 + "trying to " + doWhat + " game to " + toWhere
                 + "\nStack trace:\n" + ExceptionUtils.makeStackTraceString(e)
@@ -1410,11 +1404,9 @@ public final class GameServerSide extends Game
             }
 
             // Players
-            Iterator<PlayerServerSide> itPl = players.iterator();
-            while (itPl.hasNext())
+            for (Player p : getPlayers())
             {
-                PlayerServerSide player = itPl.next();
-
+                PlayerServerSide player = (PlayerServerSide)p;
                 el = new Element("Player");
                 el.setAttribute("name", player.getName());
                 el.setAttribute("type", player.getType());
@@ -1530,7 +1522,8 @@ public final class GameServerSide extends Game
             entrySide = EntrySide.NOT_SET;
         }
         leg.setAttribute("entrySide", "" + entrySide.ordinal());
-        leg.setAttribute("parent", legion.getParent() != null?notnull(legion.getParent().getMarkerId()):"null");
+        leg.setAttribute("parent", legion.getParent() != null ? notnull(legion
+            .getParent().getMarkerId()) : "null");
         leg.setAttribute("recruitName", notnull(legion.getRecruitName()));
         leg.setAttribute("battleTally", "" + legion.getBattleTally());
 
@@ -1824,8 +1817,8 @@ public final class GameServerSide extends Game
                 while (it2.hasNext())
                 {
                     Element cart = it2.next();
-                    carryTargets.add(HexMap.getHexByLabel(engagementHex.getTerrain(),
-                        cart.getTextTrim()));
+                    carryTargets.add(HexMap.getHexByLabel(engagementHex
+                        .getTerrain(), cart.getTextTrim()));
                 }
 
                 Player attackingPlayer = getActivePlayer();
@@ -1993,9 +1986,9 @@ public final class GameServerSide extends Game
             return false;
         }
 
-        for (PlayerServerSide p : getPlayers())
+        for (Player player : getPlayers())
         {
-            p.computeMarkersAvailable();
+            ((PlayerServerSide)player).computeMarkersAvailable();
         }
 
         server.allFullyUpdateLegionStatus();
@@ -2014,9 +2007,9 @@ public final class GameServerSide extends Game
     private boolean resyncBackupData()
     {
         boolean allOk = true;
-        for (PlayerServerSide player : getPlayers())
+        for (Player player : getPlayers())
         {
-            allOk = allOk && player.resyncBackupData();
+            allOk = allOk && ((PlayerServerSide)player).resyncBackupData();
         }
         return allOk;
     }
@@ -2263,8 +2256,7 @@ public final class GameServerSide extends Game
 
         // Lookup coords for chit starting from player[i].getTower()
         MasterHex hex = player.getStartingTower();
-        LegionServerSide legion = getStartingLegion(markerId,
-            hex, player);
+        LegionServerSide legion = getStartingLegion(markerId, hex, player);
         player.addLegion(legion);
     }
 
@@ -2573,8 +2565,7 @@ public final class GameServerSide extends Game
      *  possible entry sides.  If the hex is unoccupied, just return
      *  one entry side since it doesn't matter. */
     private Set<EntrySide> listPossibleEntrySides(Legion legion,
-        MasterHex targetHex,
-        boolean teleport)
+        MasterHex targetHex, boolean teleport)
     {
         Set<EntrySide> entrySides = new HashSet<EntrySide>();
         Player player = legion.getPlayer();
@@ -2703,7 +2694,7 @@ public final class GameServerSide extends Game
     // Called by both human and AI.
     void doSummon(Legion legion, Legion donor, CreatureType angel)
     {
-        PlayerServerSide player = getActivePlayer();
+        PlayerServerSide player = (PlayerServerSide)getActivePlayer();
 
         if (angel != null && donor != null
             && ((LegionServerSide)legion).canSummonAngel())
@@ -3549,7 +3540,7 @@ public final class GameServerSide extends Game
     @Override
     public LegionServerSide getLegionByMarkerId(String markerId)
     {
-        for (PlayerServerSide player : players)
+        for (Player player : players)
         {
             LegionServerSide legion = (LegionServerSide)player
                 .getLegionByMarkerId(markerId);
@@ -3735,7 +3726,7 @@ public final class GameServerSide extends Game
         {
             return -1;
         }
-        PlayerServerSide player = getActivePlayer();
+        PlayerServerSide player = (PlayerServerSide)getActivePlayer();
         player.takeMulligan();
         server.allUpdatePlayerInfo();
         setupPhase();
