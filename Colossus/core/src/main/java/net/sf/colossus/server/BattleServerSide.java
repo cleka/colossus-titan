@@ -77,7 +77,8 @@ public final class BattleServerSide extends Battle
         int turnNumber, BattlePhase phase)
     {
         super(game, attacker, defender, masterHex.getTerrain());
-        server = game.getServer();
+
+        this.server = game.getServer();
         this.masterHex = masterHex;
         this.activeLegionTag = activeLegionTag;
         this.turnNumber = turnNumber;
@@ -97,6 +98,12 @@ public final class BattleServerSide extends Battle
 
         placeLegion(attacker);
         placeLegion(defender);
+    }
+
+    // Used when loading a game
+    public void setServer(Server server)
+    {
+        this.server = server;
     }
 
     public void cleanRefs()
@@ -585,7 +592,7 @@ public final class BattleServerSide extends Battle
         return set;
     }
 
-    /** 
+    /**
      * Find all legal moves for this critter.
      */
     private Set<BattleHex> showMoves(CreatureServerSide critter,

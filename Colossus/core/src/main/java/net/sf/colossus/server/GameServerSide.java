@@ -1783,8 +1783,6 @@ public final class GameServerSide extends Game
                     Element leg = it2.next();
                     readLegion(leg, player);
                 }
-
-                player.backupLoadedData();
             }
 
             // Battle stuff
@@ -1843,7 +1841,14 @@ public final class GameServerSide extends Game
                 battle.setCarryDamage(carryDamage);
                 battle.setDriftDamageApplied(driftDamageApplied);
                 battle.setCarryTargets(carryTargets);
-                battle.init();
+            }
+
+            // Backup Legion data and wipe it out, so that history
+            // starts from a clean table. After history reply, we compare
+            // whether the replay result matches this "loaded data".
+            for (Player buPlayer : getPlayers())
+            {
+                ((PlayerServerSide)buPlayer).backupLoadedData();
             }
 
             // History
@@ -1915,6 +1920,10 @@ public final class GameServerSide extends Game
             legion = new LegionServerSide(markerId, parentLegion, currentHex,
                 startingHex, player, this);
             player.addLegion(legion);
+        }
+        else
+        {
+            LOGGER.warning("Legion for marker does already exist?");
         }
 
         List<Element> creatureElements = leg.getChildren("Creature");
@@ -1996,6 +2005,12 @@ public final class GameServerSide extends Game
         server.allTellAllLegionLocations();
         server.allTellReplay(false, 0);
         replayOngoing = false;
+
+        if (battle != null)
+        {
+            battle.setServer(getServer());
+            battle.init();
+        }
 
         server.allSetupTurnState();
         updateCaretakerDisplays();
@@ -3670,6 +3685,11 @@ public final class GameServerSide extends Game
                 return legion;
             }
         }
+
+        // only info. I *think* in recombining illegal split case
+        // it might not find anything and that would be totally OK ...
+        LOGGER.info("Could not find any friendly legion for player "
+            + player.getName() + " in hex " + masterHex);
         return null;
     }
 
