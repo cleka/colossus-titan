@@ -6,7 +6,7 @@ import java.awt.Point;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 
-import net.sf.colossus.common.IVariant;
+import net.sf.colossus.variant.IVariant;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;
 

@@ -27,10 +27,10 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 import net.sf.colossus.common.Constants;
-import net.sf.colossus.common.IVariant;
 import net.sf.colossus.game.RecruitGraph;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.IVariant;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;

@@ -18,10 +18,10 @@ import javax.swing.WindowConstants;
 
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.common.IOptions;
-import net.sf.colossus.common.IVariant;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.guiutil.KDialog;
 import net.sf.colossus.guiutil.SaveWindow;
+import net.sf.colossus.variant.IVariant;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;
 

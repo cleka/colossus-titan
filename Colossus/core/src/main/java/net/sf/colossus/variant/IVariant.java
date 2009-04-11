@@ -1,12 +1,9 @@
-package net.sf.colossus.common;
+package net.sf.colossus.variant;
 
 
 import java.util.Collection;
 import java.util.List;
 
-import net.sf.colossus.variant.CreatureType;
-import net.sf.colossus.variant.MasterBoardTerrain;
-import net.sf.colossus.variant.MasterHex;
 
 
 /**

@@ -23,7 +23,6 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
-import net.sf.colossus.common.IVariant;
 import net.sf.colossus.game.RecruitGraph;
 import net.sf.colossus.guiutil.KDialog;
 import net.sf.colossus.server.CreatureServerSide;
@@ -33,6 +32,7 @@ import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardTerrain;
+import net.sf.colossus.variant.IVariant;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.Variant;
 

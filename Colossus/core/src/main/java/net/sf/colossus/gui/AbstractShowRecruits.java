@@ -11,8 +11,8 @@ import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
-import net.sf.colossus.common.IVariant;
 import net.sf.colossus.guiutil.KDialog;
+import net.sf.colossus.variant.IVariant;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;

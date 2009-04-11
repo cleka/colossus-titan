@@ -7,8 +7,8 @@ import java.util.Collection;
 import javax.swing.JFrame;
 
 import net.sf.colossus.common.IOptions;
-import net.sf.colossus.common.IVariant;
 import net.sf.colossus.guiutil.SaveWindow;
+import net.sf.colossus.variant.IVariant;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.Variant;
 

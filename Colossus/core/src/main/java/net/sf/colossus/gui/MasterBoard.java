@@ -61,7 +61,6 @@ import javax.swing.SwingUtilities;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.common.Constants;
-import net.sf.colossus.common.IVariant;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Phase;
@@ -75,6 +74,7 @@ import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.util.NullCheckPredicate;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.IVariant;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;
 
