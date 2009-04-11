@@ -646,8 +646,10 @@ final class SocketClientThread extends Thread implements IServer
         {
             String playerName = args.remove(0);
             String slayerName = args.remove(0);
-            client.tellPlayerElim(client.getPlayerByName(playerName), (client
-                .getGameClientSide().getPlayerByNameIgnoreNull(slayerName)));
+            // TODO use the "noone" player instead of null if no slayer?
+            client.tellPlayerElim(client.getPlayerByName(playerName),
+                slayerName.equals("null") ? null : (client.getGameClientSide()
+                    .getPlayerByName(slayerName)));
         }
         else if (method.equals(Constants.askConcede))
         {

@@ -103,6 +103,9 @@ public class GameClientSide extends Game
         return true;
     }
 
+
+    // TODO not needed right now on client side - SCT compares to
+    // "null" instead. Check whether to remove when pulling up?
     /**
      * Resolve playerName into Player object. Name might be null,
      * then returns null.
