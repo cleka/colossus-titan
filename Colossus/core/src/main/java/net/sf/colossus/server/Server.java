@@ -2141,8 +2141,6 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    // TODO Move to Game or Player ?
-    // XXX Notify all players.
     public void withdrawFromGame()
     {
         if (obsolete || game == null || game.isGameOver())
@@ -2158,35 +2156,7 @@ public final class Server extends Thread implements IServer
 
         Player player = getPlayer();
 
-        String name = player.getName();
-        LOGGER.log(Level.FINE, "Player " + name + " withdraws from the game.");
-
-        if (player.isDead())
-        {
-            return;
-        }
-
-        // If player quits while engaged, set slayer.
-        Player slayer = null;
-        Legion legion = player.getTitanLegion();
-        if (legion != null && game.isEngagement(legion.getCurrentHex()))
-        {
-            slayer = game.getFirstEnemyLegion(legion.getCurrentHex(), player)
-                .getPlayer();
-        }
-        ((PlayerServerSide)player).die(slayer);
-        game.checkForVictory();
-
-        // checks if game over state is reached, and if yes, announces so;
-        // and returns false.
-        // Otherwise it returns true and that means game shall go on.
-        if (game.gameShouldContinue())
-        {
-            if (player == game.getActivePlayer())
-            {
-                game.advancePhase(game.getPhase(), getPlayer());
-            }
-        }
+        game.handlePlayerWithdrawal(player);
     }
 
     // client will dispose itself soon,

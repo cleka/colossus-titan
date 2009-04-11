@@ -861,6 +861,50 @@ public final class GameServerSide extends Game
         return null;
     }
 
+    /**
+     * A player requested he wants to withdraw (or connection was lost, and
+     * server socket handling does withdraw then).
+     *
+     * @param player The player that wishes to withdraw from the game
+     *
+     * TODO Notify all players.
+     */
+    void handlePlayerWithdrawal(Player player)
+    {
+        String name = player.getName();
+
+        if (player.isDead())
+        {
+            LOGGER.log(Level.FINE, "Nothing to do for withdrawal of player "
+                + name + " - is already dead.");
+            return;
+        }
+
+        LOGGER.log(Level.FINE, "Player " + name + " withdraws from the game.");
+
+        // If player quits while engaged, set slayer.
+        Player slayer = null;
+        Legion legion = player.getTitanLegion();
+        if (legion != null && isEngagement(legion.getCurrentHex()))
+        {
+            slayer = getFirstEnemyLegion(legion.getCurrentHex(), player)
+                .getPlayer();
+        }
+        ((PlayerServerSide)player).die(slayer);
+        checkForVictory();
+
+        // checks if game over state is reached, and if yes, announces so;
+        // and returns false.
+        // Otherwise it returns true and that means game shall go on.
+        if (gameShouldContinue())
+        {
+            if (player == getActivePlayer())
+            {
+                advancePhase(getPhase(), player);
+            }
+        }
+    }
+
     private Player getWinner()
     {
         int remaining = 0;
