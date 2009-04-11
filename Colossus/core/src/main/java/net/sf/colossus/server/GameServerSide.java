@@ -788,21 +788,6 @@ public final class GameServerSide extends Game
         return player;
     }
 
-    // TODO cannot pull up yet because client and server side
-    // have different (own) data structures overriding the one in game.Game
-    public int getNumLivingPlayers()
-    {
-        int alive = 0;
-        for (Player player : players)
-        {
-            if (!player.isDead())
-            {
-                alive++;
-            }
-        }
-        return alive;
-    }
-
     Player getActivePlayer()
     {
         // Sanity check in case called before all players are loaded.
@@ -856,6 +841,11 @@ public final class GameServerSide extends Game
             + playerName + "'");
     }
 
+    /**
+     *  NOTE: to be used only during loading a Game!
+     *  Client side has a more sophisticated version that takes
+     *  slain players and their inherited markers into account.
+     */
     Player getPlayerByShortColor(String shortColor)
     {
         if (shortColor != null)
@@ -869,52 +859,6 @@ public final class GameServerSide extends Game
             }
         }
         return null;
-    }
-
-    private int getNumPlayersRemaining()
-    {
-        int remaining = 0;
-        for (Player player : getPlayers())
-        {
-            if (!player.isDead())
-            {
-                remaining++;
-            }
-        }
-        return remaining;
-    }
-
-    /**
-     * Returns the number of real players (Human or Network)
-     * which are still alive.
-     *
-     * TODO compare on client side "onlyAIsRemain()" and pull up
-     */
-    private int getNumHumansRemaining()
-    {
-        int remaining = 0;
-        for (Player player : getPlayers())
-        {
-            if (player.isHuman() && !player.isDead())
-            {
-                remaining++;
-            }
-        }
-        return remaining;
-    }
-
-    // Server uses this to decide whether it needs to start a file server
-    int getNumRemoteRemaining()
-    {
-        int remaining = 0;
-        for (Player player : getPlayers())
-        {
-            if (player.isNetwork() && !player.isDead())
-            {
-                remaining++;
-            }
-        }
-        return remaining;
     }
 
     private Player getWinner()
@@ -939,6 +883,8 @@ public final class GameServerSide extends Game
         return result;
     }
 
+    // TODO Up to game.Game or not?
+    //      In practice it is only needed in server side.
     void checkForVictory()
     {
         if (isGameOver())
@@ -948,7 +894,7 @@ public final class GameServerSide extends Game
             return;
         }
 
-        int remaining = getNumPlayersRemaining();
+        int remaining = getNumLivingPlayers();
 
         switch (remaining)
         {
@@ -1023,7 +969,7 @@ public final class GameServerSide extends Game
                 + "])");
             return;
         }
-        if (getOption(Options.autoStop) && getNumHumansRemaining() < 1
+        if (getOption(Options.autoStop) && onlyAIsRemain()
             && !isGameOver())
         {
             LOGGER.info("Not advancing because no humans remain");

@@ -90,6 +90,68 @@ public class Game
         return players.size();
     }
 
+    public int getNumLivingPlayers()
+    {
+        int alive = 0;
+        for (Player info : players)
+        {
+            if (!info.isDead())
+            {
+                alive++;
+            }
+        }
+        return alive;
+    }
+
+    /**
+     *
+     * @return Returns true if all still alive players are AIs
+     */
+    public boolean onlyAIsRemain()
+    {
+        for (Player p : players)
+        {
+            if (!p.isAI() && !p.isDead())
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Returns the number of real players (Human or Network)
+     * which are still alive.
+     *
+     * TODO partly same idea as "onlyAIsRemain()"
+     */
+    protected int getNumHumansRemaining()
+    {
+        int remaining = 0;
+        for (Player player : getPlayers())
+        {
+            if (player.isHuman() && !player.isDead())
+            {
+                remaining++;
+            }
+        }
+        return remaining;
+    }
+
+    // Server uses this to decide whether it needs to start a file server
+    public int getNumRemoteRemaining()
+    {
+        int remaining = 0;
+        for (Player player : getPlayers())
+        {
+            if (player.isNetwork() && !player.isDead())
+            {
+                remaining++;
+            }
+        }
+        return remaining;
+    }
+
     public Caretaker getCaretaker()
     {
         return caretaker;

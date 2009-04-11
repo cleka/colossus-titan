@@ -63,33 +63,6 @@ public class GameClientSide extends Game
         }
     }
 
-    public int getNumLivingPlayers()
-    {
-        int alive = 0;
-        for (Player info : players)
-        {
-            if (!info.isDead())
-            {
-                alive++;
-            }
-        }
-        return alive;
-    }
-
-    // TODO compare with GameServerSide.getNumHumansRemaining() and pull up
-    public boolean onlyAIsRemain()
-    {
-        for (Player p : players)
-        {
-            if (!p.isAI() && !p.isDead())
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-
-
     // TODO not needed right now on client side - SCT compares to
     // "null" instead. Check whether to remove when pulling up?
     /**

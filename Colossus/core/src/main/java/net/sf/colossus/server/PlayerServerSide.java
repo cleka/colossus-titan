@@ -125,7 +125,9 @@ public final class PlayerServerSide extends Player implements
         }
     }
 
-    /** Set markersAvailable based on other available information. */
+    /** Set markersAvailable based on other available information.
+     *  NOTE: to be used only during loading a Game!
+     */
     void computeMarkersAvailable()
     {
         if (isDead())

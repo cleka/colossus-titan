@@ -2141,6 +2141,7 @@ public final class Server extends Thread implements IServer
         }
     }
 
+    // TODO Move to Game or Player ?
     // XXX Notify all players.
     public void withdrawFromGame()
     {
