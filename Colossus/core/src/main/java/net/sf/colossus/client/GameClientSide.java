@@ -2,7 +2,6 @@ package net.sf.colossus.client;
 
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -22,8 +21,6 @@ import net.sf.colossus.variant.Variant;
 public class GameClientSide extends Game
 {
     private Client client;
-
-    private final List<Player> players = new ArrayList<Player>();
 
     public GameClientSide(Variant variant, String[] playerNames)
     {
@@ -64,17 +61,6 @@ public class GameClientSide extends Game
             PlayerClientSide player = (PlayerClientSide)players.get(i);
             player.update(infoStrings.get(i));
         }
-    }
-
-    public List<Player> getPlayers()
-    {
-        return Collections.unmodifiableList(players);
-    }
-
-    public int GetNumPlayers()
-    {
-        assert players.size() != 0 : "getNumPlayers called before player info set (size==0)!";
-        return players.size();
     }
 
     public int getNumLivingPlayers()

@@ -2,6 +2,8 @@ package net.sf.colossus.game;
 
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
@@ -29,10 +31,8 @@ public class Game
 
     /**
      * The state of the different players in the game.
-     *
-     *
      */
-    private final List<Player> players = new ArrayList<Player>();
+    protected final List<Player> players = new ArrayList<Player>();
 
     /**
      * The caretaker takes care of managing the available and dead creatures.
@@ -78,12 +78,17 @@ public class Game
         }
     }
 
-    // just a dummy to silence the warning
-    public int getNumPlayersDummy()
+    public Collection<Player> getPlayers()
     {
-        return players.size();
+        assert players.size() != 0 : "getPlayers called before player info set (size==0)!";
+        return Collections.unmodifiableCollection(players);
     }
 
+    public int getNumPlayers()
+    {
+        assert players.size() != 0 : "getNumPlayers called before player info set (size==0)!";
+        return players.size();
+    }
 
     public Caretaker getCaretaker()
     {

@@ -78,7 +78,6 @@ public final class GameServerSide extends Game
     private static final Logger LOGGER = Logger.getLogger(GameServerSide.class
         .getName());
 
-    private final List<Player> players = new ArrayList<Player>();
     private int activePlayerNum;
     private int turnNumber; // Advance when every player has a turn
     private int lastRecruitTurnNumber;
@@ -789,11 +788,6 @@ public final class GameServerSide extends Game
         return player;
     }
 
-    int getNumPlayers()
-    {
-        return players.size();
-    }
-
     // TODO cannot pull up yet because client and server side
     // have different (own) data structures overriding the one in game.Game
     public int getNumLivingPlayers()
@@ -820,11 +814,6 @@ public final class GameServerSide extends Game
         {
             return null;
         }
-    }
-
-    Collection<Player> getPlayers()
-    {
-        return Collections.unmodifiableCollection(players);
     }
 
     /**

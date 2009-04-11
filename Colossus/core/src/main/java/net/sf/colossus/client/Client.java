@@ -562,7 +562,7 @@ public final class Client implements IClient, IOracle, IVariant
     // public for IOracle
     public int getNumPlayers()
     {
-        return game.GetNumPlayers();
+        return game.getNumPlayers();
     }
 
     public void updatePlayerInfo(List<String> infoStrings)
