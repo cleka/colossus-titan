@@ -33,9 +33,9 @@ import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;
 import net.sf.colossus.xmlparser.CreatureLoader;
+import net.sf.colossus.xmlparser.MainVarFileLoader;
 import net.sf.colossus.xmlparser.StrategicMapLoader;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
-import net.sf.colossus.xmlparser.VariantLoader;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader.NullTerrainRecruitLoader;
 
 
@@ -276,10 +276,10 @@ public final class VariantSupport
             }
             else
             {
-                VariantLoader vl = new VariantLoader(varIS);
-                if (vl.getMaxPlayers() > 0)
+                MainVarFileLoader mvfLoader = new MainVarFileLoader(varIS);
+                if (mvfLoader.getMaxPlayers() > 0)
                 {
-                    maxPlayers = vl.getMaxPlayers();
+                    maxPlayers = mvfLoader.getMaxPlayers();
                 }
                 else
                 {
@@ -296,30 +296,30 @@ public final class VariantSupport
                 varFilename = tempVarFilename;
                 variantName = tempVariantName;
 
-                mapName = vl.getMap();
+                mapName = mvfLoader.getMap();
                 if (mapName == null)
                 {
                     mapName = Constants.defaultMAPFile;
                 }
                 LOGGER.log(Level.FINEST, "Variant using MAP " + mapName);
 
-                lCreaturesName = vl.getCre();
+                lCreaturesName = mvfLoader.getCre();
                 for (String creaturesName : lCreaturesName)
                 {
                     LOGGER.log(Level.FINEST, "Variant using CRE "
                         + creaturesName);
                 }
 
-                recruitsFileName = vl.getTer();
+                recruitsFileName = mvfLoader.getTer();
                 if (recruitsFileName == null)
                 {
                     recruitsFileName = Constants.defaultTERFile;
                 }
                 LOGGER.log(Level.FINEST, "Variant using TER " + recruitsFileName);
 
-                hintName = vl.getHintName();
+                hintName = mvfLoader.getHintName();
                 LOGGER.log(Level.FINEST, "Variant using hint " + hintName);
-                dependUpon = vl.getDepends();
+                dependUpon = mvfLoader.getDepends();
                 LOGGER.log(Level.FINEST, "Variant depending upon "
                     + dependUpon);
             }

@@ -20,9 +20,9 @@ import org.jdom.input.SAXBuilder;
  * @author Romain Dolbeau
  * @version $Id$
  */
-public class VariantLoader
+public class MainVarFileLoader
 {
-    private static final Logger LOGGER = Logger.getLogger(VariantLoader.class
+    private static final Logger LOGGER = Logger.getLogger(MainVarFileLoader.class
         .getName());
 
     private String map;
@@ -34,7 +34,7 @@ public class VariantLoader
 
     // no generics in JDOM
     @SuppressWarnings("unchecked")
-    public VariantLoader(InputStream varIS)
+    public MainVarFileLoader(InputStream varIS)
     {
         SAXBuilder builder = new SAXBuilder();
         try
