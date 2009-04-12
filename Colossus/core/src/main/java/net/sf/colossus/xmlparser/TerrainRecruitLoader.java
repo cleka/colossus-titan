@@ -19,6 +19,7 @@ import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.ICustomRecruitBase;
 import net.sf.colossus.variant.IVariantInitializer;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
@@ -191,7 +192,7 @@ public class TerrainRecruitLoader implements IVariantInitializer
                 {
                     // special recruitment, need to add edge
                     // between the special aned every possible recruit
-                    CustomRecruitBase cri = getCustomRecruitBase(v2);
+                    ICustomRecruitBase cri = getCustomRecruitBase(v2);
                     List<CreatureType> allRecruits = cri
                         .getAllPossibleSpecialRecruits(t);
                     for (CreatureType cre : allRecruits)
@@ -577,7 +578,7 @@ public class TerrainRecruitLoader implements IVariantInitializer
         }
     }
 
-    public static CustomRecruitBase getCustomRecruitBase(String specialString)
+    public static ICustomRecruitBase getCustomRecruitBase(String specialString)
     {
         CustomRecruitBase cri = nameToInstance.get(specialString);
         if (cri != null)
@@ -707,7 +708,7 @@ public class TerrainRecruitLoader implements IVariantInitializer
             }
             if (tr.getName().startsWith(Keyword_Special))
             {
-                CustomRecruitBase cri = getCustomRecruitBase(tr.getName());
+                ICustomRecruitBase cri = getCustomRecruitBase(tr.getName());
                 if (cri != null)
                 {
                     List<? extends CreatureType> temp = cri
@@ -785,7 +786,7 @@ public class TerrainRecruitLoader implements IVariantInitializer
                 }
                 if (tr.getName().startsWith(Keyword_Special))
                 {
-                    CustomRecruitBase cri = getCustomRecruitBase(tr.getName());
+                    ICustomRecruitBase cri = getCustomRecruitBase(tr.getName());
                     if (cri != null)
                     {
                         List<CreatureType> temp = cri

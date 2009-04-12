@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import net.sf.colossus.game.Caretaker;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.ICustomRecruitBase;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 
@@ -21,7 +22,7 @@ import net.sf.colossus.variant.MasterHex;
  * @version $Id$
  * @author Romain Dolbeau
  */
-abstract public class CustomRecruitBase
+abstract public class CustomRecruitBase implements ICustomRecruitBase
 {
     private static final Logger LOGGER = Logger
         .getLogger(CustomRecruitBase.class.getName());

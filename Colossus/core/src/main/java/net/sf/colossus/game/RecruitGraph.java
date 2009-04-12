@@ -12,9 +12,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.LegionClientSide;
-import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.ICustomRecruitBase;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
@@ -444,7 +444,7 @@ public class RecruitGraph
                 if (tempSrc.getCreatureName().startsWith(
                     TerrainRecruitLoader.Keyword_Special))
                 {
-                    CustomRecruitBase cri = TerrainRecruitLoader
+                    ICustomRecruitBase cri = TerrainRecruitLoader
                         .getCustomRecruitBase(tempSrc.getCreatureName());
                     int v = cri.numberOfRecruiterNeeded(recruiterCre,
                         recruitCre, terrain, hex);

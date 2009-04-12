@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import net.sf.colossus.common.Constants;
-import net.sf.colossus.server.CustomRecruitBase;
 
 /**
  * The recruiting sub-tree in a terrain (or several terrains)
@@ -42,7 +42,7 @@ public class RecruitingSubTree
             new HashMap<CreatureType, Integer>();
     private final Map<CreatureType, Integer> anyDemiLord =
             new HashMap<CreatureType, Integer>();
-    private final Set<CustomRecruitBase> allCustom = new HashSet<CustomRecruitBase>();
+    private final Set<ICustomRecruitBase> allCustom = new HashSet<ICustomRecruitBase>();
 
     public void addRegular(CreatureType recruiter, CreatureType recruit,
             int number)
@@ -75,7 +75,7 @@ public class RecruitingSubTree
         anyDemiLord.put(recruit, number);
     }
 
-    public void addCustom(CustomRecruitBase crb)
+    public void addCustom(ICustomRecruitBase crb)
     {
         allCustom.add(crb);
     }
@@ -114,7 +114,7 @@ public class RecruitingSubTree
                 number = Math.min(number, anyDemiLord.get(recruit).intValue());
             }
         }
-        for (CustomRecruitBase crb : allCustom)
+        for (ICustomRecruitBase crb : allCustom)
         {
             number = Math.min(number, crb.numberOfRecruiterNeeded(recruiter,
                     recruit, terrain,
