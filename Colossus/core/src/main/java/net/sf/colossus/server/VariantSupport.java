@@ -127,8 +127,10 @@ public final class VariantSupport
             variantDir = fullPathFile.getParentFile().getAbsolutePath();
         }
         String variantFileName = variantName + Constants.varEnd;
-        return loadVariant(variantName, variantFileName, variantDir,
-            serverSide);
+
+        Variant loadedVariant = loadVariant(variantName, variantFileName,
+            variantDir, serverSide);
+        return loadedVariant.getReadme();
     }
 
     /**
@@ -142,7 +144,6 @@ public final class VariantSupport
     public static Document loadVariantByFile(java.io.File varFile,
         boolean serverSide)
     {
-
         String tempVarFilename = varFile.getName();
         String tempVarDirectory = varFile.getParentFile().getAbsolutePath();
         String tempVarName = null;
@@ -162,8 +163,10 @@ public final class VariantSupport
         String tempFullPathFilename = varFile.getAbsolutePath();
         rememberFullPathFileForVariantName(tempVarName, tempFullPathFilename);
 
-        return loadVariant(tempVarName, tempVarFilename, tempVarDirectory,
+        Variant loadedVariant = loadVariant(tempVarName, tempVarFilename,
+            tempVarDirectory,
             serverSide);
+        return loadedVariant.getReadme();
     }
 
     private static String getVariantNameFromFilename(String varFilename)
@@ -196,16 +199,23 @@ public final class VariantSupport
     /**
      * Load a Colossus Variant from the specified filename
      *   in the specified path.
+     *
+     * Synchronized to avoid concurrent threads running into it at same
+     * time (probably not possible so far, but if one day Public Server game
+     * can run with one local human and several AIs (on user's computer)
+     * this would become an issue.
+     *
      * @param tempVarFilename The name of the file holding the Variant definition.
      * @param tempVarDirectory The path to the directory holding the Variant.
      * @param tempVariantName The actual plain name of the variant
      * @param serverSide We're loading on a server.
-     * @return A Document describing the variant.
+     * @return A variant object, perhaps newly created, perhaps re-used if same
+     *         variant was used before.
      *
      * TODO right now variant name might sometimes be null, then we try a hack
      * to retrieve the variant name from the variant file name.
      */
-    public static Document loadVariant(String tempVariantName,
+    public static synchronized Variant loadVariant(String tempVariantName,
         String tempVarFilename, String tempVarDirectory, boolean serverSide)
     {
         if (tempVariantName == null)
@@ -214,10 +224,29 @@ public final class VariantSupport
             return null;
         }
 
+        return tryLoadVariant(tempVariantName, tempVarFilename, tempVarDirectory, serverSide);
+    }
+
+    /**
+     * This does the actual work for
+     *   {@link #loadVariant(String, String, String, boolean)}
+     * This here is private and should be called only from the synchronized
+     * before-mentioned method.
+     *
+     * @param tempVariantName
+     * @param tempVarFilename
+     * @param tempVarDirectory
+     * @param serverSide
+     * @return A variant object, perhaps newly created, perhaps re-used if same
+     *         variant was used before.
+     */
+    private static Variant tryLoadVariant(String tempVariantName,
+        String tempVarFilename, String tempVarDirectory, boolean serverSide)
+    {
         if (loadedVariant && varFilename.equals(tempVarFilename)
             && varDirectory.equals(tempVarDirectory))
         {
-            return varREADME;
+            return CURRENT_VARIANT;
         }
 
         if (serverSide)
@@ -382,13 +411,13 @@ public final class VariantSupport
                 LOGGER.log(Level.WARNING, "Loading variant " + tempVariantName
                     + " failed - trying to load Default instead...");
 
-                varREADME = loadVariant(Constants.defaultVarName,
+                tryLoadVariant(Constants.defaultVarName,
                     Constants.defaultVARFile, Constants.defaultDirName,
                     serverSide);
             }
         }
 
-        return varREADME;
+        return CURRENT_VARIANT;
     }
 
     /** Call immediately after loading variant, before using creatures. */
