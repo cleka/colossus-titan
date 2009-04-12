@@ -371,35 +371,16 @@ public final class GetPlayers extends KFrame
         {
             public void actionPerformed(ActionEvent e)
             {
-                int maxPlayers = VariantSupport.getMaxPlayers();
-                String varName = (String)variantBox.getSelectedItem();
+                int oldMaxPlayers = VariantSupport.getMaxPlayers();
+                String newVarName = (String)variantBox.getSelectedItem();
 
-                if (VariantSupport.getVariantName().equals(varName))
+                if (VariantSupport.getVariantName().equals(newVarName))
                 {
                     // re-selecting the same ; do nothing
                 }
                 else
                 {
-                    Document doc = VariantSupport.loadVariantByName(varName,
-                        true);
-                    options.setOption(Options.variant, varName);
-                    String varFileWithFullPath = VariantSupport
-                        .getFullPathFileForVariantName(varName);
-                    if (varFileWithFullPath == null)
-                    {
-                        varFileWithFullPath = "null";
-                    }
-                    options.setOption(Options.variantFileWithFullPath,
-                        varFileWithFullPath);
-
-                    String prop = (String)doc
-                        .getProperty(ResourceLoader.KEY_CONTENT_TYPE);
-                    readme.setContentType(prop);
-                    readme.setDocument(doc);
-                    if (maxPlayers != VariantSupport.getMaxPlayers())
-                    {
-                        enablePlayers();
-                    }
+                    actOnVariantChange(oldMaxPlayers, newVarName);
                 }
             }
         });
@@ -450,19 +431,7 @@ public final class GetPlayers extends KFrame
         // if we don't pass the JEditorPane ("readme"),
         // it won't be updated when Variant changes.
 
-        Document doc;
-        if (isValidExternVariant)
-        {
-            doc = VariantSupport.loadVariantByName(variantName, true);
-            //     File varFile = new File(variantFullPath);
-            //     doc = VariantSupport.loadVariantByFile(varFile, true);
-        }
-        else
-        {
-            // A standard (builtin) variant
-            doc = VariantSupport.loadVariantByName(variantName, true);
-        }
-
+        Document doc = VariantSupport.getCurrentVariant().getReadme();
         readmeScrollPane = ShowReadme.readmeContentScrollPane(readme, doc);
         tabbedPane.addTab("Variant README", readmeScrollPane);
 
@@ -559,6 +528,56 @@ public final class GetPlayers extends KFrame
         });
         setVisible(true);
     }
+
+    private void actOnVariantChange(int oldMaxPlayers, String newVarName)
+    {
+        // TODO change all loadVariant... to return variant, not the doc,
+        //      then the stuff below would be cleaner, too.
+        Document doc = VariantSupport.loadVariantByName(newVarName, true);
+
+        // If loading failed, change variantBox to what is actually now
+        // loaded. Probably Default.
+        String loadedName = VariantSupport.getCurrentVariant().getName();
+        if (!loadedName.equals(variantBox.getSelectedItem()))
+        {
+            LOGGER.info("Ups, loaded variant '" + loadedName
+                + "' does not match selected item in variantBox '"
+                + variantBox.getSelectedItem() + "'");
+
+            // TODO somewhat hacked to just re-set it to "Default"
+            // We just use the default from variant names array,
+            // otherwise we would have to search through all items
+            // ComboBox changes only if it is the same *object*)
+            variantBox.setSelectedItem(Constants.variantArray[0]);
+            newVarName = loadedName;
+            doc = VariantSupport.getCurrentVariant().getReadme();
+        }
+        else
+        {
+            LOGGER.finest("OK, loaded variant (" + loadedName
+                + ") matches selected item in variantBox");
+        }
+
+        options.setOption(Options.variant, newVarName);
+        String varFileWithFullPath = VariantSupport
+            .getFullPathFileForVariantName(newVarName);
+        if (varFileWithFullPath == null)
+        {
+            varFileWithFullPath = "null";
+        }
+        options
+            .setOption(Options.variantFileWithFullPath, varFileWithFullPath);
+
+        String prop = (String)doc.getProperty(ResourceLoader.KEY_CONTENT_TYPE);
+        readme.setContentType(prop);
+        readme.setDocument(doc);
+        if (oldMaxPlayers != VariantSupport.getMaxPlayers())
+        {
+            enablePlayers();
+        }
+
+    }
+
 
     private void setRunningOnLabel(int port)
     {

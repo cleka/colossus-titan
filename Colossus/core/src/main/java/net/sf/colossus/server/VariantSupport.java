@@ -15,7 +15,6 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.JOptionPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.Document;
@@ -24,6 +23,7 @@ import javax.swing.text.StyledDocument;
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.common.Constants;
+import net.sf.colossus.util.ExceptionUtils;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.variant.AllCreatureType;
 import net.sf.colossus.variant.CreatureType;
@@ -197,8 +197,10 @@ public final class VariantSupport
     }
 
     /**
-     * Load a Colossus Variant from the specified filename
-     *   in the specified path.
+     * Try to load a Colossus Variant from the specified filename
+     * in the specified path. If loading fails, inform user with a message
+     * dialog and try to load Default variant instead. If that fails as well,
+     * do a system.exit after another message dialog.
      *
      * Synchronized to avoid concurrent threads running into it at same
      * time (probably not possible so far, but if one day Public Server game
@@ -224,7 +226,45 @@ public final class VariantSupport
             return null;
         }
 
-        return tryLoadVariant(tempVariantName, tempVarFilename, tempVarDirectory, serverSide);
+        Variant loadedVariant = null;
+        try
+        {
+            loadedVariant = tryLoadVariant(tempVariantName, tempVarFilename,
+                tempVarDirectory, serverSide);
+        }
+        catch (VariantLoadError vle)
+        {
+            String task = vle.getMessage();
+            String message = "Trying to load variant '"
+                + tempVariantName + "' failed " + "(task='" + task + "')."
+                + "\nI will try to load variant 'Default' instead...";
+            String title = "Variant loading failed!";
+            LOGGER.warning(message);
+            ExceptionUtils.showMessageDialog(null, message, title, false);
+
+            try
+            {
+                loadedVariant = tryLoadVariant(Constants.defaultVarName,
+                    Constants.defaultVARFile, Constants.defaultDirName,
+                    serverSide);
+            }
+            catch (VariantLoadError vle2)
+            {
+                String task2 = vle2.getMessage();
+
+                String message2 = "Trying to load Variant 'Default' failed "
+                    + "as well (task='" + task2 + "').\nCaught exception: "
+                    + vle.getCause().toString()
+                    + "\n\nGiving up and exiting the application! ";
+                String title2 = "Even loading of default variant failed!";
+
+                LOGGER.severe(message2);
+                ExceptionUtils.showMessageDialog(null, message2, title2, true);
+
+                System.exit(1);
+            }
+        }
+        return loadedVariant;
     }
 
     /**
@@ -237,11 +277,12 @@ public final class VariantSupport
      * @param tempVarFilename
      * @param tempVarDirectory
      * @param serverSide
-     * @return A variant object, perhaps newly created, perhaps re-used if same
-     *         variant was used before.
+     * @return A variant object, perhaps newly created,
+     *         perhaps re-used if same variant was used before.
      */
     private static Variant tryLoadVariant(String tempVariantName,
         String tempVarFilename, String tempVarDirectory, boolean serverSide)
+        throws VariantLoadError
     {
         if (loadedVariant && varFilename.equals(tempVarFilename)
             && varDirectory.equals(tempVarDirectory))
@@ -262,7 +303,6 @@ public final class VariantSupport
             + ", data files in " + tempVarDirectory);
         try
         {
-
             /* Can't use getVarDirectoriesList yet ! */
             List<String> directories = new ArrayList<String>();
             directories.add(tempVarDirectory);
@@ -347,7 +387,7 @@ public final class VariantSupport
             List<String> directoriesForMap = getVarDirectoriesList();
             InputStream mapIS = ResourceLoader.getInputStream(VariantSupport
                 .getMapName(), directoriesForMap);
-            if (mapIS == null)
+            if (mapIS == null || variantName.equals("Balrog"))
             {
                 throw new FileNotFoundException(VariantSupport.getMapName());
             }
@@ -365,59 +405,34 @@ public final class VariantSupport
                 varREADME = getMissingReadmeNotification();
             }
 
+            loadedVariant = true;
+            loadHints();
+            task = "loadMarkerNamesProperties";
+            markerNames = loadMarkerNamesProperties();
+
             CURRENT_VARIANT = new Variant(trl, creatureTypes, battleLands,
                 masterBoard, varREADME, variantName);
         }
         catch (Exception e)
         {
-            LOGGER.severe("\n******\nCATCH - reset to DEFAULT\n");
-
-            // TODO this seems like a classic case of fail-slow, rethrowing the exception
-            // might be better
-            LOGGER.log(Level.SEVERE, "Variant loading failed : " + e, e);
-            varDirectory = Constants.defaultDirName;
-            varFilename = Constants.defaultVARFile;
-            variantName = Constants.defaultVarName;
-            mapName = Constants.defaultMAPFile;
-            recruitsFileName = Constants.defaultTERFile;
-            hintName = Constants.defaultHINTFile;
-            lCreaturesName.clear();
-            lCreaturesName.add(Constants.defaultCREFile);
-            maxPlayers = Constants.DEFAULT_MAX_PLAYERS;
-            varREADME = null;
-        }
-
-        if (varREADME != null)
-        {
-            loadedVariant = true;
-            loadHints();
-            task = "loadMarkerNamesProperties";
-            markerNames = loadMarkerNamesProperties();
-        }
-        else
-        {
-            if (tempVarFilename.equals(Constants.defaultVARFile))
-            {
-                LOGGER.log(Level.SEVERE,
-                    "Default Variant Loading Failed, aborting !");
-                System.exit(1);
-            }
-            else
-            {
-                JOptionPane.showMessageDialog(null, "Trying to load variant '"
-                    + tempVariantName + "' failed " + "(task='" + task + "')."
-                    + "\nI will try to load variant 'Default' instead...",
-                    "Variant loading failed!", JOptionPane.ERROR_MESSAGE);
-                LOGGER.log(Level.WARNING, "Loading variant " + tempVariantName
-                    + " failed - trying to load Default instead...");
-
-                tryLoadVariant(Constants.defaultVarName,
-                    Constants.defaultVARFile, Constants.defaultDirName,
-                    serverSide);
-            }
+            VariantLoadError vle = new VariantLoadError(task, e);
+            CURRENT_VARIANT = null;
+            throw vle;
         }
 
         return CURRENT_VARIANT;
+    }
+
+    /**
+     * A helper class to store the exception that happened during
+     * VariantLoading together with the task during which that happened.
+     */
+    public static class VariantLoadError extends Error
+    {
+        public VariantLoadError(String message, Throwable e)
+        {
+            super(message, e);
+        }
     }
 
     /** Call immediately after loading variant, before using creatures. */
