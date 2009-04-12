@@ -21,7 +21,7 @@ import net.sf.colossus.variant.BattleHex;
 /**
  * On-the-fly generation of the Collection of all possible LegionMove.
  * This doesn't full respect the Collection interface:
- * The random generation may fail before all alements have been returned,
+ * The random generation may fail before all elements have been returned,
  * so to iterators may return different subsets of the entire collection.
  * Also, this may cause size() to return a value higher than what is really
  * accessible.
@@ -485,8 +485,7 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
             }
             else
             {
-                long nChoice = ((long) byValues.size() * (long) percentTop) /
-                        100L;
+                int nChoice = length / 100 * percentTop;
                 if (nChoice < MIN_PARENT_CHOICE)
                 {
                     nChoice = MIN_PARENT_CHOICE;
@@ -496,7 +495,7 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
                     nChoice = length;
                 }
                 parent = byValues.get((int) ((length - nChoice) + rand.nextInt(
-                        (int) nChoice)));
+                        nChoice)));
             }
             return parent;
         }
