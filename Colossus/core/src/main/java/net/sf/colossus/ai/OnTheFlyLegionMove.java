@@ -494,7 +494,7 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
                 {
                     nChoice = length;
                 }
-                parent = byValues.get((int) ((length - nChoice) + rand.nextInt(
+                parent = byValues.get(((length - nChoice) + rand.nextInt(
                         nChoice)));
             }
             return parent;
