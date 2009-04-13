@@ -387,7 +387,7 @@ public final class VariantSupport
             List<String> directoriesForMap = getVarDirectoriesList();
             InputStream mapIS = ResourceLoader.getInputStream(VariantSupport
                 .getMapName(), directoriesForMap);
-            if (mapIS == null || variantName.equals("Balrog"))
+            if (mapIS == null)
             {
                 throw new FileNotFoundException(VariantSupport.getMapName());
             }
