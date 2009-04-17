@@ -76,12 +76,6 @@ public class CreatureBalrog extends CreatureType
     }
 
     @Override
-    public String getDisplayName()
-    {
-        return "Balrog";
-    }
-
-    @Override
     public int getMaxCount()
     {
         return localMaxCount;

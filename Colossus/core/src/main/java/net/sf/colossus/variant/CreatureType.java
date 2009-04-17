@@ -132,17 +132,6 @@ public class CreatureType
     }
 
     /**
-     * A display name.
-     *
-     * This is overridden by CreatureBalrog at the moment -- not sure why this
-     * is necessary. TODO check need for this method
-     */
-    public String getDisplayName()
-    {
-        return getName();
-    }
-
-    /**
      * The name used for multiple creatures of this type.
      */
     public String getPluralName()
