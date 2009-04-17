@@ -2,6 +2,7 @@ package net.sf.colossus.game;
 
 
 import java.util.logging.Logger;
+
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardHexside;
 import net.sf.colossus.variant.HazardTerrain;
@@ -9,11 +10,12 @@ import net.sf.colossus.variant.HazardTerrain;
 
 /**
  * A particular creature in a game.
- * 
+ *
  * This represents a creature in a game, such as a specific Cyclops as part of
  * a legion.
- * 
- * It includes the state for battles, i.e. the damage taken so far.
+ *
+ * TODO it should include the state for battles, i.e. the damage taken so far.
+ *      Currently that happens only on the server side.
  */
 public class Creature
 {
@@ -31,8 +33,10 @@ public class Creature
         return type;
     }
 
-    /** get the Striking Power of this Creature when striking directly at
-     * target undet the circumstances in parameters.
+    /**
+     * Calculates the Striking Power of this Creature when striking directly at
+     * target under the circumstances in parameters.
+     *
      * @param target The Creature that is struck by the current Creature
      * @param myElevation Height of the Hex on which stands the current Creature
      * @param targetElevation Height of the hex on which stands the target Creature
@@ -80,8 +84,10 @@ public class Creature
         return dice;
     }
 
-    /** get the Striking Skill of this Creature when striking directly at
-     * target undet the circumstances in parameters.
+    /**
+     * Calculates the Striking Skill of this Creature when striking directly at
+     * target under the circumstances in parameters.
+     *
      * @param target The Creature that is struck by the current Creature
      * @param myElevation Height of the Hex on which stands the current Creature
      * @param targetElevation Height of the hex on which stands the target Creature
