@@ -246,7 +246,7 @@ public class CreatureServerSide extends Creature
 
     boolean hasMoved()
     {
-        return (!currentHex.equals(startingHex));
+        return !currentHex.equals(startingHex);
     }
 
     void commitMove()
