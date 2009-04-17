@@ -54,6 +54,11 @@ public class CreatureServerSide extends Creature
      * - then by name
      *
      * TODO this is actually applicable on the CreatureType level
+     *
+     * TODO this breaks the contract of the interface since it will not be
+     * anti-symmetric for two titans: either way round it will return -1.
+     * It would be easy to fix, but needs some checking if someone relies
+     * on the current behaviour first.
      */
     public static final Comparator<CreatureServerSide> IMPORTANCE_ORDER = new Comparator<CreatureServerSide>()
     {
