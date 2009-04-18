@@ -378,7 +378,7 @@ public final class VariantSupport
              * Finally we can load the Battlelands, they need the terrain.
              */
 
-            List<CreatureType> creatureTypes = loadCreatures();
+            AllCreatureType creatureTypes = loadCreatures();
 
             IVariantInitializer trl = loadTerrainsAndRecruits(serverSide);
             // TODO add things as the variant package gets fleshed out
@@ -436,12 +436,11 @@ public final class VariantSupport
     }
 
     /** Call immediately after loading variant, before using creatures. */
-    public static List<CreatureType> loadCreatures()
+    public static AllCreatureType loadCreatures()
     {
-        List<CreatureType> creatures = new ArrayList<CreatureType>();
+        CreatureLoader creatureLoader = new CreatureLoader();
         try
         {
-            creatures.clear();
             List<String> directories = VariantSupport.getVarDirectoriesList();
             for (String creaturesName : VariantSupport.getCreaturesNames())
             {
@@ -451,8 +450,7 @@ public final class VariantSupport
                 {
                     throw new FileNotFoundException(creaturesName);
                 }
-                AllCreatureType creatureLoader = new CreatureLoader(creIS);
-                creatures.addAll(creatureLoader.getCreatures());
+                creatureLoader.fillCreatureLoader(creIS);
             }
         }
         catch (Exception e)
@@ -460,8 +458,7 @@ public final class VariantSupport
             throw new RuntimeException("Failed to load Creatures definition",
                 e);
         }
-        Collections.sort(creatures, CreatureType.NAME_ORDER);
-        return creatures;
+        return creatureLoader;
     }
 
     private static Document getMissingReadmeNotification()

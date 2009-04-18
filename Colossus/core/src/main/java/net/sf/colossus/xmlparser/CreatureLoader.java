@@ -41,11 +41,14 @@ public class CreatureLoader implements AllCreatureType
     private final List<CreatureType> creatures;
     private final Map<String,CreatureType> byName = new TreeMap<String,CreatureType>();
 
+    public CreatureLoader() {
+        this.creatures = new ArrayList<CreatureType>();
+    }
+
     // we need to cast since JDOM is not generified
     @SuppressWarnings("unchecked")
-    public CreatureLoader(InputStream creIS)
+    public void fillCreatureLoader(InputStream creIS)
     {
-        this.creatures = new ArrayList<CreatureType>();
         SAXBuilder builder = new SAXBuilder();
         try
         {
@@ -166,6 +169,7 @@ public class CreatureLoader implements AllCreatureType
         }
         this.creatures.add(creature);
         this.byName.put(name, creature);
+        Collections.sort(creatures, CreatureType.NAME_ORDER);
     }
 
     public List<CreatureType> getCreatures()

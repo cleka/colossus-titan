@@ -30,7 +30,7 @@ import net.sf.colossus.util.Predicate;
  */
 public class Variant
 {
-    private final List<CreatureType> creatureTypes;
+    private final AllCreatureType creatureTypes;
     private final List<CreatureType> summonableCreatureTypes;
     private final List<MasterBoardTerrain> battleLands;
     private final List<AcquirableData> acquirableList;
@@ -49,12 +49,12 @@ public class Variant
     private final Map<String, CreatureType> creatureTypeByNameCache = new HashMap<String, CreatureType>();
 
     public Variant(IVariantInitializer variantInitializer,
-        List<CreatureType> creatureTypes,
+        AllCreatureType creatureTypes,
         List<MasterBoardTerrain> battleLands, MasterBoard masterBoard,
         Document readme, String name)
     {
+        this.creatureTypes = creatureTypes;
         // defensive copies to ensure immutability
-        this.creatureTypes = new ArrayList<CreatureType>(creatureTypes);
         this.acquirableList = variantInitializer.getAcquirablesList();
         this.titanTeleport = variantInitializer.getTitanTeleportValue();
         this.titanImprove = variantInitializer.getTitanImprovementValue();
@@ -62,7 +62,7 @@ public class Variant
         // create some caches for faster lookups -- by name and by the "summonable" attribute
         initCreatureNameCache();
         this.summonableCreatureTypes = new ArrayList<CreatureType>();
-        CollectionHelper.copySelective(this.creatureTypes,
+        CollectionHelper.copySelective(this.creatureTypes.getCreatures(),
             this.summonableCreatureTypes, new Predicate<CreatureType>()
             {
                 public boolean matches(CreatureType creatureType)
@@ -79,7 +79,7 @@ public class Variant
 
     public List<CreatureType> getCreatureTypes()
     {
-        return Collections.unmodifiableList(this.creatureTypes);
+        return this.creatureTypes.getCreatures();
     }
 
     public List<MasterBoardTerrain> getBattleLands()
@@ -123,7 +123,7 @@ public class Variant
     private void initCreatureNameCache()
     {
         // find it the slow way and add to cache.
-        Iterator<CreatureType> it = this.creatureTypes.iterator();
+        Iterator<CreatureType> it = this.creatureTypes.getCreatures().iterator();
         while (it.hasNext())
         {
             CreatureType creatureType = it.next();
