@@ -379,7 +379,7 @@ public final class VariantSupport
 
             AllCreatureType creatureTypes = loadCreatures();
 
-            IVariantInitializer trl = loadTerrainsAndRecruits(serverSide);
+            IVariantInitializer trl = loadTerrainsAndRecruits(serverSide, creatureTypes);
             // TODO add things as the variant package gets fleshed out
             List<MasterBoardTerrain> battleLands = new ArrayList<MasterBoardTerrain>();
 
@@ -550,7 +550,7 @@ public final class VariantSupport
     }
 
     public synchronized static IVariantInitializer loadTerrainsAndRecruits(
-        boolean serverSide)
+        boolean serverSide, AllCreatureType creatureTypes)
     {
         // remove all old stuff in the custom recruitments system
         CustomRecruitBase.reset();
@@ -572,7 +572,7 @@ public final class VariantSupport
 
             // Clemens: started working on that.
             //  =>  partly now done via the IVariantInitializer
-            terrainRecruitLoader = new TerrainRecruitLoader(terIS);
+            terrainRecruitLoader = new TerrainRecruitLoader(terIS, creatureTypes);
 
             /* now initialize the static bits of the Battlelands */
             HexMap.staticBattlelandsInit(serverSide);

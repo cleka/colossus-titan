@@ -18,11 +18,13 @@ import net.sf.colossus.game.RecruitGraph;
 import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.HTMLColor;
+import net.sf.colossus.variant.AllCreatureType;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.ICustomRecruitBase;
 import net.sf.colossus.variant.IVariantInitializer;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
+import net.sf.colossus.variant.RecruitingSubTree;
 import net.sf.colossus.variant.Variant.AcquirableData;
 
 import org.jdom.Document;
@@ -116,6 +118,11 @@ public class TerrainRecruitLoader implements IVariantInitializer
      * (sometimes called Recruiting Tree).
      */
     private static RecruitGraph graph = new RecruitGraph();
+
+    /** The AllCreatureType object to use, needed to convert from String (name)
+     * to the actual CreatureType.
+     */
+    private final AllCreatureType creatureTypes;
 
     /**
      * set the Caretaker used by the graph
@@ -240,8 +247,9 @@ public class TerrainRecruitLoader implements IVariantInitializer
 
     // we need to cast since JDOM is not generified
     @SuppressWarnings("unchecked")
-    public TerrainRecruitLoader(InputStream terIS)
+    public TerrainRecruitLoader(InputStream terIS, AllCreatureType creatureTypes)
     {
+        this.creatureTypes = creatureTypes;
         SAXBuilder builder = new SAXBuilder();
         try
         {
@@ -299,6 +307,8 @@ public class TerrainRecruitLoader implements IVariantInitializer
     @SuppressWarnings("unchecked")
     private void handleTerrain(Element el) throws JDOMException
     {
+        // TODO: fill up the RST and add it to the MasterBoardTerrain.
+        // RecruitingSubTree rst = new RecruitingSubTree();
         String name = el.getAttributeValue("name");
         String displayName = el.getAttributeValue("display_name");
         if (displayName == null)
