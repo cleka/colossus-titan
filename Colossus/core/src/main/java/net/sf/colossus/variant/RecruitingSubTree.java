@@ -44,11 +44,20 @@ public class RecruitingSubTree
             new HashMap<CreatureType, Integer>();
     private final Set<ICustomRecruitBase> allCustom = new HashSet<ICustomRecruitBase>();
 
+    public RecruitingSubTree() {
+        
+    }
+
     public void addRegular(CreatureType recruiter, CreatureType recruit,
             int number)
     {
-        regular.put(new RecruiterAndRecruit(recruiter, recruit), new Integer(
-                number));
+        // regular version
+        regular.put(new RecruiterAndRecruit(recruiter, recruit),
+                    new Integer(number));
+        // down-recruit version
+        regular.put(new RecruiterAndRecruit(recruit, recruiter),
+                    new Integer(1));
+        // TODO: what about *before* recruiter in the tree ?
     }
 
     @SuppressWarnings("boxing")
@@ -84,6 +93,10 @@ public class RecruitingSubTree
             CreatureType recruit, MasterBoardTerrain terrain, MasterHex hex)
     {
         int number = Constants.BIGNUM;
+        if (recruiter.equals(recruit))
+        {
+            number = 1;
+        }
         RecruiterAndRecruit rar = new RecruiterAndRecruit(recruiter, recruit);
         if (regular.keySet().contains(rar))
         {
