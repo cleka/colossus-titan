@@ -66,6 +66,9 @@ public class MasterBoardTerrain implements Comparable<MasterBoardTerrain>
     /** Whether this terrain uses another Terrain recruit tree. */
     private final boolean isAlias;
 
+    /** The recruiting tree of this terrain */
+    RecruitingSubTree recruitingSubTree;
+
     public MasterBoardTerrain(String id, String displayName, Color color,
         boolean isAlias)
     {
@@ -74,6 +77,15 @@ public class MasterBoardTerrain implements Comparable<MasterBoardTerrain>
         this.color = color;
         this.subtitle = null;
         this.isAlias = isAlias;
+    }
+
+    public void setRecruitingSubTree(RecruitingSubTree rst)
+    {
+        this.recruitingSubTree = rst;
+    }
+
+    public RecruitingSubTree getRecruitingSubTree() {
+        return recruitingSubTree;
     }
 
     public MasterBoardTerrain(String id, String displayName, Color color)

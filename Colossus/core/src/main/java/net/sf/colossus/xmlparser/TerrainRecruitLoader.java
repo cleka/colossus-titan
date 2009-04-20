@@ -307,8 +307,6 @@ public class TerrainRecruitLoader implements IVariantInitializer
     @SuppressWarnings("unchecked")
     private void handleTerrain(Element el) throws JDOMException
     {
-        // TODO: fill up the RST and add it to the MasterBoardTerrain.
-        // RecruitingSubTree rst = new RecruitingSubTree();
         String name = el.getAttributeValue("name");
         String displayName = el.getAttributeValue("display_name");
         if (displayName == null)
@@ -367,6 +365,76 @@ public class TerrainRecruitLoader implements IVariantInitializer
         terrains.put(name, terrain);
 
         addToGraph(rl, terrain);
+
+        RecruitingSubTree rst = buildRecruitingSubTree(rl, regularRecruit);
+
+        terrain.setRecruitingSubTree(rst);
+    }
+
+    private RecruitingSubTree buildRecruitingSubTree(List<RecruitNumber> rl, boolean regularRecruit)
+    {
+        RecruitingSubTree rst = new RecruitingSubTree();
+        RecruitNumber recruiter = null;
+        for (RecruitNumber recruit : rl)
+        {
+            if (recruit.getName().equals(Keyword_Anything) ||
+                recruit.getName().equals(Keyword_AnyNonLord) ||
+                recruit.getName().equals(Keyword_Lord) ||
+                recruit.getName().equals(Keyword_DemiLord))
+            {
+                recruiter = recruit;
+                continue;
+            }
+            if (recruit.getName().startsWith(Keyword_Special))
+            {
+                // TODO: getCustomRecruitBase uses a static member, we
+                // want to avoid that.
+                recruiter = recruit;
+                rst.addCustom(getCustomRecruitBase(recruiter.getName()));
+                continue;
+            }
+            if (recruiter != null)
+            {
+                if (recruiter.getName().startsWith(Keyword_Special))
+                {
+                    continue;
+                } else if (recruiter.getName().equals(Keyword_Anything))
+                {
+                    rst.addAny(creatureTypes.getCreatureByName(
+                            recruit.getName()),
+                            recruit.getNumber());
+                }
+                else if (recruiter.getName().equals(Keyword_AnyNonLord))
+                {
+                    rst.addNonLord(creatureTypes.getCreatureByName(
+                            recruit.getName()),
+                            recruit.getNumber());
+                }
+                else if (recruiter.getName().equals(Keyword_Lord))
+                {
+                    rst.addLord(creatureTypes.getCreatureByName(
+                            recruit.getName()),
+                            recruit.getNumber());
+                }
+                else if (recruiter.getName().equals(Keyword_DemiLord))
+                {
+                    rst.addDemiLord(creatureTypes.getCreatureByName(
+                            recruit.getName()),
+                            recruit.getNumber());
+                }
+                else
+                {
+                    rst.addRegular(creatureTypes.getCreatureByName(
+                            recruiter.getName()),
+                            creatureTypes.getCreatureByName(
+                            recruit.getName()),
+                            recruit.getNumber());
+                }
+            }
+            recruiter = recruit;
+        }
+        rst.complete(regularRecruit);
+        return rst;
     }
 
     // we need to cast since JDOM is not generified
@@ -401,6 +469,8 @@ public class TerrainRecruitLoader implements IVariantInitializer
         addToGraph(strToRecruits.get(source_terrain), terrain);
 
         source_terrain.addAlias(terrain);
+
+        terrain.setRecruitingSubTree(source_terrain.getRecruitingSubTree());
     }
 
     private void handleAcquirable(Element el) throws JDOMException,
@@ -827,6 +897,20 @@ public class TerrainRecruitLoader implements IVariantInitializer
     {
         int g_value = graph.numberOfRecruiterNeeded(recruiter.getName(),
             recruit.getName(), terrain, hex);
+
+        int theNumber = terrain.getRecruitingSubTree().numberOfRecruiterNeeded(
+                recruiter, recruit, terrain, hex);
+
+        if (g_value != theNumber) {
+            LOGGER.warning("Oups, discrepancy between old (graph-based) and "+
+                    "new (RST-based) values for numberOfRecruiterNeeded ; " +
+                    "old is " + g_value + " while new is " + theNumber +
+                    " when " + recruiter.getName() + " recruits " +
+                    recruit.getName() + " in " + terrain.getId() + " on hex " +
+                    hex.getLabel());
+            LOGGER.warning("The RST is\n" + terrain.getRecruitingSubTree().toString());
+        }
+        
         return g_value;
     }
 
