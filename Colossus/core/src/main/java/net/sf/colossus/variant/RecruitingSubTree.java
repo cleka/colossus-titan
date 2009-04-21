@@ -1,11 +1,12 @@
 package net.sf.colossus.variant;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.TreeSet;
 import java.util.logging.Logger;
 import net.sf.colossus.common.Constants;
 
@@ -13,7 +14,7 @@ import net.sf.colossus.common.Constants;
  * The recruiting sub-tree in a terrain (or several terrains)
  * @author Romain Dolbeau
  */
-public class RecruitingSubTree
+public class RecruitingSubTree implements IRecruiting
 {
     private static final Logger LOGGER = Logger
         .getLogger(RecruitingSubTree.class.getName());
@@ -309,5 +310,48 @@ public class RecruitingSubTree
                     hex));
         }
         return number;
+    }
+
+    public Set<CreatureType> getPossibleRecruits(MasterBoardTerrain terrain,
+            MasterHex hex)
+    {
+        Set<CreatureType> possibleRecruits = new TreeSet<CreatureType>();
+
+        for (RecruiterAndRecruit rar : regular.keySet())
+        {
+            CreatureType recruit = rar.getRecruit();
+            if (!recruit.isTitan())
+            {
+                possibleRecruits.add(recruit);
+            }
+            else
+            {
+                LOGGER.warning("TITAN as regular recruit ????");
+                LOGGER.warning(this.toString());
+            }
+            CreatureType recruiter = rar.getRecruiter();
+            if (!recruiter.isTitan())
+            {
+                possibleRecruits.add(recruiter);
+            }
+        }
+        for (CreatureType ct : any.keySet()) {
+            possibleRecruits.add(ct);
+        }
+        for (CreatureType ct : anyNonLord.keySet()) {
+            possibleRecruits.add(ct);
+        }
+        for (CreatureType ct : anyLord.keySet()) {
+            possibleRecruits.add(ct);
+        }
+        for (CreatureType ct : anyDemiLord.keySet()) {
+            possibleRecruits.add(ct);
+        }
+        for (ICustomRecruitBase cri : allCustom)
+        {
+            List<CreatureType> temp = cri.getPossibleSpecialRecruits(terrain, hex);
+            possibleRecruits.addAll(temp);
+        }
+        return possibleRecruits;
     }
 }

@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -398,29 +400,38 @@ public class TerrainRecruitLoader implements IVariantInitializer
                 if (recruiter.getName().startsWith(Keyword_Special))
                 {
                     continue;
-                } else if (recruiter.getName().equals(Keyword_Anything))
+                }
+                else if (recruiter.getName().equals(Keyword_Anything))
                 {
                     rst.addAny(creatureTypes.getCreatureByName(
                             recruit.getName()),
                             recruit.getNumber());
+                    if (!regularRecruit)
+                        recruit = null;
                 }
                 else if (recruiter.getName().equals(Keyword_AnyNonLord))
                 {
                     rst.addNonLord(creatureTypes.getCreatureByName(
                             recruit.getName()),
                             recruit.getNumber());
+                    if (!regularRecruit)
+                        recruit = null;
                 }
                 else if (recruiter.getName().equals(Keyword_Lord))
                 {
                     rst.addLord(creatureTypes.getCreatureByName(
                             recruit.getName()),
                             recruit.getNumber());
+                    if (!regularRecruit)
+                        recruit = null;
                 }
                 else if (recruiter.getName().equals(Keyword_DemiLord))
                 {
                     rst.addDemiLord(creatureTypes.getCreatureByName(
                             recruit.getName()),
                             recruit.getNumber());
+                    if (!regularRecruit)
+                        recruit = null;
                 }
                 else
                 {
@@ -429,6 +440,8 @@ public class TerrainRecruitLoader implements IVariantInitializer
                             creatureTypes.getCreatureByName(
                             recruit.getName()),
                             recruit.getNumber());
+                    if (!regularRecruit)
+                        recruit = null;
                 }
             }
             recruiter = recruit;
@@ -797,6 +810,22 @@ public class TerrainRecruitLoader implements IVariantInitializer
                 }
             }
         }
+
+        Set<CreatureType> theSet = terrain.getRecruitingSubTree().getPossibleRecruits(terrain, hex);
+        Set<CreatureType> theSet2 = new TreeSet<CreatureType>(result);
+        if (!theSet.equals(theSet2)) {
+            LOGGER.warning("Oups, discrepancy between old (graph-based) and "+
+                    "new (RST-based) values for getPossibleRecruits");
+            LOGGER.warning("Old one is:");
+            for (CreatureType ct : theSet2) {
+                LOGGER.warning("\t" + ct.getName());
+            }
+            LOGGER.warning("New one is:");
+            for (CreatureType ct : theSet) {
+                LOGGER.warning("\t" + ct.getName());
+            }
+        }
+
         return result;
     }
 

@@ -14,8 +14,10 @@ import net.sf.colossus.server.VariantSupport;
  *
  * This class models a generic creature type, i.e. all features that are common
  * through all creatures of a specific type.
+ *
+ * Default equality and sorting order is class (in case of subclasses) then name.
  */
-public class CreatureType
+public class CreatureType implements Comparable<CreatureType>
 {
     private static final Logger LOGGER = Logger.getLogger(CreatureType.class
         .getName());
@@ -384,12 +386,12 @@ public class CreatureType
     public int getKillValue()
     {
         int val = 10 * getPointValue();
-        final int skill = getSkill();
-        if (skill >= 4)
+        final int lskill = getSkill();
+        if (lskill >= 4)
         {
             val += 2;
         }
-        else if (skill <= 2)
+        else if (lskill <= 2)
         {
             val += 1;
         }
@@ -410,5 +412,14 @@ public class CreatureType
             val += 1000;
         }
         return val;
+    }
+
+    public int compareTo(CreatureType o)
+    {
+        if (o.getClass() != this.getClass())
+        {
+            return this.getClass().getName().compareTo(o.getClass().getName());
+        }
+        return this.getName().compareTo(o.getName());
     }
 }
