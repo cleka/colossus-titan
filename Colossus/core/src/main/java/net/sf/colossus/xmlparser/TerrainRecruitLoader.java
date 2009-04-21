@@ -375,7 +375,7 @@ public class TerrainRecruitLoader implements IVariantInitializer
 
     private RecruitingSubTree buildRecruitingSubTree(List<RecruitNumber> rl, boolean regularRecruit)
     {
-        RecruitingSubTree rst = new RecruitingSubTree();
+        RecruitingSubTree rst = new RecruitingSubTree(this.creatureTypes);
         RecruitNumber recruiter = null;
         for (RecruitNumber recruit : rl)
         {
@@ -811,17 +811,21 @@ public class TerrainRecruitLoader implements IVariantInitializer
             }
         }
 
-        Set<CreatureType> theSet = terrain.getRecruitingSubTree().getPossibleRecruits(terrain, hex);
+        Set<CreatureType> theSet = terrain.getRecruitingSubTree().
+                getPossibleRecruits(terrain, hex);
         Set<CreatureType> theSet2 = new TreeSet<CreatureType>(result);
-        if (!theSet.equals(theSet2)) {
-            LOGGER.warning("Oups, discrepancy between old (graph-based) and "+
+        if (!theSet.equals(theSet2))
+        {
+            LOGGER.warning("Oups, discrepancy between old (graph-based) and " +
                     "new (RST-based) values for getPossibleRecruits");
             LOGGER.warning("Old one is:");
-            for (CreatureType ct : theSet2) {
+            for (CreatureType ct : theSet2)
+            {
                 LOGGER.warning("\t" + ct.getName());
             }
             LOGGER.warning("New one is:");
-            for (CreatureType ct : theSet) {
+            for (CreatureType ct : theSet)
+            {
                 LOGGER.warning("\t" + ct.getName());
             }
         }
@@ -905,6 +909,26 @@ public class TerrainRecruitLoader implements IVariantInitializer
                 }
             }
         }
+
+        Set<CreatureType> theSet = terrain.getRecruitingSubTree().
+                getPossibleRecruiters(terrain, hex);
+        Set<CreatureType> theSet2 = new TreeSet<CreatureType>(re);
+        if (!theSet.equals(theSet2))
+        {
+            LOGGER.warning("Oups, discrepancy between old (graph-based) and " +
+                    "new (RST-based) values for getPossibleRecruiters");
+            LOGGER.warning("Old one is:");
+            for (CreatureType ct : theSet2)
+            {
+                LOGGER.warning("\t" + ct.getName());
+            }
+            LOGGER.warning("New one is:");
+            for (CreatureType ct : theSet)
+            {
+                LOGGER.warning("\t" + ct.getName());
+            }
+        }
+
         return (re);
     }
 

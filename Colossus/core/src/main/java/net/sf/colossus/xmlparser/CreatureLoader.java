@@ -9,7 +9,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -172,9 +174,14 @@ public class CreatureLoader implements AllCreatureType
         Collections.sort(creatures, CreatureType.NAME_ORDER);
     }
 
-    public List<CreatureType> getCreatures()
+    public List<CreatureType> getCreaturesAsList()
     {
         return Collections.unmodifiableList(this.creatures);
+    }
+
+    public SortedSet<CreatureType> getCreatures()
+    {
+        return Collections.unmodifiableSortedSet(new TreeSet<CreatureType>(this.creatures));
     }
 
     public CreatureType getCreatureByName(String name)

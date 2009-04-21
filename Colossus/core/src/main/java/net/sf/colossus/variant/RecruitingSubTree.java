@@ -16,11 +16,13 @@ import net.sf.colossus.common.Constants;
  */
 public class RecruitingSubTree implements IRecruiting
 {
-    private static final Logger LOGGER = Logger
-        .getLogger(RecruitingSubTree.class.getName());
+
+    private static final Logger LOGGER = Logger.getLogger(
+            RecruitingSubTree.class.getName());
 
     private class RecruiterAndRecruit
     {
+
         final private CreatureType recruiter;
         final private CreatureType recruit;
 
@@ -37,7 +39,7 @@ public class RecruitingSubTree implements IRecruiting
             {
                 return false;
             }
-            RecruiterAndRecruit rar = (RecruiterAndRecruit)o;
+            RecruiterAndRecruit rar = (RecruiterAndRecruit) o;
             return this.getRecruiter().equals(rar.getRecruiter()) &&
                     this.getRecruit().equals(rar.getRecruit());
         }
@@ -48,7 +50,8 @@ public class RecruitingSubTree implements IRecruiting
             int hash = 3;
             hash =
                     31 * hash +
-                    (this.getRecruiter() != null ? this.getRecruiter().hashCode() : 0);
+                    (this.getRecruiter() != null ? this.getRecruiter().hashCode()
+                    : 0);
             hash =
                     31 * hash +
                     (this.getRecruit() != null ? this.getRecruit().hashCode() : 0);
@@ -58,7 +61,8 @@ public class RecruitingSubTree implements IRecruiting
         @Override
         public String toString()
         {
-            return getRecruiter().getName() + " recruits " + getRecruit().getName();
+            return getRecruiter().getName() + " recruits " + getRecruit().
+                    getName();
         }
 
         /**
@@ -87,16 +91,19 @@ public class RecruitingSubTree implements IRecruiting
             new HashMap<CreatureType, Integer>();
     private final Map<CreatureType, Integer> anyDemiLord =
             new HashMap<CreatureType, Integer>();
-    private final Set<ICustomRecruitBase> allCustom = new HashSet<ICustomRecruitBase>();
-
+    private final Set<ICustomRecruitBase> allCustom =
+            new HashSet<ICustomRecruitBase>();
     private boolean completed = false;
+    private final AllCreatureType creatureTypes;
 
-    public RecruitingSubTree() {
-        
+    public RecruitingSubTree(AllCreatureType creatureTypes)
+    {
+        this.creatureTypes = creatureTypes;
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         StringBuffer buf = new StringBuffer();
         for (RecruiterAndRecruit rar : regular.keySet())
         {
@@ -105,43 +112,51 @@ public class RecruitingSubTree implements IRecruiting
             buf.append(regular.get(rar));
             buf.append("\n");
         }
-        for (CreatureType ct : any.keySet()) {
+        for (CreatureType ct : any.keySet())
+        {
             buf.append("Any ");
             buf.append(any.get(ct));
             buf.append(" recruits ");
             buf.append(ct.getName());
             buf.append("\n");
         }
-        for (CreatureType ct : anyNonLord.keySet()) {
+        for (CreatureType ct : anyNonLord.keySet())
+        {
             buf.append("Any ");
             buf.append(anyNonLord.get(ct));
             buf.append(" non lord recruits ");
             buf.append(ct.getName());
             buf.append("\n");
         }
-        for (CreatureType ct : anyLord.keySet()) {
+        for (CreatureType ct : anyLord.keySet())
+        {
             buf.append("Any ");
             buf.append(anyLord.get(ct));
             buf.append(" lord recruits ");
             buf.append(ct.getName());
             buf.append("\n");
         }
-        for (CreatureType ct : anyDemiLord.keySet()) {
+        for (CreatureType ct : anyDemiLord.keySet())
+        {
             buf.append("Any ");
             buf.append(anyDemiLord.get(ct));
             buf.append(" demilord recruits ");
             buf.append(ct.getName());
             buf.append("\n");
         }
-        for (ICustomRecruitBase crb : allCustom) {
+        for (ICustomRecruitBase crb : allCustom)
+        {
             buf.append("Custom by class " + crb.getClass().getName());
             buf.append("\n");
         }
         return buf.toString();
     }
 
-    private boolean isRegularAncestorOf(final CreatureType a, final CreatureType b, final Set<CreatureType> checked) {
-        if (regular.containsKey(new RecruiterAndRecruit(a, b))) {
+    private boolean isRegularAncestorOf(final CreatureType a,
+            final CreatureType b, final Set<CreatureType> checked)
+    {
+        if (regular.containsKey(new RecruiterAndRecruit(a, b)))
+        {
             return true;
         }
         for (RecruiterAndRecruit rar : regular.keySet())
@@ -152,8 +167,10 @@ public class RecruitingSubTree implements IRecruiting
             {
                 Set<CreatureType> checked2 = new HashSet<CreatureType>(checked);
                 checked2.add(a);
-                if (isRegularAncestorOf(d,b,checked2))
+                if (isRegularAncestorOf(d, b, checked2))
+                {
                     return true;
+                }
             }
         }
         return false;
@@ -177,25 +194,29 @@ public class RecruitingSubTree implements IRecruiting
         {
             for (CreatureType b : allInvolved)
             {
-                RecruiterAndRecruit rar = new RecruiterAndRecruit(a,b);
+                RecruiterAndRecruit rar = new RecruiterAndRecruit(a, b);
                 if (!regular.containsKey(rar))
                 {
                     Set<CreatureType> checked = new HashSet<CreatureType>();
                     checked.add(b);
-                    if (isRegularAncestorOf(b, a, checked)) {
-                        LOGGER.finest("Completing: adding " + a.getName() + " to " + b.getName());
+                    if (isRegularAncestorOf(b, a, checked))
+                    {
+                        LOGGER.finest("Completing: adding " + a.getName() +
+                                " to " + b.getName());
                         extra.add(rar);
                     }
                 }
             }
         }
         /* finally, a creature can recruit all its ancestor with 1 */
-        for (RecruiterAndRecruit rar : extra) {
+        for (RecruiterAndRecruit rar : extra)
+        {
             regular.put(rar, new Integer(1));
         }
     }
 
-    public void complete(boolean regularRecruit) {
+    public void complete(boolean regularRecruit)
+    {
         completed = true;
         if (regularRecruit)
         {
@@ -212,7 +233,7 @@ public class RecruitingSubTree implements IRecruiting
         assert !recruit.isTitan() : "Oups, can't recruit Titan";
         // regular version
         regular.put(new RecruiterAndRecruit(recruiter, recruit),
-                    new Integer(number));
+                new Integer(number));
     }
 
     @SuppressWarnings("boxing")
@@ -266,28 +287,34 @@ public class RecruitingSubTree implements IRecruiting
             CreatureType recruit, MasterBoardTerrain terrain, MasterHex hex)
     {
         int number = Constants.BIGNUM;
-        LOGGER.finest("Start for recruiter and recruit : " + recruiter.getName() + " & " + recruit.getName());
+        LOGGER.finest("Start for recruiter and recruit : " +
+                recruiter.getName() + " & " + recruit.getName());
         if (recruiter.equals(recruit))
         {
-            LOGGER.finest("Recruiter and recruit are identical = 1 " + recruiter.getName() + " & " + recruit.getName());
+            LOGGER.finest("Recruiter and recruit are identical = 1 " +
+                    recruiter.getName() + " & " + recruit.getName());
             number = 1;
         }
         RecruiterAndRecruit rar = new RecruiterAndRecruit(recruiter, recruit);
         if (regular.keySet().contains(rar))
         {
-            LOGGER.finest("Recruiter and recruit are regular = " + regular.get(rar) + " " + recruiter.getName() + " & " + recruit.getName());
+            LOGGER.finest("Recruiter and recruit are regular = " + regular.get(
+                    rar) + " " + recruiter.getName() + " & " +
+                    recruit.getName());
             number = Math.min(number, regular.get(rar).intValue());
         }
         if (any.keySet().contains(recruit))
         {
-            LOGGER.finest("Recruit in any = " + regular.get(rar) + " " + recruit.getName());
+            LOGGER.finest("Recruit in any = " + regular.get(rar) + " " +
+                    recruit.getName());
             number = Math.min(number, any.get(recruit).intValue());
         }
         if (!recruiter.isLord() && !recruiter.isDemiLord())
         {
             if (anyNonLord.keySet().contains(recruit))
             {
-                LOGGER.finest("Recruit in anyNonLord = " + regular.get(rar) + " " + recruit.getName());
+                LOGGER.finest("Recruit in anyNonLord = " + regular.get(rar) +
+                        " " + recruit.getName());
                 number = Math.min(number, anyNonLord.get(recruit).intValue());
             }
         }
@@ -295,7 +322,8 @@ public class RecruitingSubTree implements IRecruiting
         {
             if (anyLord.keySet().contains(recruit))
             {
-                LOGGER.finest("Recruit in anyLord = " + regular.get(rar) + " " + recruit.getName());
+                LOGGER.finest("Recruit in anyLord = " + regular.get(rar) + " " +
+                        recruit.getName());
                 number = Math.min(number, anyLord.get(recruit).intValue());
             }
         }
@@ -303,7 +331,8 @@ public class RecruitingSubTree implements IRecruiting
         {
             if (anyDemiLord.keySet().contains(recruit))
             {
-                LOGGER.finest("Recruit in anyDemiLord = " + regular.get(rar) + " " + recruit.getName());
+                LOGGER.finest("Recruit in anyDemiLord = " + regular.get(rar) +
+                        " " + recruit.getName());
                 number = Math.min(number, anyDemiLord.get(recruit).intValue());
             }
         }
@@ -340,23 +369,98 @@ public class RecruitingSubTree implements IRecruiting
                 possibleRecruits.add(recruiter);
             }
         }
-        for (CreatureType ct : any.keySet()) {
+        for (CreatureType ct : any.keySet())
+        {
             possibleRecruits.add(ct);
         }
-        for (CreatureType ct : anyNonLord.keySet()) {
+        for (CreatureType ct : anyNonLord.keySet())
+        {
             possibleRecruits.add(ct);
         }
-        for (CreatureType ct : anyLord.keySet()) {
+        for (CreatureType ct : anyLord.keySet())
+        {
             possibleRecruits.add(ct);
         }
-        for (CreatureType ct : anyDemiLord.keySet()) {
+        for (CreatureType ct : anyDemiLord.keySet())
+        {
             possibleRecruits.add(ct);
         }
+        /* note: everytinh *above* that point can be cached, but the global
+         * result itself cannot, as custom recruiting might change from call to
+         * call
+         */
         for (ICustomRecruitBase cri : allCustom)
         {
-            List<CreatureType> temp = cri.getPossibleSpecialRecruits(terrain, hex);
+            List<CreatureType> temp = cri.getPossibleSpecialRecruits(terrain,
+                    hex);
             possibleRecruits.addAll(temp);
         }
         return possibleRecruits;
+    }
+
+    public Set<CreatureType> getPossibleRecruiters(MasterBoardTerrain terrain,
+            MasterHex hex)
+    {
+        if (!any.keySet().isEmpty())
+        {
+            return creatureTypes.getCreatures();
+        }
+        Set<CreatureType> possibleRecruiters = new TreeSet<CreatureType>();
+        for (RecruiterAndRecruit rar : regular.keySet())
+        {
+            CreatureType recruit = rar.getRecruit();
+            if (!recruit.isTitan())
+            {
+                possibleRecruiters.add(recruit);
+            }
+            else
+            {
+                LOGGER.warning("TITAN as regular recruit ????");
+                LOGGER.warning(this.toString());
+            }
+            CreatureType recruiter = rar.getRecruiter();
+            possibleRecruiters.add(recruiter);
+        }
+        if (!anyNonLord.keySet().isEmpty())
+        {
+            for (CreatureType ct : creatureTypes.getCreatures())
+            {
+                if (!ct.isLord() && !ct.isDemiLord())
+                {
+                    possibleRecruiters.add(ct);
+                }
+            }
+        }
+        if (!anyLord.keySet().isEmpty())
+        {
+            for (CreatureType ct : creatureTypes.getCreatures())
+            {
+                if (ct.isLord())
+                {
+                    possibleRecruiters.add(ct);
+                }
+            }
+        }
+        if (!anyDemiLord.keySet().isEmpty())
+        {
+            for (CreatureType ct : creatureTypes.getCreatures())
+            {
+                if (ct.isDemiLord())
+                {
+                    possibleRecruiters.add(ct);
+                }
+            }
+        }
+        /* note: everytinh *above* that point can be cached, but the global
+         * result itself cannot, as custom recruiting might change from call to
+         * call
+         */
+        for (ICustomRecruitBase cri : allCustom)
+        {
+            List<CreatureType> temp = cri.getPossibleSpecialRecruiters(terrain,
+                    hex);
+            possibleRecruiters.addAll(temp);
+        }
+        return possibleRecruiters;
     }
 }
