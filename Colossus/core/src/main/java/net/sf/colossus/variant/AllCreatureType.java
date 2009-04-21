@@ -24,5 +24,5 @@ public interface AllCreatureType {
      * @param name The name of the CreatureType
      * @return The CreatureType of name name.
      */
-    public CreatureType getCreatureByName(String name);
+    public CreatureType getCreatureTypeByName(String name);
 }

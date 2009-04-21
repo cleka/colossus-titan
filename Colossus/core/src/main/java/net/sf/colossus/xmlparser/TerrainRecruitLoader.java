@@ -403,7 +403,7 @@ public class TerrainRecruitLoader implements IVariantInitializer
                 }
                 else if (recruiter.getName().equals(Keyword_Anything))
                 {
-                    rst.addAny(creatureTypes.getCreatureByName(
+                    rst.addAny(creatureTypes.getCreatureTypeByName(
                             recruit.getName()),
                             recruit.getNumber());
                     if (!regularRecruit)
@@ -411,7 +411,7 @@ public class TerrainRecruitLoader implements IVariantInitializer
                 }
                 else if (recruiter.getName().equals(Keyword_AnyNonLord))
                 {
-                    rst.addNonLord(creatureTypes.getCreatureByName(
+                    rst.addNonLord(creatureTypes.getCreatureTypeByName(
                             recruit.getName()),
                             recruit.getNumber());
                     if (!regularRecruit)
@@ -419,7 +419,7 @@ public class TerrainRecruitLoader implements IVariantInitializer
                 }
                 else if (recruiter.getName().equals(Keyword_Lord))
                 {
-                    rst.addLord(creatureTypes.getCreatureByName(
+                    rst.addLord(creatureTypes.getCreatureTypeByName(
                             recruit.getName()),
                             recruit.getNumber());
                     if (!regularRecruit)
@@ -427,7 +427,7 @@ public class TerrainRecruitLoader implements IVariantInitializer
                 }
                 else if (recruiter.getName().equals(Keyword_DemiLord))
                 {
-                    rst.addDemiLord(creatureTypes.getCreatureByName(
+                    rst.addDemiLord(creatureTypes.getCreatureTypeByName(
                             recruit.getName()),
                             recruit.getNumber());
                     if (!regularRecruit)
@@ -435,9 +435,9 @@ public class TerrainRecruitLoader implements IVariantInitializer
                 }
                 else
                 {
-                    rst.addRegular(creatureTypes.getCreatureByName(
+                    rst.addRegular(creatureTypes.getCreatureTypeByName(
                             recruiter.getName()),
-                            creatureTypes.getCreatureByName(
+                            creatureTypes.getCreatureTypeByName(
                             recruit.getName()),
                             recruit.getNumber());
                     if (!regularRecruit)

@@ -32,7 +32,7 @@ import org.jdom.input.SAXBuilder;
 /**
  * CreatureLoader loads the creature descriptions.
  * @author Romain Dolbeau
- * @version $Id$
+ * @version $Id: CreatureLoader.java 4053 2009-04-21 12:40:24Z dolbeau $
  * @see net.sf.colossus.variant.CreatureType
  */
 public class CreatureLoader implements AllCreatureType
@@ -184,7 +184,7 @@ public class CreatureLoader implements AllCreatureType
         return Collections.unmodifiableSortedSet(new TreeSet<CreatureType>(this.creatures));
     }
 
-    public CreatureType getCreatureByName(String name)
+    public CreatureType getCreatureTypeByName(String name)
     {
         return this.byName.get(name);
     }
