@@ -10,10 +10,9 @@ import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
+import java.util.SortedSet;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -67,7 +66,7 @@ public class BattleTerrainHazardWindow extends KDialog
 
     private final MasterHex hex;
     private final Variant variant;
-    private final List<CreatureType> creatures;
+    private final SortedSet<CreatureType> creatures;
     private Map<String, HazardTerrain> hazardsDisplayed;
     private Map<String, HazardHexside> hexsidesDisplayed;
 
@@ -81,7 +80,7 @@ public class BattleTerrainHazardWindow extends KDialog
 
         this.hex = hex;
         variant = client.getGame().getVariant();
-        creatures = variant.getCreatureTypesAsList();
+        creatures = variant.getCreatureTypes();
         getContentPane().setLayout(new GridBagLayout());
         useSaveWindow(client.getOptions(), "BattleTerrainHazard", null);
 
@@ -247,10 +246,8 @@ public class BattleTerrainHazardWindow extends KDialog
     private void addNativesPanel(Container container, Hazards hazard)
     {
         JPanel nativePanel = new JPanel(new GridLayout(0, 6));
-        Iterator<CreatureType> it = creatures.iterator();
-        while (it.hasNext())
+        for (CreatureType creature : creatures)
         {
-            CreatureType creature = it.next();
             if (hazard instanceof HazardTerrain)
             {
                 if (creature.isNativeIn((HazardTerrain)hazard))
