@@ -164,7 +164,7 @@ public final class Client implements IClient, IOracle, IVariant
     private BattleMovement battleMovement;
     private Strike strike;
 
-    private Server localServer;
+    private final Server localServer;
     private SocketClientThread sct;
 
     /**
@@ -215,7 +215,51 @@ public final class Client implements IClient, IOracle, IVariant
         WhatNextManager whatNextMgr, Server theServer, boolean byWebClient,
         boolean noOptionsFile, boolean createGUI)
     {
-        this(whatNextMgr, playerName, noOptionsFile, createGUI);
+        assert playerName != null;
+
+        // TODO still dummy arguments
+        this.game = new GameClientSide(null, new String[0]);
+
+        // TODO give it to constructor right away? Not changing it right now,
+        // first do the "create SCT and Variant outside Client (and Game??)
+        // and pass them in" and see then whether it's better to create the
+        // Game outside ( = then we can't give Client to Game constructor)
+        // or create Game inside Client (then we can pass in the Client).
+        game.setClient(this);
+
+        // TODO this is currently not set properly straight away, it is fixed in
+        // updatePlayerInfo(..) when the PlayerInfos are initialized. Should really
+        // happen here, but doesn't yet since we don't have all players (not even as
+        // names) yet
+        this.owningPlayer = new PlayerClientSide(getGame(), playerName, 0);
+
+        this.noone = new PlayerClientSide(getGame(), "", 0);
+        this.activePlayer = noone;
+        this.battleActivePlayer = noone;
+
+        this.ai = new SimpleAI(this);
+
+        this.movement = new Movement(this);
+        this.battleMovement = new BattleMovement(this);
+        this.strike = new Strike(this);
+
+        ViableEntityManager.register(this, "Client " + playerName);
+        InstanceTracker.register(this, "Client " + playerName);
+
+        options = new Options(playerName, noOptionsFile);
+
+        if (createGUI)
+        {
+            this.gui = new ClientGUI(this, options, whatNextMgr);
+        }
+        else
+        {
+            this.gui = new NullClientGUI(this, options, whatNextMgr);
+        }
+
+        setupOptionListeners();
+        // Need to load options early so they don't overwrite server options.
+        loadOptions();
 
         this.localServer = theServer;
 
@@ -262,56 +306,6 @@ public final class Client implements IClient, IOracle, IVariant
             CustomRecruitBase.addCaretakerClientSide(getGame().getCaretaker());
             failed = false;
         }
-    }
-
-    private Client(WhatNextManager whatNextMgr, String playerName,
-        boolean noOptionsFile, boolean createGUI)
-    {
-        assert playerName != null;
-
-        // TODO still dummy arguments
-        this.game = new GameClientSide(null, new String[0]);
-
-        // TODO give it to constructor right away? Not changing it right now,
-        // first do the "create SCT and Variant outside Client (and Game??)
-        // and pass them in" and see then whether it's better to create the
-        // Game outside ( = then we can't give Client to Game constructor)
-        // or create Game inside Client (then we can pass in the Client).
-        game.setClient(this);
-
-        // TODO this is currently not set properly straight away, it is fixed in
-        // updatePlayerInfo(..) when the PlayerInfos are initialized. Should really
-        // happen here, but doesn't yet since we don't have all players (not even as
-        // names) yet
-        this.owningPlayer = new PlayerClientSide(getGame(), playerName, 0);
-
-        this.noone = new PlayerClientSide(getGame(), "", 0);
-        this.activePlayer = noone;
-        this.battleActivePlayer = noone;
-
-        this.ai = new SimpleAI(this);
-
-        this.movement = new Movement(this);
-        this.battleMovement = new BattleMovement(this);
-        this.strike = new Strike(this);
-
-        ViableEntityManager.register(this, "Client " + playerName);
-        InstanceTracker.register(this, "Client " + playerName);
-
-        options = new Options(playerName, noOptionsFile);
-
-        if (createGUI)
-        {
-            this.gui = new ClientGUI(this, options, whatNextMgr);
-        }
-        else
-        {
-            this.gui = new NullClientGUI(this, options, whatNextMgr);
-        }
-
-        setupOptionListeners();
-        // Need to load options early so they don't overwrite server options.
-        loadOptions();
     }
 
     public boolean isRemote()
