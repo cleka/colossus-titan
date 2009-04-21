@@ -195,12 +195,10 @@ class CreatureCollectionView extends KDialog
 
     private JPanel makeCreaturePanel(JScrollPane scrollPane)
     {
-        List<CreatureType> creatures = client.getGame().getVariant()
-            .getCreatureTypesAsList();
         JPanel creaturePanel = new JPanel();
         creaturePanel.setLayout(new CCVFlowLayout(scrollPane, creaturePanel,
             FlowLayout.LEFT, 2, 2));
-        for (CreatureType type : creatures)
+        for (CreatureType type : client.getGame().getVariant().getCreatureTypes())
         {
             creaturePanel.add(new CreatureCount(type));
         }
@@ -332,8 +330,6 @@ class CreatureCollectionView extends KDialog
     @Override
     public Dimension getMinimumSize()
     {
-        List<CreatureType> creatures = client.getGame().getVariant()
-            .getCreatureTypesAsList();
         // default : 5 creatures wide
 
         int minSingleX = CHIT_SIZE + 8;
@@ -343,8 +339,9 @@ class CreatureCollectionView extends KDialog
         }
 
         int minX = minSingleX * 5;
-        int minY = ((CHIT_SIZE + 8 + (2 * (int)baseLabel.getPreferredSize()
-            .getHeight())) * ((creatures.size() + 4) / 5))
+        int minY = ((CHIT_SIZE + 8 + (2 * (int) baseLabel.getPreferredSize().
+                getHeight())) * ((client.getGame().getVariant().
+                getCreatureTypes().size() + 4) / 5))
             + CHIT_SIZE;
 
         return new Dimension(minX, minY);
