@@ -272,7 +272,12 @@ public final class Client implements IClient, IOracle, IVariant
         // TODO still dummy arguments
         this.game = new GameClientSide(null, new String[0]);
 
-        (game).setClient(this);
+        // TODO give it to constructor right away? Not changing it right now,
+        // first do the "create SCT and Variant outside Client (and Game??)
+        // and pass them in" and see then whether it's better to create the
+        // Game outside ( = then we can't give Client to Game constructor)
+        // or create Game inside Client (then we can pass in the Client).
+        game.setClient(this);
 
         // TODO this is currently not set properly straight away, it is fixed in
         // updatePlayerInfo(..) when the PlayerInfos are initialized. Should really
