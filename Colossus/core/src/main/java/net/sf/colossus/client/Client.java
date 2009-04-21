@@ -3032,6 +3032,17 @@ public final class Client implements IClient, IOracle, IVariant
             && this.phase == Phase.FIGHT;
     }
 
+    /**
+     * Human user clicked on a legion to split it. Verify that splitting
+     * is legal and possible at all. Then get a child marker selected
+     * (either by dialog, or if autoPickMarker set, ask AI to pick one).
+     * If childMarkerId selection was not canceled (returned null),
+     * bring up the split dialog (which creatures go into which legion),
+     * and if that returned a list (not null) then call doSplit(...,...,...)
+     * which sends the request to server.
+     *
+     * @param legion The legion selected to split
+     */
     public void doSplit(Legion legion)
     {
         LOGGER.log(Level.FINER, "Client.doSplit " + legion);
@@ -3086,29 +3097,16 @@ public final class Client implements IClient, IOracle, IVariant
         {
             childId = gui.doPickMarker(markersAvailable);
         }
-        pickMarkerCallback(childId);
-    }
 
-    // TODO whole method to gui ?
-
-    /** Called after a marker is picked, either first marker or split. */
-    private void pickMarkerCallback(String childMarker)
-    {
-        if (childMarker == null)
+        if (childId == null)
         {
             return;
         }
-        if (parent == null)
-        {
-            // Picking first marker.
-            server.assignFirstMarker(childMarker);
-            return;
-        }
-        String results = gui.doPickSplitLegion(parent, childMarker);
+        String results = gui.doPickSplitLegion(parent, childId);
 
         if (results != null)
         {
-            doSplit(parent, childMarker, results);
+            doSplit(parent, childId, results);
         }
     }
 
@@ -3197,7 +3195,7 @@ public final class Client implements IClient, IOracle, IVariant
         {
             markerId = gui.doPickMarkerUntilGotOne(markersAvailable);
         }
-        pickMarkerCallback(markerId);
+        server.assignFirstMarker(markerId);
     }
 
     public void log(String message)
