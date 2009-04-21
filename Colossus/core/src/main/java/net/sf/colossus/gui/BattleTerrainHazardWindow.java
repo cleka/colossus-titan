@@ -81,7 +81,7 @@ public class BattleTerrainHazardWindow extends KDialog
 
         this.hex = hex;
         variant = client.getGame().getVariant();
-        creatures = variant.getCreatureTypes();
+        creatures = variant.getCreatureTypesAsList();
         getContentPane().setLayout(new GridBagLayout());
         useSaveWindow(client.getOptions(), "BattleTerrainHazard", null);
 

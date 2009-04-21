@@ -288,7 +288,7 @@ public final class GameServerSide extends Game
         {
             return;
         }
-        for (CreatureType type : getVariant().getCreatureTypes())
+        for (CreatureType type : getVariant().getCreatureTypesAsList())
         {
             updateCaretakerDisplaysFor(type);
         }
@@ -1366,7 +1366,7 @@ public final class GameServerSide extends Game
             root.addContent(car);
 
             // Caretaker stacks
-            List<CreatureType> creatures = getVariant().getCreatureTypes();
+            List<CreatureType> creatures = getVariant().getCreatureTypesAsList();
             Iterator<CreatureType> itCre = creatures.iterator();
 
             while (itCre.hasNext())

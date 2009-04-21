@@ -191,7 +191,7 @@ public final class ShowCreatureDetails extends KDialog
         {
             buf = new StringBuilder();
             List<CreatureType> recruiters = VariantSupport.getCurrentVariant()
-                .getCreatureTypes();
+                .getCreatureTypesAsList();
             separator = "";
             for (int ri = 0; ri < recruiters.size(); ri++)
             {
@@ -241,7 +241,7 @@ public final class ShowCreatureDetails extends KDialog
         {
             buf = new StringBuilder();
             List<CreatureType> recruits = VariantSupport.getCurrentVariant()
-                .getCreatureTypes();
+                .getCreatureTypesAsList();
             separator = "";
             for (int ri = 0; ri < recruits.size(); ri++)
             {

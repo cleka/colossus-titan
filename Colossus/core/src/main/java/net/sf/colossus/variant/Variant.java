@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import java.util.SortedSet;
 import javax.swing.text.Document;
 
 import net.sf.colossus.game.Game;
@@ -62,7 +63,7 @@ public class Variant
         // create some caches for faster lookups -- by name and by the "summonable" attribute
         initCreatureNameCache();
         this.summonableCreatureTypes = new ArrayList<CreatureType>();
-        CollectionHelper.copySelective(this.creatureTypes.getCreaturesAsList(),
+        CollectionHelper.copySelective(this.creatureTypes.getCreatures(),
             this.summonableCreatureTypes, new Predicate<CreatureType>()
             {
                 public boolean matches(CreatureType creatureType)
@@ -77,9 +78,14 @@ public class Variant
         this.variantName = name;
     }
 
-    public List<CreatureType> getCreatureTypes()
+    public List<CreatureType> getCreatureTypesAsList()
     {
         return this.creatureTypes.getCreaturesAsList();
+    }
+
+    public SortedSet<CreatureType> getCreatureTypes()
+    {
+        return this.creatureTypes.getCreatures();
     }
 
     public List<MasterBoardTerrain> getBattleLands()
@@ -123,10 +129,8 @@ public class Variant
     private void initCreatureNameCache()
     {
         // find it the slow way and add to cache.
-        Iterator<CreatureType> it = this.creatureTypes.getCreaturesAsList().iterator();
-        while (it.hasNext())
+        for (CreatureType creatureType : this.creatureTypes.getCreatures())
         {
-            CreatureType creatureType = it.next();
             creatureTypeByNameCache.put(creatureType.getName().toLowerCase(),
                 creatureType);
         }

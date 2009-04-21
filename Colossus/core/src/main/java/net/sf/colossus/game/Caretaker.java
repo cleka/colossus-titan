@@ -88,7 +88,7 @@ public class Caretaker
             // TODO for some reason this can happen during stresstesting -> fix game initialization
             return;
         }
-        for (CreatureType type : game.getVariant().getCreatureTypes())
+        for (CreatureType type : game.getVariant().getCreatureTypesAsList())
         {
             creatureAvailableCounts.put(type, Integer.valueOf(type
                 .getMaxCount()));
@@ -185,7 +185,7 @@ public class Caretaker
      */
     public void resurrectImmortals()
     {
-        for (CreatureType type : getGame().getVariant().getCreatureTypes())
+        for (CreatureType type : getGame().getVariant().getCreatureTypesAsList())
         {
             if (type.isImmortal())
             {

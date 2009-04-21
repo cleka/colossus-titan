@@ -861,18 +861,18 @@ public class TerrainRecruitLoader implements IVariantInitializer
                 if (tr.getName().equals(Keyword_Anything))
                 { // anyone can recruit here...
                     return new ArrayList<CreatureType>(VariantSupport
-                        .getCurrentVariant().getCreatureTypes());
+                        .getCurrentVariant().getCreatureTypesAsList());
                 }
                 if (tr.getName().equals(Keyword_AnyNonLord))
                 { // anyone can recruit here...
                     // TODO: why two cases if the same result as the last one
                     return new ArrayList<CreatureType>(VariantSupport
-                        .getCurrentVariant().getCreatureTypes());
+                        .getCurrentVariant().getCreatureTypesAsList());
                 }
                 if (tr.getName().equals(Keyword_Lord))
                 {
                     List<CreatureType> potential = VariantSupport
-                        .getCurrentVariant().getCreatureTypes();
+                        .getCurrentVariant().getCreatureTypesAsList();
                     Iterator<CreatureType> itCr = potential.iterator();
                     while (itCr.hasNext())
                     {
@@ -886,7 +886,7 @@ public class TerrainRecruitLoader implements IVariantInitializer
                 if (tr.getName().equals(Keyword_DemiLord))
                 {
                     List<CreatureType> potential = VariantSupport
-                        .getCurrentVariant().getCreatureTypes();
+                        .getCurrentVariant().getCreatureTypesAsList();
                     Iterator<CreatureType> itCr = potential.iterator();
                     while (itCr.hasNext())
                     {
