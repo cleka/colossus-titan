@@ -209,6 +209,7 @@ public class RecruitingSubTree implements IRecruiting
         assert recruit != null : "Oups, recruit must not be null";
         assert recruiter != null : "Oups, recruiter must not be null";
         assert number > 0 : "Oups, number should be > 0";
+        assert !recruit.isTitan() : "Oups, can't recruit Titan";
         // regular version
         regular.put(new RecruiterAndRecruit(recruiter, recruit),
                     new Integer(number));
@@ -220,6 +221,7 @@ public class RecruitingSubTree implements IRecruiting
         assert completed == false : "Oups, can't add after being completed";
         assert recruit != null : "Oups, recruit must not be null";
         assert number > 0 : "Oups, number should be > 0";
+        assert !recruit.isTitan() : "Oups, can't recruit Titan";
         any.put(recruit, number);
     }
 
@@ -229,6 +231,7 @@ public class RecruitingSubTree implements IRecruiting
         assert completed == false : "Oups, can't add after being completed";
         assert recruit != null : "Oups, recruit must not be null";
         assert number > 0 : "Oups, number should be > 0";
+        assert !recruit.isTitan() : "Oups, can't recruit Titan";
         anyNonLord.put(recruit, number);
     }
 
@@ -238,6 +241,7 @@ public class RecruitingSubTree implements IRecruiting
         assert completed == false : "Oups, can't add after being completed";
         assert recruit != null : "Oups, recruit must not be null";
         assert number > 0 : "Oups, number should be > 0";
+        assert !recruit.isTitan() : "Oups, can't recruit Titan";
         anyLord.put(recruit, number);
     }
 
@@ -247,6 +251,7 @@ public class RecruitingSubTree implements IRecruiting
         assert completed == false : "Oups, can't add after being completed";
         assert recruit != null : "Oups, recruit must not be null";
         assert number > 0 : "Oups, number should be > 0";
+        assert !recruit.isTitan() : "Oups, can't recruit Titan";
         anyDemiLord.put(recruit, number);
     }
 
