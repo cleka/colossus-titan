@@ -63,7 +63,7 @@ public class Variant
         // create some caches for faster lookups -- by name and by the "summonable" attribute
         initCreatureNameCache();
         this.summonableCreatureTypes = new ArrayList<CreatureType>();
-        CollectionHelper.copySelective(this.creatureTypes.getCreatures(),
+        CollectionHelper.copySelective(this.creatureTypes.getCreatureTypes(),
             this.summonableCreatureTypes, new Predicate<CreatureType>()
             {
                 public boolean matches(CreatureType creatureType)
@@ -80,12 +80,12 @@ public class Variant
 
     public List<CreatureType> getCreatureTypesAsList()
     {
-        return this.creatureTypes.getCreaturesAsList();
+        return this.creatureTypes.getCreatureTypesAsList();
     }
 
     public SortedSet<CreatureType> getCreatureTypes()
     {
-        return this.creatureTypes.getCreatures();
+        return this.creatureTypes.getCreatureTypes();
     }
 
     public List<MasterBoardTerrain> getBattleLands()
@@ -129,7 +129,7 @@ public class Variant
     private void initCreatureNameCache()
     {
         // find it the slow way and add to cache.
-        for (CreatureType creatureType : this.creatureTypes.getCreatures())
+        for (CreatureType creatureType : this.creatureTypes.getCreatureTypes())
         {
             creatureTypeByNameCache.put(creatureType.getName().toLowerCase(),
                 creatureType);

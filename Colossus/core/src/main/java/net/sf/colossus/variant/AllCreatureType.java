@@ -12,13 +12,13 @@ public interface AllCreatureType {
      * Retrieve all the CreatureType in the game. They are sorted by name.
      * @return The immutable list of all CreatureType in the Variant.
      */
-    public List<CreatureType> getCreaturesAsList();
+    public List<CreatureType> getCreatureTypesAsList();
     /**
      * Retrieve all the CreatureType in the game. The set is sorted by the
      * natural order of CreatureType
      * @return The immutable SortedSet of all CreatureType in the Variant.
      */
-    public SortedSet<CreatureType> getCreatures();
+    public SortedSet<CreatureType> getCreatureTypes();
     /**
      * Convert a name into the actual CreatureType
      * @param name The name of the CreatureType

@@ -174,12 +174,12 @@ public class CreatureLoader implements AllCreatureType
         Collections.sort(creatures, CreatureType.NAME_ORDER);
     }
 
-    public List<CreatureType> getCreaturesAsList()
+    public List<CreatureType> getCreatureTypesAsList()
     {
         return Collections.unmodifiableList(this.creatures);
     }
 
-    public SortedSet<CreatureType> getCreatures()
+    public SortedSet<CreatureType> getCreatureTypes()
     {
         return Collections.unmodifiableSortedSet(new TreeSet<CreatureType>(this.creatures));
     }

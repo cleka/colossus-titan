@@ -403,7 +403,7 @@ public class RecruitingSubTree implements IRecruiting
     {
         if (!any.keySet().isEmpty())
         {
-            return creatureTypes.getCreatures();
+            return creatureTypes.getCreatureTypes();
         }
         Set<CreatureType> possibleRecruiters = new TreeSet<CreatureType>();
         for (RecruiterAndRecruit rar : regular.keySet())
@@ -423,7 +423,7 @@ public class RecruitingSubTree implements IRecruiting
         }
         if (!anyNonLord.keySet().isEmpty())
         {
-            for (CreatureType ct : creatureTypes.getCreatures())
+            for (CreatureType ct : creatureTypes.getCreatureTypes())
             {
                 if (!ct.isLord() && !ct.isDemiLord())
                 {
@@ -433,7 +433,7 @@ public class RecruitingSubTree implements IRecruiting
         }
         if (!anyLord.keySet().isEmpty())
         {
-            for (CreatureType ct : creatureTypes.getCreatures())
+            for (CreatureType ct : creatureTypes.getCreatureTypes())
             {
                 if (ct.isLord())
                 {
@@ -443,7 +443,7 @@ public class RecruitingSubTree implements IRecruiting
         }
         if (!anyDemiLord.keySet().isEmpty())
         {
-            for (CreatureType ct : creatureTypes.getCreatures())
+            for (CreatureType ct : creatureTypes.getCreatureTypes())
             {
                 if (ct.isDemiLord())
                 {
