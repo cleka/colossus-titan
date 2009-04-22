@@ -40,11 +40,11 @@ public class CreatureLoader implements AllCreatureType
     private static final Logger LOGGER = Logger.getLogger(CreatureLoader.class
         .getName());
     private static final String currentVersion = "2";
-    private final List<CreatureType> creatures;
+    private final SortedSet<CreatureType> creatures;
     private final Map<String,CreatureType> byName = new TreeMap<String,CreatureType>();
 
     public CreatureLoader() {
-        this.creatures = new ArrayList<CreatureType>();
+        this.creatures = new TreeSet<CreatureType>();
     }
 
     // we need to cast since JDOM is not generified
@@ -171,17 +171,16 @@ public class CreatureLoader implements AllCreatureType
         }
         this.creatures.add(creature);
         this.byName.put(name, creature);
-        Collections.sort(creatures, CreatureType.NAME_ORDER);
     }
 
     public List<CreatureType> getCreatureTypesAsList()
     {
-        return Collections.unmodifiableList(this.creatures);
+        return Collections.unmodifiableList(new ArrayList<CreatureType>(this.creatures));
     }
 
     public SortedSet<CreatureType> getCreatureTypes()
     {
-        return Collections.unmodifiableSortedSet(new TreeSet<CreatureType>(this.creatures));
+        return Collections.unmodifiableSortedSet(this.creatures);
     }
 
     public CreatureType getCreatureTypeByName(String name)
