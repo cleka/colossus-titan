@@ -742,7 +742,7 @@ public final class Client implements IClient, IOracle, IVariant
         this.strike = null;
         playersNotInitialized = true;
 
-        net.sf.colossus.server.CustomRecruitBase.reset();
+        CustomRecruitBase.reset();
     }
 
     /** Called from BattleBoard to leave carry mode. */
