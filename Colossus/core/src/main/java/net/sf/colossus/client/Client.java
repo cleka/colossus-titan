@@ -517,12 +517,8 @@ public final class Client implements IClient, IOracle, IVariant
         }
     }
 
-    /** public so that server can set autoPlay for AIs.
-     *
-     * TODO This it totally confusing: this method is declared
-     * to fulfill the IClient interface, but it is never actually
-     * used, since the SocketClientThread directly deals with
-     * the actual Options object itself...
+    /** Server sends Client some option setting (e.g. AI type,
+     *  autoPlay for stresstest (also AIs (????), ...)
      */
     public void syncOption(String optname, String value)
     {
