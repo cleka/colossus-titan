@@ -182,8 +182,17 @@ public class RecruitingSubTree implements IRecruiting
         /* first, extract all creature really used (recruiter or recruit) in this terrain */
         for (RecruiterAndRecruit rar : regular.keySet())
         {
-            allInvolved.add(rar.getRecruiter());
-            allInvolved.add(rar.getRecruit());
+            // Titan should never been involved in the regular recruit graph
+            // except at the very beginning.
+            if (!rar.getRecruiter().isTitan())
+                allInvolved.add(rar.getRecruiter());
+            if (!rar.getRecruit().isTitan())
+                allInvolved.add(rar.getRecruit());
+            else
+            {
+                LOGGER.warning("TITAN as regular recruit ????");
+                LOGGER.warning(this.toString());
+            }
         }
         Set<RecruiterAndRecruit> extra = new HashSet<RecruiterAndRecruit>();
         /* then for all combinations, check which are ancestor to which other
