@@ -97,15 +97,32 @@ public final class Client implements IClient, IOracle, IVariant
     private static final Logger LOGGER = Logger.getLogger(Client.class
         .getName());
 
-    /** This will eventually be a network interface rather than a
-     *  direct reference.  So don't share this reference. */
+    /** This is (right now) always a SocketClientThread as deputy (relay)
+     *  which forwards everything that we do/tell, to the Server.
+     *  Perhaps one day this could either be a SocketConnection or e.g.
+     *  a Queue type of connection for local Clients...
+     */
     private IServer server;
 
+    /** Client constructor sets this to true if something goes wrong with the
+     *  SocketClientThread initialization. I wanted to avoid have the Client
+     *  constructor throw an exception, because that caused problems in
+     *  Java 1.4 with a "created but not run thread" which was then never
+     *  cleaned up and thus JVM did not exit by itself.
+     *  TODO perhaps that is now fixed in Java 1.5 ?
+     *  I plan to change the whole "when/how SCT is created" soon anyway...
+     */
     private boolean failed = false;
 
-    // TODO keep in sync with GUI
+    /** Replay during load of a saved game is ongoing. Client must NOT react
+     *  (not even redraw) on any of those messages, they are mostly sent to
+     *  rebuild the predict split data.
+     */
     private boolean replayOngoing = false;
 
+    /** This can be an actual ClientGUI, or a NullClientGUI (which does simply
+     *  nothing, so that we don't need to check for null everywhere).
+     */
     private final IClientGUI gui;
 
     private final List<BattleChit> battleChits = new ArrayList<BattleChit>();
@@ -113,6 +130,10 @@ public final class Client implements IClient, IOracle, IVariant
     // Per-client and per-player options.
     private final Options options;
 
+    /** At first time we get "all player info", they are created; at all
+     *  later calls just update them. So this flag here tells us whether
+     *  it's the first time (=true) or not any more (=false).
+     */
     private boolean playersNotInitialized = true;
 
     /**
@@ -452,7 +473,10 @@ public final class Client implements IClient, IOracle, IVariant
         game.setEngagementData(null, null, null);
     }
 
-    /** Legion target summons unit from legion donor. */
+    /** Legion target summons unit from Legion donor.
+     *  @param summonInfo A SummonInfo object that contains the values
+     *                    for target, donor and unit.
+     */
     private void doSummon(SummonInfo summonInfo)
     {
         assert summonInfo != null : "SummonInfo object must not be null!";
@@ -1182,7 +1206,6 @@ public final class Client implements IClient, IOracle, IVariant
             else
             {
                 summonInfo = gui.doPickSummonAngel(legion, possibleDonors);
-
             }
         }
 
