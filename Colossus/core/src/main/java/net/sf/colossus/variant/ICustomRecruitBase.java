@@ -26,8 +26,8 @@ public interface ICustomRecruitBase
      * @param hex The specific MasterHex considered for recruiting.
      * @return A List of possible special Recruiters in this hex.
      */
-    abstract public List<CreatureType> getPossibleSpecialRecruiters(
-        MasterBoardTerrain terrain, MasterHex hex);
+    public List<CreatureType> getPossibleSpecialRecruiters(
+         MasterHex hex);
 
     /**
      * List creatures that can be recruited in this terrain
@@ -38,14 +38,14 @@ public interface ICustomRecruitBase
      * BalrogRecruitment.java in Balrog variant directory)
      * @return A List of possible special Recruits in this hex.
      */
-    abstract public List<CreatureType> getPossibleSpecialRecruits(
-        MasterBoardTerrain terrain, MasterHex hex);
+    public List<CreatureType> getPossibleSpecialRecruits(
+         MasterHex hex);
 
     /**
      * Number of recruiters needed to get a recruit
      * in a special way in this terrain now.
      */
-    abstract public int numberOfRecruiterNeeded(CreatureType recruiter,
-        CreatureType recruit, MasterBoardTerrain terrain, MasterHex hex);
+    public int numberOfRecruiterNeeded(CreatureType recruiter,
+        CreatureType recruit, MasterHex hex);
 
 }

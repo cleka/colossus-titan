@@ -340,8 +340,7 @@ public class RecruitingSubTree implements IRecruiting
         {
             LOGGER.finest("Checking with CRB " + crb.getClass().getName());
             number = Math.min(number, crb.numberOfRecruiterNeeded(recruiter,
-                    recruit, terrain,
-                    hex));
+                    recruit, hex));
         }
         return number;
     }
@@ -391,8 +390,7 @@ public class RecruitingSubTree implements IRecruiting
          */
         for (ICustomRecruitBase cri : allCustom)
         {
-            List<CreatureType> temp = cri.getPossibleSpecialRecruits(terrain,
-                    hex);
+            List<CreatureType> temp = cri.getPossibleSpecialRecruits(hex);
             possibleRecruits.addAll(temp);
         }
         return possibleRecruits;
@@ -457,8 +455,7 @@ public class RecruitingSubTree implements IRecruiting
          */
         for (ICustomRecruitBase cri : allCustom)
         {
-            List<CreatureType> temp = cri.getPossibleSpecialRecruiters(terrain,
-                    hex);
+            List<CreatureType> temp = cri.getPossibleSpecialRecruiters(hex);
             possibleRecruiters.addAll(temp);
         }
         return possibleRecruiters;

@@ -192,7 +192,7 @@ abstract public class CustomRecruitBase implements ICustomRecruitBase
      * @return A List of possible special Recruiters in this hex.
      */
     abstract public List<CreatureType> getPossibleSpecialRecruiters(
-        MasterBoardTerrain terrain, MasterHex hex);
+         MasterHex hex);
 
     /**
      * List creatures that can be recruited in this terrain
@@ -204,14 +204,14 @@ abstract public class CustomRecruitBase implements ICustomRecruitBase
      * @return A List of possible special Recruits in this hex.
      */
     abstract public List<CreatureType> getPossibleSpecialRecruits(
-        MasterBoardTerrain terrain, MasterHex hex);
+         MasterHex hex);
 
     /**
      * Number of recruiters needed to get a recruit
      * in a special way in this terrain now.
      */
     abstract public int numberOfRecruiterNeeded(CreatureType recruiter,
-        CreatureType recruit, MasterBoardTerrain terrain, MasterHex hex);
+        CreatureType recruit, MasterHex hex);
 
     /**
      * Bookkeeping function, called once after every player turn.

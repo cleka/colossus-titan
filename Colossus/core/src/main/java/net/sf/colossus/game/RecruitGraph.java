@@ -447,7 +447,7 @@ public class RecruitGraph
                     ICustomRecruitBase cri = TerrainRecruitLoader
                         .getCustomRecruitBase(tempSrc.getCreatureName());
                     int v = cri.numberOfRecruiterNeeded(recruiterCre,
-                        recruitCre, terrain, hex);
+                        recruitCre, hex);
                     if (v < minValue)
                     {
                         minValue = v;

@@ -805,7 +805,7 @@ public class TerrainRecruitLoader implements IVariantInitializer
                 if (cri != null)
                 {
                     List<? extends CreatureType> temp = cri
-                        .getPossibleSpecialRecruits(terrain, hex);
+                        .getPossibleSpecialRecruits(hex);
                     result.addAll(temp);
                 }
             }
@@ -903,7 +903,7 @@ public class TerrainRecruitLoader implements IVariantInitializer
                     if (cri != null)
                     {
                         List<CreatureType> temp = cri
-                            .getPossibleSpecialRecruiters(terrain, hex);
+                            .getPossibleSpecialRecruiters(hex);
                         re.addAll(temp);
                     }
                 }

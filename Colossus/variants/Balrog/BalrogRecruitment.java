@@ -62,7 +62,7 @@ public class BalrogRecruitment extends CustomRecruitBase
 
     @Override
     public List<CreatureType> getPossibleSpecialRecruiters(
-        MasterBoardTerrain terrain, MasterHex hex)
+         MasterHex hex)
     {
         // Balrog recruited in Tower, where everything recruit anyway.
         return new ArrayList<CreatureType>();
@@ -70,7 +70,7 @@ public class BalrogRecruitment extends CustomRecruitBase
 
     @Override
     public List<CreatureType> getPossibleSpecialRecruits(
-        MasterBoardTerrain terrain, MasterHex hex)
+         MasterHex hex)
     {
         List<CreatureType> temp = new ArrayList<CreatureType>();
 
@@ -103,7 +103,7 @@ public class BalrogRecruitment extends CustomRecruitBase
 
     @Override
     public int numberOfRecruiterNeeded(CreatureType recruiter,
-        CreatureType recruit, MasterBoardTerrain terrain, MasterHex hex)
+        CreatureType recruit, MasterHex hex)
     {
         LOGGER.finest("Called with recruiter " + recruiter + " and recruit " + recruit);
         if ((recruit == null) || (recruit instanceof CreatureBalrog))
