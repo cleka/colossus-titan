@@ -43,13 +43,7 @@ public interface IClientGUI
 
     public abstract void initBoard();
 
-    public abstract void ensureEdtSetupClientGUI();
-
-    public abstract void ensureEdtNewBattleBoard();
-
     public abstract void actOnInitBattle();
-
-    public abstract void doNewBattleBoard();
 
     public abstract void updateStatusScreen();
 
@@ -70,10 +64,6 @@ public interface IClientGUI
 
     public abstract void menuLoadGame(String filename);
 
-    public abstract void focusMap();
-
-    public abstract void focusBoard();
-
     public abstract void highlightEngagements();
 
     public abstract int getViewMode();
@@ -82,8 +72,6 @@ public interface IClientGUI
 
     public abstract void addPossibleRecruitChits(LegionClientSide legion,
         Set<MasterHex> hexes);
-
-    public abstract void setupGUIOptionListeners();
 
     public abstract void eventViewerSetVisibleMaybe();
 
@@ -226,14 +214,6 @@ public interface IClientGUI
 
     public abstract void eventViewerRevealCreatures(Legion legion,
         final List<String> names, String reason);
-
-    /**
-     * Ensure that Player menu checkboxes reflect the correct state.
-     *
-     * TODO let the checkboxes have their own listeners instead. Or even
-     * better: use a binding framework.
-     */
-    public abstract void syncCheckboxes();
 
     public abstract void doAcquireAngel(Legion legion, List<String> recruits);
 

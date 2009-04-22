@@ -257,9 +257,10 @@ public final class Client implements IClient, IOracle, IVariant
             this.gui = new NullClientGUI(this, options, whatNextMgr);
         }
 
-        setupOptionListeners();
+        setupTypeOptionListener();
+
         // Need to load options early so they don't overwrite server options.
-        loadOptions();
+        options.loadOptions();
 
         this.localServer = theServer;
 
@@ -526,20 +527,18 @@ public final class Client implements IClient, IOracle, IVariant
     public void setOption(String optname, String value)
     {
         options.setOption(optname, value);
-        gui.syncCheckboxes();
+        // Commented out, because this method is, as TODO above says,
+        // not used at all, so it should not harm to take the gui.sync* call
+        // away from below. And then the sync* does not need to be in the
+        // interface at all.
+        // gui.syncCheckboxes();
         options.saveOptions();
     }
 
-    /**
-     * Trigger side effects after changing an option value.
-     *
-     *  TODO now that there are listeners, many of the other classes could listen to the
-     *  options relevant to them instead of dispatching it all through the Client class.
-     */
-    private void setupOptionListeners()
+    // TODO we will get rid of this listener (or the need for this listener),
+    // once we manage to pass in the type to Client constructor.
+    private void setupTypeOptionListener()
     {
-        gui.setupGUIOptionListeners();
-
         options.addListener(Options.playerType, new IOptions.Listener()
         {
             @Override
@@ -549,13 +548,6 @@ public final class Client implements IClient, IOracle, IVariant
                 setType(newValue);
             }
         });
-    }
-
-    /** Load player options from a file. */
-    private void loadOptions()
-    {
-        options.loadOptions();
-        gui.syncCheckboxes();
     }
 
     // public for IOracle

@@ -1002,7 +1002,14 @@ public final class MasterBoard extends JPanel
         mi = helpMenu.add(viewHelpDocAction);
     }
 
-    void twiddleOption(String name, boolean enable)
+    /**
+     * Find the checkbox for the given (boolean) option name; set it to the
+     * new given value (only if different that previous value).
+     *
+     * @param name The option name to adjust the checkbox for
+     * @param enable The should-be state of the checkbox
+     */
+    void adjustCheckboxIfNeeded(String name, boolean enable)
     {
         JCheckBoxMenuItem cbmi = checkboxes.get(name);
         if (cbmi != null)

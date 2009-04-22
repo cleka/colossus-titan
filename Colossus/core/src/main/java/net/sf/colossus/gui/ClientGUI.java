@@ -85,7 +85,6 @@ public class ClientGUI implements IClientGUI
     private WebClient webClient = null;
     private boolean startedByWebClient = false;
 
-
     /**
      * The object which handles what to do next when a game is going to end
      */
@@ -214,8 +213,8 @@ public class ClientGUI implements IClientGUI
     {
         if (this.webClient == null)
         {
-            this.webClient = new WebClient(whatNextManager, null,
-                -1, null, null);
+            this.webClient = new WebClient(whatNextManager, null, -1, null,
+                null);
             this.webClient.setGameClient(client);
         }
         else
@@ -266,7 +265,7 @@ public class ClientGUI implements IClientGUI
     /**
      * Ensure that setupClientGUI() is run inside the EDT
      */
-    public void ensureEdtSetupClientGUI()
+    private void ensureEdtSetupClientGUI()
     {
         if (SwingUtilities.isEventDispatchThread())
         {
@@ -304,6 +303,7 @@ public class ClientGUI implements IClientGUI
      */
     public void setupClientGUI()
     {
+        /*
         disposeEventViewer();
         disposePreferencesWindow();
         disposeEngagementResults();
@@ -311,6 +311,7 @@ public class ClientGUI implements IClientGUI
         disposeCaretakerDisplay();
         disposeLogWindow();
         disposeMasterBoard();
+        */
 
         int scale = options.getIntOption(Options.scale);
         if (scale == -1)
@@ -329,6 +330,9 @@ public class ClientGUI implements IClientGUI
         showOrHideLogWindow(client, options.getOption(Options.showLogWindow));
         showOrHideCaretaker(options.getOption(Options.showCaretaker));
 
+        setupGUIOptionListeners();
+        syncCheckboxes();
+
         focusBoard();
     }
 
@@ -345,7 +349,7 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    public void ensureEdtNewBattleBoard()
+    private void ensureEdtNewBattleBoard()
     {
         if (SwingUtilities.isEventDispatchThread())
         {
@@ -390,13 +394,10 @@ public class ClientGUI implements IClientGUI
 
     public void actOnInitBattle()
     {
-        if (board != null)
-        {
-            ensureEdtNewBattleBoard();
-        }
+        ensureEdtNewBattleBoard();
     }
 
-    public void doNewBattleBoard()
+    private void doNewBattleBoard()
     {
         if (battleBoard != null)
         {
@@ -407,6 +408,9 @@ public class ClientGUI implements IClientGUI
         battleBoard = new BattleBoard(this, client.getBattleSite(), client
             .getAttacker(), client.getDefender());
     }
+
+    // TODO create/dispose status screen only on request, in this call here
+    // only call the update (if it exists)
 
     public void updateStatusScreen()
     {
@@ -423,19 +427,13 @@ public class ClientGUI implements IClientGUI
             }
             else
             {
-                if (board != null)
-                {
-                    statusScreen = new StatusScreen(getPreferredParent(),
-                        client, options, client);
-                }
+                statusScreen = new StatusScreen(getPreferredParent(), client,
+                    options, client);
             }
         }
         else
         {
-            if (board != null)
-            {
-                board.twiddleOption(Options.showStatusScreen, false);
-            }
+            board.adjustCheckboxIfNeeded(Options.showStatusScreen, false);
             if (statusScreen != null)
             {
                 statusScreen.dispose();
@@ -685,7 +683,7 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    public void focusMap()
+    private void focusMap()
     {
         if (battleBoard != null)
         {
@@ -693,24 +691,18 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    public void focusBoard()
+    private void focusBoard()
     {
-        if (board != null)
-        {
-            board.reqFocus();
-        }
+        board.reqFocus();
     }
 
     public void highlightEngagements()
     {
-        if (board != null)
+        if (isMyTurn())
         {
-            if (isMyTurn())
-            {
-                focusBoard();
-            }
-            board.highlightEngagements();
+            focusBoard();
         }
+        board.highlightEngagements();
     }
 
     private JFrame getPreferredParent()
@@ -740,10 +732,7 @@ public class ClientGUI implements IClientGUI
             return;
         }
 
-        if (board != null)
-        {
-            board.addPossibleRecruitChits(legion, hexes);
-        }
+        board.addPossibleRecruitChits(legion, hexes);
     }
 
     /*
@@ -753,7 +742,7 @@ public class ClientGUI implements IClientGUI
      * options relevant to them instead of dispatching it all through the Client class.
      */
 
-    public void setupGUIOptionListeners()
+    private void setupGUIOptionListeners()
     {
         options.addListener(Options.antialias, new IOptions.Listener()
         {
@@ -945,28 +934,26 @@ public class ClientGUI implements IClientGUI
 
     public void engagementResultsMaybeShow()
     {
-        // null if there is no board, e.g. AI
+        // maybeShow decides by itself based on the current value
+        // of the option whether to hide or show.
+        // null if called too early by optionListener when loading options
+        // TODO try change order: first create, then listeners/load options?
         if (engagementResults != null)
         {
-            // maybeShow decides by itself based on the current value
-            // of the option whether to hide or show.
             engagementResults.maybeShow();
         }
     }
 
     public void actOnTellLegionLocation(Legion legion, MasterHex hex)
     {
-        if (board != null)
-        {
-            // @TODO: this creates it every time, not only when necessary ?
-            Marker marker = new Marker(3 * Scale.get(), legion.getMarkerId(),
-                client);
-            setMarker(legion, marker);
+        // @TODO: this creates it every time, not only when necessary ?
+        Marker marker = new Marker(3 * Scale.get(), legion.getMarkerId(),
+            client);
+        setMarker(legion, marker);
 
-            if (!isReplayOngoing())
-            {
-                board.alignLegions(hex);
-            }
+        if (!isReplayOngoing())
+        {
+            board.alignLegions(hex);
         }
     }
 
@@ -974,10 +961,7 @@ public class ClientGUI implements IClientGUI
     If it's already in the list, remove the earlier entry. */
     void setMarker(Legion legion, Marker marker)
     {
-        if (board != null)
-        {
-            board.setMarkerForLegion(legion, marker);
-        }
+        board.setMarkerForLegion(legion, marker);
     }
 
     public void actOnDidSplit(int turn, Legion parent, Legion child,
@@ -988,30 +972,23 @@ public class ClientGUI implements IClientGUI
             eventViewerNewSplitEvent(turn, parent, child);
         }
 
-        if (board != null)
-        {
-            Marker marker = new Marker(3 * Scale.get(), child.getMarkerId(),
-                client);
-            setMarker(child, marker);
+        Marker marker = new Marker(3 * Scale.get(), child.getMarkerId(),
+            client);
+        setMarker(child, marker);
 
-            if (isReplayOngoing())
-            {
-                replayTurnChange(turn);
-            }
-            else
-            {
-                board.alignLegions(hex);
-            }
+        if (isReplayOngoing())
+        {
+            replayTurnChange(turn);
+        }
+        else
+        {
+            board.alignLegions(hex);
         }
 
         if (client.isMyLegion(child))
         {
-            if (board != null)
-            {
-                board.clearRecruitedChits();
-                board.clearPossibleRecruitChits();
-            }
-
+            board.clearRecruitedChits();
+            board.clearPossibleRecruitChits();
             pushUndoStack(child.getMarkerId());
         }
 
@@ -1019,80 +996,65 @@ public class ClientGUI implements IClientGUI
 
     public void actOnDidSplitPart2(MasterHex hex)
     {
-        if (client.getTurnNumber() == 1 && board != null && isMyTurn())
+        if (client.getTurnNumber() == 1 && isMyTurn())
         {
             board.enableDoneAction();
         }
 
-        if (board != null)
+        if (!isReplayOngoing())
         {
-            if (!isReplayOngoing())
-            {
-                board.alignLegions(hex);
-                board.highlightTallLegions();
-            }
+            board.alignLegions(hex);
+            board.highlightTallLegions();
         }
+
     }
 
     public void actOnDoneWithMoves()
     {
-        if (board != null)
-        {
-            board.clearRecruitedChits();
-            board.clearPossibleRecruitChits();
-        }
+        board.clearRecruitedChits();
+        board.clearPossibleRecruitChits();
     }
 
     public void actOnDoneWithSplits()
     {
-        if (board != null)
-        {
-            board.clearRecruitedChits();
-        }
+        board.clearRecruitedChits();
     }
 
     public void actOnDidRecruit(Legion legion, String recruitName,
         List<String> recruiters, String reason)
     {
-        if (board != null)
-        {
-            board.addRecruitedChit(legion);
-            board.highlightPossibleRecruitLegionHexes();
+        board.addRecruitedChit(legion);
+        board.highlightPossibleRecruitLegionHexes();
 
-            if (eventViewer != null)
-            {
-                eventViewer.recruitEvent(legion.getMarkerId(), (legion)
-                    .getHeight(), recruitName, recruiters, reason);
-            }
+        if (eventViewer != null)
+        {
+            eventViewer.recruitEvent(legion.getMarkerId(), (legion)
+                .getHeight(), recruitName, recruiters, reason);
         }
     }
 
     public void actOnRemoveCreature(Legion legion, String name, String reason)
     {
-        if (eventViewer != null)
+        if (reason.equals(Constants.reasonUndidReinforce))
         {
-            if (reason.equals(Constants.reasonUndidReinforce))
-            {
-                LOGGER
-                    .warning("removeCreature should not be called for undidReinforce!");
-            }
-            else if (reason.equals(Constants.reasonUndidRecruit))
-            {
-                // normal undidRecruit does not use this, but during loading a game
-                // they appear as add- and removeCreature calls.
-                LOGGER
-                    .info("removeCreature called for undidRecruit - ignored");
-            }
-            else
-            {
-                eventViewer.removeCreature(legion.getMarkerId(), name);
-            }
+            LOGGER
+                .warning("removeCreature should not be called for undidReinforce!");
+        }
+        else if (reason.equals(Constants.reasonUndidRecruit))
+        {
+            // normal undidRecruit does not use this, but during loading a game
+            // they appear as add- and removeCreature calls.
+            LOGGER.info("removeCreature called for undidRecruit - ignored");
+        }
+        else
+        {
+            eventViewer.removeCreature(legion.getMarkerId(), name);
         }
     }
 
     public void actOnRemoveCreaturePart2(Legion legion)
     {
-        if (board != null && !isReplayOngoing())
+        if (!isReplayOngoing())
         {
             GUIMasterHex hex = board.getGUIHexByMasterHex(legion
                 .getCurrentHex());
@@ -1102,32 +1064,26 @@ public class ClientGUI implements IClientGUI
 
     public void actOnAddCreature(Legion legion, String name, String reason)
     {
-        if (board != null && !isReplayOngoing())
+        if (!isReplayOngoing())
         {
             GUIMasterHex hex = board.getGUIHexByMasterHex(legion
                 .getCurrentHex());
             hex.repaint();
         }
 
-        if (eventViewer != null)
-        {
-            eventViewer.addCreature(legion.getMarkerId(), name, reason);
-        }
+        eventViewer.addCreature(legion.getMarkerId(), name, reason);
     }
 
     public void boardActOnUndidSplit(Legion survivor, int turn)
     {
-        if (board != null)
+        if (isReplayOngoing())
         {
-            if (isReplayOngoing())
-            {
-                replayTurnChange(turn);
-            }
-            else
-            {
-                board.alignLegions(survivor.getCurrentHex());
-                board.highlightTallLegions();
-            }
+            replayTurnChange(turn);
+        }
+        else
+        {
+            board.alignLegions(survivor.getCurrentHex());
+            board.highlightTallLegions();
         }
     }
 
@@ -1136,17 +1092,11 @@ public class ClientGUI implements IClientGUI
     {
         int eventType = wasReinforcement ? RevealEvent.eventReinforce
             : RevealEvent.eventRecruit;
-        if (board != null)
-        {
-            board.cleanRecruitedChit((LegionClientSide)legion);
-            board.highlightPossibleRecruitLegionHexes();
+        board.cleanRecruitedChit((LegionClientSide)legion);
+        board.highlightPossibleRecruitLegionHexes();
 
-            if (eventViewer != null)
-            {
-                eventViewer.undoEvent(eventType, legion.getMarkerId(), null,
-                    turnNumber);
-            }
-        }
+        eventViewer.undoEvent(eventType, legion.getMarkerId(), null,
+            turnNumber);
     }
 
     public boolean chooseWhetherToTeleport()
@@ -1168,31 +1118,25 @@ public class ClientGUI implements IClientGUI
     {
         if (teleport)
         {
-            if (eventViewer != null)
-            {
-                eventViewer.newCreatureRevealEvent(RevealEvent.eventTeleport,
-                    legion.getMarkerId(), legion.getHeight(), teleportingLord,
-                    null, 0);
-            }
+            eventViewer.newCreatureRevealEvent(RevealEvent.eventTeleport,
+                legion.getMarkerId(), legion.getHeight(), teleportingLord,
+                null, 0);
         }
 
-        if (board != null)
+        board.clearPossibleRecruitChits();
+        board.alignLegions(startingHex);
+        board.alignLegions(currentHex);
+        board.highlightUnmovedLegions();
+        board.repaint();
+        if (client.isMyLegion(legion))
         {
-            board.clearPossibleRecruitChits();
-            board.alignLegions(startingHex);
-            board.alignLegions(currentHex);
-            board.highlightUnmovedLegions();
-            board.repaint();
-            if (client.isMyLegion(legion))
+            if (splitLegionHasForcedMove)
             {
-                if (splitLegionHasForcedMove)
-                {
-                    board.disableDoneAction("Split legion needs to move");
-                }
-                else
-                {
-                    board.enableDoneAction();
-                }
+                board.disableDoneAction("Split legion needs to move");
+            }
+            else
+            {
+                board.enableDoneAction();
             }
         }
     }
@@ -1201,37 +1145,34 @@ public class ClientGUI implements IClientGUI
         MasterHex currentHex, boolean splitLegionHasForcedMove,
         boolean didTeleport)
     {
-        if (board != null)
+        board.clearPossibleRecruitChits();
+        board.alignLegions(formerHex);
+        board.alignLegions(currentHex);
+        board.highlightUnmovedLegions();
+        board.repaint();
+        if (isMyTurn())
         {
-            board.clearPossibleRecruitChits();
-            board.alignLegions(formerHex);
-            board.alignLegions(currentHex);
-            board.highlightUnmovedLegions();
-            board.repaint();
-            if (isMyTurn())
+            if (isUndoStackEmpty())
             {
-                if (isUndoStackEmpty())
-                {
-                    board.disableDoneAction("At least one legion must move");
-                }
-                if (splitLegionHasForcedMove)
-                {
-                    board.disableDoneAction("Split legion needs to move");
-                }
+                board.disableDoneAction("At least one legion must move");
             }
+            if (splitLegionHasForcedMove)
+            {
+                board.disableDoneAction("Split legion needs to move");
+            }
+        }
 
-            if (didTeleport && eventViewer != null)
-            {
-                eventViewer.undoEvent(RevealEvent.eventTeleport, legion
-                    .getMarkerId(), null, client.getTurnNumber());
-            }
+        if (didTeleport)
+        {
+            eventViewer.undoEvent(RevealEvent.eventTeleport, legion
+                .getMarkerId(), null, client.getTurnNumber());
         }
     }
 
     public void actOnNextEngagement()
     {
-        if (client.getGameClientSide().findEngagements().isEmpty()
-            && board != null)
+        // TODO move condition to Client?
+        if (client.getGameClientSide().findEngagements().isEmpty())
         {
             board.enableDoneAction();
         }
@@ -1239,8 +1180,7 @@ public class ClientGUI implements IClientGUI
 
     public void alignLegionsMaybe(Legion legion)
     {
-
-        if (board != null && !isReplayOngoing())
+        if (!isReplayOngoing())
         {
             board.alignLegions(legion.getCurrentHex());
         }
@@ -1248,19 +1188,13 @@ public class ClientGUI implements IClientGUI
 
     public void actOnRemoveLegion(Legion legion)
     {
-        if (board != null)
-        {
-            board.removeMarkerForLegion(legion);
-        }
+        board.removeMarkerForLegion(legion);
     }
 
     public void actOnDoSummon()
     {
-        if (board != null)
-        {
-            highlightEngagements();
-            board.repaint();
-        }
+        highlightEngagements();
+        board.repaint();
     }
 
     public void setLookAndFeel(String lfName)
@@ -1293,11 +1227,9 @@ public class ClientGUI implements IClientGUI
 
     public void updateEverything()
     {
-        if (board != null)
-        {
-            board.updateComponentTreeUI();
-            board.pack();
-        }
+        board.updateComponentTreeUI();
+        board.pack();
+
         updateTreeAndPack(statusScreen);
         updateTreeAndPack(caretakerDisplay);
         updateTreeAndPack(preferencesWindow);
@@ -1315,6 +1247,8 @@ public class ClientGUI implements IClientGUI
 
     public void replayTurnChange(int nowTurn)
     {
+        assert board != null : "board is null in replayTurnChange!";
+
         if (board != null)
         {
             if (nowTurn != replayLastTurn)
@@ -1367,49 +1301,29 @@ public class ClientGUI implements IClientGUI
 
     public void eventViewerCancelReinforcement(String recruitName, int turnNr)
     {
-        if (eventViewer != null)
-        {
-            eventViewer.cancelReinforcement(recruitName, turnNr);
-        }
+        eventViewer.cancelReinforcement(recruitName, turnNr);
     }
 
     public void eventViewerDefenderSetCreatureDead(String name, int height)
     {
-        if (eventViewer != null)
-        {
-            eventViewer.defenderSetCreatureDead(name, height);
-        }
+        eventViewer.defenderSetCreatureDead(name, height);
     }
 
     public void eventViewerAttackerSetCreatureDead(String name, int height)
     {
-        if (eventViewer != null)
-        {
-            eventViewer.attackerSetCreatureDead(name, height);
-        }
+        eventViewer.attackerSetCreatureDead(name, height);
     }
 
     public void eventViewerNewSplitEvent(int turn, Legion parent, Legion child)
     {
-        if (eventViewer != null)
-        {
-            eventViewer.newSplitEvent(turn, parent.getMarkerId(), parent
-                .getHeight(), null, child.getMarkerId(), child.getHeight());
-        }
+        eventViewer.newSplitEvent(turn, parent.getMarkerId(), parent
+            .getHeight(), null, child.getMarkerId(), child.getHeight());
     }
 
     public void eventViewerUndoEvent(Legion splitoff, Legion survivor, int turn)
     {
-        if (eventViewer != null)
-        {
-            eventViewer.undoEvent(RevealEvent.eventSplit, survivor
-                .getMarkerId(), splitoff.getMarkerId(), turn);
-        }
-        else
-        {
-            // fine. So this client does not even have eventViewer
-            // (probably then not even a masterBoard, i.e. AI)
-        }
+        eventViewer.undoEvent(RevealEvent.eventSplit, survivor.getMarkerId(),
+            splitoff.getMarkerId(), turn);
     }
 
     private void initPreferencesWindow()
@@ -1443,6 +1357,7 @@ public class ClientGUI implements IClientGUI
     {
         if (board == null)
         {
+            LOGGER.warning("showOrHideCaretaker attempted but no board yet!");
             // No board yet, or no board at all - nothing to do.
             // Initial show will be done in initBoard.
             return;
@@ -1499,12 +1414,9 @@ public class ClientGUI implements IClientGUI
 
     public void didSummon(Legion summoner, Legion donor, String summon)
     {
-        if (eventViewer != null)
-        {
-            eventViewer.newCreatureRevealEvent(RevealEvent.eventSummon, donor
-                .getMarkerId(), (donor).getHeight(), summon, summoner
-                .getMarkerId(), (summoner).getHeight());
-        }
+        eventViewer.newCreatureRevealEvent(RevealEvent.eventSummon, donor
+            .getMarkerId(), (donor).getHeight(), summon, summoner
+            .getMarkerId(), (summoner).getHeight());
     }
 
     public void repaintBattleBoard()
@@ -1525,10 +1437,7 @@ public class ClientGUI implements IClientGUI
         {
             caretakerDisplay.repaint();
         }
-        if (board != null)
-        {
-            board.getFrame().repaint();
-        }
+        board.getFrame().repaint();
         if (battleBoard != null)
         {
             battleBoard.repaint();
@@ -1541,12 +1450,9 @@ public class ClientGUI implements IClientGUI
         {
             statusScreen.rescale();
         }
-        if (board != null)
-        {
-            board.clearRecruitedChits();
-            board.clearPossibleRecruitChits();
-            board.rescale();
-        }
+        board.clearRecruitedChits();
+        board.clearPossibleRecruitChits();
+        board.rescale();
         if (battleBoard != null)
         {
             battleBoard.rescale();
@@ -1566,10 +1472,6 @@ public class ClientGUI implements IClientGUI
 
     public void updateCreatureCountDisplay()
     {
-        if (board == null)
-        {
-            return;
-        }
         if (caretakerDisplay != null && !isReplayOngoing())
         {
             caretakerDisplay.update();
@@ -1582,6 +1484,10 @@ public class ClientGUI implements IClientGUI
         {
             board.dispose();
             board = null;
+        }
+        else
+        {
+            LOGGER.warning("attempt to dispose board but board is null!");
         }
     }
 
@@ -1646,11 +1552,9 @@ public class ClientGUI implements IClientGUI
 
     void disposeEngagementResults()
     {
-        if (engagementResults != null)
-        {
-            engagementResults.dispose();
-            engagementResults = null;
-        }
+        engagementResults.dispose();
+        engagementResults = null;
+
     }
 
     private void disposeCaretakerDisplay()
@@ -1717,15 +1621,12 @@ public class ClientGUI implements IClientGUI
 
         highlightBattleSite(client.getBattleSite());
 
-        if (eventViewer != null)
-        {
-            eventViewer.tellEngagement(attacker, defender, turnNumber);
-        }
+        eventViewer.tellEngagement(attacker, defender, turnNumber);
     }
 
     void highlightBattleSite(MasterHex battleSite)
     {
-        if (board != null && battleSite != null)
+        if (battleSite != null)
         {
             board.unselectAllHexes();
             board.selectHex(battleSite);
@@ -1749,56 +1650,39 @@ public class ClientGUI implements IClientGUI
         // it would cause trouble.
         cleanupNegotiationDialogs();
 
-        if (eventViewer != null)
-        {
-            eventViewer.tellEngagementResults(winner, method, turns);
-        }
+        eventViewer.tellEngagementResults(winner, method, turns);
 
-        if (engagementResults != null)
-        {
-            engagementResults.addData(winner, method, points, turns,
+        engagementResults
+            .addData(winner, method, points, turns,
                 tellEngagementResultsAttackerStartingContents,
                 tellEngagementResultsDefenderStartingContents,
                 tellEngagementResultsAttackerLegionCertainities,
                 tellEngagementResultsDefenderLegionCertainities, client
                     .isMyTurn());
-        }
     }
 
     public void setMulliganOldRoll(int movementRoll)
     {
-        if (eventViewer != null)
-        {
-            eventViewer.setMulliganOldRoll(movementRoll);
-        }
+        eventViewer.setMulliganOldRoll(movementRoll);
     }
 
     public void tellWhatsHappening(String message)
     {
-        if (board != null)
-        {
-            board.setPhaseInfo(message);
-        }
+        board.setPhaseInfo(message);
     }
 
     public void tellMovementRoll(int roll)
     {
-        if (eventViewer != null)
-        {
-            eventViewer.tellMovementRoll(roll);
-        }
+        eventViewer.tellMovementRoll(roll);
 
         if (movementDie == null || roll != movementDie.getLastRoll())
         {
-            if (board != null)
-            {
-                movementDie = new MovementDie(4 * Scale.get(), MovementDie
-                    .getDieImageName(roll));
+            movementDie = new MovementDie(4 * Scale.get(), MovementDie
+                .getDieImageName(roll));
 
-                if (board.getFrame().getExtendedState() != JFrame.ICONIFIED)
-                {
-                    board.repaint();
-                }
+            if (board.getFrame().getExtendedState() != JFrame.ICONIFIED)
+            {
+                board.repaint();
             }
         }
     }
@@ -1835,24 +1719,19 @@ public class ClientGUI implements IClientGUI
                 .getLegionCreatureCertainties(legion);
         }
 
-        if (eventViewer != null)
-        {
-            eventViewer.revealEngagedCreatures(names, isAttacker, reason);
-        }
+        eventViewer.revealEngagedCreatures(names, isAttacker, reason);
     }
 
     public void eventViewerRevealCreatures(Legion legion,
         final List<String> names, String reason)
     {
-        if (eventViewer != null)
-        {
-            eventViewer.revealCreatures(legion, names, reason);
-        }
+
+        eventViewer.revealCreatures(legion, names, reason);
     }
 
     private void showOrHideLogWindow(Client client, boolean show)
     {
-        if (board != null && show)
+        if (show)
         {
             if (logWindow == null)
             {
@@ -1867,18 +1746,25 @@ public class ClientGUI implements IClientGUI
         }
     }
 
+    // TODO why is syncCheckBoxes is called to sync *all* checkboxes in each
+    // listener, and not only for the one changed option?
+
+    /**
+     * Ensure that Player menu checkboxes reflect the correct state.
+     * Copied the TODO below from the interface where it's now removed...
+     *
+     * TODO let the checkboxes have their own listeners instead. Or even
+     * better: use a binding framework.
+     */
+
     public void syncCheckboxes()
     {
-        if (board == null)
-        {
-            return;
-        }
         Enumeration<String> en = options.propertyNames();
         while (en.hasMoreElements())
         {
             String name = en.nextElement();
             boolean value = options.getOption(name);
-            board.twiddleOption(name, value);
+            board.adjustCheckboxIfNeeded(name, value);
         }
     }
 
@@ -1927,10 +1813,7 @@ public class ClientGUI implements IClientGUI
         List<PlayerColor> colorsLeft)
     {
         PlayerColor color = null;
-        if (board != null)
-        {
-            board.setPhaseInfo("Pick a color!");
-        }
+        board.setPhaseInfo("Pick a color!");
         do
         {
             color = PickColor.pickColor(board.getFrame(), playerName,
@@ -1949,10 +1832,7 @@ public class ClientGUI implements IClientGUI
     public String doPickMarkerUntilGotOne(Set<String> markersAvailable)
     {
         String markerId = null;
-        if (board != null)
-        {
-            board.setPhaseInfo("Pick initial marker!");
-        }
+        board.setPhaseInfo("Pick initial marker!");
         do
         {
             markerId = doPickMarker(markersAvailable);
@@ -2036,57 +1916,51 @@ public class ClientGUI implements IClientGUI
     {
         clearUndoStack();
         cleanupNegotiationDialogs();
-
-        if (eventViewer != null)
-        {
-            eventViewer.turnOrPlayerChange(client, turnNr, player);
-        }
+        eventViewer.turnOrPlayerChange(client, turnNr, player);
     }
 
     public void actOnSetupSplit()
     {
-        if (board != null)
+        // TODO probably this can be removed?
+        if (isMyTurn())
         {
-            // TODO probably this can be removed?
-            if (isMyTurn())
+            // for debug purposes. We had a bug where legions remain
+            // on the board even if player is dead. So, let's check
+            // for this once per turn and clean up.
+            validateLegions();
+        }
+
+        disposeMovementDie();
+        board.setupSplitMenu();
+        board.fullRepaint(); // Ensure that movement die goes away
+        if (isMyTurn())
+        {
+            if (client.getTurnNumber() == 1)
             {
-                // for debug purposes. We had a bug where legions remain
-                // on the board even if player is dead. So, let's check
-                // for this once per turn and clean up.
-                validateLegions();
+                board.disableDoneAction("Split legions in first round");
             }
+            focusBoard();
+            defaultCursor();
 
-            disposeMovementDie();
-            board.setupSplitMenu();
-            board.fullRepaint(); // Ensure that movement die goes away
-            if (isMyTurn())
+            // TODO I believe the code below is meant for the purpose:
+            // "If no legions can be split, directly be done with Split
+            //  phase, except if that is the result of the autoSplit"
+            //  - so that one can review and undo.
+            // But that does not make so much sense, as this is in the
+            // "setupSplit" call, so the AI can't have done anything yet?
+
+            if ((getOwningPlayer().getMarkersAvailable().size() < 1 || client
+                .findTallLegionHexes(4).isEmpty())
+                && !options.getOption(Options.autoSplit))
             {
-                if (client.getTurnNumber() == 1)
-                {
-                    board.disableDoneAction("Split legions in first round");
-                }
-                focusBoard();
-                defaultCursor();
-
-                // TODO I believe the code below is meant for the purpose:
-                // "If no legions can be split, directly be done with Split
-                //  phase, except if that is the result of the autoSplit"
-                //  - so that one can review and undo.
-                // But that does not make so much sense, as this is in the
-                // "setupSplit" call, so the AI can't have done anything yet?
-
-                if ((getOwningPlayer().getMarkersAvailable().size() < 1 || client
-                    .findTallLegionHexes(4).isEmpty())
-                    && !options.getOption(Options.autoSplit))
-                {
-                    client.doneWithSplits();
-                }
-            }
-            else
-            {
-                waitCursor();
+                client.doneWithSplits();
             }
         }
+        else
+        {
+            waitCursor();
+        }
+
         updateStatusScreen();
 
     }
@@ -2123,18 +1997,15 @@ public class ClientGUI implements IClientGUI
         clearUndoStack();
         cleanupNegotiationDialogs();
 
-        if (board != null)
+        board.setupMusterMenu();
+        if (isMyTurn())
         {
-            board.setupMusterMenu();
-            if (isMyTurn())
+            focusBoard();
+            defaultCursor();
+            if (!options.getOption(Options.autoRecruit)
+                && client.getPossibleRecruitHexes().isEmpty())
             {
-                focusBoard();
-                defaultCursor();
-                if (!options.getOption(Options.autoRecruit)
-                    && client.getPossibleRecruitHexes().isEmpty())
-                {
-                    client.doneWithRecruits();
-                }
+                client.doneWithRecruits();
             }
         }
         updateStatusScreen();
@@ -2143,12 +2014,9 @@ public class ClientGUI implements IClientGUI
     public void actOnSetupMove()
     {
         clearUndoStack();
-        if (board != null)
-        {
-            board.setupMoveMenu();
-            // Force showing the updated movement die.
-            board.repaint();
-        }
+        board.setupMoveMenu();
+        // Force showing the updated movement die.
+        board.repaint();
         if (isMyTurn())
         {
             defaultCursor();
@@ -2159,10 +2027,7 @@ public class ClientGUI implements IClientGUI
     public void actOnSetupFight()
     {
         clearUndoStack();
-        if (board != null)
-        {
-            board.setupFightMenu();
-        }
+        board.setupFightMenu();
         updateStatusScreen();
     }
 
@@ -2383,11 +2248,8 @@ public class ClientGUI implements IClientGUI
 
     public void undoAllMoves()
     {
-        if (board != null)
-        {
-            board.clearRecruitedChits();
-            board.clearPossibleRecruitChits();
-        }
+        board.clearRecruitedChits();
+        board.clearPossibleRecruitChits();
         while (!isUndoStackEmpty())
         {
             undoLastMove();
@@ -2404,18 +2266,12 @@ public class ClientGUI implements IClientGUI
 
     public void defaultCursor()
     {
-        if (board != null)
-        {
-            board.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-        }
+        board.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     }
 
     public void waitCursor()
     {
-        if (board != null)
-        {
-            board.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        }
+        board.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
     }
 
     public void doCleanupGUI()
@@ -2506,24 +2362,21 @@ public class ClientGUI implements IClientGUI
             webClient.tellGameEnds();
         }
 
-        if (board != null)
+        if (statusScreen != null)
         {
-            if (statusScreen != null)
-            {
-                statusScreen.repaint();
-            }
-            defaultCursor();
-            board.setGameOverState(message);
-            if (disposeFollows)
-            {
-                // tell it later, together with the immediately following
-                // server closed connection message
-            }
-            else
-            {
-                // show right away. Connection closed might come or not.
-                showMessageDialogAndWait(message);
-            }
+            statusScreen.repaint();
+        }
+        defaultCursor();
+        board.setGameOverState(message);
+        if (disposeFollows)
+        {
+            // tell it later, together with the immediately following
+            // server closed connection message
+        }
+        else
+        {
+            // show right away. Connection closed might come or not.
+            showMessageDialogAndWait(message);
         }
     }
 
@@ -2539,8 +2392,8 @@ public class ClientGUI implements IClientGUI
         // Don't bother showing messages to AI players.
         if (getOwningPlayer().isAI())
         {
-            LOGGER.info("Message for AI player "
-                + getOwningPlayer().getName() + ": " + message);
+            LOGGER.info("Message for AI player " + getOwningPlayer().getName()
+                + ": " + message);
             return;
         }
 
@@ -2600,12 +2453,9 @@ public class ClientGUI implements IClientGUI
     // called by WebClient
     public void doConfirmAndQuit()
     {
-        if (board != null)
-        {
-            // Board does the "Really Quit?" confirmation and initiates
-            // then (if user confirmed) the disposal of everything.
-            board.doQuitGameAction();
-        }
+        // Board does the "Really Quit?" confirmation and initiates
+        // then (if user confirmed) the disposal of everything.
+        board.doQuitGameAction();
     }
 
     public void closePerhapsWithMessage()

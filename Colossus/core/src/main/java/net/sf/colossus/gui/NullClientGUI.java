@@ -338,12 +338,6 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public void doNewBattleBoard()
-    {
-        // TODO Auto-generated method stub
-
-    }
-
     public void doPickCarries(Client client, int carryDamage,
         Set<String> carryTargetDescriptions)
     {
@@ -420,18 +414,6 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public void ensureEdtNewBattleBoard()
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void ensureEdtSetupClientGUI()
-    {
-        // TODO Auto-generated method stub
-
-    }
-
     public void eventViewerAttackerSetCreatureDead(String name, int height)
     {
         // TODO Auto-generated method stub
@@ -470,18 +452,6 @@ public class NullClientGUI implements IClientGUI
     }
 
     public void eventViewerUndoEvent(Legion splitoff, Legion survivor, int turn)
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void focusBoard()
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void focusMap()
     {
         // TODO Auto-generated method stub
 
@@ -680,12 +650,6 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public void setupGUIOptionListeners()
-    {
-        // TODO Auto-generated method stub
-
-    }
-
     public void showConcede(Client client, Legion ally, Legion enemy)
     {
         // TODO Auto-generated method stub
@@ -729,12 +693,6 @@ public class NullClientGUI implements IClientGUI
     }
 
     public void showWebClient()
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void syncCheckboxes()
     {
         // TODO Auto-generated method stub
 
