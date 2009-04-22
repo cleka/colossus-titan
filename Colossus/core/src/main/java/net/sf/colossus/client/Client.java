@@ -157,8 +157,6 @@ public final class Client implements IClient, IOracle, IVariant
      */
     private PlayerColor color;
 
-    private Legion parent;
-
     // This ai is either the actual ai player for an AI player, but is also
     // used by human clients for the autoXXX actions.
     private AI ai;
@@ -3038,20 +3036,22 @@ public final class Client implements IClient, IOracle, IVariant
     }
 
     /**
-     * Human user clicked on a legion to split it. Verify that splitting
-     * is legal and possible at all. Then get a child marker selected
-     * (either by dialog, or if autoPickMarker set, ask AI to pick one).
-     * If childMarkerId selection was not canceled (returned null),
-     * bring up the split dialog (which creatures go into which legion),
-     * and if that returned a list (not null) then call doSplit(...,...,...)
+     *
+     * Called by MasterBoard.actOnLegion() when human user clicked on a
+     * legion to split it. This method here then:
+     * Verifies that splitting is legal and possible at all;
+     * Then get a child marker selected (either by dialog, or if
+     * autoPickMarker set, ask AI to pick one);
+     * If childMarkerId selection was not canceled (returned non-null),
+     * bring up the split dialog (which creatures go into which legion);
+     * and if that returns a list (not null) then call doSplit(...,...,...)
      * which sends the request to server.
      *
-     * @param legion The legion selected to split
+     * @param parent The legion selected to split
      */
-    public void doSplit(Legion legion)
+    public void doSplit(Legion parent)
     {
-        LOGGER.log(Level.FINER, "Client.doSplit " + legion);
-        this.parent = null;
+        LOGGER.log(Level.FINER, "Client.doSplit " + parent);
 
         if (!isMyTurn())
         {
@@ -3060,7 +3060,7 @@ public final class Client implements IClient, IOracle, IVariant
             return;
         }
         // Can't split other players' legions.
-        if (!isMyLegion(legion))
+        if (!isMyLegion(parent))
         {
             LOGGER.log(Level.SEVERE, "Not my legion!");
             kickSplit();
@@ -3075,7 +3075,7 @@ public final class Client implements IClient, IOracle, IVariant
             return;
         }
         // Legion must be tall enough to split.
-        if (legion.getHeight() < 4)
+        if (parent.getHeight() < 4)
         {
             gui.showMessageDialogAndWait("Legion is too short to split");
             kickSplit();
@@ -3091,7 +3091,6 @@ public final class Client implements IClient, IOracle, IVariant
             return;
         }
 
-        this.parent = legion;
         String childId = null;
 
         if (options.getOption(Options.autoPickMarker))
@@ -3115,12 +3114,13 @@ public final class Client implements IClient, IOracle, IVariant
         }
     }
 
-    /** Called by AI, and by pickMarkerCallback() */
-    public void doSplit(Legion parent, String childMarker, String results)
+    /** Called by AI and by doSplit() */
+    public void doSplit(Legion parent, String childMarkerId, String results)
     {
-        LOGGER.log(Level.FINER, "Client.doSplit " + parent + " " + childMarker
+        LOGGER.log(Level.FINER, "Client.doSplit " + parent + " "
+            + childMarkerId
             + " " + results);
-        server.doSplit(parent, childMarker, results);
+        server.doSplit(parent, childMarkerId, results);
     }
 
     /**
