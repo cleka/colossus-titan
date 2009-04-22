@@ -79,7 +79,7 @@ public class CreatureLoader implements AllCreatureType
     }
 
     /** Lookup attribute of name name in Element el, and return
-     * its value as boolean. Assume lack of attribtue menas false.
+     * its value as boolean. Assume lack of attribute means false.
      * @param el The element with the attribute (or not)
      * @param name The name of the attribute
      * @return The boolean value of the attribute, defaulting to false if absent
