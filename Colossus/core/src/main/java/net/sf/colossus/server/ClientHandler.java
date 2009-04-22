@@ -621,9 +621,9 @@ final class ClientHandler implements IClient
         sendToClient(Constants.tellMovementRoll + sep + roll);
     }
 
-    public void setOption(String optname, String value)
+    public void syncOption(String optname, String value)
     {
-        sendToClient(Constants.setOption + sep + optname + sep + value);
+        sendToClient(Constants.syncOption + sep + optname + sep + value);
     }
 
     public void updatePlayerInfo(List<String> infoStrings)

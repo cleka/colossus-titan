@@ -481,11 +481,11 @@ final class SocketClientThread extends Thread implements IServer
             int roll = Integer.parseInt(args.remove(0));
             client.tellMovementRoll(roll);
         }
-        else if (method.equals(Constants.setOption))
+        else if (method.equals(Constants.syncOption))
         {
             String optname = args.remove(0);
             String value = args.remove(0);
-            client.getOptions().setOption(optname, value);
+            client.syncOption(optname, value);
         }
         else if (method.equals(Constants.updatePlayerInfo))
         {

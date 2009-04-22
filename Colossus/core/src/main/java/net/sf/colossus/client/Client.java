@@ -524,15 +524,9 @@ public final class Client implements IClient, IOracle, IVariant
      * used, since the SocketClientThread directly deals with
      * the actual Options object itself...
      */
-    public void setOption(String optname, String value)
+    public void syncOption(String optname, String value)
     {
         options.setOption(optname, value);
-        // Commented out, because this method is, as TODO above says,
-        // not used at all, so it should not harm to take the gui.sync* call
-        // away from below. And then the sync* does not need to be in the
-        // interface at all.
-        // gui.syncCheckboxes();
-        options.saveOptions();
     }
 
     // TODO we will get rid of this listener (or the need for this listener),

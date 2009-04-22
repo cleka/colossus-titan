@@ -30,7 +30,7 @@ public interface IClient
 
     public void tellWhatsHappening(String message);
 
-    public void setOption(String optname, String value);
+    public void syncOption(String optname, String value);
 
     public void updatePlayerInfo(List<String> infoStrings);
 

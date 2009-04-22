@@ -2687,7 +2687,7 @@ public final class Server extends Thread implements IServer
         IClient client = getClient(player);
         if (client != null)
         {
-            client.setOption(optname, value);
+            client.syncOption(optname, value);
         }
     }
 
@@ -2696,24 +2696,24 @@ public final class Server extends Thread implements IServer
         oneSetOption(player, optname, String.valueOf(value));
     }
 
-    void allSetOption(String optname, String value)
+    void allSyncOption(String optname, String value)
     {
         Iterator<IClient> it = clients.iterator();
         while (it.hasNext())
         {
             IClient client = it.next();
-            client.setOption(optname, value);
+            client.syncOption(optname, value);
         }
     }
 
-    void allSetOption(String optname, boolean value)
+    void allSyncOption(String optname, boolean value)
     {
-        allSetOption(optname, String.valueOf(value));
+        allSyncOption(optname, String.valueOf(value));
     }
 
-    void allSetOption(String optname, int value)
+    void allSyncOption(String optname, int value)
     {
-        allSetOption(optname, String.valueOf(value));
+        allSyncOption(optname, String.valueOf(value));
     }
 
     /** DO NOT USE:

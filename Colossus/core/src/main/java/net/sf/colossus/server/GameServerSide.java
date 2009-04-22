@@ -506,7 +506,7 @@ public final class GameServerSide extends Game
             String name = en.nextElement();
             String value = options.getStringOption(name);
 
-            server.allSetOption(name, value);
+            server.allSyncOption(name, value);
         }
     }
 
