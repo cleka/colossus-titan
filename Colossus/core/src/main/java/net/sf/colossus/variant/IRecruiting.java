@@ -10,12 +10,9 @@ public interface IRecruiting
 {
 
     public int numberOfRecruiterNeeded(CreatureType recruiter,
-            CreatureType recruit,
-            MasterBoardTerrain terrain, MasterHex hex);
+            CreatureType recruit, MasterHex hex);
 
-    public Set<CreatureType> getPossibleRecruits(
-            MasterBoardTerrain terrain, MasterHex hex);
+    public Set<CreatureType> getPossibleRecruits(MasterHex hex);
 
-    public Set<CreatureType> getPossibleRecruiters(
-            MasterBoardTerrain terrain, MasterHex hex);
+    public Set<CreatureType> getPossibleRecruiters(MasterHex hex);
 }

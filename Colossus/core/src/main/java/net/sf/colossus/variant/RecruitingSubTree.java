@@ -284,7 +284,7 @@ public class RecruitingSubTree implements IRecruiting
     }
 
     public int numberOfRecruiterNeeded(CreatureType recruiter,
-            CreatureType recruit, MasterBoardTerrain terrain, MasterHex hex)
+            CreatureType recruit, MasterHex hex)
     {
         int number = Constants.BIGNUM;
         LOGGER.finest("Start for recruiter and recruit : " +
@@ -345,7 +345,7 @@ public class RecruitingSubTree implements IRecruiting
         return number;
     }
 
-    public Set<CreatureType> getPossibleRecruits(MasterBoardTerrain terrain,
+    public Set<CreatureType> getPossibleRecruits(
             MasterHex hex)
     {
         Set<CreatureType> possibleRecruits = new TreeSet<CreatureType>();
@@ -396,7 +396,7 @@ public class RecruitingSubTree implements IRecruiting
         return possibleRecruits;
     }
 
-    public Set<CreatureType> getPossibleRecruiters(MasterBoardTerrain terrain,
+    public Set<CreatureType> getPossibleRecruiters(
             MasterHex hex)
     {
         if (!any.keySet().isEmpty())

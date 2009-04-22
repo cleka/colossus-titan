@@ -812,7 +812,7 @@ public class TerrainRecruitLoader implements IVariantInitializer
         }
 
         Set<CreatureType> theSet = terrain.getRecruitingSubTree().
-                getPossibleRecruits(terrain, hex);
+                getPossibleRecruits(hex);
         Set<CreatureType> theSet2 = new TreeSet<CreatureType>(result);
         if (!theSet.equals(theSet2))
         {
@@ -911,7 +911,7 @@ public class TerrainRecruitLoader implements IVariantInitializer
         }
 
         Set<CreatureType> theSet = terrain.getRecruitingSubTree().
-                getPossibleRecruiters(terrain, hex);
+                getPossibleRecruiters(hex);
         Set<CreatureType> theSet2 = new TreeSet<CreatureType>(re);
         if (!theSet.equals(theSet2))
         {
@@ -952,7 +952,7 @@ public class TerrainRecruitLoader implements IVariantInitializer
             recruit.getName(), terrain, hex);
 
         int theNumber = terrain.getRecruitingSubTree().numberOfRecruiterNeeded(
-                recruiter, recruit, terrain, hex);
+                recruiter, recruit, hex);
 
         if (g_value != theNumber) {
             LOGGER.warning("Oups, discrepancy between old (graph-based) and "+
