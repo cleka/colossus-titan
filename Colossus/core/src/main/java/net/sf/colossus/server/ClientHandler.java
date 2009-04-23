@@ -176,7 +176,6 @@ final class ClientHandler implements IClient
             LOGGER.log(Level.SEVERE,
                 "CharacterCodingException while reading from channel"
                     + socketChannel, cce);
-
         }
     }
 
@@ -256,13 +255,14 @@ final class ClientHandler implements IClient
         Thread.yield();
     }
 
-    private void doCallMethodInTryBlock(String line, String method, List<String> li)
+    private void doCallMethodInTryBlock(String line, String method,
+        List<String> li)
     {
         try
         {
             callMethod(method, li);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             String message = "Woooah! An exception was caught while "
                 + "processing from client " + getPlayerName()
@@ -272,7 +272,6 @@ final class ClientHandler implements IClient
             LOGGER.severe(message);
             ErrorUtils.showExceptionDialog(null, message, "Exception caught!",
                 true);
-
         }
     }
 
@@ -384,30 +383,30 @@ final class ClientHandler implements IClient
         {
             int tag = Integer.parseInt(args.remove(0));
             String hexLabel = args.remove(0);
-            BattleHex hex = HexMap.getHexByLabel(server.getGame().getBattle().getLand(),
-                hexLabel);
+            BattleHex hex = HexMap.getHexByLabel(server.getGame().getBattle()
+                .getLand(), hexLabel);
             server.doBattleMove(tag, hex);
         }
         else if (method.equals(Constants.strike))
         {
             int tag = Integer.parseInt(args.remove(0));
             String hexLabel = args.remove(0);
-            BattleHex hex = HexMap.getHexByLabel(server.getGame().getBattle().getLand(),
-                hexLabel);
+            BattleHex hex = HexMap.getHexByLabel(server.getGame().getBattle()
+                .getLand(), hexLabel);
             server.strike(tag, hex);
         }
         else if (method.equals(Constants.applyCarries))
         {
             String hexLabel = args.remove(0);
-            BattleHex hex = HexMap.getHexByLabel(server.getGame().getBattle().getLand(),
-                hexLabel);
+            BattleHex hex = HexMap.getHexByLabel(server.getGame().getBattle()
+                .getLand(), hexLabel);
             server.applyCarries(hex);
         }
         else if (method.equals(Constants.undoBattleMove))
         {
             String hexLabel = args.remove(0);
-            BattleHex hex = HexMap.getHexByLabel(server.getGame().getBattle().getLand(),
-                hexLabel);
+            BattleHex hex = HexMap.getHexByLabel(server.getGame().getBattle()
+                .getLand(), hexLabel);
             server.undoBattleMove(hex);
         }
         else if (method.equals(Constants.assignStrikePenalty))
@@ -788,8 +787,8 @@ final class ClientHandler implements IClient
     }
 
     public void initBattle(MasterHex hex, int battleTurnNumber,
-        Player battleActivePlayer, BattlePhase battlePhase,
-        Legion attacker, Legion defender)
+        Player battleActivePlayer, BattlePhase battlePhase, Legion attacker,
+        Legion defender)
     {
         sendToClient(Constants.initBattle + sep + hex.getLabel() + sep
             + battleTurnNumber + sep + battleActivePlayer.getName() + sep
