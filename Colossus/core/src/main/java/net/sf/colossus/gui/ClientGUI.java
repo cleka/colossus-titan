@@ -40,7 +40,6 @@ import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.Proposal;
 import net.sf.colossus.game.SummonInfo;
-import net.sf.colossus.guiutil.KFrame;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.IVariant;
@@ -2505,26 +2504,6 @@ public class ClientGUI implements IClientGUI
             frame = board.getFrame();
         }
         return frame;
-    }
-
-    public void showErrorMessage(String reason, String title)
-    {
-        boolean isDummyFrame = false;
-        JFrame f = getMapOrBoardFrame();
-        // I do not use null or a simple frame, because then the System.exit(0)
-        // does not exit by itself (due to some bug in Swing/AWT).
-        if (f == null)
-        {
-            f = new KFrame("Dummyframe for Client error message dialog");
-            isDummyFrame = true;
-        }
-        JOptionPane.showMessageDialog(f, reason, title,
-            JOptionPane.ERROR_MESSAGE);
-        if (isDummyFrame)
-        {
-            f.dispose();
-            f = null;
-        }
     }
 
     // From other GUI components:

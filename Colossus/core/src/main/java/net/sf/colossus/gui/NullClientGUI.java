@@ -656,12 +656,6 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public void showErrorMessage(String reason, String title)
-    {
-        // TODO Auto-generated method stub
-
-    }
-
     public void showFlee(Client client, Legion ally, Legion enemy)
     {
         // TODO Auto-generated method stub

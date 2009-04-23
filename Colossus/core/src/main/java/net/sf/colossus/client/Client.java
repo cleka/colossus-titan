@@ -45,6 +45,7 @@ import net.sf.colossus.server.IServer;
 import net.sf.colossus.server.Server;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.CollectionHelper;
+import net.sf.colossus.util.ErrorUtils;
 import net.sf.colossus.util.InstanceTracker;
 import net.sf.colossus.util.Predicate;
 import net.sf.colossus.util.ResourceLoader;
@@ -302,7 +303,7 @@ public final class Client implements IClient, IOracle, IVariant
             if (!Options.isStresstest())
             {
                 String title = "Socket initialialization failed!";
-                gui.showErrorMessage(reasonFail, title);
+                ErrorUtils.showErrorDialog(null, title, reasonFail);
             }
 
             failed = true;

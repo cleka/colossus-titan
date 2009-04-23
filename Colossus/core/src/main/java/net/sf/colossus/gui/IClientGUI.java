@@ -316,8 +316,6 @@ public interface IClientGUI
 
     public abstract void closePerhapsWithMessage();
 
-    public abstract void showErrorMessage(String reason, String title);
-
     // At least the following two are from gui package classes,
     // not from Client directly.
 

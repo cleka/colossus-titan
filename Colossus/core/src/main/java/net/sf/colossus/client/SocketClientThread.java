@@ -24,6 +24,7 @@ import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.server.IServer;
+import net.sf.colossus.util.ErrorUtils;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.InstanceTracker;
 import net.sf.colossus.util.Split;
@@ -218,7 +219,7 @@ final class SocketClientThread extends Thread implements IServer
             String message = "Server not responding (could connect, "
                 + "but didn't got any initial data within 5 seconds).";
             String title = "Joining game failed!";
-            client.getGUI().showErrorMessage(message, title);
+            ErrorUtils.showErrorDialog(null, title, message);
         }
 
         // ---------------------------------------------------------------
@@ -233,13 +234,11 @@ final class SocketClientThread extends Thread implements IServer
         {
             // Right now this should never happen, but since we have
             // the catch and set the flag, let's do something with it:)
-            client
-                .getGUI()
-                .showErrorMessage(
-                    "No messages from server for very long time. "
-                        + "Right now this should never happen because in normal game "
-                        + "situation we work with infinite timeout... ??",
-                    "No messages from server!");
+            String title = "No messages from server!";
+            String message = "No messages from server for very long time. "
+                + "Right now this should never happen because in normal game "
+                + "situation we work with infinite timeout... ??";
+            ErrorUtils.showErrorDialog(null, title, message);
         }
 
         cleanupSocket();
@@ -932,7 +931,7 @@ final class SocketClientThread extends Thread implements IServer
             {
                 goingDown = true;
                 String title = "Joining game failed!";
-                client.getGUI().showErrorMessage(message, title);
+                ErrorUtils.showErrorDialog(null, title, message);
             }
             else
             {
