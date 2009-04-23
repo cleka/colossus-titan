@@ -285,7 +285,7 @@ public final class Client implements IClient, IOracle, IVariant
 
         gui.setStartedByWebClient(byWebClient);
 
-        sct = new SocketClientThread(this, host, port);
+        sct = new SocketClientThread(this, host, port, playerName, isRemote());
 
         String reasonFail = sct.getReasonFail();
         if (reasonFail != null)

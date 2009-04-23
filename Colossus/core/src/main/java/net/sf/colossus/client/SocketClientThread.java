@@ -59,13 +59,14 @@ final class SocketClientThread extends Thread implements IServer
     private final Object isWaitingLock = new Object();
     private boolean isWaiting = false;
 
-    SocketClientThread(Client client, String host, int port)
+    SocketClientThread(Client client, String host, int port,
+        String initialName, boolean isRemote)
     {
         super("Client " + client.getOwningPlayer().getName());
 
         this.client = client;
-        InstanceTracker.register(this, "SCT "
-            + client.getOwningPlayer().getName());
+
+        InstanceTracker.register(this, "SCT " + initialName);
 
         String task = "";
 
@@ -77,8 +78,7 @@ final class SocketClientThread extends Thread implements IServer
 
             int receiveBufferSize = socket.getReceiveBufferSize();
             LOGGER.info("Client socket receive buffer size for Client "
-                + client.getOwningPlayer().getName() + " is "
-                + receiveBufferSize);
+                + initialName + " is " + receiveBufferSize);
 
             task = "preparing PrintWriter";
             LOGGER.log(Level.FINEST, "Next: " + task);
@@ -86,7 +86,7 @@ final class SocketClientThread extends Thread implements IServer
 
             task = "signing on";
             LOGGER.log(Level.FINEST, "Next: " + task);
-            signOn();
+            signOn(initialName, isRemote);
 
             task = "preparing BufferedReader";
             LOGGER.log(Level.FINEST, "Next: " + task);
@@ -1057,10 +1057,9 @@ final class SocketClientThread extends Thread implements IServer
     }
 
     // Setup method
-    private void signOn()
+    private void signOn(String loginName, boolean isRemote)
     {
-        sendToServer(Constants.signOn + sep
-            + client.getOwningPlayer().getName() + sep + client.isRemote());
+        sendToServer(Constants.signOn + sep + loginName + sep + isRemote);
     }
 
     /** Set the thread name to playerName */
