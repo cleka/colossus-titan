@@ -38,7 +38,7 @@ import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.Proposal;
 import net.sf.colossus.server.BattleServerSide.AngelSummoningStates;
-import net.sf.colossus.util.ExceptionUtils;
+import net.sf.colossus.util.ErrorUtils;
 import net.sf.colossus.util.InstanceTracker;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Split;
@@ -1260,11 +1260,11 @@ public final class GameServerSide extends Game
                 : (" file " + filename);
             String message = "Woooah! An exception was caught while "
                 + "trying to " + doWhat + " game to " + toWhere
-                + "\nStack trace:\n" + ExceptionUtils.makeStackTraceString(e)
+                + "\nStack trace:\n" + ErrorUtils.makeStackTraceString(e)
                 + "\nSaving the game did probably not succeed"
                 + asNowOffMmessage + ".\n";
             LOGGER.warning(message);
-            ExceptionUtils.showMessageDialog(null, message,
+            ErrorUtils.showExceptionDialog(null, message,
                 "Exception caught during saving!", false);
         }
     }

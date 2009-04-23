@@ -36,7 +36,7 @@ import net.sf.colossus.game.Phase;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.Proposal;
-import net.sf.colossus.util.ExceptionUtils;
+import net.sf.colossus.util.ErrorUtils;
 import net.sf.colossus.util.InstanceTracker;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
@@ -463,7 +463,7 @@ public final class Server extends Thread implements IServer
             LOGGER.log(Level.SEVERE, "Exception while waiting on selector", e);
             String message = "Woooah. An exception was caught while "
                 + "waiting on Selector";
-            ExceptionUtils.showMessageDialog(null, "Exception caught!",
+            ErrorUtils.showExceptionDialog(null, "Exception caught!",
                 message, false);
         }
     }

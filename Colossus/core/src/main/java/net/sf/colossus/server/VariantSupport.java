@@ -22,7 +22,7 @@ import javax.swing.text.StyledDocument;
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.common.Constants;
-import net.sf.colossus.util.ExceptionUtils;
+import net.sf.colossus.util.ErrorUtils;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.variant.AllCreatureType;
 import net.sf.colossus.variant.CreatureType;
@@ -239,7 +239,7 @@ public final class VariantSupport
                 + "\nI will try to load variant 'Default' instead...";
             String title = "Variant loading failed!";
             LOGGER.warning(message);
-            ExceptionUtils.showMessageDialog(null, message, title, false);
+            ErrorUtils.showExceptionDialog(null, message, title, false);
 
             try
             {
@@ -258,7 +258,7 @@ public final class VariantSupport
                 String title2 = "Even loading of default variant failed!";
 
                 LOGGER.severe(message2);
-                ExceptionUtils.showMessageDialog(null, message2, title2, true);
+                ErrorUtils.showExceptionDialog(null, message2, title2, true);
 
                 System.exit(1);
             }

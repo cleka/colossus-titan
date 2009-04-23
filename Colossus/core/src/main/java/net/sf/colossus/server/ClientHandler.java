@@ -23,7 +23,7 @@ import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
-import net.sf.colossus.util.ExceptionUtils;
+import net.sf.colossus.util.ErrorUtils;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.InstanceTracker;
 import net.sf.colossus.util.Split;
@@ -267,10 +267,10 @@ final class ClientHandler implements IClient
             String message = "Woooah! An exception was caught while "
                 + "processing from client " + getPlayerName()
                 + " the input line:\n    === " + line + " ===\n"
-                + "\nStack trace:\n" + ExceptionUtils.makeStackTraceString(e)
+                + "\nStack trace:\n" + ErrorUtils.makeStackTraceString(e)
                 + "\n\nGame might be unstable or hang from now on...";
             LOGGER.severe(message);
-            ExceptionUtils.showMessageDialog(null, message, "Exception caught!",
+            ErrorUtils.showExceptionDialog(null, message, "Exception caught!",
                 true);
 
         }
