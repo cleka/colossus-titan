@@ -346,6 +346,9 @@ public final class Client implements IClient, IOracle, IVariant
         else
         {
             this.server = sct;
+            // TODO ResourceLoader could/should be passed in also, instead
+            // of creating one. Clients on same machine could share the
+            // instance (proper synchronization needed, of course).
             if (isRemote())
             {
                 this.resLoader = new ResourceLoader(host, port + 1);
