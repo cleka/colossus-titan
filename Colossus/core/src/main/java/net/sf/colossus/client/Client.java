@@ -47,7 +47,7 @@ import net.sf.colossus.util.CollectionHelper;
 import net.sf.colossus.util.ErrorUtils;
 import net.sf.colossus.util.InstanceTracker;
 import net.sf.colossus.util.Predicate;
-import net.sf.colossus.util.StaticResourceLoader;
+import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.util.ViableEntityManager;
 import net.sf.colossus.variant.BattleHex;
@@ -103,6 +103,12 @@ public final class Client implements IClient, IOracle, IVariant
      *  a Queue type of connection for local Clients...
      */
     private IServer server;
+
+    /**
+     * A first start to get rid of the static-access-everywhere to
+     * ResourceLoader.
+     */
+    private ResourceLoader resLoader;
 
     /** Client constructor sets this to true if something goes wrong with the
      *  SocketClientThread initialization. I wanted to avoid have the Client
@@ -342,12 +348,13 @@ public final class Client implements IClient, IOracle, IVariant
             this.server = sct;
             if (isRemote())
             {
-                StaticResourceLoader.setDataServer(host, port + 1);
+                this.resLoader = new ResourceLoader(host, port + 1);
             }
             else
             {
-                StaticResourceLoader.setDataServer(null, 0);
+                this.resLoader = new ResourceLoader(null, 0);
             }
+            LOGGER.finest("Created ResourceLoader: " + resLoader.toString());
 
             sct.start();
 
