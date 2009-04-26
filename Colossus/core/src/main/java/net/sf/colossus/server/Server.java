@@ -870,9 +870,10 @@ public final class Server extends Thread implements IServer
         boolean atLeastOneBoardNeeded = Constants.FORCE_VIEW_BOARD;
         for (Player player : game.getPlayers())
         {
+            String type = player.getType();
             // getDeadBeforeSave to Game instead?
             if (!((PlayerServerSide)player).getDeadBeforeSave()
-                && !player.getType().endsWith(Constants.network))
+                && !type.endsWith(Constants.network))
             {
 
                 if (player.getName().equals(game.getHostingPlayer()))
@@ -893,21 +894,23 @@ public final class Server extends Thread implements IServer
                         atLeastOneBoardNeeded = false;
                     }
                     LOGGER.info("Creating local client for player "
-                        + player.getName());
-                    createLocalClient((PlayerServerSide)player, createGUI);
+                        + player.getName() + ", type " + type);
+                    createLocalClient((PlayerServerSide)player, createGUI,
+                        type);
                 }
             }
         }
     }
 
-    private void createLocalClient(PlayerServerSide player, boolean createGUI)
+    private void createLocalClient(PlayerServerSide player, boolean createGUI,
+        String type)
     {
         String playerName = player.getName();
         boolean dontUseOptionsFile = player.isAI();
         LOGGER.finest("Called Server.createLocalClient() for " + playerName);
 
         new Client("127.0.0.1", port, playerName, whatNextManager, this,
-            false, dontUseOptionsFile, createGUI);
+            false, dontUseOptionsFile, createGUI, type);
     }
 
     boolean addClient(final IClient client, final String playerName,

@@ -808,8 +808,9 @@ public final class Start implements IStartHandler
         boolean failed = false;
         try
         {
+            String type = Constants.aiPackage + Constants.network;
             Client c = new Client(hostname, port, playerName, whatNextManager, null,
-                false, false, true);
+                false, false, true, type);
             failed = c.getFailed();
             c = null;
         }

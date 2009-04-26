@@ -325,7 +325,7 @@ public final class GameServerSide extends Game
             if (name != null && type != null && !type.equals(Constants.none))
             {
                 addPlayer(name, type);
-                LOGGER.info("Add " + type + " player " + name);
+                LOGGER.info("Added " + type + " player " + name);
             }
         }
         // No longer need the player name and type options.
@@ -779,11 +779,11 @@ public final class GameServerSide extends Game
         return server;
     }
 
-    PlayerServerSide addPlayer(String name, String type)
+    PlayerServerSide addPlayer(String name, String shortTypeName)
     {
-        PlayerServerSide player = new PlayerServerSide(name, this);
+        PlayerServerSide player = new PlayerServerSide(name, this,
+            shortTypeName);
 
-        player.setType(type);
         players.add(player);
         return player;
     }

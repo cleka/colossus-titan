@@ -39,7 +39,6 @@ import net.sf.colossus.gui.IClientGUI;
 import net.sf.colossus.gui.NullClientGUI;
 import net.sf.colossus.gui.Scale;
 import net.sf.colossus.server.CustomRecruitBase;
-import net.sf.colossus.server.Dice;
 import net.sf.colossus.server.GameServerSide;
 import net.sf.colossus.server.IServer;
 import net.sf.colossus.server.Server;
@@ -160,7 +159,15 @@ public final class Client implements IClient, IOracle, IVariant
 
     // This ai is either the actual ai player for an AI player, but is also
     // used by human clients for the autoXXX actions.
-    private AI ai;
+    private final AI ai;
+
+    // TODO: could go into owningPlayer, BUT tricky right now as long as
+    // owningPlayer is created twice (once fake and later for real)...
+
+    /** The actual player type as which this Client was created:
+     *  Human, Network, or a *concrete* AI type (i.e. not anyAI)
+     */
+    private final String playerType;
 
     /**
      * This is used as a placeholder for activePlayer and battleActivePlayer since they
@@ -218,7 +225,25 @@ public final class Client implements IClient, IOracle, IVariant
     private boolean disposeInProgress = false;
 
     /**
-     * TODO Now Client creates the Game (GameClientSide) instance.
+     * Client is the main hub for info exchange on client side.
+     *
+     * @param host The host to which SocketClientThread shall connect
+     * @param port The port to which SocketClientThread shall connect
+     * @param playerName Name of the player (might still be one of the
+     *                   <byXXX> templates
+     * @param whatNextMgr The main controller over which to handle what to do
+     *                    next when this game is over and exiting
+     * @param theServer The Server object, if this is a local client
+     * @param byWebClient If true, this was instantiated by a WebClient
+     * @param noOptionsFile E.g. AIs should not read/save any options file
+     * @param createGUI Whether to create a GUI (AI's usually not, but server
+     *                  might override that e.g. in stresstest)
+     * @param playerType Type of player, e.g. Human, Network, or some
+     *                   concrete AI type (but not "AnyAI").
+     *                   Given type must include the package name.
+     */
+
+    /* TODO Now Client creates the Game (GameClientSide) instance.
      *      So far it creates it mostly with dummy info; should do better.
      *      - for example, create first SocketClientThread, and as first
      *      answer to connect gets the Variant name, and use that
@@ -230,10 +255,12 @@ public final class Client implements IClient, IOracle, IVariant
      *      having the SCT outside and behaving like a normal server -- that way it
      *      would be easier to run the local clients without the detour across the
      *      network and the serialization/deserialization of all objects
+     *
+     * TODO Make player type typesafe
      */
     public Client(String host, int port, String playerName,
         WhatNextManager whatNextMgr, Server theServer, boolean byWebClient,
-        boolean noOptionsFile, boolean createGUI)
+        boolean noOptionsFile, boolean createGUI, String playerType)
     {
         assert playerName != null;
 
@@ -247,17 +274,18 @@ public final class Client implements IClient, IOracle, IVariant
         // or create Game inside Client (then we can pass in the Client).
         game.setClient(this);
 
-        // TODO this is currently not set properly straight away, it is fixed in
-        // updatePlayerInfo(..) when the PlayerInfos are initialized. Should really
-        // happen here, but doesn't yet since we don't have all players (not even as
-        // names) yet
+        // TODO this is currently not set properly straight away, it is fixed
+        // in updatePlayerInfo(..) when the PlayerInfos are initialized.
+        // Should really happen here, but doesn't yet since we don't have
+        // all players (not even as names) yet
         this.owningPlayer = new PlayerClientSide(getGame(), playerName, 0);
+        this.playerType = playerType;
 
         this.noone = new PlayerClientSide(getGame(), "", 0);
         this.activePlayer = noone;
         this.battleActivePlayer = noone;
 
-        this.ai = new SimpleAI(this);
+        this.ai = createAI(playerType);
 
         this.movement = new Movement(this);
         this.battleMovement = new BattleMovement(this);
@@ -550,6 +578,7 @@ public final class Client implements IClient, IOracle, IVariant
 
     // TODO we will get rid of this listener (or the need for this listener),
     // once we manage to pass in the type to Client constructor.
+    // right now it's here just for "check does it always go right" purpose.
     private void setupTypeOptionListener()
     {
         options.addListener(Options.playerType, new IOptions.Listener()
@@ -558,7 +587,13 @@ public final class Client implements IClient, IOracle, IVariant
             public void stringOptionChanged(String optname, String oldValue,
                 String newValue)
             {
-                setType(newValue);
+                if (!newValue.equals(Client.this.playerType))
+                {
+                    LOGGER.warning("In Client " + getOwningPlayer().getName()
+                    + ": Type mismatch! Got via syncOption as type "
+                    + newValue + " but old value is "
+                        + Client.this.playerType);
+                }
             }
         });
     }
@@ -3242,58 +3277,76 @@ public final class Client implements IClient, IOracle, IVariant
         return false;
     }
 
-    private void setType(final String aType)
+    /**
+     * Create the AI for this Client. If type is some (concrete) AI type,
+     * create that type of AI (then this is an AI player).
+     * Otherwise, create a SimpleAI as default (used by Human or Remote
+     * clients for the autoplay functionality).
+     *
+     * @param playerType Type of player for which to create an AI
+     * @return Some AI object, according to the situation
+     */
+    // TODO move (partly) to AI package, e.g. as static method
+    private AI createAI(String playerType)
     {
-        LOGGER.log(Level.FINEST, "Called setType for " + aType);
-        String type = aType;
-        if (type.endsWith(Constants.anyAI))
+        LOGGER.log(Level.FINEST, "Creating the AI player type " + playerType);
+
+        AI createdAI = null;
+
+        String createType = playerType;
+        if (createType.endsWith(Constants.anyAI))
         {
-            int whichAI = Dice.rollDie(Constants.numAITypes) - 1;
-            type = Constants.aiArray[whichAI];
+            LOGGER.severe("Invalid player type " + createType
+                + " on client side - server is supposed to select the "
+                + "actual AI type for random choosing.");
         }
-        if (!type.startsWith(Constants.aiPackage))
+
+        // Non-AI (= human and remote) players use some AI for autoplay:
+        if (!createType.endsWith("AI"))
         {
-            if (type.startsWith(Constants.oldAiPackage))
-            {
-                type = type.replace(Constants.oldAiPackage,
-                    Constants.aiPackage);
-            }
-            else
-            {
-                type = Constants.aiPackage + type;
-            }
+            createType = Constants.aiPackage + Constants.autoplayAI;
         }
-        LOGGER.log(Level.FINEST, "final type: " + type);
-        if (type.endsWith("AI"))
+
+        // TODO Can it still happen that we get a unqualified AI class name?
+        // Or does server nowadays always send proper fully qualified name?
+        if (!createType.startsWith(Constants.aiPackage))
         {
-            LOGGER.log(Level.FINEST, "new type is AI. current ai is "
-                + ai.getClass().getName());
-            if (!(ai.getClass().getName().equals(type)))
-            {
-                LOGGER.log(Level.FINEST, "need to change type");
-                LOGGER.log(Level.INFO, "Changing client "
-                    + owningPlayer.getName() + " from "
-                    + ai.getClass().getName() + " to " + type);
-                try
-                {
-                    // TODO these seem to be classes of either AI or Client, there
-                    // should be a common ancestor
-                    Class<?>[] classArray = new Class<?>[1];
-                    classArray[0] = Class
-                        .forName("net.sf.colossus.client.Client");
-                    Object[] objArray = new Object[1];
-                    objArray[0] = this;
-                    ai = (AI)Class.forName(type).getDeclaredConstructor(
-                        classArray).newInstance(objArray);
-                }
-                catch (Exception ex)
-                {
-                    LOGGER.log(Level.SEVERE, "Failed to change client "
-                        + owningPlayer.getName() + " from "
-                        + ai.getClass().getName() + " to " + type, ex);
-                }
-            }
+            String name = getOwningPlayer().getName();
+            LOGGER.warning("Needed to add package for AI type? Type="
+                + createType + ", Player name=" + name);
+            createType = Constants.aiPackage + createType;
         }
+
+        try
+        {
+            // TODO these seem to be classes of either AI or Client, there
+            // should be a common ancestor
+            // NOPE . The one is the "first argument of the constructor
+            //        is of type Client. The other is the Client object passed
+            //        to that constructor.
+            // TODO Anyway, this could be done better, perhaps moved to
+            // AI package, using typesafe enums that do the mapping from name
+            // to class explicitly?
+            Class<?>[] classArray = new Class<?>[1];
+            classArray[0] = Class.forName("net.sf.colossus.client.Client");
+            Object[] objArray = new Object[1];
+            objArray[0] = this;
+            createdAI = (AI)Class.forName(createType).getDeclaredConstructor(
+                classArray).newInstance(objArray);
+        }
+        catch (Exception ex)
+        {
+            LOGGER.log(Level.SEVERE, "Failed to create for client "
+                + owningPlayer.getName() + " the to " + createType, ex);
+        }
+
+        if (createdAI == null)
+        {
+            createdAI = new SimpleAI(this);
+        }
+
+        return createdAI;
+
     }
 
     /** Wait for aiDelay. */

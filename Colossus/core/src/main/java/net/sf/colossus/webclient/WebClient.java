@@ -2270,22 +2270,25 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         try
         {
             int p = port;
+            String type;
 
             if (hostingHost == null || hostingHost.equals(""))
             {
                 // Game runs on WebServer
                 hostingHost = hostname;
+                type = Constants.network;
             }
             else
             {
                 // Runs on a players computer
+                type = Constants.human;
             }
 
             boolean noOptionsFile = false;
             // System.out.println("in webclient, before new Client for username "
             //     + username);
             gc = new Client(hostingHost, p, username, whatNextManager,
-                localServer, true, noOptionsFile, true);
+                localServer, true, noOptionsFile, true, type);
             boolean failed = gc.getFailed();
             if (failed)
             {

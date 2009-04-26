@@ -1,6 +1,5 @@
 package net.sf.colossus.server;
 
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -63,11 +62,13 @@ public final class PlayerServerSide extends Player implements
 
     private boolean deadBeforeSave = false;
 
-    PlayerServerSide(String name, GameServerSide game)
+    PlayerServerSide(String name, GameServerSide game, String shortTypeName)
     {
         // TODO why are the players on the client side numbered but not here?
         super(game, name, 0);
-        super.setType(Constants.human);
+
+        // add package path to AI names and choose random type for "anyAI":
+        setType(shortTypeName);
 
         InstanceTracker.register(this, name);
     }
@@ -83,27 +84,21 @@ public final class PlayerServerSide extends Player implements
 
     // TODO strong redundancy with Client.setType(String)
     @Override
-    public void setType(final String aType)
+    public void setType(final String shortTypeName)
     {
-        String type = aType;
+        String type = shortTypeName;
         LOGGER.log(Level.FINEST, "Called Player.setType() for " + getName()
             + " " + type);
+
         if (type.endsWith(Constants.anyAI))
         {
             int whichAI = Dice.rollDie(Constants.numAITypes) - 1;
             type = Constants.aiArray[whichAI];
         }
+
         if (!type.startsWith(Constants.aiPackage))
         {
-            if (type.startsWith(Constants.oldAiPackage))
-            {
-                type = type.replace(Constants.oldAiPackage,
-                    Constants.aiPackage);
-            }
-            else
-            {
-                type = Constants.aiPackage + type;
-            }
+            type = Constants.aiPackage + type;
         }
         super.setType(type);
     }

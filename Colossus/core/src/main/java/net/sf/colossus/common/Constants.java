@@ -139,12 +139,17 @@ public final class Constants
     public static final String defaultAI = anyAI;
     public static final String[] aiArray = { "SimpleAI", "CowardSimpleAI",
         "RationalAI", "HumanHaterRationalAI", "MilvangAI", "ExperimentalAI" };
+    // Auto play for human players uses SimpleAI:
+    public static final String autoplayAI = aiArray[0];
 
     public static final int numAITypes = aiArray.length;
     public static final String aiPackage = "net.sf.colossus.ai.";
+    // TODO Probably this is not relevant any more - only for very old save
+    // games, but compatibility with those is probably broken due to other
+    // issues anyway...
     public static final String oldAiPackage = "net.sf.colossus.client.";
 
-    // Player names
+    // Player names/placeholders
     public static final String byColor = "<By color>";
     public static final String byType = "<By type>";
     public static final String byClient = "<By client>";
