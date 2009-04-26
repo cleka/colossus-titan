@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.server.VariantSupport;
-import net.sf.colossus.util.ResourceLoader;
+import net.sf.colossus.util.StaticResourceLoader;
 import net.sf.colossus.variant.MasterHex;
 
 
@@ -449,7 +449,7 @@ public final class GUIMasterHex extends GUIHex<MasterHex>
     private Image getOverlayImage()
     {
         Image overlay = null;
-        overlay = ResourceLoader.getImage(this.getHexModel()
+        overlay = StaticResourceLoader.getImage(this.getHexModel()
             .getTerrainDisplayName()
             + (!inverted ? invertedPostfix : ""), VariantSupport
             .getImagesDirectoriesList(), rectBound.width, rectBound.height);

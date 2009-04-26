@@ -745,7 +745,7 @@ public final class Start implements IStartHandler
             // for a remote client closing while game is not over, he set next
             // to do to GetPlayers dialog, dialog wants to load Variant Readme,
             // resourceloader would fail.
-            net.sf.colossus.util.ResourceLoader.resetDataServer();
+            net.sf.colossus.util.StaticResourceLoader.resetDataServer();
 
             // DebugStuff.doCleanupStuff(false);
 

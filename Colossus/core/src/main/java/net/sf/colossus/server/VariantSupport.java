@@ -23,7 +23,7 @@ import net.sf.colossus.client.HexMap;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.util.ErrorUtils;
-import net.sf.colossus.util.ResourceLoader;
+import net.sf.colossus.util.StaticResourceLoader;
 import net.sf.colossus.variant.AllCreatureType;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.IVariantInitializer;
@@ -82,8 +82,8 @@ public final class VariantSupport
         if (!(loadedVariant && varFilename.equals(tempVarFilename) && varDirectory
             .equals(tempVarDirectory)))
         {
-            ResourceLoader.purgeImageCache();
-            ResourceLoader.purgeFileCache();
+            StaticResourceLoader.purgeImageCache();
+            StaticResourceLoader.purgeFileCache();
         }
     }
 
@@ -291,8 +291,8 @@ public final class VariantSupport
 
         if (serverSide)
         {
-            ResourceLoader.purgeImageCache();
-            ResourceLoader.purgeFileCache();
+            StaticResourceLoader.purgeImageCache();
+            StaticResourceLoader.purgeFileCache();
         }
 
         loadedVariant = false;
@@ -307,7 +307,7 @@ public final class VariantSupport
             directories.add(tempVarDirectory);
             directories.add(Constants.defaultDirName);
             task = "Load variant file \"" + tempVarFilename + "\"";
-            InputStream varIS = ResourceLoader.getInputStream(tempVarFilename,
+            InputStream varIS = StaticResourceLoader.getInputStream(tempVarFilename,
                 directories);
             if (varIS == null)
             {
@@ -365,7 +365,7 @@ public final class VariantSupport
             directories = new ArrayList<String>();
             directories.add(tempVarDirectory);
             task = "getDocument README*";
-            varREADME = ResourceLoader.getDocument("README", directories);
+            varREADME = StaticResourceLoader.getDocument("README", directories);
 
             /* OK, what is the proper order here ?
              * We should start with HazardTerrain & HazardHexside, but those
@@ -384,7 +384,7 @@ public final class VariantSupport
             List<MasterBoardTerrain> battleLands = new ArrayList<MasterBoardTerrain>();
 
             List<String> directoriesForMap = getVarDirectoriesList();
-            InputStream mapIS = ResourceLoader.getInputStream(VariantSupport
+            InputStream mapIS = StaticResourceLoader.getInputStream(VariantSupport
                 .getMapName(), directoriesForMap);
             if (mapIS == null)
             {
@@ -443,7 +443,7 @@ public final class VariantSupport
             List<String> directories = VariantSupport.getVarDirectoriesList();
             for (String creaturesName : VariantSupport.getCreaturesNames())
             {
-                InputStream creIS = ResourceLoader.getInputStream(
+                InputStream creIS = StaticResourceLoader.getInputStream(
                     creaturesName, directories);
                 if (creIS == null)
                 {
@@ -480,7 +480,7 @@ public final class VariantSupport
                     "Failed to insert warning about missing readme into Document object",
                     e);
         }
-        txtdoc.putProperty(ResourceLoader.KEY_CONTENT_TYPE, "text/plain");
+        txtdoc.putProperty(StaticResourceLoader.KEY_CONTENT_TYPE, "text/plain");
         return txtdoc;
     }
 
@@ -533,7 +533,7 @@ public final class VariantSupport
         while (it.hasNext())
         {
             String dir = it.next();
-            suffixedDirs.add(dir + ResourceLoader.getPathSeparator()
+            suffixedDirs.add(dir + StaticResourceLoader.getPathSeparator()
                 + suffixPath);
         }
         return suffixedDirs;
@@ -561,7 +561,7 @@ public final class VariantSupport
         try
         {
             List<String> directories = getVarDirectoriesList();
-            InputStream terIS = ResourceLoader.getInputStream(
+            InputStream terIS = StaticResourceLoader.getInputStream(
                 recruitsFileName, directories);
             if (terIS == null)
             {
@@ -603,7 +603,7 @@ public final class VariantSupport
             singleDirectory.add(it.previous());
             try
             {
-                InputStream mmfIS = ResourceLoader.getInputStreamIgnoreFail(
+                InputStream mmfIS = StaticResourceLoader.getInputStreamIgnoreFail(
                     Constants.markersNameFile, singleDirectory);
                 if (mmfIS != null)
                 {
@@ -636,7 +636,7 @@ public final class VariantSupport
         Object o = null;
         if (hintName != null)
         {
-            o = ResourceLoader.getNewObject(hintName, getVarDirectoriesList());
+            o = StaticResourceLoader.getNewObject(hintName, getVarDirectoriesList());
         }
         if ((o != null) && (o instanceof HintInterface))
         {

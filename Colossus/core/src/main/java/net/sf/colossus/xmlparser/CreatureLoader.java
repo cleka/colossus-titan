@@ -16,7 +16,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.server.VariantSupport;
-import net.sf.colossus.util.ResourceLoader;
+import net.sf.colossus.util.StaticResourceLoader;
 import net.sf.colossus.variant.AllCreatureType;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.CreatureTypeTitan;
@@ -166,7 +166,7 @@ public class CreatureLoader implements AllCreatureType
             parameters[14] = count;
             parameters[15] = plural_name;
             parameters[16] = base_color;
-            creature = (CreatureType)ResourceLoader.getNewObject(custom_class,
+            creature = (CreatureType)StaticResourceLoader.getNewObject(custom_class,
                 VariantSupport.getVarDirectoriesList(), parameters);
         }
         this.creatures.add(creature);

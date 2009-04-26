@@ -50,7 +50,7 @@ import net.sf.colossus.gui.PickIntValue;
 import net.sf.colossus.gui.ShowReadme;
 import net.sf.colossus.guiutil.KFrame;
 import net.sf.colossus.guiutil.SaveWindow;
-import net.sf.colossus.util.ResourceLoader;
+import net.sf.colossus.util.StaticResourceLoader;
 
 
 /**
@@ -568,7 +568,7 @@ public final class GetPlayers extends KFrame
         options
             .setOption(Options.variantFileWithFullPath, varFileWithFullPath);
 
-        String prop = (String)doc.getProperty(ResourceLoader.KEY_CONTENT_TYPE);
+        String prop = (String)doc.getProperty(StaticResourceLoader.KEY_CONTENT_TYPE);
         readme.setContentType(prop);
         readme.setDocument(doc);
         if (oldMaxPlayers != VariantSupport.getMaxPlayers())
@@ -984,7 +984,7 @@ public final class GetPlayers extends KFrame
                 options.setOption(Options.variant, name);
                 options.setOption(Options.variantFileWithFullPath, fullPath);
                 readme.setContentType((String)doc
-                    .getProperty(ResourceLoader.KEY_CONTENT_TYPE));
+                    .getProperty(StaticResourceLoader.KEY_CONTENT_TYPE));
                 readme.setDocument(doc);
                 if (maxPlayers != VariantSupport.getMaxPlayers())
                 {

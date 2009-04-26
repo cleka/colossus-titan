@@ -25,7 +25,7 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.HTMLColor;
-import net.sf.colossus.util.ResourceLoader;
+import net.sf.colossus.util.StaticResourceLoader;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.HazardHexside;
 
@@ -374,7 +374,7 @@ public class GUIBattleHex extends GUIHex<BattleHex>
     {
         Image overlay = null;
         List<String> directories = VariantSupport.getImagesDirectoriesList();
-        overlay = ResourceLoader.getImage(name + imagePostfix, directories,
+        overlay = StaticResourceLoader.getImage(name + imagePostfix, directories,
             width, height);
         return overlay;
     }

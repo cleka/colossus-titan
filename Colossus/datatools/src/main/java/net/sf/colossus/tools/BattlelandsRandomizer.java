@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.colossus.variant.BattleHex;
-import net.sf.colossus.util.ResourceLoader;
+import net.sf.colossus.util.StaticResourceLoader;
 
 
 /**
@@ -38,7 +38,7 @@ public class BattlelandsRandomizer
         List<String> directories = new ArrayList<String>();
         directories.add(".");
         directories.add("");
-        InputStream inputFile = ResourceLoader.getInputStream(file, directories);
+        InputStream inputFile = StaticResourceLoader.getInputStream(file, directories);
 
         BattleHex[][] h = bhm.getBattleHexArray();
         bhm.doRandomization(h, inputFile);

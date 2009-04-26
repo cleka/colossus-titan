@@ -38,7 +38,7 @@ import javax.swing.JPopupMenu;
 
 import net.sf.colossus.gui.GUIBattleHex;
 import net.sf.colossus.server.VariantSupport;
-import net.sf.colossus.util.ResourceLoader;
+import net.sf.colossus.util.StaticResourceLoader;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.HazardHexside;
 import net.sf.colossus.variant.HazardTerrain;
@@ -125,7 +125,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
             String tempRndDirectory = rndFile.getParentFile().getAbsolutePath();
             List<String> directories = new java.util.ArrayList<String>();
             directories.add(tempRndDirectory);
-            InputStream inputFile = ResourceLoader.getInputStream(tempRndName,
+            InputStream inputFile = StaticResourceLoader.getInputStream(tempRndName,
                     directories);
             if (inputFile != null)
             {
@@ -151,7 +151,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
             List<String> directories = new ArrayList<String>();
             directories.add(temploadFileDirectory);
             InputStream inputFile =
-                    net.sf.colossus.util.ResourceLoader.getInputStream(
+                    net.sf.colossus.util.StaticResourceLoader.getInputStream(
                     temploadFileName,
                     directories);
             if (inputFile != null)
@@ -200,7 +200,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
             List<String> directories = new ArrayList<String>();
             directories.add(tempsaveFileDirectory);
             OutputStream outputFile =
-                    net.sf.colossus.util.ResourceLoader.getOutputStream(
+                    net.sf.colossus.util.StaticResourceLoader.getOutputStream(
                     tempsaveFileName,
                     directories);
             if (outputFile != null)
@@ -435,7 +435,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
 
         public void actionPerformed(ActionEvent e)
         {
-            InputStream inputFile = ResourceLoader.getInputStream(filename,
+            InputStream inputFile = StaticResourceLoader.getInputStream(filename,
                     VariantSupport.getVarDirectoriesList());
             doRandomization(getBattleHexArray(), inputFile);
             setMapName(getDisplayName());

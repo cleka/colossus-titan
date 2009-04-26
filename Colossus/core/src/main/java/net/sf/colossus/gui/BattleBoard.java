@@ -47,7 +47,7 @@ import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.guiutil.KFrame;
 import net.sf.colossus.guiutil.SaveWindow;
 import net.sf.colossus.server.LegionServerSide;
-import net.sf.colossus.util.ResourceLoader;
+import net.sf.colossus.util.StaticResourceLoader;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.MasterHex;
 
@@ -556,7 +556,7 @@ public final class BattleBoard extends KFrame
     {
         List<String> directories = new ArrayList<String>();
         directories.add(Constants.defaultDirName
-            + ResourceLoader.getPathSeparator() + Constants.imagesDirName);
+            + StaticResourceLoader.getPathSeparator() + Constants.imagesDirName);
 
         String[] iconNames = {
             Constants.battlemapIconImage,
@@ -565,7 +565,7 @@ public final class BattleBoard extends KFrame
             Constants.battlemapIconSubscript + "-Subscript-"
                 + Constants.battlemapIconTextColor };
 
-        Image image = ResourceLoader.getCompositeImage(iconNames, directories,
+        Image image = StaticResourceLoader.getCompositeImage(iconNames, directories,
             60, 60);
 
         if (image == null)

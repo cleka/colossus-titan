@@ -29,7 +29,7 @@ import net.sf.colossus.gui.GUIBattleHex;
 import net.sf.colossus.gui.GUIHex;
 import net.sf.colossus.gui.Scale;
 import net.sf.colossus.server.VariantSupport;
-import net.sf.colossus.util.ResourceLoader;
+import net.sf.colossus.util.StaticResourceLoader;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.HazardHexside;
 import net.sf.colossus.variant.HazardTerrain;
@@ -212,7 +212,7 @@ public class HexMap extends JPanel
         {
             // if ((rndSourceName == null) || (!serverSideFirstLoad))
             { // static Battlelands
-                InputStream batIS = ResourceLoader.getInputStream(
+                InputStream batIS = StaticResourceLoader.getInputStream(
                     masterBoardTerrain.getId() + ".xml", directories);
 
                 BattlelandLoader bl = new BattlelandLoader(batIS, hexModel);
@@ -687,7 +687,7 @@ public class HexMap extends JPanel
             Font oldFont = g.getFont();
             FontMetrics fm;
 
-            g.setFont(ResourceLoader.DEFAULT_FONT.deriveFont((float)48));
+            g.setFont(StaticResourceLoader.DEFAULT_FONT.deriveFont((float)48));
             fm = g.getFontMetrics();
             int tma = fm.getMaxAscent();
 
@@ -701,7 +701,7 @@ public class HexMap extends JPanel
 
             if (getSubtitle() != null)
             {
-                g.setFont(ResourceLoader.DEFAULT_FONT.deriveFont((float)24));
+                g.setFont(StaticResourceLoader.DEFAULT_FONT.deriveFont((float)24));
                 fm = g.getFontMetrics();
                 int tma2 = fm.getMaxAscent();
                 bounds = fm.getStringBounds(getSubtitle(), g);

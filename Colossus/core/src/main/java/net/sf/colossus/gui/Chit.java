@@ -23,7 +23,7 @@ import javax.swing.JPanel;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.server.VariantSupport;
-import net.sf.colossus.util.ResourceLoader;
+import net.sf.colossus.util.StaticResourceLoader;
 import net.sf.colossus.variant.CreatureType;
 
 
@@ -195,7 +195,7 @@ class Chit extends JPanel
     {
         ImageIcon tempIcon = null;
         List<String> directories = VariantSupport.getImagesDirectoriesList();
-        tempIcon = ResourceLoader.getImageIcon(imageFilename, directories,
+        tempIcon = StaticResourceLoader.getImageIcon(imageFilename, directories,
             scale, scale);
         if (tempIcon == null)
         {
@@ -211,7 +211,7 @@ class Chit extends JPanel
     private static Image getImage(String[] imageFilenames, int scale)
     {
         List<String> directories = VariantSupport.getImagesDirectoriesList();
-        Image composite = ResourceLoader.getCompositeImage(imageFilenames,
+        Image composite = StaticResourceLoader.getCompositeImage(imageFilenames,
             directories, scale, scale);
         return composite;
     }

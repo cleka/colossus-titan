@@ -14,7 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.common.Constants;
-import net.sf.colossus.util.ResourceLoader;
+import net.sf.colossus.util.StaticResourceLoader;
 import net.sf.colossus.util.Split;
 
 
@@ -32,7 +32,7 @@ final class FileServerThread extends Thread
     private ServerSocket fileServer;
 
     private static final String separator =
-        ResourceLoader.REQUEST_TOKEN_SEPARATOR;
+        StaticResourceLoader.REQUEST_TOKEN_SEPARATOR;
 
     private final Server server;
     private final int port;
@@ -134,7 +134,7 @@ final class FileServerThread extends Thread
                         // 2009-03 Now clients sends it. Let's see.
 
                         if (filename
-                            .equals(ResourceLoader.FILESERVER_IGNOREFAIL_SIGNAL))
+                            .equals(StaticResourceLoader.FILESERVER_IGNOREFAIL_SIGNAL))
                         {
                             ignoreFail = true;
                             filename = li.remove(0);
@@ -159,7 +159,7 @@ final class FileServerThread extends Thread
                             ignoreFail = true;
                         }
 */
-                        byte[] data = ResourceLoader.getBytesFromFile(
+                        byte[] data = StaticResourceLoader.getBytesFromFile(
                             filename, li, true, ignoreFail);
 
                         if (data != null)

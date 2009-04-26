@@ -12,7 +12,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.text.Document;
 
 import net.sf.colossus.guiutil.KFrame;
-import net.sf.colossus.util.ResourceLoader;
+import net.sf.colossus.util.StaticResourceLoader;
 import net.sf.colossus.variant.Variant;
 
 
@@ -85,7 +85,7 @@ public final class ShowReadme extends KFrame
         readmePane.add(readme);
 
         readme.setContentType((String)doc
-            .getProperty(ResourceLoader.KEY_CONTENT_TYPE));
+            .getProperty(StaticResourceLoader.KEY_CONTENT_TYPE));
         readme.setDocument(doc);
 
         return readmeScrollPane;

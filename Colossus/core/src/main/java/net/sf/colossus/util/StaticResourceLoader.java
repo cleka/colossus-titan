@@ -53,9 +53,9 @@ import org.jdom.Element;
  * @author David Ripton
  */
 
-public final class ResourceLoader
+public final class StaticResourceLoader
 {
-    private static final Logger LOGGER = Logger.getLogger(ResourceLoader.class
+    private static final Logger LOGGER = Logger.getLogger(StaticResourceLoader.class
         .getName());
 
     public static final String FILESERVER_IGNOREFAIL_SIGNAL = "~/~Ignore-Fail~/~";
@@ -133,7 +133,7 @@ public final class ResourceLoader
     // A hardcoded '/' works in Unix, Windows, MacOS X, and jar files.
     private static final String pathSeparator = "/";
     private static final String[] imageExtension = { ".png", ".gif" };
-    private static final ClassLoader baseCL = ResourceLoader.class
+    private static final ClassLoader baseCL = StaticResourceLoader.class
         .getClassLoader();
     private static final ColossusClassLoader cl = new ColossusClassLoader(
         baseCL);
@@ -153,14 +153,14 @@ public final class ResourceLoader
 
     public static void setDataServer(String server, int port)
     {
-        ResourceLoader.server = server;
-        ResourceLoader.serverPort = port;
+        StaticResourceLoader.server = server;
+        StaticResourceLoader.serverPort = port;
     }
 
     public static void resetDataServer()
     {
-        ResourceLoader.server = null;
-        ResourceLoader.serverPort = 0;
+        StaticResourceLoader.server = null;
+        StaticResourceLoader.serverPort = 0;
     }
 
     /**

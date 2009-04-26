@@ -784,7 +784,7 @@ public class ClientGUI implements IClientGUI
                 boolean newValue)
             {
                 CreatureType.setNoBaseColor(newValue);
-                net.sf.colossus.util.ResourceLoader.purgeImageCache();
+                net.sf.colossus.util.StaticResourceLoader.purgeImageCache();
                 repaintAllWindows();
             }
         });

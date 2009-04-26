@@ -72,7 +72,7 @@ import net.sf.colossus.server.XMLSnapshotFilter;
 import net.sf.colossus.util.ArrayHelper;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.util.NullCheckPredicate;
-import net.sf.colossus.util.ResourceLoader;
+import net.sf.colossus.util.StaticResourceLoader;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.IVariant;
 import net.sf.colossus.variant.MasterHex;
@@ -1391,7 +1391,7 @@ public final class MasterBoard extends JPanel
     {
         List<String> directories = new ArrayList<String>();
         directories.add(Constants.defaultDirName
-            + ResourceLoader.getPathSeparator() + Constants.imagesDirName);
+            + StaticResourceLoader.getPathSeparator() + Constants.imagesDirName);
 
         String[] iconNames = {
             Constants.masterboardIconImage,
@@ -1400,7 +1400,7 @@ public final class MasterBoard extends JPanel
             Constants.masterboardIconSubscript + "-Subscript-"
                 + Constants.masterboardIconTextColor };
 
-        Image image = ResourceLoader.getCompositeImage(iconNames, directories,
+        Image image = StaticResourceLoader.getCompositeImage(iconNames, directories,
             60, 60);
 
         if (image == null)

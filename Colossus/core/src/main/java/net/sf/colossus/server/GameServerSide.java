@@ -40,7 +40,7 @@ import net.sf.colossus.game.Proposal;
 import net.sf.colossus.server.BattleServerSide.AngelSummoningStates;
 import net.sf.colossus.util.ErrorUtils;
 import net.sf.colossus.util.InstanceTracker;
-import net.sf.colossus.util.ResourceLoader;
+import net.sf.colossus.util.StaticResourceLoader;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.util.ViableEntityManager;
 import net.sf.colossus.variant.BattleHex;
@@ -1411,7 +1411,7 @@ public final class GameServerSide extends Game
             }
 
             // Dump the file cache, so that generated files are preserved
-            Iterator<Element> itEl = ResourceLoader.getFileCacheDump()
+            Iterator<Element> itEl = StaticResourceLoader.getFileCacheDump()
                 .iterator();
             while (itEl.hasNext())
             {
@@ -1639,12 +1639,12 @@ public final class GameServerSide extends Game
                     String content = ((CDATA)contentList.get(0)).getText();
                     LOGGER.finest("DataFileKey: " + mapKey
                         + " DataFileContent :\n" + content);
-                    ResourceLoader
+                    StaticResourceLoader
                         .putIntoFileCache(mapKey, content.getBytes());
                 }
                 else
                 {
-                    ResourceLoader.putIntoFileCache(mapKey, new byte[0]);
+                    StaticResourceLoader.putIntoFileCache(mapKey, new byte[0]);
                 }
             }
 

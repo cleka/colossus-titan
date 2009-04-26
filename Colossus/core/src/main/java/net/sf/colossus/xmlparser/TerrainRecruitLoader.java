@@ -679,7 +679,7 @@ public class TerrainRecruitLoader implements IVariantInitializer
             return cri;
         }
         String className = specialString.substring(8);
-        Object o = net.sf.colossus.util.ResourceLoader.getNewObject(className,
+        Object o = net.sf.colossus.util.StaticResourceLoader.getNewObject(className,
             VariantSupport.getVarDirectoriesList());
         if (o == null)
         {

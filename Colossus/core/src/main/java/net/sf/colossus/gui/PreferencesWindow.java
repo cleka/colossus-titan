@@ -585,7 +585,7 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
             {
                 if (newValue != oldValue)
                 {
-                    net.sf.colossus.util.ResourceLoader.purgeImageCache();
+                    net.sf.colossus.util.StaticResourceLoader.purgeImageCache();
                     options.setOption(Options.scale, newValue);
                 }
                 oldValue = newValue;

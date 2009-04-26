@@ -47,7 +47,7 @@ import net.sf.colossus.util.CollectionHelper;
 import net.sf.colossus.util.ErrorUtils;
 import net.sf.colossus.util.InstanceTracker;
 import net.sf.colossus.util.Predicate;
-import net.sf.colossus.util.ResourceLoader;
+import net.sf.colossus.util.StaticResourceLoader;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.util.ViableEntityManager;
 import net.sf.colossus.variant.BattleHex;
@@ -342,11 +342,11 @@ public final class Client implements IClient, IOracle, IVariant
             this.server = sct;
             if (isRemote())
             {
-                ResourceLoader.setDataServer(host, port + 1);
+                StaticResourceLoader.setDataServer(host, port + 1);
             }
             else
             {
-                ResourceLoader.setDataServer(null, 0);
+                StaticResourceLoader.setDataServer(null, 0);
             }
 
             sct.start();
