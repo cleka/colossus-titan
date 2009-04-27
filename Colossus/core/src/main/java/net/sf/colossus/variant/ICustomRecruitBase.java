@@ -22,7 +22,6 @@ public interface ICustomRecruitBase
 
     /**
      * List creatures that can recruit in this terrain in a special way now.
-     * @param terrain The MasterBoardTerrain considered for recruiting
      * @param hex The specific MasterHex considered for recruiting.
      * @return A List of possible special Recruiters in this hex.
      */
@@ -32,7 +31,6 @@ public interface ICustomRecruitBase
     /**
      * List creatures that can be recruited in this terrain
      * in a special way now.
-     * @param terrain The MasterBoardTerrain considered for recruiting
      * @param hex The specific MasterHex considered for recruiting
      * (for an example, see getPossibleSpecialRecruits() in
      * BalrogRecruitment.java in Balrog variant directory)
