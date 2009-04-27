@@ -80,7 +80,7 @@ public final class ShowCreatureDetails extends KDialog
      * @param point coordinate on screen to display windows, or null.
      * @param pane if 'point' is not null it is relative to this.
      * @param variant the current Variant
-     * @param for now, the Client acting as deputy to answer Variant
+     * @param ivariant for now, the Client acting as deputy to answer Variant
      *        questions variant cannot answer yet.
      */
     public ShowCreatureDetails(final JFrame parentFrame,
