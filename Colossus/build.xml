@@ -295,7 +295,7 @@
   <target name="dist" depends="clean,buildInfo,init,sign"
   description="Make zip file for user download">
     <zip zipfile="${ZIPFILE}" basedir="."
-    excludes="**/*.sav, **/*.zip, **/*.bak, **/*javadoc*/*, *Keystore*, *cfg, *properties*, BattlelandsRandomizer.jar, .*, **/*.ps, **/*.aux, **/*.bbl, **/*.bib, **/*.blg, **/*.log, **/*.old libs/build"/>
+    excludes="build/**, target/**, **/*.sav, **/*.zip, **/*.bak, **/*javadoc*/*, *Keystore*, *cfg, *properties*, BattlelandsRandomizer.jar, .*, **/*.ps, **/*.aux, **/*.bbl, **/*.bib, **/*.blg, **/*.log, **/*.old, tmp/**, libs/build/**"/>
   </target>
   <!-- Internal: tests if we have a Subversion copy to avoid running the Ant task if we don't -
        the svn task throws NullPointerExceptions if there's no ".svn" folder -->
