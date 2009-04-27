@@ -909,8 +909,8 @@ public final class Server extends Thread implements IServer
         boolean dontUseOptionsFile = player.isAI();
         LOGGER.finest("Called Server.createLocalClient() for " + playerName);
 
-        new Client("127.0.0.1", port, playerName, whatNextManager, this,
-            false, dontUseOptionsFile, createGUI, type);
+        Client.createClient("127.0.0.1", port, playerName, type,
+            whatNextManager, this, false, dontUseOptionsFile, createGUI);
     }
 
     boolean addClient(final IClient client, final String playerName,

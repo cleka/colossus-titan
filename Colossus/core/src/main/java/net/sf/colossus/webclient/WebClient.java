@@ -2287,14 +2287,14 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             boolean noOptionsFile = false;
             // System.out.println("in webclient, before new Client for username "
             //     + username);
-            gc = new Client(hostingHost, p, username, whatNextManager,
-                localServer, true, noOptionsFile, true, type);
+            gc = Client.createClient(hostingHost, p, username, type,
+                whatNextManager, localServer, true, noOptionsFile, true);
             boolean failed = gc.getFailed();
             if (failed)
             {
                 gc = null;
                 JOptionPane.showMessageDialog(this,
-                    "Connecting to the game server hostimg the game ("
+                    "Connecting to the game server hosting the game ("
                         + hostingHost
                         + ") or starting own MasterBoard failed!",
                     "Starting game failed!", JOptionPane.ERROR_MESSAGE);

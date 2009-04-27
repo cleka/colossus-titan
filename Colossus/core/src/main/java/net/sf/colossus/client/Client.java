@@ -97,18 +97,30 @@ public final class Client implements IClient, IOracle, IVariant
     private static final Logger LOGGER = Logger.getLogger(Client.class
         .getName());
 
-    /** This is (right now) always a SocketClientThread as deputy (relay)
+    /**
+     *  This "server" is the access to the connector object which actually
+     *  acts for us as server.
+     *
+     *  Right now this is always a SocketClientThread as deputy (relay)
      *  which forwards everything that we do/tell, to the Server.
      *  Perhaps one day this could either be a SocketConnection or e.g.
      *  a Queue type of connection for local Clients...
      */
     private IServer server;
 
+    /** The object that actually handles the physical server communication for
+     *  this client. Issues related to set up and tear down of the connection
+     *  are handled via this access to the (right now) SocketClientThread.
+     */
+    private IServerConnection connection;
+
     /**
      * A first start to get rid of the static-access-everywhere to
      * ResourceLoader.
+     * ResourceLoader is used to "load" images, variant files, readme files
+     * physically (from disk, or from remote file server thread).
      */
-    private ResourceLoader resLoader;
+    private final ResourceLoader resourceLoader;
 
     /** Client constructor sets this to true if something goes wrong with the
      *  SocketClientThread initialization. I wanted to avoid have the Client
@@ -198,7 +210,6 @@ public final class Client implements IClient, IOracle, IVariant
     private Strike strike;
 
     private final Server localServer;
-    private SocketClientThread sct;
 
     /**
      * Constants modelling the party who closed this client.
@@ -230,13 +241,15 @@ public final class Client implements IClient, IOracle, IVariant
 
     private boolean disposeInProgress = false;
 
-    /**
-     * Client is the main hub for info exchange on client side.
+    /** Create a Client object and other related objects
      *
      * @param host The host to which SocketClientThread shall connect
      * @param port The port to which SocketClientThread shall connect
      * @param playerName Name of the player (might still be one of the
      *                   <byXXX> templates
+     * @param playerType Type of player, e.g. Human, Network, or some
+     *                   concrete AI type (but not "AnyAI").
+     *                   Given type must include the package name.
      * @param whatNextMgr The main controller over which to handle what to do
      *                    next when this game is over and exiting
      * @param theServer The Server object, if this is a local client
@@ -244,9 +257,50 @@ public final class Client implements IClient, IOracle, IVariant
      * @param noOptionsFile E.g. AIs should not read/save any options file
      * @param createGUI Whether to create a GUI (AI's usually not, but server
      *                  might override that e.g. in stresstest)
+     *
+     */
+
+    public static synchronized Client createClient(String host, int port,
+        String playerName, String playerType, WhatNextManager whatNextMgr,
+        Server theServer, boolean byWebClient, boolean noOptionsFile,
+        boolean createGUI)
+    {
+        /* TODO Clients on same machine could share the instance
+         * (proper synchronization needed, of course).
+         */
+        ResourceLoader loader;
+        if (theServer == null)
+        {
+            loader = new ResourceLoader(host, port + 1);
+        }
+        else
+        {
+            loader = new ResourceLoader(null, 0);
+        }
+
+        return new Client(host, port, playerName, playerType, whatNextMgr,
+            theServer, byWebClient, noOptionsFile, createGUI, loader);
+    }
+
+    /**
+     * Client is the main hub for info exchange on client side.
+     *
+     * @param host The host to which SocketClientThread shall connect
+     * @param port The port to which SocketClientThread shall connect
+     * @param playerName Name of the player (might still be one of the
+     *                   <byXXX> templates
      * @param playerType Type of player, e.g. Human, Network, or some
      *                   concrete AI type (but not "AnyAI").
      *                   Given type must include the package name.
+     * @param whatNextMgr The main controller over which to handle what to do
+     *                    next when this game is over and exiting
+     * @param theServer The Server object, if this is a local client
+     * @param byWebClient If true, this was instantiated by a WebClient
+     * @param noOptionsFile E.g. AIs should not read/save any options file
+     * @param createGUI Whether to create a GUI (AI's usually not, but server
+     *                  might override that e.g. in stresstest)
+     * @param resourceLoader The resourceLoader object that gives us access to
+     *                       load images, files etc (from disk or from server)
      */
 
     /* TODO Now Client creates the Game (GameClientSide) instance.
@@ -264,9 +318,9 @@ public final class Client implements IClient, IOracle, IVariant
      *
      * TODO Make player type typesafe
      */
-    public Client(String host, int port, String playerName,
+    public Client(String host, int port, String playerName, String playerType,
         WhatNextManager whatNextMgr, Server theServer, boolean byWebClient,
-        boolean noOptionsFile, boolean createGUI, String playerType)
+        boolean noOptionsFile, boolean createGUI, ResourceLoader loader)
     {
         assert playerName != null;
 
@@ -279,6 +333,9 @@ public final class Client implements IClient, IOracle, IVariant
         // Game outside ( = then we can't give Client to Game constructor)
         // or create Game inside Client (then we can pass in the Client).
         game.setClient(this);
+
+        this.resourceLoader = loader;
+        LOGGER.finest("Got ResourceLoader: " + resourceLoader.toString());
 
         // TODO this is currently not set properly straight away, it is fixed
         // in updatePlayerInfo(..) when the PlayerInfos are initialized.
@@ -320,18 +377,15 @@ public final class Client implements IClient, IOracle, IVariant
 
         gui.setStartedByWebClient(byWebClient);
 
-        sct = new SocketClientThread(this, host, port, playerName, isRemote());
+        connection = new SocketClientThread(this, host, port, playerName,
+            isRemote());
 
-        String reasonFail = sct.getReasonFail();
+        String reasonFail = connection.getReasonFail();
         if (reasonFail != null)
         {
             // If this failed here, it is usually a "could not connect"-problem
             // (wrong host or port or server not yet up).
             // In this case we just do cleanup and end.
-
-            // start needs to be run, otherwise thread won't be GC'd.
-            sct.start();
-            sct = null;
 
             LOGGER.warning("Client startup failed: " + reasonFail);
             if (!Options.isStresstest())
@@ -345,21 +399,9 @@ public final class Client implements IClient, IOracle, IVariant
         }
         else
         {
-            this.server = sct;
-            // TODO ResourceLoader could/should be passed in also, instead
-            // of creating one. Clients on same machine could share the
-            // instance (proper synchronization needed, of course).
-            if (isRemote())
-            {
-                this.resLoader = new ResourceLoader(host, port + 1);
-            }
-            else
-            {
-                this.resLoader = new ResourceLoader(null, 0);
-            }
-            LOGGER.finest("Created ResourceLoader: " + resLoader.toString());
+            this.server = connection.getIServer();
 
-            sct.start();
+            connection.startThread();
 
             TerrainRecruitLoader.setCaretaker(getGame().getCaretaker());
             CustomRecruitBase.addCaretakerClientSide(getGame().getCaretaker());
@@ -657,12 +699,12 @@ public final class Client implements IClient, IOracle, IVariant
         }
         closedBy = ClosedByConstant.CLOSED_BY_CLIENT;
 
-        if (sct != null && !sct.isAlreadyDown())
+        if (connection != null && !connection.isAlreadyDown())
         {
             {
                 // SCT will then end the loop and do the dispose.
                 // So nothing else to do any more here in EDT.
-                sct.stopSocketClientThread();
+                connection.stopSocketClientThread();
             }
         }
         else
@@ -770,7 +812,7 @@ public final class Client implements IClient, IOracle, IVariant
     {
         disposeInProgress = true;
 
-        sct = null;
+        connection = null;
         server = null;
 
         gui.doCleanupGUI();
@@ -1197,7 +1239,7 @@ public final class Client implements IClient, IOracle, IVariant
 
     public void confirmWhenCaughtUp()
     {
-        sct.clientConfirmedCatchup();
+        server.clientConfirmedCatchup();
     }
 
     public void initBoard()
@@ -1219,10 +1261,7 @@ public final class Client implements IClient, IOracle, IVariant
         InstanceTracker.setId(this, "Client " + playerName);
         InstanceTracker.setId(ai, "AI: " + playerName);
 
-        if (sct != null)
-        {
-            sct.fixName(playerName);
-        }
+        connection.updateThreadName(playerName);
     }
 
     public void createSummonAngel(Legion legion)
@@ -2955,7 +2994,7 @@ public final class Client implements IClient, IOracle, IVariant
 
     public boolean isSctAlreadyDown()
     {
-        return sct.isAlreadyDown();
+        return connection.isAlreadyDown();
     }
 
     public void undidSplit(Legion splitoff, Legion survivor, int turn)

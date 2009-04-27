@@ -809,8 +809,8 @@ public final class Start implements IStartHandler
         try
         {
             String type = Constants.aiPackage + Constants.network;
-            Client c = new Client(hostname, port, playerName, whatNextManager, null,
-                false, false, true, type);
+            Client c = Client.createClient(hostname, port, playerName, type,
+                whatNextManager, null, false, false, true);
             failed = c.getFailed();
             c = null;
         }

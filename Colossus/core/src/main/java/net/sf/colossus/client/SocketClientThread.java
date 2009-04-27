@@ -39,7 +39,8 @@ import net.sf.colossus.variant.MasterHex;
  *  @author David Ripton
  */
 
-final class SocketClientThread extends Thread implements IServer
+final class SocketClientThread extends Thread implements IServer,
+    IServerConnection
 {
     private static final Logger LOGGER = Logger
         .getLogger(SocketClientThread.class.getName());
@@ -63,7 +64,7 @@ final class SocketClientThread extends Thread implements IServer
     SocketClientThread(Client client, String host, int port,
         String initialName, boolean isRemote)
     {
-        super("Client " + client.getOwningPlayer().getName());
+        super("Client " + initialName);
 
         this.client = client;
 
@@ -195,6 +196,17 @@ final class SocketClientThread extends Thread implements IServer
     public String getReasonFail()
     {
         return reasonFail;
+    }
+
+    public IServer getIServer()
+    {
+        return this;
+    }
+
+    // Implements the method of the "generic" IServerConnection
+    public void startThread()
+    {
+        this.start();
     }
 
     @Override
@@ -1062,7 +1074,7 @@ final class SocketClientThread extends Thread implements IServer
     }
 
     /** Set the thread name to playerName */
-    void fixName(String playerName)
+    public void updateThreadName(String playerName)
     {
         setName("Client " + playerName);
     }
