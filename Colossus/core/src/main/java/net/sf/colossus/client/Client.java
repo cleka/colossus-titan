@@ -234,9 +234,11 @@ public final class Client implements IClient, IOracle, IVariant
 
     private final Hashtable<CreatureType, Integer> recruitReservations = new Hashtable<CreatureType, Integer>();
 
-    // Once we got dispose from server (or user initiated it himself),
-    // we'll ignore it if we we get it from server again
-    // - it's then up to the user to do some "disposing" action.
+    /**
+     * Once we got dispose from server (or user initiated it himself),
+     * we'll ignore it if we we get it from server again
+     * - it's then up to the user to do some "disposing" action.
+     */
     private boolean gotDisposeAlready = false;
 
     private boolean disposeInProgress = false;
@@ -299,8 +301,8 @@ public final class Client implements IClient, IOracle, IVariant
      * @param noOptionsFile E.g. AIs should not read/save any options file
      * @param createGUI Whether to create a GUI (AI's usually not, but server
      *                  might override that e.g. in stresstest)
-     * @param resourceLoader The resourceLoader object that gives us access to
-     *                       load images, files etc (from disk or from server)
+     * @param resLoader The ResourceLoader object that gives us access to
+     *                  load images, files etc (from disk or from server)
      */
 
     /* TODO Now Client creates the Game (GameClientSide) instance.
@@ -309,7 +311,7 @@ public final class Client implements IClient, IOracle, IVariant
      *      answer to connect gets the Variant name, and use that
      *      for game creation. So when Client constructor is completed
      *      also Game and Variant are proper.
-     *      (problem would still be ... player cound and names...)
+     *      (problem would still be ... player count and names...)
      *
      * TODO try to make the Client class agnostic of the network or not question by
      *      having the SCT outside and behaving like a normal server -- that way it
@@ -320,7 +322,7 @@ public final class Client implements IClient, IOracle, IVariant
      */
     public Client(String host, int port, String playerName, String playerType,
         WhatNextManager whatNextMgr, Server theServer, boolean byWebClient,
-        boolean noOptionsFile, boolean createGUI, ResourceLoader loader)
+        boolean noOptionsFile, boolean createGUI, ResourceLoader resLoader)
     {
         assert playerName != null;
 
@@ -334,7 +336,7 @@ public final class Client implements IClient, IOracle, IVariant
         // or create Game inside Client (then we can pass in the Client).
         game.setClient(this);
 
-        this.resourceLoader = loader;
+        this.resourceLoader = resLoader;
         LOGGER.finest("Got ResourceLoader: " + resourceLoader.toString());
 
         // TODO this is currently not set properly straight away, it is fixed
