@@ -2131,7 +2131,8 @@ public class ClientGUI implements IClientGUI
             return "";
         }
         BattleHex hex = battleUnit.getCurrentHex();
-        return battleUnit.getCreatureName() + " in " + hex.getDescription();
+        return battleUnit.getCreatureType().getName() + " in "
+            + hex.getDescription();
     }
 
     public void actOnTellStrikeResults(boolean wasCarry, int strikeNumber,

@@ -30,8 +30,8 @@ import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.SummonInfo;
-import net.sf.colossus.gui.BattleUnit;
 import net.sf.colossus.gui.BattleMap;
+import net.sf.colossus.gui.BattleUnit;
 import net.sf.colossus.server.Dice;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.InstanceTracker;
@@ -2564,7 +2564,8 @@ public class SimpleAI extends AbstractAI
         // Show the moves considered.
         StringBuilder buf = new StringBuilder("Considered " + moveList.size()
             + " moves for " + critter.getTag() + " "
-            + critter.getCreatureName() + " in " + currentHex.getLabel() + ":");
+            + critter.getCreatureType().getName() + " in "
+            + currentHex.getLabel() + ":");
         for (CritterMove cm : moveList)
         {
             buf.append(" " + cm.getEndingHex().getLabel());
@@ -2963,7 +2964,7 @@ public class SimpleAI extends AbstractAI
             }
 
             // Attack Warlocks so they don't get Titan
-            if (target.getCreatureName().equals("Warlock"))
+            if (target.getCreatureType().getName().equals("Warlock"))
             {
                 value.add(bec.ADJACENT_TO_BUDDY_TITAN, "AdjacentToBuddyTitan");
             }

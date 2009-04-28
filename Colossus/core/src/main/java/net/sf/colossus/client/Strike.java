@@ -153,8 +153,7 @@ public final class Strike
             }
         }
 
-        CreatureType creature = client.getGame().getVariant()
-            .getCreatureByName(battleUnit.getCreatureName());
+        CreatureType creature = battleUnit.getCreatureType();
 
         // Then do rangestrikes if applicable.  Rangestrikes are not allowed
         // if the creature can strike normally, so only look for them if
@@ -481,15 +480,13 @@ public final class Strike
      *   extension of Creature instead of BattleUnit and extra BattleHex
      */
     @Deprecated
-    private boolean isRangestrikePossible(BattleUnit battleUnit,
+    private boolean isRangestrikePossible(BattleUnit striker,
         BattleUnit target)
     {
-        CreatureType creature = client.getGame().getVariant()
-            .getCreatureByName(battleUnit.getCreatureName());
-        CreatureType targetCreature = client.getGame().getVariant()
-            .getCreatureByName(target.getCreatureName());
+        CreatureType creature = striker.getCreatureType();
+        CreatureType targetCreature = target.getCreatureType();
 
-        BattleHex currentHex = battleUnit.getCurrentHex();
+        BattleHex currentHex = striker.getCurrentHex();
         BattleHex targetHex = target.getCurrentHex();
 
         if (currentHex.isEntrance() || targetHex.isEntrance())
@@ -791,8 +788,7 @@ public final class Strike
     {
         BattleHex hex = battleUnit.getCurrentHex();
         BattleHex targetHex = target.getCurrentHex();
-        CreatureType striker = client.getGame().getVariant()
-            .getCreatureByName(battleUnit.getCreatureName());
+        CreatureType striker = battleUnit.getCreatureType();
 
         int dice;
         if (striker.isTitan())

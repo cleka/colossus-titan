@@ -133,8 +133,7 @@ final class BattleMovement
             }
             else
             {
-                CreatureType creature = client.getGame().getVariant()
-                    .getCreatureByName(battleUnit.getCreatureName());
+                CreatureType creature = battleUnit.getCreatureType();
                 BattleHex hex = battleUnit.getCurrentHex();
                 set = findMoves(hex, creature, creature.isFlier(), creature
                     .getSkill(), -1, true);

@@ -13,7 +13,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.Client;
-import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.variant.BattleHex;
@@ -73,8 +72,7 @@ public final class BattleUnit extends Chit
         this.currentHex = currentHex;
         this.color = HTMLColor.stringToColor(playerColor.getName() + "Colossus");
 
-        creatureType = client.getGame().getVariant().getCreatureByName(
-            getCreatureName());
+        creatureType = getCreatureType();
 
         setBackground(Color.WHITE);
     }
@@ -153,41 +151,19 @@ public final class BattleUnit extends Chit
         this.struck = struck;
     }
 
-    // XXX Titans
     public CreatureType getCreatureType()
     {
         return creatureType;
     }
 
-    public String getCreatureName()
-    {
-        String id = getId();
-        if (id == null)
-        {
-            LOGGER.log(Level.SEVERE, "Chit.getId() returned null id ?");
-            return null;
-        }
-        else if (id.startsWith(Constants.titan))
-        {
-            id = Constants.titan;
-        }
-        if (!id.equals(getCreatureType().getName()))
-        {
-            LOGGER.warning("getCreatureName() gives " + id
-                + " but creatureType.getName() gives "
-                + getCreatureType().getName());
-        }
-        return id;
-    }
-
     public boolean isTitan()
     {
-        return getCreatureName().equals(Constants.titan);
+        return getCreatureType().isTitan();
     }
 
     public int getPower()
     {
-        if (getId().startsWith("Titan-"))
+        if (isTitan())
         {
             return getTitanPower();
         }
@@ -334,7 +310,8 @@ public final class BattleUnit extends Chit
 
     public String getDescription()
     {
-        return getCreatureName() + " in " + getCurrentHex().getLabel();
+        return getCreatureType().getName() + " in "
+            + getCurrentHex().getLabel();
     }
 
     @Override
