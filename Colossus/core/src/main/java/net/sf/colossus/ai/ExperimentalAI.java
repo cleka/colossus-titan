@@ -8,10 +8,12 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.CritterMove;
+import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.Battle;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.gui.BattleChit;
+import net.sf.colossus.gui.BattleMap;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.MasterBoardTerrain;
 
@@ -286,6 +288,62 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
                                 "Progressive TitanByEdgeOrBlockingHazard (" + i +
                                 ")");
                     }
+                }
+            }
+        }
+    }
+
+    /** this compute for non-titan defending critter */
+    @SuppressWarnings("unused")
+    @Override
+    protected void evaluateCritterMove_Defender(final BattleChit critter,
+        ValueRecorder value, final MasterBoardTerrain terrain,
+        final BattleHex hex, final LegionClientSide legion, final int turn)
+    {
+        // Encourage defending critters to hang back.
+        BattleHex entrance = BattleMap.getEntrance(terrain, legion
+            .getEntrySide());
+        if (terrain.isTower())
+        {
+            // Stick to the center of the tower.
+            value.add(bec.DEFENDER_TOWER_HEIGHT_BONUS * hex.getElevation(),
+                "DefenderTowerHeightBonus");
+        }
+        else
+        {
+            int range = Battle.getRange(hex, entrance, true);
+
+            // To ensure that defending legions completely enter
+            // the board, prefer the second row to the first.  The
+            // exception is small legions early in the battle,
+            // when trying to survive long enough to recruit.
+            int preferredRange = 3;
+            if (legion.getHeight() <= 3 && turn < 4)
+            {
+                preferredRange = 2;
+            }
+            if (range != preferredRange)
+            {
+                value.add(bec.DEFENDER_FORWARD_EARLY_PENALTY * Math.abs(range -
+                        preferredRange),
+                        "DefenderForwardEarlyPenalty");
+            }
+            for (int i = 0; i < 6; i++)
+            {
+                BattleHex neighbor = hex.getNeighbor(i);
+                if (neighbor == null /* Edge of the map */ || neighbor.
+                        getTerrain().blocksGround() || (neighbor.getTerrain().
+                        isGroundNativeOnly() && !hasOpponentNativeCreature(
+                        neighbor.getTerrain())))
+                {
+                    value.add(bec.DEFENDER_BY_EDGE_OR_BLOCKINGHAZARD_BONUS,
+                            "DefenderByEdgeOrBlockingHazard (" + i + ")");
+                }
+                else if (neighbor.getTerrain().isDamagingToNonNative() &&
+                        !hasOpponentNativeCreature(neighbor.getTerrain()))
+                {
+                    value.add(bec.DEFENDER_BY_DAMAGINGHAZARD_BONUS,
+                            "DefenderByDamagingHazard (" + i + ")");
                 }
             }
         }

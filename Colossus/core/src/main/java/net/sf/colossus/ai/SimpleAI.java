@@ -2795,7 +2795,7 @@ public class SimpleAI extends AbstractAI
 
     /** this compute for non-titan defending critter */
     @SuppressWarnings("unused")
-    private void evaluateCritterMove_Defender(final BattleChit critter,
+    protected void evaluateCritterMove_Defender(final BattleChit critter,
         ValueRecorder value, final MasterBoardTerrain terrain,
         final BattleHex hex, final LegionClientSide legion, final int turn)
     {

@@ -48,6 +48,8 @@ import net.sf.colossus.variant.Variant;
  */
 abstract public class AbstractAI implements AI
 {
+    final static private Logger LOGGER = Logger.getLogger(AbstractAI.class
+        .getName());
 
     protected final BattleEvalConstants bec = new BattleEvalConstants();
     protected final CreatureValueConstants cvc = new CreatureValueConstants();
@@ -452,6 +454,7 @@ abstract public class AbstractAI implements AI
         final int TITAN_FORWARD_EARLY_PENALTY = -10000;
         final int TITAN_BY_EDGE_OR_BLOCKINGHAZARD_BONUS = 400;
         final int DEFENDER_BY_EDGE_OR_BLOCKINGHAZARD_BONUS = 1;
+        final int DEFENDER_BY_DAMAGINGHAZARD_BONUS = 75;
         final int DEFENDER_FORWARD_EARLY_PENALTY = -60;
         final int ATTACKER_DISTANCE_FROM_ENEMY_PENALTY = -300;
         final int ADJACENT_TO_BUDDY = 100;
@@ -505,6 +508,8 @@ abstract public class AbstractAI implements AI
                 break;
             }
         }
+        LOGGER.finest("Opponent " + (honc ? "has" : "doesn't have") +
+                " native(s) from " + terrain.getName());
         return honc;
     }
 
@@ -519,9 +524,6 @@ abstract public class AbstractAI implements AI
         }
         return range;
     }
-
-    final static private Logger LOGGER = Logger.getLogger(AbstractAI.class
-        .getName());
 
     /** allCritterMoves is a List of sorted MoveLists.  A MoveList is a
      *  sorted List of CritterMoves for one critter.  Return a sorted List
