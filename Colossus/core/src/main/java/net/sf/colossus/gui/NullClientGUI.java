@@ -226,7 +226,7 @@ public class NullClientGUI implements IClientGUI
     }
 
     public void actOnTellStrikeResults(boolean wasCarry, int strikeNumber,
-        List<String> rolls, BattleChit striker, BattleChit target)
+        List<String> rolls, BattleUnit striker, BattleUnit target)
     {
         // TODO Auto-generated method stub
 

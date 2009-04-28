@@ -794,7 +794,7 @@ public class ClientGUI implements IClientGUI
             public void booleanOptionChanged(String optname, boolean oldValue,
                 boolean newValue)
             {
-                BattleChit.setUseColoredBorders(newValue);
+                BattleUnit.setUseColoredBorders(newValue);
                 repaintAllWindows();
             }
         });
@@ -2124,25 +2124,25 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    private String getBattleChitDescription(BattleChit battleChit)
+    private String getBattleUnitDescription(BattleUnit battleUnit)
     {
-        if (battleChit == null)
+        if (battleUnit == null)
         {
             return "";
         }
-        BattleHex hex = battleChit.getCurrentHex();
-        return battleChit.getCreatureName() + " in " + hex.getDescription();
+        BattleHex hex = battleUnit.getCurrentHex();
+        return battleUnit.getCreatureName() + " in " + hex.getDescription();
     }
 
     public void actOnTellStrikeResults(boolean wasCarry, int strikeNumber,
-        List<String> rolls, BattleChit striker, BattleChit target)
+        List<String> rolls, BattleUnit striker, BattleUnit target)
     {
         if (battleBoard != null)
         {
             if (!wasCarry)
             {
-                battleBoard.addDiceResults(getBattleChitDescription(striker),
-                    getBattleChitDescription(target), strikeNumber, rolls);
+                battleBoard.addDiceResults(getBattleUnitDescription(striker),
+                    getBattleUnitDescription(target), strikeNumber, rolls);
             }
             battleBoard.unselectAllHexes();
         }

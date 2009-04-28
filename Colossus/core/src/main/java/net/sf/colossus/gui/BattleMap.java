@@ -203,15 +203,15 @@ public final class BattleMap extends HexMap
 
         try
         {
-            List<BattleChit> battleChits = client.getBattleChits();
-            ListIterator<BattleChit> lit = battleChits
-                .listIterator(battleChits.size());
+            List<BattleUnit> battleUnits = client.getBattleUnits();
+            ListIterator<BattleUnit> lit = battleUnits
+                .listIterator(battleUnits.size());
             while (lit.hasPrevious())
             {
-                BattleChit battleChit = lit.previous();
-                if (rectClip.intersects(battleChit.getBounds()))
+                BattleUnit battleUnit = lit.previous();
+                if (rectClip.intersects(battleUnit.getBounds()))
                 {
-                    battleChit.paintComponent(g);
+                    battleUnit.paintComponent(g);
                 }
             }
             if (attackerMarker.getLocation().x > 0) // don't paint till placed

@@ -21,7 +21,7 @@ import net.sf.colossus.variant.CreatureType;
 
 
 /**
- * Class BattleChit implements the GUI for a Titan chit representing
+ * Class BattleUnit implements the GUI for a Titan chit representing
  * a creature on a BattleMap.
  *
  * TODO this is a pretty wild mixture of GUI code with game logic -- there
@@ -31,9 +31,9 @@ import net.sf.colossus.variant.CreatureType;
  * @author David Ripton
  */
 @SuppressWarnings("serial")
-public final class BattleChit extends Chit
+public final class BattleUnit extends Chit
 {
-    private static final Logger LOGGER = Logger.getLogger(BattleChit.class
+    private static final Logger LOGGER = Logger.getLogger(BattleUnit.class
         .getName());
 
     private final int tag;
@@ -59,13 +59,13 @@ public final class BattleChit extends Chit
     private static final int borderRatio = 20;
     private static boolean useColoredBorders = false;
 
-    public BattleChit(int scale, String id, boolean inverted, int tag,
+    public BattleUnit(int scale, String id, boolean inverted, int tag,
         BattleHex currentHex, PlayerColor playerColor, Client client)
     {
         super(scale, id, inverted, client);
         if (id == null)
         {
-            LOGGER.log(Level.WARNING, "Created BattleChit with null id!");
+            LOGGER.log(Level.WARNING, "Created BattleUnit with null id!");
         }
         this.scale = scale;
         this.tag = tag;

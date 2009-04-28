@@ -279,8 +279,8 @@ public interface IClientGUI
     public abstract void actOnPlaceNewChit(BattleHex hex);
 
     public abstract void actOnTellStrikeResults(boolean wasCarry,
-        int strikeNumber, List<String> rolls, BattleChit striker,
-        BattleChit target);
+        int strikeNumber, List<String> rolls, BattleUnit striker,
+        BattleUnit target);
 
     public abstract void highlightCrittersWithTargets();
 

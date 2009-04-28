@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import net.sf.colossus.common.Options;
-import net.sf.colossus.gui.BattleChit;
+import net.sf.colossus.gui.BattleUnit;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterBoardTerrain;
@@ -45,7 +45,7 @@ final class BattleMovement
                     int reverseDir = (i + 3) % 6;
                     int entryCost;
 
-                    BattleChit bogey = client.getBattleChit(neighbor);
+                    BattleUnit bogey = client.getBattleUnit(neighbor);
                     if (bogey == null)
                     {
                         entryCost = neighbor.getEntryCost(creature,
@@ -110,20 +110,20 @@ final class BattleMovement
 
     private boolean isOccupied(BattleHex hex)
     {
-        return !client.getBattleChits(hex).isEmpty();
+        return !client.getBattleUnits(hex).isEmpty();
     }
 
     Set<BattleHex> showMoves(int tag)
     {
-        BattleChit battleChit = client.getBattleChit(tag);
-        return showMoves(battleChit);
+        BattleUnit battleUnit = client.getBattleUnit(tag);
+        return showMoves(battleUnit);
     }
 
     /** Find all legal moves for this critter.*/
-    private Set<BattleHex> showMoves(BattleChit battleChit)
+    private Set<BattleHex> showMoves(BattleUnit battleUnit)
     {
         Set<BattleHex> set = new HashSet<BattleHex>();
-        if (!battleChit.hasMoved() && !client.isInContact(battleChit, false))
+        if (!battleUnit.hasMoved() && !client.isInContact(battleUnit, false))
         {
             if (client.getBattleSite().getTerrain().hasStartList()
                 && (client.getBattleTurnNumber() == 1)
@@ -134,8 +134,8 @@ final class BattleMovement
             else
             {
                 CreatureType creature = client.getGame().getVariant()
-                    .getCreatureByName(battleChit.getCreatureName());
-                BattleHex hex = battleChit.getCurrentHex();
+                    .getCreatureByName(battleUnit.getCreatureName());
+                BattleHex hex = battleUnit.getCurrentHex();
                 set = findMoves(hex, creature, creature.isFlier(), creature
                     .getSkill(), -1, true);
             }
