@@ -28,7 +28,6 @@ import net.sf.colossus.variant.CreatureType;
  * is no representation of the creature in battle in the model, so this GUI
  * class does all that work, too. ==> move part of it into the game package
  *
- * @version $Id$
  * @author David Ripton
  */
 @SuppressWarnings("serial")
