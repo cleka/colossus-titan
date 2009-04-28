@@ -93,6 +93,8 @@ public class RecruitingSubTree implements IRecruiting
             new HashMap<CreatureType, Integer>();
     private final Set<ICustomRecruitBase> allCustom =
             new HashSet<ICustomRecruitBase>();
+    private final Set<CreatureType> allRecruits =
+            new TreeSet<CreatureType>();
     private boolean completed = false;
     private final AllCreatureType creatureTypes;
 
@@ -220,7 +222,7 @@ public class RecruitingSubTree implements IRecruiting
         /* finally, a creature can recruit all its ancestor with 1 */
         for (RecruiterAndRecruit rar : extra)
         {
-            regular.put(rar, new Integer(1));
+            addRegular(rar.getRecruiter(), rar.getRecruit(), 1);
         }
     }
 
@@ -240,9 +242,10 @@ public class RecruitingSubTree implements IRecruiting
         assert recruiter != null : "Oups, recruiter must not be null";
         assert number > 0 : "Oups, number should be > 0";
         assert !recruit.isTitan() : "Oups, can't recruit Titan";
-        // regular version
         regular.put(new RecruiterAndRecruit(recruiter, recruit),
                 new Integer(number));
+        // should recruiter by a recruitable, completeGraph will take care
+        allRecruits.add(recruit);
     }
 
     @SuppressWarnings("boxing")
@@ -253,6 +256,7 @@ public class RecruitingSubTree implements IRecruiting
         assert number >= 0 : "Oups, number should be >= 0";
         assert !recruit.isTitan() : "Oups, can't recruit Titan";
         any.put(recruit, number);
+        allRecruits.add(recruit);
     }
 
     @SuppressWarnings("boxing")
@@ -263,6 +267,7 @@ public class RecruitingSubTree implements IRecruiting
         assert number > 0 : "Oups, number should be > 0";
         assert !recruit.isTitan() : "Oups, can't recruit Titan";
         anyNonLord.put(recruit, number);
+        allRecruits.add(recruit);
     }
 
     @SuppressWarnings("boxing")
@@ -273,6 +278,7 @@ public class RecruitingSubTree implements IRecruiting
         assert number > 0 : "Oups, number should be > 0";
         assert !recruit.isTitan() : "Oups, can't recruit Titan";
         anyLord.put(recruit, number);
+        allRecruits.add(recruit);
     }
 
     @SuppressWarnings("boxing")
@@ -283,6 +289,7 @@ public class RecruitingSubTree implements IRecruiting
         assert number > 0 : "Oups, number should be > 0";
         assert !recruit.isTitan() : "Oups, can't recruit Titan";
         anyDemiLord.put(recruit, number);
+        allRecruits.add(recruit);
     }
 
     public void addCustom(ICustomRecruitBase crb)
@@ -359,44 +366,8 @@ public class RecruitingSubTree implements IRecruiting
     {
         Set<CreatureType> possibleRecruits = new TreeSet<CreatureType>();
 
-        for (RecruiterAndRecruit rar : regular.keySet())
-        {
-            CreatureType recruit = rar.getRecruit();
-            if (!recruit.isTitan())
-            {
-                possibleRecruits.add(recruit);
-            }
-            else
-            {
-                LOGGER.warning("TITAN as regular recruit ????");
-                LOGGER.warning(this.toString());
-            }
-            CreatureType recruiter = rar.getRecruiter();
-            if (!recruiter.isTitan())
-            {
-                possibleRecruits.add(recruiter);
-            }
-        }
-        for (CreatureType ct : any.keySet())
-        {
-            possibleRecruits.add(ct);
-        }
-        for (CreatureType ct : anyNonLord.keySet())
-        {
-            possibleRecruits.add(ct);
-        }
-        for (CreatureType ct : anyLord.keySet())
-        {
-            possibleRecruits.add(ct);
-        }
-        for (CreatureType ct : anyDemiLord.keySet())
-        {
-            possibleRecruits.add(ct);
-        }
-        /* note: everytinh *above* that point can be cached, but the global
-         * result itself cannot, as custom recruiting might change from call to
-         * call
-         */
+        possibleRecruits.addAll(allRecruits);
+
         for (ICustomRecruitBase cri : allCustom)
         {
             List<CreatureType> temp = cri.getPossibleSpecialRecruits(hex);

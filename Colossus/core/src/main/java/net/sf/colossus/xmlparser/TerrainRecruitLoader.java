@@ -382,56 +382,48 @@ public class TerrainRecruitLoader implements IVariantInitializer
             if (recruit.getName().equals(Keyword_Anything) ||
                 recruit.getName().equals(Keyword_AnyNonLord) ||
                 recruit.getName().equals(Keyword_Lord) ||
-                recruit.getName().equals(Keyword_DemiLord))
+                recruit.getName().equals(Keyword_DemiLord) ||
+                recruit.getName().equals("Titan"))
             {
                 recruiter = recruit;
                 continue;
             }
             if (recruit.getName().startsWith(Keyword_Special))
             {
-                // TODO: getCustomRecruitBase uses a static member, we
-                // want to avoid that.
+                rst.addCustom(getCustomRecruitBase(recruit.getName()));
+                recruiter = null;
+                continue;
+            }
+            if (recruit.getNumber() == -1) {
+                assert regularRecruit == false : "Oups, number for recruit is " + recruit.getNumber() + " but regularRecruit is true";
                 recruiter = recruit;
-                rst.addCustom(getCustomRecruitBase(recruiter.getName()));
                 continue;
             }
             if (recruiter != null)
             {
-                if (recruiter.getName().startsWith(Keyword_Special))
-                {
-                    continue;
-                }
-                else if (recruiter.getName().equals(Keyword_Anything))
+                if (recruiter.getName().equals(Keyword_Anything))
                 {
                     rst.addAny(creatureTypes.getCreatureTypeByName(
                             recruit.getName()),
                             recruit.getNumber());
-                    if (!regularRecruit)
-                        recruit = null;
                 }
                 else if (recruiter.getName().equals(Keyword_AnyNonLord))
                 {
                     rst.addNonLord(creatureTypes.getCreatureTypeByName(
                             recruit.getName()),
                             recruit.getNumber());
-                    if (!regularRecruit)
-                        recruit = null;
                 }
                 else if (recruiter.getName().equals(Keyword_Lord))
                 {
                     rst.addLord(creatureTypes.getCreatureTypeByName(
                             recruit.getName()),
                             recruit.getNumber());
-                    if (!regularRecruit)
-                        recruit = null;
                 }
                 else if (recruiter.getName().equals(Keyword_DemiLord))
                 {
                     rst.addDemiLord(creatureTypes.getCreatureTypeByName(
                             recruit.getName()),
                             recruit.getNumber());
-                    if (!regularRecruit)
-                        recruit = null;
                 }
                 else
                 {
@@ -440,8 +432,6 @@ public class TerrainRecruitLoader implements IVariantInitializer
                             creatureTypes.getCreatureTypeByName(
                             recruit.getName()),
                             recruit.getNumber());
-                    if (!regularRecruit)
-                        recruit = null;
                 }
             }
             recruiter = recruit;
