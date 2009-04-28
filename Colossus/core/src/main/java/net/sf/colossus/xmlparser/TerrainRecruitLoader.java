@@ -394,7 +394,7 @@ public class TerrainRecruitLoader implements IVariantInitializer
                 recruiter = null;
                 continue;
             }
-            if (recruit.getNumber() == -1) {
+            if (recruit.getNumber() < 0) {
                 assert regularRecruit == false : "Oups, number for recruit is " + recruit.getNumber() + " but regularRecruit is true";
                 recruiter = recruit;
                 continue;
