@@ -2671,6 +2671,10 @@ public class SimpleAI extends AbstractAI
         ValueRecorder value, final MasterBoardTerrain terrain,
         final BattleHex hex, final Legion legion, final int turn)
     {
+        if (hex.isEntrance())
+        {
+            return;
+        }
         // Reward titans sticking to the edges of the back row
         // surrounded by allies.  We need to relax this in the
         // last few turns of the battle, so that attacking titans
@@ -2718,19 +2722,20 @@ public class SimpleAI extends AbstractAI
         ValueRecorder value, final MasterBoardTerrain terrain,
         final BattleHex hex, final int power, final int skill)
     {
+        if (hex.isEntrance())
+        {
+            // Staying offboard to die is really bad.
+            value.add(bec.OFFBOARD_DEATH_SCALE_FACTOR
+                * getCombatValue(critter, terrain), "StayingOffboard");
+            return;
+        }
         PowerSkill ps = calcBonus(critter.getCreature(), hex
         .getTerrain().getName(), true);
         int native_power = ps.getPowerAttack() + (ps.getPowerDefend() + power);
         int native_skill = ps.getSkillAttack() + ps.getSkillDefend();
         // Add for sitting in favorable terrain.
         // Subtract for sitting in unfavorable terrain.
-        if (hex.isEntrance())
-        {
-            // Staying offboard to die is really bad.
-            value.add(bec.OFFBOARD_DEATH_SCALE_FACTOR
-                * getCombatValue(critter, terrain), "StayingOffboard");
-        }
-        else if (hex.isNativeBonusTerrain()
+        if (hex.isNativeBonusTerrain()
             && critter.getCreature().isNativeIn(hex.getTerrain()))
         {
             value.add(bec.NATIVE_BONUS_TERRAIN, "NativeBonusTerrain");
@@ -2786,6 +2791,10 @@ public class SimpleAI extends AbstractAI
         ValueRecorder value, final MasterBoardTerrain terrain,
         final BattleHex hex, final LegionClientSide legion, final int turn)
     {
+        if (hex.isEntrance())
+        {
+            return;
+        }
         // Attacker, non-titan, needs to charge.
         // Head for enemy creatures.
         value.add(bec.ATTACKER_DISTANCE_FROM_ENEMY_PENALTY
@@ -2799,6 +2808,10 @@ public class SimpleAI extends AbstractAI
         ValueRecorder value, final MasterBoardTerrain terrain,
         final BattleHex hex, final LegionClientSide legion, final int turn)
     {
+        if (hex.isEntrance())
+        {
+            return;
+        }
         // Encourage defending critters to hang back.
         BattleHex entrance = BattleMap.getEntrance(terrain, legion
             .getEntrySide());
@@ -2849,6 +2862,10 @@ public class SimpleAI extends AbstractAI
         final int power, final int skill, final LegionClientSide legion,
         final int turn, final Set<BattleHex> targetHexes)
     {
+        if (hex.isEntrance())
+        {
+            return;
+        }
         int numTargets = targetHexes.size();
         // Rangestrikes.
         value.add(bec.FIRST_RANGESTRIKE_TARGET, "FirstRangestrikeTarget");
@@ -2904,6 +2921,10 @@ public class SimpleAI extends AbstractAI
         final int power, final int skill, final LegionClientSide legion,
         final int turn, final Set<BattleHex> targetHexes)
     {
+        if (hex.isEntrance())
+        {
+            return;
+        }
         // Normal strikes.  If we can strike them, they can strike us.
 
         // Reward being adjacent to an enemy if attacking.

@@ -226,6 +226,10 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
             ValueRecorder value, final MasterBoardTerrain terrain,
             final BattleHex hex, final Legion legion, final int turn)
     {
+        if (hex.isEntrance())
+        {
+            return;
+        }
         // Reward titans sticking to the edges of the back row
         // surrounded by allies.  We need to relax this in the
         // last few turns of the battle, so that attacking titans
@@ -307,6 +311,10 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
         ValueRecorder value, final MasterBoardTerrain terrain,
         final BattleHex hex, final LegionClientSide legion, final int turn)
     {
+        if (hex.isEntrance())
+        {
+            return;
+        }
         // Encourage defending critters to hang back.
         BattleHex entrance = BattleMap.getEntrance(terrain, legion
             .getEntrySide());
