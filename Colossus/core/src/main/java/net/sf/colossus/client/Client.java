@@ -852,9 +852,9 @@ public final class Client implements IClient, IOracle, IVariant
 
     public boolean anyOffboardCreatures()
     {
-        for (BattleChit chit : getActiveBattleChits())
+        for (BattleChit battleChit : getActiveBattleChits())
         {
-            if (chit.getCurrentHex().getLabel().startsWith("X"))
+            if (battleChit.getCurrentHex().getLabel().startsWith("X"))
             {
                 return true;
             }
@@ -867,10 +867,10 @@ public final class Client implements IClient, IOracle, IVariant
         return CollectionHelper.selectAsList(battleChits,
             new Predicate<BattleChit>()
             {
-                public boolean matches(BattleChit chit)
+                public boolean matches(BattleChit battleChit)
                 {
                     return getBattleActivePlayer().equals(
-                        getPlayerByTag(chit.getTag()));
+                        getPlayerByTag(battleChit.getTag()));
                 }
             });
     }
@@ -880,22 +880,22 @@ public final class Client implements IClient, IOracle, IVariant
         return CollectionHelper.selectAsList(battleChits,
             new Predicate<BattleChit>()
             {
-                public boolean matches(BattleChit chit)
+                public boolean matches(BattleChit battleChit)
                 {
                     return !getBattleActivePlayer().equals(
-                        getPlayerByTag(chit.getTag()));
+                        getPlayerByTag(battleChit.getTag()));
                 }
             });
     }
 
     private void markOffboardCreaturesDead()
     {
-        for (BattleChit chit : getActiveBattleChits())
+        for (BattleChit battleChit : getActiveBattleChits())
         {
-            if (chit.getCurrentHex().getLabel().startsWith("X"))
+            if (battleChit.getCurrentHex().getLabel().startsWith("X"))
             {
-                chit.setDead(true);
-                chit.repaint();
+                battleChit.setDead(true);
+                battleChit.repaint();
             }
         }
     }
@@ -1110,31 +1110,31 @@ public final class Client implements IClient, IOracle, IVariant
         return CollectionHelper.selectAsList(battleChits,
             new Predicate<BattleChit>()
             {
-                public boolean matches(BattleChit chit)
+                public boolean matches(BattleChit battleChit)
                 {
-                    return hex.equals(chit.getCurrentHex());
+                    return hex.equals(battleChit.getCurrentHex());
                 }
             });
     }
 
     public BattleChit getBattleChit(BattleHex hex)
     {
-        List<BattleChit> chits = getBattleChits(hex);
-        if (chits.isEmpty())
+        List<BattleChit> battleChits = getBattleChits(hex);
+        if (battleChits.isEmpty())
         {
             return null;
         }
-        return chits.get(0);
+        return battleChits.get(0);
     }
 
     /** Get the BattleChit with this tag. */
     BattleChit getBattleChit(int tag)
     {
-        for (BattleChit chit : battleChits)
+        for (BattleChit battleChit : battleChits)
         {
-            if (chit.getTag() == tag)
+            if (battleChit.getTag() == tag)
             {
-                return chit;
+                return battleChit;
             }
         }
         return null;
@@ -1145,14 +1145,14 @@ public final class Client implements IClient, IOracle, IVariant
         Iterator<BattleChit> it = battleChits.iterator();
         while (it.hasNext())
         {
-            BattleChit chit = it.next();
-            if (chit.isDead())
+            BattleChit battleChit = it.next();
+            if (battleChit.isDead())
             {
                 it.remove();
 
                 // Also remove it from LegionInfo.
-                String name = chit.getId();
-                if (chit.isInverted())
+                String name = battleChit.getId();
+                if (battleChit.isInverted())
                 {
                     Legion legion = getDefender();
                     ((LegionClientSide)legion).removeCreature(name);
@@ -1211,9 +1211,10 @@ public final class Client implements IClient, IOracle, IVariant
             Player player = getAttacker().getPlayer();
             playerColor = player.getColor();
         }
-        BattleChit chit = new BattleChit(5 * Scale.get(), imageName, inverted,
+        BattleChit battleChit = new BattleChit(5 * Scale.get(), imageName,
+            inverted,
             tag, hex, playerColor, this);
-        battleChits.add(chit);
+        battleChits.add(battleChit);
     }
 
     public CreatureType chooseBestPotentialRecruit(LegionClientSide legion,
@@ -1515,17 +1516,17 @@ public final class Client implements IClient, IOracle, IVariant
         boolean wasCarry, int carryDamageLeft,
         Set<String> carryTargetDescriptions)
     {
-        BattleChit chit = getBattleChit(strikerTag);
-        if (chit != null)
+        BattleChit battleChit = getBattleChit(strikerTag);
+        if (battleChit != null)
         {
-            chit.setStruck(true);
+            battleChit.setStruck(true);
         }
 
         gui.disposePickCarryDialog();
 
         BattleChit targetChit = getBattleChit(targetTag);
 
-        gui.actOnTellStrikeResults(wasCarry, strikeNumber, rolls, chit,
+        gui.actOnTellStrikeResults(wasCarry, strikeNumber, rolls, battleChit,
             targetChit);
 
         if (targetChit != null)
@@ -2054,10 +2055,10 @@ public final class Client implements IClient, IOracle, IVariant
 
     private void resetAllBattleMoves()
     {
-        for (BattleChit chit : battleChits)
+        for (BattleChit battleChit : battleChits)
         {
-            chit.setMoved(false);
-            chit.setStruck(false);
+            battleChit.setMoved(false);
+            battleChit.setStruck(false);
         }
     }
 
@@ -2275,11 +2276,11 @@ public final class Client implements IClient, IOracle, IVariant
                 markBattleMoveSuccessful(tag, endingHex);
             }
         }
-        BattleChit chit = getBattleChit(tag);
-        if (chit != null)
+        BattleChit battleChit = getBattleChit(tag);
+        if (battleChit != null)
         {
-            chit.setHex(endingHex);
-            chit.setMoved(!undo);
+            battleChit.setHex(endingHex);
+            battleChit.setMoved(!undo);
         }
 
         gui.actOnTellBattleMove(startingHex, endingHex);
@@ -2300,11 +2301,11 @@ public final class Client implements IClient, IOracle, IVariant
         gui.actOnApplyCarries(hex);
     }
 
-    /** Return true if there are any enemies adjacent to this chit.
+    /** Return true if there are any enemies adjacent to this battleChit.
      *  Dead critters count as being in contact only if countDead is true. */
-    public boolean isInContact(BattleChit chit, boolean countDead)
+    public boolean isInContact(BattleChit battleChit, boolean countDead)
     {
-        BattleHex hex = chit.getCurrentHex();
+        BattleHex hex = battleChit.getCurrentHex();
 
         // Offboard creatures are not in contact.
         if (hex.isEntrance())
@@ -2322,7 +2323,7 @@ public final class Client implements IClient, IOracle, IVariant
                 {
                     BattleChit other = getBattleChit(neighbor);
                     if (other != null
-                        && (other.isInverted() != chit.isInverted())
+                        && (other.isInverted() != battleChit.isInverted())
                         && (countDead || !other.isDead()))
                     {
                         return true;
@@ -2338,11 +2339,11 @@ public final class Client implements IClient, IOracle, IVariant
     public Set<BattleHex> findMobileCritterHexes()
     {
         Set<BattleHex> set = new HashSet<BattleHex>();
-        for (BattleChit chit : getActiveBattleChits())
+        for (BattleChit battleChit : getActiveBattleChits())
         {
-            if (!chit.hasMoved() && !isInContact(chit, false))
+            if (!battleChit.hasMoved() && !isInContact(battleChit, false))
             {
-                set.add(chit.getCurrentHex());
+                set.add(battleChit.getCurrentHex());
             }
         }
         return set;
@@ -2352,11 +2353,11 @@ public final class Client implements IClient, IOracle, IVariant
     public Set<BattleChit> findMobileBattleChits()
     {
         Set<BattleChit> set = new HashSet<BattleChit>();
-        for (BattleChit chit : getActiveBattleChits())
+        for (BattleChit battleChit : getActiveBattleChits())
         {
-            if (!chit.hasMoved() && !isInContact(chit, false))
+            if (!battleChit.hasMoved() && !isInContact(battleChit, false))
             {
-                set.add(chit);
+                set.add(battleChit);
             }
         }
         return set;
@@ -2380,11 +2381,11 @@ public final class Client implements IClient, IOracle, IVariant
     // TODO GUI stuff?
     public void setStrikeNumbers(int tag, Set<BattleHex> targetHexes)
     {
-        BattleChit chit = getBattleChit(tag);
+        BattleChit battleChit = getBattleChit(tag);
         for (BattleHex targetHex : targetHexes)
         {
             BattleChit target = getBattleChit(targetHex);
-            target.setStrikeNumber(strike.getStrikeNumber(chit, target));
+            target.setStrikeNumber(strike.getStrikeNumber(battleChit, target));
             // TODO this whole block of code was written under the assumption
             //      that the Strike.getDice(BattleChit,BattleChit,int) method
             //      (now deleted) would return a new baseDice value through the
@@ -2393,18 +2394,18 @@ public final class Client implements IClient, IOracle, IVariant
             //      at all.
             //
             // CreatureType striker = game.getVariant().getCreatureByName(
-            //     chit.getCreatureName());
+            //     battleChit.getCreatureName());
             // int dice;
             // if (striker.isTitan())
             // {
-            //     dice = chit.getTitanPower();
+            //     dice = battleChit.getTitanPower();
             // }
             // else
             // {
             //     dice = striker.getPower();
             // }
             // int baseDice = 0;
-            // int strikeDice = strike.getDice(chit, target, baseDice);
+            // int strikeDice = strike.getDice(battleChit, target, baseDice);
             // if (baseDice == dice
             //     || options.getOption(Options.showDiceAjustmentsRange))
             // {
@@ -2416,10 +2417,10 @@ public final class Client implements IClient, IOracle, IVariant
     /** reset all strike numbers on chits */
     public void resetStrikeNumbers()
     {
-        for (BattleChit chit : battleChits)
+        for (BattleChit battleChit : battleChits)
         {
-            chit.setStrikeNumber(0);
-            chit.setStrikeDice(0);
+            battleChit.setStrikeNumber(0);
+            battleChit.setStrikeDice(0);
         }
     }
 
@@ -2431,10 +2432,10 @@ public final class Client implements IClient, IOracle, IVariant
 
     public Player getPlayerByTag(int tag)
     {
-        BattleChit chit = getBattleChit(tag);
-        assert chit != null : "Illegal value for tag parameter";
+        BattleChit battleChit = getBattleChit(tag);
+        assert battleChit != null : "Illegal value for tag parameter";
 
-        if (chit.isInverted())
+        if (battleChit.isInverted())
         {
             return getDefender().getPlayer();
         }
@@ -3318,11 +3319,11 @@ public final class Client implements IClient, IOracle, IVariant
         return "UNKNOWN";
     }
 
-    public boolean testBattleMove(BattleChit chit, BattleHex hex)
+    public boolean testBattleMove(BattleChit battleChit, BattleHex hex)
     {
-        if (showBattleMoves(chit.getTag()).contains(hex))
+        if (showBattleMoves(battleChit.getTag()).contains(hex))
         {
-            chit.setHex(hex);
+            battleChit.setHex(hex);
             return true;
         }
         return false;

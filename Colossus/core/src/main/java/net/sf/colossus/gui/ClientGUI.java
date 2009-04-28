@@ -2124,14 +2124,14 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    private String getBattleChitDescription(BattleChit chit)
+    private String getBattleChitDescription(BattleChit battleChit)
     {
-        if (chit == null)
+        if (battleChit == null)
         {
             return "";
         }
-        BattleHex hex = chit.getCurrentHex();
-        return chit.getCreatureName() + " in " + hex.getDescription();
+        BattleHex hex = battleChit.getCurrentHex();
+        return battleChit.getCreatureName() + " in " + hex.getDescription();
     }
 
     public void actOnTellStrikeResults(boolean wasCarry, int strikeNumber,

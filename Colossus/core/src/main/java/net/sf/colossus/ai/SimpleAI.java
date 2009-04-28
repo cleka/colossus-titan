@@ -2040,11 +2040,11 @@ public class SimpleAI extends AbstractAI
         return true;
     }
 
-    private static int getCombatValue(BattleChit chit,
+    private static int getCombatValue(BattleChit battleChit,
         MasterBoardTerrain terrain)
     {
-        int val = chit.getPointValue();
-        CreatureType creature = chit.getCreature();
+        int val = battleChit.getPointValue();
+        CreatureType creature = battleChit.getCreature();
 
         if (creature.isFlier())
         {

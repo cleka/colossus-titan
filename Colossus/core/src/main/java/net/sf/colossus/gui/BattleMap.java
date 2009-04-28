@@ -208,10 +208,10 @@ public final class BattleMap extends HexMap
                 .listIterator(battleChits.size());
             while (lit.hasPrevious())
             {
-                BattleChit chit = lit.previous();
-                if (rectClip.intersects(chit.getBounds()))
+                BattleChit battleChit = lit.previous();
+                if (rectClip.intersects(battleChit.getBounds()))
                 {
-                    chit.paintComponent(g);
+                    battleChit.paintComponent(g);
                 }
             }
             if (attackerMarker.getLocation().x > 0) // don't paint till placed

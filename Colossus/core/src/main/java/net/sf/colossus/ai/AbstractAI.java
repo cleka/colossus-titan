@@ -288,10 +288,10 @@ abstract public class AbstractAI implements AI
      * @param terrain The terrain on which the value is requested, or null.
      * @return The 'kill value' value of chit, on terrain if non-null
      */
-    protected int getKillValue(final BattleChit chit,
+    protected int getKillValue(final BattleChit battleChit,
         final MasterBoardTerrain terrain)
     {
-        return getKillValue(chit.getCreature(), terrain);
+        return getKillValue(battleChit.getCreature(), terrain);
     }
 
     /** Get the 'kill value' of a creature on an unspecified terrain.

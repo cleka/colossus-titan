@@ -45,11 +45,11 @@ public final class Strike
     Set<BattleHex> findCrittersWithTargets()
     {
         Set<BattleHex> set = new HashSet<BattleHex>();
-        for (BattleChit chit : client.getActiveBattleChits())
+        for (BattleChit battleChit : client.getActiveBattleChits())
         {
-            if (countStrikes(chit, true) > 0)
+            if (countStrikes(battleChit, true) > 0)
             {
-                set.add(chit.getCurrentHex());
+                set.add(battleChit.getCurrentHex());
             }
         }
 
@@ -79,14 +79,14 @@ public final class Strike
         Iterator<BattleChit> it = client.getActiveBattleChits().iterator();
         while (it.hasNext())
         {
-            BattleChit chit = it.next();
-            if (!chit.hasStruck())
+            BattleChit battleChit = it.next();
+            if (!battleChit.hasStruck())
             {
-                Set<BattleHex> set = findStrikes(chit, rangestrike);
+                Set<BattleHex> set = findStrikes(battleChit, rangestrike);
                 if (set.size() == 1)
                 {
                     BattleHex hex = set.iterator().next();
-                    client.strike(chit.getTag(), hex);
+                    client.strike(battleChit.getTag(), hex);
                     return true;
                 }
             }
@@ -102,30 +102,31 @@ public final class Strike
 
     Set<BattleHex> findStrikes(int tag)
     {
-        BattleChit chit = client.getBattleChit(tag);
-        return findStrikes(chit, true);
+        BattleChit battleChit = client.getBattleChit(tag);
+        return findStrikes(battleChit, true);
     }
 
     /** Return a set of hexes containing targets that the
      *  critter may strike.  Only include rangestrikes if rangestrike
      *  is true. */
-    private Set<BattleHex> findStrikes(BattleChit chit, boolean rangestrike)
+    private Set<BattleHex> findStrikes(BattleChit battleChit,
+        boolean rangestrike)
     {
         Set<BattleHex> set = new HashSet<BattleHex>();
 
         // Each creature may strike only once per turn.
-        if (chit.hasStruck())
+        if (battleChit.hasStruck())
         {
             return set;
         }
         // Offboard creatures can't strike.
-        if (chit.getCurrentHex().getLabel().startsWith("X"))
+        if (battleChit.getCurrentHex().getLabel().startsWith("X"))
         {
             return set;
         }
 
-        boolean inverted = chit.isInverted();
-        BattleHex currentHex = chit.getCurrentHex();
+        boolean inverted = battleChit.isInverted();
+        BattleHex currentHex = battleChit.getCurrentHex();
 
         boolean adjacentEnemy = false;
 
@@ -153,7 +154,7 @@ public final class Strike
         }
 
         CreatureType creature = client.getGame().getVariant()
-            .getCreatureByName(chit.getCreatureName());
+            .getCreatureByName(battleChit.getCreatureName());
 
         // Then do rangestrikes if applicable.  Rangestrikes are not allowed
         // if the creature can strike normally, so only look for them if
@@ -169,7 +170,7 @@ public final class Strike
                 if (!target.isDead())
                 {
                     BattleHex targetHex = target.getCurrentHex();
-                    if (isRangestrikePossible(chit, target))
+                    if (isRangestrikePossible(battleChit, target))
                     {
                         set.add(targetHex);
                     }
@@ -179,9 +180,9 @@ public final class Strike
         return set;
     }
 
-    private int countStrikes(BattleChit chit, boolean rangestrike)
+    private int countStrikes(BattleChit battleChit, boolean rangestrike)
     {
-        return findStrikes(chit, rangestrike).size();
+        return findStrikes(battleChit, rangestrike).size();
     }
 
     /** Return the titan range (inclusive at both ends) from the critter to the
@@ -191,9 +192,9 @@ public final class Strike
      * @deprecated Should use an extension of Battle instead of Strike
      */
     @Deprecated
-    public int minRangeToEnemy(BattleChit chit)
+    public int minRangeToEnemy(BattleChit battleChit)
     {
-        BattleHex hex = chit.getCurrentHex();
+        BattleHex hex = battleChit.getCurrentHex();
         int min = Constants.OUT_OF_RANGE;
 
         List<BattleChit> battleChits = client.getBattleChits();
@@ -201,7 +202,7 @@ public final class Strike
         while (it.hasNext())
         {
             BattleChit target = it.next();
-            if (chit.isInverted() != target.isInverted())
+            if (battleChit.isInverted() != target.isInverted())
             {
                 BattleHex targetHex = target.getCurrentHex();
                 int range = Battle.getRange(hex, targetHex, false);
@@ -376,7 +377,7 @@ public final class Strike
             if (midChit)
             {
                 // We're not in the initial or final hex, and we have already
-                // marked an mid chit, so it's not adjacent to the base of a
+                // marked an mid battleChit, so it's not adjacent to the base of a
                 // cliff that the target is atop.
                 return true;
             }
@@ -480,14 +481,15 @@ public final class Strike
      *   extension of Creature instead of BattleChit and extra BattleHex
      */
     @Deprecated
-    private boolean isRangestrikePossible(BattleChit chit, BattleChit target)
+    private boolean isRangestrikePossible(BattleChit battleChit,
+        BattleChit target)
     {
         CreatureType creature = client.getGame().getVariant()
-            .getCreatureByName(chit.getCreatureName());
+            .getCreatureByName(battleChit.getCreatureName());
         CreatureType targetCreature = client.getGame().getVariant()
             .getCreatureByName(target.getCreatureName());
 
-        BattleHex currentHex = chit.getCurrentHex();
+        BattleHex currentHex = battleChit.getCurrentHex();
         BattleHex targetHex = target.getCurrentHex();
 
         if (currentHex.isEntrance() || targetHex.isEntrance())
@@ -785,24 +787,24 @@ public final class Strike
      *  target, including modifications for terrain.
      * WARNING: this is duplicated in CreatureServerSide
      */
-    public int getDice(BattleChit chit, BattleChit target)
+    public int getDice(BattleChit battleChit, BattleChit target)
     {
-        BattleHex hex = chit.getCurrentHex();
+        BattleHex hex = battleChit.getCurrentHex();
         BattleHex targetHex = target.getCurrentHex();
         CreatureType striker = client.getGame().getVariant()
-            .getCreatureByName(chit.getCreatureName());
+            .getCreatureByName(battleChit.getCreatureName());
 
         int dice;
         if (striker.isTitan())
         {
-            dice = chit.getTitanPower();
+            dice = battleChit.getTitanPower();
         }
         else
         {
             dice = striker.getPower();
         }
 
-        boolean rangestrike = !client.isInContact(chit, true);
+        boolean rangestrike = !client.isInContact(battleChit, true);
         HazardTerrain terrain = hex.getTerrain();
         if (rangestrike)
         {

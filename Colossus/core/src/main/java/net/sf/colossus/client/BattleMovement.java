@@ -115,15 +115,15 @@ final class BattleMovement
 
     Set<BattleHex> showMoves(int tag)
     {
-        BattleChit chit = client.getBattleChit(tag);
-        return showMoves(chit);
+        BattleChit battleChit = client.getBattleChit(tag);
+        return showMoves(battleChit);
     }
 
     /** Find all legal moves for this critter.*/
-    private Set<BattleHex> showMoves(BattleChit chit)
+    private Set<BattleHex> showMoves(BattleChit battleChit)
     {
         Set<BattleHex> set = new HashSet<BattleHex>();
-        if (!chit.hasMoved() && !client.isInContact(chit, false))
+        if (!battleChit.hasMoved() && !client.isInContact(battleChit, false))
         {
             if (client.getBattleSite().getTerrain().hasStartList()
                 && (client.getBattleTurnNumber() == 1)
@@ -134,8 +134,8 @@ final class BattleMovement
             else
             {
                 CreatureType creature = client.getGame().getVariant()
-                    .getCreatureByName(chit.getCreatureName());
-                BattleHex hex = chit.getCurrentHex();
+                    .getCreatureByName(battleChit.getCreatureName());
+                BattleHex hex = battleChit.getCurrentHex();
                 set = findMoves(hex, creature, creature.isFlier(), creature
                     .getSkill(), -1, true);
             }
