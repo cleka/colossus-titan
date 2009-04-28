@@ -291,7 +291,7 @@ abstract public class AbstractAI implements AI
     protected int getKillValue(final BattleUnit battleUnit,
         final MasterBoardTerrain terrain)
     {
-        return getKillValue(battleUnit.getCreature(), terrain);
+        return getKillValue(battleUnit.getCreatureType(), terrain);
     }
 
     /** Get the 'kill value' of a creature on an unspecified terrain.
@@ -502,7 +502,7 @@ abstract public class AbstractAI implements AI
         boolean honc = false;
         for (BattleUnit critter : client.getInactiveBattleUnits())
         {
-            if (critter.getCreature().isNativeIn(terrain))
+            if (critter.getCreatureType().isNativeIn(terrain))
             {
                 honc = true;
                 break;

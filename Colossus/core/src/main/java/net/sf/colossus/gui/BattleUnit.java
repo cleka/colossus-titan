@@ -37,6 +37,7 @@ public final class BattleUnit extends Chit
         .getName());
 
     private final int tag;
+    private final CreatureType creatureType;
     private static Font font;
     private static Font oldFont;
     private static int fontHeight;
@@ -71,6 +72,10 @@ public final class BattleUnit extends Chit
         this.tag = tag;
         this.currentHex = currentHex;
         this.color = HTMLColor.stringToColor(playerColor.getName() + "Colossus");
+
+        creatureType = client.getGame().getVariant().getCreatureByName(
+            getCreatureName());
+
         setBackground(Color.WHITE);
     }
 
@@ -148,16 +153,29 @@ public final class BattleUnit extends Chit
         this.struck = struck;
     }
 
+    // XXX Titans
+    public CreatureType getCreatureType()
+    {
+        return creatureType;
+    }
+
     public String getCreatureName()
     {
         String id = getId();
         if (id == null)
         {
             LOGGER.log(Level.SEVERE, "Chit.getId() returned null id ?");
+            return null;
         }
         else if (id.startsWith(Constants.titan))
         {
-            return Constants.titan;
+            id = Constants.titan;
+        }
+        if (!id.equals(getCreatureType().getName()))
+        {
+            LOGGER.warning("getCreatureName() gives " + id
+                + " but creatureType.getName() gives "
+                + getCreatureType().getName());
         }
         return id;
     }
@@ -175,13 +193,13 @@ public final class BattleUnit extends Chit
         }
         else
         {
-            return getCreature().getPower();
+            return getCreatureType().getPower();
         }
     }
 
     public int getSkill()
     {
-        return getCreature().getSkill();
+        return getCreatureType().getSkill();
     }
 
     public int getPointValue()
@@ -191,15 +209,7 @@ public final class BattleUnit extends Chit
 
     public boolean isRangestriker()
     {
-        return getCreature().isRangestriker();
-    }
-
-    // XXX Titans
-    public CreatureType getCreature()
-    {
-        CreatureType creature = client.getGame().getVariant()
-            .getCreatureByName(getCreatureName());
-        return creature;
+        return getCreatureType().isRangestriker();
     }
 
     @Override

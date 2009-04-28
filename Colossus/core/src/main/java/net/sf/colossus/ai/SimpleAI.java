@@ -2044,7 +2044,7 @@ public class SimpleAI extends AbstractAI
         MasterBoardTerrain terrain)
     {
         int val = battleUnit.getPointValue();
-        CreatureType creature = battleUnit.getCreature();
+        CreatureType creature = battleUnit.getCreatureType();
 
         if (creature.isFlier())
         {
@@ -2729,14 +2729,14 @@ public class SimpleAI extends AbstractAI
                 * getCombatValue(critter, terrain), "StayingOffboard");
             return;
         }
-        PowerSkill ps = calcBonus(critter.getCreature(), hex
+        PowerSkill ps = calcBonus(critter.getCreatureType(), hex
         .getTerrain().getName(), true);
         int native_power = ps.getPowerAttack() + (ps.getPowerDefend() + power);
         int native_skill = ps.getSkillAttack() + ps.getSkillDefend();
         // Add for sitting in favorable terrain.
         // Subtract for sitting in unfavorable terrain.
         if (hex.isNativeBonusTerrain()
-            && critter.getCreature().isNativeIn(hex.getTerrain()))
+            && critter.getCreatureType().isNativeIn(hex.getTerrain()))
         {
             value.add(bec.NATIVE_BONUS_TERRAIN, "NativeBonusTerrain");
 
@@ -2765,7 +2765,7 @@ public class SimpleAI extends AbstractAI
         // Critter is not native or the terrain is not beneficial
         {
             if (hex.isNonNativePenaltyTerrain()
-                && (!critter.getCreature().isNativeIn(hex.getTerrain())))
+                && (!critter.getCreatureType().isNativeIn(hex.getTerrain())))
             {
                 value.add(bec.NON_NATIVE_PENALTY_TERRAIN, "NonNativePenalty");
 
@@ -2780,7 +2780,7 @@ public class SimpleAI extends AbstractAI
 
         /* damage is positive, healing is negative, so we can always add */
         value.add(bec.PENALTY_DAMAGE_TERRAIN
-            * hex.damageToCreature(critter.getCreature()),
+            * hex.damageToCreature(critter.getCreatureType()),
             "PenaltyDamageTerrain");
     }
 
@@ -3069,7 +3069,7 @@ public class SimpleAI extends AbstractAI
         final BattleHex hex = critter.getCurrentHex();
         final int turn = client.getBattleTurnNumber();
 
-        PowerSkill ps = calcBonus(critter.getCreature(), hex
+        PowerSkill ps = calcBonus(critter.getCreatureType(), hex
         .getTerrain().getName(), true);
 
         int native_power = ps.getPowerAttack() + (ps.getPowerDefend() + power);

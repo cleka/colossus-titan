@@ -869,8 +869,8 @@ public final class Strike
             HazardTerrain terrain = hex.getTerrain();
             // striking out of possible hazard
             attackerSkill -= hex.getTerrain().getSkillPenaltyStrikeFrom(
-                striker.getCreature().isNativeIn(terrain),
-                target.getCreature().isNativeIn(terrain));
+                striker.getCreatureType().isNativeIn(terrain),
+                target.getCreatureType().isNativeIn(terrain));
 
             if (hex.getElevation() > targetHex.getElevation())
             {
@@ -891,7 +891,7 @@ public final class Strike
                 // Non-native striking up slope: -1
                 // Striking up across wall: -1
                 // TODO Tower vs. Wall ...
-                if ((hazard == HazardHexside.SLOPE && !striker.getCreature()
+                if ((hazard == HazardHexside.SLOPE && !striker.getCreatureType()
                     .isNativeSlope())
                     || hazard == HazardHexside.TOWER)
                 {
@@ -899,7 +899,7 @@ public final class Strike
                 }
             }
         }
-        else if (!striker.getCreature().useMagicMissile())
+        else if (!striker.getCreatureType().useMagicMissile())
         {
             // Range penalty
             int range = Battle.getRange(hex, targetHex, false);
@@ -909,7 +909,7 @@ public final class Strike
             }
 
             // Non-native rangestrikes: -1 per intervening bramble hex
-            if (!striker.getCreature().isNativeIn(HazardTerrain.BRAMBLES))
+            if (!striker.getCreatureType().isNativeIn(HazardTerrain.BRAMBLES))
             {
                 attackerSkill -= countBrambleHexes(hex, targetHex);
             }
@@ -954,7 +954,7 @@ public final class Strike
         {
             // Strike number can be modified directly by terrain.
             strikeNumber += terrain.getSkillBonusStruckIn(striker
-                .getCreature().isNativeIn(terrain), target.getCreature()
+                .getCreatureType().isNativeIn(terrain), target.getCreatureType()
                 .isNativeIn(terrain));
         }
         else
@@ -962,9 +962,9 @@ public final class Strike
             // Native defending in bramble, from rangestrike by a non-native
             //     non-magicMissile: +1
             if (terrain.equals(HazardTerrain.BRAMBLES)
-                && target.getCreature().isNativeIn(HazardTerrain.BRAMBLES)
-                && !striker.getCreature().isNativeIn(HazardTerrain.BRAMBLES)
-                && !striker.getCreature().useMagicMissile())
+                && target.getCreatureType().isNativeIn(HazardTerrain.BRAMBLES)
+                && !striker.getCreatureType().isNativeIn(HazardTerrain.BRAMBLES)
+                && !striker.getCreatureType().useMagicMissile())
             {
                 strikeNumber++;
             }
@@ -972,9 +972,9 @@ public final class Strike
             // Native defending in stone, from rangestrike by a non-native
             //     non-magicMissile: +1
             if (terrain.equals(HazardTerrain.STONE)
-                && target.getCreature().isNativeIn(HazardTerrain.STONE)
-                && !striker.getCreature().isNativeIn(HazardTerrain.STONE)
-                && !striker.getCreature().useMagicMissile())
+                && target.getCreatureType().isNativeIn(HazardTerrain.STONE)
+                && !striker.getCreatureType().isNativeIn(HazardTerrain.STONE)
+                && !striker.getCreatureType().useMagicMissile())
             {
                 strikeNumber++;
             }
