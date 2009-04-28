@@ -339,11 +339,6 @@ public final class BattleChit extends Chit
         useColoredBorders = bval;
     }
 
-    public int getStrikeNumber()
-    {
-        return strikeNumber;
-    }
-
     public void setStrikeNumber(int strikeNumber)
     {
         this.strikeNumber = strikeNumber;
