@@ -305,7 +305,6 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
     }
 
     /** this compute for non-titan defending critter */
-    @SuppressWarnings("unused")
     @Override
     protected void evaluateCritterMove_Defender(final BattleChit critter,
         ValueRecorder value, final MasterBoardTerrain terrain,
