@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.Client;
+import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.variant.BattleHex;
@@ -73,10 +74,32 @@ public final class BattleUnit extends Chit implements BattleCritter
         this.currentHex = currentHex;
         this.color = HTMLColor.stringToColor(playerColor.getName() + "Colossus");
 
-        creatureType = getCreatureType();
+        creatureType = client.getGame().getVariant().getCreatureByName(getCreatureName());
 
         setBackground(Color.WHITE);
     }
+
+    public String getCreatureName()
+    {
+        String id = getId();
+        if (id == null)
+        {
+            LOGGER.log(Level.SEVERE, "Chit.getId() returned null id ?");
+            return null;
+        }
+        else if (id.startsWith(Constants.titan))
+        {
+            id = Constants.titan;
+        }
+        if (!id.equals(getCreatureType().getName()))
+        {
+            LOGGER.warning("getCreatureName() gives " + id +
+                    " but creatureType.getName() gives " + getCreatureType().
+                    getName());
+        }
+        return id;
+    }
+
 
     public int getTag()
     {
