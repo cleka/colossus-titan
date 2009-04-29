@@ -38,9 +38,6 @@ public class Creature
     /**
      * Calculates the Striking Power of this Creature when striking directly at
      * target under the circumstances in parameters.
-     * 
-     * *WARNING*: this doesn't work with Titan, as CreatureType.getPower() is
-     * still wrong.
      *
      * @param target The Creature that is struck by the current Creature
      * @param myElevation Height of the Hex on which stands the current Creature
@@ -58,7 +55,7 @@ public class Creature
     {
         CreatureType myType = this.getType();
         CreatureType targetType = target.getType();
-        int dice = type.getPower();
+        int dice = getPower();
 
         // Dice can be modified by terrain.
         dice += myHexTerrain.getPowerBonusStrikeFrom(myType
