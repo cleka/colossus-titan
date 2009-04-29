@@ -891,7 +891,7 @@ public final class Client implements IClient, IOracle, IVariant
 
     private void markOffboardCreaturesDead()
     {
-        for (BattleUnit battleUnit : getActiveBattleUnits())
+        for (BattleCritter battleUnit : getActiveBattleUnits())
         {
             if (battleUnit.getCurrentHex().getLabel().startsWith("X"))
             {
@@ -1516,7 +1516,7 @@ public final class Client implements IClient, IOracle, IVariant
         boolean wasCarry, int carryDamageLeft,
         Set<String> carryTargetDescriptions)
     {
-        BattleUnit battleUnit = getBattleUnit(strikerTag);
+        BattleCritter battleUnit = getBattleUnit(strikerTag);
         if (battleUnit != null)
         {
             battleUnit.setStruck(true);
@@ -1524,7 +1524,7 @@ public final class Client implements IClient, IOracle, IVariant
 
         gui.disposePickCarryDialog();
 
-        BattleUnit targetChit = getBattleUnit(targetTag);
+        BattleCritter targetChit = getBattleUnit(targetTag);
 
         gui.actOnTellStrikeResults(wasCarry, strikeNumber, rolls, battleUnit,
             targetChit);
@@ -2055,7 +2055,7 @@ public final class Client implements IClient, IOracle, IVariant
 
     private void resetAllBattleMoves()
     {
-        for (BattleUnit battleUnit : battleUnits)
+        for (BattleCritter battleUnit : battleUnits)
         {
             battleUnit.setMoved(false);
             battleUnit.setStruck(false);
@@ -2276,7 +2276,7 @@ public final class Client implements IClient, IOracle, IVariant
                 markBattleMoveSuccessful(tag, endingHex);
             }
         }
-        BattleUnit battleUnit = getBattleUnit(tag);
+        BattleCritter battleUnit = getBattleUnit(tag);
         if (battleUnit != null)
         {
             battleUnit.setHex(endingHex);
@@ -2339,7 +2339,7 @@ public final class Client implements IClient, IOracle, IVariant
     public Set<BattleHex> findMobileCritterHexes()
     {
         Set<BattleHex> set = new HashSet<BattleHex>();
-        for (BattleUnit battleUnit : getActiveBattleUnits())
+        for (BattleCritter battleUnit : getActiveBattleUnits())
         {
             if (!battleUnit.hasMoved() && !isInContact(battleUnit, false))
             {
@@ -2349,7 +2349,7 @@ public final class Client implements IClient, IOracle, IVariant
         return set;
     }
 
-    /** Return a set of BattleChits. */
+    /** Return a set of BattleUnits. */
     public Set<BattleUnit> findMobileBattleUnits()
     {
         Set<BattleUnit> set = new HashSet<BattleUnit>();

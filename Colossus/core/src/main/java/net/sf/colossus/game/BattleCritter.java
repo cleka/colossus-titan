@@ -43,7 +43,15 @@ public interface BattleCritter {
 
     boolean isTitan();
 
+    void setDead(boolean dead);
+
     void setHex(BattleHex hex);
+
+    void setHits(int hits);
+
+    void setMoved(boolean moved);
+
+    void setStruck(boolean struck);
 
     boolean wouldDieFrom(int hits);
 
