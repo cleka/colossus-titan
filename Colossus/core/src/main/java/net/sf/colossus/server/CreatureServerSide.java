@@ -100,10 +100,6 @@ public class CreatureServerSide extends Creature
     private static final Logger LOGGER = Logger
         .getLogger(CreatureServerSide.class.getName());
     private BattleServerSide battle;
-    private boolean struck;
-
-    /** Damage taken */
-    private int hits = 0;
 
     /**
      * The game this creature belongs to.
@@ -152,19 +148,9 @@ public class CreatureServerSide extends Creature
         return battle;
     }
 
-    int getHits()
-    {
-        return hits;
-    }
-
-    void setHits(int hits)
-    {
-        this.hits = hits;
-    }
-
     void heal()
     {
-        hits = 0;
+        setHits(0);
     }
 
     /** Apply damage to this critter.  Return the amount of excess damage
@@ -175,49 +161,37 @@ public class CreatureServerSide extends Creature
 
         if (damage > 0)
         {
-            int oldhits = hits;
-            hits = hits + damage;
-            if (hits > getPower())
+            int tmp_hits = getHits();
+            int oldhits = tmp_hits;
+            tmp_hits = tmp_hits + damage;
+            if (tmp_hits > getPower())
             {
-                excess = hits - getPower();
-                hits = getPower();
+                excess = tmp_hits - getPower();
+                tmp_hits = getPower();
             }
 
             LOGGER.log(Level.INFO, "Critter " + getDescription() + ": "
-                + oldhits + " + " + damage + " => " + hits + "; " + excess
+                + oldhits + " + " + damage + " => " + tmp_hits + "; " + excess
                 + " excess");
 
             // Check for death.
-            if (hits >= getPower())
+            if (tmp_hits >= getPower())
             {
                 LOGGER.log(Level.INFO, "Critter " + getDescription()
-                    + " is now dead: (hits=" + hits + " > power=" + getPower()
+                    + " is now dead: (hits=" + tmp_hits + " > power=" + getPower()
                     + ")");
                 setDead(true);
             }
+
+            setHits(tmp_hits);
         }
 
         return excess;
     }
 
-    boolean hasMoved()
-    {
-        return !getCurrentHex().equals(getStartingHex());
-    }
-
     void commitMove()
     {
         setStartingHex(getCurrentHex());
-    }
-
-    boolean hasStruck()
-    {
-        return struck;
-    }
-
-    void setStruck(boolean struck)
-    {
-        this.struck = struck;
     }
 
     /** Return the number of enemy creatures in contact with this critter.
@@ -856,19 +830,6 @@ public class CreatureServerSide extends Creature
     Set<PenaltyOption> getPenaltyOptions()
     {
         return Collections.unmodifiableSortedSet(penaltyOptions);
-    }
-
-    boolean isDead()
-    {
-        return (getHits() >= getPower());
-    }
-
-    void setDead(boolean dead)
-    {
-        if (dead)
-        {
-            hits = getPower();
-        }
     }
 
     public int getMaxCount()

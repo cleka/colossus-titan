@@ -26,6 +26,12 @@ public class Creature
     protected Legion legion;
     private BattleHex currentHex;
     private BattleHex startingHex;
+    /** Damage taken */
+    /**
+     * Damage taken
+     */
+    private int hits = 0;
+    private boolean struck;
 
     public Creature(CreatureType type, Legion legion)
     {
@@ -273,5 +279,53 @@ public class Creature
     public int getSkill()
     {
         return getType().getSkill();
+    }
+
+    public int getHits()
+    {
+        return hits;
+    }
+
+    public boolean hasStruck()
+    {
+        return struck;
+    }
+
+    public void setHits(int hits)
+    {
+        this.hits = hits;
+    }
+
+    public void setStruck(boolean struck)
+    {
+        this.struck = struck;
+    }
+
+    public boolean isDead()
+    {
+        return getHits() >= getPower();
+    }
+
+    public void setDead(boolean dead)
+    {
+        if (dead)
+        {
+            setHits(getPower());
+        }
+        else
+        {
+            assert (getHits() < getPower()) :
+                    "Oups, making NOT dead but should be";
+        }
+    }
+
+    public boolean hasMoved()
+    {
+        return !getCurrentHex().equals(getStartingHex());
+    }
+
+    public void setMoved(boolean moved)
+    {
+        assert (moved == hasMoved()) : "Oups, setMoved on immobile Creature";
     }
 }
