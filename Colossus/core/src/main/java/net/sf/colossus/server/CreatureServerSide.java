@@ -148,11 +148,6 @@ public class CreatureServerSide extends Creature
         return battle;
     }
 
-    void commitMove()
-    {
-        setStartingHex(getCurrentHex());
-    }
-
     /** Return the number of enemy creatures in contact with this critter.
      *  Dead critters count as being in contact only if countDead is true. */
     private int numInContact(boolean countDead)
@@ -252,6 +247,7 @@ public class CreatureServerSide extends Creature
      *  target, including modifications for terrain.
      * WARNING: this is duplicated in Strike
      */
+    @SuppressWarnings("deprecation")
     protected int getDice(CreatureServerSide target)
     {
         BattleHex hex = getCurrentHex();
@@ -330,6 +326,7 @@ public class CreatureServerSide extends Creature
     }
 
     /** WARNING: this is duplicated in Strike */
+    @SuppressWarnings("deprecation")
     private int getAttackerSkill(CreatureServerSide target)
     {
         BattleHex hex = getCurrentHex();
@@ -474,6 +471,7 @@ public class CreatureServerSide extends Creature
     }
 
     /** WARNING: this is duplicated in Strike */
+    @SuppressWarnings("deprecation")
     protected int getStrikeNumber(CreatureServerSide target)
     {
         boolean rangestrike = !isInContact(true);
@@ -789,24 +787,6 @@ public class CreatureServerSide extends Creature
     Set<PenaltyOption> getPenaltyOptions()
     {
         return Collections.unmodifiableSortedSet(penaltyOptions);
-    }
-
-    public int getHintedRecruitmentValue()
-    {
-        // Must use our local, Titan-aware getPointValue()
-        // return getCreature().getHintedRecruitmentValue();
-        return getPointValue()
-            + VariantSupport.getHintedRecruitmentValueOffset(getType()
-                .getName());
-    }
-
-    public int getHintedRecruitmentValue(String[] section)
-    {
-        // Must use our local, Titan-aware getPointValue()
-        // return getCreature().getHintedRecruitmentValue(section);
-        return getPointValue()
-            + VariantSupport.getHintedRecruitmentValueOffset(getType()
-                .getName(), section);
     }
 
     // TODO noone seems to be calling this, so we might as well remove it
