@@ -25,8 +25,8 @@ import net.sf.colossus.client.PlayerClientSide;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.game.Battle;
-import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.BattleCritter;
+import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
@@ -2296,16 +2296,15 @@ public class SimpleAI extends AbstractAI
         for (CritterMove cm : bestMoveOrder)
         {
             BattleCritter critter = cm.getCritter();
-            BattleHex startingHex = cm.getStartingHex();
 
             // LOGGER.finest(critter.getDescription() + " failed to move");
             List<CritterMove> moveList = findBattleMovesOneCritter(critter);
             if (!moveList.isEmpty())
             {
                 CritterMove cm2 = moveList.get(0);
-                /* LOGGER.finest("Moving " + critter.getDescription() + " to "
-                    + cm2.getEndingHex().getLabel() + " (startingHexLabel was "
-                    + startingHex.getLabel() + ")"); */
+                 /* LOGGER.finest("Moving " + critter.getDescription() + " to "
+                   + cm2.getEndingHex().getLabel() + " (startingHexLabel was "
+                   + cm.getStartingHex().getLabel() + ")"); */
                 client.tryBattleMove(cm2);
             }
         }
