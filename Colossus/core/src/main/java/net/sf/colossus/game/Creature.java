@@ -346,7 +346,7 @@ public class Creature
         return getType().getPluralName();
     }
 
-    void heal()
+    public void heal()
     {
         setHits(0);
     }
