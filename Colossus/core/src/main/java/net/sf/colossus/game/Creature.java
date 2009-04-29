@@ -3,6 +3,7 @@ package net.sf.colossus.game;
 
 import java.util.logging.Logger;
 
+import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardHexside;
 import net.sf.colossus.variant.HazardTerrain;
@@ -23,11 +24,15 @@ public class Creature
         .getName());
     final private CreatureType type;
     protected Legion legion;
+    private BattleHex currentHex;
+    private BattleHex startingHex;
 
     public Creature(CreatureType type, Legion legion)
     {
         this.type = type;
         this.legion = legion;
+        currentHex = null;
+        startingHex = null;
     }
 
     public CreatureType getType()
@@ -176,5 +181,97 @@ public class Creature
     public boolean isTitan()
     {
         return getType().isTitan();
+    }
+
+    public BattleHex getCurrentHex()
+    {
+        return currentHex;
+    }
+
+    public String getDescription()
+    {
+        return getName() + " in " + getCurrentHex().getDescription();
+    }
+
+    public BattleHex getStartingHex()
+    {
+        return startingHex;
+    }
+
+    public void setCurrentHex(BattleHex hex)
+    {
+        this.currentHex = hex;
+    }
+
+    public void setStartingHex(BattleHex hex)
+    {
+        this.startingHex = hex;
+    }
+
+    public String getName()
+    {
+        return getType().getName();
+    }
+
+    public void moveToHex(BattleHex hex)
+    {
+        setCurrentHex(hex);
+    }
+
+    public boolean isDemiLord()
+    {
+        return getType().isDemiLord();
+    }
+
+    public boolean isFlier()
+    {
+        return getType().isFlier();
+    }
+
+    public boolean isImmortal()
+    {
+        return getType().isImmortal();
+    }
+
+    public boolean isLord()
+    {
+        return getType().isLord();
+    }
+
+    public boolean isLordOrDemiLord()
+    {
+        return getType().isLordOrDemiLord();
+    }
+
+    public boolean isNativeHexside(HazardHexside hazard)
+    {
+        return getType().isNativeHexside(hazard.getCode());
+    }
+
+    public boolean isNativeTerrain(HazardTerrain t)
+    {
+        return getType().isNativeIn(t);
+    }
+
+    public boolean isRangestriker()
+    {
+        return getType().isRangestriker();
+    }
+
+    public boolean isSummonable()
+    {
+        return getType().isSummonable();
+    }
+
+    public int getPointValue()
+    {
+        // Must use our local, Titan-aware getPower()
+        // return getCreature().getPointValue();
+        return getPower() * getSkill();
+    }
+
+    public int getSkill()
+    {
+        return getType().getSkill();
     }
 }

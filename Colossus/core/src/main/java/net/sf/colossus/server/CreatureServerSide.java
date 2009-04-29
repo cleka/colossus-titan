@@ -101,8 +101,6 @@ public class CreatureServerSide extends Creature
         .getLogger(CreatureServerSide.class.getName());
     private BattleServerSide battle;
     private boolean struck;
-    private BattleHex currentHex;
-    private BattleHex startingHex;
 
     /** Damage taken */
     private int hits = 0;
@@ -134,8 +132,8 @@ public class CreatureServerSide extends Creature
     void setBattleInfo(BattleHex currentHex, BattleHex startingHex,
         BattleServerSide battle)
     {
-        this.currentHex = currentHex;
-        this.startingHex = startingHex;
+        setCurrentHex(currentHex);
+        setStartingHex(startingHex);
         this.battle = battle;
     }
 
@@ -152,11 +150,6 @@ public class CreatureServerSide extends Creature
     BattleServerSide getBattle()
     {
         return battle;
-    }
-
-    String getDescription()
-    {
-        return getName() + " in " + getCurrentHex().getDescription();
     }
 
     int getHits()
@@ -209,12 +202,12 @@ public class CreatureServerSide extends Creature
 
     boolean hasMoved()
     {
-        return !currentHex.equals(startingHex);
+        return !getCurrentHex().equals(getStartingHex());
     }
 
     void commitMove()
     {
-        startingHex = currentHex;
+        setStartingHex(getCurrentHex());
     }
 
     boolean hasStruck()
@@ -225,26 +218,6 @@ public class CreatureServerSide extends Creature
     void setStruck(boolean struck)
     {
         this.struck = struck;
-    }
-
-    protected BattleHex getCurrentHex()
-    {
-        return currentHex;
-    }
-
-    BattleHex getStartingHex()
-    {
-        return startingHex;
-    }
-
-    void setCurrentHex(BattleHex hex)
-    {
-        this.currentHex = hex;
-    }
-
-    void setStartingHex(BattleHex hex)
-    {
-        this.startingHex = hex;
     }
 
     /** Return the number of enemy creatures in contact with this critter.
@@ -318,22 +291,22 @@ public class CreatureServerSide extends Creature
      *  for legality and logs the move. */
     void moveToHex(BattleHex hexLabel, boolean tellClients)
     {
-        currentHex = hexLabel;
+        super.moveToHex(hexLabel);
         if (tellClients)
         {
             battle.getGame().getServer().allTellBattleMove(tag,
-                startingHex, currentHex, false);
+                getStartingHex(), getCurrentHex(), false);
         }
     }
 
     void undoMove()
     {
-        BattleHex formerHexLabel = currentHex;
-        currentHex = startingHex;
+        BattleHex formerHexLabel = getCurrentHex();
+        setCurrentHex(getStartingHex());
         LOGGER.log(Level.INFO, getName() + " undoes move and returns to "
-            + startingHex);
+            + getStartingHex());
         battle.getGame().getServer().allTellBattleMove(tag,
-            formerHexLabel, currentHex, true);
+            formerHexLabel, getCurrentHex(), true);
     }
 
     boolean canStrike(CreatureServerSide target)
@@ -853,7 +826,7 @@ public class CreatureServerSide extends Creature
             }
         }
 
-        LOGGER.log(Level.INFO, getName() + " in " + currentHex + " strikes "
+        LOGGER.log(Level.INFO, getName() + " in " + getCurrentHex() + " strikes "
             + target.getDescription() + " with strike number " + strikeNumber
             + ", rolling: " + rollString + ": " + damage
             + (damage == 1 ? " hit" : " hits"));
@@ -898,39 +871,9 @@ public class CreatureServerSide extends Creature
         }
     }
 
-    // big ugly overloading, in case our Creature isn't really a Creature,
-    // but a subclass of Creature.
-    // getPower() is not there, as it it already overloaded above
-    // to support Titan Power.
-
-    public String getName()
-    {
-        return getType().getName();
-    }
-
     public int getMaxCount()
     {
         return getType().getMaxCount();
-    }
-
-    public boolean isLord()
-    {
-        return getType().isLord();
-    }
-
-    public boolean isDemiLord()
-    {
-        return getType().isDemiLord();
-    }
-
-    public boolean isLordOrDemiLord()
-    {
-        return getType().isLordOrDemiLord();
-    }
-
-    public boolean isImmortal()
-    {
-        return getType().isImmortal();
     }
 
     public String getPluralName()
@@ -941,18 +884,6 @@ public class CreatureServerSide extends Creature
     public String[] getImageNames()
     {
         return getType().getImageNames();
-    }
-
-    public int getSkill()
-    {
-        return getType().getSkill();
-    }
-
-    public int getPointValue()
-    {
-        // Must use our local, Titan-aware getPower()
-        // return getCreature().getPointValue();
-        return getPower() * getSkill();
     }
 
     public int getHintedRecruitmentValue()
@@ -971,26 +902,6 @@ public class CreatureServerSide extends Creature
         return getPointValue()
             + VariantSupport.getHintedRecruitmentValueOffset(getType()
                 .getName(), section);
-    }
-
-    public boolean isRangestriker()
-    {
-        return getType().isRangestriker();
-    }
-
-    public boolean isFlier()
-    {
-        return getType().isFlier();
-    }
-
-    public boolean isNativeTerrain(HazardTerrain t)
-    {
-        return getType().isNativeIn(t);
-    }
-
-    public boolean isNativeHexside(HazardHexside hazard)
-    {
-        return getType().isNativeHexside(hazard.getCode());
     }
 
     /** @deprecated all isNative<HazardTerrain> are obsolete, one should use
@@ -1047,11 +958,6 @@ public class CreatureServerSide extends Creature
     public boolean useMagicMissile()
     {
         return getType().useMagicMissile();
-    }
-
-    public boolean isSummonable()
-    {
-        return getType().isSummonable();
     }
 
     // TODO noone seems to be calling this, so we might as well remove it

@@ -517,7 +517,7 @@ public final class ShowCreatureDetails extends KDialog
         //
         /** prox to simulated hex. */
         @Override
-        protected BattleHex getCurrentHex()
+        public BattleHex getCurrentHex()
         {
             return hex;
         }
