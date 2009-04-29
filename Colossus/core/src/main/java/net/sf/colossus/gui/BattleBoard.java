@@ -41,7 +41,6 @@ import javax.swing.WindowConstants;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
-import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.PlayerColor;
@@ -202,7 +201,7 @@ public final class BattleBoard extends KFrame
 
                 Point point = e.getPoint();
 
-                BattleCritter battleUnit = getBattleUnitAtPoint(point);
+                BattleUnit battleUnit = getBattleUnitAtPoint(point);
                 GUIBattleHex hex = battleMap.getHexContainingPoint(point);
 
                 handleMousePressed(battleUnit, hex);
@@ -248,10 +247,10 @@ public final class BattleBoard extends KFrame
         reqFocus();
     }
 
-    private void handleMousePressed(BattleCritter battleUnit, GUIBattleHex hex)
+    private void handleMousePressed(BattleUnit battleUnit, GUIBattleHex hex)
     {
         String hexLabel = "";
-        client.resetStrikeNumbers();
+        gui.resetStrikeNumbers();
         if (hex != null)
         {
             hexLabel = hex.getHexModel().getLabel();
@@ -285,7 +284,7 @@ public final class BattleBoard extends KFrame
         }
         else if (battleUnit != null && ownChit)
         {
-            actOnCritter(battleUnit.getTag());
+            actOnCritter(battleUnit);
         }
 
         // No hits on friendly chits, so check map.
@@ -400,7 +399,7 @@ public final class BattleBoard extends KFrame
                 {
                     unselectAllHexes();
                     battleMap.unselectEntranceHexes();
-                    client.resetStrikeNumbers();
+                    gui.resetStrikeNumbers();
                     client.doneWithStrikes();
                 }
                 else
@@ -666,13 +665,13 @@ public final class BattleBoard extends KFrame
     }
 
     /** Highlight all hexes with targets that the critter can strike. */
-    private void highlightStrikes(int tag)
+    private void highlightStrikes(BattleUnit battleUnit)
     {
-        Set<BattleHex> set = client.findStrikes(tag);
+        Set<BattleHex> set = client.findStrikes(battleUnit.getTag());
         unselectAllHexes();
-        client.resetStrikeNumbers();
+        gui.resetStrikeNumbers();
         battleMap.selectHexes(set);
-        client.setStrikeNumbers(tag, set);
+        gui.setStrikeNumbers(battleUnit, set);
         // XXX Needed?
         repaint();
     }
@@ -681,7 +680,7 @@ public final class BattleBoard extends KFrame
     public void highlightPossibleCarries(Set<BattleHex> set)
     {
         unselectAllHexes();
-        client.resetStrikeNumbers();
+        gui.resetStrikeNumbers();
         battleMap.selectHexes(set);
         // XXX Needed?
         repaint();
@@ -704,21 +703,21 @@ public final class BattleBoard extends KFrame
         return (answer == JOptionPane.YES_OPTION);
     }
 
-    private void actOnCritter(int tag)
+    private void actOnCritter(BattleUnit battleUnit)
     {
-        selectedCritterTag = tag;
+        selectedCritterTag = battleUnit.getTag();
 
         // XXX Put selected chit at the top of the z-order.
         // Then getGUIHexByLabel(hexLabel).repaint();
         BattlePhase phase = client.getBattlePhase();
         if (phase == BattlePhase.MOVE)
         {
-            highlightMoves(tag);
+            highlightMoves(selectedCritterTag);
         }
         else if (phase.isFightPhase())
         {
             client.leaveCarryMode();
-            highlightStrikes(tag);
+            highlightStrikes(battleUnit);
         }
     }
 

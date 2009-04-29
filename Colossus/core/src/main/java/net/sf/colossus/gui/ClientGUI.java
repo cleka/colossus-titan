@@ -409,6 +409,27 @@ public class ClientGUI implements IClientGUI
             .getAttacker(), client.getDefender());
     }
 
+    public void setStrikeNumbers(BattleUnit battleUnit,
+        Set<BattleHex> targetHexes)
+    {
+        for (BattleHex targetHex : targetHexes)
+        {
+            BattleUnit target = client.getBattleUnit(targetHex);
+            target.setStrikeNumber(client.getStrike().getStrikeNumber(
+                battleUnit, target));
+        }
+    }
+
+    /** reset all strike numbers on chits */
+    public void resetStrikeNumbers()
+    {
+        for (BattleUnit battleUnit : client.getBattleUnits())
+        {
+            battleUnit.setStrikeNumber(0);
+            battleUnit.setStrikeDice(0);
+        }
+    }
+
     // TODO create/dispose status screen only on request, in this call here
     // only call the update (if it exists)
 

@@ -121,6 +121,11 @@ public class NullClientGUI implements IClientGUI
 
     }
 
+    public void resetStrikeNumbers()
+    {
+        // TODO Auto-generated method stub
+    }
+
     public void actOnRemoveCreature(Legion legion, String name, String reason)
     {
         // TODO Auto-generated method stub

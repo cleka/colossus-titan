@@ -279,6 +279,8 @@ public interface IClientGUI
 
     public abstract void actOnPlaceNewChit(BattleHex hex);
 
+    public abstract void resetStrikeNumbers();
+
     public abstract void actOnTellStrikeResults(boolean wasCarry,
         int strikeNumber, List<String> rolls,BattleCritter striker, BattleCritter target);
 

@@ -23,10 +23,10 @@ import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.IOptions;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.common.WhatNextManager;
+import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.EntrySide;
-import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Phase;
@@ -2290,7 +2290,7 @@ public final class Client implements IClient, IOracle, IVariant
     /** Attempt to have critter tag strike the critter in hex. */
     public void strike(int tag, BattleHex hex)
     {
-        resetStrikeNumbers();
+        gui.resetStrikeNumbers();
         server.strike(tag, hex);
     }
 
@@ -2376,52 +2376,6 @@ public final class Client implements IClient, IOracle, IVariant
     public Set<BattleHex> findStrikes(int tag)
     {
         return strike.findStrikes(tag);
-    }
-
-    // TODO GUI stuff?
-    public void setStrikeNumbers(int tag, Set<BattleHex> targetHexes)
-    {
-        BattleCritter battleUnit = getBattleUnit(tag);
-        for (BattleHex targetHex : targetHexes)
-        {
-            BattleUnit target = getBattleUnit(targetHex);
-            target.setStrikeNumber(strike.getStrikeNumber(battleUnit, target));
-            // TODO this whole block of code was written under the assumption
-            //      that the Strike.getDice(BattleUnit,BattleUnit,int) method
-            //      (now deleted) would return a new baseDice value through the
-            //      third parameter. Java's parameters are CallByValue and do
-            //      not allow OUT parameters, thus the whole code does nothing
-            //      at all.
-            //
-            // CreatureType striker = game.getVariant().getCreatureByName(
-            //     battleChit.getCreatureName());
-            // int dice;
-            // if (striker.isTitan())
-            // {
-            //     dice = battleChit.getTitanPower();
-            // }
-            // else
-            // {
-            //     dice = striker.getPower();
-            // }
-            // int baseDice = 0;
-            // int strikeDice = strike.getDice(battleChit, target, baseDice);
-            // if (baseDice == dice
-            //     || options.getOption(Options.showDiceAjustmentsRange))
-            // {
-            //     target.setStrikeDice(strikeDice - dice);
-            // }
-        }
-    }
-
-    /** reset all strike numbers on chits */
-    public void resetStrikeNumbers()
-    {
-        for (BattleUnit battleUnit : battleUnits)
-        {
-            battleUnit.setStrikeNumber(0);
-            battleUnit.setStrikeDice(0);
-        }
     }
 
     // Mostly for SocketClientThread
