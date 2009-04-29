@@ -12,7 +12,6 @@ import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.Battle;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.BattleCritter;
-import net.sf.colossus.gui.BattleUnit;
 import net.sf.colossus.util.CompareDoubles;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
@@ -77,10 +76,8 @@ public final class Strike
             return false;
         }
 
-        Iterator<BattleUnit> it = client.getActiveBattleUnits().iterator();
-        while (it.hasNext())
+        for (BattleCritter battleUnit : client.getActiveBattleUnits())
         {
-            BattleCritter battleUnit = it.next();
             if (!battleUnit.hasStruck())
             {
                 Set<BattleHex> set = findStrikes(battleUnit, rangestrike);
@@ -141,7 +138,7 @@ public final class Strike
                 if (targetHex != null && client.isOccupied(targetHex)
                     && !targetHex.isEntrance())
                 {
-                    BattleUnit target = client.getBattleUnit(targetHex);
+                    BattleCritter target = client.getBattleUnit(targetHex);
                     if (target.isInverted() != inverted)
                     {
                         adjacentEnemy = true;
@@ -162,11 +159,8 @@ public final class Strike
         if (rangestrike && !adjacentEnemy && creature.isRangestriker()
             && client.getBattlePhase() != BattlePhase.STRIKEBACK)
         {
-            Iterator<BattleUnit> it = client.getInactiveBattleUnits()
-                .iterator();
-            while (it.hasNext())
+            for (BattleCritter target : client.getInactiveBattleUnits())
             {
-                BattleUnit target = it.next();
                 if (!target.isDead())
                 {
                     BattleHex targetHex = target.getCurrentHex();
@@ -197,11 +191,8 @@ public final class Strike
         BattleHex hex = battleUnit.getCurrentHex();
         int min = Constants.OUT_OF_RANGE;
 
-        List<BattleUnit> battleUnits = client.getBattleUnits();
-        Iterator<BattleUnit> it = battleUnits.iterator();
-        while (it.hasNext())
+        for (BattleCritter target : client.getBattleUnits())
         {
-            BattleCritter target = it.next();
             if (battleUnit.isInverted() != target.isInverted())
             {
                 BattleHex targetHex = target.getCurrentHex();
@@ -478,7 +469,7 @@ public final class Strike
      * WARNING: this is a duplication from code in Battle ; caller should use
      * a Battle instance instead.
      * @deprecated Should use an extension of Battle instead of Strike, with
-     *   extension of Creature instead of BattleUnit and extra BattleHex
+     *   extension of Creature instead of BattleCritter and extra BattleHex
      */
     @Deprecated
     private boolean isRangestrikePossible(BattleCritter striker,

@@ -1120,12 +1120,12 @@ public final class Client implements IClient, IOracle, IVariant
 
     public BattleUnit getBattleUnit(BattleHex hex)
     {
-        List<BattleUnit> battleUnits = getBattleUnits(hex);
-        if (battleUnits.isEmpty())
+        List<BattleUnit> lBattleUnits = getBattleUnits(hex);
+        if (lBattleUnits.isEmpty())
         {
             return null;
         }
-        return battleUnits.get(0);
+        return lBattleUnits.get(0);
     }
 
     /** Get the BattleUnit with this tag. */
