@@ -1,7 +1,6 @@
 package net.sf.colossus.gui;
 
 
-import net.sf.colossus.game.BattleCritter;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -15,6 +14,7 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.common.Constants;
+import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.variant.BattleHex;
