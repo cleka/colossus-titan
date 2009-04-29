@@ -17,7 +17,6 @@ import net.sf.colossus.common.Options;
 import net.sf.colossus.game.Battle;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
-import net.sf.colossus.game.Player;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardHexside;
@@ -100,8 +99,6 @@ public class CreatureServerSide extends Creature
 
     private static final Logger LOGGER = Logger
         .getLogger(CreatureServerSide.class.getName());
-
-    private Legion legion;
     private BattleServerSide battle;
     private boolean struck;
     private BattleHex currentHex;
@@ -128,9 +125,8 @@ public class CreatureServerSide extends Creature
     public CreatureServerSide(CreatureType creature, Legion legion,
         GameServerSide game)
     {
-        super(creature);
+        super(creature, legion);
         assert game != null : "No server-side creature without a game";
-        this.legion = legion;
         this.game = game;
         tag = ++tagCounter;
     }
@@ -143,24 +139,9 @@ public class CreatureServerSide extends Creature
         this.battle = battle;
     }
 
-    String getMarkerId()
-    {
-        return legion.getMarkerId();
-    }
-
     void setLegion(LegionServerSide legion)
     {
         this.legion = legion;
-    }
-
-    Legion getLegion()
-    {
-        return legion;
-    }
-
-    Player getPlayer()
-    {
-        return legion.getPlayer();
     }
 
     int getTag()
@@ -176,24 +157,6 @@ public class CreatureServerSide extends Creature
     String getDescription()
     {
         return getName() + " in " + getCurrentHex().getDescription();
-    }
-
-    private int getPower()
-    {
-        if (isTitan())
-        {
-            Player player = getPlayer();
-            if (player != null)
-            {
-                return ((PlayerServerSide)player).getTitanPower();
-            }
-            else
-            {
-                // Just in case player is dead.
-                return 6;
-            }
-        }
-        return getType().getPower();
     }
 
     int getHits()
@@ -946,11 +909,6 @@ public class CreatureServerSide extends Creature
     public boolean isImmortal()
     {
         return getType().isImmortal();
-    }
-
-    public boolean isTitan()
-    {
-        return getType().isTitan();
     }
 
     public String getPluralName()

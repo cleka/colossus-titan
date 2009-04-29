@@ -85,7 +85,7 @@ public final class LegionClientSide extends Legion
         for (String name : getContents())
         {
             result.add(new Creature(getPlayer().getGame().getVariant()
-                .getCreatureByName(name)));
+                .getCreatureByName(name), this));
         }
         return result;
     }

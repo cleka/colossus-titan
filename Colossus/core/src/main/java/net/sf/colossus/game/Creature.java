@@ -21,11 +21,13 @@ public class Creature
 {
     private static final Logger LOGGER = Logger.getLogger(Creature.class
         .getName());
-    private final CreatureType type;
+    final private CreatureType type;
+    protected Legion legion;
 
-    public Creature(CreatureType type)
+    public Creature(CreatureType type, Legion legion)
     {
         this.type = type;
+        this.legion = legion;
     }
 
     public CreatureType getType()
@@ -139,5 +141,43 @@ public class Creature
             + targetType.getName() + " [" + targetHexTerrain.getName() + " "
             + targetElevation + ", " + targetHexside.getName() + " ]");
         return attackerSkill;
+    }
+
+    public Legion getLegion()
+    {
+        return legion;
+    }
+
+    public Player getPlayer()
+    {
+        return legion.getPlayer();
+    }
+
+    public int getPower()
+    {
+        if (isTitan())
+        {
+            Player player = getPlayer();
+            if (player != null)
+            {
+                return player.getTitanPower();
+            }
+            else
+            {
+                // Just in case player is dead.
+                return 6;
+            }
+        }
+        return getType().getPower();
+    }
+
+    public String getMarkerId()
+    {
+        return legion.getMarkerId();
+    }
+
+    public boolean isTitan()
+    {
+        return getType().isTitan();
     }
 }
