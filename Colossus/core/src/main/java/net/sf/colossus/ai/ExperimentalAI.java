@@ -8,12 +8,12 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.CritterMove;
+import net.sf.colossus.client.HexMap;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.Battle;
 import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.Legion;
-import net.sf.colossus.gui.BattleMap;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.MasterBoardTerrain;
 
@@ -234,10 +234,6 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
         // surrounded by allies.  We need to relax this in the
         // last few turns of the battle, so that attacking titans
         // don't just sit back and wait for a time loss.
-        // entrance is never read right now, commented out to get rid
-        // of Eclipse warnings. -Clemens
-        // BattleHex entrance = BattleMap.getEntrance(terrain,
-        //         legion.getEntrySide());
         if (!critter.isTitan())
         {
             LOGGER.warning(
@@ -315,7 +311,7 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
             return;
         }
         // Encourage defending critters to hang back.
-        BattleHex entrance = BattleMap.getEntrance(terrain, legion
+        BattleHex entrance = HexMap.getEntrance(terrain, legion
             .getEntrySide());
         if (terrain.isTower())
         {

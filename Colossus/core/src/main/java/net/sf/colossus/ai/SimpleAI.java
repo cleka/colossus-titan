@@ -31,7 +31,6 @@ import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.SummonInfo;
-import net.sf.colossus.gui.BattleMap;
 import net.sf.colossus.server.Dice;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.InstanceTracker;
@@ -2680,7 +2679,7 @@ public class SimpleAI extends AbstractAI
         // surrounded by allies.  We need to relax this in the
         // last few turns of the battle, so that attacking titans
         // don't just sit back and wait for a time loss.
-        BattleHex entrance = BattleMap.getEntrance(terrain, legion
+        BattleHex entrance = HexMap.getEntrance(terrain, legion
             .getEntrySide());
         if (!critter.isTitan())
         {
@@ -2814,7 +2813,7 @@ public class SimpleAI extends AbstractAI
             return;
         }
         // Encourage defending critters to hang back.
-        BattleHex entrance = BattleMap.getEntrance(terrain, legion
+        BattleHex entrance = HexMap.getEntrance(terrain, legion
             .getEntrySide());
         if (terrain.isTower())
         {

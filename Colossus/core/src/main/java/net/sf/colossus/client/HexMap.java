@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 
 import javax.swing.JPanel;
 
+import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.gui.GUIBattleHex;
 import net.sf.colossus.gui.GUIHex;
 import net.sf.colossus.gui.Scale;
@@ -555,6 +556,12 @@ public class HexMap extends JPanel
         LOGGER.log(Level.SEVERE, "Could not find GUIBattleHex "
             + battleHex.getLabel());
         return null;
+    }
+
+    public static BattleHex getEntrance(MasterBoardTerrain terrain,
+        EntrySide entrySide)
+    {
+        return getHexByLabel(terrain, "X" + entrySide.getId());
     }
 
     /** Look for the Hex matching the Label in the terrain static map */

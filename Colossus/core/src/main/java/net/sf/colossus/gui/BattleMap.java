@@ -13,10 +13,8 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.HexMap;
-import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.util.InstanceTracker;
 import net.sf.colossus.variant.BattleHex;
-import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 
 
@@ -86,12 +84,6 @@ public final class BattleMap extends HexMap
         {
             attackerMarker.setLocation(point, battleHex.getLabel());
         }
-    }
-
-    public static BattleHex getEntrance(MasterBoardTerrain terrain,
-        EntrySide entrySide)
-    {
-        return HexMap.getHexByLabel(terrain, "X" + entrySide.getId());
     }
 
     // Following four override to make them public because they are needed
