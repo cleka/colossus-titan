@@ -2,7 +2,6 @@ package net.sf.colossus.client;
 
 
 import net.sf.colossus.game.BattleCritter;
-import net.sf.colossus.gui.BattleUnit;
 import net.sf.colossus.variant.BattleHex;
 
 
