@@ -896,7 +896,6 @@ public final class Client implements IClient, IOracle, IVariant
             if (battleUnit.getCurrentHex().getLabel().startsWith("X"))
             {
                 battleUnit.setDead(true);
-                battleUnit.repaint();
             }
         }
     }
