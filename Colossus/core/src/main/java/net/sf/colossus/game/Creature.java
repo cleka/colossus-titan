@@ -36,6 +36,9 @@ public class Creature
     /**
      * Calculates the Striking Power of this Creature when striking directly at
      * target under the circumstances in parameters.
+     * 
+     * *WARNING*: this doesn't work with Titan, as CreatureType.getPower() is
+     * still wrong.
      *
      * @param target The Creature that is struck by the current Creature
      * @param myElevation Height of the Hex on which stands the current Creature
