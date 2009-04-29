@@ -17,9 +17,9 @@ import net.sf.colossus.client.CritterMove;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.Battle;
+import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
-import net.sf.colossus.gui.BattleUnit;
 import net.sf.colossus.server.HintOracleInterface;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.DevRandom;
@@ -202,7 +202,7 @@ abstract public class AbstractAI implements AI
     final protected Map<BattleHex, Integer> findStrikeMap()
     {
         Map<BattleHex, Integer> map = new HashMap<BattleHex, Integer>();
-        for (BattleUnit critter : client.getActiveBattleUnits())
+        for (BattleCritter critter : client.getActiveBattleUnits())
         {
             Set<BattleHex> targets = client.findStrikes(critter.getTag());
             for (BattleHex targetHex : targets)
@@ -225,10 +225,10 @@ abstract public class AbstractAI implements AI
      * Create a map containing each target and the number of hits it would
      * likely take if all possible creatures attacked it.
      */
-    final protected Map<BattleUnit, Double> generateDamageMap()
+    final protected Map<BattleCritter, Double> generateDamageMap()
     {
-        Map<BattleUnit, Double> map = new HashMap<BattleUnit, Double>();
-        for (BattleUnit critter : client.getActiveBattleUnits())
+        Map<BattleCritter, Double> map = new HashMap<BattleCritter, Double>();
+        for (BattleCritter critter : client.getActiveBattleUnits())
         {
             // Offboard critters can't strike.
             if (critter.getCurrentHex().getLabel().startsWith("X"))
@@ -238,7 +238,7 @@ abstract public class AbstractAI implements AI
             Set<BattleHex> set = client.findStrikes(critter.getTag());
             for (BattleHex targetHex: set)
             {
-                BattleUnit target = client.getBattleUnit(targetHex);
+                BattleCritter target = client.getBattleUnit(targetHex);
                 int dice = client.getStrike().getDice(critter, target);
                 int strikeNumber = client.getStrike().getStrikeNumber(critter,
                     target);
@@ -288,7 +288,7 @@ abstract public class AbstractAI implements AI
      * @param terrain The terrain on which the value is requested, or null.
      * @return The 'kill value' value of chit, on terrain if non-null
      */
-    protected int getKillValue(final BattleUnit battleUnit,
+    protected int getKillValue(final BattleCritter battleUnit,
         final MasterBoardTerrain terrain)
     {
         return getKillValue(battleUnit.getCreatureType(), terrain);
@@ -500,7 +500,7 @@ abstract public class AbstractAI implements AI
     final protected boolean hasOpponentNativeCreature(HazardTerrain terrain)
     {
         boolean honc = false;
-        for (BattleUnit critter : client.getInactiveBattleUnits())
+        for (BattleCritter critter : client.getInactiveBattleUnits())
         {
             if (critter.getCreatureType().isNativeIn(terrain))
             {
@@ -515,7 +515,7 @@ abstract public class AbstractAI implements AI
 
     final protected int rangeToClosestOpponent(final BattleHex hex) {
         int range = Constants.BIGNUM;
-        for (BattleUnit critter : client.getInactiveBattleUnits())
+        for (BattleCritter critter : client.getInactiveBattleUnits())
         {
             BattleHex hex2 = critter.getCurrentHex();
             int r = Battle.getRange(hex, hex2, false);

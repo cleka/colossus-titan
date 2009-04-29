@@ -41,6 +41,7 @@ import javax.swing.WindowConstants;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
+import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.PlayerColor;
@@ -201,7 +202,7 @@ public final class BattleBoard extends KFrame
 
                 Point point = e.getPoint();
 
-                BattleUnit battleUnit = getBattleUnitAtPoint(point);
+                BattleCritter battleUnit = getBattleUnitAtPoint(point);
                 GUIBattleHex hex = battleMap.getHexContainingPoint(point);
 
                 handleMousePressed(battleUnit, hex);
@@ -247,7 +248,7 @@ public final class BattleBoard extends KFrame
         reqFocus();
     }
 
-    private void handleMousePressed(BattleUnit battleUnit, GUIBattleHex hex)
+    private void handleMousePressed(BattleCritter battleUnit, GUIBattleHex hex)
     {
         String hexLabel = "";
         client.resetStrikeNumbers();

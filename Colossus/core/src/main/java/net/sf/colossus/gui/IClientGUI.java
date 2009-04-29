@@ -10,6 +10,7 @@ import java.util.SortedSet;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.LegionClientSide;
+import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
@@ -279,8 +280,7 @@ public interface IClientGUI
     public abstract void actOnPlaceNewChit(BattleHex hex);
 
     public abstract void actOnTellStrikeResults(boolean wasCarry,
-        int strikeNumber, List<String> rolls, BattleUnit striker,
-        BattleUnit target);
+        int strikeNumber, List<String> rolls,BattleCritter striker, BattleCritter target);
 
     public abstract void highlightCrittersWithTargets();
 

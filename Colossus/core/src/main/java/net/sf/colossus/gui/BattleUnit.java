@@ -1,6 +1,7 @@
 package net.sf.colossus.gui;
 
 
+import net.sf.colossus.game.BattleCritter;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -30,7 +31,7 @@ import net.sf.colossus.variant.CreatureType;
  * @author David Ripton
  */
 @SuppressWarnings("serial")
-public final class BattleUnit extends Chit
+public final class BattleUnit extends Chit implements BattleCritter
 {
     private static final Logger LOGGER = Logger.getLogger(BattleUnit.class
         .getName());

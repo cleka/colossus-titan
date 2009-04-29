@@ -10,6 +10,7 @@ import net.sf.colossus.client.Client;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.common.IOptions;
 import net.sf.colossus.common.WhatNextManager;
+import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
@@ -226,7 +227,7 @@ public class NullClientGUI implements IClientGUI
     }
 
     public void actOnTellStrikeResults(boolean wasCarry, int strikeNumber,
-        List<String> rolls, BattleUnit striker, BattleUnit target)
+        List<String> rolls,BattleCritter striker, BattleCritter target)
     {
         // TODO Auto-generated method stub
 

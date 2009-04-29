@@ -1,6 +1,7 @@
 package net.sf.colossus.client;
 
 
+import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.gui.BattleUnit;
 import net.sf.colossus.variant.BattleHex;
 
@@ -14,11 +15,11 @@ import net.sf.colossus.variant.BattleHex;
 public class CritterMove
 {
     private int value;
-    private final BattleUnit critter;
+    private final BattleCritter critter;
     private final BattleHex startingHex;
     private final BattleHex endingHex;
 
-    public CritterMove(BattleUnit critter, BattleHex startingHex,
+    public CritterMove(BattleCritter critter, BattleHex startingHex,
         BattleHex endingHex)
     {
         super();
@@ -37,7 +38,7 @@ public class CritterMove
         return value;
     }
 
-    public BattleUnit getCritter()
+    public BattleCritter getCritter()
     {
         return critter;
     }

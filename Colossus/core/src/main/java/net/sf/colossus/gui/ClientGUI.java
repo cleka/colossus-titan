@@ -32,6 +32,7 @@ import net.sf.colossus.common.IOptions;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.common.WhatNextManager;
 import net.sf.colossus.common.WhatNextManager.WhatToDoNext;
+import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Game;
@@ -2124,7 +2125,7 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    private String getBattleUnitDescription(BattleUnit battleUnit)
+    private String getBattleUnitDescription(BattleCritter battleUnit)
     {
         if (battleUnit == null)
         {
@@ -2136,7 +2137,7 @@ public class ClientGUI implements IClientGUI
     }
 
     public void actOnTellStrikeResults(boolean wasCarry, int strikeNumber,
-        List<String> rolls, BattleUnit striker, BattleUnit target)
+        List<String> rolls,BattleCritter striker, BattleCritter target)
     {
         if (battleBoard != null)
         {

@@ -26,12 +26,12 @@ import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.game.Battle;
 import net.sf.colossus.game.EntrySide;
+import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.SummonInfo;
 import net.sf.colossus.gui.BattleMap;
-import net.sf.colossus.gui.BattleUnit;
 import net.sf.colossus.server.Dice;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.InstanceTracker;
@@ -1891,17 +1891,17 @@ public class SimpleAI extends AbstractAI
             : new SummonInfo(summoner, bestLegion, bestAngel);
     }
 
-    private BattleUnit findBestTarget()
+    private BattleCritter findBestTarget()
     {
-        BattleUnit bestTarget = null;
+        BattleCritter bestTarget = null;
         MasterBoardTerrain terrain = client.getBattleSite().getTerrain();
 
         // Create a map containing each target and the likely number
         // of hits it would take if all possible creatures attacked it.
-        Map<BattleUnit, Double> map = generateDamageMap();
-        for (Entry<BattleUnit, Double> entry : map.entrySet())
+        Map<BattleCritter, Double> map = generateDamageMap();
+        for (Entry<BattleCritter, Double> entry : map.entrySet())
         {
-            BattleUnit target = entry.getKey();
+            BattleCritter target = entry.getKey();
             double h = entry.getValue().doubleValue();
 
             if (h + target.getHits() >= target.getPower())
@@ -1931,9 +1931,9 @@ public class SimpleAI extends AbstractAI
     }
 
     // TODO Have this actually find the best one, not the first one.
-    private BattleUnit findBestAttacker(BattleUnit target)
+    private BattleCritter findBestAttacker(BattleCritter target)
     {
-        for (BattleUnit critter : client.getActiveBattleUnits())
+        for (BattleCritter critter : client.getActiveBattleUnits())
         {
             if (client.getStrike().canStrike(critter, target))
             {
@@ -1949,13 +1949,13 @@ public class SimpleAI extends AbstractAI
     public void handleCarries(int carryDamage, Set<String> carryTargets)
     {
         MasterBoardTerrain terrain = client.getBattleSite().getTerrain();
-        BattleUnit bestTarget = null;
+        BattleCritter bestTarget = null;
 
         for (String desc : carryTargets)
         {
             String targetHexLabel = desc.substring(desc.length() - 2);
             BattleHex targetHex = HexMap.getHexByLabel(terrain, targetHexLabel);
-            BattleUnit target = client.getBattleUnit(targetHex);
+            BattleCritter target = client.getBattleUnit(targetHex);
 
             if (target.wouldDieFrom(carryDamage))
             {
@@ -2010,13 +2010,13 @@ public class SimpleAI extends AbstractAI
         // TODO If none can, and we're going to lose the battle this turn,
         // pick the easiest target to kill.
 
-        BattleUnit bestTarget = findBestTarget();
+        BattleCritter bestTarget = findBestTarget();
         if (bestTarget == null)
         {
             LOGGER.finest("Best target is null, aborting");
             return false;
         }
-        LOGGER.finest("Best target is " + bestTarget.getDescription());
+        // LOGGER.finest("Best target is " + bestTarget.getDescription());
 
         // Having found the target, pick an attacker.  The
         // first priority is finding one that does not need
@@ -2025,13 +2025,13 @@ public class SimpleAI extends AbstractAI
         // so that more information is available when the
         // stronger attackers strike.
 
-        BattleUnit bestAttacker = findBestAttacker(bestTarget);
+        BattleCritter bestAttacker = findBestAttacker(bestTarget);
         if (bestAttacker == null)
         {
             return false;
         }
 
-        LOGGER.finest("Best attacker is " + bestAttacker.getDescription());
+        // LOGGER.finest("Best attacker is " + bestAttacker.getDescription());
 
         // Having found the target and attacker, strike.
         // Take a carry penalty if there is still a 95%
@@ -2040,7 +2040,7 @@ public class SimpleAI extends AbstractAI
         return true;
     }
 
-    private static int getCombatValue(BattleUnit battleUnit,
+    private static int getCombatValue(BattleCritter battleUnit,
         MasterBoardTerrain terrain)
     {
         int val = battleUnit.getPointValue();
@@ -2296,17 +2296,17 @@ public class SimpleAI extends AbstractAI
         }
         for (CritterMove cm : bestMoveOrder)
         {
-            BattleUnit critter = cm.getCritter();
+            BattleCritter critter = cm.getCritter();
             BattleHex startingHex = cm.getStartingHex();
 
-            LOGGER.finest(critter.getDescription() + " failed to move");
+            // LOGGER.finest(critter.getDescription() + " failed to move");
             List<CritterMove> moveList = findBattleMovesOneCritter(critter);
             if (!moveList.isEmpty())
             {
                 CritterMove cm2 = moveList.get(0);
-                LOGGER.finest("Moving " + critter.getDescription() + " to "
+                /* LOGGER.finest("Moving " + critter.getDescription() + " to "
                     + cm2.getEndingHex().getLabel() + " (startingHexLabel was "
-                    + startingHex.getLabel() + ")");
+                    + startingHex.getLabel() + ")"); */
                 client.tryBattleMove(cm2);
             }
         }
@@ -2425,7 +2425,7 @@ public class SimpleAI extends AbstractAI
         int val = 0;
         for (CritterMove cm : order)
         {
-            BattleUnit critter = cm.getCritter();
+            BattleCritter critter = cm.getCritter();
             BattleHex hex = cm.getEndingHex();
             if (client.testBattleMove(critter, hex))
             {
@@ -2445,7 +2445,7 @@ public class SimpleAI extends AbstractAI
         // Move them all back where they started.
         for (CritterMove cm : order)
         {
-            BattleUnit critter = cm.getCritter();
+            BattleCritter critter = cm.getCritter();
             BattleHex hex = cm.getStartingHex();
             critter.setHex(hex);
         }
@@ -2494,7 +2494,7 @@ public class SimpleAI extends AbstractAI
         // The caller is responsible for actually making the moves.
         final List<List<CritterMove>> allCritterMoves = new ArrayList<List<CritterMove>>();
 
-        for (BattleUnit critter : client.getActiveBattleUnits())
+        for (BattleCritter critter : client.getActiveBattleUnits())
         {
             List<CritterMove> moveList = findBattleMovesOneCritter(critter);
 
@@ -2507,7 +2507,7 @@ public class SimpleAI extends AbstractAI
             {
                 moveList = it2.next();
                 CritterMove cm = moveList.get(0);
-                BattleUnit critter2 = cm.getCritter();
+                BattleCritter critter2 = cm.getCritter();
                 critter2.moveToHex(cm.getStartingHex());
             }
         }
@@ -2516,7 +2516,7 @@ public class SimpleAI extends AbstractAI
         return legionMoves;
     }
 
-    private List<CritterMove> findBattleMovesOneCritter(BattleUnit critter)
+    private List<CritterMove> findBattleMovesOneCritter(BattleCritter critter)
     {
         BattleHex currentHex = critter.getCurrentHex();
 
@@ -2668,7 +2668,7 @@ public class SimpleAI extends AbstractAI
     }
 
     /** this compute the special case of the Titan critter */
-    protected void evaluateCritterMove_Titan(final BattleUnit critter,
+    protected void evaluateCritterMove_Titan(final BattleCritter critter,
         ValueRecorder value, final MasterBoardTerrain terrain,
         final BattleHex hex, final Legion legion, final int turn)
     {
@@ -2719,7 +2719,7 @@ public class SimpleAI extends AbstractAI
 
     /** This compute the influence of terrain */
     private void evaluateCritterMove_Terrain(
-        final BattleUnit critter, // NO_UCD
+        final BattleCritter critter, // NO_UCD
         ValueRecorder value, final MasterBoardTerrain terrain,
         final BattleHex hex, final int power, final int skill)
     {
@@ -2788,7 +2788,7 @@ public class SimpleAI extends AbstractAI
     /** this compute for non-titan attacking critter */
     @SuppressWarnings( { "unused", "deprecation" })
     private void evaluateCritterMove_Attacker(
-        final BattleUnit critter, // NO_UCD
+        final BattleCritter critter, // NO_UCD
         ValueRecorder value, final MasterBoardTerrain terrain,
         final BattleHex hex, final LegionClientSide legion, final int turn)
     {
@@ -2805,7 +2805,7 @@ public class SimpleAI extends AbstractAI
 
     /** this compute for non-titan defending critter */
     @SuppressWarnings("unused")
-    protected void evaluateCritterMove_Defender(final BattleUnit critter,
+    protected void evaluateCritterMove_Defender(final BattleCritter critter,
         ValueRecorder value, final MasterBoardTerrain terrain,
         final BattleHex hex, final LegionClientSide legion, final int turn)
     {
@@ -2857,7 +2857,7 @@ public class SimpleAI extends AbstractAI
     }
 
     @SuppressWarnings("unused")
-    private void evaluateCritterMove_Rangestrike(final BattleUnit critter,
+    private void evaluateCritterMove_Rangestrike(final BattleCritter critter,
         final Map<BattleHex, Integer> strikeMap, ValueRecorder value,
         final MasterBoardTerrain terrain, final BattleHex hex,
         final int power, final int skill, final LegionClientSide legion,
@@ -2885,7 +2885,7 @@ public class SimpleAI extends AbstractAI
         boolean penalty = true;
         for (BattleHex targetHex : targetHexes)
         {
-            BattleUnit target = client.getBattleUnit(targetHex);
+            BattleCritter target = client.getBattleUnit(targetHex);
             if (target.isTitan())
             {
                 value.add(bec.RANGESTRIKE_TITAN, "RangestrikeTitan");
@@ -2916,7 +2916,7 @@ public class SimpleAI extends AbstractAI
     }
 
     @SuppressWarnings("unused")
-    private void evaluateCritterMove_Strike(final BattleUnit critter,
+    private void evaluateCritterMove_Strike(final BattleCritter critter,
         final Map<BattleHex, Integer> strikeMap, ValueRecorder value,
         final MasterBoardTerrain terrain, final BattleHex hex,
         final int power, final int skill, final LegionClientSide legion,
@@ -2947,7 +2947,7 @@ public class SimpleAI extends AbstractAI
 
         for (BattleHex targetHex : targetHexes)
         {
-            BattleUnit target = client.getBattleUnit(targetHex);
+            BattleCritter target = client.getBattleUnit(targetHex);
 
             // Reward being next to enemy titans.  (Banzai!)
             if (target.isTitan())
@@ -3059,7 +3059,7 @@ public class SimpleAI extends AbstractAI
     }
 
     /** strikeMap is optional */
-    private int evaluateCritterMove(BattleUnit critter,
+    private int evaluateCritterMove(BattleCritter critter,
         Map<BattleHex, Integer> strikeMap, ValueRecorder value)
     {
         final MasterBoardTerrain terrain = client.getBattleSite().getTerrain();
@@ -3119,7 +3119,7 @@ public class SimpleAI extends AbstractAI
                 BattleHex neighbor = hex.getNeighbor(i);
                 if (neighbor != null && client.isOccupied(neighbor))
                 {
-                    BattleUnit other = client.getBattleUnit(neighbor);
+                    BattleCritter other = client.getBattleUnit(neighbor);
                     if (other.isInverted() == critter.isInverted())
                     {
                         // Buddy

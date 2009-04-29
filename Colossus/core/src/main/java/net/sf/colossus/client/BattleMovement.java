@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import net.sf.colossus.common.Options;
+import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.gui.BattleUnit;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
@@ -45,7 +46,7 @@ final class BattleMovement
                     int reverseDir = (i + 3) % 6;
                     int entryCost;
 
-                    BattleUnit bogey = client.getBattleUnit(neighbor);
+                    BattleCritter bogey = client.getBattleUnit(neighbor);
                     if (bogey == null)
                     {
                         entryCost = neighbor.getEntryCost(creature,
@@ -115,12 +116,12 @@ final class BattleMovement
 
     Set<BattleHex> showMoves(int tag)
     {
-        BattleUnit battleUnit = client.getBattleUnit(tag);
+        BattleCritter battleUnit = client.getBattleUnit(tag);
         return showMoves(battleUnit);
     }
 
     /** Find all legal moves for this critter.*/
-    private Set<BattleHex> showMoves(BattleUnit battleUnit)
+    private Set<BattleHex> showMoves(BattleCritter battleUnit)
     {
         Set<BattleHex> set = new HashSet<BattleHex>();
         if (!battleUnit.hasMoved() && !client.isInContact(battleUnit, false))

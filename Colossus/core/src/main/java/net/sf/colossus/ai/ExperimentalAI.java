@@ -11,8 +11,8 @@ import net.sf.colossus.client.CritterMove;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.Battle;
+import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.Legion;
-import net.sf.colossus.gui.BattleUnit;
 import net.sf.colossus.gui.BattleMap;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.MasterBoardTerrain;
@@ -222,7 +222,7 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
 
     /** this computes the special case of the Titan critter */
     @Override
-    protected void evaluateCritterMove_Titan(final BattleUnit critter,
+    protected void evaluateCritterMove_Titan(final BattleCritter critter,
             ValueRecorder value, final MasterBoardTerrain terrain,
             final BattleHex hex, final Legion legion, final int turn)
     {
@@ -306,7 +306,7 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
 
     /** this compute for non-titan defending critter */
     @Override
-    protected void evaluateCritterMove_Defender(final BattleUnit critter,
+    protected void evaluateCritterMove_Defender(final BattleCritter critter,
         ValueRecorder value, final MasterBoardTerrain terrain,
         final BattleHex hex, final LegionClientSide legion, final int turn)
     {
@@ -378,12 +378,11 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
             boolean nobodyGetsHurt = true;
             int numCanBeReached = 0;
             int maxThatCanReach = 0;
-            for (BattleUnit critter : client.getActiveBattleUnits())
+            for (BattleCritter critter : client.getActiveBattleUnits())
             {
                 int canReachMe = 0;
                 BattleHex myHex = critter.getCurrentHex();
-                List<BattleUnit> foes = client.getInactiveBattleUnits();
-                for (BattleUnit foe : foes)
+                for (BattleCritter foe : client.getInactiveBattleUnits())
                 {
                     BattleHex foeHex = foe.getCurrentHex();
                     int range = Battle.getRange(foeHex, myHex, true);

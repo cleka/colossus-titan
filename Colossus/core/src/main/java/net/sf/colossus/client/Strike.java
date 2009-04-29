@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.Battle;
 import net.sf.colossus.game.BattlePhase;
+import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.gui.BattleUnit;
 import net.sf.colossus.util.CompareDoubles;
 import net.sf.colossus.variant.BattleHex;
@@ -45,7 +46,7 @@ public final class Strike
     Set<BattleHex> findCrittersWithTargets()
     {
         Set<BattleHex> set = new HashSet<BattleHex>();
-        for (BattleUnit battleUnit : client.getActiveBattleUnits())
+        for (BattleCritter battleUnit : client.getActiveBattleUnits())
         {
             if (countStrikes(battleUnit, true) > 0)
             {
@@ -79,7 +80,7 @@ public final class Strike
         Iterator<BattleUnit> it = client.getActiveBattleUnits().iterator();
         while (it.hasNext())
         {
-            BattleUnit battleUnit = it.next();
+            BattleCritter battleUnit = it.next();
             if (!battleUnit.hasStruck())
             {
                 Set<BattleHex> set = findStrikes(battleUnit, rangestrike);
@@ -94,7 +95,7 @@ public final class Strike
         return false;
     }
 
-    public boolean canStrike(BattleUnit striker, BattleUnit target)
+    public boolean canStrike(BattleCritter striker, BattleCritter target)
     {
         BattleHex targetHex = target.getCurrentHex();
         return findStrikes(striker, true).contains(targetHex);
@@ -102,14 +103,14 @@ public final class Strike
 
     Set<BattleHex> findStrikes(int tag)
     {
-        BattleUnit battleUnit = client.getBattleUnit(tag);
+        BattleCritter battleUnit = client.getBattleUnit(tag);
         return findStrikes(battleUnit, true);
     }
 
     /** Return a set of hexes containing targets that the
      *  critter may strike.  Only include rangestrikes if rangestrike
      *  is true. */
-    private Set<BattleHex> findStrikes(BattleUnit battleUnit,
+    private Set<BattleHex> findStrikes(BattleCritter battleUnit,
         boolean rangestrike)
     {
         Set<BattleHex> set = new HashSet<BattleHex>();
@@ -179,7 +180,7 @@ public final class Strike
         return set;
     }
 
-    private int countStrikes(BattleUnit battleUnit, boolean rangestrike)
+    private int countStrikes(BattleCritter battleUnit, boolean rangestrike)
     {
         return findStrikes(battleUnit, rangestrike).size();
     }
@@ -191,7 +192,7 @@ public final class Strike
      * @deprecated Should use an extension of Battle instead of Strike
      */
     @Deprecated
-    public int minRangeToEnemy(BattleUnit battleUnit)
+    public int minRangeToEnemy(BattleCritter battleUnit)
     {
         BattleHex hex = battleUnit.getCurrentHex();
         int min = Constants.OUT_OF_RANGE;
@@ -200,7 +201,7 @@ public final class Strike
         Iterator<BattleUnit> it = battleUnits.iterator();
         while (it.hasNext())
         {
-            BattleUnit target = it.next();
+            BattleCritter target = it.next();
             if (battleUnit.isInverted() != target.isInverted())
             {
                 BattleHex targetHex = target.getCurrentHex();
@@ -480,8 +481,8 @@ public final class Strike
      *   extension of Creature instead of BattleUnit and extra BattleHex
      */
     @Deprecated
-    private boolean isRangestrikePossible(BattleUnit striker,
-        BattleUnit target)
+    private boolean isRangestrikePossible(BattleCritter striker,
+        BattleCritter target)
     {
         CreatureType creature = striker.getCreatureType();
         CreatureType targetCreature = target.getCreatureType();
@@ -784,7 +785,7 @@ public final class Strike
      *  target, including modifications for terrain.
      * WARNING: this is duplicated in CreatureServerSide
      */
-    public int getDice(BattleUnit battleUnit, BattleUnit target)
+    public int getDice(BattleCritter battleUnit, BattleCritter target)
     {
         BattleHex hex = battleUnit.getCurrentHex();
         BattleHex targetHex = target.getCurrentHex();
@@ -850,7 +851,7 @@ public final class Strike
     }
 
     /** WARNING: this is duplicated in CreatureServerSide */
-    private int getAttackerSkill(BattleUnit striker, BattleUnit target)
+    private int getAttackerSkill(BattleCritter striker, BattleCritter target)
     {
         BattleHex hex = striker.getCurrentHex();
         BattleHex targetHex = target.getCurrentHex();
@@ -935,7 +936,7 @@ public final class Strike
     }
 
     /** WARNING: this is duplicated in CreatureServerSide */
-    public int getStrikeNumber(BattleUnit striker, BattleUnit target)
+    public int getStrikeNumber(BattleCritter striker, BattleCritter target)
     {
         boolean rangestrike = !client.isInContact(striker, true);
 

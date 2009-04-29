@@ -26,6 +26,7 @@ import net.sf.colossus.common.WhatNextManager;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.EntrySide;
+import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Phase;
@@ -852,7 +853,7 @@ public final class Client implements IClient, IOracle, IVariant
 
     public boolean anyOffboardCreatures()
     {
-        for (BattleUnit battleUnit : getActiveBattleUnits())
+        for (BattleCritter battleUnit : getActiveBattleUnits())
         {
             if (battleUnit.getCurrentHex().getLabel().startsWith("X"))
             {
@@ -2105,7 +2106,7 @@ public final class Client implements IClient, IOracle, IVariant
 
     public void tryBattleMove(CritterMove cm)
     {
-        BattleUnit critter = cm.getCritter();
+        BattleCritter critter = cm.getCritter();
         BattleHex hex = cm.getEndingHex();
         doBattleMove(critter.getTag(), hex);
         aiPause();
@@ -2303,7 +2304,7 @@ public final class Client implements IClient, IOracle, IVariant
 
     /** Return true if there are any enemies adjacent to this battleChit.
      *  Dead critters count as being in contact only if countDead is true. */
-    public boolean isInContact(BattleUnit battleUnit, boolean countDead)
+    public boolean isInContact(BattleCritter battleUnit, boolean countDead)
     {
         BattleHex hex = battleUnit.getCurrentHex();
 
@@ -2321,7 +2322,7 @@ public final class Client implements IClient, IOracle, IVariant
                 BattleHex neighbor = hex.getNeighbor(i);
                 if (neighbor != null)
                 {
-                    BattleUnit other = getBattleUnit(neighbor);
+                    BattleCritter other = getBattleUnit(neighbor);
                     if (other != null
                         && (other.isInverted() != battleUnit.isInverted())
                         && (countDead || !other.isDead()))
@@ -2381,7 +2382,7 @@ public final class Client implements IClient, IOracle, IVariant
     // TODO GUI stuff?
     public void setStrikeNumbers(int tag, Set<BattleHex> targetHexes)
     {
-        BattleUnit battleUnit = getBattleUnit(tag);
+        BattleCritter battleUnit = getBattleUnit(tag);
         for (BattleHex targetHex : targetHexes)
         {
             BattleUnit target = getBattleUnit(targetHex);
@@ -2432,7 +2433,7 @@ public final class Client implements IClient, IOracle, IVariant
 
     public Player getPlayerByTag(int tag)
     {
-        BattleUnit battleUnit = getBattleUnit(tag);
+        BattleCritter battleUnit = getBattleUnit(tag);
         assert battleUnit != null : "Illegal value for tag parameter";
 
         if (battleUnit.isInverted())
@@ -3319,7 +3320,7 @@ public final class Client implements IClient, IOracle, IVariant
         return "UNKNOWN";
     }
 
-    public boolean testBattleMove(BattleUnit battleUnit, BattleHex hex)
+    public boolean testBattleMove(BattleCritter battleUnit, BattleHex hex)
     {
         if (showBattleMoves(battleUnit.getTag()).contains(hex))
         {
