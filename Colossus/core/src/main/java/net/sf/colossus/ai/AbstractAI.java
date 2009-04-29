@@ -51,8 +51,8 @@ abstract public class AbstractAI implements AI
     final static private Logger LOGGER = Logger.getLogger(AbstractAI.class
         .getName());
 
-    protected final BattleEvalConstants bec = new BattleEvalConstants();
-    protected final CreatureValueConstants cvc = new CreatureValueConstants();
+    final protected BattleEvalConstants bec = new BattleEvalConstants();
+    final protected CreatureValueConstants cvc = new CreatureValueConstants();
     /** The Client we're working for. */
     final protected Client client;
     protected Variant variant;
