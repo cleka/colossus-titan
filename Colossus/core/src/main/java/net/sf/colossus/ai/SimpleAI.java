@@ -1377,7 +1377,7 @@ public class SimpleAI extends AbstractAI
                     .size() - 1);
                 // Reduced val by 5 to make current turn recruits more
                 // valuable than next turn's recruits
-                int val = nextRecruit.getSkill() * nextRecruit.getPower() - 5;
+                int val = nextRecruit.getPointValue() - 5;
                 if (val > bestRecruitVal)
                 {
                     bestRecruitVal = val;
@@ -2246,6 +2246,7 @@ public class SimpleAI extends AbstractAI
 
     // return power and skill of a given creature given the terrain
     // board hex label
+    // *WARNING* CreatureType.getPower doesn't work for Titan.
     protected PowerSkill getNativeValue(CreatureType creature,
         MasterBoardTerrain terrain, boolean defender)
     {
