@@ -1,6 +1,7 @@
 package net.sf.colossus.game;
 
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.variant.BattleHex;
@@ -327,5 +328,119 @@ public class Creature
     public void setMoved(boolean moved)
     {
         assert (moved == hasMoved()) : "Oups, setMoved on immobile Creature";
+    }
+
+    public String[] getImageNames()
+    {
+        return getType().getImageNames();
+    }
+
+    public int getMaxCount()
+    {
+        return getType().getMaxCount();
+    }
+
+    public String getPluralName()
+    {
+        return getType().getPluralName();
+    }
+
+    void heal()
+    {
+        setHits(0);
+    }
+
+    /**
+     * @deprecated all isNative<HazardTerrain> are obsolete, one should use
+     * isNativeTerrain(<HazardTerrain>) instead, with no explicit reference
+     * to the name. This will ease adding new HazardTerrain in variant.
+     */
+    @Deprecated
+    public boolean isNativeBramble()
+    {
+        return getType().isNativeIn(HazardTerrain.BRAMBLES);
+    }
+
+    public boolean isNativeDune()
+    {
+        return getType().isNativeDune();
+    }
+
+    public boolean isNativeRiver()
+    {
+        return getType().isNativeRiver();
+    }
+
+    public boolean isNativeSlope()
+    {
+        return getType().isNativeSlope();
+    }
+
+    /**
+     * @deprecated all isNative<HazardTerrain> are obsolete, one should use
+     * isNativeTerrain(<HazardTerrain>) instead, with no explicit reference
+     * to the name. This will ease adding new HazardTerrain in variant.
+     */
+    @Deprecated
+    public boolean isNativeStone()
+    {
+        return getType().isNativeIn(HazardTerrain.STONE);
+    }
+
+    /**
+     * @deprecated all isNative<HazardTerrain> are obsolete, one should use
+     * isNativeTerrain(<HazardTerrain>) instead, with no explicit reference
+     * to the name. This will ease adding new HazardTerrain in variant.
+     */
+    @Deprecated
+    public boolean isNativeVolcano()
+    {
+        return getType().isNativeIn(HazardTerrain.VOLCANO);
+    }
+
+    @Deprecated
+    public boolean isWaterDwelling()
+    {
+        return getType().isWaterDwelling();
+    }
+
+    public boolean useMagicMissile()
+    {
+        return getType().useMagicMissile();
+    }
+
+    /** Apply damage to this critter.  Return the amount of excess damage
+     *  done, which may sometimes carry to another target. */
+    /**
+     * Apply damage to this critter.  Return the amount of excess damage
+     * done, which may sometimes carry to another target.
+     */
+    public int wound(int damage)
+    {
+        int excess = 0;
+        if (damage > 0)
+        {
+            int tmp_hits = getHits();
+            int oldhits = tmp_hits;
+            tmp_hits = tmp_hits + damage;
+            if (tmp_hits > getPower())
+            {
+                excess = tmp_hits - getPower();
+                tmp_hits = getPower();
+            }
+            LOGGER.log(Level.INFO,
+                    "Critter " + getDescription() + ": " + oldhits + " + " +
+                    damage + " => " + tmp_hits + "; " + excess + " excess");
+            // Check for death.
+            if (tmp_hits >= getPower())
+            {
+                LOGGER.log(Level.INFO,
+                        "Critter " + getDescription() + " is now dead: (hits=" +
+                        tmp_hits + " > power=" + getPower() + ")");
+                setDead(true);
+            }
+            setHits(tmp_hits);
+        }
+        return excess;
     }
 }
