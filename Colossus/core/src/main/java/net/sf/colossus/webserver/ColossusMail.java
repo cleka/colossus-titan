@@ -15,12 +15,12 @@ import net.sf.colossus.webcommon.IColossusMail;
  *  This is in webcommon (even if the client side never needs this)
  *  because on client side the "User" gets instantiated and that one
  *  needs the ColossusMail class during compile time.
- *  
+ *
  *  Right now during development time (30.12.2008) there is a boolean variable
- *    reallySendMail 
- *  which controls whether it actually sends the mail, or just prints 
+ *    reallySendMail
+ *  which controls whether it actually sends the mail, or just prints
  *  something to STDERR (because I do not have a mailserver running locally
- *  on the PC where I do the development). 
+ *  on the PC where I do the development).
  */
 
 public class ColossusMail implements IColossusMail
@@ -65,17 +65,28 @@ public class ColossusMail implements IColossusMail
             try
             {
                 testFile = new File(mailToFileName);
-                PrintWriter mailToFileWriter = new PrintWriter(
-                    new FileOutputStream(testFile, true));
-                mailToFileWriter.println("");
-                mailToFileWriter.println("WebServer started.");
-                mailToFileWriter.println("");
-                mailToFileWriter.close();
-                success = true;
+                File directory = testFile.getParentFile();
+                if (!directory.exists() || !directory.canWrite())
+                {
+                    LOGGER.warning("Invalid mailFile '" + mailToFileName
+                        + "':\n  '" + directory.getAbsolutePath()
+                        + "'\ndoes not exist or is not a writable directory! "
+                        + "Check the configuration.");
+                }
+                else
+                {
+                    PrintWriter mailToFileWriter = new PrintWriter(
+                        new FileOutputStream(testFile, true));
+                    mailToFileWriter.println("");
+                    mailToFileWriter.println("WebServer started.");
+                    mailToFileWriter.println("");
+                    mailToFileWriter.close();
+                    success = true;
+                }
             }
             catch (IOException e)
             {
-                LOGGER.warning("Exception while) trying to write "
+                LOGGER.warning("Exception while trying to write "
                     + "initial message to mail file: " + e);
             }
 
