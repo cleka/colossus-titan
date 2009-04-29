@@ -91,12 +91,6 @@ public final class BattleUnit extends Chit implements BattleCritter
         {
             id = Constants.titan;
         }
-        if (!id.equals(getCreatureType().getName()))
-        {
-            LOGGER.warning("getCreatureName() gives " + id +
-                    " but creatureType.getName() gives " + getCreatureType().
-                    getName());
-        }
         return id;
     }
 
