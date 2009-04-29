@@ -396,6 +396,28 @@ public class CreatureServerSide extends Creature
             {
                 dice--;
             }
+
+            /* TODO: remove TEST TEST TEST TEST TEST */
+            /* getStrikingPower should be used instead of the logic above, but
+             * 1) I'm not sure everyone will agree it belongs in Creature
+             * 2) I haven't had time to verify it's correct.
+             * Incidentally, if you're reading this after noticing the warning
+             * below in your logfile, then it isn't correct ;-)
+             */
+            int checkStrikingPower = getStrikingPower(target, hex
+                .getElevation(), targetHex.getElevation(),
+                hex.getTerrain(), targetHex.getTerrain(),
+                hex.getHexsideHazard(BattleServerSide.getDirection(hex,
+                    targetHex, false)),
+                targetHex.getHexsideHazard(BattleServerSide.getDirection(
+                    targetHex, hex, false)));
+
+            if (checkStrikingPower != dice)
+            {
+                LOGGER.warning("attackerPower says " + dice
+                    + " but checkStrikingPower says " + checkStrikingPower);
+            }
+            /* END TODO: remove TEST TEST TEST TEST TEST */
         }
 
         return dice;
