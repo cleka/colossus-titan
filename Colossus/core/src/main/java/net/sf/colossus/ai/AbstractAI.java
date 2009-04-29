@@ -284,7 +284,7 @@ abstract public class AbstractAI implements AI
     }
 
     /** Get the 'kill value' of a creature on a specific terrain.
-     * @param chit The BattleUnit whose value is requested.
+     * @param chit The BattleCritter whose value is requested.
      * @param terrain The terrain on which the value is requested, or null.
      * @return The 'kill value' value of chit, on terrain if non-null
      */
