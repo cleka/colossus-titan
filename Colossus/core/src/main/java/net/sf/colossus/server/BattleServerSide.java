@@ -18,7 +18,6 @@ import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
-import net.sf.colossus.gui.BattleMap;
 import net.sf.colossus.util.CompareDoubles;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.HazardTerrain;
@@ -113,7 +112,7 @@ public final class BattleServerSide extends Battle
 
     private void placeLegion(Legion legion)
     {
-        BattleHex entrance = BattleMap.getEntrance(masterHex.getTerrain(),
+        BattleHex entrance = HexMap.getEntrance(masterHex.getTerrain(),
             legion.getEntrySide());
         for (CreatureServerSide critter : ((LegionServerSide)legion)
             .getCreatures())
@@ -136,7 +135,7 @@ public final class BattleServerSide extends Battle
 
     private void placeCritter(CreatureServerSide critter)
     {
-        BattleHex entrance = BattleMap.getEntrance(masterHex.getTerrain(),
+        BattleHex entrance = HexMap.getEntrance(masterHex.getTerrain(),
             critter.getLegion().getEntrySide());
         critter.setBattleInfo(entrance, entrance, this);
         server.allPlaceNewChit(critter);
