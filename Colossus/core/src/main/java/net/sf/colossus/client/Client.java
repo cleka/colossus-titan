@@ -1195,8 +1195,11 @@ public final class Client implements IClient, IOracle, IVariant
         CreatureType type = getGame().getVariant().getCreatureByName(
             bareImageName);
 
-        BattleUnit battleUnit = new BattleUnit(5 * Scale.get(), imageName,
-            inverted, tag, hex, playerColor, this, type, legion);
+        GUIBattleChit battleChit = new GUIBattleChit(5 * Scale.get(),
+            imageName, inverted, tag, hex, playerColor, this);
+
+        BattleUnit battleUnit = new BattleUnit(imageName, inverted, tag, hex,
+            type, legion, battleChit);
         battleUnits.add(battleUnit);
 
         gui.actOnPlaceNewChit(hex);

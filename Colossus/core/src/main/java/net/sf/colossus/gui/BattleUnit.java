@@ -4,11 +4,9 @@ package net.sf.colossus.gui;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.client.Client;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.Legion;
-import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 
@@ -28,7 +26,7 @@ public final class BattleUnit implements BattleCritter
 
     private final int tag;
     private final String id;
-    private final boolean inverted;
+    private final boolean defender;
     private final CreatureType creatureType;
     private final Legion legion;
     private int hits = 0;
@@ -39,20 +37,19 @@ public final class BattleUnit implements BattleCritter
     private boolean dead;
     private final GUIBattleChit battleChit;
 
-    public BattleUnit(int scale, String id, boolean inverted, int tag,
-        BattleHex currentHex, PlayerColor playerColor, Client client,
-        CreatureType type, Legion legion)
+    public BattleUnit(String id, boolean defender, int tag,
+        BattleHex currentHex, CreatureType type, Legion legion,
+        GUIBattleChit battleChit)
     {
         if (id == null)
         {
             LOGGER.log(Level.WARNING, "Created BattleUnit with null id!");
         }
-        this.battleChit = new GUIBattleChit(scale, id, inverted, tag,
-            currentHex, playerColor, client);
+        this.battleChit = battleChit;
 
         this.tag = tag;
         this.id = id;
-        this.inverted = inverted;
+        this.defender = defender;
         this.currentHex = currentHex;
 
         this.creatureType = type;
@@ -170,7 +167,7 @@ public final class BattleUnit implements BattleCritter
 
     public boolean isInverted()
     {
-        return inverted;
+        return defender;
     }
 
     public String getId()
