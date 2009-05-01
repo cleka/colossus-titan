@@ -2446,7 +2446,7 @@ public class SimpleAI extends AbstractAI
         {
             BattleCritter critter = cm.getCritter();
             BattleHex hex = cm.getStartingHex();
-            critter.setHex(hex);
+            critter.setCurrentHex(hex);
         }
 
         if (!allOK)

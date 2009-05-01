@@ -66,32 +66,33 @@ public class GUIBattleChit extends Chit
         setBackground(Color.WHITE);
     }
 
+    // TODO ask from BattleUnit / BattleCreature
     public String getCreatureName()
     {
         String id = getId();
-        if (id == null)
-        {
-            LOGGER.log(Level.SEVERE, "Chit.getId() returned null id ?");
-            return null;
-        }
-        else if (id.startsWith(Constants.titan))
+        if (id.startsWith(Constants.titan))
         {
             id = Constants.titan;
         }
         return id;
     }
 
+    // TODO ask from BattleUnit / BattleCreature
     public int getTag()
     {
         return tag;
     }
 
+    // TODO listener to BattleUnit / BattleCreature to call us here
+    // when hits changed.
     public void setHits(int hits)
     {
         this.hits = hits;
         repaint();
     }
 
+    // TODO listener to BattleUnit / BattleCreature to call us here
+    // when hits changed.
     @Override
     public void setDead(boolean dead)
     {
@@ -102,37 +103,44 @@ public class GUIBattleChit extends Chit
         }
     }
 
+    // TODO ask from BattleUnit / BattleCreature
     public BattleHex getCurrentHex()
     {
         return currentHex;
     }
 
+    // TODO ask from BattleUnit / BattleCreature
     public BattleHex getStartingHex()
     {
         return startingHex;
     }
 
-    public void setHex(BattleHex hex)
+    // TODO ask from BattleUnit / BattleCreature
+    public void setCurrentHex(BattleHex hex)
     {
         this.currentHex = hex;
     }
 
+    // TODO ask from BattleUnit / BattleCreature
     public void moveToHex(BattleHex hex)
     {
         startingHex = currentHex;
         currentHex = hex;
     }
 
+    // TODO ask from BattleUnit / BattleCreature
     public CreatureType getCreatureType()
     {
         return creatureType;
     }
 
+    // TODO ask from BattleUnit / BattleCreature
     public boolean isTitan()
     {
         return getCreatureType().isTitan();
     }
 
+    // TODO ask from BattleUnit / BattleCreature
     public int getPower()
     {
         if (isTitan())
@@ -143,21 +151,6 @@ public class GUIBattleChit extends Chit
         {
             return getCreatureType().getPower();
         }
-    }
-
-    public int getSkill()
-    {
-        return getCreatureType().getSkill();
-    }
-
-    public int getPointValue()
-    {
-        return getPower() * getSkill();
-    }
-
-    public boolean isRangestriker()
-    {
-        return getCreatureType().isRangestriker();
     }
 
     @Override
@@ -280,21 +273,18 @@ public class GUIBattleChit extends Chit
             / 2, midScale, midScale);
     }
 
+    // TODO ask from BattleUnit / BattleCreature
     public String getDescription()
     {
         return getCreatureType().getName() + " in "
             + getCurrentHex().getLabel();
     }
 
+    // TODO ask from BattleUnit / BattleCreature
     @Override
     public String toString()
     {
         return getDescription();
-    }
-
-    protected static void setUseColoredBorders(boolean bval)
-    {
-        useColoredBorders = bval;
     }
 
     public void setStrikeNumber(int strikeNumber)
@@ -320,5 +310,10 @@ public class GUIBattleChit extends Chit
     public void setStrikeDice(int numDice)
     {
         this.numDice = numDice;
+    }
+
+    protected static void setUseColoredBorders(boolean bval)
+    {
+        useColoredBorders = bval;
     }
 }

@@ -45,7 +45,7 @@ public interface BattleCritter {
 
     void setDead(boolean dead);
 
-    void setHex(BattleHex hex);
+    void setCurrentHex(BattleHex hex);
 
     void setHits(int hits);
 

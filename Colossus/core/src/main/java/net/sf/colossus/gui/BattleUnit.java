@@ -125,10 +125,10 @@ public final class BattleUnit implements BattleCritter
         return startingHex;
     }
 
-    public void setHex(BattleHex hex)
+    public void setCurrentHex(BattleHex hex)
     {
         this.currentHex = hex;
-        battleChit.setHex(hex);
+        battleChit.setCurrentHex(hex);
     }
 
     public void moveToHex(BattleHex hex)

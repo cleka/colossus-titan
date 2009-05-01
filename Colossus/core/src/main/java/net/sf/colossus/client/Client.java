@@ -2271,7 +2271,7 @@ public final class Client implements IClient, IOracle, IVariant
         BattleCritter battleUnit = getBattleUnit(tag);
         if (battleUnit != null)
         {
-            battleUnit.setHex(endingHex);
+            battleUnit.setCurrentHex(endingHex);
             battleUnit.setMoved(!undo);
         }
 
@@ -3269,7 +3269,7 @@ public final class Client implements IClient, IOracle, IVariant
     {
         if (showBattleMoves(battleUnit.getTag()).contains(hex))
         {
-            battleUnit.setHex(hex);
+            battleUnit.setCurrentHex(hex);
             return true;
         }
         return false;
