@@ -16,7 +16,13 @@ import net.sf.colossus.variant.CreatureType;
  * GUI aspects moved to new Class GUIBattleChit, still a member variable,
  * but that might change too.
  *
+ * TODO This should at some point extend Creature, or perhaps Creature can
+ * take care of all so no extend is needed; but right now, Creature handles
+ * some things (e.g. how to change the hexes) differently than how it's done
+ * here, so can not "just delegate it" - needs investigation and checking.
+ *
  * @author David Ripton
+ * @author Clemens Katzer (strip GUI issues out, to own new Class)
  */
 @SuppressWarnings("serial")
 public final class BattleUnit implements BattleCritter
