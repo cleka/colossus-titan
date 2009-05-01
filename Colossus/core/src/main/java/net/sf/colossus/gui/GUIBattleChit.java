@@ -14,27 +14,14 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.common.Constants;
-import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 
-
-/**
- * Class BattleUnit implements the GUI for a Titan chit representing
- * a creature on a BattleMap.
- *
- * TODO this is a pretty wild mixture of GUI code with game logic -- there
- * is no representation of the creature in battle in the model, so this GUI
- * class does all that work, too. ==> move part of it into the game package
- *
- * @author David Ripton
- */
-@SuppressWarnings("serial")
-public final class BattleUnit extends Chit implements BattleCritter
+public class GUIBattleChit extends Chit
 {
-    private static final Logger LOGGER = Logger.getLogger(BattleUnit.class
+    private static final Logger LOGGER = Logger.getLogger(GUIBattleChit.class
         .getName());
 
     private final int tag;
@@ -56,47 +43,29 @@ public final class BattleUnit extends Chit implements BattleCritter
     private StrikeDie strikeDie; // Graphical representation of strikeNumber.
     private StrikeDie strikeAdjDie; // representation of dice gained or lost.
     private final int scale;
-    private final GUIBattleChit battleChit;
 
     // inner scale divided by border thickness
     private static final int borderRatio = 20;
     private static boolean useColoredBorders = false;
 
-    public BattleUnit(int scale, String id, boolean inverted, int tag,
-        BattleHex currentHex, PlayerColor playerColor, Client client,
-        CreatureType type)
+    public GUIBattleChit(int scale, String id, boolean inverted, int tag,
+        BattleHex currentHex, PlayerColor playerColor, Client client)
     {
         super(scale, id, inverted, client);
         if (id == null)
         {
             LOGGER.log(Level.WARNING, "Created BattleUnit with null id!");
         }
-        this.battleChit = new GUIBattleChit(scale, id, inverted, tag,
-            currentHex, playerColor, client);
-
         this.scale = scale;
         this.tag = tag;
         this.currentHex = currentHex;
-        this.color = HTMLColor.stringToColor(playerColor.getName() + "Colossus");
+        this.color = HTMLColor.stringToColor(playerColor.getName()
+            + "Colossus");
 
-        creatureType = type;
+        creatureType = client.getGame().getVariant().getCreatureByName(
+            getCreatureName());
 
         setBackground(Color.WHITE);
-    }
-
-    public String deriveCreatureNameFromId()
-    {
-        String id = getId();
-        if (id == null)
-        {
-            LOGGER.log(Level.SEVERE, "Chit.getId() returned null id ?");
-            return null;
-        }
-        else if (id.startsWith(Constants.titan))
-        {
-            id = Constants.titan;
-        }
-        return id;
     }
 
     public String getCreatureName()
@@ -112,11 +81,6 @@ public final class BattleUnit extends Chit implements BattleCritter
             id = Constants.titan;
         }
         return id;
-    }
-
-    public GUIBattleChit getGUIBattleChit()
-    {
-        return battleChit;
     }
 
     public int getTag()

@@ -1189,8 +1189,11 @@ public final class Client implements IClient, IOracle, IVariant
 
         PlayerColor playerColor = legion.getPlayer().getColor();
 
+        CreatureType type = getGame().getVariant().getCreatureByName(
+            bareImageName);
+
         BattleUnit battleUnit = new BattleUnit(5 * Scale.get(), imageName,
-            inverted, tag, hex, playerColor, this);
+            inverted, tag, hex, playerColor, this, type);
         battleUnits.add(battleUnit);
 
         gui.actOnPlaceNewChit(hex);
