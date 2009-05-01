@@ -20,10 +20,10 @@ import net.sf.colossus.variant.MasterHex;
 
 /**
  * Class BattleMap implements the GUI for a Titan battlemap.
- * 
+ *
  * TODO there is still model code in here, thus we still have dependencies
  *      from the AI and server packages into this class.
- * 
+ *
  * @version $Id$
  * @author David Ripton
  */
@@ -201,9 +201,10 @@ public final class BattleMap extends HexMap
             while (lit.hasPrevious())
             {
                 BattleUnit battleUnit = lit.previous();
-                if (rectClip.intersects(battleUnit.getBounds()))
+                GUIBattleChit battleChit = battleUnit.getGUIBattleChit();
+                if (rectClip.intersects(battleChit.getBounds()))
                 {
-                    battleUnit.paintComponent(g);
+                    battleChit.paintComponent(g);
                 }
             }
             if (attackerMarker.getLocation().x > 0) // don't paint till placed

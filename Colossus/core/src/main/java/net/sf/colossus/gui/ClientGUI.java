@@ -415,7 +415,8 @@ public class ClientGUI implements IClientGUI
         for (BattleHex targetHex : targetHexes)
         {
             BattleUnit target = client.getBattleUnit(targetHex);
-            target.setStrikeNumber(client.getStrike().getStrikeNumber(
+            target.getGUIBattleChit().setStrikeNumber(
+                client.getStrike().getStrikeNumber(
                 battleUnit, target));
         }
     }
@@ -425,8 +426,8 @@ public class ClientGUI implements IClientGUI
     {
         for (BattleUnit battleUnit : client.getBattleUnits())
         {
-            battleUnit.setStrikeNumber(0);
-            battleUnit.setStrikeDice(0);
+            battleUnit.getGUIBattleChit().setStrikeNumber(0);
+            battleUnit.getGUIBattleChit().setStrikeDice(0);
         }
     }
 
@@ -816,7 +817,7 @@ public class ClientGUI implements IClientGUI
             public void booleanOptionChanged(String optname, boolean oldValue,
                 boolean newValue)
             {
-                BattleUnit.setUseColoredBorders(newValue);
+                GUIBattleChit.setUseColoredBorders(newValue);
                 repaintAllWindows();
             }
         });

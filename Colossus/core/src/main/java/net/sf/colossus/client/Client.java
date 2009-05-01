@@ -36,6 +36,7 @@ import net.sf.colossus.game.Proposal;
 import net.sf.colossus.game.SummonInfo;
 import net.sf.colossus.gui.BattleUnit;
 import net.sf.colossus.gui.ClientGUI;
+import net.sf.colossus.gui.GUIBattleChit;
 import net.sf.colossus.gui.IClientGUI;
 import net.sf.colossus.gui.NullClientGUI;
 import net.sf.colossus.gui.Scale;
@@ -891,11 +892,13 @@ public final class Client implements IClient, IOracle, IVariant
 
     private void markOffboardCreaturesDead()
     {
-        for (BattleCritter battleUnit : getActiveBattleUnits())
+        for (BattleUnit battleUnit : getActiveBattleUnits())
         {
             if (battleUnit.getCurrentHex().getLabel().startsWith("X"))
             {
                 battleUnit.setDead(true);
+                GUIBattleChit battleChit = battleUnit.getGUIBattleChit();
+                battleChit.setDead(true);
             }
         }
     }
@@ -1193,7 +1196,7 @@ public final class Client implements IClient, IOracle, IVariant
             bareImageName);
 
         BattleUnit battleUnit = new BattleUnit(5 * Scale.get(), imageName,
-            inverted, tag, hex, playerColor, this, type);
+            inverted, tag, hex, playerColor, this, type, legion);
         battleUnits.add(battleUnit);
 
         gui.actOnPlaceNewChit(hex);
@@ -1506,22 +1509,26 @@ public final class Client implements IClient, IOracle, IVariant
 
         gui.disposePickCarryDialog();
 
-        BattleCritter targetChit = getBattleUnit(targetTag);
+        BattleUnit targetUnit = getBattleUnit(targetTag);
+        GUIBattleChit targetChit = targetUnit.getGUIBattleChit();
+        BattleCritter targetCritter = getBattleUnit(targetTag);
 
         gui.actOnTellStrikeResults(wasCarry, strikeNumber, rolls, battleUnit,
-            targetChit);
+            targetUnit);
 
-        if (targetChit != null)
+        if (targetCritter != null)
         {
             if (killed)
             {
+                targetCritter.setDead(true);
                 targetChit.setDead(true);
             }
             else
             {
                 if (damage > 0)
                 {
-                    targetChit.setHits(targetChit.getHits() + damage);
+                    targetCritter.setHits(targetUnit.getHits() + damage);
+                    targetChit.setHits(targetUnit.getHits() + damage);
                 }
             }
         }

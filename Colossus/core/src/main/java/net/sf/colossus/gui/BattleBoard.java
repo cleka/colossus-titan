@@ -586,7 +586,7 @@ public final class BattleBoard extends KFrame
         List<BattleUnit> battleUnits = client.getBattleUnits();
         for (BattleUnit battleUnit : battleUnits)
         {
-            if (battleUnit.contains(point))
+            if (battleUnit.getGUIBattleChit().contains(point))
             {
                 return battleUnit;
             }
@@ -605,7 +605,7 @@ public final class BattleBoard extends KFrame
             return;
         }
         BattleUnit battleUnit = battleUnits.get(0);
-        int chitscale = battleUnit.getBounds().width;
+        int chitscale = battleUnit.getGUIBattleChit().getBounds().width;
         int chitscale4 = chitscale / 4;
 
         Point point = new Point(hex.findCenter());
@@ -615,15 +615,15 @@ public final class BattleBoard extends KFrame
         point.x -= offset;
         point.y -= offset;
 
-        battleMap.add(battleUnit);
-        battleUnit.setLocation(point);
+        battleMap.add(battleUnit.getGUIBattleChit());
+        battleUnit.getGUIBattleChit().setLocation(point);
 
         for (int i = 1; i < numChits; i++)
         {
             point.x += chitscale4;
             point.y += chitscale4;
             battleUnit = battleUnits.get(i);
-            battleUnit.setLocation(point);
+            battleUnit.getGUIBattleChit().setLocation(point);
         }
         hex.repaint();
     }
@@ -769,7 +769,7 @@ public final class BattleBoard extends KFrame
         while (it.hasNext())
         {
             BattleUnit battleUnit = it.next();
-            battleUnit.rescale(chitScale);
+            battleUnit.getGUIBattleChit().rescale(chitScale);
         }
         alignChits(battleMap.getAllHexes());
 

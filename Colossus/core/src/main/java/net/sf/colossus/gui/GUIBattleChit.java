@@ -32,8 +32,6 @@ public class GUIBattleChit extends Chit
     private int hits = 0;
     private BattleHex currentHex;
     private BattleHex startingHex;
-    private boolean moved;
-    private boolean struck;
     private final Color color;
     private static BasicStroke borderStroke;
     private Rectangle midRect;
@@ -54,7 +52,7 @@ public class GUIBattleChit extends Chit
         super(scale, id, inverted, client);
         if (id == null)
         {
-            LOGGER.log(Level.WARNING, "Created BattleUnit with null id!");
+            LOGGER.log(Level.WARNING, "Created GUIBattleChit with null id!");
         }
         this.scale = scale;
         this.tag = tag;
@@ -88,20 +86,10 @@ public class GUIBattleChit extends Chit
         return tag;
     }
 
-    public int getHits()
-    {
-        return hits;
-    }
-
     public void setHits(int hits)
     {
         this.hits = hits;
         repaint();
-    }
-
-    public boolean wouldDieFrom(int hits)
-    {
-        return (hits + getHits() >= getPower());
     }
 
     @Override
@@ -133,28 +121,6 @@ public class GUIBattleChit extends Chit
     {
         startingHex = currentHex;
         currentHex = hex;
-    }
-
-    // TODO make package private
-    public boolean hasMoved()
-    {
-        return moved;
-    }
-
-    // TODO make package private
-    public void setMoved(boolean moved)
-    {
-        this.moved = moved;
-    }
-
-    public boolean hasStruck()
-    {
-        return struck;
-    }
-
-    public void setStruck(boolean struck)
-    {
-        this.struck = struck;
     }
 
     public CreatureType getCreatureType()
