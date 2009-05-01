@@ -1176,45 +1176,24 @@ public final class Client implements IClient, IOracle, IVariant
     }
 
     // TODO move to GUI ?
-    public void placeNewChit(String imageName, boolean inverted, int tag,
+    public void placeNewChit(String bareImageName, boolean inverted, int tag,
         BattleHex hex)
     {
-        addBattleChit(imageName, inverted, tag, hex);
-        gui.actOnPlaceNewChit(hex);
-    }
+        Legion legion = inverted ? getDefender() : getAttacker();
 
-    // TODO move to GUI ?
-    /** Create a new BattleUnit and add it to the end of the list. */
-    private void addBattleChit(final String bareImageName, boolean inverted,
-        int tag, BattleHex hex)
-    {
         String imageName = bareImageName;
         if (imageName.equals(Constants.titan))
         {
-            if (inverted)
-            {
-                imageName = getDefender().getPlayer().getTitanBasename();
-            }
-            else
-            {
-                imageName = getAttacker().getPlayer().getTitanBasename();
-            }
+            imageName = legion.getPlayer().getTitanBasename();
         }
-        PlayerColor playerColor;
-        if (inverted)
-        {
-            Player player = getDefender().getPlayer();
-            playerColor = player.getColor();
-        }
-        else
-        {
-            Player player = getAttacker().getPlayer();
-            playerColor = player.getColor();
-        }
+
+        PlayerColor playerColor = legion.getPlayer().getColor();
+
         BattleUnit battleUnit = new BattleUnit(5 * Scale.get(), imageName,
-            inverted,
-            tag, hex, playerColor, this);
+            inverted, tag, hex, playerColor, this);
         battleUnits.add(battleUnit);
+
+        gui.actOnPlaceNewChit(hex);
     }
 
     public CreatureType chooseBestPotentialRecruit(LegionClientSide legion,
