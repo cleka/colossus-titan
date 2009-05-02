@@ -115,6 +115,12 @@ public class NullClientGUI implements IClientGUI
 
     }
 
+    public void addBattleChit(GUIBattleChit battleChit)
+    {
+        // TODO Auto-generated method stub
+
+    }
+
     public void actOnPlaceNewChit(BattleHex hex)
     {
         // TODO Auto-generated method stub

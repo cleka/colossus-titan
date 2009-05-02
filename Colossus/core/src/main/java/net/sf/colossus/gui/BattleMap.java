@@ -5,8 +5,6 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ConcurrentModificationException;
-import java.util.List;
-import java.util.ListIterator;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,17 +34,19 @@ public final class BattleMap extends HexMap
     private static int count = 1;
 
     private final Client client;
+    private final ClientGUI gui;
 
     private final Marker attackerMarker;
     private final Marker defenderMarker;
 
     // TODO pass Legions instead of markerIds
     public BattleMap(Client client, MasterHex masterHex,
-        String attackerMarkerId, String defenderMarkerId)
+        String attackerMarkerId, String defenderMarkerId, ClientGUI gui)
     {
         super(masterHex);
 
         this.client = client;
+        this.gui = gui;
 
         attackerMarker = new Marker(3 * Scale.get(), attackerMarkerId, false);
         defenderMarker = new Marker(3 * Scale.get(), defenderMarkerId, true);
@@ -195,13 +195,8 @@ public final class BattleMap extends HexMap
 
         try
         {
-            List<BattleUnit> battleUnits = client.getBattleUnits();
-            ListIterator<BattleUnit> lit = battleUnits
-                .listIterator(battleUnits.size());
-            while (lit.hasPrevious())
+            for (GUIBattleChit battleChit : gui.getGUIBattleChits())
             {
-                BattleUnit battleUnit = lit.previous();
-                GUIBattleChit battleChit = battleUnit.getGUIBattleChit();
                 if (rectClip.intersects(battleChit.getBounds()))
                 {
                     battleChit.paintComponent(g);

@@ -277,6 +277,8 @@ public interface IClientGUI
 
     public abstract void actOnSetupBattleSummon();
 
+    public abstract void addBattleChit(GUIBattleChit battleChit);
+
     public abstract void actOnPlaceNewChit(BattleHex hex);
 
     public abstract void resetStrikeNumbers();

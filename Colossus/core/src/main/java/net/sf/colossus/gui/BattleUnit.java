@@ -15,8 +15,7 @@ import net.sf.colossus.variant.CreatureType;
 
 /**
  * Class BattleUnit represents a Creature in a specific Battle.
- * GUI aspects moved to new Class GUIBattleChit, still a member variable,
- * but that might change too.
+ * GUI aspects moved to new Class GUIBattleChit.
  *
  * TODO This should at some point extend Creature, or perhaps Creature can
  * take care of all so no extend is needed; but right now, Creature handles
@@ -43,13 +42,11 @@ public final class BattleUnit implements BattleCritter
     private boolean moved;
     private boolean struck;
     private boolean dead;
-    private GUIBattleChit battleChit;
 
     /** Listeners to be informed when something changes, e.g. right now only
      *  GUIBattleChit that needs to repaint if dead or hits change.
      */
     private final Set<Listener> listeners = new TreeSet<Listener>();
-
 
     public BattleUnit(String id, boolean defender, int tag,
         BattleHex currentHex, CreatureType type, Legion legion)
@@ -66,16 +63,6 @@ public final class BattleUnit implements BattleCritter
 
         this.creatureType = type;
         this.legion = legion;
-    }
-
-    public void setBattleChit(GUIBattleChit battleChit)
-    {
-        this.battleChit = battleChit;
-    }
-
-    public GUIBattleChit getGUIBattleChit()
-    {
-        return battleChit;
     }
 
     public String deriveCreatureNameFromId()
@@ -255,8 +242,8 @@ public final class BattleUnit implements BattleCritter
     }
 
     /**
-     * Listeners who needs to be notified if (currently) hits or dead
-     * values change, to trigger a repaint: GUIBattleChit
+     * Listeners who needs to be notified if (currently) hits or dead values
+     * change, to trigger repaint: a GUIBattleChit representing this creature
      */
     abstract public class Listener
     {

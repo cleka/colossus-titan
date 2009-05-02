@@ -100,7 +100,7 @@ final class BattleMovement
         for (String hexLabel : terrain.getStartList())
         {
             BattleHex hex = HexMap.getHexByLabel(terrain, hexLabel);
-            if (!isOccupied(hex))
+            if (!client.isOccupied(hex))
             {
                 set.add(hex);
             }
@@ -108,19 +108,8 @@ final class BattleMovement
         return set;
     }
 
-    private boolean isOccupied(BattleHex hex)
-    {
-        return !client.getBattleUnits(hex).isEmpty();
-    }
-
-    Set<BattleHex> showMoves(int tag)
-    {
-        BattleCritter battleUnit = client.getBattleUnit(tag);
-        return showMoves(battleUnit);
-    }
-
     /** Find all legal moves for this critter.*/
-    private Set<BattleHex> showMoves(BattleCritter battleUnit)
+    public Set<BattleHex> showMoves(BattleCritter battleUnit)
     {
         Set<BattleHex> set = new HashSet<BattleHex>();
         if (!battleUnit.hasMoved() && !client.isInContact(battleUnit, false))

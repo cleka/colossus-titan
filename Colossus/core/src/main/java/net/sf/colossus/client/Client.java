@@ -1176,7 +1176,10 @@ public final class Client implements IClient, IOracle, IVariant
         gui.repaintBattleBoard();
     }
 
-    // TODO move to GUI ?
+    /** Create a new BattleUnit and (if GUI) a new GUIBattleChit with
+     *  the given parameters. Place them in given hex, and add them to
+     *  the lists of BattleUnits (in Client) and GUIBattleChits (in GUI)
+     */
     public void placeNewChit(String bareImageName, boolean inverted, int tag,
         BattleHex hex)
     {
@@ -1195,11 +1198,12 @@ public final class Client implements IClient, IOracle, IVariant
 
         BattleUnit battleUnit = new BattleUnit(imageName, inverted, tag, hex,
             type, legion);
-        GUIBattleChit battleChit = new GUIBattleChit(5 * Scale.get(),
-            imageName, inverted, playerColor, this, battleUnit);
-        battleUnit.setBattleChit(battleChit);
         battleUnits.add(battleUnit);
 
+        // TODO move creation also to GUI.
+        GUIBattleChit battleChit = new GUIBattleChit(5 * Scale.get(),
+            imageName, inverted, playerColor, this, battleUnit);
+        gui.addBattleChit(battleChit);
         gui.actOnPlaceNewChit(hex);
     }
 
@@ -2350,9 +2354,9 @@ public final class Client implements IClient, IOracle, IVariant
         return set;
     }
 
-    public Set<BattleHex> showBattleMoves(int tag)
+    public Set<BattleHex> showBattleMoves(BattleCritter battleCritter)
     {
-        return battleMovement.showMoves(tag);
+        return battleMovement.showMoves(battleCritter);
     }
 
     public Set<BattleHex> findCrittersWithTargets()
@@ -3262,7 +3266,7 @@ public final class Client implements IClient, IOracle, IVariant
 
     public boolean testBattleMove(BattleCritter battleUnit, BattleHex hex)
     {
-        if (showBattleMoves(battleUnit.getTag()).contains(hex))
+        if (showBattleMoves(battleUnit).contains(hex))
         {
             battleUnit.setCurrentHex(hex);
             return true;

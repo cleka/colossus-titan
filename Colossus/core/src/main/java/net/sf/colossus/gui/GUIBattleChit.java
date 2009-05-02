@@ -105,6 +105,11 @@ public class GUIBattleChit extends Chit
         return battleUnit.getTag();
     }
 
+    public BattleUnit getBattleUnit()
+    {
+        return battleUnit;
+    }
+
     public void updateAndRepaint()
     {
         this.hits = battleUnit.getHits();

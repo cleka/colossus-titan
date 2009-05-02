@@ -7,6 +7,8 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -41,6 +43,8 @@ import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.Proposal;
 import net.sf.colossus.game.SummonInfo;
+import net.sf.colossus.util.CollectionHelper;
+import net.sf.colossus.util.Predicate;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.IVariant;
@@ -102,6 +106,8 @@ public class ClientGUI implements IClientGUI
      * identifiers of something) isn't that safe.
      */
     private final LinkedList<Object> undoStack = new LinkedList<Object>();
+
+    private final List<GUIBattleChit> battleChits = new ArrayList<GUIBattleChit>();
 
     /** Information on the current moving legion. */
     private Legion mover;
@@ -409,25 +415,25 @@ public class ClientGUI implements IClientGUI
             .getAttacker(), client.getDefender());
     }
 
-    public void setStrikeNumbers(BattleUnit battleUnit,
+    public void setStrikeNumbers(BattleUnit striker,
         Set<BattleHex> targetHexes)
     {
         for (BattleHex targetHex : targetHexes)
         {
-            BattleUnit target = client.getBattleUnit(targetHex);
-            target.getGUIBattleChit().setStrikeNumber(
-                client.getStrike().getStrikeNumber(
-                battleUnit, target));
+            GUIBattleChit targetChit = getGUIBattleChit(targetHex);
+            BattleUnit target = targetChit.getBattleUnit();
+            int strikeNr = client.getStrike().getStrikeNumber(striker, target);
+            targetChit.setStrikeNumber(strikeNr);
         }
     }
 
     /** reset all strike numbers on chits */
     public void resetStrikeNumbers()
     {
-        for (BattleUnit battleUnit : client.getBattleUnits())
+        for (GUIBattleChit battleChit : getGUIBattleChits())
         {
-            battleUnit.getGUIBattleChit().setStrikeNumber(0);
-            battleUnit.getGUIBattleChit().setStrikeDice(0);
+            battleChit.setStrikeNumber(0);
+            battleChit.setStrikeDice(0);
         }
     }
 
@@ -2137,8 +2143,56 @@ public class ClientGUI implements IClientGUI
         updateStatusScreen();
     }
 
+    public void addBattleChit(GUIBattleChit battleChit)
+    {
+        battleChits.add(battleChit);
+    }
+
+    /**
+     * Get a list of all GUIBattleChits (on the current BattleMap)
+     * @return The list of GUIBattleChits
+     */
+    public List<GUIBattleChit> getGUIBattleChits()
+    {
+        return Collections.unmodifiableList(battleChits);
+    }
+
+    /**
+     * Find all GUIBattleChits that occupy a specified hex
+     * Note that this can be several for the offboard position(s)
+     *
+     * @param hex The hex to give Chits for
+     * @return A List of GUIBattleChits
+     */
+    public List<GUIBattleChit> getGUIBattleChitsInHex(final BattleHex hex)
+    {
+        return CollectionHelper.selectAsList(battleChits,
+            new Predicate<GUIBattleChit>()
+            {
+                public boolean matches(GUIBattleChit battleChit)
+                {
+                    return hex.equals(battleChit.getBattleUnit()
+                        .getCurrentHex());
+                }
+            }
+        );
+    }
+
+    public GUIBattleChit getGUIBattleChit(BattleHex hex)
+    {
+        for (GUIBattleChit battleChit : getGUIBattleChits())
+        {
+            if (hex.equals(battleChit.getBattleUnit().getCurrentHex()))
+            {
+                return battleChit;
+            }
+        }
+        return null;
+    }
+
     public void actOnPlaceNewChit(BattleHex hex)
     {
+        // TODO is the "if ( != null)" still needed?
         if (battleBoard != null)
         {
             battleBoard.alignChits(hex);
@@ -2196,6 +2250,7 @@ public class ClientGUI implements IClientGUI
             battleBoard.dispose();
             battleBoard = null;
         }
+        battleChits.clear();
     }
 
     void undoLastRecruit()

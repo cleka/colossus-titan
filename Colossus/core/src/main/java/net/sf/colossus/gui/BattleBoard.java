@@ -17,7 +17,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -41,6 +40,7 @@ import javax.swing.WindowConstants;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
+import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.PlayerColor;
@@ -185,7 +185,7 @@ public final class BattleBoard extends KFrame
         setLocation(location);
 
         battleMap = new BattleMap(client, masterHex, attackerMarkerId,
-            defenderMarkerId);
+            defenderMarkerId, gui);
         contentPane.add(new JScrollPane(battleMap), BorderLayout.CENTER);
         battleMap.addMouseListener(new MouseAdapter()
         {
@@ -201,10 +201,10 @@ public final class BattleBoard extends KFrame
 
                 Point point = e.getPoint();
 
-                BattleUnit battleUnit = getBattleUnitAtPoint(point);
+                GUIBattleChit battleChit = getBattleChitAtPoint(point);
                 GUIBattleHex hex = battleMap.getHexContainingPoint(point);
 
-                handleMousePressed(battleUnit, hex);
+                handleMousePressed(battleChit, hex);
             }
         });
 
@@ -247,7 +247,7 @@ public final class BattleBoard extends KFrame
         reqFocus();
     }
 
-    private void handleMousePressed(BattleUnit battleUnit, GUIBattleHex hex)
+    private void handleMousePressed(GUIBattleChit battleChit, GUIBattleHex hex)
     {
         String hexLabel = "";
         gui.resetStrikeNumbers();
@@ -258,13 +258,13 @@ public final class BattleBoard extends KFrame
 
         String choiceDesc;
         PickCarry pickCarryDialog = getGUI().getPickCarryDialog();
-        boolean ownChit = (battleUnit != null && client
-            .getPlayerByTag(battleUnit.getTag()).equals(
+        boolean ownChit = (battleChit != null && client.getPlayerByTag(
+            battleChit.getTag()).equals(
                 client.getBattleActivePlayer()));
 
         if (pickCarryDialog != null)
         {
-            if (battleUnit != null && !ownChit)
+            if (battleChit != null && !ownChit)
             {
                 choiceDesc = pickCarryDialog.findCarryChoiceForHex(hexLabel);
                 // clicked on possible carry target
@@ -282,9 +282,9 @@ public final class BattleBoard extends KFrame
                 // not a chit, or at least not own chit
             }
         }
-        else if (battleUnit != null && ownChit)
+        else if (battleChit != null && ownChit)
         {
-            actOnCritter(battleUnit);
+            actOnCritter(battleChit);
         }
 
         // No hits on friendly chits, so check map.
@@ -579,16 +579,15 @@ public final class BattleBoard extends KFrame
         }
     }
 
-    /** Return the BattleUnit containing the given point,
+    /** Return the BattleChit containing the given point,
      *  or null if none does. */
-    private BattleUnit getBattleUnitAtPoint(Point point)
+    private GUIBattleChit getBattleChitAtPoint(Point point)
     {
-        List<BattleUnit> battleUnits = client.getBattleUnits();
-        for (BattleUnit battleUnit : battleUnits)
+        for (GUIBattleChit battleChit : gui.getGUIBattleChits())
         {
-            if (battleUnit.getGUIBattleChit().contains(point))
+            if (battleChit.contains(point))
             {
-                return battleUnit;
+                return battleChit;
             }
         }
         return null;
@@ -597,15 +596,17 @@ public final class BattleBoard extends KFrame
     public void alignChits(BattleHex battleHex)
     {
         GUIBattleHex hex = battleMap.getGUIHexByModelHex(battleHex);
-        List<BattleUnit> battleUnits = client.getBattleUnits(battleHex);
-        int numChits = battleUnits.size();
+        List<GUIBattleChit> battleChits = gui
+            .getGUIBattleChitsInHex(battleHex);
+        int numChits = battleChits.size();
         if (numChits < 1)
         {
             hex.repaint();
             return;
         }
-        BattleUnit battleUnit = battleUnits.get(0);
-        int chitscale = battleUnit.getGUIBattleChit().getBounds().width;
+
+        GUIBattleChit battleChit = battleChits.get(0);
+        int chitscale = battleChit.getBounds().width;
         int chitscale4 = chitscale / 4;
 
         Point point = new Point(hex.findCenter());
@@ -615,15 +616,15 @@ public final class BattleBoard extends KFrame
         point.x -= offset;
         point.y -= offset;
 
-        battleMap.add(battleUnit.getGUIBattleChit());
-        battleUnit.getGUIBattleChit().setLocation(point);
+        battleMap.add(battleChit);
+        battleChit.setLocation(point);
 
         for (int i = 1; i < numChits; i++)
         {
             point.x += chitscale4;
             point.y += chitscale4;
-            battleUnit = battleUnits.get(i);
-            battleUnit.getGUIBattleChit().setLocation(point);
+            battleChit = battleChits.get(i);
+            battleChit.setLocation(point);
         }
         hex.repaint();
     }
@@ -646,9 +647,9 @@ public final class BattleBoard extends KFrame
         battleMap.selectEntranceHexes(set);
     }
 
-    private void highlightMoves(int tag)
+    private void highlightMoves(BattleCritter critter)
     {
-        Set<BattleHex> set = client.showBattleMoves(tag);
+        Set<BattleHex> set = client.showBattleMoves(critter);
         battleMap.unselectAllHexes();
         battleMap.unselectEntranceHexes();
         battleMap.selectHexes(set);
@@ -703,21 +704,21 @@ public final class BattleBoard extends KFrame
         return (answer == JOptionPane.YES_OPTION);
     }
 
-    private void actOnCritter(BattleUnit battleUnit)
+    private void actOnCritter(GUIBattleChit battleChit)
     {
-        selectedCritterTag = battleUnit.getTag();
+        selectedCritterTag = battleChit.getTag();
 
         // XXX Put selected chit at the top of the z-order.
         // Then getGUIHexByLabel(hexLabel).repaint();
         BattlePhase phase = client.getBattlePhase();
         if (phase == BattlePhase.MOVE)
         {
-            highlightMoves(selectedCritterTag);
+            highlightMoves(battleChit.getBattleUnit());
         }
         else if (phase.isFightPhase())
         {
             client.leaveCarryMode();
-            highlightStrikes(battleUnit);
+            highlightStrikes(battleChit.getBattleUnit());
         }
     }
 
@@ -764,12 +765,9 @@ public final class BattleBoard extends KFrame
         battleMap.setupHexes();
 
         int chitScale = 4 * Scale.get();
-        List<BattleUnit> battleUnits = client.getBattleUnits();
-        Iterator<BattleUnit> it = battleUnits.iterator();
-        while (it.hasNext())
+        for (GUIBattleChit battleChit : gui.getGUIBattleChits())
         {
-            BattleUnit battleUnit = it.next();
-            battleUnit.getGUIBattleChit().rescale(chitScale);
+            battleChit.rescale(chitScale);
         }
         alignChits(battleMap.getAllHexes());
 
