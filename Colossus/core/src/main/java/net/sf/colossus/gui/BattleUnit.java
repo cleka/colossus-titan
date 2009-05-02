@@ -174,7 +174,7 @@ public final class BattleUnit implements BattleCritter
         return creatureType;
     }
 
-    public boolean isInverted()
+    public boolean isDefender()
     {
         return defender;
     }

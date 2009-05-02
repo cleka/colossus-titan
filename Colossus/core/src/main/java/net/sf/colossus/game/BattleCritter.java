@@ -37,7 +37,7 @@ public interface BattleCritter {
 
     boolean isDead();
 
-    boolean isInverted();
+    boolean isDefender();
 
     boolean isRangestriker();
 

@@ -3119,7 +3119,7 @@ public class SimpleAI extends AbstractAI
                 if (neighbor != null && client.isOccupied(neighbor))
                 {
                     BattleCritter other = client.getBattleUnit(neighbor);
-                    if (other.isInverted() == critter.isInverted())
+                    if (other.isDefender() == critter.isDefender())
                     {
                         // Buddy
                         if (other.isTitan())

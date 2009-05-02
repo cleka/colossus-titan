@@ -1153,7 +1153,7 @@ public final class Client implements IClient, IOracle, IVariant
 
                 // Also remove it from LegionInfo.
                 String name = battleUnit.getId();
-                if (battleUnit.isInverted())
+                if (battleUnit.isDefender())
                 {
                     Legion legion = getDefender();
                     ((LegionClientSide)legion).removeCreature(name);
@@ -2314,7 +2314,7 @@ public final class Client implements IClient, IOracle, IVariant
                 {
                     BattleCritter other = getBattleUnit(neighbor);
                     if (other != null
-                        && (other.isInverted() != battleUnit.isInverted())
+                        && (other.isDefender() != battleUnit.isDefender())
                         && (countDead || !other.isDead()))
                     {
                         return true;
@@ -2380,7 +2380,7 @@ public final class Client implements IClient, IOracle, IVariant
         BattleCritter battleUnit = getBattleUnit(tag);
         assert battleUnit != null : "Illegal value for tag parameter";
 
-        if (battleUnit.isInverted())
+        if (battleUnit.isDefender())
         {
             return getDefender().getPlayer();
         }

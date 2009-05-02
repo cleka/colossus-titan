@@ -121,7 +121,7 @@ public final class Strike
             return set;
         }
 
-        boolean inverted = battleUnit.isInverted();
+        boolean inverted = battleUnit.isDefender();
         BattleHex currentHex = battleUnit.getCurrentHex();
 
         boolean adjacentEnemy = false;
@@ -137,7 +137,7 @@ public final class Strike
                     && !targetHex.isEntrance())
                 {
                     BattleCritter target = client.getBattleUnit(targetHex);
-                    if (target.isInverted() != inverted)
+                    if (target.isDefender() != inverted)
                     {
                         adjacentEnemy = true;
                         if (!target.isDead())
@@ -191,7 +191,7 @@ public final class Strike
 
         for (BattleCritter target : client.getBattleUnits())
         {
-            if (battleUnit.isInverted() != target.isInverted())
+            if (battleUnit.isDefender() != target.isDefender())
             {
                 BattleHex targetHex = target.getCurrentHex();
                 int range = Battle.getRange(hex, targetHex, false);
