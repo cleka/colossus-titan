@@ -16,22 +16,17 @@ import net.sf.colossus.client.Client;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.util.HTMLColor;
-import net.sf.colossus.variant.BattleHex;
-import net.sf.colossus.variant.CreatureType;
 
 public class GUIBattleChit extends Chit
 {
     private static final Logger LOGGER = Logger.getLogger(GUIBattleChit.class
         .getName());
 
-    private final int tag;
-    private final CreatureType creatureType;
+    private final BattleUnit battleUnit;
     private static Font font;
     private static Font oldFont;
     private static int fontHeight;
     private int hits = 0;
-    private BattleHex currentHex;
-    private BattleHex startingHex;
     private final Color color;
     private static BasicStroke borderStroke;
     private Rectangle midRect;
@@ -46,27 +41,36 @@ public class GUIBattleChit extends Chit
     private static final int borderRatio = 20;
     private static boolean useColoredBorders = false;
 
-    public GUIBattleChit(int scale, String id, boolean inverted, int tag,
-        BattleHex currentHex, PlayerColor playerColor, Client client)
+    public GUIBattleChit(int scale, String id, boolean inverted,
+        PlayerColor playerColor, Client client, BattleUnit battleUnit)
     {
         super(scale, id, inverted, client);
         if (id == null)
         {
             LOGGER.log(Level.WARNING, "Created GUIBattleChit with null id!");
         }
+        this.battleUnit = battleUnit;
+
+        battleUnit.addListener(battleUnit.new Listener()
+        {
+            @Override
+            public void actOnHitOrDeadChanged()
+            {
+                // TODO Auto-generated method stub
+                updateAndRepaint();
+            }
+        });
+
         this.scale = scale;
-        this.tag = tag;
-        this.currentHex = currentHex;
+
         this.color = HTMLColor.stringToColor(playerColor.getName()
             + "Colossus");
 
-        creatureType = client.getGame().getVariant().getCreatureByName(
-            getCreatureName());
-
         setBackground(Color.WHITE);
+
     }
 
-    // TODO ask from BattleUnit / BattleCreature
+    // TODO does asking from BattleUnit / BattleCreature give same result?
     public String getCreatureName()
     {
         String id = getId();
@@ -74,83 +78,48 @@ public class GUIBattleChit extends Chit
         {
             id = Constants.titan;
         }
+
+        String buName = battleUnit.getCreatureType().getName();
+        if (!buName.equals(id))
+        {
+            LOGGER.warning("own name is " + id + " but battleUnit gave us "
+                + buName + "!");
+        }
         return id;
     }
 
-    // TODO ask from BattleUnit / BattleCreature
+    public String getDescription()
+    {
+        return battleUnit.getCreatureType().getName() + " in "
+            + battleUnit.getCurrentHex().getLabel();
+    }
+
+    @Override
+    public String toString()
+    {
+        return getDescription();
+    }
+
     public int getTag()
     {
-        return tag;
+        return battleUnit.getTag();
     }
 
-    // TODO listener to BattleUnit / BattleCreature to call us here
-    // when hits changed.
-    public void setHits(int hits)
+    public void updateAndRepaint()
     {
-        this.hits = hits;
-        repaint();
+        this.hits = battleUnit.getHits();
+        setDead(battleUnit.isDead());
     }
 
-    // TODO listener to BattleUnit / BattleCreature to call us here
-    // when hits changed.
     @Override
     public void setDead(boolean dead)
     {
-        super.setDead(dead);
         if (dead)
         {
-            setHits(0);
+            this.hits = 0;
         }
-    }
-
-    // TODO ask from BattleUnit / BattleCreature
-    public BattleHex getCurrentHex()
-    {
-        return currentHex;
-    }
-
-    // TODO ask from BattleUnit / BattleCreature
-    public BattleHex getStartingHex()
-    {
-        return startingHex;
-    }
-
-    // TODO ask from BattleUnit / BattleCreature
-    public void setCurrentHex(BattleHex hex)
-    {
-        this.currentHex = hex;
-    }
-
-    // TODO ask from BattleUnit / BattleCreature
-    public void moveToHex(BattleHex hex)
-    {
-        startingHex = currentHex;
-        currentHex = hex;
-    }
-
-    // TODO ask from BattleUnit / BattleCreature
-    public CreatureType getCreatureType()
-    {
-        return creatureType;
-    }
-
-    // TODO ask from BattleUnit / BattleCreature
-    public boolean isTitan()
-    {
-        return getCreatureType().isTitan();
-    }
-
-    // TODO ask from BattleUnit / BattleCreature
-    public int getPower()
-    {
-        if (isTitan())
-        {
-            return getTitanPower();
-        }
-        else
-        {
-            return getCreatureType().getPower();
-        }
+        // Chit.setDead() triggers repaint
+        super.setDead(dead);
     }
 
     @Override
@@ -271,20 +240,6 @@ public class GUIBattleChit extends Chit
         int midScale = (int)(Math.round((scale + innerScale) / 2.0));
         midRect = new Rectangle(center.x - midScale / 2, center.y - midScale
             / 2, midScale, midScale);
-    }
-
-    // TODO ask from BattleUnit / BattleCreature
-    public String getDescription()
-    {
-        return getCreatureType().getName() + " in "
-            + getCurrentHex().getLabel();
-    }
-
-    // TODO ask from BattleUnit / BattleCreature
-    @Override
-    public String toString()
-    {
-        return getDescription();
     }
 
     public void setStrikeNumber(int strikeNumber)

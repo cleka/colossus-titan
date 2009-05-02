@@ -897,8 +897,6 @@ public final class Client implements IClient, IOracle, IVariant
             if (battleUnit.getCurrentHex().getLabel().startsWith("X"))
             {
                 battleUnit.setDead(true);
-                GUIBattleChit battleChit = battleUnit.getGUIBattleChit();
-                battleChit.setDead(true);
             }
         }
     }
@@ -1195,11 +1193,11 @@ public final class Client implements IClient, IOracle, IVariant
         CreatureType type = getGame().getVariant().getCreatureByName(
             bareImageName);
 
-        GUIBattleChit battleChit = new GUIBattleChit(5 * Scale.get(),
-            imageName, inverted, tag, hex, playerColor, this);
-
         BattleUnit battleUnit = new BattleUnit(imageName, inverted, tag, hex,
-            type, legion, battleChit);
+            type, legion);
+        GUIBattleChit battleChit = new GUIBattleChit(5 * Scale.get(),
+            imageName, inverted, playerColor, this, battleUnit);
+        battleUnit.setBattleChit(battleChit);
         battleUnits.add(battleUnit);
 
         gui.actOnPlaceNewChit(hex);
@@ -1513,7 +1511,6 @@ public final class Client implements IClient, IOracle, IVariant
         gui.disposePickCarryDialog();
 
         BattleUnit targetUnit = getBattleUnit(targetTag);
-        GUIBattleChit targetChit = targetUnit.getGUIBattleChit();
         BattleCritter targetCritter = getBattleUnit(targetTag);
 
         gui.actOnTellStrikeResults(wasCarry, strikeNumber, rolls, battleUnit,
@@ -1524,14 +1521,12 @@ public final class Client implements IClient, IOracle, IVariant
             if (killed)
             {
                 targetCritter.setDead(true);
-                targetChit.setDead(true);
             }
             else
             {
                 if (damage > 0)
                 {
                     targetCritter.setHits(targetUnit.getHits() + damage);
-                    targetChit.setHits(targetUnit.getHits() + damage);
                 }
             }
         }

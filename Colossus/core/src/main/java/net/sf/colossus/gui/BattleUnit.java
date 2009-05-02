@@ -1,6 +1,8 @@
 package net.sf.colossus.gui;
 
 
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -41,17 +43,21 @@ public final class BattleUnit implements BattleCritter
     private boolean moved;
     private boolean struck;
     private boolean dead;
-    private final GUIBattleChit battleChit;
+    private GUIBattleChit battleChit;
+
+    /** Listeners to be informed when something changes, e.g. right now only
+     *  GUIBattleChit that needs to repaint if dead or hits change.
+     */
+    private final Set<Listener> listeners = new TreeSet<Listener>();
+
 
     public BattleUnit(String id, boolean defender, int tag,
-        BattleHex currentHex, CreatureType type, Legion legion,
-        GUIBattleChit battleChit)
+        BattleHex currentHex, CreatureType type, Legion legion)
     {
         if (id == null)
         {
             LOGGER.log(Level.WARNING, "Created BattleUnit with null id!");
         }
-        this.battleChit = battleChit;
 
         this.tag = tag;
         this.id = id;
@@ -60,6 +66,16 @@ public final class BattleUnit implements BattleCritter
 
         this.creatureType = type;
         this.legion = legion;
+    }
+
+    public void setBattleChit(GUIBattleChit battleChit)
+    {
+        this.battleChit = battleChit;
+    }
+
+    public GUIBattleChit getGUIBattleChit()
+    {
+        return battleChit;
     }
 
     public String deriveCreatureNameFromId()
@@ -75,11 +91,6 @@ public final class BattleUnit implements BattleCritter
             id = Constants.titan;
         }
         return id;
-    }
-
-    public GUIBattleChit getGUIBattleChit()
-    {
-        return battleChit;
     }
 
     public Legion getLegion()
@@ -100,6 +111,7 @@ public final class BattleUnit implements BattleCritter
     public void setHits(int hits)
     {
         this.hits = hits;
+        notifyListeners();
     }
 
     public boolean wouldDieFrom(int hits)
@@ -113,6 +125,12 @@ public final class BattleUnit implements BattleCritter
         if (dead)
         {
             setHits(0);
+            // setHits() calls notifyListeners
+        }
+        else
+        {
+            // otherwise we need to call here
+            notifyListeners();
         }
     }
 
@@ -134,14 +152,12 @@ public final class BattleUnit implements BattleCritter
     public void setCurrentHex(BattleHex hex)
     {
         this.currentHex = hex;
-        battleChit.setCurrentHex(hex);
     }
 
     public void moveToHex(BattleHex hex)
     {
         startingHex = currentHex;
         currentHex = hex;
-        battleChit.moveToHex(hex);
     }
 
     // TODO make package private
@@ -225,6 +241,7 @@ public final class BattleUnit implements BattleCritter
         return getCreatureType().isRangestriker();
     }
 
+    // TODO does this give plain Titan name or user specific one?
     public String getDescription()
     {
         return getCreatureType().getName() + " in "
@@ -236,4 +253,32 @@ public final class BattleUnit implements BattleCritter
     {
         return getDescription();
     }
+
+    /**
+     * Listeners who needs to be notified if (currently) hits or dead
+     * values change, to trigger a repaint: GUIBattleChit
+     */
+    abstract public class Listener
+    {
+        abstract public void actOnHitOrDeadChanged();
+    }
+
+    public void addListener(Listener listener)
+    {
+        listeners.add(listener);
+    }
+
+    public void removeListener(Listener listener)
+    {
+        listeners.remove(listener);
+    }
+
+    public void notifyListeners()
+    {
+        for (Listener listener : listeners)
+        {
+            listener.actOnHitOrDeadChanged();
+        }
+    }
+
 }
