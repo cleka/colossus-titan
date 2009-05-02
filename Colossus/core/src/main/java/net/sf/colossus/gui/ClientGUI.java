@@ -36,6 +36,7 @@ import net.sf.colossus.common.WhatNextManager;
 import net.sf.colossus.common.WhatNextManager.WhatToDoNext;
 import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.BattlePhase;
+import net.sf.colossus.game.BattleUnit;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;

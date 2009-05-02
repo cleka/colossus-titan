@@ -42,6 +42,7 @@ import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.BattlePhase;
+import net.sf.colossus.game.BattleUnit;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.guiutil.KFrame;

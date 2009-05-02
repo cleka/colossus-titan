@@ -1,4 +1,4 @@
-package net.sf.colossus.gui;
+package net.sf.colossus.game;
 
 
 import java.util.Set;
@@ -7,8 +7,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.common.Constants;
-import net.sf.colossus.game.BattleCritter;
-import net.sf.colossus.game.Legion;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 

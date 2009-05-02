@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.common.Constants;
+import net.sf.colossus.game.BattleUnit;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.util.HTMLColor;
 
