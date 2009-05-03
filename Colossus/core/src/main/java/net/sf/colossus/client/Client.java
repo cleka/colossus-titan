@@ -36,10 +36,8 @@ import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.Proposal;
 import net.sf.colossus.game.SummonInfo;
 import net.sf.colossus.gui.ClientGUI;
-import net.sf.colossus.gui.GUIBattleChit;
 import net.sf.colossus.gui.IClientGUI;
 import net.sf.colossus.gui.NullClientGUI;
-import net.sf.colossus.gui.Scale;
 import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.server.GameServerSide;
 import net.sf.colossus.server.IServer;
@@ -1191,8 +1189,6 @@ public final class Client implements IClient, IOracle, IVariant
             imageName = legion.getPlayer().getTitanBasename();
         }
 
-        PlayerColor playerColor = legion.getPlayer().getColor();
-
         CreatureType type = getGame().getVariant().getCreatureByName(
             bareImageName);
 
@@ -1200,11 +1196,7 @@ public final class Client implements IClient, IOracle, IVariant
             type, legion);
         battleUnits.add(battleUnit);
 
-        // TODO move creation also to GUI.
-        GUIBattleChit battleChit = new GUIBattleChit(5 * Scale.get(),
-            imageName, inverted, playerColor, this, battleUnit);
-        gui.addBattleChit(battleChit);
-        gui.actOnPlaceNewChit(hex);
+        gui.actOnPlaceNewChit(imageName, battleUnit, hex);
     }
 
     public CreatureType chooseBestPotentialRecruit(LegionClientSide legion,

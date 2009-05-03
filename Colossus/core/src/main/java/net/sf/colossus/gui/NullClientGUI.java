@@ -12,6 +12,7 @@ import net.sf.colossus.common.IOptions;
 import net.sf.colossus.common.WhatNextManager;
 import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.BattlePhase;
+import net.sf.colossus.game.BattleUnit;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
@@ -115,13 +116,8 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public void addBattleChit(GUIBattleChit battleChit)
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void actOnPlaceNewChit(BattleHex hex)
+    public void actOnPlaceNewChit(String imageName, BattleUnit battleUnit,
+        BattleHex hex)
     {
         // TODO Auto-generated method stub
 

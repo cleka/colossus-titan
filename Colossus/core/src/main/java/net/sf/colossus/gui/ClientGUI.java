@@ -2149,7 +2149,7 @@ public class ClientGUI implements IClientGUI
         updateStatusScreen();
     }
 
-    public void addBattleChit(GUIBattleChit battleChit)
+    private void addBattleChit(GUIBattleChit battleChit)
     {
         battleChits.add(battleChit);
     }
@@ -2196,8 +2196,17 @@ public class ClientGUI implements IClientGUI
         return null;
     }
 
-    public void actOnPlaceNewChit(BattleHex hex)
+    public void actOnPlaceNewChit(String imageName,
+        BattleUnit battleUnit, BattleHex hex)
     {
+        Legion legion = battleUnit.getLegion();
+        PlayerColor playerColor = legion.getPlayer().getColor();
+
+        GUIBattleChit battleChit = new GUIBattleChit(5 * Scale.get(),
+            imageName, battleUnit.isDefender(), playerColor, getClient(),
+            battleUnit);
+
+        addBattleChit(battleChit);
         // TODO is the "if ( != null)" still needed?
         if (battleBoard != null)
         {

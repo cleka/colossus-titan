@@ -12,6 +12,7 @@ import net.sf.colossus.client.Client;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.BattlePhase;
+import net.sf.colossus.game.BattleUnit;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
@@ -277,9 +278,8 @@ public interface IClientGUI
 
     public abstract void actOnSetupBattleSummon();
 
-    public abstract void addBattleChit(GUIBattleChit battleChit);
-
-    public abstract void actOnPlaceNewChit(BattleHex hex);
+    public abstract void actOnPlaceNewChit(String imageName,
+        BattleUnit battleUnit, BattleHex hex);
 
     public abstract void resetStrikeNumbers();
 
