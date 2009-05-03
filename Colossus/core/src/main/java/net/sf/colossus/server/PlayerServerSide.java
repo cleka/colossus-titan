@@ -60,8 +60,6 @@ public final class PlayerServerSide extends Player implements
     private String playersEliminatedBackup = "";
     private final List<Legion> legionsBackup = new ArrayList<Legion>();
 
-    private boolean deadBeforeSave = false;
-
     PlayerServerSide(String name, GameServerSide game, String shortTypeName)
     {
         // TODO why are the players on the client side numbered but not here?
@@ -678,15 +676,5 @@ public final class PlayerServerSide extends Player implements
             }
         }
         return ok;
-    }
-
-    public void setDeadBeforeSave(boolean val)
-    {
-        this.deadBeforeSave = val;
-    }
-
-    public boolean getDeadBeforeSave()
-    {
-        return this.deadBeforeSave;
     }
 }

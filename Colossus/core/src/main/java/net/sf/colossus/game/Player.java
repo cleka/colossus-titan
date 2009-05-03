@@ -56,6 +56,12 @@ public class Player
     private boolean dead;
 
     /**
+     *  Only needed during loading of a game. Pulled up to game anyway,
+     *  getNumLivingLegions needs it during loading.
+     */
+    private boolean deadBeforeSave = false;
+
+    /**
      * The starting tower of the player.
      *
      * TODO this should be kind-of final: once a tower has been assigned, it shouldn't
@@ -157,6 +163,21 @@ public class Player
     public void setDead(boolean dead)
     {
         this.dead = dead;
+    }
+
+    /** During loading of a game, this player was already dead in the game
+     *  before saving. No client needs to be created for this player, and
+     *  all legion activities/reveals are skipped.
+     * @return True if player was dead
+     */
+    public boolean getDeadBeforeSave()
+    {
+        return this.deadBeforeSave;
+    }
+
+    public void setDeadBeforeSave(boolean val)
+    {
+        this.deadBeforeSave = val;
     }
 
     public void setType(String type)

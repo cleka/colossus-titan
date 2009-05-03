@@ -95,7 +95,7 @@ public class Game
         int alive = 0;
         for (Player info : players)
         {
-            if (!info.isDead())
+            if (!info.isDead() && !info.getDeadBeforeSave())
             {
                 alive++;
             }
