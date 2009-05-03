@@ -462,12 +462,17 @@ public class ClientGUI implements IClientGUI
         }
         else
         {
-            board.adjustCheckboxIfNeeded(Options.showStatusScreen, false);
-            if (statusScreen != null)
+            // It seems board might be null in one AI client when reloading
+            //  a game and forceViewBoard set.... so, added null check again
+            if (board != null)
             {
-                statusScreen.dispose();
+                board.adjustCheckboxIfNeeded(Options.showStatusScreen, false);
+                if (statusScreen != null)
+                {
+                    statusScreen.dispose();
+                }
+                this.statusScreen = null;
             }
-            this.statusScreen = null;
         }
 
         // XXX Should be called somewhere else, just once.
