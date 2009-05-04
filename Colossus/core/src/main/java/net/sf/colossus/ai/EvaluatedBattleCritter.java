@@ -1,6 +1,5 @@
 package net.sf.colossus.ai;
 
-import java.util.logging.Logger;
 import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
@@ -11,8 +10,6 @@ import net.sf.colossus.variant.CreatureType;
  */
 public class EvaluatedBattleCritter implements BattleCritter
 {
-    private static final Logger LOGGER = Logger.getLogger(
-            EvaluatedBattleCritter.class.getName());
     private final BattleCritter parent;
     private BattleHex startingHex;
     private BattleHex currentHex;
