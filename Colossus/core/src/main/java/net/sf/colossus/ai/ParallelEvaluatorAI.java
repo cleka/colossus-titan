@@ -8,6 +8,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import net.sf.colossus.client.Client;
 import net.sf.colossus.common.Constants;
 
@@ -105,7 +106,6 @@ public class ParallelEvaluatorAI extends ExperimentalAI
                     }
                     else
                     {
-                        lm = null;
                         done = true;
                     }
                 }
