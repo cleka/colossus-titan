@@ -3077,6 +3077,10 @@ public class SimpleAI extends AbstractAI
 
         evaluateCritterMove_Terrain(critter, value, terrain, hex, power, skill);
 
+        if (hex.isEntrance()) {
+            return value.getValue();
+        }
+
         Set<BattleHex> targetHexes = client.findStrikes(critter.getTag());
         int numTargets = targetHexes.size();
 

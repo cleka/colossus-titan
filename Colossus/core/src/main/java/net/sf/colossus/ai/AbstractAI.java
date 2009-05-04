@@ -429,7 +429,7 @@ abstract public class AbstractAI implements AI
     {
         /* per critter */
 
-              int OFFBOARD_DEATH_SCALE_FACTOR = -150;
+              int OFFBOARD_DEATH_SCALE_FACTOR = -1500;
         final int NATIVE_BONUS_TERRAIN = 40; // 50 -- old value
         final int NATIVE_BOG = 20;
         final int NON_NATIVE_PENALTY_TERRAIN = -100;
@@ -451,7 +451,7 @@ abstract public class AbstractAI implements AI
         final int DEFENDER_GET_HIT_SCALE_FACTOR = -2;
         final int TITAN_TOWER_HEIGHT_BONUS = 2000;
         final int DEFENDER_TOWER_HEIGHT_BONUS = 80;
-        final int TITAN_FORWARD_EARLY_PENALTY = -10000;
+        final int TITAN_FORWARD_EARLY_PENALTY = -5000;
         final int TITAN_BY_EDGE_OR_BLOCKINGHAZARD_BONUS = 400;
               int DEFENDER_BY_EDGE_OR_BLOCKINGHAZARD_BONUS = 1;
               int DEFENDER_BY_DAMAGINGHAZARD_BONUS = 1;

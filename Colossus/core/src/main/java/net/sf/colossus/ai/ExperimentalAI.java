@@ -33,7 +33,7 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
         super(client);
 
         /* ExperimentalAI doesn't like to loose critter. */
-        bec.OFFBOARD_DEATH_SCALE_FACTOR = -500;
+        bec.OFFBOARD_DEATH_SCALE_FACTOR = -2000;
         /* ExperimentalAI doesn't like to get out unprotected */
         bec.DEFENDER_BY_EDGE_OR_BLOCKINGHAZARD_BONUS = 40;
         /* And it's a sadist, too. */
