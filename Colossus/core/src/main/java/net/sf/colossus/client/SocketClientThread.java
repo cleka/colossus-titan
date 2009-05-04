@@ -565,7 +565,7 @@ final class SocketClientThread extends Thread implements IServer,
                 names.remove(0);
             }
             String reason = args.isEmpty() ? "<Unknown>" : args.remove(0);
-            Player player = client.getGame().getPlayerByMarkerId(
+            Player player = client.getGameClientSide().getPlayerByMarkerId(
                 markerId);
             Legion legion;
             if (player.hasLegion(markerId))
@@ -659,7 +659,7 @@ final class SocketClientThread extends Thread implements IServer,
             String slayerName = args.remove(0);
             // TODO use the "noone" player instead of null if no slayer?
             client.tellPlayerElim(client.getPlayerByName(playerName),
-                slayerName.equals("null") ? null : (client.getGame()
+                slayerName.equals("null") ? null : (client.getGameClientSide()
                     .getPlayerByName(slayerName)));
         }
         else if (method.equals(Constants.askConcede))

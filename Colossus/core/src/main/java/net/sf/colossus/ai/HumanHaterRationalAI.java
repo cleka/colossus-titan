@@ -32,7 +32,7 @@ public class HumanHaterRationalAI extends RationalAI // NO_UCD
         if (this.I_HATE_HUMANS)
         {
             // check that this is still the case
-            if (this.client.getGame().onlyAIsRemain())
+            if (this.client.getGameClientSide().onlyAIsRemain())
             {
                 // only computer players remain.
                 this.I_HATE_HUMANS = false;

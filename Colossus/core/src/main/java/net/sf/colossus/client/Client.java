@@ -2460,7 +2460,7 @@ public final class Client implements IClient, IOracle, IVariant
         List<String> lords = new ArrayList<String>();
 
         // Titan teleport
-        List<LegionClientSide> legions = getGame().getLegionsByHex(
+        List<LegionClientSide> legions = getGameClientSide().getLegionsByHex(
             hex);
         if (!legions.isEmpty())
         {
@@ -2849,7 +2849,7 @@ public final class Client implements IClient, IOracle, IVariant
                 {
                     // check for engagement -- > 1 legion is good enough since
                     // it is not split phase
-                    int numInHex = getGame().getLegionsByHex(
+                    int numInHex = getGameClientSide().getLegionsByHex(
                         legion.getCurrentHex()).size();
                     if (numInHex == 1)
                     {
@@ -3372,7 +3372,12 @@ public final class Client implements IClient, IOracle, IVariant
         }
     }
 
-    public GameClientSide getGame()
+    public Game getGame()
+    {
+        return game;
+    }
+
+    public GameClientSide getGameClientSide()
     {
         return game;
     }
