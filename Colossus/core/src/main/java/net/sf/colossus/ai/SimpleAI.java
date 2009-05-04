@@ -1327,7 +1327,7 @@ public class SimpleAI extends AbstractAI
                     LOGGER.severe("Bogus legion height "
                         + (legion).getHeight() + " in legion "
                         + legion.getMarkerId() + "; content: "
-                        + legion.getCreatures().toString());
+                        + Glob.glob(",", legion.getCreatures()));
                 }
 
                 LOGGER.finest("--- if " + legion + " moves to " + hex

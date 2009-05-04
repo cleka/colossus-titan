@@ -5,12 +5,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-/** Perl-style split function.
- * 
- *  Still useful, because String.split works with arrays and 
- *  regexes, not Lists and plain Strings.
- * 
- *  @author David Ripton
+/**
+ * Perl-style split function.
+ *
+ * Still useful, because String.split works with arrays and
+ * regexes, not Lists and plain Strings.
+ *
+ * @see Glob
+ *
+ * @author David Ripton
  */
 
 public final class Split

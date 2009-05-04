@@ -5,8 +5,12 @@ import java.util.Collection;
 import java.util.Iterator;
 
 
-/** Stringify contents of various container classes.
- *  @author David Ripton
+/**
+ * Stringify contents of various container classes.
+ *
+ * @see Split
+ *
+ * @author David Ripton
  */
 
 public final class Glob
