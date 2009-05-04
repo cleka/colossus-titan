@@ -46,7 +46,7 @@ import net.sf.colossus.variant.Variant;
  * Also contains extracted code from RationalAI:
  * @author Bruce Sherrod, David Ripton, Romain Dolbeau, Corwin Joy
  */
-abstract public class AbstractAI implements AI
+abstract class AbstractAI implements AI
 {
     final static private Logger LOGGER = Logger.getLogger(AbstractAI.class
         .getName());

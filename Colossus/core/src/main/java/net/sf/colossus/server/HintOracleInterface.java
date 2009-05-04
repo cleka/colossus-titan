@@ -1,15 +1,11 @@
 package net.sf.colossus.server;
 
-
-import net.sf.colossus.ai.AbstractAI;
-
-
 /**
  * Interface for an Oracle used for AI Hints.
  *
  * These methods are to be used in the context of a given legion,
  * on a given master board hex and with a list of recruit options.
- * This is currently implemented by {@linkplain AbstractAI}.
+ * This is currently implemented by {@linkplain net.sf.colossus.ai.AbstractAI}.
  *
  * @version $Id$
  * @author Romain Dolbeau
