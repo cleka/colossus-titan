@@ -1206,7 +1206,7 @@ public class ClientGUI implements IClientGUI
     public void actOnNextEngagement()
     {
         // TODO move condition to Client?
-        if (client.getGameClientSide().findEngagements().isEmpty())
+        if (client.getGame().findEngagements().isEmpty())
         {
             board.enableDoneAction();
         }
@@ -1921,7 +1921,7 @@ public class ClientGUI implements IClientGUI
     public void tellProposal(String proposalString)
     {
         Proposal proposal = Proposal.makeFromString(proposalString, client
-            .getGameClientSide());
+            .getGame());
         if (replyToProposal != null)
         {
             replyToProposal.dispose();
@@ -2003,7 +2003,7 @@ public class ClientGUI implements IClientGUI
     {
         boolean foundProblem = false;
 
-        for (Player p : client.getGameClientSide().getPlayers())
+        for (Player p : client.getGame().getPlayers())
         {
             if (p.isDead())
             {

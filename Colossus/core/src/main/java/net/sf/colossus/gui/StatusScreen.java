@@ -134,7 +134,7 @@ final class StatusScreen extends KDialog
         gridPane.add(new JLabel("Player"));
 
         int j = 0;
-        for (Player player : client.getGameClientSide().getPlayers())
+        for (Player player : client.getGame().getPlayers())
         {
             nameLabel[j] = new JLabel();
             nameLabel[j].setOpaque(true);
@@ -291,7 +291,7 @@ final class StatusScreen extends KDialog
         battlePhaseLabel.setText(oracle.getBattlePhaseName());
 
         int i = 0;
-        for (Player player : client.getGameClientSide().getPlayers())
+        for (Player player : client.getGame().getPlayers())
         {
             if (player.isDead())
             {

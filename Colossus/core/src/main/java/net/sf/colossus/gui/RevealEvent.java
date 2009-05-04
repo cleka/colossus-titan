@@ -168,7 +168,7 @@ public class RevealEvent
             {
                 Player player = (realPlayer != null ? realPlayer
                     : client
-                    .getGameClientSide().getPlayerByMarkerId(markerId));
+                    .getGame().getPlayerByMarkerId(markerId));
 
                 if (player == null)
                 {

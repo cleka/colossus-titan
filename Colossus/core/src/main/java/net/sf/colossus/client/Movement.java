@@ -75,10 +75,10 @@ public final class Movement
         // also a friendly legion there, just stop recursing.
         // Do a check versus fromHexLabel if we are evaluating
         // passing through this hex
-        if (client.getGameClientSide().getEnemyLegions(hex, player).size() > 0
+        if (client.getGame().getEnemyLegions(hex, player).size() > 0
             && !hex.equals(fromHex))
         {
-            if (client.getGameClientSide().getFriendlyLegions(hex, player)
+            if (client.getGame().getFriendlyLegions(hex, player)
                 .size() == 0)
             {
                 // Set the entry side relative to the hex label.
@@ -96,10 +96,10 @@ public final class Movement
             // This hex is the final destination.  Mark it as legal if
             // it is unoccupied by friendly legions that have already moved.
             // Account for spin cycles.
-            if (client.getGameClientSide().getFriendlyLegions(hex, player)
+            if (client.getGame().getFriendlyLegions(hex, player)
                 .size() > 0)
             {
-                List<LegionClientSide> legions = client.getGameClientSide()
+                List<LegionClientSide> legions = client.getGame()
                     .getLegionsByHex(hex);
                 if (legions.get(0).hasMoved())
                 {
@@ -165,7 +165,7 @@ public final class Movement
         // it is unoccupied.
         Set<MasterHex> result = new HashSet<MasterHex>();
 
-        if (!client.getGameClientSide().isOccupied(hex))
+        if (!client.getGame().isOccupied(hex))
         {
             result.add(hex);
         }
@@ -344,7 +344,7 @@ public final class Movement
                 for (MasterHex tower : client.getGame().getVariant()
                     .getMasterBoard().getTowerSet())
                 {
-                    if (!client.getGameClientSide().isOccupied(tower)
+                    if (!client.getGame().isOccupied(tower)
                         && !(tower.equals(hex)))
                     {
                         result.add(tower);
@@ -365,11 +365,11 @@ public final class Movement
         {
             // Mark every hex containing an enemy stack that does not
             // already contain a friendly stack.
-            for (Legion other : client.getGameClientSide().getEnemyLegions(
+            for (Legion other : client.getGame().getEnemyLegions(
                 player))
             {
                 MasterHex otherHex = other.getCurrentHex();
-                if (!client.getGameClientSide().isEngagement(otherHex))
+                if (!client.getGame().isEngagement(otherHex))
                 {
                     result.add(otherHex);
                 }
@@ -396,7 +396,7 @@ public final class Movement
             {
                 // Startlisted terrain only have bottom entry side.
                 // Don't bother finding more than one entry side if unoccupied.
-                if (!client.getGameClientSide().isOccupied(targetHex)
+                if (!client.getGame().isOccupied(targetHex)
                     || targetHex.getTerrain().hasStartList())
 
                 {
@@ -431,7 +431,7 @@ public final class Movement
                 String buf = parts.get(1);
                 entrySides.add(EntrySide.fromLabel(buf));
                 // Don't bother finding more than one entry side if unoccupied.
-                if (!client.getGameClientSide().isOccupied(targetHex))
+                if (!client.getGame().isOccupied(targetHex))
                 {
                     return entrySides;
                 }
