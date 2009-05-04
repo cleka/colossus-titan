@@ -640,7 +640,7 @@ public final class BattleServerSide extends Battle
 
         for (Creature creature : legion.getCreatures())
         {
-            ((CreatureServerSide)creature).setDead(true);
+            creature.setDead(true);
         }
 
         if (legion.getPlayer().equals(getActivePlayer()))
@@ -657,7 +657,7 @@ public final class BattleServerSide extends Battle
         Iterator<CreatureServerSide> it = legion.getCreatures().iterator();
         while (it.hasNext())
         {
-            CreatureServerSide critter = it.next();
+            Creature critter = it.next();
             if (critter.getCurrentHex().isEntrance())
             {
                 critter.setDead(true);
@@ -672,7 +672,7 @@ public final class BattleServerSide extends Battle
             .iterator();
         while (it.hasNext())
         {
-            CreatureServerSide critter = it.next();
+            Creature critter = it.next();
             critter.commitMove();
         }
     }
