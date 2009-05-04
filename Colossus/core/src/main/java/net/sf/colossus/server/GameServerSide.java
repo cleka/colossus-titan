@@ -612,6 +612,10 @@ public final class GameServerSide extends Game
         {
             newName = "Experimental" + number;
         }
+        else if (shortName.equals("ParallelEvaluatorAI"))
+        {
+            newName = "ParallelEvaluator" + number;
+        }
         else
         {
             newName = null;

@@ -139,6 +139,7 @@ public final class Constants
     public static final String defaultAI = anyAI;
     public static final String[] aiArray = { "SimpleAI", "CowardSimpleAI",
         "RationalAI", "HumanHaterRationalAI", "MilvangAI", "ExperimentalAI" };
+        // , "ParallelEvaluatorAI"};
     // Auto play for human players uses SimpleAI:
     public static final String autoplayAI = aiArray[0];
 

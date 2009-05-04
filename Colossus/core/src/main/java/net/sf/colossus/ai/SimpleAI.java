@@ -129,7 +129,7 @@ public class SimpleAI extends AbstractAI
         // the other types have only movement bonuses
     }
 
-    private int timeLimit = Constants.DEFAULT_AI_TIME_LIMIT; // in s
+    protected int timeLimit = Constants.DEFAULT_AI_TIME_LIMIT; // in s
     boolean timeIsUp;
     private int splitsDone = 0;
     private int splitsAcked = 0;
@@ -2589,11 +2589,11 @@ public class SimpleAI extends AbstractAI
         return timer;
     }
 
-    private final static int MIN_ITERATIONS = 50;
+    protected final static int MIN_ITERATIONS = 50;
 
     /** Evaluate all legion moves in the list, and return the best one.
      *  Break out early if the time limit is exceeded. */
-    private LegionMove findBestLegionMove(Collection<LegionMove> legionMoves)
+    protected LegionMove findBestLegionMove(Collection<LegionMove> legionMoves)
     {
         int bestScore = Integer.MIN_VALUE;
         LegionMove best = null;
@@ -3147,7 +3147,7 @@ public class SimpleAI extends AbstractAI
         return value.getValue();
     }
 
-    private int evaluateLegionBattleMove(LegionMove lm)
+    protected int evaluateLegionBattleMove(LegionMove lm)
     {
         lm.resetEvaluate();
 
