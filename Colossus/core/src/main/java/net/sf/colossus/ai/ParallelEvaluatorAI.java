@@ -109,7 +109,7 @@ public class ParallelEvaluatorAI extends ExperimentalAI
                         done = true;
                     }
                 }
-                if (!done)
+                if (lm != null)
                 {
                     // this can't possibly work, as evaluateLegionBattleMove is
                     // about as non-thread-safe as it is possible to be.
@@ -187,17 +187,27 @@ public class ParallelEvaluatorAI extends ExperimentalAI
 
         best = bests[0];
 
-        assert best != null : "Didn't manage to evaluate a single one :-(";
-
-        for (int i = 1 ; i < NTHREADS ; i++) {
-            if (best.getValue() < bests[i].getValue()) {
+        for (int i = 1; i < NTHREADS; i++)
+        {
+            if (best == null)
+            {
                 best = bests[i];
+            }
+            else
+            {
+                if (bests[i] != null)
+                {
+                    if (best.getValue() < bests[i].getValue())
+                    {
+                        best = bests[i];
+                    }
+                }
             }
         }
         LOGGER.finer("// Best legion move (turn "
             + client.getBattleTurnNumber() + "): "
-            + best.getStringWithEvaluation()
-            + " (" + best.getValue() + ")");
+            + (best == null ? "none": best.getStringWithEvaluation())
+            + " (" + (best == null ? "-" : (""+best.getValue())) + ")");
         return best;
     }
 }
