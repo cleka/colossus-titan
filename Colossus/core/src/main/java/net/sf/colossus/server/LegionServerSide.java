@@ -615,7 +615,7 @@ public final class LegionServerSide extends Legion implements
      */
     void sortCritters()
     {
-        Collections.sort(getCreatures(), CreatureServerSide.IMPORTANCE_ORDER);
+        Collections.sort(getCreatures(), Creature.IMPORTANCE_ORDER);
     }
 
     /** Recombine this legion into another legion. Only remove this

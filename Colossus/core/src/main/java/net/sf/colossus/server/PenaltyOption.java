@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.game.Creature;
 import net.sf.colossus.variant.BattleHex;
 
 
@@ -101,15 +102,15 @@ final class PenaltyOption implements Comparable<PenaltyOption>
         {
             return 1;
         }
-        else if (CreatureServerSide.IMPORTANCE_ORDER.compare(striker,
+        else if (Creature.IMPORTANCE_ORDER.compare(striker,
             other.striker) != 0)
         {
-            return CreatureServerSide.IMPORTANCE_ORDER.compare(striker,
+            return Creature.IMPORTANCE_ORDER.compare(striker,
                 other.striker);
         }
         else
         {
-            return CreatureServerSide.IMPORTANCE_ORDER.compare(target,
+            return Creature.IMPORTANCE_ORDER.compare(target,
                 other.target);
         }
     }

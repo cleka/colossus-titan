@@ -3,7 +3,6 @@ package net.sf.colossus.server;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -42,56 +41,6 @@ import net.sf.colossus.variant.HazardTerrain;
 
 public class CreatureServerSide extends Creature
 {
-    /**
-     * Implements an order on Critters by some definition of importance.
-     *
-     * The order is:
-     * - titans first
-     * - then sorted by points value
-     * - then sorted by rangestriker or not
-     * - then sorted by flyer or not
-     * - then by name
-     *
-     * TODO this is actually applicable on the CreatureType level
-     */
-    public static final Comparator<CreatureServerSide> IMPORTANCE_ORDER = new Comparator<CreatureServerSide>()
-    {
-        public int compare(CreatureServerSide critter1,
-            CreatureServerSide critter2)
-        {
-            if (critter1.isTitan() && !critter2.isTitan())
-            {
-                return -1;
-            }
-            if (critter2.isTitan() && !critter1.isTitan())
-            {
-                return 1;
-            }
-            int diff = critter2.getPointValue() - critter1.getPointValue();
-            if (diff != 0)
-            {
-                return diff;
-            }
-            if (critter1.isRangestriker() && !critter2.isRangestriker())
-            {
-                return -1;
-            }
-            if (!critter1.isRangestriker() && critter2.isRangestriker())
-            {
-                return 1;
-            }
-            if (critter1.isFlier() && !critter2.isFlier())
-            {
-                return -1;
-            }
-            if (!critter1.isFlier() && critter2.isFlier())
-            {
-                return 1;
-            }
-            return critter1.getName().compareTo(critter2.getName());
-        }
-    };
-
     private static final Logger LOGGER = Logger
         .getLogger(CreatureServerSide.class.getName());
     private BattleServerSide battle;

@@ -1,6 +1,7 @@
 package net.sf.colossus.game;
 
 
+import java.util.Comparator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,6 +23,53 @@ import net.sf.colossus.variant.HazardTerrain;
  */
 public class Creature
 {
+    /**
+     * Implements an order on Critters by some definition of importance.
+     *
+     * The order is:
+     * - titans first
+     * - then sorted by points value
+     * - then sorted by rangestriker or not
+     * - then sorted by flyer or not
+     * - then by name
+     */
+    public static final Comparator<Creature> IMPORTANCE_ORDER = new Comparator<Creature>()
+    {
+        public int compare(Creature critter1, Creature critter2)
+        {
+            if (critter1.isTitan() && !critter2.isTitan())
+            {
+                return -1;
+            }
+            if (critter2.isTitan() && !critter1.isTitan())
+            {
+                return 1;
+            }
+            int diff = critter2.getPointValue() - critter1.getPointValue();
+            if (diff != 0)
+            {
+                return diff;
+            }
+            if (critter1.isRangestriker() && !critter2.isRangestriker())
+            {
+                return -1;
+            }
+            if (!critter1.isRangestriker() && critter2.isRangestriker())
+            {
+                return 1;
+            }
+            if (critter1.isFlier() && !critter2.isFlier())
+            {
+                return -1;
+            }
+            if (!critter1.isFlier() && critter2.isFlier())
+            {
+                return 1;
+            }
+            return critter1.getName().compareTo(critter2.getName());
+        }
+    };
+
     private static final Logger LOGGER = Logger.getLogger(Creature.class
         .getName());
     final private CreatureType type;
