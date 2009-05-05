@@ -32,6 +32,8 @@ import net.sf.colossus.common.Constants;
  * on several variant at once.
  * @author Romain Dolbeau
  */
+//TODO re-enable warnings once the class is active
+@SuppressWarnings("null")
 public class ParallelEvaluatorAI extends ExperimentalAI
 {
     private static final Logger LOGGER = Logger.getLogger(
