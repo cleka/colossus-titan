@@ -196,7 +196,7 @@ public class ParallelEvaluatorAI extends ExperimentalAI
         }
         LOGGER.finer("// Best legion move (turn "
             + client.getBattleTurnNumber() + "): "
-            + ((best == null) ? "none " : best.getStringWithEvaluation())
+            + best.getStringWithEvaluation()
             + " (" + best.getValue() + ")");
         return best;
     }
