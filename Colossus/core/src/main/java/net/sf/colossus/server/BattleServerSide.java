@@ -154,8 +154,8 @@ public final class BattleServerSide extends Battle
     void init()
     {
         server.allInitBattle(masterHex);
-        initBattleChits(getAttacker());
-        initBattleChits(getDefender());
+        initBattleChits(getAttackingLegion());
+        initBattleChits(getDefendingLegion());
 
         boolean advance = false;
         switch (phase)
@@ -199,14 +199,22 @@ public final class BattleServerSide extends Battle
         return getLegion(activeLegionTag).getPlayer();
     }
 
-    LegionServerSide getAttacker()
+    /**
+     * Override with covariant return type to ease transition into new model.
+     */
+    @Override
+    public LegionServerSide getAttackingLegion()
     {
-        return (LegionServerSide)getAttackingLegion();
+        return (LegionServerSide)super.getAttackingLegion();
     }
-
-    LegionServerSide getDefender()
+    
+    /**
+     * Override with covariant return type to ease transition into new model.
+     */
+    @Override
+    public LegionServerSide getDefendingLegion()
     {
-        return (LegionServerSide)getDefendingLegion();
+        return (LegionServerSide)super.getDefendingLegion();
     }
 
     LegionServerSide getActiveLegion()
@@ -225,26 +233,11 @@ public final class BattleServerSide extends Battle
         switch (legionTag)
         {
             case DEFENDER:
-                return getDefender();
+                return getDefendingLegion();
             case ATTACKER:
-                return getAttacker();
+                return getAttackingLegion();
         }
         throw new IllegalArgumentException("Parameter out of range");
-    }
-
-    private Legion getLegionByPlayer(Player player)
-    {
-        Legion attacker = getAttacker();
-        if (attacker != null && attacker.getPlayer().equals(player))
-        {
-            return attacker;
-        }
-        Legion defender = getDefender();
-        if (defender != null && defender.getPlayer().equals(player))
-        {
-            return defender;
-        }
-        return null;
     }
 
     public MasterHex getMasterHex()
@@ -379,7 +372,7 @@ public final class BattleServerSide extends Battle
         private void timeLoss()
         {
             LOGGER.log(Level.INFO, "Time loss");
-            LegionServerSide attacker = getAttacker();
+            LegionServerSide attacker = getAttackingLegion();
             // Time loss.  Attacker is eliminated but defender gets no points.
             if (attacker.hasTitan())
             {
@@ -387,7 +380,7 @@ public final class BattleServerSide extends Battle
                 // his markers plus half points for his unengaged legions.
                 PlayerServerSide player = attacker.getPlayer();
                 attacker.remove();
-                player.die(getDefender().getPlayer());
+                player.die(getDefendingLegion().getPlayer());
                 getGame().checkForVictory();
             }
             else
@@ -405,9 +398,9 @@ public final class BattleServerSide extends Battle
         boolean advance = true;
         if (summonState == AngelSummoningStates.FIRST_BLOOD)
         {
-            if (getAttacker().canSummonAngel())
+            if (getAttackingLegion().canSummonAngel())
             {
-                getGame().createSummonAngel(getAttacker());
+                getGame().createSummonAngel(getAttackingLegion());
                 advance = false;
             }
 
@@ -452,7 +445,7 @@ public final class BattleServerSide extends Battle
     {
         if (placeNewChit)
         {
-            LegionServerSide attacker = getAttacker();
+            LegionServerSide attacker = getAttackingLegion();
             CreatureServerSide critter = attacker.getCritter(attacker
                 .getHeight() - 1);
             placeCritter(critter);
@@ -465,7 +458,7 @@ public final class BattleServerSide extends Battle
 
     private boolean recruitReinforcement()
     {
-        LegionServerSide defender = getDefender();
+        LegionServerSide defender = getDefendingLegion();
         if (turnNumber == 4 && defender.canRecruit())
         {
             LOGGER.log(Level.FINEST, "Calling Game.reinforce()"
@@ -480,7 +473,7 @@ public final class BattleServerSide extends Battle
     void doneReinforcing()
     {
         LOGGER.log(Level.FINEST, "Called Battle.doneReinforcing()");
-        LegionServerSide defender = getDefender();
+        LegionServerSide defender = getDefendingLegion();
         if (defender.hasRecruited())
         {
             CreatureServerSide newCritter = defender.getCritter(defender
@@ -737,8 +730,8 @@ public final class BattleServerSide extends Battle
         attackerElim = true;
         defenderElim = true;
 
-        LegionServerSide attacker = getAttacker();
-        LegionServerSide defender = getDefender();
+        LegionServerSide attacker = getAttackingLegion();
+        LegionServerSide defender = getDefendingLegion();
 
         removeDeadCreaturesFromLegion(defender);
         removeDeadCreaturesFromLegion(attacker);
@@ -779,7 +772,7 @@ public final class BattleServerSide extends Battle
                 else
                 // critter is alive
                 {
-                    if (legion == getAttacker())
+                    if (legion == getAttackingLegion())
                     {
                         attackerElim = false;
                     }
@@ -804,7 +797,7 @@ public final class BattleServerSide extends Battle
         // no points awarded.
         if (critter.getCurrentHex().isEntrance() && getTurnNumber() > 1)
         {
-            if (legion == getAttacker())
+            if (legion == getAttackingLegion())
             {
                 // Summoned angel.
                 donor = player.getDonor();
@@ -834,14 +827,14 @@ public final class BattleServerSide extends Battle
                 player.undoReinforcement(legion);
             }
         }
-        else if (legion == getAttacker())
+        else if (legion == getAttackingLegion())
         {
-            getDefender().addToBattleTally(critter.getPointValue());
+            getDefendingLegion().addToBattleTally(critter.getPointValue());
         }
         else
         // defender
         {
-            getAttacker().addToBattleTally(critter.getPointValue());
+            getAttackingLegion().addToBattleTally(critter.getPointValue());
 
             // Creatures left off board do not trigger angel
             // summoning.
@@ -865,8 +858,8 @@ public final class BattleServerSide extends Battle
 
     private void checkForElimination()
     {
-        LegionServerSide attacker = getAttacker();
-        LegionServerSide defender = getDefender();
+        LegionServerSide attacker = getAttackingLegion();
+        LegionServerSide defender = getDefendingLegion();
         PlayerServerSide attackerPlayer = attacker.getPlayer();
         PlayerServerSide defenderPlayer = defender.getPlayer();
 
@@ -1262,8 +1255,8 @@ public final class BattleServerSide extends Battle
             LOGGER.log(Level.WARNING, critter.getName() + " in "
                 + critter.getCurrentHex().getLabel()
                 + " tried to illegally move to " + hex.getLabel() + " in "
-                + masterHex.getTerrain() + " (" + getAttacker().getMarkerId()
-                + " attacking " + getDefender().getMarkerId() + ", active: "
+                + masterHex.getTerrain() + " (" + getAttackingLegion().getMarkerId()
+                + " attacking " + getDefendingLegion().getMarkerId() + ", active: "
                 + markerId + ")");
             return false;
         }
@@ -1280,12 +1273,12 @@ public final class BattleServerSide extends Battle
     private List<CreatureServerSide> getAllCritters()
     {
         List<CreatureServerSide> critters = new ArrayList<CreatureServerSide>();
-        LegionServerSide defender = getDefender();
+        LegionServerSide defender = getDefendingLegion();
         if (defender != null)
         {
             critters.addAll(defender.getCreatures());
         }
-        LegionServerSide attacker = getAttacker();
+        LegionServerSide attacker = getAttackingLegion();
         if (attacker != null)
         {
             critters.addAll(attacker.getCreatures());

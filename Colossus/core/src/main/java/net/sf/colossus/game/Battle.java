@@ -622,4 +622,19 @@ abstract public class Battle
                 toLeft(xDist, yDist), 0);
         }
     }
+
+    protected Legion getLegionByPlayer(Player player)
+    {
+        Legion lattacker = getAttackingLegion();
+        if (lattacker != null && lattacker.getPlayer().equals(player))
+        {
+            return lattacker;
+        }
+        Legion ldefender = getDefendingLegion();
+        if (ldefender != null && ldefender.getPlayer().equals(player))
+        {
+            return ldefender;
+        }
+        return null;
+    }
 }

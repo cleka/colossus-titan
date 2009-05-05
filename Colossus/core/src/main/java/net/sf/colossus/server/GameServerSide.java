@@ -1408,8 +1408,8 @@ public final class GameServerSide extends Game
                     LegionServerSide legion = it2.next();
 
                     el.addContent(dumpLegion(legion, battleInProgress
-                        && (legion == battle.getAttacker() || legion == battle
-                            .getDefender())));
+                        && (legion == battle.getAttackingLegion() || legion == battle
+                            .getDefendingLegion())));
                 }
                 root.addContent(el);
             }
