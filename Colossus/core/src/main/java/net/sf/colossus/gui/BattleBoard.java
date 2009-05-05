@@ -18,6 +18,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -584,8 +585,13 @@ public final class BattleBoard extends KFrame
      *  or null if none does. */
     private GUIBattleChit getBattleChitAtPoint(Point point)
     {
-        for (GUIBattleChit battleChit : gui.getGUIBattleChits())
+        // iterate through list backwards, so the topmost chit is found
+        List<GUIBattleChit> chits = gui.getGUIBattleChits();
+        ListIterator<GUIBattleChit> it = chits
+            .listIterator(chits.size());
+        while (it.hasPrevious())
         {
+            GUIBattleChit battleChit = it.previous();
             if (battleChit.contains(point))
             {
                 return battleChit;
