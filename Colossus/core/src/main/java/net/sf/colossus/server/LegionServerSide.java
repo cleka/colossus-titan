@@ -61,7 +61,7 @@ public final class LegionServerSide extends Legion implements
     {
         super(player, markerId, currentHex);
         assert markerId != null : "MarkerId must not be null";
-        assert (parent == null) || !markerId.equals(parent.getMarkerId()) : 
+        assert (parent == null) || !markerId.equals(parent.getMarkerId()) :
             "Parent can not have the same markerId as we have";
         assert startingHex != null : "Legion needs to start on some hex";
         assert game != null : "Legion needs to be part of some game";
@@ -521,7 +521,7 @@ public final class LegionServerSide extends Legion implements
      *  legion.  Do not actually remove it, to prevent co-modification
      *  errors.  Do not disband the legion if empty, since the critter
      *  has not actually been removed. */
-    void prepareToRemoveCritter(CreatureServerSide critter,
+    void prepareToRemoveCritter(Creature critter,
         boolean returnToStacks, boolean updateHistory)
     {
         if (critter == null || !getCreatures().contains(critter))

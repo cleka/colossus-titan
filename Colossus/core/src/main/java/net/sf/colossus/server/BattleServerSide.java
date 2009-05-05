@@ -647,10 +647,8 @@ public final class BattleServerSide extends Battle
     private void removeOffboardCreatures()
     {
         LegionServerSide legion = getActiveLegion();
-        Iterator<CreatureServerSide> it = legion.getCreatures().iterator();
-        while (it.hasNext())
+        for (Creature critter : legion.getCreatures())
         {
-            Creature critter = it.next();
             if (critter.getCurrentHex().isEntrance())
             {
                 critter.setDead(true);
@@ -661,11 +659,8 @@ public final class BattleServerSide extends Battle
 
     private void commitMoves()
     {
-        Iterator<CreatureServerSide> it = getActiveLegion().getCreatures()
-            .iterator();
-        while (it.hasNext())
+        for (Creature critter : getActiveLegion().getCreatures())
         {
-            Creature critter = it.next();
             critter.commitMove();
         }
     }
@@ -683,11 +678,9 @@ public final class BattleServerSide extends Battle
         //    during the strike phase.
         if (phase == BattlePhase.FIGHT && !driftDamageApplied)
         {
-            Iterator<CreatureServerSide> it = getAllCritters().iterator();
             driftDamageApplied = true;
-            while (it.hasNext())
+            for (CreatureServerSide critter : getAllCritters())
             {
-                CreatureServerSide critter = it.next();
                 int dam = critter.getCurrentHex().damageToCreature(
                     critter.getType());
                 if (dam > 0)
@@ -785,7 +778,7 @@ public final class BattleServerSide extends Battle
         }
     }
 
-    private void cleanupOneDeadCritter(CreatureServerSide critter)
+    private void cleanupOneDeadCritter(Creature critter)
     {
         Legion legion = critter.getLegion();
         LegionServerSide donor = null;
@@ -943,10 +936,8 @@ public final class BattleServerSide extends Battle
         LegionServerSide legion = getActiveLegion();
         if (legion != null)
         {
-            Iterator<CreatureServerSide> it = legion.getCreatures().iterator();
-            while (it.hasNext())
+            for (Creature critter : legion.getCreatures())
             {
-                CreatureServerSide critter = it.next();
                 critter.setStruck(false);
             }
         }
@@ -957,10 +948,8 @@ public final class BattleServerSide extends Battle
         LegionServerSide legion = getActiveLegion();
         if (legion != null)
         {
-            Iterator<CreatureServerSide> it = legion.getCreatures().iterator();
-            while (it.hasNext())
+            for (CreatureServerSide critter : legion.getCreatures())
             {
-                CreatureServerSide critter = it.next();
                 if (!critter.hasStruck() && critter.isInContact(false))
                 {
                     return true;
@@ -1033,11 +1022,8 @@ public final class BattleServerSide extends Battle
             && getBattlePhase() != BattlePhase.STRIKEBACK
             && critter.getLegion() == getActiveLegion())
         {
-            Iterator<CreatureServerSide> it = getInactiveLegion()
-                .getCreatures().iterator();
-            while (it.hasNext())
+            for (Creature target : getInactiveLegion().getCreatures())
             {
-                CreatureServerSide target = it.next();
                 if (!target.isDead())
                 {
                     BattleHex targetHex = target.getCurrentHex();
@@ -1286,12 +1272,11 @@ public final class BattleServerSide extends Battle
         return critters;
     }
 
+    // TODO get rid of String-based access
     private boolean isOccupied(String hexLabel)
     {
-        Iterator<CreatureServerSide> it = getAllCritters().iterator();
-        while (it.hasNext())
+        for (Creature critter : getAllCritters())
         {
-            CreatureServerSide critter = it.next();
             if (hexLabel.equals(critter.getCurrentHex().getLabel()))
             {
                 return true;
