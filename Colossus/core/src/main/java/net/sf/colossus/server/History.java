@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.variant.CreatureType;
@@ -401,9 +402,9 @@ public class History
             }
             else
             {
-                List<CreatureServerSide> cres = legion.getCreatures();
+                List<? extends Creature> cres = legion.getCreatures();
                 List<String> crenames = new ArrayList<String>();
-                for (CreatureServerSide c : cres)
+                for (Creature c : cres)
                 {
                     crenames.add(c.getName());
                 }

@@ -43,6 +43,8 @@ public class CreatureServerSide extends Creature
 {
     private static final Logger LOGGER = Logger
         .getLogger(CreatureServerSide.class.getName());
+    // TODO the creature would probably be better off not knowing
+    // about the battle
     private BattleServerSide battle;
 
     /**
@@ -181,7 +183,7 @@ public class CreatureServerSide extends Creature
             formerHexLabel, getCurrentHex(), true);
     }
 
-    boolean canStrike(CreatureServerSide target)
+    boolean canStrike(Creature target)
     {
         String hexLabel = target.getCurrentHex().getLabel();
         return battle.findStrikes(this, true).contains(hexLabel);

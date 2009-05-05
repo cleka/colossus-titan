@@ -82,7 +82,7 @@ public final class LegionServerSide extends Legion implements
     public int getPointValue()
     {
         int pointValue = 0;
-        for (CreatureServerSide critter : getCreatures())
+        for (Creature critter : getCreatures())
         {
             pointValue += critter.getPointValue();
         }
@@ -228,11 +228,8 @@ public final class LegionServerSide extends Legion implements
     {
         sortCritters();
         List<String> imageNames = new ArrayList<String>();
-        Iterator<CreatureServerSide> it = getCreatures().iterator();
-        while (it.hasNext())
+        for (Creature critter : getCreatures())
         {
-            CreatureServerSide critter = it.next();
-
             /*
              * Use getName(), not getImageName(), as
              * 1) Chit should be built with actual name to make sure
@@ -471,7 +468,7 @@ public final class LegionServerSide extends Legion implements
     CreatureType removeCreature(int i, boolean returnToStack,
         boolean disbandIfEmpty)
     {
-        CreatureServerSide critter = getCreatures().remove(i);
+        Creature critter = getCreatures().remove(i);
 
         // If the creature is an immortal, put it back in the stacks.
         if (returnToStack)
@@ -721,7 +718,7 @@ public final class LegionServerSide extends Legion implements
         // Tower teleport
         else
         {
-            for (CreatureServerSide critter : getCreatures())
+            for (Creature critter : getCreatures())
             {
                 if (critter.isLord())
                 {

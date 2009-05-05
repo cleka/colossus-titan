@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 import junit.framework.TestCase;
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.game.BattlePhase;
+import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.variant.BattleHex;
@@ -104,10 +105,10 @@ public class LOSTest extends TestCase
             BattleServerSide.LegionTags.ATTACKER, hex, 1,
             BattlePhase.FIGHT);
 
-        CreatureServerSide centaur1 = defender.getCritter(0);
-        CreatureServerSide gargoyle1 = defender.getCritter(1);
+        Creature centaur1 = defender.getCritter(0);
+        Creature gargoyle1 = defender.getCritter(1);
 
-        CreatureServerSide hydra1 = attacker.getCritter(0);
+        Creature hydra1 = attacker.getCritter(0);
 
         placeCreature(centaur1, "B3");
         placeCreature(gargoyle1, "B4");
@@ -120,7 +121,7 @@ public class LOSTest extends TestCase
             .getCurrentHex()));
     }
 
-    private void placeCreature(CreatureServerSide creature,
+    private void placeCreature(Creature creature,
         String battleHexLabel)
     {
         MasterBoardTerrain terrain = battle.getMasterHex().getTerrain();
@@ -147,21 +148,21 @@ public class LOSTest extends TestCase
             BattleServerSide.LegionTags.ATTACKER, hex, 1,
             BattlePhase.FIGHT);
 
-        CreatureServerSide centaur1 = defender.getCritter(0);
-        CreatureServerSide centaur2 = defender.getCritter(1);
-        CreatureServerSide lion1 = defender.getCritter(2);
-        CreatureServerSide lion2 = defender.getCritter(3);
-        CreatureServerSide ranger1 = defender.getCritter(4);
-        CreatureServerSide ranger2 = defender.getCritter(5);
-        CreatureServerSide ranger3 = defender.getCritter(6);
+        Creature centaur1 = defender.getCritter(0);
+        Creature centaur2 = defender.getCritter(1);
+        Creature lion1 = defender.getCritter(2);
+        Creature lion2 = defender.getCritter(3);
+        Creature ranger1 = defender.getCritter(4);
+        Creature ranger2 = defender.getCritter(5);
+        Creature ranger3 = defender.getCritter(6);
 
-        CreatureServerSide gargoyle1 = attacker.getCritter(0);
-        CreatureServerSide cyclops1 = attacker.getCritter(1);
-        CreatureServerSide cyclops2 = attacker.getCritter(2);
-        CreatureServerSide cyclops3 = attacker.getCritter(3);
-        CreatureServerSide gorgon1 = attacker.getCritter(4);
-        CreatureServerSide gorgon2 = attacker.getCritter(5);
-        CreatureServerSide ranger4 = attacker.getCritter(6);
+        Creature gargoyle1 = attacker.getCritter(0);
+        Creature cyclops1 = attacker.getCritter(1);
+        Creature cyclops2 = attacker.getCritter(2);
+        Creature cyclops3 = attacker.getCritter(3);
+        Creature gorgon1 = attacker.getCritter(4);
+        Creature gorgon2 = attacker.getCritter(5);
+        Creature ranger4 = attacker.getCritter(6);
 
         placeCreature(centaur1, "D1");
         placeCreature(centaur2, "E1");
@@ -290,18 +291,18 @@ public class LOSTest extends TestCase
             BattleServerSide.LegionTags.ATTACKER, hex, 1,
             BattlePhase.FIGHT);
 
-        CreatureServerSide centaur1 = defender.getCritter(0);
-        CreatureServerSide lion1 = defender.getCritter(1);
-        CreatureServerSide ranger1 = defender.getCritter(2);
-        CreatureServerSide ranger2 = defender.getCritter(3);
+        Creature centaur1 = defender.getCritter(0);
+        Creature lion1 = defender.getCritter(1);
+        Creature ranger1 = defender.getCritter(2);
+        Creature ranger2 = defender.getCritter(3);
 
-        CreatureServerSide cyclops1 = attacker.getCritter(0);
-        CreatureServerSide gorgon1 = attacker.getCritter(1);
-        CreatureServerSide gorgon2 = attacker.getCritter(2);
-        CreatureServerSide gorgon3 = attacker.getCritter(3);
-        CreatureServerSide gorgon4 = attacker.getCritter(4);
-        CreatureServerSide ranger3 = attacker.getCritter(5);
-        CreatureServerSide ranger4 = attacker.getCritter(6);
+        Creature cyclops1 = attacker.getCritter(0);
+        Creature gorgon1 = attacker.getCritter(1);
+        Creature gorgon2 = attacker.getCritter(2);
+        Creature gorgon3 = attacker.getCritter(3);
+        Creature gorgon4 = attacker.getCritter(4);
+        Creature ranger3 = attacker.getCritter(5);
+        Creature ranger4 = attacker.getCritter(6);
 
         placeCreature(centaur1, "D3");
         placeCreature(lion1, "E3");
@@ -420,17 +421,17 @@ public class LOSTest extends TestCase
             BattleServerSide.LegionTags.ATTACKER, hex, 1,
             BattlePhase.FIGHT);
 
-        CreatureServerSide centaur1 = defender.getCritter(0);
-        CreatureServerSide centaur2 = defender.getCritter(1);
-        CreatureServerSide lion1 = defender.getCritter(2);
-        CreatureServerSide lion2 = defender.getCritter(3);
-        CreatureServerSide ranger1 = defender.getCritter(4);
-        CreatureServerSide ranger2 = defender.getCritter(5);
+        Creature centaur1 = defender.getCritter(0);
+        Creature centaur2 = defender.getCritter(1);
+        Creature lion1 = defender.getCritter(2);
+        Creature lion2 = defender.getCritter(3);
+        Creature ranger1 = defender.getCritter(4);
+        Creature ranger2 = defender.getCritter(5);
 
-        CreatureServerSide gorgon1 = attacker.getCritter(0);
-        CreatureServerSide gorgon2 = attacker.getCritter(1);
-        CreatureServerSide ranger3 = attacker.getCritter(2);
-        CreatureServerSide ranger4 = attacker.getCritter(3);
+        Creature gorgon1 = attacker.getCritter(0);
+        Creature gorgon2 = attacker.getCritter(1);
+        Creature ranger3 = attacker.getCritter(2);
+        Creature ranger4 = attacker.getCritter(3);
 
         placeCreature(centaur1, "D4");
         placeCreature(centaur2, "B1");
@@ -535,11 +536,11 @@ public class LOSTest extends TestCase
             BattleServerSide.LegionTags.ATTACKER, hex, 2,
             BattlePhase.FIGHT);
 
-        CreatureServerSide troll1 = defender.getCritter(0);
-        CreatureServerSide troll2 = defender.getCritter(1);
-        CreatureServerSide troll3 = defender.getCritter(2);
-        CreatureServerSide troll4 = defender.getCritter(3);
-        CreatureServerSide wyvern1 = defender.getCritter(4);
+        Creature troll1 = defender.getCritter(0);
+        Creature troll2 = defender.getCritter(1);
+        Creature troll3 = defender.getCritter(2);
+        Creature troll4 = defender.getCritter(3);
+        Creature wyvern1 = defender.getCritter(4);
 
         CreatureServerSide ranger1 = attacker.getCritter(0);
         CreatureServerSide ranger2 = attacker.getCritter(1);
@@ -625,11 +626,11 @@ public class LOSTest extends TestCase
             BattleServerSide.LegionTags.ATTACKER, hex, 2,
             BattlePhase.FIGHT);
 
-        CreatureServerSide dragon1 = defender.getCritter(0);
-        CreatureServerSide dragon2 = defender.getCritter(1);
-        CreatureServerSide minotaur1 = defender.getCritter(2);
-        CreatureServerSide minotaur2 = defender.getCritter(3);
-        CreatureServerSide minotaur3 = defender.getCritter(4);
+        Creature dragon1 = defender.getCritter(0);
+        Creature dragon2 = defender.getCritter(1);
+        Creature minotaur1 = defender.getCritter(2);
+        Creature minotaur2 = defender.getCritter(3);
+        Creature minotaur3 = defender.getCritter(4);
 
         CreatureServerSide ranger1 = attacker.getCritter(0);
         CreatureServerSide ranger2 = attacker.getCritter(1);
@@ -713,9 +714,9 @@ public class LOSTest extends TestCase
             BattleServerSide.LegionTags.ATTACKER, hex, 1,
             BattlePhase.FIGHT);
 
-        CreatureServerSide hydra1 = defender.getCritter(0);
+        Creature hydra1 = defender.getCritter(0);
         CreatureServerSide hydra2 = attacker.getCritter(0);
-        CreatureServerSide guardian1 = attacker.getCritter(1);
+        Creature guardian1 = attacker.getCritter(1);
 
         placeCreature(hydra1, "D5");
         placeCreature(hydra2, "E3");

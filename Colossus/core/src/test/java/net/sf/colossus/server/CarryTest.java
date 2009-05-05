@@ -6,6 +6,7 @@ import java.util.Iterator;
 import junit.framework.TestCase;
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.game.BattlePhase;
+import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.variant.BattleHex;
@@ -134,7 +135,7 @@ public class CarryTest extends TestCase
         assertTrue(hydra1.getPenaltyOptions().size() == 0);
     }
 
-    private void placeCreature(CreatureServerSide creature,
+    private void placeCreature(Creature creature,
         String battleHexLabel)
     {
         MasterBoardTerrain terrain = battle.getMasterHex().getTerrain();

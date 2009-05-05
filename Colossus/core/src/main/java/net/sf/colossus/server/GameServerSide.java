@@ -1505,12 +1505,8 @@ public final class GameServerSide extends Game
         leg.setAttribute("recruitName", notnull(legion.getRecruitName()));
         leg.setAttribute("battleTally", "" + legion.getBattleTally());
 
-        Collection<CreatureServerSide> critters = legion.getCreatures();
-        Iterator<CreatureServerSide> it = critters.iterator();
-
-        while (it.hasNext())
+        for (Creature critter : legion.getCreatures())
         {
-            CreatureServerSide critter = it.next();
             Element cre = new Element("Creature");
 
             cre.setAttribute("name", critter.getName());
