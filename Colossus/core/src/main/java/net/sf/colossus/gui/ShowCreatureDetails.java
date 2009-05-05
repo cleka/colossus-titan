@@ -23,6 +23,7 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
+import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.RecruitGraph;
 import net.sf.colossus.guiutil.KDialog;
 import net.sf.colossus.server.CreatureServerSide;
@@ -495,13 +496,13 @@ public final class ShowCreatureDetails extends KDialog
         }
 
         /** power of this creature hitting target. */
-        public int getSimulatedPower(final CreatureServerSide target)
+        public int getSimulatedPower(final Creature target)
         {
             return getDice(target);
         }
 
         /** skill of this creature hitting target. */
-        public int getSimulatedSkill(final CreatureServerSide target)
+        public int getSimulatedSkill(final Creature target)
         {
             return getStrikeNumber(target);
         }

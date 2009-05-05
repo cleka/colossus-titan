@@ -192,7 +192,7 @@ public class CreatureServerSide extends Creature
      * WARNING: this is duplicated in Strike
      */
     @SuppressWarnings("deprecation")
-    protected int getDice(CreatureServerSide target)
+    protected int getDice(Creature target)
     {
         BattleHex hex = getCurrentHex();
         BattleHex targetHex = target.getCurrentHex();
@@ -271,7 +271,7 @@ public class CreatureServerSide extends Creature
 
     /** WARNING: this is duplicated in Strike */
     @SuppressWarnings("deprecation")
-    private int getAttackerSkill(CreatureServerSide target)
+    private int getAttackerSkill(Creature target)
     {
         BattleHex hex = getCurrentHex();
         BattleHex targetHex = target.getCurrentHex();
@@ -416,7 +416,7 @@ public class CreatureServerSide extends Creature
 
     /** WARNING: this is duplicated in Strike */
     @SuppressWarnings("deprecation")
-    protected int getStrikeNumber(CreatureServerSide target)
+    protected int getStrikeNumber(Creature target)
     {
         boolean rangestrike = !isInContact(true);
 
