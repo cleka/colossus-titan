@@ -91,7 +91,7 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
                     Set<List<CritterMove>> unusedYet = dfmr.getPerfectMatches(
                             amoves, attackers, client.getBattleSite().
                             getTerrain(), client.getDefender().getEntrySide());
-                    Set<List<CritterMove>> unusedYet2 = dfmr.getPerfectMatches(
+                    Set<List<CritterMove>> unusedYet2 = dfmr.getImperfectMatches(
                             amoves, attackers, client.getBattleSite().
                             getTerrain(), client.getDefender().getEntrySide());
                     LOGGER.warning("FOUND " + unusedYet.size() + " perfect matches and " + unusedYet2.size() + " imperfect matches.");
