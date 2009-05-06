@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
+
 import net.sf.colossus.client.CritterMove;
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.game.BattleCritter;
@@ -24,6 +25,8 @@ import net.sf.colossus.variant.MasterBoardTerrain;
  *
  * @author Romain Dolbeau
  */
+// TODO remove later
+@SuppressWarnings("unused")
 class DefenderFirstMoveRecordSQL
 {
 
