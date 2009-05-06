@@ -53,7 +53,6 @@ public class KDialog extends JDialog
      */
     public void placeRelative(JFrame parentFrame, Point point, JScrollPane pane)
     {
-
         JViewport viewPort = pane.getViewport();
 
         // Absolute coordinate in the screen since the window is toplevel
@@ -81,7 +80,6 @@ public class KDialog extends JDialog
     }
 
     /**
-     *
      * Center this dialog on the screen, with an additional offset.
      *
      * Must be called after the dialog size has been set.
@@ -93,18 +91,20 @@ public class KDialog extends JDialog
             (d.height / 2 - getSize().height / 2) + yoffset));
     }
 
+    /**
+     * Returns a point with a horizontal offset of the top right corner of the screen.
+     *
+     * This finds the upper right corner of the computer's screen and then moves
+     * the location to the left by the given width.
+     *
+     * @param width The horizontal offset.
+     * @return the target location
+     */
     public Point getUpperRightCorner(int width)
     {
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         Point location = new Point(d.width - width, 0);
         return location;
-    }
-
-    public void upperRightCorner()
-    {
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        Point location = new Point(d.width - getSize().width, 0);
-        setLocation(location);
     }
 
     // Move up a few pixels from the bottom, to help avoid taskbars.
