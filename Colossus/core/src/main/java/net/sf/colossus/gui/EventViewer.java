@@ -44,7 +44,6 @@ import net.sf.colossus.common.Options;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.guiutil.KDialog;
-import net.sf.colossus.guiutil.SaveWindow;
 
 
 /**
@@ -90,11 +89,10 @@ final class EventViewer extends KDialog
     private static final Logger LOGGER = Logger.getLogger(EventViewer.class
         .getName());
 
-    private final static String windowTitle = "Event Viewer";
+    private final static String WINDOW_TITLE = "Event Viewer";
 
     private IOptions options;
     private Client client;
-    private SaveWindow saveWindow;
 
     private boolean visible;
 
@@ -168,7 +166,7 @@ final class EventViewer extends KDialog
 
     EventViewer(final JFrame frame, final IOptions options, Client client)
     {
-        super(frame, windowTitle, false);
+        super(frame, WINDOW_TITLE, false);
         setFocusable(false);
 
         this.options = options;
@@ -215,6 +213,10 @@ final class EventViewer extends KDialog
                 options.setOption(Options.showEventViewer, false);
             }
         });
+
+        Point defaultLoc = getUpperRightCorner(getWidth());
+        defaultLoc.setLocation(defaultLoc.x, 120);
+        useSaveWindow(options, WINDOW_TITLE, defaultLoc);
 
         setVisibleMaybe();
     }
@@ -1365,10 +1367,6 @@ final class EventViewer extends KDialog
     @Override
     public void dispose()
     {
-        if (saveWindow != null)
-        {
-            saveWindow.save(this);
-        }
         cleanup();
         super.dispose();
     }
@@ -1384,13 +1382,6 @@ final class EventViewer extends KDialog
     {
         if (visible)
         {
-            if (this.saveWindow == null)
-            {
-                this.saveWindow = new SaveWindow(options, windowTitle);
-            }
-            Point defaultLoc = getUpperRightCorner(getWidth());
-            defaultLoc.setLocation(defaultLoc.x, 120);
-            saveWindow.restore(this, defaultLoc);
             settingsPane.setMinimumSize(settingsPane.getSize());
             // eventPane.setMinimumSize(eventPane.getSize());
             this.visible = true;
@@ -1398,15 +1389,6 @@ final class EventViewer extends KDialog
         }
         else
         {
-            if (this.isVisible())
-            {
-                // do not save when not visible - in particular this
-                // would be run when a new user first time creates a
-                // board - Inspector option not selected, but EventViewer
-                // gets created anyway and "setVisibleMaybe()" - that
-                // would save (0, 0) as initial location...
-                saveWindow.save(this);
-            }
             this.visible = false;
         }
         super.setVisible(visible);
