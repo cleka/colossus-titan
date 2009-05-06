@@ -20,7 +20,6 @@ import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.common.IOptions;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.guiutil.KDialog;
-import net.sf.colossus.guiutil.SaveWindow;
 import net.sf.colossus.variant.IVariant;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;
@@ -30,8 +29,6 @@ import net.sf.colossus.variant.Variant;
 class AutoInspector extends KDialog
 {
     private final IOptions options;
-
-    private final SaveWindow saveWindow;
 
     private final Variant variant;
     private final IVariant ivariant;
@@ -67,9 +64,8 @@ class AutoInspector extends KDialog
             }
         });
 
-        saveWindow = new SaveWindow(options, "AutoInspector");
         Point location = getUpperRightCorner(550);
-        saveWindow.restore(this, location);
+        useSaveWindow(options, "AutoInspector", location);
 
         scrollPane = new JScrollPane();
 
@@ -78,14 +74,6 @@ class AutoInspector extends KDialog
         contentPane.add(scrollPane, BorderLayout.CENTER);
 
         setVisible(true);
-    }
-
-    @Override
-    public void dispose()
-    {
-        saveWindow.saveSize(getSize());
-        saveWindow.saveLocation(getLocation());
-        super.dispose();
     }
 
     @Override
