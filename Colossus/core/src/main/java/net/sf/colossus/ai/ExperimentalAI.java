@@ -31,7 +31,7 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
         .getName());
     private final static long MAX_EXHAUSTIVE_SEARCH_MOVES = 15000;
 
-    private final DefenderFirstMoveRecordSQL dfmr;;
+    private final DefenderFirstMoveRecordSQL dfmr;
 
     public ExperimentalAI(Client client)
     {
