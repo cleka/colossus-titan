@@ -32,7 +32,7 @@ import net.sf.colossus.common.Constants;
  * on several variant at once.
  * @author Romain Dolbeau
  */
-public class ParallelEvaluatorAI extends ExperimentalAI
+public class ParallelEvaluatorAI extends ExperimentalAI // NO_UCD
 {
     private static final Logger LOGGER = Logger.getLogger(
             ParallelEvaluatorAI.class.getName());
