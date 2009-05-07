@@ -329,12 +329,6 @@ public class Variant
     {
         return titanTeleport;
     }
-
-    public AllCreatureType getAllCreatureType()
-    {
-        return creatureTypes;
-    }
-
 }
 
 

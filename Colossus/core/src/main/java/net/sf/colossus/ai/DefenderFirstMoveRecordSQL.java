@@ -18,29 +18,24 @@ import net.sf.colossus.client.CritterMove;
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.EntrySide;
-import net.sf.colossus.variant.AllCreatureType;
 import net.sf.colossus.variant.MasterBoardTerrain;
 
 /**
  *
  * @author Romain Dolbeau
  */
-// TODO remove later
-@SuppressWarnings("unused")
 class DefenderFirstMoveRecordSQL
 {
 
     final static private Logger LOGGER = Logger.getLogger(
             DefenderFirstMoveRecordSQL.class.getName());
     private Connection connection;
-    private final AllCreatureType creatures;
     private final String variantName;
 
     /** Creates a new instance of BattleRecordSQL */
     DefenderFirstMoveRecordSQL(String serverName, String username,
-            String password, AllCreatureType creatures, String variantName)
+            String password, String variantName)
     {
-        this.creatures = creatures;
         this.variantName = variantName;
         /* connect */
         try
@@ -57,7 +52,13 @@ class DefenderFirstMoveRecordSQL
         {
             // Could not find the database driver
             connection = null;
-            LOGGER.warning("SQL: " + e.toString());
+            LOGGER.info("SQL: " + e.toString());
+            LOGGER.info("Current implementation requires a mysql database"
+                    + " (using driver com.mysql.jdbc.Driver) on "
+                    + serverName + " with a pre-existing base of name "
+                    + getDatabaseName() + " accessible to user " + username
+                    + " with password " + password
+                    + " ; Colossus will take care of creating the tables by itself.");
         } catch (SQLException e)
         {
             // Could not connect to the database

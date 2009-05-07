@@ -45,8 +45,7 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
         bec.DEFENDER_BY_DAMAGINGHAZARD_BONUS = 60;
 
         dfmr = new DefenderFirstMoveRecordSQL("localhost", "colossus",
-                "colossus", VariantSupport.getCurrentVariant().getAllCreatureType(),
-                VariantSupport.getCurrentVariant().getName());
+                "colossus", VariantSupport.getCurrentVariant().getName());
     }
 
     @Override
