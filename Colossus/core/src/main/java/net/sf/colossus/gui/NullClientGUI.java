@@ -784,4 +784,10 @@ public class NullClientGUI implements IClientGUI
 
     }
 
+    public void removeBattleChit(BattleUnit battleUnit)
+    {
+        // TODO Auto-generated method stub
+
+    }
+
 }

@@ -1148,6 +1148,7 @@ public final class Client implements IClient, IOracle, IVariant
             if (battleUnit.isDead())
             {
                 it.remove();
+                gui.removeBattleChit(battleUnit);
 
                 // Also remove it from LegionInfo.
                 String name = battleUnit.getId();

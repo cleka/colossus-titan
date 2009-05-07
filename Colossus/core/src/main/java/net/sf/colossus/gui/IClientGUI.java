@@ -329,4 +329,5 @@ public interface IClientGUI
     // for PreferencesWindow
     public abstract void setLookAndFeel(String text);
 
+    public abstract void removeBattleChit(BattleUnit battleUnit);
 }

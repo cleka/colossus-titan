@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -2635,6 +2636,19 @@ public class ClientGUI implements IClientGUI
     public boolean doMove(MasterHex hex)
     {
         return client.doMove(mover, hex);
+    }
+
+    public void removeBattleChit(BattleUnit battleUnit)
+    {
+        for (Iterator<GUIBattleChit> iterator = battleChits.iterator(); iterator
+            .hasNext();)
+        {
+            GUIBattleChit chit = iterator.next();
+            if (chit.getBattleUnit().equals(battleUnit))
+            {
+                iterator.remove();
+            }
+        }
     }
 
 }
