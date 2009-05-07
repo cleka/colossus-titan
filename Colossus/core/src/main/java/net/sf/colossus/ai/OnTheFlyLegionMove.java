@@ -469,6 +469,11 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
             int[] dad = getParent(RANDOM_PARENT_PERCENT,
                     GOOD_PARENT_TOP_PERCENT);
 
+            if ((mom == null) || (dad == null))
+            {
+                return null;
+            }
+
             int[] child = breed(mom, dad, RANDOM_GENE_PERCENT);
 
             return child;
@@ -479,6 +484,11 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
         {
             int[] parent;
             int length = byValues.size();
+            if (length <= 0)
+            {
+                LOGGER.warning("getParent called but byValues has no element.");
+                return null;
+            }
             if (rand.nextInt(100) < percentRandom)
             {
                 parent = byValues.get(rand.nextInt(length));
@@ -594,7 +604,7 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
                         indexes = geneticGeneration();
                         genetic = true;
                     }
-                    if (!isBad(indexes))
+                    if ((indexes !=null) && !isBad(indexes))
                     {
                         if (!beingdone.keySet().contains(indexes) && !alreadydone.keySet().
                                 contains(indexes))
