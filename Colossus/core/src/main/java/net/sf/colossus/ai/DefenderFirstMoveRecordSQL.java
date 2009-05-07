@@ -265,6 +265,8 @@ class DefenderFirstMoveRecordSQL
         sql.append(getTableName());
         sql.append(" WHERE defenders='");
         sql.append(critterMoveListToNameString(moves));
+        sql.append("' AND attackers<>'");
+        sql.append(battleCritterListToString(attackers));
         sql.append("' AND battleland='");
         sql.append(mbt.getDisplayName());
         sql.append("' AND entryside='");
