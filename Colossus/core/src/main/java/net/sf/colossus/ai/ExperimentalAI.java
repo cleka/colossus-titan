@@ -396,7 +396,7 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
         {
             if (lcritter.isTitan())
             {
-                listObjectives.add(new DestroyCreatureTacticalObjective(10,
+                listObjectives.add(new DestroyCreatureTacticalObjective(5,
                         client,
                         client.getDefender(),
                         lcritter));
@@ -414,6 +414,16 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
                         toKill = lcritter;
                     }
                 }
+            }
+        }
+        for (Creature lcritter : client.getAttacker().getCreatures())
+        {
+            if (lcritter.isTitan())
+            {
+                listObjectives.add(new PreserveCreatureTacticalObjective(1,
+                        client,
+                        client.getAttacker(),
+                        lcritter));
             }
         }
         if (toKill != null)
@@ -436,9 +446,19 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
         {
             if (lcritter.isTitan())
             {
-                listObjectives.add(new DestroyCreatureTacticalObjective(10,
+                listObjectives.add(new DestroyCreatureTacticalObjective(5,
                         client,
                         client.getAttacker(),
+                        lcritter));
+            }
+        }
+        for (Creature lcritter : client.getDefender().getCreatures())
+        {
+            if (lcritter.isTitan())
+            {
+                listObjectives.add(new PreserveCreatureTacticalObjective(5,
+                        client,
+                        client.getDefender(),
                         lcritter));
             }
         }

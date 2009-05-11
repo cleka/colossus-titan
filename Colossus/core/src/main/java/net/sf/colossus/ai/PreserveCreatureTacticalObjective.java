@@ -11,12 +11,12 @@ import net.sf.colossus.game.Legion;
  *
  * @author Romain Dolbeau
  */
-class DestroyCreatureTacticalObjective implements TacticalObjective
+class PreserveCreatureTacticalObjective implements TacticalObjective
 {
     private static final Logger LOGGER = Logger.getLogger(
-            DestroyCreatureTacticalObjective.class.getName());
+            PreserveCreatureTacticalObjective.class.getName());
     private final Creature critter;
-    private final Legion killlegion;
+    private final Legion liveLegion;
     private final Client client;
     private final int count;
     private final int priority;
@@ -34,24 +34,24 @@ class DestroyCreatureTacticalObjective implements TacticalObjective
         return lcount;
     }
 
-    DestroyCreatureTacticalObjective(int priority, Client client, Legion killlegion,
+    PreserveCreatureTacticalObjective(int priority, Client client, Legion liveLegion,
             Creature critter)
     {
         this.priority = priority;
         this.critter = critter;
-        this.killlegion = killlegion;
+        this.liveLegion = liveLegion;
         this.client = client;
-        count = countCreatureType(killlegion);
+        count = countCreatureType(liveLegion);
         if (count <= 0)
         {
-            LOGGER.warning("Trying to kill a " + critter.getName() +
-                    " but there isn't any in " + killlegion.getMarkerId());
+            LOGGER.warning("Trying to preserve all " + critter.getName() +
+                    " but there isn't any in " + liveLegion.getMarkerId());
         }
     }
 
     public boolean objectiveAttained()
     {
-        if (countCreatureType(killlegion) < count)
+        if (countCreatureType(liveLegion) >= count)
         {
             return true;
         }
@@ -61,12 +61,12 @@ class DestroyCreatureTacticalObjective implements TacticalObjective
     public int situationContributeToTheObjective()
     {
         int mcount = 0;
-        for (BattleCritter dCritter : client.getInactiveBattleUnits())
+        for (BattleCritter dCritter : client.getActiveBattleUnits())
         {
             if (dCritter.getCreatureType().equals(critter.getType()))
             {
                 int lcount = 0;
-                for (BattleCritter aCritter : client.getActiveBattleUnits())
+                for (BattleCritter aCritter : client.getInactiveBattleUnits())
                 {
                     int range = Battle.getRange(dCritter.getCurrentHex(),
                             aCritter.getCurrentHex(), false);
@@ -85,7 +85,7 @@ class DestroyCreatureTacticalObjective implements TacticalObjective
                 }
             }
         }
-        return mcount * getPriority();
+        return -(mcount * getPriority());
     }
 
     public int getPriority()
@@ -95,6 +95,6 @@ class DestroyCreatureTacticalObjective implements TacticalObjective
 
     public String getDescription()
     {
-        return "Destroying a " + critter.getName();
+        return "Preserving all " + critter.getName();
     }
 }
