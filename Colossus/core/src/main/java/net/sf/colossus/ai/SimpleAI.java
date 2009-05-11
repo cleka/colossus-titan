@@ -2660,7 +2660,7 @@ public class SimpleAI extends AbstractAI
 
     @SuppressWarnings("unused")
     protected int evaluateLegionBattleMoveAsAWhole(LegionMove lm,
-        Map<BattleHex, Integer> strikeMap, StringBuffer why)
+        Map<BattleHex, Integer> strikeMap, ValueRecorder value)
     {
         // This is empty, to be overidden by subclasses.
         return 0;
@@ -2903,7 +2903,7 @@ public class SimpleAI extends AbstractAI
                     .intValue();
                 if (numAttackingThisTarget > 1)
                 {
-                    value.add(bec.GANG_UP_ON_CREATURE, "GangUpOnCreature");
+                    value.add(bec.GANG_UP_ON_CREATURE, "GangUpOnCreature RangeStrike");
                 }
             }
         }
@@ -2995,7 +2995,7 @@ public class SimpleAI extends AbstractAI
                     .intValue();
                 if (numAttackingThisTarget > 1)
                 {
-                    value.add(bec.GANG_UP_ON_CREATURE, "GangUpOnCreature 2");
+                    value.add(bec.GANG_UP_ON_CREATURE, "GangUpOnCreature Strike");
                 }
             }
 
@@ -3010,15 +3010,13 @@ public class SimpleAI extends AbstractAI
 
         if (legion.equals(client.getAttacker()))
         {
-            value.add(bec.ATTACKER_KILL_SCALE_FACTOR * killValue
-                + bec.KILLABLE_TARGETS_SCALE_FACTOR * numKillableTargets,
-                "Attacker Killable Stuff");
+            value.add(bec.ATTACKER_KILL_SCALE_FACTOR * killValue, "AttackerKillValueScaled");
+            value.add(bec.KILLABLE_TARGETS_SCALE_FACTOR * numKillableTargets, "AttackerNumKillable");
         }
         else
         {
-            value.add(bec.DEFENDER_KILL_SCALE_FACTOR * killValue
-                + bec.KILLABLE_TARGETS_SCALE_FACTOR * numKillableTargets,
-                "Defender Killable Stuff");
+            value.add(bec.DEFENDER_KILL_SCALE_FACTOR * killValue, "DefenderKillValueScaled");
+            value.add(bec.KILLABLE_TARGETS_SCALE_FACTOR * numKillableTargets, "DefenderNumKillable");
         }
 
         int hits = critter.getHits();
@@ -3171,7 +3169,7 @@ public class SimpleAI extends AbstractAI
 
         // whole position evaluation
         {
-            StringBuffer why = new StringBuffer();
+            ValueRecorder why = new ValueRecorder();
             int val = evaluateLegionBattleMoveAsAWhole(lm, strikeMap, why);
             lm.setEvaluate(why.toString());
             sum += val;

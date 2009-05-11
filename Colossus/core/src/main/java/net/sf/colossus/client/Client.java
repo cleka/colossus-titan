@@ -1679,6 +1679,11 @@ public final class Client implements IClient, IOracle, IVariant
         this.getDefender().setEntrySide(
             this.getAttacker().getEntrySide().getOpposingSide());
 
+        if (options.getOption(Options.autoPlay))
+        {
+            ai.initBattle();
+        }
+
         gui.actOnInitBattle();
     }
 
@@ -1693,6 +1698,12 @@ public final class Client implements IClient, IOracle, IVariant
             + " Client.cleanupBattle()");
 
         gui.actOnCleanupBattle();
+
+        if (options.getOption(Options.autoPlay))
+        {
+            ai.cleanupBattle();
+        }
+        
 
         battleUnits.clear();
         battlePhase = null;

@@ -51,8 +51,14 @@ public interface AI
     /** make battle strikes for legion */
     boolean strike(Legion legion);
 
+    /** a Battle start */
+    void initBattle();
+
     /** return a list of battle moves for the active legion */
     List<CritterMove> battleMove();
+
+    /** a Battle is finished */
+    void cleanupBattle();
 
     /** Try another move for creatures whose moves failed. */
     void retryFailedBattleMoves(List<CritterMove> bestMoveOrder);

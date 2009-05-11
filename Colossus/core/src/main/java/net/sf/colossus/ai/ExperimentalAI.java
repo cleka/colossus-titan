@@ -15,6 +15,7 @@ import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.Battle;
 import net.sf.colossus.game.BattleCritter;
+import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.variant.BattleHex;
@@ -269,9 +270,8 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
 
     @Override
     protected int evaluateLegionBattleMoveAsAWhole(LegionMove lm,
-        Map<BattleHex, Integer> strikeMap, StringBuffer why)
+        Map<BattleHex, Integer> strikeMap, ValueRecorder value)
     {
-        int value = 0;
         final Legion legion = client.getMyEngagedLegion();
         if (legion.equals(client.getAttacker()))
         {
@@ -308,26 +308,151 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
             }
             if (numCanBeReached == 1) // TODO: Rangestriker
             {
-                value += bec.DEF__AT_MOST_ONE_IS_REACHABLE;
-                why.append("+");
-                why.append(bec.DEF__AT_MOST_ONE_IS_REACHABLE);
-                why.append(" [Def_AtMostOneIsReachable]");
+                value.add(bec.DEF__AT_MOST_ONE_IS_REACHABLE, "Def_AtMostOneIsReachable");
             }
             if (maxThatCanReach == 1) // TODO: Rangestriker
             {
-                value += bec.DEF__NOONE_IS_GANGBANGED;
-                why.append("+");
-                why.append(bec.DEF__NOONE_IS_GANGBANGED);
-                why.append(" [Def_NoOneIsGangbanged]");
+                value.add(bec.DEF__NOONE_IS_GANGBANGED, "Def_NoOneIsGangbanged");
             }
             if (nobodyGetsHurt) // TODO: Rangestriker
             {
-                value += bec.DEF__NOBODY_GETS_HURT;
-                why.append("+");
-                why.append(bec.DEF__NOBODY_GETS_HURT);
-                why.append(" [Def_NobodyGetsHurt]");
+                value.add(bec.DEF__NOBODY_GETS_HURT, "Def_NobodyGetsHurt");
             }
         }
-        return value;
+        if (listObjectives != null)
+        {
+            for (TacticalObjective to : listObjectives)
+            {
+                int temp = to.situationContributeToTheObjective();
+                value.add(temp, "Objective: " + to.getDescription());
+            }
+        }
+        return value.getValue();
+    }
+
+    private List<TacticalObjective> listObjectives = null;
+    
+    @Override
+    public void initBattle()
+    {
+        super.initBattle();
+        if (client.getMyEngagedLegion() != null)
+        {
+            if (client.getMyEngagedLegion().equals(client.getDefender()))
+            {
+                defenderObjective();
+            }
+            else
+            {
+                attackerObjective();
+            }
+        }
+    }
+
+    @Override
+    public void cleanupBattle()
+    {
+        super.cleanupBattle();
+        if (listObjectives != null)
+        {
+            for (TacticalObjective to : listObjectives)
+            {
+                LOGGER.info("Objective:" + to.getDescription() + " -> " + to.
+                        objectiveAttained());
+            }
+            listObjectives = null;
+        }
+    }
+
+    /** really stupid heuristic */
+    private Creature findCreatureToDestroyInAttacker()
+    {
+        Creature creature = null;
+        int mcount = 0;
+
+        for (Creature lcritter : client.getAttacker().getCreatures())
+        {
+            int count = countCreatureAccrossAllLegionFromPlayer(lcritter);
+            LOGGER.finest("Found " + count + " " + lcritter.getName() + " for the attacker");
+            if (!lcritter.isLord() && !lcritter.isDemiLord() &&
+                    ((creature == null) || (count < mcount)))
+            {
+                creature = lcritter;
+                mcount = count;
+            }
+        }
+
+        return creature;
+    }
+
+    /** Currently attackerObjective is very dumb:
+     * try and kill the Titan (if there) and the biggest creature
+     */
+    private void attackerObjective()
+    {
+        listObjectives = new ArrayList<TacticalObjective>();
+        Creature toKill = null;
+        for (Creature lcritter : client.getDefender().getCreatures())
+        {
+            if (lcritter.isTitan())
+            {
+                listObjectives.add(new DestroyCreatureTacticalObjective(10,
+                        client,
+                        client.getDefender(),
+                        lcritter));
+            }
+            else
+            {
+                if (toKill == null)
+                {
+                    toKill = lcritter;
+                }
+                else
+                {
+                    if (toKill.getPointValue() < lcritter.getPointValue())
+                    {
+                        toKill = lcritter;
+                    }
+                }
+            }
+        }
+        if (toKill != null)
+        {
+            listObjectives.add(new DestroyCreatureTacticalObjective(1,
+                    client,
+                    client.getDefender(),
+                    toKill));
+        }
+        for (TacticalObjective to : listObjectives)
+        {
+            LOGGER.info("Attacker Objective: " + to.getDescription());
+        }
+    }
+
+    private void defenderObjective()
+    {
+        listObjectives = new ArrayList<TacticalObjective>();
+        for (Creature lcritter : client.getAttacker().getCreatures())
+        {
+            if (lcritter.isTitan())
+            {
+                listObjectives.add(new DestroyCreatureTacticalObjective(10,
+                        client,
+                        client.getAttacker(),
+                        lcritter));
+            }
+        }
+        Creature toKill = findCreatureToDestroyInAttacker();
+        if (toKill != null)
+        {
+            listObjectives.add(new DestroyCreatureTacticalObjective(1,
+                    client,
+                    client.getAttacker(),
+                    toKill));
+        }
+        for (TacticalObjective to : listObjectives)
+        {
+            LOGGER.info("Defender Objective: " + to.getDescription());
+        }
     }
 }
