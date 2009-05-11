@@ -386,7 +386,7 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
             }
         }
 
-        LOGGER.finest("Less Common choice: " + creature.getName());
+        LOGGER.finest("Less Common choice: " + (creature != null ? creature.getName() : "(NOBODY)"));
 
         List<AllThereIsToKnowAboutYourCreature> overkill = new ArrayList<AllThereIsToKnowAboutYourCreature>();
         for (Creature lcritter : attacker.getCreatures())
