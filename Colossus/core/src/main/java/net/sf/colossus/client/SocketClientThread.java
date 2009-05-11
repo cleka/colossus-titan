@@ -23,6 +23,7 @@ import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
+import net.sf.colossus.game.events.RecruitEvent;
 import net.sf.colossus.server.IServer;
 import net.sf.colossus.util.ErrorUtils;
 import net.sf.colossus.util.Glob;
@@ -1110,11 +1111,13 @@ final class SocketClientThread extends Thread implements IServer,
             + (donor != null ? donor.getMarkerId() : null) + sep + angel);
     }
 
-    public void doRecruit(Legion legion, String recruitName,
-        String recruiterName)
+    public void doRecruit(RecruitEvent event)
     {
-        sendToServer(Constants.doRecruit + sep + legion.getMarkerId() + sep
-            + recruitName + sep + recruiterName);
+        CreatureType recruiter = event.getRecruiter();
+        sendToServer(Constants.doRecruit + sep
+            + event.getLegion().getMarkerId() + sep
+            + event.getRecruited().getName() + sep
+            + ((recruiter == null) ? null : recruiter.getName()));
     }
 
     public void engage(MasterHex hex)

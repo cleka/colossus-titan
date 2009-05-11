@@ -20,7 +20,7 @@ import net.sf.colossus.variant.Variant;
  * As opposed to {@link Variant} this class holds information about an ongoing game
  * and its status.
  */
-public class Game
+public abstract class Game
 {
     private static final Logger LOGGER = Logger
         .getLogger(Game.class.getName());
@@ -245,4 +245,11 @@ public class Game
         return null;
     }
 
+    /**
+     * The current turn in the game.
+     *
+     * TODO the implementation should probably be pulled up
+     * @return
+     */
+    public abstract int getTurnNumber();
 }

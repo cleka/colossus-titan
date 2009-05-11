@@ -4,6 +4,7 @@ package net.sf.colossus.server;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.PlayerColor;
+import net.sf.colossus.game.events.RecruitEvent;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.MasterHex;
 
@@ -26,8 +27,8 @@ public interface IServer
     public void doSummon(Legion receivingLegion, Legion donorLegion,
         String angel);
 
-    public void doRecruit(Legion legion, String recruitName,
-        String recruiterName);
+    // TODO extend or subclass event to include recruiter
+    public void doRecruit(RecruitEvent event);
 
     public void engage(MasterHex hex);
 

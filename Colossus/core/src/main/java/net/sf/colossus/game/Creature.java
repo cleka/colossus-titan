@@ -76,7 +76,7 @@ public class Creature
     protected Legion legion;
     private BattleHex currentHex;
     private BattleHex startingHex;
-    /** Damage taken */
+
     /**
      * Damage taken
      */

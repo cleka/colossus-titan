@@ -35,6 +35,7 @@ import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.Proposal;
 import net.sf.colossus.game.SummonInfo;
+import net.sf.colossus.game.events.RecruitEvent;
 import net.sf.colossus.gui.ClientGUI;
 import net.sf.colossus.gui.IClientGUI;
 import net.sf.colossus.gui.NullClientGUI;
@@ -1797,9 +1798,15 @@ public final class Client implements IClient, IOracle, IVariant
     public void doRecruit(Legion legion, String recruitName,
         String recruiterName)
     {
+        CreatureType recruited = game.getVariant().getCreatureByName(
+            recruitName);
+        CreatureType recruiter = (recruiterName == null) ? null : game
+            .getVariant().getCreatureByName(
+            recruiterName);
         // Call server even if some arguments are null, to get past
         // reinforcement.
-        server.doRecruit(legion, recruitName, recruiterName);
+        server.doRecruit(new RecruitEvent(game.getTurnNumber(), legion,
+            recruited, recruiter));
     }
 
     /** Always needs to call server.doRecruit(), even if no recruit is

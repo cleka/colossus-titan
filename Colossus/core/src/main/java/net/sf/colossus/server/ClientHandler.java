@@ -23,6 +23,7 @@ import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
+import net.sf.colossus.game.events.RecruitEvent;
 import net.sf.colossus.util.ErrorUtils;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.InstanceTracker;
@@ -341,8 +342,12 @@ final class ClientHandler implements IClient
             String markerId = args.remove(0);
             String recruitName = args.remove(0);
             String recruiterName = args.remove(0);
-            server.doRecruit(resolveLegion(markerId), recruitName,
-                recruiterName);
+            Legion legion = resolveLegion(markerId);
+            CreatureType recruited = resolveCreatureType(recruitName);
+            CreatureType recruiter = resolveCreatureType(recruiterName);
+            server
+                .doRecruit(new RecruitEvent(server.getGame().getTurnNumber(),
+                    legion, recruited, recruiter));
         }
         else if (method.equals(Constants.engage))
         {
@@ -524,6 +529,11 @@ final class ClientHandler implements IClient
             LOGGER.log(Level.SEVERE, "Bogus packet (Server, method: " + method
                 + ", args: " + args + ")");
         }
+    }
+
+    private CreatureType resolveCreatureType(String name)
+    {
+        return server.getGame().getVariant().getCreatureByName(name);
     }
 
     private void withdrawIfNeeded()

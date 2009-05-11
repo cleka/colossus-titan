@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
+import net.sf.colossus.game.events.AddCreatureEvent;
 import net.sf.colossus.variant.CreatureType;
 
 import org.jdom.Element;
@@ -68,17 +69,22 @@ public class History
         return (Element)root.clone();
     }
 
-    void addCreatureEvent(Legion legion, String creatureName, int turn)
+    /**
+     * TODO reconsider name
+     * TODO decide if we should move it all into one big handleEvent(GameEvent) method
+     */
+    void addCreatureEvent(AddCreatureEvent event)
     {
         if (loading)
         {
             return;
         }
-        Element event = new Element("AddCreature");
-        event.setAttribute("markerId", legion.getMarkerId());
-        event.setAttribute("creatureName", creatureName);
-        event.setAttribute("turn", "" + turn);
-        root.addContent(event);
+        Element element = new Element("AddCreature");
+        element.setAttribute("markerId", event.getLegion().getMarkerId());
+        element
+            .setAttribute("creatureName", event.getAddedCreatureType().getName());
+        element.setAttribute("turn", "" + event.getTurn());
+        root.addContent(element);
     }
 
     void removeCreatureEvent(Legion legion, String creatureName, int turn)
@@ -375,12 +381,15 @@ public class History
                 + "' to legion with markerId '" + markerId + "', reason '"
                 + reason + "'");
             LegionServerSide legion = game.getLegionByMarkerId(markerId);
-            legion.addCreature(game.getVariant().getCreatureByName(
-                creatureName), false);
+            CreatureType creatureType = game.getVariant().getCreatureByName(
+                creatureName);
+            legion.addCreature(creatureType, false);
             // Skip for players that will be dead by end of replay
             if (!legion.getPlayer().getDeadBeforeSave())
             {
-                server.allTellAddCreature(legion, creatureName, false, reason);
+                server.allTellAddCreature(
+                    new AddCreatureEvent(game.getTurnNumber(), legion
+                        .getPlayer(), legion, creatureType), false);
             }
             LOGGER.finest("Legion '" + markerId + "' now contains "
                 + legion.getCreatures());

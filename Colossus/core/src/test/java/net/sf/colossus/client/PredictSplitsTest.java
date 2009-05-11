@@ -60,7 +60,14 @@ public class PredictSplitsTest extends TestCase
         .getLogger(PredictSplitsTest.class.getName());
 
     private static final Player player = new Player(new Game(null,
-        new String[] {}), "Tester", 1);
+        new String[] {})
+    {
+        @Override
+        public int getTurnNumber()
+        {
+            return 0;
+        }
+    }, "Tester", 1);
 
     private static class TestLegion extends Legion
     {

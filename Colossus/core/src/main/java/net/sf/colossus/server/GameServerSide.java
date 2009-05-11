@@ -37,6 +37,8 @@ import net.sf.colossus.game.Phase;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.Proposal;
+import net.sf.colossus.game.events.AddCreatureEvent;
+import net.sf.colossus.game.events.SummonEvent;
 import net.sf.colossus.server.BattleServerSide.AngelSummoningStates;
 import net.sf.colossus.util.ErrorUtils;
 import net.sf.colossus.util.InstanceTracker;
@@ -1221,7 +1223,8 @@ public final class GameServerSide extends Game
         }
     }
 
-    int getTurnNumber()
+    @Override
+    public int getTurnNumber()
     {
         return turnNumber;
     }
@@ -2698,8 +2701,8 @@ public final class GameServerSide extends Game
 
             server.allTellRemoveCreature(donor, angel.getName(), true,
                 Constants.reasonSummon);
-            server.allTellAddCreature(legion, angel.getName(), true,
-                Constants.reasonSummon);
+            server.allTellAddCreature(new SummonEvent(turnNumber, legion,
+                donor, angel), true);
 
             server.allTellDidSummon(legion, donor, angel.getName());
 
@@ -3738,10 +3741,10 @@ public final class GameServerSide extends Game
     }
 
     // History wrappers.  Time to start obeying the Law of Demeter.
-    void addCreatureEvent(Legion legion, String creatureName)
+    void addCreatureEvent(AddCreatureEvent event)
     {
         lastRecruitTurnNumber = turnNumber;
-        history.addCreatureEvent(legion, creatureName, turnNumber);
+        history.addCreatureEvent(event);
     }
 
     void removeCreatureEvent(Legion legion, String creatureName)

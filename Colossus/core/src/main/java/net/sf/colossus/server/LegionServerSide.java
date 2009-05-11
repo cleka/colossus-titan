@@ -14,6 +14,7 @@ import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
+import net.sf.colossus.game.events.AcquireEvent;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
 
@@ -133,8 +134,10 @@ public final class LegionServerSide extends Legion implements
                     {
                         LOGGER.log(Level.INFO, "Legion " + getLongMarkerName()
                             + " acquired one " + angelType);
-                        game.getServer().allTellAddCreature(this, angelType,
-                            true, Constants.reasonAcquire);
+                        game.getServer()
+                            .allTellAddCreature(
+                                new AcquireEvent(game.getTurnNumber(), this,
+                                    angel), true);
                     }
                     else
                     {
@@ -374,8 +377,11 @@ public final class LegionServerSide extends Legion implements
         setRecruitName(null);
     }
 
-    /** hasMoved() is a separate check, so that this function can be used in
-     *  battle as well as during the muster phase. */
+    /**
+     * hasMoved() is a separate check, so that this function can be used in
+     * battle as well as during the muster phase.
+     * TODO move up
+     */
     boolean canRecruit()
     {
         return (getRecruitName() == null && getHeight() <= 6

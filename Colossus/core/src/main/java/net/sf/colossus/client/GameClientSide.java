@@ -316,4 +316,11 @@ public class GameClientSide extends Game
         return client.getLegion(markerId);
     }
 
+    @Override
+    public int getTurnNumber()
+    {
+        // TODO move into this class
+        return client.getTurnNumber();
+    }
+
 }
