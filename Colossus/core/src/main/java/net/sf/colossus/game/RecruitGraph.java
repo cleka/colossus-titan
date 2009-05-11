@@ -570,16 +570,16 @@ public class RecruitGraph
     /**
      * Return the name of the recruit for the given number of the given
      * recruiter in the given terrain, or null if there's none.
-     * @param cre Name of the recruiting creature.
+     * @param cre The recruiting creature.
      * @param number Number of creature
      * @param t Terrain in which the recruiting may occur.
-     * @return Name of the recruit.
+     * @return The recruit.
      */
-    public String getRecruitFromRecruiterTerrainNumber(String cre, String t,
-        int number)
+    public CreatureType getRecruitFromRecruiterTerrainNumber(CreatureType cre,
+            MasterBoardTerrain t, int number)
     {
-        List<RecruitEdge> outgoing = getOutgoingEdges(cre);
-        String v2 = null;
+        List<RecruitEdge> outgoing = getOutgoingEdges(cre.getName());
+        CreatureType v2 = null;
 
         Iterator<RecruitEdge> it = outgoing.iterator();
 
@@ -587,10 +587,10 @@ public class RecruitGraph
         {
             RecruitEdge e = it.next();
 
-            if ((e.getNumber() == number)
-                && (e.getTerrain().getDisplayName().equals(t)))
+            if ((e.getNumber() == number) && (e.getTerrain().equals(t)))
             {
-                v2 = e.getDestination().getCreatureName();
+                v2 = VariantSupport.getCurrentVariant().getCreatureByName(e.
+                        getDestination().getCreatureName());
             }
         }
         return v2;
@@ -599,14 +599,14 @@ public class RecruitGraph
     /**
      * Return the name of the best possible creature that is reachable
      * trough the given creature from the given LegionInfo (can be null).
-     * @param cre Name of the recruiting creature.
+     * @param cre The recruiting creature.
      * @param legion The recruiting legion or null.
-     * @return Name of the best possible recruit.
+     * @return The best possible recruit.
      */
-    public String getBestPossibleRecruitEver(String cre,
-        Legion legion)
+    public CreatureType getBestPossibleRecruitEver(String cre, Legion legion)
     {
-        String best = cre;
+        CreatureType best = VariantSupport.getCurrentVariant()
+                .getCreatureByName(cre);
         int maxVP = -1;
         List<RecruitVertex> all = traverse(cre, legion);
         Iterator<RecruitVertex> it = all.iterator();
@@ -619,7 +619,7 @@ public class RecruitGraph
             if (vp > maxVP)
             {
                 maxVP = vp;
-                best = v2.getCreatureName();
+                best = creature;
             }
         }
         return best;

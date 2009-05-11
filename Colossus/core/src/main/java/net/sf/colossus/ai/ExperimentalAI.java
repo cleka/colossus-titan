@@ -3,6 +3,8 @@ package net.sf.colossus.ai;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -19,7 +21,9 @@ import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.variant.BattleHex;
+import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterBoardTerrain;
+import net.sf.colossus.variant.RecruitingSubTree;
 
 
 /**
@@ -369,11 +373,11 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
     {
         Creature creature = null;
         int mcount = 0;
+        Legion attacker = client.getAttacker();
 
-        for (Creature lcritter : client.getAttacker().getCreatures())
+        for (Creature lcritter : attacker.getCreatures())
         {
             int count = countCreatureAccrossAllLegionFromPlayer(lcritter);
-            LOGGER.finest("Found " + count + " " + lcritter.getName() + " for the attacker");
             if (!lcritter.isLord() && !lcritter.isDemiLord() &&
                     ((creature == null) || (count < mcount)))
             {
@@ -381,6 +385,28 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
                 mcount = count;
             }
         }
+
+        LOGGER.finest("Less Common choice: " + creature.getName());
+
+        List<AllThereIsToKnowAboutYourCreature> overkill = new ArrayList<AllThereIsToKnowAboutYourCreature>();
+        for (Creature lcritter : attacker.getCreatures())
+        {
+            if (!lcritter.isTitan())
+            {
+                overkill.add(new AllThereIsToKnowAboutYourCreature(this, lcritter, attacker));
+            }
+        }
+        Collections.sort(overkill, HEURISTIC_ORDER);
+
+        StringBuffer buf = new StringBuffer();
+        for (AllThereIsToKnowAboutYourCreature atitkayc : overkill)
+        {
+            buf.append(atitkayc.creature.getName() + ", ");
+        }
+        LOGGER.finest("AllThereIsToKnowAboutYourCreature order: " + buf.toString());
+
+        if (overkill.size() > 0)
+            return overkill.get(0).creature;
 
         return creature;
     }
@@ -473,6 +499,110 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
         for (TacticalObjective to : listObjectives)
         {
             LOGGER.info("Defender Objective: " + to.getDescription());
+        }
+    }
+
+
+    private static final Comparator<AllThereIsToKnowAboutYourCreature> HEURISTIC_ORDER = new Comparator<AllThereIsToKnowAboutYourCreature>()
+    {
+        public int compare(AllThereIsToKnowAboutYourCreature c1, AllThereIsToKnowAboutYourCreature c2)
+        {
+            if (c1.isImmediatelyUsefulKilling && !c2.isImmediatelyUsefulKilling)
+                return 1;
+            if (!c1.isImmediatelyUsefulKilling && c2.isImmediatelyUsefulKilling)
+                return -1;
+            if (c1.isImmediatelyUsefulKilling && c2.isImmediatelyUsefulKilling)
+            {
+                if ((c1.bestRecruit != null) && (c2.bestRecruit == null))
+                    return 1;
+                if ((c1.bestRecruit == null) && (c2.bestRecruit != null))
+                    return -1;
+                if ((c1.bestRecruit != null) && (c2.bestRecruit != null))
+                {
+                    if (c1.bestRecruit.getPointValue() > c2.bestRecruit.
+                            getPointValue())
+                        return 1;
+                    if (c1.bestRecruit.getPointValue() < c2.bestRecruit.
+                            getPointValue())
+                        return -1;
+                }
+            }
+            if (c1.onlyThisStackHasIt && !c2.onlyThisStackHasIt)
+                return 1;
+            if (!c1.onlyThisStackHasIt && c2.onlyThisStackHasIt)
+                return -1;
+            if (c1.onlyThisStackHasIt && c2.onlyThisStackHasIt)
+            {
+                if ((c1.bestRecruit != null) && (c2.bestRecruit == null))
+                    return 1;
+                if ((c1.bestRecruit == null) && (c2.bestRecruit != null))
+                    return -1;
+                if ((c1.bestRecruit != null) && (c2.bestRecruit != null))
+                {
+                    if (c1.bestRecruit.getPointValue() > c2.bestRecruit.getPointValue())
+                        return 1;
+                    if (c1.bestRecruit.getPointValue() < c2.bestRecruit.getPointValue())
+                        return -1;
+                }
+            }
+            if (c1.numberNeededHere > c2.numberNeededHere)
+                return 1;
+            if (c1.numberNeededHere < c2.numberNeededHere)
+                return -1;
+            return c1.creature.getName().compareTo(c2.creature.getName());
+        }
+    };
+    class AllThereIsToKnowAboutYourCreature
+    {
+        final Creature creature;
+        final int playerNumber;
+        final int stackNumber;
+        final Set<CreatureType> recruits;
+        final CreatureType bestRecruit;
+        final int numberNeededHere;
+        final boolean isImmediatelyUsefulKilling;
+        final boolean onlyThisStackHasIt;
+
+        AllThereIsToKnowAboutYourCreature(ExperimentalAI ai, Creature creature, Legion legion)
+        {
+            this.creature = creature;
+            MasterBoardTerrain terrain = legion.getCurrentHex().getTerrain();
+            playerNumber = ai.countCreatureAccrossAllLegionFromPlayer(creature);
+            int count = 0;
+            for (Creature creature2 : legion.getCreatures())
+            {
+                if (creature.getType().equals(creature2.getType()))
+                {
+                    count ++;
+                }
+            }
+            stackNumber = count;
+            recruits = RecruitingSubTree.getAllInAllSubtreesIgnoringSpecials(creature.getType());
+            CreatureType temp = null;
+            for (CreatureType ct : recruits)
+            {
+                if (temp == null)
+                {
+                    temp = ct;
+                }
+                else
+                {
+                    if (temp.getPointValue() < ct.getPointValue())
+                    {
+                        temp = ct;
+                    }
+                }
+            }
+            bestRecruit = temp;
+            numberNeededHere = terrain.getRecruitingSubTree().maximumNumberNeededOf(creature.getType(), legion.getCurrentHex());
+            if (numberNeededHere == stackNumber)
+                isImmediatelyUsefulKilling = true; // TODO: what if we already have the next step?
+            else
+                isImmediatelyUsefulKilling = false;
+            if (playerNumber == stackNumber)
+                onlyThisStackHasIt = true;
+            else
+                onlyThisStackHasIt = false;
         }
     }
 }

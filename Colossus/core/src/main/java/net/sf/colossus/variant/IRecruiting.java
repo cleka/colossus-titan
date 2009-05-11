@@ -27,4 +27,6 @@ public interface IRecruiting
      * @return All CreatureType that can recruit in hex
      */
     public Set<CreatureType> getPossibleRecruiters(MasterHex hex);
+
+    public int maximumNumberNeededOf(CreatureType ct, MasterHex hex);
 }

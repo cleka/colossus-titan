@@ -9,6 +9,7 @@ import java.util.TreeSet;
 import java.util.logging.Logger;
 
 import net.sf.colossus.common.Constants;
+import net.sf.colossus.server.VariantSupport;
 
 /**
  * The recruiting sub-tree in a terrain (or several terrains)
@@ -429,7 +430,7 @@ public class RecruitingSubTree implements IRecruiting
                 }
             }
         }
-        /* note: everytinh *above* that point can be cached, but the global
+        /* note: everyting *above* that point can be cached, but the global
          * result itself cannot, as custom recruiting might change from call to
          * call
          */
@@ -439,5 +440,53 @@ public class RecruitingSubTree implements IRecruiting
             possibleRecruiters.addAll(temp);
         }
         return possibleRecruiters;
+    }
+
+    public int maximumNumberNeededOf(CreatureType ct, MasterHex hex)
+    {
+        int max = -1;
+        for (CreatureType rec : allRecruits)
+        {
+            int num = this.numberOfRecruiterNeeded(ct, rec, hex);
+            if ((num < Constants.BIGNUM) &&
+                (num > max))
+            {
+                max = num;
+            }
+        }
+        return max;
+    }
+
+    public static Set<CreatureType> getAllInAllSubtreesIgnoringSpecials(CreatureType creature)
+    {
+        Set<CreatureType> results = new TreeSet<CreatureType>();
+        Set<CreatureType> checked = new TreeSet<CreatureType>();
+        checked.add(creature);
+        results.addAll(getAllInAllSubtreesIgnoringSpecialsRec(checked, creature));
+        return results;
+    }
+
+    private static Set<CreatureType> getAllInAllSubtreesIgnoringSpecialsRec(Set<CreatureType> checked, CreatureType creature)
+    {
+        Set<CreatureType> results = new TreeSet<CreatureType>();
+
+        for (MasterBoardTerrain terrain : VariantSupport.getCurrentVariant().getBattleLands())
+        {
+            RecruitingSubTree r = (RecruitingSubTree)terrain.getRecruitingSubTree();
+            for (RecruiterAndRecruit rar : r.regular.keySet())
+            {
+                if (rar.getRecruiter().equals(creature))
+                {
+                    CreatureType recruit = rar.getRecruit();
+                    results.add(recruit);
+                    if (!checked.contains(recruit))
+                    {
+                        checked.add(recruit);
+                        results.addAll(getAllInAllSubtreesIgnoringSpecialsRec(checked, recruit));
+                    }
+                }
+            }
+        }
+        return results;
     }
 }
