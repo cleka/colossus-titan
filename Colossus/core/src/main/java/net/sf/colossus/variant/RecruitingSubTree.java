@@ -487,7 +487,23 @@ public class RecruitingSubTree implements IRecruiting
                      {
                          continue;
                      }
+                  // also downgrade in point is backward (this doesn't catch Troll -> Ranger)
+                  // but it should have been catched above
+                  // note that this still won't catch C->A if A->B, B->C, and PV(A)==PV(B)==PV(C)
+                     if ((r.regular.get(rar) ==1) &&
+                         (r.regular.get(backward) < Constants.BIGNUM) &&
+                         rar.getRecruit().getPointValue() < backward.getRecruit().getPointValue())
+                     {
+                         continue;
+                     }
                 }
+                else
+                {
+                    // One-way only? Then this is a more-than-on-levele backward edge.
+                    LOGGER.finest("CHECK:" + backward.toString() + " is direct, " + rar.toString() + " is backward.");
+                    continue;
+                }
+                LOGGER.finest("CHECK:" + rar.toString() + " is direct, " + backward.toString() + " is backward.");
                 if (rar.getRecruiter().equals(creature))
                 {
                     CreatureType recruit = rar.getRecruit();
