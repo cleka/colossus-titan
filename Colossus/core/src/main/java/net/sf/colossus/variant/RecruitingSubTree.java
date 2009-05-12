@@ -465,6 +465,7 @@ public class RecruitingSubTree implements IRecruiting
         return results;
     }
 
+    @SuppressWarnings("boxing")
     private static Set<CreatureType> getAllInAllSubtreesIgnoringSpecialsRec(Map<MasterBoardTerrain,Set<CreatureType>> checked, CreatureType creature)
     {
         Set<CreatureType> results = new TreeSet<CreatureType>();
