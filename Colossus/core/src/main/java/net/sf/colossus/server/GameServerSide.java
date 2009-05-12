@@ -2683,26 +2683,34 @@ public final class GameServerSide extends Game
         checkEngagementDone();
     }
 
-    // Called by both human and AI.
-    void doSummon(Legion legion, Legion donor, CreatureType angel)
+    /**
+     * Handles summoning of a creature.
+     *
+     * @param event The summoning event (or null if summoning is to be skipped)
+     *
+     * TODO get rid of downcasts
+     */
+    void doSummon(SummonEvent event)
     {
         PlayerServerSide player = (PlayerServerSide)getActivePlayer();
 
-        if (angel != null && donor != null
-            && ((LegionServerSide)legion).canSummonAngel())
+        if (event != null
+            && ((LegionServerSide)event.getLegion()).canSummonAngel())
         {
+            Legion legion = event.getLegion();
             // Only one angel can be summoned per turn.
             player.setSummoned(true);
+            Legion donor = event.getDonor();
             player.setDonor(((LegionServerSide)donor));
 
             // Move the angel or archangel.
+            CreatureType angel = event.getAddedCreatureType();
             ((LegionServerSide)donor).removeCreature(angel, false, false);
             ((LegionServerSide)legion).addCreature(angel, false);
 
             server.allTellRemoveCreature(donor, angel.getName(), true,
                 Constants.reasonSummon);
-            server.allTellAddCreature(new SummonEvent(turnNumber, legion,
-                donor, angel), true);
+            server.allTellAddCreature(event, true);
 
             server.allTellDidSummon(legion, donor, angel.getName());
 

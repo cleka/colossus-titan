@@ -4,7 +4,11 @@ package net.sf.colossus.game;
 /**
  * Little helper class to store information about a summoning:
  * The target legion, the donor legion, and the summoned
- * creature(type) (creature as String, for now). 
+ * creature(type) (creature as String, for now).
+ *
+ * TODO there is overlap with the SummonEvent here, although the
+ * semantics are different. Maybe a constructor for SummonEvent could
+ * use this class.
  */
 public class SummonInfo
 {
@@ -13,6 +17,7 @@ public class SummonInfo
     final private String unit;
     final private boolean noSummoningWanted;
 
+    // TODO: unit should be a CreatureType instance
     public SummonInfo(Legion target, Legion donor, String unit)
     {
         this.target = target;

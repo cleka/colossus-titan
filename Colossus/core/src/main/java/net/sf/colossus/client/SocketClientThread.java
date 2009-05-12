@@ -24,6 +24,7 @@ import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.events.RecruitEvent;
+import net.sf.colossus.game.events.SummonEvent;
 import net.sf.colossus.server.IServer;
 import net.sf.colossus.util.ErrorUtils;
 import net.sf.colossus.util.Glob;
@@ -1104,11 +1105,10 @@ final class SocketClientThread extends Thread implements IServer,
             + angelType);
     }
 
-    public void doSummon(Legion legion, Legion donor, String angel)
+    public void doSummon(SummonEvent event)
     {
-        sendToServer(Constants.doSummon + sep
-            + (legion != null ? legion.getMarkerId() : null) + sep
-            + (donor != null ? donor.getMarkerId() : null) + sep + angel);
+        sendToServer(Constants.doSummon + sep + event.getLegion() + sep
+            + event.getDonor() + sep + event.getAddedCreatureType());
     }
 
     public void doRecruit(RecruitEvent event)

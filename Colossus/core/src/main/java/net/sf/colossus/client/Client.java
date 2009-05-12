@@ -36,6 +36,7 @@ import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.Proposal;
 import net.sf.colossus.game.SummonInfo;
 import net.sf.colossus.game.events.RecruitEvent;
+import net.sf.colossus.game.events.SummonEvent;
 import net.sf.colossus.gui.ClientGUI;
 import net.sf.colossus.gui.IClientGUI;
 import net.sf.colossus.gui.NullClientGUI;
@@ -566,12 +567,15 @@ public final class Client implements IClient, IOracle, IVariant
         if (summonInfo.noSummoningWanted())
         {
             // could also use getXXX from object...
-            server.doSummon(null, null, null);
+            server.doSummon(null);
         }
         else
         {
-            server.doSummon(summonInfo.getTarget(), summonInfo.getDonor(),
+            CreatureType creatureType = game.getVariant().getCreatureByName(
                 summonInfo.getUnit());
+            SummonEvent event = new SummonEvent(game.getTurnNumber(),
+                summonInfo.getTarget(), summonInfo.getDonor(), creatureType);
+            server.doSummon(event);
         }
         gui.actOnDoSummon();
     }
@@ -1704,7 +1708,7 @@ public final class Client implements IClient, IOracle, IVariant
         {
             ai.cleanupBattle();
         }
-        
+
 
         battleUnits.clear();
         battlePhase = null;

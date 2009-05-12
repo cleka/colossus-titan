@@ -24,6 +24,7 @@ import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.events.RecruitEvent;
+import net.sf.colossus.game.events.SummonEvent;
 import net.sf.colossus.util.ErrorUtils;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.InstanceTracker;
@@ -278,6 +279,7 @@ final class ClientHandler implements IClient
 
     private void callMethod(String method, List<String> args)
     {
+        int turnNumber = server.getGame().getTurnNumber();
         if (method.equals(Constants.signOn))
         {
             String tmpPlayerName = args.remove(0);
@@ -331,22 +333,19 @@ final class ClientHandler implements IClient
         }
         else if (method.equals(Constants.doSummon))
         {
-            String markerId = args.remove(0);
-            String donorId = args.remove(0);
-            String angel = args.remove(0);
-            server.doSummon(resolveLegion(markerId), resolveLegion(donorId),
-                angel);
+            Legion legion = resolveLegion(args.remove(0));
+            Legion donor = resolveLegion(args.remove(0));
+            CreatureType creatureType = resolveCreatureType(args.remove(0));
+            server.doSummon(new SummonEvent(turnNumber, legion, donor,
+                creatureType));
         }
         else if (method.equals(Constants.doRecruit))
         {
-            String markerId = args.remove(0);
-            String recruitName = args.remove(0);
-            String recruiterName = args.remove(0);
-            Legion legion = resolveLegion(markerId);
-            CreatureType recruited = resolveCreatureType(recruitName);
-            CreatureType recruiter = resolveCreatureType(recruiterName);
+            Legion legion = resolveLegion(args.remove(0));
+            CreatureType recruited = resolveCreatureType(args.remove(0));
+            CreatureType recruiter = resolveCreatureType(args.remove(0));
             server
-                .doRecruit(new RecruitEvent(server.getGame().getTurnNumber(),
+                .doRecruit(new RecruitEvent(turnNumber,
                     legion, recruited, recruiter));
         }
         else if (method.equals(Constants.engage))

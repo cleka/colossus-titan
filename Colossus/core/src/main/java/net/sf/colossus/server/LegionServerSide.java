@@ -422,7 +422,10 @@ public final class LegionServerSide extends Legion implements
         }
     }
 
-    /** Return true if this legion can summon. */
+    /**
+     * Return true if this legion can summon.
+     * TODO likely candidate for pulling up
+     */
     boolean canSummonAngel()
     {
         PlayerServerSide player = getPlayer();

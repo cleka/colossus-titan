@@ -5,13 +5,14 @@ import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.events.RecruitEvent;
+import net.sf.colossus.game.events.SummonEvent;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.MasterHex;
 
 
 /**
  *  IServer is an interface for the client-accessible parts of Server.
- *  @version $Id$
+ *
  *  @author David Ripton
  */
 public interface IServer
@@ -24,8 +25,12 @@ public interface IServer
 
     public void acquireAngel(Legion legion, String angelType);
 
-    public void doSummon(Legion receivingLegion, Legion donorLegion,
-        String angel);
+    /**
+     * Handles a summon event
+     *
+     * @param event The summon event or null if summoning is not wanted.
+     */
+    public void doSummon(SummonEvent event);
 
     // TODO extend or subclass event to include recruiter
     public void doRecruit(RecruitEvent event);

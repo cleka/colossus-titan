@@ -54,7 +54,6 @@ public class AddCreatureEvent extends LegionEvent implements
     {
         return String.format(
             "In turn %d, player %s has added creature of type %s to legion %s",
-                getTurn(), getPlayer().getName(), getAddedCreatureType()
-                    .getName(), getLegion().getMarkerId());
+                getTurn(), getPlayer(), getAddedCreatureType(), getLegion());
     }
 }

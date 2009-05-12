@@ -35,8 +35,7 @@ public class SummonEvent extends AddCreatureEvent
         return String
             .format(
                 "In turn %d, player %s has summoned creature of type %s from legion %s into legion %s",
-                getTurn(), getPlayer().getName(), getAddedCreatureType()
-                    .getName(), getLegion().getMarkerId(), getDonor()
-                    .getMarkerId());
+                getTurn(), getPlayer(), getAddedCreatureType(), getLegion(),
+                getDonor());
     }
 }

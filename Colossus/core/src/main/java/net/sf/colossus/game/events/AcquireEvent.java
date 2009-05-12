@@ -23,7 +23,6 @@ public class AcquireEvent extends AddCreatureEvent
     {
         return String.format(
             "In turn %d, player %s acquired creature of type %s in legion %s",
-            getTurn(), getPlayer().getName(),
-            getAddedCreatureType().getName(), getLegion().getMarkerId());
+            getTurn(), getPlayer(), getAddedCreatureType(), getLegion());
     }
 }

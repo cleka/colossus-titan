@@ -54,6 +54,6 @@ public abstract class GameEvent
     public String toString()
     {
         return String.format("Game event in turn %d, player %s moving",
-            getTurn(), getPlayer().getName());
+            getTurn(), getPlayer());
     }
 }

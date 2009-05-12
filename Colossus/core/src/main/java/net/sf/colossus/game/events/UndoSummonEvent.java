@@ -26,7 +26,6 @@ public class UndoSummonEvent extends AddCreatureEvent
         return String
             .format(
                 "In turn %d, player %s returned creature of type %s into legion %s by undoing a summon",
-                getTurn(), getPlayer().getName(), getAddedCreatureType()
-                    .getName(), getLegion().getMarkerId());
+                getTurn(), getPlayer(), getAddedCreatureType(), getLegion());
     }
 }

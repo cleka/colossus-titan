@@ -5,6 +5,9 @@ import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.variant.CreatureType;
 
+
+// TODO why is there only one recruiter? Does it imply knowledge about how many creatures are needed?
+// Since there is always N of one type that could work.
 public class RecruitEvent extends AddCreatureEvent
 {
     private final CreatureType recruiter;
@@ -37,5 +40,17 @@ public class RecruitEvent extends AddCreatureEvent
     {
         // TODO distinguish between Constants.reasonRecruited and Constants.reasonReinforced
         return Constants.reasonRecruited;
+    }
+
+    @SuppressWarnings("boxing")
+    @Override
+    public String toString()
+    {
+        return String
+            .format(
+                "In turn %d, player %s has recruited creature of type %s into legion %s",
+                getTurn(), getPlayer(), getRecruited(), getLegion())
+            + (getRecruiter() != null ? ", recruiter type is "
+                + getRecruiter() : "");
     }
 }

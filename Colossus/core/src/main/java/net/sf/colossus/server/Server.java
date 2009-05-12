@@ -38,6 +38,7 @@ import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.Proposal;
 import net.sf.colossus.game.events.AddCreatureEvent;
 import net.sf.colossus.game.events.RecruitEvent;
+import net.sf.colossus.game.events.SummonEvent;
 import net.sf.colossus.util.ErrorUtils;
 import net.sf.colossus.util.InstanceTracker;
 import net.sf.colossus.variant.BattleHex;
@@ -50,7 +51,7 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  *  Class Server lives on the server side and handles all communcation with
  *  the clients.  It talks to the server classes locally, and to the Clients
  *  via the network protocol.
- *  @version $Id$
+ *
  *  @author David Ripton
  */
 public final class Server extends Thread implements IServer
@@ -1489,19 +1490,14 @@ public final class Server extends Thread implements IServer
         client.doReinforce(legion);
     }
 
-    public void doSummon(Legion legion, Legion donor, String angel)
+    public void doSummon(SummonEvent event)
     {
         if (!isActivePlayer())
         {
             LOGGER.severe(getPlayerName() + " illegally called doSummon()");
             return;
         }
-        CreatureType creature = null;
-        if (angel != null)
-        {
-            creature = game.getVariant().getCreatureByName(angel);
-        }
-        game.doSummon(legion, donor, creature);
+        game.doSummon(event);
     }
 
     /**
