@@ -21,7 +21,7 @@ public class RecruitingSubTree implements IRecruiting
     private static final Logger LOGGER = Logger.getLogger(
             RecruitingSubTree.class.getName());
 
-    private class RecruiterAndRecruit
+    private static class RecruiterAndRecruit
     {
 
         final private CreatureType recruiter;
@@ -478,6 +478,16 @@ public class RecruitingSubTree implements IRecruiting
             RecruitingSubTree r = (RecruitingSubTree)terrain.getRecruitingSubTree();
             for (RecruiterAndRecruit rar : r.regular.keySet())
             {
+                RecruiterAndRecruit backward = new RecruiterAndRecruit(rar.getRecruit(), rar.getRecruiter());
+                if (r.regular.keySet().contains(backward))
+                { // don't go backward ; we assume backward is the cheapest way.
+                     if ((r.regular.get(rar) >=1) &&
+                         (r.regular.get(backward) < Constants.BIGNUM) &&
+                         (r.regular.get(rar) < r.regular.get(backward)))
+                     {
+                         continue;
+                     }
+                }
                 if (rar.getRecruiter().equals(creature))
                 {
                     CreatureType recruit = rar.getRecruit();
