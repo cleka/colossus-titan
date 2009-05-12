@@ -9,7 +9,7 @@ import java.util.TreeSet;
 import java.util.logging.Logger;
 
 import net.sf.colossus.common.Constants;
-import net.sf.colossus.server.VariantSupport;
+import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 /**
  * The recruiting sub-tree in a terrain (or several terrains)
@@ -304,8 +304,8 @@ public class RecruitingSubTree implements IRecruiting
             CreatureType recruit, MasterHex hex)
     {
         int number = Constants.BIGNUM;
-        LOGGER.finest("Start for recruiter and recruit : " +
-                recruiter.getName() + " & " + recruit.getName());
+        /* LOGGER.finest("Start for recruiter and recruit : " +
+                recruiter.getName() + " & " + recruit.getName()); */
         if (recruiter.equals(recruit))
         {
             LOGGER.finest("Recruiter and recruit are identical = 1 " +
@@ -460,18 +460,21 @@ public class RecruitingSubTree implements IRecruiting
     public static Set<CreatureType> getAllInAllSubtreesIgnoringSpecials(CreatureType creature)
     {
         Set<CreatureType> results = new TreeSet<CreatureType>();
-        Set<CreatureType> checked = new TreeSet<CreatureType>();
-        checked.add(creature);
+        Map<MasterBoardTerrain,Set<CreatureType>> checked = new HashMap<MasterBoardTerrain,Set<CreatureType>>();
         results.addAll(getAllInAllSubtreesIgnoringSpecialsRec(checked, creature));
         return results;
     }
 
-    private static Set<CreatureType> getAllInAllSubtreesIgnoringSpecialsRec(Set<CreatureType> checked, CreatureType creature)
+    private static Set<CreatureType> getAllInAllSubtreesIgnoringSpecialsRec(Map<MasterBoardTerrain,Set<CreatureType>> checked, CreatureType creature)
     {
         Set<CreatureType> results = new TreeSet<CreatureType>();
 
-        for (MasterBoardTerrain terrain : VariantSupport.getCurrentVariant().getBattleLands())
+        for (MasterBoardTerrain terrain : TerrainRecruitLoader.getTerrains())
         {
+            if (checked.get(terrain) == null)
+            {
+                checked.put(terrain,new TreeSet<CreatureType>());
+            }
             RecruitingSubTree r = (RecruitingSubTree)terrain.getRecruitingSubTree();
             for (RecruiterAndRecruit rar : r.regular.keySet())
             {
@@ -479,9 +482,9 @@ public class RecruitingSubTree implements IRecruiting
                 {
                     CreatureType recruit = rar.getRecruit();
                     results.add(recruit);
-                    if (!checked.contains(recruit))
+                    if (!checked.get(terrain).contains(recruit))
                     {
-                        checked.add(recruit);
+                        checked.get(terrain).add(recruit);
                         results.addAll(getAllInAllSubtreesIgnoringSpecialsRec(checked, recruit));
                     }
                 }

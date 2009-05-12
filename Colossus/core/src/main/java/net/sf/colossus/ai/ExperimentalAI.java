@@ -401,12 +401,12 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
         StringBuffer buf = new StringBuffer();
         for (AllThereIsToKnowAboutYourCreature atitkayc : overkill)
         {
-            buf.append(atitkayc.creature.getName() + ", ");
+            buf.append("\t" + atitkayc.toString() + "\n");
         }
-        LOGGER.finest("AllThereIsToKnowAboutYourCreature order: " + buf.toString());
+        LOGGER.finest("AllThereIsToKnowAboutYourCreature order:\n" + buf.toString());
 
         if (overkill.size() > 0)
-            return overkill.get(0).creature;
+            return overkill.get(overkill.size() - 1).creature;
 
         return creature;
     }
@@ -507,6 +507,26 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
     {
         public int compare(AllThereIsToKnowAboutYourCreature c1, AllThereIsToKnowAboutYourCreature c2)
         {
+            if (!c1.thisStackHasBetter && c2.thisStackHasBetter)
+                return 1;
+            if (c1.thisStackHasBetter && !c2.thisStackHasBetter)
+                return -1;
+            if (c1.thisStackHasBetter && c2.thisStackHasBetter)
+            {
+                if ((c1.bestRecruit != null) && (c2.bestRecruit == null))
+                    return 1;
+                if ((c1.bestRecruit == null) && (c2.bestRecruit != null))
+                    return -1;
+                if ((c1.bestRecruit != null) && (c2.bestRecruit != null))
+                {
+                    if (c1.bestRecruit.getPointValue() > c2.bestRecruit.
+                            getPointValue())
+                        return 1;
+                    if (c1.bestRecruit.getPointValue() < c2.bestRecruit.
+                            getPointValue())
+                        return -1;
+                }
+            }
             if (c1.isImmediatelyUsefulKilling && !c2.isImmediatelyUsefulKilling)
                 return 1;
             if (!c1.isImmediatelyUsefulKilling && c2.isImmediatelyUsefulKilling)
@@ -560,8 +580,24 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
         final Set<CreatureType> recruits;
         final CreatureType bestRecruit;
         final int numberNeededHere;
+        final boolean thisStackHasBetter;
         final boolean isImmediatelyUsefulKilling;
         final boolean onlyThisStackHasIt;
+
+        @Override
+        public String toString()
+        {
+            StringBuffer buf = new StringBuffer();
+            buf.append(creature.getName());
+            buf.append(" playerNumber=" + playerNumber);
+            buf.append(" stackNumber=" + stackNumber);
+            buf.append(" bestRecruit="+(bestRecruit!=null?bestRecruit.getName():"(NONE)"));
+            buf.append(" numberNeededHere="+numberNeededHere);
+            buf.append(" thisStackHasBetter="+thisStackHasBetter);
+            buf.append(" isImmediatelyUsefulKilling="+isImmediatelyUsefulKilling);
+            buf.append(" onlyThisStackHasIt="+onlyThisStackHasIt);
+            return buf.toString();
+        }
 
         AllThereIsToKnowAboutYourCreature(ExperimentalAI ai, Creature creature, Legion legion)
         {
@@ -595,8 +631,24 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
             }
             bestRecruit = temp;
             numberNeededHere = terrain.getRecruitingSubTree().maximumNumberNeededOf(creature.getType(), legion.getCurrentHex());
-            if (numberNeededHere == stackNumber)
-                isImmediatelyUsefulKilling = true; // TODO: what if we already have the next step?
+            boolean hasBetter = false;
+            for (CreatureType recruit : recruits)
+            {
+                if (recruit.getPointValue() > creature.getPointValue())
+                {
+                    for (Creature c : legion.getCreatures())
+                    {
+                        if (c.getType().equals(recruit))
+                        {
+                            hasBetter = true;
+                        }
+                    }
+                }
+            }
+            thisStackHasBetter = hasBetter;
+
+            if (!hasBetter && (numberNeededHere == stackNumber))
+                isImmediatelyUsefulKilling = true;
             else
                 isImmediatelyUsefulKilling = false;
             if (playerNumber == stackNumber)
