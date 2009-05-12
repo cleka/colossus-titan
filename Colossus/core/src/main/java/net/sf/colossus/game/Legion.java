@@ -314,6 +314,7 @@ public abstract class Legion
      * Calculate the acquirableDecisions and store them in the legion.
      * @param score
      * @param points
+     * TODO this is AI code not game code -- it should be in the AI package
      */
     public void setupAcquirableDecisions(int score, int points)
     {
@@ -336,6 +337,8 @@ public abstract class Legion
      * @param score Current score of player
      * @param points Points to be added which entitle to acquiring
      * @return List of decisions
+     *
+     * TODO this is AI code not game code -- it should be in the AI package
      */
     List<AcquirableDecision> calculateAcquirableDecisions(int score, int points)
     {
