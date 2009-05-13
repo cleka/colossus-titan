@@ -335,6 +335,11 @@ final class ClientHandler implements IClient
         else if (method.equals(Constants.doSummon))
         {
             Legion legion = resolveLegion(args.remove(0));
+            if (legion == null)
+            {
+                server.doSummon(null);
+                return;
+            }
             Legion donor = resolveLegion(args.remove(0));
             CreatureType creatureType = resolveCreatureType(args.remove(0));
             server.doSummon(new SummonEvent(turnNumber, legion, donor,

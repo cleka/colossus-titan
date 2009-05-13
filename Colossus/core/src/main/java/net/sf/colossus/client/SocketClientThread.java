@@ -1107,8 +1107,16 @@ final class SocketClientThread extends Thread implements IServer,
 
     public void doSummon(SummonEvent event)
     {
+        if (event == null)
+        {
+            sendToServer(Constants.doSummon + sep + "null" + sep + "null"
+                + sep + "null");
+        }
+        else
+        {
         sendToServer(Constants.doSummon + sep + event.getLegion() + sep
             + event.getDonor() + sep + event.getAddedCreatureType());
+        }
     }
 
     public void doRecruit(RecruitEvent event)

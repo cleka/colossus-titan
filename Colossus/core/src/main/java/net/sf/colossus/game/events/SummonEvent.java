@@ -13,7 +13,8 @@ public class SummonEvent extends AddCreatureEvent
     public SummonEvent(int turn, Legion targetLegion, Legion donor,
         CreatureType summonedCreature)
     {
-        super(turn, targetLegion.getPlayer(), targetLegion, summonedCreature);
+        super(turn, (targetLegion == null) ? null : targetLegion.getPlayer(),
+            targetLegion, summonedCreature);
         this.donor = donor;
     }
 
