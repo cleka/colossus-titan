@@ -1238,10 +1238,11 @@ final class SocketClientThread extends Thread implements IServer,
         sendToServer(Constants.stopGame);
     }
 
-    public void doSplit(Legion parent, String childMarker, String results)
+    public void doSplit(Legion parent, String childMarker,
+        List<CreatureType> creaturesToSplit)
     {
         sendToServer(Constants.doSplit + sep + parent.getMarkerId() + sep
-            + childMarker + sep + results);
+            + childMarker + sep + Glob.glob(",", creaturesToSplit));
     }
 
     public void doMove(Legion legion, MasterHex hex, EntrySide entrySide,

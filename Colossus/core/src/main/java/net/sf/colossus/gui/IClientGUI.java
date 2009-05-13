@@ -19,6 +19,7 @@ import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.SummonInfo;
 import net.sf.colossus.variant.BattleHex;
+import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.webclient.WebClient;
 
@@ -224,7 +225,8 @@ public interface IClientGUI
     public abstract SummonInfo doPickSummonAngel(Legion legion,
         SortedSet<Legion> possibleDonors);
 
-    public abstract String doPickSplitLegion(Legion parent, String childMarker);
+    public abstract List<CreatureType> doPickSplitLegion(Legion parent,
+        String childMarker);
 
     public abstract void doPickCarries(Client client, int carryDamage,
         Set<String> carryTargetDescriptions);

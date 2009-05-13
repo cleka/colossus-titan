@@ -19,6 +19,7 @@ import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.SummonInfo;
 import net.sf.colossus.variant.BattleHex;
+import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.webclient.WebClient;
 
@@ -397,7 +398,8 @@ public class NullClientGUI implements IClientGUI
         return null;
     }
 
-    public String doPickSplitLegion(Legion parent, String childMarker)
+    public List<CreatureType> doPickSplitLegion(Legion parent,
+        String childMarker)
     {
         // TODO Auto-generated method stub
         return null;

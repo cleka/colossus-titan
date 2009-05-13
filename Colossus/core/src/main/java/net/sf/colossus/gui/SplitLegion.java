@@ -25,6 +25,7 @@ import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.guiutil.KDialog;
 import net.sf.colossus.guiutil.SaveWindow;
+import net.sf.colossus.variant.CreatureType;
 
 
 /**
@@ -44,8 +45,7 @@ final class SplitLegion extends KDialog
     private final ClientGUI gui;
     private static boolean active;
 
-    /** new marker id,creature1,creature2... */
-    private static String results;
+    private List<CreatureType> creaturesToSplit;
 
     private final Box oldBox;
     private final Box newBox;
@@ -194,16 +194,20 @@ final class SplitLegion extends KDialog
         setVisible(true);
     }
 
-    /** Return childMarkerId,splitCreature1,splitCreature2,etc. */
-    static String splitLegion(ClientGUI gui, Legion parent,
+    /**
+     * Opens a dialog to select the creatures to split and returns the result.
+     *
+     * @return The list of creature types selected for the split or null if the split was cancelled.
+     */
+    static List<CreatureType> splitLegion(ClientGUI gui, Legion parent,
         String selectedMarkerId)
     {
         if (!active)
         {
             active = true;
-            new SplitLegion(gui, parent, selectedMarkerId);
+            SplitLegion dialog = new SplitLegion(gui, parent, selectedMarkerId);
             active = false;
-            return results;
+            return dialog.creaturesToSplit;
         }
         return null;
     }
@@ -278,13 +282,13 @@ final class SplitLegion extends KDialog
 
     private void cancel()
     {
-        results = null;
+        creaturesToSplit = null;
         dispose();
     }
 
     private void returnSplitResults()
     {
-        StringBuilder buf = new StringBuilder();
+        creaturesToSplit = new ArrayList<CreatureType>();
         Iterator<Chit> it = newChits.iterator();
         while (it.hasNext())
         {
@@ -294,13 +298,9 @@ final class SplitLegion extends KDialog
             {
                 creatureName = Constants.titan;
             }
-            buf.append(creatureName);
-            if (it.hasNext())
-            {
-                buf.append(",");
-            }
+            creaturesToSplit.add(gui.getGame().getVariant().getCreatureByName(
+                creatureName));
         }
-        results = buf.toString();
         dispose();
     }
 }

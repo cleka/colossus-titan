@@ -1,12 +1,15 @@
 package net.sf.colossus.server;
 
 
+import java.util.List;
+
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.events.RecruitEvent;
 import net.sf.colossus.game.events.SummonEvent;
 import net.sf.colossus.variant.BattleHex;
+import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
 
 
@@ -81,7 +84,15 @@ public interface IServer
 
     public void stopGame();
 
-    public void doSplit(Legion parent, String childMarker, String results);
+    /**
+     * Executes a split of certain creatures from a legion.
+     *
+     * @param parent The legion to split the creatures out of.
+     * @param childMarker A marker for the new legion.
+     * @param creaturesToSplit The creatures to split out.
+     */
+    public void doSplit(Legion parent, String childMarker,
+        List<CreatureType> creaturesToSplit);
 
     public void doMove(Legion legion, MasterHex hex, EntrySide entrySide,
         boolean teleport, String teleportingLord);

@@ -257,7 +257,7 @@ public class RationalAI extends SimpleAI
             return true;
         }
 
-        StringBuilder results = new StringBuilder();
+        List<CreatureType> results = new ArrayList<CreatureType>();
         boolean hasMustered = false;
 
         MusteredCreatures mc = chooseCreaturesToSplitOut(legion, at_risk);
@@ -272,11 +272,7 @@ public class RationalAI extends SimpleAI
             CreatureType creature = it.next();
 
             child_value += (creature).getPointValue();
-            results.append(creature.getName());
-            if (it.hasNext())
-            {
-                results.append(",");
-            }
+            results.add(creature);
         }
 
         // don't split a stack if it has not mustered
@@ -298,7 +294,7 @@ public class RationalAI extends SimpleAI
         }
 
         logger.log(Level.FINEST, "Wait for split callback");
-        client.doSplit(legion, newMarkerId, results.toString());
+        client.doSplit(legion, newMarkerId, results);
         return false;
     }
 

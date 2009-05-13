@@ -40,6 +40,7 @@ import net.sf.colossus.game.events.AddCreatureEvent;
 import net.sf.colossus.game.events.RecruitEvent;
 import net.sf.colossus.game.events.SummonEvent;
 import net.sf.colossus.util.ErrorUtils;
+import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.InstanceTracker;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
@@ -2196,10 +2197,11 @@ public final class Server extends Thread implements IServer
         return info;
     }
 
-    public void doSplit(Legion parent, String childId, String results)
+    public void doSplit(Legion parent, String childId,
+        List<CreatureType> creaturesToSplit)
     {
         LOGGER.log(Level.FINER, "Server.doSplit " + parent + " " + childId
-            + " " + results);
+            + " " + Glob.glob(",", creaturesToSplit));
         IClient client = getClient(getPlayer());
         if (!isActivePlayer())
         {
@@ -2209,7 +2211,7 @@ public final class Server extends Thread implements IServer
                 + "(active player is " + game.getActivePlayer());
             return;
         }
-        if (!game.doSplit(parent, childId, results))
+        if (!game.doSplit(parent, childId, creaturesToSplit))
         {
             LOGGER.warning(getPlayerName() + " tried split for " + parent
                 + ", failed!");

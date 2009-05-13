@@ -447,18 +447,12 @@ public class SimpleAI extends AbstractAI
         remainingMarkers.remove(0);
 
         List<CreatureType> creatures = chooseCreaturesToSplitOut(legion);
-        List<String> creatureNames = new ArrayList<String>();
-        for (CreatureType creature : creatures)
-        {
-            creatureNames.add(creature.getName());
-        }
-        String results = Glob.glob(",", creatureNames);
         // increment BEFORE calling client
         // (instead of: return true and caller increments).
         // Otherwise we might have a race situation, if callback is quicker
         // than caller incrementing the splitsDone value...
         this.splitsDone++;
-        client.doSplit(legion, newMarkerId, results);
+        client.doSplit(legion, newMarkerId, creatures);
     }
 
     /** Decide how to split this legion, and return a list of

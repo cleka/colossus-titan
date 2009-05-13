@@ -2818,7 +2818,8 @@ public final class GameServerSide extends Game
 
     /** Return true and call Server.didSplit() if the split succeeded.
      *  Return false if it failed. */
-    boolean doSplit(Legion parent, String childId, String results)
+    boolean doSplit(Legion parent, String childId,
+        List<CreatureType> creaturesToSplit)
     {
         PlayerServerSide player = (PlayerServerSide)parent.getPlayer();
 
@@ -2838,25 +2839,17 @@ public final class GameServerSide extends Game
             return false;
         }
 
-        if (results == null)
+        if (creaturesToSplit == null)
         {
             LOGGER
                 .finest("Empty split list (" + parent + ", " + childId + ")");
             return false;
         }
-        List<String> strings = Split.split(',', results);
-        List<CreatureType> creatures = new ArrayList<CreatureType>();
-        Iterator<String> it = strings.iterator();
-        while (it.hasNext())
-        {
-            String name = it.next();
-            CreatureType creature = getVariant().getCreatureByName(name);
-            creatures.add(creature);
-        }
 
         // Each legion must have 2+ creatures after the split.
-        if (creatures.size() < 2
-            || ((LegionServerSide)parent).getHeight() - creatures.size() < 2)
+        if (creaturesToSplit.size() < 2
+            || ((LegionServerSide)parent).getHeight()
+                - creaturesToSplit.size() < 2)
         {
             LOGGER.finest("Too small/big split list (" + parent + ", "
                 + childId + ")");
@@ -2870,7 +2863,7 @@ public final class GameServerSide extends Game
             tempCreatureTypes.add(creature.getType());
         }
 
-        for (CreatureType creatureType : creatures)
+        for (CreatureType creatureType : creaturesToSplit)
         {
             if (!tempCreatureTypes.remove(creatureType))
             {
@@ -2889,14 +2882,14 @@ public final class GameServerSide extends Game
                 return false;
             }
             // Each stack must contain exactly 4 creatures.
-            if (creatures.size() != 4)
+            if (creaturesToSplit.size() != 4)
             {
                 return false;
             }
             // Each stack must contain exactly 1 lord.
             int numLords = 0;
 
-            for (CreatureType creature : creatures)
+            for (CreatureType creature : creaturesToSplit)
             {
                 if (creature.isLord())
                 {
@@ -2910,7 +2903,8 @@ public final class GameServerSide extends Game
         }
 
         Legion newLegion = ((LegionServerSide)parent)
-            .split(creatures, childId);
+            .split(creaturesToSplit,
+            childId);
         if (newLegion == null)
         {
             return false;

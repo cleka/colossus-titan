@@ -1820,7 +1820,8 @@ public class ClientGUI implements IClientGUI
         return SummonAngel.summonAngel(this, legion, possibleDonors);
     }
 
-    public String doPickSplitLegion(Legion parent, String childMarker)
+    public List<CreatureType> doPickSplitLegion(Legion parent,
+        String childMarker)
     {
         return SplitLegion.splitLegion(this, parent, childMarker);
     }

@@ -10,6 +10,7 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -477,7 +478,12 @@ final class ClientHandler implements IClient
             String parentId = args.remove(0);
             String childId = args.remove(0);
             String results = args.remove(0);
-            server.doSplit(resolveLegion(parentId), childId, results);
+            List<CreatureType> creatures = new ArrayList<CreatureType>();
+            for (String name : results.split(","))
+            {
+                creatures.add(resolveCreatureType(name));
+            }
+            server.doSplit(resolveLegion(parentId), childId, creatures);
         }
         else if (method.equals(Constants.doMove))
         {

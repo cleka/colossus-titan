@@ -47,6 +47,7 @@ import net.sf.colossus.server.Server;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.CollectionHelper;
 import net.sf.colossus.util.ErrorUtils;
+import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.InstanceTracker;
 import net.sf.colossus.util.Predicate;
 import net.sf.colossus.util.ResourceLoader;
@@ -3154,7 +3155,7 @@ public final class Client implements IClient, IOracle, IVariant
         {
             return;
         }
-        String results = gui.doPickSplitLegion(parent, childId);
+        List<CreatureType> results = gui.doPickSplitLegion(parent, childId);
 
         if (results != null)
         {
@@ -3163,11 +3164,12 @@ public final class Client implements IClient, IOracle, IVariant
     }
 
     /** Called by AI and by doSplit() */
-    public void doSplit(Legion parent, String childMarkerId, String results)
+    public void doSplit(Legion parent, String childMarkerId,
+        List<CreatureType> results)
     {
         LOGGER.log(Level.FINER, "Client.doSplit " + parent + " "
             + childMarkerId
-            + " " + results);
+            + " " + Glob.glob(",", results));
         server.doSplit(parent, childMarkerId, results);
     }
 
