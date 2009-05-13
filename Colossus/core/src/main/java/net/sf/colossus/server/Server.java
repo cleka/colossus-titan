@@ -1666,6 +1666,7 @@ public final class Server extends Thread implements IServer
 
     public void concede(Legion legion)
     {
+        // TODO the next line can throw NPEs when quitting the game
         if (!getPlayer().equals(legion.getPlayer()))
         {
             LOGGER.severe(getPlayerName() + " illegally called concede()");
