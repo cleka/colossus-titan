@@ -512,6 +512,42 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
 
     private static final Comparator<AllThereIsToKnowAboutYourCreature> HEURISTIC_ORDER = new Comparator<AllThereIsToKnowAboutYourCreature>()
     {
+        private int avoidNullPointerException(
+                AllThereIsToKnowAboutYourCreature c1,
+                AllThereIsToKnowAboutYourCreature c2)
+        {
+            if ((c1.bestRecruit != null) && (c2.bestRecruit == null))
+            {
+                return 1;
+            }
+            if ((c1.bestRecruit == null) && (c2.bestRecruit != null))
+            {
+                return -1;
+            }
+            if ((c1.bestRecruit != null) && (c2.bestRecruit != null))
+            {
+                if (c1.bestRecruit.getPointValue() > c2.bestRecruit.
+                        getPointValue())
+                {
+                    return 1;
+                }
+                if (c1.bestRecruit.getPointValue() < c2.bestRecruit.
+                        getPointValue())
+                {
+                    return -1;
+                }
+            }
+            if (c1.creature.getPointValue() > c2.creature.getPointValue())
+            {
+                return 1;
+            }
+            if (c1.creature.getPointValue() < c2.creature.getPointValue())
+            {
+                return -1;
+            }
+            return 0;
+        }
+
         public int compare(AllThereIsToKnowAboutYourCreature c1, AllThereIsToKnowAboutYourCreature c2)
         {
             if (!c1.thisStackHasBetter && c2.thisStackHasBetter)
@@ -520,19 +556,9 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
                 return -1;
             if (c1.thisStackHasBetter && c2.thisStackHasBetter)
             {
-                if ((c1.bestRecruit != null) && (c2.bestRecruit == null))
-                    return 1;
-                if ((c1.bestRecruit == null) && (c2.bestRecruit != null))
-                    return -1;
-                if ((c1.bestRecruit != null) && (c2.bestRecruit != null))
-                {
-                    if (c1.bestRecruit.getPointValue() > c2.bestRecruit.
-                            getPointValue())
-                        return 1;
-                    if (c1.bestRecruit.getPointValue() < c2.bestRecruit.
-                            getPointValue())
-                        return -1;
-                }
+                int result = avoidNullPointerException(c1, c2);
+                if (result != 0)
+                    return result;
             }
             if (c1.isImmediatelyUsefulKilling && !c2.isImmediatelyUsefulKilling)
                 return 1;
@@ -540,19 +566,9 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
                 return -1;
             if (c1.isImmediatelyUsefulKilling && c2.isImmediatelyUsefulKilling)
             {
-                if ((c1.bestRecruit != null) && (c2.bestRecruit == null))
-                    return 1;
-                if ((c1.bestRecruit == null) && (c2.bestRecruit != null))
-                    return -1;
-                if ((c1.bestRecruit != null) && (c2.bestRecruit != null))
-                {
-                    if (c1.bestRecruit.getPointValue() > c2.bestRecruit.
-                            getPointValue())
-                        return 1;
-                    if (c1.bestRecruit.getPointValue() < c2.bestRecruit.
-                            getPointValue())
-                        return -1;
-                }
+                int result = avoidNullPointerException(c1, c2);
+                if (result != 0)
+                    return result;
             }
             if (c1.onlyThisStackHasIt && !c2.onlyThisStackHasIt)
                 return 1;
@@ -560,17 +576,9 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
                 return -1;
             if (c1.onlyThisStackHasIt && c2.onlyThisStackHasIt)
             {
-                if ((c1.bestRecruit != null) && (c2.bestRecruit == null))
-                    return 1;
-                if ((c1.bestRecruit == null) && (c2.bestRecruit != null))
-                    return -1;
-                if ((c1.bestRecruit != null) && (c2.bestRecruit != null))
-                {
-                    if (c1.bestRecruit.getPointValue() > c2.bestRecruit.getPointValue())
-                        return 1;
-                    if (c1.bestRecruit.getPointValue() < c2.bestRecruit.getPointValue())
-                        return -1;
-                }
+                int result = avoidNullPointerException(c1, c2);
+                if (result != 0)
+                    return result;
             }
             if (c1.numberNeededHere > c2.numberNeededHere)
                 return 1;
@@ -637,7 +645,16 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
                 }
             }
             bestRecruit = temp;
-            numberNeededHere = terrain.getRecruitingSubTree().maximumNumberNeededOf(creature.getType(), legion.getCurrentHex());
+            int nnh = terrain.getRecruitingSubTree().maximumNumberNeededOf(
+                    creature.getType(), legion.getCurrentHex());
+            if (nnh == -1)
+            {
+                numberNeededHere = Constants.BIGNUM;
+            }
+            else
+            {
+                numberNeededHere = nnh;
+            }
             boolean hasBetter = false;
             for (CreatureType recruit : recruits)
             {
