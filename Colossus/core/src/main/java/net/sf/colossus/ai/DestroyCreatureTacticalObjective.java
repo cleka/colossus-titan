@@ -20,6 +20,7 @@ class DestroyCreatureTacticalObjective implements TacticalObjective
     private final Client client;
     private final int count;
     private final int priority;
+    private final int number;
 
     private int countCreatureType(Legion legion)
     {
@@ -35,23 +36,25 @@ class DestroyCreatureTacticalObjective implements TacticalObjective
     }
 
     DestroyCreatureTacticalObjective(int priority, Client client, Legion killlegion,
-            Creature critter)
+            Creature critter, int number)
     {
+        this.number = number;
         this.priority = priority;
         this.critter = critter;
         this.killlegion = killlegion;
         this.client = client;
         count = countCreatureType(killlegion);
-        if (count <= 0)
+        if (count < number)
         {
-            LOGGER.warning("Trying to kill a " + critter.getName() +
-                    " but there isn't any in " + killlegion.getMarkerId());
+            LOGGER.warning("Trying to kill + number + "  + critter.getName()
+                    + " but there is only " + count + " in "
+                    + killlegion.getMarkerId());
         }
     }
 
     public boolean objectiveAttained()
     {
-        if (countCreatureType(killlegion) < count)
+        if (countCreatureType(killlegion) + number <= count)
         {
             return true;
         }
@@ -61,6 +64,10 @@ class DestroyCreatureTacticalObjective implements TacticalObjective
     public int situationContributeToTheObjective()
     {
         int mcount = 0;
+        if (objectiveAttained())
+        {
+            return 0;
+        }
         for (BattleCritter dCritter : client.getInactiveBattleUnits())
         {
             if (dCritter.getCreatureType().equals(critter.getType()))
@@ -95,6 +102,6 @@ class DestroyCreatureTacticalObjective implements TacticalObjective
 
     public String getDescription()
     {
-        return "Destroying a " + critter.getName();
+        return "Destroying " + number + " " + critter.getName();
     }
 }

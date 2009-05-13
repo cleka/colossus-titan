@@ -369,7 +369,7 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
     }
 
     /** really stupid heuristic */
-    private Creature findCreatureToDestroyInAttacker()
+    private AllThereIsToKnowAboutYourCreature findCreatureToDestroyInAttacker()
     {
         Creature creature = null;
         int mcount = 0;
@@ -406,9 +406,12 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
         LOGGER.finest("AllThereIsToKnowAboutYourCreature order:\n" + buf.toString());
 
         if (overkill.size() > 0)
-            return overkill.get(overkill.size() - 1).creature;
+            return overkill.get(overkill.size() - 1);
 
-        return creature;
+        if (creature != null)
+            return new AllThereIsToKnowAboutYourCreature(this, creature, attacker);
+
+        return null;
     }
 
     /** Currently attackerObjective is very dumb:
@@ -425,7 +428,8 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
                 listObjectives.add(new DestroyCreatureTacticalObjective(5,
                         client,
                         client.getDefender(),
-                        lcritter));
+                        lcritter,
+                        1));
             }
             else
             {
@@ -457,7 +461,8 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
             listObjectives.add(new DestroyCreatureTacticalObjective(1,
                     client,
                     client.getDefender(),
-                    toKill));
+                    toKill,
+                    1));
         }
         for (TacticalObjective to : listObjectives)
         {
@@ -475,7 +480,8 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
                 listObjectives.add(new DestroyCreatureTacticalObjective(5,
                         client,
                         client.getAttacker(),
-                        lcritter));
+                        lcritter,
+                        1));
             }
         }
         for (Creature lcritter : client.getDefender().getCreatures())
@@ -488,13 +494,14 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
                         lcritter));
             }
         }
-        Creature toKill = findCreatureToDestroyInAttacker();
+        AllThereIsToKnowAboutYourCreature toKill = findCreatureToDestroyInAttacker();
         if (toKill != null)
         {
             listObjectives.add(new DestroyCreatureTacticalObjective(1,
                     client,
                     client.getAttacker(),
-                    toKill));
+                    toKill.creature,
+                    Math.min(toKill.stackNumber, toKill.numberNeededHere)));
         }
         for (TacticalObjective to : listObjectives)
         {

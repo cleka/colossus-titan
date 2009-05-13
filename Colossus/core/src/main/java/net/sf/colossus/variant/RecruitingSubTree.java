@@ -501,10 +501,8 @@ public class RecruitingSubTree implements IRecruiting
                 else
                 {
                     // One-way only? Then this is a more-than-on-levele backward edge.
-                    LOGGER.finest("CHECK:" + backward.toString() + " is direct, " + rar.toString() + " is backward.");
                     continue;
                 }
-                LOGGER.finest("CHECK:" + rar.toString() + " is direct, " + backward.toString() + " is backward.");
                 if (rar.getRecruiter().equals(creature))
                 {
                     CreatureType recruit = rar.getRecruit();
