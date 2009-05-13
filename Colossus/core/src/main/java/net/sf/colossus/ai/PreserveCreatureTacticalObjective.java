@@ -74,7 +74,7 @@ class PreserveCreatureTacticalObjective implements TacticalObjective
                     {
                         lcount += aCritter.getPointValue();
                     }
-                    else if (range <= aCritter.getSkill())
+                    else if (aCritter.isRangestriker() &&  (range <= aCritter.getSkill()))
                     { /* TODO: lord are immnue to non-magical rangestrike */
                         lcount += aCritter.getPointValue() / 2;
                     }
