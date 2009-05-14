@@ -3090,16 +3090,14 @@ public final class GameServerSide extends Game
         handleConcession(legion, attacker, true);
     }
 
-    // TODO get rid of markerId in favor of Legion
-    void concede(String markerId)
+    void concede(Legion attacker)
     {
         if (battleInProgress)
         {
-            battle.concede(getLegionByMarkerId(markerId).getPlayer());
+            battle.concede(attacker.getPlayer());
         }
         else
         {
-            Legion attacker = getLegionByMarkerId(markerId);
             Legion defender = getFirstEnemyLegion(attacker.getCurrentHex(),
                 attacker.getPlayer());
 

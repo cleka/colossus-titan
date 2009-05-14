@@ -1672,7 +1672,7 @@ public final class Server extends Thread implements IServer
             LOGGER.severe(getPlayerName() + " illegally called concede()");
             return;
         }
-        game.concede(legion.getMarkerId());
+        game.concede(legion);
     }
 
     public void doNotConcede(Legion legion)
