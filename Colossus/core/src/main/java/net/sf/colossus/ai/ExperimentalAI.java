@@ -38,6 +38,8 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
 
     private final DefenderFirstMoveRecordSQL dfmr;
 
+    protected final ObjectiveEvalConstants oec;
+
     public ExperimentalAI(Client client)
     {
         super(client);
@@ -51,6 +53,8 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
 
         dfmr = new DefenderFirstMoveRecordSQL("localhost", "colossus",
                 "colossus", VariantSupport.getCurrentVariant().getName());
+
+        oec = new ObjectiveEvalConstants();
     }
 
     @Override
@@ -425,7 +429,8 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
         {
             if (lcritter.isTitan())
             {
-                listObjectives.add(new DestroyCreatureTacticalObjective(5,
+                listObjectives.add(new DestroyCreatureTacticalObjective(
+                        oec.DESTROY_TITAN_PRIORITY,
                         client,
                         client.getDefender(),
                         lcritter,
@@ -450,7 +455,8 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
         {
             if (lcritter.isTitan())
             {
-                listObjectives.add(new PreserveCreatureTacticalObjective(1,
+                listObjectives.add(new PreserveCreatureTacticalObjective(
+                        oec.ATTACKER_PRESERVE_TITAN_PRIORITY,
                         client,
                         client.getAttacker(),
                         lcritter));
@@ -458,7 +464,8 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
         }
         if (toKill != null)
         {
-            listObjectives.add(new DestroyCreatureTacticalObjective(1,
+            listObjectives.add(new DestroyCreatureTacticalObjective(
+                    oec.DESTROY_IMPORTANT_CRITTER_PRIORITY,
                     client,
                     client.getDefender(),
                     toKill,
@@ -477,7 +484,8 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
         {
             if (lcritter.isTitan())
             {
-                listObjectives.add(new DestroyCreatureTacticalObjective(5,
+                listObjectives.add(new DestroyCreatureTacticalObjective(
+                        oec.DESTROY_TITAN_PRIORITY,
                         client,
                         client.getAttacker(),
                         lcritter,
@@ -488,7 +496,8 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
         {
             if (lcritter.isTitan())
             {
-                listObjectives.add(new PreserveCreatureTacticalObjective(5,
+                listObjectives.add(new PreserveCreatureTacticalObjective(
+                        oec.DEFENDER_PRESERVE_TITAN_PRIORITY,
                         client,
                         client.getDefender(),
                         lcritter));
@@ -497,7 +506,8 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
         AllThereIsToKnowAboutYourCreature toKill = findCreatureToDestroyInAttacker();
         if (toKill != null)
         {
-            listObjectives.add(new DestroyCreatureTacticalObjective(1,
+            listObjectives.add(new DestroyCreatureTacticalObjective(
+                    oec.DESTROY_IMPORTANT_CRITTER_PRIORITY,
                     client,
                     client.getAttacker(),
                     toKill.creature,
@@ -507,6 +517,14 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
         {
             LOGGER.info("Defender Objective: " + to.getDescription());
         }
+    }
+
+    protected class ObjectiveEvalConstants
+    {
+        final int DESTROY_TITAN_PRIORITY = 5;
+        final int ATTACKER_PRESERVE_TITAN_PRIORITY = 2;
+        final int DEFENDER_PRESERVE_TITAN_PRIORITY = 5;
+        final int DESTROY_IMPORTANT_CRITTER_PRIORITY = 1;
     }
 
 

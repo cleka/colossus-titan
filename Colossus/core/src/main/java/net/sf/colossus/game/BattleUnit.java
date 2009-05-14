@@ -187,6 +187,16 @@ public final class BattleUnit implements BattleCritter
         return getCreatureType().isTitan();
     }
 
+    public boolean isLord()
+    {
+        return getCreatureType().isLord();
+    }
+
+    public boolean isDemiLord()
+    {
+        return getCreatureType().isDemiLord();
+    }
+
     public int getPower()
     {
         if (isTitan())
@@ -224,6 +234,11 @@ public final class BattleUnit implements BattleCritter
     public boolean isRangestriker()
     {
         return getCreatureType().isRangestriker();
+    }
+
+    public boolean useMagicMissile()
+    {
+        return getCreatureType().useMagicMissile();
     }
 
     // TODO does this give plain Titan name or user specific one?

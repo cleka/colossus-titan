@@ -39,6 +39,10 @@ public interface BattleCritter {
 
     boolean isDefender();
 
+    boolean isLord();
+
+    boolean isDemiLord();
+
     boolean isRangestriker();
 
     boolean isTitan();
@@ -52,6 +56,8 @@ public interface BattleCritter {
     void setMoved(boolean moved);
 
     void setStruck(boolean struck);
+
+    boolean useMagicMissile();
 
     boolean wouldDieFrom(int hits);
 

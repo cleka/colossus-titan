@@ -425,6 +425,8 @@ abstract class AbstractAI implements AI
     /** Various constants used by the AIs code for battle evaluation.
      * Each specific AI should be able to override them
      * to tweak the evaluation results w/o rewriting the code.
+     * So if an AI needs to modify one or more of those, feel free to
+     * remove the 'final' from the appropriate variable(s);
      */
     protected class BattleEvalConstants
     {

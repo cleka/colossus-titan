@@ -102,6 +102,16 @@ public class EvaluatedBattleCritter implements BattleCritter
         return parent.isRangestriker();
     }
 
+    public boolean isLord()
+    {
+        return parent.isLord();
+    }
+
+    public boolean isDemiLord()
+    {
+        return parent.isDemiLord();
+    }
+
     public boolean isTitan()
     {
         return parent.isTitan();
@@ -130,6 +140,11 @@ public class EvaluatedBattleCritter implements BattleCritter
     public void setStruck(boolean struck)
     {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public boolean useMagicMissile()
+    {
+        return parent.useMagicMissile();
     }
 
     public boolean wouldDieFrom(int hits)
