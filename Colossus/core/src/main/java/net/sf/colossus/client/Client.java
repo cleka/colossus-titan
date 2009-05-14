@@ -1294,7 +1294,7 @@ public final class Client implements IClient, IOracle, IVariant
      * game would first call this for 400: recruits = [Angel]
      * and then call it once more for 500: recruits = [Angel, Archangel]
      */
-    public void askAcquireAngel(Legion legion, List<String> recruits)
+    public void askAcquireAngel(Legion legion, List<CreatureType> recruits)
     {
         if (options.getOption(Options.autoAcquireAngels))
         {
@@ -1306,7 +1306,7 @@ public final class Client implements IClient, IOracle, IVariant
         }
     }
 
-    public void acquireAngelCallback(Legion legion, String angelType)
+    public void acquireAngelCallback(Legion legion, CreatureType angelType)
     {
         server.acquireAngel(legion, angelType);
     }

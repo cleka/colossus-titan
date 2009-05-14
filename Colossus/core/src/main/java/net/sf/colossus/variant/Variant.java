@@ -166,6 +166,7 @@ public class Variant
      */
     public static class AcquirableData
     {
+        // TODO should be CreatureType
         private final String name;
         private final int value;
         private final List<MasterBoardTerrain> where;
@@ -255,6 +256,9 @@ public class Variant
     /**
      * To obtain all the Creature that can be acquired at the given amount of
      * points in the given terrain.
+     *
+     * TODO should return List<CreatureType>
+     *
      * @param t The Terrain in which the recruitment occurs.
      * @param value The number of points at which the recruitment occurs.
      * Valid values are constrained.

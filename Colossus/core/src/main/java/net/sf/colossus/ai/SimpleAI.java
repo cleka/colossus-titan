@@ -1800,7 +1800,7 @@ public class SimpleAI extends AbstractAI
     }
 
     // should be correct for most variants.
-    public String acquireAngel(Legion legion, List<String> angels)
+    public CreatureType acquireAngel(Legion legion, List<CreatureType> angels)
     {
         // TODO If the legion is a tiny scooby snack that's about to get
         // smooshed, turn down the angel.
@@ -1825,22 +1825,21 @@ public class SimpleAI extends AbstractAI
                 return null;
             }
         }
-        return bestAngel.getName();
+        return bestAngel;
     }
 
-    /** Return the most important Creature in the list of Creatures or
-     * creature name strings.. */
-    private CreatureType getBestCreature(List<String> creatures)
+    /**
+     * Return the most important Creature in the list of Creatures.
+     */
+    private CreatureType getBestCreature(List<CreatureType> creatures)
     {
         if (creatures == null || creatures.isEmpty())
         {
             return null;
         }
         CreatureType best = null;
-        for (String creatureName : creatures)
+        for (CreatureType creature : creatures)
         {
-            CreatureType creature = variant
-                .getCreatureByName(creatureName);
             if (best == null || getKillValue(creature) > getKillValue(best))
             {
                 best = creature;

@@ -1803,7 +1803,7 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    public void doAcquireAngel(Legion legion, List<String> recruits)
+    public void doAcquireAngel(Legion legion, List<CreatureType> recruits)
     {
         board.deiconify();
         new AcquireAngel(board.getFrame(), client, legion, recruits);

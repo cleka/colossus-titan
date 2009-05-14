@@ -3405,7 +3405,7 @@ public final class GameServerSide extends Game
     }
 
     void askAcquireAngel(PlayerServerSide player, Legion legion,
-        List<String> recruits)
+        List<CreatureType> recruits)
     {
         acquiring = true;
         server.askAcquireAngel(player, legion, recruits);

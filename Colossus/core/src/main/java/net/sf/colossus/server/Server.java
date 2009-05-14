@@ -1453,7 +1453,7 @@ public final class Server extends Thread implements IServer
 
     /** Find out if the player wants to acquire an angel or archangel. */
     void askAcquireAngel(PlayerServerSide player, Legion legion,
-        List<String> recruits)
+        List<CreatureType> recruits)
     {
         if (((LegionServerSide)legion).getHeight() < 7)
         {
@@ -1465,7 +1465,7 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    public void acquireAngel(Legion legion, String angelType)
+    public void acquireAngel(Legion legion, CreatureType angelType)
     {
         if (legion != null)
         {

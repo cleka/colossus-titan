@@ -636,7 +636,7 @@ final class SocketClientThread extends Thread implements IServer,
         else if (method.equals(Constants.askAcquireAngel))
         {
             String markerId = args.remove(0);
-            List<String> recruits = Split.split(Glob.sep, args.remove(0));
+            List<CreatureType> recruits = resolveCreatureTypes(args.remove(0));
             client.askAcquireAngel(resolveLegion(markerId), recruits);
         }
         else if (method.equals(Constants.askChooseStrikePenalty))
@@ -1007,6 +1007,17 @@ final class SocketClientThread extends Thread implements IServer,
             + "' finished method processing");
     }
 
+    private List<CreatureType> resolveCreatureTypes(String nameList)
+    {
+        List<String> names = Split.split(Glob.sep, nameList);
+        List<CreatureType> creatures = new ArrayList<CreatureType>();
+        for (String creatureName : names)
+        {
+            creatures.add(resolveCreatureType(creatureName));
+        }
+        return creatures;
+    }
+
     private CreatureType resolveCreatureType(String creatureName)
     {
         CreatureType creatureByName = client.getGame().getVariant()
@@ -1099,7 +1110,7 @@ final class SocketClientThread extends Thread implements IServer,
         sendToServer(Constants.doneWithStrikes);
     }
 
-    public void acquireAngel(Legion legion, String angelType)
+    public void acquireAngel(Legion legion, CreatureType angelType)
     {
         sendToServer(Constants.acquireAngel + sep + legion.getMarkerId() + sep
             + angelType);

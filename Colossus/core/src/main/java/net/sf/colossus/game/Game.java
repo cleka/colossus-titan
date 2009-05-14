@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import net.sf.colossus.server.VariantSupport;
+import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;
@@ -208,29 +209,28 @@ public abstract class Game
     }
 
     /**
-     * Return a list of names of angel types that can be acquired based
+     * Return a list of angel types that can be acquired based
      * on the hex in which legion is, when reaching given score threshold,
      * and if they are still available from caretaker
      * @param terrain The terrain in which this legion wants to acquire
      * @param score A acquring threshold, e.g. in Default 100, ..., 400, 500
-     * @return list of acquirable names
+     * @return list of acquirables
      */
-    List<String> findAvailableEligibleAngels(MasterBoardTerrain terrain,
+    List<CreatureType> findAvailableEligibleAngels(MasterBoardTerrain terrain,
         int score)
     {
-        List<String> recruits = new ArrayList<String>();
+        List<CreatureType> recruits = new ArrayList<CreatureType>();
         List<String> allRecruits = getVariant().getRecruitableAcquirableList(
             terrain, score);
         Iterator<String> it = allRecruits.iterator();
         while (it.hasNext())
         {
             String name = it.next();
-
-            if (getCaretaker().getAvailableCount(
-                getVariant().getCreatureByName(name)) >= 1
-                && !recruits.contains(name))
+            CreatureType creature = getVariant().getCreatureByName(name);
+            if (getCaretaker().getAvailableCount(creature) >= 1
+                && !recruits.contains(creature))
             {
-                recruits.add(name);
+                recruits.add(creature);
             }
         }
         return recruits;

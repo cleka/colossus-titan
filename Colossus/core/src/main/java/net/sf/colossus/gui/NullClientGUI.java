@@ -329,7 +329,7 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public void doAcquireAngel(Legion legion, List<String> recruits)
+    public void doAcquireAngel(Legion legion, List<CreatureType> recruits)
     {
         // TODO Auto-generated method stub
 

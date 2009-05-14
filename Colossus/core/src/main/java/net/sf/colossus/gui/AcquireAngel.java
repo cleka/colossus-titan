@@ -23,11 +23,12 @@ import net.sf.colossus.client.Client;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.guiutil.KDialog;
 import net.sf.colossus.guiutil.SaveWindow;
+import net.sf.colossus.variant.CreatureType;
 
 
 /**
  * Class AcquireAngel allows a player to acquire an angel or archangel.
- * @version $Id$
+ *
  * @author David Ripton
  */
 
@@ -39,7 +40,7 @@ final class AcquireAngel extends KDialog
     private final SaveWindow saveWindow;
 
     AcquireAngel(JFrame parentFrame, final Client client, Legion legion,
-        final List<String> recruits)
+        final List<CreatureType> recruits)
     {
         super(parentFrame, client.getOwningPlayer().getName()
             + ": Acquire Angel in legion " + legion, false);
@@ -62,11 +63,11 @@ final class AcquireAngel extends KDialog
 
         setBackground(Color.lightGray);
 
-        Iterator<String> it = recruits.iterator();
+        Iterator<CreatureType> it = recruits.iterator();
         while (it.hasNext())
         {
-            final String creatureName = it.next();
-            Chit chit = new Chit(4 * Scale.get(), creatureName);
+            final CreatureType creature = it.next();
+            Chit chit = new Chit(4 * Scale.get(), creature.getName());
             chits.add(chit);
             contentPane.add(chit);
             chit.addMouseListener(new MouseAdapter()
@@ -74,7 +75,7 @@ final class AcquireAngel extends KDialog
                 @Override
                 public void mousePressed(MouseEvent e)
                 {
-                    cleanup(creatureName);
+                    cleanup(creature);
                 }
             });
         }
@@ -123,7 +124,7 @@ final class AcquireAngel extends KDialog
         repaint();
     }
 
-    void cleanup(String angelType)
+    void cleanup(CreatureType angelType)
     {
         client.acquireAngelCallback(legion, angelType);
         saveWindow.saveLocation(getLocation());

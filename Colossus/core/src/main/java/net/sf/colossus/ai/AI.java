@@ -70,7 +70,7 @@ public interface AI
     MasterHex pickEngagement();
 
     /** choose whether to acquire an angel or archangel */
-    String acquireAngel(Legion legion, List<String> recruits);
+    CreatureType acquireAngel(Legion legion, List<CreatureType> recruits);
 
     /** choose whether to summon an angel or archangel */
     SummonInfo summonAngel(Legion summoner, SortedSet<Legion> possibleDonors);

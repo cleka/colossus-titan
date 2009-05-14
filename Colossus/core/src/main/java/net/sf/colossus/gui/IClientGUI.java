@@ -218,7 +218,8 @@ public interface IClientGUI
     public abstract void eventViewerRevealCreatures(Legion legion,
         final List<String> names, String reason);
 
-    public abstract void doAcquireAngel(Legion legion, List<String> recruits);
+    public abstract void doAcquireAngel(Legion legion,
+        List<CreatureType> recruits);
 
     public abstract void setBoardActive(boolean val);
 

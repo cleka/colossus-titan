@@ -26,7 +26,7 @@ public interface IServer
 
     public void doneWithStrikes();
 
-    public void acquireAngel(Legion legion, String angelType);
+    public void acquireAngel(Legion legion, CreatureType angelType);
 
     /**
      * Handles a summon event

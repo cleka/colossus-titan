@@ -355,7 +355,7 @@ public abstract class Legion
         tmpScore -= round; // 300
         tmpPoints += round; // 225
 
-        List<String> recruits;
+        List<CreatureType> recruits;
 
         // @TODO: the constraint by height would make only sense, if askAquire's
         // would be fired sequentially - 2nd not before decision response for 1st
@@ -392,7 +392,7 @@ public abstract class Legion
      * @param points Score threshold (100, ..., 400, 500) for which to get angel
      * @return list of creatures that can be get at that threshold
      */
-    public List<String> findEligibleAngels(int points)
+    public List<CreatureType> findEligibleAngels(int points)
     {
         MasterBoardTerrain terrain = getCurrentHex().getTerrain();
         return player.getGame().findAvailableEligibleAngels(terrain, points);
@@ -407,18 +407,19 @@ public abstract class Legion
     {
         private final Legion legion;
         private final int points;
-        private final List<String> acquirableNames;
+        private final List<CreatureType> acquirables;
 
-        public AcquirableDecision(Legion legion, int points, List<String> names)
+        public AcquirableDecision(Legion legion, int points,
+            List<CreatureType> acquirables)
         {
             this.legion = legion;
             this.points = points;
-            this.acquirableNames = names;
+            this.acquirables = acquirables;
         }
 
-        public List<String> getNames()
+        public List<CreatureType> getAcquirables()
         {
-            return acquirableNames;
+            return acquirables;
         }
 
         // so far not used anywhere

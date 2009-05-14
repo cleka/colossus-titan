@@ -11,6 +11,7 @@ import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.server.VariantSupport;
+import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
 
 
@@ -95,11 +96,11 @@ public class PredictSplitsTest extends TestCase
         }
 
         @Override
-        public List<String> findEligibleAngels(int tmpScore)
+        public List<CreatureType> findEligibleAngels(int tmpScore)
         {
             assert false : "Not implemented in PredictSplitsTest.";
 
-            List<String> angels = new ArrayList<String>();
+            List<CreatureType> angels = new ArrayList<CreatureType>();
             return angels;
         }
     }

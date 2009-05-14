@@ -330,7 +330,8 @@ final class ClientHandler implements IClient
         {
             String markerId = args.remove(0);
             String angelType = args.remove(0);
-            server.acquireAngel(resolveLegion(markerId), angelType);
+            server.acquireAngel(resolveLegion(markerId),
+                resolveCreatureType(angelType));
         }
         else if (method.equals(Constants.doSummon))
         {
@@ -541,6 +542,8 @@ final class ClientHandler implements IClient
         }
     }
 
+    // TODO resolveX methods are on both sides of the network, they should
+    // be extracted into some resolver object (or a base class)
     private CreatureType resolveCreatureType(String name)
     {
         return server.getGame().getVariant().getCreatureByName(name);
@@ -747,7 +750,7 @@ final class ClientHandler implements IClient
         sendToClient(Constants.createSummonAngel + sep + legion.getMarkerId());
     }
 
-    public void askAcquireAngel(Legion legion, List<String> recruits)
+    public void askAcquireAngel(Legion legion, List<CreatureType> recruits)
     {
         sendToClient(Constants.askAcquireAngel + sep + legion.getMarkerId()
             + sep + Glob.glob(recruits));

@@ -16,7 +16,7 @@ import net.sf.colossus.variant.MasterHex;
 
 /**
  *  IClient is a remote interface for the client-accessible parts of Client.
- *  @version $Id$
+ *
  *  @author David Ripton
  */
 public interface IClient
@@ -72,7 +72,7 @@ public interface IClient
 
     public void createSummonAngel(Legion legion);
 
-    public void askAcquireAngel(Legion legion, List<String> recruits);
+    public void askAcquireAngel(Legion legion, List<CreatureType> recruits);
 
     public void askChooseStrikePenalty(List<String> choices);
 

@@ -99,11 +99,11 @@ public final class LegionServerSide extends Legion implements
         PlayerServerSide player = getPlayer();
         for (AcquirableDecision decision : decisions)
         {
-            game.askAcquireAngel(player, this, decision.getNames());
+            game.askAcquireAngel(player, this, decision.getAcquirables());
         }
     }
 
-    void addAngel(String angelType)
+    void addAngel(CreatureType angelType)
     {
         if (angelsToAcquire <= 0)
         {
@@ -122,30 +122,24 @@ public final class LegionServerSide extends Legion implements
             }
             else
             {
-                CreatureType angel = game.getVariant().getCreatureByName(
-                    angelType);
-                if (angel != null)
+                LOGGER.log(Level.INFO, "Legion " + getLongMarkerName()
+                    + " is going to call addCreature() to add "
+                    + "one acquired " + angelType);
+
+                if (addCreature(angelType, true))
                 {
                     LOGGER.log(Level.INFO, "Legion " + getLongMarkerName()
-                        + " is going to call addCreature() to add "
-                        + "one acquired " + angelType);
-
-                    if (addCreature(angel, true))
-                    {
-                        LOGGER.log(Level.INFO, "Legion " + getLongMarkerName()
-                            + " acquired one " + angelType);
-                        game.getServer()
-                            .allTellAddCreature(
-                                new AcquireEvent(game.getTurnNumber(), this,
-                                    angel), true);
-                    }
-                    else
-                    {
-                        LOGGER.log(Level.WARNING, "Legion "
-                            + getLongMarkerName()
-                            + " attempting to acquire one " + angelType
-                            + " failed!!");
-                    }
+                        + " acquired one " + angelType);
+                    game.getServer()
+                        .allTellAddCreature(
+                            new AcquireEvent(game.getTurnNumber(), this,
+                                angelType), true);
+                }
+                else
+                {
+                    LOGGER.log(Level.WARNING, "Legion " + getLongMarkerName()
+                        + " attempting to acquire one " + angelType
+                        + " failed!!");
                 }
             }
         }
