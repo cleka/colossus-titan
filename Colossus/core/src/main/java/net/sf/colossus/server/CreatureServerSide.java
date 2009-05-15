@@ -298,7 +298,7 @@ public class CreatureServerSide extends Creature
                 HazardHexside hazard = hex.getHexsideHazard(direction);
 
                 // Striking down across wall: +1
-                if (hazard == HazardHexside.TOWER)
+                if (hazard.equals(HazardHexside.TOWER))
                 {
                     attackerSkill++;
                 }
@@ -311,8 +311,8 @@ public class CreatureServerSide extends Creature
                 HazardHexside hazard = targetHex.getHexsideHazard(direction);
                 // Non-native striking up slope: -1
                 // Striking up across wall: -1
-                if ((hazard == HazardHexside.SLOPE && !isNativeSlope())
-                    || hazard == HazardHexside.TOWER)
+                if ((hazard.equals(HazardHexside.SLOPE) && !isNativeSlope())
+                    || hazard.equals(HazardHexside.TOWER))
                 {
                     attackerSkill--;
                 }
