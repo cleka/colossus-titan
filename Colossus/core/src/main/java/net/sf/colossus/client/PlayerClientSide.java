@@ -10,6 +10,7 @@ import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.util.InstanceTracker;
 import net.sf.colossus.util.Split;
+import net.sf.colossus.variant.CreatureType;
 
 
 /**
@@ -106,10 +107,11 @@ public final class PlayerClientSide extends Player
         return predictSplits;
     }
 
-    public void initPredictSplits(Legion rootLegion, List<String> creatureNames)
+    public void initPredictSplits(Legion rootLegion,
+        List<CreatureType> creatures)
     {
         this.predictSplits = new PredictSplits(rootLegion.getMarkerId(),
-            creatureNames);
+            Legion.extractCreatureNames(creatures));
     }
 
     @Override

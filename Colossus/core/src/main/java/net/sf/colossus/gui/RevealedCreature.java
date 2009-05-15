@@ -9,17 +9,17 @@ import net.sf.colossus.common.Constants;
 
 /**
  * Contains info about one revealed creature for RevealEvent.
- * 
- * @version $Id$
+ *
+ * TODO still using lots of Strings instead of CreatureType
+ *
  * @author Clemens Katzer
  */
-
 public class RevealedCreature
 {
     private static final Logger LOGGER = Logger
         .getLogger(RevealedCreature.class.getName());
 
-    private String creatureName;
+    private final String creatureName;
     private String titanBaseName = null;
     private boolean dead = false;
 
@@ -35,13 +35,13 @@ public class RevealedCreature
 
     public RevealedCreature(String name)
     {
+        this.creatureName = name;
         if (name == null)
         {
             LOGGER.log(Level.SEVERE,
                 "Tried to create RevealedCreature with null name");
             return;
         }
-        this.creatureName = name;
     }
 
     // EventViewer does this when necessary. Would perhaps be cleaner
@@ -157,7 +157,7 @@ public class RevealedCreature
         return didTeleport;
     }
 
-    /*    
+    /*
      public void setDidTowerTeleport(boolean value)
      {
      this.didTowerTeleport = value;

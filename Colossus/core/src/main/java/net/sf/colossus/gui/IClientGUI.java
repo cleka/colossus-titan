@@ -93,15 +93,15 @@ public interface IClientGUI
 
     public abstract void actOnDoneWithSplits();
 
-    public abstract void actOnDidRecruit(Legion legion, String recruitName,
-        List<String> recruiters, String reason);
+    public abstract void actOnDidRecruit(Legion legion,
+        CreatureType recruitName, List<CreatureType> recruiters, String reason);
 
     public abstract void actOnRemoveCreature(Legion legion, String name,
         String reason);
 
     public abstract void actOnRemoveCreaturePart2(Legion legion);
 
-    public abstract void actOnAddCreature(Legion legion, String name,
+    public abstract void actOnAddCreature(Legion legion, CreatureType type,
         String reason);
 
     public abstract void boardActOnUndidSplit(Legion survivor, int turn);
@@ -114,7 +114,7 @@ public interface IClientGUI
     public abstract boolean chooseWhetherToTeleport();
 
     public abstract void actOnDidMove(Legion legion, MasterHex startingHex,
-        MasterHex currentHex, boolean teleport, String teleportingLord,
+        MasterHex currentHex, boolean teleport, CreatureType teleportingLord,
         boolean splitLegionHasForcedMove);
 
     public abstract void actOnUndidMove(Legion legion, MasterHex formerHex,
@@ -213,10 +213,10 @@ public interface IClientGUI
      * additionally remember the images list for later, the engagement report
      */
     public abstract void revealEngagedCreatures(Legion legion,
-        final List<String> names, boolean isAttacker, String reason);
+        final List<CreatureType> creatures, boolean isAttacker, String reason);
 
     public abstract void eventViewerRevealCreatures(Legion legion,
-        final List<String> names, String reason);
+        final List<CreatureType> creatures, String reason);
 
     public abstract void doAcquireAngel(Legion legion,
         List<CreatureType> recruits);
@@ -249,7 +249,7 @@ public interface IClientGUI
     public abstract EntrySide doPickEntrySide(MasterHex hex,
         Set<EntrySide> entrySides);
 
-    public abstract String doPickLord(List<String> lords);
+    public abstract CreatureType doPickLord(List<CreatureType> lords);
 
     public abstract void doPickStrikePenalty(Client client,
         List<String> choices);

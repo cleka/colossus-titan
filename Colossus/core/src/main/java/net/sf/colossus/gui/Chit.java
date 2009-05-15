@@ -30,7 +30,11 @@ import net.sf.colossus.variant.CreatureType;
 /**
  * Class Chit implements the GUI for a Titan chit representing
  * either a character or a legion.
- * @version $Id$
+ *
+ * TODO offer constructors using the Legion and CreatureType classes instead
+ *      of strings
+ * TODO consider splitting into LegionChit and CreatureChit
+ *
  * @author David Ripton
  * @author Romain Dolbeau
  */

@@ -46,10 +46,8 @@ import net.sf.colossus.variant.MasterHex;
  *  when data from client was received (usually from THIS client, but
  *  there might be other cases).
  *
- *  @version $Id$
  *  @author David Ripton
  */
-
 final class ClientHandler implements IClient
 {
     private static final Logger LOGGER = Logger.getLogger(ClientHandler.class
@@ -499,7 +497,7 @@ final class ClientHandler implements IClient
             boolean teleport = Boolean.valueOf(args.remove(0)).booleanValue();
             String teleportingLord = args.remove(0);
             server.doMove(resolveLegion(markerId), resolveMasterHex(hexLabel),
-                entrySide, teleport, teleportingLord);
+                entrySide, teleport, resolveCreatureType(teleportingLord));
         }
         else if (method.equals(Constants.assignColor))
         {
@@ -677,10 +675,10 @@ final class ClientHandler implements IClient
             + lastRecruit);
     }
 
-    public void addCreature(Legion legion, String name, String reason)
+    public void addCreature(Legion legion, CreatureType creature, String reason)
     {
         sendToClient(Constants.addCreature + sep + legion.getMarkerId() + sep
-            + name + sep + reason);
+            + creature + sep + reason);
     }
 
     public void removeCreature(Legion legion, String name, String reason)
@@ -689,26 +687,29 @@ final class ClientHandler implements IClient
             + sep + name + sep + reason);
     }
 
-    public void revealCreatures(Legion legion, final List<String> names,
+    public void revealCreatures(Legion legion,
+        final List<CreatureType> creatures,
         String reason)
     {
         sendToClient(Constants.revealCreatures + sep + legion.getMarkerId()
-            + sep + Glob.glob(names) + sep + reason);
+            + sep + Glob.glob(creatures) + sep + reason);
     }
 
     /** print the 'revealEngagagedCreature'-message,
      *   args: markerId, isAttacker, list of creature names
      * @param markerId legion marker name that is currently in battle
-     * @param names List of creature names in this legion
+     * @param creatures List of creatures in this legion
      * @param isAttacker true for attacker, false for defender
      * @param reason why this was revealed
      * @author Towi, copied from revealCreatures
      */
     public void revealEngagedCreatures(final Legion legion,
-        final List<String> names, final boolean isAttacker, String reason)
+        final List<CreatureType> creatures, final boolean isAttacker,
+        String reason)
     {
         sendToClient(Constants.revealEngagedCreatures + sep
-            + legion.getMarkerId() + sep + isAttacker + sep + Glob.glob(names)
+            + legion.getMarkerId() + sep + isAttacker + sep
+            + Glob.glob(creatures)
             + sep + reason);
     }
 
@@ -834,11 +835,11 @@ final class ClientHandler implements IClient
         sendToClient(Constants.doReinforce + sep + legion.getMarkerId());
     }
 
-    public void didRecruit(Legion legion, String recruitName,
-        String recruiterName, int numRecruiters)
+    public void didRecruit(Legion legion, CreatureType recruit,
+        CreatureType recruiter, int numRecruiters)
     {
         sendToClient(Constants.didRecruit + sep + legion.getMarkerId() + sep
-            + recruitName + sep + recruiterName + sep + numRecruiters);
+            + recruit + sep + recruiter + sep + numRecruiters);
     }
 
     public void undidRecruit(Legion legion, String recruitName)
@@ -916,7 +917,7 @@ final class ClientHandler implements IClient
 
     public void didMove(Legion legion, MasterHex startingHex,
         MasterHex currentHex, EntrySide entrySide, boolean teleport,
-        String teleportingLord, boolean splitLegionHasForcedMove)
+        CreatureType teleportingLord, boolean splitLegionHasForcedMove)
     {
         sendToClient(Constants.didMove + sep + legion.getMarkerId() + sep
             + startingHex.getLabel() + sep + currentHex.getLabel() + sep

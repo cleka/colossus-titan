@@ -2936,7 +2936,7 @@ public final class GameServerSide extends Game
      *  the reason why it is illegal, or null if ok and move was done.
      */
     String doMove(Legion legion, MasterHex hex, EntrySide entrySide,
-        boolean teleport, String teleportingLord)
+        boolean teleport, CreatureType teleportingLord)
     {
         assert legion != null : "Legion must not be null";
 
@@ -3011,9 +3011,9 @@ public final class GameServerSide extends Game
                         .toString() + " does not contain '" + teleportingLord
                     + "'";
             }
-            List<String> creatureNames = new ArrayList<String>();
-            creatureNames.add(teleportingLord);
-            server.allRevealCreatures(legion, creatureNames,
+            List<CreatureType> creatures = new ArrayList<CreatureType>();
+            creatures.add(teleportingLord);
+            server.allRevealCreatures(legion, creatures,
                 Constants.reasonTeleport);
         }
         ((LegionServerSide)legion).moveToHex(hex, entrySide, teleport,
@@ -3762,8 +3762,9 @@ public final class GameServerSide extends Game
         history.mergeEvent(splitoffId, survivorId, turnNumber);
     }
 
+    // TODO second parameter should be List<Player>
     void revealEvent(boolean allPlayers, List<String> playerNames,
-        Legion legion, List<String> creatureNames)
+        Legion legion, List<CreatureType> creatureNames)
     {
         history.revealEvent(allPlayers, playerNames, legion, creatureNames,
             turnNumber);

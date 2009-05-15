@@ -1048,12 +1048,14 @@ public final class Client implements IClient, IOracle, IVariant
         }
     }
 
-    /** Add a new creature to this legion. */
-    public void addCreature(Legion legion, String name, String reason)
+    /**
+     * Add a new creature to this legion.
+     */
+    public void addCreature(Legion legion, CreatureType creature, String reason)
     {
-        ((LegionClientSide)legion).addCreature(name);
+        ((LegionClientSide)legion).addCreature(creature.getName());
 
-        gui.actOnAddCreature(legion, name, reason);
+        gui.actOnAddCreature(legion, creature, reason);
 
     }
 
@@ -1087,18 +1089,19 @@ public final class Client implements IClient, IOracle, IVariant
      *  revealed to the split prediction
      * */
 
-    public void revealCreatures(Legion legion, final List<String> names,
+    public void revealCreatures(Legion legion,
+        final List<CreatureType> creatures,
         String reason)
     {
-        gui.eventViewerRevealCreatures(legion, names, reason);
+        gui.eventViewerRevealCreatures(legion, creatures, reason);
 
-        ((LegionClientSide)legion).revealCreatures(names);
+        ((LegionClientSide)legion).revealCreatures(creatures);
     }
 
     /* pass revealed info to SplitPrediction and the GUI
      */
     public void revealEngagedCreatures(Legion legion,
-        final List<String> names, boolean isAttacker, String reason)
+        final List<CreatureType> names, boolean isAttacker, String reason)
     {
         revealCreatures(legion, names, reason);
 
@@ -1838,30 +1841,30 @@ public final class Client implements IClient, IOracle, IVariant
         }
     }
 
-    public void didRecruit(Legion legion, String recruitName,
-        String recruiterName, int numRecruiters)
+    public void didRecruit(Legion legion, CreatureType recruit,
+        CreatureType recruiter, int numRecruiters)
     {
         if (isMyLegion(legion))
         {
             gui.pushUndoStack(legion.getMarkerId());
         }
 
-        List<String> recruiters = new ArrayList<String>();
-        if (numRecruiters >= 1 && recruiterName != null)
+        List<CreatureType> recruiters = new ArrayList<CreatureType>();
+        if (numRecruiters >= 1 && recruiter != null)
         {
             for (int i = 0; i < numRecruiters; i++)
             {
-                recruiters.add(recruiterName);
+                recruiters.add(recruiter);
             }
             revealCreatures(legion, recruiters, Constants.reasonRecruiter);
         }
         String reason = (getBattleSite() != null ? Constants.reasonReinforced
             : Constants.reasonRecruited);
 
-        addCreature(legion, recruitName, reason);
-        ((LegionClientSide)legion).setRecruitName(recruitName);
+        addCreature(legion, recruit, reason);
+        ((LegionClientSide)legion).setRecruitName(recruit.getName());
 
-        gui.actOnDidRecruit(legion, recruitName, recruiters, reason);
+        gui.actOnDidRecruit(legion, recruit, recruiters, reason);
 
     }
 
@@ -2438,32 +2441,22 @@ public final class Client implements IClient, IOracle, IVariant
         return turnNumber;
     }
 
-    private String figureTeleportingLord(Legion legion, MasterHex hex)
+    private CreatureType figureTeleportingLord(Legion legion, MasterHex hex)
     {
-        List<String> lords = listTeleportingLords(legion, hex);
-        String lordName = null;
+        List<CreatureType> lords = listTeleportingLords(legion, hex);
         switch (lords.size())
         {
             case 0:
+                assert false : "We should have at least one teleporting lord";
                 return null;
 
             case 1:
-                lordName = lords.get(0);
-                if (lordName.startsWith(Constants.titan))
-                {
-                    lordName = Constants.titan;
-                }
-                return lordName;
+                return lords.get(0);
 
             default:
                 if (options.getOption(Options.autoPickLord))
                 {
-                    lordName = lords.get(0);
-                    if (lordName.startsWith(Constants.titan))
-                    {
-                        lordName = Constants.titan;
-                    }
-                    return lordName;
+                    return lords.get(0);
                 }
                 else
                 {
@@ -2472,16 +2465,15 @@ public final class Client implements IClient, IOracle, IVariant
         }
     }
 
-    /** List the lords eligible to teleport this legion to hexLabel,
-     *  as strings.
-     *
-     *  TODO return value should be List<Creature> or List<CreatureType>
+    /**
+     * List the lords eligible to teleport this legion to hexLabel.
      */
-    private List<String> listTeleportingLords(Legion legion, MasterHex hex)
+    private List<CreatureType> listTeleportingLords(Legion legion,
+        MasterHex hex)
     {
         // Needs to be a List not a Set so that it can be passed as
         // an imageList.
-        List<String> lords = new ArrayList<String>();
+        List<CreatureType> lords = new ArrayList<CreatureType>();
 
         // Titan teleport
         List<LegionClientSide> legions = getGameClientSide().getLegionsByHex(
@@ -2489,9 +2481,15 @@ public final class Client implements IClient, IOracle, IVariant
         if (!legions.isEmpty())
         {
             Legion legion0 = legions.get(0);
-            if (legion0 != null && !isMyLegion(legion0) && legion.hasTitan())
+            if (legion0 != null && !isMyLegion(legion0))
             {
-                lords.add(legion.getPlayer().getTitanBasename());
+                for (Creature creature : legion.getCreatures())
+                {
+                    if (creature.getType().isTitan())
+                    {
+                        lords.add(creature.getType());
+                    }
+                }
             }
         }
 
@@ -2502,16 +2500,9 @@ public final class Client implements IClient, IOracle, IVariant
             {
                 CreatureType creatureType = creature.getType();
                 if (creatureType != null && creatureType.isLord()
-                    && !lords.contains(creatureType.getName()))
+                    && !lords.contains(creatureType))
                 {
-                    if (creatureType.isTitan())
-                    {
-                        lords.add(legion.getPlayer().getTitanBasename());
-                    }
-                    else
-                    {
-                        lords.add(creatureType.getName());
-                    }
+                    lords.add(creatureType);
                 }
             }
         }
@@ -2562,7 +2553,7 @@ public final class Client implements IClient, IOracle, IVariant
             entrySide = gui.doPickEntrySide(hex, entrySides);
         }
 
-        String teleportingLord = null;
+        CreatureType teleportingLord = null;
         if (teleport)
         {
             teleportingLord = figureTeleportingLord(mover, hex);
@@ -2594,7 +2585,7 @@ public final class Client implements IClient, IOracle, IVariant
 
     public void didMove(Legion legion, MasterHex startingHex,
         MasterHex currentHex, EntrySide entrySide, boolean teleport,
-        String teleportingLord, boolean splitLegionHasForcedMove)
+        CreatureType teleportingLord, boolean splitLegionHasForcedMove)
     {
         if (isMyLegion(legion))
         {

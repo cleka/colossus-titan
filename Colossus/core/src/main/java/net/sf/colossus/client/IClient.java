@@ -45,15 +45,15 @@ public interface IClient
     public void setLegionStatus(Legion legion, boolean moved,
         boolean teleported, EntrySide entrySide, String lastRecruit);
 
-    public void addCreature(Legion legion, String name, String reason);
+    public void addCreature(Legion legion, CreatureType type, String reason);
 
     public void removeCreature(Legion legion, String name, String reason);
 
-    public void revealCreatures(Legion legion, final List<String> names,
+    public void revealCreatures(Legion legion, final List<CreatureType> names,
         String reason);
 
     public void revealEngagedCreatures(Legion legion,
-        final List<String> names, boolean isAttacker, String reason);
+        final List<CreatureType> names, boolean isAttacker, String reason);
 
     public void removeDeadBattleChits();
 
@@ -104,8 +104,8 @@ public interface IClient
 
     public void doReinforce(Legion legion);
 
-    public void didRecruit(Legion legion, String recruitName,
-        String recruiterName, int numRecruiters);
+    public void didRecruit(Legion legion, CreatureType recruitName,
+        CreatureType recruiterName, int numRecruiters);
 
     public void undidRecruit(Legion legion, String recruitName);
 
@@ -137,7 +137,7 @@ public interface IClient
         BattleHex endingHex, boolean undo);
 
     public void didMove(Legion legion, MasterHex startingHex, MasterHex hex,
-        EntrySide entrySide, boolean teleport, String teleportingLord,
+        EntrySide entrySide, boolean teleport, CreatureType teleportingLord,
         boolean splitLegionHasForcedMove);
 
     public void undidMove(Legion legion, MasterHex formerHex,

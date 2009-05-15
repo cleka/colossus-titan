@@ -44,6 +44,7 @@ import net.sf.colossus.common.Options;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.guiutil.KDialog;
+import net.sf.colossus.variant.CreatureType;
 
 
 /**
@@ -1026,7 +1027,7 @@ final class EventViewer extends KDialog
         }
     }
 
-    public void revealEngagedCreatures(final List<String> names,
+    public void revealEngagedCreatures(final List<CreatureType> creatures,
         boolean isAttacker, String reason)
     {
         // can't do anything if (old) server or history do not provide
@@ -1044,11 +1045,10 @@ final class EventViewer extends KDialog
             event = isAttacker ? attackerEventLegion : defenderEventLegion;
 
             ArrayList<RevealedCreature> rcNames = new ArrayList<RevealedCreature>();
-            Iterator<String> it = names.iterator();
-            while (it.hasNext())
+            for (CreatureType creatureType : creatures)
             {
-                String name = it.next();
-                RevealedCreature rc = new RevealedCreature(name);
+                RevealedCreature rc = new RevealedCreature(creatureType
+                    .getName());
                 rcNames.add(rc);
             }
 
@@ -1160,23 +1160,21 @@ final class EventViewer extends KDialog
         }
     }
 
-    public void recruitEvent(String markerId, int height, String recruitName,
-        List<String> recruiters, String reason)
+    public void recruitEvent(String markerId, int height,
+        CreatureType recruit, List<CreatureType> recruiters, String reason)
     {
         ArrayList<RevealedCreature> rcList = new ArrayList<RevealedCreature>();
         RevealedCreature rc;
 
-        Iterator<String> it = recruiters.iterator();
-        while (it.hasNext())
+        for (CreatureType creature : recruiters)
         {
-            String recruiterName = it.next();
-            rc = new RevealedCreature(recruiterName);
+            rc = new RevealedCreature(creature.getName());
             rc.setDidRecruit(true);
             rcList.add(rc);
         }
 
         int recruitType;
-        rc = new RevealedCreature(recruitName);
+        rc = new RevealedCreature(recruit.getName());
         if (reason.equals(Constants.reasonReinforced))
         {
             recruitType = RevealEvent.eventReinforce;

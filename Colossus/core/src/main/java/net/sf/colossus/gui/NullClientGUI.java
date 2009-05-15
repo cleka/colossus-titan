@@ -41,7 +41,8 @@ public class NullClientGUI implements IClientGUI
         // Nothing to do...
     }
 
-    public void actOnAddCreature(Legion legion, String name, String reason)
+    public void actOnAddCreature(Legion legion, CreatureType creature,
+        String reason)
     {
         // TODO Auto-generated method stub
 
@@ -60,15 +61,15 @@ public class NullClientGUI implements IClientGUI
     }
 
     public void actOnDidMove(Legion legion, MasterHex startingHex,
-        MasterHex currentHex, boolean teleport, String teleportingLord,
+        MasterHex currentHex, boolean teleport, CreatureType teleportingLord,
         boolean splitLegionHasForcedMove)
     {
         // TODO Auto-generated method stub
 
     }
 
-    public void actOnDidRecruit(Legion legion, String recruitName,
-        List<String> recruiters, String reason)
+    public void actOnDidRecruit(Legion legion, CreatureType recruit,
+        List<CreatureType> recruiters, String reason)
     {
         // TODO Auto-generated method stub
 
@@ -367,7 +368,7 @@ public class NullClientGUI implements IClientGUI
         return null;
     }
 
-    public String doPickLord(List<String> lords)
+    public CreatureType doPickLord(List<CreatureType> lords)
     {
         // TODO Auto-generated method stub
         return null;
@@ -448,7 +449,8 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public void eventViewerRevealCreatures(Legion legion, List<String> names,
+    public void eventViewerRevealCreatures(Legion legion,
+        List<CreatureType> creatures,
         String reason)
     {
         // TODO Auto-generated method stub
@@ -593,7 +595,8 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public void revealEngagedCreatures(Legion legion, List<String> names,
+    public void revealEngagedCreatures(Legion legion,
+        List<CreatureType> creatures,
         boolean isAttacker, String reason)
     {
         // TODO Auto-generated method stub

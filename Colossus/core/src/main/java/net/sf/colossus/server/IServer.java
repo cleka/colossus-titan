@@ -95,7 +95,7 @@ public interface IServer
         List<CreatureType> creaturesToSplit);
 
     public void doMove(Legion legion, MasterHex hex, EntrySide entrySide,
-        boolean teleport, String teleportingLord);
+        boolean teleport, CreatureType teleportingLord);
 
     public void assignColor(PlayerColor color);
 

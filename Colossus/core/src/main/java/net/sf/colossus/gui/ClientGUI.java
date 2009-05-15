@@ -1055,8 +1055,8 @@ public class ClientGUI implements IClientGUI
         board.clearRecruitedChits();
     }
 
-    public void actOnDidRecruit(Legion legion, String recruitName,
-        List<String> recruiters, String reason)
+    public void actOnDidRecruit(Legion legion, CreatureType recruit,
+        List<CreatureType> recruiters, String reason)
     {
         board.addRecruitedChit(legion);
         board.highlightPossibleRecruitLegionHexes();
@@ -1064,7 +1064,7 @@ public class ClientGUI implements IClientGUI
         if (eventViewer != null)
         {
             eventViewer.recruitEvent(legion.getMarkerId(), (legion)
-                .getHeight(), recruitName, recruiters, reason);
+                .getHeight(), recruit, recruiters, reason);
         }
     }
 
@@ -1097,7 +1097,8 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    public void actOnAddCreature(Legion legion, String name, String reason)
+    public void actOnAddCreature(Legion legion, CreatureType creature,
+        String reason)
     {
         if (!isReplayOngoing())
         {
@@ -1106,7 +1107,8 @@ public class ClientGUI implements IClientGUI
             hex.repaint();
         }
 
-        eventViewer.addCreature(legion.getMarkerId(), name, reason);
+        eventViewer.addCreature(legion.getMarkerId(), creature.getName(),
+            reason);
     }
 
     public void boardActOnUndidSplit(Legion survivor, int turn)
@@ -1148,13 +1150,14 @@ public class ClientGUI implements IClientGUI
     }
 
     public void actOnDidMove(Legion legion, MasterHex startingHex,
-        MasterHex currentHex, boolean teleport, String teleportingLord,
+        MasterHex currentHex, boolean teleport, CreatureType teleportingLord,
         boolean splitLegionHasForcedMove)
     {
         if (teleport)
         {
             eventViewer.newCreatureRevealEvent(RevealEvent.eventTeleport,
-                legion.getMarkerId(), legion.getHeight(), teleportingLord,
+                legion.getMarkerId(), legion.getHeight(), teleportingLord
+                    .getName(),
                 null, 0);
         }
 
@@ -1731,7 +1734,7 @@ public class ClientGUI implements IClientGUI
      * additionally remember the images list for later, the engagement report
      */
     public void revealEngagedCreatures(Legion legion,
-        final List<String> names, boolean isAttacker, String reason)
+        final List<CreatureType> creatures, boolean isAttacker, String reason)
     {
 
         // in engagement we need to update the remembered list, too.
@@ -1754,14 +1757,14 @@ public class ClientGUI implements IClientGUI
                 .getLegionCreatureCertainties(legion);
         }
 
-        eventViewer.revealEngagedCreatures(names, isAttacker, reason);
+        eventViewer.revealEngagedCreatures(creatures, isAttacker, reason);
     }
 
     public void eventViewerRevealCreatures(Legion legion,
-        final List<String> names, String reason)
+        final List<CreatureType> creatures, String reason)
     {
-
-        eventViewer.revealCreatures(legion, names, reason);
+        eventViewer.revealCreatures(legion, Legion
+            .extractCreatureNames(creatures), reason);
     }
 
     private void showOrHideLogWindow(Client client, boolean show)
@@ -1910,7 +1913,7 @@ public class ClientGUI implements IClientGUI
         return PickEntrySide.pickEntrySide(board.getFrame(), hex, entrySides);
     }
 
-    public String doPickLord(List<String> lords)
+    public CreatureType doPickLord(List<CreatureType> lords)
     {
         return PickLord.pickLord(options, board.getFrame(), lords);
     }

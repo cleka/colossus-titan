@@ -37,7 +37,7 @@ import net.sf.colossus.variant.MasterHex;
 
 /**
  *  Thread to handle server connection on client side.
- *  @version $Id$
+ *
  *  @author David Ripton
  */
 
@@ -544,7 +544,8 @@ final class SocketClientThread extends Thread implements IServer,
             String markerId = args.remove(0);
             String name = args.remove(0);
             String reason = args.isEmpty() ? "<Unknown>" : args.remove(0);
-            client.addCreature(resolveLegion(markerId), name, reason);
+            client.addCreature(resolveLegion(markerId),
+                resolveCreatureType(name), reason);
         }
         else if (method.equals(Constants.removeCreature))
         {
@@ -585,16 +586,22 @@ final class SocketClientThread extends Thread implements IServer,
                     .getStartingTower());
                 player.addLegion(legion);
             }
-            client.revealCreatures(legion, names, reason);
+            List<CreatureType> creatures = new ArrayList<CreatureType>();
+            for (String name : names)
+            {
+                creatures.add(resolveCreatureType(name));
+            }
+            client.revealCreatures(legion, creatures, reason);
         }
         else if (method.equals(Constants.revealEngagedCreatures))
         {
             String markerId = args.remove(0);
             boolean isAttacker = Boolean.valueOf(args.remove(0))
                 .booleanValue();
-            List<String> names = Split.split(Glob.sep, args.remove(0));
+            String names = args.remove(0);
             String reason = args.isEmpty() ? "<Unknown>" : args.remove(0);
-            client.revealEngagedCreatures(resolveLegion(markerId), names,
+            client.revealEngagedCreatures(resolveLegion(markerId),
+                resolveCreatureTypes(names),
                 isAttacker, reason);
         }
         else if (method.equals(Constants.removeDeadBattleChits))
@@ -749,8 +756,9 @@ final class SocketClientThread extends Thread implements IServer,
             String recruitName = args.remove(0);
             String recruiterName = args.remove(0);
             int numRecruiters = Integer.parseInt(args.remove(0));
-            client.didRecruit(resolveLegion(markerId), recruitName,
-                recruiterName, numRecruiters);
+            client.didRecruit(resolveLegion(markerId),
+                resolveCreatureType(recruitName),
+                resolveCreatureType(recruiterName), numRecruiters);
         }
         else if (method.equals(Constants.undidRecruit))
         {
@@ -859,7 +867,8 @@ final class SocketClientThread extends Thread implements IServer,
             client.didMove(resolveLegion(markerId),
                 resolveHex(startingHexLabel), resolveHex(currentHexLabel),
                 EntrySide.fromLabel(entrySideLabel), teleport,
-                teleportingLord, splitLegionHasForcedMove);
+                resolveCreatureType(teleportingLord),
+                    splitLegionHasForcedMove);
         }
         else if (method.equals(Constants.undidMove))
         {
@@ -1020,6 +1029,10 @@ final class SocketClientThread extends Thread implements IServer,
 
     private CreatureType resolveCreatureType(String creatureName)
     {
+        if (creatureName == null)
+        {
+            return null;
+        }
         CreatureType creatureByName = client.getGame().getVariant()
             .getCreatureByName(creatureName);
         assert creatureByName != null : "Client got unknown creature name '"
@@ -1265,7 +1278,7 @@ final class SocketClientThread extends Thread implements IServer,
     }
 
     public void doMove(Legion legion, MasterHex hex, EntrySide entrySide,
-        boolean teleport, String teleportingLord)
+        boolean teleport, CreatureType teleportingLord)
     {
         sendToServer(Constants.doMove + sep + legion.getMarkerId() + sep
             + hex.getLabel() + sep + entrySide.getLabel() + sep + teleport

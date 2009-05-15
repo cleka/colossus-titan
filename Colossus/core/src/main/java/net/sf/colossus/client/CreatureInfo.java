@@ -16,6 +16,7 @@ class CreatureInfo implements Cloneable
     // Was the creature here when this legion was split off?
     private boolean atSplit;
 
+    // TODO first parameter should be CreatureType
     CreatureInfo(String name, boolean certain, boolean atSplit)
     {
         if (name.startsWith("Titan"))

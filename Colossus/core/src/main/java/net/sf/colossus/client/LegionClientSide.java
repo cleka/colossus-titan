@@ -26,7 +26,6 @@ import net.sf.colossus.variant.MasterHex;
  * -setMarker(Marker)
  *    requires abstraction of the client.Marker class first, should replace markerId member
  *
- * @version $Id$
  * @author David Ripton
  */
 public final class LegionClientSide extends Legion
@@ -177,26 +176,33 @@ public final class LegionClientSide extends Legion
         return (PlayerClientSide)super.getPlayer();
     }
 
-    /** Add a new creature to this legion. */
+    /**
+     * Add a new creature to this legion.
+     *
+     * TODO should get a CreatureType
+     */
     void addCreature(String name)
     {
         getNode().addCreature(name);
     }
 
+    // TODO should get a CreatureType
     void removeCreature(String name)
     {
         getNode().removeCreature(name);
     }
 
-    /** Reveal creatures in this legion, some of which already may be known. */
-    void revealCreatures(final List<String> names)
+    /**
+     * Reveal creatures in this legion, some of which already may be known.
+     */
+    void revealCreatures(final List<CreatureType> creatures)
     {
-        // TODO find better way of initializing the PredictSplits object in Player
+        // TODO find better way of initialising the PredictSplits object in Player
         if (getPlayer().getPredictSplits() == null)
         {
-            getPlayer().initPredictSplits(this, names);
+            getPlayer().initPredictSplits(this, creatures);
         }
-        getNode().revealCreatures(names);
+        getNode().revealCreatures(Legion.extractCreatureNames(creatures));
     }
 
     void split(int childHeight, Legion child, int turn)

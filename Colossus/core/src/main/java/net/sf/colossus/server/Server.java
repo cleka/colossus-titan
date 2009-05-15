@@ -1595,31 +1595,24 @@ public final class Server extends Thread implements IServer
             .numberOfRecruiterNeeded(recruiter, event.getAddedCreatureType(), event
                 .getLegion().getCurrentHex().getTerrain(), event.getLegion()
                 .getCurrentHex()));
-        String recruiterName = null;
-        if (recruiter != null)
-        {
-            recruiterName = recruiter.getName();
-        }
-
         Iterator<IClient> it = clients.iterator();
         while (it.hasNext())
         {
             IClient client = it.next();
             // TODO pass event around
-            client.didRecruit(event.getLegion(), event.getAddedCreatureType()
-                .getName(), recruiterName,
-                numRecruiters);
+            client.didRecruit(event.getLegion(), event.getAddedCreatureType(),
+                recruiter, numRecruiters);
         }
 
         // reveal only if there is something to tell
         if (recruiter != null)
         {
-            List<String> recruiterNames = new ArrayList<String>();
+            List<CreatureType> recruiters = new ArrayList<CreatureType>();
             for (int i = 0; i < numRecruiters; i++)
             {
-                recruiterNames.add(recruiterName);
+                recruiters.add(recruiter);
             }
-            game.revealEvent(true, null, event.getLegion(), recruiterNames);
+            game.revealEvent(true, null, event.getLegion(), recruiters);
         }
         game.addCreatureEvent(event);
     }
@@ -2258,7 +2251,7 @@ public final class Server extends Thread implements IServer
     }
 
     public void doMove(Legion legion, MasterHex hex, EntrySide entrySide,
-        boolean teleport, String teleportingLord)
+        boolean teleport, CreatureType teleportingLord)
     {
         IClient client = getClient(getPlayer());
         if (!isActivePlayer())
@@ -2284,7 +2277,7 @@ public final class Server extends Thread implements IServer
     }
 
     void allTellDidMove(Legion legion, MasterHex startingHex, MasterHex hex,
-        EntrySide entrySide, boolean teleport, String teleportingLord)
+        EntrySide entrySide, boolean teleport, CreatureType teleportingLord)
     {
         PlayerServerSide player = getActivePlayerSS();
         // needed in didMove to decide whether to dis/enable button
@@ -2318,8 +2311,8 @@ public final class Server extends Thread implements IServer
         {
             IClient client = it.next();
             // TODO pass event into client (requires adding the reason as property of the event)
-            client.addCreature(event.getLegion(), event.getAddedCreatureType()
-                .getName(), event.getReason());
+            client.addCreature(event.getLegion(),
+                event.getAddedCreatureType(), event.getReason());
         }
         if (updateHistory)
         {
@@ -2349,10 +2342,10 @@ public final class Server extends Thread implements IServer
         {
             IClient client = it.next();
             client.revealCreatures(legion, ((LegionServerSide)legion)
-                .getImageNames(), reason);
+                .getCreatureTypes(), reason);
         }
         game.revealEvent(true, null, legion, ((LegionServerSide)legion)
-            .getImageNames());
+            .getCreatureTypes());
     }
 
     /** pass to all clients the 'revealEngagedCreatures' message,
@@ -2370,21 +2363,21 @@ public final class Server extends Thread implements IServer
         {
             IClient client = it.next();
             client.revealEngagedCreatures(legion, ((LegionServerSide)legion)
-                .getImageNames(), isAttacker, reason);
+                .getCreatureTypes(), isAttacker, reason);
         }
         game.revealEvent(true, null, legion, ((LegionServerSide)legion)
-            .getImageNames());
+            .getCreatureTypes());
     }
 
     /** Call from History during load game only */
-    void allRevealLegion(Legion legion, List<String> creatureNames,
+    void allRevealLegion(Legion legion, List<CreatureType> creatures,
         String reason)
     {
         Iterator<IClient> it = clients.iterator();
         while (it.hasNext())
         {
             IClient client = it.next();
-            client.revealCreatures(legion, creatureNames, reason);
+            client.revealCreatures(legion, creatures, reason);
         }
     }
 
@@ -2394,17 +2387,17 @@ public final class Server extends Thread implements IServer
         if (client != null)
         {
             client.revealCreatures(legion, ((LegionServerSide)legion)
-                .getImageNames(), reason);
+                .getCreatureTypes(), reason);
         }
         List<String> li = new ArrayList<String>();
         li.add(player.getName());
         game.revealEvent(false, li, legion, ((LegionServerSide)legion)
-            .getImageNames());
+            .getCreatureTypes());
     }
 
     /** Call from History during load game only */
     void oneRevealLegion(Player player, Legion legion,
-        List<String> creatureNames, String reason)
+        List<CreatureType> creatureNames, String reason)
     {
         IClient client = getClient(player);
         if (client != null)
@@ -2439,7 +2432,7 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    void allRevealCreatures(Legion legion, List<String> creatureNames,
+    void allRevealCreatures(Legion legion, List<CreatureType> creatureNames,
         String reason)
     {
         Iterator<IClient> it = clients.iterator();

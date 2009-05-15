@@ -9,31 +9,30 @@ import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JFrame;
 
-import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.IOptions;
 import net.sf.colossus.guiutil.KDialog;
 import net.sf.colossus.guiutil.SaveWindow;
+import net.sf.colossus.variant.CreatureType;
 
 
 /**
  * Class PickLord allows a player to choose which lord tower teleports.
- * @version $Id$
+ *
  * @author David Ripton
  */
 
 final class PickLord extends KDialog
 {
     private final List<Chit> chits = new ArrayList<Chit>();
-    private String lordType;
+    private CreatureType lordType;
     private final SaveWindow saveWindow;
 
     private PickLord(IOptions options, JFrame parentFrame,
-        List<String> imageNames)
+        List<CreatureType> choices)
     {
         super(parentFrame, "Reveal Which Lord?", true);
 
@@ -44,11 +43,9 @@ final class PickLord extends KDialog
         pack();
         setBackground(Color.lightGray);
 
-        Iterator<String> it = imageNames.iterator();
-        while (it.hasNext())
+        for (final CreatureType creatureType : choices)
         {
-            final String imageName = it.next();
-            Chit chit = new Chit(4 * Scale.get(), imageName);
+            Chit chit = new Chit(4 * Scale.get(), creatureType.getName());
             chits.add(chit);
             contentPane.add(chit);
             chit.addMouseListener(new MouseAdapter()
@@ -56,11 +53,7 @@ final class PickLord extends KDialog
                 @Override
                 public void mousePressed(MouseEvent e)
                 {
-                    lordType = imageName;
-                    if (lordType.startsWith(Constants.titan))
-                    {
-                        lordType = Constants.titan;
-                    }
+                    lordType = creatureType;
                     saveWindow.saveLocation(getLocation());
                     dispose();
                 }
@@ -82,15 +75,15 @@ final class PickLord extends KDialog
         repaint();
     }
 
-    private String getLordType()
+    private CreatureType getLordType()
     {
         return lordType;
     }
 
-    static synchronized String pickLord(IOptions options, JFrame parentFrame,
-        List<String> imageNames)
+    static synchronized CreatureType pickLord(IOptions options,
+        JFrame parentFrame, List<CreatureType> choices)
     {
-        PickLord pl = new PickLord(options, parentFrame, imageNames);
+        PickLord pl = new PickLord(options, parentFrame, choices);
         return pl.getLordType();
     }
 }

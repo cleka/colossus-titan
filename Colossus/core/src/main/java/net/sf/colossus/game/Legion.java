@@ -386,6 +386,24 @@ public abstract class Legion
     }
 
     /**
+     * Retrieves a list of all creature types in this legion.
+     *
+     * This matches getCreatures() but lists the types instead of the
+     * individual creatures.
+     *
+     * @return A list of all creature types in this legion.
+     */
+    public List<CreatureType> getCreatureTypes()
+    {
+        List<CreatureType> result = new ArrayList<CreatureType>();
+        for (Creature creature : getCreatures())
+        {
+            result.add(creature.getType());
+        }
+        return result;
+    }
+
+    /**
      * Calculate which angels this legion can get in its current land
      * when crossing the given points threshold
      *
@@ -396,6 +414,22 @@ public abstract class Legion
     {
         MasterBoardTerrain terrain = getCurrentHex().getTerrain();
         return player.getGame().findAvailableEligibleAngels(terrain, points);
+    }
+
+    /**
+     * Maps a list of creature types to the names.
+     *
+     * TODO just a temporary helper method. It should not stay.
+     */
+    public static List<String> extractCreatureNames(
+        List<CreatureType> creatures)
+    {
+        List<String> result = new ArrayList<String>();
+        for (CreatureType creatureType : creatures)
+        {
+            result.add(creatureType.getName());
+        }
+        return result;
     }
 
     /**

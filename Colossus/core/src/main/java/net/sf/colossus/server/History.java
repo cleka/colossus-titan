@@ -138,13 +138,13 @@ public class History
     }
 
     void revealEvent(boolean allPlayers, List<String> playerNames,
-        Legion legion, List<String> creatureNames, int turn)
+        Legion legion, List<CreatureType> creatures, int turn)
     {
         if (loading)
         {
             return;
         }
-        if (creatureNames.isEmpty())
+        if (creatures.isEmpty())
         {
             // this happens e.g. when in final battle (titan vs. titan)
             // angel was called out of legion which was then empty,
@@ -155,7 +155,7 @@ public class History
             LOGGER.log(Level.WARNING, "Called revealEvent(" + allPlayers
                 + ", "
                 + (playerNames != null ? playerNames.toString() : "-null-")
-                + ", " + legion + ", " + creatureNames.toString() + ", "
+                + ", " + legion + ", " + creatures.toString() + ", "
                 + turn + ") with empty creatureNames");
             return;
         }
@@ -176,15 +176,13 @@ public class History
                 viewers.addContent(viewer);
             }
         }
-        Element creatures = new Element("creatures");
-        event.addContent(creatures);
-        Iterator<String> it = creatureNames.iterator();
-        while (it.hasNext())
+        Element creaturesElem = new Element("creatures");
+        event.addContent(creaturesElem);
+        for (CreatureType creatureType : creatures)
         {
-            String creatureName = it.next();
-            Element creature = new Element("creature");
-            creature.addContent(creatureName);
-            creatures.addContent(creature);
+            Element creatureElem = new Element("creature");
+            creatureElem.addContent(creatureType.getName());
+            creaturesElem.addContent(creatureElem);
         }
         root.addContent(event);
     }
@@ -252,14 +250,12 @@ public class History
                     playerNames.add(playerName);
                 }
             }
-            List<String> creatureNames = new ArrayList<String>();
             List<Element> creatureElements = el.getChild("creatures")
                 .getChildren();
             List<CreatureType> creatures = new ArrayList<CreatureType>();
             for (Element creature : creatureElements)
             {
                 String creatureName = creature.getTextNormalize();
-                creatureNames.add(creatureName);
                 creatures.add(game.getVariant()
                     .getCreatureByName(creatureName));
             }
@@ -287,12 +283,12 @@ public class History
             }
             else if (all)
             {
-                server.allRevealCreatures(legion, creatureNames, reason);
+                server.allRevealCreatures(legion, creatures, reason);
             }
             else
             {
                 server.oneRevealLegion(game.getPlayerByName(playerName), legion,
-                    creatureNames, reason);
+                    creatures, reason);
             }
         }
         else if (el.getName().equals("Split"))

@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.Caretaker;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.EntrySide;
@@ -22,7 +21,7 @@ import net.sf.colossus.variant.MasterHex;
 /**
  * Class Legion represents a Titan stack of Creatures and its
  * stack marker.
- * @version $Id$
+ *
  * @author David Ripton
  * @author Romain Dolbeau
  */
@@ -310,7 +309,8 @@ public final class LegionServerSide extends Legion implements
     }
 
     void moveToHex(MasterHex hex, EntrySide entrySide,
-        boolean teleported, String teleportingLord)
+        boolean teleported,
+        CreatureType teleportingLord)
     {
         PlayerServerSide player = getPlayer();
 
@@ -701,21 +701,23 @@ public final class LegionServerSide extends Legion implements
         return newLegion;
     }
 
-    /** List the lords eligible to teleport this legion to hexLabel,
-     *  as strings. */
-    List<String> listTeleportingLords(MasterHex hex)
+    /**
+     * List the lords eligible to teleport this legion to hexLabel.
+     */
+    List<CreatureType> listTeleportingLords(MasterHex hex)
     {
         // Needs to be a List not a Set so that it can be passed as
         // an imageList.
-        List<String> lords = new ArrayList<String>();
+        List<CreatureType> lords = new ArrayList<CreatureType>();
 
         // Titan teleport
         if (game.getNumEnemyLegions(hex, getPlayer()) >= 1)
         {
-            if (hasTitan())
-            {
-                lords.add(Constants.titan);
-            }
+                for (Creature creature : getCreatures())
+                {
+                    if(creature.isTitan()) {
+                    lords.add(creature.getType());}
+                }
         }
 
         // Tower teleport
@@ -725,10 +727,9 @@ public final class LegionServerSide extends Legion implements
             {
                 if (critter.isLord())
                 {
-                    String name = critter.getName();
-                    if (!lords.contains(name))
+                    if (!lords.contains(critter))
                     {
-                        lords.add(name);
+                        lords.add(critter.getType());
                     }
                 }
             }
