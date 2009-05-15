@@ -9,6 +9,8 @@ import java.util.Map;
 /**
  * This is a typesafe enumeration of all hazard Hexsides, i.e. the
  * Hexsides used in the battle maps.
+ *
+ * TODO turn into proper enum
  */
 public class HazardHexside extends Hazards
 {
