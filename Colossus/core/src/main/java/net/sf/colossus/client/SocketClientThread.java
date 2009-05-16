@@ -1029,7 +1029,7 @@ final class SocketClientThread extends Thread implements IServer,
 
     private CreatureType resolveCreatureType(String creatureName)
     {
-        if (creatureName == null)
+        if ((creatureName == null) || (creatureName.equals("null")))
         {
             return null;
         }

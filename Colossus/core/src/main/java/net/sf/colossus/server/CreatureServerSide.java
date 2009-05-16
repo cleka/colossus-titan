@@ -334,8 +334,18 @@ public class CreatureServerSide extends Creature
 
             if (checkStrikingSkill != attackerSkill)
             {
-                LOGGER.warning("attackerSkill says " + attackerSkill
-                    + " but checkStrikingSkill says " + checkStrikingSkill);
+                LOGGER.warning(String.format("For creature %s striking %s from %s(%d) to %s(%d) via %s/%s, " +
+                		"we calculated %d as attacker skill, but getStrikingSkill says %d",
+                    this, target, hex.getTerrain(), Integer
+                                .valueOf(hex.getElevation()), targetHex
+                                .getTerrain(), Integer.valueOf(targetHex
+                                .getElevation()),
+                    hex.getHexsideHazard(BattleServerSide.getDirection(hex,
+                        targetHex, false)),
+                    targetHex.getHexsideHazard(BattleServerSide.getDirection(
+                        targetHex, hex, false)), Integer
+                                .valueOf(attackerSkill), Integer
+                                .valueOf(checkStrikingSkill)));
             }
             /* END TODO: remove TEST TEST TEST TEST TEST */
         }
