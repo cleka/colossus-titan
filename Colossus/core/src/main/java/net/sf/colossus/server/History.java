@@ -87,7 +87,7 @@ public class History
         root.addContent(element);
     }
 
-    void removeCreatureEvent(Legion legion, String creatureName, int turn)
+    void removeCreatureEvent(Legion legion, CreatureType creature, int turn)
     {
         if (loading)
         {
@@ -95,7 +95,7 @@ public class History
         }
         Element event = new Element("RemoveCreature");
         event.setAttribute("markerId", legion.getMarkerId());
-        event.setAttribute("creatureName", creatureName);
+        event.setAttribute("creatureName", creature.getName());
         event.setAttribute("turn", "" + turn);
         root.addContent(event);
     }
@@ -426,7 +426,7 @@ public class History
             if (removedCritter != null
                 && !legion.getPlayer().getDeadBeforeSave())
             {
-                server.allTellRemoveCreature(legion, creatureName, false,
+                server.allTellRemoveCreature(legion, removedCritter, false,
                     reason);
             }
             LOGGER.finest("Legion '" + markerId + "' now contains "

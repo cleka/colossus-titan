@@ -43,11 +43,11 @@ public interface IClient
     public void removeLegion(Legion legion);
 
     public void setLegionStatus(Legion legion, boolean moved,
-        boolean teleported, EntrySide entrySide, String lastRecruit);
+        boolean teleported, EntrySide entrySide, CreatureType lastRecruit);
 
     public void addCreature(Legion legion, CreatureType type, String reason);
 
-    public void removeCreature(Legion legion, String name, String reason);
+    public void removeCreature(Legion legion, CreatureType type, String reason);
 
     public void revealCreatures(Legion legion, final List<CreatureType> names,
         String reason);
@@ -107,7 +107,7 @@ public interface IClient
     public void didRecruit(Legion legion, CreatureType recruitName,
         CreatureType recruiterName, int numRecruiters);
 
-    public void undidRecruit(Legion legion, String recruitName);
+    public void undidRecruit(Legion legion, CreatureType recruitName);
 
     public void setupTurnState(Player activePlayer, int turnNumber);
 

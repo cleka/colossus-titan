@@ -87,7 +87,7 @@ public final class BattleServerSide extends Battle
         // Set defender's entry side opposite attacker's.
         defender.setEntrySide(attacker.getEntrySide().getOpposingSide());
         // Make sure defender can recruit, even if savegame is off.
-        defender.setRecruitName(null);
+        defender.setRecruit(null);
 
         // Make sure donor is null, if it remained set from an earlier battle
         ((LegionServerSide)attacker).getPlayer().setDonor(null);

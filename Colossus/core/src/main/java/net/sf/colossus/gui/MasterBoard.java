@@ -1952,12 +1952,12 @@ public final class MasterBoard extends JPanel
 
     void addRecruitedChit(Legion legion)
     {
-        if (legion.getRecruitName() != null)
+        if (legion.getRecruit() != null)
         {
             MasterHex masterHex = legion.getCurrentHex();
             int scale = 2 * Scale.get();
             GUIMasterHex hex = getGUIHexByMasterHex(masterHex);
-            Chit chit = new Chit(scale, legion.getRecruitName());
+            Chit chit = new Chit(scale, legion.getRecruit());
             recruitedChits.put(legion, chit);
             Point startingPoint = hex.getOffCenter();
             Point point = new Point(startingPoint);

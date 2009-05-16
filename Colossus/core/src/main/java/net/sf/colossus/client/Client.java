@@ -1006,12 +1006,12 @@ public final class Client implements IClient, IOracle, IVariant
 
     /** Needed when loading a game outside split phase. */
     public void setLegionStatus(Legion legion, boolean moved,
-        boolean teleported, EntrySide entrySide, String lastRecruit)
+        boolean teleported, EntrySide entrySide, CreatureType lastRecruit)
     {
         legion.setMoved(moved);
         legion.setTeleported(teleported);
         legion.setEntrySide(entrySide);
-        legion.setRecruitName(lastRecruit);
+        legion.setRecruit(lastRecruit);
     }
 
     /** Return a list of Strings.  Use the proper string for titans and
@@ -1059,17 +1059,17 @@ public final class Client implements IClient, IOracle, IVariant
 
     }
 
-    public void removeCreature(Legion legion, String name, String reason)
+    public void removeCreature(Legion legion, CreatureType creature, String reason)
     {
-        if (legion == null || name == null)
+        if (legion == null || creature == null)
         {
             return;
         }
 
-        gui.actOnRemoveCreature(legion, name, reason);
+        gui.actOnRemoveCreature(legion, creature.getName(), reason);
 
         int height = legion.getHeight();
-        ((LegionClientSide)legion).removeCreature(name);
+        ((LegionClientSide)legion).removeCreature(creature.getName());
         if (height <= 1)
         {
             // do not remove this, sever will give explicit order to remove it
@@ -1862,7 +1862,7 @@ public final class Client implements IClient, IOracle, IVariant
             : Constants.reasonRecruited);
 
         addCreature(legion, recruit, reason);
-        ((LegionClientSide)legion).setRecruitName(recruit.getName());
+        ((LegionClientSide)legion).setRecruit(recruit);
 
         gui.actOnDidRecruit(legion, recruit, recruiters, reason);
 
@@ -1873,22 +1873,22 @@ public final class Client implements IClient, IOracle, IVariant
         server.undoRecruit(legion);
     }
 
-    public void undidRecruit(Legion legion, String recruitName)
+    public void undidRecruit(Legion legion, CreatureType recruit)
     {
         boolean wasReinforcement;
         if (battlePhase != null)
         {
             wasReinforcement = true;
-            gui.eventViewerCancelReinforcement(recruitName, getTurnNumber());
+            gui.eventViewerCancelReinforcement(recruit.getName(), getTurnNumber());
         }
         else
         {
             // normal undoRecruit
             wasReinforcement = false;
-            ((LegionClientSide)legion).removeCreature(recruitName);
+            ((LegionClientSide)legion).removeCreature(recruit.getName());
         }
 
-        ((LegionClientSide)legion).setRecruitName(null);
+        ((LegionClientSide)legion).setRecruit(null);
         gui.actOnUndidRecruitPart2(legion, wasReinforcement, turnNumber);
     }
 
@@ -1932,7 +1932,7 @@ public final class Client implements IClient, IOracle, IVariant
             {
                 legion.setMoved(false);
                 legion.setTeleported(false);
-                legion.setRecruitName(null);
+                legion.setRecruit(null);
             }
         }
     }
@@ -2614,7 +2614,7 @@ public final class Client implements IClient, IOracle, IVariant
     public void undidMove(Legion legion, MasterHex formerHex,
         MasterHex currentHex, boolean splitLegionHasForcedMove)
     {
-        ((LegionClientSide)legion).setRecruitName(null);
+        ((LegionClientSide)legion).setRecruit(null);
         legion.setCurrentHex(currentHex);
         legion.setMoved(false);
         boolean didTeleport = legion.hasTeleported();

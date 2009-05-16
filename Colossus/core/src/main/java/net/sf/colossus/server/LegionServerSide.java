@@ -368,7 +368,7 @@ public final class LegionServerSide extends Legion implements
     {
         startingHex = getCurrentHex();
         setMoved(false);
-        setRecruitName(null);
+        setRecruit(null);
     }
 
     /**
@@ -378,7 +378,7 @@ public final class LegionServerSide extends Legion implements
      */
     boolean canRecruit()
     {
-        return (getRecruitName() == null && getHeight() <= 6
+        return (getRecruit() == null && getHeight() <= 6
             && !getPlayer().isDead() && !(game.findEligibleRecruits(this,
             getCurrentHex()).isEmpty()));
     }
@@ -387,11 +387,10 @@ public final class LegionServerSide extends Legion implements
     {
         if (hasRecruited())
         {
-            CreatureType creature = game.getVariant().getCreatureByName(
-                getRecruitName());
+            CreatureType creature = getRecruit();
             game.getCaretaker().putOneBack(creature);
             removeCreature(creature, false, true);
-            setRecruitName(null);
+            setRecruit(null);
             LOGGER.log(Level.INFO, "Legion " + getLongMarkerName()
                 + " undoes its recruit");
         }
@@ -405,12 +404,11 @@ public final class LegionServerSide extends Legion implements
      */
     void undoReinforcement()
     {
-        if (getRecruitName() != null)
+        if (getRecruit() != null)
         {
-            CreatureType creature = game.getVariant().getCreatureByName(
-                getRecruitName());
+            CreatureType creature = getRecruit();
             game.getCaretaker().putOneBack(creature);
-            setRecruitName(null);
+            setRecruit(null);
             LOGGER.log(Level.INFO, "Legion " + getLongMarkerName()
                 + " undoes its reinforcement");
         }
@@ -538,7 +536,7 @@ public final class LegionServerSide extends Legion implements
         }
         if (updateHistory)
         {
-            game.removeCreatureEvent(this, critter.getName());
+            game.removeCreatureEvent(this, critter.getType());
         }
     }
 

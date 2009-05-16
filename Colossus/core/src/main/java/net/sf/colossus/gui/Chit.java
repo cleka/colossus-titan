@@ -31,8 +31,7 @@ import net.sf.colossus.variant.CreatureType;
  * Class Chit implements the GUI for a Titan chit representing
  * either a character or a legion.
  *
- * TODO offer constructors using the Legion and CreatureType classes instead
- *      of strings
+ * TODO offer constructors using the Legion instead of strings
  * TODO consider splitting into LegionChit and CreatureChit
  *
  * @author David Ripton
@@ -68,6 +67,11 @@ class Chit extends JPanel
     Chit(int scale, String id)
     {
         this(scale, id, false, false);
+    }
+
+    Chit(int scale, CreatureType creature)
+    {
+        this(scale, creature.getName());
     }
 
     Chit(int scale, String id, String[] overlays)

@@ -1505,7 +1505,7 @@ public final class GameServerSide extends Game
         leg.setAttribute("entrySide", "" + entrySide.ordinal());
         leg.setAttribute("parent", legion.getParent() != null ? notnull(legion
             .getParent().getMarkerId()) : "null");
-        leg.setAttribute("recruitName", notnull(legion.getRecruitName()));
+        leg.setAttribute("recruitName", String.valueOf(legion.getRecruit()));
         leg.setAttribute("battleTally", "" + legion.getBattleTally());
 
         for (Creature critter : legion.getCreatures())
@@ -1940,7 +1940,7 @@ public final class GameServerSide extends Game
         }
 
         legion.setMoved(moved);
-        legion.setRecruitName(recruitName);
+        legion.setRecruit(getVariant().getCreatureByName(recruitName));
         legion.setEntrySide(entrySide);
         legion.addToBattleTally(battleTally);
     }
@@ -2199,7 +2199,7 @@ public final class GameServerSide extends Game
                         : recruiter.getName())));
 
             // Recruits are one to a customer.
-            ((LegionServerSide)legion).setRecruitName(recruit.getName());
+            ((LegionServerSide)legion).setRecruit(recruit);
             reinforcing = false;
         }
         else
@@ -2708,7 +2708,7 @@ public final class GameServerSide extends Game
             ((LegionServerSide)donor).removeCreature(angel, false, false);
             ((LegionServerSide)legion).addCreature(angel, false);
 
-            server.allTellRemoveCreature(donor, angel.getName(), true,
+            server.allTellRemoveCreature(donor, angel, true,
                 Constants.reasonSummon);
             server.allTellAddCreature(event, true);
 
@@ -3338,8 +3338,8 @@ public final class GameServerSide extends Game
                 CreatureType creature = getVariant().getCreatureByName(
                     creatureName);
                 negotiatedWinner.removeCreature(creature, true, true);
-                server.allTellRemoveCreature(negotiatedWinner, creatureName,
-                    true, Constants.reasonNegotiated);
+                server.allTellRemoveCreature(negotiatedWinner, creature, true,
+                    Constants.reasonNegotiated);
             }
             LOGGER.info(log.toString());
 
@@ -3747,9 +3747,9 @@ public final class GameServerSide extends Game
         history.addCreatureEvent(event);
     }
 
-    void removeCreatureEvent(Legion legion, String creatureName)
+    void removeCreatureEvent(Legion legion, CreatureType creature)
     {
-        history.removeCreatureEvent(legion, creatureName, turnNumber);
+        history.removeCreatureEvent(legion, creature, turnNumber);
     }
 
     void splitEvent(Legion parent, Legion child, List<String> splitoffs)

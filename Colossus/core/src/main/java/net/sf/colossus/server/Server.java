@@ -1617,16 +1617,16 @@ public final class Server extends Thread implements IServer
         game.addCreatureEvent(event);
     }
 
-    void undidRecruit(Legion legion, String recruitName)
+    void undidRecruit(Legion legion, CreatureType recruit)
     {
         allUpdatePlayerInfo();
         Iterator<IClient> it = clients.iterator();
         while (it.hasNext())
         {
             IClient client = it.next();
-            client.undidRecruit(legion, recruitName);
+            client.undidRecruit(legion, recruit);
         }
-        game.removeCreatureEvent(legion, recruitName);
+        game.removeCreatureEvent(legion, recruit);
     }
 
     public void engage(MasterHex hex)
@@ -2320,18 +2320,18 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    void allTellRemoveCreature(Legion legion, String creatureName,
+    void allTellRemoveCreature(Legion legion, CreatureType creature,
         boolean updateHistory, String reason)
     {
         Iterator<IClient> it = clients.iterator();
         while (it.hasNext())
         {
             IClient client = it.next();
-            client.removeCreature(legion, creatureName, reason);
+            client.removeCreature(legion, creature, reason);
         }
         if (updateHistory)
         {
-            game.removeCreatureEvent(legion, creatureName);
+            game.removeCreatureEvent(legion, creature);
         }
     }
 
@@ -2418,7 +2418,7 @@ public final class Server extends Thread implements IServer
                 {
                     client.setLegionStatus(legion, legion.hasMoved(), legion
                         .hasTeleported(), legion.getEntrySide(),
-                        ((LegionServerSide)legion).getRecruitName());
+                        ((LegionServerSide)legion).getRecruit());
                 }
             }
         }

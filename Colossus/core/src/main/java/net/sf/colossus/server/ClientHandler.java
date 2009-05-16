@@ -668,7 +668,7 @@ final class ClientHandler implements IClient
     }
 
     public void setLegionStatus(Legion legion, boolean moved,
-        boolean teleported, EntrySide entrySide, String lastRecruit)
+        boolean teleported, EntrySide entrySide, CreatureType lastRecruit)
     {
         sendToClient(Constants.setLegionStatus + sep + legion.getMarkerId()
             + sep + moved + sep + teleported + sep + entrySide.getId() + sep
@@ -681,10 +681,11 @@ final class ClientHandler implements IClient
             + creature + sep + reason);
     }
 
-    public void removeCreature(Legion legion, String name, String reason)
+    public void removeCreature(Legion legion, CreatureType creature,
+        String reason)
     {
-        sendToClient(Constants.removeCreature + sep + legion.getMarkerId()
-            + sep + name + sep + reason);
+        sendToClient(Constants.removeCreature + sep + legion + sep + creature
+            + sep + reason);
     }
 
     public void revealCreatures(Legion legion,
@@ -842,10 +843,9 @@ final class ClientHandler implements IClient
             + recruit + sep + recruiter + sep + numRecruiters);
     }
 
-    public void undidRecruit(Legion legion, String recruitName)
+    public void undidRecruit(Legion legion, CreatureType recruit)
     {
-        sendToClient(Constants.undidRecruit + sep + legion.getMarkerId() + sep
-            + recruitName);
+        sendToClient(Constants.undidRecruit + sep + legion + sep + recruit);
     }
 
     public void setupTurnState(Player activePlayer, int turnNumber)

@@ -14,6 +14,7 @@ import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.InstanceTracker;
+import net.sf.colossus.variant.CreatureType;
 
 
 /**
@@ -372,8 +373,8 @@ public final class PlayerServerSide extends Player implements
 
         // This is now permanently fixed in Player.java, so this should
         // never happen again. Still, leaving this in place, just to be sure...
-        String recruitName = ((LegionServerSide)legion).getRecruitName();
-        if (recruitName == null)
+        CreatureType recruit = ((LegionServerSide)legion).getRecruit();
+        if (recruit == null)
         {
             LOGGER.log(Level.SEVERE,
                 "Player.undoRecruit: Nothing to unrecruit for legion "
@@ -384,7 +385,7 @@ public final class PlayerServerSide extends Player implements
 
         // Update number of creatures in status window.
         getGame().getServer().allUpdatePlayerInfo();
-        getGame().getServer().undidRecruit(legion, recruitName);
+        getGame().getServer().undidRecruit(legion, recruit);
     }
 
     /**
@@ -397,8 +398,8 @@ public final class PlayerServerSide extends Player implements
     {
         // This is now permanently fixed in Player.java, so this should
         // never happen again. Still, leaving this in place, just to be sure...
-        String recruitName = ((LegionServerSide)legion).getRecruitName();
-        if (recruitName == null)
+        CreatureType recruit = ((LegionServerSide)legion).getRecruit();
+        if (recruit == null)
         {
             LOGGER.log(Level.SEVERE,
                 "Player.undoReinforcement: Nothing to unreinforce for marker "
@@ -409,7 +410,7 @@ public final class PlayerServerSide extends Player implements
 
         // We don't do the allUpdatePlayerInfo() here, because the remove
         // is done later by iterator (so amounts are not even changed yet)
-        getGame().getServer().undidRecruit(legion, recruitName);
+        getGame().getServer().undidRecruit(legion, recruit);
     }
 
     void undoSplit(Legion splitoff)

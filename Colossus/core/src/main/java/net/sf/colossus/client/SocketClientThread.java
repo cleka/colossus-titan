@@ -537,7 +537,8 @@ final class SocketClientThread extends Thread implements IServer,
             int entrySideId = Integer.parseInt(args.remove(0));
             String lastRecruit = args.remove(0);
             client.setLegionStatus(resolveLegion(markerId), moved, teleported,
-                EntrySide.fromIntegerId(entrySideId), lastRecruit);
+                EntrySide.fromIntegerId(entrySideId),
+                resolveCreatureType(lastRecruit));
         }
         else if (method.equals(Constants.addCreature))
         {
@@ -552,7 +553,8 @@ final class SocketClientThread extends Thread implements IServer,
             String markerId = args.remove(0);
             String name = args.remove(0);
             String reason = args.isEmpty() ? "<Unknown>" : args.remove(0);
-            client.removeCreature(resolveLegion(markerId), name, reason);
+            client.removeCreature(resolveLegion(markerId),
+                resolveCreatureType(name), reason);
         }
         else if (method.equals(Constants.revealCreatures))
         {
@@ -764,7 +766,8 @@ final class SocketClientThread extends Thread implements IServer,
         {
             String markerId = args.remove(0);
             String recruitName = args.remove(0);
-            client.undidRecruit(resolveLegion(markerId), recruitName);
+            client.undidRecruit(resolveLegion(markerId),
+                resolveCreatureType(recruitName));
         }
         else if (method.equals(Constants.setupTurnState))
         {
