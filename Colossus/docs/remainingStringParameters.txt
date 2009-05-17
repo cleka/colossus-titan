@@ -1,0 +1,28 @@
+This file lists remaining uses of String as parameter and return types,
+why they still exist and how that could be changed.
+
+- split prediction: the whole split prediction code (around the 
+  PredictSplits object) is still string-based. It could be replaced with 
+  CreatureType based code, but since it is very local and might be affected 
+  by introducing game action/event objects it doesn't seem urgent.
+- event viewer: the EventViewer class still uses strings. Again only local,
+  and in this case the introduction of game actions/events will severely
+  affect the code (much likely make it a lot easier).
+- "reason"s: in a few methods on IServer/IClient/IClientGUI there is a
+  parameter "reason" of type String. They are constants denoting subtypes of
+  events, e.g. Constants.reasonSplit denotes that a creature reveal event is
+  due to a split, which could be modelled by a RevealEvent/SplitRevealEvent
+  pair. If we shouldn't do that, the  Strings should be replaced with enums.
+- markerIds: we still haven't modelled the markers as game (or rather variant)
+  entities. Most likely there should be classes Marker and MarkerSet in the
+  variant package.
+- Chits: the chits are used for both Legions and Creature(Type)s. They should
+  probably be split into an abstract base chit with concrete subclasses for
+  Legion and CreatureType respectively, possibly using generics on the base
+  class.
+- carry targets: the carry targets are still passed around as descriptions.
+  They might need their own objects, but that could be part of a game action
+  hierarchy (player gets list of possible actions as choices and picks one)
+
+On a related note: creatures in battle are currently represented by an int
+value ("tag"), which would be better replaced with some objects, too.
