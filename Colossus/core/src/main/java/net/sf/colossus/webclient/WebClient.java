@@ -406,7 +406,21 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             }
             else
             {
-                this.password = "";
+                // For debug/development purposes (when usernames do not
+                // match), instead of empty password use the one from property
+                // - this is helpful because I usually need 2 or more clients
+                // and without this here I would have to type in a real
+                // password for at least one of them, every time...
+                String DEBUG_PASSWD_PROP = "wcpasswd";
+                String debugPassword = System.getProperty(DEBUG_PASSWD_PROP);
+                if (debugPassword != null)
+                {
+                    this.password = debugPassword;
+                }
+                else
+                {
+                    this.password = "";
+                }
             }
         }
     }
