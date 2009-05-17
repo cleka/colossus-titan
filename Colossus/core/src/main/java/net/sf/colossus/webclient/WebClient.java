@@ -2186,6 +2186,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         infoTextLabel.setText(startingText);
     }
 
+    // TODO Remove?
     public void gameStarted(String gameId)
     {
         startButton.setEnabled(false);
@@ -2492,6 +2493,8 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
                                 break;
 
                             case RUNNING:
+                                startButton.setEnabled(false);
+                                startLocallyButton.setEnabled(false);
                                 infoTextLabel.setText(startedText);
                                 // System.out
                                 //     .println("Got a running game, replacing in run game list and remove in inst game list");

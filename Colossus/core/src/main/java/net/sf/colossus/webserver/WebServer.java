@@ -535,7 +535,7 @@ public class WebServer implements IWebServer, IRunWebServer
             // "on game start close web client" is in use
             if (client != null)
             {
-                client.gameStarted(gameId);
+                client.gameInfo(gi);
             }
         }
     }
