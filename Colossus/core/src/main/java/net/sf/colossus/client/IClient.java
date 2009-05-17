@@ -148,6 +148,8 @@ public interface IClient
 
     public void undidSplit(Legion splitoff, Legion survivor, int turn);
 
+    // TODO splitoffs is not actually used anymore, but it is still part
+    // of the network protocol
     public void didSplit(MasterHex hex, Legion parent, Legion child,
         int childHeight, List<String> splitoffs, int turn);
 
