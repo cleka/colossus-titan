@@ -426,19 +426,21 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public void eventViewerAttackerSetCreatureDead(String name, int height)
+    public void eventViewerAttackerSetCreatureDead(CreatureType creature,
+        int height)
     {
         // TODO Auto-generated method stub
 
     }
 
-    public void eventViewerCancelReinforcement(String recruitName, int turnNr)
+    public void eventViewerCancelReinforcement(CreatureType recruit, int turnNr)
     {
         // TODO Auto-generated method stub
 
     }
 
-    public void eventViewerDefenderSetCreatureDead(String name, int height)
+    public void eventViewerDefenderSetCreatureDead(CreatureType creature,
+        int height)
     {
         // TODO Auto-generated method stub
 

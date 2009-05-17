@@ -1135,9 +1135,9 @@ final class EventViewer extends KDialog
         }
     }
 
-    public void cancelReinforcement(String name, int turn)
+    public void cancelReinforcement(CreatureType creature, int turn)
     {
-        defenderEventLegion.removeReinforcedCreature(turn, name);
+        defenderEventLegion.removeReinforcedCreature(turn, creature.getName());
     }
 
     public void removeCreature(Legion legion, CreatureType type)
@@ -1198,9 +1198,9 @@ final class EventViewer extends KDialog
         attackerEventLegion.setCreatureDied(name, height);
     }
 
-    public void defenderSetCreatureDead(String name, int height)
+    public void defenderSetCreatureDead(CreatureType creature, int height)
     {
-        defenderEventLegion.setCreatureDied(name, height);
+        defenderEventLegion.setCreatureDied(creature.getName(), height);
     }
 
     /*

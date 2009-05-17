@@ -1165,18 +1165,16 @@ public final class Client implements IClient, IOracle, IVariant
                 {
                     Legion legion = getDefender();
                     ((LegionClientSide)legion).removeCreature(name);
-                    gui.eventViewerDefenderSetCreatureDead(name, legion
-                        .getHeight());
-
+                    gui.eventViewerDefenderSetCreatureDead(battleUnit
+                        .getCreatureType(), legion.getHeight());
                 }
                 else
                 {
                     Legion info = getAttacker();
                     ((LegionClientSide)info).removeCreature(name);
 
-                    gui.eventViewerAttackerSetCreatureDead(name, info
-                        .getHeight());
-
+                    gui.eventViewerAttackerSetCreatureDead(battleUnit
+                        .getCreatureType(), info.getHeight());
                 }
             }
         }
@@ -1879,7 +1877,7 @@ public final class Client implements IClient, IOracle, IVariant
         if (battlePhase != null)
         {
             wasReinforcement = true;
-            gui.eventViewerCancelReinforcement(recruit.getName(), getTurnNumber());
+            gui.eventViewerCancelReinforcement(recruit, getTurnNumber());
         }
         else
         {

@@ -141,13 +141,15 @@ public interface IClientGUI
 
     public abstract void pushUndoStack(Object object);
 
-    public abstract void eventViewerCancelReinforcement(String recruitName,
+    public abstract void eventViewerCancelReinforcement(CreatureType recruit,
         int turnNr);
 
-    public abstract void eventViewerDefenderSetCreatureDead(String name,
+    public abstract void eventViewerDefenderSetCreatureDead(
+        CreatureType creature,
         int height);
 
-    public abstract void eventViewerAttackerSetCreatureDead(String name,
+    public abstract void eventViewerAttackerSetCreatureDead(
+        CreatureType creature,
         int height);
 
     public abstract void eventViewerNewSplitEvent(int turn, Legion parent,

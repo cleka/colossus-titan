@@ -1338,19 +1338,21 @@ public class ClientGUI implements IClientGUI
         return undoStack.isEmpty();
     }
 
-    public void eventViewerCancelReinforcement(String recruitName, int turnNr)
+    public void eventViewerCancelReinforcement(CreatureType recruit, int turnNr)
     {
-        eventViewer.cancelReinforcement(recruitName, turnNr);
+        eventViewer.cancelReinforcement(recruit, turnNr);
     }
 
-    public void eventViewerDefenderSetCreatureDead(String name, int height)
+    public void eventViewerDefenderSetCreatureDead(CreatureType creature,
+        int height)
     {
-        eventViewer.defenderSetCreatureDead(name, height);
+        eventViewer.defenderSetCreatureDead(creature, height);
     }
 
-    public void eventViewerAttackerSetCreatureDead(String name, int height)
+    public void eventViewerAttackerSetCreatureDead(CreatureType creature,
+        int height)
     {
-        eventViewer.attackerSetCreatureDead(name, height);
+        eventViewer.attackerSetCreatureDead(creature.getName(), height);
     }
 
     public void eventViewerNewSplitEvent(int turn, Legion parent, Legion child)
