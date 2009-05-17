@@ -339,16 +339,15 @@ public class GameTableModel extends AbstractTableModel
         }
     }
 
-    public Integer getRowIndex(String gameId)
+    public Integer getRowIndex(GameInfo gi)
     {
-        Integer index = rowIndex.get(gameId);
+        Integer index = rowIndex.get(gi.getGameId());
         if (index == null)
         {
             index = Integer.valueOf(data.size());
             int row = index.intValue();
-            GameInfo gi = new GameInfo(gameId);
             data.add(gi);
-            rowIndex.put(gameId, Integer.valueOf(row));
+            rowIndex.put(gi.getGameId(), Integer.valueOf(row));
             fireTableRowsInserted(row, row);
         }
         return index;

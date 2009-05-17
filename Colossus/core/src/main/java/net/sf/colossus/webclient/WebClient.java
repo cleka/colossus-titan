@@ -2155,12 +2155,12 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
         if (scheduled)
         {
-            int index = schedGameDataModel.getRowIndex(gameId).intValue();
+            int index = schedGameDataModel.getRowIndex(gi).intValue();
             schedGameTable.setRowSelectionInterval(index, index);
         }
         else
         {
-            int index = instGameDataModel.getRowIndex(gameId).intValue();
+            int index = instGameDataModel.getRowIndex(gi).intValue();
             instGameTable.setRowSelectionInterval(index, index);
         }
         updateGUI();
@@ -2525,7 +2525,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     {
         GameTableModel model = (GameTableModel)table.getModel();
 
-        int index = model.getRowIndex(gi.getGameId()).intValue();
+        int index = model.getRowIndex(gi).intValue();
         model.setRowAt(gi, index);
         table.repaint();
     }
