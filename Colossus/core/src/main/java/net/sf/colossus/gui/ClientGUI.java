@@ -1450,10 +1450,10 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    public void didSummon(Legion summoner, Legion donor, String summon)
+    public void didSummon(Legion summoner, Legion donor, CreatureType summon)
     {
         eventViewer.newCreatureRevealEvent(RevealEvent.eventSummon, donor
-            .getMarkerId(), (donor).getHeight(), summon, summoner
+            .getMarkerId(), (donor).getHeight(), summon.getName(), summoner
             .getMarkerId(), (summoner).getHeight());
     }
 

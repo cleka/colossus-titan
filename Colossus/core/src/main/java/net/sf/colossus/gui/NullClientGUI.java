@@ -312,7 +312,7 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public void didSummon(Legion summoner, Legion donor, String summon)
+    public void didSummon(Legion summoner, Legion donor, CreatureType summon)
     {
         // TODO Auto-generated method stub
 

@@ -168,7 +168,8 @@ public interface IClientGUI
      */
     public abstract void showHexRecruitTree(GUIMasterHex hex);
 
-    public abstract void didSummon(Legion summoner, Legion donor, String summon);
+    public abstract void didSummon(Legion summoner, Legion donor,
+        CreatureType summon);
 
     public abstract void repaintBattleBoard();
 

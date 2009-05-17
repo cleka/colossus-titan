@@ -2293,7 +2293,7 @@ public final class Server extends Thread implements IServer
     }
 
     void allTellDidSummon(Legion receivingLegion, Legion donorLegion,
-        String summon)
+        CreatureType summon)
     {
         Iterator<IClient> it = clients.iterator();
         while (it.hasNext())

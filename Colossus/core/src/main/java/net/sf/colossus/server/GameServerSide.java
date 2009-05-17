@@ -2712,10 +2712,10 @@ public final class GameServerSide extends Game
                 Constants.reasonSummon);
             server.allTellAddCreature(event, true);
 
-            server.allTellDidSummon(legion, donor, angel.getName());
+            server.allTellDidSummon(legion, donor, angel);
 
-            LOGGER.info("One " + angel.getName() + " is summoned from legion "
-                + donor + " into legion " + legion);
+            LOGGER.info("One " + angel + " is summoned from legion " + donor
+                + " into legion " + legion);
         }
 
         // Need to call this regardless to advance past the summon phase.

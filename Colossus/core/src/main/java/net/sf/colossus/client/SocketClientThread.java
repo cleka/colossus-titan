@@ -895,7 +895,7 @@ final class SocketClientThread extends Thread implements IServer,
             String donorId = args.remove(0);
             String summon = args.remove(0);
             client.didSummon(resolveLegion(summonerId),
-                resolveLegion(donorId), summon);
+                resolveLegion(donorId), resolveCreatureType(summon));
         }
         else if (method.equals(Constants.undidSplit))
         {

@@ -934,10 +934,10 @@ final class ClientHandler implements IClient
             + splitLegionHasForcedMove);
     }
 
-    public void didSummon(Legion summoner, Legion donor, String summon)
+    public void didSummon(Legion summoner, Legion donor, CreatureType summon)
     {
-        sendToClient(Constants.didSummon + sep + summoner.getMarkerId() + sep
-            + donor.getMarkerId() + sep + summon);
+        sendToClient(Constants.didSummon + sep + summoner + sep + donor + sep
+            + summon);
     }
 
     public void undidSplit(Legion splitoff, Legion survivor, int turn)

@@ -144,7 +144,7 @@ public interface IClient
         MasterHex currentHex, boolean splitLegionHasForcedMove);
 
     public void didSummon(Legion receivingLegion, Legion donorLegion,
-        String summon);
+        CreatureType summon);
 
     public void undidSplit(Legion splitoff, Legion survivor, int turn);
 

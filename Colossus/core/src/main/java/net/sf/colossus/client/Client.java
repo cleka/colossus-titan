@@ -581,7 +581,7 @@ public final class Client implements IClient, IOracle, IVariant
         gui.actOnDoSummon();
     }
 
-    public void didSummon(Legion summoner, Legion donor, String summon)
+    public void didSummon(Legion summoner, Legion donor, CreatureType summon)
     {
         gui.didSummon(summoner, donor, summon);
     }
