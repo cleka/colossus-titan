@@ -601,24 +601,24 @@ public class WebServer implements IWebServer, IRunWebServer
         {
             gr.setServerNull();
             gr.start(); // does nothing, just to get it GC'd and finalized
-
-            Iterator<User> it = User.getLoggedInUsersIterator();
-            while (it.hasNext())
-            {
-                User u = it.next();
-                IWebClient client = (IWebClient)u.getThread();
-                client.gameCancelled(gameId, byUser);
-            }
-
-            proposedGames.remove(gi.getGameId());
-            proposedGamesListModified = true;
-            updateGUI();
         }
         else
         {
             LOGGER.info("For Cancel: no GameRunner for GameInfo with gameId "
                 + gameId);
         }
+
+        Iterator<User> it = User.getLoggedInUsersIterator();
+        while (it.hasNext())
+        {
+            User u = it.next();
+            IWebClient client = (IWebClient)u.getThread();
+            client.gameCancelled(gameId, byUser);
+        }
+
+        proposedGames.remove(gi.getGameId());
+        proposedGamesListModified = true;
+        updateGUI();
     }
 
     public void startGame(String gameId)
