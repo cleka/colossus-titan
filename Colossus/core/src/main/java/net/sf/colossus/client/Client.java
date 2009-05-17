@@ -1066,7 +1066,7 @@ public final class Client implements IClient, IOracle, IVariant
             return;
         }
 
-        gui.actOnRemoveCreature(legion, creature.getName(), reason);
+        gui.actOnRemoveCreature(legion, creature, reason);
 
         int height = legion.getHeight();
         ((LegionClientSide)legion).removeCreature(creature.getName());

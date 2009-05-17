@@ -1140,23 +1140,25 @@ final class EventViewer extends KDialog
         defenderEventLegion.removeReinforcedCreature(turn, name);
     }
 
-    public void removeCreature(String markerId, String name)
+    public void removeCreature(Legion legion, CreatureType type)
     {
         if (attacker != null && attackerEventLegion != null
-            && attacker.getMarkerId().equals(markerId))
+            && attacker.equals(legion))
         {
-            LOGGER.log(Level.FINEST, "During battle, remove creature " + name
-                + " from attacker legion " + markerId);
+            LOGGER.log(Level.FINEST, "During battle, remove creature " + type
+                + " from attacker legion " + legion);
 
-            attackerEventLegion.setCreatureDied(name, (attacker).getHeight());
+            attackerEventLegion.setCreatureDied(type.getName(), attacker
+                .getHeight());
         }
 
         else if (defender != null && defenderEventLegion != null
-            && defender.getMarkerId().equals(markerId))
+            && defender.equals(legion))
         {
-            LOGGER.log(Level.FINEST, "During battle, remove creature " + name
-                + " from defender legion " + markerId);
-            defenderEventLegion.setCreatureDied(name, (defender).getHeight());
+            LOGGER.log(Level.FINEST, "During battle, remove creature " + type
+                + " from defender legion " + legion);
+            defenderEventLegion.setCreatureDied(type.getName(), defender
+                .getHeight());
         }
     }
 

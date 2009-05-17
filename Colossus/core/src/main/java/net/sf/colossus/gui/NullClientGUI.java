@@ -130,7 +130,8 @@ public class NullClientGUI implements IClientGUI
         // TODO Auto-generated method stub
     }
 
-    public void actOnRemoveCreature(Legion legion, String name, String reason)
+    public void actOnRemoveCreature(Legion legion, CreatureType type,
+        String reason)
     {
         // TODO Auto-generated method stub
 

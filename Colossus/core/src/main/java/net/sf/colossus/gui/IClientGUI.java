@@ -96,7 +96,7 @@ public interface IClientGUI
     public abstract void actOnDidRecruit(Legion legion,
         CreatureType recruitName, List<CreatureType> recruiters, String reason);
 
-    public abstract void actOnRemoveCreature(Legion legion, String name,
+    public abstract void actOnRemoveCreature(Legion legion, CreatureType type,
         String reason);
 
     public abstract void actOnRemoveCreaturePart2(Legion legion);

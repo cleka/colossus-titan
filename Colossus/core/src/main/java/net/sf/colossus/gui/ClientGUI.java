@@ -1068,7 +1068,8 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    public void actOnRemoveCreature(Legion legion, String name, String reason)
+    public void actOnRemoveCreature(Legion legion, CreatureType type,
+        String reason)
     {
         if (reason.equals(Constants.reasonUndidReinforce))
         {
@@ -1083,7 +1084,7 @@ public class ClientGUI implements IClientGUI
         }
         else
         {
-            eventViewer.removeCreature(legion.getMarkerId(), name);
+            eventViewer.removeCreature(legion, type);
         }
     }
 
