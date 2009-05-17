@@ -1859,21 +1859,19 @@ public class SimpleAI extends AbstractAI
         // TODO Sometimes leave room for recruiting.
 
         LegionClientSide bestLegion = null;
-        String bestAngel = null;
+        CreatureType bestAngel = null;
 
         for (Legion legion : donors)
         {
             LegionClientSide lcs = new LegionClientSide(client.getOwningPlayer(),
                 legion.getMarkerId(), legion.getCurrentHex());
 
-            String myAngel = lcs.bestSummonable();
+            CreatureType myAngel = lcs.bestSummonable();
             if (bestAngel == null
                 || bestLegion == null
-                || (variant.getCreatureByName(myAngel)).getPointValue() > (variant
-                    .getCreatureByName(bestAngel)).getPointValue()
+                || myAngel.getPointValue() > bestAngel.getPointValue()
                 || Legion.ORDER_TITAN_THEN_POINTS.compare(lcs, bestLegion) > 0
-                && ((variant.getCreatureByName(myAngel)).getPointValue() == (variant
-                    .getCreatureByName(bestAngel)).getPointValue()))
+                && myAngel.getPointValue() == bestAngel.getPointValue())
             {
                 bestLegion = lcs;
                 bestAngel = myAngel;

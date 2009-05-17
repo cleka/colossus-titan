@@ -31,6 +31,7 @@ import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.SummonInfo;
 import net.sf.colossus.guiutil.KDialog;
 import net.sf.colossus.guiutil.SaveWindow;
+import net.sf.colossus.variant.CreatureType;
 
 
 /**
@@ -113,14 +114,15 @@ final class SummonAngel extends KDialog
             box.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
             for (Creature creature : donor.getCreatures())
             {
-                String name = creature.getType().getName();
-                if (creature.getType().isTitan())
+                final CreatureType type = creature.getType();
+                String name = type.getName();
+                if (type.isTitan())
                 {
                     name = legion.getPlayer().getTitanBasename();
                 }
                 final Chit chit = new Chit(scale, name);
                 box.add(chit);
-                if (creature.getType().isSummonable())
+                if (type.isSummonable())
                 {
                     chit.setBorder(true);
                     chit.setBorderColor(Color.red);
@@ -132,7 +134,7 @@ final class SummonAngel extends KDialog
                             if (!chit.isDead())
                             {
                                 Legion donor = chitToDonor.get(chit);
-                                cleanup(donor, chit.getId());
+                                cleanup(donor, type);
                             }
                         }
                     });
@@ -236,7 +238,7 @@ final class SummonAngel extends KDialog
         return summonInfo;
     }
 
-    private void cleanup(Legion donor, String angel)
+    private void cleanup(Legion donor, CreatureType angel)
     {
         LOGGER.log(Level.FINEST, "SummonAngel.cleanup " + donor + " " + angel);
         if (donor != null && angel != null)

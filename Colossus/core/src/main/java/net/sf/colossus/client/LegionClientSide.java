@@ -227,7 +227,8 @@ public final class LegionClientSide extends Legion
         return getContents().contains(Constants.titan);
     }
 
-    public String bestSummonable()
+    // TODO the notion of which summonable is best might be better in the AI code
+    public CreatureType bestSummonable()
     {
         CreatureType best = null;
 
@@ -251,7 +252,7 @@ public final class LegionClientSide extends Legion
         {
             return null;
         }
-        return best.getName();
+        return best;
     }
 
     /** Return the point value of suspected contents of this legion. */

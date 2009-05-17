@@ -572,10 +572,8 @@ public final class Client implements IClient, IOracle, IVariant
         }
         else
         {
-            CreatureType creatureType = game.getVariant().getCreatureByName(
-                summonInfo.getUnit());
             SummonEvent event = new SummonEvent(game.getTurnNumber(),
-                summonInfo.getTarget(), summonInfo.getDonor(), creatureType);
+                summonInfo.getTarget(), summonInfo.getDonor(), summonInfo.getUnit());
             server.doSummon(event);
         }
         gui.actOnDoSummon();

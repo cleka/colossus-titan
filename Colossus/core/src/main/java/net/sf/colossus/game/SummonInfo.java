@@ -1,6 +1,9 @@
 package net.sf.colossus.game;
 
 
+import net.sf.colossus.variant.CreatureType;
+
+
 /**
  * Little helper class to store information about a summoning:
  * The target legion, the donor legion, and the summoned
@@ -14,11 +17,10 @@ public class SummonInfo
 {
     final private Legion target;
     final private Legion donor;
-    final private String unit;
+    final private CreatureType unit;
     final private boolean noSummoningWanted;
 
-    // TODO: unit should be a CreatureType instance
-    public SummonInfo(Legion target, Legion donor, String unit)
+    public SummonInfo(Legion target, Legion donor, CreatureType unit)
     {
         this.target = target;
         this.donor = donor;
@@ -44,7 +46,7 @@ public class SummonInfo
         return donor;
     }
 
-    public String getUnit()
+    public CreatureType getUnit()
     {
         return unit;
     }
