@@ -179,17 +179,17 @@ public final class LegionClientSide extends Legion
     /**
      * Add a new creature to this legion.
      *
-     * TODO should get a CreatureType
+     * TODO this seems to be a candidate to pull up -- at the moment the server
+     *      side equivalent is more complicated, though
      */
-    void addCreature(String name)
+    void addCreature(CreatureType creature)
     {
-        getNode().addCreature(name);
+        getNode().addCreature(creature.getName());
     }
 
-    // TODO should get a CreatureType
-    void removeCreature(String name)
+    void removeCreature(CreatureType creature)
     {
-        getNode().removeCreature(name);
+        getNode().removeCreature(creature.getName());
     }
 
     /**

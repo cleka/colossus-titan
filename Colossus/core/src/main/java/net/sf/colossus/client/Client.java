@@ -1053,7 +1053,7 @@ public final class Client implements IClient, IOracle, IVariant
      */
     public void addCreature(Legion legion, CreatureType creature, String reason)
     {
-        ((LegionClientSide)legion).addCreature(creature.getName());
+        ((LegionClientSide)legion).addCreature(creature);
 
         gui.actOnAddCreature(legion, creature, reason);
 
@@ -1069,7 +1069,7 @@ public final class Client implements IClient, IOracle, IVariant
         gui.actOnRemoveCreature(legion, creature, reason);
 
         int height = legion.getHeight();
-        ((LegionClientSide)legion).removeCreature(creature.getName());
+        ((LegionClientSide)legion).removeCreature(creature);
         if (height <= 1)
         {
             // do not remove this, sever will give explicit order to remove it
@@ -1160,18 +1160,19 @@ public final class Client implements IClient, IOracle, IVariant
                 gui.removeBattleChit(battleUnit);
 
                 // Also remove it from LegionInfo.
-                String name = battleUnit.getId();
                 if (battleUnit.isDefender())
                 {
                     Legion legion = getDefender();
-                    ((LegionClientSide)legion).removeCreature(name);
+                    ((LegionClientSide)legion).removeCreature(battleUnit
+                        .getCreatureType());
                     gui.eventViewerDefenderSetCreatureDead(battleUnit
                         .getCreatureType(), legion.getHeight());
                 }
                 else
                 {
                     Legion info = getAttacker();
-                    ((LegionClientSide)info).removeCreature(name);
+                    ((LegionClientSide)info).removeCreature(battleUnit
+                        .getCreatureType());
 
                     gui.eventViewerAttackerSetCreatureDead(battleUnit
                         .getCreatureType(), info.getHeight());
@@ -1883,7 +1884,7 @@ public final class Client implements IClient, IOracle, IVariant
         {
             // normal undoRecruit
             wasReinforcement = false;
-            ((LegionClientSide)legion).removeCreature(recruit.getName());
+            ((LegionClientSide)legion).removeCreature(recruit);
         }
 
         ((LegionClientSide)legion).setRecruit(null);
