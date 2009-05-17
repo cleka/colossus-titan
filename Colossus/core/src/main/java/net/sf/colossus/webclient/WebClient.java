@@ -1,7 +1,6 @@
 package net.sf.colossus.webclient;
 
 
-
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -283,8 +282,8 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     private final static String defaultSummaryText = "Type here a short "
         + "summary what kind of game you would wish to play";
 
-    public WebClient(WhatNextManager whatNextManager, String hostname, int port, String login,
-        String password)
+    public WebClient(WhatNextManager whatNextManager, String hostname,
+        int port, String login, String password)
     {
         super(windowTitle);
 
@@ -517,8 +516,8 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             public void windowClosing(WindowEvent e)
             {
                 WhatNextManager whatNextManager = WebClient.this.whatNextManager;
-                whatNextManager.setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG,
-                    false);
+                whatNextManager.setWhatToDoNext(
+                    WhatToDoNext.GET_PLAYERS_DIALOG, false);
                 dispose();
             }
         });
@@ -570,7 +569,8 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         }
         else if (whatToDo.equals(AutoGameStartActionClose))
         {
-            WebClient.this.whatNextManager.setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
+            WebClient.this.whatNextManager.setWhatToDoNext(
+                WhatToDoNext.GET_PLAYERS_DIALOG, false);
             dispose();
         }
         else
@@ -1999,11 +1999,13 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
      * until is has set startObject to the next action to do
      * and notified us to continue.
      */
-    void runGetPlayersDialogAndWait(Options presetOptions, WhatNextManager whatNextManager)
+    void runGetPlayersDialogAndWait(Options presetOptions,
+        WhatNextManager whatNextManager)
     {
         playersDialogMutex = new Object();
 
-        new GetPlayers(presetOptions, playersDialogMutex, whatNextManager, true);
+        new GetPlayers(presetOptions, playersDialogMutex, whatNextManager,
+            true);
 
         // System.out.println("doStartLocally after GetPlayersWeb");
 
@@ -2097,6 +2099,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         initiatingWebClient = null;
         return wc;
     }
+
     public void setLocalServer(Server server)
     {
         localServer = server;

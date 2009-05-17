@@ -74,8 +74,8 @@ public class WebClientSocketThread extends Thread implements IWebServer
         this.email = email;
         this.ackWaiter = new AckWaiter();
 
-        net.sf.colossus.util.InstanceTracker.register(this, "WCST "
-            + username);
+        net.sf.colossus.util.InstanceTracker
+            .register(this, "WCST " + username);
 
         try
         {

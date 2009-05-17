@@ -19,11 +19,11 @@ import java.util.logging.Logger;
 /** One user at the WebServer side.
  *  Also used on client side, because interface requires so, but
  *  basically only to store the username, everything else is unused.
- *  
+ *
  *  The class statically contains a list of all user registered
  *  at the webserver; this list is read from a file (later a DB??)
  *  into a hashMap to quicky look up all users.
- *  
+ *
  *  @version $Id$
  *  @author Clemens Katzer
  */

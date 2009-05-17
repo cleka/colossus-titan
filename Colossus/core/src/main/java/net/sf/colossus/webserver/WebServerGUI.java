@@ -18,7 +18,7 @@ import javax.swing.ScrollPaneConstants;
 /** The web server GUI - so far shows only simple info
  *  like amount of users logged in, scheduled-, instant-,
  *  running- and ending games.
- *  
+ *
  *  @version $Id$
  *  @author Clemens Katzer
  */
@@ -27,12 +27,12 @@ public class WebServerGUI extends JFrame implements IWebServerGUI
 {
 
     private WebServer webServer;
-    private JLabel userInfo;
+    private final JLabel userInfo;
 
-    private JLabel scheduledGamesInfo;
-    private JLabel instantGamesInfo;
-    private JLabel runningGamesInfo;
-    private JLabel endingGamesInfo;
+    private final JLabel scheduledGamesInfo;
+    private final JLabel instantGamesInfo;
+    private final JLabel runningGamesInfo;
+    private final JLabel endingGamesInfo;
 
     public WebServerGUI(WebServer webServer)
     {

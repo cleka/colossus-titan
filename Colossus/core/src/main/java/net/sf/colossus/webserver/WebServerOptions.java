@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 
 
 /** WebServer specific version of the Options / cf file handling.
- * 
+ *
  * TODO: why did I make a copy, instead of using the normal Options class?
  *
  */

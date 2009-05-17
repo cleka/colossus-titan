@@ -8,7 +8,7 @@ package net.sf.colossus.webcommon;
  *  GameInfo also goes to Client ( = main Colossus.jar) side
  *  and I don't want to deliver all Web server stuff inside
  *  the main jar.
- *  
+ *
  *  @version $Id$
  *  @author Clemens Katzer
  */

@@ -1,7 +1,7 @@
 package net.sf.colossus.webcommon;
 
 
-/** Interface for what WebClient sends to WebServer 
+/** Interface for what WebClient sends to WebServer
  *
  *  @version $Id$
  *  @author Clemens Katzer

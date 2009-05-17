@@ -19,10 +19,10 @@ public class PortBookKeeper
     private static final Logger LOGGER = Logger.getLogger(PortBookKeeper.class
         .getName());
 
-    private int portRangeFrom;
-    private int availablePorts;
+    private final int portRangeFrom;
+    private final int availablePorts;
 
-    private boolean[] portUsed;
+    private final boolean[] portUsed;
 
     public PortBookKeeper(int portRangeFrom, int availablePorts)
     {

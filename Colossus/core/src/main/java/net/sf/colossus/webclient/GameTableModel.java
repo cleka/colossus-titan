@@ -284,7 +284,7 @@ public class GameTableModel extends AbstractTableModel
         }
         else
         {
-            // no problem. For example on login client gets told all the 
+            // no problem. For example on login client gets told all the
             // running games and client tries to remove them from pot table
             // but they are not there...
         }

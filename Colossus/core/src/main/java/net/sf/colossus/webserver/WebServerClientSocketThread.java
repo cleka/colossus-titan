@@ -22,9 +22,9 @@ import net.sf.colossus.webcommon.User;
  *  Thread to handle one user client connection at the webserver
  *  Reads always one line from the socket, parses it and
  *  executes the corresponding action.
- *  This class also provides the methods which the server calls 
+ *  This class also provides the methods which the server calls
  *  on the client.
- *  
+ *
  *  @version $Id$
  *  @author Clemens Katzer
  */
@@ -103,7 +103,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
         }
         catch (IOException e)
         {
-            // quietly close  
+            // quietly close
         }
     }
 
@@ -138,7 +138,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             {
                 // when remote admin user requested shutdown, the method
                 // called by parseLine() created the stopper Runnable;
-                // we start that one here, to minimize the risk it tries 
+                // we start that one here, to minimize the risk it tries
                 // to stop ("interrupt") us where we are still processing
                 // instead of being back and blocked in readLine().
                 if (stopper != null)
@@ -504,7 +504,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
     }
 
     /*
-     * Called by another WebSocketClientSocketThread, 
+     * Called by another WebSocketClientSocketThread,
      * when user does a login with force flag set;
      * for example, when a connection got lost but client
      * somehow still logged on... ?
@@ -528,7 +528,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             }
             catch (NullPointerException e)
             {
-                // It's funny. It seems the interrupt above always gives a 
+                // It's funny. It seems the interrupt above always gives a
                 // null pointer exception, but the interrupting has done
                 // it's job anyway...
             }

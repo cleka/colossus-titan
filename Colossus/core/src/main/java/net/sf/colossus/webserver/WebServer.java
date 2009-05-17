@@ -33,7 +33,7 @@ import net.sf.colossus.webcommon.GameInfo.GameState;
 /** The main class for the WebServer
  *  - brings up the WebServer GUI
  *  - starts the ServerSocket and listens there for WebClients
- *  - based on actions coming from clients, keeps book of 
+ *  - based on actions coming from clients, keeps book of
  *    "instant" and "running" games (both GameInfo objects),
  *    and tell the GameInfo objects when to start the game.
  *
@@ -107,7 +107,7 @@ public class WebServer implements IWebServer, IRunWebServer
         // JVM should do a clean exit now, no System.exit() needed.
         // @TODO: does it work on all platforms, all Java versions?
         //        If not, build here a demon timer that does the
-        //        System.exit() after a few seconds...?        
+        //        System.exit() after a few seconds...?
     }
 
     public WebServer(String optionsFile)
@@ -229,7 +229,7 @@ public class WebServer implements IWebServer, IRunWebServer
         LOGGER.log(Level.FINE, "Web Server after main loop.");
     }
 
-    // called by WebServerGUI.closeWindow() event 
+    // called by WebServerGUI.closeWindow() event
     // OR     by WebServerSocketThread.shutdownServer().
     // If the latter ( = admin user requested it remotely), need to close
     // also the GUI window -- if there is one.
@@ -337,7 +337,7 @@ public class WebServer implements IWebServer, IRunWebServer
     {
         ArrayList<User> toDo = new ArrayList<User>();
 
-        // copy them first to own list. 
+        // copy them first to own list.
         // Otherwise we get a ConcurrentModificationException
         Iterator<User> it2 = User.getLoggedInUsersIterator();
         while (it2.hasNext())
@@ -364,8 +364,8 @@ public class WebServer implements IWebServer, IRunWebServer
             }
             catch (NullPointerException e)
             {
-                // It's funny. It seems the interrupt above always gives a 
-                // null pointer exception, but the interrupting has done 
+                // It's funny. It seems the interrupt above always gives a
+                // null pointer exception, but the interrupting has done
                 // it's job anyway...
             }
             catch (Exception e)
@@ -546,7 +546,7 @@ public class WebServer implements IWebServer, IRunWebServer
             + reason);
     }
 
-    // =========== Client actions ========== 
+    // =========== Client actions ==========
 
     public void enrollUserToGame(String gameId, String username)
     {
@@ -1049,9 +1049,9 @@ public class WebServer implements IWebServer, IRunWebServer
     }
 
     /**
-     * Check whether any game executed in an own process has been 
+     * Check whether any game executed in an own process has been
      * finished.
-     * 
+     *
      */
 
     class GameThreadReaper extends Thread

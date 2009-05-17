@@ -167,7 +167,7 @@ class RegisterPasswordPanel extends JDialog
             ok = false;
         }
 
-        // validateXXXchecks and PW-compare showed message dialog if 
+        // validateXXXchecks and PW-compare showed message dialog if
         // something is wrong, so here we simply abort.
         if (!ok)
         {
@@ -271,7 +271,7 @@ class RegisterPasswordPanel extends JDialog
 
             if (providedConfCode == null)
             {
-                // TODO send a cancel message to server so that it 
+                // TODO send a cancel message to server so that it
                 //      removes the pending user from list?
                 //      Not critical, because if user tries again
                 //      it will replace it anyway...

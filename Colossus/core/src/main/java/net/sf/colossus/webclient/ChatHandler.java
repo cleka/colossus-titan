@@ -249,7 +249,7 @@ public class ChatHandler
 
         }
 
-        /* call this *after* timeAsString() call 
+        /* call this *after* timeAsString() call
          * It will return the new date, if changed, null otherwise */
 
         public String hasDateChanged()

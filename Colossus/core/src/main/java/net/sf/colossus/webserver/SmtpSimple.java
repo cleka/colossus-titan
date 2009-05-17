@@ -1,11 +1,11 @@
 package net.sf.colossus.webserver;
 
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
-
 
 
 /** Sending a simple (text-only) mail by submitting it to the SMTP

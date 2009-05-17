@@ -559,4 +559,3 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
         }
     } // END Class NullDumper
 }
-

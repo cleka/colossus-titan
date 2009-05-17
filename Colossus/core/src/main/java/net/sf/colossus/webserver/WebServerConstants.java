@@ -1,9 +1,9 @@
 package net.sf.colossus.webserver;
 
 
-/** Class WebServerConstants holds constants related to 
+/** Class WebServerConstants holds constants related to
  *  the Web server, so far only for the config file.
- *  
+ *
  *  @version $Id$
  *  @author Clemens Katzer
  */
