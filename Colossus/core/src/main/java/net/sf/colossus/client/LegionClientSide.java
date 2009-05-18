@@ -227,34 +227,6 @@ public final class LegionClientSide extends Legion
         return getContents().contains(Constants.titan);
     }
 
-    // TODO the notion of which summonable is best might be better in the AI code
-    public CreatureType bestSummonable()
-    {
-        CreatureType best = null;
-
-        Iterator<String> it = getContents().iterator();
-        while (it.hasNext())
-        {
-            String name = it.next();
-            CreatureType creature = getPlayer().getGame().getVariant()
-                .getCreatureByName(name);
-            if (creature.isSummonable())
-            {
-                if (best == null
-                    || creature.getPointValue() > best.getPointValue())
-                {
-                    best = creature;
-                }
-            }
-        }
-
-        if (best == null)
-        {
-            return null;
-        }
-        return best;
-    }
-
     /** Return the point value of suspected contents of this legion. */
     @Override
     public int getPointValue()

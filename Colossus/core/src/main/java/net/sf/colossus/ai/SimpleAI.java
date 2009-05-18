@@ -1848,8 +1848,8 @@ public class SimpleAI extends AbstractAI
         return best;
     }
 
-    /** Return a SummonInfo object, contaning summoner, donor and unittype.
-     *  Returns null for no summoning.
+    /**
+     * Return a SummonInfo object, containing the summoner, donor and unittype.
      */
     public SummonInfo summonAngel(Legion summoner, SortedSet<Legion> donors)
     {
@@ -1858,23 +1858,28 @@ public class SimpleAI extends AbstractAI
         //
         // TODO Sometimes leave room for recruiting.
 
-        LegionClientSide bestLegion = null;
+        Legion bestLegion = null;
         CreatureType bestAngel = null;
 
         for (Legion legion : donors)
         {
-            LegionClientSide lcs = new LegionClientSide(client.getOwningPlayer(),
-                legion.getMarkerId(), legion.getCurrentHex());
-
-            CreatureType myAngel = lcs.bestSummonable();
-            if (bestAngel == null
-                || bestLegion == null
-                || myAngel.getPointValue() > bestAngel.getPointValue()
-                || Legion.ORDER_TITAN_THEN_POINTS.compare(lcs, bestLegion) > 0
-                && myAngel.getPointValue() == bestAngel.getPointValue())
+            for (CreatureType candidate : legion.getCreatureTypes())
             {
-                bestLegion = lcs;
-                bestAngel = myAngel;
+                if (candidate.isSummonable())
+                {
+                    if (bestAngel == null
+                        || bestLegion == null
+                        || candidate.getPointValue() > bestAngel
+                            .getPointValue()
+                        || Legion.ORDER_TITAN_THEN_POINTS.compare(legion,
+                            bestLegion) > 0
+                        && candidate.getPointValue() == bestAngel
+                            .getPointValue())
+                    {
+                        bestLegion = legion;
+                        bestAngel = candidate;
+                    }
+                }
             }
         }
         return bestAngel == null || bestLegion == null ? new SummonInfo()
