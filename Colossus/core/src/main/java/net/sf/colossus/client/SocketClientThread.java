@@ -911,12 +911,7 @@ final class SocketClientThread extends Thread implements IServer,
             String parentId = args.remove(0);
             String childId = args.remove(0);
             int childHeight = Integer.parseInt(args.remove(0));
-            List<String> splitoffs = new ArrayList<String>();
-            if (!args.isEmpty())
-            {
-                List<String> soList = Split.split(Glob.sep, args.remove(0));
-                splitoffs.addAll(soList);
-            }
+            List<CreatureType> splitoffs = resolveCreatureTypes(args.remove(0));
             int turn = Integer.parseInt(args.remove(0));
             // create client-side copy of new legion
             MasterHex hex = resolveHex(hexLabel);

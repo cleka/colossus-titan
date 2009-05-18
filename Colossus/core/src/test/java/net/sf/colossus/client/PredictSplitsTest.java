@@ -78,12 +78,6 @@ public class PredictSplitsTest extends TestCase
         }
 
         @Override
-        public List<String> getImageNames()
-        {
-            return null;
-        }
-
-        @Override
         public int getPointValue()
         {
             return 0;

@@ -143,7 +143,6 @@ public final class LegionClientSide extends Legion
 
     /** Return a list of Strings.  Use the proper string for titans and
      *  unknown creatures. */
-    @Override
     public List<String> getImageNames()
     {
         List<String> names = new ArrayList<String>();

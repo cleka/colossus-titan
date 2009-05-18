@@ -11,6 +11,7 @@ import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.events.AddCreatureEvent;
+import net.sf.colossus.util.Glob;
 import net.sf.colossus.variant.CreatureType;
 
 import org.jdom.Element;
@@ -100,7 +101,7 @@ public class History
         root.addContent(event);
     }
 
-    void splitEvent(Legion parent, Legion child, List<String> splitoffs,
+    void splitEvent(Legion parent, Legion child, List<CreatureType> splitoffs,
         int turn)
     {
         if (loading)
@@ -113,12 +114,10 @@ public class History
         event.setAttribute("turn", "" + turn);
         Element creatures = new Element("splitoffs");
         event.addContent(creatures);
-        Iterator<String> it = splitoffs.iterator();
-        while (it.hasNext())
+        for (CreatureType creatureType : splitoffs)
         {
-            String creatureName = it.next();
             Element cr = new Element("creature");
-            cr.addContent(creatureName);
+            cr.addContent(creatureType.getName());
             creatures.addContent(cr);
         }
         root.addContent(event);
@@ -318,10 +317,10 @@ public class History
             if (player.hasLegion(childId))
             {
                 childLegion = game.getLegionByMarkerId(childId);
-                List<String> content = childLegion.getImageNames();
                 LOGGER.severe("During replay of history: child legion "
                     + childId + " should not " + "exist yet (turn=" + turn
-                    + ")!!\n" + "Exists already with: " + content.toString()
+                    + ")!!\n" + "Exists already with: "
+                    + Glob.glob(",", childLegion.getCreatureTypes())
                     + " but " + "should now be created with creatures: "
                     + creatures);
 

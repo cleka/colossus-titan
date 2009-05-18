@@ -211,12 +211,6 @@ public abstract class Legion
     }
 
     /**
-     * TODO unify between the two derived classes or even better: replace with code
-     *      for getting the image
-     */
-    public abstract List<String> getImageNames();
-
-    /**
      * TODO unify between the two derived classes if possible -- the handling of Titans
      *      is quite different, although it should have the same result
      */

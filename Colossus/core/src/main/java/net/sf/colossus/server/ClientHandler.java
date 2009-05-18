@@ -947,7 +947,7 @@ final class ClientHandler implements IClient
     }
 
     public void didSplit(MasterHex hex, Legion parent, Legion child,
-        int childHeight, List<String> splitoffs, int turn)
+        int childHeight, List<CreatureType> splitoffs, int turn)
     {
         // hex can be null when loading a game
         // TODO make sure we always have a hex

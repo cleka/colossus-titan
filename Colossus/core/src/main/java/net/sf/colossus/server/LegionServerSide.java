@@ -212,32 +212,6 @@ public final class LegionServerSide extends Legion implements
         return parent;
     }
 
-    /** Return a list of imageNames for all critters in this legion. */
-    @Override
-    public List<String> getImageNames()
-    {
-        sortCritters();
-        List<String> imageNames = new ArrayList<String>();
-        for (Creature critter : getCreatures())
-        {
-            /*
-             * Use getName(), not getImageName(), as
-             * 1) Chit should be built with actual name to make sure
-             * they find the Creature ;
-             * 2) it seems that elements in this List somehow find their
-             * way to Creature.getCreatureByName(), and if one uses the
-             * Image Name in there, hell breaks loose.
-             */
-            String name = critter.getName();
-            if (name == null || name.equals(""))
-            {
-                LOGGER.log(Level.SEVERE, "getImagenames: null or empty name");
-            }
-            imageNames.add(critter.getName());
-        }
-        return imageNames;
-    }
-
     @Override
     public PlayerServerSide getPlayer()
     {

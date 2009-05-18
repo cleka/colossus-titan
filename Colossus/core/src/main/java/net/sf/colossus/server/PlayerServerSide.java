@@ -652,8 +652,8 @@ public final class PlayerServerSide extends Player implements
         {
             Legion l = getLegionByMarkerId(bl.getMarkerId());
 
-            String list1 = ((LegionServerSide)l).getImageNames().toString();
-            String list2 = ((LegionServerSide)bl).getImageNames().toString();
+            String list1 = Glob.glob(l.getCreatureTypes());
+            String list2 = Glob.glob(bl.getCreatureTypes());
 
             if (!list1.equals(list2))
             {

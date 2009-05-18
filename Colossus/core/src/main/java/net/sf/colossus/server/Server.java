@@ -2225,7 +2225,7 @@ public final class Server extends Thread implements IServer
 
         IClient activeClient = getClient(game.getActivePlayer());
 
-        List<String> splitoffs = ((LegionServerSide)child).getImageNames();
+        List<CreatureType> splitoffs = child.getCreatureTypes();
         activeClient.didSplit(hex, parent, child, childSize, splitoffs, turn);
 
         if (history)

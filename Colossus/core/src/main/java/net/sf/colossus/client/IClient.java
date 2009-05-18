@@ -151,7 +151,7 @@ public interface IClient
     // TODO splitoffs is not actually used anymore, but it is still part
     // of the network protocol
     public void didSplit(MasterHex hex, Legion parent, Legion child,
-        int childHeight, List<String> splitoffs, int turn);
+        int childHeight, List<CreatureType> splitoffs, int turn);
 
     public void askPickColor(List<PlayerColor> colorsLeft);
 

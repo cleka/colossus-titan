@@ -3752,7 +3752,7 @@ public final class GameServerSide extends Game
         history.removeCreatureEvent(legion, creature, turnNumber);
     }
 
-    void splitEvent(Legion parent, Legion child, List<String> splitoffs)
+    void splitEvent(Legion parent, Legion child, List<CreatureType> splitoffs)
     {
         history.splitEvent(parent, child, splitoffs, turnNumber);
     }

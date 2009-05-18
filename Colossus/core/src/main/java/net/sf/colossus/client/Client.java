@@ -3167,7 +3167,7 @@ public final class Client implements IClient, IOracle, IVariant
      * TODO childHeight is probably redundant now that we pass the legion object
      */
     public void didSplit(MasterHex hex, Legion parent, Legion child,
-        int childHeight, List<String> splitoffs, int turn)
+        int childHeight, List<CreatureType> splitoffs, int turn)
     {
         LOGGER.log(Level.FINEST, "Client.didSplit " + hex + " " + parent + " "
             + child + " " + childHeight + " " + turn);
