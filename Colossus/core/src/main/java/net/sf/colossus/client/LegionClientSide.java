@@ -284,10 +284,4 @@ public final class LegionClientSide extends Legion
     {
         return getNode().numUncertainCreatures();
     }
-
-    @Override
-    public String toString()
-    {
-        return getMarkerId();
-    }
 }

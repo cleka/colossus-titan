@@ -426,6 +426,18 @@ public abstract class Legion
     }
 
     /**
+     * Returns the markerId for debug and serialisation purposes.
+     *
+     * Since this is relevant for the network protocol, the method
+     * is declared final.
+     */
+    @Override
+    public final String toString()
+    {
+        return getMarkerId();
+    }
+
+    /**
      * Data for one pending decision. For example, for crossing the 500
      * there will be a decision, whether the player takes for this legion
      * an angel or an archangel.

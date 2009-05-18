@@ -212,12 +212,6 @@ public final class LegionServerSide extends Legion implements
         return parent;
     }
 
-    @Override
-    public String toString()
-    {
-        return getMarkerId();
-    }
-
     /** Return a list of imageNames for all critters in this legion. */
     @Override
     public List<String> getImageNames()
