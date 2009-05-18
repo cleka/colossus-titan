@@ -67,7 +67,7 @@ public abstract class Legion
      *
      * Used as identifier for serialization purposes. Never null.
      */
-    protected final String markerId;
+    private final String markerId;
 
     /**
      * Flag if the legion has moved in the current masterboard round.

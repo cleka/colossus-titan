@@ -185,7 +185,7 @@ public final class LegionServerSide extends Legion implements
 
     public String getMarkerName()
     {
-        return getMarkerName(markerId);
+        return getMarkerName(getMarkerId());
     }
 
     public static String getMarkerName(String markerId)
@@ -204,7 +204,7 @@ public final class LegionServerSide extends Legion implements
 
     public String getLongMarkerName()
     {
-        return getLongMarkerName(markerId);
+        return getLongMarkerName(getMarkerId());
     }
 
     public Legion getParent()
@@ -215,7 +215,7 @@ public final class LegionServerSide extends Legion implements
     @Override
     public String toString()
     {
-        return markerId;
+        return getMarkerId();
     }
 
     /** Return a list of imageNames for all critters in this legion. */
@@ -268,7 +268,7 @@ public final class LegionServerSide extends Legion implements
     /** Do the cleanup required before this legion can be removed. */
     void prepareToRemove(boolean returnCrittersToStacks, boolean updateHistory)
     {
-        LOGGER.log(Level.INFO, "Legion " + markerId
+        LOGGER.log(Level.INFO, "Legion " + getMarkerId()
             + getCreatures().toString() + " is eliminated");
         if (getHeight() > 0)
         {

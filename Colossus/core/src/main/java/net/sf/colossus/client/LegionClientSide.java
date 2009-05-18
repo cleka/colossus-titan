@@ -52,7 +52,7 @@ public final class LegionClientSide extends Legion
     {
         if (myNode == null)
         {
-            myNode = getNode(this.markerId);
+            myNode = getNode(getMarkerId());
         }
         return myNode;
     }
@@ -218,7 +218,7 @@ public final class LegionClientSide extends Legion
         getNode().merge(getNode(splitoff.getMarkerId()));
         // since this is potentially a merge of a 3-way split, be safe and
         // find the node again
-        myNode = getNode(this.markerId);
+        myNode = getNode(getMarkerId());
     }
 
     @Override
@@ -288,6 +288,6 @@ public final class LegionClientSide extends Legion
     @Override
     public String toString()
     {
-        return markerId;
+        return getMarkerId();
     }
 }
