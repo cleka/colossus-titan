@@ -255,9 +255,6 @@ public abstract class Legion
         return true;
     }
 
-    /**
-     * TODO unify between the two derived classes
-     */
     public int numCreature(CreatureType creatureType)
     {
         int count = 0;

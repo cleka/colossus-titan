@@ -135,12 +135,6 @@ public final class LegionClientSide extends Legion
         return count;
     }
 
-    @Override
-    public int numCreature(CreatureType creature)
-    {
-        return numCreature(creature.getName());
-    }
-
     /** Return a list of Strings.  Use the proper string for titans and
      *  unknown creatures. */
     public List<String> getImageNames()
