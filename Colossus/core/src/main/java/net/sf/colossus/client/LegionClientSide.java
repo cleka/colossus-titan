@@ -94,7 +94,7 @@ public final class LegionClientSide extends Legion
      *
      * TODO get rid of this string-based version in favor of the typesafe ones
      */
-    public List<String> getContents()
+    private List<String> getContents()
     {
         try
         {

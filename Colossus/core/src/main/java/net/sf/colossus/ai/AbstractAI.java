@@ -345,10 +345,8 @@ abstract class AbstractAI implements AI
      */
     final protected boolean couldRecruitUp(Legion legion, MasterHex hex, Legion enemy)
     {
-        CreatureType weakest = variant
-            .
-                getCreatureByName(((LegionClientSide) legion).getContents().
-                get(legion.getHeight() - 1));
+        CreatureType weakest = legion.getCreatureTypes().get(
+            legion.getHeight() - 1);
         // Consider recruiting.
         List<CreatureType> recruits = client.findEligibleRecruits(legion, hex);
         if (!recruits.isEmpty())

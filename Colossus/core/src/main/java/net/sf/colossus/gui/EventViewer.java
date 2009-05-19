@@ -37,7 +37,6 @@ import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
 
 import net.sf.colossus.client.Client;
-import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.IOptions;
 import net.sf.colossus.common.Options;
@@ -1012,14 +1011,11 @@ final class EventViewer extends KDialog
             {
                 String ownMarkerId = ownEvent.getMarkerId();
                 Legion ownLegion = getLegion(ownMarkerId);
-                List<String> ownNames = ((LegionClientSide)ownLegion)
-                    .getContents();
                 ArrayList<RevealedCreature> rcNames = new ArrayList<RevealedCreature>();
-                Iterator<String> it = ownNames.iterator();
-                while (it.hasNext())
+                for (CreatureType creature : ownLegion.getCreatureTypes())
                 {
-                    String name = it.next();
-                    RevealedCreature rc = new RevealedCreature(name);
+                    RevealedCreature rc = new RevealedCreature(creature
+                        .getName());
                     rcNames.add(rc);
                 }
                 ownEvent.updateKnownCreatures(rcNames);

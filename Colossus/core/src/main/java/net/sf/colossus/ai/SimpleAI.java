@@ -497,11 +497,8 @@ public class SimpleAI extends AbstractAI
         CreatureType weakest1 = null;
         CreatureType weakest2 = null;
 
-        for (String name : legion.getContents())
+        for (CreatureType critter : legion.getCreatureTypes())
         {
-            CreatureType critter = variant
-                .getCreatureByName(name);
-
             // Never split out the titan.
             if (critter.isTitan())
             {
@@ -2106,16 +2103,14 @@ public class SimpleAI extends AbstractAI
     private int getCombatValue(Legion legion, MasterBoardTerrain terrain)
     {
         int val = 0;
-        for (String name : ((LegionClientSide)legion).getContents())
+        for (CreatureType creature : legion.getCreatureTypes())
         {
-            if (name.startsWith(Constants.titan))
+            if (creature.isTitan())
             {
                 val += getTitanCombatValue(legion.getPlayer().getTitanPower());
             }
             else
             {
-                CreatureType creature = variant
-                    .getCreatureByName(name);
                 val += getCombatValue(creature, terrain);
             }
         }

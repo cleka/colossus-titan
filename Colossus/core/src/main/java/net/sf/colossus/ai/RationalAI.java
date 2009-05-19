@@ -23,6 +23,7 @@ import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
+import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.MultiSet;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterBoardTerrain;
@@ -2228,9 +2229,9 @@ public class RationalAI extends SimpleAI
         int result = (int)br.getExpectedValue();
 
         logger.log(Level.FINEST, "flee: attacking legion = " + enemy + ":"
-            + ((LegionClientSide)enemy).getContents());
+            + Glob.glob(enemy.getCreatureTypes()));
         logger.log(Level.FINEST, "flee: defending legion = " + legion + ":"
-            + ((LegionClientSide)legion).getContents());
+            + Glob.glob(legion.getCreatureTypes()));
         logger.log(Level.FINEST, "flee called. battle results value: "
             + result);
         logger.log(Level.FINEST, "expected value of attacker dead = "
@@ -2350,9 +2351,9 @@ public class RationalAI extends SimpleAI
         I_HATE_HUMANS = save_hate;
 
         logger.log(Level.FINEST, "concede: attacking legion = " + legion + ":"
-            + ((LegionClientSide)legion).getContents());
+            + Glob.glob(legion.getCreatureTypes()));
         logger.log(Level.FINEST, "concede: defending legion = " + enemy + ":"
-            + ((LegionClientSide)enemy).getContents());
+            + Glob.glob(enemy.getCreatureTypes()));
         logger.log(Level.FINEST, "concede called. battle results value: "
             + br.getExpectedValue());
         logger.log(Level.FINEST, "expected value of attacker dead = "
@@ -2389,13 +2390,9 @@ public class RationalAI extends SimpleAI
         MasterBoardTerrain terrain, boolean defender)
     {
         List<PowerSkill> powerskills = new ArrayList<PowerSkill>();
-        Iterator<String> it = ((LegionClientSide)legion).getContents()
-            .iterator();
-
-        while (it.hasNext())
+        for (CreatureType creature : legion.getCreatureTypes())
         {
-            String name = it.next();
-            if (name.startsWith(Constants.titan))
+            if (creature.getName().startsWith(Constants.titan))
             {
                 PowerSkill ps;
                 int titanPower = legion.getPlayer().getTitanPower();
@@ -2406,13 +2403,12 @@ public class RationalAI extends SimpleAI
                 // of creatures so that the AI knows to jump
                 // titan singletons
                 ps = new PowerSkill("Titan", Math.max(titanPower - 5, 1),
-                    (variant.getCreatureByName("Titan")).getSkill());
+                    creature.getSkill());
                 powerskills.add(ps);
 
             }
             else
             {
-                CreatureType creature = variant.getCreatureByName(name);
                 PowerSkill ps = getNativeValue(creature, terrain, defender);
                 powerskills.add(ps);
             }
