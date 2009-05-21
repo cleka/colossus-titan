@@ -1865,10 +1865,12 @@ public final class GameServerSide extends Game
         {
             parentId = null;
         }
+
+        CreatureType recruit = null;
         String recruitName = leg.getAttribute("recruitName").getValue();
-        if (recruitName.equals("null"))
+        if (recruitName != null && !recruitName.equals("null"))
         {
-            recruitName = null;
+            recruit = getVariant().getCreatureByName(recruitName);
         }
 
         int battleTally = leg.getAttribute("battleTally").getIntValue();
@@ -1928,7 +1930,7 @@ public final class GameServerSide extends Game
         }
 
         legion.setMoved(moved);
-        legion.setRecruit(getVariant().getCreatureByName(recruitName));
+        legion.setRecruit(recruit);
         legion.setEntrySide(entrySide);
         legion.addToBattleTally(battleTally);
     }
