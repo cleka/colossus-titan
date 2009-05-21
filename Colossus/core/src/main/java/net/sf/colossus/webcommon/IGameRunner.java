@@ -18,16 +18,9 @@ public interface IGameRunner
 
     void setServerNull();
 
-    void run();
-
-    void runInOwnJVM();
-
-    boolean isSocketUp();
-
     /* Waits until socket is up, i.e. game is ready to accept clients.
      */
     boolean waitUntilReadyToAcceptClients(int timeout);
 
     boolean waitUntilGameStartedSuccessfully(int timeout);
-
 }

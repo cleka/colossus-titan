@@ -986,7 +986,7 @@ public final class Server extends Thread implements IServer
         {
             logToStartLog((remote ? "Remote" : "Local") + " player " + name
                 + " signed on.");
-            game.getNotifyWebServer().gotClient(player, remote);
+            game.getNotifyWebServer().gotClient(player.getName(), remote);
             waitingForPlayers--;
             LOGGER.info("Decremented waitingForPlayers to "
                 + waitingForPlayers);
@@ -1038,7 +1038,7 @@ public final class Server extends Thread implements IServer
             }
 
             logToStartLog("\nStarting the game now.\n");
-            game.getNotifyWebServer().allClientsConnected();
+            game.getNotifyWebServer().gameStartupCompleted();
             if (startLog != null)
             {
                 startLog.setCompleted();

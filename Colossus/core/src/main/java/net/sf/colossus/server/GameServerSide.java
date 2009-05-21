@@ -49,6 +49,7 @@ import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
+import net.sf.colossus.webclient.RunGameInSameJVM;
 import net.sf.colossus.webclient.WebClient;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
@@ -110,7 +111,7 @@ public final class GameServerSide extends Game
 
     private String hostingPlayerName = null;
     private String flagFilename = null;
-    private NotifyWebServer notifyWebServer = null;
+    private INotifyWebServer notifyWebServer = null;
     private WebClient startingWebClient = null;
 
     private final WhatNextManager whatNextManager;
@@ -203,7 +204,15 @@ public final class GameServerSide extends Game
         // create it even if not needed (=no web server).
         // This way we can have all the "if <there is a webserver>"
         // wrappers inside the notify Class, instead spread over the code...
-        notifyWebServer = new NotifyWebServer(flagFilename);
+
+        if (startingWebClient != null)
+        {
+            notifyWebServer = startingWebClient.getWhomToNotify();
+        }
+        else
+        {
+            notifyWebServer = new NotifyWebServerViaFile(flagFilename);
+        }
 
         if (server != null)
         {
@@ -213,6 +222,8 @@ public final class GameServerSide extends Game
         server = new Server(this, whatNextManager, getPort());
         if (startingWebClient != null)
         {
+            // TODO get rid of this:
+            // WebClient needs this to start the players local Client.
             startingWebClient.setLocalServer(server);
         }
         try
@@ -239,6 +250,12 @@ public final class GameServerSide extends Game
                 // This is needed to that run() after the loop notifies that
                 // the game is over.
                 server.start();
+
+                // Tell WebClient to inform the WebServer that the game
+                // was started (on this player's PC) and all clients have
+                // connected (WebClients updates the status in bottom row
+                // then).
+                notifyWebServer.allClientsConnected();
 
                 if (startingWebClient != null)
                 {
@@ -336,24 +353,31 @@ public final class GameServerSide extends Game
         getVariant().getCreatureByName("Titan").setMaxCount(getNumPlayers());
     }
 
+    boolean startNewGameAndWaitUntilOver(String hostingPlayer)
+    {
+        boolean ok = newGame(hostingPlayer);
+
+        if (ok)
+        {
+            // Main thread has now nothing to do any more, can wait
+            // until game finishes.
+            cleanupWhenGameOver();
+        }
+        return ok;
+    }
+
     /** Start a new game. */
-    void newGame(String hostingPlayer, WebClient webClient)
+    boolean newGame(String hostingPlayer)
     {
         hostingPlayerName = hostingPlayer;
-        if (webClient != null)
-        {
-            startingWebClient = webClient;
-        }
-        else
-        {
-            // In case game was started by WebClient locally on user's
-            // computer, WebClient cannot be passed into the GameServerSide
-            // (to do so, the IStartHandler interfact would need to import the
-            // WebClient class, and then we would have a cyclic dependency).
-            // So, the initiating WebClient stores itself into a static
-            // variable which we query here.
-            startingWebClient = WebClient.getInitiatingWebClient();
-        }
+
+        // In case game was started by WebClient locally on user's
+        // computer, WebClient cannot be passed into the GameServerSide
+        // (to do so, the IStartHandler interface would need to import the
+        // WebClient class, and then we would have a cyclic dependency).
+        // So, the initiating WebClient stores itself into a static
+        // variable which we query here.
+        startingWebClient = RunGameInSameJVM.getInitiatingWebClient();
 
         clearFlags();
 
@@ -378,21 +402,23 @@ public final class GameServerSide extends Game
 
         history = new History();
 
+        // initServer returns after all clients have connected
+        // (or if server startup failed for some reason)
         initServer();
+
         // Some more stuff is done from newGame2() when the last
         // expected client has connected.
-        // Main thread has now nothing to do any more, can wait
-        // until game finishes.
 
-        if (server.isServerRunning())
+        if (!server.isServerRunning())
         {
-            cleanupWhenGameOver();
-        }
-        else
-        {
+            // Startup Failed: clean up
             server.cleanup();
             server = null;
+            return false;
         }
+
+        // Inform caller that startup went ok
+        return true;
     }
 
     /* Called from the last ClientHandler connecting
@@ -1942,8 +1968,6 @@ public final class GameServerSide extends Game
     {
         server.allSetColor();
 
-        // We need to set the autoPlay option before loading the board,
-        // so that we can avoid showing boards for AI players.
         syncOptions();
 
         server.allUpdatePlayerInfo(true);
@@ -3764,119 +3788,9 @@ public final class GameServerSide extends Game
         history.playerElimEvent(player, slayer, turnNumber);
     }
 
-    NotifyWebServer getNotifyWebServer()
+    INotifyWebServer getNotifyWebServer()
     {
         return this.notifyWebServer;
     }
 
-    /* Interface from Game/Server to WebServer who started this.
-     * Perhaps later replaced with a two-way socket connection?
-     * Class is always created, no matter whether we have a web
-     * server ( => active == true) or not ( => active == false);
-     * but this way, we can have all the
-     *    "if (we have a web server) { } "
-     * checking done inside this class and do not clutter the
-     * main server code.
-     */
-
-    class NotifyWebServer
-    {
-        private final String flagFilename;
-        private PrintWriter out;
-        private File flagFile = null;
-        // Do we even have a web server to notify at all?
-        private final boolean active;
-
-        public NotifyWebServer(String name)
-        {
-            if (name != null && !name.equals(""))
-            {
-                flagFilename = name;
-                active = true;
-            }
-            else
-            {
-                flagFilename = null;
-                active = false;
-            }
-        }
-
-        public boolean isActive()
-        {
-            return active;
-        }
-
-        public void readyToAcceptClients()
-        {
-            if (active)
-            {
-                createFlagfile();
-            }
-        }
-
-        public void gotClient(Player player, boolean remote)
-        {
-            if (active)
-            {
-                out.println("Client (type " + (remote ? "remote" : "local")
-                    + ") connected: " + player.getName());
-                out.flush();
-            }
-        }
-
-        public void allClientsConnected()
-        {
-            if (active)
-            {
-                out.println("All clients connected");
-                out.flush();
-            }
-        }
-
-        public void serverStoppedRunning()
-        {
-            if (active)
-            {
-                removeFlagfile();
-            }
-        }
-
-        private void createFlagfile()
-        {
-            if (active)
-            {
-                flagFile = new File(flagFilename);
-                try
-                {
-                    // flagFile.createNewFile();
-                    out = new PrintWriter(new FileWriter(flagFile));
-                }
-                catch (IOException e)
-                {
-                    LOGGER.log(Level.SEVERE,
-                        "Could not create web server flag file "
-                            + flagFilename + "!!", (Throwable)null);
-                }
-            }
-        }
-
-        private void removeFlagfile()
-        {
-            out.close();
-            if (active)
-            {
-                try
-                {
-                    flagFile.delete();
-                }
-                catch (Exception e)
-                {
-                    LOGGER.log(Level.SEVERE,
-                        "Could not delete web server flag file "
-                            + flagFilename + "!!" + e.toString(),
-                        (Throwable)null);
-                }
-            }
-        }
-    } // END Class NotifyWebServer
 }

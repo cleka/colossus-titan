@@ -14,7 +14,6 @@ import net.sf.colossus.cmdline.CmdLine;
 import net.sf.colossus.cmdline.Opt;
 import net.sf.colossus.cmdline.Opts;
 import net.sf.colossus.common.Constants;
-import net.sf.colossus.common.IStartHandler;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.common.WhatNextManager;
 import net.sf.colossus.common.WhatNextManager.WhatToDoNext;
@@ -30,7 +29,7 @@ import net.sf.colossus.webclient.WebClient;
  *  @author Clemens Katzer (rewritten big parts of the main() method)
  */
 
-public final class Start implements IStartHandler
+public final class Start
 {
     private static final Logger LOGGER = Logger.getLogger(Start.class
         .getName());
@@ -645,7 +644,7 @@ public final class Start implements IStartHandler
                     whatNextManager.setWhatToDoNext(WhatToDoNext.QUIT_ALL, false);
                     game.setFlagFilename(webGameFlagFileName);
                 }
-                game.newGame(null, null);
+                game.startNewGameAndWaitUntilOver(null);
             }
 
             else if (getWhatToDoNext() == WhatToDoNext.LOAD_GAME)
@@ -828,13 +827,6 @@ public final class Start implements IStartHandler
         // it ends. But if it fails, main() shall not wait, so that user
         // gets a new dialog immediately.
         return dontWait;
-    }
-
-    public void startWebGameLocally(Options presetOptions, String username)
-    {
-        GameServerSide game = new GameServerSide(getWhatNextManager(),
-            presetOptions);
-        game.newGame(username, null);
     }
 
     /* **********************************************************************

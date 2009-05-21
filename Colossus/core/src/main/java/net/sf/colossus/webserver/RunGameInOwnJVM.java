@@ -104,7 +104,7 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
         runInOwnJVM();
     }
 
-    public void runInOwnJVM()
+    private void runInOwnJVM()
     {
         File gameDir = new File(workFilesBaseDir, gameId);
         gameDir.mkdirs();
@@ -317,7 +317,7 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
      * after it created the socket.
      */
 
-    public boolean isSocketUp()
+    private boolean isSocketUp()
     {
         if (flagFile == null)
         {
@@ -426,6 +426,11 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
                 ok = true;
             }
 
+            else if (line.startsWith("Game Startup Completed"))
+            {
+                ok = true;
+            }
+
             if (connected >= gi.getPlayers().size())
             {
                 ok = true;
@@ -454,7 +459,7 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
         return ok;
     }
 
-    public void sleepFor(long millis)
+    private void sleepFor(long millis)
     {
         try
         {
