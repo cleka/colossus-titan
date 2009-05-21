@@ -20,7 +20,6 @@ import java.util.logging.Logger;
 import net.sf.colossus.ai.AI;
 import net.sf.colossus.ai.SimpleAI;
 import net.sf.colossus.common.Constants;
-import net.sf.colossus.common.IOptions;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.common.WhatNextManager;
 import net.sf.colossus.game.BattleCritter;
@@ -185,11 +184,6 @@ public final class Client implements IClient, IOracle, IVariant
     // TODO: could go into owningPlayer, BUT tricky right now as long as
     // owningPlayer is created twice (once fake and later for real)...
 
-    /** The actual player type as which this Client was created:
-     *  Human, Network, or a *concrete* AI type (i.e. not anyAI)
-     */
-    private final String playerType;
-
     /**
      * This is used as a placeholder for activePlayer and battleActivePlayer since they
      * are sometimes accessed when they are not available.
@@ -347,7 +341,11 @@ public final class Client implements IClient, IOracle, IVariant
         // Should really happen here, but doesn't yet since we don't have
         // all players (not even as names) yet
         this.owningPlayer = new PlayerClientSide(getGame(), playerName, 0);
-        this.playerType = playerType;
+
+        // type setting is needed because we ask owningPlayer.isAI() below
+        // TODO set type in constructor
+        // (the whole player info setup needs fixing...)
+        this.owningPlayer.setType(playerType);
 
         this.noone = new PlayerClientSide(getGame(), "", 0);
         this.activePlayer = noone;
@@ -373,10 +371,15 @@ public final class Client implements IClient, IOracle, IVariant
             this.gui = new NullClientGUI(this, options, whatNextMgr);
         }
 
-        setupTypeOptionListener();
-
         // Need to load options early so they don't overwrite server options.
         options.loadOptions();
+
+        // This is needed because we do not do syncAutoPlay any more,
+        // and many places rely on "if (Options.getOption(... .autoXXXX)
+        // returning true because autoPlay was set for AI type players.
+        // And it needs to be in place already when the pickColor and
+        // pickMarker requests come from server:
+        options.setOption(Options.autoPlay, this.owningPlayer.isAI());
 
         this.localServer = theServer;
 
@@ -632,28 +635,6 @@ public final class Client implements IClient, IOracle, IVariant
     public void syncOption(String optname, String value)
     {
         options.setOption(optname, value);
-    }
-
-    // TODO we will get rid of this listener (or the need for this listener),
-    // once we manage to pass in the type to Client constructor.
-    // right now it's here just for "check does it always go right" purpose.
-    private void setupTypeOptionListener()
-    {
-        options.addListener(Options.playerType, new IOptions.Listener()
-        {
-            @Override
-            public void stringOptionChanged(String optname, String oldValue,
-                String newValue)
-            {
-                if (!newValue.equals(Client.this.playerType))
-                {
-                    LOGGER.warning("In Client " + getOwningPlayer().getName()
-                    + ": Type mismatch! Got via syncOption as type "
-                    + newValue + " but old value is "
-                        + Client.this.playerType);
-                }
-            }
-        });
     }
 
     // public for IOracle

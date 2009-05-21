@@ -229,6 +229,9 @@ public final class Options implements IOptions
         {
             in = new FileInputStream(optionsFile);
             props.load(in);
+            // The pure "Player\ Type\ " (without number) is not needed,
+            // it causes on Client side trouble if there is a listener
+            props.remove(Options.playerType);
             triggerAllOptions();
         }
         catch (IOException e)

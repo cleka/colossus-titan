@@ -400,9 +400,6 @@ public final class GameServerSide extends Game
      */
     void newGame2()
     {
-        // We need to set the autoPlay option before loading the board,
-        // so that we can avoid showing boards for AI players.
-        syncAutoPlay();
         syncOptions();
         server.allInitBoard();
         assignTowers();
@@ -487,15 +484,6 @@ public final class GameServerSide extends Game
             }
         }
         return null;
-    }
-
-    private void syncAutoPlay()
-    {
-        for (Player player : getPlayers())
-        {
-            server.oneSetOption(player, Options.autoPlay, player.isAI());
-            server.oneSetOption(player, Options.playerType, player.getType());
-        }
     }
 
     /** Send all current game option values to all clients. */
@@ -1954,7 +1942,6 @@ public final class GameServerSide extends Game
 
         // We need to set the autoPlay option before loading the board,
         // so that we can avoid showing boards for AI players.
-        syncAutoPlay();
         syncOptions();
 
         server.allUpdatePlayerInfo(true);
