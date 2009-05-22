@@ -6,6 +6,7 @@
 	<classpathentry kind="src" path="datatools/src/main/java"/>
 	<classpathentry kind="src" path="datatools/src/main/javacc"/>
 	<classpathentry kind="src" path="core/src/guitest/java"/>
+	<classpathentry kind="src" path="core/src/functest"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
 	<classpathentry kind="lib" path="libs/jdom.jar"/>
 	<classpathentry kind="lib" path="libs/junit.jar"/>

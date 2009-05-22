@@ -28,6 +28,7 @@
   <!-- inputs -->
   <property name="core.src.dir" value="core/src/main/java" />
   <property name="tests.src.dir" value="core/src/test/java" />
+  <property name="functests.src.dir" value="core/src/functest/java" />
   <property name="core.resource.dir"
 	  value="core/src/main/resource" />
   <property name="datatools.src.dir"
@@ -111,13 +112,14 @@
   <!-- TODO compiling the test cases into the same folder as the
        main source means that we have a danger of including the
        test classes in the JAR or other artifcats -->
+	
   <target name="compileTests" depends="compile"
-  description="Compiles the JUnit tests">
-    <javac debug="yes" deprecation="yes" target="${target.level}"
-    source="${source.level}" srcdir="${tests.src.dir}"
-    destdir="${build.classes.dir}">
-      <classpath refid="project.class.path" />
-    </javac>
+	  description="Compiles the JUnit tests">
+	    <javac debug="yes" deprecation="yes" target="${target.level}"
+	    source="${source.level}" srcdir="${tests.src.dir}"
+	    destdir="${build.classes.dir}">
+	      <classpath refid="project.class.path" />
+	    </javac>
   </target>
   <target name="test" depends="compileTests,compileVariants"
   description="Run all unit tests using JUnit">
@@ -128,6 +130,26 @@
       <formatter type="xml" />
       <batchtest todir="${testresults.dir}">
         <fileset dir="${tests.src.dir}" />
+      </batchtest>
+    </junit>
+  </target>
+  <target name="compileFuncTests" depends="compile"
+  description="Compiles the JUnit GUI tests">
+    <javac debug="yes" deprecation="yes" target="${target.level}"
+    source="${source.level}" srcdir="${functests.src.dir}"
+    destdir="${build.classes.dir}">
+      <classpath refid="project.class.path" />
+    </javac>
+  </target>
+  <target name="functest" depends="compileFuncTests,compileVariants"
+  description="Run all GUI unit tests using JUnit">
+    <junit printsummary="yes" fork="no" haltonfailure="no"
+    failureproperty="junit.testFailed"
+    errorproperty="junit.testError">
+      <classpath refid="project.class.path" />
+      <formatter type="xml" />
+      <batchtest todir="${testresults.dir}">
+        <fileset dir="${functests.src.dir}" />
       </batchtest>
     </junit>
   </target>
