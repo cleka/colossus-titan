@@ -16,7 +16,16 @@ public class LoadGameTest extends TestCase
         super(testName);
     }
 
-    public void testLoadOneGame()
+    public void testLoadSimple3PlayerGame()
+    {
+        String fileName = makeFullPath("3-players-no-recruit.xml");
+        LOGGER.info("Filename: " + fileName);
+        String[] args = { "--load", fileName };
+
+        Start.main(args);
+    }
+
+    public void testLoadGameWithRecruit()
     {
         String fileName = makeFullPath("Simple-6-players.xml");
         LOGGER.info("Filename: " + fileName);
