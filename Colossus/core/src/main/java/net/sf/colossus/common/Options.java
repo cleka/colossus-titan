@@ -518,7 +518,7 @@ public final class Options implements IOptions
     synchronized public static int getHowManyStresstestRoundsProperty()
     {
         String propHowMany = System.getProperty(propNameStresstestRounds);
-        int howMany = 1;
+        int howMany = 0;
 
         if (propHowMany != null)
         {
