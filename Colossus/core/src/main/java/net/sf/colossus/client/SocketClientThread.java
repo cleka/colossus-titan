@@ -1016,11 +1016,14 @@ final class SocketClientThread extends Thread implements IServer,
 
     private List<CreatureType> resolveCreatureTypes(String nameList)
     {
-        List<String> names = Split.split(Glob.sep, nameList);
         List<CreatureType> creatures = new ArrayList<CreatureType>();
-        for (String creatureName : names)
+        if (!nameList.equals(""))
         {
-            creatures.add(resolveCreatureType(creatureName));
+            List<String> names = Split.split(Glob.sep, nameList);
+            for (String creatureName : names)
+            {
+                creatures.add(resolveCreatureType(creatureName));
+            }
         }
         return creatures;
     }
