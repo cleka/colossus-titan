@@ -3415,7 +3415,7 @@ public final class Client implements IClient, IOracle, IVariant
      */
     public Collection<MasterBoardTerrain> getTerrains()
     {
-        return TerrainRecruitLoader.getTerrains();
+        return game.getVariant().getTerrains();
     }
 
 }

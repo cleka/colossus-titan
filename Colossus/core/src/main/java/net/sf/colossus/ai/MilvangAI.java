@@ -149,8 +149,7 @@ public class MilvangAI extends RationalAI // NO_UCD
 
             double totalRecruitValue = 0;
             double bestRecruitValue = 0;
-            for (MasterBoardTerrain terrain : TerrainRecruitLoader
-                .getTerrains())
+            for (MasterBoardTerrain terrain : variant.getTerrains())
             {
                 double currRecruitValue = findRecruitPotential(critterMap,
                     terrain);
