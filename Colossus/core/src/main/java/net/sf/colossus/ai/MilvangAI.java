@@ -67,7 +67,11 @@ public class MilvangAI extends RationalAI // NO_UCD
                 // reason: it's required for custom recruiting.
                 int numNeeded = TerrainRecruitLoader.numberOfRecruiterNeeded(
                     lesser, creature, terrain, null);
-                int hintValue = creature.getHintedRecruitmentValue();
+                // TODO Not sure whether it's totally clean to directly use the
+                // NonTitan form. But Titan cannot be a recruit anyway, and
+                // before I changed it it used the method from CreatureType
+                // directly anyway.
+                int hintValue = getHintedRecruitmentValueNonTitan(creature);
                 if (hintValue > recruitNow
                     && numNeeded <= critters.get(lesser).intValue())
                 {
@@ -123,7 +127,8 @@ public class MilvangAI extends RationalAI // NO_UCD
             for (CreatureType creatureType : keepers)
             {
                 keepTitan |= creatureType.getName().equals("Titan");
-                int tmp = creatureType.getHintedRecruitmentValue();
+                // TODO: should this use the Titan-aware form of the method?
+                int tmp = getHintedRecruitmentValueNonTitan(creatureType);
                 critterValue += tmp * tmp;
                 Integer numCritters = critterMap.get(creatureType);
                 if (numCritters == null)

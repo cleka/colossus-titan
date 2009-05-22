@@ -6,8 +6,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import net.sf.colossus.server.VariantSupport;
-
 
 /**
  * A type of creature in a variant.
@@ -277,19 +275,6 @@ public class CreatureType implements Comparable<CreatureType>
     public int getPointValue()
     { // this function is replicated in Critter
         return getPower() * getSkill();
-    }
-
-    public int getHintedRecruitmentValue()
-    { // this function is replicated in Critter
-        return getPointValue()
-            + VariantSupport.getHintedRecruitmentValueOffset(getName());
-    }
-
-    public int getHintedRecruitmentValue(String[] section)
-    { // this function is replicated in Critter
-        return getPointValue()
-            + VariantSupport.getHintedRecruitmentValueOffset(getName(),
-                section);
     }
 
     public boolean isRangestriker()

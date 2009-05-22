@@ -405,12 +405,31 @@ abstract class AbstractAI implements AI
         return false;
     }
 
+    // The NonTitan forms moved here from variant.CreatureType so that variant
+    // does not (just for those two calls from VariantSupport) depend on
+    // server any more. AIs are the only users of that functionality anyway.
+
+    public int getHintedRecruitmentValueNonTitan(CreatureType creature)
+    {
+        return creature.getPointValue()
+            + VariantSupport.getHintedRecruitmentValueOffset(creature
+                .getName());
+    }
+
+    public int getHintedRecruitmentValueNonTitan(CreatureType creature,
+        String[] section)
+    {
+        return creature.getPointValue()
+            + VariantSupport.getHintedRecruitmentValueOffset(creature
+                .getName(), section);
+    }
+
     protected final int getHintedRecruitmentValue(CreatureType creature,
             Legion legion, String[] section)
     {
         if (!creature.isTitan())
         {
-            return creature.getHintedRecruitmentValue(section);
+            return getHintedRecruitmentValueNonTitan(creature, section);
         }
         Player player = legion.getPlayer();
         int power = player.getTitanPower();
