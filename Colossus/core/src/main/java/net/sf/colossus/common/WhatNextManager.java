@@ -11,7 +11,7 @@ public class WhatNextManager
         .getLogger(WhatNextManager.class.getName());
 
     private WhatToDoNext whatToDoNext;
-    private Options startOptions;
+    private final Options startOptions;
     private int howManyGamesLeft = 0;
 
     public WhatNextManager(Options startOpts)
@@ -27,7 +27,7 @@ public class WhatNextManager
     /**
      * Set the action what shall be executed next.
      * Trigger also the timer for the "Timed Quit", if requested so.
-     * 
+     *
      * @param whatToDoNext
      * @param triggerQuitTimer
      */
@@ -44,7 +44,7 @@ public class WhatNextManager
     }
 
     /**
-     * 
+     *
      * @return Returns the same startOptions object that Start object uses.
      */
     public Options getStartOptions()
@@ -65,7 +65,7 @@ public class WhatNextManager
 
     /**
      * Trigger a timed Quit, which will (by using a demon thread) terminate
-     * the JVM after a timeout (currently 10 seconds)  
+     * the JVM after a timeout (currently 10 seconds)
      * - unless the JVM has quit already anyway because cleanup has
      * succeeded as planned.
      */
@@ -74,7 +74,8 @@ public class WhatNextManager
         LOGGER.log(Level.FINEST, "triggerTimedQuit called.");
         if (howManyGamesLeft > 0)
         {
-            LOGGER.info("HowManyGamesLeft not zero yet - ignoring the "
+            LOGGER.info("HowManyGamesLeft now " + howManyGamesLeft
+                + " not zero yet - ignoring the "
                 + "request to trigger a timed quit.");
         }
         else
@@ -92,7 +93,7 @@ public class WhatNextManager
      * not be any other non-demon threads alive, so the JVM *should*
      * terminate by itself cleanly.
      * So, if this TimedJvmQuit strikes, it means the "clean shutdown"
-     * has somehow failed. 
+     * has somehow failed.
      */
     public static class TimedJvmQuit extends Thread
     {
