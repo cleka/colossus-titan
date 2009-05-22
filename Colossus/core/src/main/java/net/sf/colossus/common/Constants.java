@@ -62,6 +62,7 @@ public final class Constants
     {
         NONE, BLOCK, ARCH, ARROW, ARROWS
     }
+
     // TODO the next three constants should probably be part of the HexsideGates enum
     public static final int ARCHES_AND_ARROWS = -1;
     public static final int ARROWS_ONLY = -2;
@@ -139,7 +140,7 @@ public final class Constants
     public static final String defaultAI = anyAI;
     public static final String[] aiArray = { "SimpleAI", "CowardSimpleAI",
         "RationalAI", "HumanHaterRationalAI", "MilvangAI", "ExperimentalAI" };
-        // , "ParallelEvaluatorAI"};
+    // , "ParallelEvaluatorAI"};
     // Auto play for human players uses SimpleAI:
     public static final String autoplayAI = aiArray[0];
 

@@ -44,26 +44,26 @@ public interface IOptions
      */
     abstract class Listener
     {
-        public void booleanOptionChanged(@SuppressWarnings("unused")
-        String optname, @SuppressWarnings("unused")
-        boolean oldValue, @SuppressWarnings("unused")
-        boolean newValue)
+        public void booleanOptionChanged(
+            @SuppressWarnings("unused") String optname,
+            @SuppressWarnings("unused") boolean oldValue,
+            @SuppressWarnings("unused") boolean newValue)
         {
             // default does nothing
         }
 
-        public void intOptionChanged(@SuppressWarnings("unused")
-        String optname, @SuppressWarnings("unused")
-        int oldValue, @SuppressWarnings("unused")
-        int newValue)
+        public void intOptionChanged(
+            @SuppressWarnings("unused") String optname,
+            @SuppressWarnings("unused") int oldValue,
+            @SuppressWarnings("unused") int newValue)
         {
             // default does nothing
         }
 
-        public void stringOptionChanged(@SuppressWarnings("unused")
-        String optname, @SuppressWarnings("unused")
-        String oldValue, @SuppressWarnings("unused")
-        String newValue)
+        public void stringOptionChanged(
+            @SuppressWarnings("unused") String optname,
+            @SuppressWarnings("unused") String oldValue,
+            @SuppressWarnings("unused") String newValue)
         {
             // default does nothing
         }

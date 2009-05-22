@@ -1,8 +1,8 @@
 package net.sf.colossus.common;
 
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 
 
 public class WhatNextManager
@@ -12,12 +12,13 @@ public class WhatNextManager
 
     private WhatToDoNext whatToDoNext;
     private Options startOptions;
-    private int howManyGamesLeft = 0; 
+    private int howManyGamesLeft = 0;
 
     public WhatNextManager(Options startOpts)
     {
         this.startOptions = startOpts;
     }
+
     public WhatToDoNext getWhatToDoNext()
     {
         return whatToDoNext;
@@ -61,7 +62,7 @@ public class WhatNextManager
     {
         howManyGamesLeft = left;
     }
-    
+
     /**
      * Trigger a timed Quit, which will (by using a demon thread) terminate
      * the JVM after a timeout (currently 10 seconds)  
@@ -95,8 +96,8 @@ public class WhatNextManager
      */
     public static class TimedJvmQuit extends Thread
     {
-        private static final Logger LOGGER = Logger.getLogger(
-            WhatNextManager.TimedJvmQuit.class.getName());
+        private static final Logger LOGGER = Logger
+            .getLogger(WhatNextManager.TimedJvmQuit.class.getName());
 
         private static final String defaultName = "TimedJvmQuit thread";
         private final String name;
@@ -135,7 +136,6 @@ public class WhatNextManager
         }
     }
 
-    
     /**
      * The various constants for activities what the Start class should do
      * as next thing, typically when a dialog is closed or a games ended.
@@ -164,7 +164,4 @@ public class WhatNextManager
         }
     }
 
-    
-    
-    
 }

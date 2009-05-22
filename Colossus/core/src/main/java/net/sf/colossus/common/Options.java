@@ -15,7 +15,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
-
 /** Class Options lists game options for Colossus.
  *  @version $Id$
  *  @author David Ripton
