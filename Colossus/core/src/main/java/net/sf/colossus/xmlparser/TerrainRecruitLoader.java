@@ -532,10 +532,23 @@ public class TerrainRecruitLoader implements IVariantInitializer
 
     /**
      * Return a collection of all possible terrains.
+     * TODO get rid of this. Only once place still needs it.
      *
      * @return A collection containing all instances of {@link MasterBoardTerrain}.
      */
-    public static Collection<MasterBoardTerrain> getTerrains()
+    public static Collection<MasterBoardTerrain> getTerrainsStatic()
+    {
+        return Collections.unmodifiableCollection(terrains.values());
+    }
+
+    /**
+     * Return a collection of all possible terrains.
+     * NOTE: Only meant to be used for Variant Initialization!
+     *       In normal cases this list should be get from variant object.
+     *
+     * @return A collection containing all instances of {@link MasterBoardTerrain}.
+     */
+    public Collection<MasterBoardTerrain> getTerrains()
     {
         return Collections.unmodifiableCollection(terrains.values());
     }
@@ -953,7 +966,7 @@ public class TerrainRecruitLoader implements IVariantInitializer
                     hex.getLabel());
             LOGGER.warning("The RST is\n" + terrain.getRecruitingSubTree().toString());
         }
-        
+
         return g_value;
     }
 
@@ -1039,6 +1052,12 @@ public class TerrainRecruitLoader implements IVariantInitializer
         {
             // TODO Auto-generated method stub
             return new ArrayList<AcquirableData>();
+        }
+
+        public Collection<MasterBoardTerrain> getTerrains()
+        {
+            // TODO Auto-generated method stub
+            return new ArrayList<MasterBoardTerrain>();
         }
 
         public int getTitanImprovementValue()

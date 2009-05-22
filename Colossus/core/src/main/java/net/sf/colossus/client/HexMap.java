@@ -114,7 +114,10 @@ public class HexMap extends JPanel
         terrainH.clear();
         entranceHexes.clear();
 
-        for (MasterBoardTerrain terrain : TerrainRecruitLoader.getTerrains())
+        // TODO get rid of this last use of the static
+        //      TerrainRecruitLoader.getTerrainsStatic())
+        for (MasterBoardTerrain terrain : TerrainRecruitLoader
+            .getTerrainsStatic())
         {
             GUIBattleHex[][] gameH = new GUIBattleHex[6][6];
             List<GUIBattleHex> gameHexes = new ArrayList<GUIBattleHex>();

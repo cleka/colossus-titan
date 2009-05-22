@@ -50,9 +50,7 @@ public class Variant
     private final Map<String, CreatureType> creatureTypeByNameCache = new HashMap<String, CreatureType>();
 
     public Variant(IVariantInitializer variantInitializer,
-        AllCreatureType creatureTypes,
-        Collection<MasterBoardTerrain> terrains,
-        MasterBoard masterBoard,
+        AllCreatureType creatureTypes, MasterBoard masterBoard,
         Document readme, String name)
     {
         this.creatureTypes = creatureTypes;
@@ -73,7 +71,7 @@ public class Variant
                 }
             });
 
-        this.terrains = terrains;
+        this.terrains = variantInitializer.getTerrains();
         this.masterBoard = masterBoard;
         this.readme = readme;
         this.variantName = name;

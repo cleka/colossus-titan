@@ -1,6 +1,7 @@
 package net.sf.colossus.variant;
 
 
+import java.util.Collection;
 import java.util.List;
 
 import net.sf.colossus.variant.Variant.AcquirableData;
@@ -19,5 +20,7 @@ public interface IVariantInitializer
     public int getTitanImprovementValue();
 
     public int getTitanTeleportValue();
+
+    public Collection<MasterBoardTerrain> getTerrains();
 
 }
