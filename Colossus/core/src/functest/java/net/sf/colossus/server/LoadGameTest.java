@@ -3,6 +3,8 @@ package net.sf.colossus.server;
 import java.util.logging.Logger;
 
 import junit.framework.TestCase;
+import net.sf.colossus.common.Options;
+import net.sf.colossus.util.ErrorUtils;
 
 public class LoadGameTest extends TestCase
 {
@@ -18,20 +20,29 @@ public class LoadGameTest extends TestCase
 
     public void testLoadSimple3PlayerGame()
     {
+        Options.setFunctionalTest(true);
+        ErrorUtils.setErrorDuringFunctionalTest(false);
         String fileName = makeFullPath("3-players-no-recruit.xml");
         LOGGER.info("Filename: " + fileName);
         String[] args = { "--load", fileName };
 
         Start.main(args);
+
+        assertFalse(ErrorUtils.getErrorDuringFunctionalTest());
     }
 
     public void testLoadGameWithRecruit()
     {
+        Options.setFunctionalTest(true);
+        ErrorUtils.setErrorDuringFunctionalTest(false);
         String fileName = makeFullPath("Simple-6-players.xml");
         LOGGER.info("Filename: " + fileName);
-        String[] args = { "--load", fileName };
 
-        Start.main(args);
+        /// String[] args = { "--load", fileName };
+
+        // Start.main(args);
+
+        assertFalse(ErrorUtils.getErrorDuringFunctionalTest());
     }
 
     private String makeFullPath(String fileName)

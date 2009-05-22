@@ -29,6 +29,8 @@ public class ErrorUtils
     private static final Logger LOGGER = Logger.getLogger(ErrorUtils.class
         .getName());
 
+    private static boolean errorDuringFunctionalTest = false;
+
     /**
      * Query the stacktrace items from an exception, and put them
      * nicely into a single string.
@@ -42,6 +44,16 @@ public class ErrorUtils
         String stackTrace = sw.toString();
 
         return stackTrace;
+    }
+
+    public static void setErrorDuringFunctionalTest(boolean val)
+    {
+        errorDuringFunctionalTest = val;
+    }
+
+    public static boolean getErrorDuringFunctionalTest()
+    {
+        return errorDuringFunctionalTest;
     }
 
     /** During stress-testing, don't bother to show message,
@@ -122,6 +134,21 @@ public class ErrorUtils
     {
         // as method name says...
         exitIfStresstest();
+
+
+        /* During functional testing, don't bother to show message,
+         * instead log it and return immediately:
+         */
+        if (Options.isFunctionalTest())
+        {
+            String info = "Exiting due to an Error or Exception: "
+                + "A dialog box should have been shown now, "
+                + "but we are in a functional test so we rather exit "
+                + "immediately instead of waiting for user input .";
+            LOGGER.severe(info);
+            setErrorDuringFunctionalTest(true);
+            return;
+        }
 
         // Skip copying to clipboard and showing of the message dialog
         // if there is no Graphics device available:

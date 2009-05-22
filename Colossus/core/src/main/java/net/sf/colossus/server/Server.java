@@ -1115,12 +1115,12 @@ public final class Server extends Thread implements IServer
 
     public void loadFailed()
     {
-        JOptionPane.showMessageDialog(startLog.getFrame(),
+        ErrorUtils.showErrorDialog(startLog.getFrame(),
+            "Loading game failed!",
             "Loading, replay of history and comparison between saved "
-                + "state and replay result failed!!\n\n"
+            + "state and replay result failed!!\n\n"
                 + "Click Abort on the Startup Progress Dialog to return to "
-                + "Game setup dialog to start a different or new one.",
-            "Loading game failed!", JOptionPane.ERROR_MESSAGE);
+                + "Game setup dialog to start a different or new one.");
     }
 
     public void cleanup()

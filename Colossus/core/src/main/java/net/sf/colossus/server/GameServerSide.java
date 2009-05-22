@@ -996,7 +996,16 @@ public final class GameServerSide extends Game
     {
         LOGGER.info("All clients have caught up with loading/replay or "
             + "pickColor, now kicking off the Game!");
-        setupPhase();
+
+        if (Options.isFunctionalTest())
+        {
+            server.doSetWhatToDoNext(WhatToDoNext.QUIT_ALL, true);
+            server.triggerDispose();
+        }
+        else
+        {
+            setupPhase();
+        }
     }
 
     Phase getPhase()

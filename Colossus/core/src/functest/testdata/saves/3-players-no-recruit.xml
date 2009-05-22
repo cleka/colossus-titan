@@ -47,7 +47,7 @@
         <Creature name="Zeus" remaining="1" dead="0" />
         <Creature name="Titan" remaining="0" dead="0" />
     </Caretaker>
-    <Player name="TheOther" type="net.sf.colossus.ai.Human" color="Orange" startingTower="600" score="0" dead="false" mulligansLeft="1" colorsElim="" movementRoll="0" teleported="false" summoned="false">
+    <Player name="TheOther" type="net.sf.colossus.ai.SimpleAI" color="Orange" startingTower="600" score="0" dead="false" mulligansLeft="1" colorsElim="" movementRoll="0" teleported="false" summoned="false">
         <Legion name="Or04" currentHex="600" startingHex="600" moved="false" entrySide="6" parent="null" recruitName="null" battleTally="0">
             <Creature name="Titan" />
             <Creature name="Angel" />
@@ -71,7 +71,7 @@
             <Creature name="Gargoyle" />
         </Legion>
     </Player>
-    <Player name="TheOne" type="net.sf.colossus.ai.Human" color="Silver" startingTower="200" score="0" dead="false" mulligansLeft="1" colorsElim="" movementRoll="0" teleported="false" summoned="false">
+    <Player name="TheOne" type="net.sf.colossus.ai.SimpleAI" color="Silver" startingTower="200" score="0" dead="false" mulligansLeft="1" colorsElim="" movementRoll="0" teleported="false" summoned="false">
         <Legion name="Si07" currentHex="200" startingHex="200" moved="false" entrySide="6" parent="null" recruitName="null" battleTally="0">
             <Creature name="Titan" />
             <Creature name="Angel" />

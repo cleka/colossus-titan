@@ -72,7 +72,12 @@ public class WhatNextManager
     public void triggerTimedQuit()
     {
         LOGGER.log(Level.FINEST, "triggerTimedQuit called.");
-        if (howManyGamesLeft > 0)
+        if (Options.isFunctionalTest())
+        {
+            LOGGER.info("Functional test ongoing - ignoring the "
+                + "request to trigger a timed quit.");
+        }
+        else if (howManyGamesLeft > 0)
         {
             LOGGER.info("HowManyGamesLeft now " + howManyGamesLeft
                 + " not zero yet - ignoring the "
