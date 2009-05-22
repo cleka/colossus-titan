@@ -9,7 +9,6 @@ import java.util.TreeSet;
 import java.util.logging.Logger;
 
 import net.sf.colossus.common.Constants;
-import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 /**
  * The recruiting sub-tree in a terrain (or several terrains)
@@ -457,20 +456,24 @@ public class RecruitingSubTree implements IRecruiting
         return max;
     }
 
-    public static Set<CreatureType> getAllInAllSubtreesIgnoringSpecials(CreatureType creature)
+    public static Set<CreatureType> getAllInAllSubtreesIgnoringSpecials(
+        Variant variant, CreatureType creature)
     {
         Set<CreatureType> results = new TreeSet<CreatureType>();
         Map<MasterBoardTerrain,Set<CreatureType>> checked = new HashMap<MasterBoardTerrain,Set<CreatureType>>();
-        results.addAll(getAllInAllSubtreesIgnoringSpecialsRec(checked, creature));
+        results.addAll(getAllInAllSubtreesIgnoringSpecialsRec(variant,
+            checked, creature));
         return results;
     }
 
     @SuppressWarnings("boxing")
-    private static Set<CreatureType> getAllInAllSubtreesIgnoringSpecialsRec(Map<MasterBoardTerrain,Set<CreatureType>> checked, CreatureType creature)
+    private static Set<CreatureType> getAllInAllSubtreesIgnoringSpecialsRec(
+        Variant variant, Map<MasterBoardTerrain, Set<CreatureType>> checked,
+        CreatureType creature)
     {
         Set<CreatureType> results = new TreeSet<CreatureType>();
 
-        for (MasterBoardTerrain terrain : TerrainRecruitLoader.getTerrains())
+        for (MasterBoardTerrain terrain : variant.getTerrains())
         {
             if (checked.get(terrain) == null)
             {
@@ -510,7 +513,8 @@ public class RecruitingSubTree implements IRecruiting
                     if (!checked.get(terrain).contains(recruit))
                     {
                         checked.get(terrain).add(recruit);
-                        results.addAll(getAllInAllSubtreesIgnoringSpecialsRec(checked, recruit));
+                        results.addAll(getAllInAllSubtreesIgnoringSpecialsRec(
+                            variant, checked, recruit));
                     }
                 }
             }

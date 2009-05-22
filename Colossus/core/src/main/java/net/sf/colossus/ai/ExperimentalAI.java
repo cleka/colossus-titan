@@ -339,7 +339,7 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
     }
 
     private List<TacticalObjective> listObjectives = null;
-    
+
     @Override
     public void initBattle()
     {
@@ -646,7 +646,8 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
                 }
             }
             stackNumber = count;
-            recruits = RecruitingSubTree.getAllInAllSubtreesIgnoringSpecials(creature.getType());
+            recruits = RecruitingSubTree.getAllInAllSubtreesIgnoringSpecials(
+                variant, creature.getType());
             CreatureType temp = null;
             for (CreatureType ct : recruits)
             {

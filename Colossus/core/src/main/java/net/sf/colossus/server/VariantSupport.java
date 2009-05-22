@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -379,13 +381,15 @@ public final class VariantSupport
 
             AllCreatureType creatureTypes = loadCreatures();
 
-            IVariantInitializer trl = loadTerrainsAndRecruits(serverSide, creatureTypes);
+            IVariantInitializer trl = loadTerrainsAndRecruits(serverSide,
+                creatureTypes);
             // TODO add things as the variant package gets fleshed out
-            List<MasterBoardTerrain> battleLands = new ArrayList<MasterBoardTerrain>();
+            Collection<MasterBoardTerrain> terrains = Collections
+                .unmodifiableCollection(TerrainRecruitLoader.getTerrains());
 
             List<String> directoriesForMap = getVarDirectoriesList();
-            InputStream mapIS = StaticResourceLoader.getInputStream(VariantSupport
-                .getMapName(), directoriesForMap);
+            InputStream mapIS = StaticResourceLoader.getInputStream(
+                VariantSupport.getMapName(), directoriesForMap);
             if (mapIS == null)
             {
                 throw new FileNotFoundException(VariantSupport.getMapName());
@@ -409,7 +413,7 @@ public final class VariantSupport
             task = "loadMarkerNamesProperties";
             markerNames = loadMarkerNamesProperties();
 
-            CURRENT_VARIANT = new Variant(trl, creatureTypes, battleLands,
+            CURRENT_VARIANT = new Variant(trl, creatureTypes, terrains,
                 masterBoard, varREADME, variantName);
         }
         catch (Exception e)

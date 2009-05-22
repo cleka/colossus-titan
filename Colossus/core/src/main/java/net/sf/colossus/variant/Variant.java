@@ -2,7 +2,7 @@ package net.sf.colossus.variant;
 
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -33,7 +33,7 @@ public class Variant
 {
     private final AllCreatureType creatureTypes;
     private final List<CreatureType> summonableCreatureTypes;
-    private final List<MasterBoardTerrain> battleLands;
+    private final Collection<MasterBoardTerrain> terrains;
     private final List<AcquirableData> acquirableList;
     private final MasterBoard masterBoard;
     private final Document readme;
@@ -51,7 +51,8 @@ public class Variant
 
     public Variant(IVariantInitializer variantInitializer,
         AllCreatureType creatureTypes,
-        List<MasterBoardTerrain> battleLands, MasterBoard masterBoard,
+        Collection<MasterBoardTerrain> terrains,
+        MasterBoard masterBoard,
         Document readme, String name)
     {
         this.creatureTypes = creatureTypes;
@@ -72,7 +73,7 @@ public class Variant
                 }
             });
 
-        this.battleLands = new ArrayList<MasterBoardTerrain>(battleLands);
+        this.terrains = terrains;
         this.masterBoard = masterBoard;
         this.readme = readme;
         this.variantName = name;
@@ -88,9 +89,9 @@ public class Variant
         return this.creatureTypes.getCreatureTypes();
     }
 
-    public List<MasterBoardTerrain> getBattleLands()
+    public Collection<MasterBoardTerrain> getTerrains()
     {
-        return Collections.unmodifiableList(this.battleLands);
+        return this.terrains;
     }
 
     public MasterBoard getMasterBoard()
