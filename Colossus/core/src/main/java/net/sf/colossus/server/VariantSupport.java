@@ -105,9 +105,9 @@ public final class VariantSupport
      * Load a Colossus Variant by name.
      * @param variantName The name of the variant.
      * @param serverSide We're loading on a server.
-     * @return A Document describing the variant.
+     * @return The loaded variant.
      */
-    public static Document loadVariantByName(String variantName,
+    public static Variant loadVariantByName(String variantName,
         boolean serverSide)
     {
         // if it's a variant earlier loaded with Load Extern Variant, find out the
@@ -129,7 +129,7 @@ public final class VariantSupport
 
         Variant loadedVariant = loadVariant(variantName, variantFileName,
             variantDir, serverSide);
-        return loadedVariant.getReadme();
+        return loadedVariant;
     }
 
     /**
@@ -137,10 +137,10 @@ public final class VariantSupport
      * @param varFile The File to load as a Variant, probably selected
      *        by user in a FileSelectionDialog, with full absolute path.
      * @param serverSide We're loading on a server.
-     * @return A Document describing the variant.
+     * @return The loaded variant.
      */
 
-    public static Document loadVariantByFile(java.io.File varFile,
+    public static Variant loadVariantByFile(java.io.File varFile,
         boolean serverSide)
     {
         String tempVarFilename = varFile.getName();
@@ -163,9 +163,8 @@ public final class VariantSupport
         rememberFullPathFileForVariantName(tempVarName, tempFullPathFilename);
 
         Variant loadedVariant = loadVariant(tempVarName, tempVarFilename,
-            tempVarDirectory,
-            serverSide);
-        return loadedVariant.getReadme();
+            tempVarDirectory, serverSide);
+        return loadedVariant;
     }
 
     private static String getVariantNameFromFilename(String varFilename)

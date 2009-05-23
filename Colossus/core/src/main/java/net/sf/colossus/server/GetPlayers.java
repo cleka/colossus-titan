@@ -51,6 +51,7 @@ import net.sf.colossus.gui.ShowReadme;
 import net.sf.colossus.guiutil.KFrame;
 import net.sf.colossus.guiutil.SaveWindow;
 import net.sf.colossus.util.StaticResourceLoader;
+import net.sf.colossus.variant.Variant;
 
 
 /**
@@ -533,11 +534,12 @@ public final class GetPlayers extends KFrame
     {
         // TODO change all loadVariant... to return variant, not the doc,
         //      then the stuff below would be cleaner, too.
-        Document doc = VariantSupport.loadVariantByName(newVarName, true);
+        Variant variant = VariantSupport.loadVariantByName(newVarName, true);
+        Document doc = variant.getReadme();
 
         // If loading failed, change variantBox to what is actually now
         // loaded. Probably Default.
-        String loadedName = VariantSupport.getCurrentVariant().getName();
+        String loadedName = variant.getName();
         if (!loadedName.equals(variantBox.getSelectedItem()))
         {
             LOGGER.info("Ups, loaded variant '" + loadedName
@@ -974,7 +976,8 @@ public final class GetPlayers extends KFrame
         if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION)
         {
             File varFile = varChooser.getSelectedFile().getAbsoluteFile();
-            Document doc = VariantSupport.loadVariantByFile(varFile, true);
+            Variant variant = VariantSupport.loadVariantByFile(varFile, true);
+            Document doc = variant.getReadme();
             if (doc != null)
             {
                 String name = varFile.getName();
