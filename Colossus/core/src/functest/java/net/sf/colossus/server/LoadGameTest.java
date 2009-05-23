@@ -11,7 +11,7 @@ public class LoadGameTest extends TestCase
     private static final Logger LOGGER = Logger.getLogger(LoadGameTest.class
         .getName());
 
-    public static final String SAVED_GAMES_TEST_DIR = "./core/src/functest/testdata/saves/";
+    public static final String SAVED_GAMES_TEST_DIR = "./core/src/functest/resource/saves/";
 
     public LoadGameTest(String testName)
     {
@@ -38,9 +38,9 @@ public class LoadGameTest extends TestCase
         String fileName = makeFullPath("Simple-6-players.xml");
         LOGGER.info("Filename: " + fileName);
 
-        /// String[] args = { "--load", fileName };
+        String[] args = { "--load", fileName };
 
-        // Start.main(args);
+        Start.main(args);
 
         assertFalse(ErrorUtils.getErrorDuringFunctionalTest());
     }

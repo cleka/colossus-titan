@@ -1026,9 +1026,17 @@ public final class Server extends Thread implements IServer
                 else
                 {
                     logToStartLog("Loading/Replay failed!!\n");
-                    logToStartLog("\n-- Press Abort button "
-                        + "to return to Start Game dialog --\n");
-                    loadFailed();
+                    if (Options.isFunctionalTest())
+                    {
+                        ErrorUtils.setErrorDuringFunctionalTest(true);
+                        game.stopAllDueToFunctionalTestCompleted();
+                    }
+                    else
+                    {
+                        logToStartLog("\n-- Press Abort button "
+                            + "to return to Start Game dialog --\n");
+                        loadFailed();
+                    }
                     return;
                 }
             }
@@ -1123,13 +1131,18 @@ public final class Server extends Thread implements IServer
                 + "Game setup dialog to start a different or new one.");
     }
 
-    public void cleanup()
+    public void cleanupStartlog()
     {
         if (startLog != null)
         {
             startLog.dispose();
             startLog = null;
         }
+    }
+
+    public void cleanup()
+    {
+        cleanupStartlog();
         game = null;
     }
 

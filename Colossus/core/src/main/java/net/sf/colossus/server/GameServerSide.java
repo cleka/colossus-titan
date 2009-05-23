@@ -992,6 +992,14 @@ public final class GameServerSide extends Game
         return loadingGame;
     }
 
+    public void stopAllDueToFunctionalTestCompleted()
+    {
+        server.doSetWhatToDoNext(WhatToDoNext.QUIT_ALL, true);
+        LOGGER.info("kickstartGame - before stop server running");
+        server.stopServerRunning();
+        server.cleanupStartlog();
+    }
+
     public void kickstartGame()
     {
         LOGGER.info("All clients have caught up with loading/replay or "
@@ -999,8 +1007,7 @@ public final class GameServerSide extends Game
 
         if (Options.isFunctionalTest())
         {
-            server.doSetWhatToDoNext(WhatToDoNext.QUIT_ALL, true);
-            server.triggerDispose();
+            stopAllDueToFunctionalTestCompleted();
         }
         else
         {
