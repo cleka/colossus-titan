@@ -17,17 +17,18 @@ import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.ICustomRecruitBase;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
+import net.sf.colossus.variant.Variant;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
 /**
  * Implementation of a graph dedicated to the Recruit "Tree" (it's a directed
  * graph, not a tree, as we can have cycle in theory).
- * 
+ *
  * Moved into game package. Does it belong more to game or variant package?
- *  
+ *
  * TODO this is still string-based, see comment in {@link TerrainRecruitLoader}
- * 
+ *
  * @version $Id$
  * @author Romain Dolbeau
  */
@@ -47,7 +48,7 @@ public class RecruitGraph
 
     /**
      * The vertex of the Recruit Graph
-     * 
+     *
      * @version $Id$
      * @author Romain Dolbeau
      */
@@ -103,7 +104,7 @@ public class RecruitGraph
         {
             if (graph.getCaretaker() != null)
             {
-                CreatureType type = VariantSupport.getCurrentVariant()
+                CreatureType type = graph.getVariant()
                     .getCreatureByName(cre);
                 return graph.getCaretaker().getAvailableCount(type);
             }
@@ -202,7 +203,7 @@ public class RecruitGraph
 
     /**
      * Models a recruit option for a given creature.
-     * 
+     *
      * This is an return object for the question which recruit options a particular
      * creature has. Each option consists of a terrain to muster in, a target creatures
      * and a number of start creatures required to upgrade.
@@ -243,11 +244,6 @@ public class RecruitGraph
         {
             return numberRequired;
         }
-    }
-
-    public RecruitGraph(Caretaker caretaker)
-    {
-        this.caretaker = caretaker;
     }
 
     public RecruitGraph()
@@ -320,7 +316,7 @@ public class RecruitGraph
                 RecruitEdge e = it.next();
                 RecruitVertex v = e.getDestination();
                 String creName = s.getCreatureName();
-                 
+
                 int already = (legion == null ? 0 : ((LegionClientSide)legion).numCreature(creName));
 
                 /* only explore if
@@ -353,6 +349,10 @@ public class RecruitGraph
         return caretaker;
     }
 
+    private Variant getVariant()
+    {
+        return VariantSupport.getCurrentVariant();
+    }
     /**
      * Give the List of RecruitEdge where the given creature is the source.
      * @param  cre Name of the recruiting creature
@@ -407,9 +407,9 @@ public class RecruitGraph
     {
         List<RecruitEdge> allEdge = getIncomingEdges(recruit);
         RecruitVertex source = getVertex(recruiter);
-        CreatureType recruiterCre = VariantSupport.getCurrentVariant()
+        CreatureType recruiterCre = getVariant()
             .getCreatureByName(recruiter);
-        CreatureType recruitCre = VariantSupport.getCurrentVariant()
+        CreatureType recruitCre = getVariant()
             .getCreatureByName(recruit);
         // if the recruiter is a special such as Anything, avoid
         // crashing with NullPointerException
@@ -549,7 +549,7 @@ public class RecruitGraph
         return result;
     }
 
-    /** 
+    /**
      * A list of what can recruit a creature.
      */
     public List<RecruitOption> getAllThatCanRecruitThisCreature(String cre)
@@ -589,7 +589,8 @@ public class RecruitGraph
 
             if ((e.getNumber() == number) && (e.getTerrain().equals(t)))
             {
-                v2 = VariantSupport.getCurrentVariant().getCreatureByName(e.
+                v2 = getVariant().getCreatureByName(
+                    e.
                         getDestination().getCreatureName());
             }
         }
@@ -605,7 +606,7 @@ public class RecruitGraph
      */
     public CreatureType getBestPossibleRecruitEver(String cre, Legion legion)
     {
-        CreatureType best = VariantSupport.getCurrentVariant()
+        CreatureType best = getVariant()
                 .getCreatureByName(cre);
         int maxVP = -1;
         List<RecruitVertex> all = traverse(cre, legion);
@@ -613,7 +614,7 @@ public class RecruitGraph
         while (it.hasNext())
         {
             RecruitVertex v2 = it.next();
-            CreatureType creature = VariantSupport.getCurrentVariant()
+            CreatureType creature = getVariant()
                 .getCreatureByName(v2.getCreatureName());
             int vp = (creature == null ? -1 : creature.getPointValue());
             if (vp > maxVP)
@@ -627,10 +628,10 @@ public class RecruitGraph
 
     /**
      * Determine if a creature given by 'lesser' could potentially
-     * summon the higher valued creature given by 'greater' within N steps.  
+     * summon the higher valued creature given by 'greater' within N steps.
      * This is used to determine if 'lesser' is redundant for mustering purposes
      * if we have 'greater'
-     * Here we limit the search to 'distance' (typically 2) recruit steps 
+     * Here we limit the search to 'distance' (typically 2) recruit steps
      * since otherwise every creature
      * is 'reachable' via a downmuster at the tower and starting all over which
      * is not what we are interested in.
