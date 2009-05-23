@@ -19,7 +19,6 @@ import net.sf.colossus.game.Battle;
 import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
-import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterBoardTerrain;
@@ -52,7 +51,7 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
         bec.DEFENDER_BY_DAMAGINGHAZARD_BONUS = 60;
 
         dfmr = new DefenderFirstMoveRecordSQL("localhost", "colossus",
-                "colossus", VariantSupport.getCurrentVariant().getName());
+                "colossus", variant.getName());
 
         oec = new ObjectiveEvalConstants();
     }
