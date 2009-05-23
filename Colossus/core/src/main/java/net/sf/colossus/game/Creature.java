@@ -5,7 +5,6 @@ import java.util.Comparator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardHexside;
@@ -491,24 +490,6 @@ public class Creature
             setHits(tmp_hits);
         }
         return excess;
-    }
-
-    public int getHintedRecruitmentValue()
-    {
-        // Must use our local, Titan-aware getPointValue()
-        // return getCreature().getHintedRecruitmentValue();
-        return getPointValue() +
-                VariantSupport.getHintedRecruitmentValueOffset(getType().
-                getName());
-    }
-
-    public int getHintedRecruitmentValue(String[] section)
-    {
-        // Must use our local, Titan-aware getPointValue()
-        // return getCreature().getHintedRecruitmentValue(section);
-        return getPointValue() +
-                VariantSupport.getHintedRecruitmentValueOffset(getType().
-                getName(), section);
     }
 
     public void commitMove()
