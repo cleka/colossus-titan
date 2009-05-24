@@ -22,6 +22,7 @@ import net.sf.colossus.variant.Variant;
 public class GameClientSide extends Game
 {
     private Client client;
+    private int turnNumber = -1;
 
     public GameClientSide(Variant variant, String[] playerNames,
         IVariantKnower variantKnower)
@@ -318,11 +319,15 @@ public class GameClientSide extends Game
         return client.getLegion(markerId);
     }
 
+    public void setTurnNumber(int turn)
+    {
+        this.turnNumber = turn;
+    }
+
     @Override
     public int getTurnNumber()
     {
-        // TODO move into this class
-        return client.getTurnNumber();
+        return turnNumber;
     }
 
 }

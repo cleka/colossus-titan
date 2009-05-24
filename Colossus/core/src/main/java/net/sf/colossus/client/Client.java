@@ -195,7 +195,6 @@ public final class Client implements IClient, IOracle, IVariant
      */
     private final PlayerClientSide noone;
 
-    private int turnNumber = -1;
     private PlayerClientSide activePlayer;
     private Phase phase;
 
@@ -554,7 +553,7 @@ public final class Client implements IClient, IOracle, IVariant
     public void tellEngagement(MasterHex hex, Legion attacker, Legion defender)
     {
         game.setEngagementData(hex, attacker, defender);
-        gui.tellEngagement(attacker, defender, turnNumber);
+        gui.tellEngagement(attacker, defender, getTurnNumber());
     }
 
     public void tellEngagementResults(Legion winner, String method,
@@ -952,11 +951,12 @@ public final class Client implements IClient, IOracle, IVariant
         if (legion == null)
         {
             LOGGER.log(Level.SEVERE, "No legion with markerId '" + markerId
-                + "'" + " (for player " + player + "), turn = " + turnNumber
+                + "'" + " (for player " + player + "), turn = "
+                + getTurnNumber()
                 + " in client " + getOwningPlayer());
         }
         assert legion != null : "No legion with markerId '" + markerId + "'"
-            + " (for player " + player + "), turn = " + turnNumber
+            + " (for player " + player + "), turn = " + getTurnNumber()
             + " in client " + getOwningPlayer();
         return legion;
     }
@@ -1871,7 +1871,7 @@ public final class Client implements IClient, IOracle, IVariant
         }
 
         ((LegionClientSide)legion).setRecruit(null);
-        gui.actOnUndidRecruitPart2(legion, wasReinforcement, turnNumber);
+        gui.actOnUndidRecruitPart2(legion, wasReinforcement, getTurnNumber());
     }
 
     /** null means cancel.  "none" means no recruiter (tower creature). */
@@ -1936,7 +1936,7 @@ public final class Client implements IClient, IOracle, IVariant
     public void setupTurnState(Player activePlayer, int turnNumber)
     {
         this.activePlayer = (PlayerClientSide)activePlayer;
-        this.turnNumber = turnNumber;
+        game.setTurnNumber(turnNumber);
 
         gui.actOnTurnOrPlayerChange(this, turnNumber, this.activePlayer);
     }
@@ -2420,7 +2420,7 @@ public final class Client implements IClient, IOracle, IVariant
     // public for IOracle
     public int getTurnNumber()
     {
-        return turnNumber;
+        return game.getTurnNumber();
     }
 
     private CreatureType figureTeleportingLord(Legion legion, MasterHex hex)
