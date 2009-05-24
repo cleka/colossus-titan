@@ -47,8 +47,10 @@ import net.sf.colossus.util.StaticResourceLoader;
 import net.sf.colossus.util.ViableEntityManager;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.IVariantKnower;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
+import net.sf.colossus.variant.Variant;
 import net.sf.colossus.webclient.RunGameInSameJVM;
 import net.sf.colossus.webclient.WebClient;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
@@ -135,7 +137,7 @@ public final class GameServerSide extends Game
         WhatNextManager whatNextManager = new WhatNextManager(startOptions);
 
         Options serverOptions = new Options("UnitTest", true);
-        return new GameServerSide(whatNextManager, serverOptions);
+        return new GameServerSide(whatNextManager, serverOptions, null, new VariantKnower());
     }
 
     /** The normal constructor to be used everywhere
@@ -146,9 +148,10 @@ public final class GameServerSide extends Game
      * @param serverOptions The server side options, initialized from the
      * GetPlayers dialog and/or command line options.
      */
-    GameServerSide(WhatNextManager whatNextMgr, Options serverOptions)
+    GameServerSide(WhatNextManager whatNextMgr, Options serverOptions,
+        Variant variant, IVariantKnower variantKnower)
     {
-        super(null, new String[0]);
+        super(variant, new String[0], variantKnower);
         // later perhaps from command line, GUI, or WebServer set it?
         gameId = "#" + (gameCounter++);
         this.whatNextManager = whatNextMgr;

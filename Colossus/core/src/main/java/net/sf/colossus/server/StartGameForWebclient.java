@@ -24,7 +24,8 @@ public class StartGameForWebclient implements IStartHandler
 
     public void startWebGameLocally(Options presetOptions, String username)
     {
-        this.game = new GameServerSide(whatNextManager, presetOptions);
+        this.game = new GameServerSide(whatNextManager, presetOptions, null,
+            new VariantKnower());
         this.username = username;
 
         // initServer does not return before it has accepted all clients,

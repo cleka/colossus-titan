@@ -59,9 +59,19 @@ public class LOSTest extends TestCase
     @Override
     protected void setUp()
     {
-        game = GameServerSide.makeNewGameServerSide();
-        VariantSupport.loadVariantByName("Default", true);
+        // Nothing to do here, moved stuff to setupForVariant because
+        // we need now the variant name as argument.
+    }
 
+    private void setupForVariant(String variantName)
+    {
+        VariantSupport.loadVariantByName(variantName, true);
+        game = GameServerSide.makeNewGameServerSide();
+        createPlayersAndCreatures();
+    }
+
+    private void createPlayersAndCreatures()
+    {
         black = game.addPlayer("Black", "SimpleAI");
         green = game.addPlayer("Green", "SimpleAI");
         red = game.addPlayer("Red", "SimpleAI");
@@ -89,6 +99,8 @@ public class LOSTest extends TestCase
     public void testLOS1()
     {
         LOGGER.log(Level.FINEST, "testLOS1()");
+        setupForVariant("Default");
+
         MasterHex hex = game.getVariant().getMasterBoard().getHexByLabel("3"); // Brush
 
         defender = new LegionServerSide("Rd03", null, hex, hex, red, game,
@@ -132,6 +144,8 @@ public class LOSTest extends TestCase
     public void testLOS2()
     {
         LOGGER.log(Level.FINEST, "testLOS2()");
+        setupForVariant("Default");
+
         MasterHex hex = game.getVariant().getMasterBoard().getHexByLabel("40"); // Jungle
 
         defender = new LegionServerSide("Gr03", null, hex, hex, green, game,
@@ -274,6 +288,8 @@ public class LOSTest extends TestCase
     public void testLOS3()
     {
         LOGGER.log(Level.FINEST, "testLOS3()");
+        setupForVariant("Default");
+
         MasterHex hex = game.getVariant().getMasterBoard()
             .getHexByLabel("100"); // Tower
 
@@ -405,6 +421,8 @@ public class LOSTest extends TestCase
     public void testLOS4()
     {
         LOGGER.log(Level.FINEST, "testLOS4()");
+        setupForVariant("Default");
+
         MasterHex hex = game.getVariant().getMasterBoard().getHexByLabel("4"); // Hills
 
         defender = new LegionServerSide("Gr03", null, hex, hex, green, game,
@@ -519,7 +537,8 @@ public class LOSTest extends TestCase
     public void testLOS5()
     {
         LOGGER.log(Level.FINEST, "testLOS5()");
-        VariantSupport.loadVariantByName("TG-ConceptIII", true);
+        setupForVariant("TG-ConceptIII");
+
         MasterHex hex = game.getVariant().getMasterBoard().getHexByLabel("1"); // Plains - Delta
 
         defender = new LegionServerSide("Gr03", null, hex, hex, green, game,
@@ -608,7 +627,8 @@ public class LOSTest extends TestCase
     public void testLOS6()
     {
         LOGGER.log(Level.FINEST, "testLOS6()");
-        VariantSupport.loadVariantByName("Badlands-JDG", true);
+        setupForVariant("Badlands-JDG");
+
         MasterHex hex = game.getVariant().getMasterBoard().getHexByLabel(
             "5000"); // MountainsAlt
 
@@ -698,6 +718,8 @@ public class LOSTest extends TestCase
     public void testLOS7()
     {
         LOGGER.log(Level.FINEST, "testLOS7()");
+        setupForVariant("Default");
+
         MasterHex hex = game.getVariant().getMasterBoard().getHexByLabel("40"); // Jungle
 
         defender = new LegionServerSide("Gr03", null, hex, hex, green, game,

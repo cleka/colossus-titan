@@ -43,6 +43,7 @@ import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.server.GameServerSide;
 import net.sf.colossus.server.IServer;
 import net.sf.colossus.server.Server;
+import net.sf.colossus.server.VariantKnower;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.CollectionHelper;
 import net.sf.colossus.util.ErrorUtils;
@@ -323,8 +324,11 @@ public final class Client implements IClient, IOracle, IVariant
     {
         assert playerName != null;
 
+        // TODO IVariantKnower is only temporary until game properly always
+        //      knows the Variant right from the start on
         // TODO still dummy arguments
-        this.game = new GameClientSide(null, new String[0]);
+        this.game = new GameClientSide(null, new String[0],
+            new VariantKnower());
 
         // TODO give it to constructor right away? Not changing it right now,
         // first do the "create SCT and Variant outside Client (and Game??)

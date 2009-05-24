@@ -8,8 +8,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
-import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.IVariantKnower;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;
@@ -28,7 +28,7 @@ public abstract class Game
     /**
      * The variant played in this game.
      */
-    private final Variant variant;
+    private Variant variant;
 
     /**
      * The state of the different players in the game.
@@ -39,6 +39,12 @@ public abstract class Game
      * The caretaker takes care of managing the available and dead creatures.
      */
     private final Caretaker caretaker;
+
+    /**
+     * Some object to ask about current variant, in case / as long as it is
+     * not properly passed in right away.
+     */
+    private final IVariantKnower variantKnower;
 
     /** Last movement roll for any player. */
     private int movementRoll = -1;
@@ -58,25 +64,35 @@ public abstract class Game
     private Legion defender;
     private MasterHex battleSite;
 
-    @SuppressWarnings("unused")
-    public Game(Variant variant, String[] playerNames)
+    /**
+     * Create a Game object.
+     *
+     * @param variant The variant object, might right now still be null (game
+     *        is created before Client gets/knows the variant name)
+     * @param playerNames Names of the players, not used yet
+     * @param variantKnower An object to ask for the current variant, will be
+     *        called first time someone asks Variant from Game.
+     */
+    public Game(Variant variant, String[] playerNames,
+        IVariantKnower variantKnower)
     {
+        // NOTE variant/variantKnower needs to be assigned before caretaker,
+        // because caretaker asks Game for the variant
         this.variant = variant;
+        this.variantKnower = variantKnower;
+
         this.caretaker = new Caretaker(this);
     }
 
     public Variant getVariant()
     {
-        if (variant != null)
+        if (variant == null)
         {
-            return variant;
+            // TODO temporary solution until all game creations pass in the
+            //      used variant right away
+            variant = variantKnower.getTheCurrentVariant();
         }
-        else
-        {
-            // TODO this is just temporarily until the variant member always gets initialized
-            // properly
-            return VariantSupport.getCurrentVariant();
-        }
+        return variant;
     }
 
     public Collection<Player> getPlayers()

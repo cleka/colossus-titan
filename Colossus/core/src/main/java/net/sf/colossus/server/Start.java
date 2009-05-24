@@ -637,7 +637,8 @@ public final class Start
                     .getStringOption(Options.webFlagFileName);
                 startOptions.removeOption(Options.webFlagFileName);
 
-                GameServerSide game = new GameServerSide(getWhatNextManager(), serverOptions);
+                GameServerSide game = new GameServerSide(getWhatNextManager(),
+                    serverOptions, null, new VariantKnower());
                 if (webGameFlagFileName != null
                     && !webGameFlagFileName.equals(""))
                 {
@@ -658,8 +659,9 @@ public final class Start
 
                 if (loadFileName != null && loadFileName.length() > 0)
                 {
-                    GameServerSide game = new GameServerSide(getWhatNextManager(),
-                        serverOptions);
+                    GameServerSide game = new GameServerSide(
+                        getWhatNextManager(), serverOptions, null,
+                        new VariantKnower());
                     serverOptions.clearPlayerInfo();
                     game.loadGame(loadFileName);
                 }

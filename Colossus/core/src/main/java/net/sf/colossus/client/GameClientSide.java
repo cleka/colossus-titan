@@ -14,6 +14,7 @@ import net.sf.colossus.game.Player;
 import net.sf.colossus.util.CollectionHelper;
 import net.sf.colossus.util.Predicate;
 import net.sf.colossus.util.Split;
+import net.sf.colossus.variant.IVariantKnower;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;
 
@@ -22,9 +23,10 @@ public class GameClientSide extends Game
 {
     private Client client;
 
-    public GameClientSide(Variant variant, String[] playerNames)
+    public GameClientSide(Variant variant, String[] playerNames,
+        IVariantKnower variantKnower)
     {
-        super(variant, playerNames);
+        super(variant, playerNames, variantKnower);
     }
 
     public void setClient(Client client)
