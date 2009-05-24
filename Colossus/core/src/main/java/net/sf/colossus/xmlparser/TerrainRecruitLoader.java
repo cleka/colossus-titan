@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 import net.sf.colossus.game.Caretaker;
 import net.sf.colossus.game.RecruitGraph;
 import net.sf.colossus.server.CustomRecruitBase;
+import net.sf.colossus.server.VariantKnower;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.variant.AllCreatureType;
@@ -118,8 +119,11 @@ public class TerrainRecruitLoader implements IVariantInitializer
     /**
      * Representation of the Recruiting Graph (for use)
      * (sometimes called Recruiting Tree).
+     * TODO the VariantKnower is meant only as temporary solution; when
+     * variant loading and all this stuff here is not static any more,
+     * variant should be passed in or set afterwards or something...
      */
-    private static RecruitGraph graph = new RecruitGraph();
+    private static RecruitGraph graph = new RecruitGraph(new VariantKnower());
 
     /** The AllCreatureType object to use, needed to convert from String (name)
      * to the actual CreatureType.

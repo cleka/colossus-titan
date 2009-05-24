@@ -12,9 +12,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.LegionClientSide;
-import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.ICustomRecruitBase;
+import net.sf.colossus.variant.IVariantKnower;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;
@@ -39,6 +39,7 @@ public class RecruitGraph
         .getName());
 
     private Caretaker caretaker;
+    private final IVariantKnower variantKnower;
     private final List<RecruitVertex> allVertex = new ArrayList<RecruitVertex>();
     private final List<RecruitEdge> allEdge = new ArrayList<RecruitEdge>();
     private final Map<String, RecruitVertex> creatureToVertex = new HashMap<String, RecruitVertex>();
@@ -246,8 +247,12 @@ public class RecruitGraph
         }
     }
 
-    public RecruitGraph()
+    // TODO variantKnower is only a temporary solution. Instead the variant
+    // should be passed in (not possible right now), or perhaps the Game,
+    // from which the variant can be asked.
+    public RecruitGraph(IVariantKnower variantKnower)
     {
+        this.variantKnower = variantKnower;
         this.caretaker = null;
     }
 
@@ -351,7 +356,7 @@ public class RecruitGraph
 
     private Variant getVariant()
     {
-        return VariantSupport.getCurrentVariant();
+        return variantKnower.getTheCurrentVariant();
     }
     /**
      * Give the List of RecruitEdge where the given creature is the source.
