@@ -19,6 +19,7 @@ import net.sf.colossus.game.Battle;
 import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
+import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterBoardTerrain;
@@ -49,6 +50,8 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
         bec.DEFENDER_BY_EDGE_OR_BLOCKINGHAZARD_BONUS = 40;
         /* And it's a sadist, too. */
         bec.DEFENDER_BY_DAMAGINGHAZARD_BONUS = 60;
+
+        variant = VariantSupport.getCurrentVariant();
 
         dfmr = new DefenderFirstMoveRecordSQL("localhost", "colossus",
                 "colossus", variant.getName());
