@@ -84,7 +84,6 @@ public final class GameServerSide extends Game
         .getName());
 
     private int activePlayerNum;
-    private int turnNumber; // Advance when every player has a turn
     private int lastRecruitTurnNumber;
     private boolean engagementInProgress;
     private boolean battleInProgress;
@@ -1254,12 +1253,6 @@ public final class GameServerSide extends Game
         {
             server.allSetupMuster();
         }
-    }
-
-    @Override
-    public int getTurnNumber()
-    {
-        return turnNumber;
     }
 
     private String makeAutosaveFileName()

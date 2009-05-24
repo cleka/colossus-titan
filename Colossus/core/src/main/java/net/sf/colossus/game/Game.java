@@ -46,6 +46,11 @@ public abstract class Game
      */
     private final IVariantKnower variantKnower;
 
+    /**
+     * The current turn number. Advance when every player has done his move
+     */
+    protected int turnNumber = -1;
+
     /** Last movement roll for any player. */
     private int movementRoll = -1;
 
@@ -262,10 +267,22 @@ public abstract class Game
     }
 
     /**
-     * The current turn in the game.
+     * Set the current turn number. Used only on client side;
+     * server side increments directly.
      *
-     * TODO the implementation should probably be pulled up
-     * @return
+     * @param turn Set this number as current turn number
      */
-    public abstract int getTurnNumber();
+    public void setTurnNumber(int turn)
+    {
+        this.turnNumber = turn;
+    }
+
+    /**
+     * Returns the current turn in the game
+     * @return returns the current turn number
+     */
+    public int getTurnNumber()
+    {
+        return turnNumber;
+    }
 }
