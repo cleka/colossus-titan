@@ -652,16 +652,18 @@ public final class PlayerServerSide extends Player implements
         {
             Legion l = getLegionByMarkerId(bl.getMarkerId());
 
-            String list1 = Glob.glob(l.getCreatureTypes());
-            String list2 = Glob.glob(bl.getCreatureTypes());
+            List<CreatureType> ourCreatures = new ArrayList<CreatureType>(l
+                .getCreatureTypes());
+            ourCreatures.removeAll(bl.getCreatureTypes());
 
-            if (!list1.equals(list2))
+            if ((l.getHeight() != bl.getHeight()) || !ourCreatures.isEmpty())
             {
                 LOGGER
                     .severe("Loaded legion data differs from replay result: "
                         + "Replay-Legion content for " + l.getMarkerId()
-                        + " is " + list1 + ", Loaded-Legion content is "
-                        + list2);
+                        + " is " + Glob.glob(l.getCreatureTypes())
+                        + ", Loaded-Legion content is "
+                        + Glob.glob(bl.getCreatureTypes()));
                 ok = false;
             }
         }
