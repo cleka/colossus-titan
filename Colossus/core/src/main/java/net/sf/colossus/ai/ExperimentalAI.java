@@ -36,8 +36,6 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
         .getName());
     private final static long MAX_EXHAUSTIVE_SEARCH_MOVES = 15000;
 
-    private final DefenderFirstMoveRecordSQL dfmr;
-
     protected final ObjectiveEvalConstants oec;
 
     public ExperimentalAI(Client client)
@@ -52,9 +50,6 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
         bec.DEFENDER_BY_DAMAGINGHAZARD_BONUS = 60;
 
         variant = VariantSupport.getCurrentVariant();
-
-        dfmr = new DefenderFirstMoveRecordSQL("localhost", "colossus",
-                "colossus", variant.getName());
 
         oec = new ObjectiveEvalConstants();
     }
@@ -82,54 +77,6 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
     @Override
     public List<CritterMove> battleMove()
     {
-        if (client.getBattleTurnNumber() == 1)
-        {
-            if (dfmr.isUsable())
-            {
-                if (client.getMyEngagedLegion().equals(client.getDefender()))
-                {
-                    List<CritterMove> amoves = new ArrayList<CritterMove>();
-                    for (BattleCritter critter : client.getActiveBattleUnits())
-                    {
-                        CritterMove cm = new CritterMove(critter, critter.
-                                getStartingHex(), critter.getCurrentHex());
-                        amoves.add(cm);
-                    }
-                    List<BattleCritter> attackers =
-                            new ArrayList<BattleCritter>();
-                    attackers.addAll(client.getInactiveBattleUnits());
-                    Set<List<CritterMove>> unusedYet = dfmr.getPerfectMatches(
-                            amoves, attackers, client.getBattleSite().
-                            getTerrain(), client.getDefender().getEntrySide());
-                    Set<List<CritterMove>> unusedYet2 = dfmr.getImperfectMatches(
-                            amoves, attackers, client.getBattleSite().
-                            getTerrain(), client.getDefender().getEntrySide());
-                    LOGGER.warning("FOUND " + unusedYet.size() + " perfect matches and " + unusedYet2.size() + " imperfect matches.");
-                }
-                else
-                {
-                    if (true || isHumanLegion(client.getDefender()))
-                    {
-                        List<CritterMove> dmoves = new ArrayList<CritterMove>();
-                        for (BattleCritter critter : client.
-                                getInactiveBattleUnits())
-                        {
-                            CritterMove cm = new CritterMove(critter, critter.
-                                    getStartingHex(), critter.getCurrentHex());
-                            dmoves.add(cm);
-                        }
-                        List<BattleCritter> attackers =
-                                new ArrayList<BattleCritter>();
-                        attackers.addAll(client.getActiveBattleUnits());
-                        dfmr.insertMove(dmoves, attackers, client.getBattleSite().
-                                getTerrain(),
-                                client.getDefender().getEntrySide());
-                    }
-                }
-            }
-        }
-
-
         List<CritterMove> r = super.battleMove();
         /* force the GC, so we have a chance to call the finalize() from
          * the OnTheFlyLegionMove::Iterator used in findBattleMoves.
