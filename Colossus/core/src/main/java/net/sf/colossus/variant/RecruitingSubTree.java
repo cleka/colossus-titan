@@ -456,6 +456,26 @@ public class RecruitingSubTree implements IRecruiting
         return max;
     }
 
+    public static boolean isADeadEnd(Variant variant, CreatureType creature)
+    {
+        for (MasterBoardTerrain terrain : variant.getTerrains())
+        {
+            RecruitingSubTree r = (RecruitingSubTree)terrain.getRecruitingSubTree();
+            for (RecruiterAndRecruit rar : r.regular.keySet())
+            {
+                if (rar.getRecruiter().equals(creature))
+                {
+                    CreatureType recruit = rar.getRecruit();
+                    if (recruit.getPointValue() > creature.getPointValue())
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
     public static Set<CreatureType> getAllInAllSubtreesIgnoringSpecials(
         Variant variant, CreatureType creature)
     {
