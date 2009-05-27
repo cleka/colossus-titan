@@ -278,6 +278,6 @@ class CreatureAttackTacticalObjective extends AbstractTacticalObjective
 
     public String getDescription()
     {
-        return "Using " + creature.getName() + " to attack";
+        return "Using " + creature.getName() + " to attack (" + getPriority() + ")";
     }
 }
