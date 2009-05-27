@@ -3,7 +3,6 @@ package net.sf.colossus.variant;
 
 import java.util.List;
 
-import net.sf.colossus.client.LegionClientSide;
 
 
 /**
@@ -27,7 +26,7 @@ public interface IVariantHint
      * @return The name of the suggested recruit
      */
     public String getRecruitHint(MasterBoardTerrain terrain,
-        LegionClientSide legion, List<CreatureType> recruits,
+        IOracleLegion legion, List<CreatureType> recruits,
         IHintOracle oracle, String[] section);
 
     /**

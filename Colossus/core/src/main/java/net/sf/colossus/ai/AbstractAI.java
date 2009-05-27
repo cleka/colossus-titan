@@ -1,7 +1,6 @@
 package net.sf.colossus.ai;
 
 
-import net.sf.colossus.util.ValueRecorder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -25,6 +24,7 @@ import net.sf.colossus.game.Player;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.DevRandom;
 import net.sf.colossus.util.Probs;
+import net.sf.colossus.util.ValueRecorder;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardTerrain;

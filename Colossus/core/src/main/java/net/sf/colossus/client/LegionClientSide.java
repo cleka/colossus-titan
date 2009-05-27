@@ -13,6 +13,7 @@ import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.IOracleLegion;
 import net.sf.colossus.variant.MasterHex;
 
 
@@ -28,7 +29,7 @@ import net.sf.colossus.variant.MasterHex;
  *
  * @author David Ripton
  */
-public final class LegionClientSide extends Legion
+public final class LegionClientSide extends Legion implements IOracleLegion
 {
     private static final Logger LOGGER = Logger
         .getLogger(LegionClientSide.class.getName());

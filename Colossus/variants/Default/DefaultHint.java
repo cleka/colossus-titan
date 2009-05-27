@@ -6,11 +6,11 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.util.DevRandom;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.IHintOracle;
+import net.sf.colossus.variant.IOracleLegion;
 import net.sf.colossus.variant.IVariantHint;
 import net.sf.colossus.variant.MasterBoardTerrain;
 
@@ -33,7 +33,7 @@ public class DefaultHint implements IVariantHint
     }
 
     public String getRecruitHint(MasterBoardTerrain terrain,
-        LegionClientSide legion, List<CreatureType> recruits,
+        IOracleLegion legion, List<CreatureType> recruits,
         IHintOracle oracle, String[] section)
     {
         String terrainId = terrain.getId();

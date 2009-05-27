@@ -20,13 +20,13 @@ import javax.swing.text.Document;
 import javax.swing.text.StyledDocument;
 
 import net.sf.colossus.client.HexMap;
-import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.util.ErrorUtils;
 import net.sf.colossus.util.StaticResourceLoader;
 import net.sf.colossus.variant.AllCreatureType;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.IHintOracle;
+import net.sf.colossus.variant.IOracleLegion;
 import net.sf.colossus.variant.IVariantHint;
 import net.sf.colossus.variant.IVariantInitializer;
 import net.sf.colossus.variant.MasterBoard;
@@ -663,7 +663,7 @@ public final class VariantSupport
     }
 
     public synchronized static String getRecruitHint(
-        MasterBoardTerrain terrain, LegionClientSide legion,
+        MasterBoardTerrain terrain, IOracleLegion legion,
         List<CreatureType> recruits, IHintOracle oracle)
     {
         String[] section = new String[1];
@@ -672,7 +672,7 @@ public final class VariantSupport
     }
 
     public synchronized static String getRecruitHint(
-        MasterBoardTerrain terrain, LegionClientSide legion,
+        MasterBoardTerrain terrain, IOracleLegion legion,
         List<CreatureType> recruits, IHintOracle oracle,
         String[] section)
     {
