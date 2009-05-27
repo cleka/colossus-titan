@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.logging.Logger;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.common.Constants;
@@ -85,8 +87,16 @@ public class BasicObjectiveHelper implements IObjectiveHelper {
     private List<TacticalObjective> commonObjective(Legion myself)
     {
         List<TacticalObjective> lListObjectives = new ArrayList<TacticalObjective>();
+        Map<CreatureType,Creature> toConsider = new TreeMap<CreatureType,Creature>();
+
         for (Creature lcritter : myself.getCreatures())
+        { // at most one entry per CreatureType ...
+            toConsider.put(lcritter.getType(), lcritter);
+        }
+
+        for (CreatureType creature : toConsider.keySet())
         {
+            Creature lcritter = toConsider.get(creature);
             if (!lcritter.isLord() && RecruitingSubTree.isADeadEnd(variant, lcritter.getType()))
             {
                 lListObjectives.add(new CreatureAttackTacticalObjective(

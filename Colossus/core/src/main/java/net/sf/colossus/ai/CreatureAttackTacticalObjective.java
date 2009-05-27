@@ -47,7 +47,7 @@ class CreatureAttackTacticalObjective extends AbstractTacticalObjective
 
     public boolean objectiveAttained()
     {
-        return liveLegion.numCreature(creature.getType()) >= 0;
+        return liveLegion.numCreature(creature.getType()) == 0;
     }
 
     /** This is mostly a copy/paste from the EvaluateCritterMove_Strike
