@@ -1,7 +1,6 @@
 package net.sf.colossus.ai;
 
 import java.util.List;
-import net.sf.colossus.client.Client;
 
 /**
  *
