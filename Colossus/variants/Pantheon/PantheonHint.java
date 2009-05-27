@@ -7,14 +7,14 @@ import java.util.List;
 
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.common.Constants;
-import net.sf.colossus.server.IHintOracle;
 import net.sf.colossus.util.DevRandom;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.IHintOracle;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import Default.DefaultHint;
 
 
-public class PantheonHint implements net.sf.colossus.server.IVariantHint
+public class PantheonHint implements net.sf.colossus.variant.IVariantHint
 {
     private final DevRandom rnd = new DevRandom();
 

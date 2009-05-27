@@ -1,11 +1,9 @@
-package net.sf.colossus.server;
+package net.sf.colossus.variant;
 
 
 import java.util.List;
 
 import net.sf.colossus.client.LegionClientSide;
-import net.sf.colossus.variant.CreatureType;
-import net.sf.colossus.variant.MasterBoardTerrain;
 
 
 /**

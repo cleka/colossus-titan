@@ -4,8 +4,8 @@ package Balrog;
 import java.util.List;
 
 import net.sf.colossus.client.LegionClientSide;
-import net.sf.colossus.server.IHintOracle;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.IHintOracle;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import Default.DefaultHint;
 

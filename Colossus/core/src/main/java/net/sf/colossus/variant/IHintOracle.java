@@ -1,4 +1,4 @@
-package net.sf.colossus.server;
+package net.sf.colossus.variant;
 
 /**
  * Interface for an Oracle used for AI Hints.

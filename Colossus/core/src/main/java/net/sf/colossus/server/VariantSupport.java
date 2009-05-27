@@ -26,6 +26,8 @@ import net.sf.colossus.util.ErrorUtils;
 import net.sf.colossus.util.StaticResourceLoader;
 import net.sf.colossus.variant.AllCreatureType;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.IHintOracle;
+import net.sf.colossus.variant.IVariantHint;
 import net.sf.colossus.variant.IVariantInitializer;
 import net.sf.colossus.variant.MasterBoard;
 import net.sf.colossus.variant.MasterBoardTerrain;
