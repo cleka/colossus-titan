@@ -272,12 +272,16 @@ class CreatureAttackTacticalObjective extends AbstractTacticalObjective
                 }
             }
         }
-        LOGGER.finest("Current situation: " + value.toString());
+        if (value.getValue() > 0)
+        {
+            LOGGER.finest("Current situation: " + value.toString());
+        }
         return Math.round(value.getValue() * getPriority());
     }
 
     public String getDescription()
     {
-        return "Using " + creature.getName() + " to attack (" + getPriority() + ")";
+        return "Using " + creature.getName() + " to attack (" + getPriority() +
+                ")";
     }
 }

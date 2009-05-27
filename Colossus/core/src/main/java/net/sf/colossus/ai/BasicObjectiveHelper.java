@@ -87,7 +87,15 @@ public class BasicObjectiveHelper implements IObjectiveHelper {
         List<TacticalObjective> lListObjectives = new ArrayList<TacticalObjective>();
         for (Creature lcritter : myself.getCreatures())
         {
-            if (RecruitingSubTree.isADeadEnd(variant, lcritter.getType()))
+            if (!lcritter.isLord() && RecruitingSubTree.isADeadEnd(variant, lcritter.getType()))
+            {
+                lListObjectives.add(new CreatureAttackTacticalObjective(
+                        oec.FIRST_WAVE_ATTACK_PRIORITY,
+                        client,
+                        myself,
+                        lcritter,
+                        ai, ai.bec));
+            } else if (!lcritter.isTitan() && lcritter.isLord())
             {
                 lListObjectives.add(new CreatureAttackTacticalObjective(
                         oec.FIRST_WAVE_ATTACK_PRIORITY,
