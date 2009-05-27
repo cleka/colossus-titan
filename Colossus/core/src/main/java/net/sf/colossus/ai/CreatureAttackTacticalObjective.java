@@ -7,6 +7,7 @@ package net.sf.colossus.ai;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+
 import net.sf.colossus.client.Client;
 import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.Creature;
@@ -28,7 +29,6 @@ class CreatureAttackTacticalObjective extends AbstractTacticalObjective
     private final Creature creature;
     private final Legion liveLegion;
     private final Client client;
-    private final int count;
     private final AbstractAI ai;
     private final BattleEvalConstants bec;
 
@@ -40,14 +40,18 @@ class CreatureAttackTacticalObjective extends AbstractTacticalObjective
         this.creature = creature;
         this.liveLegion = liveLegion;
         this.client = client;
-        this.count = liveLegion.numCreature(creature.getType());
         this.ai = ai;
         this.bec = bec;
     }
 
     public boolean objectiveAttained()
     {
-        return liveLegion.numCreature(creature.getType()) == 0;
+        return getCount() == 0;
+    }
+
+    public int getCount()
+    {
+        return liveLegion.numCreature(creature.getType());
     }
 
     /** This is mostly a copy/paste from the EvaluateCritterMove_Strike
