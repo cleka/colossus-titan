@@ -22,7 +22,7 @@ import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
-import net.sf.colossus.server.HintOracleInterface;
+import net.sf.colossus.server.IHintOracle;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.DevRandom;
 import net.sf.colossus.util.Probs;
@@ -678,7 +678,7 @@ abstract class AbstractAI implements AI
         return changed;
     }
 
-    protected class AbstractAIOracle implements HintOracleInterface
+    protected class AbstractAIOracle implements IHintOracle
     {
 
         private final LegionClientSide legion;

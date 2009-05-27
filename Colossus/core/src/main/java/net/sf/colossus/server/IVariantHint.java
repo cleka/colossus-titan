@@ -13,7 +13,7 @@ import net.sf.colossus.variant.MasterBoardTerrain;
  * @version $Id$
  * @author Romain Dolbeau
  */
-public interface HintInterface
+public interface IVariantHint
 {
 
     /**
@@ -30,7 +30,7 @@ public interface HintInterface
      */
     public String getRecruitHint(MasterBoardTerrain terrain,
         LegionClientSide legion, List<CreatureType> recruits,
-        HintOracleInterface oracle, String[] section);
+        IHintOracle oracle, String[] section);
 
     /**
      * To obtain the list of creature to split on turn one.

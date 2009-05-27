@@ -10,7 +10,7 @@ package net.sf.colossus.server;
  * @version $Id$
  * @author Romain Dolbeau
  */
-public interface HintOracleInterface
+public interface IHintOracle
 {
     /**
      * A creature with the given name could be recruited.

@@ -64,7 +64,7 @@ public final class VariantSupport
     private static List<String> dependUpon = null;
     private static boolean loadedVariant = false;
     private static int maxPlayers;
-    private static HintInterface aihl = null;
+    private static IVariantHint aihl = null;
     private static Properties markerNames;
 
     private static Variant CURRENT_VARIANT;
@@ -637,9 +637,9 @@ public final class VariantSupport
         {
             o = StaticResourceLoader.getNewObject(hintName, getVarDirectoriesList());
         }
-        if ((o != null) && (o instanceof HintInterface))
+        if ((o != null) && (o instanceof IVariantHint))
         {
-            aihl = (HintInterface)o;
+            aihl = (IVariantHint)o;
             LOGGER.log(Level.FINEST, "Using class " + hintName
                 + " to supply hints to the AIs.");
         }
@@ -662,7 +662,7 @@ public final class VariantSupport
 
     public synchronized static String getRecruitHint(
         MasterBoardTerrain terrain, LegionClientSide legion,
-        List<CreatureType> recruits, HintOracleInterface oracle)
+        List<CreatureType> recruits, IHintOracle oracle)
     {
         String[] section = new String[1];
         section[0] = Constants.sectionAllAI;
@@ -671,7 +671,7 @@ public final class VariantSupport
 
     public synchronized static String getRecruitHint(
         MasterBoardTerrain terrain, LegionClientSide legion,
-        List<CreatureType> recruits, HintOracleInterface oracle,
+        List<CreatureType> recruits, IHintOracle oracle,
         String[] section)
     {
         assert aihl != null : "No AIHintLoader available";
