@@ -2,7 +2,7 @@ package net.sf.colossus.ai;
 
 /**
  *
- * @author dolbeau
+ * @author Romain Dolbeau
  */
 public abstract class AbstractTacticalObjective implements TacticalObjective {
     private int priority;
