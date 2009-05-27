@@ -8,14 +8,14 @@ import java.util.List;
 
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.common.Constants;
-import net.sf.colossus.server.HintInterface;
-import net.sf.colossus.server.HintOracleInterface;
+import net.sf.colossus.server.IVariantHint;
+import net.sf.colossus.server.IHintOracle;
 import net.sf.colossus.util.DevRandom;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterBoardTerrain;
 
 
-public class DefaultHint implements HintInterface
+public class DefaultHint implements IVariantHint
 {
     private final DevRandom rnd = new DevRandom();
 
@@ -34,7 +34,7 @@ public class DefaultHint implements HintInterface
 
     public String getRecruitHint(MasterBoardTerrain terrain,
         LegionClientSide legion, List<CreatureType> recruits,
-        HintOracleInterface oracle, String[] section)
+        IHintOracle oracle, String[] section)
     {
         String terrainId = terrain.getId();
         List<String> recruitNames = creaturesToStrings(recruits);
