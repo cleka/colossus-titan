@@ -11,7 +11,7 @@ import net.sf.colossus.game.Legion;
  *
  * @author Romain Dolbeau
  */
-class DestroyCreatureTacticalObjective implements TacticalObjective
+class DestroyCreatureTacticalObjective extends AbstractTacticalObjective
 {
     private static final Logger LOGGER = Logger.getLogger(
             DestroyCreatureTacticalObjective.class.getName());
@@ -19,7 +19,6 @@ class DestroyCreatureTacticalObjective implements TacticalObjective
     private final Legion killlegion;
     private final Client client;
     private final int count;
-    private final int priority;
     private final int number;
 
     private int countCreatureType(Legion legion)
@@ -38,8 +37,8 @@ class DestroyCreatureTacticalObjective implements TacticalObjective
     DestroyCreatureTacticalObjective(int priority, Client client, Legion killlegion,
             Creature critter, int number)
     {
+        super(priority);
         this.number = number;
-        this.priority = priority;
         this.critter = critter;
         this.killlegion = killlegion;
         this.client = client;
@@ -96,11 +95,6 @@ class DestroyCreatureTacticalObjective implements TacticalObjective
             }
         }
         return mcount * getPriority();
-    }
-
-    public int getPriority()
-    {
-        return priority;
     }
 
     public String getDescription()
