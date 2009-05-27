@@ -7,7 +7,16 @@ import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 
-/**
+/** The tactical objective of killing a certain number of a specific
+ * CreatureType.
+ *
+ * The evaluation function currently return the highest amount of point
+ * gang-banging any one of the creaturetype in the opposing legion, multiplied
+ * by the priority. Rangestriker count for half. This is capped to 0 if the
+ * objective is already attained.
+ *
+ * The objective is attained whenever the number of creature are missing
+ * in the opposing legion.
  *
  * @author Romain Dolbeau
  */

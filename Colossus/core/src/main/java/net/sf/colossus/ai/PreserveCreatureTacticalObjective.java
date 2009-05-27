@@ -7,7 +7,17 @@ import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 
-/**
+/** The tactical objective of preserving all of a specific CreatureType.
+ *
+ * The evaluation function currently return the negative of the highest amount
+ * of point gang-banging any one of the creaturetype in our legion, multiplied
+ * by the priority. Rangestriker count for half. This doesn't take a number
+ * into account, so if you try to preserve 2 out of 3 Lions, this will
+ * try to protect ALL Lions. This is capped to 0 after the objective has
+ * failed.
+ *
+ * The objective is attained as long as enough creature are alive.
+ *
  *
  * @author Romain Dolbeau
  */
@@ -60,6 +70,10 @@ class PreserveCreatureTacticalObjective extends AbstractTacticalObjective
     public int situationContributeToTheObjective()
     {
         int mcount = 0;
+        if (!objectiveAttained())
+        {
+            return 0;
+        }
         for (BattleCritter dCritter : client.getActiveBattleUnits())
         {
             if (dCritter.getCreatureType().equals(critter.getType()))
