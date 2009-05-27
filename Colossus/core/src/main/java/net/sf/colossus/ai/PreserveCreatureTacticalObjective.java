@@ -30,27 +30,14 @@ class PreserveCreatureTacticalObjective extends AbstractTacticalObjective
     private final Client client;
     private final int count;
 
-    private int countCreatureType(Legion legion)
-    {
-        int lcount = 0;
-        for (Creature lcreature : legion.getCreatures())
-        {
-            if (lcreature.getType().equals(critter.getType()))
-            {
-                lcount++;
-            }
-        }
-        return lcount;
-    }
-
-    PreserveCreatureTacticalObjective(int priority, Client client, Legion liveLegion,
+    PreserveCreatureTacticalObjective(float priority, Client client, Legion liveLegion,
             Creature critter)
     {
         super(priority);
         this.critter = critter;
         this.liveLegion = liveLegion;
         this.client = client;
-        count = countCreatureType(liveLegion);
+        count = liveLegion.numCreature(critter.getType());
         if (count <= 0)
         {
             LOGGER.warning("Trying to preserve all " + critter.getName() +
@@ -60,7 +47,7 @@ class PreserveCreatureTacticalObjective extends AbstractTacticalObjective
 
     public boolean objectiveAttained()
     {
-        if (countCreatureType(liveLegion) >= count)
+        if (liveLegion.numCreature(critter.getType()) >= count)
         {
             return true;
         }
@@ -101,7 +88,7 @@ class PreserveCreatureTacticalObjective extends AbstractTacticalObjective
                 }
             }
         }
-        return -(mcount * getPriority());
+        return Math.round(-1.f * mcount * getPriority());
     }
 
     public String getDescription()

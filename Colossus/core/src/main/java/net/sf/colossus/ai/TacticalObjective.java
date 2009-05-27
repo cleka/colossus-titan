@@ -23,7 +23,7 @@ public interface TacticalObjective
      *
      * @return The current priority of this objective.
      */
-    int getPriority();
+    float getPriority();
 
     /** Get the description of this objective.
      *
@@ -36,5 +36,5 @@ public interface TacticalObjective
      * @param newPriority The new priority.
      * @return The old priority.
      */
-    int changePriority(int newPriority);
+    float changePriority(float newPriority);
 }

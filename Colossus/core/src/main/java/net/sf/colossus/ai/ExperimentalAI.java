@@ -1,6 +1,5 @@
 package net.sf.colossus.ai;
 
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -15,12 +14,15 @@ import net.sf.colossus.game.Battle;
 import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.server.VariantSupport;
+import net.sf.colossus.util.ValueRecorder;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.MasterBoardTerrain;
 
 
 /**
  * Yet Another AI, to test some stuff.
+ *
+ * @author Romain Dolbeau
  */
 public class ExperimentalAI extends SimpleAI // NO_UCD
 {

@@ -187,10 +187,10 @@ public class BasicObjectiveHelper implements IObjectiveHelper {
 
     protected class ObjectiveEvalConstants
     {
-        final int DESTROY_TITAN_PRIORITY = 5;
-        final int ATTACKER_PRESERVE_TITAN_PRIORITY = 2;
-        final int DEFENDER_PRESERVE_TITAN_PRIORITY = 5;
-        final int DESTROY_IMPORTANT_CRITTER_PRIORITY = 1;
+        final float DESTROY_TITAN_PRIORITY = 5.f;
+        final float ATTACKER_PRESERVE_TITAN_PRIORITY = 2.f;
+        final float DEFENDER_PRESERVE_TITAN_PRIORITY = 5.f;
+        final float DESTROY_IMPORTANT_CRITTER_PRIORITY = 1.f;
     }
 
 

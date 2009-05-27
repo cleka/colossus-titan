@@ -30,20 +30,7 @@ class DestroyCreatureTacticalObjective extends AbstractTacticalObjective
     private final int count;
     private final int number;
 
-    private int countCreatureType(Legion legion)
-    {
-        int lcount = 0;
-        for (Creature lcreature : legion.getCreatures())
-        {
-            if (lcreature.getType().equals(critter.getType()))
-            {
-                lcount++;
-            }
-        }
-        return lcount;
-    }
-
-    DestroyCreatureTacticalObjective(int priority, Client client, Legion killlegion,
+    DestroyCreatureTacticalObjective(float priority, Client client, Legion killlegion,
             Creature critter, int number)
     {
         super(priority);
@@ -51,7 +38,7 @@ class DestroyCreatureTacticalObjective extends AbstractTacticalObjective
         this.critter = critter;
         this.killlegion = killlegion;
         this.client = client;
-        count = countCreatureType(killlegion);
+        count = killlegion.numCreature(critter.getType());
         if (count < number)
         {
             LOGGER.warning("Trying to kill + number + "  + critter.getName()
@@ -62,7 +49,7 @@ class DestroyCreatureTacticalObjective extends AbstractTacticalObjective
 
     public boolean objectiveAttained()
     {
-        if (countCreatureType(killlegion) + number <= count)
+        if (killlegion.numCreature(critter.getType()) + number <= count)
         {
             return true;
         }
@@ -103,7 +90,7 @@ class DestroyCreatureTacticalObjective extends AbstractTacticalObjective
                 }
             }
         }
-        return mcount * getPriority();
+        return Math.round(mcount * getPriority());
     }
 
     public String getDescription()

@@ -1,25 +1,26 @@
 package net.sf.colossus.ai;
 
-/**
+/** Abstract implementation of TacticalObjective, handling the priority
+ * stuff to avoid duplication.
  *
  * @author Romain Dolbeau
  */
 public abstract class AbstractTacticalObjective implements TacticalObjective {
-    private int priority;
+    private float priority;
 
-    public AbstractTacticalObjective(int priority)
+    public AbstractTacticalObjective(float priority)
     {
         this.priority = priority;
     }
 
-    public int getPriority()
+    public float getPriority()
     {
         return priority;
     }
 
-    public int changePriority(int newPriority)
+    public float changePriority(float newPriority)
     {
-        int oldPriority = priority;
+        float oldPriority = priority;
         priority = newPriority;
         return oldPriority;
     }
