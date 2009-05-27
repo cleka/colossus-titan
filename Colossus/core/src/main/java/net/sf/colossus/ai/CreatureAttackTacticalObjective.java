@@ -32,7 +32,7 @@ class CreatureAttackTacticalObjective extends AbstractTacticalObjective
     private final AbstractAI ai;
     private final BattleEvalConstants bec;
 
-    CreatureAttackTacticalObjective(int priority, Client client,
+    CreatureAttackTacticalObjective(float priority, Client client,
             Legion liveLegion, Creature creature, AbstractAI ai,
             BattleEvalConstants bec)
     {

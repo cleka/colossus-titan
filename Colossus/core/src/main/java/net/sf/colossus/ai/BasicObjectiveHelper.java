@@ -82,12 +82,40 @@ public class BasicObjectiveHelper implements IObjectiveHelper {
         return null;
     }
 
+    private List<TacticalObjective> commonObjective(Legion myself)
+    {
+        List<TacticalObjective> lListObjectives = new ArrayList<TacticalObjective>();
+        for (Creature lcritter : myself.getCreatures())
+        {
+            if (RecruitingSubTree.isADeadEnd(variant, lcritter.getType()))
+            {
+                lListObjectives.add(new CreatureAttackTacticalObjective(
+                        oec.FIRST_WAVE_ATTACK_PRIORITY,
+                        client,
+                        myself,
+                        lcritter,
+                        ai, ai.bec));
+            } else if (!lcritter.isTitan())
+            {
+                lListObjectives.add(new CreatureAttackTacticalObjective(
+                        oec.SECOND_WAVE_ATTACK_PRIORITY,
+                        client,
+                        myself,
+                        lcritter,
+                        ai, ai.bec));
+            }
+        }
+
+        return lListObjectives;
+    }
+
     /** Currently attackerObjective is very dumb:
      * try and kill the Titan (if there) and the biggest creature
      */
     public List<TacticalObjective> attackerObjective()
     {
         List<TacticalObjective> lListObjectives = new ArrayList<TacticalObjective>();
+        lListObjectives.addAll(commonObjective(client.getAttacker()));
         Creature toKill = null;
         for (Creature lcritter : client.getDefender().getCreatures())
         {
@@ -145,6 +173,7 @@ public class BasicObjectiveHelper implements IObjectiveHelper {
     public List<TacticalObjective> defenderObjective()
     {
         List<TacticalObjective> lListObjectives = new ArrayList<TacticalObjective>();
+        lListObjectives.addAll(commonObjective(client.getDefender()));
         for (Creature lcritter : client.getAttacker().getCreatures())
         {
             if (lcritter.isTitan())
@@ -191,6 +220,9 @@ public class BasicObjectiveHelper implements IObjectiveHelper {
         final float ATTACKER_PRESERVE_TITAN_PRIORITY = 2.f;
         final float DEFENDER_PRESERVE_TITAN_PRIORITY = 5.f;
         final float DESTROY_IMPORTANT_CRITTER_PRIORITY = 1.f;
+
+        final float FIRST_WAVE_ATTACK_PRIORITY = 1.f;
+        final float SECOND_WAVE_ATTACK_PRIORITY = 0.5f;
     }
 
 
