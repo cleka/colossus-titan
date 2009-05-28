@@ -35,7 +35,6 @@ public final class Start
         .getName());
 
     private CmdLine cmdLine;
-    private int howManyGamesLeft = 0;
 
     private final WhatNextManager whatNextManager;
 
@@ -563,9 +562,6 @@ public final class Start
         // - or are stored within the options or startOptions.
         cmdLine = null;
 
-        howManyGamesLeft = Options.getHowManyStresstestRoundsProperty();
-        whatNextManager.updateHowManyGamesLeft(howManyGamesLeft);
-
         // Make sure "AIs stop when no humans left" is off when stresstesting
         if (Options.isStresstest())
         {
@@ -629,6 +625,8 @@ public final class Start
 
             else if (getWhatToDoNext() == WhatToDoNext.START_GAME)
             {
+                whatNextManager.decrementHowManyGamesLeft();
+
                 // TODO is this re-setting it needed?
                 whatNextManager.setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
                 int port = startOptions.getIntOption(Options.serveAtPort);
@@ -650,6 +648,8 @@ public final class Start
 
             else if (getWhatToDoNext() == WhatToDoNext.LOAD_GAME)
             {
+                whatNextManager.decrementHowManyGamesLeft();
+
                 // TODO is this re-setting it needed?
                 whatNextManager.setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
                 int port = startOptions.getIntOption(Options.serveAtPort);
@@ -739,9 +739,6 @@ public final class Start
                 ViableEntityManager.waitUntilAllGone();
             }
 
-            serverOptions = null;
-            netclientOptions = null;
-
             // ResourceLoader has static String telling the server; if not reset,
             // for a remote client closing while game is not over, he set next
             // to do to GetPlayers dialog, dialog wants to load Variant Readme,
@@ -751,15 +748,9 @@ public final class Start
             // DebugStuff.doCleanupStuff(false);
 
             // For Stresstesting (controlled by a system property):
-            if (Options.isStresstest() && howManyGamesLeft > 0)
+            if (Options.isStresstest()
+                && whatNextManager.getHowManyGamesLeft() > 0)
             {
-                // Decrement in here, not in if, otherwise we decrement it
-                // until negative infinity ;-)
-                howManyGamesLeft--;
-                whatNextManager.updateHowManyGamesLeft(howManyGamesLeft);
-                LOGGER.log(Level.ALL, "howManyGamesLeft now "
-                    + howManyGamesLeft + "\n");
-
                 String loadFileName = startOptions
                     .getStringOption(Options.loadGameFileName);
                 if (loadFileName != null)
@@ -770,6 +761,11 @@ public final class Start
                 {
                     whatNextManager.setWhatToDoNext(WhatToDoNext.START_GAME, false);
                 }
+            }
+            else
+            {
+                serverOptions = null;
+                netclientOptions = null;
             }
 
         } // end WHILE not QuitAll

@@ -349,8 +349,13 @@ public final class GameServerSide extends Game
                 LOGGER.info("Added " + type + " player " + name);
             }
         }
-        // No longer need the player name and type options.
-        options.clearPlayerInfo();
+
+        // No longer need the player name and type options
+        // - except if needed for next stresstest round.
+        if (!Options.isStresstest())
+        {
+            options.clearPlayerInfo();
+        }
 
         getVariant().getCreatureByName("Titan").setMaxCount(getNumPlayers());
     }

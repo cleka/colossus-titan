@@ -10,13 +10,14 @@ public class WhatNextManager
     private static final Logger LOGGER = Logger
         .getLogger(WhatNextManager.class.getName());
 
-    private WhatToDoNext whatToDoNext;
     private final Options startOptions;
-    private int howManyGamesLeft = 0;
+    private WhatToDoNext whatToDoNext;
+    private int howManyGamesLeft;
 
     public WhatNextManager(Options startOpts)
     {
         this.startOptions = startOpts;
+        this.howManyGamesLeft = Options.getHowManyStresstestRoundsProperty();
     }
 
     public WhatToDoNext getWhatToDoNext()
@@ -58,11 +59,17 @@ public class WhatNextManager
         startOptions.setOption(Options.loadGameFileName, loadFile);
     }
 
-    public void updateHowManyGamesLeft(int left)
+    public int getHowManyGamesLeft()
     {
-        howManyGamesLeft = left;
+        return howManyGamesLeft;
     }
 
+    public int decrementHowManyGamesLeft()
+    {
+        howManyGamesLeft--;
+        LOGGER.log(Level.INFO, "howManyGamesLeft now " + howManyGamesLeft);
+        return howManyGamesLeft;
+    }
     /**
      * Trigger a timed Quit, which will (by using a demon thread) terminate
      * the JVM after a timeout (currently 10 seconds)
@@ -77,7 +84,7 @@ public class WhatNextManager
             LOGGER.info("Functional test ongoing - ignoring the "
                 + "request to trigger a timed quit.");
         }
-        else if (howManyGamesLeft > 0)
+        else if (Options.isStresstest() && howManyGamesLeft > 0)
         {
             LOGGER.info("HowManyGamesLeft now " + howManyGamesLeft
                 + " not zero yet - ignoring the "
