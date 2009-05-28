@@ -22,7 +22,9 @@ import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
+import net.sf.colossus.client.Client;
 import net.sf.colossus.client.HexMap;
+import net.sf.colossus.client.Client.ConnectionInitException;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.common.WhatNextManager;
@@ -230,28 +232,17 @@ public final class GameServerSide extends Game
         }
         try
         {
-            // Clemens 12/2007:
-            // initFileServer can now done before creating local clients,
-            // starting the ClientHandlers and accepting the clients.
-            // It decides whether to start a FST or not based on whether there
-            // are *Network type* players in the Player list (instead of
-            // whether there is something in the socket list, which was bogus,
-            // because also local clients will be in socket list).
-            // It's also not necessary to be after the socket server-start
-            //   / client-accepting, "because FST accepts only request from known
-            //       client addresses"  -- in fact a client won't request files
-            // before he is registered. So, do the FST start first and we are safe.
             server.initFileServer();
             server.initSocketServer();
+            server.start();
             notifyWebServer.readyToAcceptClients();
-            if (server.waitForClients())
+
+            createLocalClients();
+
+            boolean gotAll = true;
+            if (gotAll)
             {
                 ViableEntityManager.register(this, "Server/Game " + gameId);
-
-                // Note server.start() is done even if not all clients came in.
-                // This is needed to that run() after the loop notifies that
-                // the game is over.
-                server.start();
 
                 // Tell WebClient to inform the WebServer that the game
                 // was started (on this player's PC) and all clients have
@@ -270,19 +261,74 @@ public final class GameServerSide extends Game
             }
             else
             {
-                // Note server.start() is done even if not all clients came in.
-                // This is needed to that run() after the loop notifies that
-                // the game is over.
-                server.start();
+                LOGGER.warning("waitForClients returned false, "
+                    + "indicating that not all clients connected.");
             }
-
         }
+
         catch (Exception e)
         {
             LOGGER.log(Level.SEVERE, "Server initialization got Exception "
                 + e.getMessage(), e);
         }
     }
+
+    public void createLocalClients()
+    {
+        boolean atLeastOneBoardNeeded = Constants.FORCE_VIEW_BOARD;
+        for (Player player : getPlayers())
+        {
+            String type = player.getType();
+            // getDeadBeforeSave to Game instead?
+            if (!((PlayerServerSide)player).getDeadBeforeSave()
+                && !type.endsWith(Constants.network))
+            {
+
+                if (player.getName().equals(getHostingPlayer()))
+                {
+                    LOGGER.info("Skipping creation of local client for "
+                        + "hosting player " + player.getName());
+                }
+                else
+                {
+                    boolean createGUI = !player.isAI();
+                    if (atLeastOneBoardNeeded)
+                    {
+                        // Yes, only depending on the atLeast..., no matter
+                        // whether for this player true or not!
+                        // This relies on the fact that for cmdline setup
+                        // Human players are created before AI players.
+                        createGUI = true;
+                        atLeastOneBoardNeeded = false;
+                    }
+                    LOGGER.info("Creating local client for player "
+                        + player.getName() + ", type " + type);
+                    createLocalClient((PlayerServerSide)player, createGUI,
+                        type);
+                }
+            }
+        }
+    }
+
+    private void createLocalClient(PlayerServerSide player, boolean createGUI,
+        String type)
+    {
+        String playerName = player.getName();
+        boolean dontUseOptionsFile = player.isAI();
+        LOGGER.finest("Called Server.createLocalClient() for " + playerName);
+
+        try
+        {
+            Client.createClient("127.0.0.1", getPort(), playerName, type,
+                whatNextManager, server, false, dontUseOptionsFile, createGUI);
+        }
+        catch (ConnectionInitException e)
+        {
+            LOGGER.warning("Creating local client for player " + playerName
+                + " failed, reason " + e.getMessage());
+        }
+    }
+
 
     /**
      * Update the dead and available counts for a creature type on all clients.

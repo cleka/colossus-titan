@@ -46,7 +46,6 @@ import net.sf.colossus.server.Server;
 import net.sf.colossus.server.VariantKnower;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.CollectionHelper;
-import net.sf.colossus.util.ErrorUtils;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.InstanceTracker;
 import net.sf.colossus.util.Predicate;
@@ -133,7 +132,7 @@ public final class Client implements IClient, IOracle, IVariant
      *  TODO perhaps that is now fixed in Java 1.5 ?
      *  I plan to change the whole "when/how SCT is created" soon anyway...
      */
-    private boolean failed = false;
+    private final boolean failed = false;
 
     /** Replay during load of a saved game is ongoing. Client must NOT react
      *  (not even redraw) on any of those messages, they are mostly sent to
@@ -240,7 +239,8 @@ public final class Client implements IClient, IOracle, IVariant
 
     private boolean disposeInProgress = false;
 
-    /** Create a Client object and other related objects
+    /**
+     * Create a Client object and other related objects
      *
      * @param host The host to which SocketClientThread shall connect
      * @param port The port to which SocketClientThread shall connect
@@ -263,22 +263,30 @@ public final class Client implements IClient, IOracle, IVariant
         String playerName, String playerType, WhatNextManager whatNextMgr,
         Server theServer, boolean byWebClient, boolean noOptionsFile,
         boolean createGUI)
+    throws ConnectionInitException
     {
         /* TODO Clients on same machine could share the instance
          * (proper synchronization needed, of course).
          */
         ResourceLoader loader;
+        boolean remote;
+
         if (theServer == null)
         {
             loader = new ResourceLoader(host, port + 1);
+            remote = true;
         }
         else
         {
             loader = new ResourceLoader(null, 0);
+            remote = false;
         }
 
-        return new Client(host, port, playerName, playerType, whatNextMgr,
-            theServer, byWebClient, noOptionsFile, createGUI, loader);
+        IServerConnection conn = SocketClientThread.createConnection(host,
+            port, playerName, remote);
+
+        return new Client(playerName, playerType, whatNextMgr,
+            theServer, byWebClient, noOptionsFile, createGUI, loader, conn);
     }
 
     /**
@@ -317,9 +325,10 @@ public final class Client implements IClient, IOracle, IVariant
      *
      * TODO Make player type typesafe
      */
-    public Client(String host, int port, String playerName, String playerType,
+    public Client(String playerName, String playerType,
         WhatNextManager whatNextMgr, Server theServer, boolean byWebClient,
-        boolean noOptionsFile, boolean createGUI, ResourceLoader resLoader)
+        boolean noOptionsFile, boolean createGUI, ResourceLoader resLoader,
+        IServerConnection conn)
     {
         assert playerName != null;
 
@@ -335,6 +344,9 @@ public final class Client implements IClient, IOracle, IVariant
         // Game outside ( = then we can't give Client to Game constructor)
         // or create Game inside Client (then we can pass in the Client).
         game.setClient(this);
+
+        this.connection = conn;
+        connection.setClient(this);
 
         this.resourceLoader = resLoader;
         LOGGER.finest("Got ResourceLoader: " + resourceLoader.toString());
@@ -384,40 +396,17 @@ public final class Client implements IClient, IOracle, IVariant
         // pickMarker requests come from server:
         options.setOption(Options.autoPlay, this.owningPlayer.isAI());
 
+        this.server = connection.getIServer();
+
+        connection.startThread();
+
+        TerrainRecruitLoader.setCaretaker(getGame().getCaretaker());
+        CustomRecruitBase.addCaretakerClientSide(getGame().getCaretaker());
+
         this.localServer = theServer;
 
         gui.setStartedByWebClient(byWebClient);
 
-        connection = new SocketClientThread(this, host, port, playerName,
-            isRemote());
-
-        String reasonFail = connection.getReasonFail();
-        if (reasonFail != null)
-        {
-            // If this failed here, it is usually a "could not connect"-problem
-            // (wrong host or port or server not yet up).
-            // In this case we just do cleanup and end.
-
-            LOGGER.warning("Client startup failed: " + reasonFail);
-            if (!Options.isStresstest())
-            {
-                String title = "Socket initialialization failed!";
-                ErrorUtils.showErrorDialog(null, title, reasonFail);
-            }
-
-            failed = true;
-            ViableEntityManager.unregister(this);
-        }
-        else
-        {
-            this.server = connection.getIServer();
-
-            connection.startThread();
-
-            TerrainRecruitLoader.setCaretaker(getGame().getCaretaker());
-            CustomRecruitBase.addCaretakerClientSide(getGame().getCaretaker());
-            failed = false;
-        }
     }
 
     public boolean isRemote()
@@ -3422,4 +3411,11 @@ public final class Client implements IClient, IOracle, IVariant
         return game.getVariant().getTerrains();
     }
 
+    public static class ConnectionInitException extends Exception
+    {
+        public ConnectionInitException(String reason)
+        {
+            super(reason);
+        }
+    }
 }

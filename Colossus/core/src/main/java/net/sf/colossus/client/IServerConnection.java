@@ -14,6 +14,8 @@ import net.sf.colossus.server.IServer;
  */
 public interface IServerConnection
 {
+    public void setClient(Client client);
+
     public String getReasonFail();
 
     public void startThread();

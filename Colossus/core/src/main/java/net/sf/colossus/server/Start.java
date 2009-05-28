@@ -802,22 +802,16 @@ public final class Start
         String hostname = startOptions.getStringOption(Options.runClientHost);
         int port = startOptions.getIntOption(Options.runClientPort);
 
-        boolean failed = false;
         try
         {
             String type = Constants.aiPackage + Constants.network;
-            Client c = Client.createClient(hostname, port, playerName, type,
+            Client.createClient(hostname, port, playerName, type,
                 whatNextManager, null, false, false, true);
-            failed = c.getFailed();
-            c = null;
         }
         catch (Exception e)
         {
-            failed = true;
-        }
-        if (failed)
-        {
-            // client startup failed for some reason
+            LOGGER.warning("Creating the network CLIENT failed, reason: "
+                + e.getMessage());
             dontWait = true;
         }
 

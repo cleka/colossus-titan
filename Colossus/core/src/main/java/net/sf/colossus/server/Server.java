@@ -24,7 +24,6 @@ import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
-import net.sf.colossus.client.Client;
 import net.sf.colossus.client.IClient;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
@@ -163,6 +162,9 @@ public final class Server extends Thread implements IServer
     @Override
     public void run()
     {
+        // boolean gotAll = waitForClients();
+        waitForClients();
+
         int timeout = timeoutDuringGame;
         int disposeRound = 0;
         while (!shuttingDown && disposeRound < 60)
@@ -287,7 +289,6 @@ public final class Server extends Thread implements IServer
             System.exit(1);
 
         }
-        createLocalClients();
     }
 
     boolean waitForClients()
@@ -466,9 +467,10 @@ public final class Server extends Thread implements IServer
         {
             LOGGER.log(Level.SEVERE, "Exception while waiting on selector", e);
             String message = "Woooah. An exception was caught while "
-                + "waiting on Selector";
-            ErrorUtils.showExceptionDialog(null, "Exception caught!",
-                message, false);
+                + "waiting on Selector!" + "\nStack trace:\n"
+                + ErrorUtils.makeStackTraceString(e);
+            ErrorUtils.showExceptionDialog(null, message, "Exception caught!",
+                false);
         }
     }
 
@@ -867,54 +869,6 @@ public final class Server extends Thread implements IServer
         return game.getBattle() != null
             && game.getBattle().getActivePlayer() != null
             && getPlayer().equals(game.getBattle().getActivePlayer());
-    }
-
-    public void createLocalClients()
-    {
-        boolean atLeastOneBoardNeeded = Constants.FORCE_VIEW_BOARD;
-        for (Player player : game.getPlayers())
-        {
-            String type = player.getType();
-            // getDeadBeforeSave to Game instead?
-            if (!((PlayerServerSide)player).getDeadBeforeSave()
-                && !type.endsWith(Constants.network))
-            {
-
-                if (player.getName().equals(game.getHostingPlayer()))
-                {
-                    LOGGER.info("Skipping creation of local client for "
-                        + "hosting player " + player.getName());
-                }
-                else
-                {
-                    boolean createGUI = !player.isAI();
-                    if (atLeastOneBoardNeeded)
-                    {
-                        // Yes, only depending on the atLeast..., no matter
-                        // whether for this player true or not!
-                        // This relies on the fact that for cmdline setup
-                        // Human players are created before AI players.
-                        createGUI = true;
-                        atLeastOneBoardNeeded = false;
-                    }
-                    LOGGER.info("Creating local client for player "
-                        + player.getName() + ", type " + type);
-                    createLocalClient((PlayerServerSide)player, createGUI,
-                        type);
-                }
-            }
-        }
-    }
-
-    private void createLocalClient(PlayerServerSide player, boolean createGUI,
-        String type)
-    {
-        String playerName = player.getName();
-        boolean dontUseOptionsFile = player.isAI();
-        LOGGER.finest("Called Server.createLocalClient() for " + playerName);
-
-        Client.createClient("127.0.0.1", port, playerName, type,
-            whatNextManager, this, false, dontUseOptionsFile, createGUI);
     }
 
     boolean addClient(final IClient client, final String playerName,

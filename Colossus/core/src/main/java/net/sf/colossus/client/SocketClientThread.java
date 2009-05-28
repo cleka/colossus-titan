@@ -17,7 +17,9 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.client.Client.ConnectionInitException;
 import net.sf.colossus.common.Constants;
+import net.sf.colossus.common.Options;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
@@ -63,12 +65,35 @@ final class SocketClientThread extends Thread implements IServer,
     private final Object isWaitingLock = new Object();
     private boolean isWaiting = false;
 
-    SocketClientThread(Client client, String host, int port,
-        String initialName, boolean isRemote)
+    public static SocketClientThread createConnection(String host, int port,
+        String playerName, boolean remote) throws ConnectionInitException
+    {
+        SocketClientThread conn = new SocketClientThread(host, port,
+            playerName, remote);
+
+        String reasonFail = conn.getReasonFail();
+        if (reasonFail != null)
+        {
+            // If this failed here, it is usually a "could not connect"-problem
+            // (wrong host or port or server not yet up).
+            // In this case we just do cleanup and end.
+
+            LOGGER.warning("Client startup failed: " + reasonFail);
+            if (!Options.isStresstest())
+            {
+                String title = "Socket initialialization failed!";
+                ErrorUtils.showErrorDialog(null, title, reasonFail);
+            }
+            throw new ConnectionInitException(reasonFail);
+        }
+
+        return conn;
+    }
+
+    SocketClientThread(String host, int port, String initialName,
+        boolean isRemote)
     {
         super("Client " + initialName);
-
-        this.client = client;
 
         InstanceTracker.register(this, "SCT " + initialName);
 
@@ -97,7 +122,24 @@ final class SocketClientThread extends Thread implements IServer,
             in = new BufferedReader(new InputStreamReader(socket
                 .getInputStream()));
 
+            task = "try initial read";
+            LOGGER.log(Level.FINEST, "Next: " + task);
+            tryInitialRead();
+
+            reasonFail = null;
         }
+
+        catch (UnknownHostException e)
+        {
+            LOGGER.log(Level.INFO, "UnknownHostException ('" + e.getMessage()
+                + "') " + "in SCT during " + task);
+            reasonFail = "UnknownHostException ('" + e.getMessage() + "') "
+                + "during " + task + ".\n(This probably means:\n"
+                + "You have given a server as name istead of IP address and "
+                + "the name cannot be resolved to an address (typo?).";
+            return;
+        }
+
         // Could not connect - probably Firewall/NAT, or wrong IP or port
         catch (ConnectException e)
         {
@@ -131,18 +173,43 @@ final class SocketClientThread extends Thread implements IServer,
             return;
         }
 
-        catch (UnknownHostException e)
+        // e.g. readLine in initialRead()
+        catch (SocketTimeoutException ste)
         {
-            LOGGER.log(Level.INFO, "UnknownHostException ('" + e.getMessage()
-                + "') " + "in SCT during " + task);
-            reasonFail = "UnknownHostException ('" + e.getMessage() + "') "
-                + "during " + task + ".\n(This probably means:\n"
-                + "You have given a server as name istead of IP address and "
-                + "the name cannot be resolved to an address (typo?).";
+            String msg = ste.getMessage();
+            LOGGER.log(Level.INFO, "SocketTimeoutException (\"" + msg + "\") "
+                + "in SCT during " + task);
+            reasonFail = "Server not responding (could connect, "
+                + "but didn't got any initial data within 5 seconds. "
+                + "Probably the game has already as many clients as "
+                + "it expects).";
             return;
         }
 
-        // probably IOException
+        // e.g. setSoTimeout calls in tryInitialRead
+        catch (SocketException e)
+        {
+            LOGGER.log(Level.SEVERE, "SocketException in SCT during " + task
+                + ": ", e);
+            reasonFail = "Exception during " + task + ": " + e.toString()
+                + "\n(No typical case is known causing this situation; "
+                + "check the exception details for any information what "
+                + "might be wrong)";
+            return;
+        }
+
+        // e.g. readLine() in tryInitialRead
+        catch (IOException e)
+        {
+            LOGGER.log(Level.SEVERE, "IOException in SCT during " + task
+                + ": ", e);
+            reasonFail = "Exception during " + task + ": " + e.toString()
+                + "\n(No typical case is known causing this situation; "
+                + "check the exception details for any information what "
+                + "might be wrong)";
+            return;
+        }
+
         catch (Exception e)
         {
             LOGGER.log(Level.SEVERE, "Unusual Exception in SCT during " + task
@@ -155,42 +222,23 @@ final class SocketClientThread extends Thread implements IServer,
         }
     }
 
-    public void tryInitialRead()
+    public void tryInitialRead() throws SocketTimeoutException,
+        SocketException, IOException
     {
-        try
+        // Directly after connect we should get some first message
+        // rather quickly... if not, probably Server has already enough
+        // clients and we would hang in the queue...
+        socket.setSoTimeout(5000);
+        initialLine = in.readLine();
+        if (initialLine.startsWith("SignOn:"))
         {
-            // Directly after connect we should get some first message
-            // rather quickly... if not, probably Server has already enough
-            // clients and we would hang in the queue...
-            socket.setSoTimeout(5000);
-            initialLine = in.readLine();
-            if (initialLine.startsWith("SignOn:"))
-            {
-                LOGGER.log(Level.INFO, "Got prompt - ok!");
-                initialLine = null;
-            }
-            // ... but after we got first data, during game it might take
-            // unpredictable time before next thing comes, so reset it to 0
-            //  ( = wait forever).
-            socket.setSoTimeout(0);
-            reasonFail = null;
+            LOGGER.log(Level.INFO, "Got prompt - ok!");
+            initialLine = null;
         }
-        catch (SocketTimeoutException ex)
-        {
-            reasonFail = "Server not responding (could connect, "
-                + "but didn't got any initial data within 5 seconds. "
-                + "Probably the game has already as many clients as "
-                + "it expects).";
-            return;
-
-        }
-        catch (Exception ex)
-        {
-            reasonFail = "Unanticipated exception during"
-                + " reading first line from server: " + ex.toString();
-
-            return;
-        }
+        // ... but after we got first data, during game it might take
+        // unpredictable time before next thing comes, so reset it to 0
+        //  ( = wait forever).
+        socket.setSoTimeout(0);
 
         return;
     }
@@ -203,6 +251,11 @@ final class SocketClientThread extends Thread implements IServer,
     public IServer getIServer()
     {
         return this;
+    }
+
+    public void setClient(Client client)
+    {
+        this.client = client;
     }
 
     // Implements the method of the "generic" IServerConnection
@@ -226,7 +279,6 @@ final class SocketClientThread extends Thread implements IServer,
             return;
         }
 
-        tryInitialRead();
         if (reasonFail != null)
         {
             goingDown = true;
@@ -1097,7 +1149,7 @@ final class SocketClientThread extends Thread implements IServer,
     // Setup method
     private void signOn(String loginName, boolean isRemote)
     {
-        sendToServer(Constants.signOn + sep + loginName + sep + isRemote);
+        out.println(Constants.signOn + sep + loginName + sep + isRemote);
     }
 
     /** Set the thread name to playerName */

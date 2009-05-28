@@ -54,6 +54,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import net.sf.colossus.client.Client;
+import net.sf.colossus.client.Client.ConnectionInitException;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.common.WhatNextManager;
@@ -2177,73 +2178,71 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             boolean noOptionsFile = false;
             // System.out.println("in webclient, before new Client for username "
             //     + username);
+
+
             gc = Client.createClient(hostingHost, p, username, type,
                 whatNextManager, localServer, true, noOptionsFile, true);
-            boolean failed = gc.getFailed();
-            if (failed)
-            {
-                gc = null;
-                JOptionPane.showMessageDialog(this,
-                    "Connecting to the game server hosting the game ("
-                        + hostingHost
-                        + ") or starting own MasterBoard failed!",
-                    "Starting game failed!", JOptionPane.ERROR_MESSAGE);
 
-                state = LoggedIn;
+            infoTextLabel.setText(waitingText);
+            setGameClient(gc);
+            gc.getGUI().setWebClient(this);
+
+            Timer timeoutStartup = setupTimer();
+
+            while (!clientIsUp && !timeIsUp)
+            {
+                synchronized (comingUpMutex)
+                {
+                    try
+                    {
+                        // System.out.println("before comingUpMutex.wait()");
+                        comingUpMutex.wait();
+                        // System.out.println("after  comingUpMutex.wait()");
+                    }
+                    catch (InterruptedException e)
+                    {
+                        // ignored
+                    }
+                    catch (Exception e)
+                    {
+                        // just to be sure...
+                    }
+                }
+            }
+
+            timeoutStartup.cancel();
+
+            if (clientIsUp)
+            {
+                state = Playing;
                 updateGUI();
+                onGameStartAutoAction();
             }
             else
             {
-                infoTextLabel.setText(waitingText);
-                setGameClient(gc);
-                gc.getGUI().setWebClient(this);
-
-                Timer timeoutStartup = setupTimer();
-
-                while (!clientIsUp && !timeIsUp)
-                {
-                    synchronized (comingUpMutex)
-                    {
-                        try
-                        {
-                            // System.out.println("before comingUpMutex.wait()");
-                            comingUpMutex.wait();
-                            // System.out.println("after  comingUpMutex.wait()");
-                        }
-                        catch (InterruptedException e)
-                        {
-                            // ignored
-                        }
-                        catch (Exception e)
-                        {
-                            // just to be sure...
-                        }
-                    }
-                }
-
-                timeoutStartup.cancel();
-
-                if (clientIsUp)
-                {
-                    state = Playing;
-                    updateGUI();
-                    onGameStartAutoAction();
-                }
-                else
-                {
-                    JOptionPane
-                        .showMessageDialog(
-                            this,
-                            "Own client could connect, but game did not start "
-                                + "(probably some other player connecting failed?)",
-                            "Starting game failed!", JOptionPane.ERROR_MESSAGE);
-                    state = LoggedIn;
-                    updateGUI();
-                }
+                JOptionPane.showMessageDialog(this,
+                    "Own client could connect, but game did not start "
+                        + "(probably some other player connecting failed?)",
+                    "Starting game failed!", JOptionPane.ERROR_MESSAGE);
+                state = LoggedIn;
+                updateGUI();
             }
+        }
+        catch (ConnectionInitException e)
+        {
+            gc = null;
+            JOptionPane.showMessageDialog(this,
+                "Connecting to the game server hosting the game ("
+                    + hostingHost + ") or starting own MasterBoard failed!\n"
+                    + "Reason: " + e.getMessage(), "Starting game failed!",
+                JOptionPane.ERROR_MESSAGE);
+
+            state = LoggedIn;
+            updateGUI();
         }
         catch (Exception e)
         {
+            gc = null;
             // client startup failed for some reason
             JOptionPane.showMessageDialog(this,
                 "Unexpected exception while starting the game client: "
