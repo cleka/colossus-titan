@@ -28,6 +28,7 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.undo.UndoManager;
 
 import net.sf.colossus.client.Client;
+import net.sf.colossus.client.GameClientSide;
 import net.sf.colossus.client.IClientGUI;
 import net.sf.colossus.client.IOracle;
 import net.sf.colossus.client.LegionClientSide;
@@ -37,7 +38,6 @@ import net.sf.colossus.common.Options;
 import net.sf.colossus.common.WhatNextManager;
 import net.sf.colossus.common.WhatNextManager.WhatToDoNext;
 import net.sf.colossus.game.BattleCritter;
-import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.BattleUnit;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Game;
@@ -184,6 +184,11 @@ public class ClientGUI implements IClientGUI
     public Game getGame()
     {
         return client.getGame();
+    }
+
+    public GameClientSide getGameClientSide()
+    {
+        return (GameClientSide)client.getGame();
     }
 
     public IOptions getOptions()
@@ -2099,13 +2104,12 @@ public class ClientGUI implements IClientGUI
         updateStatusScreen();
     }
 
-    public void actOnSetupBattleFight(BattlePhase battlePhase,
-        int battleTurnNumber)
+    public void actOnSetupBattleFight()
     {
         if (battleBoard != null)
         {
-            battleBoard.setPhase(battlePhase);
-            battleBoard.setTurn(battleTurnNumber);
+            battleBoard.setPhase(getGameClientSide().getBattlePhase());
+            battleBoard.setTurn(getGameClientSide().getBattleTurnNumber());
             if (client.isMyBattlePhase())
             {
                 focusMap();

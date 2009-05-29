@@ -194,10 +194,6 @@ public final class Client implements IClient, IOracle, IVariant
 
     private PlayerClientSide activePlayer;
 
-    private int battleTurnNumber = -1;
-    private Player battleActivePlayer;
-    private BattlePhase battlePhase;
-
     private Movement movement;
     private BattleMovement battleMovement;
     private Strike strike;
@@ -361,7 +357,7 @@ public final class Client implements IClient, IOracle, IVariant
 
         this.noone = new PlayerClientSide(getGame(), "", 0);
         this.activePlayer = noone;
-        this.battleActivePlayer = noone;
+        game.setBattleActivePlayer(noone);
 
         this.ai = createAI(playerType);
 
@@ -901,7 +897,7 @@ public final class Client implements IClient, IOracle, IVariant
                 boolean struck = makeForcedStrikes();
                 if (!struck)
                 {
-                    struck = ai.strike(getBattleActiveLegion());
+                    struck = ai.strike(game.getBattleActiveLegion());
                 }
                 if (!struck)
                 {
@@ -1650,9 +1646,9 @@ public final class Client implements IClient, IOracle, IVariant
     {
         gui.cleanupNegotiationDialogs();
 
-        this.battleTurnNumber = battleTurnNumber;
-        this.battleActivePlayer = battleActivePlayer;
-        this.battlePhase = battlePhase;
+        game.setBattleTurnNumber(battleTurnNumber);
+        game.setBattleActivePlayer(battleActivePlayer);
+        game.setBattlePhase(battlePhase);
         this.getDefender().setEntrySide(
             this.getAttacker().getEntrySide().getOpposingSide());
 
@@ -1683,9 +1679,7 @@ public final class Client implements IClient, IOracle, IVariant
 
 
         battleUnits.clear();
-        battlePhase = null;
-        battleTurnNumber = -1;
-        battleActivePlayer = noone;
+        game.cleanupBattle(noone);
     }
 
     public int[] getReinforcementTurns()
@@ -1844,7 +1838,8 @@ public final class Client implements IClient, IOracle, IVariant
     public void undidRecruit(Legion legion, CreatureType recruit)
     {
         boolean wasReinforcement;
-        if (battlePhase != null)
+        // TODO ask "is battle ongoing" instead of comparing battlePhase?
+        if (game.getBattlePhase() != null)
         {
             wasReinforcement = true;
             gui.eventViewerCancelReinforcement(recruit, getTurnNumber());
@@ -2010,9 +2005,9 @@ public final class Client implements IClient, IOracle, IVariant
     public void setupBattleSummon(Player battleActivePlayer,
         int battleTurnNumber)
     {
-        this.battlePhase = BattlePhase.SUMMON;
-        this.battleActivePlayer = battleActivePlayer;
-        this.battleTurnNumber = battleTurnNumber;
+        game.setBattlePhase(BattlePhase.SUMMON);
+        game.setBattleActivePlayer(battleActivePlayer);
+        game.setBattleTurnNumber(battleTurnNumber);
 
         gui.actOnSetupBattleSummon();
 
@@ -2021,12 +2016,10 @@ public final class Client implements IClient, IOracle, IVariant
     public void setupBattleRecruit(Player battleActivePlayer,
         int battleTurnNumber)
     {
-        this.battlePhase = BattlePhase.RECRUIT;
-        this.battleActivePlayer = battleActivePlayer;
-        this.battleTurnNumber = battleTurnNumber;
-
+        game.setBattlePhase(BattlePhase.RECRUIT);
+        game.setBattleActivePlayer(battleActivePlayer);
+        game.setBattleTurnNumber(battleTurnNumber);
         gui.actOnSetupBattleRecruit();
-
     }
 
     private void resetAllBattleMoves()
@@ -2040,14 +2033,14 @@ public final class Client implements IClient, IOracle, IVariant
 
     public void setupBattleMove(Player battleActivePlayer, int battleTurnNumber)
     {
-        this.battleActivePlayer = battleActivePlayer;
-        this.battleTurnNumber = battleTurnNumber;
+        game.setBattleActivePlayer(battleActivePlayer);
+        game.setBattleTurnNumber(battleTurnNumber);
 
         // Just in case the other player started the battle
         // really quickly.
         gui.cleanupNegotiationDialogs();
         resetAllBattleMoves();
-        this.battlePhase = BattlePhase.MOVE;
+        game.setBattlePhase(BattlePhase.MOVE);
 
         gui.actOnSetupBattleMove();
 
@@ -2099,14 +2092,14 @@ public final class Client implements IClient, IOracle, IVariant
     public void setupBattleFight(BattlePhase battlePhase,
         Player battleActivePlayer)
     {
-        this.battlePhase = battlePhase;
-        this.battleActivePlayer = battleActivePlayer;
-        if (battlePhase == BattlePhase.FIGHT)
+        game.setBattlePhase(battlePhase);
+        game.setBattleActivePlayer(battleActivePlayer);
+        if (game.isBattlePhase(BattlePhase.FIGHT))
         {
             markOffboardCreaturesDead();
         }
 
-        gui.actOnSetupBattleFight(battlePhase, battleTurnNumber);
+        gui.actOnSetupBattleFight();
 
         doAutoStrikes();
     }
@@ -2129,23 +2122,14 @@ public final class Client implements IClient, IOracle, IVariant
         return color.getShortName();
     }
 
-    // TODO Comment Clemens I think this would be better a variable
-    //      in GameClientSide...
     public Player getBattleActivePlayer()
     {
-        return battleActivePlayer;
+        return game.getBattleActivePlayer();
     }
 
     Legion getBattleActiveLegion()
     {
-        if (battleActivePlayer.equals(getDefender().getPlayer()))
-        {
-            return getDefender();
-        }
-        else
-        {
-            return getAttacker();
-        }
+        return game.getBattleActiveLegion();
     }
 
     // public for IOracle
@@ -2170,26 +2154,19 @@ public final class Client implements IClient, IOracle, IVariant
 
     public BattlePhase getBattlePhase()
     {
-        return battlePhase;
+        return game.getBattlePhase();
     }
 
     // public for IOracle
     public String getBattlePhaseName()
     {
-        if (game.isPhase(Phase.FIGHT))
-        {
-            if (battlePhase != null)
-            {
-                return battlePhase.toString();
-            }
-        }
-        return "";
+        return game.getBattlePhaseName();
     }
 
     // public for IOracle and BattleBoard
     public int getBattleTurnNumber()
     {
-        return battleTurnNumber;
+        return game.getBattleTurnNumber();
     }
 
     public void doBattleMove(int tag, BattleHex hex)

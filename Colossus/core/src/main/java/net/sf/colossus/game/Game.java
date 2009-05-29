@@ -76,6 +76,7 @@ public abstract class Game
     private Legion defender;
     private MasterHex battleSite;
 
+
     /**
      * Create a Game object.
      *

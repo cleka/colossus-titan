@@ -9,7 +9,6 @@ import java.util.SortedSet;
 import net.sf.colossus.common.IOptions;
 import net.sf.colossus.common.WhatNextManager;
 import net.sf.colossus.game.BattleCritter;
-import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.BattleUnit;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
@@ -147,8 +146,7 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public void actOnSetupBattleFight(BattlePhase battlePhase,
-        int battleTurnNumber)
+    public void actOnSetupBattleFight()
     {
         // TODO Auto-generated method stub
 

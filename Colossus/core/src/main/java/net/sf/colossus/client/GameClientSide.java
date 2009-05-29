@@ -8,8 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
+import net.sf.colossus.game.Phase;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.util.CollectionHelper;
 import net.sf.colossus.util.Predicate;
@@ -22,6 +24,10 @@ import net.sf.colossus.variant.Variant;
 public class GameClientSide extends Game // implements IOracle
 {
     private Client client;
+
+    private BattlePhase battlePhase;
+    private int battleTurnNumber = -1;
+    private Player battleActivePlayer;
 
     public GameClientSide(Variant variant, String[] playerNames,
         IVariantKnower variantKnower)
@@ -316,6 +322,74 @@ public class GameClientSide extends Game // implements IOracle
     public Legion getLegionByMarkerId(String markerId)
     {
         return client.getLegion(markerId);
+    }
+
+    // TODO move battlePhase (& friends) to Battle or BattleClientSide?
+    public BattlePhase getBattlePhase()
+    {
+        return battlePhase;
+    }
+
+    public void setBattlePhase(BattlePhase battlePhase)
+    {
+        this.battlePhase = battlePhase;
+    }
+
+    public boolean isBattlePhase(BattlePhase phase)
+    {
+        return this.battlePhase == phase;
+    }
+
+    // public for IOracle
+    public String getBattlePhaseName()
+    {
+        if (isPhase(Phase.FIGHT))
+        {
+            if (battlePhase != null)
+            {
+                return battlePhase.toString();
+            }
+        }
+        return "";
+    }
+
+    public void setBattleActivePlayer(Player battleActivePlayer)
+    {
+        this.battleActivePlayer = battleActivePlayer;
+    }
+
+    public void setBattleTurnNumber(int battleTurnNumber)
+    {
+        this.battleTurnNumber = battleTurnNumber;
+    }
+
+    public int getBattleTurnNumber()
+    {
+        return battleTurnNumber;
+    }
+
+    public Player getBattleActivePlayer()
+    {
+        return battleActivePlayer;
+    }
+
+    public void cleanupBattle(Player noonePlayer)
+    {
+        setBattlePhase(null);
+        battleTurnNumber = -1;
+        battleActivePlayer = noonePlayer;
+    }
+
+    public Legion getBattleActiveLegion()
+    {
+        if (battleActivePlayer.equals(getDefender().getPlayer()))
+        {
+            return getDefender();
+        }
+        else
+        {
+            return getAttacker();
+        }
     }
 
 }

@@ -9,7 +9,6 @@ import java.util.Set;
 import java.util.SortedSet;
 
 import net.sf.colossus.game.BattleCritter;
-import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.BattleUnit;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
@@ -258,8 +257,7 @@ public interface IClientGUI
 
     public abstract void actOnSetupFight();
 
-    public abstract void actOnSetupBattleFight(BattlePhase battlePhase,
-        int battleTurnNumber);
+    public abstract void actOnSetupBattleFight();
 
     public abstract void actOnSetupBattleMove();
 

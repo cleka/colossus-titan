@@ -116,7 +116,8 @@ final class BattleMovement
         {
             if (client.getBattleSite().getTerrain().hasStartList()
                 && (client.getBattleTurnNumber() == 1)
-                && client.getBattleActiveLegion().equals(client.getDefender()))
+                && client.getGameClientSide().getBattleActiveLegion().equals(
+                    client.getDefender()))
             {
                 set = findUnoccupiedStartlistHexes();
             }
