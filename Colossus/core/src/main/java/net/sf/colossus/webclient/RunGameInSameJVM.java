@@ -4,11 +4,11 @@ package net.sf.colossus.webclient;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.appmain.GetPlayers;
 import net.sf.colossus.common.IStartHandler;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.common.WhatNextManager;
 import net.sf.colossus.common.WhatNextManager.WhatToDoNext;
-import net.sf.colossus.server.GetPlayers;
 import net.sf.colossus.server.INotifyWebServer;
 import net.sf.colossus.server.StartGameForWebclient;
 import net.sf.colossus.webcommon.GameInfo;

@@ -1,4 +1,4 @@
-package net.sf.colossus.server;
+package net.sf.colossus.appmain;
 
 
 
@@ -50,6 +50,9 @@ import net.sf.colossus.gui.PickIntValue;
 import net.sf.colossus.gui.ShowReadme;
 import net.sf.colossus.guiutil.KFrame;
 import net.sf.colossus.guiutil.SaveWindow;
+import net.sf.colossus.server.Dice;
+import net.sf.colossus.server.VariantSupport;
+import net.sf.colossus.server.XMLSnapshotFilter;
 import net.sf.colossus.util.StaticResourceLoader;
 import net.sf.colossus.variant.Variant;
 

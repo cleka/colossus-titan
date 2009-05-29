@@ -1,4 +1,4 @@
-package net.sf.colossus.client;
+package net.sf.colossus.appmain;
 
 
 import java.awt.Container;

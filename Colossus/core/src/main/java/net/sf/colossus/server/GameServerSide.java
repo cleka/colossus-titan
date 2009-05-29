@@ -149,7 +149,7 @@ public final class GameServerSide extends Game
      * @param serverOptions The server side options, initialized from the
      * GetPlayers dialog and/or command line options.
      */
-    GameServerSide(WhatNextManager whatNextMgr, Options serverOptions,
+    public GameServerSide(WhatNextManager whatNextMgr, Options serverOptions,
         Variant variant, IVariantKnower variantKnower)
     {
         super(variant, new String[0], variantKnower);
@@ -406,7 +406,7 @@ public final class GameServerSide extends Game
         getVariant().getCreatureByName("Titan").setMaxCount(getNumPlayers());
     }
 
-    boolean startNewGameAndWaitUntilOver(String hostingPlayer)
+    public boolean startNewGameAndWaitUntilOver(String hostingPlayer)
     {
         boolean ok = newGame(hostingPlayer);
 
@@ -1619,7 +1619,7 @@ public final class GameServerSide extends Game
      */
     // JDOM lacks generics, so we need casts
     @SuppressWarnings("unchecked")
-    void loadGame(String filename)
+    public void loadGame(String filename)
     {
         File file = null;
 

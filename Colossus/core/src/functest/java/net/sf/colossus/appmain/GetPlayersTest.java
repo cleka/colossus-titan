@@ -1,4 +1,4 @@
-package net.sf.colossus.server;
+package net.sf.colossus.appmain;
 
 
 import java.lang.reflect.InvocationTargetException;
@@ -8,9 +8,11 @@ import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 
 import junit.framework.TestCase;
+import net.sf.colossus.appmain.GetPlayers;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.common.WhatNextManager;
+import net.sf.colossus.server.VariantSupport;
 
 
 public class GetPlayersTest extends TestCase
