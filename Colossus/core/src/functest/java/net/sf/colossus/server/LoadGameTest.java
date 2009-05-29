@@ -3,7 +3,6 @@ package net.sf.colossus.server;
 import java.util.logging.Logger;
 
 import junit.framework.TestCase;
-import net.sf.colossus.appmain.Start;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.util.ErrorUtils;
 

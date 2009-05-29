@@ -1,4 +1,4 @@
-package net.sf.colossus.appmain;
+package net.sf.colossus.server;
 
 
 import java.util.Date;
@@ -8,6 +8,8 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.appmain.GetPlayers;
+import net.sf.colossus.appmain.NetworkClientDialog;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.cmdline.CmdLine;
 import net.sf.colossus.cmdline.Opt;
@@ -17,8 +19,6 @@ import net.sf.colossus.common.Options;
 import net.sf.colossus.common.WhatNextManager;
 import net.sf.colossus.common.WhatNextManager.WhatToDoNext;
 import net.sf.colossus.guiutil.DebugMethods;
-import net.sf.colossus.server.GameServerSide;
-import net.sf.colossus.server.VariantKnower;
 import net.sf.colossus.util.ViableEntityManager;
 import net.sf.colossus.webclient.WebClient;
 
