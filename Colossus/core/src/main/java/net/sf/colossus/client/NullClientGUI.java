@@ -16,7 +16,6 @@ import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.SummonInfo;
-import net.sf.colossus.gui.Marker;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
@@ -670,12 +669,6 @@ public class NullClientGUI implements IClientGUI
     }
 
     public void showFlee(Client client, Legion ally, Legion enemy)
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void showMarker(Marker marker)
     {
         // TODO Auto-generated method stub
 

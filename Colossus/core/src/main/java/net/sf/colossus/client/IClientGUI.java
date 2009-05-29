@@ -16,7 +16,6 @@ import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.SummonInfo;
-import net.sf.colossus.gui.Marker;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
@@ -156,11 +155,6 @@ public interface IClientGUI
         Legion survivor, int turn);
 
     public abstract void setPreferencesWindowVisible(boolean val);
-
-    /**
-     * Displays the marker and its legion if possible.
-     */
-    public abstract void showMarker(Marker marker);
 
     public abstract void didSummon(Legion summoner, Legion donor,
         CreatureType summon);
