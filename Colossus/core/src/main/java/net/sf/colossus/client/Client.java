@@ -182,17 +182,6 @@ public final class Client implements IClient, IOracle, IVariant
     // TODO: could go into owningPlayer, BUT tricky right now as long as
     // owningPlayer is created twice (once fake and later for real)...
 
-    /**
-     * This is used as a placeholder for activePlayer and battleActivePlayer since they
-     * are sometimes accessed when they are not available.
-     *
-     * TODO this is a hack. Those members should just not be accessed at times where they
-     * are not available. It seems to happen during startup (the not yet set case) and in
-     * some GUI parts after battles, when battleActivePlayer has been reset already.
-     */
-    private final PlayerClientSide noone;
-
-    private PlayerClientSide activePlayer;
 
     private Movement movement;
     private BattleMovement battleMovement;
@@ -354,10 +343,6 @@ public final class Client implements IClient, IOracle, IVariant
         // TODO set type in constructor
         // (the whole player info setup needs fixing...)
         this.owningPlayer.setType(playerType);
-
-        this.noone = new PlayerClientSide(getGame(), "", 0);
-        this.activePlayer = noone;
-        game.setBattleActivePlayer(noone);
 
         this.ai = createAI(playerType);
 
@@ -1679,7 +1664,7 @@ public final class Client implements IClient, IOracle, IVariant
 
 
         battleUnits.clear();
-        game.cleanupBattle(noone);
+        game.cleanupBattle();
     }
 
     public int[] getReinforcementTurns()
@@ -1916,10 +1901,10 @@ public final class Client implements IClient, IOracle, IVariant
      */
     public void setupTurnState(Player activePlayer, int turnNumber)
     {
-        this.activePlayer = (PlayerClientSide)activePlayer;
+        game.setActivePlayer(activePlayer);
         game.setTurnNumber(turnNumber);
 
-        gui.actOnTurnOrPlayerChange(this, turnNumber, this.activePlayer);
+        gui.actOnTurnOrPlayerChange(this, turnNumber, game.getActivePlayer());
     }
 
     public void setupSplit(Player activePlayer, int turnNumber)
@@ -2358,9 +2343,12 @@ public final class Client implements IClient, IOracle, IVariant
     }
 
     // TODO active or not would probably work better as state in PlayerState
-    public PlayerClientSide getActivePlayer()
+    // NOTTODO ... I'd say it's not about "is one active or not" but which one
+    // is the one... ?
+
+    public Player getActivePlayer()
     {
-        return activePlayer;
+        return game.getActivePlayer();
     }
 
     public Phase getPhase()
@@ -2776,7 +2764,7 @@ public final class Client implements IClient, IOracle, IVariant
     {
         Set<MasterHex> result = new HashSet<MasterHex>();
 
-        for (Legion legion : activePlayer.getLegions())
+        for (Legion legion : game.getActivePlayer().getLegions())
         {
             if (canRecruit(legion))
             {
@@ -2842,7 +2830,7 @@ public final class Client implements IClient, IOracle, IVariant
     public Set<MasterHex> findUnmovedLegionHexes()
     {
         Set<MasterHex> result = new HashSet<MasterHex>();
-        for (Legion legion : activePlayer.getLegions())
+        for (Legion legion : game.getActivePlayer().getLegions())
         {
             if (!legion.hasMoved())
             {
@@ -2865,7 +2853,7 @@ public final class Client implements IClient, IOracle, IVariant
     {
         Set<MasterHex> result = new HashSet<MasterHex>();
 
-        for (Legion legion : activePlayer.getLegions())
+        for (Legion legion : game.getActivePlayer().getLegions())
         {
             if (legion.getHeight() >= minHeight)
             {

@@ -25,6 +25,18 @@ public class GameClientSide extends Game // implements IOracle
 {
     private Client client;
 
+    /**
+     * This is used as a placeholder for activePlayer and battleActivePlayer since they
+     * are sometimes accessed when they are not available.
+     *
+     * TODO this is a hack. Those members should just not be accessed at times where they
+     * are not available. It seems to happen during startup (the not yet set case) and in
+     * some GUI parts after battles, when battleActivePlayer has been reset already.
+     */
+    private final PlayerClientSide noone;
+
+    private Player activePlayer;
+
     private BattlePhase battlePhase;
     private int battleTurnNumber = -1;
     private Player battleActivePlayer;
@@ -33,6 +45,14 @@ public class GameClientSide extends Game // implements IOracle
         IVariantKnower variantKnower)
     {
         super(variant, playerNames, variantKnower);
+
+        // TODO fix this dummy constructor args
+        this.noone = new PlayerClientSide(this, "", 0);
+
+        this.activePlayer = noone;
+        this.battleActivePlayer = noone;
+
+
     }
 
     public void setClient(Client client)
@@ -373,11 +393,11 @@ public class GameClientSide extends Game // implements IOracle
         return battleActivePlayer;
     }
 
-    public void cleanupBattle(Player noonePlayer)
+    public void cleanupBattle()
     {
         setBattlePhase(null);
         battleTurnNumber = -1;
-        battleActivePlayer = noonePlayer;
+        battleActivePlayer = noone;
     }
 
     public Legion getBattleActiveLegion()
@@ -392,4 +412,13 @@ public class GameClientSide extends Game // implements IOracle
         }
     }
 
+    public void setActivePlayer(Player player)
+    {
+        activePlayer = player;
+    }
+
+    public Player getActivePlayer()
+    {
+        return activePlayer;
+    }
 }
