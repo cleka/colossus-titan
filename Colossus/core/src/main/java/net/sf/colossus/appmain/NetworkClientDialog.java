@@ -36,9 +36,9 @@ import net.sf.colossus.guiutil.SaveWindow;
  *  @author David Ripton
  */
 @SuppressWarnings("serial")
-public class StartClient extends KFrame
+public class NetworkClientDialog extends KFrame
 {
-    private static final Logger LOGGER = Logger.getLogger(StartClient.class
+    private static final Logger LOGGER = Logger.getLogger(NetworkClientDialog.class
         .getName());
 
     private final Object mutex;
@@ -55,7 +55,7 @@ public class StartClient extends KFrame
     private final JComboBox hostBox;
     private final JComboBox portBox;
 
-    public StartClient(Object mutex, final WhatNextManager whatNextMgr)
+    public NetworkClientDialog(Object mutex, final WhatNextManager whatNextMgr)
     {
         super("Client startup options");
         getContentPane().setLayout(new GridLayout(0, 2));
@@ -158,7 +158,7 @@ public class StartClient extends KFrame
             }
         });
         pack();
-        saveWindow = new SaveWindow(netclientOptions, "StartClient");
+        saveWindow = new SaveWindow(netclientOptions, "NetworkClientDialog");
         saveWindow.restoreOrCenter(this);
 
         setVisible(true);

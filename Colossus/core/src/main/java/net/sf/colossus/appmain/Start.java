@@ -183,17 +183,17 @@ public final class Start
         }
         else if (cl.optIsSet('g') && cl.optIsSet('c'))
         {
-            // Host empty means for StartClient: no command line wish given
+            // Host empty means for NetworkClientDialog: no command line wish given
             //  => it will initialize host name box based on mostly LRU list.
             // If no -s given, but -g, we must here do the same preferredHost
-            // evaluation what StartClient would do, so that the automatic
+            // evaluation what NetworkClientDialog would do, so that the automatic
             // Client starting has a host != null.
             // And I want that "with or without -g" behaves (apart from the
             // whether one has to click somewhere or not) otherwise same,
             //   ( = would end up same host).
 
             Set<String> dummy = new TreeSet<String>();
-            String preferred = StartClient.initServerNames(hostname, dummy,
+            String preferred = NetworkClientDialog.initServerNames(hostname, dummy,
                 netclientOptions);
             hostname = preferred;
             dummy.clear();
@@ -775,7 +775,7 @@ public final class Start
     private void runNetClientDialogAndWait()
     {
         Object mutex = new Object();
-        new StartClient(mutex, getWhatNextManager());
+        new NetworkClientDialog(mutex, getWhatNextManager());
 
         synchronized (mutex)
         {
