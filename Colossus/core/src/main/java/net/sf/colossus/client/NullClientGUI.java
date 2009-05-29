@@ -1,4 +1,4 @@
-package net.sf.colossus.gui;
+package net.sf.colossus.client;
 
 
 import java.awt.GraphicsDevice;
@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 
-import net.sf.colossus.client.Client;
-import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.common.IOptions;
 import net.sf.colossus.common.WhatNextManager;
 import net.sf.colossus.game.BattleCritter;
@@ -18,6 +16,7 @@ import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.SummonInfo;
+import net.sf.colossus.gui.Marker;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
@@ -472,16 +471,14 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public MasterBoard getBoard()
+    public boolean isPickCarryOngoing()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return false;
     }
 
-    public PickCarry getPickCarryDialog()
+    public void handlePickCarry()
     {
         // TODO Auto-generated method stub
-        return null;
     }
 
     public int getRecruitChitMode()
@@ -673,12 +670,6 @@ public class NullClientGUI implements IClientGUI
     }
 
     public void showFlee(Client client, Legion ally, Legion enemy)
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void showHexRecruitTree(GUIMasterHex hex)
     {
         // TODO Auto-generated method stub
 

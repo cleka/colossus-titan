@@ -1,4 +1,4 @@
-package net.sf.colossus.gui;
+package net.sf.colossus.client;
 
 
 import java.awt.Graphics2D;
@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 
-import net.sf.colossus.client.Client;
-import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.BattleUnit;
@@ -18,6 +16,7 @@ import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.SummonInfo;
+import net.sf.colossus.gui.Marker;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
@@ -32,8 +31,6 @@ public interface IClientGUI
     public abstract void setWebClient(WebClient wc);
 
     public abstract void setClientInWebClientNull();
-
-    public abstract MasterBoard getBoard();
 
     /*
      * If webclient is just hidden, bring it back;
@@ -165,11 +162,6 @@ public interface IClientGUI
      */
     public abstract void showMarker(Marker marker);
 
-    /**
-     * Displays the recruit tree of the hex if possible.
-     */
-    public abstract void showHexRecruitTree(GUIMasterHex hex);
-
     public abstract void didSummon(Legion summoner, Legion donor,
         CreatureType summon);
 
@@ -235,7 +227,7 @@ public interface IClientGUI
     public abstract void doPickCarries(Client client, int carryDamage,
         Set<String> carryTargetDescriptions);
 
-    public abstract PickCarry getPickCarryDialog();
+    public abstract boolean isPickCarryOngoing();
 
     public abstract PlayerColor doPickColor(String playerName,
         List<PlayerColor> colorsLeft);

@@ -39,6 +39,7 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
 import net.sf.colossus.client.Client;
+import net.sf.colossus.client.IClientGUI;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.game.BattleCritter;
@@ -251,33 +252,18 @@ public final class BattleBoard extends KFrame
 
     private void handleMousePressed(GUIBattleChit battleChit, GUIBattleHex hex)
     {
-        String hexLabel = "";
         gui.resetStrikeNumbers();
-        if (hex != null)
-        {
-            hexLabel = hex.getHexModel().getLabel();
-        }
 
-        String choiceDesc;
-        PickCarry pickCarryDialog = getGUI().getPickCarryDialog();
         boolean ownChit = (battleChit != null && client.getPlayerByTag(
             battleChit.getTag()).equals(
                 client.getBattleActivePlayer()));
 
-        if (pickCarryDialog != null)
+        boolean isPickCarryOngoing = getGUI().isPickCarryOngoing();
+        if (isPickCarryOngoing)
         {
             if (battleChit != null && !ownChit)
             {
-                choiceDesc = pickCarryDialog.findCarryChoiceForHex(hexLabel);
-                // clicked on possible carry target
-                if (choiceDesc != null)
-                {
-                    pickCarryDialog.handleCarryToDescription(choiceDesc);
-                }
-                else
-                {
-                    // enemy but not carryable to there
-                }
+                gui.handlePickCarry(hex);
             }
             else
             {

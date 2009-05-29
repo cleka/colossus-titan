@@ -28,6 +28,7 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.undo.UndoManager;
 
 import net.sf.colossus.client.Client;
+import net.sf.colossus.client.IClientGUI;
 import net.sf.colossus.client.IOracle;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.common.Constants;
@@ -1832,6 +1833,11 @@ public class ClientGUI implements IClientGUI
         return SplitLegion.splitLegion(this, parent, childMarker);
     }
 
+    public boolean isPickCarryOngoing()
+    {
+        return pickCarryDialog != null;
+    }
+
     public void doPickCarries(Client client, int carryDamage,
         Set<String> carryTargetDescriptions)
     {
@@ -1849,6 +1855,26 @@ public class ClientGUI implements IClientGUI
     public PickCarry getPickCarryDialog()
     {
         return pickCarryDialog;
+    }
+
+    public void handlePickCarry(GUIBattleHex hex)
+    {
+        String hexLabel = "";
+        if (hex != null)
+        {
+            hexLabel = hex.getHexModel().getLabel();
+        }
+
+        String choiceDesc = pickCarryDialog.findCarryChoiceForHex(hexLabel);
+        // clicked on possible carry target
+        if (choiceDesc != null)
+        {
+            pickCarryDialog.handleCarryToDescription(choiceDesc);
+        }
+        else
+        {
+            // enemy but not carryable to there
+        }
     }
 
     public PlayerColor doPickColor(String playerName,

@@ -37,8 +37,6 @@ import net.sf.colossus.game.SummonInfo;
 import net.sf.colossus.game.events.RecruitEvent;
 import net.sf.colossus.game.events.SummonEvent;
 import net.sf.colossus.gui.ClientGUI;
-import net.sf.colossus.gui.IClientGUI;
-import net.sf.colossus.gui.NullClientGUI;
 import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.server.GameServerSide;
 import net.sf.colossus.server.IServer;
