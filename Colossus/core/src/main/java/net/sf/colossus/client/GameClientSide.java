@@ -19,7 +19,7 @@ import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;
 
 
-public class GameClientSide extends Game
+public class GameClientSide extends Game // implements IOracle
 {
     private Client client;
 

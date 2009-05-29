@@ -101,7 +101,6 @@ public final class GameServerSide extends Game
     private boolean loadingGame;
     private boolean replayOngoing = false;
     private BattleServerSide battle;
-    private Phase phase;
     private Server server;
     // Negotiation
     private final Set<Proposal> attackerProposals = new HashSet<Proposal>();
@@ -436,7 +435,7 @@ public final class GameServerSide extends Game
 
         turnNumber = 1;
         lastRecruitTurnNumber = -1;
-        phase = Phase.SPLIT;
+        setPhase(Phase.SPLIT);
         players.clear();
 
         VariantSupport.loadVariantByName(options
@@ -1068,11 +1067,6 @@ public final class GameServerSide extends Game
         }
     }
 
-    Phase getPhase()
-    {
-        return phase;
-    }
-
     /**
      * Advance to the next phase, only if the passed oldPhase and playerName
      * are current.
@@ -1133,15 +1127,15 @@ public final class GameServerSide extends Game
             Phase oldPhase = phase;
             if (oldPhase == Phase.SPLIT)
             {
-                phase = Phase.MOVE;
+                setPhase(Phase.MOVE);
             }
             else if (oldPhase == Phase.MOVE)
             {
-                phase = Phase.FIGHT;
+                setPhase(Phase.FIGHT);
             }
             else if (oldPhase == Phase.FIGHT)
             {
-                phase = Phase.MUSTER;
+                setPhase(Phase.MUSTER);
             }
 
             if (oldPhase == Phase.MUSTER
@@ -1180,7 +1174,7 @@ public final class GameServerSide extends Game
              active player, for bookkeeping purpose */
             CustomRecruitBase.everyoneAdvanceTurn(activePlayerNum);
 
-            phase = Phase.SPLIT;
+            setPhase(Phase.SPLIT);
             if (getActivePlayer().isDead() && getNumLivingPlayers() > 0)
             {
                 advanceTurn();
@@ -1196,19 +1190,19 @@ public final class GameServerSide extends Game
 
     private void setupPhase()
     {
-        if (phase == Phase.SPLIT)
+        if (isPhase(Phase.SPLIT))
         {
             setupSplit();
         }
-        else if (phase == Phase.MOVE)
+        else if (isPhase(Phase.MOVE))
         {
             setupMove();
         }
-        else if (phase == Phase.FIGHT)
+        else if (isPhase(Phase.FIGHT))
         {
             setupFight();
         }
-        else if (phase == Phase.MUSTER)
+        else if (isPhase(Phase.MUSTER))
         {
             setupMuster();
         }
@@ -1751,7 +1745,7 @@ public final class GameServerSide extends Game
             activePlayerNum = Integer.parseInt(el.getTextTrim());
 
             el = root.getChild("CurrentPhase");
-            phase = Phase.fromInt(Integer.parseInt(el.getTextTrim()));
+            setPhase(Phase.fromInt(Integer.parseInt(el.getTextTrim())));
 
             Element ct = root.getChild("Caretaker");
             List<Element> kids = ct.getChildren();

@@ -193,7 +193,6 @@ public final class Client implements IClient, IOracle, IVariant
     private final PlayerClientSide noone;
 
     private PlayerClientSide activePlayer;
-    private Phase phase;
 
     private int battleTurnNumber = -1;
     private Player battleActivePlayer;
@@ -1936,7 +1935,7 @@ public final class Client implements IClient, IOracle, IVariant
         resetLegionMovesAndRecruitData();
 
         // Now the actual setup split stuff
-        this.phase = Phase.SPLIT;
+        game.setPhase(Phase.SPLIT);
         numSplitsThisTurn = 0;
 
         gui.actOnSetupSplit();
@@ -1958,15 +1957,13 @@ public final class Client implements IClient, IOracle, IVariant
 
     public void setupMove()
     {
-        this.phase = Phase.MOVE;
-
+        game.setPhase(Phase.MOVE);
         gui.actOnSetupMove();
     }
 
     public void setupFight()
     {
-        this.phase = Phase.FIGHT;
-
+        game.setPhase(Phase.FIGHT);
         gui.actOnSetupFight();
 
         if (isMyTurn())
@@ -1989,7 +1986,7 @@ public final class Client implements IClient, IOracle, IVariant
 
     public void setupMuster()
     {
-        this.phase = Phase.MUSTER;
+        game.setPhase(Phase.MUSTER);
 
         gui.actOnSetupMuster();
 
@@ -1998,7 +1995,7 @@ public final class Client implements IClient, IOracle, IVariant
         // when they did win against all others and continue playing
         // (just for growing bigger creatures ;-)
         if (options.getOption(Options.autoRecruit) && playerAlive
-            && isMyTurn() && this.phase == Phase.MUSTER)
+            && isMyTurn() && game.isPhase(Phase.MUSTER))
         {
             ai.muster();
             // For autoRecruit alone, do not automatically say we are done.
@@ -2179,7 +2176,7 @@ public final class Client implements IClient, IOracle, IVariant
     // public for IOracle
     public String getBattlePhaseName()
     {
-        if (phase == Phase.FIGHT)
+        if (game.isPhase(Phase.FIGHT))
         {
             if (battlePhase != null)
             {
@@ -2391,17 +2388,13 @@ public final class Client implements IClient, IOracle, IVariant
 
     public Phase getPhase()
     {
-        return phase;
+        return game.getPhase();
     }
 
     // public for IOracle
     public String getPhaseName()
     {
-        if (phase != null)
-        {
-            return phase.toString();
-        }
-        return "";
+        return game.getPhaseName();
     }
 
     // public for IOracle
@@ -2936,7 +2929,7 @@ public final class Client implements IClient, IOracle, IVariant
 
         gui.boardActOnUndidSplit(survivor, turn);
 
-        if (isMyTurn() && this.phase == Phase.SPLIT && !replayOngoing
+        if (isMyTurn() && game.isPhase(Phase.SPLIT) && !replayOngoing
             && options.getOption(Options.autoSplit) && !game.isGameOver())
         {
             boolean done = ai.splitCallback(null, null);
@@ -2960,19 +2953,19 @@ public final class Client implements IClient, IOracle, IVariant
      */
     public void doneWithPhase()
     {
-        if (phase == Phase.SPLIT)
+        if (game.isPhase(Phase.SPLIT))
         {
             doneWithSplits();
         }
-        else if (phase == Phase.MOVE)
+        else if (game.isPhase(Phase.MOVE))
         {
             doneWithMoves();
         }
-        else if (phase == Phase.FIGHT)
+        else if (game.isPhase(Phase.FIGHT))
         {
             doneWithEngagements();
         }
-        else if (phase == Phase.MUSTER)
+        else if (game.isPhase(Phase.MUSTER))
         {
             doneWithRecruits();
         }
@@ -3041,7 +3034,7 @@ public final class Client implements IClient, IOracle, IVariant
         // check also for phase, because delayed callbacks could come
         // after our phase is over but activePlayerName not updated yet
         return playerAlive && owningPlayer.equals(getBattleActivePlayer())
-            && this.phase == Phase.FIGHT;
+            && game.isPhase(Phase.FIGHT);
     }
 
     /**
@@ -3161,7 +3154,7 @@ public final class Client implements IClient, IOracle, IVariant
 
         // check also for phase, because delayed callbacks could come
         // after our phase is over but activePlayerName not updated yet.
-        if (isMyTurn() && this.phase == Phase.SPLIT && !replayOngoing
+        if (isMyTurn() && game.isPhase(Phase.SPLIT) && !replayOngoing
             && options.getOption(Options.autoSplit) && !game.isGameOver())
         {
             boolean done = ai.splitCallback(parent, child);

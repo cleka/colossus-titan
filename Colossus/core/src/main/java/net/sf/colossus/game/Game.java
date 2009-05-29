@@ -51,7 +51,14 @@ public abstract class Game
      */
     protected int turnNumber = -1;
 
-    /** Last movement roll for any player. */
+    /**
+     * The current game phase (Split, Move, Fight, Muster)
+     */
+    protected Phase phase;
+
+    /**
+     * Last movement roll for any player.
+     */
     private int movementRoll = -1;
 
     /**
@@ -285,4 +292,29 @@ public abstract class Game
     {
         return turnNumber;
     }
+
+    public boolean isPhase(Phase phase)
+    {
+        return this.phase == phase;
+    }
+
+    public void setPhase(Phase phase)
+    {
+        this.phase = phase;
+    }
+
+    public Phase getPhase()
+    {
+        return phase;
+    }
+
+    public String getPhaseName()
+    {
+        if (phase != null)
+        {
+            return phase.toString();
+        }
+        return "";
+    }
+
 }
