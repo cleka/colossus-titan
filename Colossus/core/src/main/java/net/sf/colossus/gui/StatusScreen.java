@@ -19,7 +19,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.sf.colossus.client.Client;
-import net.sf.colossus.client.IOracle;
 import net.sf.colossus.client.PlayerClientSide;
 import net.sf.colossus.common.IOptions;
 import net.sf.colossus.common.Options;
@@ -57,27 +56,23 @@ final class StatusScreen extends KDialog
     private final JLabel battleTurnLabel;
     private final JLabel battlePhaseLabel;
 
-    private IOracle oracle;
-    private Client client;
+    private final ClientGUI gui;
 
     private Point location;
     private Dimension size;
     private final SaveWindow saveWindow;
 
-    StatusScreen(final JFrame frame, IOracle oracle, final IOptions options,
-        final Client client)
+    StatusScreen(final JFrame frame, ClientGUI gui, final IOptions options)
     {
         super(frame, "Game Status", false);
 
         setVisible(false);
         setFocusable(false);
 
-        // TODO This should not use Oracle, use client.getGame() instead everywhere
-        this.oracle = oracle;
-        this.client = client;
+        this.gui = gui;
 
         // Needs to be set up before calling this.
-        numPlayers = oracle.getNumPlayers();
+        numPlayers = gui.getGame().getNumPlayers();
 
         addWindowListener(new WindowAdapter()
         {
@@ -135,7 +130,7 @@ final class StatusScreen extends KDialog
         gridPane.add(new JLabel("Player"));
 
         int j = 0;
-        for (Player player : client.getGameClientSide().getPlayers())
+        for (Player player : gui.getGameClientSide().getPlayers())
         {
             nameLabel[j] = new JLabel();
             nameLabel[j].setOpaque(true);
@@ -147,7 +142,7 @@ final class StatusScreen extends KDialog
                 @Override
                 public void mouseClicked(MouseEvent e)
                 {
-                    new PlayerDetailsDialog(frame, thePlayer, client);
+                    new PlayerDetailsDialog(frame, thePlayer, getClient());
                 }
             });
 
@@ -242,6 +237,11 @@ final class StatusScreen extends KDialog
         setVisible(true);
     }
 
+    private Client getClient()
+    {
+        return gui.getClient();
+    }
+
     private void setPlayerLabelColors(JLabel label, Color bgColor,
         Color fgColor)
     {
@@ -271,28 +271,32 @@ final class StatusScreen extends KDialog
 
     void updateStatusScreen()
     {
-        activePlayerLabel.setText(oracle.getActivePlayer().getName());
-        int turnNumber = oracle.getTurnNumber();
+        activePlayerLabel.setText(gui.getGameClientSide().getActivePlayer()
+            .getName());
+        int turnNumber = gui.getGame().getTurnNumber();
         String turn = "";
         if (turnNumber >= 1)
         {
             turn = "" + turnNumber;
         }
         turnLabel.setText(turn);
-        phaseLabel.setText(oracle.getPhaseName());
+        phaseLabel.setText(gui.getGame().getPhaseName());
 
-        if (oracle.isBattleOngoing())
+        if (gui.getGameClientSide().isBattleOngoing())
         {
-            battleActivePlayerLabel.setText(oracle.getBattleActivePlayer()
+            battleActivePlayerLabel.setText(gui.getGameClientSide()
+                .getBattleActivePlayer()
                 .getName());
-            int battleTurnNumber = oracle.getBattleTurnNumber();
+            int battleTurnNumber = gui.getGameClientSide()
+                .getBattleTurnNumber();
             String battleTurn = "";
             if (battleTurnNumber >= 1)
             {
                 battleTurn = "" + battleTurnNumber;
             }
             battleTurnLabel.setText(battleTurn);
-            battlePhaseLabel.setText(oracle.getBattlePhaseName());
+            battlePhaseLabel.setText(gui.getGameClientSide()
+                .getBattlePhaseName());
         }
         else
         {
@@ -302,13 +306,13 @@ final class StatusScreen extends KDialog
         }
 
         int i = 0;
-        for (Player player : client.getGameClientSide().getPlayers())
+        for (Player player : gui.getGameClientSide().getPlayers())
         {
             if (player.isDead())
             {
                 setPlayerLabelBackground(i, Color.RED);
             }
-            else if (oracle.getActivePlayer().equals(player))
+            else if (gui.getGameClientSide().getActivePlayer().equals(player))
             {
                 setPlayerLabelBackground(i, Color.YELLOW);
             }
@@ -360,8 +364,6 @@ final class StatusScreen extends KDialog
         saveWindow.saveSize(size);
         location = getLocation();
         saveWindow.saveLocation(location);
-        this.client = null;
-        this.oracle = null;
     }
 
     @Override

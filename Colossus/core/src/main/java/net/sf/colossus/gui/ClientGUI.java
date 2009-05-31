@@ -463,8 +463,8 @@ public class ClientGUI implements IClientGUI
             }
             else
             {
-                statusScreen = new StatusScreen(getPreferredParent(), client,
-                    options, client);
+                statusScreen = new StatusScreen(getPreferredParent(), this,
+                    options);
             }
         }
         else
