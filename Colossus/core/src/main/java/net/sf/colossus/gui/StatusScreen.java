@@ -72,6 +72,7 @@ final class StatusScreen extends KDialog
         setVisible(false);
         setFocusable(false);
 
+        // TODO This should not use Oracle, use client.getGame() instead everywhere
         this.oracle = oracle;
         this.client = client;
 
@@ -279,16 +280,26 @@ final class StatusScreen extends KDialog
         }
         turnLabel.setText(turn);
         phaseLabel.setText(oracle.getPhaseName());
-        battleActivePlayerLabel.setText(oracle.getBattleActivePlayer()
-            .getName());
-        int battleTurnNumber = oracle.getBattleTurnNumber();
-        String battleTurn = "";
-        if (battleTurnNumber >= 1)
+
+        if (oracle.isBattleOngoing())
         {
-            battleTurn = "" + battleTurnNumber;
+            battleActivePlayerLabel.setText(oracle.getBattleActivePlayer()
+                .getName());
+            int battleTurnNumber = oracle.getBattleTurnNumber();
+            String battleTurn = "";
+            if (battleTurnNumber >= 1)
+            {
+                battleTurn = "" + battleTurnNumber;
+            }
+            battleTurnLabel.setText(battleTurn);
+            battlePhaseLabel.setText(oracle.getBattlePhaseName());
         }
-        battleTurnLabel.setText(battleTurn);
-        battlePhaseLabel.setText(oracle.getBattlePhaseName());
+        else
+        {
+            battleActivePlayerLabel.setText("");
+            battleTurnLabel.setText("");
+            battlePhaseLabel.setText("");
+        }
 
         int i = 0;
         for (Player player : client.getGameClientSide().getPlayers())

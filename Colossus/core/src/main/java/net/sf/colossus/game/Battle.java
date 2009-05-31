@@ -19,9 +19,9 @@ abstract public class Battle
     private static final Logger LOGGER = Logger.getLogger(Battle.class
         .getName());
 
-    private final Game game;
-    private final Legion attacker;
-    private final Legion defender;
+    protected final Game game;
+    protected final Legion attacker;
+    protected final Legion defender;
     private final MasterBoardTerrain land;
 
     public Battle(Game game, Legion attacker, Legion defender,

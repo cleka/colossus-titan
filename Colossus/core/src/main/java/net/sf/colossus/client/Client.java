@@ -964,38 +964,16 @@ public final class Client implements IClient, IOracle, IVariant
         legion.setRecruit(lastRecruit);
     }
 
-    /** Return a list of Strings.  Use the proper string for titans and
-     *  unknown creatures. */
-    // public for IOracle
+    // TODO make all who use this use directly from game
     public List<String> getLegionImageNames(Legion legion)
     {
-        LegionClientSide info = (LegionClientSide)legion;
-        if (info != null)
-        {
-            return info.getImageNames();
-        }
-        return new ArrayList<String>();
+        return game.getLegionImageNames(legion);
     }
 
-    /** Return a list of Booleans */
-    // public for IOracle
+    // TODO make all who use this use directly from game
     public List<Boolean> getLegionCreatureCertainties(Legion legion)
     {
-        LegionClientSide info = (LegionClientSide)legion;
-        if (info != null)
-        {
-            return info.getCertainties();
-        }
-        else
-        {
-            // TODO: is this the right thing?
-            List<Boolean> l = new ArrayList<Boolean>(10); // just longer then max
-            for (int idx = 0; idx < 10; idx++)
-            {
-                l.add(Boolean.valueOf(true)); // all true
-            }
-            return l;
-        }
+        return game.getLegionCreatureCertainties(legion);
     }
 
     /**
@@ -1631,11 +1609,9 @@ public final class Client implements IClient, IOracle, IVariant
     {
         gui.cleanupNegotiationDialogs();
 
-        game.setBattleTurnNumber(battleTurnNumber);
-        game.setBattleActivePlayer(battleActivePlayer);
-        game.setBattlePhase(battlePhase);
-        this.getDefender().setEntrySide(
-            this.getAttacker().getEntrySide().getOpposingSide());
+        game.initBattle(hex, battleTurnNumber, battleActivePlayer,
+            battlePhase, attacker, defender);
+
 
         if (options.getOption(Options.autoPlay))
         {
@@ -1990,20 +1966,16 @@ public final class Client implements IClient, IOracle, IVariant
     public void setupBattleSummon(Player battleActivePlayer,
         int battleTurnNumber)
     {
-        game.setBattlePhase(BattlePhase.SUMMON);
-        game.setBattleActivePlayer(battleActivePlayer);
-        game.setBattleTurnNumber(battleTurnNumber);
-
+        getBattle().setupPhase(BattlePhase.SUMMON, battleActivePlayer,
+            battleTurnNumber);
         gui.actOnSetupBattleSummon();
-
     }
 
     public void setupBattleRecruit(Player battleActivePlayer,
         int battleTurnNumber)
     {
-        game.setBattlePhase(BattlePhase.RECRUIT);
-        game.setBattleActivePlayer(battleActivePlayer);
-        game.setBattleTurnNumber(battleTurnNumber);
+        getBattle().setupPhase(BattlePhase.RECRUIT, battleActivePlayer,
+            battleTurnNumber);
         gui.actOnSetupBattleRecruit();
     }
 
@@ -2018,14 +1990,16 @@ public final class Client implements IClient, IOracle, IVariant
 
     public void setupBattleMove(Player battleActivePlayer, int battleTurnNumber)
     {
-        game.setBattleActivePlayer(battleActivePlayer);
-        game.setBattleTurnNumber(battleTurnNumber);
+        // TODO clean up order of stuff here
+
+        getBattle().setBattleActivePlayer(battleActivePlayer);
+        getBattle().setBattleTurnNumber(battleTurnNumber);
 
         // Just in case the other player started the battle
         // really quickly.
         gui.cleanupNegotiationDialogs();
         resetAllBattleMoves();
-        game.setBattlePhase(BattlePhase.MOVE);
+        getBattle().setBattlePhase(BattlePhase.MOVE);
 
         gui.actOnSetupBattleMove();
 
@@ -2073,13 +2047,18 @@ public final class Client implements IClient, IOracle, IVariant
         kickBattleMove();
     }
 
+    public BattleClientSide getBattle()
+    {
+        return game.getBattle();
+    }
+
     /** Used for both strike and strikeback. */
     public void setupBattleFight(BattlePhase battlePhase,
         Player battleActivePlayer)
     {
-        game.setBattlePhase(battlePhase);
-        game.setBattleActivePlayer(battleActivePlayer);
-        if (game.isBattlePhase(BattlePhase.FIGHT))
+        getBattle().setBattlePhase(battlePhase);
+        getBattle().setBattleActivePlayer(battleActivePlayer);
+        if (getBattle().isBattlePhase(BattlePhase.FIGHT))
         {
             markOffboardCreaturesDead();
         }
@@ -2129,6 +2108,11 @@ public final class Client implements IClient, IOracle, IVariant
     public Legion getAttacker()
     {
         return game.getAttacker();
+    }
+
+    public boolean isBattleOngoing()
+    {
+        return game.isBattleOngoing();
     }
 
     // public for IOracle

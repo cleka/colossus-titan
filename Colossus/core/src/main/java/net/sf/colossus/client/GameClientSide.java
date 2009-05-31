@@ -11,7 +11,6 @@ import java.util.Set;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
-import net.sf.colossus.game.Phase;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.util.CollectionHelper;
 import net.sf.colossus.util.Predicate;
@@ -21,7 +20,7 @@ import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;
 
 
-public class GameClientSide extends Game // implements IOracle
+public class GameClientSide extends Game implements IOracle
 {
     private Client client;
 
@@ -37,9 +36,7 @@ public class GameClientSide extends Game // implements IOracle
 
     private Player activePlayer;
 
-    private BattlePhase battlePhase;
-    private int battleTurnNumber = -1;
-    private Player battleActivePlayer;
+    private BattleClientSide battle = null;
 
     public GameClientSide(Variant variant, String[] playerNames,
         IVariantKnower variantKnower)
@@ -50,8 +47,6 @@ public class GameClientSide extends Game // implements IOracle
         this.noone = new PlayerClientSide(this, "", 0);
 
         this.activePlayer = noone;
-        this.battleActivePlayer = noone;
-
 
     }
 
@@ -80,6 +75,11 @@ public class GameClientSide extends Game // implements IOracle
             }
         }
         return owningPlayer;
+    }
+
+    public Player getNoonePlayer()
+    {
+        return noone;
     }
 
     public void updatePlayerInfo(List<String> infoStrings)
@@ -344,73 +344,6 @@ public class GameClientSide extends Game // implements IOracle
         return client.getLegion(markerId);
     }
 
-    // TODO move battlePhase (& friends) to Battle or BattleClientSide?
-    public BattlePhase getBattlePhase()
-    {
-        return battlePhase;
-    }
-
-    public void setBattlePhase(BattlePhase battlePhase)
-    {
-        this.battlePhase = battlePhase;
-    }
-
-    public boolean isBattlePhase(BattlePhase phase)
-    {
-        return this.battlePhase == phase;
-    }
-
-    // public for IOracle
-    public String getBattlePhaseName()
-    {
-        if (isPhase(Phase.FIGHT))
-        {
-            if (battlePhase != null)
-            {
-                return battlePhase.toString();
-            }
-        }
-        return "";
-    }
-
-    public void setBattleActivePlayer(Player battleActivePlayer)
-    {
-        this.battleActivePlayer = battleActivePlayer;
-    }
-
-    public void setBattleTurnNumber(int battleTurnNumber)
-    {
-        this.battleTurnNumber = battleTurnNumber;
-    }
-
-    public int getBattleTurnNumber()
-    {
-        return battleTurnNumber;
-    }
-
-    public Player getBattleActivePlayer()
-    {
-        return battleActivePlayer;
-    }
-
-    public void cleanupBattle()
-    {
-        setBattlePhase(null);
-        battleTurnNumber = -1;
-        battleActivePlayer = noone;
-    }
-
-    public Legion getBattleActiveLegion()
-    {
-        if (battleActivePlayer.equals(getDefender().getPlayer()))
-        {
-            return getDefender();
-        }
-        else
-        {
-            return getAttacker();
-        }
-    }
 
     public void setActivePlayer(Player player)
     {
@@ -421,4 +354,122 @@ public class GameClientSide extends Game // implements IOracle
     {
         return activePlayer;
     }
+
+
+    public void initBattle(MasterHex hex, int battleTurnNumber,
+        Player battleActivePlayer, BattlePhase battlePhase, Legion attacker,
+        Legion defender)
+    {
+        this.battle = new BattleClientSide(this, attacker, defender, hex
+            .getTerrain());
+
+        battle.init(battleTurnNumber, battleActivePlayer, battlePhase);
+
+    }
+
+    public BattleClientSide getBattle()
+    {
+        return battle;
+    }
+
+    public boolean isBattleOngoing()
+    {
+        return battle != null;
+    }
+
+    public BattlePhase getBattlePhase()
+    {
+        assert battle != null : "No battle phase if there is no battle!";
+        return battle.getBattlePhase();
+    }
+
+    public void setBattlePhase(BattlePhase battlePhase)
+    {
+        battle.setBattlePhase(battlePhase);
+    }
+
+    public boolean isBattlePhase(BattlePhase phase)
+    {
+        return battle.getBattlePhase() == phase;
+    }
+
+    public String getBattlePhaseName()
+    {
+        return battle.getBattlePhaseName();
+    }
+
+    public void setBattleActivePlayer(Player battleActivePlayer)
+    {
+        battle.setBattleActivePlayer(battleActivePlayer);
+    }
+
+    public void setBattleTurnNumber(int battleTurnNumber)
+    {
+        battle.setBattleTurnNumber(battleTurnNumber);
+    }
+
+    public int getBattleTurnNumber()
+    {
+        return battle.getBattleTurnNumber();
+    }
+
+    public Legion getBattleActiveLegion()
+    {
+        return battle.getBattleActiveLegion();
+    }
+
+    public Player getBattleActivePlayer()
+    {
+        if (battle == null)
+        {
+            return null;
+        }
+        return battle.getBattleActivePlayer();
+    }
+
+    public void cleanupBattle()
+    {
+        if (battle != null)
+        {
+            battle.cleanupBattle();
+            battle = null;
+        }
+    }
+
+
+    /** Return a list of Strings.  Use the proper string for titans and
+     *  unknown creatures. */
+    // public for IOracle
+    public List<String> getLegionImageNames(Legion legion)
+    {
+        LegionClientSide info = (LegionClientSide)legion;
+        if (info != null)
+        {
+            return info.getImageNames();
+        }
+        return new ArrayList<String>();
+    }
+
+    /** Return a list of Booleans */
+    // public for IOracle
+    public List<Boolean> getLegionCreatureCertainties(Legion legion)
+    {
+        LegionClientSide info = (LegionClientSide)legion;
+        if (info != null)
+        {
+            return info.getCertainties();
+        }
+        else
+        {
+            // TODO: is this the right thing?
+            List<Boolean> l = new ArrayList<Boolean>(10); // just longer then max
+            for (int idx = 0; idx < 10; idx++)
+            {
+                l.add(Boolean.valueOf(true)); // all true
+            }
+            return l;
+        }
+    }
+
+
 }

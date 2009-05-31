@@ -66,7 +66,13 @@ public final class Strike
      *  Returns true if a strike was made. */
     boolean makeForcedStrikes(boolean rangestrike)
     {
-        if (!client.getBattlePhase().isFightPhase()
+        if (client.getBattlePhase() == null)
+        {
+            LOGGER.log(Level.SEVERE,
+                "Called Strike.makeForcedStrikes() when there is no battle");
+            return false;
+        }
+        else if (!client.getBattlePhase().isFightPhase()
             && !client.isMyBattlePhase())
         {
             LOGGER.log(Level.SEVERE,
