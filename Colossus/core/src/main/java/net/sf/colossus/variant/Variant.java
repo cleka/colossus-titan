@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
+import java.util.logging.Logger;
 
 import javax.swing.text.Document;
 
@@ -31,6 +32,9 @@ import net.sf.colossus.util.Predicate;
  */
 public class Variant
 {
+    private static final Logger LOGGER = Logger.getLogger(Variant.class
+        .getName());
+
     private final AllCreatureType creatureTypes;
     private final List<CreatureType> summonableCreatureTypes;
     private final Collection<MasterBoardTerrain> terrains;
@@ -121,8 +125,16 @@ public class Variant
      */
     public CreatureType getCreatureByName(final String name)
     {
+        assert name != null;
         String lowerCaseName = name.toLowerCase();
-        return creatureTypeByNameCache.get(lowerCaseName);
+        CreatureType result = creatureTypeByNameCache.get(lowerCaseName);
+        if (result == null)
+        {
+            // TODO find every case where this happens and get rid of it,
+            // we should be able to assert a result
+            LOGGER.info("Could not find creature with name " + name);
+        }
+        return result;
     }
 
     private void initCreatureNameCache()
