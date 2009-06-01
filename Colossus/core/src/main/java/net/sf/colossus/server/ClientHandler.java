@@ -589,7 +589,16 @@ final class ClientHandler implements IClient
         else
         {
             sendViaChannel(message);
-            if (server.getGame().isLoadingGame())
+            if (server == null)
+            {
+                LOGGER.severe("server null");
+            }
+            else if (server.getGame() == null)
+            {
+                LOGGER.severe("game null");
+            }
+
+            else if (server.getGame().isLoadingGame())
             {
                 // Give clients some opportunity to process it
                 // (especially during replay during loading game)
