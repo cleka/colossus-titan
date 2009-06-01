@@ -8,7 +8,6 @@ import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 
 import junit.framework.TestCase;
-import net.sf.colossus.appmain.GetPlayers;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.common.WhatNextManager;
@@ -98,7 +97,7 @@ public class GetPlayersTest extends TestCase
         String shouldBeName = System.getProperty("user.name",
             Constants.byColor);
 
-        LOGGER.info("Got player name 0 as " + name + "; expecpted would be "
+        LOGGER.info("Got player name 0 as " + name + "; expected would be "
             + shouldBeName);
 
         assertTrue(type != null && type.equals(Constants.human));
