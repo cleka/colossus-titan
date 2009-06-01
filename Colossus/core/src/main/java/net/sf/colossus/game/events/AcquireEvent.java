@@ -7,9 +7,9 @@ import net.sf.colossus.variant.CreatureType;
 
 public class AcquireEvent extends AddCreatureEvent
 {
-    public AcquireEvent(int turn, Legion legion, CreatureType creatureType)
+    public AcquireEvent(Legion legion, CreatureType creatureType)
     {
-        super(turn, legion.getPlayer(), legion, creatureType);
+        super(legion, creatureType);
     }
 
     @Override
@@ -17,12 +17,12 @@ public class AcquireEvent extends AddCreatureEvent
     {
         return Constants.reasonAcquire;
     }
-    @SuppressWarnings("boxing")
+
     @Override
     public String toString()
     {
         return String.format(
-            "In turn %d, player %s acquired creature of type %s in legion %s",
-            getTurn(), getPlayer(), getAddedCreatureType(), getLegion());
+            "AcquireEvent: acquire creature of type %s in legion %s",
+            getAddedCreatureType(), getLegion());
     }
 }

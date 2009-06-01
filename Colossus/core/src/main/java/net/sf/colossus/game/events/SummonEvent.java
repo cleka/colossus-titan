@@ -10,11 +10,10 @@ public class SummonEvent extends AddCreatureEvent
 {
     private final Legion donor;
 
-    public SummonEvent(int turn, Legion targetLegion, Legion donor,
+    public SummonEvent(Legion targetLegion, Legion donor,
         CreatureType summonedCreature)
     {
-        super(turn, (targetLegion == null) ? null : targetLegion.getPlayer(),
-            targetLegion, summonedCreature);
+        super(targetLegion, summonedCreature);
         this.donor = donor;
     }
 
@@ -29,14 +28,12 @@ public class SummonEvent extends AddCreatureEvent
         return donor;
     }
 
-    @SuppressWarnings("boxing")
     @Override
     public String toString()
     {
         return String
             .format(
-                "In turn %d, player %s has summoned creature of type %s from legion %s into legion %s",
-                getTurn(), getPlayer(), getAddedCreatureType(), getLegion(),
-                getDonor());
+                "SummonEvent: summon creature of type %s from legion %s into legion %s",
+                getAddedCreatureType(), getLegion(), getDonor());
     }
 }

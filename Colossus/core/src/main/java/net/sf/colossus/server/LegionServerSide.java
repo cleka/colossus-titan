@@ -131,8 +131,7 @@ public final class LegionServerSide extends Legion implements
                         + " acquired one " + angelType);
                     game.getServer()
                         .allTellAddCreature(
-                            new AcquireEvent(game.getTurnNumber(), this,
-                                angelType), true);
+                            new AcquireEvent(this, angelType), true);
                 }
                 else
                 {

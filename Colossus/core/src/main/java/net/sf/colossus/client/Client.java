@@ -545,8 +545,8 @@ public final class Client implements IClient, IOracle, IVariant
         }
         else
         {
-            SummonEvent event = new SummonEvent(game.getTurnNumber(),
-                summonInfo.getTarget(), summonInfo.getDonor(), summonInfo.getUnit());
+            SummonEvent event = new SummonEvent(summonInfo.getTarget(),
+                summonInfo.getDonor(), summonInfo.getUnit());
             server.doSummon(event);
         }
         gui.actOnDoSummon();
@@ -1736,8 +1736,7 @@ public final class Client implements IClient, IOracle, IVariant
             recruiterName);
         // Call server even if some arguments are null, to get past
         // reinforcement.
-        server.doRecruit(new RecruitEvent(game.getTurnNumber(), legion,
-            recruited, recruiter));
+        server.doRecruit(new RecruitEvent(legion, recruited, recruiter));
     }
 
     /** Always needs to call server.doRecruit(), even if no recruit is

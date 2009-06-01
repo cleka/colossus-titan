@@ -7,10 +7,9 @@ import net.sf.colossus.variant.CreatureType;
 
 public class UndoSummonEvent extends AddCreatureEvent
 {
-    public UndoSummonEvent(int turn, Legion legion,
-        CreatureType creatureType)
+    public UndoSummonEvent(Legion legion, CreatureType creatureType)
     {
-        super(turn, legion.getPlayer(), legion, creatureType);
+        super(legion, creatureType);
     }
 
     @Override
@@ -19,13 +18,12 @@ public class UndoSummonEvent extends AddCreatureEvent
         return Constants.reasonUndoSummon;
     }
 
-    @SuppressWarnings("boxing")
     @Override
     public String toString()
     {
         return String
             .format(
-                "In turn %d, player %s returned creature of type %s into legion %s by undoing a summon",
-                getTurn(), getPlayer(), getAddedCreatureType(), getLegion());
+                "UndoSummonEvent: return creature of type %s into legion %s by undoing a summon",
+                getAddedCreatureType(), getLegion());
     }
 }

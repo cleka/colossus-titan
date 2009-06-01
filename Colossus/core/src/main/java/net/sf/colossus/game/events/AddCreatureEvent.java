@@ -1,7 +1,6 @@
 package net.sf.colossus.game.events;
 
 import net.sf.colossus.game.Legion;
-import net.sf.colossus.game.Player;
 import net.sf.colossus.variant.CreatureType;
 
 
@@ -17,10 +16,10 @@ public class AddCreatureEvent extends LegionEvent implements
 {
     private final CreatureType creatureType;
 
-    public AddCreatureEvent(int turn, Player player, Legion legion,
+    public AddCreatureEvent(Legion legion,
         CreatureType creatureType)
     {
-        super(turn, player, legion);
+        super(legion);
         this.creatureType = creatureType;
     }
 
@@ -48,12 +47,11 @@ public class AddCreatureEvent extends LegionEvent implements
         return "unknown";
     }
 
-    @SuppressWarnings("boxing")
     @Override
     public String toString()
     {
         return String.format(
-            "In turn %d, player %s has added creature of type %s to legion %s",
-                getTurn(), getPlayer(), getAddedCreatureType(), getLegion());
+            "AddCreatureEvent: add creature of type %s to legion %s",
+            getAddedCreatureType(), getLegion());
     }
 }

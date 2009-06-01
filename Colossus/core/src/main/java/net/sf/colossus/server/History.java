@@ -74,7 +74,7 @@ public class History
      * TODO reconsider name
      * TODO decide if we should move it all into one big handleEvent(GameEvent) method
      */
-    void addCreatureEvent(AddCreatureEvent event)
+    void addCreatureEvent(AddCreatureEvent event, int turn)
     {
         if (loading)
         {
@@ -84,7 +84,7 @@ public class History
         element.setAttribute("markerId", event.getLegion().getMarkerId());
         element
             .setAttribute("creatureName", event.getAddedCreatureType().getName());
-        element.setAttribute("turn", "" + event.getTurn());
+        element.setAttribute("turn", "" + turn);
         root.addContent(element);
     }
 
@@ -383,8 +383,8 @@ public class History
             if (!legion.getPlayer().getDeadBeforeSave())
             {
                 server.allTellAddCreature(
-                    new AddCreatureEvent(game.getTurnNumber(), legion
-                        .getPlayer(), legion, creatureType), false);
+                    new AddCreatureEvent(legion,
+                    creatureType), false);
             }
             LOGGER.finest("Legion '" + markerId + "' now contains "
                 + legion.getCreatures());

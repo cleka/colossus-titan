@@ -278,7 +278,6 @@ final class ClientHandler implements IClient
 
     private void callMethod(String method, List<String> args)
     {
-        int turnNumber = server.getGame().getTurnNumber();
         if (method.equals(Constants.signOn))
         {
             String tmpPlayerName = args.remove(0);
@@ -341,17 +340,14 @@ final class ClientHandler implements IClient
             }
             Legion donor = resolveLegion(args.remove(0));
             CreatureType creatureType = resolveCreatureType(args.remove(0));
-            server.doSummon(new SummonEvent(turnNumber, legion, donor,
-                creatureType));
+            server.doSummon(new SummonEvent(legion, donor, creatureType));
         }
         else if (method.equals(Constants.doRecruit))
         {
             Legion legion = resolveLegion(args.remove(0));
             CreatureType recruited = resolveCreatureType(args.remove(0));
             CreatureType recruiter = resolveCreatureType(args.remove(0));
-            server
-                .doRecruit(new RecruitEvent(turnNumber,
-                    legion, recruited, recruiter));
+            server.doRecruit(new RecruitEvent(legion, recruited, recruiter));
         }
         else if (method.equals(Constants.engage))
         {

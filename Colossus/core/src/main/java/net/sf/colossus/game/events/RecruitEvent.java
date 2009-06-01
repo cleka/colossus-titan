@@ -12,10 +12,10 @@ public class RecruitEvent extends AddCreatureEvent
 {
     private final CreatureType recruiter;
 
-    public RecruitEvent(int turn, Legion legion,
-        CreatureType recruited, CreatureType recruiter)
+    public RecruitEvent(Legion legion, CreatureType recruited,
+        CreatureType recruiter)
     {
-        super(turn, legion.getPlayer(), legion, recruited);
+        super(legion, recruited);
         this.recruiter = recruiter;
     }
 
@@ -42,14 +42,13 @@ public class RecruitEvent extends AddCreatureEvent
         return Constants.reasonRecruited;
     }
 
-    @SuppressWarnings("boxing")
     @Override
     public String toString()
     {
         return String
             .format(
-                "In turn %d, player %s has recruited creature of type %s into legion %s",
-                getTurn(), getPlayer(), getRecruited(), getLegion())
+                "RecruitEvent: recruit creature of type %s into legion %s",
+            getRecruited(), getLegion())
             + (getRecruiter() != null ? ", recruiter type is "
                 + getRecruiter() : "");
     }

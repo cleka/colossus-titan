@@ -3814,7 +3814,7 @@ public final class GameServerSide extends Game
     void addCreatureEvent(AddCreatureEvent event)
     {
         lastRecruitTurnNumber = turnNumber;
-        history.addCreatureEvent(event);
+        history.addCreatureEvent(event, turnNumber);
     }
 
     void removeCreatureEvent(Legion legion, CreatureType creature)

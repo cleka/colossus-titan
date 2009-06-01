@@ -798,8 +798,8 @@ public final class BattleServerSide extends Battle
                 if (donor != null)
                 {
                     donor.addCreature(critter.getType(), false);
-                    server.allTellAddCreature(new UndoSummonEvent(getGame()
-                        .getTurnNumber(), donor, critter.getType()), true);
+                    server.allTellAddCreature(new UndoSummonEvent(donor,
+                        critter.getType()), true);
                     LOGGER.log(Level.INFO, "undosummon critter " + critter
                         + " back to marker " + donor + "");
                     // This summon doesn't count; the player can
