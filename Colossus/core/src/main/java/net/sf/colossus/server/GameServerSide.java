@@ -1724,8 +1724,9 @@ public final class GameServerSide extends Game
 
             // we're server, but the file generation process has been done
             // by loading the savefile.
-            VariantSupport.loadVariant(varName, fil.getValue(),
-                dir.getValue(), false);
+            Variant variant = VariantSupport.loadVariant(varName, fil
+                .getValue(), dir.getValue(), false);
+            setVariant(variant);
             // old save games (before r3360, 09/2008) do not save the
             // variant name - retrieve it back from VariantSupport.
             // TODO remove this one day?

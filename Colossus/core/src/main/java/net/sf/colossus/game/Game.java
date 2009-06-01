@@ -108,6 +108,11 @@ public abstract class Game
         return variant;
     }
 
+    protected void setVariant(Variant variant)
+    {
+        this.variant = variant;
+    }
+
     public Collection<Player> getPlayers()
     {
         assert players.size() != 0 : "getPlayers called before player info set (size==0)!";
