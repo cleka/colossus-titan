@@ -6,17 +6,17 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import net.sf.colossus.ai.AbstractHintProvider;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.util.DevRandom;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.IHintOracle;
 import net.sf.colossus.variant.IOracleLegion;
-import net.sf.colossus.variant.IVariantHint;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 
 
-public class DefaultHint implements IVariantHint
+public class DefaultHint extends AbstractHintProvider
 {
     private final DevRandom rnd = new DevRandom();
 
@@ -273,11 +273,5 @@ public class DefaultHint implements IVariantHint
             throw new RuntimeException("Bad hex: " + hex);
         }
         return li;
-    }
-
-    public int getHintedRecruitmentValueOffset(CreatureType creature,
-        String[] section)
-    {
-        return 0;
     }
 }

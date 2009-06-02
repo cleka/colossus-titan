@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import net.sf.colossus.ai.AbstractHintProvider;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.util.DevRandom;
 import net.sf.colossus.variant.CreatureType;
@@ -15,7 +16,7 @@ import net.sf.colossus.variant.MasterHex;
 import Default.DefaultHint;
 
 
-public class Abyssal6Hint implements net.sf.colossus.variant.IVariantHint
+public class Abyssal6Hint extends AbstractHintProvider
 {
     private final DevRandom rnd = new DevRandom();
 
@@ -308,6 +309,7 @@ public class Abyssal6Hint implements net.sf.colossus.variant.IVariantHint
         return li;
     }
 
+    @Override
     public int getHintedRecruitmentValueOffset(CreatureType creature,
         String[] section)
     {
