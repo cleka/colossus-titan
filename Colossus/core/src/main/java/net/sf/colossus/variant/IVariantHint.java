@@ -41,10 +41,11 @@ public interface IVariantHint
     /**
      * Give an offset to apply to the creature Point Value
      *     before estimating its recruitment value.
-     * @param name Name of the Creature
+     * @param creature Type of the creature
      * @param section Array of AI section to be used
      *     (usually one or more of "AllAI:", "DefensiveAI:", "OffensiveAI:")
      * @return An offset to the Point Value of the creature.
      */
-    public int getHintedRecruitmentValueOffset(String name, String[] section);
+    public int getHintedRecruitmentValueOffset(CreatureType creature,
+        String[] section);
 }

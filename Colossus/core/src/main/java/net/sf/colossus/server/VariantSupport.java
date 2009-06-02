@@ -697,17 +697,18 @@ public final class VariantSupport
         return null;
     }
 
-    public synchronized static int getHintedRecruitmentValueOffset(String name)
+    public synchronized static int getHintedRecruitmentValueOffset(
+        CreatureType creature)
     {
         String[] section = new String[1];
         section[0] = Constants.sectionAllAI;
-        return getHintedRecruitmentValueOffset(name, section);
+        return getHintedRecruitmentValueOffset(creature, section);
     }
 
     public synchronized static int getHintedRecruitmentValueOffset(
-        String name, String[] section)
+        CreatureType creature, String[] section)
     {
-        return aihl.getHintedRecruitmentValueOffset(name, section);
+        return aihl.getHintedRecruitmentValueOffset(creature, section);
     }
 
     /** get maximum number of players in that variant */

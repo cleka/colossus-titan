@@ -283,13 +283,14 @@ public class BeelzebubHint implements IVariantHint
         return li;
     }
 
-    public int getHintedRecruitmentValueOffset(String name, String[] section)
+    public int getHintedRecruitmentValueOffset(CreatureType creature,
+        String[] section)
     {
-        if (name.equals("Imp"))
+        if (creature.getName().equals("Imp"))
         {
             return -5;
         }
-        else if (name.equals("Devil"))
+        else if (creature.getName().equals("Devil"))
         {
             return 10;
         }

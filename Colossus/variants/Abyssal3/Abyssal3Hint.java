@@ -172,7 +172,8 @@ public class Abyssal3Hint implements IVariantHint
         return li;
     }
 
-    public int getHintedRecruitmentValueOffset(String name, String[] section)
+    public int getHintedRecruitmentValueOffset(CreatureType creature,
+        String[] section)
     {
         return 0;
     }

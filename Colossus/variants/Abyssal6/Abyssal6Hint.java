@@ -308,9 +308,10 @@ public class Abyssal6Hint implements net.sf.colossus.variant.IVariantHint
         return li;
     }
 
-    public int getHintedRecruitmentValueOffset(String name, String[] section)
+    public int getHintedRecruitmentValueOffset(CreatureType creature,
+        String[] section)
     {
-        if (name.equals("Druid"))
+        if (creature.getName().equals("Druid"))
         {
             return -10;
         }

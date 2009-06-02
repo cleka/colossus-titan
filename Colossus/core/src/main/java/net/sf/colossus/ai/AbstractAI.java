@@ -413,16 +413,15 @@ abstract class AbstractAI implements AI
     public int getHintedRecruitmentValueNonTitan(CreatureType creature)
     {
         return creature.getPointValue()
-            + VariantSupport.getHintedRecruitmentValueOffset(creature
-                .getName());
+            + VariantSupport.getHintedRecruitmentValueOffset(creature);
     }
 
     public int getHintedRecruitmentValueNonTitan(CreatureType creature,
         String[] section)
     {
         return creature.getPointValue()
-            + VariantSupport.getHintedRecruitmentValueOffset(creature
-                .getName(), section);
+            + VariantSupport
+                .getHintedRecruitmentValueOffset(creature, section);
     }
 
     protected final int getHintedRecruitmentValue(CreatureType creature,
@@ -436,8 +435,8 @@ abstract class AbstractAI implements AI
         int power = player.getTitanPower();
         int skill = creature.getSkill();
         return power * skill *
-                VariantSupport.getHintedRecruitmentValueOffset(creature.getName(),
-                section);
+                VariantSupport
+                .getHintedRecruitmentValueOffset(creature, section);
     }
 
     /** Various constants used by the AIs code for creature evaluation.
