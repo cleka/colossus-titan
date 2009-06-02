@@ -10,6 +10,7 @@ import net.sf.colossus.variant.IHintOracle;
 import net.sf.colossus.variant.IOracleLegion;
 import net.sf.colossus.variant.IVariantHint;
 import net.sf.colossus.variant.MasterBoardTerrain;
+import net.sf.colossus.variant.MasterHex;
 import Default.DefaultHint;
 
 
@@ -199,10 +200,10 @@ public class Beelzebub12Hint implements IVariantHint
         return recruitNames.get(recruitNames.size() - 1);
     }
 
-    public List<String> getInitialSplitHint(String label, String[] section)
+    public List<String> getInitialSplitHint(MasterHex hex, String[] section)
     {
         List<String> li = new ArrayList<String>();
-        if (label.equals("501"))
+        if (hex.getLabel().equals("501"))
         {
             float nextFloat = rnd.nextFloat();
             if (nextFloat < 0.3333)
@@ -227,14 +228,14 @@ public class Beelzebub12Hint implements IVariantHint
                 li.add("Skeleton");
             }
         }
-        else if (label.equals("502"))
+        else if (hex.getLabel().equals("502"))
         {
             li.add("Titan");
             li.add("Centaur");
             li.add("Centaur");
             li.add("Skeleton");
         }
-        else if (label.equals("503"))
+        else if (hex.getLabel().equals("503"))
         {
             if (rnd.nextFloat() < 0.5)
             {
@@ -251,14 +252,14 @@ public class Beelzebub12Hint implements IVariantHint
                 li.add("Skeleton");
             }
         }
-        else if (label.equals("504"))
+        else if (hex.getLabel().equals("504"))
         {
             li.add("Titan");
             li.add("Skeleton");
             li.add("Skeleton");
             li.add("Goblin");
         }
-        else if (label.equals("505"))
+        else if (hex.getLabel().equals("505"))
         {
             if (rnd.nextFloat() < 0.5)
             {
@@ -275,14 +276,14 @@ public class Beelzebub12Hint implements IVariantHint
                 li.add("Goblin");
             }
         }
-        else if (label.equals("506"))
+        else if (hex.getLabel().equals("506"))
         {
             li.add("Titan");
             li.add("Centaur");
             li.add("Centaur");
             li.add("Skeleton");
         }
-        else if (label.equals("507"))
+        else if (hex.getLabel().equals("507"))
         {
             if (rnd.nextFloat() < 0.5)
             {
@@ -299,7 +300,7 @@ public class Beelzebub12Hint implements IVariantHint
                 li.add("Goblin");
             }
         }
-        else if (label.equals("508"))
+        else if (hex.getLabel().equals("508"))
         {
             if (rnd.nextFloat() < 0.5)
             {
@@ -316,7 +317,7 @@ public class Beelzebub12Hint implements IVariantHint
                 li.add("Goblin");
             }
         }
-        else if (label.equals("509"))
+        else if (hex.getLabel().equals("509"))
         {
             if (rnd.nextFloat() < 0.5)
             {
@@ -333,21 +334,21 @@ public class Beelzebub12Hint implements IVariantHint
                 li.add("Skeleton");
             }
         }
-        else if (label.equals("510"))
+        else if (hex.getLabel().equals("510"))
         {
             li.add("Titan");
             li.add("Centaur");
             li.add("Centaur");
             li.add("Skeleton");
         }
-        else if (label.equals("511"))
+        else if (hex.getLabel().equals("511"))
         {
             li.add("Titan");
             li.add("Centaur");
             li.add("Centaur");
             li.add("Skeleton");
         }
-        else if (label.equals("512"))
+        else if (hex.getLabel().equals("512"))
         {
             if (rnd.nextFloat() < 0.5)
             {
@@ -366,7 +367,7 @@ public class Beelzebub12Hint implements IVariantHint
         }
         else
         {
-            throw new RuntimeException("Bad hex label " + label);
+            throw new RuntimeException("Bad hex: " + hex);
         }
         return li;
     }

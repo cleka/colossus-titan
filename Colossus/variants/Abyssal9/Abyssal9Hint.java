@@ -10,11 +10,13 @@ import net.sf.colossus.util.DevRandom;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.IHintOracle;
 import net.sf.colossus.variant.IOracleLegion;
+import net.sf.colossus.variant.IVariantHint;
 import net.sf.colossus.variant.MasterBoardTerrain;
+import net.sf.colossus.variant.MasterHex;
 import Default.DefaultHint;
 
 
-public class Abyssal9Hint implements net.sf.colossus.variant.IVariantHint
+public class Abyssal9Hint implements IVariantHint
 {
     private final DevRandom rnd = new DevRandom();
 
@@ -213,9 +215,9 @@ public class Abyssal9Hint implements net.sf.colossus.variant.IVariantHint
         return recruitNames.get(recruitNames.size() - 1);
     }
 
-    public List<String> getInitialSplitHint(String label, String[] section)
+    public List<String> getInitialSplitHint(MasterHex hex, String[] section)
     {
-        // This variant favors the ogre track over the centaur track at 
+        // This variant favors the ogre track over the centaur track at
         // the start, so keep either ogres or gargoyles with the centaur
         // except for a rare change-up.
         List<String> li = new ArrayList<String>();

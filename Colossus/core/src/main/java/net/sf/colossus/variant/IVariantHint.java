@@ -4,10 +4,9 @@ package net.sf.colossus.variant;
 import java.util.List;
 
 
-
 /**
  * Interface for the use of AI Hints.
- * @version $Id$
+ *
  * @author Romain Dolbeau
  */
 public interface IVariantHint
@@ -31,12 +30,13 @@ public interface IVariantHint
 
     /**
      * To obtain the list of creature to split on turn one.
-     * @param label Label of the starting Tower.
+     * @param startingTower The starting Tower.
      * @param section Array of AI section to be used
      *     (usually one or more of "AllAI:", "DefensiveAI:", "OffensiveAI:")
      * @return The list of creature to split (listed by name)
      */
-    public List<String> getInitialSplitHint(String label, String[] section);
+    public List<String> getInitialSplitHint(MasterHex startingTower,
+        String[] section);
 
     /**
      * Give an offset to apply to the creature Point Value

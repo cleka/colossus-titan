@@ -692,7 +692,7 @@ public final class VariantSupport
     {
         if (aihl != null)
         {
-            return aihl.getInitialSplitHint(hex.getLabel(), section);
+            return aihl.getInitialSplitHint(hex, section);
         }
         return null;
     }

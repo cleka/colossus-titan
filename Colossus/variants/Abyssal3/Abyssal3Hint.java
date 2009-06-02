@@ -10,6 +10,7 @@ import net.sf.colossus.variant.IHintOracle;
 import net.sf.colossus.variant.IOracleLegion;
 import net.sf.colossus.variant.IVariantHint;
 import net.sf.colossus.variant.MasterBoardTerrain;
+import net.sf.colossus.variant.MasterHex;
 import Default.DefaultHint;
 
 
@@ -130,17 +131,17 @@ public class Abyssal3Hint implements IVariantHint
         return recruitNames.get(recruitNames.size() - 1);
     }
 
-    public List<String> getInitialSplitHint(String label, String[] section)
+    public List<String> getInitialSplitHint(MasterHex hex, String[] section)
     {
         List<String> li = new ArrayList<String>();
-        if (label.equals("500"))
+        if (hex.getLabel().equals("500"))
         {
             li.add("Titan");
             li.add("Cyclops");
             li.add("Troll");
             li.add("Troll");
         }
-        else if (label.equals("100"))
+        else if (hex.getLabel().equals("100"))
         {
             if (rnd.nextFloat() < 0.3)
             {
@@ -157,7 +158,7 @@ public class Abyssal3Hint implements IVariantHint
                 li.add("Lion");
             }
         }
-        else if (label.equals("300"))
+        else if (hex.getLabel().equals("300"))
         {
             li.add("Titan");
             li.add("Cyclops");
@@ -166,7 +167,7 @@ public class Abyssal3Hint implements IVariantHint
         }
         else
         {
-            throw new RuntimeException("Bad hex label " + label);
+            throw new RuntimeException("Bad hex: " + hex);
         }
         return li;
     }

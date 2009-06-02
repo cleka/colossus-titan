@@ -12,6 +12,7 @@ import net.sf.colossus.variant.IHintOracle;
 import net.sf.colossus.variant.IOracleLegion;
 import net.sf.colossus.variant.IVariantHint;
 import net.sf.colossus.variant.MasterBoardTerrain;
+import net.sf.colossus.variant.MasterHex;
 import Default.DefaultHint;
 
 
@@ -131,12 +132,12 @@ public class ExtTitanHint implements IVariantHint
         return recruitNames.get(recruitNames.size() - 1);
     }
 
-    public List<String> getInitialSplitHint(String label, String[] section)
+    public List<String> getInitialSplitHint(MasterHex hex, String[] section)
     {
         List<String> sect = Arrays.asList(section);
 
         List<String> li = new ArrayList<String>();
-        if (label.equals("100"))
+        if (hex.getLabel().equals("100"))
         {
             if (rnd.nextFloat() < 0.5)
             {
@@ -153,14 +154,14 @@ public class ExtTitanHint implements IVariantHint
                 li.add("Ogre");
             }
         }
-        else if (label.equals("200"))
+        else if (hex.getLabel().equals("200"))
         {
             li.add("Titan");
             li.add("Gargoyle");
             li.add("Ogre");
             li.add("Ogre");
         }
-        else if (label.equals("300"))
+        else if (hex.getLabel().equals("300"))
         {
             if (rnd.nextFloat() < 0.5)
             {
@@ -177,7 +178,7 @@ public class ExtTitanHint implements IVariantHint
                 li.add("Ogre");
             }
         }
-        else if (label.equals("400"))
+        else if (hex.getLabel().equals("400"))
         {
             if (rnd.nextFloat() < 0.5)
             {
@@ -194,14 +195,14 @@ public class ExtTitanHint implements IVariantHint
                 li.add("Centaur");
             }
         }
-        else if (label.equals("500"))
+        else if (hex.getLabel().equals("500"))
         {
             li.add("Titan");
             li.add("Gargoyle");
             li.add("Ogre");
             li.add("Ogre");
         }
-        else if (label.equals("600"))
+        else if (hex.getLabel().equals("600"))
         {
             if (rnd.nextFloat() < 0.5)
             {
@@ -218,7 +219,7 @@ public class ExtTitanHint implements IVariantHint
                 li.add("Centaur");
             }
         }
-        else if (label.equals("700"))
+        else if (hex.getLabel().equals("700"))
         {
             if (sect.contains(Constants.sectionDefensiveAI))
             {
@@ -300,7 +301,7 @@ public class ExtTitanHint implements IVariantHint
                 }
             }
         }
-        else if (label.equals("800"))
+        else if (hex.getLabel().equals("800"))
         {
             if (sect.contains(Constants.sectionDefensiveAI))
             {
@@ -384,7 +385,7 @@ public class ExtTitanHint implements IVariantHint
         }
         else
         {
-            throw new RuntimeException("Bad hex label " + label);
+            throw new RuntimeException("Bad hex: " + hex);
         }
         return li;
     }

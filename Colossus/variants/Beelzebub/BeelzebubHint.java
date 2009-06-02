@@ -10,6 +10,7 @@ import net.sf.colossus.variant.IHintOracle;
 import net.sf.colossus.variant.IOracleLegion;
 import net.sf.colossus.variant.IVariantHint;
 import net.sf.colossus.variant.MasterBoardTerrain;
+import net.sf.colossus.variant.MasterHex;
 import Default.DefaultHint;
 
 
@@ -199,10 +200,10 @@ public class BeelzebubHint implements IVariantHint
         return recruitNames.get(recruitNames.size() - 1);
     }
 
-    public List<String> getInitialSplitHint(String label, String[] section)
+    public List<String> getInitialSplitHint(MasterHex hex, String[] section)
     {
         List<String> li = new ArrayList<String>();
-        if (label.equals("100"))
+        if (hex.getLabel().equals("100"))
         {
             if (rnd.nextFloat() < 0.5)
             {
@@ -219,14 +220,14 @@ public class BeelzebubHint implements IVariantHint
                 li.add("Goblin");
             }
         }
-        else if (label.equals("200"))
+        else if (hex.getLabel().equals("200"))
         {
             li.add("Titan");
             li.add("Goblin");
             li.add("Goblin");
             li.add("Skeleton");
         }
-        else if (label.equals("300"))
+        else if (hex.getLabel().equals("300"))
         {
             if (rnd.nextFloat() < 0.5)
             {
@@ -243,7 +244,7 @@ public class BeelzebubHint implements IVariantHint
                 li.add("Goblin");
             }
         }
-        else if (label.equals("400"))
+        else if (hex.getLabel().equals("400"))
         {
             li.add("Titan");
             li.add("Goblin");
@@ -251,7 +252,7 @@ public class BeelzebubHint implements IVariantHint
             li.add("Skeleton");
 
         }
-        else if (label.equals("500"))
+        else if (hex.getLabel().equals("500"))
         {
             if (rnd.nextFloat() < 0.5)
             {
@@ -268,7 +269,7 @@ public class BeelzebubHint implements IVariantHint
                 li.add("Goblin");
             }
         }
-        else if (label.equals("600"))
+        else if (hex.getLabel().equals("600"))
         {
             li.add("Titan");
             li.add("Goblin");
@@ -277,7 +278,7 @@ public class BeelzebubHint implements IVariantHint
         }
         else
         {
-            throw new RuntimeException("Bad hex label " + label);
+            throw new RuntimeException("Bad hex: " + hex);
         }
         return li;
     }
