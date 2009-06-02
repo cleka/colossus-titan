@@ -2,11 +2,9 @@ package SmallTitan;
 
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import net.sf.colossus.ai.AbstractHintProvider;
-import net.sf.colossus.common.Constants;
 import net.sf.colossus.util.DevRandom;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.IHintOracle;
@@ -22,11 +20,11 @@ public class SmallTitanHint extends AbstractHintProvider
 
     public String getRecruitHint(MasterBoardTerrain terrain,
         IOracleLegion legion, List<CreatureType> recruits,
-        IHintOracle oracle, String[] section)
+        IHintOracle oracle,
+        List<AIStyle> aiStyles)
     {
         String terrainId = terrain.getId();
         List<String> recruitNames = DefaultHint.creaturesToStrings(recruits);
-        List<String> sect = Arrays.asList(section);
 
         if (terrainId.equals("Brush"))
         {
@@ -47,7 +45,7 @@ public class SmallTitanHint extends AbstractHintProvider
             {
                 return "Lion";
             }
-            if (sect.contains(Constants.sectionDefensiveAI))
+            if (aiStyles.contains(AIStyle.Defensive))
             {
                 if (recruitNames.contains("Centaur")
                     && legion.numCreature("Centaur") == 2
@@ -61,7 +59,7 @@ public class SmallTitanHint extends AbstractHintProvider
                     return "Centaur";
                 }
             }
-            else if (sect.contains(Constants.sectionOffensiveAI))
+            else if (aiStyles.contains(AIStyle.Offensive))
             {
                 if (recruitNames.contains("Centaur")
                     && legion.numCreature("Centaur") == 2
@@ -82,7 +80,7 @@ public class SmallTitanHint extends AbstractHintProvider
             {
                 return "Troll";
             }
-            if (sect.contains(Constants.sectionDefensiveAI))
+            if (aiStyles.contains(AIStyle.Defensive))
             {
                 if (recruitNames.contains("Ogre")
                     && legion.numCreature("Ogre") == 2
@@ -96,7 +94,7 @@ public class SmallTitanHint extends AbstractHintProvider
                     return "Ogre";
                 }
             }
-            else if (sect.contains(Constants.sectionOffensiveAI))
+            else if (aiStyles.contains(AIStyle.Offensive))
             {
                 if (recruitNames.contains("Ogre")
                     && legion.numCreature("Ogre") == 2
@@ -169,7 +167,8 @@ public class SmallTitanHint extends AbstractHintProvider
         return recruitNames.get(recruitNames.size() - 1);
     }
 
-    public List<String> getInitialSplitHint(MasterHex hex, String[] section)
+    public List<String> getInitialSplitHint(MasterHex hex,
+        List<AIStyle> aiStyles)
     {
         List<String> li = new ArrayList<String>();
         if (hex.getLabel().equals("2000"))

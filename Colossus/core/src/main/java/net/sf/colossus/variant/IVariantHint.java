@@ -11,6 +11,10 @@ import java.util.List;
  */
 public interface IVariantHint
 {
+    enum AIStyle
+    {
+        Any, Offensive, Defensive
+    }
 
     /**
      * Give the suggested recruit in this terrain for this legion.
@@ -20,32 +24,30 @@ public interface IVariantHint
      *     (returned value must be the name of one of those)
      * @param oracle An oracle that answers some questions
      *     about the situation of the legion
-     * @param section Array of AI section to be used
-     *     (usually one or more of "AllAI:", "DefensiveAI:", "OffensiveAI:")
+     * @param aiStyles The styles the AI prefers to play
      * @return The name of the suggested recruit
      */
     public String getRecruitHint(MasterBoardTerrain terrain,
         IOracleLegion legion, List<CreatureType> recruits,
-        IHintOracle oracle, String[] section);
+        IHintOracle oracle,
+        List<IVariantHint.AIStyle> aiStyles);
 
     /**
      * To obtain the list of creature to split on turn one.
      * @param startingTower The starting Tower.
-     * @param section Array of AI section to be used
-     *     (usually one or more of "AllAI:", "DefensiveAI:", "OffensiveAI:")
+     * @param aiStyles The style the AI prefers to play.
      * @return The list of creature to split (listed by name)
      */
     public List<String> getInitialSplitHint(MasterHex startingTower,
-        String[] section);
+        List<IVariantHint.AIStyle> aiStyles);
 
     /**
      * Give an offset to apply to the creature Point Value
      *     before estimating its recruitment value.
      * @param creature Type of the creature
-     * @param section Array of AI section to be used
-     *     (usually one or more of "AllAI:", "DefensiveAI:", "OffensiveAI:")
+     * @param style List of AI styles to hint for
      * @return An offset to the Point Value of the creature.
      */
     public int getHintedRecruitmentValueOffset(CreatureType creature,
-        String[] section);
+        List<AIStyle> styles);
 }

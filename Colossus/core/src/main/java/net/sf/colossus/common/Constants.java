@@ -104,11 +104,6 @@ public final class Constants
     /** Default HINT file */
     public static final String defaultHINTFile = "DefaultHint";
 
-    // AI types for hints
-    public static final String sectionAllAI = "AllAI:";
-    public static final String sectionOffensiveAI = "OffensiveAI:";
-    public static final String sectionDefensiveAI = "DefensiveAI:";
-
     /** Default VAR file */
     public static final String defaultVARFile = "DefaultVar.xml";
     public static final String varEnd = "Var.xml";

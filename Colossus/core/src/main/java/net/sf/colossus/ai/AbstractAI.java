@@ -3,6 +3,7 @@ package net.sf.colossus.ai;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -29,6 +30,7 @@ import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardTerrain;
 import net.sf.colossus.variant.IHintOracle;
+import net.sf.colossus.variant.IVariantHint;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;
@@ -61,10 +63,13 @@ abstract class AbstractAI implements AI
 
     /** Our random source. */
     final protected Random random = new DevRandom();
-    /** for the Oracle Hint stuff, the section we use.
-     *  This can be replaced by AI implementation.
+    /**
+     * For the Oracle Hint stuff, the play style we use.
+     *
+     * This can be replaced by AI implementation.
      */
-    protected final String[] hintSectionUsed = { Constants.sectionOffensiveAI };
+    protected List<IVariantHint.AIStyle> hintSectionUsed = Collections
+        .singletonList(IVariantHint.AIStyle.Offensive);
 
     protected AbstractAI(Client client)
     {
@@ -417,26 +422,26 @@ abstract class AbstractAI implements AI
     }
 
     public int getHintedRecruitmentValueNonTitan(CreatureType creature,
-        String[] section)
+        List<IVariantHint.AIStyle> styles)
     {
         return creature.getPointValue()
             + VariantSupport
-                .getHintedRecruitmentValueOffset(creature, section);
+                .getHintedRecruitmentValueOffset(creature, styles);
     }
 
     protected final int getHintedRecruitmentValue(CreatureType creature,
-            Legion legion, String[] section)
+            Legion legion, List<IVariantHint.AIStyle> styles)
     {
         if (!creature.isTitan())
         {
-            return getHintedRecruitmentValueNonTitan(creature, section);
+            return getHintedRecruitmentValueNonTitan(creature, styles);
         }
         Player player = legion.getPlayer();
         int power = player.getTitanPower();
         int skill = creature.getSkill();
         return power * skill *
                 VariantSupport
-                .getHintedRecruitmentValueOffset(creature, section);
+                .getHintedRecruitmentValueOffset(creature, styles);
     }
 
     /** Various constants used by the AIs code for creature evaluation.

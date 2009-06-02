@@ -20,7 +20,8 @@ public class TitanPlusHint extends AbstractHintProvider
 
     public String getRecruitHint(MasterBoardTerrain terrain,
         IOracleLegion legion, List<CreatureType> recruits,
-        IHintOracle oracle, String[] section)
+        IHintOracle oracle,
+        List<AIStyle> aiStyles)
     {
         String terrainId = terrain.getId();
         List<String> recruitNames = DefaultHint.creaturesToStrings(recruits);
@@ -85,7 +86,8 @@ public class TitanPlusHint extends AbstractHintProvider
         return recruitNames.get(recruitNames.size() - 1);
     }
 
-    public List<String> getInitialSplitHint(MasterHex hex, String[] section)
+    public List<String> getInitialSplitHint(MasterHex hex,
+        List<AIStyle> aiStyles)
     {
         List<String> li = new ArrayList<String>();
         if (hex.getLabel().equals("100"))

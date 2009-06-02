@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -666,33 +667,32 @@ public final class VariantSupport
         MasterBoardTerrain terrain, IOracleLegion legion,
         List<CreatureType> recruits, IHintOracle oracle)
     {
-        String[] section = new String[1];
-        section[0] = Constants.sectionAllAI;
-        return getRecruitHint(terrain, legion, recruits, oracle, section);
+        return getRecruitHint(terrain, legion, recruits, oracle, Collections
+            .singletonList(IVariantHint.AIStyle.Any));
     }
 
     public synchronized static String getRecruitHint(
         MasterBoardTerrain terrain, IOracleLegion legion,
         List<CreatureType> recruits, IHintOracle oracle,
-        String[] section)
+        List<IVariantHint.AIStyle> aiStyles)
     {
         assert aihl != null : "No AIHintLoader available";
-        return aihl.getRecruitHint(terrain, legion, recruits, oracle, section);
+        return aihl
+            .getRecruitHint(terrain, legion, recruits, oracle, aiStyles);
     }
 
     public synchronized static List<String> getInitialSplitHint(MasterHex hex)
     {
-        String[] section = new String[1];
-        section[0] = Constants.sectionAllAI;
-        return getInitialSplitHint(hex, section);
+        return getInitialSplitHint(hex, Collections
+            .singletonList(IVariantHint.AIStyle.Any));
     }
 
     public synchronized static List<String> getInitialSplitHint(MasterHex hex,
-        String[] section)
+        List<IVariantHint.AIStyle> aiStyles)
     {
         if (aihl != null)
         {
-            return aihl.getInitialSplitHint(hex, section);
+            return aihl.getInitialSplitHint(hex, aiStyles);
         }
         return null;
     }
@@ -700,15 +700,14 @@ public final class VariantSupport
     public synchronized static int getHintedRecruitmentValueOffset(
         CreatureType creature)
     {
-        String[] section = new String[1];
-        section[0] = Constants.sectionAllAI;
-        return getHintedRecruitmentValueOffset(creature, section);
+        return getHintedRecruitmentValueOffset(creature, Collections
+            .singletonList(IVariantHint.AIStyle.Any));
     }
 
     public synchronized static int getHintedRecruitmentValueOffset(
-        CreatureType creature, String[] section)
+        CreatureType creature, List<IVariantHint.AIStyle> aiStyles)
     {
-        return aihl.getHintedRecruitmentValueOffset(creature, section);
+        return aihl.getHintedRecruitmentValueOffset(creature, aiStyles);
     }
 
     /** get maximum number of players in that variant */

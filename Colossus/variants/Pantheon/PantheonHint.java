@@ -2,11 +2,9 @@ package Pantheon;
 
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import net.sf.colossus.ai.AbstractHintProvider;
-import net.sf.colossus.common.Constants;
 import net.sf.colossus.util.DevRandom;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.IHintOracle;
@@ -22,7 +20,8 @@ public class PantheonHint extends AbstractHintProvider
 
     public String getRecruitHint(MasterBoardTerrain terrain,
         IOracleLegion legion, List<CreatureType> recruits,
-        IHintOracle oracle, String[] section)
+        IHintOracle oracle,
+        List<AIStyle> aiStyles)
     {
         String terrainId = terrain.getId();
         List<String> recruitNames = DefaultHint.creaturesToStrings(recruits);
@@ -122,10 +121,9 @@ public class PantheonHint extends AbstractHintProvider
         return recruitNames.get(recruitNames.size() - 1);
     }
 
-    public List<String> getInitialSplitHint(MasterHex hex, String[] section)
+    public List<String> getInitialSplitHint(MasterHex hex,
+        List<AIStyle> aiStyles)
     {
-        List<String> sect = Arrays.asList(section);
-
         List<String> li = new ArrayList<String>();
         if (hex.getLabel().equals("100"))
         {
@@ -211,7 +209,7 @@ public class PantheonHint extends AbstractHintProvider
         }
         else if (hex.getLabel().equals("700"))
         {
-            if (sect.contains(Constants.sectionDefensiveAI))
+            if (aiStyles.contains(AIStyle.Defensive))
             {
                 if (rnd.nextFloat() < 0.4)
                 {
@@ -242,7 +240,7 @@ public class PantheonHint extends AbstractHintProvider
                     li.add("Centaur");
                 }
             }
-            else if (sect.contains(Constants.sectionOffensiveAI))
+            else if (aiStyles.contains(AIStyle.Offensive))
             {
                 if (rnd.nextFloat() < 0.25)
                 {
@@ -293,7 +291,7 @@ public class PantheonHint extends AbstractHintProvider
         }
         else if (hex.getLabel().equals("800"))
         {
-            if (sect.contains(Constants.sectionDefensiveAI))
+            if (aiStyles.contains(AIStyle.Defensive))
             {
                 if (rnd.nextFloat() < 0.4)
                 {
@@ -324,7 +322,7 @@ public class PantheonHint extends AbstractHintProvider
                     li.add("Centaur");
                 }
             }
-            else if (sect.contains(Constants.sectionOffensiveAI))
+            else if (aiStyles.contains(AIStyle.Offensive))
             {
                 if (rnd.nextFloat() < 0.25)
                 {

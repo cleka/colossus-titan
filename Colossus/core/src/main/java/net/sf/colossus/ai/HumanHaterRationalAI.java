@@ -1,8 +1,10 @@
 package net.sf.colossus.ai;
 
 
+import java.util.Collections;
+
 import net.sf.colossus.client.Client;
-import net.sf.colossus.common.Constants;
+import net.sf.colossus.variant.IVariantHint.AIStyle;
 
 
 /**
@@ -21,7 +23,7 @@ public class HumanHaterRationalAI extends RationalAI // NO_UCD
 
         /* this is a defensive AI, not an offensive one, so use
          the proper hints section */
-        hintSectionUsed[0] = Constants.sectionDefensiveAI;
+        hintSectionUsed = Collections.singletonList(AIStyle.Defensive);
     }
 
     /** Return true if we need to run this method again after the server

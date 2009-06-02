@@ -1,8 +1,10 @@
 package net.sf.colossus.ai;
 
 
+import java.util.Collections;
+
 import net.sf.colossus.client.Client;
-import net.sf.colossus.common.Constants;
+import net.sf.colossus.variant.IVariantHint;
 
 
 /**
@@ -19,7 +21,8 @@ public class CowardSimpleAI extends SimpleAI // NO_UCD
 
         /* this is a defensive AI, not an offensive one, so use
          the proper hints section */
-        hintSectionUsed[0] = Constants.sectionDefensiveAI;
+        hintSectionUsed = Collections
+            .singletonList(IVariantHint.AIStyle.Defensive);
     }
 
     /* up the ratios a little */

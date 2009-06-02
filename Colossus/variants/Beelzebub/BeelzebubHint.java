@@ -20,7 +20,8 @@ public class BeelzebubHint extends AbstractHintProvider
 
     public String getRecruitHint(MasterBoardTerrain terrain,
         IOracleLegion legion, List<CreatureType> recruits,
-        IHintOracle oracle, String[] section)
+        IHintOracle oracle,
+        List<AIStyle> aiStyles)
     {
         String terrainId = terrain.getId();
         List<String> recruitNames = DefaultHint.creaturesToStrings(recruits);
@@ -200,7 +201,8 @@ public class BeelzebubHint extends AbstractHintProvider
         return recruitNames.get(recruitNames.size() - 1);
     }
 
-    public List<String> getInitialSplitHint(MasterHex hex, String[] section)
+    public List<String> getInitialSplitHint(MasterHex hex,
+        List<AIStyle> aiStyles)
     {
         List<String> li = new ArrayList<String>();
         if (hex.getLabel().equals("100"))
@@ -285,7 +287,7 @@ public class BeelzebubHint extends AbstractHintProvider
 
     @Override
     public int getHintedRecruitmentValueOffset(CreatureType creature,
-        String[] section)
+        List<AIStyle> aiStyles)
     {
         if (creature.getName().equals("Imp"))
         {

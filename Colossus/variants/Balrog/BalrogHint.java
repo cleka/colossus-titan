@@ -15,7 +15,8 @@ public class BalrogHint extends DefaultHint
     @Override
     public String getRecruitHint(MasterBoardTerrain terrain,
         IOracleLegion legion, List<CreatureType> recruits,
-        IHintOracle oracle, String[] section)
+        IHintOracle oracle,
+        List<AIStyle> aiStyles)
     {
         String terrainId = terrain.getId();
         List<String> recruitNames = creaturesToStrings(recruits);
@@ -34,6 +35,7 @@ public class BalrogHint extends DefaultHint
         }
 
         return super
-            .getRecruitHint(terrain, legion, recruits, oracle, section);
+            .getRecruitHint(terrain, legion, recruits, oracle,
+            aiStyles);
     }
 }
