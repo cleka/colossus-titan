@@ -663,7 +663,7 @@ public final class VariantSupport
         }
     }
 
-    public synchronized static String getRecruitHint(
+    public synchronized static CreatureType getRecruitHint(
         MasterBoardTerrain terrain, IOracleLegion legion,
         List<CreatureType> recruits, IHintOracle oracle)
     {
@@ -671,7 +671,7 @@ public final class VariantSupport
             .singletonList(IVariantHint.AIStyle.Any));
     }
 
-    public synchronized static String getRecruitHint(
+    public synchronized static CreatureType getRecruitHint(
         MasterBoardTerrain terrain, IOracleLegion legion,
         List<CreatureType> recruits, IHintOracle oracle,
         List<IVariantHint.AIStyle> aiStyles)

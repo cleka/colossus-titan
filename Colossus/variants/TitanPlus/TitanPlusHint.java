@@ -24,7 +24,7 @@ public class TitanPlusHint extends AbstractHintProvider
 
     private final DevRandom rnd = new DevRandom();
 
-    public String getRecruitHint(MasterBoardTerrain terrain,
+    public CreatureType getRecruitHint(MasterBoardTerrain terrain,
         IOracleLegion legion, List<CreatureType> recruits,
         IHintOracle oracle,
         List<AIStyle> aiStyles)
@@ -39,7 +39,7 @@ public class TitanPlusHint extends AbstractHintProvider
                 && legion.numCreature("Cyclops") == 2
                 && oracle.creatureAvailable("Behemoth") >= 2)
             {
-                return "Cyclops";
+                return getCreatureType("Cyclops");
             }
         }
         else if (terrainId.equals("Plains"))
@@ -49,7 +49,7 @@ public class TitanPlusHint extends AbstractHintProvider
                 && oracle.canReach("Desert")
                 && oracle.creatureAvailable("Griffon") >= 2)
             {
-                return "Lion";
+                return getCreatureType("Lion");
             }
         }
         else if (terrainId.equals("Marsh"))
@@ -59,37 +59,37 @@ public class TitanPlusHint extends AbstractHintProvider
                 && oracle.canReach("Swamp")
                 && oracle.creatureAvailable("Wyvern") >= 2)
             {
-                return "Troll";
+                return getCreatureType("Troll");
             }
         }
         else if (terrainId.equals("Tower"))
         {
             if (recruitNames.contains("Warlock"))
             {
-                return "Warlock";
+                return getCreatureType("Warlock");
             }
             if (recruitNames.contains("Guardian"))
             {
-                return "Guardian";
+                return getCreatureType("Guardian");
             }
             if (recruitNames.contains("Cyclops")
                 && legion.numCreature("Cyclops") == 2)
             {
-                return "Cyclops";
+                return getCreatureType("Cyclops");
             }
             if (recruitNames.contains("Troll")
                 && legion.numCreature("Troll") == 2)
             {
-                return "Troll";
+                return getCreatureType("Troll");
             }
             if (recruitNames.contains("Lion")
                 && legion.numCreature("Lion") == 2)
             {
-                return "Lion";
+                return getCreatureType("Lion");
             }
         }
 
-        return recruitNames.get(recruitNames.size() - 1);
+        return recruits.get(recruits.size() - 1);
     }
 
     public List<String> getInitialSplitHint(MasterHex hex,

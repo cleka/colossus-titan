@@ -24,7 +24,7 @@ public class ExtTitanHint extends AbstractHintProvider
 
     private final DevRandom rnd = new DevRandom();
 
-    public String getRecruitHint(MasterBoardTerrain terrain,
+    public CreatureType getRecruitHint(MasterBoardTerrain terrain,
         IOracleLegion legion, List<CreatureType> recruits,
         IHintOracle oracle,
         List<AIStyle> aiStyles)
@@ -38,7 +38,7 @@ public class ExtTitanHint extends AbstractHintProvider
                 && legion.numCreature("Cyclops") == 2
                 && oracle.creatureAvailable("Jabberwok") >= 2)
             {
-                return "Cyclops";
+                return getCreatureType("Cyclops");
             }
         }
         else if (terrainId.equals("Plains"))
@@ -48,7 +48,7 @@ public class ExtTitanHint extends AbstractHintProvider
                 && oracle.creatureAvailable("Griffon") >= 2
                 && oracle.canReach("Desert"))
             {
-                return "Lion";
+                return getCreatureType("Lion");
             }
         }
         else if (terrainId.equals("Marsh"))
@@ -58,7 +58,7 @@ public class ExtTitanHint extends AbstractHintProvider
                 && oracle.creatureAvailable("Wyvern") >= 2
                 && oracle.canReach("Swamp"))
             {
-                return "Troll";
+                return getCreatureType("Troll");
             }
         }
         else if (terrainId.equals("Woods"))
@@ -69,7 +69,7 @@ public class ExtTitanHint extends AbstractHintProvider
                 && oracle.creatureAvailable("Salamander") >= 2
                 && oracle.canReach("Desert"))
             {
-                return "Griffon";
+                return getCreatureType("Griffon");
             }
         }
         else if (terrainId.equals("Hills"))
@@ -79,62 +79,62 @@ public class ExtTitanHint extends AbstractHintProvider
                 && oracle.creatureAvailable("Mammoth") >= 2
                 && oracle.canReach("Swamp"))
             {
-                return "Wyvern";
+                return getCreatureType("Wyvern");
             }
         }
         else if (terrainId.equals("Tower"))
         {
             if (recruitNames.contains("Wraith"))
             {
-                return "Wraith";
+                return getCreatureType("Wraith");
             }
             if (recruitNames.contains("Warlock"))
             {
-                return "Warlock";
+                return getCreatureType("Warlock");
             }
             if (recruitNames.contains("Guardian"))
             {
-                return "Guardian";
+                return getCreatureType("Guardian");
             }
             if (recruitNames.contains("Gargoyle")
                 && legion.numCreature("Gargoyle") == 1
                 && oracle.creatureAvailable("Cyclops") >= 3)
             {
-                return "Gargoyle";
+                return getCreatureType("Gargoyle");
             }
             if (recruitNames.contains("Ogre")
                 && legion.numCreature("Ogre") == 1
                 && oracle.creatureAvailable("Troll") >= 2)
             {
-                return "Ogre";
+                return getCreatureType("Ogre");
             }
             if (recruitNames.contains("Centaur")
                 && legion.numCreature("Centaur") == 1
                 && oracle.creatureAvailable("Lion") >= 2)
             {
-                return "Centaur";
+                return getCreatureType("Centaur");
             }
             if (recruitNames.contains("Gargoyle")
                 && legion.numCreature("Gargoyle") == 0
                 && oracle.creatureAvailable("Cyclops") >= 6)
             {
-                return "Gargoyle";
+                return getCreatureType("Gargoyle");
             }
             if (recruitNames.contains("Ogre")
                 && legion.numCreature("Ogre") == 0
                 && oracle.creatureAvailable("Troll") >= 6)
             {
-                return "Ogre";
+                return getCreatureType("Ogre");
             }
             if (recruitNames.contains("Centaur")
                 && legion.numCreature("Centaur") == 0
                 && oracle.creatureAvailable("Lion") >= 6)
             {
-                return "Centaur";
+                return getCreatureType("Centaur");
             }
         }
 
-        return recruitNames.get(recruitNames.size() - 1);
+        return recruits.get(recruits.size() - 1);
     }
 
     public List<String> getInitialSplitHint(MasterHex hex,

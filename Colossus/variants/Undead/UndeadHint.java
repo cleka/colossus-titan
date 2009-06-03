@@ -24,7 +24,7 @@ public class UndeadHint extends AbstractHintProvider
 
     private final DevRandom rnd = new DevRandom();
 
-    public String getRecruitHint(MasterBoardTerrain terrain,
+    public CreatureType getRecruitHint(MasterBoardTerrain terrain,
         IOracleLegion legion, List<CreatureType> recruits,
         IHintOracle oracle,
         List<AIStyle> aiStyles)
@@ -38,7 +38,7 @@ public class UndeadHint extends AbstractHintProvider
                 && legion.numCreature("Zombie") == 2
                 && oracle.creatureAvailable("Wraith") >= 2)
             {
-                return "Zombie";
+                return getCreatureType("Zombie");
             }
         }
         else if (terrainId.equals("Plains"))
@@ -48,7 +48,7 @@ public class UndeadHint extends AbstractHintProvider
                 && oracle.canReach("Desert")
                 && oracle.creatureAvailable("Griffin") >= 2)
             {
-                return "Naga";
+                return getCreatureType("Naga");
             }
         }
         else if (terrainId.equals("Marsh"))
@@ -57,66 +57,66 @@ public class UndeadHint extends AbstractHintProvider
                 && legion.numCreature("Orc") == 2 && oracle.canReach("Swamp")
                 && oracle.creatureAvailable("Wyvern") >= 2)
             {
-                return "Orc";
+                return getCreatureType("Orc");
             }
         }
         else if (terrainId.equals("Tower"))
         {
             if (recruitNames.contains("Beholder"))
             {
-                return "Beholder";
+                return getCreatureType("Beholder");
             }
             if (recruitNames.contains("Harpy"))
             {
-                return "Harpy";
+                return getCreatureType("Harpy");
             }
             if (recruitNames.contains("Golem"))
             {
-                return "Golem";
+                return getCreatureType("Golem");
             }
             if (recruitNames.contains("Wizard"))
             {
-                return "Wizard";
+                return getCreatureType("Wizard");
             }
             if (recruitNames.contains("Skeleton")
                 && legion.numCreature("Skeleton") == 1
                 && oracle.creatureAvailable("Zombie") >= 3)
             {
-                return "Skeleton";
+                return getCreatureType("Skeleton");
             }
             if (recruitNames.contains("Troglodyte")
                 && legion.numCreature("Troglodyte") == 1
                 && oracle.creatureAvailable("Orc") >= 2)
             {
-                return "Troglodyte";
+                return getCreatureType("Troglodyte");
             }
             if (recruitNames.contains("Paladin")
                 && legion.numCreature("Paladin") == 1
                 && oracle.creatureAvailable("Naga") >= 2)
             {
-                return "Paladin";
+                return getCreatureType("Paladin");
             }
             if (recruitNames.contains("Skeleton")
                 && legion.numCreature("Skeleton") == 0
                 && oracle.creatureAvailable("Zombie") >= 6)
             {
-                return "Skeleton";
+                return getCreatureType("Skeleton");
             }
             if (recruitNames.contains("Troglodyte")
                 && legion.numCreature("Troglodyte") == 0
                 && oracle.creatureAvailable("Orc") >= 6)
             {
-                return "Troglodyte";
+                return getCreatureType("Troglodyte");
             }
             if (recruitNames.contains("Paladin")
                 && legion.numCreature("Paladin") == 0
                 && oracle.creatureAvailable("Naga") >= 6)
             {
-                return "Paladin";
+                return getCreatureType("Paladin");
             }
         }
 
-        return recruitNames.get(recruitNames.size() - 1);
+        return recruits.get(recruits.size() - 1);
     }
 
     public List<String> getInitialSplitHint(MasterHex hex,

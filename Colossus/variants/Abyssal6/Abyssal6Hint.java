@@ -24,7 +24,7 @@ public class Abyssal6Hint extends AbstractHintProvider
 
     private final DevRandom rnd = new DevRandom();
 
-    public String getRecruitHint(MasterBoardTerrain terrain,
+    public CreatureType getRecruitHint(MasterBoardTerrain terrain,
         IOracleLegion legion, List<CreatureType> recruits,
         IHintOracle oracle,
         List<AIStyle> aiStyles)
@@ -40,7 +40,7 @@ public class Abyssal6Hint extends AbstractHintProvider
                 && oracle.creatureAvailable("Behemoth") >= 2
                 && oracle.canReach("Jungle"))
             {
-                return "Cyclops";
+                return getCreatureType("Cyclops");
             }
         }
         else if (terrainId.equals("Plains"))
@@ -50,7 +50,7 @@ public class Abyssal6Hint extends AbstractHintProvider
                 && oracle.creatureAvailable("Griffon") >= 2
                 && oracle.canReach("Desert"))
             {
-                return "Lion";
+                return getCreatureType("Lion");
             }
             if (aiStyles.contains(AIStyle.Defensive))
             {
@@ -63,7 +63,7 @@ public class Abyssal6Hint extends AbstractHintProvider
                     && !oracle.hexLabel().equals("15")
                     && !oracle.hexLabel().equals("29"))
                 {
-                    return "Centaur";
+                    return getCreatureType("Centaur");
                 }
             }
             else if (aiStyles.contains(AIStyle.Offensive))
@@ -74,7 +74,7 @@ public class Abyssal6Hint extends AbstractHintProvider
                     && oracle.biggestAttackerHeight() == 0
                     && oracle.canReach("Woods"))
                 {
-                    return "Centaur";
+                    return getCreatureType("Centaur");
                 }
             }
         }
@@ -85,7 +85,7 @@ public class Abyssal6Hint extends AbstractHintProvider
                 && oracle.creatureAvailable("Wyvern") >= 2
                 && oracle.canReach("Swamp"))
             {
-                return "Troll";
+                return getCreatureType("Troll");
             }
             if (recruitNames.contains("Ranger")
                 && !legion.contains("AirElemental") && legion.getHeight() != 6
@@ -93,7 +93,7 @@ public class Abyssal6Hint extends AbstractHintProvider
                 && oracle.creatureAvailable("AirElemental") >= 3
                 && oracle.canReach("Plains"))
             {
-                return "Ranger";
+                return getCreatureType("Ranger");
             }
             if (aiStyles.contains(AIStyle.Defensive))
             {
@@ -106,7 +106,7 @@ public class Abyssal6Hint extends AbstractHintProvider
                     && !oracle.hexLabel().equals("22")
                     && !oracle.hexLabel().equals("36"))
                 {
-                    return "Ogre";
+                    return getCreatureType("Ogre");
                 }
             }
             else if (aiStyles.contains(AIStyle.Offensive))
@@ -117,7 +117,7 @@ public class Abyssal6Hint extends AbstractHintProvider
                     && oracle.biggestAttackerHeight() == 0
                     && oracle.canReach("Hills"))
                 {
-                    return "Ogre";
+                    return getCreatureType("Ogre");
                 }
             }
         }
@@ -130,7 +130,7 @@ public class Abyssal6Hint extends AbstractHintProvider
                 && oracle.creatureAvailable("EarthElemental") >= 3
                 && oracle.canReach("Hills"))
             {
-                return "Unicorn";
+                return getCreatureType("Unicorn");
             }
         }
         else if (terrainId.equals("Desert"))
@@ -141,7 +141,7 @@ public class Abyssal6Hint extends AbstractHintProvider
                 && oracle.creatureAvailable("WaterElemental") >= 3
                 && oracle.canReach("Swamp"))
             {
-                return "Hydra";
+                return getCreatureType("Hydra");
             }
         }
         else if (terrainId.equals("Tundra"))
@@ -153,72 +153,72 @@ public class Abyssal6Hint extends AbstractHintProvider
                 && oracle.creatureAvailable("FireElemental") >= 3
                 && oracle.canReach("Mountains"))
             {
-                return "Colossus";
+                return getCreatureType("Colossus");
             }
         }
         else if (terrainId.equals("Tower"))
         {
             if (recruitNames.contains("Knight"))
             {
-                return "Knight";
+                return getCreatureType("Knight");
             }
             if (recruitNames.contains("Warlock"))
             {
-                return "Warlock";
+                return getCreatureType("Warlock");
             }
             if (recruitNames.contains("Guardian"))
             {
-                return "Guardian";
+                return getCreatureType("Guardian");
             }
             if (recruitNames.contains("Ogre")
                 && legion.numCreature("Ogre") == 2)
             {
-                return "Ogre";
+                return getCreatureType("Ogre");
             }
             if (recruitNames.contains("Centaur")
                 && legion.numCreature("Centaur") == 2)
             {
-                return "Centaur";
+                return getCreatureType("Centaur");
             }
             if (recruitNames.contains("Gargoyle")
                 && legion.numCreature("Gargoyle") == 1
                 && oracle.creatureAvailable("Cyclops") >= 3)
             {
-                return "Gargoyle";
+                return getCreatureType("Gargoyle");
             }
             if (recruitNames.contains("Ogre")
                 && legion.numCreature("Ogre") == 1
                 && oracle.creatureAvailable("Troll") >= 2)
             {
-                return "Ogre";
+                return getCreatureType("Ogre");
             }
             if (recruitNames.contains("Centaur")
                 && legion.numCreature("Centaur") == 1
                 && oracle.creatureAvailable("Lion") >= 2)
             {
-                return "Centaur";
+                return getCreatureType("Centaur");
             }
             if (recruitNames.contains("Gargoyle")
                 && legion.numCreature("Gargoyle") == 0
                 && oracle.creatureAvailable("Cyclops") >= 6)
             {
-                return "Gargoyle";
+                return getCreatureType("Gargoyle");
             }
             if (recruitNames.contains("Ogre")
                 && legion.numCreature("Ogre") == 0
                 && oracle.creatureAvailable("Troll") >= 6)
             {
-                return "Ogre";
+                return getCreatureType("Ogre");
             }
             if (recruitNames.contains("Centaur")
                 && legion.numCreature("Centaur") == 0
                 && oracle.creatureAvailable("Lion") >= 6)
             {
-                return "Centaur";
+                return getCreatureType("Centaur");
             }
         }
 
-        return recruitNames.get(recruitNames.size() - 1);
+        return recruits.get(recruits.size() - 1);
     }
 
     public List<String> getInitialSplitHint(MasterHex hex,

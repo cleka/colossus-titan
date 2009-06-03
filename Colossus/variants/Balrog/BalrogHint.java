@@ -19,23 +19,22 @@ public class BalrogHint extends DefaultHint
     }
 
     @Override
-    public String getRecruitHint(MasterBoardTerrain terrain,
+    public CreatureType getRecruitHint(MasterBoardTerrain terrain,
         IOracleLegion legion, List<CreatureType> recruits,
         IHintOracle oracle,
         List<AIStyle> aiStyles)
     {
         String terrainId = terrain.getId();
-        List<String> recruitNames = creaturesToStrings(recruits);
         // TODO: Is this "sect" needed / planned to be needed for something?
         // List<String> sect = Arrays.asList(section);
 
         if (terrainId.equals("Tower"))
         {
-            for (String n : recruitNames)
+            for (CreatureType c : recruits)
             {
-                if (n.startsWith("Balrog"))
+                if (c.getName().startsWith("Balrog"))
                 {
-                    return n;
+                    return c;
                 }
             }
         }

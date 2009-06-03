@@ -24,7 +24,7 @@ public class Beelzebub12Hint extends AbstractHintProvider
 
     private final DevRandom rnd = new DevRandom();
 
-    public String getRecruitHint(MasterBoardTerrain terrain,
+    public CreatureType getRecruitHint(MasterBoardTerrain terrain,
         IOracleLegion legion, List<CreatureType> recruits,
         IHintOracle oracle,
         List<AIStyle> aiStyles)
@@ -43,7 +43,7 @@ public class Beelzebub12Hint extends AbstractHintProvider
                 && oracle.canReach("Woods")
                 && oracle.creatureAvailable("Warbear") >= 2)
             {
-                return "Centaur";
+                return getCreatureType("Centaur");
             }
             if (recruitNames.contains("Ranger")
                 && !legion.contains("Basilisk") && legion.getHeight() != 6
@@ -51,7 +51,7 @@ public class Beelzebub12Hint extends AbstractHintProvider
                 && oracle.canReach("Marsh")
                 && oracle.creatureAvailable("Basilisk") >= 1)
             {
-                return "Ranger";
+                return getCreatureType("Ranger");
             }
 
         }
@@ -66,7 +66,7 @@ public class Beelzebub12Hint extends AbstractHintProvider
                 && legion.getHeight() != 6 && oracle.canReach("Hills")
                 && oracle.creatureAvailable("Minotaur") >= 2)
             {
-                return "Goblin";
+                return getCreatureType("Goblin");
             }
         }
         else if (terrainId.equals("Ruins"))
@@ -80,7 +80,7 @@ public class Beelzebub12Hint extends AbstractHintProvider
                 && legion.getHeight() != 6 && oracle.canReach("Tombs")
                 && oracle.creatureAvailable("Zombie") >= 2)
             {
-                return "Skeleton";
+                return getCreatureType("Skeleton");
             }
             if (recruitNames.contains("Shade") && !legion.contains("Ghost")
                 && !legion.contains("Wraith") && !legion.contains("Beelzebub")
@@ -90,7 +90,7 @@ public class Beelzebub12Hint extends AbstractHintProvider
                 && oracle.canReach("Circle")
                 && oracle.creatureAvailable("Ghost") >= 2)
             {
-                return "Shade";
+                return getCreatureType("Shade");
             }
         }
         else if (terrainId.equals("Tombs"))
@@ -102,7 +102,7 @@ public class Beelzebub12Hint extends AbstractHintProvider
                 && oracle.canReach("Circle")
                 && oracle.creatureAvailable("Wraith") >= 2)
             {
-                return "Ghost";
+                return getCreatureType("Ghost");
             }
         }
         else if (terrainId.equals("Desert"))
@@ -113,7 +113,7 @@ public class Beelzebub12Hint extends AbstractHintProvider
                 && oracle.canReach("Hills")
                 && oracle.creatureAvailable("Manticore") >= 1)
             {
-                return "Djinn";
+                return getCreatureType("Djinn");
             }
         }
         else if (terrainId.equals("Swamp"))
@@ -123,7 +123,7 @@ public class Beelzebub12Hint extends AbstractHintProvider
                 && oracle.canReach("Woods")
                 && oracle.creatureAvailable("Unicorn") >= 1)
             {
-                return "Ent";
+                return getCreatureType("Ent");
             }
         }
         else if (terrainId.equals("Tower"))
@@ -136,7 +136,7 @@ public class Beelzebub12Hint extends AbstractHintProvider
                     && !legion.contains("Zombie") && oracle
                     .creatureAvailable("Zombie") >= 2)))
             {
-                return "Skeleton";
+                return getCreatureType("Skeleton");
             }
             if (recruitNames.contains("Skeleton")
                 && legion.contains("Skeleton")
@@ -144,7 +144,7 @@ public class Beelzebub12Hint extends AbstractHintProvider
                 && !legion.contains("Shade") && !oracle.canRecruit("Golem")
                 && oracle.creatureAvailable("Shade") >= 2)
             {
-                return "Skeleton";
+                return getCreatureType("Skeleton");
             }
             if (recruitNames.contains("Skeleton")
                 && !legion.contains("Skeleton") && !legion.contains("Shade")
@@ -152,7 +152,7 @@ public class Beelzebub12Hint extends AbstractHintProvider
                 && oracle.creatureAvailable("Shade") >= 6
                 && !oracle.canRecruit("Golem"))
             {
-                return "Skeleton";
+                return getCreatureType("Skeleton");
             }
             if (recruitNames.contains("Goblin")
                 && legion.contains("Goblin")
@@ -162,21 +162,21 @@ public class Beelzebub12Hint extends AbstractHintProvider
                     && !legion.contains("Minotaur") && oracle
                     .creatureAvailable("Minotaur") >= 2)))
             {
-                return "Goblin";
+                return getCreatureType("Goblin");
             }
             if (recruitNames.contains("Goblin") && legion.contains("Goblin")
                 && legion.numCreature("Goblin") == 1
                 && !legion.contains("Naga") && !oracle.canRecruit("Golem")
                 && oracle.creatureAvailable("Naga") >= 2)
             {
-                return "Goblin";
+                return getCreatureType("Goblin");
             }
             if (recruitNames.contains("Goblin") && !legion.contains("Goblin")
                 && !legion.contains("Naga") && legion.getHeight() != 6
                 && oracle.creatureAvailable("Naga") >= 6
                 && !oracle.canRecruit("Golem"))
             {
-                return "Goblin";
+                return getCreatureType("Goblin");
             }
             if (recruitNames.contains("Centaur")
                 && legion.contains("Centaur")
@@ -186,14 +186,14 @@ public class Beelzebub12Hint extends AbstractHintProvider
                     && !legion.contains("Warbear") && oracle
                     .creatureAvailable("Warbear") >= 2)))
             {
-                return "Centaur";
+                return getCreatureType("Centaur");
             }
             if (recruitNames.contains("Centaur") && legion.contains("Centaur")
                 && legion.numCreature("Centaur") == 1
                 && !legion.contains("Lion") && !oracle.canRecruit("Golem")
                 && oracle.creatureAvailable("Lion") >= 2)
             {
-                return "Centaur";
+                return getCreatureType("Centaur");
             }
             if (recruitNames.contains("Centaur")
                 && !legion.contains("Centaur") && !legion.contains("Lion")
@@ -201,10 +201,10 @@ public class Beelzebub12Hint extends AbstractHintProvider
                 && oracle.creatureAvailable("Lion") >= 6
                 && !oracle.canRecruit("Golem"))
             {
-                return "Centaur";
+                return getCreatureType("Centaur");
             }
         }
-        return recruitNames.get(recruitNames.size() - 1);
+        return recruits.get(recruits.size() - 1);
     }
 
     public List<String> getInitialSplitHint(MasterHex hex,

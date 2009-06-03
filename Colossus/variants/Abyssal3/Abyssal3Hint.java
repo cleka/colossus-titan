@@ -24,7 +24,7 @@ public class Abyssal3Hint extends AbstractHintProvider
 
     private final DevRandom rnd = new DevRandom();
 
-    public String getRecruitHint(MasterBoardTerrain terrain,
+    public CreatureType getRecruitHint(MasterBoardTerrain terrain,
         IOracleLegion legion, List<CreatureType> recruits,
         IHintOracle oracle,
         List<AIStyle> aiStyles)
@@ -39,7 +39,7 @@ public class Abyssal3Hint extends AbstractHintProvider
                 && legion.numCreature("Cyclops") == 2
                 && oracle.creatureAvailable("Behemoth") >= 2)
             {
-                return "Cyclops";
+                return getCreatureType("Cyclops");
             }
         }
         else if (terrainId.equals("Plains"))
@@ -48,7 +48,7 @@ public class Abyssal3Hint extends AbstractHintProvider
                 && legion.getHeight() != 6 && legion.numCreature("Lion") == 2
                 && oracle.creatureAvailable("Griffon") >= 2)
             {
-                return "Lion";
+                return getCreatureType("Lion");
             }
         }
         else if (terrainId.equals("Marsh"))
@@ -58,7 +58,7 @@ public class Abyssal3Hint extends AbstractHintProvider
                 && oracle.creatureAvailable("Wyvern") >= 2
                 && oracle.canReach("Swamp"))
             {
-                return "Troll";
+                return getCreatureType("Troll");
             }
             if (recruitNames.contains("Ranger")
                 && !legion.contains("AirElemental") && legion.getHeight() != 6
@@ -66,7 +66,7 @@ public class Abyssal3Hint extends AbstractHintProvider
                 && oracle.creatureAvailable("AirElemental") >= 3
                 && oracle.canReach("Plains"))
             {
-                return "Ranger";
+                return getCreatureType("Ranger");
             }
         }
         else if (terrainId.equals("Woods"))
@@ -78,7 +78,7 @@ public class Abyssal3Hint extends AbstractHintProvider
                 && oracle.creatureAvailable("EarthElemental") >= 3
                 && oracle.canReach("Hills"))
             {
-                return "Unicorn";
+                return getCreatureType("Unicorn");
             }
         }
         else if (terrainId.equals("Desert"))
@@ -89,7 +89,7 @@ public class Abyssal3Hint extends AbstractHintProvider
                 && oracle.creatureAvailable("WaterElemental") >= 3
                 && oracle.canReach("Swamp"))
             {
-                return "Hydra";
+                return getCreatureType("Hydra");
             }
         }
         else if (terrainId.equals("Tundra"))
@@ -101,41 +101,41 @@ public class Abyssal3Hint extends AbstractHintProvider
                 && oracle.creatureAvailable("FireElemental") >= 3
                 && oracle.canReach("Mountains"))
             {
-                return "Colossus";
+                return getCreatureType("Colossus");
             }
         }
         else if (terrainId.equals("Tower"))
         {
             if (recruitNames.contains("Knight"))
             {
-                return "Knight";
+                return getCreatureType("Knight");
             }
             if (recruitNames.contains("Warlock"))
             {
-                return "Warlock";
+                return getCreatureType("Warlock");
             }
             if (recruitNames.contains("Guardian"))
             {
-                return "Guardian";
+                return getCreatureType("Guardian");
             }
             if (recruitNames.contains("Cyclops")
                 && legion.numCreature("Cyclops") == 2)
             {
-                return "Cyclops";
+                return getCreatureType("Cyclops");
             }
             if (recruitNames.contains("Troll")
                 && legion.numCreature("Troll") == 2)
             {
-                return "Troll";
+                return getCreatureType("Troll");
             }
             if (recruitNames.contains("Lion")
                 && legion.numCreature("Lion") == 2)
             {
-                return "Lion";
+                return getCreatureType("Lion");
             }
         }
 
-        return recruitNames.get(recruitNames.size() - 1);
+        return recruits.get(recruits.size() - 1);
     }
 
     public List<String> getInitialSplitHint(MasterHex hex,

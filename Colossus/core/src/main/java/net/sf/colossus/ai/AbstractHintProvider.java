@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.IVariantHint;
+import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;
 
 
@@ -33,8 +34,18 @@ public abstract class AbstractHintProvider implements IVariantHint
         return 0;
     }
 
-    public Variant getVariant()
+    protected Variant getVariant()
     {
         return variant;
+    }
+
+    protected CreatureType getCreatureType(String creatureName)
+    {
+        return variant.getCreatureByName(creatureName);
+    }
+
+    protected MasterHex getMasterHex(String hexLabel)
+    {
+        return variant.getMasterBoard().getHexByLabel(hexLabel);
     }
 }

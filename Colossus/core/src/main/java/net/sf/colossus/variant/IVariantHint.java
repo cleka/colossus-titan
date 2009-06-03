@@ -25,9 +25,10 @@ public interface IVariantHint
      * @param oracle An oracle that answers some questions
      *     about the situation of the legion
      * @param aiStyles The styles the AI prefers to play
-     * @return The name of the suggested recruit
+     * @return The suggested recruit type, a null means recruiting should be
+     *         skipped.
      */
-    public String getRecruitHint(MasterBoardTerrain terrain,
+    public CreatureType getRecruitHint(MasterBoardTerrain terrain,
         IOracleLegion legion, List<CreatureType> recruits,
         IHintOracle oracle,
         List<IVariantHint.AIStyle> aiStyles);

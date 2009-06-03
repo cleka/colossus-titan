@@ -84,27 +84,9 @@ abstract class AbstractAI implements AI
     final public CreatureType getVariantRecruitHint(LegionClientSide legion,
         MasterHex hex, List<CreatureType> recruits)
     {
-        String recruitName = VariantSupport.getRecruitHint(hex.getTerrain(),
-            legion, recruits, new AbstractAIOracle(legion, hex, recruits),
+        return VariantSupport.getRecruitHint(hex.getTerrain(), legion,
+            recruits, new AbstractAIOracle(legion, hex, recruits),
             hintSectionUsed);
-        if (recruitName == null)
-        {
-            return recruits.get(recruits.size() - 1);
-        }
-        if ((recruitName.equals("nothing")) || (recruitName.equals("Nothing")))
-        {
-            // suggest recruiting nothing
-            return null;
-        }
-        CreatureType recruit = variant.getCreatureByName(recruitName);
-        if (!(recruits.contains(recruit)))
-        {
-            LOGGER.warning("HINT: Invalid Hint for this variant !"
-                + " (can\'t recruit " + recruitName + "; recruits="
-                + recruits.toString() + ") in " + hex.getTerrain());
-            return recruits.get(recruits.size() - 1);
-        }
-        return recruit;
     }
 
     /**
