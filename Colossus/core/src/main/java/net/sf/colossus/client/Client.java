@@ -1033,8 +1033,9 @@ public final class Client implements IClient, IOracle, IVariant
     }
 
     /** Create a new BattleUnit and (if GUI) a new GUIBattleChit with
-     *  the given parameters. Place them in given hex, and add them to
-     *  the lists of BattleUnits (in Client) and GUIBattleChits (in GUI)
+     *  the given parameters. Place them in given hex,
+     *  and add them to the lists of BattleUnits (in Battle[ClientSide])
+     *  and GUIBattleChits (in GUI)
      */
     public void placeNewChit(String bareImageName, boolean inverted, int tag,
         BattleHex hex)
