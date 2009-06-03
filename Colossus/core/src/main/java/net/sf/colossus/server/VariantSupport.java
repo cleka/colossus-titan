@@ -681,13 +681,15 @@ public final class VariantSupport
             .getRecruitHint(terrain, legion, recruits, oracle, aiStyles);
     }
 
-    public synchronized static List<String> getInitialSplitHint(MasterHex hex)
+    public synchronized static List<CreatureType> getInitialSplitHint(
+        MasterHex hex)
     {
         return getInitialSplitHint(hex, Collections
             .singletonList(IVariantHint.AIStyle.Any));
     }
 
-    public synchronized static List<String> getInitialSplitHint(MasterHex hex,
+    public synchronized static List<CreatureType> getInitialSplitHint(
+        MasterHex hex,
         List<IVariantHint.AIStyle> aiStyles)
     {
         if (aihl != null)

@@ -173,49 +173,49 @@ public class SmallTitanHint extends AbstractHintProvider
         return recruits.get(recruits.size() - 1);
     }
 
-    public List<String> getInitialSplitHint(MasterHex hex,
+    public List<CreatureType> getInitialSplitHint(MasterHex hex,
         List<AIStyle> aiStyles)
     {
-        List<String> li = new ArrayList<String>();
+        List<CreatureType> li = new ArrayList<CreatureType>();
         if (hex.getLabel().equals("2000"))
         {
             if (rnd.nextFloat() < 0.5)
             {
-                li.add("Titan");
-                li.add("Gargoyle");
-                li.add("Ogre");
-                li.add("Ogre");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Gargoyle"));
+                li.add(getCreatureType("Ogre"));
+                li.add(getCreatureType("Ogre"));
             }
             else
             {
-                li.add("Titan");
-                li.add("Gargoyle");
-                li.add("Gargoyle");
-                li.add("Ogre");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Gargoyle"));
+                li.add(getCreatureType("Gargoyle"));
+                li.add(getCreatureType("Ogre"));
             }
         }
         else if (hex.getLabel().equals("4000"))
         {
-            li.add("Titan");
-            li.add("Gargoyle");
-            li.add("Gargoyle");
-            li.add("Ogre");
+            li.add(getCreatureType("Titan"));
+            li.add(getCreatureType("Gargoyle"));
+            li.add(getCreatureType("Gargoyle"));
+            li.add(getCreatureType("Ogre"));
         }
         else if (hex.getLabel().equals("6000"))
         {
             if (rnd.nextFloat() < 0.5)
             {
-                li.add("Titan");
-                li.add("Gargoyle");
-                li.add("Gargoyle");
-                li.add("Centaur");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Gargoyle"));
+                li.add(getCreatureType("Gargoyle"));
+                li.add(getCreatureType("Centaur"));
             }
             else
             {
-                li.add("Titan");
-                li.add("Gargoyle");
-                li.add("Centaur");
-                li.add("Centaur");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Gargoyle"));
+                li.add(getCreatureType("Centaur"));
+                li.add(getCreatureType("Centaur"));
             }
         }
         else

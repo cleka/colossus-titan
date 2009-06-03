@@ -207,170 +207,170 @@ public class Beelzebub12Hint extends AbstractHintProvider
         return recruits.get(recruits.size() - 1);
     }
 
-    public List<String> getInitialSplitHint(MasterHex hex,
+    public List<CreatureType> getInitialSplitHint(MasterHex hex,
         List<AIStyle> aiStyles)
     {
-        List<String> li = new ArrayList<String>();
+        List<CreatureType> li = new ArrayList<CreatureType>();
         if (hex.getLabel().equals("501"))
         {
             float nextFloat = rnd.nextFloat();
             if (nextFloat < 0.3333)
             {
-                li.add("Titan");
-                li.add("Skeleton");
-                li.add("Skeleton");
-                li.add("Goblin");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Skeleton"));
+                li.add(getCreatureType("Skeleton"));
+                li.add(getCreatureType("Goblin"));
             }
             else if (nextFloat < 0.6667)
             {
-                li.add("Titan");
-                li.add("Goblin");
-                li.add("Goblin");
-                li.add("Skeleton");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Goblin"));
+                li.add(getCreatureType("Goblin"));
+                li.add(getCreatureType("Skeleton"));
             }
             else
             {
-                li.add("Titan");
-                li.add("Centaur");
-                li.add("Centaur");
-                li.add("Skeleton");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Centaur"));
+                li.add(getCreatureType("Centaur"));
+                li.add(getCreatureType("Skeleton"));
             }
         }
         else if (hex.getLabel().equals("502"))
         {
-            li.add("Titan");
-            li.add("Centaur");
-            li.add("Centaur");
-            li.add("Skeleton");
+            li.add(getCreatureType("Titan"));
+            li.add(getCreatureType("Centaur"));
+            li.add(getCreatureType("Centaur"));
+            li.add(getCreatureType("Skeleton"));
         }
         else if (hex.getLabel().equals("503"))
         {
             if (rnd.nextFloat() < 0.5)
             {
-                li.add("Titan");
-                li.add("Centaur");
-                li.add("Centaur");
-                li.add("Skeleton");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Centaur"));
+                li.add(getCreatureType("Centaur"));
+                li.add(getCreatureType("Skeleton"));
             }
             else
             {
-                li.add("Titan");
-                li.add("Goblin");
-                li.add("Goblin");
-                li.add("Skeleton");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Goblin"));
+                li.add(getCreatureType("Goblin"));
+                li.add(getCreatureType("Skeleton"));
             }
         }
         else if (hex.getLabel().equals("504"))
         {
-            li.add("Titan");
-            li.add("Skeleton");
-            li.add("Skeleton");
-            li.add("Goblin");
+            li.add(getCreatureType("Titan"));
+            li.add(getCreatureType("Skeleton"));
+            li.add(getCreatureType("Skeleton"));
+            li.add(getCreatureType("Goblin"));
         }
         else if (hex.getLabel().equals("505"))
         {
             if (rnd.nextFloat() < 0.5)
             {
-                li.add("Titan");
-                li.add("Centaur");
-                li.add("Centaur");
-                li.add("Skeleton");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Centaur"));
+                li.add(getCreatureType("Centaur"));
+                li.add(getCreatureType("Skeleton"));
             }
             else
             {
-                li.add("Titan");
-                li.add("Skeleton");
-                li.add("Skeleton");
-                li.add("Goblin");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Skeleton"));
+                li.add(getCreatureType("Skeleton"));
+                li.add(getCreatureType("Goblin"));
             }
         }
         else if (hex.getLabel().equals("506"))
         {
-            li.add("Titan");
-            li.add("Centaur");
-            li.add("Centaur");
-            li.add("Skeleton");
+            li.add(getCreatureType("Titan"));
+            li.add(getCreatureType("Centaur"));
+            li.add(getCreatureType("Centaur"));
+            li.add(getCreatureType("Skeleton"));
         }
         else if (hex.getLabel().equals("507"))
         {
             if (rnd.nextFloat() < 0.5)
             {
-                li.add("Titan");
-                li.add("Skeleton");
-                li.add("Centaur");
-                li.add("Centaur");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Skeleton"));
+                li.add(getCreatureType("Centaur"));
+                li.add(getCreatureType("Centaur"));
             }
             else
             {
-                li.add("Titan");
-                li.add("Skeleton");
-                li.add("Goblin");
-                li.add("Goblin");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Skeleton"));
+                li.add(getCreatureType("Goblin"));
+                li.add(getCreatureType("Goblin"));
             }
         }
         else if (hex.getLabel().equals("508"))
         {
             if (rnd.nextFloat() < 0.5)
             {
-                li.add("Titan");
-                li.add("Skeleton");
-                li.add("Skeleton");
-                li.add("Centaur");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Skeleton"));
+                li.add(getCreatureType("Skeleton"));
+                li.add(getCreatureType("Centaur"));
             }
             else
             {
-                li.add("Titan");
-                li.add("Skeleton");
-                li.add("Goblin");
-                li.add("Goblin");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Skeleton"));
+                li.add(getCreatureType("Goblin"));
+                li.add(getCreatureType("Goblin"));
             }
         }
         else if (hex.getLabel().equals("509"))
         {
             if (rnd.nextFloat() < 0.5)
             {
-                li.add("Titan");
-                li.add("Centaur");
-                li.add("Centaur");
-                li.add("Skeleton");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Centaur"));
+                li.add(getCreatureType("Centaur"));
+                li.add(getCreatureType("Skeleton"));
             }
             else
             {
-                li.add("Titan");
-                li.add("Goblin");
-                li.add("Goblin");
-                li.add("Skeleton");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Goblin"));
+                li.add(getCreatureType("Goblin"));
+                li.add(getCreatureType("Skeleton"));
             }
         }
         else if (hex.getLabel().equals("510"))
         {
-            li.add("Titan");
-            li.add("Centaur");
-            li.add("Centaur");
-            li.add("Skeleton");
+            li.add(getCreatureType("Titan"));
+            li.add(getCreatureType("Centaur"));
+            li.add(getCreatureType("Centaur"));
+            li.add(getCreatureType("Skeleton"));
         }
         else if (hex.getLabel().equals("511"))
         {
-            li.add("Titan");
-            li.add("Centaur");
-            li.add("Centaur");
-            li.add("Skeleton");
+            li.add(getCreatureType("Titan"));
+            li.add(getCreatureType("Centaur"));
+            li.add(getCreatureType("Centaur"));
+            li.add(getCreatureType("Skeleton"));
         }
         else if (hex.getLabel().equals("512"))
         {
             if (rnd.nextFloat() < 0.5)
             {
-                li.add("Titan");
-                li.add("Skeleton");
-                li.add("Skeleton");
-                li.add("Centaur");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Skeleton"));
+                li.add(getCreatureType("Skeleton"));
+                li.add(getCreatureType("Centaur"));
             }
             else
             {
-                li.add("Titan");
-                li.add("Skeleton");
-                li.add("Goblin");
-                li.add("Goblin");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Skeleton"));
+                li.add(getCreatureType("Goblin"));
+                li.add(getCreatureType("Goblin"));
             }
         }
         else

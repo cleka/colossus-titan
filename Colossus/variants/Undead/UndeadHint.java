@@ -119,90 +119,90 @@ public class UndeadHint extends AbstractHintProvider
         return recruits.get(recruits.size() - 1);
     }
 
-    public List<String> getInitialSplitHint(MasterHex hex,
+    public List<CreatureType> getInitialSplitHint(MasterHex hex,
         List<AIStyle> aiStyles)
     {
-        List<String> li = new ArrayList<String>();
+        List<CreatureType> li = new ArrayList<CreatureType>();
         if (hex.getLabel().equals("100"))
         {
             if (rnd.nextFloat() < 0.5)
             {
-                li.add("Titan");
-                li.add("Skeleton");
-                li.add("Paladin");
-                li.add("Paladin");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Skeleton"));
+                li.add(getCreatureType("Paladin"));
+                li.add(getCreatureType("Paladin"));
             }
             else
             {
-                li.add("Titan");
-                li.add("Skeleton");
-                li.add("Skeleton");
-                li.add("Troglodyte");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Skeleton"));
+                li.add(getCreatureType("Skeleton"));
+                li.add(getCreatureType("Troglodyte"));
             }
         }
         else if (hex.getLabel().equals("200"))
         {
-            li.add("Titan");
-            li.add("Skeleton");
-            li.add("Skeleton");
-            li.add("Troglodyte");
+            li.add(getCreatureType("Titan"));
+            li.add(getCreatureType("Skeleton"));
+            li.add(getCreatureType("Skeleton"));
+            li.add(getCreatureType("Troglodyte"));
         }
         else if (hex.getLabel().equals("300"))
         {
             if (rnd.nextFloat() < 0.5)
             {
-                li.add("Titan");
-                li.add("Skeleton");
-                li.add("Skeleton");
-                li.add("Troglodyte");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Skeleton"));
+                li.add(getCreatureType("Skeleton"));
+                li.add(getCreatureType("Troglodyte"));
             }
             else
             {
-                li.add("Titan");
-                li.add("Paladin");
-                li.add("Paladin");
-                li.add("Troglodyte");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Paladin"));
+                li.add(getCreatureType("Paladin"));
+                li.add(getCreatureType("Troglodyte"));
             }
         }
         else if (hex.getLabel().equals("400"))
         {
             if (rnd.nextFloat() < 0.5)
             {
-                li.add("Titan");
-                li.add("Skeleton");
-                li.add("Troglodyte");
-                li.add("Troglodyte");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Skeleton"));
+                li.add(getCreatureType("Troglodyte"));
+                li.add(getCreatureType("Troglodyte"));
             }
             else
             {
-                li.add("Titan");
-                li.add("Skeleton");
-                li.add("Skeleton");
-                li.add("Paladin");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Skeleton"));
+                li.add(getCreatureType("Skeleton"));
+                li.add(getCreatureType("Paladin"));
             }
         }
         else if (hex.getLabel().equals("500"))
         {
-            li.add("Titan");
-            li.add("Skeleton");
-            li.add("Skeleton");
-            li.add("Paladin");
+            li.add(getCreatureType("Titan"));
+            li.add(getCreatureType("Skeleton"));
+            li.add(getCreatureType("Skeleton"));
+            li.add(getCreatureType("Paladin"));
         }
         else if (hex.getLabel().equals("600"))
         {
             if (rnd.nextFloat() < 0.5)
             {
-                li.add("Titan");
-                li.add("Skeleton");
-                li.add("Skeleton");
-                li.add("Paladin");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Skeleton"));
+                li.add(getCreatureType("Skeleton"));
+                li.add(getCreatureType("Paladin"));
             }
             else
             {
-                li.add("Titan");
-                li.add("Troglodyte");
-                li.add("Troglodyte");
-                li.add("Paladin");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Troglodyte"));
+                li.add(getCreatureType("Troglodyte"));
+                li.add(getCreatureType("Paladin"));
             }
         }
         else

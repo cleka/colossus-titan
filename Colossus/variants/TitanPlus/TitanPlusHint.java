@@ -92,90 +92,90 @@ public class TitanPlusHint extends AbstractHintProvider
         return recruits.get(recruits.size() - 1);
     }
 
-    public List<String> getInitialSplitHint(MasterHex hex,
+    public List<CreatureType> getInitialSplitHint(MasterHex hex,
         List<AIStyle> aiStyles)
     {
-        List<String> li = new ArrayList<String>();
+        List<CreatureType> li = new ArrayList<CreatureType>();
         if (hex.getLabel().equals("100"))
         {
             if (rnd.nextFloat() < 0.5)
             {
-                li.add("Titan");
-                li.add("Cyclops");
-                li.add("Lion");
-                li.add("Lion");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Cyclops"));
+                li.add(getCreatureType("Lion"));
+                li.add(getCreatureType("Lion"));
             }
             else
             {
-                li.add("Titan");
-                li.add("Cyclops");
-                li.add("Cyclops");
-                li.add("Troll");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Cyclops"));
+                li.add(getCreatureType("Cyclops"));
+                li.add(getCreatureType("Troll"));
             }
         }
         else if (hex.getLabel().equals("200"))
         {
-            li.add("Titan");
-            li.add("Cyclops");
-            li.add("Troll");
-            li.add("Troll");
+            li.add(getCreatureType("Titan"));
+            li.add(getCreatureType("Cyclops"));
+            li.add(getCreatureType("Troll"));
+            li.add(getCreatureType("Troll"));
         }
         else if (hex.getLabel().equals("300"))
         {
             if (rnd.nextFloat() < 0.5)
             {
-                li.add("Titan");
-                li.add("Cyclops");
-                li.add("Cyclops");
-                li.add("Troll");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Cyclops"));
+                li.add(getCreatureType("Cyclops"));
+                li.add(getCreatureType("Troll"));
             }
             else
             {
-                li.add("Titan");
-                li.add("Lion");
-                li.add("Lion");
-                li.add("Troll");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Lion"));
+                li.add(getCreatureType("Lion"));
+                li.add(getCreatureType("Troll"));
             }
         }
         else if (hex.getLabel().equals("400"))
         {
             if (rnd.nextFloat() < 0.5)
             {
-                li.add("Titan");
-                li.add("Cyclops");
-                li.add("Troll");
-                li.add("Troll");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Cyclops"));
+                li.add(getCreatureType("Troll"));
+                li.add(getCreatureType("Troll"));
             }
             else
             {
-                li.add("Titan");
-                li.add("Cyclops");
-                li.add("Cyclops");
-                li.add("Lion");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Cyclops"));
+                li.add(getCreatureType("Cyclops"));
+                li.add(getCreatureType("Lion"));
             }
         }
         else if (hex.getLabel().equals("500"))
         {
-            li.add("Titan");
-            li.add("Cyclops");
-            li.add("Troll");
-            li.add("Troll");
+            li.add(getCreatureType("Titan"));
+            li.add(getCreatureType("Cyclops"));
+            li.add(getCreatureType("Troll"));
+            li.add(getCreatureType("Troll"));
         }
         else if (hex.getLabel().equals("600"))
         {
             if (rnd.nextFloat() < 0.5)
             {
-                li.add("Titan");
-                li.add("Cyclops");
-                li.add("Cyclops");
-                li.add("Lion");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Cyclops"));
+                li.add(getCreatureType("Cyclops"));
+                li.add(getCreatureType("Lion"));
             }
             else
             {
-                li.add("Titan");
-                li.add("Troll");
-                li.add("Troll");
-                li.add("Lion");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Troll"));
+                li.add(getCreatureType("Troll"));
+                li.add(getCreatureType("Lion"));
             }
         }
         else

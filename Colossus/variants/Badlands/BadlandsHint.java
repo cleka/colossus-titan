@@ -183,90 +183,90 @@ public class BadlandsHint extends AbstractHintProvider
         return recruits.get(recruits.size() - 1);
     }
 
-    public List<String> getInitialSplitHint(MasterHex hex,
+    public List<CreatureType> getInitialSplitHint(MasterHex hex,
         List<AIStyle> aiStyles)
     {
-        List<String> li = new ArrayList<String>();
+        List<CreatureType> li = new ArrayList<CreatureType>();
         if (hex.getLabel().equals("100"))
         {
             if (rnd.nextFloat() < 0.5)
             {
-                li.add("Titan");
-                li.add("Gargoyle");
-                li.add("Centaur");
-                li.add("Centaur");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Gargoyle"));
+                li.add(getCreatureType("Centaur"));
+                li.add(getCreatureType("Centaur"));
             }
             else
             {
-                li.add("Titan");
-                li.add("Gargoyle");
-                li.add("Gargoyle");
-                li.add("Ogre");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Gargoyle"));
+                li.add(getCreatureType("Gargoyle"));
+                li.add(getCreatureType("Ogre"));
             }
         }
         else if (hex.getLabel().equals("200"))
         {
-            li.add("Titan");
-            li.add("Gargoyle");
-            li.add("Gargoyle");
-            li.add("Ogre");
+            li.add(getCreatureType("Titan"));
+            li.add(getCreatureType("Gargoyle"));
+            li.add(getCreatureType("Gargoyle"));
+            li.add(getCreatureType("Ogre"));
         }
         else if (hex.getLabel().equals("300"))
         {
             if (rnd.nextFloat() < 0.5)
             {
-                li.add("Titan");
-                li.add("Gargoyle");
-                li.add("Gargoyle");
-                li.add("Ogre");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Gargoyle"));
+                li.add(getCreatureType("Gargoyle"));
+                li.add(getCreatureType("Ogre"));
             }
             else
             {
-                li.add("Titan");
-                li.add("Centaur");
-                li.add("Centaur");
-                li.add("Ogre");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Centaur"));
+                li.add(getCreatureType("Centaur"));
+                li.add(getCreatureType("Ogre"));
             }
         }
         else if (hex.getLabel().equals("400"))
         {
             if (rnd.nextFloat() < 0.5)
             {
-                li.add("Titan");
-                li.add("Gargoyle");
-                li.add("Ogre");
-                li.add("Ogre");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Gargoyle"));
+                li.add(getCreatureType("Ogre"));
+                li.add(getCreatureType("Ogre"));
             }
             else
             {
-                li.add("Titan");
-                li.add("Gargoyle");
-                li.add("Gargoyle");
-                li.add("Centaur");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Gargoyle"));
+                li.add(getCreatureType("Gargoyle"));
+                li.add(getCreatureType("Centaur"));
             }
         }
         else if (hex.getLabel().equals("500"))
         {
-            li.add("Titan");
-            li.add("Gargoyle");
-            li.add("Gargoyle");
-            li.add("Centaur");
+            li.add(getCreatureType("Titan"));
+            li.add(getCreatureType("Gargoyle"));
+            li.add(getCreatureType("Gargoyle"));
+            li.add(getCreatureType("Centaur"));
         }
         else if (hex.getLabel().equals("600"))
         {
             if (rnd.nextFloat() < 0.5)
             {
-                li.add("Titan");
-                li.add("Gargoyle");
-                li.add("Gargoyle");
-                li.add("Centaur");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Gargoyle"));
+                li.add(getCreatureType("Gargoyle"));
+                li.add(getCreatureType("Centaur"));
             }
             else
             {
-                li.add("Titan");
-                li.add("Ogre");
-                li.add("Ogre");
-                li.add("Centaur");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Ogre"));
+                li.add(getCreatureType("Ogre"));
+                li.add(getCreatureType("Centaur"));
             }
         }
         else

@@ -251,26 +251,7 @@ abstract class AbstractAI implements AI
      */
     final protected List<CreatureType> getInitialSplitHint(MasterHex hex)
     {
-        List<String> byName = VariantSupport.getInitialSplitHint(hex,
-            hintSectionUsed);
-        if (byName == null)
-        {
-            return null;
-        }
-        List<CreatureType> byCreature = new ArrayList<CreatureType>();
-        for (String name : byName)
-        {
-            CreatureType cre = variant
-                .getCreatureByName(name);
-            if (cre == null)
-            {
-                LOGGER.severe("HINT: Unknown creature in hint (" + name
-                    + "), aborting.");
-                return null;
-            }
-            byCreature.add(cre);
-        }
-        return byCreature;
+        return VariantSupport.getInitialSplitHint(hex, hintSectionUsed);
     }
 
     /** Get the 'kill value' of a creature on a specific terrain.

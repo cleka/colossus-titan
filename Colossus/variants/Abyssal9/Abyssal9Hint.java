@@ -219,42 +219,42 @@ public class Abyssal9Hint extends AbstractHintProvider
         return recruits.get(recruits.size() - 1);
     }
 
-    public List<String> getInitialSplitHint(MasterHex hex,
+    public List<CreatureType> getInitialSplitHint(MasterHex hex,
         List<AIStyle> aiStyles)
     {
         // This variant favors the ogre track over the centaur track at
         // the start, so keep either ogres or gargoyles with the centaur
         // except for a rare change-up.
-        List<String> li = new ArrayList<String>();
+        List<CreatureType> li = new ArrayList<CreatureType>();
         {
             float f = rnd.nextFloat();
             if (f < 0.01)
             {
-                li.add("Titan");
-                li.add("Gargoyle");
-                li.add("Centaur");
-                li.add("Centaur");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Gargoyle"));
+                li.add(getCreatureType("Centaur"));
+                li.add(getCreatureType("Centaur"));
             }
             else if (f < 0.5)
             {
-                li.add("Titan");
-                li.add("Gargoyle");
-                li.add("Ogre");
-                li.add("Ogre");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Gargoyle"));
+                li.add(getCreatureType("Ogre"));
+                li.add(getCreatureType("Ogre"));
             }
             else if (f < 0.75)
             {
-                li.add("Titan");
-                li.add("Gargoyle");
-                li.add("Gargoyle");
-                li.add("Centaur");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Gargoyle"));
+                li.add(getCreatureType("Gargoyle"));
+                li.add(getCreatureType("Centaur"));
             }
             else
             {
-                li.add("Titan");
-                li.add("Gargoyle");
-                li.add("Gargoyle");
-                li.add("Ogre");
+                li.add(getCreatureType("Titan"));
+                li.add(getCreatureType("Gargoyle"));
+                li.add(getCreatureType("Gargoyle"));
+                li.add(getCreatureType("Ogre"));
             }
         }
         return li;

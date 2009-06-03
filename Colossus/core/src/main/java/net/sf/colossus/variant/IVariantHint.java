@@ -37,10 +37,10 @@ public interface IVariantHint
      * To obtain the list of creature to split on turn one.
      * @param startingTower The starting Tower.
      * @param aiStyles The style the AI prefers to play.
-     * @return The list of creature to split (listed by name)
+     * @return The list of creatures to split.
      */
-    public List<String> getInitialSplitHint(MasterHex startingTower,
-        List<IVariantHint.AIStyle> aiStyles);
+    public List<CreatureType> getInitialSplitHint(MasterHex startingTower,
+        List<AIStyle> aiStyles);
 
     /**
      * Give an offset to apply to the creature Point Value
