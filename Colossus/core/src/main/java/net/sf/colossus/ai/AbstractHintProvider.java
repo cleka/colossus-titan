@@ -13,8 +13,8 @@ import net.sf.colossus.variant.Variant;
  * Abstract base class for variant-specific recruitment hinting.
  *
  * TODO: add implementations for the other IVariantHint methods, so this class
- * could be the default behaviour for new variants (avoiding each variant to
- * compile Java code).
+ * could be the default behaviour for new variants (thus getting rid of the
+ * requirement that each variant has to compile Java code).
  */
 public abstract class AbstractHintProvider implements IVariantHint
 {
