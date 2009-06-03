@@ -1289,6 +1289,9 @@ public final class StaticResourceLoader
      * @param parameter Array of parameters to pass to the constructor, can be null.
      * @return A new object, instance from the given class or null if
      *         instantiation failed.
+     *
+     * TODO logging SEVERE and then returning null is not consistent, it would probably
+     *      be best to throw a checked exception
      */
     public static Object getNewObject(String className,
         List<String> directories, Object[] parameter)

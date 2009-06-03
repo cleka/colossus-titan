@@ -7,11 +7,17 @@ import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.IHintOracle;
 import net.sf.colossus.variant.IOracleLegion;
 import net.sf.colossus.variant.MasterBoardTerrain;
+import net.sf.colossus.variant.Variant;
 import Default.DefaultHint;
 
 
 public class BalrogHint extends DefaultHint
 {
+    public BalrogHint(Variant variant)
+    {
+        super(variant);
+    }
+
     @Override
     public String getRecruitHint(MasterBoardTerrain terrain,
         IOracleLegion legion, List<CreatureType> recruits,

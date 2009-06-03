@@ -12,10 +12,16 @@ import net.sf.colossus.variant.IHintOracle;
 import net.sf.colossus.variant.IOracleLegion;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
+import net.sf.colossus.variant.Variant;
 
 
 public class DefaultHint extends AbstractHintProvider
 {
+    public DefaultHint(Variant variant)
+    {
+        super(variant);
+    }
+
     private final DevRandom rnd = new DevRandom();
 
     // Convert list of recruits from Creature to String for easier compares.

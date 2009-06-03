@@ -406,13 +406,12 @@ public final class VariantSupport
                 varREADME = getMissingReadmeNotification();
             }
 
+            CURRENT_VARIANT = new Variant(trl, creatureTypes, masterBoard,
+                varREADME, variantName);
             loadedVariant = true;
-            loadHints();
+            loadHints(CURRENT_VARIANT);
             task = "loadMarkerNamesProperties";
             markerNames = loadMarkerNamesProperties();
-
-            CURRENT_VARIANT = new Variant(trl, creatureTypes,
-                masterBoard, varREADME, variantName);
         }
         catch (Exception e)
         {
@@ -632,13 +631,14 @@ public final class VariantSupport
         return markerNames;
     }
 
-    private synchronized static void loadHints()
+    private synchronized static void loadHints(Variant variant)
     {
         aihl = null;
         Object o = null;
         if (hintName != null)
         {
-            o = StaticResourceLoader.getNewObject(hintName, getVarDirectoriesList());
+            o = StaticResourceLoader.getNewObject(hintName,
+                getVarDirectoriesList(), new Object[] { variant });
         }
         if ((o != null) && (o instanceof IVariantHint))
         {
@@ -658,7 +658,7 @@ public final class VariantSupport
                 LOGGER.log(Level.WARNING,
                     "Couldn't load hints. Trying with Default.");
                 hintName = Constants.defaultHINTFile;
-                loadHints();
+                loadHints(variant);
             }
         }
     }

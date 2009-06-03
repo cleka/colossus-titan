@@ -11,11 +11,17 @@ import net.sf.colossus.variant.IHintOracle;
 import net.sf.colossus.variant.IOracleLegion;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
+import net.sf.colossus.variant.Variant;
 import Default.DefaultHint;
 
 
 public class Beelzebub12Hint extends AbstractHintProvider
 {
+    public Beelzebub12Hint(Variant variant)
+    {
+        super(variant);
+    }
+
     private final DevRandom rnd = new DevRandom();
 
     public String getRecruitHint(MasterBoardTerrain terrain,

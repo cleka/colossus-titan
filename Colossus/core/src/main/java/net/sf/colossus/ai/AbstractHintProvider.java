@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.IVariantHint;
+import net.sf.colossus.variant.Variant;
 
 
 /**
@@ -16,6 +17,13 @@ import net.sf.colossus.variant.IVariantHint;
  */
 public abstract class AbstractHintProvider implements IVariantHint
 {
+    private final Variant variant;
+
+    public AbstractHintProvider(Variant variant)
+    {
+        this.variant = variant;
+    }
+
     /**
      * No creature gets an offset by default, subclasses can override.
      */
@@ -23,5 +31,10 @@ public abstract class AbstractHintProvider implements IVariantHint
         List<AIStyle> styles)
     {
         return 0;
+    }
+
+    public Variant getVariant()
+    {
+        return variant;
     }
 }
