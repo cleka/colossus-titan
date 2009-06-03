@@ -139,13 +139,7 @@ public interface IClientGUI
     public abstract void eventViewerCancelReinforcement(CreatureType recruit,
         int turnNr);
 
-    public abstract void eventViewerDefenderSetCreatureDead(
-        CreatureType creature,
-        int height);
-
-    public abstract void eventViewerAttackerSetCreatureDead(
-        CreatureType creature,
-        int height);
+    public abstract void eventViewerSetCreatureDead(BattleUnit battleUnit);
 
     public abstract void eventViewerNewSplitEvent(int turn, Legion parent,
         Legion child);

@@ -40,6 +40,7 @@ import net.sf.colossus.client.Client;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.IOptions;
 import net.sf.colossus.common.Options;
+import net.sf.colossus.game.BattleUnit;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.guiutil.KDialog;
@@ -1144,7 +1145,7 @@ final class EventViewer extends KDialog
             LOGGER.log(Level.FINEST, "During battle, remove creature " + type
                 + " from attacker legion " + legion);
 
-            attackerEventLegion.setCreatureDied(type.getName(), attacker
+            attackerEventLegion.setCreatureDied(type, attacker
                 .getHeight());
         }
 
@@ -1153,7 +1154,7 @@ final class EventViewer extends KDialog
         {
             LOGGER.log(Level.FINEST, "During battle, remove creature " + type
                 + " from defender legion " + legion);
-            defenderEventLegion.setCreatureDied(type.getName(), defender
+            defenderEventLegion.setCreatureDied(type, defender
                 .getHeight());
         }
     }
@@ -1188,15 +1189,13 @@ final class EventViewer extends KDialog
         newEvent(recruitType, markerId, height, rcList, null, 0);
     }
 
-    // next two are for removeDeadBattleChits:
-    public void attackerSetCreatureDead(String name, int height)
+    // for removeDeadBattleChits:
+    public void setCreatureDead(BattleUnit battleUnit)
     {
-        attackerEventLegion.setCreatureDied(name, height);
-    }
-
-    public void defenderSetCreatureDead(CreatureType creature, int height)
-    {
-        defenderEventLegion.setCreatureDied(creature.getName(), height);
+        RevealEvent event = (battleUnit.isDefender() ? defenderEventLegion
+            : attackerEventLegion);
+        event.setCreatureDied(battleUnit.getCreatureType(), battleUnit
+            .getLegion().getHeight());
     }
 
     /*

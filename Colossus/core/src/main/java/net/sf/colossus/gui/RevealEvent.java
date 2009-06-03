@@ -18,6 +18,7 @@ import javax.swing.border.TitledBorder;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.Player;
+import net.sf.colossus.variant.CreatureType;
 
 
 /**
@@ -275,8 +276,9 @@ public class RevealEvent
         this.height = knownCreatures.size();
     }
 
-    public void setCreatureDied(String name, int newHeight)
+    public void setCreatureDied(CreatureType type, int newHeight)
     {
+        String name = type.getName();
         if (readyToDie != null && readyToDie.getName().equals(name))
         {
             readyToDie = null;

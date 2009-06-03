@@ -1008,30 +1008,22 @@ public final class Client implements IClient, IOracle, IVariant
             BattleUnit battleUnit = it.next();
             if (battleUnit.isDead())
             {
-                // Moved to a 2nd loop that is then done inside Battle,
-                // otherwise unsupportedOperationExceptiom because we get
-                // an unmodifiable list from Battle.
+                // Moved it.remove() to a 2nd loop that is then done inside
+                // Battle, otherwise unsupportedOperationException because
+                // we get an unmodifiable list from Battle.
                 // it.remove();
+
                 gui.removeBattleChit(battleUnit);
 
                 // Also remove it from LegionInfo.
-                if (battleUnit.isDefender())
-                {
-                    Legion legion = getDefender();
-                    ((LegionClientSide)legion).removeCreature(battleUnit
-                        .getCreatureType());
-                    gui.eventViewerDefenderSetCreatureDead(battleUnit
-                        .getCreatureType(), legion.getHeight());
-                }
-                else
-                {
-                    Legion info = getAttacker();
-                    ((LegionClientSide)info).removeCreature(battleUnit
-                        .getCreatureType());
+                ((LegionClientSide)battleUnit.getLegion())
+                    .removeCreature(battleUnit.getCreatureType());
 
-                    gui.eventViewerAttackerSetCreatureDead(battleUnit
-                        .getCreatureType(), info.getHeight());
-                }
+                // And generate EventViewer event:
+                // Note that have to do the legion.removeCreature before this
+                // gui / eventviewer call so that eventViewer sees already new
+                // height.
+                gui.eventViewerSetCreatureDead(battleUnit);
             }
         }
 

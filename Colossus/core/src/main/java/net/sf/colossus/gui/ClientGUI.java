@@ -1349,16 +1349,9 @@ public class ClientGUI implements IClientGUI
         eventViewer.cancelReinforcement(recruit, turnNr);
     }
 
-    public void eventViewerDefenderSetCreatureDead(CreatureType creature,
-        int height)
+    public void eventViewerSetCreatureDead(BattleUnit battleUnit)
     {
-        eventViewer.defenderSetCreatureDead(creature, height);
-    }
-
-    public void eventViewerAttackerSetCreatureDead(CreatureType creature,
-        int height)
-    {
-        eventViewer.attackerSetCreatureDead(creature.getName(), height);
+        eventViewer.setCreatureDead(battleUnit);
     }
 
     public void eventViewerNewSplitEvent(int turn, Legion parent, Legion child)
