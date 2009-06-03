@@ -97,7 +97,8 @@ class CreatureAttackTacticalObjective extends AbstractTacticalObjective
 
                     for (BattleHex targetHex : targetHexes)
                     {
-                        BattleCritter target = client.getBattleUnit(targetHex);
+                        BattleCritter target = client.getBattle()
+                            .getBattleUnit(targetHex);
 
                         // Reward being next to enemy titans.  (Banzai!)
                         if (target.isTitan())
@@ -243,7 +244,8 @@ class CreatureAttackTacticalObjective extends AbstractTacticalObjective
                     boolean penalty = true;
                     for (BattleHex targetHex : targetHexes)
                     {
-                        BattleCritter target = client.getBattleUnit(targetHex);
+                        BattleCritter target = client.getBattle()
+                            .getBattleUnit(targetHex);
                         if (target.isTitan())
                         {
                             value.add(bec.RANGESTRIKE_TITAN, desc +

@@ -102,9 +102,10 @@ public final class Strike
         return findStrikes(striker, true).contains(targetHex);
     }
 
+    // TODO move all this strike stuff to BattleClientSide / Battle
     Set<BattleHex> findStrikes(int tag)
     {
-        BattleCritter battleUnit = client.getBattleUnit(tag);
+        BattleCritter battleUnit = client.getBattle().getBattleUnit(tag);
         return findStrikes(battleUnit, true);
     }
 
@@ -142,7 +143,8 @@ public final class Strike
                 if (targetHex != null && client.isOccupied(targetHex)
                     && !targetHex.isEntrance())
                 {
-                    BattleCritter target = client.getBattleUnit(targetHex);
+                    BattleCritter target = client.getBattle().getBattleUnit(
+                        targetHex);
                     if (target.isDefender() != inverted)
                     {
                         adjacentEnemy = true;
@@ -195,7 +197,7 @@ public final class Strike
         BattleHex hex = battleUnit.getCurrentHex();
         int min = Constants.OUT_OF_RANGE;
 
-        for (BattleCritter target : client.getBattleUnits())
+        for (BattleCritter target : client.getBattle().getBattleUnits())
         {
             if (battleUnit.isDefender() != target.isDefender())
             {

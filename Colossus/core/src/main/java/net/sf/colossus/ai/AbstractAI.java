@@ -19,6 +19,7 @@ import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.Battle;
 import net.sf.colossus.game.BattleCritter;
+import net.sf.colossus.game.BattleUnit;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
@@ -245,7 +246,7 @@ abstract class AbstractAI implements AI
             Set<BattleHex> set = client.findStrikes(critter.getTag());
             for (BattleHex targetHex: set)
             {
-                BattleCritter target = client.getBattleUnit(targetHex);
+                BattleCritter target = getBattleUnit(targetHex);
                 int dice = client.getStrike().getDice(critter, target);
                 int strikeNumber = client.getStrike().getStrikeNumber(critter,
                     target);
@@ -785,6 +786,12 @@ abstract class AbstractAI implements AI
     public void cleanupBattle()
     {
         LOGGER.finer("A battle is finished.");
+    }
+
+    // TODO get directly, not via Client
+    protected BattleUnit getBattleUnit(BattleHex hex)
+    {
+        return client.getBattle().getBattleUnit(hex);
     }
 
     protected int countCreatureAccrossAllLegionFromPlayer(Creature creature)

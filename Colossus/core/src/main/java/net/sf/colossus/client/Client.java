@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -43,10 +42,8 @@ import net.sf.colossus.server.IServer;
 import net.sf.colossus.server.Server;
 import net.sf.colossus.server.VariantKnower;
 import net.sf.colossus.server.VariantSupport;
-import net.sf.colossus.util.CollectionHelper;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.InstanceTracker;
-import net.sf.colossus.util.Predicate;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.util.ViableEntityManager;
@@ -142,8 +139,6 @@ public final class Client implements IClient, IOracle, IVariant
      *  nothing, so that we don't need to check for null everywhere).
      */
     private final IClientGUI gui;
-
-    private final List<BattleUnit> battleUnits = new ArrayList<BattleUnit>();
 
     // Per-client and per-player options.
     private final Options options;
@@ -805,53 +800,22 @@ public final class Client implements IClient, IOracle, IVariant
         server.doneWithBattleMoves();
     }
 
+    // eliminate this, ask directly from Game / Battle
     public boolean anyOffboardCreatures()
     {
-        for (BattleCritter battleUnit : getActiveBattleUnits())
-        {
-            if (battleUnit.getCurrentHex().getLabel().startsWith("X"))
-            {
-                return true;
-            }
-        }
-        return false;
+        return (isBattleOngoing() ? getBattle().anyOffboardCreatures() : false);
     }
 
+    // TODO move to Game or Battle
     public List<BattleUnit> getActiveBattleUnits()
     {
-        return CollectionHelper.selectAsList(battleUnits,
-            new Predicate<BattleUnit>()
-            {
-                public boolean matches(BattleUnit battleUnit)
-                {
-                    return getBattleActivePlayer().equals(
-                        getPlayerByTag(battleUnit.getTag()));
-                }
-            });
+        return getBattle().getActiveBattleUnits();
     }
 
+    // TODO move to Game or Battle
     public List<BattleUnit> getInactiveBattleUnits()
     {
-        return CollectionHelper.selectAsList(battleUnits,
-            new Predicate<BattleUnit>()
-            {
-                public boolean matches(BattleUnit battleUnit)
-                {
-                    return !getBattleActivePlayer().equals(
-                        getPlayerByTag(battleUnit.getTag()));
-                }
-            });
-    }
-
-    private void markOffboardCreaturesDead()
-    {
-        for (BattleUnit battleUnit : getActiveBattleUnits())
-        {
-            if (battleUnit.getCurrentHex().getLabel().startsWith("X"))
-            {
-                battleUnit.setDead(true);
-            }
-        }
+        return getBattle().getInactiveBattleUnits();
     }
 
     public void doneWithStrikes()
@@ -1036,55 +1000,18 @@ public final class Client implements IClient, IOracle, IVariant
         gui.revealEngagedCreatures(legion, names, isAttacker, reason);
     }
 
-    public List<BattleUnit> getBattleUnits()
-    {
-        return Collections.unmodifiableList(battleUnits);
-    }
-
-    public List<BattleUnit> getBattleUnits(final BattleHex hex)
-    {
-        return CollectionHelper.selectAsList(battleUnits,
-            new Predicate<BattleUnit>()
-            {
-                public boolean matches(BattleUnit battleUnit)
-                {
-                    return hex.equals(battleUnit.getCurrentHex());
-                }
-            });
-    }
-
-    public BattleUnit getBattleUnit(BattleHex hex)
-    {
-        List<BattleUnit> lBattleUnits = getBattleUnits(hex);
-        if (lBattleUnits.isEmpty())
-        {
-            return null;
-        }
-        return lBattleUnits.get(0);
-    }
-
-    /** Get the BattleUnit with this tag. */
-    BattleUnit getBattleUnit(int tag)
-    {
-        for (BattleUnit battleUnit : battleUnits)
-        {
-            if (battleUnit.getTag() == tag)
-            {
-                return battleUnit;
-            }
-        }
-        return null;
-    }
-
     public void removeDeadBattleChits()
     {
-        Iterator<BattleUnit> it = battleUnits.iterator();
+        Iterator<BattleUnit> it = getBattle().getBattleUnits().iterator();
         while (it.hasNext())
         {
             BattleUnit battleUnit = it.next();
             if (battleUnit.isDead())
             {
-                it.remove();
+                // Moved to a 2nd loop that is then done inside Battle,
+                // otherwise unsupportedOperationExceptiom because we get
+                // an unmodifiable list from Battle.
+                // it.remove();
                 gui.removeBattleChit(battleUnit);
 
                 // Also remove it from LegionInfo.
@@ -1108,6 +1035,8 @@ public final class Client implements IClient, IOracle, IVariant
             }
         }
 
+        getBattle().removeDeadBattleChits();
+
         gui.repaintBattleBoard();
     }
 
@@ -1129,9 +1058,8 @@ public final class Client implements IClient, IOracle, IVariant
         CreatureType type = getGame().getVariant().getCreatureByName(
             bareImageName);
 
-        BattleUnit battleUnit = new BattleUnit(imageName, inverted, tag, hex,
-            type, legion);
-        battleUnits.add(battleUnit);
+        BattleUnit battleUnit = getBattle().createBattleUnit(imageName,
+            inverted, tag, hex, type, legion);
 
         gui.actOnPlaceNewChit(imageName, battleUnit, hex);
     }
@@ -1425,9 +1353,10 @@ public final class Client implements IClient, IOracle, IVariant
         server.makeProposal(proposal.toString());
     }
 
+    // TODO move to Battle / BattleClientSide
     public boolean isOccupied(BattleHex hex)
     {
-        return !getBattleUnits(hex).isEmpty();
+        return !getBattle().getBattleUnits(hex).isEmpty();
     }
 
     public void tellStrikeResults(int strikerTag, int targetTag,
@@ -1435,7 +1364,7 @@ public final class Client implements IClient, IOracle, IVariant
         boolean wasCarry, int carryDamageLeft,
         Set<String> carryTargetDescriptions)
     {
-        BattleCritter battleUnit = getBattleUnit(strikerTag);
+        BattleCritter battleUnit = getBattle().getBattleUnit(strikerTag);
         if (battleUnit != null)
         {
             battleUnit.setStruck(true);
@@ -1443,8 +1372,8 @@ public final class Client implements IClient, IOracle, IVariant
 
         gui.disposePickCarryDialog();
 
-        BattleUnit targetUnit = getBattleUnit(targetTag);
-        BattleCritter targetCritter = getBattleUnit(targetTag);
+        BattleUnit targetUnit = getBattle().getBattleUnit(targetTag);
+        BattleCritter targetCritter = getBattle().getBattleUnit(targetTag);
 
         gui.actOnTellStrikeResults(wasCarry, strikeNumber, rolls, battleUnit,
             targetUnit);
@@ -1638,8 +1567,6 @@ public final class Client implements IClient, IOracle, IVariant
             ai.cleanupBattle();
         }
 
-
-        battleUnits.clear();
         game.cleanupBattle();
     }
 
@@ -1978,15 +1905,6 @@ public final class Client implements IClient, IOracle, IVariant
         gui.actOnSetupBattleRecruit();
     }
 
-    private void resetAllBattleMoves()
-    {
-        for (BattleCritter battleUnit : battleUnits)
-        {
-            battleUnit.setMoved(false);
-            battleUnit.setStruck(false);
-        }
-    }
-
     public void setupBattleMove(Player battleActivePlayer, int battleTurnNumber)
     {
         // TODO clean up order of stuff here
@@ -1997,7 +1915,7 @@ public final class Client implements IClient, IOracle, IVariant
         // Just in case the other player started the battle
         // really quickly.
         gui.cleanupNegotiationDialogs();
-        resetAllBattleMoves();
+        getBattle().resetAllBattleMoves();
         getBattle().setBattlePhase(BattlePhase.MOVE);
 
         gui.actOnSetupBattleMove();
@@ -2051,19 +1969,13 @@ public final class Client implements IClient, IOracle, IVariant
         return game.getBattle();
     }
 
+
     /** Used for both strike and strikeback. */
     public void setupBattleFight(BattlePhase battlePhase,
         Player battleActivePlayer)
     {
-        getBattle().setBattlePhase(battlePhase);
-        getBattle().setBattleActivePlayer(battleActivePlayer);
-        if (getBattle().isBattlePhase(BattlePhase.FIGHT))
-        {
-            markOffboardCreaturesDead();
-        }
-
+        getBattle().setupBattleFight(battlePhase, battleActivePlayer);
         gui.actOnSetupBattleFight();
-
         doAutoStrikes();
     }
 
@@ -2071,7 +1983,6 @@ public final class Client implements IClient, IOracle, IVariant
     public void tellLegionLocation(Legion legion, MasterHex hex)
     {
         legion.setCurrentHex(hex);
-
         gui.actOnTellLegionLocation(legion, hex);
     }
 
@@ -2197,7 +2108,7 @@ public final class Client implements IClient, IOracle, IVariant
                 markBattleMoveSuccessful(tag, endingHex);
             }
         }
-        BattleCritter battleUnit = getBattleUnit(tag);
+        BattleCritter battleUnit = getBattle().getBattleUnit(tag);
         if (battleUnit != null)
         {
             battleUnit.setCurrentHex(endingHex);
@@ -2242,7 +2153,7 @@ public final class Client implements IClient, IOracle, IVariant
                 BattleHex neighbor = hex.getNeighbor(i);
                 if (neighbor != null)
                 {
-                    BattleCritter other = getBattleUnit(neighbor);
+                    BattleCritter other = getBattle().getBattleUnit(neighbor);
                     if (other != null
                         && (other.isDefender() != battleUnit.isDefender())
                         && (countDead || !other.isDead()))
@@ -2304,20 +2215,9 @@ public final class Client implements IClient, IOracle, IVariant
     {
         return game.getPlayerByName(name);
     }
-
     public Player getPlayerByTag(int tag)
     {
-        BattleCritter battleUnit = getBattleUnit(tag);
-        assert battleUnit != null : "Illegal value for tag parameter";
-
-        if (battleUnit.isDefender())
-        {
-            return getDefender().getPlayer();
-        }
-        else
-        {
-            return getAttacker().getPlayer();
-        }
+        return game.getPlayerByTag(tag);
     }
 
     private boolean isMyCritter(int tag)

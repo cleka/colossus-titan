@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
@@ -131,6 +132,21 @@ public class GameClientSide extends Game implements IOracle
         }
         throw new IllegalArgumentException("No player object found for name '"
             + playerName + "'");
+    }
+
+    public Player getPlayerByTag(int tag)
+    {
+        BattleCritter battleUnit = battle.getBattleUnit(tag);
+        assert battleUnit != null : "Illegal value for tag parameter";
+
+        if (battleUnit.isDefender())
+        {
+            return client.getDefender().getPlayer();
+        }
+        else
+        {
+            return client.getAttacker().getPlayer();
+        }
     }
 
     private Player getPlayerUsingColor(String shortColor)
@@ -470,6 +486,7 @@ public class GameClientSide extends Game implements IOracle
             return l;
         }
     }
+
 
 
 }

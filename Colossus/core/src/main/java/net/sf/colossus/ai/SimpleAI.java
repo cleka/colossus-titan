@@ -1948,7 +1948,7 @@ public class SimpleAI extends AbstractAI
         {
             String targetHexLabel = desc.substring(desc.length() - 2);
             BattleHex targetHex = HexMap.getHexByLabel(terrain, targetHexLabel);
-            BattleCritter target = client.getBattleUnit(targetHex);
+            BattleCritter target = getBattleUnit(targetHex);
 
             if (target.wouldDieFrom(carryDamage))
             {
@@ -2876,7 +2876,7 @@ public class SimpleAI extends AbstractAI
         boolean penalty = true;
         for (BattleHex targetHex : targetHexes)
         {
-            BattleCritter target = client.getBattleUnit(targetHex);
+            BattleCritter target = getBattleUnit(targetHex);
             if (target.isTitan())
             {
                 value.add(bec.RANGESTRIKE_TITAN, "RangestrikeTitan");
@@ -2938,7 +2938,7 @@ public class SimpleAI extends AbstractAI
 
         for (BattleHex targetHex : targetHexes)
         {
-            BattleCritter target = client.getBattleUnit(targetHex);
+            BattleCritter target = getBattleUnit(targetHex);
 
             // Reward being next to enemy titans.  (Banzai!)
             if (target.isTitan())
@@ -3112,7 +3112,7 @@ public class SimpleAI extends AbstractAI
                 BattleHex neighbor = hex.getNeighbor(i);
                 if (neighbor != null && client.isOccupied(neighbor))
                 {
-                    BattleCritter other = client.getBattleUnit(neighbor);
+                    BattleCritter other = getBattleUnit(neighbor);
                     if (other.isDefender() == critter.isDefender())
                     {
                         // Buddy

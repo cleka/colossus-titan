@@ -364,6 +364,8 @@ public final class BattleBoard extends KFrame
         {
             public void actionPerformed(ActionEvent e)
             {
+                // TODO use everywhere gui and getGame/getBattle instead of
+                //      going via Client
                 if (!client.getOwningPlayer().equals(
                     client.getBattleActivePlayer()))
                 {
