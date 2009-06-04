@@ -2,7 +2,6 @@ package Default;
 
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import net.sf.colossus.ai.AbstractHintProvider;
@@ -28,11 +27,9 @@ public class DefaultHint extends AbstractHintProvider
     public static List<String> creaturesToStrings(List<CreatureType> creatures)
     {
         List<String> recruits = new ArrayList<String>();
-        for (Iterator<CreatureType> it = creatures.iterator(); it.hasNext();)
+        for (CreatureType creature : creatures)
         {
-            Object ob = it.next();
-            String str = ob.toString();
-            recruits.add(str);
+            recruits.add(creature.getName());
         }
         return recruits;
     }
