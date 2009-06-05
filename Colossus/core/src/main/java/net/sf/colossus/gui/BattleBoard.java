@@ -221,6 +221,8 @@ public final class BattleBoard extends KFrame
         dicePanel = new DicePanel();
         getContentPane().add(dicePanel, BorderLayout.SOUTH);
 
+        // TODO using here the static method getMarkerName from
+        // LegionServerSide is really not the cleanest way...
         infoText = gui.getOwningPlayerName() + ": "
             + LegionServerSide.getMarkerName(attackerMarkerId) + " ("
             + attackerMarkerId + ") attacks "
