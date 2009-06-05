@@ -2101,7 +2101,7 @@ public class ClientGUI implements IClientGUI
     {
         if (battleBoard != null)
         {
-            battleBoard.setPhase(getGameClientSide().getBattlePhase());
+            battleBoard.updatePhase();
             battleBoard.setTurn(getGameClientSide().getBattleTurnNumber());
             if (client.isMyBattlePhase())
             {
@@ -2121,7 +2121,7 @@ public class ClientGUI implements IClientGUI
     {
         if (battleBoard != null)
         {
-            battleBoard.setPhase(client.getBattlePhase());
+            battleBoard.updatePhase();
             battleBoard.setTurn(client.getBattleTurnNumber());
             if (client.isMyBattlePhase())
             {
@@ -2148,7 +2148,7 @@ public class ClientGUI implements IClientGUI
     {
         if (battleBoard != null)
         {
-            battleBoard.setPhase(client.getBattlePhase());
+            battleBoard.updatePhase();
             battleBoard.setTurn(client.getBattleTurnNumber());
             if (client.isMyBattlePhase())
             {
@@ -2164,7 +2164,7 @@ public class ClientGUI implements IClientGUI
     {
         if (battleBoard != null)
         {
-            battleBoard.setPhase(client.getBattlePhase());
+            battleBoard.updatePhase();
             battleBoard.setTurn(client.getBattleTurnNumber());
             if (client.isMyBattlePhase())
             {

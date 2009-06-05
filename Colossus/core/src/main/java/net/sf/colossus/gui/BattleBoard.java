@@ -242,7 +242,7 @@ public final class BattleBoard extends KFrame
         // @TODO: perhaps those could be done earlier, but in previous code
         // (still in Client) they were done after BattleBoard instantiation,
         // so I keep them like that, for now.
-        setPhase(getGame().getBattlePhase());
+        updatePhase();
         setTurn(getGame().getBattleTurnNumber());
         setBattleMarkerLocation(false, "X" + attacker.getEntrySide().ordinal());
         setBattleMarkerLocation(true, "X" + defender.getEntrySide().ordinal());
@@ -533,19 +533,18 @@ public final class BattleBoard extends KFrame
         }
     }
 
-    // TODO make this fetch the phase, instead every caller have to query it
-    // to pass it in
-    public void setPhase(BattlePhase newBattlePhase)
+    public void updatePhase()
     {
+        String newPhaseName = getGame().getBattlePhase().toString();
         if (isMyBattleTurn())
         {
             enableDoneButton();
-            infoPanel.setOwnPhase(newBattlePhase.toString());
+            infoPanel.setOwnPhase(newPhaseName);
         }
         else
         {
             disableDoneButton();
-            infoPanel.setForeignPhase(newBattlePhase.toString());
+            infoPanel.setForeignPhase(newPhaseName);
         }
     }
 
