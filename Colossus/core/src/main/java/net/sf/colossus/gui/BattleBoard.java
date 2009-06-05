@@ -242,8 +242,8 @@ public final class BattleBoard extends KFrame
         // @TODO: perhaps those could be done earlier, but in previous code
         // (still in Client) they were done after BattleBoard instantiation,
         // so I keep them like that, for now.
-        updatePhase();
-        setTurn(getGame().getBattleTurnNumber());
+        updatePhaseAndTurn();
+
         setBattleMarkerLocation(false, "X" + attacker.getEntrySide().ordinal());
         setBattleMarkerLocation(true, "X" + defender.getEntrySide().ordinal());
         reqFocus();
@@ -533,7 +533,7 @@ public final class BattleBoard extends KFrame
         }
     }
 
-    public void updatePhase()
+    public void updatePhaseAndTurn()
     {
         String newPhaseName = getGame().getBattlePhase().toString();
         if (isMyBattleTurn())
@@ -546,11 +546,7 @@ public final class BattleBoard extends KFrame
             disableDoneButton();
             infoPanel.setForeignPhase(newPhaseName);
         }
-    }
-
-    public void setTurn(int newturn)
-    {
-        infoPanel.turnPanel.advTurn(newturn);
+        infoPanel.turnPanel.advTurn(getGame().getBattleTurnNumber());
     }
 
     private void setupIcon()

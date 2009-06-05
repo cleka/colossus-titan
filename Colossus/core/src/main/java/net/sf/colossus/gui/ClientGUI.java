@@ -2101,8 +2101,7 @@ public class ClientGUI implements IClientGUI
     {
         if (battleBoard != null)
         {
-            battleBoard.updatePhase();
-            battleBoard.setTurn(getGameClientSide().getBattleTurnNumber());
+            battleBoard.updatePhaseAndTurn();
             if (client.isMyBattlePhase())
             {
                 focusMap();
@@ -2121,8 +2120,7 @@ public class ClientGUI implements IClientGUI
     {
         if (battleBoard != null)
         {
-            battleBoard.updatePhase();
-            battleBoard.setTurn(client.getBattleTurnNumber());
+            battleBoard.updatePhaseAndTurn();
             if (client.isMyBattlePhase())
             {
                 focusMap();
@@ -2148,8 +2146,7 @@ public class ClientGUI implements IClientGUI
     {
         if (battleBoard != null)
         {
-            battleBoard.updatePhase();
-            battleBoard.setTurn(client.getBattleTurnNumber());
+            battleBoard.updatePhaseAndTurn();
             if (client.isMyBattlePhase())
             {
                 focusMap();
@@ -2164,8 +2161,7 @@ public class ClientGUI implements IClientGUI
     {
         if (battleBoard != null)
         {
-            battleBoard.updatePhase();
-            battleBoard.setTurn(client.getBattleTurnNumber());
+            battleBoard.updatePhaseAndTurn();
             if (client.isMyBattlePhase())
             {
                 focusMap();
