@@ -39,7 +39,7 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
 import net.sf.colossus.client.Client;
-import net.sf.colossus.client.IClientGUI;
+import net.sf.colossus.client.GameClientSide;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.game.BattleCritter;
@@ -75,7 +75,6 @@ public final class BattleBoard extends KFrame
     private JMenu helpMenu;
     private final InfoPanel infoPanel;
     private final DicePanel dicePanel;
-    private final Client client;
     private final ClientGUI gui;
     private final String infoText;
 
@@ -152,7 +151,6 @@ public final class BattleBoard extends KFrame
         super(); // title will be set later
 
         this.gui = gui;
-        this.client = gui.getClient();
 
         String attackerMarkerId = attacker.getMarkerId();
         String defenderMarkerId = defender.getMarkerId();
@@ -187,7 +185,7 @@ public final class BattleBoard extends KFrame
         }
         setLocation(location);
 
-        battleMap = new BattleMap(client, masterHex, attackerMarkerId,
+        battleMap = new BattleMap(getClient(), masterHex, attackerMarkerId,
             defenderMarkerId, gui);
         contentPane.add(new JScrollPane(battleMap), BorderLayout.CENTER);
         battleMap.addMouseListener(new MouseAdapter()
@@ -196,8 +194,7 @@ public final class BattleBoard extends KFrame
             public void mousePressed(MouseEvent e)
             {
                 // Only the active player can click on stuff.
-                if (!gui.getOwningPlayer().equals(
-                    client.getBattleActivePlayer()))
+                if (!isMyBattleTurn())
                 {
                     return;
                 }
@@ -214,7 +211,7 @@ public final class BattleBoard extends KFrame
         infoPanel = new InfoPanel();
         contentPane.add(infoPanel, BorderLayout.NORTH);
 
-        PlayerColor color = client.getColor();
+        PlayerColor color = getClient().getColor();
         if (color != null)
         {
             Color bgColor = PickColor.getBackgroundColor(color);
@@ -224,7 +221,7 @@ public final class BattleBoard extends KFrame
         dicePanel = new DicePanel();
         getContentPane().add(dicePanel, BorderLayout.SOUTH);
 
-        infoText = gui.getOwningPlayer().getName() + ": "
+        infoText = gui.getOwningPlayerName() + ": "
             + LegionServerSide.getMarkerName(attackerMarkerId) + " ("
             + attackerMarkerId + ") attacks "
             + LegionServerSide.getMarkerName(defenderMarkerId) + " ("
@@ -232,7 +229,7 @@ public final class BattleBoard extends KFrame
 
         setTitle(getInfoText());
 
-        String instanceId = client.getOwningPlayer().getName() + ": "
+        String instanceId = gui.getOwningPlayerName() + ": "
             + attackerMarkerId + "/" + defenderMarkerId + " (" + count + ")";
         count++;
         net.sf.colossus.util.InstanceTracker.setId(this, instanceId);
@@ -243,8 +240,8 @@ public final class BattleBoard extends KFrame
         // @TODO: perhaps those could be done earlier, but in previous code
         // (still in Client) they were done after BattleBoard instantiation,
         // so I keep them like that, for now.
-        setPhase(client.getBattlePhase());
-        setTurn(client.getBattleTurnNumber());
+        setPhase(getGame().getBattlePhase());
+        setTurn(getGame().getBattleTurnNumber());
         setBattleMarkerLocation(false, "X" + attacker.getEntrySide().ordinal());
         setBattleMarkerLocation(true, "X" + defender.getEntrySide().ordinal());
         reqFocus();
@@ -254,11 +251,17 @@ public final class BattleBoard extends KFrame
     {
         gui.resetStrikeNumbers();
 
-        boolean ownChit = (battleChit != null && client.getPlayerByTag(
+        // This checks only if its a chit of the active player
+        // But that's ok, this here is called only if it's own phase
+        boolean ownChit = (battleChit != null && getGame().getPlayerByTag(
             battleChit.getTag()).equals(
-                client.getBattleActivePlayer()));
+                getGame().getBattleActivePlayer()));
 
-        boolean isPickCarryOngoing = getGUI().isPickCarryOngoing();
+        boolean ownChit2 = (battleChit != null && battleChit.getBattleUnit()
+            .getLegion().getPlayer().equals(getGame().getBattleActivePlayer()));
+
+        assert ownChit == ownChit2 : "checks for 'is own chit' return different result!";
+        boolean isPickCarryOngoing = gui.isPickCarryOngoing();
         if (isPickCarryOngoing)
         {
             if (battleChit != null && !ownChit)
@@ -294,19 +297,31 @@ public final class BattleBoard extends KFrame
         battleMap.setBattleMarkerLocation(isDefender, hex);
     }
 
-    // TODO perhaps this is not needed at all,
-    //      - use the instance variable everywhere?
-    private IClientGUI getGUI()
-    {
-        return gui;
-    }
-
-    // TODO: access to variable client should be replaced with this here,
-    // or rather, on the long run, probably many of them should get the
-    // info they need from Game (gui.getGame() or gui.getGameClientSide?)
     private Client getClient()
     {
         return gui.getClient();
+    }
+
+    private GameClientSide getGame()
+    {
+        return (GameClientSide)gui.getGame();
+    }
+
+    // Handy shortcut because it's used frequently
+    private boolean isFightPhase()
+    {
+        return getGame().getBattlePhase().isFightPhase();
+    }
+
+    // Handy shortcut because it's used frequently
+    private boolean isMovePhase()
+    {
+        return getGame().isBattlePhase(BattlePhase.MOVE);
+    }
+
+    private boolean isMyBattleTurn()
+    {
+        return gui.getOwningPlayer().equals(getGame().getBattleActivePlayer());
     }
 
     private String getInfoText()
@@ -320,7 +335,7 @@ public final class BattleBoard extends KFrame
         {
             public void actionPerformed(ActionEvent e)
             {
-                new BattleTerrainHazardWindow(BattleBoard.this, client,
+                new BattleTerrainHazardWindow(BattleBoard.this, getClient(),
                     battleMap.getMasterHex());
             }
         };
@@ -328,15 +343,14 @@ public final class BattleBoard extends KFrame
         {
             public void actionPerformed(ActionEvent e)
             {
-                if (!client.getOwningPlayer().equals(
-                    client.getBattleActivePlayer()))
+                if (!isMyBattleTurn())
                 {
                     return;
                 }
-                if (client.getBattlePhase() == BattlePhase.MOVE)
+                if (isMovePhase())
                 {
                     selectedCritterTag = -1;
-                    getGUI().undoLastBattleMove();
+                    gui.undoLastBattleMove();
                     highlightMobileCritters();
                 }
             }
@@ -346,15 +360,14 @@ public final class BattleBoard extends KFrame
         {
             public void actionPerformed(ActionEvent e)
             {
-                if (!client.getOwningPlayer().equals(
-                    client.getBattleActivePlayer()))
+                if (!isMyBattleTurn())
                 {
                     return;
                 }
-                if (client.getBattlePhase() == BattlePhase.MOVE)
+                if (isMovePhase())
                 {
                     selectedCritterTag = -1;
-                    getGUI().undoAllBattleMoves();
+                    gui.undoAllBattleMoves();
                     highlightMobileCritters();
                 }
             }
@@ -366,31 +379,29 @@ public final class BattleBoard extends KFrame
             {
                 // TODO use everywhere gui and getGame/getBattle instead of
                 //      going via Client
-                if (!client.getOwningPlayer().equals(
-                    client.getBattleActivePlayer()))
+                if (!isMyBattleTurn())
                 {
                     return;
                 }
 
-                BattlePhase phase = client.getBattlePhase();
-                if (phase == BattlePhase.MOVE)
+                if (isMovePhase())
                 {
-                    if (!client.getOptions().getOption(Options.autoPlay)
-                        && client.anyOffboardCreatures()
+                    if (!getClient().getOptions().getOption(Options.autoPlay)
+                        && getGame().getBattle().anyOffboardCreatures()
                         && !confirmLeavingCreaturesOffboard())
                     {
                         return;
                     }
                     unselectAllHexes();
                     battleMap.unselectEntranceHexes();
-                    client.doneWithBattleMoves();
+                    getClient().doneWithBattleMoves();
                 }
-                else if (phase.isFightPhase())
+                else if (isFightPhase())
                 {
                     unselectAllHexes();
                     battleMap.unselectEntranceHexes();
                     gui.resetStrikeNumbers();
-                    client.doneWithStrikes();
+                    getClient().doneWithStrikes();
                 }
                 else
                 {
@@ -413,10 +424,9 @@ public final class BattleBoard extends KFrame
 
                 if (answer == JOptionPane.YES_OPTION)
                 {
-                    String playerName = client.getOwningPlayer().getName();
-                    LOGGER
-                        .log(Level.INFO, playerName + " concedes the battle");
-                    client.concede();
+                    LOGGER.log(Level.INFO, gui.getOwningPlayerName()
+                        + " concedes the battle");
+                    getClient().concede();
                 }
             }
         };
@@ -488,7 +498,7 @@ public final class BattleBoard extends KFrame
         mi.setMnemonic(KeyEvent.VK_C);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0));
 
-        if (client.getOwningPlayer().equals(client.getBattleActivePlayer()))
+        if (isMyBattleTurn())
         {
             highlightMobileCritters();
             reqFocus();
@@ -499,7 +509,7 @@ public final class BattleBoard extends KFrame
     {
         phaseMenu.removeAll();
 
-        if (client.getMyEngagedLegion() == null)
+        if (getClient().getMyEngagedLegion() == null)
         {
             // We are not involved - we can't do concede or done
             return;
@@ -516,16 +526,18 @@ public final class BattleBoard extends KFrame
         mi.setMnemonic(KeyEvent.VK_C);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0));
 
-        if (client.getOwningPlayer().equals(client.getBattleActivePlayer()))
+        if (isMyBattleTurn())
         {
             highlightCrittersWithTargets();
             reqFocus();
         }
     }
 
+    // TODO make this fetch the phase, instead every caller have to query it
+    // to pass it in
     public void setPhase(BattlePhase newBattlePhase)
     {
-        if (client.getOwningPlayer().equals(client.getBattleActivePlayer()))
+        if (isMyBattleTurn())
         {
             enableDoneButton();
             infoPanel.setOwnPhase(newBattlePhase.toString());
@@ -635,7 +647,7 @@ public final class BattleBoard extends KFrame
     /** Select all hexes containing critters eligible to move. */
     public void highlightMobileCritters()
     {
-        Set<BattleHex> set = client.findMobileCritterHexes();
+        Set<BattleHex> set = getClient().findMobileCritterHexes();
         unselectAllHexes();
         battleMap.unselectEntranceHexes();
         battleMap.selectHexes(set);
@@ -644,7 +656,7 @@ public final class BattleBoard extends KFrame
 
     private void highlightMoves(BattleCritter critter)
     {
-        Set<BattleHex> set = client.showBattleMoves(critter);
+        Set<BattleHex> set = getClient().showBattleMoves(critter);
         battleMap.unselectAllHexes();
         battleMap.unselectEntranceHexes();
         battleMap.selectHexes(set);
@@ -653,7 +665,7 @@ public final class BattleBoard extends KFrame
     /** Select hexes containing critters that have valid strike targets. */
     public void highlightCrittersWithTargets()
     {
-        Set<BattleHex> set = client.findCrittersWithTargets();
+        Set<BattleHex> set = getClient().findCrittersWithTargets();
         unselectAllHexes();
         battleMap.selectHexes(set);
         // XXX Needed?
@@ -663,7 +675,7 @@ public final class BattleBoard extends KFrame
     /** Highlight all hexes with targets that the critter can strike. */
     private void highlightStrikes(BattleUnit battleUnit)
     {
-        Set<BattleHex> set = client.findStrikes(battleUnit.getTag());
+        Set<BattleHex> set = getClient().findStrikes(battleUnit.getTag());
         unselectAllHexes();
         gui.resetStrikeNumbers();
         battleMap.selectHexes(set);
@@ -705,35 +717,33 @@ public final class BattleBoard extends KFrame
 
         // XXX Put selected chit at the top of the z-order.
         // Then getGUIHexByLabel(hexLabel).repaint();
-        BattlePhase phase = client.getBattlePhase();
-        if (phase == BattlePhase.MOVE)
+        if (isMovePhase())
         {
             highlightMoves(battleChit.getBattleUnit());
         }
-        else if (phase.isFightPhase())
+        else if (isFightPhase())
         {
-            client.leaveCarryMode();
+            getClient().leaveCarryMode();
             highlightStrikes(battleChit.getBattleUnit());
         }
     }
 
     private void actOnHex(BattleHex hex)
     {
-        BattlePhase phase = client.getBattlePhase();
-        if (phase == BattlePhase.MOVE)
+        if (isMovePhase())
         {
             if (selectedCritterTag != -1)
             {
-                client.doBattleMove(selectedCritterTag, hex);
+                getClient().doBattleMove(selectedCritterTag, hex);
                 selectedCritterTag = -1;
                 highlightMobileCritters();
             }
         }
-        else if (phase.isFightPhase())
+        else if (isFightPhase())
         {
             if (selectedCritterTag != -1)
             {
-                client.strike(selectedCritterTag, hex);
+                getClient().strike(selectedCritterTag, hex);
                 selectedCritterTag = -1;
             }
         }
@@ -741,16 +751,15 @@ public final class BattleBoard extends KFrame
 
     private void actOnMisclick()
     {
-        BattlePhase phase = client.getBattlePhase();
-        if (phase == BattlePhase.MOVE)
+        if (isMovePhase())
         {
             selectedCritterTag = -1;
             highlightMobileCritters();
         }
-        else if (phase.isFightPhase())
+        else if (isFightPhase())
         {
             selectedCritterTag = -1;
-            client.leaveCarryMode();
+            getClient().leaveCarryMode();
             highlightCrittersWithTargets();
         }
     }
@@ -775,7 +784,7 @@ public final class BattleBoard extends KFrame
 
     public void reqFocus()
     {
-        if (client.getOptions().getOption(Options.stealFocus))
+        if (getClient().getOptions().getOption(Options.stealFocus))
         {
             requestFocus();
             toFront();
@@ -790,7 +799,8 @@ public final class BattleBoard extends KFrame
 
         private TurnPanel()
         {
-            this(client.getMaxBattleTurns());
+            // TODO move getMaxBattleTurns() to Variant
+            this(getClient().getMaxBattleTurns());
         }
 
         private TurnPanel(int MAXBATTLETURNS)
@@ -798,7 +808,8 @@ public final class BattleBoard extends KFrame
             super(new GridLayout((MAXBATTLETURNS + 1) % 8 + 1, 0));
             turn = new JLabel[MAXBATTLETURNS + 1];
             // Create Special labels for Recruitment turns
-            int[] REINFORCEMENTTURNS = client.getReinforcementTurns();
+            // TODO move to Variant
+            int[] REINFORCEMENTTURNS = getClient().getReinforcementTurns();
             for (int j : REINFORCEMENTTURNS)
             {
                 turn[j - 1] = new JLabel((j) + "+", SwingConstants.CENTER);
@@ -841,7 +852,7 @@ public final class BattleBoard extends KFrame
 
         private void setTurn(int newTurn)
         {
-            if (client.isMyBattlePhase())
+            if (isMyBattleTurn())
             {
                 setBorder(turn[newTurn - 1], 5);
             }
@@ -904,7 +915,7 @@ public final class BattleBoard extends KFrame
 
         private void setForeignPhase(String s)
         {
-            String name = client.getBattleActivePlayer().getName();
+            String name = getGame().getBattleActivePlayer().getName();
             phaseLabel.setText("(" + name + ") " + s);
             doneButton.setEnabled(false);
         }
@@ -948,7 +959,8 @@ public final class BattleBoard extends KFrame
             return;
         }
         dicePanel.addValues("Battle Phase "
-            + getClient().getBattleTurnNumber(), getClient()
+            + getGame().getBattleTurnNumber(),
+            getGame()
             .getBattleActivePlayer().getName(), strikerDesc, targetDesc,
             targetNumber, rolls);
         dicePanel.showLastRoll();

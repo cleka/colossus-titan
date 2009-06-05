@@ -2125,6 +2125,7 @@ public final class Client implements IClient, IOracle, IVariant
         gui.actOnApplyCarries(hex);
     }
 
+    // TODO move to Battle
     /** Return true if there are any enemies adjacent to this battleChit.
      *  Dead critters count as being in contact only if countDead is true. */
     public boolean isInContact(BattleCritter battleUnit, boolean countDead)
@@ -2159,6 +2160,7 @@ public final class Client implements IClient, IOracle, IVariant
         return false;
     }
 
+    // TODO move to Battle
     /** Return a set of hexLabels. */
     public Set<BattleHex> findMobileCritterHexes()
     {
@@ -2173,6 +2175,7 @@ public final class Client implements IClient, IOracle, IVariant
         return set;
     }
 
+    // TODO move to Battle
     /** Return a set of BattleUnits. */
     public Set<BattleUnit> findMobileBattleUnits()
     {
@@ -2192,11 +2195,13 @@ public final class Client implements IClient, IOracle, IVariant
         return battleMovement.showMoves(battleCritter);
     }
 
+    // TODO move to Battle
     public Set<BattleHex> findCrittersWithTargets()
     {
         return strike.findCrittersWithTargets();
     }
 
+    // TODO move to Battle
     public Set<BattleHex> findStrikes(int tag)
     {
         return strike.findStrikes(tag);
