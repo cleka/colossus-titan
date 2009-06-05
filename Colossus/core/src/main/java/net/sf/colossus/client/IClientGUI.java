@@ -130,12 +130,6 @@ public interface IClientGUI
 
     public abstract void actOnTellReplay(int maxTurn);
 
-    public abstract void clearUndoStack();
-
-    public abstract Object popUndoStack();
-
-    public abstract void pushUndoStack(Object object);
-
     public abstract void eventViewerCancelReinforcement(CreatureType recruit,
         int turnNr);
 
@@ -256,7 +250,9 @@ public interface IClientGUI
     public abstract void actOnSetupBattleMove();
 
     public abstract void actOnTellBattleMove(BattleHex startingHex,
-        BattleHex endingHex);
+        BattleHex endingHex, boolean rememberForUndo);
+
+    public abstract void actOnDoneWithBattleMoves();
 
     public abstract void actOnSetupBattleRecruit();
 

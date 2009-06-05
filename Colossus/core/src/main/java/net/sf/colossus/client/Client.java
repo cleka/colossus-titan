@@ -456,7 +456,6 @@ public final class Client implements IClient, IOracle, IVariant
     public void mulligan()
     {
         gui.undoAllMoves(); // XXX Maybe move entirely to server
-        gui.clearUndoStack();
 
         tookMulligan = true;
 
@@ -796,7 +795,7 @@ public final class Client implements IClient, IOracle, IVariant
     public void doneWithBattleMoves()
     {
         aiPause();
-        gui.clearUndoStack();
+        gui.actOnDoneWithBattleMoves();
         server.doneWithBattleMoves();
     }
 
@@ -1669,11 +1668,6 @@ public final class Client implements IClient, IOracle, IVariant
     public void didRecruit(Legion legion, CreatureType recruit,
         CreatureType recruiter, int numRecruiters)
     {
-        if (isMyLegion(legion))
-        {
-            gui.pushUndoStack(legion.getMarkerId());
-        }
-
         List<CreatureType> recruiters = new ArrayList<CreatureType>();
         if (numRecruiters >= 1 && recruiter != null)
         {
@@ -1690,7 +1684,6 @@ public final class Client implements IClient, IOracle, IVariant
         ((LegionClientSide)legion).setRecruit(recruit);
 
         gui.actOnDidRecruit(legion, recruit, recruiters, reason);
-
     }
 
     public void undoRecruit(Legion legion)
@@ -2075,9 +2068,10 @@ public final class Client implements IClient, IOracle, IVariant
     public void tellBattleMove(int tag, BattleHex startingHex,
         BattleHex endingHex, boolean undo)
     {
+        boolean rememberForUndo = false;
         if (isMyCritter(tag) && !undo)
         {
-            gui.pushUndoStack(endingHex.getLabel());
+            rememberForUndo = true;
             if (options.getOption(Options.autoPlay))
             {
                 markBattleMoveSuccessful(tag, endingHex);
@@ -2090,7 +2084,7 @@ public final class Client implements IClient, IOracle, IVariant
             battleUnit.setMoved(!undo);
         }
 
-        gui.actOnTellBattleMove(startingHex, endingHex);
+        gui.actOnTellBattleMove(startingHex, endingHex, rememberForUndo);
 
     }
 
@@ -2377,10 +2371,6 @@ public final class Client implements IClient, IOracle, IVariant
         MasterHex currentHex, EntrySide entrySide, boolean teleport,
         CreatureType teleportingLord, boolean splitLegionHasForcedMove)
     {
-        if (isMyLegion(legion))
-        {
-            gui.pushUndoStack(legion.getMarkerId());
-        }
         legion.setCurrentHex(currentHex);
         legion.setMoved(true);
         legion.setEntrySide(entrySide);
@@ -2728,7 +2718,6 @@ public final class Client implements IClient, IOracle, IVariant
 
     public void notifyServer()
     {
-        gui.clearUndoStack();
         if (!isRemote())
         {
             localServer.setGuiSuspendOngoing(false);

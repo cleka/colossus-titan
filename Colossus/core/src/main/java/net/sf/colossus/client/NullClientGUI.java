@@ -201,7 +201,13 @@ public class NullClientGUI implements IClientGUI
     }
 
     public void actOnTellBattleMove(BattleHex startingHex,
-        BattleHex endingHex)
+        BattleHex endingHex, boolean rememberForUndo)
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void actOnDoneWithBattleMoves()
     {
         // TODO Auto-generated method stub
 
@@ -286,12 +292,6 @@ public class NullClientGUI implements IClientGUI
     }
 
     public void cleanupNegotiationDialogs()
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void clearUndoStack()
     {
         // TODO Auto-generated method stub
 
@@ -537,18 +537,6 @@ public class NullClientGUI implements IClientGUI
     }
 
     public void menuQuitGame()
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    public Object popUndoStack()
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public void pushUndoStack(Object object)
     {
         // TODO Auto-generated method stub
 

@@ -1051,6 +1051,11 @@ public class ClientGUI implements IClientGUI
     public void actOnDidRecruit(Legion legion, CreatureType recruit,
         List<CreatureType> recruiters, String reason)
     {
+        if (client.isMyLegion(legion))
+        {
+            pushUndoStack(legion.getMarkerId());
+        }
+
         board.addRecruitedChit(legion);
         board.highlightPossibleRecruitLegionHexes();
 
@@ -1162,6 +1167,7 @@ public class ClientGUI implements IClientGUI
         board.repaint();
         if (client.isMyLegion(legion))
         {
+            pushUndoStack(legion.getMarkerId());
             if (splitLegionHasForcedMove)
             {
                 board.disableDoneAction("Split legion needs to move");
@@ -1311,17 +1317,17 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    public void clearUndoStack()
+    private void clearUndoStack()
     {
         undoStack.clear();
     }
 
-    public Object popUndoStack()
+    private Object popUndoStack()
     {
         return undoStack.removeFirst();
     }
 
-    public void pushUndoStack(Object object)
+    private void pushUndoStack(Object object)
     {
         undoStack.addFirst(object);
     }
@@ -2118,8 +2124,14 @@ public class ClientGUI implements IClientGUI
         updateStatusScreen();
     }
 
-    public void actOnTellBattleMove(BattleHex startingHex, BattleHex endingHex)
+    public void actOnTellBattleMove(BattleHex startingHex,
+        BattleHex endingHex, boolean rememberForUndo)
     {
+        if (rememberForUndo)
+        {
+            pushUndoStack(endingHex.getLabel());
+        }
+
         if (battleBoard != null)
         {
             battleBoard.alignChits(startingHex);
@@ -2127,6 +2139,11 @@ public class ClientGUI implements IClientGUI
             battleBoard.repaint();
             battleBoard.highlightMobileCritters();
         }
+    }
+
+    public void actOnDoneWithBattleMoves()
+    {
+        clearUndoStack();
     }
 
     public void actOnSetupBattleRecruit()
