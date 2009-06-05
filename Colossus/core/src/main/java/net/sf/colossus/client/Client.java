@@ -800,12 +800,6 @@ public final class Client implements IClient, IOracle, IVariant
         server.doneWithBattleMoves();
     }
 
-    // eliminate this, ask directly from Game / Battle
-    public boolean anyOffboardCreatures()
-    {
-        return (isBattleOngoing() ? getBattle().anyOffboardCreatures() : false);
-    }
-
     // TODO move to Game or Battle
     public List<BattleUnit> getActiveBattleUnits()
     {

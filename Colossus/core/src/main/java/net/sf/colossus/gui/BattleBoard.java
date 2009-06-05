@@ -377,8 +377,6 @@ public final class BattleBoard extends KFrame
         {
             public void actionPerformed(ActionEvent e)
             {
-                // TODO use everywhere gui and getGame/getBattle instead of
-                //      going via Client
                 if (!isMyBattleTurn())
                 {
                     return;
@@ -807,7 +805,6 @@ public final class BattleBoard extends KFrame
             super(new GridLayout((MAXBATTLETURNS + 1) % 8 + 1, 0));
             turn = new JLabel[MAXBATTLETURNS + 1];
             // Create Special labels for Recruitment turns
-            // TODO move to Variant
             int[] REINFORCEMENTTURNS = getGame().getVariant()
                 .getReinforcementTurns();
             for (int j : REINFORCEMENTTURNS)
