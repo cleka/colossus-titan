@@ -344,6 +344,17 @@ public class Variant
     {
         return titanTeleport;
     }
+
+    public int[] getReinforcementTurns()
+    {
+        int[] reinforcementTurns = { 4 };
+        return reinforcementTurns;
+    }
+
+    public int getMaxBattleTurns()
+    {
+        return 7;
+    }
 }
 
 

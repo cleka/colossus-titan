@@ -799,8 +799,7 @@ public final class BattleBoard extends KFrame
 
         private TurnPanel()
         {
-            // TODO move getMaxBattleTurns() to Variant
-            this(getClient().getMaxBattleTurns());
+            this(getGame().getVariant().getMaxBattleTurns());
         }
 
         private TurnPanel(int MAXBATTLETURNS)
@@ -809,7 +808,8 @@ public final class BattleBoard extends KFrame
             turn = new JLabel[MAXBATTLETURNS + 1];
             // Create Special labels for Recruitment turns
             // TODO move to Variant
-            int[] REINFORCEMENTTURNS = getClient().getReinforcementTurns();
+            int[] REINFORCEMENTTURNS = getGame().getVariant()
+                .getReinforcementTurns();
             for (int j : REINFORCEMENTTURNS)
             {
                 turn[j - 1] = new JLabel((j) + "+", SwingConstants.CENTER);

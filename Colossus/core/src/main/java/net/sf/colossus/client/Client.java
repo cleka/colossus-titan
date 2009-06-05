@@ -1563,17 +1563,6 @@ public final class Client implements IClient, IOracle, IVariant
         game.cleanupBattle();
     }
 
-    public int[] getReinforcementTurns()
-    {
-        int[] reinforcementTurns = { 4 };
-        return reinforcementTurns;
-    }
-
-    public int getMaxBattleTurns()
-    {
-        return 7;
-    }
-
     public void nextEngagement()
     {
         gui.highlightEngagements();
