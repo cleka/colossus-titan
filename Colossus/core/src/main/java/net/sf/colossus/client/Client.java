@@ -1718,8 +1718,7 @@ public final class Client implements IClient, IOracle, IVariant
     public void undidRecruit(Legion legion, CreatureType recruit)
     {
         boolean wasReinforcement;
-        // TODO ask "is battle ongoing" instead of comparing battlePhase?
-        if (game.getBattlePhase() != null)
+        if (game.isBattleOngoing())
         {
             wasReinforcement = true;
             gui.eventViewerCancelReinforcement(recruit, getTurnNumber());
