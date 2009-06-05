@@ -1118,7 +1118,7 @@ public class ClientGUI implements IClientGUI
             reason);
     }
 
-    public void boardActOnUndidSplit(Legion survivor, int turn)
+    public void actOnUndidSplit(Legion survivor, int turn)
     {
         if (isReplayOngoing())
         {
@@ -1131,7 +1131,7 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    public void actOnUndidRecruitPart2(Legion legion,
+    public void actOnUndidRecruitPart(Legion legion,
         boolean wasReinforcement, int turnNumber)
     {
         int eventType = wasReinforcement ? RevealEvent.eventReinforce

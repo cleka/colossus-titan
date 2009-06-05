@@ -99,9 +99,9 @@ public interface IClientGUI
     public abstract void actOnAddCreature(Legion legion, CreatureType type,
         String reason);
 
-    public abstract void boardActOnUndidSplit(Legion survivor, int turn);
+    public abstract void actOnUndidSplit(Legion survivor, int turn);
 
-    public abstract void actOnUndidRecruitPart2(Legion legion,
+    public abstract void actOnUndidRecruitPart(Legion legion,
         boolean wasReinforcement, int turnNumber);
 
     /** Present a dialog allowing the player to enter via land or teleport.

@@ -1731,7 +1731,7 @@ public final class Client implements IClient, IOracle, IVariant
         }
 
         ((LegionClientSide)legion).setRecruit(null);
-        gui.actOnUndidRecruitPart2(legion, wasReinforcement, getTurnNumber());
+        gui.actOnUndidRecruitPart(legion, wasReinforcement, getTurnNumber());
     }
 
     /** null means cancel.  "none" means no recruiter (tower creature). */
@@ -2767,7 +2767,7 @@ public final class Client implements IClient, IOracle, IVariant
             gui.eventViewerUndoEvent(splitoff, survivor, turn);
         }
 
-        gui.boardActOnUndidSplit(survivor, turn);
+        gui.actOnUndidSplit(survivor, turn);
 
         if (isMyTurn() && game.isPhase(Phase.SPLIT) && !replayOngoing
             && options.getOption(Options.autoSplit) && !game.isGameOver())

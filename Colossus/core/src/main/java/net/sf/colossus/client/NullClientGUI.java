@@ -247,7 +247,7 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public void actOnUndidRecruitPart2(Legion legion,
+    public void actOnUndidRecruitPart(Legion legion,
         boolean wasReinforcement, int turnNumber)
     {
         // TODO Auto-generated method stub
@@ -273,7 +273,7 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public void boardActOnUndidSplit(Legion survivor, int turn)
+    public void actOnUndidSplit(Legion survivor, int turn)
     {
         // TODO Auto-generated method stub
 
