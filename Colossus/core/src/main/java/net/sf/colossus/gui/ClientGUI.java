@@ -347,7 +347,7 @@ public class ClientGUI implements IClientGUI
         setupGUIOptionListeners();
         syncCheckboxes();
 
-        focusBoard();
+        board.reqFocus();
     }
 
     public void setChosenDevice(GraphicsDevice chosen)
@@ -724,24 +724,11 @@ public class ClientGUI implements IClientGUI
         }
     }
 
-    private void focusMap()
-    {
-        if (battleBoard != null)
-        {
-            battleBoard.reqFocus();
-        }
-    }
-
-    private void focusBoard()
-    {
-        board.reqFocus();
-    }
-
     public void highlightEngagements()
     {
         if (isMyTurn())
         {
-            focusBoard();
+            board.reqFocus();
         }
         board.highlightEngagements();
     }
@@ -2005,7 +1992,7 @@ public class ClientGUI implements IClientGUI
             {
                 board.disableDoneAction("Split legions in first round");
             }
-            focusBoard();
+            board.reqFocus();
             defaultCursor();
 
             // TODO I believe the code below is meant for the purpose:
@@ -2066,7 +2053,7 @@ public class ClientGUI implements IClientGUI
         board.setupMusterMenu();
         if (isMyTurn())
         {
-            focusBoard();
+            board.reqFocus();
             defaultCursor();
             if (!options.getOption(Options.autoRecruit)
                 && client.getPossibleRecruitHexes().isEmpty())
@@ -2104,7 +2091,7 @@ public class ClientGUI implements IClientGUI
             battleBoard.updatePhaseAndTurn();
             if (client.isMyBattlePhase())
             {
-                focusMap();
+                battleBoard.reqFocus();
                 defaultCursor();
             }
             else
@@ -2123,7 +2110,7 @@ public class ClientGUI implements IClientGUI
             battleBoard.updatePhaseAndTurn();
             if (client.isMyBattlePhase())
             {
-                focusMap();
+                battleBoard.reqFocus();
                 defaultCursor();
                 battleBoard.setupMoveMenu();
             }
@@ -2149,7 +2136,7 @@ public class ClientGUI implements IClientGUI
             battleBoard.updatePhaseAndTurn();
             if (client.isMyBattlePhase())
             {
-                focusMap();
+                battleBoard.reqFocus();
                 battleBoard.setupRecruitMenu();
             }
         }
@@ -2164,7 +2151,7 @@ public class ClientGUI implements IClientGUI
             battleBoard.updatePhaseAndTurn();
             if (client.isMyBattlePhase())
             {
-                focusMap();
+                battleBoard.reqFocus();
                 battleBoard.setupSummonMenu();
                 defaultCursor();
             }
@@ -2238,8 +2225,8 @@ public class ClientGUI implements IClientGUI
         if (battleBoard != null)
         {
             battleBoard.alignChits(hex);
-            // Make sure map is visible after summon or muster.
-            focusMap();
+            // Make sure BattleBoard is visible after summon or muster.
+            battleBoard.reqFocus();
         }
     }
 
