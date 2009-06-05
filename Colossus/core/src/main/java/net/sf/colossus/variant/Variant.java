@@ -96,6 +96,27 @@ public class Variant
         return this.terrains;
     }
 
+    /**
+     * Retrieves the terrain with the given identifier.
+     *
+     * @param id The identifier for the terrain. Must be a valid for this variant.
+     * @return The matching terrain.
+     * @throws IllegalArgumentException iff the identifier does not refer to an
+     *          existing terrain in this variant.
+     */
+    public MasterBoardTerrain getTerrainById(String id)
+    {
+        for (MasterBoardTerrain terrain : this.terrains)
+        {
+            if (terrain.getId().equals(id))
+            {
+                return terrain;
+            }
+
+        }
+        throw new IllegalArgumentException("No terrain with the ID " + id);
+    }
+
     public MasterBoard getMasterBoard()
     {
         return masterBoard;
