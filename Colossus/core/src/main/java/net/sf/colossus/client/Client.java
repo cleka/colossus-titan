@@ -443,7 +443,7 @@ public final class Client implements IClient, IOracle, IVariant
         server.undoSplit(splitoff);
         getOwningPlayer().addMarkerAvailable(splitoff.getMarkerId());
 
-        numSplitsThisTurn++;
+        numSplitsThisTurn--;
 
         if (getTurnNumber() == 1 && numSplitsThisTurn == 0)
         {
