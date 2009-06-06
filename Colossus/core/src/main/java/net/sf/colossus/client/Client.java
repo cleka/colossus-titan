@@ -2069,7 +2069,9 @@ public final class Client implements IClient, IOracle, IVariant
         BattleHex endingHex, boolean undo)
     {
         boolean rememberForUndo = false;
-        if (isMyCritter(tag) && !undo)
+
+        boolean isMyCritter = owningPlayer.equals(game.getPlayerByTag(tag));
+        if (isMyCritter && !undo)
         {
             rememberForUndo = true;
             if (options.getOption(Options.autoPlay))
@@ -2085,7 +2087,6 @@ public final class Client implements IClient, IOracle, IVariant
         }
 
         gui.actOnTellBattleMove(startingHex, endingHex, rememberForUndo);
-
     }
 
     /** Attempt to have critter tag strike the critter in hex. */
@@ -2188,15 +2189,6 @@ public final class Client implements IClient, IOracle, IVariant
     public Player getPlayerByName(String name)
     {
         return game.getPlayerByName(name);
-    }
-    public Player getPlayerByTag(int tag)
-    {
-        return game.getPlayerByTag(tag);
-    }
-
-    private boolean isMyCritter(int tag)
-    {
-        return owningPlayer.equals(getPlayerByTag(tag));
     }
 
     // TODO active or not would probably work better as state in PlayerState
