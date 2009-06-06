@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.BattlePhase;
+import net.sf.colossus.game.BattleUnit;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
@@ -136,17 +136,10 @@ public class GameClientSide extends Game implements IOracle
 
     public Player getPlayerByTag(int tag)
     {
-        BattleCritter battleUnit = battle.getBattleUnit(tag);
+        BattleUnit battleUnit = battle.getBattleUnit(tag);
         assert battleUnit != null : "Illegal value for tag parameter";
 
-        if (battleUnit.isDefender())
-        {
-            return client.getDefender().getPlayer();
-        }
-        else
-        {
-            return client.getAttacker().getPlayer();
-        }
+        return battleUnit.getLegion().getPlayer();
     }
 
     private Player getPlayerUsingColor(String shortColor)
