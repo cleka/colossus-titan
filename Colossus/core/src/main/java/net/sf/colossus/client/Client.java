@@ -3147,7 +3147,10 @@ public final class Client implements IClient, IOracle, IVariant
     private void setupDelay()
     {
         delay = options.getIntOption(Options.aiDelay);
-        // TODO why is this set to MIN_AI_DELAY, if called when not in autoPlay?
+        // If not in autoPlay mode, set it to minimum, because then it is a
+        // human player who just uses some autoXXX functionality,
+        // and we don't want a human to have to wait after certain activities
+        // the AI does for him.
         if (!options.getOption(Options.autoPlay)
             || delay < Constants.MIN_AI_DELAY)
         {
