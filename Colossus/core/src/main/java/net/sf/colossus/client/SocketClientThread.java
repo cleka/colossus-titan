@@ -1199,9 +1199,10 @@ final class SocketClientThread extends Thread implements IServer,
     public void doRecruit(RecruitEvent event)
     {
         CreatureType recruiter = event.getRecruiter();
+        CreatureType recruited = event.getRecruited();
         sendToServer(Constants.doRecruit + sep
             + event.getLegion().getMarkerId() + sep
-            + event.getRecruited().getName() + sep
+            + ((recruiter == null) ? null : recruited.getName()) + sep
             + ((recruiter == null) ? null : recruiter.getName()));
     }
 
