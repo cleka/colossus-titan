@@ -1631,11 +1631,10 @@ public final class Client implements IClient, IOracle, IVariant
     public void doRecruit(Legion legion, String recruitName,
         String recruiterName)
     {
-        CreatureType recruited = game.getVariant().getCreatureByName(
-            recruitName);
+        CreatureType recruited = (recruitName == null) ? null : game
+            .getVariant().getCreatureByName(recruitName);
         CreatureType recruiter = (recruiterName == null) ? null : game
-            .getVariant().getCreatureByName(
-            recruiterName);
+            .getVariant().getCreatureByName(recruiterName);
         // Call server even if some arguments are null, to get past
         // reinforcement.
         server.doRecruit(new RecruitEvent(legion, recruited, recruiter));
