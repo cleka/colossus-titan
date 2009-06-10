@@ -8,12 +8,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
-/** WebServer specific version of the Options / cf file handling.
+/**
+ *  WebServer specific version of the Options / cf file handling.
  *
- * TODO: why did I make a copy, instead of using the normal Options class?
+ *  TODO: why did I make a copy, instead of using the normal Options class?
  *
+ *  @author Clemens Katzer
  */
-
 public class WebServerOptions
 {
     private static final Logger LOGGER = Logger

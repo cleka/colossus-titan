@@ -1,6 +1,11 @@
 package net.sf.colossus.webserver;
 
 
+/**
+ *  Interface for the operations the WebServer can do with it's GUI
+ *
+ *  @author Clemens Katzer
+ */
 public interface IWebServerGUI
 {
     public abstract void setUserInfo(String s);

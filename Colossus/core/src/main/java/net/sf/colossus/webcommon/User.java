@@ -16,18 +16,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
-/** One user at the WebServer side.
+/**
+ *  One user at the WebServer side.
  *  Also used on client side, because interface requires so, but
  *  basically only to store the username, everything else is unused.
  *
- *  The class statically contains a list of all user registered
- *  at the webserver; this list is read from a file (later a DB??)
- *  into a hashMap to quicky look up all users.
+ *  The class statically contains a list of all user registered at the
+ *  Public Game Server; this list is read from a file (later a DB??)
+ *  into a HashMap to quickly look up all users.
  *
- *  @version $Id$
  *  @author Clemens Katzer
  */
-
 public class User
 {
     private static final Logger LOGGER = Logger
@@ -145,14 +144,13 @@ public class User
         this.thread = cst;
     }
 
-    /*
+    /**
      * Given a username and password, verifies that the user
      * is allowed to login with that password.
      * @param String username
      * @param String password
      * @returns String reasonLoginFailed, null if login ok
      **/
-
     public static String verifyLogin(String username, String password)
     {
         String reasonLoginFailed = null;

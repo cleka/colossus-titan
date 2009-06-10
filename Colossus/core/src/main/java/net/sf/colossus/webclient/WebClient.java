@@ -72,16 +72,15 @@ import net.sf.colossus.webcommon.User;
 import net.sf.colossus.webcommon.GameInfo.GameState;
 
 
-/** This is the main class for one user client for the web server.
+/**
+ *  This is the main class for one user client for the web server.
  *  One such client can register and/or login to the web server,
  *  propose a game, browse proposed games and enroll to such a game.
  *  When a game has enough players, it can be started, and this
  *  brings up the MasterBoard like the network client would do.
  *
- *  @version $Id$
  *  @author Clemens Katzer
  */
-
 public class WebClient extends KFrame implements ActionListener, IWebClient
 {
     private static final Logger LOGGER = Logger.getLogger(WebClient.class

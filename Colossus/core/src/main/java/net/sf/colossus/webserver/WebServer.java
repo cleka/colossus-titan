@@ -30,17 +30,16 @@ import net.sf.colossus.webcommon.User;
 import net.sf.colossus.webcommon.GameInfo.GameState;
 
 
-/** The main class for the WebServer
+/**
+ *  The main class for the WebServer
  *  - brings up the WebServer GUI
  *  - starts the ServerSocket and listens there for WebClients
  *  - based on actions coming from clients, keeps book of
  *    "instant" and "running" games (both GameInfo objects),
  *    and tell the GameInfo objects when to start the game.
  *
- *  @version $Id$
  *  @author Clemens Katzer
  */
-
 public class WebServer implements IWebServer, IRunWebServer
 {
     private static final Logger LOGGER = Logger.getLogger(WebServer.class
@@ -55,10 +54,10 @@ public class WebServer implements IWebServer, IRunWebServer
     /**
      * Controls whether the GUI is shown or not.
      *
-     * At the moment this is configured only by the possibility of doing so -- if
-     * the environment supports running a GUI, we will, if not, we won't. It could
-     * be combined with a command line option to suppress the GUI even if it would
-     * be possible to show one.
+     * At the moment this is configured only by the possibility of doing so:
+     * if the environment supports running a GUI, we will, if not, we won't.
+     * It could be combined with a command line option to suppress the GUI
+     * even if it would be possible to show one.
      */
     private final boolean runGUI = !GraphicsEnvironment.isHeadless();
 

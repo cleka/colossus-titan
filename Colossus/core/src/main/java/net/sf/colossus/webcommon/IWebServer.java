@@ -1,28 +1,27 @@
 package net.sf.colossus.webcommon;
 
 
-/** Interface for what WebClient sends to WebServer
+/**
+ *  Interface for what WebClient sends to WebServer
  *
- *  @version $Id$
  *  @author Clemens Katzer
  */
-
 public interface IWebServer
 {
-    public static String Login = "login";
-    public static String Logout = "logout";
-    public static String RegisterUser = "register";
-    public static String ConfirmRegistration = "confirm";
-    public static String ChangePassword = "changepassword";
-    public static String Propose = "propose";
-    public static String Enroll = "enroll";
-    public static String Unenroll = "unenroll";
-    public static String Start = "start";
-    public static String StartAtPlayer = "startAtPlayer";
-    public static String StartedByPlayer = "startedByPlayer";
-    public static String Cancel = "cancel";
-    public static String ChatSubmit = "chatsubmit";
-    public static String ShutdownServer = "shutdownserver";
+    public static final String Login = "login";
+    public static final String Logout = "logout";
+    public static final String RegisterUser = "register";
+    public static final String ConfirmRegistration = "confirm";
+    public static final String ChangePassword = "changepassword";
+    public static final String Propose = "propose";
+    public static final String Enroll = "enroll";
+    public static final String Unenroll = "unenroll";
+    public static final String Start = "start";
+    public static final String StartAtPlayer = "startAtPlayer";
+    public static final String StartedByPlayer = "startedByPlayer";
+    public static final String Cancel = "cancel";
+    public static final String ChatSubmit = "chatsubmit";
+    public static final String ShutdownServer = "shutdownserver";
 
     public static String generalChatName = "#general";
 

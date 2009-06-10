@@ -7,13 +7,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
-/** This class keeps track of which ports are currently occupied
+/**
+ *  This class keeps track of which ports are currently occupied
  *  by ongoing games and which are free for new games.
  *
- *  @version $Id$
  *  @author Clemens Katzer
  */
-
 public class PortBookKeeper
 {
     private static final Logger LOGGER = Logger.getLogger(PortBookKeeper.class

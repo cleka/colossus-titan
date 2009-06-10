@@ -3,9 +3,10 @@ package net.sf.colossus.webcommon;
 
 /**
  *  Interface for classes that can run/supervise a WebServer Game.
- *  E.g. RunGameInOwnJVM and there should be also RunGameInSameJVM (tbd.)
+ *  Implemented by RunGameInOwnJVM and RunGameInSameJVM.
+ *
+ *  @author Clemens Katzer
  */
-
 public interface IGameRunner
 {
     public void start();
@@ -18,7 +19,8 @@ public interface IGameRunner
 
     void setServerNull();
 
-    /* Waits until socket is up, i.e. game is ready to accept clients.
+    /**
+     *  Waits until socket is up, i.e. game is ready to accept clients.
      */
     boolean waitUntilReadyToAcceptClients(int timeout);
 

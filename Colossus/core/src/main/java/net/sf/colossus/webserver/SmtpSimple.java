@@ -8,10 +8,13 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 
 
-/** Sending a simple (text-only) mail by submitting it to the SMTP
+/**
+ *  Sending a simple (text-only) mail by submitting it to the SMTP
  *  server at port 25.
  *  Basically copied 1:1 (only changed formatting and indentation) from:
  *    http://www.torsten-horn.de/techdocs/java-smtp.htm
+ *
+ *  @author Clemens Katzer
  */
 public class SmtpSimple
 {

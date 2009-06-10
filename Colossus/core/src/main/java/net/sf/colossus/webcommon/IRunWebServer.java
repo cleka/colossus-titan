@@ -9,10 +9,10 @@ package net.sf.colossus.webcommon;
  *  and I don't want to deliver all Web server stuff inside
  *  the main jar.
  *
- *  @version $Id$
+ *  TODO Align with IGameRunner and RunGameInSameJVM/RunGameInOwnJVM
+ *
  *  @author Clemens Katzer
  */
-
 public interface IRunWebServer
 {
     public void tellEnrolledGameStartsSoon(GameInfo gi);

@@ -15,14 +15,13 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
 
-/** The web server GUI - so far shows only simple info
+/**
+ *  The web server GUI - so far shows only simple info
  *  like amount of users logged in, scheduled-, instant-,
  *  running- and ending games.
  *
- *  @version $Id$
  *  @author Clemens Katzer
  */
-
 public class WebServerGUI extends JFrame implements IWebServerGUI
 {
 

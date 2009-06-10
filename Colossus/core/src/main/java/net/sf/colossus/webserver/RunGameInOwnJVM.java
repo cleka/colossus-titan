@@ -25,10 +25,10 @@ import net.sf.colossus.webcommon.IRunWebServer;
  *  It finds and reserves a port for it, starts it in a separate process
  *  and when the process terminates, join()s it and releases the port.
  *
- *  If the game is run on a user's PC, the class for that needs still
- *  to be done...
- *  ( or when game runs locally on a players computer and this here handles
- *    the rendezvous (tell the other players when and where to connect) )
+ *  If the game is run on a user's PC, the class RunGameInSameJVM will be
+ *  used.
+ *
+ *  @author Clemens Katzer
  */
 public class RunGameInOwnJVM extends Thread implements IGameRunner
 {
@@ -472,12 +472,21 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
         }
     }
 
-    /*
-     * We have to take care to read all what comes on the Game's processes
-     * stdout and stderr, otherwise the game would block at some point
+    /**
+     * NullDumper is a dummy reader that just consumes all the output
+     * produced by a Game's process - similar to /dev/null. That is needed
+     * because we have to take care to read all what comes on the
+     * Game's processes stdout and stderr, otherwise the game would block
+     * at some point.
+     *
+     * If the boolean argument toNull to constructor is false, it will
+     * send the produced output to the log instead.
+     *
+     * TODO rename to toLog instead. Should toLog be default nowadays that
+     * there is not much output any more?
+     *
      */
-
-    static class NullDumper implements Runnable
+    private static class NullDumper implements Runnable
     {
         Process process;
         boolean toNull;

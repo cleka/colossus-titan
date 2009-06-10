@@ -1,28 +1,27 @@
 package net.sf.colossus.webcommon;
 
 
-/** Interface for what WebServer sends to WebClient
+/**
+ *  Interface for what WebServer (Public Game Server) sends to WebClient
  *
- *  @version $Id$
  *  @author Clemens Katzer
  */
-
 public interface IWebClient
 {
-    public static String alreadyLoggedIn = "alreadyLoggedIn";
-    public static String grantAdmin = "grantAdmin";
-    public static String tooManyUsers = "tooManyUsers";
-    public static String connectionClosed = "connectionClosed";
-    public static String forcedLogout = "forcedLogout";
-    public static String didEnroll = "didEnroll";
-    public static String didUnenroll = "didUnenroll";
-    public static String gameInfo = "gameInfo";
-    public static String userInfo = "userInfo";
-    public static String gameStarted = "gameStarted";
-    public static String gameStartsNow = "gameStartsNow";
-    public static String gameStartsSoon = "gameStartsSoon";
-    public static String gameCancelled = "gameCancelled";
-    public static String chatDeliver = "chatDeliver";
+    public static final String alreadyLoggedIn = "alreadyLoggedIn";
+    public static final String grantAdmin = "grantAdmin";
+    public static final String tooManyUsers = "tooManyUsers";
+    public static final String connectionClosed = "connectionClosed";
+    public static final String forcedLogout = "forcedLogout";
+    public static final String didEnroll = "didEnroll";
+    public static final String didUnenroll = "didUnenroll";
+    public static final String gameInfo = "gameInfo";
+    public static final String userInfo = "userInfo";
+    public static final String gameStarted = "gameStarted";
+    public static final String gameStartsNow = "gameStartsNow";
+    public static final String gameStartsSoon = "gameStartsSoon";
+    public static final String gameCancelled = "gameCancelled";
+    public static final String chatDeliver = "chatDeliver";
 
     public void grantAdminStatus();
 

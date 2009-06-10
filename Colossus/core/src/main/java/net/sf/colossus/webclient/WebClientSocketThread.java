@@ -17,7 +17,8 @@ import net.sf.colossus.webcommon.IWebClient;
 import net.sf.colossus.webcommon.IWebServer;
 
 
-/** This implements the webserver/client communication at client side.
+/**
+ *  This implements the webserver/client communication at client side.
  *  It implements the server interface on client side;
  *  i.e. something server wanted to execute for a client, is read
  *  from the client socket input stream, parsed, and executed
@@ -27,10 +28,8 @@ import net.sf.colossus.webcommon.IWebServer;
  *  (WebClient's GUI) and are sent over the socket to the server
  *  (note that those calls mostly happen in the EDT).
  *
- *  @version $Id$
  *  @author Clemens Katzer
  */
-
 public class WebClientSocketThread extends Thread implements IWebServer
 {
     private static final Logger LOGGER = Logger

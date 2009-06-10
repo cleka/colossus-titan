@@ -11,10 +11,11 @@ import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
 
 
-/** One object of this this class represents a game for which players/users
+/**
+ *  One object of this this class represents a game for which players/users
  *  have enrolled to play it together.
  *  It starts in state "PROPOSED" as type either instantly or scheduled.
- *  Then it's state will change along the sequence of states
+ *  Then its state will change along the sequence of states
  *  PROPOSED, DUE, ACTIVATED, STARTING, READY_TO_CONNECT, RUNNING, ENDING
  *  as denoted in the GameState enum.
  *
@@ -24,10 +25,8 @@ import net.sf.colossus.common.Options;
  *  The same class is also used at client side, but only part of the data
  *  is used there (e.g. the user has only a name, not a socket).
  *
- *  @version $Id$
  *  @author Clemens Katzer
  */
-
 public class GameInfo
 {
     private static final Logger LOGGER = Logger.getLogger(GameInfo.class

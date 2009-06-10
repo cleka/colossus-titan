@@ -1,13 +1,12 @@
 package net.sf.colossus.webserver;
 
 
-/** Class WebServerConstants holds constants related to
+/**
+ *  Class WebServerConstants holds constants related to
  *  the Web server, so far only for the config file.
  *
- *  @version $Id$
  *  @author Clemens Katzer
  */
-
 public final class WebServerConstants
 {
 
@@ -28,7 +27,6 @@ public final class WebServerConstants
     public final static String optJavaCommand = "JavaCommand";
     public final static String optColossusJar = "ColossusJar";
     public final static String optLogPropTemplate = "LogPropTemplate";
-
     public final static String optWorkFilesBaseDir = "WorkFilesBaseDir";
 
     // Mail sending related options / cf file entries:
@@ -41,7 +39,9 @@ public final class WebServerConstants
     public final static String optMailReallyMail = "MailReallyMail";
     public final static String optMailToFile = "MailToFile";
 
-    // how many messages does chat server cache, for redisplay to
-    // those who just log in:
+    /**
+     *  How many messages does chat server cache,
+     *  for redisplay to those who just log in
+     */
     public final static int keepLastNMessages = 10;
 }

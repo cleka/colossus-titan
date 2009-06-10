@@ -10,19 +10,12 @@ import java.util.logging.Logger;
 import net.sf.colossus.webcommon.IColossusMail;
 
 
-/** Encapsulates the way how the web server sends mail in some situations,
+/**
+ *  Encapsulates the way how the web server sends mail in some situations,
  *  so far only for registration procedure.
- *  This is in webcommon (even if the client side never needs this)
- *  because on client side the "User" gets instantiated and that one
- *  needs the ColossusMail class during compile time.
  *
- *  Right now during development time (30.12.2008) there is a boolean variable
- *    reallySendMail
- *  which controls whether it actually sends the mail, or just prints
- *  something to STDERR (because I do not have a mailserver running locally
- *  on the PC where I do the development).
+ *  @author Clemens Katzer
  */
-
 public class ColossusMail implements IColossusMail
 {
     private static final Logger LOGGER = Logger.getLogger(ColossusMail.class
@@ -35,6 +28,11 @@ public class ColossusMail implements IColossusMail
     private final String thisServer;
     private final String contactMail;
     private final String contactWWW;
+    /**
+     *  Whether or not to really send a mail. During development on PC I set
+     *  this in the cf file to false, because I do not really have a mail
+     *  server process running.
+     */
     private final boolean reallyMail;
     private final String mailToFileName;
     private final File mailToFileFile;

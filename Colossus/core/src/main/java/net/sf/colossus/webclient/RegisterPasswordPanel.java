@@ -20,8 +20,11 @@ import javax.swing.JTextField;
 import net.sf.colossus.webcommon.User;
 
 
-/** A panel with which one can either create a new account,
+/**
+ *  A panel with which one can either create a new account,
  *  or change the password.
+ *
+ *  @author Clemens Katzer
  */
 class RegisterPasswordPanel extends JDialog
 {

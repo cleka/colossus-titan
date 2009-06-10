@@ -23,12 +23,11 @@ import net.sf.colossus.webcommon.User;
  *  Reads always one line from the socket, parses it and
  *  executes the corresponding action.
  *  This class also provides the methods which the server calls
- *  on the client.
+ *  on the client (=translates method calls to sending them as text
+ *  messages over the socket).
  *
- *  @version $Id$
  *  @author Clemens Katzer
  */
-
 public class WebServerClientSocketThread extends Thread implements IWebClient
 {
     private static final Logger LOGGER = Logger

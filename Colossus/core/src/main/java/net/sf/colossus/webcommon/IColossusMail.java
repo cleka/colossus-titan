@@ -1,6 +1,18 @@
 package net.sf.colossus.webcommon;
 
 
+/**
+ *  Describes the interface how the Game Server sends a mail.
+ *
+ *  So far the only use case is to send a mail with confirmation code
+ *  to complete a registration.
+ *
+ *  The interface is needed because class User (which does send the
+ *  registration mail) is also needed in WebClient, but the actual
+ *  implementation exists only on Game Server side ( = webserver package).
+ *
+ *  @author Clemens Katzer
+ */
 public interface IColossusMail
 {
     /**
