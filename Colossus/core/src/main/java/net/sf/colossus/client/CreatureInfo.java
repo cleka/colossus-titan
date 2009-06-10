@@ -1,6 +1,9 @@
 package net.sf.colossus.client;
 
 
+import net.sf.colossus.variant.CreatureType;
+
+
 /**
  *  Basic information about one creature, for split prediction.
  *
@@ -8,7 +11,7 @@ package net.sf.colossus.client;
  */
 class CreatureInfo implements Cloneable
 {
-    private final String name;
+    private final CreatureType type;
 
     // Are we sure this creature is in this legion?
     private boolean certain;
@@ -16,25 +19,23 @@ class CreatureInfo implements Cloneable
     // Was the creature here when this legion was split off?
     private boolean atSplit;
 
-    // TODO first parameter should be CreatureType
-    CreatureInfo(String name, boolean certain, boolean atSplit)
+    CreatureInfo(CreatureType type, boolean certain, boolean atSplit)
     {
-        if (name.startsWith("Titan"))
-        {
-            name = "Titan";
-        }
-        else if (name.length() == 0)
-        {
-            throw new RuntimeException("CreatureInfo with empty name!");
-        }
-        this.name = name;
+        this.type = type;
         this.certain = certain;
         this.atSplit = atSplit;
     }
 
     final String getName()
     {
-        return name;
+        if (type.isTitan())
+        {
+            return "Titan";
+        }
+        else
+        {
+            return type.getName();
+        }
     }
 
     void setCertain(boolean certain)
@@ -60,10 +61,12 @@ class CreatureInfo implements Cloneable
     @Override
     public CreatureInfo clone()
     {
-        return new CreatureInfo(name, certain, atSplit);
+        return new CreatureInfo(type, certain, atSplit);
     }
 
-    /** Two CreatureInfo objects match if the names match. */
+    /**
+     * Two CreatureInfo objects match if the types match.
+     */
     @Override
     public boolean equals(Object other)
     {
@@ -71,20 +74,20 @@ class CreatureInfo implements Cloneable
         {
             throw new ClassCastException();
         }
-        return name.equals(((CreatureInfo)other).name);
+        return type.equals(((CreatureInfo)other).type);
     }
 
     /** Two CreatureInfo objects match if the names match. */
     @Override
     public int hashCode()
     {
-        return name.hashCode();
+        return type.hashCode();
     }
 
     @Override
     public String toString()
     {
-        StringBuilder sb = new StringBuilder(name);
+        StringBuilder sb = new StringBuilder(getName());
         if (!certain)
         {
             sb.append('?');
@@ -94,5 +97,10 @@ class CreatureInfo implements Cloneable
             sb.append('*');
         }
         return sb.toString();
+    }
+
+    public CreatureType getCreatureType()
+    {
+        return type;
     }
 }

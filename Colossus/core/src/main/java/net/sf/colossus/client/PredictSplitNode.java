@@ -16,7 +16,7 @@ import net.sf.colossus.variant.CreatureType;
 
 
 /**
- *  Predicts splits for one enemy player, and adjusts predictions as 
+ *  Predicts splits for one enemy player, and adjusts predictions as
  *  creatures are revealed.
  *  @author David Ripton
  *  @author Kim Milvang-Jensen
@@ -287,27 +287,27 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
     /**
      * Return true iff new information was sent to this legion's parent.
      */
-    void revealCreatures(List<String> cnl)
+    void revealCreatures(List<CreatureType> cnl)
     {
         if (cnl == null)
         {
             // this means we are updating the parent, and the info gained is
             // computed from children
-            cnl = new ArrayList<String>();
+            cnl = new ArrayList<CreatureType>();
             cnl.addAll(child1.getCertainAtSplitOrRemovedCreatures()
-                .getCreatureNames());
+                .getCreatureTypes());
             cnl.addAll(child2.getCertainAtSplitOrRemovedCreatures()
-                .getCreatureNames());
+                .getCreatureTypes());
         }
 
-        List<String> certainInfoGained = subtractLists(cnl,
-            getCertainCreatures().getCreatureNames());
+        List<CreatureType> certainInfoGained = subtractLists(cnl,
+            getCertainCreatures().getCreatureTypes());
 
         if (!certainInfoGained.isEmpty())
         {
-            for (String name : certainInfoGained)
+            for (CreatureType type : certainInfoGained)
             {
-                this.creatures.add(new CreatureInfo(name, true, true));
+                this.creatures.add(new CreatureInfo(type, true, true));
             }
 
             // TODO : added null guard, because during loading a game it went
@@ -367,7 +367,7 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
     /**
      * Return a list of all legal combinations of splitoffs. Also update
      * knownKeep and knownSplit if we conclude that more creatures are certain.
-     * 
+     *
      * @param childSize
      * @param knownKeep
      * @param knownSplit
@@ -579,7 +579,7 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
      * some pieces that are keept or spilt. Also makes the new
      * CreatureInfoLists. Note that knownKeep and knownSplit will be altered,
      * and be empty after call
-     * 
+     *
      * @param childSize
      * @param knownKeep
      *            certain creatures to keep
@@ -605,7 +605,8 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
         for (CreatureInfo ci : creatures)
         {
             String name = ci.getName();
-            CreatureInfo newinfo = new CreatureInfo(name, false, true);
+            CreatureInfo newinfo = new CreatureInfo(ci.getCreatureType(),
+                false, true);
             if (splitoffNames.contains(name))
             {
                 splitList.add(newinfo);
@@ -632,7 +633,7 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
 
     /**
      * Perform the initial split of a stack, and creater the children
-     * 
+     *
      * @param childSize
      * @param otherMarkerId
      * @param turn
@@ -659,7 +660,7 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
     /**
      * Recompute the split of a stack, taking advantage of any information
      * potentially gained from the children
-     * 
+     *
      */
     void reSplit()
     {
@@ -684,7 +685,7 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
      * This takes potentially new information about the legion's composition at
      * split and applies the later changes to the legion to get a new predicton
      * of contents. It then recursively resplits.
-     * 
+     *
      * @param newList
      */
     void updateInitialSplitInfo(CreatureInfoList newList)
@@ -786,34 +787,25 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
         }
     }
 
-    void addCreature(String creatureName)
+    void addCreature(CreatureType type)
     {
-        if (creatureName.startsWith("Titan"))
-        {
-            creatureName = "Titan";
-        }
         assert getHeight() < 7 || child1 == null : "Tried adding to 7-high legion";
-        CreatureInfo ci = new CreatureInfo(creatureName, true, false);
+        CreatureInfo ci = new CreatureInfo(type, true, false);
         creatures.add(ci);
     }
 
-    void removeCreature(String creatureName)
+    void removeCreature(CreatureType type)
     {
-        if (creatureName.startsWith("Titan"))
-        {
-            creatureName = "Titan";
-        }
         assert getHeight() > 0 : "Tried removing from 0-high legion";
 
-        List<String> cnl = new ArrayList<String>();
-        cnl.add(creatureName);
+        List<CreatureType> cnl = Collections.singletonList(type);
         revealCreatures(cnl);
 
         // Find the creature to remove
         Iterator<CreatureInfo> it = creatures.iterator();
         // We have already checked height>0, so taking next is ok.
         CreatureInfo ci = it.next();
-        while (!(ci.isCertain() && ci.getName().equals(creatureName)))
+        while (!(ci.isCertain() && ci.getCreatureType().equals(type)))
         {
             assert it.hasNext() : "Tried to remove nonexistant creature";
             ci = it.next();
@@ -828,12 +820,12 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
         it.remove();
     }
 
-    void removeCreatures(List<String> creatureNames)
+    void removeCreatures(List<CreatureType> creatureTypes)
     {
-        revealCreatures(creatureNames);
-        for (String name : creatureNames)
+        revealCreatures(creatureTypes);
+        for (CreatureType type : creatureTypes)
         {
-            removeCreature(name);
+            removeCreature(type);
         }
     }
 
@@ -844,12 +836,12 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
         return toString().compareTo(other.toString());
     }
 
-    static List<String> subtractLists(List<String> big, List<String> little)
+    static <T> List<T> subtractLists(List<T> big, List<T> little)
     {
-        ArrayList<String> li = new ArrayList<String>(big);
-        for (String str : little)
+        ArrayList<T> li = new ArrayList<T>(big);
+        for (T item : little)
         {
-            li.remove(str);
+            li.remove(item);
         }
         return li;
     }

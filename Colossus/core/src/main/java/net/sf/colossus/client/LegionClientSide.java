@@ -178,12 +178,12 @@ public final class LegionClientSide extends Legion implements IOracleLegion
      */
     void addCreature(CreatureType creature)
     {
-        getNode().addCreature(creature.getName());
+        getNode().addCreature(creature);
     }
 
     void removeCreature(CreatureType creature)
     {
-        getNode().removeCreature(creature.getName());
+        getNode().removeCreature(creature);
     }
 
     /**
@@ -196,7 +196,7 @@ public final class LegionClientSide extends Legion implements IOracleLegion
         {
             getPlayer().initPredictSplits(this, creatures);
         }
-        getNode().revealCreatures(Legion.extractCreatureNames(creatures));
+        getNode().revealCreatures(creatures);
     }
 
     void split(int childHeight, Legion child, int turn)
@@ -262,13 +262,13 @@ public final class LegionClientSide extends Legion implements IOracleLegion
                 PlayerClientSide info = getPlayer();
                 // Titan skill is changed by variants.
                 sum += info.getTitanPower()
-                    * (getPlayer().getGame().getVariant()
-                        .getCreatureByName("Titan")).getSkill();
+                    * getPlayer().getGame().getVariant().getCreatureByName(
+                        "Titan").getSkill();
             }
             else
             {
-                sum += (getPlayer().getGame().getVariant()
-                    .getCreatureByName(name)).getPointValue();
+                sum += getPlayer().getGame().getVariant().getCreatureByName(
+                    name).getPointValue();
             }
         }
         return sum;

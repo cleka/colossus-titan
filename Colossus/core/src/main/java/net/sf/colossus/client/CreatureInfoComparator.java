@@ -4,7 +4,6 @@ package net.sf.colossus.client;
 import java.io.Serializable;
 import java.util.Comparator;
 
-import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.variant.CreatureType;
 
 
@@ -15,10 +14,8 @@ final class CreatureInfoComparator implements Comparator<CreatureInfo>,
 {
     public int compare(CreatureInfo info1, CreatureInfo info2)
     {
-        CreatureType creature1 = VariantSupport.getCurrentVariant()
-            .getCreatureByName(info1.getName());
-        CreatureType creature2 = VariantSupport.getCurrentVariant()
-            .getCreatureByName(info2.getName());
+        CreatureType creature1 = info1.getCreatureType();
+        CreatureType creature2 = info2.getCreatureType();
         int diff = creature2.getKillValue() - creature1.getKillValue();
         if (diff != 0)
         {

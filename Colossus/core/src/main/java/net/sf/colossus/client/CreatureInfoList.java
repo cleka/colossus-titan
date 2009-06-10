@@ -2,11 +2,12 @@ package net.sf.colossus.client;
 
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import net.sf.colossus.variant.CreatureType;
 
 
 /**
@@ -60,31 +61,22 @@ class CreatureInfoList extends ArrayList<CreatureInfo>
         LOGGER.log(Level.SEVERE, "No uncertain creatures");
     }
 
-    /** Remove the first element matching name.  Return true if found. */
-    boolean removeCreatureByName(String name)
-    {
-        if (name.startsWith("Titan"))
-        {
-            name = "Titan";
-        }
-        for (Iterator<CreatureInfo> it = iterator(); it.hasNext();)
-        {
-            CreatureInfo ci = it.next();
-            if (name.equals(ci.getName()))
-            {
-                it.remove();
-                return true;
-            }
-        }
-        return false;
-    }
-
     List<String> getCreatureNames()
     {
         List<String> list = new ArrayList<String>();
         for (CreatureInfo ci : this)
         {
             list.add(ci.getName());
+        }
+        return list;
+    }
+
+    List<CreatureType> getCreatureTypes()
+    {
+        List<CreatureType> list = new ArrayList<CreatureType>();
+        for (CreatureInfo ci : this)
+        {
+            list.add(ci.getCreatureType());
         }
         return list;
     }

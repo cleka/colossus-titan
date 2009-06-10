@@ -9,11 +9,13 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.variant.CreatureType;
+
 
 /**
- *  Predicts splits for one enemy player, and adjusts predictions as 
+ *  Predicts splits for one enemy player, and adjusts predictions as
  *  creatures are revealed.
- *  
+ *
  *  @author David Ripton
  *  See docs/SplitPrediction.txt
  */
@@ -26,12 +28,12 @@ public final class PredictSplits
     private final PredictSplitNode root; // All contents of root must be known.
     private final NodeTurnComparator nodeTurnComparator = new NodeTurnComparator();
 
-    PredictSplits(String rootId, List<String> creatureNames)
+    PredictSplits(String rootId, List<CreatureType> creatureTypes)
     {
         CreatureInfoList infoList = new CreatureInfoList();
-        for (String name : creatureNames)
+        for (CreatureType type : creatureTypes)
         {
-            CreatureInfo ci = new CreatureInfo(name, true, true);
+            CreatureInfo ci = new CreatureInfo(type, true, true);
             infoList.add(ci);
         }
         root = new PredictSplitNode(rootId, 0, infoList, null);
@@ -109,7 +111,7 @@ public final class PredictSplits
 
     class ReverseIntegerComparator implements Comparator<Integer>
     {
-        // Sort in reverse, so we don't disturb array 
+        // Sort in reverse, so we don't disturb array
         // indexes when removing.
         public int compare(Integer in1, Integer in2)
         {

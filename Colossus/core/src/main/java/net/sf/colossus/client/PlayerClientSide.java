@@ -109,7 +109,7 @@ public final class PlayerClientSide extends Player
         List<CreatureType> creatures)
     {
         this.predictSplits = new PredictSplits(rootLegion.getMarkerId(),
-            Legion.extractCreatureNames(creatures));
+            creatures);
     }
 
     @Override
