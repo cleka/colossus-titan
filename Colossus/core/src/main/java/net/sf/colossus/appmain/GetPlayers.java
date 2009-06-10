@@ -535,8 +535,6 @@ public final class GetPlayers extends KFrame
 
     private void actOnVariantChange(int oldMaxPlayers, String newVarName)
     {
-        // TODO change all loadVariant... to return variant, not the doc,
-        //      then the stuff below would be cleaner, too.
         Variant variant = VariantSupport.loadVariantByName(newVarName, true);
         Document doc = variant.getReadme();
 
