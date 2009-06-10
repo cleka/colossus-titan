@@ -677,10 +677,13 @@ abstract class AbstractAI implements AI
             // Still TODO ?
             //      Fixed "Griffon vs. Griffin" in Undead, which was the
             //      reason in all cases I got that exception (Clemens).
-            CreatureType type = variant
-                .getCreatureByName(name);
-            int count = client.getReservedRemain(type);
-            return count;
+            CreatureType type = variant.getCreatureByName(name);
+            return client.getReservedRemain(type);
+        }
+
+        public int creatureAvailable(CreatureType creatureType)
+        {
+            return client.getReservedRemain(creatureType);
         }
 
         public boolean canRecruit(String name)

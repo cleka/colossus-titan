@@ -27,6 +27,8 @@ public interface IHintOracle
      */
     public int creatureAvailable(String name);
 
+    int creatureAvailable(CreatureType creatureType);
+
     /**
      * The height of the tallest legion that can attack
      * the legion we consider.

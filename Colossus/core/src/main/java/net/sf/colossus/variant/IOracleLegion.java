@@ -9,11 +9,11 @@ package net.sf.colossus.variant;
 
 public interface IOracleLegion
 {
-
     boolean contains(String string);
+    boolean contains(CreatureType creatureType);
 
     int numCreature(String string);
+    int numCreature(CreatureType creatureType);
 
     int getHeight();
-
 }

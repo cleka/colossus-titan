@@ -16,9 +16,40 @@ import net.sf.colossus.variant.Variant;
 
 public class DefaultHint extends AbstractHintProvider
 {
+    private final CreatureType behemoth;
+    private final CreatureType centaur;
+    private final CreatureType cyclops;
+    private final CreatureType gargoyle;
+    private final CreatureType griffon;
+    private final CreatureType guardian;
+    private final CreatureType lion;
+    private final CreatureType minotaur;
+    private final CreatureType ogre;
+    private final CreatureType serpent;
+    private final CreatureType titan;
+    private final CreatureType troll;
+    private final CreatureType warbear;
+    private final CreatureType warlock;
+    private final CreatureType wyvern;
+
     public DefaultHint(Variant variant)
     {
         super(variant);
+        this.behemoth = getCreatureType("Behemoth");
+        this.centaur = getCreatureType("Centaur");
+        this.cyclops = getCreatureType("Cyclops");
+        this.gargoyle = getCreatureType("Gargoyle");
+        this.griffon = getCreatureType("Griffon");
+        this.guardian = getCreatureType("Guardian");
+        this.lion = getCreatureType("Lion");
+        this.minotaur = getCreatureType("Minotaur");
+        this.ogre = getCreatureType("Ogre");
+        this.serpent = getCreatureType("Serpent");
+        this.titan = getCreatureType("Titan");
+        this.troll = getCreatureType("Troll");
+        this.warbear = getCreatureType("Warbear");
+        this.warlock = getCreatureType("Warlock");
+        this.wyvern = getCreatureType("Wyvern");
     }
 
     private final DevRandom rnd = new DevRandom();
@@ -29,144 +60,135 @@ public class DefaultHint extends AbstractHintProvider
         List<AIStyle> aiStyles)
     {
         String terrainId = terrain.getId();
-        List<String> recruitNames = AbstractHintProvider.creaturesToStrings(recruits);
-
         if (terrainId.equals("Brush") || terrainId.equals("Jungle"))
         {
-            int numCyclops = legion.numCreature("Cyclops");
+            int numCyclops = legion.numCreature(cyclops);
             if (numCyclops > 0 && numCyclops < 3
-                && !legion.contains("Behemoth") && !legion.contains("Serpent")
-                && oracle.creatureAvailable("Behemoth") >= 2
-                && oracle.creatureAvailable("Cyclops") >= 1)
+                && !legion.contains(behemoth)
+                && !legion.contains(serpent)
+                && oracle.creatureAvailable(behemoth) >= 2
+                && oracle.creatureAvailable(cyclops) >= 1)
             {
-                return getCreatureType("Cyclops");
+                return cyclops;
             }
         }
         else if (terrainId.equals("Plains"))
         {
-            if (recruitNames.contains("Lion") && !legion.contains("Griffon")
-                && legion.numCreature("Lion") == 2
+            if (recruits.contains(lion) && !legion.contains(griffon)
+                && legion.numCreature(lion) == 2
                 && oracle.canReach("Desert")
-                && oracle.creatureAvailable("Griffon") >= 2)
+                && oracle.creatureAvailable(griffon) >= 2)
             {
-                return getCreatureType("Lion");
+                return lion;
             }
             if (aiStyles.contains(AIStyle.Defensive))
             {
-                if (recruitNames.contains("Centaur")
-                    && legion.numCreature("Centaur") == 2
-                    && !legion.contains("Warbear") && legion.getHeight() < 6
+                if (recruits.contains(centaur)
+                    && legion.numCreature(centaur) == 2
+                    && !legion.contains(warbear) && legion.getHeight() < 6
                     && oracle.biggestAttackerHeight() == 0
                     && oracle.canReach("Woods")
                     && !oracle.hexLabel().equals("1")
                     && !oracle.hexLabel().equals("15")
                     && !oracle.hexLabel().equals("29"))
                 {
-                    return getCreatureType("Centaur");
+                    return centaur;
                 }
             }
             else if (aiStyles.contains(AIStyle.Offensive))
             {
-                if (recruitNames.contains("Centaur")
-                    && legion.numCreature("Centaur") == 2
-                    && !legion.contains("Warbear") && legion.getHeight() <= 2
+                if (recruits.contains(centaur)
+                    && legion.numCreature(centaur) == 2
+                    && !legion.contains(warbear) && legion.getHeight() <= 2
                     && oracle.biggestAttackerHeight() == 0
                     && oracle.canReach("Woods"))
                 {
-                    return getCreatureType("Centaur");
+                    return centaur;
                 }
             }
         }
         else if (terrainId.equals("Marsh"))
         {
-            if (recruitNames.contains("Troll") && !legion.contains("Wyvern")
-                && legion.numCreature("Troll") == 2
+            if (recruits.contains(troll) && !legion.contains(wyvern)
+                && legion.numCreature(troll) == 2
                 && oracle.canReach("Swamp")
-                && oracle.creatureAvailable("Wyvern") >= 2)
+                && oracle.creatureAvailable(wyvern) >= 2)
             {
-                return getCreatureType("Troll");
+                return troll;
             }
             if (aiStyles.contains(AIStyle.Defensive))
             {
-                if (recruitNames.contains("Ogre")
-                    && legion.numCreature("Ogre") == 2
-                    && !legion.contains("Minotaur") && legion.getHeight() < 6
+                if (recruits.contains(ogre) && legion.numCreature(ogre) == 2
+                    && !legion.contains(minotaur) && legion.getHeight() < 6
                     && oracle.biggestAttackerHeight() == 0
                     && oracle.canReach("Hills")
                     && !oracle.hexLabel().equals("8")
                     && !oracle.hexLabel().equals("22")
                     && !oracle.hexLabel().equals("36"))
                 {
-                    return getCreatureType("Ogre");
+                    return ogre;
                 }
             }
             else if (aiStyles.contains(AIStyle.Offensive))
             {
-                if (recruitNames.contains("Ogre")
-                    && legion.numCreature("Ogre") == 2
-                    && !legion.contains("Minotaur") && legion.getHeight() <= 2
+                if (recruits.contains(ogre) && legion.numCreature(ogre) == 2
+                    && !legion.contains(minotaur) && legion.getHeight() <= 2
                     && oracle.biggestAttackerHeight() == 0
                     && oracle.canReach("Hills"))
                 {
-                    return getCreatureType("Ogre");
+                    return ogre;
                 }
             }
         }
         else if (terrainId.equals("Tower"))
         {
-            if (recruitNames.contains("Warlock"))
+            if (recruits.contains(warlock))
             {
-                return getCreatureType("Warlock");
+                return warlock;
             }
-            if (recruitNames.contains("Guardian"))
+            if (recruits.contains(guardian))
             {
-                return getCreatureType("Guardian");
+                return guardian;
             }
-            if (recruitNames.contains("Ogre")
-                && legion.numCreature("Ogre") == 2)
+            if (recruits.contains(ogre) && legion.numCreature(ogre) == 2)
             {
-                return getCreatureType("Ogre");
+                return ogre;
             }
-            if (recruitNames.contains("Centaur")
-                && legion.numCreature("Centaur") == 2)
+            if (recruits.contains(centaur) && legion.numCreature(centaur) == 2)
             {
-                return getCreatureType("Centaur");
+                return centaur;
             }
-            if (recruitNames.contains("Gargoyle")
-                && legion.numCreature("Gargoyle") == 1
-                && oracle.creatureAvailable("Cyclops") >= 3)
+            if (recruits.contains(gargoyle)
+                && legion.numCreature(gargoyle) == 1
+                && oracle.creatureAvailable(cyclops) >= 3)
             {
-                return getCreatureType("Gargoyle");
+                return gargoyle;
             }
-            if (recruitNames.contains("Ogre")
-                && legion.numCreature("Ogre") == 1
-                && oracle.creatureAvailable("Troll") >= 2)
+            if (recruits.contains(ogre) && legion.numCreature(ogre) == 1
+                && oracle.creatureAvailable(troll) >= 2)
             {
-                return getCreatureType("Ogre");
+                return ogre;
             }
-            if (recruitNames.contains("Centaur")
-                && legion.numCreature("Centaur") == 1
-                && oracle.creatureAvailable("Lion") >= 2)
+            if (recruits.contains(centaur) && legion.numCreature(centaur) == 1
+                && oracle.creatureAvailable(lion) >= 2)
             {
-                return getCreatureType("Centaur");
+                return centaur;
             }
-            if (recruitNames.contains("Gargoyle")
-                && legion.numCreature("Gargoyle") == 0
-                && oracle.creatureAvailable("Cyclops") >= 6)
+            if (recruits.contains(gargoyle)
+                && legion.numCreature(gargoyle) == 0
+                && oracle.creatureAvailable(cyclops) >= 6)
             {
-                return getCreatureType("Gargoyle");
+                return gargoyle;
             }
-            if (recruitNames.contains("Ogre")
-                && legion.numCreature("Ogre") == 0
-                && oracle.creatureAvailable("Troll") >= 6)
+            if (recruits.contains(ogre) && legion.numCreature(ogre) == 0
+                && oracle.creatureAvailable(troll) >= 6)
             {
-                return getCreatureType("Ogre");
+                return ogre;
             }
-            if (recruitNames.contains("Centaur")
-                && legion.numCreature("Centaur") == 0
-                && oracle.creatureAvailable("Lion") >= 6)
+            if (recruits.contains(centaur) && legion.numCreature(centaur) == 0
+                && oracle.creatureAvailable(lion) >= 6)
             {
-                return getCreatureType("Centaur");
+                return centaur;
             }
         }
 
@@ -181,82 +203,82 @@ public class DefaultHint extends AbstractHintProvider
         {
             if (rnd.nextFloat() < 0.5)
             {
-                li.add(getCreatureType("Titan"));
-                li.add(getCreatureType("Gargoyle"));
-                li.add(getCreatureType("Centaur"));
-                li.add(getCreatureType("Centaur"));
+                li.add(titan);
+                li.add(gargoyle);
+                li.add(centaur);
+                li.add(centaur);
             }
             else
             {
-                li.add(getCreatureType("Titan"));
-                li.add(getCreatureType("Gargoyle"));
-                li.add(getCreatureType("Gargoyle"));
-                li.add(getCreatureType("Ogre"));
+                li.add(titan);
+                li.add(gargoyle);
+                li.add(gargoyle);
+                li.add(ogre);
             }
         }
         else if (hex.getLabel().equals("200"))
         {
-            li.add(getCreatureType("Titan"));
-            li.add(getCreatureType("Gargoyle"));
-            li.add(getCreatureType("Gargoyle"));
-            li.add(getCreatureType("Ogre"));
+            li.add(titan);
+            li.add(gargoyle);
+            li.add(gargoyle);
+            li.add(ogre);
         }
         else if (hex.getLabel().equals("300"))
         {
             if (rnd.nextFloat() < 0.5)
             {
-                li.add(getCreatureType("Titan"));
-                li.add(getCreatureType("Gargoyle"));
-                li.add(getCreatureType("Gargoyle"));
-                li.add(getCreatureType("Ogre"));
+                li.add(titan);
+                li.add(gargoyle);
+                li.add(gargoyle);
+                li.add(ogre);
             }
             else
             {
-                li.add(getCreatureType("Titan"));
-                li.add(getCreatureType("Centaur"));
-                li.add(getCreatureType("Centaur"));
-                li.add(getCreatureType("Ogre"));
+                li.add(titan);
+                li.add(centaur);
+                li.add(centaur);
+                li.add(ogre);
             }
         }
         else if (hex.getLabel().equals("400"))
         {
             if (rnd.nextFloat() < 0.5)
             {
-                li.add(getCreatureType("Titan"));
-                li.add(getCreatureType("Gargoyle"));
-                li.add(getCreatureType("Ogre"));
-                li.add(getCreatureType("Ogre"));
+                li.add(titan);
+                li.add(gargoyle);
+                li.add(ogre);
+                li.add(ogre);
             }
             else
             {
-                li.add(getCreatureType("Titan"));
-                li.add(getCreatureType("Gargoyle"));
-                li.add(getCreatureType("Gargoyle"));
-                li.add(getCreatureType("Centaur"));
+                li.add(titan);
+                li.add(gargoyle);
+                li.add(gargoyle);
+                li.add(centaur);
             }
         }
         else if (hex.getLabel().equals("500"))
         {
-            li.add(getCreatureType("Titan"));
-            li.add(getCreatureType("Gargoyle"));
-            li.add(getCreatureType("Gargoyle"));
-            li.add(getCreatureType("Centaur"));
+            li.add(titan);
+            li.add(gargoyle);
+            li.add(gargoyle);
+            li.add(centaur);
         }
         else if (hex.getLabel().equals("600"))
         {
             if (rnd.nextFloat() < 0.5)
             {
-                li.add(getCreatureType("Titan"));
-                li.add(getCreatureType("Gargoyle"));
-                li.add(getCreatureType("Gargoyle"));
-                li.add(getCreatureType("Centaur"));
+                li.add(titan);
+                li.add(gargoyle);
+                li.add(gargoyle);
+                li.add(centaur);
             }
             else
             {
-                li.add(getCreatureType("Titan"));
-                li.add(getCreatureType("Ogre"));
-                li.add(getCreatureType("Ogre"));
-                li.add(getCreatureType("Centaur"));
+                li.add(titan);
+                li.add(ogre);
+                li.add(ogre);
+                li.add(centaur);
             }
         }
         else
