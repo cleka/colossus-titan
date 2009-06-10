@@ -13,11 +13,10 @@ import net.sf.colossus.variant.Variant;
 
 /**
  * Displays recruit trees for a single Hex type.
- * @version $Id$
+ *
  * @author David Ripton
  * @author Barrie Treloar
  */
-
 final class ShowRecruits extends AbstractShowRecruits
 {
 

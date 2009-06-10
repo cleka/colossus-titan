@@ -18,9 +18,9 @@ import net.sf.colossus.guiutil.KDialog;
 
 
 /**
- * Class ChooseScreen allows a player to choose the screen 
+ * Class ChooseScreen allows a player to choose the screen
  *   on which to display the secondaries windows.
- * @version $Id$
+ *
  * @author Romain Dolbeau
  */
 @SuppressWarnings("serial")

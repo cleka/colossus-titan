@@ -12,9 +12,7 @@ import net.sf.colossus.variant.Hex;
 
 
 /**
- *  Abstract parent class for various GUI hexes
- *  
- *  @version $Id$
+ * Abstract parent class for various GUI hexes
  */
 public abstract class GUIHex<H extends Hex> extends JComponent
 {

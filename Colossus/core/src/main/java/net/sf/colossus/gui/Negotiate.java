@@ -29,10 +29,9 @@ import net.sf.colossus.guiutil.SaveWindow;
 
 /**
  * Negotiate allows making a new proposal to settle an engagement.
- * @version $Id$
+ *
  * @author David Ripton
  */
-
 final class Negotiate extends KDialog
 {
     private final Legion attacker;

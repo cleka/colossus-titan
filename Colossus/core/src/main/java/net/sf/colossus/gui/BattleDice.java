@@ -21,11 +21,10 @@ import net.sf.colossus.util.HTMLColor;
 
 /**
  * Class BattleDice displays dice rolls during a battle.
- * @version $Id$
+ *
  * @author David Ripton
  * @author Romain Dolbeau
  */
-
 final class BattleDice extends Box
 {
     private static class DiceEntry
@@ -264,8 +263,8 @@ final class BattleDice extends Box
 
     /**
      * Use to set the current roll in the history.  Updates the control.
-     * 
-     * @param pValue 
+     *
+     * @param pValue
      */
     public void setCurrentRoll(int pValue)
     {

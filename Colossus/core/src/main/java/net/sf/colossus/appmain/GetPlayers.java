@@ -60,7 +60,7 @@ import net.sf.colossus.variant.Variant;
 /**
  * Class GetPlayers is a dialog used to enter players'
  *   names, types, variant, etc.
- * @version $Id$
+ *
  * @author David Ripton
  * @author Romain Dolbeau
  */

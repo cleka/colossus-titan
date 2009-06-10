@@ -29,10 +29,8 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  *
  * TODO this is still string-based, see comment in {@link TerrainRecruitLoader}
  *
- * @version $Id$
  * @author Romain Dolbeau
  */
-
 public class RecruitGraph
 {
     private static final Logger LOGGER = Logger.getLogger(RecruitGraph.class
@@ -50,7 +48,6 @@ public class RecruitGraph
     /**
      * The vertex of the Recruit Graph
      *
-     * @version $Id$
      * @author Romain Dolbeau
      */
     private static class RecruitVertex
@@ -141,7 +138,7 @@ public class RecruitGraph
 
     /**
      * The edge of the Recruit Graph
-     * @version $Id$
+     *
      * @author Romain Dolbeau
      */
     private static class RecruitEdge

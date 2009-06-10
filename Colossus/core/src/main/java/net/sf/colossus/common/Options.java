@@ -15,13 +15,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
-/** Class Options lists game options for Colossus.
- *  @version $Id$
- *  @author David Ripton
+/**
+ * Class Options lists game options for Colossus.
  *
- *  TODO constants should be all uppercase
+ * @author David Ripton
+ *
+ * TODO constants should be all uppercase
  */
-
 public final class Options implements IOptions
 {
     private static final Logger LOGGER = Logger.getLogger(Options.class

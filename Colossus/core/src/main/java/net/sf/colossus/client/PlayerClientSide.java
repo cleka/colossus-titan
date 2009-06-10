@@ -16,10 +16,8 @@ import net.sf.colossus.variant.CreatureType;
 /**
  * This class holds client-side version of a player.
  *
- * @version $Id$
  * @author David Ripton
  */
-
 public final class PlayerClientSide extends Player
 {
     private PredictSplits predictSplits;

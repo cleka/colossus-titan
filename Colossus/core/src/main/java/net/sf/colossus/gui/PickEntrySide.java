@@ -26,7 +26,7 @@ import net.sf.colossus.variant.MasterHex;
 /**
  * Class PickEntrySide allows picking which side of a MasterBoard hex
  * to enter.
- * @version $Id$
+ *
  * @author David Ripton
  */
 @SuppressWarnings("serial")

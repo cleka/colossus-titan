@@ -19,7 +19,7 @@ import org.jdom.Element;
 
 /**
  * Stores game history as XML.
- * @version $Id$
+ *
  * @author David Ripton
  */
 public class History

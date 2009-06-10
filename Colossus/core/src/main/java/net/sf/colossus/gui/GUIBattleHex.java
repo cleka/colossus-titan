@@ -32,11 +32,10 @@ import net.sf.colossus.variant.HazardHexside;
 
 /**
  * Class GUIBattleHex holds GUI info for one battle hex.
- * @version $Id$
+ *
  * @author David Ripton
  * @author Romain Dolbeau
  */
-
 public class GUIBattleHex extends GUIHex<BattleHex>
 {
     private static final Logger LOGGER = Logger.getLogger(GUIBattleHex.class

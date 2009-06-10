@@ -31,9 +31,9 @@ import net.sf.colossus.guiutil.SaveWindow;
 
 
 /**
- *  Startup code for network Client
- *  @version $Id$
- *  @author David Ripton
+ * Startup code for network Client
+ *
+ * @author David Ripton
  */
 @SuppressWarnings("serial")
 public class NetworkClientDialog extends KFrame

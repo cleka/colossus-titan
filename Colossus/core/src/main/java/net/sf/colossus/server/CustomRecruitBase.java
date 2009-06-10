@@ -19,7 +19,6 @@ import net.sf.colossus.variant.MasterHex;
  * Base class to implement custom recruiting functions
  *   (i.e. anything that is not a-number-of-creature to another creature)
  *
- * @version $Id$
  * @author Romain Dolbeau
  */
 abstract public class CustomRecruitBase implements ICustomRecruitBase

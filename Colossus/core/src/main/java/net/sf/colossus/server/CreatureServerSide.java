@@ -34,11 +34,9 @@ import net.sf.colossus.variant.HazardTerrain;
  * easier if this class was just a dumb critter and the rules of battles
  * are all in the Battle class.
  *
- * @version $Id$
  * @author David Ripton
  * @author Romain Dolbeau
  */
-
 public class CreatureServerSide extends Creature
 {
     private static final Logger LOGGER = Logger

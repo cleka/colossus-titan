@@ -53,10 +53,9 @@ import net.sf.colossus.variant.CreatureType;
  * It collects all revealed events and displays all or
  * only the recent ones of them.
  *
- * @version $Id$
+ *
  * @author Clemens Katzer
  */
-
 /*
  * @TODO:
  * @IMPORTANT

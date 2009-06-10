@@ -14,7 +14,7 @@ import net.sf.colossus.variant.BattleHex;
 /**
  * Holds the information for one possible strike penalty, including
  * the null no-penalty option.
- * @version $Id$
+ *
  * @author David Ripton
  */
 final class PenaltyOption implements Comparable<PenaltyOption>

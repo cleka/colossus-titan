@@ -5,15 +5,12 @@ import java.lang.reflect.Field;
 
 
 /**
- *  Special hack to cleanup some static reference to the JFrame
- *  inside Swing; copied from here:
- *  http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4907798
- * 
- *  @version $Id$
- *  @author Clemens Katzer
+ * Special hack to cleanup some static reference to the JFrame
+ * inside Swing; copied from here:
+ * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4907798
  *
+ * @author Clemens Katzer
  */
-
 public class SwingReferenceCleanupHacks
 {
     public static void cleanupJPopupMenuGlobals(

@@ -67,7 +67,6 @@ import net.sf.colossus.variant.Variant;
  * TODO this dialog should have a SaveWindow attached to it.
  *
  * @author Towi, copied from ShowRecruitTree
- * @version $Id$
  */
 public final class ShowCreatureDetails extends KDialog
 {

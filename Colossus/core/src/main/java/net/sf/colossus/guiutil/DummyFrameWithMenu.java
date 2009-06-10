@@ -15,26 +15,22 @@ import javax.swing.JMenuItem;
 import net.sf.colossus.util.InstanceTracker;
 
 
-
 /**
- *  Dummy JFrame (KFrame) with menu.
+ * Dummy JFrame (KFrame) with menu.
  *
- *  Seems due to some bug, AWT keeps always some reference to the last
- *  JFrame which has a menu used (or even the last two of those) -
- *  which will nearly always being some MasterBoard, thus preventing
- *  MasterBoard and with that very often also the Client (and many other
- *  related objects) from being properly garbage-collected.
- *  So, by opening one or two dummy frames, we get the MasterBoards
- *  free and AWT hold on those dummy frames - which are small and
- *  don't hurts us much.
- *  And if the SwingCleanup is done afterwards, we get even rid of
- *  the dummyFrames.
+ * Seems due to some bug, AWT keeps always some reference to the last
+ * JFrame which has a menu used (or even the last two of those) -
+ * which will nearly always being some MasterBoard, thus preventing
+ * MasterBoard and with that very often also the Client (and many other
+ * related objects) from being properly garbage-collected.
+ * So, by opening one or two dummy frames, we get the MasterBoards
+ * free and AWT hold on those dummy frames - which are small and
+ * don't hurts us much.
+ * And if the SwingCleanup is done afterwards, we get even rid of
+ * the dummyFrames.
  *
- *  @version $Id$
- *  @author Clemens Katzer
- *
+ * @author Clemens Katzer
  */
-
 public class DummyFrameWithMenu extends KFrame
 {
     String id;

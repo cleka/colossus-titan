@@ -30,10 +30,9 @@ import net.sf.colossus.variant.CreatureType;
 
 /**
  * Class SplitLegion allows a player to split a Legion into two Legions.
- * @version $Id$
+ *
  * @author David Ripton
  */
-
 final class SplitLegion extends KDialog
 {
     private final List<Chit> oldChits = new ArrayList<Chit>(8);

@@ -6,12 +6,11 @@ import java.util.TreeMap;
 
 
 /**
- *  Class Opts represents a configured group of command-line options
- *  for a program.
- *  @version $Id$
- *  @author David Ripton
+ * Class Opts represents a configured group of command-line options
+ * for a program.
+ *
+ * @author David Ripton
  */
-
 public class Opts
 {
     // maps the single char abbreviation to the Opt

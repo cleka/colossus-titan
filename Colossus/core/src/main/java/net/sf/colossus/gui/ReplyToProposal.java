@@ -26,10 +26,9 @@ import net.sf.colossus.guiutil.SaveWindow;
 
 /**
  * ReplyToProposal allows responding to a negotiation proposal.
- * @version $Id$ 
+ *
  * @author David Ripton
  */
-
 final class ReplyToProposal extends KDialog implements ActionListener
 {
     private final Legion attacker;

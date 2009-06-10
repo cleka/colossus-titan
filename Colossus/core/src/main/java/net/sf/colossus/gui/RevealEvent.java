@@ -25,10 +25,8 @@ import net.sf.colossus.variant.CreatureType;
  * Contains info about one event that revealed some interestng information,
  * stored in EventViewer.
  *
- * @version $Id$
  * @author Clemens Katzer
  */
-
 public class RevealEvent
 {
     private static final Logger LOGGER = Logger.getLogger(RevealEvent.class

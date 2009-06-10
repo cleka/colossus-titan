@@ -29,7 +29,7 @@ import net.sf.colossus.guiutil.SaveWindow;
 
 /**
  * Class StatusScreen displays some information about the current game.
- * @version $Id$
+ *
  * @author David Ripton
  */
 @SuppressWarnings("serial")

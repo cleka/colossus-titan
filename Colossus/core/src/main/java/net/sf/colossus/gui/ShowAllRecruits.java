@@ -15,11 +15,10 @@ import net.sf.colossus.variant.Variant;
 
 /**
  * Displays recruit trees for all MasterHex types.
- * @version $Id$
+ *
  * @author David Ripton
  * @author Barrie Treloar
  */
-
 final class ShowAllRecruits extends AbstractShowRecruits
 {
     private final SaveWindow saveWindow;

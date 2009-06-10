@@ -34,7 +34,6 @@ import net.sf.colossus.variant.MasterHex;
  *      is that the MasterHex class doesn't offer isInverted(), which it
  *      probably could (and maybe should)
  *      
- * @version $Id$
  * @author David Ripton
  */
 @SuppressWarnings("serial")

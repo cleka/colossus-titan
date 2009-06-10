@@ -27,7 +27,7 @@ import net.sf.colossus.util.HTMLColor;
 
 /**
  * Class PickColor lets a player choose a color of legion markers.
- * @version $Id$
+ *
  * @author David Ripton
  */
 @SuppressWarnings("serial")

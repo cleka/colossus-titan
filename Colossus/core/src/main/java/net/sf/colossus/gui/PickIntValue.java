@@ -23,11 +23,10 @@ import net.sf.colossus.guiutil.SaveWindow;
 
 
 /**
- *  Allows picking any integer value
- *  @version $Id$
- *  @author David Ripton
+ * Allows picking any integer value
+ *
+ * @author David Ripton
  */
-
 public final class PickIntValue extends KDialog
 {
     private int newValue;

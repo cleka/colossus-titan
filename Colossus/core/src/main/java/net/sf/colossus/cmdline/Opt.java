@@ -1,12 +1,11 @@
 package net.sf.colossus.cmdline;
 
 
-/** 
- *  Class Opt represents a single command-line option.
- *  @version $Id$
- *  @author David Ripton
+/**
+ * Class Opt represents a single command-line option.
+ *
+ * @author David Ripton
  */
-
 public class Opt
 {
     private final char optch;

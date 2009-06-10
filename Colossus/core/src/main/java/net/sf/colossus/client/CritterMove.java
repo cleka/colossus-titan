@@ -7,7 +7,7 @@ import net.sf.colossus.variant.BattleHex;
 
 /**
  * One battle move for one critter.
- * @version $Id$
+ *
  * @author David Ripton
  */
 

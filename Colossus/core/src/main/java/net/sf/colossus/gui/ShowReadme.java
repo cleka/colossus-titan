@@ -20,10 +20,9 @@ import net.sf.colossus.variant.Variant;
  * Provides a JScrollPane to display the Variant README,
  * either within GetPlayer selection tab,
  * or from main boards help (then in own KFrame).
- * @version $Id$
+ *
  * @author Clemens Katzer
  */
-
 public final class ShowReadme extends KFrame
 {
     private JEditorPane myReadme;

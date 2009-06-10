@@ -18,10 +18,9 @@ import net.sf.colossus.guiutil.KDialog;
 
 /**
  * Class ShowLegion displays the chits of the Creatures in a Legion
- * @version $Id$
+ *
  * @author David Ripton
  */
-
 final class ShowLegion extends KDialog
 {
     ShowLegion(JFrame parentFrame, LegionClientSide legion, Point point,

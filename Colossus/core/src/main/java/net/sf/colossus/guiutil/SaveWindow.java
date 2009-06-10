@@ -10,15 +10,15 @@ import net.sf.colossus.common.IOptions;
 import net.sf.colossus.common.Options;
 
 
-/** 
- *  Saves window position and size.
- *  @version $Id$
- *  @author David Ripton 
+/**
+ * Saves window position and size.
+ *
+ * @author David Ripton
  */
 public final class SaveWindow
 {
-    private IOptions options;
-    private String name;
+    private final IOptions options;
+    private final String name;
 
     public SaveWindow(IOptions options, String name)
     {
@@ -104,7 +104,7 @@ public final class SaveWindow
         window.setSize(size);
     }
 
-    /* 
+    /*
      * Restore size and location, center on screen if no saved location.
      */
     public void restoreOrCenter(KDialog window)

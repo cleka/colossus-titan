@@ -25,10 +25,9 @@ import net.sf.colossus.guiutil.SaveWindow;
 
 /**
  * Class PickMarker allows a player to pick a legion marker.
- * @version $Id$
+ *
  * @author David Ripton
  */
-
 final class PickMarker extends KDialog
 {
     private final List<Marker> markers = new ArrayList<Marker>();

@@ -19,10 +19,9 @@ import net.sf.colossus.variant.MasterHex;
 
 /**
  * Class Movement handles client-side masterboard moves.
- * @version $Id$
+ *
  * @author David Ripton
  */
-
 // XXX There is massive duplication of code between this class and
 // the server-side movement code in Game.  Need to completely refactor.
 public final class Movement

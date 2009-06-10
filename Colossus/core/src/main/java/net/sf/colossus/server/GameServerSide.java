@@ -74,12 +74,10 @@ import org.jdom.output.XMLOutputter;
  * class which then can be shared between server and clients (the class, not the instances).
  * Other parts should be moved into the {@link Server} class or elsewhere.
  *
- * @version $Id$
  * @author David Ripton
  * @author Bruce Sherrod
  * @author Romain Dolbeau
  */
-
 public final class GameServerSide extends Game
 {
     private static final Logger LOGGER = Logger.getLogger(GameServerSide.class

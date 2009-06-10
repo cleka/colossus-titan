@@ -21,9 +21,10 @@ import net.sf.colossus.guiutil.SaveWindow;
 import net.sf.colossus.variant.BattleHex;
 
 
-/** Chooses between multiple carry options.
- *  @version $Id$
- *  @author David Ripton
+/**
+ * Chooses between multiple carry options.
+ *
+ * @author David Ripton
  */
 @SuppressWarnings("serial")
 final class PickCarry extends KDialog implements ActionListener
@@ -89,12 +90,12 @@ final class PickCarry extends KDialog implements ActionListener
     }
 
     /**
-     * @param hex String The short string denoting a hex on the 
+     * @param hex String The short string denoting a hex on the
      *                   battle map, eg. A1 or D5
      *
-     * Client calls this when user clicked on a hex (or chit) 
+     * Client calls this when user clicked on a hex (or chit)
      * instead of the dialog.
-     * Check whether the clicked hex is a potential carry 
+     * Check whether the clicked hex is a potential carry
      * and if yes, return choice the description string
      */
     public String findCarryChoiceForHex(String hex)
@@ -114,7 +115,7 @@ final class PickCarry extends KDialog implements ActionListener
      * Called by click on one one of the buttons
      * (from actionPerformed) or, from battleMap via Client,
      * if a chit was clicked which is a potential carry target.
-     * 
+     *
      * @param desc String denoting a carry target choice
      */
     public void handleCarryToDescription(String desc)

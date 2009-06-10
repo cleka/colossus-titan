@@ -29,10 +29,9 @@ import net.sf.colossus.guiutil.SaveWindow;
 
 /**
  * Class PickRecruiter allows a player to choose which creature(s) recruit.
- * @version $Id$
+ *
  * @author David Ripton
  */
-
 final class PickRecruiter extends KDialog
 {
     private final List<Chit> recruiterChits = new ArrayList<Chit>();

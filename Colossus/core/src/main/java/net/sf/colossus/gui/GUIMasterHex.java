@@ -29,11 +29,10 @@ import net.sf.colossus.variant.MasterHex;
 
 /**
  * Class GUIMasterHex holds GUI information for a MasterHex.
- * @version $Id$
+ *
  * @author David Ripton
  * @author Romain Dolbeau
  */
-
 public final class GUIMasterHex extends GUIHex<MasterHex>
 {
     private static final Logger LOGGER = Logger.getLogger(GUIMasterHex.class

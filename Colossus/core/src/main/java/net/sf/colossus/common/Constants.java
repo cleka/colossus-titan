@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  * Class Constants just holds constants.
- * @version $Id$
+ *
  * @author David Ripton
  */
 public final class Constants

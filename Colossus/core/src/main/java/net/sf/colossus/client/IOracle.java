@@ -8,15 +8,16 @@ import net.sf.colossus.game.Player;
 import net.sf.colossus.variant.MasterHex;
 
 
-/** Knows a lot of things, but cannot actually take any actions.
- *  Everything returned by this interface must be immutable, or a copy.
- *  An attempt to reduce the God-class nature of Client.
+/**
+ * Knows a lot of things, but cannot actually take any actions.
  *
- *  TODO this should be replaced with classes from the game package, mostly
- *       Game itself
+ * Everything returned by this interface must be immutable, or a copy.
+ * An attempt to reduce the God-class nature of Client.
  *
- *  @version $Id$
- *  @author David Ripton
+ * TODO this should be replaced with classes from the game package, mostly
+ *      Game itself
+ *
+ * @author David Ripton
  */
 public interface IOracle
 {

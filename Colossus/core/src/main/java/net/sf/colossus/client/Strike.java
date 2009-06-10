@@ -20,7 +20,6 @@ import net.sf.colossus.variant.HazardTerrain;
 /**
  * Class Strike holds client-side strike logic.
  *
- * @version $Id$
  * @author David Ripton
  * @author Romain Dolbeau
  */

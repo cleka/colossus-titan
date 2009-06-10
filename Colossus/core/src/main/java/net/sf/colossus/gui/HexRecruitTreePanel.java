@@ -1,13 +1,5 @@
 package net.sf.colossus.gui;
 
-
-/**
- *  Arranges the recruit tree for one hex in a panel, which can be
- *  displayed e.g. in Autoinspector or right-click popup.
- *
- *  @version $Id$
- */
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.MouseAdapter;
@@ -36,6 +28,10 @@ import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;
 
 
+/**
+ * Arranges the recruit tree for one hex in a panel, which can be
+ * displayed e.g. in Autoinspector or right-click popup.
+ */
 public class HexRecruitTreePanel extends Box
 {
     private final Map<Chit, CreatureType> chitToCreatureMap = new HashMap<Chit, CreatureType>();

@@ -7,10 +7,9 @@ import java.awt.Toolkit;
 
 /**
  * Class Scale holds static information used to scale all GUI elements.
- * @version $Id$
+ *
  * @author David Ripton
  */
-
 public final class Scale
 {
     static int scale = 15;

@@ -11,13 +11,13 @@ import net.sf.colossus.common.IOptions;
 import net.sf.colossus.util.InstanceTracker;
 
 
-/** KFrame adds some generally useful functions to JFrame.
+/**
+ * KFrame adds some generally useful functions to JFrame.
  *
  * TODO SaveWindow handling should be on this level
  *
- *  @version $Id$
- *  @author Clemens Katzer */
-
+ * @author Clemens Katzer
+ */
 public class KFrame extends JFrame
 {
     private SaveWindow kSaveWindow;

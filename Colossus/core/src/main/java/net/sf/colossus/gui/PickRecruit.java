@@ -33,10 +33,9 @@ import net.sf.colossus.variant.CreatureType;
 
 /**
  * Class PickRecruit allows a player to pick a creature to recruit.
- * @version $Id$
+ *
  * @author David Ripton
  */
-
 final class PickRecruit extends KDialog
 {
     private final List<Chit> recruitChits = new ArrayList<Chit>();

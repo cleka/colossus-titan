@@ -2,13 +2,13 @@ package net.sf.colossus.gui;
 
 
 /**
- * Class StrikeDie displays a die representing the threshold for 
+ * Class StrikeDie displays a die representing the threshold for
  * a successful hit during the Strike/strike-back phase.
+ *
  * --Cloned from David Ripton's MovementDie.--
- * @version $Id$
+ *
  * @author Dranathi
  */
-
 final class StrikeDie extends Chit
 {
     private int lastRoll = 0;

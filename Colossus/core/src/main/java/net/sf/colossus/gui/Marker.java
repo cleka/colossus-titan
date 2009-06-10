@@ -22,10 +22,8 @@ import net.sf.colossus.client.Client;
  * TODO after carve out of GUI stuff Marker should probably not be accessed
  *      by client at all - need cleanup with Legion ?
  *
- * @version $Id$
  * @author David Ripton
  */
-
 public final class Marker extends Chit
 {
     private static final Logger LOGGER = Logger.getLogger(Marker.class

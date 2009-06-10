@@ -7,7 +7,6 @@ package net.sf.colossus.variant;
  * on a given master board hex and with a list of recruit options.
  * This is currently implemented by {@linkplain net.sf.colossus.ai.AbstractAI}.
  *
- * @version $Id$
  * @author Romain Dolbeau
  */
 public interface IHintOracle

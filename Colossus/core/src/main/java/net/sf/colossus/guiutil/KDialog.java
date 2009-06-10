@@ -19,8 +19,7 @@ import net.sf.colossus.util.InstanceTracker;
 /**
  * KDialog adds some generally useful functions to JDialog.
  *
- *  @version $Id$
- *  @author David Ripton
+ * @author David Ripton
  */
 @SuppressWarnings("serial")
 public class KDialog extends JDialog

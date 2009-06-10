@@ -34,10 +34,10 @@ import net.sf.colossus.variant.IVariant;
 
 
 /**
- *  Viewer for a collection, say the graveyard or the creature keeper
- *  @version $Id$
- *  @author Tom Fruchterman
- *  @author David Ripton
+ * Viewer for a collection, say the graveyard or the creature keeper
+ *
+ * @author Tom Fruchterman
+ * @author David Ripton
  */
 class CreatureCollectionView extends KDialog
 {

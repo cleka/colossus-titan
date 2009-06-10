@@ -36,11 +36,10 @@ import net.sf.colossus.variant.CreatureType;
 
 /**
  * Allows a player to summon an angel or archangel.
- * @version $Id$
+ *
  * @author David Ripton
  * @author Romain Dolbeau
  */
-
 final class SummonAngel extends KDialog
 {
     private static final Logger LOGGER = Logger.getLogger(SummonAngel.class

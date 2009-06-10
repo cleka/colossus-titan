@@ -20,10 +20,9 @@ import net.sf.colossus.util.StaticResourceLoader;
 
 /**
  * Thread handling the distribution of files to clients.
- * @version $Id$
+ *
  * @author Romain Dolbeau
  */
-
 final class FileServerThread extends Thread
 {
     private static final Logger LOGGER = Logger

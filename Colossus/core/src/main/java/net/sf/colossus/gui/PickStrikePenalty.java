@@ -17,9 +17,10 @@ import net.sf.colossus.common.Constants;
 import net.sf.colossus.guiutil.KDialog;
 
 
-/** Chooses between multiple strike penalty options.
- *  @version $Id$
- *  @author David Ripton
+/**
+ * Chooses between multiple strike penalty options.
+ *
+ * @author David Ripton
  */
 final class PickStrikePenalty extends KDialog
 {

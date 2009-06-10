@@ -10,9 +10,9 @@ import java.util.logging.Logger;
 
 
 /**
- *  A specialized list of creature info, for split prediction.
- *  @version $Id$
- *  @author David Ripton
+ * A specialized list of creature info, for split prediction.
+ *
+ * @author David Ripton
  */
 class CreatureInfoList extends ArrayList<CreatureInfo>
 {

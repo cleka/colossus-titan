@@ -31,10 +31,9 @@ import net.sf.colossus.server.LegionServerSide;
 
 /**
  * Class Concede allows a player to flee or concede before starting a Battle.
- * @version $Id$
+ *
  * @author David Ripton
  */
-
 final class Concede extends KDialog
 {
     private final boolean flee;

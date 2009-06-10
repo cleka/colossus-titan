@@ -10,7 +10,7 @@ import net.sf.colossus.util.DevRandom;
 
 /**
  * Class Dice handles die-rolling
- * @version $Id$
+ *
  * @author David Ripton
  * @author Romain Dolbeau
  */

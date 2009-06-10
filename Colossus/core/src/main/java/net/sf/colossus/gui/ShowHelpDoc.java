@@ -7,17 +7,15 @@ import javax.swing.JTextArea;
 import net.sf.colossus.guiutil.KFrame;
 
 
-
 /**
- * Provides a simple JTextArea to display pointers to the Option 
+ * Provides a simple JTextArea to display pointers to the Option
  * documentation HTML files in Internet.
+ *
  * Eventually one day this should show the option documents
  * itself as an own JEditorPane, let user browse them etc...
- * 
- * @version $Id$
+ *
  * @author Clemens Katzer
  */
-
 public final class ShowHelpDoc extends KFrame
 {
     private static String title = "Pointer to Options documentation";

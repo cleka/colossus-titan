@@ -20,7 +20,7 @@ import net.sf.colossus.variant.Variant;
 
 /**
  * Common class for displaying recruit trees information.
- * @version $Id$
+ *
  * @author David Ripton
  * @author Barrie Treloar
  */

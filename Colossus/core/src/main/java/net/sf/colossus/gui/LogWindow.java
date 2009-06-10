@@ -20,10 +20,10 @@ import net.sf.colossus.guiutil.SaveWindow;
 import net.sf.colossus.util.SwingDocumentLogHandler;
 
 
-/** 
- *  Simple log window
- *  @version $Id$
- *  @author David Ripton 
+/**
+ * Simple log window
+ *
+ * @author David Ripton
  */
 public final class LogWindow extends JTextArea
 {
@@ -89,7 +89,7 @@ public final class LogWindow extends JTextArea
         super.append(s);
 
         // XXX Removed because of graphical corruption
-        // scrollToEnd();   
+        // scrollToEnd();
     }
 
     void scrollToEnd()

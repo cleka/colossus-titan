@@ -81,11 +81,10 @@ import net.sf.colossus.variant.Variant;
 
 /**
  * Class MasterBoard implements the GUI for a Titan masterboard.
- * @version $Id$
+ *
  * @author David Ripton
  * @author Romain Dolbeau
  */
-
 public final class MasterBoard extends JPanel
 {
     private static final Logger LOGGER = Logger.getLogger(MasterBoard.class

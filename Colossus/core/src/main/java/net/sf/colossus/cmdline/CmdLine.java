@@ -9,9 +9,9 @@ import java.util.TreeSet;
 
 
 /**
- *  Class CmdLine represents a parsed command line for one run of a program.
- *  @version $Id$
- *  @author David Ripton
+ * Class CmdLine represents a parsed command line for one run of a program.
+ *
+ * @author David Ripton
  */
 
 /* The rules:

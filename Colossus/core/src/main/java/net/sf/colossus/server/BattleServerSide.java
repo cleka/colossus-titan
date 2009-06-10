@@ -27,15 +27,14 @@ import net.sf.colossus.variant.MasterHex;
 
 
 /**
- * Class Battle holds data about a Titan battle. It has utility functions
- * related to incrementing the phase, managing moves, and managing
- * strikes
+ * Class Battle holds data about a Titan battle.
  *
- * @version $Id$
+ * It has utility functions related to incrementing the phase, managing
+ * moves, and managing strikes.
+ *
  * @author David Ripton
  * @author Romain Dolbeau
  */
-
 public final class BattleServerSide extends Battle
 {
     public static enum AngelSummoningStates

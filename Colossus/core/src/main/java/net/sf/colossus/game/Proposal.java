@@ -11,10 +11,9 @@ import net.sf.colossus.util.Split;
 
 /**
  * Class Proposal holds the results of a settlement attempt.
- * @version $Id$
+ *
  * @author David Ripton
  */
-
 public final class Proposal
 {
     private final Legion attacker;
