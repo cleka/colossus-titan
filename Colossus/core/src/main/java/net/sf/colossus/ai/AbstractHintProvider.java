@@ -1,6 +1,7 @@
 package net.sf.colossus.ai;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.colossus.variant.CreatureType;
@@ -53,5 +54,16 @@ public abstract class AbstractHintProvider implements IVariantHint
     protected MasterBoardTerrain getTerrain(String id)
     {
         return variant.getTerrainById(id);
+    }
+
+    // Convert list of recruits from Creature to String for easier compares.
+    public static List<String> creaturesToStrings(List<CreatureType> creatures)
+    {
+        List<String> recruits = new ArrayList<String>();
+        for (CreatureType creature : creatures)
+        {
+            recruits.add(creature.getName());
+        }
+        return recruits;
     }
 }

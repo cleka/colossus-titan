@@ -23,24 +23,13 @@ public class DefaultHint extends AbstractHintProvider
 
     private final DevRandom rnd = new DevRandom();
 
-    // Convert list of recruits from Creature to String for easier compares.
-    public static List<String> creaturesToStrings(List<CreatureType> creatures)
-    {
-        List<String> recruits = new ArrayList<String>();
-        for (CreatureType creature : creatures)
-        {
-            recruits.add(creature.getName());
-        }
-        return recruits;
-    }
-
     public CreatureType getRecruitHint(MasterBoardTerrain terrain,
         IOracleLegion legion, List<CreatureType> recruits,
         IHintOracle oracle,
         List<AIStyle> aiStyles)
     {
         String terrainId = terrain.getId();
-        List<String> recruitNames = creaturesToStrings(recruits);
+        List<String> recruitNames = AbstractHintProvider.creaturesToStrings(recruits);
 
         if (terrainId.equals("Brush") || terrainId.equals("Jungle"))
         {

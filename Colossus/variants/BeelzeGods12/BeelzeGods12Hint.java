@@ -12,7 +12,6 @@ import net.sf.colossus.variant.IOracleLegion;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;
-import Default.DefaultHint;
 
 
 public class BeelzeGods12Hint extends AbstractHintProvider
@@ -30,7 +29,7 @@ public class BeelzeGods12Hint extends AbstractHintProvider
         List<AIStyle> aiStyles)
     {
         String terrainId = terrain.getId();
-        List<String> recruitNames = DefaultHint.creaturesToStrings(recruits);
+        List<String> recruitNames = AbstractHintProvider.creaturesToStrings(recruits);
 
         if (terrainId.equals("Plains"))
         {
