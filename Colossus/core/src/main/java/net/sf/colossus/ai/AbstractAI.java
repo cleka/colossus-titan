@@ -655,11 +655,11 @@ abstract class AbstractAI implements AI
         private Map<MasterHex, List<Legion>>[] enemyAttackMap = null;
 
         AbstractAIOracle(LegionClientSide legion, MasterHex hex,
-            List<CreatureType> recruits2)
+            List<CreatureType> recruits)
         {
             this.legion = legion;
             this.hex = hex;
-            this.recruits = recruits2;
+            this.recruits = recruits;
 
         }
 
@@ -671,14 +671,7 @@ abstract class AbstractAI implements AI
 
         public int creatureAvailable(String name)
         {
-            // TODO name doesn't seem to always refer to an actual creature
-            //      type, which means the next line can return null, then
-            //      causing an NPE in getReservedRemain(..)
-            // Still TODO ?
-            //      Fixed "Griffon vs. Griffin" in Undead, which was the
-            //      reason in all cases I got that exception (Clemens).
-            CreatureType type = variant.getCreatureByName(name);
-            return client.getReservedRemain(type);
+            return creatureAvailable(variant.getCreatureByName(name));
         }
 
         public int creatureAvailable(CreatureType creatureType)
