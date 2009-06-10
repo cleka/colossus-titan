@@ -50,13 +50,18 @@ public class BattleClientSide extends Battle
 
         this.getDefendingLegion().setEntrySide(
             this.getAttackingLegion().getEntrySide().getOpposingSide());
-
     }
 
     @Override
     protected boolean isOccupied(BattleHex hex)
     {
-        // TODO Auto-generated method stub
+        for (BattleCritter battleUnit : getBattleUnits())
+        {
+            if (battleUnit.getCurrentHex().equals(hex))
+            {
+                return true;
+            }
+        }
         return false;
     }
 
