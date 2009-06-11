@@ -20,13 +20,6 @@ import net.sf.colossus.variant.MasterHex;
 /**
  * Client-side version of a legion.
  *
- * TODO candidates to pull up:
- * -canRecruit()
- *    requires Game.findEligibleRecruits() on both sides, might be better as method in Game
- * -getMarker()
- * -setMarker(Marker)
- *    requires abstraction of the client.Marker class first, should replace markerId member
- *
  * @author David Ripton
  */
 public final class LegionClientSide extends Legion implements IOracleLegion
