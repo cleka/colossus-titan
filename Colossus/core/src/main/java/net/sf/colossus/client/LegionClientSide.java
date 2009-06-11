@@ -124,11 +124,9 @@ public final class LegionClientSide extends Legion implements IOracleLegion
     public int numCreature(String creatureName)
     {
         int count = 0;
-        Iterator<String> it = getContents().iterator();
-        while (it.hasNext())
+        for (CreatureType type : getCreatureTypes())
         {
-            String name = it.next();
-            if (name.equals(creatureName))
+            if (type.getName().equals(creatureName))
             {
                 count++;
             }
@@ -218,7 +216,14 @@ public final class LegionClientSide extends Legion implements IOracleLegion
     @Override
     public boolean hasTitan()
     {
-        return getContents().contains(Constants.titan);
+        for (CreatureType type : getCreatureTypes())
+        {
+            if (type.isTitan())
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** Return the point value of suspected contents of this legion. */
@@ -226,21 +231,16 @@ public final class LegionClientSide extends Legion implements IOracleLegion
     public int getPointValue()
     {
         int sum = 0;
-        Iterator<String> it = getContents().iterator();
-        while (it.hasNext())
+        for (CreatureType type : getCreatureTypes())
         {
-            String name = it.next();
-            if (name.startsWith(Constants.titan))
+            if (type.isTitan())
             {
                 // Titan skill is changed by variants.
-                sum += getPlayer().getTitanPower()
-                    * getPlayer().getGame().getVariant().getCreatureByName(
-                        "Titan").getSkill();
+                sum += getPlayer().getTitanPower() * type.getSkill();
             }
             else
             {
-                sum += getPlayer().getGame().getVariant().getCreatureByName(
-                    name).getPointValue();
+                sum += type.getPointValue();
             }
         }
         return sum;
@@ -252,23 +252,17 @@ public final class LegionClientSide extends Legion implements IOracleLegion
     public int getCertainPointValue()
     {
         int sum = 0;
-        Iterator<String> it = getNode().getCertainCreatures()
-            .getCreatureNames().iterator();
-        while (it.hasNext())
+        for (CreatureType type : getNode().getCertainCreatures()
+            .getCreatureTypes())
         {
-            String name = it.next();
-            if (name.startsWith(Constants.titan))
+            if (type.isTitan())
             {
-                PlayerClientSide info = getPlayer();
                 // Titan skill is changed by variants.
-                sum += info.getTitanPower()
-                    * getPlayer().getGame().getVariant().getCreatureByName(
-                        "Titan").getSkill();
+                sum += getPlayer().getTitanPower() * type.getSkill();
             }
             else
             {
-                sum += getPlayer().getGame().getVariant().getCreatureByName(
-                    name).getPointValue();
+                sum += type.getPointValue();
             }
         }
         return sum;

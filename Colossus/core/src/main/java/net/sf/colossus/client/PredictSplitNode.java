@@ -2,13 +2,13 @@ package net.sf.colossus.client;
 
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.util.Combos;
 import net.sf.colossus.variant.CreatureType;
@@ -276,7 +276,16 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
         return creatures.size();
     }
 
-    /** Return true if big is a superset of little. */
+    /**
+     * Return true if big is a superset of little.
+     *
+     * Note that this treats repeated elements as distinct, i.e. if the
+     * little list contains two copies of something, then the big list has
+     * to contain two copies, too. It differs in that regard from
+     * {@linkplain Collection#containsAll(Collection)} which is implemented
+     * in a fashion where this is not necessary (the specification as of JDK
+     * 1.5 is actually blurry on the matter).
+     */
     static <T> boolean superset(List<T> big, List<T> little)
     {
         List<T> bigclone = new ArrayList<T>(big);
@@ -290,9 +299,6 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
         return true;
     }
 
-    /**
-     * Return true iff new information was sent to this legion's parent.
-     */
     void revealCreatures(List<CreatureType> cnl)
     {
         if (cnl == null)
@@ -318,7 +324,7 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
 
             // TODO : added null guard, because during loading a game it went
             // up and up many times (7+) until it hit null.
-            // Probably caused by incorrent legion contents...
+            // Probably caused by incorrect legion contents...
             // So null guard here to find the reason for that...
             // Probably should never happen any more after loading of saved
             // games was fixed in 08/2008... (Clemens)
@@ -388,9 +394,9 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
         assert creatures.size() != 8 || childSize == 4 : "Illegal initial split ("
             + childSize + "/" + creatures.size() + ")";
         assert creatures.size() != 8
-            || creatures.getCreatureNames().contains(Constants.titan) : "No titan in 8-high legion";
+            || creatures.getCreatureTypes().contains(titan) : "No titan in 8-high legion";
         assert creatures.size() != 8
-            || creatures.getCreatureNames().contains(Constants.angel) : "No angel in 8-high legion";
+            || creatures.getCreatureTypes().contains(angel) : "No angel in 8-high legion";
 
         List<CreatureType> knownCombo = new ArrayList<CreatureType>();
         knownCombo.addAll(knownSplit);
