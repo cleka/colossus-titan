@@ -206,19 +206,6 @@ public final class LegionClientSide extends Legion implements IOracleLegion
         myNode = getNode(getMarkerId());
     }
 
-    @Override
-    public boolean hasTitan()
-    {
-        for (CreatureType type : getCreatureTypes())
-        {
-            if (type.isTitan())
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
     /** Return the point value of suspected contents of this legion. */
     @Override
     public int getPointValue()
