@@ -9,7 +9,6 @@ import java.util.List;
 /**
  * Returns all possible combinations of n elements of a List.
  * 
- * @version $Id$
  * @author David Ripton
  */
 public final class Combos<T>

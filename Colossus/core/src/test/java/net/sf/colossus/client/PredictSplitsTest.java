@@ -133,7 +133,7 @@ public class PredictSplitsTest extends TestCase
     public void testPredictSplits1()
     {
         LOGGER.log(Level.FINEST, "testPredictSplits1()");
-        ps = new PredictSplits("Rd01", cnl);
+        ps = new PredictSplits("Rd01", cnl, variant);
 
         turn = 1;
         LOGGER.log(Level.FINEST, "Turn " + turn);
@@ -459,7 +459,7 @@ public class PredictSplitsTest extends TestCase
     public void testPredictSplits2()
     {
         LOGGER.log(Level.FINEST, "testPredictSplits2()");
-        ps = new PredictSplits("Rd11", cnl);
+        ps = new PredictSplits("Rd11", cnl, variant);
 
         turn = 1;
         LOGGER.log(Level.FINEST, "Turn " + turn);
@@ -1055,7 +1055,7 @@ public class PredictSplitsTest extends TestCase
     public void testPredictSplits3()
     {
         LOGGER.log(Level.FINEST, "testPredictSplits3()");
-        ps = new PredictSplits("Gr07", cnl);
+        ps = new PredictSplits("Gr07", cnl, variant);
 
         turn = 1;
         LOGGER.log(Level.FINEST, "Turn " + turn);
@@ -1110,7 +1110,7 @@ public class PredictSplitsTest extends TestCase
     public void testPredictSplits5()
     {
         LOGGER.log(Level.FINEST, "testPredictSplits5()");
-        ps = new PredictSplits("Gd04", cnl);
+        ps = new PredictSplits("Gd04", cnl, variant);
         cnl.clear();
         cnl.add(variant.getCreatureByName("Titan"));
         cnl.add(variant.getCreatureByName("Angel"));
@@ -1700,7 +1700,7 @@ public class PredictSplitsTest extends TestCase
     public void testPredictSplits6()
     {
         LOGGER.log(Level.FINEST, "testPredictSplits6()");
-        ps = new PredictSplits("Gr11", cnl);
+        ps = new PredictSplits("Gr11", cnl, variant);
         aps.add(ps);
 
         turn = 1;
@@ -1831,7 +1831,7 @@ public class PredictSplitsTest extends TestCase
     public void testPredictSplits7()
     {
         LOGGER.log(Level.FINEST, "testPredictSplits7()");
-        ps = new PredictSplits("Gr08", cnl);
+        ps = new PredictSplits("Gr08", cnl, variant);
         aps.add(ps);
         aps.printLeaves();
 
@@ -2204,12 +2204,12 @@ public class PredictSplitsTest extends TestCase
 
     public void testPredictSplits9()
     {
-        aps.add(new PredictSplits("Gd08", cnl));
-        aps.add(new PredictSplits("Bu02", cnl));
-        aps.add(new PredictSplits("Gr12", cnl));
-        aps.add(new PredictSplits("Br06", cnl));
-        aps.add(new PredictSplits("Bk06", cnl));
-        aps.add(new PredictSplits("Rd06", cnl));
+        aps.add(new PredictSplits("Gd08", cnl, variant));
+        aps.add(new PredictSplits("Bu02", cnl, variant));
+        aps.add(new PredictSplits("Gr12", cnl, variant));
+        aps.add(new PredictSplits("Br06", cnl, variant));
+        aps.add(new PredictSplits("Bk06", cnl, variant));
+        aps.add(new PredictSplits("Rd06", cnl, variant));
 
         aps.printLeaves();
         turn = 1;
@@ -5267,7 +5267,7 @@ public class PredictSplitsTest extends TestCase
     public void testPredictSplits10()
     {
         LOGGER.log(Level.FINEST, "testPredictSplits10()");
-        ps = new PredictSplits("Bk06", cnl);
+        ps = new PredictSplits("Bk06", cnl, variant);
         ps.printLeaves();
 
         turn = 1;
@@ -5346,7 +5346,7 @@ public class PredictSplitsTest extends TestCase
     public void testPredictSplits11()
     {
         LOGGER.log(Level.FINEST, "testPredictSplits11()");
-        ps = new PredictSplits("Bk06", cnl);
+        ps = new PredictSplits("Bk06", cnl, variant);
 
         turn = 1;
         LOGGER.log(Level.FINEST, "Turn " + turn);
@@ -5480,7 +5480,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Centaur"));
         cnl.add(variant.getCreatureByName("Ogre"));
         cnl.add(variant.getCreatureByName("Ogre"));
-        ps = new PredictSplits("Gr07", cnl);
+        ps = new PredictSplits("Gr07", cnl, variant);
         aps.add(ps);
         cnl.clear();
         cnl.add(variant.getCreatureByName("Titan"));
@@ -5501,7 +5501,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Centaur"));
         cnl.add(variant.getCreatureByName("Ogre"));
         cnl.add(variant.getCreatureByName("Ogre"));
-        ps = new PredictSplits("Bu08", cnl);
+        ps = new PredictSplits("Bu08", cnl, variant);
         aps.add(ps);
         cnl.clear();
         cnl.add(variant.getCreatureByName("Titan"));
@@ -5522,7 +5522,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Centaur"));
         cnl.add(variant.getCreatureByName("Ogre"));
         cnl.add(variant.getCreatureByName("Ogre"));
-        ps = new PredictSplits("Gd01", cnl);
+        ps = new PredictSplits("Gd01", cnl, variant);
         aps.add(ps);
         cnl.clear();
         cnl.add(variant.getCreatureByName("Titan"));
@@ -5543,7 +5543,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Centaur"));
         cnl.add(variant.getCreatureByName("Ogre"));
         cnl.add(variant.getCreatureByName("Ogre"));
-        ps = new PredictSplits("Bk10", cnl);
+        ps = new PredictSplits("Bk10", cnl, variant);
         aps.add(ps);
         cnl.clear();
         cnl.add(variant.getCreatureByName("Titan"));
@@ -5564,7 +5564,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Centaur"));
         cnl.add(variant.getCreatureByName("Ogre"));
         cnl.add(variant.getCreatureByName("Ogre"));
-        ps = new PredictSplits("Br12", cnl);
+        ps = new PredictSplits("Br12", cnl, variant);
         aps.add(ps);
         cnl.clear();
         cnl.add(variant.getCreatureByName("Titan"));
@@ -5585,7 +5585,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Centaur"));
         cnl.add(variant.getCreatureByName("Ogre"));
         cnl.add(variant.getCreatureByName("Ogre"));
-        ps = new PredictSplits("Rd12", cnl);
+        ps = new PredictSplits("Rd12", cnl, variant);
         aps.add(ps);
         cnl.clear();
         cnl.add(variant.getCreatureByName("Titan"));

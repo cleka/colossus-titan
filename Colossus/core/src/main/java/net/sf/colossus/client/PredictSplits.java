@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.Variant;
 
 
 /**
@@ -28,15 +29,17 @@ public final class PredictSplits
     private final PredictSplitNode root; // All contents of root must be known.
     private final NodeTurnComparator nodeTurnComparator = new NodeTurnComparator();
 
-    PredictSplits(String rootId, List<CreatureType> creatureTypes)
+    PredictSplits(String rootId, List<CreatureType> creatureTypes,
+        Variant variant)
     {
+        assert variant != null;
         CreatureInfoList infoList = new CreatureInfoList();
         for (CreatureType type : creatureTypes)
         {
             CreatureInfo ci = new CreatureInfo(type, true, true);
             infoList.add(ci);
         }
-        root = new PredictSplitNode(rootId, 0, infoList, null);
+        root = new PredictSplitNode(rootId, 0, infoList, null, variant);
     }
 
     /** Return all non-empty childless nodes in subtree starting from node. */

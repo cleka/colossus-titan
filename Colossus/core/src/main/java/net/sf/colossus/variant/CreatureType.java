@@ -179,6 +179,10 @@ public class CreatureType implements Comparable<CreatureType>
     @Override
     public final boolean equals(Object object)
     {
+        if (object == null)
+        {
+            return false;
+        }
         if (object.getClass() != this.getClass())
         {
             return false;
