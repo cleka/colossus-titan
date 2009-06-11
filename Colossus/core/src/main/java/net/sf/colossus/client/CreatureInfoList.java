@@ -20,32 +20,6 @@ class CreatureInfoList extends ArrayList<CreatureInfo>
     private static final Logger LOGGER = Logger
         .getLogger(CreatureInfoList.class.getName());
 
-    int numCreature(String creatureName)
-    {
-        int count = 0;
-        for (CreatureInfo ci : this)
-        {
-            if (creatureName.equals(ci.getName()))
-            {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    /** Return the first CreatureInfo that matches the passed name. */
-    CreatureInfo getCreatureInfo(String creatureName)
-    {
-        for (CreatureInfo ci : this)
-        {
-            if (ci.getName().equals(creatureName))
-            {
-                return ci;
-            }
-        }
-        return null;
-    }
-
     void removeLastUncertainCreature()
     {
         ListIterator<CreatureInfo> lit = this.listIterator(this.size());
