@@ -256,7 +256,7 @@ public class SimpleAI extends AbstractAI
                 if (recruit != null)
                 {
                     List<String> recruiters = client.findEligibleRecruiters(
-                        legion, recruit.getName());
+                        legion, recruit);
 
                     String recruiterName = null;
                     if (!recruiters.isEmpty())
@@ -282,7 +282,7 @@ public class SimpleAI extends AbstractAI
         {
             recruitName = recruit.getName();
             List<String> recruiters = client.findEligibleRecruiters(legion,
-                recruit.getName());
+                recruit);
             if (!recruiters.isEmpty())
             {
                 recruiterName = recruiters.get(0);

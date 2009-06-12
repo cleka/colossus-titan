@@ -41,7 +41,7 @@ final class PickRecruit extends KDialog
     private final List<Chit> recruitChits = new ArrayList<Chit>();
     private final Marker legionMarker;
     private final List<Chit> legionChits = new ArrayList<Chit>();
-    private String recruit;
+    private CreatureType recruit;
     private static boolean active;
     private final SaveWindow saveWindow;
 
@@ -103,7 +103,7 @@ final class PickRecruit extends KDialog
                 public void mousePressed(MouseEvent e)
                 {
                     // Recruit the chosen creature.
-                    PickRecruit.this.recruit = recruit.getName();
+                    PickRecruit.this.recruit = recruit;
                     dispose();
                 }
             });
@@ -142,17 +142,17 @@ final class PickRecruit extends KDialog
         repaint();
     }
 
-    private String getRecruit()
+    private CreatureType getRecruit()
     {
         return recruit;
     }
 
     /** Return the creature recruited, or null if none. */
-    static synchronized String pickRecruit(JFrame parentFrame,
+    static synchronized CreatureType pickRecruit(JFrame parentFrame,
         List<CreatureType> recruits, String hexDescription, Legion legion,
         Client client)
     {
-        String recruit = null;
+        CreatureType recruit = null;
         if (!active)
         {
             active = true;

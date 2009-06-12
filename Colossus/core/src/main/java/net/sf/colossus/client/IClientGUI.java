@@ -217,7 +217,8 @@ public interface IClientGUI
 
     public abstract String doPickMarkerUntilGotOne(Set<String> markersAvailable);
 
-    public abstract String doPickRecruit(Legion legion, String hexDescription);
+    public abstract CreatureType doPickRecruit(Legion legion,
+        String hexDescription);
 
     public abstract String doPickRecruiter(List<String> recruiters,
         String hexDescription, Legion legion);

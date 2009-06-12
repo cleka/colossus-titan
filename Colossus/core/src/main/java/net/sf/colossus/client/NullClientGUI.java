@@ -383,7 +383,7 @@ public class NullClientGUI implements IClientGUI
         return null;
     }
 
-    public String doPickRecruit(Legion legion, String hexDescription)
+    public CreatureType doPickRecruit(Legion legion, String hexDescription)
     {
         // TODO Auto-generated method stub
         return null;

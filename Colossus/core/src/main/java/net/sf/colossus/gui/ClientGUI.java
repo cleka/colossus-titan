@@ -1898,7 +1898,7 @@ public class ClientGUI implements IClientGUI
         return markerId;
     }
 
-    public String doPickRecruit(Legion legion, String hexDescription)
+    public CreatureType doPickRecruit(Legion legion, String hexDescription)
     {
         List<CreatureType> recruits = client.findEligibleRecruits(legion,
             legion.getCurrentHex());

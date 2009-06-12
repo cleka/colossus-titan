@@ -1603,21 +1603,21 @@ public final class Client implements IClient, IOracle, IVariant
 
         String hexDescription = legion.getCurrentHex().getDescription();
 
-        String recruitName = gui.doPickRecruit(legion, hexDescription);
+        CreatureType recruit = gui.doPickRecruit(legion, hexDescription);
 
-        if (recruitName == null)
+        if (recruit == null)
         {
             return;
         }
 
-        String recruiterName = findRecruiterName(legion, recruitName,
+        String recruiterName = findRecruiterName(legion, recruit,
             hexDescription);
         if (recruiterName == null)
         {
             return;
         }
 
-        doRecruit(legion, recruitName, recruiterName);
+        doRecruit(legion, recruit.getName(), recruiterName);
     }
 
     // TODO use CreatureType instead of String
@@ -1645,15 +1645,16 @@ public final class Client implements IClient, IOracle, IVariant
         {
             String hexDescription = legion.getCurrentHex().getDescription();
 
-            String recruitName = gui.doPickRecruit(legion, hexDescription);
+            CreatureType recruit = gui.doPickRecruit(legion, hexDescription);
 
             String recruiterName = null;
-            if (recruitName != null)
+            if (recruit != null)
             {
-                recruiterName = findRecruiterName(legion, recruitName,
+                recruiterName = findRecruiterName(legion, recruit,
                     hexDescription);
             }
-            doRecruit(legion, recruitName, recruiterName);
+            doRecruit(legion, (recruit == null) ? null : recruit.getName(),
+                recruiterName);
         }
     }
 
@@ -1703,12 +1704,12 @@ public final class Client implements IClient, IOracle, IVariant
     }
 
     /** null means cancel.  "none" means no recruiter (tower creature). */
-    private String findRecruiterName(Legion legion, String recruitName,
+    private String findRecruiterName(Legion legion, CreatureType recruit,
         String hexDescription)
     {
         String recruiterName = null;
 
-        List<String> recruiters = findEligibleRecruiters(legion, recruitName);
+        List<String> recruiters = findEligibleRecruiters(legion, recruit);
 
         int numEligibleRecruiters = recruiters.size();
         if (numEligibleRecruiters == 0)
@@ -2551,16 +2552,14 @@ public final class Client implements IClient, IOracle, IVariant
      * TODO return List<CreatureType>
      */
     public List<String> findEligibleRecruiters(Legion legion,
-        String recruitName)
+        CreatureType recruit)
     {
-        Set<CreatureType> recruiters;
-        CreatureType recruit = game.getVariant()
-            .getCreatureByName(recruitName);
         if (recruit == null)
         {
             return new ArrayList<String>();
         }
 
+        Set<CreatureType> recruiters;
         MasterHex hex = legion.getCurrentHex();
         MasterBoardTerrain terrain = hex.getTerrain();
 
@@ -2573,8 +2572,7 @@ public final class Client implements IClient, IOracle, IVariant
             int needed = TerrainRecruitLoader.numberOfRecruiterNeeded(
                 possibleRecruiter, recruit, terrain, hex);
             if (needed < 1
-                || needed > ((LegionClientSide)legion)
-                    .numCreature(possibleRecruiter))
+                || needed > legion.numCreature(possibleRecruiter))
             {
                 // Zap this possible recruiter.
                 it.remove();
