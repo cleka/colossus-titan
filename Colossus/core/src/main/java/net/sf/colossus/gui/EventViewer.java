@@ -966,8 +966,8 @@ final class EventViewer extends KDialog
         addEvent(e);
     }
 
-    public void revealCreatures(Legion legion, final List<String> names,
-        String reason)
+    public void revealCreatures(Legion legion,
+        List<CreatureType> creatureTypes, String reason)
     {
         // EventViewer stuff:
         // looks as if right now we need this revealedInfo only for
@@ -998,11 +998,9 @@ final class EventViewer extends KDialog
             if (otherEvent != null)
             {
                 List<RevealedCreature> rcNames = new ArrayList<RevealedCreature>();
-                Iterator<String> it = names.iterator();
-                while (it.hasNext())
+                for (CreatureType type : creatureTypes)
                 {
-                    String name = it.next();
-                    RevealedCreature rc = new RevealedCreature(name);
+                    RevealedCreature rc = new RevealedCreature(type.getName());
                     rcNames.add(rc);
                 }
                 otherEvent.updateKnownCreatures(rcNames);

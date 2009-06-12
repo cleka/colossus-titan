@@ -401,22 +401,6 @@ public abstract class Legion
     }
 
     /**
-     * Maps a list of creature types to the names.
-     *
-     * TODO just a temporary helper method. It should not stay.
-     */
-    public static List<String> extractCreatureNames(
-        List<CreatureType> creatures)
-    {
-        List<String> result = new ArrayList<String>();
-        for (CreatureType creatureType : creatures)
-        {
-            result.add(creatureType.getName());
-        }
-        return result;
-    }
-
-    /**
      * Returns the markerId for debug and serialisation purposes.
      *
      * Since this is relevant for the network protocol, the method

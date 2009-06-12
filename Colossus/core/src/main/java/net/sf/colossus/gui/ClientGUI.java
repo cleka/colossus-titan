@@ -1758,8 +1758,7 @@ public class ClientGUI implements IClientGUI
     public void eventViewerRevealCreatures(Legion legion,
         final List<CreatureType> creatures, String reason)
     {
-        eventViewer.revealCreatures(legion, Legion
-            .extractCreatureNames(creatures), reason);
+        eventViewer.revealCreatures(legion, creatures, reason);
     }
 
     private void showOrHideLogWindow(Client client, boolean show)
