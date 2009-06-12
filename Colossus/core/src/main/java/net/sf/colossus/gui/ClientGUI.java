@@ -1106,8 +1106,7 @@ public class ClientGUI implements IClientGUI
             hex.repaint();
         }
 
-        eventViewer.addCreature(legion.getMarkerId(), creature.getName(),
-            reason);
+        eventViewer.addCreature(legion, creature, reason);
     }
 
     public void actOnUndidSplit(Legion survivor, int turn)
@@ -1155,8 +1154,7 @@ public class ClientGUI implements IClientGUI
         if (teleport)
         {
             eventViewer.newCreatureRevealEvent(RevealEvent.eventTeleport,
-                legion.getMarkerId(), legion.getHeight(), teleportingLord
-                    .getName(),
+                legion.getMarkerId(), legion.getHeight(), teleportingLord,
                 null, 0);
         }
 
@@ -1448,8 +1446,8 @@ public class ClientGUI implements IClientGUI
     public void didSummon(Legion summoner, Legion donor, CreatureType summon)
     {
         eventViewer.newCreatureRevealEvent(RevealEvent.eventSummon, donor
-            .getMarkerId(), (donor).getHeight(), summon.getName(), summoner
-            .getMarkerId(), (summoner).getHeight());
+            .getMarkerId(), donor.getHeight(), summon, summoner.getMarkerId(),
+            summoner.getHeight());
     }
 
     public void repaintBattleBoard()

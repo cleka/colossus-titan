@@ -5,12 +5,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.common.Constants;
+import net.sf.colossus.variant.CreatureType;
 
 
 /**
  * Contains info about one revealed creature for RevealEvent.
- *
- * TODO still using lots of Strings instead of CreatureType
  *
  * @author Clemens Katzer
  */
@@ -19,7 +18,7 @@ public class RevealedCreature
     private static final Logger LOGGER = Logger
         .getLogger(RevealedCreature.class.getName());
 
-    private final String creatureName;
+    private final CreatureType creatureType;
     private String titanBaseName = null;
     private boolean dead = false;
 
@@ -33,13 +32,14 @@ public class RevealedCreature
     private boolean wasSummoned = false;
     private boolean wasAcquired = false;
 
-    public RevealedCreature(String name)
+    public RevealedCreature(CreatureType type)
     {
-        this.creatureName = name;
-        if (name == null)
+        this.creatureType = type;
+        if (type == null)
         {
             LOGGER.log(Level.SEVERE,
-                "Tried to create RevealedCreature with null name");
+                "Tried to create RevealedCreature with null type");
+            assert false : "Can not reveal creature without type";
             return;
         }
     }
@@ -55,17 +55,22 @@ public class RevealedCreature
 
     public String getName()
     {
-        return titanBaseName != null ? titanBaseName : creatureName;
+        return titanBaseName != null ? titanBaseName : creatureType.getName();
+    }
+
+    public CreatureType getCreatureType()
+    {
+        return creatureType;
     }
 
     public String getPlainName()
     {
-        return creatureName;
+        return creatureType.getName();
     }
 
     public boolean matches(String name)
     {
-        if (name.equals(creatureName))
+        if (name.equals(creatureType))
         {
             return true;
         }
@@ -88,10 +93,7 @@ public class RevealedCreature
             + (wasRecruited ? "was recruited; " : "")
             + (wasReinforced ? "was reinforced; " : "")
             + (didTeleport ? "teleported; " : "")
-            +
-            // (didTowerTeleport ? "tower teleported; " : "") +
-            // (didTitanTeleport ? "titan teleported; " : "") +
-            (wasSummoned ? "was summoned; " : "")
+            + (wasSummoned ? "was summoned; " : "")
             + (wasAcquired ? "was acquired; " : "")
             + (dead ? "is dead; " : "");
 

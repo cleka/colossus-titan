@@ -22,7 +22,7 @@ import net.sf.colossus.variant.CreatureType;
 
 
 /**
- * Contains info about one event that revealed some interestng information,
+ * Contains info about one event that revealed some interesting information,
  * stored in EventViewer.
  *
  * @author Clemens Katzer
@@ -165,8 +165,7 @@ public class RevealEvent
             if (rc != null && rc.getPlainName() != null
                 && rc.getPlainName().equals(Constants.titan))
             {
-                Player player = (realPlayer != null ? realPlayer
-                    : client
+                Player player = (realPlayer != null ? realPlayer : client
                     .getGameClientSide().getPlayerByMarkerId(markerId));
 
                 if (player == null)

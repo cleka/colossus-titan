@@ -933,7 +933,7 @@ final class EventViewer extends KDialog
     }
 
     public void newCreatureRevealEvent(int eventType, String markerId1,
-        int height1, String creature, String markerId2, int height2)
+        int height1, CreatureType creature, String markerId2, int height2)
     {
         RevealedCreature rc = new RevealedCreature(creature);
         switch (eventType)
@@ -1000,7 +1000,7 @@ final class EventViewer extends KDialog
                 List<RevealedCreature> rcNames = new ArrayList<RevealedCreature>();
                 for (CreatureType type : creatureTypes)
                 {
-                    RevealedCreature rc = new RevealedCreature(type.getName());
+                    RevealedCreature rc = new RevealedCreature(type);
                     rcNames.add(rc);
                 }
                 otherEvent.updateKnownCreatures(rcNames);
@@ -1012,8 +1012,7 @@ final class EventViewer extends KDialog
                 ArrayList<RevealedCreature> rcNames = new ArrayList<RevealedCreature>();
                 for (CreatureType creature : ownLegion.getCreatureTypes())
                 {
-                    RevealedCreature rc = new RevealedCreature(creature
-                        .getName());
+                    RevealedCreature rc = new RevealedCreature(creature);
                     rcNames.add(rc);
                 }
                 ownEvent.updateKnownCreatures(rcNames);
@@ -1041,8 +1040,7 @@ final class EventViewer extends KDialog
             ArrayList<RevealedCreature> rcNames = new ArrayList<RevealedCreature>();
             for (CreatureType creatureType : creatures)
             {
-                RevealedCreature rc = new RevealedCreature(creatureType
-                    .getName());
+                RevealedCreature rc = new RevealedCreature(creatureType);
                 rcNames.add(rc);
             }
 
@@ -1057,24 +1055,24 @@ final class EventViewer extends KDialog
         }
     }
 
-    public void addCreature(String markerId, String name, String reason)
+    public void addCreature(Legion legion, CreatureType type, String reason)
     {
         RevealEvent battleEvent = null;
         if (attackerEventLegion != null
-            && attackerEventLegion.getMarkerId().equals(markerId))
+            && attackerEventLegion.getMarkerId().equals(legion.getMarkerId()))
         {
             battleEvent = attackerEventLegion;
 
         }
         else if (defenderEventLegion != null
-            && defenderEventLegion.getMarkerId().equals(markerId))
+            && defenderEventLegion.getMarkerId().equals(legion.getMarkerId()))
         {
             battleEvent = defenderEventLegion;
         }
 
         if (battleEvent != null)
         {
-            RevealedCreature rc = new RevealedCreature(name);
+            RevealedCreature rc = new RevealedCreature(type);
             rc.setReason(reason);
             battleEvent.addCreature(rc);
         }
@@ -1086,13 +1084,14 @@ final class EventViewer extends KDialog
         if (reason.equals(Constants.reasonAcquire))
         {
             // create also the separate acquire event:
-            int newHeight = getLegion(markerId).getHeight();
-            RevealedCreature rc = new RevealedCreature(name);
+            int newHeight = legion.getHeight();
+            RevealedCreature rc = new RevealedCreature(type);
             rc.setWasAcquired(true);
             ArrayList<RevealedCreature> rcList = new ArrayList<RevealedCreature>(
                 1);
             rcList.add(rc);
-            newEvent(RevealEvent.eventAcquire, markerId, newHeight, rcList,
+            newEvent(RevealEvent.eventAcquire, legion.getMarkerId(),
+                newHeight, rcList,
                 null, 0);
 
             if (attackerEventLegion == null || defenderEventLegion == null)
@@ -1102,9 +1101,9 @@ final class EventViewer extends KDialog
                     + " legion event for acquiring!!" + " turn"
                     + client.getTurnNumber() + " player "
                     + client.getActivePlayer().getName() + " phase "
-                    + client.getPhase() + " markerid " + markerId
+                    + client.getPhase() + " markerid " + legion.getMarkerId()
                     + " marker owner"
-                    + getLegion(markerId).getPlayer().getName()
+                    + legion.getPlayer().getName()
                     + "last engagement were" + " attacker "
                     + lastAttackerEventLegion.getMarkerId() + " defender "
                     + lastDefenderEventLegion.getMarkerId());
@@ -1115,11 +1114,13 @@ final class EventViewer extends KDialog
         {
             // addCreature adds summoned creature back to donor:
             int turn = client.getTurnNumber();
-            undoEvent(RevealEvent.eventSummon, markerId, null, turn);
-            if (!attackerEventLegion.removeSummonedCreature(turn, name))
+            undoEvent(RevealEvent.eventSummon, legion.getMarkerId(), null,
+                turn);
+            if (!attackerEventLegion.removeSummonedCreature(turn, type
+                .getName()))
             {
                 // this should never happen...
-                LOGGER.log(Level.WARNING, "Un-Summon " + name
+                LOGGER.log(Level.WARNING, "Un-Summon " + type.getName()
                     + " out of attacker event failed!");
             }
         }
@@ -1164,13 +1165,13 @@ final class EventViewer extends KDialog
 
         for (CreatureType creature : recruiters)
         {
-            rc = new RevealedCreature(creature.getName());
+            rc = new RevealedCreature(creature);
             rc.setDidRecruit(true);
             rcList.add(rc);
         }
 
         int recruitType;
-        rc = new RevealedCreature(recruit.getName());
+        rc = new RevealedCreature(recruit);
         if (reason.equals(Constants.reasonReinforced))
         {
             recruitType = RevealEvent.eventReinforce;
