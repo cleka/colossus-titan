@@ -938,7 +938,7 @@ public final class Client implements IClient, IOracle, IVariant
      */
     public void addCreature(Legion legion, CreatureType creature, String reason)
     {
-        ((LegionClientSide)legion).addCreature(creature);
+        legion.addCreature(creature);
 
         gui.actOnAddCreature(legion, creature, reason);
 
@@ -954,7 +954,7 @@ public final class Client implements IClient, IOracle, IVariant
         gui.actOnRemoveCreature(legion, creature, reason);
 
         int height = legion.getHeight();
-        ((LegionClientSide)legion).removeCreature(creature);
+        legion.removeCreature(creature);
         if (height <= 1)
         {
             // do not remove this, sever will give explicit order to remove it
@@ -1008,9 +1008,9 @@ public final class Client implements IClient, IOracle, IVariant
 
                 gui.removeBattleChit(battleUnit);
 
-                // Also remove it from LegionInfo.
-                ((LegionClientSide)battleUnit.getLegion())
-                    .removeCreature(battleUnit.getCreatureType());
+                // Also remove it from legion.
+                battleUnit.getLegion().removeCreature(
+                    battleUnit.getCreatureType());
 
                 // And generate EventViewer event:
                 // Note that have to do the legion.removeCreature before this
@@ -1680,7 +1680,7 @@ public final class Client implements IClient, IOracle, IVariant
             : Constants.reasonRecruited);
 
         addCreature(legion, recruit, reason);
-        ((LegionClientSide)legion).setRecruit(recruit);
+        legion.setRecruit(recruit);
 
         gui.actOnDidRecruit(legion, recruit, recruiters, reason);
     }
@@ -1702,10 +1702,10 @@ public final class Client implements IClient, IOracle, IVariant
         {
             // normal undoRecruit
             wasReinforcement = false;
-            ((LegionClientSide)legion).removeCreature(recruit);
+            legion.removeCreature(recruit);
         }
 
-        ((LegionClientSide)legion).setRecruit(null);
+        legion.setRecruit(null);
         gui.actOnUndidRecruitPart(legion, wasReinforcement, getTurnNumber());
     }
 
@@ -1744,8 +1744,7 @@ public final class Client implements IClient, IOracle, IVariant
     {
         for (Player player : game.getPlayers())
         {
-            for (LegionClientSide legion : ((PlayerClientSide)player)
-                .getLegions())
+            for (Legion legion : player.getLegions())
             {
                 legion.setMoved(false);
                 legion.setTeleported(false);
@@ -2385,7 +2384,7 @@ public final class Client implements IClient, IOracle, IVariant
     public void undidMove(Legion legion, MasterHex formerHex,
         MasterHex currentHex, boolean splitLegionHasForcedMove)
     {
-        ((LegionClientSide)legion).setRecruit(null);
+        legion.setRecruit(null);
         legion.setCurrentHex(currentHex);
         legion.setMoved(false);
         boolean didTeleport = legion.hasTeleported();

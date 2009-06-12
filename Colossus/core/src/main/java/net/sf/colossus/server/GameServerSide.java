@@ -2268,7 +2268,7 @@ public final class GameServerSide extends Game
                         : recruiter.getName())));
 
             // Recruits are one to a customer.
-            ((LegionServerSide)legion).setRecruit(recruit);
+            legion.setRecruit(recruit);
             reinforcing = false;
         }
         else

@@ -200,6 +200,10 @@ public abstract class Legion
         return getCreatures().contains(type);
     }
 
+    public abstract void addCreature(CreatureType type);
+
+    public abstract void removeCreature(CreatureType type);
+
     public void setEntrySide(EntrySide entrySide)
     {
         this.entrySide = entrySide;

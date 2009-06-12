@@ -726,4 +726,16 @@ public final class LegionServerSide extends Legion implements
             return (other.getPointValue() - this.getPointValue());
         }
     }
+
+    @Override
+    public void addCreature(CreatureType type)
+    {
+        addCreature(type, true);
+    }
+
+    @Override
+    public void removeCreature(CreatureType type)
+    {
+        removeCreature(type, true, true);
+    }
 }

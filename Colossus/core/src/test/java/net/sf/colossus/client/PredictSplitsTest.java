@@ -101,6 +101,18 @@ public class PredictSplitsTest extends TestCase
             List<CreatureType> angels = new ArrayList<CreatureType>();
             return angels;
         }
+
+        @Override
+        public void addCreature(CreatureType type)
+        {
+            assert false : "Not implemented";
+        }
+
+        @Override
+        public void removeCreature(CreatureType type)
+        {
+            assert false : "Not implemented";
+        }
     }
 
     List<CreatureType> cnl;

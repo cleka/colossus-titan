@@ -163,16 +163,15 @@ public final class LegionClientSide extends Legion implements IOracleLegion
 
     /**
      * Add a new creature to this legion.
-     *
-     * TODO this seems to be a candidate to pull up -- at the moment the server
-     *      side equivalent is more complicated, though
      */
-    void addCreature(CreatureType creature)
+    @Override
+    public void addCreature(CreatureType creature)
     {
         getNode().addCreature(creature);
     }
 
-    void removeCreature(CreatureType creature)
+    @Override
+    public void removeCreature(CreatureType creature)
     {
         getNode().removeCreature(creature);
     }
