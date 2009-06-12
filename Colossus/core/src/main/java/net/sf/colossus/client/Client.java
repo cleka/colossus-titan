@@ -80,11 +80,6 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  *  the GameClientSide for now and relocating code there.
  *  ==> Clemens march 2009: I started the GameClientSide approach :)
  *
- *  TODO there are a few places where an Iterator is used to remove all elements
- *  of a list -- an enhanced for loop with a Collection.clear() would probably
- *  look better and be more efficient (not that the latter would be significant
- *  in any of the cases)
- *
  *  @author David Ripton
  *  @author Romain Dolbeau
  */
@@ -995,10 +990,8 @@ public final class Client implements IClient, IOracle, IVariant
 
     public void removeDeadBattleChits()
     {
-        Iterator<BattleUnit> it = getBattle().getBattleUnits().iterator();
-        while (it.hasNext())
+        for (BattleUnit battleUnit : getBattle().getBattleUnits())
         {
-            BattleUnit battleUnit = it.next();
             if (battleUnit.isDead())
             {
                 // Moved it.remove() to a 2nd loop that is then done inside
@@ -2517,14 +2510,10 @@ public final class Client implements IClient, IOracle, IVariant
         List<CreatureType> recruiters = TerrainRecruitLoader
             .getPossibleRecruiters(terrain, hex);
 
-        Iterator<CreatureType> lit = tempRecruits.iterator();
-        while (lit.hasNext())
+        for (CreatureType creature : tempRecruits)
         {
-            CreatureType creature = lit.next();
-            Iterator<CreatureType> liter = recruiters.iterator();
-            while (liter.hasNext())
+            for (CreatureType lesser : recruiters)
             {
-                CreatureType lesser = liter.next();
                 if ((TerrainRecruitLoader.numberOfRecruiterNeeded(lesser,
                     creature, terrain, hex) <= ((LegionClientSide)legion)
                     .numCreature(lesser))
@@ -2593,10 +2582,8 @@ public final class Client implements IClient, IOracle, IVariant
         }
 
         List<String> strings = new ArrayList<String>();
-        it = recruiters.iterator();
-        while (it.hasNext())
+        for (CreatureType creature : recruiters)
         {
-            CreatureType creature = it.next();
             strings.add(creature.getName());
         }
         return strings;
