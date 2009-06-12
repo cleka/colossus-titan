@@ -20,8 +20,8 @@ import org.jdom.input.SAXBuilder;
 
 /**
  * BattlelandLoader loads the battle hex data
+ *
  * @author Romain Dolbeau
- * @version $Id$
  */
 public class BattlelandLoader
 {

@@ -20,7 +20,6 @@ import net.sf.colossus.variant.HazardTerrain;
  * by the Player. This means the maximum number of aailable Balrog changes,
  * which is why we need a custom CreatureType.
  *
- * @version $Id$
  * @author Romain Dolbeau
  */
 public class CreatureBalrog extends CreatureType

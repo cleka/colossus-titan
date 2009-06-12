@@ -4,10 +4,10 @@ package net.sf.colossus.util;
 import junit.framework.TestCase;
 
 
-/** 
- *  JUnit test for MultiSet. 
- *  @version $Id$
- *  @author David Ripton
+/**
+ * JUnit test for MultiSet.
+ *
+ * @author David Ripton
  */
 public class MultiSetTest extends TestCase
 {

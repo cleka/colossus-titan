@@ -17,8 +17,8 @@ import org.jdom.input.SAXBuilder;
 
 /**
  * Loads the top-level variant file
+ *
  * @author Romain Dolbeau
- * @version $Id$
  */
 public class MainVarFileLoader
 {

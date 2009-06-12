@@ -8,11 +8,10 @@ import java.util.logging.Logger;
 
 
 /**
- *  Class HTMLColor contains constant Colors defined by the W3C.
- *  @version $Id$
- *  @author David Ripton
+ * Class HTMLColor contains constant Colors defined by the W3C.
+ *
+ * @author David Ripton
  */
-
 public final class HTMLColor // NO_UCD
 {
     private static final Logger LOGGER = Logger.getLogger(HTMLColor.class

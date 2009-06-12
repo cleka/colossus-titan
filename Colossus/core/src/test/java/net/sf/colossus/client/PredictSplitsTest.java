@@ -17,7 +17,9 @@ import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;
 
 
-/** Test helper */
+/**
+ * Test helper
+ */
 class AllPredictSplits extends ArrayList<PredictSplits>
 {
     PredictSplitNode getLeaf(String markerId)
@@ -52,9 +54,9 @@ class AllPredictSplits extends ArrayList<PredictSplits>
 
 
 /**
- *  JUnit test for split prediction.
- *  @version $Id$
- *  @author David Ripton
+ * JUnit test for split prediction.
+ *
+ * @author David Ripton
  */
 public class PredictSplitsTest extends TestCase
 {

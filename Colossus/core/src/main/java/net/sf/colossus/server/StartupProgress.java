@@ -19,20 +19,19 @@ import javax.swing.WindowConstants;
 import net.sf.colossus.guiutil.KFrame;
 
 
-
-/** 
- *  Simple log window for Startup progress (waiting for clients)
- *  @version $Id$
- *  @author Clemens Katzer
+/**
+ * Simple log window for Startup progress (waiting for clients)
+ *
+ * @author Clemens Katzer
  */
 public final class StartupProgress implements ActionListener
 {
     /**
      * The time the window takes to show itself.
-     * 
+     *
      * This is a number of milliseconds to wait before showing the window in this
      * class is shown. This means that in local games where everyone is there straight
-     * away the window will never be visible. 
+     * away the window will never be visible.
      */
     private static final int SHOWUP_DELAY = 1000;
 

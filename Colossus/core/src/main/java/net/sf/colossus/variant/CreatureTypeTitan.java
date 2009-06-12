@@ -22,10 +22,8 @@ import net.sf.colossus.common.Constants;
  * then could be stored as member in the class, delegating {@link #getPower()}
  * to {@link net.sf.colossus.server.PlayerServerSide#getTitanPower()}.
  *
- * @version $Id$
  * @author Romain Dolbeau
  */
-
 public class CreatureTypeTitan extends CreatureType
 {
     private static final Logger LOGGER = Logger

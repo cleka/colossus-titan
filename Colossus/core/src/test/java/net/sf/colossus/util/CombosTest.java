@@ -8,10 +8,10 @@ import java.util.List;
 import junit.framework.TestCase;
 
 
-/** 
- *  JUnit test for combinations. 
- *  @version $Id$
- *  @author David Ripton
+/**
+ * JUnit test for combinations.
+ *
+ * @author David Ripton
  */
 public class CombosTest extends TestCase
 {

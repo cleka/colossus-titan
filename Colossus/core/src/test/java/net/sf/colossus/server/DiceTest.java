@@ -10,10 +10,10 @@ import java.util.logging.Logger;
 import junit.framework.TestCase;
 
 
-/** 
- *  JUnit test for dice. 
- *  @version $Id$
- *  @author David Ripton
+/**
+ * JUnit test for dice.
+ *
+ * @author David Ripton
  */
 public class DiceTest extends TestCase
 {

@@ -8,10 +8,10 @@ import junit.framework.TestCase;
 import net.sf.colossus.variant.MasterHex;
 
 
-/** 
- *  JUnit test for balanced towers. 
- *  @version $Id$
- *  @author David Ripton
+/**
+ * JUnit test for balanced towers.
+ *
+ * @author David Ripton
  */
 public class BalancedTowersTest extends TestCase
 {

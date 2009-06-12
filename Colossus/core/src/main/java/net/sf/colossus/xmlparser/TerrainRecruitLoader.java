@@ -48,7 +48,7 @@ import org.jdom.input.SAXBuilder;
  *      recruits marked by the "Special:" keyword
  *
  * @author Romain Dolbeau
- * @version $Id$
+ *
  * @see net.sf.colossus.variant.CreatureType
  */
 public class TerrainRecruitLoader implements IVariantInitializer
@@ -564,14 +564,16 @@ public class TerrainRecruitLoader implements IVariantInitializer
         return terrains.get(id);
     }
 
-    /** Helper class, associating a Creature and a Number
+    /**
+     * Helper class, associating a Creature and a number.
+     *
      * The basic identification is the name (because of the hack of using
      * special name for special stuff...) but the CreatureType is there to
      * avoid reloading from the Variant all the time.
      * We can't look-up at creation time, because the variant isn't available
      * yet, so we delay until the first call to getCreature.
+     *
      * @author Romain Dolbeau
-     * @version $Id$
      */
     private abstract class CreatureAndNumber
     {
@@ -585,7 +587,7 @@ public class TerrainRecruitLoader implements IVariantInitializer
         private final String name;
 
         /**
-         * The Number in the pair
+         * The number in the pair
          */
         private final int number;
 
@@ -644,8 +646,8 @@ public class TerrainRecruitLoader implements IVariantInitializer
     /**
      * Used internally to associate a creature name and the number of
      * creatures needed to recruit it.
+     *
      * @author Romain Dolbeau
-     * @version $Id$
      */
     private class RecruitNumber extends CreatureAndNumber
     {
@@ -664,8 +666,8 @@ public class TerrainRecruitLoader implements IVariantInitializer
     /**
      * Used internally to associate a creature name and the number received
      * when starting a game.
+     *
      * @author Romain Dolbeau
-     * @version $Id$
      */
     private class StartingNumber extends CreatureAndNumber
     {

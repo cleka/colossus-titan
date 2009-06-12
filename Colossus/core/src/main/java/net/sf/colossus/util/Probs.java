@@ -7,10 +7,9 @@ import java.util.logging.Logger;
 
 /**
  * Class Probs holds utility methods for working with probabilities.
- * @version $Id$
+ *
  * @author David Ripton
  */
-
 public final class Probs
 {
     private static final Logger LOGGER = Logger.getLogger(Probs.class

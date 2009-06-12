@@ -12,28 +12,27 @@ import java.util.logging.Logger;
 
 /**
  *  Objects can register here when they are created.
- *  This class notices when it an object is garbage collected 
+ *
+ *  This class notices when it an object is garbage collected
  *  and keeps then track which instances are still running/alive.
- *   
+ *
  *  One can configure for which classes one is interested
  *  in seeing the created/removed delta.
- *   
+ *
  *  This is meant for debug/development purposes, to verify
  *  that cleanup is usually done properly, and not threads
  *  or objects stay unintentionally referenced and never
- *  get garbagecollected. 
- *  So while editing/testing, one sets the "which one to see" 
- *  to the ones one want to monitor, but in productive use, 
+ *  get garbage collected.
+ *
+ *  So while editing/testing, one sets the "which one to see"
+ *  to the ones one want to monitor, but in productive use,
  *  i.e. when checked in to svn, this should be set to
  *  "don't show anything".
  *  (perhaps with Java 1.5 or 1.6, or a good debugger one can
  *  achieve the same effect, but I don't know how ;-)
- *   
- *  @version $Id$
+ *
  *  @author Clemens Katzer
- *    
  */
-
 public class InstanceTracker
 {
     private static final Logger LOGGER = Logger

@@ -12,12 +12,14 @@ import java.util.logging.Logger;
 
 /**
  * Class DevRandom generates random bits (same interface as class Random).
+ *
  * Which random data source to use can be specified by providing a
  * property called "net.sf.colossus.randomFile" (see randomPropertyName)
  * or as argument to the constructor.
+ *
  * If no special source is specified or the specified source is unreachable
  * then it falls back on the regular java Random class.
- * @version $Id$
+ *
  * @author Romain Dolbeau
  * @author David Ripton
  */

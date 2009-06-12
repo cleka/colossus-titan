@@ -3,10 +3,9 @@ package net.sf.colossus.variant;
 
 /**
  * Class Hex describes one general hex.
- * @version $Id$
+ *
  * @author David Ripton
  */
-
 public abstract class Hex
 {
     // The hex vertexes are numbered like this:
@@ -75,7 +74,7 @@ public abstract class Hex
 
     /**
      * We consider two hexes equal if their x/y coordinates are the same.
-     * 
+     *
      * This gives equality within the context of a HexMap, since we don't know to
      * which map the Hex belongs we can't do any better.
      */
@@ -94,5 +93,5 @@ public abstract class Hex
         if (yCoord != other.yCoord)
             return false;
         return true;
-    }    
+    }
 }

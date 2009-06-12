@@ -16,11 +16,10 @@ import net.sf.colossus.variant.MasterHex;
 
 
 /**
- *  JUnit test for line of sight.
- *  @version $Id$
- *  @author David Ripton
+ * JUnit test for line of sight.
+ *
+ * @author David Ripton
  */
-
 public class CarryTest extends TestCase
 {
     GameServerSide game;

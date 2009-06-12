@@ -9,14 +9,11 @@ import java.util.logging.Logger;
 
 
 /**
- *  Storage object for all objects of one class type registered
- *  in InstanceTracker.
- *   
- *  @version $Id$
- *  @author Clemens Katzer
- *    
+ * Storage object for all objects of one class type registered in
+ * InstanceTracker.
+ *
+ * @author Clemens Katzer
  */
-
 public class InstanceGroup
 {
     private static final Logger LOGGER = Logger.getLogger(InstanceGroup.class

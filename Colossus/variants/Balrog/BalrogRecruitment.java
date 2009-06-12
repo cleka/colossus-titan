@@ -24,7 +24,6 @@ import net.sf.colossus.variant.MasterHex;
  * One becomes available in a Player home Tower for every 300 points earned
  * by the Player.
  *
- * @version $Id$
  * @author Romain Dolbeau
  */
 public class BalrogRecruitment extends CustomRecruitBase

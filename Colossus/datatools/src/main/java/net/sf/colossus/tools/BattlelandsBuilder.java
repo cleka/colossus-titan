@@ -3,9 +3,10 @@ package net.sf.colossus.tools;
 import net.sf.colossus.gui.GUIHex;
 import net.sf.colossus.server.VariantSupport;
 
+
 /**
  * Class BattlelandsBuilder
- * @version $Id$
+ *
  * @author Romain Dolbeau
  */
 public class BattlelandsBuilder

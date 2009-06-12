@@ -44,9 +44,10 @@ import net.sf.colossus.variant.HazardHexside;
 import net.sf.colossus.variant.HazardTerrain;
 import net.sf.colossus.xmlparser.BattlelandLoader;
 
+
 /**
  * Class ShowBuilderHexMap displays a battle map.
- * @version $Id$
+ *
  * @author David Ripton
  * @author Romain Dolbeau
  */

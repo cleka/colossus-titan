@@ -19,8 +19,8 @@ import org.jdom.input.SAXBuilder;
 
 /**
  * StrategicMapLoader loads the masterboard data.
+ *
  * @author Romain Dolbeau
- * @version $Id$
  */
 public class StrategicMapLoader
 {

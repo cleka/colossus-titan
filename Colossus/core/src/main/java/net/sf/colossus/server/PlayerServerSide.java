@@ -20,10 +20,8 @@ import net.sf.colossus.variant.CreatureType;
 /**
  * Class Player holds the data for one player in a Titan game.
  *
- * @version $Id$
  * @author David Ripton
  */
-
 public final class PlayerServerSide extends Player implements
     Comparable<PlayerServerSide>
 {

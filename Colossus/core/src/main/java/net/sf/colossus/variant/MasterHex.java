@@ -8,11 +8,10 @@ import net.sf.colossus.common.Constants;
 
 /**
  * Class MasterHex describes one Masterboard hex, without GUI info.
- * @version $Id$
+ *
  * @author David Ripton
  * @author Romain Dolbeau
  */
-
 public class MasterHex extends Hex
 {
     private final MasterHex[] neighbors = new MasterHex[6];

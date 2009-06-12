@@ -16,9 +16,10 @@ import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.HazardHexside;
 import net.sf.colossus.variant.HazardTerrain;
 
+
 /**
  * Class BuilderHexMap displays a basic battle map.
- * @version $Id$
+ *
  * @author David Ripton
  * @author Romain Dolbeau
  */

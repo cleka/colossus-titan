@@ -24,12 +24,11 @@ import net.sf.colossus.webclient.WebClient;
 
 
 /**
- *  Class Start contains code to start the different types of games.
- *  @version $Id$
- *  @author David Ripton
- *  @author Clemens Katzer (rewritten big parts of the main() method)
+ * Class Start contains code to start the different types of games.
+ *
+ * @author David Ripton
+ * @author Clemens Katzer (rewritten big parts of the main() method)
  */
-
 public final class Start
 {
     private static final Logger LOGGER = Logger.getLogger(Start.class

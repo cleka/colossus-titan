@@ -9,10 +9,9 @@ import net.sf.colossus.common.Constants;
 
 /**
  * Class XMLSnapshotFilter implements a FilenameFilter for savegames.
+ *
  * @author David Ripton
- * @version $Id$
  */
-
 public final class XMLSnapshotFilter extends
     javax.swing.filechooser.FileFilter implements FilenameFilter
 {

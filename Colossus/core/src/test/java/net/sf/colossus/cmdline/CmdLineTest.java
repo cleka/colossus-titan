@@ -2,15 +2,12 @@ package net.sf.colossus.cmdline;
 
 
 import junit.framework.TestCase;
-import net.sf.colossus.cmdline.CmdLine;
-import net.sf.colossus.cmdline.Opt;
-import net.sf.colossus.cmdline.Opts;
 
 
 /**
- *  JUnit test for cmdline package.
- *  @version $Id$
- *  @author David Ripton
+ * JUnit test for cmdline package.
+ *
+ * @author David Ripton
  */
 public class CmdLineTest extends TestCase
 {

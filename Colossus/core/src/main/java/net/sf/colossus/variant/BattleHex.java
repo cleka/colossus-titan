@@ -10,11 +10,10 @@ import net.sf.colossus.util.HTMLColor;
 
 /**
  * Class BattleHex holds game state for battle hex.
- * @version $Id$
+ *
  * @author David Ripton
  * @author Romain Dolbeau
  */
-
 public class BattleHex extends Hex
 {
     private static final Logger LOGGER = Logger.getLogger(BattleHex.class
