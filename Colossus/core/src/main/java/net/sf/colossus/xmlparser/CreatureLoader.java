@@ -16,6 +16,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.server.VariantSupport;
+import net.sf.colossus.util.ObjectCreationException;
 import net.sf.colossus.util.StaticResourceLoader;
 import net.sf.colossus.variant.AllCreatureType;
 import net.sf.colossus.variant.CreatureType;
@@ -76,6 +77,10 @@ public class CreatureLoader implements AllCreatureType
         {
             LOGGER.log(Level.SEVERE, "IO exception caught", ex);
         }
+        catch (ObjectCreationException ex)
+        {
+            LOGGER.log(Level.SEVERE, "Failed to create custom object", ex);
+        }
     }
 
     /** Lookup attribute of name name in Element el, and return
@@ -94,7 +99,8 @@ public class CreatureLoader implements AllCreatureType
     }
 
     @SuppressWarnings("boxing")
-    private void handleCreature(Element el) throws JDOMException
+    private void handleCreature(Element el) throws JDOMException,
+        ObjectCreationException
     {
         String name = el.getAttributeValue("name");
         int power = el.getAttribute("power").getIntValue();

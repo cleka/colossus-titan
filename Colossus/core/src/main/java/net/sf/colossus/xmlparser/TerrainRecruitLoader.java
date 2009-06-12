@@ -21,6 +21,8 @@ import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.server.VariantKnower;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.HTMLColor;
+import net.sf.colossus.util.ObjectCreationException;
+import net.sf.colossus.util.StaticResourceLoader;
 import net.sf.colossus.variant.AllCreatureType;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.ICustomRecruitBase;
@@ -686,17 +688,21 @@ public class TerrainRecruitLoader implements IVariantInitializer
             return cri;
         }
         String className = specialString.substring(8);
-        Object o = net.sf.colossus.util.StaticResourceLoader.getNewObject(className,
-            VariantSupport.getVarDirectoriesList());
-        if (o == null)
+        try
         {
+            Object o = StaticResourceLoader.getNewObject(className,
+                VariantSupport.getVarDirectoriesList());
+            cri = (CustomRecruitBase)o;
+            nameToInstance.put(specialString, cri);
+            return cri;
+        }
+        catch (ObjectCreationException e)
+        {
+            // TODO it might be better to throw an exception to avoid fail late scenarios
             LOGGER.log(Level.SEVERE, "CustomRecruitBase doesn't exist for: "
                 + specialString);
             return null;
         }
-        cri = (CustomRecruitBase)o;
-        nameToInstance.put(specialString, cri);
-        return cri;
     }
 
     /**

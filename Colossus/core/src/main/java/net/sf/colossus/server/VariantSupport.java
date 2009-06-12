@@ -23,6 +23,7 @@ import javax.swing.text.StyledDocument;
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.util.ErrorUtils;
+import net.sf.colossus.util.ObjectCreationException;
 import net.sf.colossus.util.StaticResourceLoader;
 import net.sf.colossus.variant.AllCreatureType;
 import net.sf.colossus.variant.CreatureType;
@@ -637,8 +638,15 @@ public final class VariantSupport
         Object o = null;
         if (hintName != null)
         {
-            o = StaticResourceLoader.getNewObject(hintName,
-                getVarDirectoriesList(), new Object[] { variant });
+            try
+            {
+                o = StaticResourceLoader.getNewObject(hintName,
+                    getVarDirectoriesList(), new Object[] { variant });
+            }
+            catch (ObjectCreationException e)
+            {
+                // ignore here, the o == null case is covered below
+            }
         }
         if ((o != null) && (o instanceof IVariantHint))
         {

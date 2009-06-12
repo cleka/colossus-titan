@@ -48,11 +48,10 @@ import org.jdom.Element;
 /**
  * Class ResourceLoader is an utility class to load a resource from
  * a filename and a list of directory.
- * @version $Id$
+ *
  * @author Romain Dolbeau
  * @author David Ripton
  */
-
 public final class StaticResourceLoader
 {
     private static final Logger LOGGER = Logger.getLogger(StaticResourceLoader.class
@@ -1264,12 +1263,14 @@ public final class StaticResourceLoader
 
     /**
      * Create an instance of the class whose name is in parameter.
+     *
      * @param className The name of the class to use.
      * @param directories List of directories to search (in order).
      * @return A new object, instance from the given class.
+     * @throws ObjectCreationException iff the object could not be created
      */
     public static Object getNewObject(String className,
-        List<String> directories)
+        List<String> directories) throws ObjectCreationException
     {
         return getNewObject(className, directories, null);
     }
@@ -1280,21 +1281,16 @@ public final class StaticResourceLoader
      *
      * If no parameters are given, the default constructor is used.
      *
-     * TODO this is full of catch(Exception) blocks, which all return null.
-     *      Esp. returning null seems a rather bad idea, since it will most
-     *      likely turn out to be NPEs somewhere later.
-     *
      * @param className The name of the class to use, must not be null.
      * @param directories List of directories to search (in order), must not be null.
      * @param parameter Array of parameters to pass to the constructor, can be null.
      * @return A new object, instance from the given class or null if
      *         instantiation failed.
-     *
-     * TODO logging SEVERE and then returning null is not consistent, it would probably
-     *      be best to throw a checked exception
+     * @throws ObjectCreationException iff the object could not be created for some reason
      */
     public static Object getNewObject(String className,
         List<String> directories, Object[] parameter)
+        throws ObjectCreationException
     {
         Class<?> theClass = null;
         cl.setDirectories(directories);
@@ -1304,9 +1300,8 @@ public final class StaticResourceLoader
         }
         catch (Exception e)
         {
-            LOGGER.log(Level.SEVERE, "Loading of class \"" + className
-                + "\" failed.", e);
-            return null;
+            throw new ObjectCreationException(
+                "Could not load class with name '" + className + "'", e);
         }
         if (parameter != null)
         {
@@ -1322,16 +1317,18 @@ public final class StaticResourceLoader
             }
             catch (Exception e)
             {
-                LOGGER.log(Level.SEVERE,
+                LOGGER.log(Level.INFO,
                     "Loading or instantiating class' constructor for \""
                         + className + "\" failed", e);
                 Constructor<?>[] constructors = theClass.getConstructors();
                 for (int i = 0; i < constructors.length; i++)
                 {
-                    LOGGER.log(Level.SEVERE, "I have access to: "
+                    LOGGER.log(Level.INFO, "I have access to: "
                         + constructors[i]);
                 }
-                return null;
+                throw new ObjectCreationException(
+                    "Loading or instantiating class' constructor for \""
+                        + className + "\" failed", e);
             }
         }
         else
@@ -1342,9 +1339,9 @@ public final class StaticResourceLoader
             }
             catch (Exception e)
             {
-                LOGGER.log(Level.SEVERE, "Instantiating \"" + className
-                    + "\" failed", e);
-                return null;
+                throw new ObjectCreationException(
+                    "Call to default constructor of '" + className
+                        + "' failed", e);
             }
         }
     }
