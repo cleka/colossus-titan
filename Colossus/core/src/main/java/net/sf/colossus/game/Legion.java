@@ -197,7 +197,7 @@ public abstract class Legion
 
     public boolean contains(CreatureType type)
     {
-        return getCreatures().contains(type);
+        return getCreatureTypes().contains(type);
     }
 
     public abstract void addCreature(CreatureType type);
