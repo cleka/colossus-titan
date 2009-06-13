@@ -72,6 +72,13 @@ public class PredictSplitsTest extends TestCase
         {
             return 0;
         }
+
+        @Override
+        public boolean isEngagement(MasterHex hex)
+        {
+            return false;
+        }
+
     }, "Tester", 1);
 
     private static class TestLegion extends Legion

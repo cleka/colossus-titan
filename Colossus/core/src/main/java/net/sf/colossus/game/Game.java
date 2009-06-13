@@ -270,6 +270,29 @@ public abstract class Game
         return recruits;
     }
 
+    // TODO Client and Server side handle the getLegionsByHex differently,
+    //      so just delegate the "isEngagement" decision to them.
+    public abstract boolean isEngagement(MasterHex hex);
+
+    /**
+     * Return a set of all other unengaged legions of the legion's player
+     * that have summonables (not sorted in any particular order).
+     */
+    public List<Legion> findLegionsWithSummonables(Legion summoner)
+    {
+        List<Legion> result = new ArrayList<Legion>();
+        Player player = summoner.getPlayer();
+        for (Legion legion : player.getLegions())
+        {
+            if (!legion.equals(summoner) && legion.hasSummonable()
+                && !isEngagement(legion.getCurrentHex()))
+            {
+                result.add(legion);
+            }
+        }
+        return result;
+    }
+
     // For making Proposals needed both client and server side
     public Legion getLegionByMarkerId(String markerId)
     {

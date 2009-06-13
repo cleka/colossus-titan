@@ -330,7 +330,8 @@ public class GameClientSide extends Game implements IOracle
         return result;
     }
 
-    boolean isEngagement(MasterHex hex)
+    @Override
+    public boolean isEngagement(MasterHex hex)
     {
         List<LegionClientSide> legions = getLegionsByHex(hex);
         if (legions.size() == 2)
@@ -480,32 +481,4 @@ public class GameClientSide extends Game implements IOracle
         }
     }
 
-    // TODO pull up to Game
-    /**
-     * Return a set of all other unengaged legions of the legion's player
-     * that have summonables (not sorted in any particular order).
-     */
-    public List<Legion> findLegionsWithSummonables(Legion summoner)
-    {
-        List<Legion> result = new ArrayList<Legion>();
-        Player player = summoner.getPlayer();
-        for (Legion legion : player.getLegions())
-        {
-            if (!legion.equals(summoner))
-            {
-                if (legion.hasSummonable())
-                {
-                    // check for engagement -- > 1 legion is good enough since
-                    // it is not split phase
-                    int numInHex = getLegionsByHex(legion.getCurrentHex())
-                        .size();
-                    if (numInHex == 1)
-                    {
-                        result.add(legion);
-                    }
-                }
-            }
-        }
-        return result;
-    }
 }

@@ -2695,7 +2695,8 @@ public final class GameServerSide extends Game
         return entrySides;
     }
 
-    boolean isEngagement(MasterHex hex)
+    @Override
+    public boolean isEngagement(MasterHex hex)
     {
         Player player = null;
         for (Legion legion : getLegions(hex))
@@ -2847,42 +2848,6 @@ public final class GameServerSide extends Game
         setEngagementResult(Constants.erMethodFight, battleWinner, points,
             turnDone);
         checkEngagementDone();
-    }
-
-    /**
-     * @TODO now duplicate to client side method with same name
-     *
-     * Return a set of Legions containing creatures that could
-     * be actually summoned (i.e. is not the summoner itself and is
-     * not currently engaged.
-     * @param summoner  The legion that intends to summon
-     */
-    List<Legion> findLegionsWithSummonables(Legion summoner)
-    {
-        List<Legion> result = new ArrayList<Legion>();
-        for (Legion candidate : summoner.getPlayer().getLegions())
-        {
-            if (candidate != summoner
-                && !isEngagement(candidate.getCurrentHex()))
-            {
-                boolean hasSummonable = false;
-                List<CreatureType> summonableList = getVariant()
-                    .getSummonableCreatureTypes();
-                Iterator<CreatureType> sumIt = summonableList.iterator();
-                while (sumIt.hasNext() && !hasSummonable)
-                {
-                    CreatureType c = sumIt.next();
-
-                    hasSummonable = hasSummonable
-                        || (((LegionServerSide)candidate).numCreature(c) > 0);
-                }
-                if (hasSummonable)
-                {
-                    result.add(candidate);
-                }
-            }
-        }
-        return result;
     }
 
     /** Return true and call Server.didSplit() if the split succeeded.
