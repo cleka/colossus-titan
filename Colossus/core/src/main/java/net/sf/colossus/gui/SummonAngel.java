@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -55,7 +56,7 @@ final class SummonAngel extends KDialog
     private final Map<Chit, Legion> chitToDonor = new HashMap<Chit, Legion>();
 
     private SummonAngel(ClientGUI gui, Legion legion,
-        SortedSet<Legion> possibleDonors)
+        List<Legion> possibleDonors)
     {
         super(gui.getBoard().getFrame(), gui.getOwningPlayer().getName()
             + baseSummonString + legion, false);
@@ -104,7 +105,11 @@ final class SummonAngel extends KDialog
 
         sumChitList.clear();
 
-        for (Legion donor : possibleDonors)
+        SortedSet<Legion> sortedDonors = new TreeSet<Legion>(
+            Legion.ORDER_TITAN_THEN_POINTS_THEN_MARKER);
+        sortedDonors.addAll(possibleDonors);
+
+        for (Legion donor : sortedDonors)
         {
             Box box = new Box(BoxLayout.X_AXIS);
             Marker marker = new Marker(scale, donor.getMarkerId());
@@ -199,7 +204,7 @@ final class SummonAngel extends KDialog
      * and the summoned unit, _OR_ the flag noSummoningWanted is set.
      */
     static SummonInfo summonAngel(ClientGUI gui, Legion legion,
-        SortedSet<Legion> possibleDonors)
+        List<Legion> possibleDonors)
     {
         // Default constructor creates an info with the flag
         // "noSummoningWanted" set to true

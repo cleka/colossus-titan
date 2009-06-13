@@ -6,7 +6,6 @@ import java.awt.GraphicsDevice;
 import java.awt.geom.AffineTransform;
 import java.util.List;
 import java.util.Set;
-import java.util.SortedSet;
 
 import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.BattleUnit;
@@ -200,7 +199,7 @@ public interface IClientGUI
     public abstract void setBoardActive(boolean val);
 
     public abstract SummonInfo doPickSummonAngel(Legion legion,
-        SortedSet<Legion> possibleDonors);
+        List<Legion> possibleDonors);
 
     public abstract List<CreatureType> doPickSplitLegion(Legion parent,
         String childMarker);

@@ -11,7 +11,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Map.Entry;
@@ -1849,7 +1848,7 @@ public class SimpleAI extends AbstractAI
     /**
      * Return a SummonInfo object, containing the summoner, donor and unittype.
      */
-    public SummonInfo summonAngel(Legion summoner, SortedSet<Legion> donors)
+    public SummonInfo summonAngel(Legion summoner, List<Legion> donors)
     {
         // Always summon the biggest possible angel, from the least
         // important legion that has one.

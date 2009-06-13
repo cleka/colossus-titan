@@ -3,7 +3,6 @@ package net.sf.colossus.ai;
 
 import java.util.List;
 import java.util.Set;
-import java.util.SortedSet;
 
 import net.sf.colossus.client.CritterMove;
 import net.sf.colossus.client.LegionClientSide;
@@ -73,7 +72,7 @@ public interface AI
     CreatureType acquireAngel(Legion legion, List<CreatureType> recruits);
 
     /** choose whether to summon an angel or archangel */
-    SummonInfo summonAngel(Legion summoner, SortedSet<Legion> possibleDonors);
+    SummonInfo summonAngel(Legion summoner, List<Legion> possibleDonors);
 
     /** pick a color of legion markers */
     PlayerColor pickColor(List<PlayerColor> colors,

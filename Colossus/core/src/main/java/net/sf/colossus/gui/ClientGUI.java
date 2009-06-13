@@ -15,7 +15,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -1810,7 +1809,7 @@ public class ClientGUI implements IClientGUI
     }
 
     public SummonInfo doPickSummonAngel(Legion legion,
-        SortedSet<Legion> possibleDonors)
+        List<Legion> possibleDonors)
     {
         return SummonAngel.summonAngel(this, legion, possibleDonors);
     }

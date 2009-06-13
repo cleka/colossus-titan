@@ -11,8 +11,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -1097,7 +1095,7 @@ public final class Client implements IClient, IOracle, IVariant
     {
         SummonInfo summonInfo = new SummonInfo();
 
-        SortedSet<Legion> possibleDonors = findLegionsWithSummonables(legion);
+        List<Legion> possibleDonors = findLegionsWithSummonables(legion);
         if (possibleDonors.size() < 1)
         {
             // Should not happen any more since I fixed it on server side.
@@ -2604,12 +2602,11 @@ public final class Client implements IClient, IOracle, IVariant
 
     /**
      * Return a set of all other unengaged legions of the legion's player
-     * that have summonables.
+     * that have summonables, not sorted in any particular order.
      */
-    private SortedSet<Legion> findLegionsWithSummonables(Legion summoner)
+    private List<Legion> findLegionsWithSummonables(Legion summoner)
     {
-        SortedSet<Legion> result = new TreeSet<Legion>(
-            Legion.ORDER_TITAN_THEN_POINTS_THEN_MARKER);
+        List<Legion> result = new ArrayList<Legion>();
         Player player = summoner.getPlayer();
         for (Legion legion : player.getLegions())
         {

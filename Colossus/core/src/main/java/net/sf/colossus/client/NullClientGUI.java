@@ -4,7 +4,6 @@ package net.sf.colossus.client;
 import java.awt.GraphicsDevice;
 import java.util.List;
 import java.util.Set;
-import java.util.SortedSet;
 
 import net.sf.colossus.common.IOptions;
 import net.sf.colossus.common.WhatNextManager;
@@ -410,7 +409,7 @@ public class NullClientGUI implements IClientGUI
     }
 
     public SummonInfo doPickSummonAngel(Legion legion,
-        SortedSet<Legion> possibleDonors)
+        List<Legion> possibleDonors)
     {
         // TODO Auto-generated method stub
         return null;
