@@ -2609,7 +2609,7 @@ public final class Client implements IClient, IOracle, IVariant
     private SortedSet<Legion> findLegionsWithSummonables(Legion summoner)
     {
         SortedSet<Legion> result = new TreeSet<Legion>(
-            Legion.ORDER_TITAN_THEN_POINTS);
+            Legion.ORDER_TITAN_THEN_POINTS_THEN_MARKER);
         Player player = summoner.getPlayer();
         for (Legion legion : player.getLegions())
         {

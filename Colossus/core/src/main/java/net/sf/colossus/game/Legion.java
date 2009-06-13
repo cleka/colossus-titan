@@ -15,8 +15,8 @@ public abstract class Legion
     /**
      * A comparator to order legions by points, with Titan armies first.
      *
-     * This only works properly if all legions are owned by the same player. The case of two
-     * legions with titans is not handled.
+     * This only works properly if all legions are owned by the same player.
+     * The case of two legions with titans is not handled.
      */
     public static final Comparator<Legion> ORDER_TITAN_THEN_POINTS = new Comparator<Legion>()
     {
@@ -39,6 +39,37 @@ public abstract class Legion
             else
             {
                 return (o2.getPointValue() - o1.getPointValue());
+            }
+        }
+    };
+
+    /**
+     * A comparator to order legions by points, with Titan armies first.
+     * If same points, by MarkerId.
+     *
+     * This only works properly if all legions are owned by the same player.
+     * The case of two legions with titans is not handled.
+     */
+    public static final Comparator<Legion> ORDER_TITAN_THEN_POINTS_THEN_MARKER = new Comparator<Legion>()
+    {
+        /**
+         * Legions are sorted in descending order of known total point value,
+         * with the titan legion always coming first, and same points by
+         * markerId. (Otherwise some legions could be "equals" which is not
+         * a good idea when one wants to store them in a sorted Set.
+         *
+         * Really only useful for comparing legions of one player.
+         */
+        public int compare(Legion o1, Legion o2)
+        {
+            int titan_then_points = ORDER_TITAN_THEN_POINTS.compare(o1, o2);
+            if (titan_then_points != 0)
+            {
+                return (titan_then_points);
+            }
+            else
+            {
+                return o1.getMarkerId().compareTo(o2.getMarkerId());
             }
         }
     };
