@@ -2857,9 +2857,9 @@ public final class GameServerSide extends Game
      * not currently engaged.
      * @param summoner  The legion that intends to summon
      */
-    Set<Legion> findLegionsWithSummonables(Legion summoner)
+    List<Legion> findLegionsWithSummonables(Legion summoner)
     {
-        Set<Legion> result = new HashSet<Legion>();
+        List<Legion> result = new ArrayList<Legion>();
         for (Legion candidate : summoner.getPlayer().getLegions())
         {
             if (candidate != summoner
