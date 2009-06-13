@@ -1095,7 +1095,7 @@ public final class Client implements IClient, IOracle, IVariant
     {
         SummonInfo summonInfo = new SummonInfo();
 
-        List<Legion> possibleDonors = findLegionsWithSummonables(legion);
+        List<Legion> possibleDonors = game.findLegionsWithSummonables(legion);
         if (possibleDonors.size() < 1)
         {
             // Should not happen any more since I fixed it on server side.
@@ -2595,34 +2595,6 @@ public final class Client implements IClient, IOracle, IVariant
             if (canRecruit(legion))
             {
                 result.add(legion.getCurrentHex());
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Return a set of all other unengaged legions of the legion's player
-     * that have summonables, not sorted in any particular order.
-     */
-    private List<Legion> findLegionsWithSummonables(Legion summoner)
-    {
-        List<Legion> result = new ArrayList<Legion>();
-        Player player = summoner.getPlayer();
-        for (Legion legion : player.getLegions())
-        {
-            if (!legion.equals(summoner))
-            {
-                if (legion.hasSummonable())
-                {
-                    // check for engagement -- > 1 legion is good enough since
-                    // it is not split phase
-                    int numInHex = getGameClientSide().getLegionsByHex(
-                        legion.getCurrentHex()).size();
-                    if (numInHex == 1)
-                    {
-                        result.add(legion);
-                    }
-                }
             }
         }
         return result;
