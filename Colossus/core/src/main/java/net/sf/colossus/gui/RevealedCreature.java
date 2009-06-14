@@ -70,7 +70,7 @@ public class RevealedCreature
 
     public boolean matches(String name)
     {
-        if (name.equals(creatureType))
+        if (name.equals(getPlainName()))
         {
             return true;
         }
