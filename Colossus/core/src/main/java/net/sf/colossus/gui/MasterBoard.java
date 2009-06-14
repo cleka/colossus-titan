@@ -71,6 +71,7 @@ import net.sf.colossus.guiutil.KFrame;
 import net.sf.colossus.guiutil.SaveWindow;
 import net.sf.colossus.server.XMLSnapshotFilter;
 import net.sf.colossus.util.ArrayHelper;
+import net.sf.colossus.util.BuildInfo;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.util.NullCheckPredicate;
 import net.sf.colossus.util.StaticResourceLoader;
@@ -785,7 +786,7 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                String buildInfo = Client.getVersion() + "\n"
+                String buildInfo = BuildInfo.getFullBuildInfoString() + "\n"
                     + "user.home:      " + System.getProperty("user.home");
                 String colossusHome = System.getProperty("user.home")
                     + File.separator + ".colossus";
@@ -794,7 +795,7 @@ public final class MasterBoard extends JPanel
                 JOptionPane.showMessageDialog(masterFrame, ""
                     + "Colossus build: " + buildInfo + "\n"
                     + "Colossus home:  " + colossusHome + "\n"
-                    + "Logdirectory:   " + logDirectory + "\n"
+                    + "Log directory:  " + logDirectory + "\n"
                     + "java.version:   " + System.getProperty("java.version"),
                     "About Colossus",
                     JOptionPane.INFORMATION_MESSAGE);

@@ -53,6 +53,7 @@ import net.sf.colossus.guiutil.SaveWindow;
 import net.sf.colossus.server.Dice;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.server.XMLSnapshotFilter;
+import net.sf.colossus.util.BuildInfo;
 import net.sf.colossus.util.StaticResourceLoader;
 import net.sf.colossus.variant.Variant;
 
@@ -597,7 +598,9 @@ public final class GetPlayers extends KFrame
             // it's for the displaying in GUI only.
             LOGGER.log(Level.WARNING, ex.toString(), ex);
         }
-        String runningOnString = "Running on " + hostString + ", port " + port;
+        String runningOnString = "Running Colossus (revision "
+            + BuildInfo.getRevisionInfoString() + ") on " + hostString
+            + ", port " + port;
         runningOnLabel.setText(runningOnString);
     }
 

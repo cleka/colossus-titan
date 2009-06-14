@@ -19,6 +19,7 @@ import net.sf.colossus.common.Options;
 import net.sf.colossus.common.WhatNextManager;
 import net.sf.colossus.common.WhatNextManager.WhatToDoNext;
 import net.sf.colossus.guiutil.DebugMethods;
+import net.sf.colossus.util.BuildInfo;
 import net.sf.colossus.util.ViableEntityManager;
 import net.sf.colossus.webclient.WebClient;
 
@@ -829,8 +830,9 @@ public final class Start
      */
     public static void main(String[] args)
     {
-        LOGGER.log(Level.INFO, "Start for Colossus version "
-            + Client.getVersion() + " at " + new Date().getTime());
+        LOGGER.log(Level.INFO, "Start for Colossus version '"
+            + BuildInfo.getFullBuildInfoString() + "' at "
+            + new Date().getTime());
 
         Start startObject = new Start(args);
 

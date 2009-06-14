@@ -1,15 +1,12 @@
 package net.sf.colossus.client;
 
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -2971,35 +2968,6 @@ public final class Client implements IClient, IOracle, IVariant
     public void log(String message)
     {
         LOGGER.log(Level.INFO, message);
-    }
-
-    public static String getVersion()
-    {
-        try
-        {
-            Properties buildInfo = new Properties();
-            ClassLoader cl = Client.class.getClassLoader();
-            InputStream is = cl
-                .getResourceAsStream("META-INF/build.properties");
-            if (is == null)
-            {
-                LOGGER.log(Level.INFO, "No build information available.");
-                return "UNKNOWN";
-            }
-            buildInfo.load(is);
-            String revInfo = buildInfo
-                .getProperty("svn.revision.max-with-flags");
-            String timeStamp = buildInfo.getProperty("build.timestamp");
-            String byUser = buildInfo.getProperty("username");
-            String buildInfoString = "Built " + timeStamp + " by " + byUser
-                + " from revision " + revInfo;
-            return buildInfoString;
-        }
-        catch (IOException ex)
-        {
-            LOGGER.log(Level.WARNING, "Problem reading build info file", ex);
-        }
-        return "UNKNOWN";
     }
 
     public boolean testBattleMove(BattleCritter battleUnit, BattleHex hex)
