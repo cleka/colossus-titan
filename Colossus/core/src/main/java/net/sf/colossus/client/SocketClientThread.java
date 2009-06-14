@@ -115,7 +115,7 @@ final class SocketClientThread extends Thread implements IServer,
 
             task = "signing on";
             LOGGER.log(Level.FINEST, "Next: " + task);
-            signOn(initialName, isRemote);
+            signOn(initialName, isRemote, IServer.CLIENT_VERSION);
 
             task = "preparing BufferedReader";
             LOGGER.log(Level.FINEST, "Next: " + task);
@@ -1147,9 +1147,10 @@ final class SocketClientThread extends Thread implements IServer,
     }
 
     // Setup method
-    private void signOn(String loginName, boolean isRemote)
+    private void signOn(String loginName, boolean isRemote, int version)
     {
-        out.println(Constants.signOn + sep + loginName + sep + isRemote);
+        out.println(Constants.signOn + sep + loginName + sep + isRemote + sep
+            + version);
     }
 
     /** Set the thread name to playerName */

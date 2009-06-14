@@ -15,7 +15,7 @@ import net.sf.colossus.variant.MasterHex;
 
 
 /**
- *  IClient is a remote interface for the client-accessible parts of Client.
+ *  IClient is a remote interface for the server-accessible parts of Client.
  *
  *  @author David Ripton
  */

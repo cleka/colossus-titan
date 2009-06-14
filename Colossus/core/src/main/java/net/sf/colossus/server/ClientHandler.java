@@ -282,8 +282,20 @@ final class ClientHandler implements IClient
         {
             String tmpPlayerName = args.remove(0);
             boolean remote = Boolean.valueOf(args.remove(0)).booleanValue();
-            boolean success = server.addClient(this, tmpPlayerName, remote);
-            if (success)
+            int clientVersion = 0;
+            if (!args.isEmpty())
+            {
+                clientVersion = Integer.parseInt(args.remove(0));
+            }
+            else
+            {
+                LOGGER.info("Connecting client does not send version info "
+                    + "- setting it to -1.");
+                clientVersion = -1;
+            }
+            String reasonFail = server.addClient(this, tmpPlayerName, remote,
+                clientVersion);
+            if (reasonFail == null)
             {
                 // this setPlayerName is only send for the reason that the client
                 // expects a response quickly
@@ -294,9 +306,9 @@ final class ClientHandler implements IClient
             }
             else
             {
-                System.out.println("Rejecting unexpected client "
+                System.out.println("Rejecting client "
                     + tmpPlayerName);
-                nak("SignOn", "Invalid player name '" + tmpPlayerName + "'!");
+                nak("SignOn", reasonFail);
             }
             InstanceTracker.setId(this, tmpPlayerName);
         }

@@ -20,6 +20,13 @@ import net.sf.colossus.variant.MasterHex;
  */
 public interface IServer
 {
+    public static final int CLIENT_VERSION = 1;
+
+    // Clients that do not send version yet at all, are treated as version -1.
+    // For those, even show on server side an error dialog and refuse them to
+    // connect.
+    public static final int MINIMUM_CLIENT_VERSION = 0;
+
     public void leaveCarryMode();
 
     public void doneWithBattleMoves();

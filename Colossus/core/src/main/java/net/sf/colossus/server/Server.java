@@ -871,10 +871,50 @@ public final class Server extends Thread implements IServer
             && getPlayer().equals(game.getBattle().getActivePlayer());
     }
 
-    boolean addClient(final IClient client, final String playerName,
-        final boolean remote)
+    /**
+     * Add a Client.
+     *
+     * @param client
+     * @param playerName
+     * @param remote
+     * @param clientVersion
+     * @return Reason why adding Client was refused, null if all is fine.
+     */
+    String addClient(final IClient client, final String playerName,
+        final boolean remote, final int clientVersion)
     {
         LOGGER.finest("Calling Server.addClient() for " + playerName);
+
+        if (clientVersion <= IServer.MINIMUM_CLIENT_VERSION)
+        {
+            String versionText = (clientVersion == -1 ? "-1 (=no Version defined)"
+                : clientVersion + "");
+            LOGGER.warning("Client " + playerName + " uses too old Client "
+                + "Version: " + versionText
+                + " but server requires at least: "
+                + IServer.MINIMUM_CLIENT_VERSION);
+
+            logToStartLog("PROBLEM: One client attempted to join with player"
+                + " name " + playerName + "\n- rejected, because client uses "
+                + "too old version: " + versionText);
+            return "You are using too old Client Version: " + versionText
+                + " - expected at least: " + IServer.MINIMUM_CLIENT_VERSION;
+        }
+        else if (clientVersion != IServer.CLIENT_VERSION)
+        {
+            String diffWhat = (clientVersion < IServer.CLIENT_VERSION ? "older"
+                : " newer");
+            logToStartLog("WARNING: One client attempted to join with player name "
+                + playerName
+                + ", using different ("
+                + diffWhat
+                + ") client version: "
+                + clientVersion
+                + " - trying it anyway.");
+            LOGGER.warning("Client " + playerName + " uses Client Version: "
+                + clientVersion + " but we would expect "
+                + IServer.CLIENT_VERSION + " - trying it anyway.");
+        }
 
         Player player = null;
         if (playerName.equalsIgnoreCase("spectator"))
@@ -904,7 +944,7 @@ public final class Server extends Thread implements IServer
             logToStartLog("NOTE: One client attempted to join with player name "
                 + playerName
                 + " - rejected, because no such player is expected!");
-            return false;
+            return "No player with name " + playerName + " expected.";
         }
         else if (clientMap.containsKey(player))
         {
@@ -914,7 +954,7 @@ public final class Server extends Thread implements IServer
             logToStartLog("NOTE: One client attempted to join with player name "
                 + playerName
                 + " - rejected, because same player name already " + "joined.");
-            return false;
+            return "Other player with same name already connected.";
         }
         else
         {
@@ -961,7 +1001,9 @@ public final class Server extends Thread implements IServer
             logToStartLog((remote ? "Remote" : "Local") + " spectator ("
                 + name + ") signed on.");
         }
-        return true;
+
+        // ReasonFail == null means "everything is fine.":
+        return null;
     }
 
     public void startGameIfAllPlayers()
