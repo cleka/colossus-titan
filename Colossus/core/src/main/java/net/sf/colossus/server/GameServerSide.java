@@ -2695,42 +2695,6 @@ public final class GameServerSide extends Game
         return entrySides;
     }
 
-    @Override
-    public boolean isEngagement(MasterHex hex)
-    {
-        Player player = null;
-        for (Legion legion : getLegions(hex))
-        {
-            if (player == null)
-            {
-                player = legion.getPlayer();
-            }
-            else if (legion.getPlayer() != player)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /** Return set of hexLabels for engagements found. */
-    Set<MasterHex> findEngagements()
-    {
-        Set<MasterHex> result = new HashSet<MasterHex>();
-        Player player = getActivePlayer();
-
-        for (Legion legion : player.getLegions())
-        {
-            MasterHex hex = legion.getCurrentHex();
-
-            if (getNumEnemyLegions(hex, player) > 0)
-            {
-                result.add(hex);
-            }
-        }
-        return result;
-    }
-
     void createSummonAngel(Legion attacker)
     {
         if (!isGameOver())
@@ -3536,33 +3500,6 @@ public final class GameServerSide extends Game
         }
     }
 
-    /** Return a list of all players' legions. */
-    List<Legion> getAllLegions()
-    {
-        List<Legion> list = new ArrayList<Legion>();
-        for (Player player : players)
-        {
-            List<? extends Legion> legions = player.getLegions();
-            list.addAll(legions);
-        }
-        return list;
-    }
-
-    /** Return a list of all legions not belonging to player. */
-    private List<Legion> getAllEnemyLegions(Player player)
-    {
-        List<Legion> list = new ArrayList<Legion>();
-        for (Player otherPlayer : players)
-        {
-            if (otherPlayer != player)
-            {
-                List<? extends Legion> legions = otherPlayer.getLegions();
-                list.addAll(legions);
-            }
-        }
-        return list;
-    }
-
     @Override
     public LegionServerSide getLegionByMarkerId(String markerId)
     {
@@ -3618,115 +3555,6 @@ public final class GameServerSide extends Game
                 {
                     return getPlayerUsingColor(player.getShortColor());
                 }
-            }
-        }
-        return null;
-    }
-
-    int getNumLegions(MasterHex masterHex)
-    {
-        int count = 0;
-        for (Legion legion : getAllLegions())
-        {
-            if (masterHex.equals(legion.getCurrentHex()))
-            {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    private boolean isOccupied(MasterHex masterHex)
-    {
-        for (Legion legion : getAllLegions())
-        {
-            if (masterHex.equals(legion.getCurrentHex()))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private Legion getFirstLegion(MasterHex masterHex)
-    {
-        for (Legion legion : getAllLegions())
-        {
-            if (masterHex.equals(legion.getCurrentHex()))
-            {
-                return legion;
-            }
-        }
-        return null;
-    }
-
-    private List<Legion> getLegions(MasterHex masterHex)
-    {
-        List<Legion> result = new ArrayList<Legion>();
-        for (Legion legion : getAllLegions())
-        {
-            if (masterHex.equals(legion.getCurrentHex()))
-            {
-                result.add(legion);
-            }
-        }
-        return result;
-    }
-
-    int getNumFriendlyLegions(MasterHex masterHex, Player player)
-    {
-        int count = 0;
-        List<? extends Legion> legions = player.getLegions();
-        for (Legion legion : legions)
-        {
-            if (masterHex.equals(legion.getCurrentHex()))
-            {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    Legion getFirstFriendlyLegion(MasterHex masterHex, Player player)
-    {
-        for (Legion legion : player.getLegions())
-        {
-            if (masterHex.equals(legion.getCurrentHex()))
-            {
-                return legion;
-            }
-        }
-
-        // only info. I *think* in recombining illegal split case
-        // it might not find anything and that would be totally OK ...
-        LOGGER.info("Could not find any friendly legion for player "
-            + player.getName() + " in hex " + masterHex);
-        return null;
-    }
-
-    int getNumEnemyLegions(MasterHex masterHex, Player player)
-    {
-        int count = 0;
-        for (Legion legion : getAllEnemyLegions(player))
-        {
-            if (masterHex.equals(legion.getCurrentHex()))
-            {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    /**
-     * TODO this could probably be done much easier as getFirstEnemyLegion(Legion)
-     */
-    Legion getFirstEnemyLegion(MasterHex masterHex, Player player)
-    {
-        for (Legion legion : getAllEnemyLegions(player))
-        {
-            if (masterHex.equals(legion.getCurrentHex()))
-            {
-                return legion;
             }
         }
         return null;

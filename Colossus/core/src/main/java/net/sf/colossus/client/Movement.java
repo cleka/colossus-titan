@@ -98,8 +98,7 @@ public final class Movement
             if (client.getGameClientSide().getFriendlyLegions(hex, player)
                 .size() > 0)
             {
-                List<LegionClientSide> legions = client.getGameClientSide()
-                    .getLegionsByHex(hex);
+                List<Legion> legions = client.getGame().getLegionsByHex(hex);
                 if (legions.get(0).hasMoved())
                 {
                     return result;
@@ -364,11 +363,11 @@ public final class Movement
         {
             // Mark every hex containing an enemy stack that does not
             // already contain a friendly stack.
-            for (Legion other : client.getGameClientSide().getEnemyLegions(
+            for (Legion other : client.getGame().getEnemyLegions(
                 player))
             {
                 MasterHex otherHex = other.getCurrentHex();
-                if (!client.getGameClientSide().isEngagement(otherHex))
+                if (!client.getGame().isEngagement(otherHex))
                 {
                     result.add(otherHex);
                 }

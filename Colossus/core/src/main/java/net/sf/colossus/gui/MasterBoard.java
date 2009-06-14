@@ -1264,7 +1264,7 @@ public final class MasterBoard extends JPanel
         {
             return;
         }
-        List<LegionClientSide> legions = client.getGameClientSide()
+        List<Legion> legions = client.getGameClientSide()
             .getLegionsByHex(masterHex);
 
         int numLegions = legions.size();
@@ -1274,7 +1274,7 @@ public final class MasterBoard extends JPanel
             return;
         }
 
-        LegionClientSide legion = legions.get(0);
+        LegionClientSide legion = (LegionClientSide)legions.get(0);
         Marker marker = legionToMarkerMap.get(legion);
         if (marker == null)
         {
@@ -1305,7 +1305,7 @@ public final class MasterBoard extends JPanel
             point = new Point(startingPoint);
             point.x -= chitScale4;
             point.y -= chitScale4;
-            legion = legions.get(1);
+            legion = (LegionClientSide)legions.get(1);
             marker = legionToMarkerMap.get(legion);
             if (marker != null)
             {
@@ -1325,14 +1325,14 @@ public final class MasterBoard extends JPanel
             point = new Point(startingPoint);
             point.x -= chitScale4;
             point.y -= chitScale4;
-            legion = legions.get(1);
+            legion = (LegionClientSide)legions.get(1);
             marker = legionToMarkerMap.get(legion);
             marker.setLocation(point);
 
             point = new Point(startingPoint);
             point.x -= chitScale4;
             point.y -= chitScale;
-            legion = legions.get(2);
+            legion = (LegionClientSide)legions.get(2);
             marker = legionToMarkerMap.get(legion);
             marker.setLocation(point);
         }

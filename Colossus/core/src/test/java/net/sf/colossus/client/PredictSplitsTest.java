@@ -65,21 +65,7 @@ public class PredictSplitsTest extends TestCase
         .getLogger(PredictSplitsTest.class.getName());
 
     private static final Player player = new Player(new Game(null,
-        new String[] {}, new VariantKnower())
-    {
-        @Override
-        public int getTurnNumber()
-        {
-            return 0;
-        }
-
-        @Override
-        public boolean isEngagement(MasterHex hex)
-        {
-            return false;
-        }
-
-    }, "Tester", 1);
+        new String[] {}, new VariantKnower()), "Tester", 1);
 
     private static class TestLegion extends Legion
     {

@@ -4,10 +4,16 @@ package net.sf.colossus.game;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
+import net.sf.colossus.util.CollectionHelper;
+import net.sf.colossus.util.Predicate;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.IVariantKnower;
 import net.sf.colossus.variant.MasterBoardTerrain;
@@ -21,7 +27,7 @@ import net.sf.colossus.variant.Variant;
  * As opposed to {@link Variant} this class holds information about an ongoing game
  * and its status.
  */
-public abstract class Game
+public class Game
 {
     private static final Logger LOGGER = Logger
         .getLogger(Game.class.getName());
@@ -270,9 +276,282 @@ public abstract class Game
         return recruits;
     }
 
-    // TODO Client and Server side handle the getLegionsByHex differently,
-    //      so just delegate the "isEngagement" decision to them.
-    public abstract boolean isEngagement(MasterHex hex);
+    /** Return a list of all legions of all players. */
+    public List<Legion> getAllLegions()
+    {
+        List<Legion> list = new ArrayList<Legion>();
+        for (Player player : players)
+        {
+            List<? extends Legion> legions = player.getLegions();
+            list.addAll(legions);
+        }
+        return list;
+    }
+
+    /** Return a list of all legions not belonging to player. */
+    public List<Legion> getAllEnemyLegions(Player player)
+    {
+        List<Legion> list = new ArrayList<Legion>();
+        for (Player otherPlayer : players)
+        {
+            if (otherPlayer != player)
+            {
+                List<? extends Legion> legions = otherPlayer.getLegions();
+                list.addAll(legions);
+            }
+        }
+        return list;
+    }
+
+    public List<Legion> getLegionsByHex(MasterHex masterHex)
+    {
+        assert masterHex != null : "No hex given to find legions on.";
+
+        List<Legion> result = new ArrayList<Legion>();
+        for (Legion legion : getAllLegions())
+        {
+            if (masterHex.equals(legion.getCurrentHex()))
+            {
+                result.add(legion);
+            }
+        }
+        return result;
+    }
+
+    public int getNumEnemyLegions(MasterHex masterHex, Player player)
+    {
+        int count = 0;
+        for (Legion legion : getAllEnemyLegions(player))
+        {
+            if (masterHex.equals(legion.getCurrentHex()))
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public int getNumLegions(MasterHex masterHex)
+    {
+        int count = 0;
+        for (Legion legion : getAllLegions())
+        {
+            if (masterHex.equals(legion.getCurrentHex()))
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public List<Legion> getFriendlyLegions(final MasterHex hex,
+        final Player player)
+    {
+        return CollectionHelper.selectAsList(player.getLegions(),
+            new Predicate<Legion>()
+            {
+                public boolean matches(Legion legion)
+                {
+                    return legion.getCurrentHex().equals(hex);
+                }
+            });
+    }
+
+    public List<Legion> getEnemyLegions(final Player player)
+    {
+        List<Legion> result = new ArrayList<Legion>();
+        for (Player otherPlayer : players)
+        {
+            if (!otherPlayer.equals(player))
+            {
+                result.addAll(otherPlayer.getLegions());
+            }
+        }
+        return result;
+    }
+
+    public List<Legion> getEnemyLegions(final MasterHex hex,
+        final Player player)
+    {
+        List<Legion> result = new ArrayList<Legion>();
+        for (Player otherPlayer : players)
+        {
+            if (!otherPlayer.equals(player))
+            {
+                for (Legion legion : otherPlayer.getLegions())
+                {
+                    if (legion.getCurrentHex().equals(hex))
+                    {
+                        result.add(legion);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    // TODO decide which one of getFirstFriendlyLegion() to use;
+    // the one is from server side, the other from client side.
+    // Is the CollectionHelper style more efficient?
+    // The simple loop is easier to understand IMHO...
+    /*
+    public Legion getFirstFriendlyLegion(final MasterHex hex, Player player)
+    {
+        return CollectionHelper.selectFirst(player.getLegions(),
+            new Predicate<Legion>()
+            {
+                public boolean matches(Legion legion)
+                {
+                    return legion.getCurrentHex().equals(hex);
+                }
+            });
+    }
+    */
+
+    public Legion getFirstFriendlyLegion(MasterHex masterHex, Player player)
+    {
+        for (Legion legion : player.getLegions())
+        {
+            if (masterHex.equals(legion.getCurrentHex()))
+            {
+                return legion;
+            }
+        }
+
+        // only info. I *think* in recombining illegal split case
+        // it might not find anything and that would be totally OK ...
+        LOGGER.info("Could not find any friendly legion for player "
+            + player.getName() + " in hex " + masterHex);
+        return null;
+    }
+
+    public boolean isOccupied(MasterHex masterHex)
+    {
+        for (Legion legion : getAllLegions())
+        {
+            if (masterHex.equals(legion.getCurrentHex()))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Legion getFirstLegion(MasterHex masterHex)
+    {
+        for (Legion legion : getAllLegions())
+        {
+            if (masterHex.equals(legion.getCurrentHex()))
+            {
+                return legion;
+            }
+        }
+        return null;
+    }
+
+    public int getNumFriendlyLegions(MasterHex masterHex, Player player)
+    {
+        int count = 0;
+        List<? extends Legion> legions = player.getLegions();
+        for (Legion legion : legions)
+        {
+            if (masterHex.equals(legion.getCurrentHex()))
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
+     * TODO this could probably be done much easier as getFirstEnemyLegion(Legion)
+     */
+    public Legion getFirstEnemyLegion(MasterHex masterHex, Player player)
+    {
+        for (Legion legion : getAllEnemyLegions(player))
+        {
+            if (masterHex.equals(legion.getCurrentHex()))
+            {
+                return legion;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Return a set of all hexes with engagements.
+     *
+     * TODO if we can be sure that the activePlayer is set properly, we could
+     *      just create a set of all hexes he is on and then check if someone
+     *      else occupies any of the same
+     */
+    // TODO This is the client side version
+    public Set<MasterHex> findEngagements()
+    {
+        Set<MasterHex> result = new HashSet<MasterHex>();
+        Map<MasterHex, Player> playersOnHex = new HashMap<MasterHex, Player>();
+        for (Player player : players)
+        {
+            for (Legion legion : player.getLegions())
+            {
+                MasterHex hex = legion.getCurrentHex();
+                if (playersOnHex.get(hex) == null)
+                {
+                    // no player on that hex found yet, set this one
+                    playersOnHex.put(hex, player);
+                }
+                else
+                {
+                    if (!playersOnHex.get(hex).equals(player))
+                    {
+                        // someone else already on the hex -> engagement
+                        result.add(hex);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    /** Return set of hexLabels for engagements found. */
+    // The GameServerSide version works based on the activePlayer idea...
+    // TODO which one to keep?
+    /*
+    public Set<MasterHex> findEngagements()
+    {
+        Set<MasterHex> result = new HashSet<MasterHex>();
+        Player player = getActivePlayer();
+
+        for (Legion legion : player.getLegions())
+        {
+            MasterHex hex = legion.getCurrentHex();
+
+            if (getNumEnemyLegions(hex, player) > 0)
+            {
+                result.add(hex);
+            }
+        }
+        return result;
+    }
+    */
+
+    public boolean isEngagement(MasterHex hex)
+    {
+        Player player = null;
+        for (Legion legion : getLegionsByHex(hex))
+        {
+            if (player == null)
+            {
+                player = legion.getPlayer();
+            }
+            else if (legion.getPlayer() != player)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     /**
      * Return a set of all other unengaged legions of the legion's player

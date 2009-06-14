@@ -2242,7 +2242,7 @@ public final class Client implements IClient, IOracle, IVariant
         List<CreatureType> lords = new ArrayList<CreatureType>();
 
         // Titan teleport
-        List<LegionClientSide> legions = getGameClientSide().getLegionsByHex(
+        List<Legion> legions = getGame().getLegionsByHex(
             hex);
         if (!legions.isEmpty())
         {
