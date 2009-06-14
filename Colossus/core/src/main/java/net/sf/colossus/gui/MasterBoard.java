@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 import java.util.logging.Level;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -784,27 +785,19 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                String dirSep = File.separator;
-                String colossusHome = System.getProperty("user.home") + dirSep
-                    + ".colossus";
-                String logDirectory = System.getProperty("java.io.tmpdir");
-                // Resolve "DOCUME~1" stuff to real names on windows:
-                File logDir = new File(logDirectory);
-                String logPath = logDirectory;
-                try
-                {
-                    logPath = logDir.getCanonicalPath();
-                }
-                catch (Exception exc)
-                {
-                    // ignore it...
-                }
-                JOptionPane.showMessageDialog(masterFrame, "Colossus build: "
-                    + Client.getVersion() + "\n" + "user.home:      "
-                    + System.getProperty("user.home") + "\n"
+                String buildInfo = Client.getVersion() + "\n"
+                    + "user.home:      " + System.getProperty("user.home");
+                String colossusHome = System.getProperty("user.home")
+                    + File.separator + ".colossus";
+                String logDirectory = getLogDirectory();
+
+                JOptionPane.showMessageDialog(masterFrame, ""
+                    + "Colossus build: " + buildInfo + "\n"
                     + "Colossus home:  " + colossusHome + "\n"
-                    + "Logdirectory:   " + logPath + "\n" + "java.version:   "
-                    + System.getProperty("java.version"));
+                    + "Logdirectory:   " + logDirectory + "\n"
+                    + "java.version:   " + System.getProperty("java.version"),
+                    "About Colossus",
+                    JOptionPane.INFORMATION_MESSAGE);
             }
         };
 
@@ -830,6 +823,42 @@ public final class MasterBoard extends JPanel
                 showHelpDoc = new ShowHelpDoc();
             }
         };
+    }
+
+    // Derive the logDirectory from the FileHandler.pattern property
+    // (in case someone modified the default in logging.properties file)
+    // to show it in Help-About dialog.
+    private String getLogDirectory()
+    {
+        String propName = "java.util.logging.FileHandler.pattern";
+        String logPattern = LogManager.getLogManager().getProperty(propName);
+        String logDirectory = logPattern;
+        try
+        {
+            File logFileWouldBe = new File(logPattern);
+            logDirectory = logFileWouldBe.getParent();
+        }
+        catch (Exception ex)
+        {
+            LOGGER.warning("Exception while trying to determine log "
+                + "directory from logPattern " + logPattern
+                + " - ignoring it.");
+        }
+
+        // initialize logPath with what we have so far...
+        String logPath = logDirectory;
+
+        // ... and try to resolve "DOCUME~1" stuff to real names on windows:
+        try
+        {
+            File logDir = new File(logDirectory);
+            logPath = logDir.getCanonicalPath();
+        }
+        catch (Exception exc)
+        {
+            // ignore it...
+        }
+        return logPath;
     }
 
     public void doQuitGameAction()

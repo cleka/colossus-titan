@@ -2987,7 +2987,13 @@ public final class Client implements IClient, IOracle, IVariant
                 return "UNKNOWN";
             }
             buildInfo.load(is);
-            return buildInfo.getProperty("svn.revision.max-with-flags");
+            String revInfo = buildInfo
+                .getProperty("svn.revision.max-with-flags");
+            String timeStamp = buildInfo.getProperty("build.timestamp");
+            String byUser = buildInfo.getProperty("username");
+            String buildInfoString = "Built " + timeStamp + " by " + byUser
+                + " from revision " + revInfo;
+            return buildInfoString;
         }
         catch (IOException ex)
         {
