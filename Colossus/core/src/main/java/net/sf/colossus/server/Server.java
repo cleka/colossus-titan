@@ -38,6 +38,7 @@ import net.sf.colossus.game.Proposal;
 import net.sf.colossus.game.events.AddCreatureEvent;
 import net.sf.colossus.game.events.RecruitEvent;
 import net.sf.colossus.game.events.SummonEvent;
+import net.sf.colossus.util.BuildInfo;
 import net.sf.colossus.util.ErrorUtils;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.InstanceTracker;
@@ -881,16 +882,23 @@ public final class Server extends Thread implements IServer
      * @return Reason why adding Client was refused, null if all is fine.
      */
     String addClient(final IClient client, final String playerName,
-        final boolean remote, final int clientVersion)
+        final boolean remote, final int clientVersion, String buildInfo)
     {
-        LOGGER.finest("Calling Server.addClient() for " + playerName);
+        LOGGER.info("Server.addClient() called with: " + "playerName: '"
+            + playerName + "', remote: '" + remote + "', client version '"
+            + clientVersion + "', client build info: '" + buildInfo + "'");
+        if (!buildInfo.equals(BuildInfo.getFullBuildInfoString()))
+        {
+            LOGGER.info("NOTE: client build info differs from "
+                + "server build info.");
+        }
 
         if (clientVersion <= IServer.MINIMUM_CLIENT_VERSION)
         {
             String versionText = (clientVersion == -1 ? "-1 (=no Version defined)"
                 : clientVersion + "");
-            LOGGER.warning("Client " + playerName + " uses too old Client "
-                + "Version: " + versionText
+            LOGGER.warning("Rejecting client " + playerName + " because it "
+                + "uses too old Client version: " + versionText
                 + " but server requires at least: "
                 + IServer.MINIMUM_CLIENT_VERSION);
 

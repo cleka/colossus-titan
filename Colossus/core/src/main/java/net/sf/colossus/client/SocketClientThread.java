@@ -28,6 +28,7 @@ import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.events.RecruitEvent;
 import net.sf.colossus.game.events.SummonEvent;
 import net.sf.colossus.server.IServer;
+import net.sf.colossus.util.BuildInfo;
 import net.sf.colossus.util.ErrorUtils;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.InstanceTracker;
@@ -115,7 +116,8 @@ final class SocketClientThread extends Thread implements IServer,
 
             task = "signing on";
             LOGGER.log(Level.FINEST, "Next: " + task);
-            signOn(initialName, isRemote, IServer.CLIENT_VERSION);
+            signOn(initialName, isRemote, IServer.CLIENT_VERSION, BuildInfo
+                .getFullBuildInfoString());
 
             task = "preparing BufferedReader";
             LOGGER.log(Level.FINEST, "Next: " + task);
@@ -1147,10 +1149,11 @@ final class SocketClientThread extends Thread implements IServer,
     }
 
     // Setup method
-    private void signOn(String loginName, boolean isRemote, int version)
+    private void signOn(String loginName, boolean isRemote, int version,
+        String buildInfo)
     {
         out.println(Constants.signOn + sep + loginName + sep + isRemote + sep
-            + version);
+            + version + sep + buildInfo);
     }
 
     /** Set the thread name to playerName */

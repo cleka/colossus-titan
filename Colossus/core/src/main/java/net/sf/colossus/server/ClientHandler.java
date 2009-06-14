@@ -282,19 +282,22 @@ final class ClientHandler implements IClient
         {
             String tmpPlayerName = args.remove(0);
             boolean remote = Boolean.valueOf(args.remove(0)).booleanValue();
-            int clientVersion = 0;
-            if (!args.isEmpty())
+            int clientVersion;
+            String buildInfo;
+            if (args.size() < 2)
             {
-                clientVersion = Integer.parseInt(args.remove(0));
+                LOGGER.info("Connecting client did not send version/build "
+                    + "info - treating that as version -1, build info NONE.");
+                clientVersion = -1;
+                buildInfo = "NONE";
             }
             else
             {
-                LOGGER.info("Connecting client does not send version info "
-                    + "- setting it to -1.");
-                clientVersion = -1;
+                clientVersion = Integer.parseInt(args.remove(0));
+                buildInfo = args.remove(0);
             }
             String reasonFail = server.addClient(this, tmpPlayerName, remote,
-                clientVersion);
+                clientVersion, buildInfo);
             if (reasonFail == null)
             {
                 // this setPlayerName is only send for the reason that the client
