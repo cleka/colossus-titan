@@ -894,6 +894,9 @@ public final class Server extends Thread implements IServer
                 + " but server requires at least: "
                 + IServer.MINIMUM_CLIENT_VERSION);
 
+            // We do not disable the autoCloseStartupLog here, because since a
+            // player will be missing the startup will not reach the point
+            // where to close it automatically.
             logToStartLog("PROBLEM: One client attempted to join with player"
                 + " name " + playerName + "\n- rejected, because client uses "
                 + "too old version: " + versionText);
@@ -903,14 +906,16 @@ public final class Server extends Thread implements IServer
         else if (clientVersion != IServer.CLIENT_VERSION)
         {
             String diffWhat = (clientVersion < IServer.CLIENT_VERSION ? "older"
-                : " newer");
-            logToStartLog("WARNING: One client attempted to join with player name "
+                : "newer");
+            logToStartLog("WARNING: Client version mismatch detected!!!\n"
+                + "One client attempted to join with player name "
                 + playerName
                 + ", using different ("
                 + diffWhat
                 + ") client version: "
                 + clientVersion
                 + " - trying it anyway.");
+            disableAutoCloseStartupLog();
             LOGGER.warning("Client " + playerName + " uses Client Version: "
                 + clientVersion + " but we would expect "
                 + IServer.CLIENT_VERSION + " - trying it anyway.");
@@ -2747,6 +2752,15 @@ public final class Server extends Thread implements IServer
         if (startLog != null)
         {
             startLog.append(message);
+        }
+    }
+
+    // To disable the auto close when warnings where displayed
+    private void disableAutoCloseStartupLog()
+    {
+        if (startLog != null)
+        {
+            startLog.disableAutoClose();
         }
     }
 

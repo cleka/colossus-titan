@@ -97,6 +97,15 @@ public final class StartupProgress implements ActionListener
         return logFrame;
     }
 
+    /**
+     * Server startup calls this so that possible warning message
+     * can be noticed.
+     */
+    public void disableAutoClose()
+    {
+        this.autoCloseCheckBox.setSelected(false);
+    }
+
     public void setCompleted()
     {
         if (showUpTimer.isRunning())
