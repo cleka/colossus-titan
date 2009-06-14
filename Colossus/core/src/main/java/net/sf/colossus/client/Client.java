@@ -61,8 +61,9 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  *  There is one client per player.
  *
  *  TODO Handle GUI related issues purely via ClientGUI
- *       All GUI classes should talk to the server purely through
- *       ClientGUI which handles it via the Client.
+ *
+ *  TODO All GUI classes should talk to the server purely through
+ *  ClientGUI which handles it via the Client.
  *
  *  TODO the logic for the battles could probably be separated from the
  *  rest of this code. At the moment the battle logic seems to bounce
