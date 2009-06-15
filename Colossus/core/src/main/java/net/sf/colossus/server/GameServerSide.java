@@ -117,6 +117,21 @@ public final class GameServerSide extends Game
     private final WhatNextManager whatNextManager;
     private History history;
 
+    /**
+     *  snapshot of game data (caretaker, players with Legions) at the last
+     *  "commit point", initially those are taken only at start of a phase.
+     *  (Later this might be also after each completed engagement/battle).
+     *  Savegame contains then this snapshot plus the redo-Data which was
+     *  additionally done after that.
+     *
+     *  TODO This whole idea of "snapshot at start of phase and redoLog for
+     *  all what happens after that" is right now (2009-06-15) just in the
+     *  beginning (changed overall methods to support that idea but otherwise
+     *  save game content is still same as before).
+     *
+     */
+    private Element phaseStartSnapshot;
+
     private static int gameCounter = 1;
     private final String gameId;
 
@@ -1298,6 +1313,13 @@ public final class GameServerSide extends Game
         }
     }
 
+    /**
+     * Generate the filename for autosaving (or just "Save" where one does
+     * specify file name either) according to the pattern:
+     *   DIRECTORY/snap TIMESTAMP TURN-PLAYER-PHASE
+     *
+     * @return The file name/path, including directory
+     */
     private String makeAutosaveFileName()
     {
         Date date = new Date();
@@ -1316,7 +1338,15 @@ public final class GameServerSide extends Game
         return name;
     }
 
-    void saveGameInTry(final String filename, boolean autoSave)
+    /**
+     *  Call saveGame in a try-catch block. If any exception is caught,
+     *  log it, show an error dialog, and additionally if this was triggered
+     *  by autosave, disable the autosave from now on.
+     *
+     *  @param filename The name of the file to create
+     *  @param autoSave True if this was triggered by autoSave
+     */
+    void saveGameWithErrorHandling(final String filename, boolean autoSave)
     {
         try
         {
@@ -1324,11 +1354,11 @@ public final class GameServerSide extends Game
         }
         catch (Exception e)
         {
-            String asNowOffMmessage = "";
+            String autosaveNowOffMmessage = "";
             if (autoSave)
             {
                 options.setOption(Options.autosave, false);
-                asNowOffMmessage = " (autosave now disabled)";
+                autosaveNowOffMmessage = " (autosave now disabled)";
             }
 
             String doWhat = autoSave ? "auto-save" : "save";
@@ -1338,59 +1368,86 @@ public final class GameServerSide extends Game
                 + "trying to " + doWhat + " game to " + toWhere
                 + "\nStack trace:\n" + ErrorUtils.makeStackTraceString(e)
                 + "\nSaving the game did probably not succeed"
-                + asNowOffMmessage + ".\n";
+                + autosaveNowOffMmessage + ".\n";
             LOGGER.warning(message);
             ErrorUtils.showExceptionDialog(null, message,
                 "Exception caught during saving!", false);
         }
     }
 
+    /**
+     * Produce one "automatically generated file name" for saving games,
+     * including directory handling:
+     *
+     * 1) Creates the save game directory if it does not exist yet,
+     *    including error handling.
+     * 2) Generates an "automatic" file name (both for autoSave and File-Save)
+     * 3) if it is autosave and the option to keep only a limited number of
+     *    autosave files, add it to the list of autosave file names
+     *
+     * @param filename User specified filename, null for autosave or File-Save
+     * @param autoSave Whether or not this was triggered by autosave
+     * @param keep     How many autosave files to keep, 0 for "keep all"
+     * @return The automatically generated file name
+     */
+    private String automaticFilenameHandling(final String filename,
+        boolean autoSave, int keep)
+    {
+        File savesDir = new File(Constants.SAVE_DIR_NAME);
+
+        if (!savesDir.exists() || !savesDir.isDirectory())
+        {
+            LOGGER.info("Trying to make directory " + Constants.SAVE_DIR_NAME);
+            if (!savesDir.mkdirs())
+            {
+                LOGGER.log(Level.SEVERE, "Could not create saves directory");
+                JOptionPane.showMessageDialog(null,
+                    "Could not create directory " + savesDir
+                        + "\n- saving game failed! Unless the directory "
+                        + "can be created, you can't use File=>Save, and "
+                        + "make sure Autosave (in Game Setup) is disabled.",
+                    "Can't save game!", JOptionPane.ERROR_MESSAGE);
+
+                return null;
+            }
+        }
+
+        String autosaveFilename = makeAutosaveFileName();
+        if (autoSave)
+        {
+            // Real autosave
+            LOGGER.finest("Autosaving game to " + autosaveFilename);
+            if (keep > 0)
+            {
+                autoGeneratedFiles.add(autosaveFilename);
+            }
+        }
+        else
+        {
+            // File-Save (without providing a name) from File menu
+            LOGGER.finest("File-Save saving the game to " + autosaveFilename);
+        }
+
+        return autosaveFilename;
+
+    }
+
+    /**
+     * High-level method to save a file. Used for all three cases: Auto-save,
+     * User specified file and File-Save (without specified file name).
+     *
+     * @param filename user specified filename, null for auto-save or File-Save
+     * @param autoSave Whether or not this is autoSave
+     */
     private synchronized void saveGame(final String filename, boolean autoSave)
     {
         int keep = options.getIntOption(Options.autosaveMaxKeep);
-        String fn = null;
 
+        String fn = null;
         if (filename == null || filename.equals("null"))
         {
-            File savesDir = new File(Constants.SAVE_DIR_NAME);
-
-            if (!savesDir.exists() || !savesDir.isDirectory())
-            {
-                LOGGER.info("Trying to make directory "
-                    + Constants.SAVE_DIR_NAME);
-                if (!savesDir.mkdirs())
-                {
-                    LOGGER.log(Level.SEVERE,
-                        "Could not create saves directory");
-                    JOptionPane
-                        .showMessageDialog(
-                            null,
-                            "Could not create directory "
-                                + savesDir
-                                + "\n- saving game failed! Unless the directory "
-                                + "can be created, you can't use File=>Save, and "
-                                + "make sure Autosave (in Game Setup) is disabled.",
-                            "Can't save game!", JOptionPane.ERROR_MESSAGE);
-
-                    return;
-                }
-            }
-
-            fn = makeAutosaveFileName();
-            if (autoSave)
-            {
-                // Real autosave
-                LOGGER.finest("Autosaving game to " + fn);
-                if (keep > 0)
-                {
-                    autoGeneratedFiles.add(fn);
-                }
-            }
-            else
-            {
-                // File-Save (without providing a name) from File menu
-                LOGGER.finest("File-Save saving the game to " + fn);
-            }
+            fn = automaticFilenameHandling(filename, autoSave, keep);
+            // automaticFilenameHandling did the logging already
         }
         else
         {
@@ -1398,128 +1455,34 @@ public final class GameServerSide extends Game
             LOGGER.info("Saving game to user-provided file name " + filename);
         }
 
+        // Something went wrong. Called methods shoed error message already
+        // TODO do not show errors in called methods, propagate up and
+        // let saveGameWithErrorHandling deal with it.
+        if (fn == null)
+        {
+            return;
+        }
+
         FileWriter fileWriter;
+        PrintWriter out;
         try
         {
             fileWriter = new FileWriter(fn);
+            out = new PrintWriter(fileWriter);
         }
         catch (IOException e)
         {
             LOGGER.log(Level.SEVERE, "Couldn't open " + fn, e);
             return;
         }
-        PrintWriter out = new PrintWriter(fileWriter);
 
+        takeSnapshotAtBeginOfPhase();
+        Element root = createSavegameContent();
+        Document doc = new Document(root);
+
+        // Now write it all out to the file
         try
         {
-            Element root = new Element("ColossusSnapshot");
-
-            root.setAttribute("version", Constants.XML_SNAPSHOT_VERSION);
-
-            Document doc = new Document(root);
-
-            Element el = new Element("Variant");
-
-            el.setAttribute("dir", VariantSupport.getVarDirectory());
-            el.setAttribute("file", VariantSupport.getVarFilename());
-            el.setAttribute("name", VariantSupport.getVariantName());
-            root.addContent(el);
-
-            el = new Element("TurnNumber");
-            el.addContent("" + getTurnNumber());
-            root.addContent(el);
-
-            el = new Element("CurrentPlayer");
-            el.addContent("" + activePlayerNum);
-            root.addContent(el);
-
-            el = new Element("CurrentPhase");
-            el.addContent("" + getPhase().toInt());
-            root.addContent(el);
-
-            Element car = new Element("Caretaker");
-
-            root.addContent(car);
-
-            // Caretaker stacks
-            for (CreatureType creature : getVariant().getCreatureTypes())
-            {
-                el = new Element("Creature");
-                el.setAttribute("name", creature.getName());
-                el.setAttribute("remaining", ""
-                    + getCaretaker().getAvailableCount(creature));
-                el.setAttribute("dead", ""
-                    + getCaretaker().getDeadCount(creature));
-                car.addContent(el);
-            }
-
-            // Players
-            for (Player p : getPlayers())
-            {
-                PlayerServerSide player = (PlayerServerSide)p;
-                el = new Element("Player");
-                el.setAttribute("name", player.getName());
-                el.setAttribute("type", player.getType());
-                el.setAttribute("color", player.getColor().getName());
-                el.setAttribute("startingTower", player.getStartingTower()
-                    .getLabel());
-                el.setAttribute("score", "" + player.getScore());
-                el.setAttribute("dead", "" + player.isDead());
-                el.setAttribute("mulligansLeft", ""
-                    + player.getMulligansLeft());
-                el.setAttribute("colorsElim", player.getPlayersElim());
-                el.setAttribute("movementRoll", "" + player.getMovementRoll());
-                el.setAttribute("teleported", "" + player.hasTeleported());
-                el.setAttribute("summoned", "" + player.hasSummoned());
-
-                Collection<LegionServerSide> legions = player.getLegions();
-                Iterator<LegionServerSide> it2 = legions.iterator();
-
-                while (it2.hasNext())
-                {
-                    LegionServerSide legion = it2.next();
-
-                    el.addContent(dumpLegion(legion, battleInProgress
-                        && (legion == battle.getAttackingLegion() || legion == battle
-                            .getDefendingLegion())));
-                }
-                root.addContent(el);
-            }
-
-            // Dump the file cache, so that generated files are preserved
-            Iterator<Element> itEl = StaticResourceLoader.getFileCacheDump()
-                .iterator();
-            while (itEl.hasNext())
-            {
-                root.addContent(itEl.next());
-            }
-
-            // Battle stuff
-            if (engagementInProgress && battle != null)
-            {
-                Element bat = new Element("Battle");
-
-                bat.setAttribute("masterHexLabel", battle.getMasterHex()
-                    .getLabel());
-                bat.setAttribute("turnNumber", "" + battle.getTurnNumber());
-                bat.setAttribute("activePlayer", ""
-                    + battle.getActivePlayer().getName());
-                bat.setAttribute("phase", ""
-                    + battle.getBattlePhase().ordinal());
-                bat.setAttribute("summonState", "" + battle.getSummonState());
-                bat.setAttribute("carryDamage", "" + battle.getCarryDamage());
-                bat.setAttribute("driftDamageApplied", ""
-                    + battle.isDriftDamageApplied());
-
-                for (BattleHex hex : battle.getCarryTargets())
-                {
-                    Element ct = new Element("CarryTarget");
-                    ct.addContent(hex.getLabel());
-                    bat.addContent(ct);
-                }
-                root.addContent(bat);
-            }
-            root.addContent(history.getCopy());
             XMLOutputter putter = new XMLOutputter("    ", true);
             putter.output(doc, out);
             fileWriter.close();
@@ -1542,6 +1505,169 @@ public final class GameServerSide extends Game
         {
             LOGGER.log(Level.SEVERE, "Error writing XML savegame.", ex);
         }
+    }
+
+    /**
+     *  Take a new snapshot of the data (basic game data,
+     *  players with legions, and history) at the begin of a phase.
+     *  At every point of time there is always one such latest snapshot
+     *  in this.phaseStartSnapshot.
+     */
+    private void takeSnapshotAtBeginOfPhase()
+    {
+        Element root = new Element("ColossusSnapshot");
+        root.setAttribute("version", Constants.XML_SNAPSHOT_VERSION);
+
+        addBasicData(root);
+        addPlayerData(root);
+        root.addContent(history.getCopy());
+
+        this.phaseStartSnapshot = root;
+    }
+
+    /**
+     * Create the whole content that will be written to the save game file.
+     * Takes the last phaseStartSnapshot plus redo-Data plus battle data plus
+     * data files.
+     *
+     * @return The root element which contains all information
+     */
+    private Element createSavegameContent()
+    {
+        Element root = this.phaseStartSnapshot;
+        boolean storeFiles = true;
+        if (storeFiles)
+        {
+            addDataFiles(root);
+        }
+
+        // Battle stuff
+        if (engagementInProgress && battle != null)
+        {
+            addBattleData(root);
+        }
+
+        return root;
+    }
+
+    /**
+     * Adds the basic data: variant info, turn number, current player,
+     * current phase, and caretaker.
+     *
+     * @param root The document root to which to add all the data
+     */
+    private void addBasicData(Element root)
+    {
+        Element el = new Element("Variant");
+        el.setAttribute("dir", VariantSupport.getVarDirectory());
+        el.setAttribute("file", VariantSupport.getVarFilename());
+        el.setAttribute("name", VariantSupport.getVariantName());
+        root.addContent(el);
+
+        el = new Element("TurnNumber");
+        el.addContent("" + getTurnNumber());
+        root.addContent(el);
+
+        el = new Element("CurrentPlayer");
+        el.addContent("" + activePlayerNum);
+        root.addContent(el);
+
+        el = new Element("CurrentPhase");
+        el.addContent("" + getPhase().toInt());
+        root.addContent(el);
+
+        // Caretaker stacks
+        Element careTakerEl = new Element("Caretaker");
+        for (CreatureType creature : getVariant().getCreatureTypes())
+        {
+            el = new Element("Creature");
+            el.setAttribute("name", creature.getName());
+            el.setAttribute("remaining", ""
+                + getCaretaker().getAvailableCount(creature));
+            el
+                .setAttribute("dead", ""
+                    + getCaretaker().getDeadCount(creature));
+            careTakerEl.addContent(el);
+        }
+        root.addContent(careTakerEl);
+    }
+
+    /**
+     * Adds the data for all players and their legions to an XML document
+     *
+     * @param root The document root to which to add the data
+     */
+    public void addPlayerData(Element root)
+    {
+        // Players
+        Element el;
+        for (Player p : getPlayers())
+        {
+            PlayerServerSide player = (PlayerServerSide)p;
+            el = new Element("Player");
+            el.setAttribute("name", player.getName());
+            el.setAttribute("type", player.getType());
+            el.setAttribute("color", player.getColor().getName());
+            el.setAttribute("startingTower", player.getStartingTower()
+                .getLabel());
+            el.setAttribute("score", "" + player.getScore());
+            el.setAttribute("dead", "" + player.isDead());
+            el.setAttribute("mulligansLeft", "" + player.getMulligansLeft());
+            el.setAttribute("colorsElim", player.getPlayersElim());
+            el.setAttribute("movementRoll", "" + player.getMovementRoll());
+            el.setAttribute("teleported", "" + player.hasTeleported());
+            el.setAttribute("summoned", "" + player.hasSummoned());
+
+            Collection<LegionServerSide> legions = player.getLegions();
+            Iterator<LegionServerSide> it2 = legions.iterator();
+
+            while (it2.hasNext())
+            {
+                LegionServerSide legion = it2.next();
+
+                el
+                    .addContent(dumpLegion(
+                        legion,
+                        battleInProgress
+                            && (legion == battle.getAttackingLegion() || legion == battle
+                                .getDefendingLegion())));
+            }
+            root.addContent(el);
+        }
+    }
+
+    private void addDataFiles(Element root)
+    {
+        // Dump the file cache, so that generated files are preserved
+        Iterator<Element> itEl = StaticResourceLoader.getFileCacheDump()
+            .iterator();
+        while (itEl.hasNext())
+        {
+            root.addContent(itEl.next());
+        }
+    }
+
+    private void addBattleData(Element root)
+    {
+        Element bat = new Element("Battle");
+
+        bat.setAttribute("masterHexLabel", battle.getMasterHex().getLabel());
+        bat.setAttribute("turnNumber", "" + battle.getTurnNumber());
+        bat.setAttribute("activePlayer", ""
+            + battle.getActivePlayer().getName());
+        bat.setAttribute("phase", "" + battle.getBattlePhase().ordinal());
+        bat.setAttribute("summonState", "" + battle.getSummonState());
+        bat.setAttribute("carryDamage", "" + battle.getCarryDamage());
+        bat.setAttribute("driftDamageApplied", ""
+            + battle.isDriftDamageApplied());
+
+        for (BattleHex hex : battle.getCarryTargets())
+        {
+            Element ct = new Element("CarryTarget");
+            ct.addContent(hex.getLabel());
+            bat.addContent(ct);
+        }
+        root.addContent(bat);
     }
 
     private String notnull(String in)
@@ -1600,7 +1726,7 @@ public final class GameServerSide extends Game
     {
         if (getOption(Options.autosave) && !isGameOver())
         {
-            saveGameInTry(null, true);
+            saveGameWithErrorHandling(null, true);
         }
     }
 

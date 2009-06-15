@@ -2488,7 +2488,7 @@ public final class Server extends Thread implements IServer
 
     public void saveGame(String filename, boolean autoSave)
     {
-        game.saveGameInTry(filename, autoSave);
+        game.saveGameWithErrorHandling(filename, autoSave);
     }
 
     // User has requested to save game via File=>Save Game or Save Game as...
@@ -2537,7 +2537,7 @@ public final class Server extends Thread implements IServer
         {
             if (guiRequestSaveFlag)
             {
-                game.saveGameInTry(guiRequestSaveFilename, false);
+                game.saveGameWithErrorHandling(guiRequestSaveFilename, false);
                 guiRequestSaveFlag = false;
                 guiRequestSaveFilename = null;
                 didSomething = true;
