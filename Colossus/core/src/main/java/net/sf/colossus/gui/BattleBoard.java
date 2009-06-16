@@ -170,6 +170,19 @@ public final class BattleBoard extends KFrame
             {
                 gui.askNewCloseQuitCancel(BattleBoard.this, true);
             }
+
+            /* Bruno reported the following issue:
+             * If one switches to another desktop which game (battle) is
+             * ongoing, updates to BattleBoard do not happen and there is no
+             * easy way to refresh the BattleBoard when needed.
+             * Now... just minimize and restore, that forces a repain,
+             * that should solve the problem... I hope ;-) __Clemens.
+             */
+            @Override
+            public void windowDeiconified(WindowEvent e)
+            {
+                repaint();
+            }
         });
 
         setupActions();
