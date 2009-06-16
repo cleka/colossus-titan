@@ -5,7 +5,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import junit.framework.TestCase;
-import net.sf.colossus.client.HexMap;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.EntrySide;
@@ -137,7 +136,7 @@ public class LOSTest extends TestCase
         String battleHexLabel)
     {
         MasterBoardTerrain terrain = battle.getMasterHex().getTerrain();
-        BattleHex battleHex = HexMap.getHexByLabel(terrain, battleHexLabel);
+        BattleHex battleHex = terrain.getHexByLabel(battleHexLabel);
         creature.setCurrentHex(battleHex);
     }
 

@@ -23,7 +23,6 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 import net.sf.colossus.client.Client;
-import net.sf.colossus.client.HexMap;
 import net.sf.colossus.client.Client.ConnectionInitException;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
@@ -1988,8 +1987,8 @@ public final class GameServerSide extends Game
                 while (it2.hasNext())
                 {
                     Element cart = it2.next();
-                    carryTargets.add(HexMap.getHexByLabel(engagementHex
-                        .getTerrain(), cart.getTextTrim()));
+                    carryTargets.add(engagementHex.getTerrain().getHexByLabel(
+                        cart.getTextTrim()));
                 }
 
                 Player attackingPlayer = getActivePlayer();
@@ -2119,14 +2118,14 @@ public final class GameServerSide extends Game
                     .getHexByLabel(currentHexLabel).getTerrain();
                 String currentBattleHexLabel = cre.getAttribute("currentHex")
                     .getValue();
-                BattleHex currentBattleHex = HexMap.getHexByLabel(terrain,
-                    currentBattleHexLabel);
+                BattleHex currentBattleHex = terrain
+                    .getHexByLabel(currentBattleHexLabel);
                 critter.setCurrentHex(currentBattleHex);
 
                 String startingBattleHexLabel = cre
                     .getAttribute("startingHex").getValue();
-                BattleHex startingBattleHex = HexMap.getHexByLabel(terrain,
-                    startingBattleHexLabel);
+                BattleHex startingBattleHex = terrain
+                    .getHexByLabel(startingBattleHexLabel);
                 critter.setStartingHex(startingBattleHex);
 
                 boolean struck = cre.getAttribute("struck").getBooleanValue();

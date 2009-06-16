@@ -16,7 +16,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.client.HexMap;
 import net.sf.colossus.client.IClient;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.BattlePhase;
@@ -403,30 +402,26 @@ final class ClientHandler implements IClient
         {
             int tag = Integer.parseInt(args.remove(0));
             String hexLabel = args.remove(0);
-            BattleHex hex = HexMap.getHexByLabel(server.getGame().getBattle()
-                .getLand(), hexLabel);
+            BattleHex hex = resolveBattleHex(hexLabel);
             server.doBattleMove(tag, hex);
         }
         else if (method.equals(Constants.strike))
         {
             int tag = Integer.parseInt(args.remove(0));
             String hexLabel = args.remove(0);
-            BattleHex hex = HexMap.getHexByLabel(server.getGame().getBattle()
-                .getLand(), hexLabel);
+            BattleHex hex = resolveBattleHex(hexLabel);
             server.strike(tag, hex);
         }
         else if (method.equals(Constants.applyCarries))
         {
             String hexLabel = args.remove(0);
-            BattleHex hex = HexMap.getHexByLabel(server.getGame().getBattle()
-                .getLand(), hexLabel);
+            BattleHex hex = resolveBattleHex(hexLabel);
             server.applyCarries(hex);
         }
         else if (method.equals(Constants.undoBattleMove))
         {
             String hexLabel = args.remove(0);
-            BattleHex hex = HexMap.getHexByLabel(server.getGame().getBattle()
-                .getLand(), hexLabel);
+            BattleHex hex = resolveBattleHex(hexLabel);
             server.undoBattleMove(hex);
         }
         else if (method.equals(Constants.assignStrikePenalty))
@@ -549,6 +544,11 @@ final class ClientHandler implements IClient
             LOGGER.log(Level.SEVERE, "Bogus packet (Server, method: " + method
                 + ", args: " + args + ")");
         }
+    }
+
+    private BattleHex resolveBattleHex(String hexLabel)
+    {
+        return server.getGame().getBattle().getLand().getHexByLabel(hexLabel);
     }
 
     // TODO resolveX methods are on both sides of the network, they should

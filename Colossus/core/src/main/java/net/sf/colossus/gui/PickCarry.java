@@ -15,7 +15,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 
 import net.sf.colossus.client.Client;
-import net.sf.colossus.client.HexMap;
 import net.sf.colossus.guiutil.KDialog;
 import net.sf.colossus.guiutil.SaveWindow;
 import net.sf.colossus.variant.BattleHex;
@@ -127,7 +126,8 @@ final class PickCarry extends KDialog implements ActionListener
         else
         {
             String targetHexLabel = desc.substring(desc.length() - 2);
-            BattleHex targetHex = HexMap.getHexByLabel(client.getBattleSite().getTerrain(), targetHexLabel);
+            BattleHex targetHex = client.getBattleSite().getTerrain()
+                .getHexByLabel(targetHexLabel);
             client.applyCarries(targetHex);
         }
         saveWindow.saveLocation(getLocation());

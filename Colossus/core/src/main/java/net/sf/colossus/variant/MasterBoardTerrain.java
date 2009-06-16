@@ -2,13 +2,22 @@ package net.sf.colossus.variant;
 
 
 import java.awt.Color;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import net.sf.colossus.client.HexMap;
+import net.sf.colossus.game.EntrySide;
+import net.sf.colossus.server.VariantSupport;
+import net.sf.colossus.util.StaticResourceLoader;
+import net.sf.colossus.xmlparser.BattlelandLoader;
 
 
 /**
@@ -67,6 +76,10 @@ public class MasterBoardTerrain implements Comparable<MasterBoardTerrain>
     /** Whether this terrain uses another Terrain recruit tree. */
     private final boolean isAlias;
 
+    // TODO it might be worthwhile moving the battle land into a separate class
+    private final BattleHex[][] battleHexes = new BattleHex[6][6];
+    private final BattleHex[] entrances = new BattleHex[6];
+
     /** The recruiting tree of this terrain */
     IRecruiting recruitingSubTree;
 
@@ -78,6 +91,285 @@ public class MasterBoardTerrain implements Comparable<MasterBoardTerrain>
         this.color = color;
         this.subtitle = null;
         this.isAlias = isAlias;
+        setupHexArrays();
+    }
+
+    private void setupHexArrays()
+    {
+        // Initialize game state hex array.
+        for (int i = 0; i < battleHexes.length; i++)
+        {
+            for (int j = 0; j < battleHexes[0].length; j++)
+            {
+                if (HexMap.VISIBLE_HEXES[i][j])
+                {
+                    BattleHex hex = new BattleHex(i, j);
+
+                    battleHexes[i][j] = hex;
+                }
+            }
+        }
+        setupHexesGameState();
+        setupNeighbors();
+        setupEntrances();
+    }
+
+    private void setupEntrances()
+    {
+        for (int k = 0; k < 6; k++)
+        {
+            entrances[k] = new BattleHex(-1, k);
+        }
+        entrances[0].setNeighbor(3, battleHexes[3][0]);
+        entrances[0].setNeighbor(4, battleHexes[4][1]);
+        entrances[0].setNeighbor(5, battleHexes[5][1]);
+
+        entrances[1].setNeighbor(3, battleHexes[5][1]);
+        entrances[1].setNeighbor(4, battleHexes[5][2]);
+        entrances[1].setNeighbor(5, battleHexes[5][3]);
+        entrances[1].setNeighbor(0, battleHexes[5][4]);
+
+        entrances[2].setNeighbor(4, battleHexes[5][4]);
+        entrances[2].setNeighbor(5, battleHexes[4][5]);
+        entrances[2].setNeighbor(0, battleHexes[3][5]);
+
+        entrances[3].setNeighbor(5, battleHexes[3][5]);
+        entrances[3].setNeighbor(0, battleHexes[2][5]);
+        entrances[3].setNeighbor(1, battleHexes[1][4]);
+        entrances[3].setNeighbor(2, battleHexes[0][4]);
+
+        entrances[4].setNeighbor(0, battleHexes[0][4]);
+        entrances[4].setNeighbor(1, battleHexes[0][3]);
+        entrances[4].setNeighbor(2, battleHexes[0][2]);
+
+        entrances[5].setNeighbor(1, battleHexes[0][2]);
+        entrances[5].setNeighbor(2, battleHexes[1][1]);
+        entrances[5].setNeighbor(3, battleHexes[2][1]);
+        entrances[5].setNeighbor(4, battleHexes[3][0]);
+    }
+
+    /** Add references to neighbor hexes. */
+    private void setupNeighbors()
+    {
+        for (int i = 0; i < battleHexes.length; i++)
+        {
+            for (int j = 0; j < battleHexes[0].length; j++)
+            {
+                if (HexMap.VISIBLE_HEXES[i][j])
+                {
+                    if (j > 0 && HexMap.VISIBLE_HEXES[i][j - 1])
+                    {
+                        battleHexes[i][j]
+                            .setNeighbor(0, battleHexes[i][j - 1]);
+                    }
+
+                    if (i < 5
+                        && HexMap.VISIBLE_HEXES[i + 1][j - ((i + 1) & 1)])
+                    {
+                        battleHexes[i][j].setNeighbor(1, battleHexes[i + 1][j
+                            - ((i + 1) & 1)]);
+                    }
+
+                    if (i < 5 && j + (i & 1) < 6
+                        && HexMap.VISIBLE_HEXES[i + 1][j + (i & 1)])
+                    {
+                        battleHexes[i][j].setNeighbor(2, battleHexes[i + 1][j
+                            + (i & 1)]);
+                    }
+
+                    if (j < 5 && HexMap.VISIBLE_HEXES[i][j + 1])
+                    {
+                        battleHexes[i][j]
+                            .setNeighbor(3, battleHexes[i][j + 1]);
+                    }
+
+                    if (i > 0 && j + (i & 1) < 6
+                        && HexMap.VISIBLE_HEXES[i - 1][j + (i & 1)])
+                    {
+                        battleHexes[i][j].setNeighbor(4, battleHexes[i - 1][j
+                            + (i & 1)]);
+                    }
+
+                    if (i > 0
+                        && HexMap.VISIBLE_HEXES[i - 1][j - ((i + 1) & 1)])
+                    {
+                        battleHexes[i][j].setNeighbor(5, battleHexes[i - 1][j
+                            - ((i + 1) & 1)]);
+                    }
+                }
+            }
+        }
+    }
+
+    public BattleHex getEntrance(EntrySide entrySide)
+    {
+        return getHexByLabel("X" + entrySide.ordinal());
+    }
+
+    /** Add terrain, hexsides, elevation, and exits to hexes.
+     *  Cliffs are bidirectional; other hexside obstacles are noted
+     *  only on the high side, since they only interfere with
+     *  uphill movement. */
+    private void setupHexesGameState()
+    {
+        List<String> directories = VariantSupport
+            .getBattlelandsDirectoriesList();
+        BattleHex[][] hexModel = new BattleHex[battleHexes.length][battleHexes[0].length];
+        for (int i = 0; i < battleHexes.length; i++)
+        {
+            for (int j = 0; j < battleHexes[0].length; j++)
+            {
+                if (HexMap.VISIBLE_HEXES[i][j])
+                {
+                    hexModel[i][j] = new BattleHex(i, j);
+                }
+            }
+        }
+        try
+        {
+            // TODO variant loading code does not belong here
+            { // static Battlelands
+                InputStream batIS = StaticResourceLoader.getInputStream(
+                    getId() + ".xml", directories);
+
+                BattlelandLoader bl = new BattlelandLoader(batIS, hexModel);
+                List<String> tempTowerStartList = bl.getStartList();
+                setStartList(tempTowerStartList);
+                setTower(bl.isTower());
+                setSubtitle(bl.getSubtitle());
+            }
+
+            /* slow & inefficient... */
+            Map<HazardTerrain, Integer> t2n = new HashMap<HazardTerrain, Integer>();
+            for (HazardTerrain hTerrain : HazardTerrain.getAllHazardTerrains())
+            {
+                int count = 0;
+                for (int x = 0; x < 6; x++)
+                {
+                    for (int y = 0; y < 6; y++)
+                    {
+                        if (HexMap.VISIBLE_HEXES[x][y])
+                        {
+                            if (hexModel[x][y].getTerrain().equals(hTerrain))
+                            {
+                                count++;
+                            }
+                        }
+                    }
+                }
+                t2n.put(hTerrain, Integer.valueOf(count));
+            }
+            setHazardNumberMap(t2n);
+            Collection<HazardHexside> hazardTypes = HazardHexside
+                .getAllHazardHexsides();
+
+            // old way
+            Map<Character, Integer> s2n = new HashMap<Character, Integer>();
+            // new way
+            Map<HazardHexside, Integer> h2n = new HashMap<HazardHexside, Integer>();
+
+            for (HazardHexside hazard : hazardTypes)
+            {
+                int count = 0;
+                for (int x = 0; x < 6; x++)
+                {
+                    for (int y = 0; y < 6; y++)
+                    {
+                        if (HexMap.VISIBLE_HEXES[x][y])
+                        {
+                            for (int k = 0; k < 6; k++)
+                            {
+                                if (hexModel[x][y].getHexsideHazard(k) == hazard)
+                                {
+                                    count++;
+                                }
+                            }
+                        }
+                    }
+                }
+                char side = hazard.getCode();
+                // old way
+                s2n.put(Character.valueOf(side), Integer.valueOf(count));
+                // new way
+                h2n.put(hazard, Integer.valueOf(count));
+            }
+            setHazardSideNumberMap(s2n);
+            setHexsideHazardNumberMap(h2n);
+            // map model into GUI
+            for (int i = 0; i < hexModel.length; i++)
+            {
+                BattleHex[] row = hexModel[i];
+                for (int j = 0; j < row.length; j++)
+                {
+                    BattleHex hex = row[j];
+                    if (HexMap.VISIBLE_HEXES[i][j])
+                    {
+                        battleHexes[i][j] = hex;
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            LOGGER.log(Level.SEVERE, "Battleland " + this.displayName
+                + " loading failed.", e);
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Look for the Hex matching the Label in this terrain.
+     */
+    public BattleHex getHexByLabel(String label)
+    {
+        assert label != null : "We must have a label";
+        int x = 0;
+        int y = Integer.parseInt(label.substring(1));
+        switch (label.charAt(0))
+        {
+            case 'A':
+            case 'a':
+                x = 0;
+                break;
+
+            case 'B':
+            case 'b':
+                x = 1;
+                break;
+
+            case 'C':
+            case 'c':
+                x = 2;
+                break;
+
+            case 'D':
+            case 'd':
+                x = 3;
+                break;
+
+            case 'E':
+            case 'e':
+                x = 4;
+                break;
+
+            case 'F':
+            case 'f':
+                x = 5;
+                break;
+
+            case 'X':
+            case 'x':
+
+                /* entrances */
+                return entrances[y];
+
+            default:
+                String message = "Label " + label + " is invalid";
+                LOGGER.log(Level.SEVERE, message);
+                assert false : message;
+        }
+        y = 6 - y - Math.abs((x - 3) / 2);
+        return battleHexes[x][y];
     }
 
     public void setRecruitingSubTree(IRecruiting rst)

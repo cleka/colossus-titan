@@ -4,7 +4,6 @@ package net.sf.colossus.server;
 import java.util.Iterator;
 
 import junit.framework.TestCase;
-import net.sf.colossus.client.HexMap;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.EntrySide;
@@ -134,11 +133,10 @@ public class CarryTest extends TestCase
         assertTrue(hydra1.getPenaltyOptions().size() == 0);
     }
 
-    private void placeCreature(Creature creature,
-        String battleHexLabel)
+    private void placeCreature(Creature creature, String battleHexLabel)
     {
         MasterBoardTerrain terrain = battle.getMasterHex().getTerrain();
-        BattleHex battleHex = HexMap.getHexByLabel(terrain, battleHexLabel);
+        BattleHex battleHex = terrain.getHexByLabel(battleHexLabel);
         creature.setCurrentHex(battleHex);
     }
 

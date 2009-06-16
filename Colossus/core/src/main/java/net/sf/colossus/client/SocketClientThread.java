@@ -670,8 +670,7 @@ final class SocketClientThread extends Thread implements IServer,
             boolean inverted = Boolean.valueOf(args.remove(0)).booleanValue();
             int tag = Integer.parseInt(args.remove(0));
             String hexLabel = args.remove(0);
-            BattleHex hex = HexMap.getHexByLabel(client.getGame()
-                .getBattleSite().getTerrain(), hexLabel);
+            BattleHex hex = resolveBattleHex(hexLabel);
             client.placeNewChit(imageName, inverted, tag, hex);
         }
         else if (method.equals(Constants.replayOngoing))
@@ -891,10 +890,8 @@ final class SocketClientThread extends Thread implements IServer,
             String startingHexLabel = args.remove(0);
             String endingHexLabel = args.remove(0);
             boolean undo = Boolean.valueOf(args.remove(0)).booleanValue();
-            BattleHex startingHex = HexMap.getHexByLabel(client.getGame()
-                .getBattleSite().getTerrain(), startingHexLabel);
-            BattleHex endingHex = HexMap.getHexByLabel(client.getGame()
-                .getBattleSite().getTerrain(), endingHexLabel);
+            BattleHex startingHex = resolveBattleHex(startingHexLabel);
+            BattleHex endingHex = resolveBattleHex(endingHexLabel);
             client.tellBattleMove(tag, startingHex, endingHex, undo);
         }
         else if (method.equals(Constants.didMove))
@@ -1066,6 +1063,12 @@ final class SocketClientThread extends Thread implements IServer,
         }
         LOGGER.finer("Client '" + client.getOwningPlayer().getName()
             + "' finished method processing");
+    }
+
+    private BattleHex resolveBattleHex(String hexLabel)
+    {
+        return client.getGame().getBattleSite().getTerrain().getHexByLabel(
+            hexLabel);
     }
 
     private List<CreatureType> resolveCreatureTypes(String nameList)

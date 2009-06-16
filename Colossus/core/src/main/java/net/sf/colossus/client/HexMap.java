@@ -25,7 +25,6 @@ import java.util.logging.Logger;
 
 import javax.swing.JPanel;
 
-import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.gui.GUIBattleHex;
 import net.sf.colossus.gui.GUIHex;
 import net.sf.colossus.gui.Scale;
@@ -37,13 +36,10 @@ import net.sf.colossus.variant.HazardTerrain;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.xmlparser.BattlelandLoader;
-import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
 /**
  * Class HexMap displays a basic battle map.
- *
- * TODO it also contains model information, particularly in the static members
  *
  * @author David Ripton
  * @author Romain Dolbeau
@@ -59,14 +55,10 @@ public class HexMap extends JPanel
     protected final GUIBattleHex[][] h = new GUIBattleHex[6][6];
     protected final List<GUIBattleHex> hexes = new ArrayList<GUIBattleHex>(33);
 
-    // The game state hexes can be set up once for each terrain type.
-    private final static Map<MasterBoardTerrain, GUIBattleHex[][]> terrainH = new HashMap<MasterBoardTerrain, GUIBattleHex[][]>();
-    private final static Map<MasterBoardTerrain, GUIBattleHex[]> entranceHexes = new HashMap<MasterBoardTerrain, GUIBattleHex[]>();
-
     /** ne, e, se, sw, w, nw */
     private final GUIBattleHex[] entrances = new GUIBattleHex[6];
 
-    protected static final boolean[][] show = {
+    public static final boolean[][] VISIBLE_HEXES = {
         { false, false, true, true, true, false },
         { false, true, true, true, true, false },
         { false, true, true, true, true, true },
@@ -108,51 +100,6 @@ public class HexMap extends JPanel
         }
     }
 
-    /** Set up a static non-GUI hex map for each terrain type. */
-    public static void staticBattlelandsInit(boolean serverSideFirstLoad)
-    {
-        terrainH.clear();
-        entranceHexes.clear();
-
-        // TODO get rid of this last use of the static
-        //      TerrainRecruitLoader.getTerrainsStatic())
-        for (MasterBoardTerrain terrain : TerrainRecruitLoader
-            .getTerrainsStatic())
-        {
-            GUIBattleHex[][] gameH = new GUIBattleHex[6][6];
-            List<GUIBattleHex> gameHexes = new ArrayList<GUIBattleHex>();
-
-            // Initialize game state hex array.
-            for (int i = 0; i < gameH.length; i++)
-            {
-                for (int j = 0; j < gameH[0].length; j++)
-                {
-                    if (show[i][j])
-                    {
-                        GUIBattleHex hex = new GUIBattleHex(i, j);
-
-                        gameH[i][j] = hex;
-                        gameHexes.add(hex);
-                    }
-                }
-            }
-            setupHexesGameState(terrain, gameH, serverSideFirstLoad);
-            setupNeighbors(gameH);
-
-            // Initialize non-GUI entrances
-            GUIBattleHex[] gameEntrances = new GUIBattleHex[6];
-            for (int k = 0; k < 6; k++)
-            {
-                gameEntrances[k] = new GUIBattleHex(-1, k);
-                gameHexes.add(gameEntrances[k]);
-            }
-            setupEntrancesGameState(gameEntrances, gameH);
-            entranceHexes.put(terrain, gameEntrances);
-            // Add hexes to both the [][] and ArrayList maps.
-            terrainH.put(terrain, gameH);
-        }
-    }
-
     protected MasterHex getMasterHex()
     {
         return masterHex;
@@ -175,7 +122,7 @@ public class HexMap extends JPanel
         {
             for (int j = 0; j < h[0].length; j++)
             {
-                if (show[i][j])
+                if (VISIBLE_HEXES[i][j])
                 {
                     GUIBattleHex hex = new GUIBattleHex(cx + 3 * i * scale,
                         (int)Math.round(cy + (2 * j + (i & 1)) * GUIHex.SQRT3
@@ -206,7 +153,7 @@ public class HexMap extends JPanel
         {
             for (int j = 0; j < h[0].length; j++)
             {
-                if (show[i][j])
+                if (VISIBLE_HEXES[i][j])
                 {
                     hexModel[i][j] = new BattleHex(i, j);
                 }
@@ -225,89 +172,6 @@ public class HexMap extends JPanel
                 masterBoardTerrain.setTower(bl.isTower());
                 masterBoardTerrain.setSubtitle(bl.getSubtitle());
             }
-            /*  Commented out until ported to XML
-            else
-            {// random Battlelands
-                 Log.debug("Randomizing " + terrain + " with " + rndSourceName);
-                 InputStream brlIS =
-                 ResourceLoader.getInputStream(rndSourceName,
-                 directories);
-                 BattlelandRandomizerLoader brl =
-                 new BattlelandRandomizerLoader(brlIS);
-                 while (brl.oneArea(h) >= 0)
-                 {
-                 }
-                 brl.resolveAllHexsides(h);
-                 List tempTowerStartList = brl.getStartList();
-                 if (tempTowerStartList != null)
-                 {
-                 startlistMap.put(terrain, tempTowerStartList);
-                 }
-                 towerStatusMap.put(terrain, new Boolean(brl.isTower()));
-                 subtitleMap.put(terrain, null);
-                 StringBuilder buf = new StringBuilder();
-                 for (int i = 0; i < 6; i++)
-                 {
-                 for (int j = 0; j < 6; j++)
-                 {
-                 if (show[i][j])
-                 {
-                 boolean doDumpSides = false;
-                 String haz = h[i][j].getTerrain();
-                 int e = h[i][j].getElevation();
-                 for (int k = 0; k < 6; k++)
-                 {
-                 char s = h[i][j].getHexside(k);
-                 if (s != ' ')
-                 {
-                 doDumpSides = true;
-                 }
-                 }
-                 if (doDumpSides ||
-                 (!haz.equals("Plains")) ||
-                 (e != 0))
-                 {
-                 buf.append(i + " " + j + " ");
-                 buf.append(h[i][j].getTerrain());
-                 buf.append(" ");
-                 buf.append(h[i][j].getElevation());
-                 if (doDumpSides)
-                 {
-                 for (int k = 0; k < 6; k++)
-                 {
-                 if (h[i][j].getHexside(k) != ' ')
-                 {
-                 buf.append(" " + k + " ");
-                 buf.append(h[i][j].getHexside(k));
-                 }
-                 }
-                 }
-                 buf.append("\n");
-                 }
-                 }
-                 }
-                 }
-                 if (brl.isTower())
-                 {
-                 buf.append("TOWER\n");
-                 }
-                 if (tempTowerStartList != null)
-                 {
-                 buf.append("STARTLIST");
-                 Iterator it = tempTowerStartList.iterator();
-                 while (it.hasNext())
-                 {
-                 String label = (String)it.next();
-                 buf.append(" " + label);
-                 }
-                 buf.append("\n");
-                 }
-                 ResourceLoader.putIntoFileCache(terrain, directories,
-                 (new String(buf)).getBytes());
-
-            }
-            */
-            /* count all hazards & hazard sides */
 
             /* slow & inefficient... */
             Map<HazardTerrain, Integer> t2n = new HashMap<HazardTerrain, Integer>();
@@ -318,7 +182,7 @@ public class HexMap extends JPanel
                 {
                     for (int y = 0; y < 6; y++)
                     {
-                        if (show[x][y])
+                        if (VISIBLE_HEXES[x][y])
                         {
                             if (hexModel[x][y].getTerrain().equals(hTerrain))
                             {
@@ -346,7 +210,7 @@ public class HexMap extends JPanel
                 {
                     for (int y = 0; y < 6; y++)
                     {
-                        if (show[x][y])
+                        if (VISIBLE_HEXES[x][y])
                         {
                             for (int k = 0; k < 6; k++)
                             {
@@ -373,7 +237,7 @@ public class HexMap extends JPanel
                 for (int j = 0; j < row.length; j++)
                 {
                     BattleHex hex = row[j];
-                    if (show[i][j])
+                    if (VISIBLE_HEXES[i][j])
                     {
                         h[i][j].setHexModel(hex);
                     }
@@ -395,34 +259,34 @@ public class HexMap extends JPanel
         {
             for (int j = 0; j < h[0].length; j++)
             {
-                if (show[i][j])
+                if (VISIBLE_HEXES[i][j])
                 {
-                    if (j > 0 && show[i][j - 1])
+                    if (j > 0 && VISIBLE_HEXES[i][j - 1])
                     {
                         h[i][j].setNeighbor(0, h[i][j - 1]);
                     }
 
-                    if (i < 5 && show[i + 1][j - ((i + 1) & 1)])
+                    if (i < 5 && VISIBLE_HEXES[i + 1][j - ((i + 1) & 1)])
                     {
                         h[i][j].setNeighbor(1, h[i + 1][j - ((i + 1) & 1)]);
                     }
 
-                    if (i < 5 && j + (i & 1) < 6 && show[i + 1][j + (i & 1)])
+                    if (i < 5 && j + (i & 1) < 6 && VISIBLE_HEXES[i + 1][j + (i & 1)])
                     {
                         h[i][j].setNeighbor(2, h[i + 1][j + (i & 1)]);
                     }
 
-                    if (j < 5 && show[i][j + 1])
+                    if (j < 5 && VISIBLE_HEXES[i][j + 1])
                     {
                         h[i][j].setNeighbor(3, h[i][j + 1]);
                     }
 
-                    if (i > 0 && j + (i & 1) < 6 && show[i - 1][j + (i & 1)])
+                    if (i > 0 && j + (i & 1) < 6 && VISIBLE_HEXES[i - 1][j + (i & 1)])
                     {
                         h[i][j].setNeighbor(4, h[i - 1][j + (i & 1)]);
                     }
 
-                    if (i > 0 && show[i - 1][j - ((i + 1) & 1)])
+                    if (i > 0 && VISIBLE_HEXES[i - 1][j - ((i + 1) & 1)])
                     {
                         h[i][j].setNeighbor(5, h[i - 1][j - ((i + 1) & 1)]);
                     }
@@ -434,7 +298,6 @@ public class HexMap extends JPanel
     private void setupEntrances()
     {
         setupEntrancesGUI();
-        setupEntrancesGameState(entrances, h);
     }
 
     private void setupEntrancesGUI()
@@ -459,37 +322,6 @@ public class HexMap extends JPanel
         hexes.add(entrances[3]);
         hexes.add(entrances[4]);
         hexes.add(entrances[5]);
-    }
-
-    private static void setupEntrancesGameState(GUIBattleHex[] entrances,
-        GUIBattleHex[][] h)
-    {
-        entrances[0].setNeighbor(3, h[3][0]);
-        entrances[0].setNeighbor(4, h[4][1]);
-        entrances[0].setNeighbor(5, h[5][1]);
-
-        entrances[1].setNeighbor(3, h[5][1]);
-        entrances[1].setNeighbor(4, h[5][2]);
-        entrances[1].setNeighbor(5, h[5][3]);
-        entrances[1].setNeighbor(0, h[5][4]);
-
-        entrances[2].setNeighbor(4, h[5][4]);
-        entrances[2].setNeighbor(5, h[4][5]);
-        entrances[2].setNeighbor(0, h[3][5]);
-
-        entrances[3].setNeighbor(5, h[3][5]);
-        entrances[3].setNeighbor(0, h[2][5]);
-        entrances[3].setNeighbor(1, h[1][4]);
-        entrances[3].setNeighbor(2, h[0][4]);
-
-        entrances[4].setNeighbor(0, h[0][4]);
-        entrances[4].setNeighbor(1, h[0][3]);
-        entrances[4].setNeighbor(2, h[0][2]);
-
-        entrances[5].setNeighbor(1, h[0][2]);
-        entrances[5].setNeighbor(2, h[1][1]);
-        entrances[5].setNeighbor(3, h[2][1]);
-        entrances[5].setNeighbor(4, h[3][0]);
     }
 
     protected void unselectAllHexes()
@@ -561,72 +393,9 @@ public class HexMap extends JPanel
         return null;
     }
 
-    public static BattleHex getEntrance(MasterBoardTerrain terrain,
-        EntrySide entrySide)
-    {
-        return getHexByLabel(terrain, "X" + entrySide.ordinal());
-    }
-
-    /** Look for the Hex matching the Label in the terrain static map */
-    public static BattleHex getHexByLabel(MasterBoardTerrain terrain,
-        String label)
-    {
-        assert terrain != null : "We must have a terrain";
-        assert label != null : "We must have a label";
-        int x = 0;
-        int y = Integer.parseInt(label.substring(1));
-        switch (label.charAt(0))
-        {
-            case 'A':
-            case 'a':
-                x = 0;
-                break;
-
-            case 'B':
-            case 'b':
-                x = 1;
-                break;
-
-            case 'C':
-            case 'c':
-                x = 2;
-                break;
-
-            case 'D':
-            case 'd':
-                x = 3;
-                break;
-
-            case 'E':
-            case 'e':
-                x = 4;
-                break;
-
-            case 'F':
-            case 'f':
-                x = 5;
-                break;
-
-            case 'X':
-            case 'x':
-
-                /* entrances */
-                GUIBattleHex[] gameEntrances = entranceHexes.get(terrain);
-                return gameEntrances[y].getHexModel();
-
-            default:
-                String message = "Label " + label + " is invalid";
-                LOGGER.log(Level.SEVERE, message);
-                assert false : message;
-        }
-        y = 6 - y - Math.abs((x - 3) / 2);
-        GUIBattleHex[][] correctHexes = terrainH.get(terrain);
-        return correctHexes[x][y].getHexModel();
-    }
-
     public BattleHex getHexByLabel(String hexLabel)
     {
-        return getHexByLabel(masterHex.getTerrain(), hexLabel);
+        return masterHex.getTerrain().getHexByLabel(hexLabel);
     }
 
     /** Return the GUIBattleHex that contains the given point, or

@@ -538,17 +538,6 @@ public class TerrainRecruitLoader implements IVariantInitializer
 
     /**
      * Return a collection of all possible terrains.
-     * TODO get rid of this. Only once place still needs it.
-     *
-     * @return A collection containing all instances of {@link MasterBoardTerrain}.
-     */
-    public static Collection<MasterBoardTerrain> getTerrainsStatic()
-    {
-        return Collections.unmodifiableCollection(terrains.values());
-    }
-
-    /**
-     * Return a collection of all possible terrains.
      * NOTE: Only meant to be used for Variant Initialization!
      *       In normal cases this list should be get from variant object.
      *

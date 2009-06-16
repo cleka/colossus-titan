@@ -1489,8 +1489,8 @@ public final class Client implements IClient, IOracle, IVariant
             Iterator<String> it = carryTargetDescriptions.iterator();
             String desc = it.next();
             String targetHexLabel = desc.substring(desc.length() - 2);
-            BattleHex targetHex = HexMap.getHexByLabel(game.getBattleSite()
-                .getTerrain(), targetHexLabel);
+            BattleHex targetHex = game.getBattleSite().getTerrain()
+                .getHexByLabel(targetHexLabel);
             applyCarries(targetHex);
         }
         else

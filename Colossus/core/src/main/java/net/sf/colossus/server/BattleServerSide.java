@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.client.HexMap;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.game.Battle;
@@ -112,7 +111,7 @@ public final class BattleServerSide extends Battle
 
     private void placeLegion(Legion legion)
     {
-        BattleHex entrance = HexMap.getEntrance(masterHex.getTerrain(),
+        BattleHex entrance = masterHex.getTerrain().getEntrance(
             legion.getEntrySide());
         for (CreatureServerSide critter : ((LegionServerSide)legion)
             .getCreatures())
@@ -135,7 +134,7 @@ public final class BattleServerSide extends Battle
 
     private void placeCritter(CreatureServerSide critter)
     {
-        BattleHex entrance = HexMap.getEntrance(masterHex.getTerrain(),
+        BattleHex entrance = masterHex.getTerrain().getEntrance(
             critter.getLegion().getEntrySide());
         critter.setBattleInfo(entrance, entrance, this);
         server.allPlaceNewChit(critter);
@@ -575,7 +574,7 @@ public final class BattleServerSide extends Battle
         Set<BattleHex> set = new HashSet<BattleHex>();
         for (String hexLabel : terrain.getStartList())
         {
-            BattleHex hex = HexMap.getHexByLabel(terrain, hexLabel);
+            BattleHex hex = terrain.getHexByLabel(hexLabel);
             if (ignoreMobileAllies || !isOccupied(hex))
             {
                 set.add(hex);

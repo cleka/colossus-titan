@@ -7,7 +7,6 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.CritterMove;
-import net.sf.colossus.client.HexMap;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.Battle;
@@ -168,8 +167,7 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
             return;
         }
         // Encourage defending critters to hang back.
-        BattleHex entrance = HexMap.getEntrance(terrain, legion
-            .getEntrySide());
+        BattleHex entrance = terrain.getEntrance(legion.getEntrySide());
         if (terrain.isTower())
         {
             // Stick to the center of the tower.

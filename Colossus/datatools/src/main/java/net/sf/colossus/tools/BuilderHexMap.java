@@ -110,7 +110,7 @@ public class BuilderHexMap extends HexMap
         {
             for (int j = 0; j < 6; j++)
             {
-                if (show[i][j])
+                if (VISIBLE_HEXES[i][j])
                 {
                     boolean doDumpSides = false;
                     boolean hasSlope = false;

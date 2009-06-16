@@ -20,7 +20,6 @@ import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.Document;
 import javax.swing.text.StyledDocument;
 
-import net.sf.colossus.client.HexMap;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.util.ErrorUtils;
 import net.sf.colossus.util.ObjectCreationException;
@@ -382,8 +381,7 @@ public final class VariantSupport
 
             AllCreatureType creatureTypes = loadCreatures();
 
-            IVariantInitializer trl = loadTerrainsAndRecruits(serverSide,
-                creatureTypes);
+            IVariantInitializer trl = loadTerrainsAndRecruits(creatureTypes);
             // TODO add things as the variant package gets fleshed out
 
             List<String> directoriesForMap = getVarDirectoriesList();
@@ -552,7 +550,7 @@ public final class VariantSupport
     }
 
     public synchronized static IVariantInitializer loadTerrainsAndRecruits(
-        boolean serverSide, AllCreatureType creatureTypes)
+        AllCreatureType creatureTypes)
     {
         // remove all old stuff in the custom recruitments system
         CustomRecruitBase.reset();
@@ -575,14 +573,11 @@ public final class VariantSupport
             // Clemens: started working on that.
             //  =>  partly now done via the IVariantInitializer
             terrainRecruitLoader = new TerrainRecruitLoader(terIS, creatureTypes);
-
-            /* now initialize the static bits of the Battlelands */
-            HexMap.staticBattlelandsInit(serverSide);
         }
         catch (Exception e)
         {
             // TODO another exception anti-pattern: calling System.exit which means
-            // noone can escape the disappearing VM, even if they would know how
+            // no one can escape the disappearing VM, even if they would know how
             LOGGER.log(Level.SEVERE, "Recruit-per-terrain loading failed.", e);
             System.exit(1);
         }

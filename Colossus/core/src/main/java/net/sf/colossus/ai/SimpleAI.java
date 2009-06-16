@@ -18,7 +18,6 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.CritterMove;
-import net.sf.colossus.client.HexMap;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.client.PlayerClientSide;
 import net.sf.colossus.common.Constants;
@@ -1946,7 +1945,7 @@ public class SimpleAI extends AbstractAI
         for (String desc : carryTargets)
         {
             String targetHexLabel = desc.substring(desc.length() - 2);
-            BattleHex targetHex = HexMap.getHexByLabel(terrain, targetHexLabel);
+            BattleHex targetHex = terrain.getHexByLabel(targetHexLabel);
             BattleCritter target = getBattleUnit(targetHex);
 
             if (target.wouldDieFrom(carryDamage))
@@ -2670,8 +2669,7 @@ public class SimpleAI extends AbstractAI
         // surrounded by allies.  We need to relax this in the
         // last few turns of the battle, so that attacking titans
         // don't just sit back and wait for a time loss.
-        BattleHex entrance = HexMap.getEntrance(terrain, legion
-            .getEntrySide());
+        BattleHex entrance = terrain.getEntrance(legion.getEntrySide());
         if (!critter.isTitan())
         {
             LOGGER
@@ -2804,8 +2802,7 @@ public class SimpleAI extends AbstractAI
             return;
         }
         // Encourage defending critters to hang back.
-        BattleHex entrance = HexMap.getEntrance(terrain, legion
-            .getEntrySide());
+        BattleHex entrance = terrain.getEntrance(legion.getEntrySide());
         if (terrain.isTower())
         {
             // Stick to the center of the tower.

@@ -100,7 +100,7 @@ final class BattleMovement
         Set<BattleHex> set = new HashSet<BattleHex>();
         for (String hexLabel : terrain.getStartList())
         {
-            BattleHex hex = HexMap.getHexByLabel(terrain, hexLabel);
+            BattleHex hex = terrain.getHexByLabel(hexLabel);
             if (!client.isOccupied(hex))
             {
                 set.add(hex);
