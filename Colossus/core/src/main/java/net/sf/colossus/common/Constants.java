@@ -143,10 +143,6 @@ public final class Constants
 
     public static final int numAITypes = aiArray.length;
     public static final String aiPackage = "net.sf.colossus.ai.";
-    // TODO Probably this is not relevant any more - only for very old save
-    // games, but compatibility with those is probably broken due to other
-    // issues anyway...
-    public static final String oldAiPackage = "net.sf.colossus.client.";
 
     // Player names/placeholders
     public static final String byColor = "<By color>";
