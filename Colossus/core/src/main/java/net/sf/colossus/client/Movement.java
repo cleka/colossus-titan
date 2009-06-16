@@ -51,7 +51,7 @@ public final class Movement
                 entrySide = (6 + cameFrom - hex.getLabelSide()) % 6;
             }
         }
-        return EntrySide.fromIntegerId(entrySide);
+        return EntrySide.values()[entrySide];
     }
 
     /** Recursively find conventional moves from this hex.

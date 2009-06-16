@@ -591,7 +591,7 @@ final class SocketClientThread extends Thread implements IServer,
             int entrySideId = Integer.parseInt(args.remove(0));
             String lastRecruit = args.remove(0);
             client.setLegionStatus(resolveLegion(markerId), moved, teleported,
-                EntrySide.fromIntegerId(entrySideId),
+                EntrySide.values()[entrySideId],
                 resolveCreatureType(lastRecruit));
         }
         else if (method.equals(Constants.addCreature))

@@ -691,7 +691,7 @@ final class ClientHandler implements IClient
         boolean teleported, EntrySide entrySide, CreatureType lastRecruit)
     {
         sendToClient(Constants.setLegionStatus + sep + legion.getMarkerId()
-            + sep + moved + sep + teleported + sep + entrySide.getId() + sep
+            + sep + moved + sep + teleported + sep + entrySide.ordinal() + sep
             + lastRecruit);
     }
 

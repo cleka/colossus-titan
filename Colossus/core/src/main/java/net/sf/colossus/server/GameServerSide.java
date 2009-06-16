@@ -2066,8 +2066,8 @@ public final class GameServerSide extends Game
         MasterHex startingHex = getVariant().getMasterBoard().getHexByLabel(
             startingHexLabel);
         boolean moved = leg.getAttribute("moved").getBooleanValue();
-        EntrySide entrySide = EntrySide.fromIntegerId(leg.getAttribute(
-            "entrySide").getIntValue());
+        EntrySide entrySide = EntrySide.values()[leg.getAttribute(
+        "entrySide").getIntValue()];
         String parentId = leg.getAttribute("parent").getValue();
         if (parentId.equals("null"))
         {
@@ -2463,7 +2463,7 @@ public final class GameServerSide extends Game
                 entrySide = (6 + cameFrom - hex.getLabelSide()) % 6;
             }
         }
-        return EntrySide.fromIntegerId(entrySide);
+        return EntrySide.values()[entrySide];
     }
 
     /** Recursively find conventional moves from this hex.

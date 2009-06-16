@@ -564,7 +564,7 @@ public class HexMap extends JPanel
     public static BattleHex getEntrance(MasterBoardTerrain terrain,
         EntrySide entrySide)
     {
-        return getHexByLabel(terrain, "X" + entrySide.getId());
+        return getHexByLabel(terrain, "X" + entrySide.ordinal());
     }
 
     /** Look for the Hex matching the Label in the terrain static map */
