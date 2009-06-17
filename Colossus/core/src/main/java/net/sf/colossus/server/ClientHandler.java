@@ -303,13 +303,12 @@ final class ClientHandler implements IClient
                 // expects a response quickly
                 setPlayerName(tmpPlayerName);
                 // @TODO: move to outside Select loop
-                //   => notify main thread to so this?
+                //   => notify main thread to do this?
                 server.startGameIfAllPlayers();
             }
             else
             {
-                System.out.println("Rejecting client "
-                    + tmpPlayerName);
+                LOGGER.info("Rejecting client " + tmpPlayerName);
                 nak("SignOn", reasonFail);
             }
             InstanceTracker.setId(this, tmpPlayerName);
