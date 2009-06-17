@@ -1045,6 +1045,11 @@ public final class GameServerSide extends Game
         return loadingGame;
     }
 
+    boolean isReplayOngoing()
+    {
+        return replayOngoing;
+    }
+
     public void stopAllDueToFunctionalTestCompleted()
     {
         server.doSetWhatToDoNext(WhatToDoNext.QUIT_ALL, true);
@@ -2763,6 +2768,7 @@ public final class GameServerSide extends Game
         }
         ((LegionServerSide)legion).moveToHex(hex, entrySide, teleport,
             teleportingLord);
+        legionMovedEvent(legion, hex, entrySide, teleport, teleportingLord);
         return null;
     }
 
@@ -3380,6 +3386,18 @@ public final class GameServerSide extends Game
     void playerElimEvent(Player player, Player slayer)
     {
         history.playerElimEvent(player, slayer, turnNumber);
+    }
+
+    void movementRollEvent(Player player, int roll)
+    {
+        history.movementRollEvent(player, roll);
+    }
+
+    void legionMovedEvent(Legion legion, MasterHex newHex,
+        EntrySide entrySide,
+        boolean teleport, CreatureType lord)
+    {
+        history.legionMovedEvent(legion, newHex, entrySide, teleport, lord);
     }
 
     INotifyWebServer getNotifyWebServer()

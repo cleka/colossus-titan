@@ -2284,7 +2284,8 @@ public final class Server extends Thread implements IServer
         boolean teleport, CreatureType teleportingLord)
     {
         IClient client = getClient(getPlayer());
-        if (!isActivePlayer())
+        // Check for "is it the right player", but not during replay / redo
+        if (!game.isReplayOngoing() && !isActivePlayer())
         {
             LOGGER.severe(getPlayerName() + " illegally called doMove()");
             client.nak(Constants.doMove, "Wrong player");

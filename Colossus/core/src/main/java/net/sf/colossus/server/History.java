@@ -9,11 +9,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.game.Creature;
+import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.events.AddCreatureEvent;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.MasterHex;
 
 import org.jdom.Element;
 
@@ -119,7 +121,18 @@ public class History
             // System.out.println("flushing element from redo to history: "
             //     + el.getName());
             el.detach();
-            root.addContent(el);
+            String name = el.getName();
+            // TODO later, when this are proper events (not XML elements),
+            // ask rather from the Event whether it belongs copied to
+            // history or not.
+            if (name.equals("LegionMoved") || name.equals("LegionMoved"))
+            {
+                LOGGER.finest("Flush Redo to History: skipping " + name);
+            }
+            else
+            {
+                root.addContent(el);
+            }
         }
         recentEvents.clear();
     }
@@ -273,6 +286,38 @@ public class History
             event.setAttribute("slayer", slayer.getName());
         }
         event.setAttribute("turn", "" + turn);
+        recentEvents.add(event);
+    }
+
+    void movementRollEvent(Player player, int roll)
+    {
+        if (loading)
+        {
+            return;
+        }
+
+        Element event = new Element("MovementRoll");
+        event.setAttribute("playerName", player.getName());
+        event.setAttribute("roll", "" + roll);
+        recentEvents.add(event);
+    }
+
+    void legionMovedEvent(Legion legion, MasterHex newHex,
+        EntrySide entrySide,
+        boolean teleport, CreatureType lord)
+    {
+        if (loading)
+        {
+            return;
+        }
+
+        Element event = new Element("LegionMoved");
+        event.setAttribute("markerId", legion.getMarkerId());
+        event.setAttribute("newHex", newHex.getLabel());
+        event.setAttribute("entrySide", entrySide.getLabel());
+        event.setAttribute("teleport", "" + teleport);
+        String creNameOrTextNull = lord == null ? "null" : lord.getName();
+        event.setAttribute("revealedLord", creNameOrTextNull);
         recentEvents.add(event);
     }
 
@@ -543,6 +588,51 @@ public class History
             player.setDead(true);
             server.allUpdatePlayerInfo();
             server.allTellPlayerElim(player, slayer, false);
+        }
+
+        else if (el.getName().equals("MovementRoll")
+            || el.getName().equals("LegionMoved"))
+        {
+            // XXX Those two are right now not in use yet, because they will
+            // cause errors because activePlayer is wrong.
+            // Need to get "setupPhase" for ReDo done right first.
+            // TODO also, for LegionMoved event, also need MoveUndone first,
+            // otherwise problems if someone undoes a move before saving.
+            return;
+        }
+
+        else if (el.getName().equals("MovementRoll"))
+        {
+            String playerName = el.getAttributeValue("playerName");
+            Player player = game.getPlayerByName(playerName);
+            int roll = Integer.parseInt(el.getAttributeValue("roll"));
+
+            ((PlayerServerSide)player).setMovementRoll(roll);
+            server.allTellMovementRoll(roll);
+        }
+
+        else if (el.getName().equals("LegionMoved"))
+        {
+            String markerId = el.getAttributeValue("markerId");
+            String lordName = el.getAttributeValue("revealedLord");
+            String tele = el.getAttributeValue("teleport");
+            String newHexLabel = el.getAttributeValue("newHex");
+            String entrySideName = el.getAttributeValue("entrySide");
+
+            LegionServerSide legion = game.getLegionByMarkerId(markerId);
+            CreatureType revealedLord = game.getVariant().getCreatureByName(
+                lordName);
+            MasterHex newHex = server.getGame().getVariant().getMasterBoard()
+                .getHexByLabel(newHexLabel);
+            EntrySide entrySide = EntrySide.fromLabel(entrySideName);
+            boolean teleport = tele != null && tele.equals("true");
+
+            LOGGER.finest("LegionMoved redo event: \n" + "  marker "
+                + markerId + ", lordName " + revealedLord + " teleported "
+                + teleport + " to hex " + newHex.getLabel() + " entrySide "
+                + entrySide.toString());
+
+            server.doMove(legion, newHex, entrySide, teleport, revealedLord);
         }
     }
 
