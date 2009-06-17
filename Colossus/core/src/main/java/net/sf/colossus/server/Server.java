@@ -1477,7 +1477,7 @@ public final class Server extends Thread implements IServer
     void askAcquireAngel(PlayerServerSide player, Legion legion,
         List<CreatureType> recruits)
     {
-        if (((LegionServerSide)legion).getHeight() < 7)
+        if (legion.getHeight() < 7)
         {
             IClient client = getClient(player);
             if (client != null)
@@ -2363,11 +2363,9 @@ public final class Server extends Thread implements IServer
         while (it.hasNext())
         {
             IClient client = it.next();
-            client.revealCreatures(legion, ((LegionServerSide)legion)
-                .getCreatureTypes(), reason);
+            client.revealCreatures(legion, legion.getCreatureTypes(), reason);
         }
-        game.revealEvent(true, null, legion, ((LegionServerSide)legion)
-            .getCreatureTypes());
+        game.revealEvent(true, null, legion, legion.getCreatureTypes());
     }
 
     /** pass to all clients the 'revealEngagedCreatures' message,
@@ -2384,11 +2382,10 @@ public final class Server extends Thread implements IServer
         while (it.hasNext())
         {
             IClient client = it.next();
-            client.revealEngagedCreatures(legion, ((LegionServerSide)legion)
-                .getCreatureTypes(), isAttacker, reason);
+            client.revealEngagedCreatures(legion, legion.getCreatureTypes(),
+                isAttacker, reason);
         }
-        game.revealEvent(true, null, legion, ((LegionServerSide)legion)
-            .getCreatureTypes());
+        game.revealEvent(true, null, legion, legion.getCreatureTypes());
     }
 
     /** Call from History during load game only */
@@ -2408,13 +2405,11 @@ public final class Server extends Thread implements IServer
         IClient client = getClient(player);
         if (client != null)
         {
-            client.revealCreatures(legion, ((LegionServerSide)legion)
-                .getCreatureTypes(), reason);
+            client.revealCreatures(legion, legion.getCreatureTypes(), reason);
         }
-        List<String> li = new ArrayList<String>();
-        li.add(player.getName());
-        game.revealEvent(false, li, legion, ((LegionServerSide)legion)
-            .getCreatureTypes());
+        List<Player> li = new ArrayList<Player>();
+        li.add(player);
+        game.revealEvent(false, li, legion, legion.getCreatureTypes());
     }
 
     /** Call from History during load game only */
@@ -2439,8 +2434,8 @@ public final class Server extends Thread implements IServer
                 for (Legion legion : game.getAllLegions())
                 {
                     client.setLegionStatus(legion, legion.hasMoved(), legion
-                        .hasTeleported(), legion.getEntrySide(),
-                        ((LegionServerSide)legion).getRecruit());
+                        .hasTeleported(), legion.getEntrySide(), legion
+                        .getRecruit());
                 }
             }
         }

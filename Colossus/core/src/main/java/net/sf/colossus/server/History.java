@@ -136,7 +136,7 @@ public class History
         root.addContent(event);
     }
 
-    void revealEvent(boolean allPlayers, List<String> playerNames,
+    void revealEvent(boolean allPlayers, List<Player> players,
         Legion legion, List<CreatureType> creatures, int turn)
     {
         if (loading)
@@ -153,7 +153,7 @@ public class History
             // should be logged
             LOGGER.log(Level.WARNING, "Called revealEvent(" + allPlayers
                 + ", "
-                + (playerNames != null ? playerNames.toString() : "-null-")
+                + (players != null ? players.toString() : "-null-")
                 + ", " + legion + ", " + creatures.toString() + ", "
                 + turn + ") with empty creatureNames");
             return;
@@ -166,10 +166,10 @@ public class History
         {
             Element viewers = new Element("viewers");
             event.addContent(viewers);
-            Iterator<String> it = playerNames.iterator();
+            Iterator<Player> it = players.iterator();
             while (it.hasNext())
             {
-                String playerName = it.next();
+                String playerName = it.next().getName();
                 Element viewer = new Element("viewer");
                 viewer.addContent(playerName);
                 viewers.addContent(viewer);

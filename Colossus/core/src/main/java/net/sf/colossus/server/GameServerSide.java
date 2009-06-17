@@ -3347,11 +3347,10 @@ public final class GameServerSide extends Game
         history.mergeEvent(splitoffId, survivorId, turnNumber);
     }
 
-    // TODO second parameter should be List<Player>
-    void revealEvent(boolean allPlayers, List<String> playerNames,
+    void revealEvent(boolean allPlayers, List<Player> players,
         Legion legion, List<CreatureType> creatureNames)
     {
-        history.revealEvent(allPlayers, playerNames, legion, creatureNames,
+        history.revealEvent(allPlayers, players, legion, creatureNames,
             turnNumber);
     }
 
