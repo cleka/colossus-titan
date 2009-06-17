@@ -740,6 +740,8 @@ public final class GameServerSide extends Game
         }
 
         server.allTellAllLegionLocations();
+        gameSaver.commitPointReached();
+
         autoSave();
         updateCaretakerDisplays();
         server.allRequestConfirmCatchup("KickstartGame");
@@ -1151,6 +1153,10 @@ public final class GameServerSide extends Game
             setupPhase();
         }
 
+        /**
+         * Make the next player being the activePlayer, and set phase to Split.
+         * If that next player is dead, advance again (recursively).
+         */
         public void advanceTurn()
         {
             clearFlags();
@@ -1182,6 +1188,7 @@ public final class GameServerSide extends Game
             {
                 LOGGER.info(getActivePlayer() + "'s turn, number "
                     + turnNumber);
+
                 autoSave();
             }
         }
@@ -1189,6 +1196,8 @@ public final class GameServerSide extends Game
 
     private void setupPhase()
     {
+        gameSaver.commitPointReached();
+
         if (isPhase(Phase.SPLIT))
         {
             setupSplit();
@@ -1606,10 +1615,8 @@ public final class GameServerSide extends Game
                 ((PlayerServerSide)buPlayer).backupLoadedData();
             }
 
-            // History
-            history = new History();
-            Element his = root.getChild("History");
-            history.copyTree(his);
+            // Load history (RedoLog stuff is handled later)
+            history = new History(root);
 
             initServer();
             // Remaining stuff has been moved to loadGame2()
@@ -1739,7 +1746,13 @@ public final class GameServerSide extends Game
         server.allTellReplay(true, turnNumber);
         server.allInitBoard();
 
+        // XXX
+        // System.out
+        //     .println("\n################\nFiring history events from XML");
         history.fireEventsFromXML(server);
+        // System.out
+        //    .println("################\nCompleted Firing history events from XML\n");
+
         boolean ok = resyncBackupData();
         LOGGER.info("Loading and resync result: " + ok);
 
@@ -1757,6 +1770,17 @@ public final class GameServerSide extends Game
         server.allFullyUpdateLegionStatus();
         server.allUpdatePlayerInfo(false);
         server.allTellAllLegionLocations();
+
+        server.allTellRedo(true);
+        // XXX
+        // System.out.println("\n################\nProcessing redo log ");
+        history.processRedoLog(server);
+
+        // XXX
+        // System.out
+        //    .println("################\nCompleted Processing redo log\n");
+
+        server.allTellRedo(false);
         server.allTellReplay(false, 0);
         replayOngoing = false;
 
@@ -3179,7 +3203,6 @@ public final class GameServerSide extends Game
         // This comes from a system property:
         if (Constants.END_AFTER_FIRST_BATTLE)
         {
-            // System.err.println("Battle completed, result: " + result);
             LOGGER.info("endAfterFirstBattle is set, terminating game.");
             server.doSetWhatToDoNext(WhatToDoNext.QUIT_ALL, true);
             server.triggerDispose();

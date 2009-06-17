@@ -1282,6 +1282,14 @@ public final class Server extends Thread implements IServer
         }
     }
 
+    void allTellRedo(boolean val)
+    {
+        for (IClient client : clients)
+        {
+            client.tellRedo(val);
+        }
+    }
+
     void allRequestConfirmCatchup(String action)
     {
         // First put them all to the list, send messages after that

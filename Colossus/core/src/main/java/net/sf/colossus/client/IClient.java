@@ -64,6 +64,8 @@ public interface IClient
 
     public void tellReplay(boolean val, int maxTurn);
 
+    public void tellRedo(boolean val);
+
     public void confirmWhenCaughtUp();
 
     public void serverConfirmsConnection();

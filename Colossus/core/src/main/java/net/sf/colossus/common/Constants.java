@@ -50,7 +50,7 @@ public final class Constants
         + "saves" + File.separator;
     public static final String XML_EXTENSION = ".xml";
     public static final String XML_SNAPSHOT_START = "snap";
-    public static final String XML_SNAPSHOT_VERSION = "12";
+    public static final String XML_SNAPSHOT_VERSION = "13";
 
     public static final int BIGNUM = 99;
     public static final int OUT_OF_RANGE = 5;
@@ -283,6 +283,7 @@ public final class Constants
     public static final String removeDeadBattleChits = "removeDeadBattleChits";
     public static final String placeNewChit = "placeNewChit";
     public static final String replayOngoing = "replayOngoing";
+    public static final String redoOngoing = "redoOngoing";
     public static final String initBoard = "initBoard";
     public static final String setPlayerName = "setPlayerName";
     public static final String createSummonAngel = "createSummonAngel";

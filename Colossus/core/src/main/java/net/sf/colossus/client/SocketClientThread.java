@@ -677,9 +677,16 @@ final class SocketClientThread extends Thread implements IServer,
         {
             boolean val = Boolean.valueOf(args.remove(0)).booleanValue();
             // older servers may not send this...
+            // TODO obsolete... nowadays they do, and there are other,
+            // incompatiblities added since then...
             String turnArgMaybe = args.isEmpty() ? "0" : args.remove(0);
             int maxTurn = Integer.parseInt(turnArgMaybe);
             client.tellReplay(val, maxTurn);
+        }
+        else if (method.equals(Constants.redoOngoing))
+        {
+            boolean val = Boolean.valueOf(args.remove(0)).booleanValue();
+            client.tellRedo(val);
         }
         else if (method.equals(Constants.initBoard))
         {

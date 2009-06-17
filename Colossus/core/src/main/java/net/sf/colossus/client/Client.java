@@ -126,6 +126,13 @@ public final class Client implements IClient, IOracle, IVariant
      */
     private boolean replayOngoing = false;
 
+    /**
+     * Redo of the events since last commit phase is ongoing.
+     * Needed right now only for "if redo ends, set flag to prevent the
+     * setupXxxxxPhase methods to clear the undo stack.
+     */
+    private boolean redoOngoing = false;
+
     /** This can be an actual ClientGUI, or a NullClientGUI (which does simply
      *  nothing, so that we don't need to check for null everywhere).
      */
@@ -1060,6 +1067,17 @@ public final class Client implements IClient, IOracle, IVariant
     public boolean isReplayOngoing()
     {
         return replayOngoing;
+    }
+
+    public void tellRedo(boolean val)
+    {
+        redoOngoing = val;
+        gui.actOnTellRedoChange();
+    }
+
+    public boolean isRedoOngoing()
+    {
+        return redoOngoing;
     }
 
     public void confirmWhenCaughtUp()

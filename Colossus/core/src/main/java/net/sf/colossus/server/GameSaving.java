@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -62,7 +63,6 @@ public class GameSaving
     {
         this.options = options;
         this.game = game;
-
     }
 
     /**
@@ -73,14 +73,53 @@ public class GameSaving
      */
     private void takeSnapshotAtBeginOfPhase()
     {
-        Element root = new Element("ColossusSnapshot");
-        root.setAttribute("version", Constants.XML_SNAPSHOT_VERSION);
+        Element root = new Element("CommitPointSnapshot");
 
         addBasicData(root);
         addPlayerData(root);
-        root.addContent(game.getHistory().getCopy());
 
         this.phaseStartSnapshot = root;
+    }
+
+    /**
+     * When a commit point is reached (typically, one phase is "Done"
+     * and a new phase begins),
+     * 1) take new snapshot of overall game state, player, legion, caretaker data
+     * 2) flush the so far redoLog data to the history,
+     * 3) clear the redoLog data.
+     *
+     */
+    public void commitPointReached()
+    {
+        // XXX
+        /*
+        System.out.println("Commit point reached. Turn="
+            + game.getTurnNumber() + ", player= "
+            + game.getActivePlayer().getName() + ", phase="
+            + game.getPhaseName());
+        */
+        takeSnapshotAtBeginOfPhase();
+        game.getHistory().flushRecentToRoot();
+    }
+
+    // unchecked conversions from JDOM
+    @SuppressWarnings("unchecked")
+    private void addSnapshotData(Element saveGameRoot,
+        Element commitDataRoot)
+    {
+        Element copyOfSnapshot = (Element)commitDataRoot.clone();
+
+        List<Element> kids = new LinkedList<Element>(copyOfSnapshot
+            .getChildren());
+        for (Element el : kids)
+        {
+            el.detach();
+            Element newEl = (Element)el.clone();
+
+            // System.out.println("    adding commit data, element name: "
+            //     + el.getName());
+            saveGameRoot.addContent(newEl);
+        }
     }
 
     /**
@@ -88,17 +127,28 @@ public class GameSaving
      * Takes the last phaseStartSnapshot plus redo-Data plus battle data plus
      * data files.
      *
-     * @return The root element which contains all information
+     * @return The "ColossusSnapshot" root element containing all information
      */
     private Element createSavegameContent()
     {
-        Element root = this.phaseStartSnapshot;
-        boolean storeFiles = true;
-        if (storeFiles)
-        {
-            addDataFiles(root);
-        }
+        Element root = new Element("ColossusSnapshot");
+        root.setAttribute("version", Constants.XML_SNAPSHOT_VERSION);
 
+        // System.out.println("- Adding snapshot data from last commit point");
+        addSnapshotData(root, this.phaseStartSnapshot);
+
+        // Everything up to last commit point:
+        // System.out.println("- Adding history");
+        root.addContent(game.getHistory().getCopy());
+
+        // Add the events since last commit point, some of them are more
+        // detailed level. Redo log might also be empty, add it anyway,
+        // otherwise there is trouble during loading.
+        // System.out.println("- Adding redoLog");
+        Element redoLogElement = game.getHistory().getNewRedoLogElement();
+        root.addContent(redoLogElement);
+
+        addDataFiles(root);
 
         // Battle stuff
 
@@ -150,6 +200,7 @@ public class GameSaving
                     + game.getCaretaker().getDeadCount(creature));
             careTakerEl.addContent(el);
         }
+        // XXX temporarily out of use to keep save games small during development / debugging
         root.addContent(careTakerEl);
     }
 
@@ -430,7 +481,8 @@ public class GameSaving
             return;
         }
 
-        takeSnapshotAtBeginOfPhase();
+        // Not here any more. Should now be taken at begin of each phase.
+        // takeSnapshotAtBeginOfPhase();
         Element root = createSavegameContent();
         Document doc = new Document(root);
 

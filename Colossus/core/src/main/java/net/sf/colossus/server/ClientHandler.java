@@ -751,6 +751,11 @@ final class ClientHandler implements IClient
         sendToClient(Constants.replayOngoing + sep + val + sep + maxTurn);
     }
 
+    public void tellRedo(boolean val)
+    {
+        sendToClient(Constants.redoOngoing + sep + val);
+    }
+
     public void initBoard()
     {
         sendToClient(Constants.initBoard);

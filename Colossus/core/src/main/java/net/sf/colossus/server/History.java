@@ -3,6 +3,7 @@ package net.sf.colossus.server;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,13 +28,26 @@ public class History
     private static final Logger LOGGER = Logger.getLogger(History.class
         .getName());
 
-    private Element root = new Element("History");
+    /**
+     * History: events that happened before last commit point
+     */
+    private final Element root;
+
+    /**
+     * History elements/events that happened since the last commit/"snapshot".
+     */
+    private final List<Element> recentEvents = new LinkedList<Element>();
 
     /**
      * Set to true during the processing of {@link #fireEventsFromXML(Server)}
      * to avoid triggering events we just restored again.
      */
     private boolean loading = false;
+
+    /**
+     *
+     */
+    private final Element loadedRedoLog;
 
     /**
      * Stores the surviving legions (this variable is not needed any more)
@@ -65,9 +79,69 @@ public class History
      * during replay).
      */
 
+    public History()
+    {
+        root = new Element("History");
+        // Dummy:
+        loadedRedoLog = new Element("LoadedRedoLog");
+    }
+
+    /**
+     * Constructor used by "LoadGame"
+     */
+    public History(Element loadGameRoot)
+    {
+        // Get the history elements and store them to "root"
+        root = (Element)loadGameRoot.getChild("History").clone();
+
+        // Get the redo log content
+        loadedRedoLog = (Element)loadGameRoot.getChild("Redo").clone();
+    }
+
+    /**
+     *  All events before last commit
+     */
     Element getCopy()
     {
         return (Element)root.clone();
+    }
+
+    /**
+     * Reached a commit point: append all recent events to the history,
+     * clear list of recent events; caller should do this together with creating
+     * the next snapshot.
+     */
+    void flushRecentToRoot()
+    {
+        for (Element el : recentEvents)
+        {
+            // XXX
+            // System.out.println("flushing element from redo to history: "
+            //     + el.getName());
+            el.detach();
+            root.addContent(el);
+        }
+        recentEvents.clear();
+    }
+
+    /**
+     *  @return A Redo Element, containing all events since last commit
+     *  i.e. which need to be REDOne on top of last commit point/snapshot
+     */
+    Element getNewRedoLogElement()
+    {
+        Element redoLogElement = new Element("Redo");
+        for (Element el : recentEvents)
+        {
+            // XXX
+            // System.out
+            //     .println("    adding recent event to new RedoLog, element "
+            //        + el.getName());
+            el.detach();
+            redoLogElement.addContent(el);
+        }
+
+        return redoLogElement;
     }
 
     /**
@@ -85,7 +159,7 @@ public class History
         element
             .setAttribute("creatureName", event.getAddedCreatureType().getName());
         element.setAttribute("turn", "" + turn);
-        root.addContent(element);
+        recentEvents.add(element);
     }
 
     void removeCreatureEvent(Legion legion, CreatureType creature, int turn)
@@ -98,7 +172,7 @@ public class History
         event.setAttribute("markerId", legion.getMarkerId());
         event.setAttribute("creatureName", creature.getName());
         event.setAttribute("turn", "" + turn);
-        root.addContent(event);
+        recentEvents.add(event);
     }
 
     void splitEvent(Legion parent, Legion child, List<CreatureType> splitoffs,
@@ -120,7 +194,7 @@ public class History
             cr.addContent(creatureType.getName());
             creatures.addContent(cr);
         }
-        root.addContent(event);
+        recentEvents.add(event);
     }
 
     void mergeEvent(String splitoffId, String survivorId, int turn)
@@ -133,7 +207,7 @@ public class History
         event.setAttribute("splitoffId", splitoffId);
         event.setAttribute("survivorId", survivorId);
         event.setAttribute("turn", "" + turn);
-        root.addContent(event);
+        recentEvents.add(event);
     }
 
     void revealEvent(boolean allPlayers, List<Player> players,
@@ -183,7 +257,7 @@ public class History
             creatureElem.addContent(creatureType.getName());
             creaturesElem.addContent(creatureElem);
         }
-        root.addContent(event);
+        recentEvents.add(event);
     }
 
     void playerElimEvent(Player player, Player slayer, int turn)
@@ -199,12 +273,30 @@ public class History
             event.setAttribute("slayer", slayer.getName());
         }
         event.setAttribute("turn", "" + turn);
-        root.addContent(event);
+        recentEvents.add(event);
     }
 
-    void copyTree(Element his)
+    /**
+     * Now fire all events from redoLog. Note that "loading" is not set
+     * to true, so they DO GET ADDED to the recentEvents list again.
+     * @param server
+     */
+    void processRedoLog(Server server)
     {
-        root = (Element)his.clone();
+        assert loadedRedoLog != null : "Loaded RedoLog should always "
+            + "have a JDOM root element as backing store";
+
+        LOGGER.info("Histroy: Start processing redo log");
+        for (Object obj : loadedRedoLog.getChildren())
+        {
+            Element el = (Element)obj;
+            // XXX
+            // System.out.println("processing redo event " + el.getName());
+            LOGGER.info("processing redo event " + el.getName());
+            fireEventFromElement(server, el);
+        }
+        // TODO clear loadedRedoLog?
+        LOGGER.info("Completed processing redo log");
     }
 
     // unchecked conversions from JDOM
@@ -212,7 +304,8 @@ public class History
     void fireEventsFromXML(Server server)
     {
         this.loading = true;
-        assert root != null : "History should always have a JDOM root element as backing store";
+        assert root != null : "History should always have a "
+            + " JDOM root element as backing store";
 
         List<Element> kids = root.getChildren();
         Iterator<Element> it = kids.iterator();
@@ -452,4 +545,5 @@ public class History
             server.allTellPlayerElim(player, slayer, false);
         }
     }
+
 }

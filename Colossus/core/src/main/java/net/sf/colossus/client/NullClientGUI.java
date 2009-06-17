@@ -237,6 +237,12 @@ public class NullClientGUI implements IClientGUI
 
     }
 
+    public void actOnTellRedoChange()
+    {
+        // TODO Auto-generated method stub
+
+    }
+
     public void actOnTellStrikeResults(boolean wasCarry, int strikeNumber,
         List<String> rolls,BattleCritter striker, BattleCritter target)
     {

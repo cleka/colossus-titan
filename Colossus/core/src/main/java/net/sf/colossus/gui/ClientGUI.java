@@ -109,6 +109,17 @@ public class ClientGUI implements IClientGUI
      */
     private final LinkedList<Object> undoStack = new LinkedList<Object>();
 
+    /**
+     * When loading a game, at the point server sends us the replay is now
+     * over, Client tells us to set this flag here.
+     * Then server sends us the redoLog events, which are stored to the
+     * undoStack.
+     * Next will then come the "setupXxxxxhase" which would normally reset
+     * the undoStack, but in this case we do not want that, so this flag here
+     * indicates to suppress this reset.
+     */
+    private boolean dontClearUndoStack = false;
+
     private final List<GUIBattleChit> battleChits = new ArrayList<GUIBattleChit>();
 
     /** Information on the current moving legion. */
@@ -1298,6 +1309,7 @@ public class ClientGUI implements IClientGUI
     {
         if (isReplayOngoing())
         {
+            // Switching to replay mode
             replayMaxTurn = maxTurn;
             if (board != null)
             {
@@ -1307,6 +1319,7 @@ public class ClientGUI implements IClientGUI
         }
         else
         {
+            // Replay mode now over
             if (board != null)
             {
                 board.recreateMarkers();
@@ -1314,9 +1327,30 @@ public class ClientGUI implements IClientGUI
         }
     }
 
+    public void actOnTellRedoChange()
+    {
+        if (client.isRedoOngoing())
+        {
+            // nothing needed so far
+        }
+        else
+        {
+            // Set flag for next setupPhase to not clear the undo stack
+            dontClearUndoStack = true;
+        }
+
+    }
+
     private void clearUndoStack()
     {
-        undoStack.clear();
+        if (dontClearUndoStack)
+        {
+            dontClearUndoStack = false;
+        }
+        else
+        {
+            undoStack.clear();
+        }
     }
 
     private Object popUndoStack()

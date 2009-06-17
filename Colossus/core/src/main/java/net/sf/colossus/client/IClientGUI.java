@@ -129,6 +129,8 @@ public interface IClientGUI
 
     public abstract void actOnTellReplay(int maxTurn);
 
+    public abstract void actOnTellRedoChange();
+
     public abstract void eventViewerCancelReinforcement(CreatureType recruit,
         int turnNr);
 
