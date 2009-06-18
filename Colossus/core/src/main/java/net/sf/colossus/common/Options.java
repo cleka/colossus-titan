@@ -149,6 +149,8 @@ public final class Options implements IOptions
     public static final String autoPickEntrySide = "Auto pick entry sides";
     public static final String autoPickLord = "Auto pick teleporting lord";
     public static final String autoPickEngagements = "Auto pick engagements";
+    // for Fight and Muster, if there's nothing (left) to do
+    public static final String autoDone = "Auto done";
     public static final String autoFlee = "Auto flee";
     public static final String autoConcede = "Auto concede";
     public static final String autoNegotiate = "Auto negotiate";

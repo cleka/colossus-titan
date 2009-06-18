@@ -1801,6 +1801,8 @@ public final class Client implements IClient, IOracle, IVariant
     // TODO very similar to nextEngagement, even called redundantly...
     private void kickFight()
     {
+        // Should not be needed, there comes a nextEngagement additionally anyway?
+        /*
         if (isMyTurn())
         {
             gui.defaultCursor();
@@ -1817,6 +1819,7 @@ public final class Client implements IClient, IOracle, IVariant
                 }
             }
         }
+        */
     }
 
     // TODO check overlap with kickFight()
@@ -1825,6 +1828,7 @@ public final class Client implements IClient, IOracle, IVariant
         gui.highlightEngagements();
         if (isMyTurn())
         {
+            // TODO search eng. first, decide then based on autoXXX
             if (options.getOption(Options.autoPickEngagements))
             {
                 aiPause();
@@ -1841,9 +1845,21 @@ public final class Client implements IClient, IOracle, IVariant
             else
             {
                 gui.defaultCursor();
+                if (game.findEngagements().size() == 0)
+                {
+                    if (options.getOption(Options.autoDone))
+                    {
+                        LOGGER.info("No engagements left, "
+                            + "auto done with engagements");
+                        doneWithEngagements();
+                    }
+                    else
+                    {
+                        // Enables the Done button
+                        gui.actOnNextEngagement();
+                    }
+                }
             }
-
-            gui.actOnNextEngagement();
         }
     }
 
@@ -1864,14 +1880,36 @@ public final class Client implements IClient, IOracle, IVariant
         if (options.getOption(Options.autoRecruit) && playerAlive
             && isMyTurn() && game.isPhase(Phase.MUSTER))
         {
+            // Note that this fires all doRecruit calls in one row,
+            // i.e. does NOT wait for callback from server.
             ai.muster();
+
             // For autoRecruit alone, do not automatically say we are done.
             // Allow humans to override. But full autoPlay be done.
             if (options.getOption(Options.autoPlay))
             {
                 doneWithRecruits();
             }
+            else if (options.getOption(Options.autoDone)
+                && noRecruitActionPossible())
+            {
+                doneWithRecruits();
+            }
         }
+    }
+
+    /**
+     * Check whether any legion has possibility to recruit at all,
+     * no matter whether it could or has already.
+     * If there is none, autoDone can automatically be done with recruit
+     * phase; but if there is something (e.g. autoRecruit has recruited
+     * something, allow human to override/force him to really confirm "Done".
+     *
+     * @return Whether there is any legion that could recruit or undoRecruit
+     */
+    private boolean noRecruitActionPossible()
+    {
+        return getPossibleRecruitActionHexes().isEmpty();
     }
 
     public void setupBattleSummon(Player battleActivePlayer,
@@ -2627,6 +2665,24 @@ public final class Client implements IClient, IOracle, IVariant
         return result;
     }
 
+    /** Return a set of hexLabels with legions that could do a recuit
+     *  or undo recruit. Used for "if there is nothing to do in this recruit
+     *  phase, can to autoDone that option is set".
+     */
+    public Set<MasterHex> getPossibleRecruitActionHexes()
+    {
+        Set<MasterHex> result = new HashSet<MasterHex>();
+
+        for (Legion legion : game.getActivePlayer().getLegions())
+        {
+            if (canRecruit(legion) || legion.hasRecruited())
+            {
+                result.add(legion.getCurrentHex());
+            }
+        }
+        return result;
+    }
+
     public Movement getMovement()
     {
         return movement;
@@ -2846,6 +2902,7 @@ public final class Client implements IClient, IOracle, IVariant
         if (!isMyTurn())
         {
             LOGGER.log(Level.SEVERE, "Not my turn!");
+            // TODO I think this is useless here
             kickSplit();
             return;
         }
@@ -2853,6 +2910,7 @@ public final class Client implements IClient, IOracle, IVariant
         if (!isMyLegion(parent))
         {
             LOGGER.log(Level.SEVERE, "Not my legion!");
+            // TODO is this needed here?
             kickSplit();
             return;
         }
@@ -2861,6 +2919,7 @@ public final class Client implements IClient, IOracle, IVariant
         if (markersAvailable.size() < 1)
         {
             gui.showMessageDialogAndWait("No legion markers");
+            // TODO is this useful here?
             kickSplit();
             return;
         }
