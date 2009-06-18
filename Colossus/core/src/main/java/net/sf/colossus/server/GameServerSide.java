@@ -1137,7 +1137,15 @@ public final class GameServerSide extends Game
             }
             else if (oldPhase == Phase.MOVE)
             {
-                setPhase(Phase.FIGHT);
+                // skip phase totally if there aren't any engagements.
+                if (findEngagements().size() > 0)
+                {
+                    setPhase(Phase.FIGHT);
+                }
+                else
+                {
+                    setPhase(Phase.MUSTER);
+                }
             }
             else if (oldPhase == Phase.FIGHT)
             {
