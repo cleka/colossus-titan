@@ -227,7 +227,7 @@ public final class BattleBoard extends KFrame
         PlayerColor color = getClient().getColor();
         if (color != null)
         {
-            Color bgColor = PickColor.getBackgroundColor(color);
+            Color bgColor = color.getBackgroundColor();
             contentPane.setBorder(BorderFactory.createLineBorder(bgColor));
         }
 

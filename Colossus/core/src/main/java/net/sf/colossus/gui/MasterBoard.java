@@ -1078,7 +1078,7 @@ public final class MasterBoard extends JPanel
         // the defaults.
         if (clientColor != null)
         {
-            Color color = PickColor.getBackgroundColor(clientColor);
+            Color color = clientColor.getBackgroundColor();
             bottomBar.setPlayerColor(color);
             // Don't do this again.
             playerLabelDone = true;

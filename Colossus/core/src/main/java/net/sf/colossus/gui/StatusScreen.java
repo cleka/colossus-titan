@@ -323,9 +323,9 @@ final class StatusScreen extends KDialog
 
             if (player.getColor() != null)
             {
-                setPlayerLabelColors(nameLabel[i], PickColor
-                    .getBackgroundColor(player.getColor()), PickColor
-                    .getForegroundColor(player.getColor()));
+                setPlayerLabelColors(nameLabel[i], player.getColor()
+                    .getBackgroundColor(), player.getColor()
+                    .getForegroundColor());
             }
             else
             {

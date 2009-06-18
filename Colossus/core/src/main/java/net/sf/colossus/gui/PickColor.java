@@ -22,7 +22,6 @@ import net.sf.colossus.common.Options;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.guiutil.KDialog;
 import net.sf.colossus.guiutil.SaveWindow;
-import net.sf.colossus.util.HTMLColor;
 
 
 /**
@@ -33,26 +32,8 @@ import net.sf.colossus.util.HTMLColor;
 @SuppressWarnings("serial")
 final class PickColor extends KDialog
 {
-    // TODO the next two arrays should be members in Constants.PlayerColor
-    private static final Color[] background;
-    private static final Color[] foreground;
     private PlayerColor color;
     private final SaveWindow saveWindow;
-
-    static
-    {
-        background = new Color[Constants.MAX_MAX_PLAYERS];
-        foreground = new Color[Constants.MAX_MAX_PLAYERS];
-
-        for (int i = 0; i < Constants.MAX_MAX_PLAYERS; i++)
-        {
-            background[i] = HTMLColor.stringToColor(PlayerColor.values()[i].getName()
-                + "Colossus");
-            int sum = background[i].getRed() + background[i].getGreen()
-                + background[i].getBlue();
-            foreground[i] = (sum > 200 ? Color.black : Color.white);
-        }
-    }
 
     private PickColor(JFrame parentFrame, String playerName,
         List<PlayerColor> colorsLeft, IOptions options)
@@ -77,8 +58,8 @@ final class PickColor extends KDialog
                 button.setPreferredSize(new Dimension(7 * scale, 3 * scale));
                 button.setText(curColor.getName());
                 button.setMnemonic(curColor.getMnemonic());
-                button.setBackground(background[i]);
-                button.setForeground(foreground[i]);
+                button.setBackground(curColor.getBackgroundColor());
+                button.setForeground(curColor.getForegroundColor());
                 button.addActionListener(new ActionListener()
                 {
                     public void actionPerformed(ActionEvent e)
@@ -124,30 +105,6 @@ final class PickColor extends KDialog
         if (i >= 0 && i < PlayerColor.values().length)
         {
             return PlayerColor.values()[i].getName();
-        }
-        return null;
-    }
-
-    static Color getForegroundColor(PlayerColor playerColor)
-    {
-        for (int i = 0; i < PlayerColor.values().length; i++)
-        {
-            if (playerColor.equals(PlayerColor.values()[i]))
-            {
-                return foreground[i]; // TODO this could probably be expressed via playerColor.ordinal()
-            }
-        }
-        return null;
-    }
-
-    static Color getBackgroundColor(PlayerColor color)
-    {
-        for (int i = 0; i < PlayerColor.values().length; i++)
-        {
-            if (color.equals(PlayerColor.values()[i]))
-            {
-                return background[i];
-            }
         }
         return null;
     }

@@ -1,8 +1,12 @@
 package net.sf.colossus.game;
 
+
+import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
+
+import net.sf.colossus.util.HTMLColor;
 
 /**
  * TODO the colors themselves should be defined in here
@@ -20,12 +24,18 @@ public enum PlayerColor
     private final String name;
     private final String shortName;
     private final int mnemonic;
+    private final Color backgroundColor;
+    private final Color foregroundColor;
 
     private PlayerColor(String name, String shortName, int mnemonic)
     {
         this.name = name;
         this.shortName = shortName;
         this.mnemonic = mnemonic;
+        this.backgroundColor = HTMLColor.stringToColor(name + "Colossus");
+        int sum = backgroundColor.getRed() + backgroundColor.getGreen()
+            + backgroundColor.getBlue();
+        this.foregroundColor = (sum > 200 ? Color.black : Color.white);
     }
 
     public int getMnemonic()
@@ -41,6 +51,16 @@ public enum PlayerColor
     public String getShortName()
     {
         return shortName;
+    }
+
+    public Color getBackgroundColor()
+    {
+        return backgroundColor;
+    }
+
+    public Color getForegroundColor()
+    {
+        return foregroundColor;
     }
 
     public static PlayerColor getByName(String name)
