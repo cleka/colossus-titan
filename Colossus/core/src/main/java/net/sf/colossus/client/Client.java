@@ -1563,33 +1563,6 @@ public final class Client implements IClient, IOracle, IVariant
         game.cleanupBattle();
     }
 
-    public void nextEngagement()
-    {
-        gui.highlightEngagements();
-        if (isMyTurn())
-        {
-            if (options.getOption(Options.autoPickEngagements))
-            {
-                aiPause();
-                MasterHex hex = ai.pickEngagement();
-                if (hex != null)
-                {
-                    engage(hex);
-                }
-                else
-                {
-                    doneWithEngagements();
-                }
-            }
-            else
-            {
-                gui.defaultCursor();
-            }
-
-            gui.actOnNextEngagement();
-        }
-    }
-
     public boolean canRecruit(Legion legion)
     {
         return legion.hasMoved() && legion.getHeight() < 7
@@ -1822,6 +1795,12 @@ public final class Client implements IClient, IOracle, IVariant
         game.setPhase(Phase.FIGHT);
         gui.actOnSetupFight();
 
+        kickFight();
+    }
+
+    // TODO very similar to nextEngagement, even called redundantly...
+    private void kickFight()
+    {
         if (isMyTurn())
         {
             gui.defaultCursor();
@@ -1840,12 +1819,44 @@ public final class Client implements IClient, IOracle, IVariant
         }
     }
 
+    // TODO check overlap with kickFight()
+    public void nextEngagement()
+    {
+        gui.highlightEngagements();
+        if (isMyTurn())
+        {
+            if (options.getOption(Options.autoPickEngagements))
+            {
+                aiPause();
+                MasterHex hex = ai.pickEngagement();
+                if (hex != null)
+                {
+                    engage(hex);
+                }
+                else
+                {
+                    doneWithEngagements();
+                }
+            }
+            else
+            {
+                gui.defaultCursor();
+            }
+
+            gui.actOnNextEngagement();
+        }
+    }
+
     public void setupMuster()
     {
         game.setPhase(Phase.MUSTER);
-
         gui.actOnSetupMuster();
 
+        kickMuster();
+    }
+
+    private void kickMuster()
+    {
         // I changed the "&& !game.isGameOver()" to "&& I am not dead";
         // before, this makes auto-recruit stop working also for human
         // when they did win against all others and continue playing
