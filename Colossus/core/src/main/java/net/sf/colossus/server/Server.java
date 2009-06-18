@@ -1405,6 +1405,15 @@ public final class Server extends Thread implements IServer
         }
     }
 
+    void kickPhase()
+    {
+        // XXX TODO Should do only for the active Client!
+        for (IClient client : clients)
+        {
+            client.kickPhase();
+        }
+    }
+
     void allSetupBattleSummon()
     {
         BattleServerSide battle = game.getBattle();

@@ -899,6 +899,11 @@ final class ClientHandler implements IClient
         sendToClient(Constants.setupMuster);
     }
 
+    public void kickPhase()
+    {
+        sendToClient(Constants.kickPhase);
+    }
+
     public void setupBattleSummon(Player battleActivePlayer,
         int battleTurnNumber)
     {

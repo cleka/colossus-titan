@@ -564,12 +564,38 @@ public final class Client implements IClient, IOracle, IVariant
     {
         game.setMovementRoll(roll);
         gui.tellMovementRoll(roll);
-        kickMoves();
+
+        // kickMoves() now called by kickPhase(), because the kickXXXX
+        // are now done separately, not implied in the setupXXXXX
+        // (or in this case, tellMovementRoll()) any more.
+        // kickMoves();
     }
 
     public void tellWhatsHappening(String message)
     {
         gui.tellWhatsHappening(message);
+    }
+
+    public void kickPhase() // NOT: kickFace!  ;-)
+    {
+        if (game.isPhase(Phase.SPLIT))
+        {
+            kickSplit();
+        }
+        else if (game.isPhase(Phase.MOVE))
+        {
+            kickMoves();
+        }
+
+        else if (game.isPhase(Phase.FIGHT))
+        {
+            kickFight();
+        }
+
+        else if (game.isPhase(Phase.MUSTER))
+        {
+            kickMuster();
+        }
     }
 
     private void kickMoves()
@@ -1768,7 +1794,10 @@ public final class Client implements IClient, IOracle, IVariant
         numSplitsThisTurn = 0;
 
         gui.actOnSetupSplit();
-        kickSplit();
+
+        // kickSplit() now called by kickPhase(), because the kickXXXX
+        // are now done separately, not implied in the setupXXXXX any more.
+        // kickSplit();
     }
 
     private void kickSplit()
@@ -1795,12 +1824,18 @@ public final class Client implements IClient, IOracle, IVariant
         game.setPhase(Phase.FIGHT);
         gui.actOnSetupFight();
 
-        kickFight();
+        // kickFight() now called by kickPhase(), because the kickXXXX
+        // are now done separately, not implied in the setupXXXXX any more.
+        // kickFight();
     }
 
     // TODO very similar to nextEngagement, even called redundantly...
     private void kickFight()
     {
+        // TODO
+        // In practice we should not get the kickXXXX from server any more
+        // if it's not our turn... but this below is how it was before
+
         // Should not be needed, there comes a nextEngagement additionally anyway?
         /*
         if (isMyTurn())
@@ -1818,6 +1853,14 @@ public final class Client implements IClient, IOracle, IVariant
                     doneWithEngagements();
                 }
             }
+        }
+        else
+        {
+            LOGGER
+                .warning("Got called kickFight but it's not our phase? Client "
+                    + getOwningPlayer().getName()
+                    + ", active player "
+                    + getActivePlayer().getName());
         }
         */
     }
@@ -1868,7 +1911,8 @@ public final class Client implements IClient, IOracle, IVariant
         game.setPhase(Phase.MUSTER);
         gui.actOnSetupMuster();
 
-        kickMuster();
+        // Not here any more...
+        // kickMuster();
     }
 
     private void kickMuster()

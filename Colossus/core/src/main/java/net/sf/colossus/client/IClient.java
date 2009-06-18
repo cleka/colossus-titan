@@ -121,6 +121,8 @@ public interface IClient
 
     public void setupMuster();
 
+    public void kickPhase();
+
     public void setupBattleSummon(Player battleActivePlayer,
         int battleTurnNumber);
 

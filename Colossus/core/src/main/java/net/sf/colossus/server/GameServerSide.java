@@ -1214,18 +1214,22 @@ public final class GameServerSide extends Game
         if (isPhase(Phase.SPLIT))
         {
             setupSplit();
+            server.kickPhase();
         }
         else if (isPhase(Phase.MOVE))
         {
             setupMove();
+            server.kickPhase();
         }
         else if (isPhase(Phase.FIGHT))
         {
             setupFight();
+            server.kickPhase();
         }
         else if (isPhase(Phase.MUSTER))
         {
             setupMuster();
+            server.kickPhase();
         }
         else
         {
@@ -1295,6 +1299,8 @@ public final class GameServerSide extends Game
     {
         Player player = getActivePlayer();
 
+        // TODO can/should this be other order - first setup move phase,
+        // then tell the movement roll, and then could come the kickMove
         ((PlayerServerSide)player).rollMovement();
         server.allSetupMove();
     }

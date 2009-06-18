@@ -146,10 +146,9 @@ public class History
         Element redoLogElement = new Element("Redo");
         for (Element el : recentEvents)
         {
-            // XXX
             // System.out
             //     .println("    adding recent event to new RedoLog, element "
-            //        + el.getName());
+            //         + el.getName());
             el.detach();
             redoLogElement.addContent(el);
         }
@@ -299,6 +298,7 @@ public class History
         Element event = new Element("MovementRoll");
         event.setAttribute("playerName", player.getName());
         event.setAttribute("roll", "" + roll);
+        // System.out.println("created redo element movementroll");
         recentEvents.add(event);
     }
 
@@ -590,9 +590,9 @@ public class History
             server.allTellPlayerElim(player, slayer, false);
         }
 
-        else if (el.getName().equals("MovementRoll")
-            || el.getName().equals("LegionMoved"))
+        else if (el.getName().equals("LegionMoved"))
         {
+            // XXX XXX only moved ignored, movement roll taken into use try...
             // XXX Those two are right now not in use yet, because they will
             // cause errors because activePlayer is wrong.
             // Need to get "setupPhase" for ReDo done right first.

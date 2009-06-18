@@ -307,6 +307,7 @@ public final class Constants
     public static final String setupMove = "setupMove";
     public static final String setupFight = "setupFight";
     public static final String setupMuster = "setupMuster";
+    public static final String kickPhase = "kickPhase";
     public static final String setupBattleSummon = "setupBattleSummon";
     public static final String setupBattleRecruit = "setupBattleRecruit";
     public static final String setupBattleMove = "setupBattleMove";

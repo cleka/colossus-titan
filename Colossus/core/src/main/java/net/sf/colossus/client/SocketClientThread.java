@@ -855,6 +855,11 @@ final class SocketClientThread extends Thread implements IServer,
         {
             client.setupMuster();
         }
+        else if (method.equals(Constants.kickPhase))
+        {
+            client.kickPhase();
+        }
+
         else if (method.equals(Constants.setupBattleSummon))
         {
             String battleActivePlayerName = args.remove(0);

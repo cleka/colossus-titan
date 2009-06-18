@@ -296,6 +296,7 @@ public final class PlayerServerSide extends Player implements
                 + " for movement");
         }
         getGame().getServer().allTellMovementRoll(movementRoll);
+        getGame().movementRollEvent(this, movementRoll);
     }
 
     void takeMulligan()
