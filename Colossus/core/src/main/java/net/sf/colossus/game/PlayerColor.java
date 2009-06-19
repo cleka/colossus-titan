@@ -8,8 +8,14 @@ import java.util.List;
 
 import net.sf.colossus.util.HTMLColor;
 
+
 /**
- * TODO the colors themselves should be defined in here
+ * Models the notion of a color a player can pick.
+ *
+ * This is not just the actual color of the markers, but also the names used
+ * for it (long and short version) as well as a suitable foreground color. The
+ * marker color itself is available through the {{@link #getBackgroundColor()}
+ * method.
  */
 public enum PlayerColor
 {
