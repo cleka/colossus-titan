@@ -38,6 +38,9 @@ public interface IOracle
 
     List<Boolean> getLegionCreatureCertainties(Legion legion);
 
+    // TODO: the sole function of this seems to be avoiding premature content
+    // rendering in StatusScreen, which doesn't seem a good reason for this
+    // method
     int getNumPlayers();
 
     Player getActivePlayer();
