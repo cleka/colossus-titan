@@ -246,11 +246,6 @@ public class GameClientSide extends Game implements IOracle
         return battle.getBattlePhase() == phase;
     }
 
-    public String getBattlePhaseName()
-    {
-        return battle.getBattlePhaseName();
-    }
-
     public void setBattleActivePlayer(Player battleActivePlayer)
     {
         battle.setBattleActivePlayer(battleActivePlayer);

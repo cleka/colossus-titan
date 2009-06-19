@@ -2103,12 +2103,6 @@ public final class Client implements IClient, IOracle, IVariant
         return game.getBattlePhase();
     }
 
-    // public for IOracle
-    public String getBattlePhaseName()
-    {
-        return game.getBattlePhaseName();
-    }
-
     // public for IOracle and BattleBoard
     public int getBattleTurnNumber()
     {

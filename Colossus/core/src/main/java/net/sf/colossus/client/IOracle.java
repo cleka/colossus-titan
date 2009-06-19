@@ -3,6 +3,7 @@ package net.sf.colossus.client;
 
 import java.util.List;
 
+import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.variant.MasterHex;
@@ -43,8 +44,5 @@ public interface IOracle
 
     Player getBattleActivePlayer();
 
-    /**
-     * TODO make typesafe
-     */
-    String getBattlePhaseName();
+    BattlePhase getBattlePhase();
 }

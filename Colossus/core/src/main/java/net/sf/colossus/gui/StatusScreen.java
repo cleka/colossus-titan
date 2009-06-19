@@ -295,8 +295,8 @@ final class StatusScreen extends KDialog
                 battleTurn = "" + battleTurnNumber;
             }
             battleTurnLabel.setText(battleTurn);
-            battlePhaseLabel.setText(gui.getGameClientSide()
-                .getBattlePhaseName());
+            battlePhaseLabel.setText(gui.getGameClientSide().getBattlePhase()
+                .toString());
         }
         else
         {
