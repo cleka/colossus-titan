@@ -464,10 +464,21 @@ public class Game
     }
 
     /**
-     * TODO this could probably be done much easier as getFirstEnemyLegion(Legion)
+     * Finds the first legion in a hex not belonging to a certain player.
+     *
+     * Note that there is no assumption that the player has a legion in that
+     * location itself. This method is e.g. used to evaluate moves in the AI.
+     *
+     * @param masterHex the hex where to look for enemy regions. Not null.
+     * @param player the player whose enemies we are looking for. Not null.
+     *
+     * @return the first legion that is in the specified hex and does not
+     *         belong to the given player, null if no such legion exists
      */
     public Legion getFirstEnemyLegion(MasterHex masterHex, Player player)
     {
+        assert masterHex != null : "Hex needs to be specified";
+        assert player != null : "Player needs to be specified";
         for (Legion legion : getAllEnemyLegions(player))
         {
             if (masterHex.equals(legion.getCurrentHex()))
