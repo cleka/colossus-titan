@@ -113,7 +113,6 @@ public final class Proposal
             return false;
         }
 
-        // TODO can we compare legions directly?
         if (!winner.equals(otherProposal.getWinner()))
         {
             return false;

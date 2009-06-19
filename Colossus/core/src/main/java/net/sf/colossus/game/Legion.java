@@ -17,6 +17,9 @@ public abstract class Legion
      *
      * This only works properly if all legions are owned by the same player.
      * The case of two legions with titans is not handled.
+     *
+     * WARNING: This is not consistent with equals() since two legions with
+     * the same point value are considered equal.
      */
     public static final Comparator<Legion> ORDER_TITAN_THEN_POINTS = new Comparator<Legion>()
     {
@@ -447,10 +450,53 @@ public abstract class Legion
         return getMarkerId();
     }
 
+    @Override
+    public final int hashCode()
+    {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result
+            + ((markerId == null) ? 0 : markerId.hashCode());
+        return result;
+    }
+
+    /**
+     * Two legions are considered equal if they have the same marker.
+     *
+     * Even though contents may change over time, we consider two legions
+     * to be the same as long as they have the same marker. This notion of
+     * equality is used throughout the code, so we enforce it by having both
+     * {{@link #equals(Object)} and {@link #hashCode()} declared final.
+     */
+    @Override
+    public final boolean equals(Object obj)
+    {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Legion other = (Legion)obj;
+        if (markerId == null)
+        {
+            if (other.markerId != null)
+                return false;
+        }
+        else if (!markerId.equals(other.markerId))
+            return false;
+        return true;
+    }
+
+
+
     /**
      * Data for one pending decision. For example, for crossing the 500
      * there will be a decision, whether the player takes for this legion
      * an angel or an archangel.
+     *
+     * TODO this should not be here, it should probably be modelled as a
+     * game action
      */
     public class AcquirableDecision
     {
