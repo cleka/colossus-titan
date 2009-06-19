@@ -280,7 +280,7 @@ final class StatusScreen extends KDialog
             turn = "" + turnNumber;
         }
         turnLabel.setText(turn);
-        phaseLabel.setText(gui.getGame().getPhaseName());
+        phaseLabel.setText(gui.getGame().getPhase().toString());
 
         if (gui.getGameClientSide().isBattleOngoing())
         {

@@ -41,11 +41,6 @@ public interface IOracle
 
     Player getActivePlayer();
 
-    /**
-     * TODO make typesafe
-     */
-    String getPhaseName();
-
     Player getBattleActivePlayer();
 
     /**

@@ -2305,12 +2305,6 @@ public final class Client implements IClient, IOracle, IVariant
     }
 
     // public for IOracle
-    public String getPhaseName()
-    {
-        return game.getPhaseName();
-    }
-
-    // public for IOracle
     public int getTurnNumber()
     {
         return game.getTurnNumber();
