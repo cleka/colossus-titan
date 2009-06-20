@@ -130,6 +130,12 @@ public final class Server extends Thread implements IServer
     // The ClientHandler of which the input is currently processed
     ClientHandler processingCH = null;
 
+    // During processing of redoLog, need to override the processing player
+    // with the one who did that event originally
+    // (because right now, all redo is processed while processingCH is the
+    // one of the last player that joined and triggered the loadGame2() etc.)
+    ClientHandler overriddenCH = null;
+
     // Channels are queued into here, to be removed from selector on
     // next possible opportunity ( = when all waiting-to-be-processed keys
     // have been processed).
@@ -321,6 +327,19 @@ public final class Server extends Thread implements IServer
         }
 
         return (waitingForPlayers == 0);
+    }
+
+    public void overrideProcessingCH(Player player)
+    {
+        overriddenCH = processingCH;
+        processingCH = (ClientHandler)getClient(player);
+
+    }
+
+    public void restoreProcessingCH()
+    {
+        processingCH = overriddenCH;
+        overriddenCH = null;
     }
 
     public void waitOnSelector(int timeout)

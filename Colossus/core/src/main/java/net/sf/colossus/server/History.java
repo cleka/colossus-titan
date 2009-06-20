@@ -117,15 +117,12 @@ public class History
     {
         for (Element el : recentEvents)
         {
-            // XXX
-            // System.out.println("flushing element from redo to history: "
-            //     + el.getName());
             el.detach();
             String name = el.getName();
             // TODO later, when this are proper events (not XML elements),
             // ask rather from the Event whether it belongs copied to
             // history or not.
-            if (name.equals("LegionMoved") || name.equals("LegionMoved"))
+            if (name.equals("Move") || name.equals("UndoMove"))
             {
                 LOGGER.finest("Flush Redo to History: skipping " + name);
             }
@@ -146,9 +143,6 @@ public class History
         Element redoLogElement = new Element("Redo");
         for (Element el : recentEvents)
         {
-            // System.out
-            //     .println("    adding recent event to new RedoLog, element "
-            //         + el.getName());
             el.detach();
             redoLogElement.addContent(el);
         }
@@ -298,11 +292,10 @@ public class History
         Element event = new Element("MovementRoll");
         event.setAttribute("playerName", player.getName());
         event.setAttribute("roll", "" + roll);
-        // System.out.println("created redo element movementroll");
         recentEvents.add(event);
     }
 
-    void legionMovedEvent(Legion legion, MasterHex newHex,
+    void legionMoveEvent(Legion legion, MasterHex newHex,
         EntrySide entrySide,
         boolean teleport, CreatureType lord)
     {
@@ -311,7 +304,7 @@ public class History
             return;
         }
 
-        Element event = new Element("LegionMoved");
+        Element event = new Element("Move");
         event.setAttribute("markerId", legion.getMarkerId());
         event.setAttribute("newHex", newHex.getLabel());
         event.setAttribute("entrySide", entrySide.getLabel());
@@ -321,10 +314,32 @@ public class History
         recentEvents.add(event);
     }
 
+    void legionUndoMoveEvent(Legion legion)
+    {
+        if (loading)
+        {
+            return;
+        }
+
+        Element event = new Element("UndoMove");
+        event.setAttribute("markerId", legion.getMarkerId());
+        recentEvents.add(event);
+    }
+
     /**
-     * Now fire all events from redoLog. Note that "loading" is not set
-     * to true, so they DO GET ADDED to the recentEvents list again.
-     * @param server
+     * Fire all events from redoLog.
+     * Elements from RedoLog are processed one by one and the corresponding
+     * method is called on the Server object, pretty much as if a
+     * ClientHandler would call it when receiving such a request from Client.
+     * Note that in some cases overriding the processingCH is necessary
+     * (because technically, this all currently happens while still the
+     * connecting of last joining player is processed, so processingCH is
+     * set to his ClientHandler).
+     *
+     * Note that "loading" is not set to true, so they DO GET ADDED to the
+     * recentEvents list again.
+     *
+     * @param server The server on which to call all the actions to be redone
      */
     void processRedoLog(Server server)
     {
@@ -335,8 +350,6 @@ public class History
         for (Object obj : loadedRedoLog.getChildren())
         {
             Element el = (Element)obj;
-            // XXX
-            // System.out.println("processing redo event " + el.getName());
             LOGGER.info("processing redo event " + el.getName());
             fireEventFromElement(server, el);
         }
@@ -590,17 +603,6 @@ public class History
             server.allTellPlayerElim(player, slayer, false);
         }
 
-        else if (el.getName().equals("LegionMoved"))
-        {
-            // XXX XXX only moved ignored, movement roll taken into use try...
-            // XXX Those two are right now not in use yet, because they will
-            // cause errors because activePlayer is wrong.
-            // Need to get "setupPhase" for ReDo done right first.
-            // TODO also, for LegionMoved event, also need MoveUndone first,
-            // otherwise problems if someone undoes a move before saving.
-            return;
-        }
-
         else if (el.getName().equals("MovementRoll"))
         {
             String playerName = el.getAttributeValue("playerName");
@@ -611,7 +613,15 @@ public class History
             server.allTellMovementRoll(roll);
         }
 
-        else if (el.getName().equals("LegionMoved"))
+        else if (el.getName().equals("Move")
+            || el.getName().equals("UndoMove"))
+        {
+            // XXX Moved and UndoMoveare right now not in use yet.
+            // Need to get "setupPhase" and "kickPhase" done right first.
+            return;
+        }
+
+        else if (el.getName().equals("Move"))
         {
             String markerId = el.getAttributeValue("markerId");
             String lordName = el.getAttributeValue("revealedLord");
@@ -626,13 +636,28 @@ public class History
                 .getHexByLabel(newHexLabel);
             EntrySide entrySide = EntrySide.fromLabel(entrySideName);
             boolean teleport = tele != null && tele.equals("true");
-
-            LOGGER.finest("LegionMoved redo event: \n" + "  marker "
+            LOGGER.finest("Legion Move redo event: \n" + " marker "
                 + markerId + ", lordName " + revealedLord + " teleported "
                 + teleport + " to hex " + newHex.getLabel() + " entrySide "
                 + entrySide.toString());
 
+            server.overrideProcessingCH(legion.getPlayer());
             server.doMove(legion, newHex, entrySide, teleport, revealedLord);
+            server.restoreProcessingCH();
+        }
+        else if (el.getName().equals("UndoMove"))
+        {
+            String markerId = el.getAttributeValue("markerId");
+            LegionServerSide legion = game.getLegionByMarkerId(markerId);
+            LOGGER.finest("Legion Undo Move redo event: \n" + " marker "
+                + markerId);
+            server.overrideProcessingCH(legion.getPlayer());
+            server.undoMove(legion);
+            server.restoreProcessingCH();
+        }
+        else
+        {
+            LOGGER.warning("Unknown Redo element " + el.getName());
         }
     }
 

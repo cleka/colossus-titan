@@ -3411,7 +3411,7 @@ public final class GameServerSide extends Game
         EntrySide entrySide,
         boolean teleport, CreatureType lord)
     {
-        history.legionMovedEvent(legion, newHex, entrySide, teleport, lord);
+        history.legionMoveEvent(legion, newHex, entrySide, teleport, lord);
     }
 
     INotifyWebServer getNotifyWebServer()
