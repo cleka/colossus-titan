@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ColossusSnapshot version="12">
-    <Variant dir="Pantheon" file="PantheonVar.xml" name="Pantheon" />
+<ColossusSnapshot version="13">
+    <Variant dir="Pantheon" file="PantheonVar.xml" name="Pantheon" ></Variant>
     <TurnNumber>1</TurnNumber>
     <CurrentPlayer>0</CurrentPlayer>
     <CurrentPhase>1</CurrentPhase>
@@ -1618,5 +1618,7 @@ playtesting has been done.</P>
             </creatures>
         </Reveal>
     </History>
+    <Redo>
+    </Redo>
 </ColossusSnapshot>
 

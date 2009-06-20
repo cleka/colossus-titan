@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ColossusSnapshot version="12">
-    <Variant dir="Abyssal6" file="Abyssal6Var.xml" name="Abyssal6" />
+<ColossusSnapshot version="13">
+    <Variant dir="Abyssal6" file="Abyssal6Var.xml" name="Abyssal6" ></Variant>
     <TurnNumber>7</TurnNumber>
     <CurrentPlayer>2</CurrentPlayer>
     <CurrentPhase>1</CurrentPhase>
@@ -2763,5 +2763,7 @@ In12 = Sombrero
         </Reveal>
         <AddCreature markerId="Bk11" creatureName="Lion" turn="7" />
     </History>
+    <Redo>
+    </Redo>
 </ColossusSnapshot>
 
