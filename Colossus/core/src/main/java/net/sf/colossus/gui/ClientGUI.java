@@ -1735,7 +1735,7 @@ public class ClientGUI implements IClientGUI
         board.setPhaseInfo(message);
     }
 
-    public void tellMovementRoll(int roll)
+    public void acOnTellMovementRoll(int roll)
     {
         eventViewer.tellMovementRoll(roll);
 
