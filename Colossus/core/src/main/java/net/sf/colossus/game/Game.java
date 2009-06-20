@@ -101,6 +101,7 @@ public class Game
         this.variantKnower = variantKnower;
 
         this.caretaker = new Caretaker(this);
+        this.phase = Phase.INIT;
     }
 
     public Variant getVariant()
