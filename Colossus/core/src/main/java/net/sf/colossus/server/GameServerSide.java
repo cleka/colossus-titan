@@ -3354,7 +3354,8 @@ public final class GameServerSide extends Game
         PlayerServerSide player = (PlayerServerSide)getActivePlayer();
         player.takeMulligan();
         server.allUpdatePlayerInfo();
-        setupPhase();
+        setupMove();
+        server.kickPhase();
         return player.getMovementRoll();
     }
 
