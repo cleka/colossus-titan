@@ -1005,7 +1005,8 @@ public class ClientGUI implements IClientGUI
     public void actOnDidSplit(int turn, Legion parent, Legion child,
         MasterHex hex)
     {
-        if (!isReplayOngoing())
+        // Not during replay, but during redo:
+        if (!isReplayOngoing() || client.isRedoOngoing())
         {
             eventViewerNewSplitEvent(turn, parent, child);
         }
@@ -1331,7 +1332,9 @@ public class ClientGUI implements IClientGUI
     {
         if (client.isRedoOngoing())
         {
-            // nothing needed so far
+            // TODO perhaps needed only temporary. Once we get the proper
+            // order setupPhase, redo, kickPhase this should not be needed here.
+            clearUndoStack();
         }
         else
         {
@@ -1341,6 +1344,9 @@ public class ClientGUI implements IClientGUI
 
     }
 
+    // TODO this is just a hack.
+    // Instead of this flag, setupPhase which clears the undoStack should be
+    // done first and then the processing of the redo elements.
     private void clearUndoStack()
     {
         if (dontClearUndoStack)
@@ -2003,7 +2009,6 @@ public class ClientGUI implements IClientGUI
     public void actOnTurnOrPlayerChange(Client client, int turnNr,
         Player player)
     {
-        clearUndoStack();
         cleanupNegotiationDialogs();
         eventViewer.turnOrPlayerChange(client, turnNr, player);
     }
@@ -2020,10 +2025,14 @@ public class ClientGUI implements IClientGUI
         }
 
         disposeMovementDie();
+        clearUndoStack();
         board.setupSplitMenu();
         board.fullRepaint(); // Ensure that movement die goes away
         if (isMyTurn())
         {
+            // TODO replace all those "when xxx happens then set label to yyy"
+            // with proper "set game state to state xxx and trigger redisplaying
+            // of labels and setting actions dis-/enabled accordingly"...
             if (client.getTurnNumber() == 1)
             {
                 board.disableDoneAction("Split legions in first round");
