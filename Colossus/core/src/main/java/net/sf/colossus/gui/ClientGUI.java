@@ -2037,10 +2037,14 @@ public class ClientGUI implements IClientGUI
             //  - so that one can review and undo.
             // But that does not make so much sense, as this is in the
             // "setupSplit" call, so the AI can't have done anything yet?
-
+            //
+            // 2009 June, Clemens: added "&& !isUndoStackEmpty()". If one did
+            // split all possible legions just before save and load it again,
+            // then this one here would otherwise automatically do the
+            // "doneWithSplit()".
             if ((getOwningPlayer().getMarkersAvailable().size() < 1 || client
                 .findTallLegionHexes(4).isEmpty())
-                && !options.getOption(Options.autoSplit))
+                && !options.getOption(Options.autoSplit) && isUndoStackEmpty())
             {
                 client.doneWithSplits();
             }
