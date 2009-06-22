@@ -30,7 +30,7 @@ public final class Constants
     /** Base path for all external game data files. */
     public static final String GAME_DATA_PATH = System
         .getProperty("user.home")
-        + File.separator + ".colossus" + File.separator;
+        + File.separator + ".colossus";
 
     // Constants related to the options config files
     public static final String OPTIONS_BASE = "Colossus-";
