@@ -51,6 +51,8 @@ public class History
      */
     private final Element loadedRedoLog;
 
+    private boolean isRedo = false;
+
     /**
      * Stores the surviving legions (this variable is not needed any more)
      *
@@ -346,13 +348,15 @@ public class History
         assert loadedRedoLog != null : "Loaded RedoLog should always "
             + "have a JDOM root element as backing store";
 
-        LOGGER.info("Histroy: Start processing redo log");
+        LOGGER.info("History: Start processing redo log");
+        isRedo = true;
         for (Object obj : loadedRedoLog.getChildren())
         {
             Element el = (Element)obj;
             LOGGER.info("processing redo event " + el.getName());
             fireEventFromElement(server, el);
         }
+        isRedo = false;
         // TODO clear loadedRedoLog?
         LOGGER.info("Completed processing redo log");
     }
@@ -460,6 +464,13 @@ public class History
                     .getCreatureByName(creatureName));
             }
             LegionServerSide parentLegion = game.getLegionByMarkerId(parentId);
+
+            if (isRedo)
+            {
+                server.doSplit(parentLegion, childId, creatures);
+                return;
+            }
+
             // LegionServerSide.split(..) doesn't like us here since the parent
             // legion can't remove creatures (not there?) -- create child directly
             // instead
