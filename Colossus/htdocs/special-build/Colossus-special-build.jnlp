@@ -4,7 +4,7 @@
      <jnlp
        codebase="http://colossus.sf.net/"
        href="special-build/Colossus-special-build.jnlp">
-       <application-desc main-class="net.sf.colossus.server.Start"/>
+       <application-desc main-class="net.sf.colossus.appmain.Start"/>
        <information>
          <title>Colossus (Special Build)</title>
          <vendor>Colossus dev team</vendor>

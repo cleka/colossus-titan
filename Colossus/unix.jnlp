@@ -4,7 +4,7 @@
      <jnlp
        codebase="file:///home/dripton/src/Colossus"
        href="unix.jnlp">
-       <application-desc main-class="net.sf.colossus.server.Start"/>
+       <application-desc main-class="net.sf.colossus.appmain.Start"/>
        <information>
          <title>Colossus</title>
          <vendor>Colossus dev team</vendor>

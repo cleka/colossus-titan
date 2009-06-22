@@ -4,7 +4,7 @@
      <jnlp
        codebase="file:///c:/src/Colossus"
        href="win.jnlp">
-       <application-desc main-class="net.sf.colossus.server.Start"/>
+       <application-desc main-class="net.sf.colossus.appmain.Start"/>
        <information>
          <title>Colossus</title>
          <vendor>Colossus dev team</vendor>

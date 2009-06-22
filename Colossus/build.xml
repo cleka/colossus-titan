@@ -187,7 +187,7 @@
     includes="**" excludes="**/webserver/**">
       <manifest>
         <attribute name="Main-Class"
-        value="net.sf.colossus.server.Start" />
+        value="net.sf.colossus.appmain.Start" />      	
         <attribute name="Class-Path"
         value="${manifest.classpath}" />
       </manifest>

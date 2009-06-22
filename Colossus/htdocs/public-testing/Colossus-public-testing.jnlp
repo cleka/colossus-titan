@@ -4,7 +4,7 @@
      <jnlp
        codebase="http://colossus.sf.net/"
        href="public-testing/Colossus-public-testing.jnlp">
-       <application-desc main-class="net.sf.colossus.server.Start"/>
+       <application-desc main-class="net.sf.colossus.appmain.Start"/>
        <information>
          <title>Colossus (Public Testing Build)</title>
          <vendor>Colossus dev team</vendor>
