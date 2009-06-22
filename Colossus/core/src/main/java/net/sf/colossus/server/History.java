@@ -467,7 +467,9 @@ public class History
 
             if (isRedo)
             {
+                server.overrideProcessingCH(parentLegion.getPlayer());
                 server.doSplit(parentLegion, childId, creatures);
+                server.overrideProcessingCH(parentLegion.getPlayer());
                 return;
             }
 
