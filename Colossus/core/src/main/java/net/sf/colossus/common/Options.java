@@ -177,17 +177,29 @@ public final class Options implements IOptions
     private final Properties props = new Properties();
     private final String owner; // playerName, or Constants.optionsServerName
     private final String dataPath; // WebServer sets to create a server.cfg file
+    // AIs and the "startOption" do not read nor write to an actual file
     private boolean noFile;
+    // Unit and functional tests read a file, but should not write anything back
+    private final boolean readOnly;
 
     private final Map<String, List<Listener>> listeners = new HashMap<String, List<Listener>>();
 
-    // in the directory in which the game is run
+
+    public Options(String owner, String customPath, boolean noFile,
+        boolean readOnly)
+    {
+        this.owner = owner;
+        this.dataPath = customPath;
+        this.noFile = noFile;
+        this.readOnly = readOnly;
+    }
 
     public Options(String owner, String customPath, boolean noFile)
     {
         this.owner = owner;
         this.dataPath = customPath;
         this.noFile = noFile;
+        this.readOnly = false;
     }
 
     public Options(String owner)
@@ -202,7 +214,7 @@ public final class Options implements IOptions
 
     public String getOptionsFilename()
     {
-        return dataPath + Constants.OPTIONS_BASE + owner
+        return dataPath + "/" + Constants.OPTIONS_BASE + owner
             + Constants.OPTIONS_EXTENSION;
     }
 
@@ -266,6 +278,13 @@ public final class Options implements IOptions
         {
             return;
         }
+
+        // Don't save if readOnly mode was set - typically test cases
+        if (this.readOnly)
+        {
+            return;
+        }
+
         String optionsFile = getOptionsFilename();
 
         File optionsDir = new File(dataPath);
