@@ -3,7 +3,10 @@ package net.sf.colossus.server;
 import java.util.logging.Logger;
 
 import junit.framework.TestCase;
+import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
+import net.sf.colossus.common.TestConstants;
+import net.sf.colossus.common.WhatNextManager;
 import net.sf.colossus.util.ErrorUtils;
 
 public class StartEachVariant extends TestCase
@@ -16,33 +19,64 @@ public class StartEachVariant extends TestCase
         super(name);
     }
 
-    public void testStart()
+    public void testDefault()
     {
-        //        Right now it seems it does not work if there is more than one
-        //        game run in same test...
-        //        startOneVariant("Default", 6);
-        //        startOneVariant("Abyssal3", 3);
-        startOneVariant("Abyssal9", 9);
+        testStartOneVariant("Default", 6);
     }
 
-    private void startOneVariant(String variantName, int playerCount)
+    public void testAbyssal3()
     {
-        LOGGER.info("startOneVariant for variant " + variantName + " with "
-            + playerCount + " SimpleAIs.");
+        testStartOneVariant("Abyssal3", 3);
+    }
+
+    public void testAbyssal6()
+    {
+        testStartOneVariant("Abyssal6", 6);
+    }
+
+    /*
+    public void testIllegalVariant()
+    {
+        testStartOneVariant("NoSuchVariant", 6);
+    }
+    */
+
+
+
+    // TODO nrOfAIs still dummy...
+    private void testStartOneVariant(String variantName, int nrOfAIs)
+    {
+        LOGGER.info("test: starting variant " + variantName + " with "
+            + nrOfAIs + "AIs");
 
         Options.setFunctionalTest(true);
-        ErrorUtils.setErrorDuringFunctionalTest(false);
+        ErrorUtils.clearErrorDuringFunctionalTest();
 
-        // String countStr = playerCount + "";
+        // noFile argument true, we never want the START options to be saved.
+        Options startOptions = new Options(Constants.OPTIONS_START, true);
 
-        // -Z = Simple AIs
-        //String[] args = { "-g", "--variant", variantName, "-i", countStr,
-        //    "-Z", countStr };
+        WhatNextManager whatNextManager = new WhatNextManager(startOptions);
 
-        //Start.main(args);
+        // use colossus-home from resource directory.
+        // Get -server.cf file from there.
+        // The booleans are: noFile=false, readOnly=true
+        Options serverOptions = new Options(Constants.OPTIONS_SERVER_NAME,
+            TestConstants.TEST_COLOSSUS_HOME, false, true);
 
-        assertFalse(ErrorUtils.getErrorDuringFunctionalTest());
-        LOGGER.info("startOneVariant for variant " + variantName + " with "
-            + playerCount + " SimpleAIs: COMPLETED!");
+        serverOptions.loadOptions();
+        serverOptions.setOption(Options.variant, variantName);
+        VariantSupport.loadVariantByName(variantName, true);
+
+        GameServerSide game = new GameServerSide(whatNextManager,
+            serverOptions, null, new VariantKnower());
+        game.startNewGameAndWaitUntilOver(null);
+
+        assertFalse("Starting game with variant " + variantName
+            + " failed!",
+            ErrorUtils.checkErrorDuringFunctionalTest());
+
+        LOGGER.info("OK: starting variant Default COMPLETED.");
     }
+
+
 }

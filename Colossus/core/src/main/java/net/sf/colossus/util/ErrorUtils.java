@@ -6,6 +6,8 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.Box;
@@ -29,7 +31,7 @@ public class ErrorUtils
     private static final Logger LOGGER = Logger.getLogger(ErrorUtils.class
         .getName());
 
-    private static boolean errorDuringFunctionalTest = false;
+    private static List<String> errorDuringFunctionalTest = new ArrayList<String>();
 
     /**
      * Query the stacktrace items from an exception, and put them
@@ -46,14 +48,40 @@ public class ErrorUtils
         return stackTrace;
     }
 
-    public static void setErrorDuringFunctionalTest(boolean val)
+    public static void clearErrorDuringFunctionalTest()
     {
-        errorDuringFunctionalTest = val;
+        errorDuringFunctionalTest.clear();
     }
 
-    public static boolean getErrorDuringFunctionalTest()
+    /**
+     *
+     * @param reason
+     * @throws IllegalArgumentException
+     */
+    public static void setErrorDuringFunctionalTest(String reason)
+        throws IllegalArgumentException
     {
-        return errorDuringFunctionalTest;
+        if (reason == null)
+        {
+            throw new IllegalArgumentException(
+                "reason to setErrorDuringFunctionalTest must not be null!");
+        }
+        errorDuringFunctionalTest.add(reason);
+    }
+
+    public static String getErrorDuringFunctionalTest()
+    {
+        StringBuilder errorList = new StringBuilder("");
+        for (String errorMsg : errorDuringFunctionalTest)
+        {
+            errorList.append(errorMsg + "\n");
+        }
+        return errorList.toString();
+    }
+
+    public static boolean checkErrorDuringFunctionalTest()
+    {
+        return !(errorDuringFunctionalTest.isEmpty());
     }
 
     /** During stress-testing, don't bother to show message,
@@ -146,7 +174,7 @@ public class ErrorUtils
                 + "but we are in a functional test so we rather exit "
                 + "immediately instead of waiting for user input .";
             LOGGER.severe(info);
-            setErrorDuringFunctionalTest(true);
+            setErrorDuringFunctionalTest("showErrorDialog requested");
             return;
         }
 

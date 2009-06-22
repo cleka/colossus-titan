@@ -1056,7 +1056,8 @@ public final class Server extends Thread implements IServer
                     logToStartLog("Loading/Replay failed!!\n");
                     if (Options.isFunctionalTest())
                     {
-                        ErrorUtils.setErrorDuringFunctionalTest(true);
+                        ErrorUtils
+                            .setErrorDuringFunctionalTest("Loading/Replay failed!");
                         game.stopAllDueToFunctionalTestCompleted();
                     }
                     else

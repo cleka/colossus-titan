@@ -21,20 +21,21 @@ public class LoadGameTest extends TestCase
     public void testLoadSimple3PlayerGame()
     {
         Options.setFunctionalTest(true);
-        ErrorUtils.setErrorDuringFunctionalTest(false);
+        ErrorUtils.clearErrorDuringFunctionalTest();
         String fileName = makeFullPath("3-players-no-recruit.xml");
         LOGGER.info("Filename: " + fileName);
         String[] args = { "--load", fileName };
 
         Start.main(args);
 
-        assertFalse(ErrorUtils.getErrorDuringFunctionalTest());
+        assertFalse("Error message dialog would have been shown!", ErrorUtils
+            .checkErrorDuringFunctionalTest());
     }
 
     public void testLoadGameWithRecruit()
     {
         Options.setFunctionalTest(true);
-        ErrorUtils.setErrorDuringFunctionalTest(false);
+        ErrorUtils.clearErrorDuringFunctionalTest();
         String fileName = makeFullPath("Simple-6-players.xml");
         LOGGER.info("Filename: " + fileName);
 
@@ -42,7 +43,8 @@ public class LoadGameTest extends TestCase
 
         Start.main(args);
 
-        assertFalse(ErrorUtils.getErrorDuringFunctionalTest());
+        assertFalse("Error message dialog would have been shown!", ErrorUtils
+            .checkErrorDuringFunctionalTest());
     }
 
     private String makeFullPath(String fileName)
