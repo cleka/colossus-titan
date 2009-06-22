@@ -149,7 +149,8 @@
       <classpath refid="project.class.path" />
       <formatter type="xml" />
       <batchtest todir="${testresults.dir}">
-        <fileset dir="${functests.src.dir}" />
+        <fileset dir="${functests.src.dir}"
+         excludes="**/TestConstants.*"/>
       </batchtest>
     </junit>
   </target>

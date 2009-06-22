@@ -3,7 +3,6 @@ package net.sf.colossus.appmain;
 import java.util.logging.Logger;
 
 import junit.framework.TestCase;
-import net.sf.colossus.appmain.Start;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.util.ErrorUtils;
 
@@ -12,7 +11,7 @@ public class LoadGameTest extends TestCase
     private static final Logger LOGGER = Logger.getLogger(LoadGameTest.class
         .getName());
 
-    public static final String SAVED_GAMES_TEST_DIR = "./core/src/functest/resource/saves/";
+    public static final String SAVED_GAMES_TEST_DIR = "./core/src/functest/resource/colossus-home/saves/";
 
     public LoadGameTest(String testName)
     {
