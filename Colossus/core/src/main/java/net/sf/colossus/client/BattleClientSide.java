@@ -18,7 +18,7 @@ import net.sf.colossus.util.CollectionHelper;
 import net.sf.colossus.util.Predicate;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
-import net.sf.colossus.variant.MasterBoardTerrain;
+import net.sf.colossus.variant.MasterHex;
 
 public class BattleClientSide extends Battle
 {
@@ -32,13 +32,13 @@ public class BattleClientSide extends Battle
     private final List<BattleUnit> battleUnits = new ArrayList<BattleUnit>();
 
     public BattleClientSide(Game game, Legion attacker, Legion defender,
-        MasterBoardTerrain land)
+        MasterHex location)
     {
-        super(game, attacker, defender, land);
+        super(game, attacker, defender, location);
 
         LOGGER.info("Battle client side instantiated for "
             + attacker.getMarkerId() + " attacking " + defender.getMarkerId()
-            + " in land " + land.getDisplayName());
+            + " in land " + location.getTerrain().getDisplayName());
     }
 
     public void init(int battleTurnNumber, Player battleActivePlayer,

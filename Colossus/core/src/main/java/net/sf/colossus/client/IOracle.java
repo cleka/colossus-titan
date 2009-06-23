@@ -3,10 +3,10 @@ package net.sf.colossus.client;
 
 import java.util.List;
 
+import net.sf.colossus.game.Battle;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
-import net.sf.colossus.variant.MasterHex;
 
 
 /**
@@ -22,15 +22,7 @@ import net.sf.colossus.variant.MasterHex;
  */
 public interface IOracle
 {
-    boolean isBattleOngoing();
-
-    MasterHex getBattleSite();
-
-    Legion getAttacker();
-
-    Legion getDefender();
-
-    int getBattleTurnNumber();
+    Battle getBattle();
 
     int getTurnNumber();
 

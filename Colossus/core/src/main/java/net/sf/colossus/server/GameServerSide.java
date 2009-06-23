@@ -1413,6 +1413,8 @@ public final class GameServerSide extends Game
             if (!ver.getValue().equals(Constants.XML_SNAPSHOT_VERSION))
             {
                 LOGGER.severe("Can't load this savegame version.");
+                // TODO not only would this fail to load quietly, it also fails
+                // to fail quietly rather noisily by causing an NPE in dispose().
                 dispose();
                 return;
             }

@@ -213,11 +213,8 @@ public class GameClientSide extends Game implements IOracle
         Player battleActivePlayer, BattlePhase battlePhase, Legion attacker,
         Legion defender)
     {
-        this.battle = new BattleClientSide(this, attacker, defender, hex
-            .getTerrain());
-
+        this.battle = new BattleClientSide(this, attacker, defender, hex);
         battle.init(battleTurnNumber, battleActivePlayer, battlePhase);
-
     }
 
     public BattleClientSide getBattle()

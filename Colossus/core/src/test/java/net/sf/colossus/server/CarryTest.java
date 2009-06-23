@@ -135,7 +135,7 @@ public class CarryTest extends TestCase
 
     private void placeCreature(Creature creature, String battleHexLabel)
     {
-        MasterBoardTerrain terrain = battle.getMasterHex().getTerrain();
+        MasterBoardTerrain terrain = battle.getLocation().getTerrain();
         BattleHex battleHex = terrain.getHexByLabel(battleHexLabel);
         creature.setCurrentHex(battleHex);
     }

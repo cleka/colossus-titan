@@ -51,7 +51,6 @@ public final class BattleServerSide extends Battle
 
     private Server server;
     private LegionTags activeLegionTag;
-    private final MasterHex masterHex;
     private int turnNumber;
     private BattlePhase phase;
     private AngelSummoningStates summonState = AngelSummoningStates.NO_KILLS;
@@ -74,10 +73,9 @@ public final class BattleServerSide extends Battle
         LegionTags activeLegionTag, MasterHex masterHex,
         int turnNumber, BattlePhase phase)
     {
-        super(game, attacker, defender, masterHex.getTerrain());
+        super(game, attacker, defender, masterHex);
 
         this.server = game.getServer();
-        this.masterHex = masterHex;
         this.activeLegionTag = activeLegionTag;
         this.turnNumber = turnNumber;
         this.phase = phase;
@@ -111,7 +109,7 @@ public final class BattleServerSide extends Battle
 
     private void placeLegion(Legion legion)
     {
-        BattleHex entrance = masterHex.getTerrain().getEntrance(
+        BattleHex entrance = getLocation().getTerrain().getEntrance(
             legion.getEntrySide());
         for (CreatureServerSide critter : ((LegionServerSide)legion)
             .getCreatures())
@@ -134,7 +132,7 @@ public final class BattleServerSide extends Battle
 
     private void placeCritter(CreatureServerSide critter)
     {
-        BattleHex entrance = masterHex.getTerrain().getEntrance(
+        BattleHex entrance = getLocation().getTerrain().getEntrance(
             critter.getLegion().getEntrySide());
         critter.setBattleInfo(entrance, entrance, this);
         server.allPlaceNewChit(critter);
@@ -152,7 +150,7 @@ public final class BattleServerSide extends Battle
      *  is non-null earlier. */
     void init()
     {
-        server.allInitBattle(masterHex);
+        server.allInitBattle(getLocation());
         initBattleChits(getAttackingLegion());
         initBattleChits(getDefendingLegion());
 
@@ -237,11 +235,6 @@ public final class BattleServerSide extends Battle
                 return getAttackingLegion();
         }
         throw new IllegalArgumentException("Parameter out of range");
-    }
-
-    public MasterHex getMasterHex()
-    {
-        return masterHex;
     }
 
     BattlePhase getBattlePhase()
@@ -592,11 +585,11 @@ public final class BattleServerSide extends Battle
         Set<BattleHex> set = new HashSet<BattleHex>();
         if (!critter.hasMoved() && !critter.isInContact(false))
         {
-            if (masterHex.getTerrain().hasStartList() && (turnNumber == 1)
+            if (getLocation().getTerrain().hasStartList() && (turnNumber == 1)
                 && activeLegionTag == LegionTags.DEFENDER)
             {
                 set = findUnoccupiedStartlistHexes(ignoreMobileAllies,
-                    masterHex.getTerrain());
+                    getLocation().getTerrain());
             }
             else
             {
@@ -1240,7 +1233,8 @@ public final class BattleServerSide extends Battle
             LOGGER.log(Level.WARNING, critter.getName() + " in "
                 + critter.getCurrentHex().getLabel()
                 + " tried to illegally move to " + hex.getLabel() + " in "
-                + masterHex.getTerrain() + " (" + getAttackingLegion().getMarkerId()
+                + getLocation().getTerrain() + " ("
+                + getAttackingLegion().getMarkerId()
                 + " attacking " + getDefendingLegion().getMarkerId() + ", active: "
                 + markerId + ")");
             return false;
@@ -1250,7 +1244,7 @@ public final class BattleServerSide extends Battle
     private void cleanup()
     {
         battleOver = true;
-        getGame().finishBattle(masterHex, attackerEntered, pointsScored,
+        getGame().finishBattle(getLocation(), attackerEntered, pointsScored,
             turnNumber);
     }
 

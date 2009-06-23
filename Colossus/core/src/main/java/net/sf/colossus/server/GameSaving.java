@@ -330,7 +330,7 @@ public class GameSaving
     {
         Element bat = new Element("Battle");
 
-        bat.setAttribute("masterHexLabel", game.getBattle().getMasterHex()
+        bat.setAttribute("masterHexLabel", game.getBattle().getLocation()
             .getLabel());
         bat.setAttribute("turnNumber", "" + game.getBattle().getTurnNumber());
         bat.setAttribute("activePlayer", ""

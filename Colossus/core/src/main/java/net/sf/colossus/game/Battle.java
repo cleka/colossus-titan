@@ -8,7 +8,7 @@ import net.sf.colossus.common.Constants;
 import net.sf.colossus.util.CompareDoubles;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.HazardTerrain;
-import net.sf.colossus.variant.MasterBoardTerrain;
+import net.sf.colossus.variant.MasterHex;
 
 
 /**
@@ -22,15 +22,15 @@ abstract public class Battle
     protected final Game game;
     protected final Legion attacker;
     protected final Legion defender;
-    private final MasterBoardTerrain land;
+    private final MasterHex location;
 
     public Battle(Game game, Legion attacker, Legion defender,
-        MasterBoardTerrain land)
+        MasterHex location)
     {
         this.game = game;
         this.attacker = attacker;
         this.defender = defender;
-        this.land = land;
+        this.location = location;
     }
 
     public Game getGame()
@@ -46,11 +46,6 @@ abstract public class Battle
     public Legion getDefendingLegion()
     {
         return defender;
-    }
-
-    public MasterBoardTerrain getLand()
-    {
-        return land;
     }
 
     /** Whether the hex is occupied by a critter/creature/chit/...
@@ -636,5 +631,10 @@ abstract public class Battle
             return ldefender;
         }
         return null;
+    }
+
+    public MasterHex getLocation()
+    {
+        return location;
     }
 }

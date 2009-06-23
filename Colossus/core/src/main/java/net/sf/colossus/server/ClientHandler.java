@@ -547,7 +547,8 @@ final class ClientHandler implements IClient
 
     private BattleHex resolveBattleHex(String hexLabel)
     {
-        return server.getGame().getBattle().getLand().getHexByLabel(hexLabel);
+        return server.getGame().getBattle().getLocation().getTerrain()
+            .getHexByLabel(hexLabel);
     }
 
     // TODO resolveX methods are on both sides of the network, they should
