@@ -642,6 +642,7 @@ public class History
             int roll = Integer.parseInt(el.getAttributeValue("roll"));
 
             ((PlayerServerSide)player).setMovementRoll(roll);
+            game.movementRollEvent(player, roll);
             server.allTellMovementRoll(roll);
         }
         else if (el.getName().equals("Move"))
