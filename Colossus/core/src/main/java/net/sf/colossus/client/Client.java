@@ -1951,7 +1951,7 @@ public final class Client implements IClient, IOracle, IVariant
      *
      * @return Whether there is any legion that could recruit or undoRecruit
      */
-    private boolean noRecruitActionPossible()
+    public boolean noRecruitActionPossible()
     {
         return getPossibleRecruitActionHexes().isEmpty();
     }
@@ -2701,7 +2701,7 @@ public final class Client implements IClient, IOracle, IVariant
      *  or undo recruit. Used for "if there is nothing to do in this recruit
      *  phase, can to autoDone that option is set".
      */
-    public Set<MasterHex> getPossibleRecruitActionHexes()
+    private Set<MasterHex> getPossibleRecruitActionHexes()
     {
         Set<MasterHex> result = new HashSet<MasterHex>();
 

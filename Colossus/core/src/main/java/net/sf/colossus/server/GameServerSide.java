@@ -740,10 +740,13 @@ public final class GameServerSide extends Game
         }
 
         server.allTellAllLegionLocations();
-        gameSaver.commitPointReached();
-
-        autoSave();
+        server.allSetupTurnState();
         updateCaretakerDisplays();
+        setupSplit();
+
+        gameSaver.commitPointReached();
+        autoSave();
+
         server.allRequestConfirmCatchup("KickstartGame");
     }
 
@@ -1069,7 +1072,7 @@ public final class GameServerSide extends Game
         }
         else
         {
-            setupPhase();
+            server.kickPhase();
         }
     }
 
@@ -1163,7 +1166,31 @@ public final class GameServerSide extends Game
             }
 
             pendingAdvancePhase = false;
+
+            if (isPhase(Phase.SPLIT))
+            {
+                server.allSetupTurnState();
+            }
+
+            // A new phase starts.
+            // First, set it up and create commit point (take snapshot)
             setupPhase();
+            gameSaver.commitPointReached();
+
+            if (isAutoSavePoint())
+            {
+                autoSave();
+            }
+
+            // Next, initial actions in that phase. So far, only for move.
+            if (isPhase(Phase.MOVE))
+            {
+                Player player = getActivePlayer();
+                ((PlayerServerSide)player).rollMovement();
+            }
+
+            // Inform Client now it's his time to act.
+            server.kickPhase();
         }
 
         /**
@@ -1201,35 +1228,27 @@ public final class GameServerSide extends Game
             {
                 LOGGER.info(getActivePlayer() + "'s turn, number "
                     + turnNumber);
-
-                autoSave();
             }
         }
     }
 
     private void setupPhase()
     {
-        gameSaver.commitPointReached();
-
         if (isPhase(Phase.SPLIT))
         {
             setupSplit();
-            server.kickPhase();
         }
         else if (isPhase(Phase.MOVE))
         {
             setupMove();
-            server.kickPhase();
         }
         else if (isPhase(Phase.FIGHT))
         {
             setupFight();
-            server.kickPhase();
         }
         else if (isPhase(Phase.MUSTER))
         {
             setupMuster();
-            server.kickPhase();
         }
         else
         {
@@ -1297,11 +1316,6 @@ public final class GameServerSide extends Game
 
     private void setupMove()
     {
-        Player player = getActivePlayer();
-
-        // TODO can/should this be other order - first setup move phase,
-        // then tell the movement roll, and then could come the kickMove
-        ((PlayerServerSide)player).rollMovement();
         server.allSetupMove();
     }
 
@@ -1325,6 +1339,20 @@ public final class GameServerSide extends Game
         {
             server.allSetupMuster();
         }
+    }
+
+    /**
+     * So far, we do autosave only at begin of each players turn, i.e. when
+     * a split phase was just set up.
+     * @return Whether now is a time when autosave is due.
+     */
+    private boolean isAutoSavePoint()
+    {
+        if (isPhase(Phase.SPLIT))
+        {
+            return true;
+        }
+        return false;
     }
 
     void autoSave()
@@ -1540,12 +1568,15 @@ public final class GameServerSide extends Game
                     .getIntValue();
                 player.setMulligansLeft(mulligansLeft);
 
+                /*
                 player.setMovementRoll(pla.getAttribute("movementRoll")
                     .getIntValue());
+                */
 
+                /*
                 player.setTeleported(pla.getAttribute("teleported")
                     .getBooleanValue());
-
+                */
                 // TODO what about the donor value? Just summoned is
                 // good enough, so that at least one cannot summon
                 // twice in same engagements-phase,
@@ -1791,6 +1822,12 @@ public final class GameServerSide extends Game
         server.allFullyUpdateLegionStatus();
         server.allUpdatePlayerInfo(false);
         server.allTellAllLegionLocations();
+        updateCaretakerDisplays();
+
+        server.allSetupTurnState();
+        setupPhase();
+        // Create an initial snapshot
+        gameSaver.commitPointReached();
 
         server.allTellRedo(true);
         // XXX
@@ -1810,9 +1847,6 @@ public final class GameServerSide extends Game
             battle.setServer(getServer());
             battle.init();
         }
-
-        server.allSetupTurnState();
-        updateCaretakerDisplays();
 
         server.allRequestConfirmCatchup("KickstartGame");
         return ok;
@@ -2784,8 +2818,26 @@ public final class GameServerSide extends Game
         }
         ((LegionServerSide)legion).moveToHex(hex, entrySide, teleport,
             teleportingLord);
-        legionMovedEvent(legion, hex, entrySide, teleport, teleportingLord);
+        legionMoveEvent(legion, hex, entrySide, teleport, teleportingLord);
         return null;
+    }
+
+    void undoMove(Legion legion)
+    {
+        MasterHex formerHex = legion.getCurrentHex();
+
+        PlayerServerSide activePlayer = (PlayerServerSide)getActivePlayer();
+        activePlayer.undoMove(legion);
+        MasterHex currentHex = legion.getCurrentHex();
+
+        // TODO calculate on client side instead where needed
+        // needed in undidMove to decide whether to dis/enable button
+        boolean splitLegionHasForcedMove = activePlayer
+            .splitLegionHasForcedMove();
+
+        legionUndoMoveEvent(legion);
+        server.allTellUndidMove(legion, formerHex, currentHex,
+            splitLegionHasForcedMove);
     }
 
     void engage(MasterHex hex)
@@ -3357,6 +3409,7 @@ public final class GameServerSide extends Game
         player.takeMulligan();
         server.allUpdatePlayerInfo();
         setupMove();
+        player.rollMovement();
         server.kickPhase();
         return player.getMovementRoll();
     }
@@ -3410,11 +3463,16 @@ public final class GameServerSide extends Game
         history.movementRollEvent(player, roll);
     }
 
-    void legionMovedEvent(Legion legion, MasterHex newHex,
+    void legionMoveEvent(Legion legion, MasterHex newHex,
         EntrySide entrySide,
         boolean teleport, CreatureType lord)
     {
         history.legionMoveEvent(legion, newHex, entrySide, teleport, lord);
+    }
+
+    void legionUndoMoveEvent(Legion legion)
+    {
+        history.legionUndoMoveEvent(legion);
     }
 
     INotifyWebServer getNotifyWebServer()

@@ -124,6 +124,13 @@ public class History
             // TODO later, when this are proper events (not XML elements),
             // ask rather from the Event whether it belongs copied to
             // history or not.
+            // TODO At some point in future, put also those Move events
+            // that reveal something to history, and make either the history
+            // replay only send the relevant reveal messages, or make the
+            // Clients during replay (but not redo part) ignore the "move"
+            // and just process the revealing part.
+            // Preferrably the latter, so that proper events show up in the
+            // EventViewer.
             if (name.equals("Move") || name.equals("UndoMove"))
             {
                 LOGGER.finest("Flush Redo to History: skipping " + name);
@@ -325,6 +332,19 @@ public class History
 
         Element event = new Element("UndoMove");
         event.setAttribute("markerId", legion.getMarkerId());
+        recentEvents.add(event);
+    }
+
+    void recruitEvent(Legion legion)
+    {
+        if (loading)
+        {
+            return;
+        }
+
+        Element event = new Element("Recruit");
+        event.setAttribute("markerId", legion.getMarkerId());
+
         recentEvents.add(event);
     }
 
@@ -615,7 +635,6 @@ public class History
             server.allUpdatePlayerInfo();
             server.allTellPlayerElim(player, slayer, false);
         }
-
         else if (el.getName().equals("MovementRoll"))
         {
             String playerName = el.getAttributeValue("playerName");
@@ -625,15 +644,6 @@ public class History
             ((PlayerServerSide)player).setMovementRoll(roll);
             server.allTellMovementRoll(roll);
         }
-
-        else if (el.getName().equals("Move")
-            || el.getName().equals("UndoMove"))
-        {
-            // XXX Moved and UndoMoveare right now not in use yet.
-            // Need to get "setupPhase" and "kickPhase" done right first.
-            return;
-        }
-
         else if (el.getName().equals("Move"))
         {
             String markerId = el.getAttributeValue("markerId");
@@ -653,7 +663,6 @@ public class History
                 + markerId + ", lordName " + revealedLord + " teleported "
                 + teleport + " to hex " + newHex.getLabel() + " entrySide "
                 + entrySide.toString());
-
             server.overrideProcessingCH(legion.getPlayer());
             server.doMove(legion, newHex, entrySide, teleport, revealedLord);
             server.restoreProcessingCH();

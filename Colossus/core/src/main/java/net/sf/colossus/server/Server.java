@@ -2068,17 +2068,13 @@ public final class Server extends Thread implements IServer
         {
             return;
         }
-        MasterHex formerHex = legion.getCurrentHex();
 
-        PlayerServerSide activePlayer = (PlayerServerSide)game
-            .getActivePlayer();
-        activePlayer.undoMove(legion);
-        MasterHex currentHex = legion.getCurrentHex();
+        game.undoMove(legion);
+    }
 
-        // needed in undidMove to decide whether to dis/enable button
-        boolean splitLegionHasForcedMove = activePlayer
-            .splitLegionHasForcedMove();
-
+    public void allTellUndidMove(Legion legion, MasterHex formerHex,
+        MasterHex currentHex, boolean splitLegionHasForcedMove)
+    {
         Iterator<IClient> it = clients.iterator();
         while (it.hasNext())
         {

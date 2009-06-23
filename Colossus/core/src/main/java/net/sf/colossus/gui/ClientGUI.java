@@ -1749,7 +1749,7 @@ public class ClientGUI implements IClientGUI
         {
             movementDie = new MovementDie(4 * Scale.get(), MovementDie
                 .getDieImageName(roll));
-
+            // TODO why do we not repaint if iconified?
             if (board.getFrame().getExtendedState() != JFrame.ICONIFIED)
             {
                 board.repaint();
@@ -2104,8 +2104,11 @@ public class ClientGUI implements IClientGUI
         {
             board.reqFocus();
             defaultCursor();
-            if (!options.getOption(Options.autoRecruit)
-                && client.getPossibleRecruitHexes().isEmpty())
+            // TODO move that entirely to server to skip muster phase if there
+            // is nothing to do?
+            // BUT THEN... no, because cleanupNegotiationDialog etc.
+            // should be done
+            if (client.noRecruitActionPossible())
             {
                 client.doneWithRecruits();
             }
@@ -2118,7 +2121,8 @@ public class ClientGUI implements IClientGUI
         clearUndoStack();
         board.setupMoveMenu();
         // Force showing the updated movement die.
-        board.repaint();
+        // taken repaint away because actOnTellMovementRoll does it anyway
+        // board.repaint();
         if (isMyTurn())
         {
             defaultCursor();
