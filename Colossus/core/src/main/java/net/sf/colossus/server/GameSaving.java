@@ -289,8 +289,6 @@ public class GameSaving
             el.setAttribute("dead", "" + player.isDead());
             el.setAttribute("mulligansLeft", "" + player.getMulligansLeft());
             el.setAttribute("colorsElim", player.getPlayersElim());
-            el.setAttribute("movementRoll", "" + player.getMovementRoll());
-            el.setAttribute("teleported", "" + player.hasTeleported());
             el.setAttribute("summoned", "" + player.hasSummoned());
 
             Collection<LegionServerSide> legions = player.getLegions();
