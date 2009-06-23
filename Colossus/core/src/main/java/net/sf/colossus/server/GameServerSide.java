@@ -1568,15 +1568,6 @@ public final class GameServerSide extends Game
                     .getIntValue();
                 player.setMulligansLeft(mulligansLeft);
 
-                /*
-                player.setMovementRoll(pla.getAttribute("movementRoll")
-                    .getIntValue());
-                */
-
-                /*
-                player.setTeleported(pla.getAttribute("teleported")
-                    .getBooleanValue());
-                */
                 // TODO what about the donor value? Just summoned is
                 // good enough, so that at least one cannot summon
                 // twice in same engagements-phase,
@@ -1707,8 +1698,8 @@ public final class GameServerSide extends Game
         MasterHex startingHex = getVariant().getMasterBoard().getHexByLabel(
             startingHexLabel);
         boolean moved = leg.getAttribute("moved").getBooleanValue();
-        EntrySide entrySide = EntrySide.values()[leg.getAttribute(
-        "entrySide").getIntValue()];
+        EntrySide entrySide = EntrySide.values()[leg.getAttribute("entrySide")
+            .getIntValue()];
         String parentId = leg.getAttribute("parent").getValue();
         if (parentId.equals("null"))
         {
