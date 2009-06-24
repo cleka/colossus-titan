@@ -300,7 +300,7 @@ public interface IClientGUI
     // called by WebClient
     public abstract void doConfirmAndQuit();
 
-    public abstract void closePerhapsWithMessage();
+    public abstract void showConnectionClosedMessage();
 
     // At least the following two are from gui package classes,
     // not from Client directly.

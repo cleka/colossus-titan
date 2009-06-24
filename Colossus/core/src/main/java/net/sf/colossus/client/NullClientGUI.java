@@ -302,7 +302,7 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public void closePerhapsWithMessage()
+    public void showConnectionClosedMessage()
     {
         // TODO Auto-generated method stub
 

@@ -2629,7 +2629,7 @@ public class ClientGUI implements IClientGUI
         board.doQuitGameAction();
     }
 
-    public void closePerhapsWithMessage()
+    public void showConnectionClosedMessage()
     {
         defaultCursor();
         board.setServerClosedMessage(client.getGame().isGameOver());

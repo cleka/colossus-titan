@@ -774,8 +774,7 @@ public final class Client implements IClient, IOracle, IVariant
         {
             if (isRemote())
             {
-                gui.closePerhapsWithMessage();
-
+                gui.showConnectionClosedMessage();
                 close = false;
             }
             else
