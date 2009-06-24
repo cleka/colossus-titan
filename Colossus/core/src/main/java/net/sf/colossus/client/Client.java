@@ -385,8 +385,15 @@ public final class Client implements IClient, IOracle, IVariant
         return (localServer == null);
     }
 
+    // TODO can this be replaced with "!owningPlayer.isDead()" ?
+    // Only critical issue AFAIS is that owningPlayer is not properly
+    // initialized right away from the start (re-assigned later).
     public boolean isAlive()
     {
+        assert owningPlayer != null : "owningPlayer is null, "
+            + "can't ask whether alive or not!";
+        assert owningPlayer.isDead() != playerAlive : "playerAlive gives "
+            + "different result than owningPlayer.isDead()!";
         return playerAlive;
     }
 
@@ -1921,7 +1928,7 @@ public final class Client implements IClient, IOracle, IVariant
         // before, this makes auto-recruit stop working also for human
         // when they did win against all others and continue playing
         // (just for growing bigger creatures ;-)
-        if (options.getOption(Options.autoRecruit) && playerAlive
+        if (options.getOption(Options.autoRecruit) && isAlive()
             && isMyTurn() && game.isPhase(Phase.MUSTER))
         {
             // Note that this fires all doRecruit calls in one row,
@@ -2909,7 +2916,7 @@ public final class Client implements IClient, IOracle, IVariant
     {
         // check also for phase, because delayed callbacks could come
         // after our phase is over but activePlayerName not updated yet
-        return playerAlive && owningPlayer.equals(getBattleActivePlayer())
+        return isAlive() && owningPlayer.equals(getBattleActivePlayer())
             && game.isPhase(Phase.FIGHT);
     }
 
