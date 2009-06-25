@@ -21,32 +21,9 @@
 -->
 <project name="Colossus" default="jar" basedir=".">
   <property environment="env" />
-	
-  <!-- inputs -->
-  <property name="core.src.dir" value="core/src/main/java" />
-  <property name="tests.src.dir" value="core/src/test/java" />
-  <property name="functests.src.dir" value="core/src/functest/java" />
-  <property name="core.resource.dir"
-	  value="core/src/main/resource" />
-  <property name="datatools.src.dir"
-      value="datatools/src/main/java" />
-  <property name="datatoolsparser.src.dir"
-      value="datatools/src/main/javacc" />
-  <property name="libs.dir" value="libs" />
-  <property name="variants.dir" value="variants" />
-	
-  <!-- outputs -->
-  <property name="build.dir" value="build/ant" />
-  <property name="build.classes.dir"
-  value="${build.dir}/classes" />
-  <property name="testresults.dir"
-  value="${build.dir}/testresults" />
-  <property name="build.javadoc.dir"
-	  value="${build.dir}/javadoc" />
-  
-  <!-- settings -->
-  <property name="source.level" value="1.5" />
-  <property name="target.level" value="1.5" />
+
+  <property file="local_build.properties"/>
+  <property file="build.properties"/>
 	
   <!-- classpaths -->
   <path id="project.class.path">
