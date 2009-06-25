@@ -280,9 +280,6 @@
     <signjar jar="libs/jdom.jar" alias="${user.name}"
     keystore="${user.name}Keystore"
     storepass="${env.JARPASSWORD}" />
-    <signjar jar="libs/junit.jar" alias="${user.name}"
-    keystore="${user.name}Keystore"
-    storepass="${env.JARPASSWORD}" />
   </target>
   <!-- TODO: picking selectively from the base directory is a bit messy, particularly in respect
        to cleaning up and ignoring files in the VCS. It would be better to collect all generated
