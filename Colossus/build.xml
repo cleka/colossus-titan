@@ -1,11 +1,8 @@
 <?xml version="1.0"?>
 <!-- Ant buildfile for Colossus -->
-<!-- $Id$ -->
 <!-- To use this you need:
      Sun JDK 1.5+    http://java.sun.com  (currently recommend 1.5.0)
      Ant 1.5+        http://jakarta.apache.org/ant/
-     JUnit 3.8.1+      http://junit.org
-        (Jars are included in the libs subdirectory.)
      To sign jarfiles, you need to have a file called usernameKeystore
         in the main Colossus directory (there where build.xml is;
           substituting your username for "username"),
@@ -109,10 +106,10 @@
       <compilerarg value="-Xlint:unchecked" />
     </javac>
   </target>
+
   <!-- TODO compiling the test cases into the same folder as the
        main source means that we have a danger of including the
        test classes in the JAR or other artifcats -->
-	
   <target name="compileTests" depends="compile"
 	  description="Compiles the JUnit tests">
 	    <javac debug="yes" deprecation="yes" target="${target.level}"
@@ -197,10 +194,10 @@
     <jar jarfile="Colossus.jar" basedir="${core.resource.dir}"
     includes="**" update="true" />
     <!-- 
-                        Add the resources from the variants by including the whole variants folder.
-                        The variants should have a structure with java source and extra resources, too.
-                        TODO: create that structure for all variants.
-                -->
+       Add the resources from the variants by including the whole variants folder.
+       The variants should have a structure with java source and extra resources, too.
+       TODO: create that structure for all variants.
+    -->
     <jar jarfile="Colossus.jar" basedir="${variants.dir}"
     includes="**" excludes="*.java" update="true" />
     <chmod file="Colossus.jar" perm="755" />
@@ -310,7 +307,6 @@
     keystore="${user.name}Keystore"
     storepass="${env.JARPASSWORD}" />
   </target>
-  <!-- Tasks from here down are only needed for installation on the web site. -->
   <!-- TODO: picking selectively from the base directory is a bit messy, particularly in respect
        to cleaning up and ignoring files in the VCS. It would be better to collect all generated
        artifacts somewhere in the build directories and then zip those together with sources that
@@ -386,6 +382,7 @@
       <entry key="os.version" value="${os.version}"/>
     </propertyfile>
   </target>
+  <!-- Tasks from here down are only needed for installation on the web site. -->
   <target name="inst" depends="clean,init,sign,dist"
   description="Locally copy files into htdocs tree on SF">
     <copy file="Colossus.jar" todir="${HTML_DIR}" />
