@@ -23,7 +23,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
-import net.sf.colossus.client.Client;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.client.PlayerClientSide;
 import net.sf.colossus.client.PredictSplitNode;
@@ -41,7 +40,7 @@ import net.sf.colossus.variant.CreatureType;
 public final class PlayerDetailsDialog extends KDialog
 {
     private final PlayerClientSide player;
-    private final Client client;
+    private final ClientGUI gui;
 
     private static final int MAX_CREATURE_COLUMNS = 6;
 
@@ -89,14 +88,14 @@ public final class PlayerDetailsDialog extends KDialog
     }
 
     public PlayerDetailsDialog(final JFrame parentFrame,
-        PlayerClientSide player, Client client)
+        PlayerClientSide player, ClientGUI clientGui)
     {
         // TODO currently modal since we don't listen for updates yet --> fix
         super(parentFrame, "Details for player " + player.getName(), true);
         this.player = player;
-        this.client = client;
+        this.gui = clientGui;
 
-        useSaveWindow(client.getOptions(), "PlayerDetails", null);
+        useSaveWindow(gui.getOptions(), "PlayerDetails", null);
 
         JPanel mainPane = new JPanel();
         JScrollPane scrollPane = new JScrollPane(mainPane);
@@ -171,15 +170,14 @@ public final class PlayerDetailsDialog extends KDialog
             result.add(new JLabel(legion.getCurrentHex().getLabel()),
                 LABEL_CONSTRAINT);
             result.add(new LegionInfoPanel(legion, 2 * Scale.get(), 0, 0,
-                true, client.getGUI().getViewMode(),
-                client.isMyLegion(legion), client.getOptions()
-                    .getOption(Options.dubiousAsBlanks), true),
+                true, gui.getViewMode(), gui.getClient().isMyLegion(legion),
+                gui.getOptions().getOption(Options.dubiousAsBlanks), true),
                 LABEL_CONSTRAINT);
             result.add(new JPanel(), HORIZONTAL_FILL_CONSTRAINT);
         }
 
         result.add(new JLabel("Split history:"), SECTION_TITLE_CONSTRAINT);
-        if (client.getTurnNumber() < 512)
+        if (gui.getGame().getTurnNumber() < 512)
         {
             JScrollPane splitNodesPanel = new JScrollPane(
                 createSplitNodesPanel());
@@ -261,7 +259,7 @@ public final class PlayerDetailsDialog extends KDialog
         else
         {
             constraints.gridheight = 1;
-            constraints.gridwidth = client.getTurnNumber()
+            constraints.gridwidth = gui.getGame().getTurnNumber()
                 - node.getTurnCreated();
         }
         layouts.put(node, constraints);

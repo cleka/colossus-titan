@@ -18,7 +18,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import net.sf.colossus.client.Client;
 import net.sf.colossus.client.PlayerClientSide;
 import net.sf.colossus.common.IOptions;
 import net.sf.colossus.common.Options;
@@ -142,7 +141,8 @@ final class StatusScreen extends KDialog
                 @Override
                 public void mouseClicked(MouseEvent e)
                 {
-                    new PlayerDetailsDialog(frame, thePlayer, getClient());
+                    new PlayerDetailsDialog(frame, thePlayer,
+                        StatusScreen.this.gui);
                 }
             });
 
@@ -235,11 +235,6 @@ final class StatusScreen extends KDialog
         }
 
         setVisible(true);
-    }
-
-    private Client getClient()
-    {
-        return gui.getClient();
     }
 
     private void setPlayerLabelColors(JLabel label, Color bgColor,

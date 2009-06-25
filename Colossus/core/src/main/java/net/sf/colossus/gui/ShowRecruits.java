@@ -6,7 +6,6 @@ import java.awt.Point;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 
-import net.sf.colossus.variant.IVariant;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;
 
@@ -21,11 +20,11 @@ final class ShowRecruits extends AbstractShowRecruits
 {
 
     ShowRecruits(JFrame parentFrame, Point point, MasterHex hex,
-        JScrollPane pane, Variant variant, IVariant ivariant)
+        JScrollPane pane, Variant variant, ClientGUI gui)
     {
         super(parentFrame);
 
-        doOneTerrain(hex.getTerrain(), hex, variant, ivariant);
+        doOneTerrain(hex.getTerrain(), hex, variant, gui);
 
         pack();
 

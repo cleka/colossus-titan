@@ -350,7 +350,7 @@ public final class BattleBoard extends KFrame
         {
             public void actionPerformed(ActionEvent e)
             {
-                new BattleTerrainHazardWindow(BattleBoard.this, getClient(),
+                new BattleTerrainHazardWindow(BattleBoard.this, gui,
                     battleMap.getMasterHex());
             }
         };
@@ -399,7 +399,7 @@ public final class BattleBoard extends KFrame
 
                 if (isMovePhase())
                 {
-                    if (!getClient().getOptions().getOption(Options.autoPlay)
+                    if (!gui.getOptions().getOption(Options.autoPlay)
                         && getGame().getBattle().anyOffboardCreatures()
                         && !confirmLeavingCreaturesOffboard())
                     {
@@ -407,14 +407,14 @@ public final class BattleBoard extends KFrame
                     }
                     unselectAllHexes();
                     battleMap.unselectEntranceHexes();
-                    getClient().doneWithBattleMoves();
+                    gui.getCallbackHandler().doneWithBattleMoves();
                 }
                 else if (isFightPhase())
                 {
                     unselectAllHexes();
                     battleMap.unselectEntranceHexes();
                     gui.resetStrikeNumbers();
-                    getClient().doneWithStrikes();
+                    gui.getCallbackHandler().doneWithStrikes();
                 }
                 else
                 {
@@ -439,7 +439,7 @@ public final class BattleBoard extends KFrame
                 {
                     LOGGER.log(Level.INFO, gui.getOwningPlayerName()
                         + " concedes the battle");
-                    getClient().concede();
+                    gui.getCallbackHandler().concede();
                 }
             }
         };
@@ -731,7 +731,7 @@ public final class BattleBoard extends KFrame
         }
         else if (isFightPhase())
         {
-            getClient().leaveCarryMode();
+            gui.getCallbackHandler().leaveCarryMode();
             highlightStrikes(battleChit.getBattleUnit());
         }
     }
@@ -742,7 +742,7 @@ public final class BattleBoard extends KFrame
         {
             if (selectedCritterTag != -1)
             {
-                getClient().doBattleMove(selectedCritterTag, hex);
+                gui.getCallbackHandler().doBattleMove(selectedCritterTag, hex);
                 selectedCritterTag = -1;
                 highlightMobileCritters();
             }
@@ -751,7 +751,7 @@ public final class BattleBoard extends KFrame
         {
             if (selectedCritterTag != -1)
             {
-                getClient().strike(selectedCritterTag, hex);
+                gui.getCallbackHandler().strike(selectedCritterTag, hex);
                 selectedCritterTag = -1;
             }
         }
@@ -767,7 +767,7 @@ public final class BattleBoard extends KFrame
         else if (isFightPhase())
         {
             selectedCritterTag = -1;
-            getClient().leaveCarryMode();
+            gui.getCallbackHandler().leaveCarryMode();
             highlightCrittersWithTargets();
         }
     }
@@ -792,7 +792,7 @@ public final class BattleBoard extends KFrame
 
     public void reqFocus()
     {
-        if (getClient().getOptions().getOption(Options.stealFocus))
+        if (gui.getOptions().getOption(Options.stealFocus))
         {
             requestFocus();
             toFront();

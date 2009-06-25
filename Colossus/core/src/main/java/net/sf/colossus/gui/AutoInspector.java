@@ -20,7 +20,6 @@ import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.common.IOptions;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.guiutil.KDialog;
-import net.sf.colossus.variant.IVariant;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;
 
@@ -31,7 +30,8 @@ class AutoInspector extends KDialog
     private final IOptions options;
 
     private final Variant variant;
-    private final IVariant ivariant;
+
+    private final ClientGUI gui;
 
     private final JScrollPane scrollPane;
 
@@ -42,13 +42,13 @@ class AutoInspector extends KDialog
     private boolean dubiousAsBlanks;
 
     public AutoInspector(JFrame frame, IOptions options, int viewMode,
-        boolean dubiousAsBlanks, Variant variant, IVariant ivariant)
+        boolean dubiousAsBlanks, Variant variant, ClientGUI clientGui)
     {
         super(frame, "Inspector", false);
         assertEDT(); // maybe better in KDialog
         this.parentFrame = frame;
         this.variant = variant;
-        this.ivariant = ivariant;
+        this.gui = clientGui;
         this.options = options;
         this.viewMode = viewMode;
         this.dubiousAsBlanks = dubiousAsBlanks;
@@ -112,7 +112,7 @@ class AutoInspector extends KDialog
         MasterHex hexModel = hex.getHexModel();
         scrollPane.getViewport().add(
             new HexRecruitTreePanel(BoxLayout.X_AXIS, hexModel.getTerrain(),
-                hexModel, this.parentFrame, false, variant, ivariant));
+                hexModel, this.parentFrame, false, variant, gui));
         repaint();
     }
 

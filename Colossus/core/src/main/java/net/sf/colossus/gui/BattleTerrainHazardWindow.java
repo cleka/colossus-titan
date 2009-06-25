@@ -18,7 +18,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import net.sf.colossus.client.Client;
 import net.sf.colossus.guiutil.KDialog;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
@@ -70,7 +69,7 @@ public class BattleTerrainHazardWindow extends KDialog
     private Map<String, HazardTerrain> hazardsDisplayed;
     private Map<String, HazardHexside> hexsidesDisplayed;
 
-    public BattleTerrainHazardWindow(JFrame frame, Client client, MasterHex hex)
+    public BattleTerrainHazardWindow(JFrame frame, ClientGUI gui, MasterHex hex)
 
     {
         super(frame, "Battle Terrain Hazards for "
@@ -79,10 +78,10 @@ public class BattleTerrainHazardWindow extends KDialog
         assert SwingUtilities.isEventDispatchThread() : "Constructor should be called only on the EDT";
 
         this.hex = hex;
-        variant = client.getGame().getVariant();
+        variant = gui.getGame().getVariant();
         creatures = variant.getCreatureTypes();
         getContentPane().setLayout(new GridBagLayout());
-        useSaveWindow(client.getOptions(), "BattleTerrainHazard", null);
+        useSaveWindow(gui.getOptions(), "BattleTerrainHazard", null);
 
         addMouseListener(new MouseAdapter()
         {

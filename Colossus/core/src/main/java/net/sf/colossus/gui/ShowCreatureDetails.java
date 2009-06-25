@@ -72,6 +72,9 @@ public final class ShowCreatureDetails extends KDialog
 {
 
     // Client acting as placeholder for Variant
+    // TODO ivariant can be removed when Variant itself
+    //      is able to provide that information
+
     private final IVariant ivariant;
 
     /** pops up the non-modal dialog. info can be updated if needed.
@@ -80,16 +83,16 @@ public final class ShowCreatureDetails extends KDialog
      * @param point coordinate on screen to display windows, or null.
      * @param pane if 'point' is not null it is relative to this.
      * @param variant the current Variant
-     * @param ivariant for now, the Client acting as deputy to answer Variant
-     *        questions variant cannot answer yet.
+     * @param clientGui for now, the Client acting as deputy to answer Variant
+     * questions variant cannot answer yet, and we get iVariant from clientGui
      */
     public ShowCreatureDetails(final JFrame parentFrame,
         final CreatureType creature, final Point point,
-        final JScrollPane pane, Variant variant, IVariant ivariant)
+        final JScrollPane pane, Variant variant, ClientGUI clientGui)
     {
         super(parentFrame, "Creature Info: " + creature.getName(), false);
 
-        this.ivariant = ivariant;
+        this.ivariant = clientGui.getClient();
 
         setBackground(Color.lightGray);
         addWindowListener(new WindowAdapter()
@@ -187,7 +190,7 @@ public final class ShowCreatureDetails extends KDialog
         //
         _section(s, "Recruit");
         //   in
-        for (MasterBoardTerrain terrain : ivariant.getTerrains())
+        for (MasterBoardTerrain terrain : variant.getTerrains())
         {
             buf = new StringBuilder();
             List<CreatureType> recruiters = VariantSupport.getCurrentVariant()
@@ -237,7 +240,7 @@ public final class ShowCreatureDetails extends KDialog
             }
         }
         //   out
-        for (MasterBoardTerrain terrain : ivariant.getTerrains())
+        for (MasterBoardTerrain terrain : variant.getTerrains())
         {
             buf = new StringBuilder();
             List<CreatureType> recruits = VariantSupport.getCurrentVariant()

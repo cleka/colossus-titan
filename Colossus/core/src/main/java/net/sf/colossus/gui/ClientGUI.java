@@ -49,14 +49,13 @@ import net.sf.colossus.util.CollectionHelper;
 import net.sf.colossus.util.Predicate;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
-import net.sf.colossus.variant.IVariant;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;
 import net.sf.colossus.webclient.WebClient;
 
 
 @SuppressWarnings("serial")
-public class ClientGUI implements IClientGUI
+public class ClientGUI implements IClientGUI, GUICallbacks
 {
     private static final Logger LOGGER = Logger.getLogger(ClientGUI.class
         .getName());
@@ -351,7 +350,7 @@ public class ClientGUI implements IClientGUI
         initShowEngagementResults();
         initPreferencesWindow();
         showOrHideAutoInspector(options.getOption(Options.showAutoInspector));
-        showOrHideLogWindow(client, options.getOption(Options.showLogWindow));
+        showOrHideLogWindow(options.getOption(Options.showLogWindow));
         showOrHideCaretaker(options.getOption(Options.showCaretaker));
 
         setupGUIOptionListeners();
@@ -853,7 +852,7 @@ public class ClientGUI implements IClientGUI
             public void booleanOptionChanged(String optname, boolean oldValue,
                 boolean newValue)
             {
-                showOrHideLogWindow(client, newValue);
+                showOrHideLogWindow(newValue);
                 syncCheckboxes();
             }
         });
@@ -1400,7 +1399,7 @@ public class ClientGUI implements IClientGUI
     {
         if (preferencesWindow == null)
         {
-            preferencesWindow = new PreferencesWindow(options, client);
+            preferencesWindow = new PreferencesWindow(options, this);
         }
     }
 
@@ -1438,7 +1437,7 @@ public class ClientGUI implements IClientGUI
             if (caretakerDisplay == null)
             {
                 caretakerDisplay = new CreatureCollectionView(
-                    getPreferredParent(), client);
+                    getPreferredParent(), this);
             }
         }
         else
@@ -1461,11 +1460,8 @@ public class ClientGUI implements IClientGUI
             if (autoInspector == null)
             {
                 Variant variant = getGame().getVariant();
-                IVariant ivariant = getClient();
-
                 autoInspector = new AutoInspector(parent, options, viewMode,
-                    options.getOption(Options.dubiousAsBlanks), variant,
-                    ivariant);
+                    options.getOption(Options.dubiousAsBlanks), variant, this);
             }
         }
         else
@@ -1653,12 +1649,12 @@ public class ClientGUI implements IClientGUI
 
     public void showConcede(Client client, Legion ally, Legion enemy)
     {
-        Concede.concede(client, board.getFrame(), ally, enemy);
+        Concede.concede(this, board.getFrame(), ally, enemy);
     }
 
     public void showFlee(Client client, Legion ally, Legion enemy)
     {
-        Concede.flee(client, board.getFrame(), ally, enemy);
+        Concede.flee(this, board.getFrame(), ally, enemy);
     }
 
     public void initShowEngagementResults()
@@ -1798,7 +1794,7 @@ public class ClientGUI implements IClientGUI
         eventViewer.revealCreatures(legion, creatures, reason);
     }
 
-    private void showOrHideLogWindow(Client client, boolean show)
+    private void showOrHideLogWindow(boolean show)
     {
         if (show)
         {
@@ -1806,7 +1802,7 @@ public class ClientGUI implements IClientGUI
             {
                 // the logger with the empty name is parent to all loggers
                 // and thus catches all messages
-                logWindow = new LogWindow(client, Logger.getLogger(""));
+                logWindow = new LogWindow(options, Logger.getLogger(""));
             }
         }
         else
@@ -1840,7 +1836,7 @@ public class ClientGUI implements IClientGUI
     public void doAcquireAngel(Legion legion, List<CreatureType> recruits)
     {
         board.deiconify();
-        new AcquireAngel(board.getFrame(), client, legion, recruits);
+        new AcquireAngel(board.getFrame(), this, legion, recruits);
     }
 
     public void setBoardActive(boolean val)
@@ -1875,7 +1871,7 @@ public class ClientGUI implements IClientGUI
                 .substring(desc.length() - 2)));
         }
         battleBoard.highlightPossibleCarries(carryTargetHexes);
-        pickCarryDialog = new PickCarry(battleBoard, client, carryDamage,
+        pickCarryDialog = new PickCarry(battleBoard, this, carryDamage,
             carryTargetDescriptions);
     }
 
@@ -1943,7 +1939,7 @@ public class ClientGUI implements IClientGUI
             legion.getCurrentHex());
 
         return PickRecruit.pickRecruit(board.getFrame(), recruits,
-            hexDescription, legion, client);
+            hexDescription, legion, this);
     }
 
     public String doPickRecruiter(List<String> recruiters,
@@ -1958,7 +1954,7 @@ public class ClientGUI implements IClientGUI
         board.disableDoneAction("Finish 'Pick Recruiter' first");
 
         recruiterName = PickRecruiter.pickRecruiter(board.getFrame(),
-            recruiters, hexDescription, legion, client);
+            recruiters, hexDescription, legion, this);
         board.enableDoneAction();
 
         return recruiterName;
@@ -2728,4 +2724,63 @@ public class ClientGUI implements IClientGUI
         }
     }
 
+    public GUICallbacks getCallbackHandler()
+    {
+        return this;
+    }
+
+    public void leaveCarryMode()
+    {
+        getClient().leaveCarryMode();
+    }
+
+    public void applyCarries(BattleHex hex)
+    {
+        getClient().applyCarries(hex);
+    }
+
+    public void acquireAngelCallback(Legion legion, CreatureType angelType)
+    {
+        getClient().acquireAngelCallback(legion, angelType);
+    }
+
+    public void answerFlee(Legion ally, boolean answer)
+    {
+        getClient().answerFlee(ally, answer);
+    }
+
+    public void answerConcede(Legion legion, boolean answer)
+    {
+        getClient().answerConcede(legion, answer);
+    }
+
+    public void doBattleMove(int tag, BattleHex hex)
+    {
+        getClient().doBattleMove(tag, hex);
+    }
+
+    public void undoBattleMove(BattleHex hex)
+    {
+        getClient().undoBattleMove(hex);
+    }
+
+    public void strike(int tag, BattleHex hex)
+    {
+        getClient().strike(tag, hex);
+    }
+
+    public void doneWithBattleMoves()
+    {
+        getClient().doneWithBattleMoves();
+    }
+
+    public void doneWithStrikes()
+    {
+        getClient().doneWithStrikes();
+    }
+
+    public void concede()
+    {
+        getClient().concede();
+    }
 }

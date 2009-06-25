@@ -841,9 +841,14 @@ public final class Client implements IClient, IOracle, IVariant
         return getBattle().getInactiveBattleUnits();
     }
 
-    public void doneWithStrikes()
+    public void aiDoneWithStrikes()
     {
         aiPause();
+        doneWithStrikes();
+    }
+
+    public void doneWithStrikes()
+    {
         server.doneWithStrikes();
     }
 
@@ -873,7 +878,7 @@ public final class Client implements IClient, IOracle, IVariant
                 }
                 if (!struck)
                 {
-                    doneWithStrikes();
+                    aiDoneWithStrikes();
                 }
             }
             else
@@ -882,7 +887,7 @@ public final class Client implements IClient, IOracle, IVariant
                 gui.highlightCrittersWithTargets();
                 if (!struck && findCrittersWithTargets().isEmpty())
                 {
-                    doneWithStrikes();
+                    aiDoneWithStrikes();
                 }
             }
         }

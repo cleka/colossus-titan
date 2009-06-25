@@ -20,7 +20,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import net.sf.colossus.client.Client;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.guiutil.KDialog;
@@ -41,9 +40,9 @@ final class PickRecruiter extends KDialog
 
     /** recruiters is a list of creature name strings */
     private PickRecruiter(JFrame parentFrame, List<String> recruiters,
-        String hexDescription, Legion legion, Client client)
+        String hexDescription, Legion legion, ClientGUI gui)
     {
-        super(parentFrame, client.getOwningPlayer().getName()
+        super(parentFrame, gui.getOwningPlayer().getName()
             + ": Pick Recruiter in " + hexDescription, true);
 
         recruiterName = null;
@@ -70,7 +69,8 @@ final class PickRecruiter extends KDialog
         legionMarker = new Marker(scale, legion.getMarkerId());
         legionPane.add(legionMarker);
 
-        List<String> imageNames = client.getLegionImageNames(legion);
+        List<String> imageNames = gui.getGameClientSide().getLegionImageNames(
+            legion);
         Iterator<String> it = imageNames.iterator();
         while (it.hasNext())
         {
@@ -118,7 +118,7 @@ final class PickRecruiter extends KDialog
         }
 
         pack();
-        saveWindow = new SaveWindow(client.getOptions(), "PickRecruiter");
+        saveWindow = new SaveWindow(gui.getOptions(), "PickRecruiter");
         Point location = saveWindow.loadLocation();
         if (location == null)
         {
@@ -139,10 +139,10 @@ final class PickRecruiter extends KDialog
 
     static synchronized String pickRecruiter(JFrame parentFrame,
         List<String> recruiters, String hexDescription, Legion legion,
-        Client client)
+        ClientGUI gui)
     {
         PickRecruiter pr = new PickRecruiter(parentFrame, recruiters,
-            hexDescription, legion, client);
+            hexDescription, legion, gui);
         return pr.getRecruiterName();
     }
 }

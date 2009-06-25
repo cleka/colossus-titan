@@ -24,7 +24,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import net.sf.colossus.client.Client;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.guiutil.KDialog;
 import net.sf.colossus.guiutil.SaveWindow;
@@ -46,9 +45,9 @@ final class PickRecruit extends KDialog
     private final SaveWindow saveWindow;
 
     private PickRecruit(JFrame parentFrame, List<CreatureType> recruits,
-        String hexDescription, Legion legion, Client client)
+        String hexDescription, Legion legion, ClientGUI gui)
     {
-        super(parentFrame, client.getOwningPlayer().getName()
+        super(parentFrame, gui.getOwningPlayer().getName()
             + ": Pick Recruit in " + hexDescription, true);
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -67,7 +66,8 @@ final class PickRecruit extends KDialog
         legionMarker = new Marker(scale, legion.getMarkerId());
         legionPane.add(legionMarker);
 
-        List<String> imageNames = client.getLegionImageNames(legion);
+        List<String> imageNames = gui.getGameClientSide().getLegionImageNames(
+            legion);
         Iterator<String> itName = imageNames.iterator();
         while (itName.hasNext())
         {
@@ -108,7 +108,8 @@ final class PickRecruit extends KDialog
                 }
             });
 
-            int count = client.getGame().getCaretaker().getAvailableCount(
+            int count = gui.getGame().getCaretaker()
+                .getAvailableCount(
                 recruit);
             JLabel countLabel = new JLabel(Integer.toString(count));
             countLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -128,7 +129,7 @@ final class PickRecruit extends KDialog
         recruitPane.add(cancelButton);
 
         pack();
-        saveWindow = new SaveWindow(client.getOptions(), "PickRecruit");
+        saveWindow = new SaveWindow(gui.getOptions(), "PickRecruit");
         Point location = saveWindow.loadLocation();
         if (location == null)
         {
@@ -150,14 +151,14 @@ final class PickRecruit extends KDialog
     /** Return the creature recruited, or null if none. */
     static synchronized CreatureType pickRecruit(JFrame parentFrame,
         List<CreatureType> recruits, String hexDescription, Legion legion,
-        Client client)
+        ClientGUI gui)
     {
         CreatureType recruit = null;
         if (!active)
         {
             active = true;
             PickRecruit pr = new PickRecruit(parentFrame, recruits,
-                hexDescription, legion, client);
+                hexDescription, legion, gui);
             recruit = pr.getRecruit();
             active = false;
         }

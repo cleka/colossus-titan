@@ -26,11 +26,9 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
-import net.sf.colossus.client.Client;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.guiutil.KDialog;
 import net.sf.colossus.variant.CreatureType;
-import net.sf.colossus.variant.IVariant;
 
 
 /**
@@ -44,8 +42,10 @@ class CreatureCollectionView extends KDialog
     private static final Logger LOGGER = Logger
         .getLogger(CreatureCollectionView.class.getName());
 
-    private Client client;
+    private final ClientGUI gui;
     private static final int CHIT_SIZE = 60;
+
+    private boolean gone;
 
     /**
      * Maps each creature type to the bottom label with all counts.
@@ -83,13 +83,14 @@ class CreatureCollectionView extends KDialog
         baseLabel.setFont(countFont);
     }
 
-    CreatureCollectionView(JFrame frame, Client client)
+    CreatureCollectionView(JFrame frame, ClientGUI clientGui)
     {
         super(frame, "Caretaker's Stacks", false);
         this.parentFrame = frame;
         setFocusable(false);
 
-        this.client = client;
+        this.gui = clientGui;
+        this.gone = false;
 
         getContentPane().setLayout(new BorderLayout());
 
@@ -108,7 +109,7 @@ class CreatureCollectionView extends KDialog
             @Override
             public void windowClosing(WindowEvent e)
             {
-                CreatureCollectionView.this.client.getOptions().setOption(
+                CreatureCollectionView.this.gui.getOptions().setOption(
                     Options.showCaretaker, false);
             }
         });
@@ -117,7 +118,7 @@ class CreatureCollectionView extends KDialog
 
         setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 
-        useSaveWindow(client.getOptions(), "CreatureCollectionView", null);
+        useSaveWindow(gui.getOptions(), "CreatureCollectionView", null);
 
         update();
         setVisible(true);
@@ -160,13 +161,10 @@ class CreatureCollectionView extends KDialog
                 {
                     if (e.getButton() == MouseEvent.BUTTON1)
                     {
-                        // TODO ivariant can be removed when Variant itself
-                        //      is able to provide that information
-                        IVariant ivariant = client;
                         new ShowCreatureDetails(
                             CreatureCollectionView.this.parentFrame, type,
-                            null, CreatureCollectionView.this.scrollPane,
-                            client.getGame().getVariant(), ivariant);
+                            null, CreatureCollectionView.this.scrollPane, gui
+                                .getGame().getVariant(), gui);
                     }
                 }
             });
@@ -197,7 +195,7 @@ class CreatureCollectionView extends KDialog
         JPanel creaturePanel = new JPanel();
         creaturePanel.setLayout(new CCVFlowLayout(scrollPane, creaturePanel,
             FlowLayout.LEFT, 2, 2));
-        for (CreatureType type : client.getGame().getVariant().getCreatureTypes())
+        for (CreatureType type : gui.getGame().getVariant().getCreatureTypes())
         {
             creaturePanel.add(new CreatureCount(type));
         }
@@ -213,10 +211,11 @@ class CreatureCollectionView extends KDialog
             {
                 CreatureType type = entry.getKey();
                 JLabel label = entry.getValue();
-                int count = client.getGame().getCaretaker().getAvailableCount(
+                int count = gui.getGame().getCaretaker().getAvailableCount(
                     type);
                 int maxcount = type.getMaxCount();
-                int deadCount = client.getGame().getCaretaker().getDeadCount(
+                int deadCount = gui.getGame().getCaretaker()
+                    .getDeadCount(
                     type);
                 int inGameCount = maxcount - (deadCount + count);
 
@@ -301,18 +300,18 @@ class CreatureCollectionView extends KDialog
     public void dispose()
     {
         // Don't do anything if dispose already done.
-        if (client == null)
+        if (gone)
         {
             return;
         }
 
+        gone = true;
         setVisible(false);
 
         // We MUST remove this. Otherwise the object does not get
         // garbage-collected.
         getContentPane().remove(legendLabel);
 
-        client = null;
         parentFrame = null;
         scrollPane = null;
 
@@ -339,7 +338,7 @@ class CreatureCollectionView extends KDialog
 
         int minX = minSingleX * 5;
         int minY = ((CHIT_SIZE + 8 + (2 * (int) baseLabel.getPreferredSize().
-                getHeight())) * ((client.getGame().getVariant().
+                getHeight())) * ((gui.getGame().getVariant().
                 getCreatureTypes().size() + 4) / 5))
             + CHIT_SIZE;
 

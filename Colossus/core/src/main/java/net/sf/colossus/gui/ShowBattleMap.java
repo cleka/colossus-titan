@@ -17,7 +17,6 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
-import net.sf.colossus.client.Client;
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.guiutil.KDialog;
@@ -26,14 +25,14 @@ import net.sf.colossus.variant.MasterHex;
 
 /**
  * Class ShowBattleMap displays a battle map.
- * 
- * TODO this is inside out: the dialog this class is displayed in is owned 
+ *
+ * TODO this is inside out: the dialog this class is displayed in is owned
  *      and managed by this class
- *      
+ *
  * TODO the only reason this class needs GUIMasterHex and not just MasterHex
  *      is that the MasterHex class doesn't offer isInverted(), which it
  *      probably could (and maybe should)
- *      
+ *
  * @author David Ripton
  */
 @SuppressWarnings("serial")
@@ -48,7 +47,7 @@ final class ShowBattleMap extends HexMap
 
     private int oldScale = -1;
 
-    ShowBattleMap(final JFrame parentFrame, final Client client,
+    ShowBattleMap(final JFrame parentFrame, final ClientGUI gui,
         final GUIMasterHex hex)
     {
         super(hex.getHexModel());
@@ -100,7 +99,7 @@ final class ShowBattleMap extends HexMap
             contentPane.add(rightButton);
         }
 
-        dialog.useSaveWindow(client.getOptions(), "ShowBattleMap", null);
+        dialog.useSaveWindow(gui.getOptions(), "ShowBattleMap", null);
 
         addMouseListener(new MouseAdapter()
         {
@@ -113,7 +112,7 @@ final class ShowBattleMap extends HexMap
                 }
                 else
                 {
-                    new BattleTerrainHazardWindow(parentFrame, client, hex
+                    new BattleTerrainHazardWindow(parentFrame, gui, hex
                         .getHexModel());
                 }
             }

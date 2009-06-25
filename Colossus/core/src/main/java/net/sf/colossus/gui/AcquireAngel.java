@@ -19,7 +19,6 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
-import net.sf.colossus.client.Client;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.guiutil.KDialog;
 import net.sf.colossus.guiutil.SaveWindow;
@@ -35,17 +34,17 @@ import net.sf.colossus.variant.CreatureType;
 final class AcquireAngel extends KDialog
 {
     private final List<Chit> chits = new ArrayList<Chit>();
-    private final Client client;
+    private final ClientGUI gui;
     private final Legion legion;
     private final SaveWindow saveWindow;
 
-    AcquireAngel(JFrame parentFrame, final Client client, Legion legion,
+    AcquireAngel(JFrame parentFrame, final ClientGUI clientGui, Legion legion,
         final List<CreatureType> recruits)
     {
-        super(parentFrame, client.getOwningPlayer().getName()
+        super(parentFrame, clientGui.getOwningPlayer().getName()
             + ": Acquire Angel in legion " + legion, false);
 
-        this.client = client;
+        this.gui = clientGui;
         this.legion = legion;
 
         addWindowListener(new WindowAdapter()
@@ -92,7 +91,7 @@ final class AcquireAngel extends KDialog
                 }
                 else
                 {
-                    client.showMessageDialog("Acquire which type?");
+                    gui.showMessageDialogAndWait("Acquire which type?");
                 }
             }
         });
@@ -110,7 +109,7 @@ final class AcquireAngel extends KDialog
         });
 
         pack();
-        saveWindow = new SaveWindow(client.getOptions(), "AcquireAngel");
+        saveWindow = new SaveWindow(gui.getOptions(), "AcquireAngel");
         Point location = saveWindow.loadLocation();
         if (location == null)
         {
@@ -126,7 +125,7 @@ final class AcquireAngel extends KDialog
 
     void cleanup(CreatureType angelType)
     {
-        client.acquireAngelCallback(legion, angelType);
+        gui.getCallbackHandler().acquireAngelCallback(legion, angelType);
         saveWindow.saveLocation(getLocation());
         dispose();
     }

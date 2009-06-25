@@ -38,8 +38,6 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import net.sf.colossus.client.Client;
-import net.sf.colossus.common.IOptions;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.guiutil.KFrame;
@@ -93,8 +91,8 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
         SUBPANEL_CONSTRAINTS.fill = GridBagConstraints.BOTH; // panel should use all of cell
     }
 
-    private IOptions options;
-    private Client client;
+    private Options options;
+    private final ClientGUI gui;
     private final Map<String, JCheckBox> prefCheckboxes = new HashMap<String, JCheckBox>();
     private JButton closeButton;
     private Box lfBox; // Look & Feel
@@ -104,12 +102,12 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
     private List<PlayerColor> favoriteColors;
     private List<PlayerColor> colorsLeft;
 
-    PreferencesWindow(IOptions options, Client client)
+    PreferencesWindow(Options options, ClientGUI clientGui)
     {
         super("Preferences");
 
         this.options = options;
-        this.client = client;
+        this.gui = clientGui;
 
         getContentPane().add(new JLabel("Dummy"));
 
@@ -258,7 +256,7 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
         miscPane.setAlignmentX(LEFT_ALIGNMENT);
         //  The "dubious as blanks" option makes only sense with the
         //    "view what SplitPrediction tells us" mode => otherwise inactive.
-        boolean avail = (client.getGUI().getViewMode() == Options.viewableEverNum);
+        boolean avail = (gui.getViewMode() == Options.viewableEverNum);
         addCheckBox(miscPane, Options.dubiousAsBlanks, avail, false);
         // , KeyEvent.VK_D);
         viewPane.add(new JPanel(), FILL_CONSTRAINTS);
@@ -405,7 +403,6 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
     {
         super.dispose();
         options = null;
-        client = null;
     }
 
     @Override
@@ -417,7 +414,7 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
         // hide/unhide:
         if (!val)
         {
-            client.getOptions().saveOptions();
+            options.saveOptions();
         }
         else
         {
@@ -462,7 +459,7 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
             }
             else if (sourceJC.getParent() == lfBox)
             {
-                client.getGUI().setLookAndFeel(text);
+                gui.setLookAndFeel(text);
             }
         }
     }
@@ -480,12 +477,11 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
                 }
                 favorites.append(color.getName());
             }
-            client.getOptions().setOption(Options.favoriteColors,
-                favorites.toString());
+            options.setOption(Options.favoriteColors, favorites.toString());
         }
         else
         {
-            client.getOptions().removeOption(Options.favoriteColors);
+            options.removeOption(Options.favoriteColors);
         }
     }
 

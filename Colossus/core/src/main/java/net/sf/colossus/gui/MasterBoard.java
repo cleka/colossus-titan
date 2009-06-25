@@ -76,7 +76,6 @@ import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.util.NullCheckPredicate;
 import net.sf.colossus.util.StaticResourceLoader;
 import net.sf.colossus.variant.CreatureType;
-import net.sf.colossus.variant.IVariant;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;
 
@@ -271,7 +270,7 @@ public final class MasterBoard extends JPanel
                 LegionClientSide legion = client.getLegion(marker.getId());
                 int scale = 2 * Scale.get();
 
-                boolean dubiousAsBlanks = client.getOptions().getOption(
+                boolean dubiousAsBlanks = gui.getOptions().getOption(
                     Options.dubiousAsBlanks);
                 final JPanel panel = new LegionInfoPanel(legion, scale,
                     PANEL_MARGIN, PANEL_PADDING, true, gui.getViewMode(),
@@ -349,7 +348,7 @@ public final class MasterBoard extends JPanel
 
         setupPlayerLabel();
 
-        saveWindow = new SaveWindow(client.getOptions(), "MasterBoardScreen");
+        saveWindow = new SaveWindow(gui.getOptions(), "MasterBoardScreen");
         Point loadLocation = saveWindow.loadLocation();
 
         if (loadLocation == null)
@@ -526,13 +525,9 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                // TODO replace with actual ...getVariant() when Variant is
-                //      ready to provide the needed data
-                IVariant ivariant = client;
-                Variant variant = client.getGame().getVariant();
-                new ShowAllRecruits(masterFrame, client.getOptions(),
-                    variant,
-                    ivariant);
+                Variant variant = gui.getGame().getVariant();
+                new ShowAllRecruits(masterFrame, gui.getOptions(), variant,
+                    gui);
             }
         };
 
@@ -553,11 +548,10 @@ public final class MasterBoard extends JPanel
                 {
                     // TODO replace with actual ...getVariant() when Variant is
                     //      ready to provide the needed data
-                    Variant variant = client.getGame().getVariant();
-                    IVariant ivariant = client;
+                    Variant variant = gui.getGame().getVariant();
                     MasterHex hexModel = hex.getHexModel();
                     new ShowRecruits(masterFrame, lastPoint, hexModel,
-                        scrollPane, variant, ivariant);
+                        scrollPane, variant, gui);
                 }
             }
         };
@@ -569,7 +563,7 @@ public final class MasterBoard extends JPanel
                 GUIMasterHex hex = getHexContainingPoint(lastPoint);
                 if (hex != null)
                 {
-                    new ShowBattleMap(masterFrame, client, hex);
+                    new ShowBattleMap(masterFrame, gui, hex);
                 }
             }
         };
@@ -585,7 +579,7 @@ public final class MasterBoard extends JPanel
             public void actionPerformed(ActionEvent e)
             {
                 boolean quitAll = false;
-                if (client.getGame().isGameOver())
+                if (gui.getGame().isGameOver())
                 {
                     quitAll = true;
                 }
@@ -617,7 +611,7 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                if (!client.getGame().isGameOver())
+                if (!gui.getGame().isGameOver())
                 {
                     String[] options = new String[2];
                     options[0] = "Yes";
@@ -729,7 +723,7 @@ public final class MasterBoard extends JPanel
             public void actionPerformed(ActionEvent e)
             {
                 boolean closeBoard = false;
-                if (client.getGame().isGameOver() || !client.isAlive())
+                if (gui.getGame().isGameOver() || !client.isAlive())
                 {
                     closeBoard = true;
                 }
@@ -770,7 +764,7 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                new ChooseScreen(getFrame(), client);
+                new ChooseScreen(getFrame(), gui);
             }
         };
 
@@ -810,7 +804,7 @@ public final class MasterBoard extends JPanel
                 {
                     showReadme.dispose();
                 }
-                showReadme = new ShowReadme(client.getGame().getVariant());
+                showReadme = new ShowReadme(gui.getGame().getVariant());
             }
         };
         viewHelpDocAction = new AbstractAction(viewHelpDoc)
@@ -885,7 +879,7 @@ public final class MasterBoard extends JPanel
     {
         JCheckBoxMenuItem cbmi = new JCheckBoxMenuItem(name);
         cbmi.setMnemonic(mnemonic);
-        cbmi.setSelected(client.getOptions().getOption(name));
+        cbmi.setSelected(gui.getOptions().getOption(name));
 
         cbmi.addItemListener(itemHandler);
         menu.add(cbmi);
@@ -1120,7 +1114,7 @@ public final class MasterBoard extends JPanel
      */
     private net.sf.colossus.variant.MasterBoard getMasterBoard()
     {
-        return client.getGame().getVariant().getMasterBoard();
+        return gui.getGame().getVariant().getMasterBoard();
     }
 
     private void cleanGUIHexes()
@@ -1186,7 +1180,7 @@ public final class MasterBoard extends JPanel
     void setupMoveMenu()
     {
         setupPhasePreparations("Movement Roll: "
-            + client.getGame().getMovementRoll());
+            + gui.getGame().getMovementRoll());
 
         if (gui.isMyTurn())
         {
@@ -1294,7 +1288,7 @@ public final class MasterBoard extends JPanel
         {
             return;
         }
-        List<Legion> legions = client.getGameClientSide()
+        List<Legion> legions = gui.getGameClientSide()
             .getLegionsByHex(masterHex);
 
         int numLegions = legions.size();
@@ -1411,7 +1405,7 @@ public final class MasterBoard extends JPanel
 
     void highlightEngagements()
     {
-        Set<MasterHex> set = client.getGameClientSide().findEngagements();
+        Set<MasterHex> set = gui.getGameClientSide().findEngagements();
         unselectAllHexes();
         selectHexes(set);
     }
@@ -1497,7 +1491,7 @@ public final class MasterBoard extends JPanel
         synchronized (legionToMarkerMap)
         {
             legionToMarkerMap.clear();
-            for (Player player : client.getGameClientSide().getPlayers())
+            for (Player player : gui.getGameClientSide().getPlayers())
             {
                 for (Legion legion : player.getLegions())
                 {
@@ -1613,7 +1607,7 @@ public final class MasterBoard extends JPanel
 
     void actOnMisclick()
     {
-        Phase phase = client.getPhase();
+        Phase phase = gui.getGame().getPhase();
         if (phase == Phase.SPLIT)
         {
             highlightTallLegions();
@@ -1667,7 +1661,7 @@ public final class MasterBoard extends JPanel
                 if (isPopupButton(e))
                 {
                     int viewMode = gui.getViewMode();
-                    boolean dubiousAsBlanks = client.getOptions().getOption(
+                    boolean dubiousAsBlanks = gui.getOptions().getOption(
                         Options.dubiousAsBlanks);
                     new ShowLegion(masterFrame, legion, point, scrollPane,
                         4 * Scale.get(), viewMode, client.isMyLegion(legion),
@@ -1747,7 +1741,7 @@ public final class MasterBoard extends JPanel
             return;
         }
 
-        Phase phase = client.getPhase();
+        Phase phase = gui.getGame().getPhase();
         if (phase == Phase.SPLIT)
         {
             client.doSplit(legion);
@@ -1778,7 +1772,7 @@ public final class MasterBoard extends JPanel
 
     private void actOnHex(MasterHex hex)
     {
-        Phase phase = client.getPhase();
+        Phase phase = gui.getGame().getPhase();
         if (phase == Phase.SPLIT)
         {
             highlightTallLegions();
@@ -1818,7 +1812,7 @@ public final class MasterBoard extends JPanel
             JMenuItem source = (JMenuItem)e.getSource();
             String text = source.getText();
             boolean selected = (e.getStateChange() == ItemEvent.SELECTED);
-            client.getOptions().setOption(text, selected);
+            gui.getOptions().setOption(text, selected);
         }
     }
 
@@ -2170,7 +2164,7 @@ public final class MasterBoard extends JPanel
 
     void reqFocus()
     {
-        if (client.getOptions().getOption(Options.stealFocus))
+        if (gui.getOptions().getOption(Options.stealFocus))
         {
             requestFocus();
             getFrame().toFront();

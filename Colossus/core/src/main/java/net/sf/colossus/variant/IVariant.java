@@ -1,7 +1,6 @@
 package net.sf.colossus.variant;
 
 
-import java.util.Collection;
 import java.util.List;
 
 
@@ -29,10 +28,4 @@ public interface IVariant
     public int numberOfRecruiterNeeded(CreatureType recruiter,
         CreatureType recruit, MasterBoardTerrain terrain, MasterHex hex);
 
-    /**
-     * Return a collection of all possible terrains.
-     *
-     * @return A collection containing all instances of {@link MasterBoardTerrain}.
-     */
-    public Collection<MasterBoardTerrain> getTerrains();
 }

@@ -14,7 +14,6 @@ import java.util.Set;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
-import net.sf.colossus.client.Client;
 import net.sf.colossus.guiutil.KDialog;
 import net.sf.colossus.guiutil.SaveWindow;
 import net.sf.colossus.variant.BattleHex;
@@ -28,19 +27,20 @@ import net.sf.colossus.variant.BattleHex;
 @SuppressWarnings("serial")
 final class PickCarry extends KDialog implements ActionListener
 {
-    private final Client client;
+    private final ClientGUI gui;
     private final Set<String> choices;
     private static final String cancel = "Decline carry";
     private final SaveWindow saveWindow;
 
     /** Each choice is a String of form "Warbear in Plains Hex G3" */
-    PickCarry(JFrame parentFrame, Client client, int carryDamage,
+    PickCarry(JFrame parentFrame, ClientGUI clientGui,
+        int carryDamage,
         Set<String> choices)
     {
         super(parentFrame, "Apply " + carryDamage
             + (carryDamage == 1 ? " carry to:" : " carries to:"), false);
 
-        this.client = client;
+        this.gui = clientGui;
         this.choices = choices;
 
         getContentPane().setLayout(new GridLayout(choices.size() + 1, 1));
@@ -63,12 +63,12 @@ final class PickCarry extends KDialog implements ActionListener
             @Override
             public void windowClosing(WindowEvent e)
             {
-                PickCarry.this.client.leaveCarryMode();
+                PickCarry.this.gui.getCallbackHandler().leaveCarryMode();
             }
         });
 
         pack();
-        saveWindow = new SaveWindow(client.getOptions(), "PickCarry");
+        saveWindow = new SaveWindow(gui.getOptions(), "PickCarry");
         Point location = saveWindow.loadLocation();
         if (location == null)
         {
@@ -121,14 +121,14 @@ final class PickCarry extends KDialog implements ActionListener
     {
         if (desc.equals(cancel))
         {
-            client.leaveCarryMode();
+            gui.getCallbackHandler().leaveCarryMode();
         }
         else
         {
             String targetHexLabel = desc.substring(desc.length() - 2);
-            BattleHex targetHex = client.getBattleSite().getTerrain()
+            BattleHex targetHex = gui.getGame().getBattleSite().getTerrain()
                 .getHexByLabel(targetHexLabel);
-            client.applyCarries(targetHex);
+            gui.getCallbackHandler().applyCarries(targetHex);
         }
         saveWindow.saveLocation(getLocation());
         dispose();

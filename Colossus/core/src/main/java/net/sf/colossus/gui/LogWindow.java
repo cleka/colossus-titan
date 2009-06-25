@@ -14,7 +14,6 @@ import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import net.sf.colossus.client.Client;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.guiutil.SaveWindow;
 import net.sf.colossus.util.SwingDocumentLogHandler;
@@ -29,16 +28,16 @@ public final class LogWindow extends JTextArea
 {
     private final JFrame logFrame;
     private final JScrollPane scrollPane;
-    private Client client;
+    private final Options options;
     private Point location;
     private Dimension size;
     private final SaveWindow saveWindow;
     private final Logger logger;
     private final SwingDocumentLogHandler handler;
 
-    public LogWindow(Client client, Logger logger)
+    public LogWindow(Options options, Logger logger)
     {
-        this.client = client;
+        this.options = options;
         this.logger = logger;
         setEditable(false);
         setBackground(Color.white);
@@ -49,8 +48,7 @@ public final class LogWindow extends JTextArea
             @Override
             public void windowClosing(WindowEvent e)
             {
-                LogWindow.this.client.getOptions().setOption(
-                    Options.showLogWindow, false);
+                LogWindow.this.options.setOption(Options.showLogWindow, false);
             }
         });
 
@@ -58,7 +56,7 @@ public final class LogWindow extends JTextArea
         logFrame.getContentPane().add(scrollPane);
         logFrame.pack();
 
-        saveWindow = new SaveWindow(client.getOptions(), "LogWindow");
+        saveWindow = new SaveWindow(options, "LogWindow");
 
         size = saveWindow.loadSize();
         if (size == null)
@@ -111,6 +109,5 @@ public final class LogWindow extends JTextArea
         saveWindow.save(logFrame);
         logFrame.dispose();
         logger.removeHandler(handler);
-        client = null;
     }
 }

@@ -21,7 +21,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import net.sf.colossus.client.Client;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.guiutil.KDialog;
@@ -38,11 +37,11 @@ final class Concede extends KDialog
 {
     private final boolean flee;
     private Point location;
-    private final Client client;
+    private final ClientGUI gui;
     private final Legion ally;
     private final SaveWindow saveWindow;
 
-    private Concede(Client client, JFrame parentFrame, Legion ally,
+    private Concede(ClientGUI clientGui, JFrame parentFrame, Legion ally,
         Legion enemy, boolean flee)
     {
         super(parentFrame, (flee ? "Flee" : "Concede") + " with Legion "
@@ -62,7 +61,7 @@ final class Concede extends KDialog
         });
 
         this.flee = flee;
-        this.client = client;
+        this.gui = clientGui;
         this.ally = ally;
 
         setBackground(Color.lightGray);
@@ -100,7 +99,7 @@ final class Concede extends KDialog
 
         pack();
 
-        saveWindow = new SaveWindow(client.getOptions(), "Concede");
+        saveWindow = new SaveWindow(gui.getOptions(), "Concede");
 
         if (location == null)
         {
@@ -127,7 +126,8 @@ final class Concede extends KDialog
 
         int scale = 4 * Scale.get();
 
-        Marker marker = new Marker(scale, legion.getMarkerId(), client);
+        Marker marker = new Marker(scale, legion.getMarkerId(), gui
+            .getClient());
         pane.add(marker);
         pane.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
 
@@ -139,7 +139,8 @@ final class Concede extends KDialog
         pane.add(pointsPanel);
         pane.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
 
-        List<String> imageNames = client.getLegionImageNames(legion);
+        List<String> imageNames = gui.getGameClientSide().getLegionImageNames(
+            legion);
         Iterator<String> it = imageNames.iterator();
         while (it.hasNext())
         {
@@ -149,16 +150,16 @@ final class Concede extends KDialog
         }
     }
 
-    static void concede(Client client, JFrame parentFrame, Legion ally,
+    static void concede(ClientGUI gui, JFrame parentFrame, Legion ally,
         Legion enemy)
     {
-        new Concede(client, parentFrame, ally, enemy, false);
+        new Concede(gui, parentFrame, ally, enemy, false);
     }
 
-    static void flee(Client client, JFrame parentFrame, Legion ally,
+    static void flee(ClientGUI gui, JFrame parentFrame, Legion ally,
         Legion enemy)
     {
-        new Concede(client, parentFrame, ally, enemy, true);
+        new Concede(gui, parentFrame, ally, enemy, true);
     }
 
     private void cleanup(boolean answer)
@@ -168,11 +169,11 @@ final class Concede extends KDialog
         dispose();
         if (flee)
         {
-            client.answerFlee(ally, answer);
+            gui.getCallbackHandler().answerFlee(ally, answer);
         }
         else
         {
-            client.answerConcede(ally, answer);
+            gui.getCallbackHandler().answerConcede(ally, answer);
         }
     }
 }

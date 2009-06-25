@@ -41,15 +41,17 @@ public class HexRecruitTreePanel extends Box
     private final JFrame parentFrame;
     private final Variant variant;
     private final IVariant ivariant;
+    private final ClientGUI gui;
 
     public HexRecruitTreePanel(int direction, MasterBoardTerrain terrain,
         MasterHex hex, JFrame parent, boolean clickable, Variant variant,
-        IVariant ivariant)
+        ClientGUI clientGui)
     {
         super(direction);
         this.parentFrame = parent;
         this.variant = variant;
-        this.ivariant = ivariant; // in reality, right now that is the client...
+        this.gui = clientGui;
+        this.ivariant = clientGui.getClient();
 
         setAlignmentY(0);
         setBorder(BorderFactory.createLineBorder(Color.black));
@@ -158,7 +160,7 @@ public class HexRecruitTreePanel extends Box
             CreatureType type = chitToCreatureMap.get(source);
             ShowCreatureDetails creatureWindow = new ShowCreatureDetails(
                 this.parentFrame, type, null, null, this.variant,
-                this.ivariant);
+                gui);
             creatureWindows.add(creatureWindow);
         }
         else

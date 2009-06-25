@@ -13,7 +13,6 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
-import net.sf.colossus.client.Client;
 import net.sf.colossus.guiutil.KDialog;
 
 
@@ -26,13 +25,13 @@ import net.sf.colossus.guiutil.KDialog;
 @SuppressWarnings("serial")
 final class ChooseScreen extends KDialog implements ActionListener
 {
-    private final Client client;
+    private final ClientGUI gui;
 
-    ChooseScreen(JFrame parentFrame, Client client)
+    ChooseScreen(JFrame parentFrame, ClientGUI clientGui)
     {
         super(parentFrame, "Choose A Screen", true);
 
-        this.client = client;
+        this.gui = clientGui;
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new GridLayout(0, 1));
@@ -74,7 +73,7 @@ final class ChooseScreen extends KDialog implements ActionListener
             }
         }
         setVisible(false);
-        client.getGUI().setChosenDevice(chosen);
+        gui.setChosenDevice(chosen);
         dispose();
     }
 }
