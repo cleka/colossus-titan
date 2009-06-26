@@ -204,12 +204,12 @@ public final class Options implements IOptions
 
     public Options(String owner)
     {
-        this(owner, Constants.GAME_DATA_PATH, false);
+        this(owner, Constants.DEFAULT_COLOSSUS_HOME, false);
     }
 
     public Options(String owner, boolean noFile)
     {
-        this(owner, Constants.GAME_DATA_PATH, noFile);
+        this(owner, Constants.DEFAULT_COLOSSUS_HOME, noFile);
     }
 
     public String getOptionsFilename()

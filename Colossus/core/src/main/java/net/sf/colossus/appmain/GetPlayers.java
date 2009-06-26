@@ -972,7 +972,7 @@ public final class GetPlayers extends KFrame
     {
         int maxPlayers = VariantSupport.getMaxPlayers();
         javax.swing.JFileChooser varChooser = new JFileChooser(
-            Constants.GAME_DATA_PATH);
+            Constants.DEFAULT_COLOSSUS_HOME);
         varChooser.setFileFilter(new varFileFilter());
         varChooser
             .setDialogTitle("Choose your variant (or cancel for default game)");

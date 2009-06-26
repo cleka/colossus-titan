@@ -27,8 +27,11 @@ public final class Constants
         System.getProperty(FORCE_VIEW_BOARD_PROPNAME, "false").toString())
         .booleanValue();
 
-    /** Base path for all external game data files. */
-    public static final String GAME_DATA_PATH = System
+    /**
+     * Default base path for save game and cf files;
+     * Also used as start dir for Custom Variant loading dialog
+     */
+    public static final String DEFAULT_COLOSSUS_HOME = System
         .getProperty("user.home")
         + File.separator + ".colossus";
 
@@ -46,7 +49,7 @@ public final class Constants
     // Constants for savegames
 
     /** Must include trailing slash. */
-    public static final String SAVE_DIR_NAME = GAME_DATA_PATH + File.separator
+    public static final String SAVE_DIR_NAME = DEFAULT_COLOSSUS_HOME + File.separator
         + "saves" + File.separator;
     public static final String XML_EXTENSION = ".xml";
     public static final String XML_SNAPSHOT_START = "snap";
