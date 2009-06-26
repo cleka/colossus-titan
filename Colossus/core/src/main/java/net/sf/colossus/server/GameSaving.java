@@ -26,6 +26,7 @@ import net.sf.colossus.variant.CreatureType;
 
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
 public class GameSaving
@@ -484,7 +485,7 @@ public class GameSaving
         // Now write it all out to the file
         try
         {
-            XMLOutputter putter = new XMLOutputter("    ", true);
+            XMLOutputter putter = new XMLOutputter(Format.getPrettyFormat());
             putter.output(doc, out);
             fileWriter.close();
             if ((filename == null || filename.equals("null")) && keep > 0)
