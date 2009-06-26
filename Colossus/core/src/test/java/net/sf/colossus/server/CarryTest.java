@@ -106,31 +106,31 @@ public class CarryTest extends TestCase
         assertTrue(hydra1.canStrike(lion1));
         assertTrue(hydra1.canStrike(colossus1));
 
-        assertTrue(hydra1.getDice(centaur1) == 10);
-        assertTrue(hydra1.getDice(centaur2) == 10);
-        assertTrue(hydra1.getDice(lion1) == 10);
-        assertTrue(hydra1.getDice(colossus1) == 12);
+        assertEquals(10, hydra1.getDice(centaur1));
+        assertEquals(10, hydra1.getDice(centaur2));
+        assertEquals(10, hydra1.getDice(lion1));
+        assertEquals(12, hydra1.getDice(colossus1));
 
-        assertTrue(hydra1.getStrikeNumber(centaur1) == 5);
-        assertTrue(hydra1.getStrikeNumber(centaur2) == 5);
-        assertTrue(hydra1.getStrikeNumber(lion1) == 4);
-        assertTrue(hydra1.getStrikeNumber(colossus1) == 5);
+        assertEquals(5, hydra1.getStrikeNumber(centaur1));
+        assertEquals(5, hydra1.getStrikeNumber(centaur2));
+        assertEquals(4, hydra1.getStrikeNumber(lion1));
+        assertEquals(5, hydra1.getStrikeNumber(colossus1));
 
         hydra1.findCarries(centaur1);
-        assertTrue(battle.getCarryTargets().size() == 3);
-        assertTrue(hydra1.getPenaltyOptions().size() == 0);
+        assertEquals(3, battle.getCarryTargets().size());
+        assertEquals(0, hydra1.getPenaltyOptions().size());
 
         hydra1.findCarries(centaur2);
-        assertTrue(battle.getCarryTargets().size() == 3);
-        assertTrue(hydra1.getPenaltyOptions().size() == 0);
+        assertEquals(3, battle.getCarryTargets().size());
+        assertEquals(0, hydra1.getPenaltyOptions().size());
 
         hydra1.findCarries(lion1);
-        assertTrue(battle.getCarryTargets().size() == 0);
-        assertTrue(hydra1.getPenaltyOptions().size() == 2);
+        assertEquals(0, battle.getCarryTargets().size());
+        assertEquals(2, hydra1.getPenaltyOptions().size());
 
         hydra1.findCarries(colossus1);
-        assertTrue(battle.getCarryTargets().size() == 0);
-        assertTrue(hydra1.getPenaltyOptions().size() == 0);
+        assertEquals(0, battle.getCarryTargets().size());
+        assertEquals(0, hydra1.getPenaltyOptions().size());
     }
 
     private void placeCreature(Creature creature, String battleHexLabel)
@@ -182,30 +182,30 @@ public class CarryTest extends TestCase
         assertTrue(colossus1.canStrike(ogre1));
         assertTrue(colossus1.canStrike(ogre2));
 
-        assertTrue(colossus1.getDice(gargoyle1) == 10);
-        assertTrue(colossus1.getDice(ogre1) == 10);
-        assertTrue(colossus1.getDice(ogre2) == 10);
+        assertEquals(10, colossus1.getDice(gargoyle1));
+        assertEquals(10, colossus1.getDice(ogre1));
+        assertEquals(10, colossus1.getDice(ogre2));
 
-        assertTrue(colossus1.getStrikeNumber(gargoyle1) == 3);
-        assertTrue(colossus1.getStrikeNumber(ogre1) == 2);
-        assertTrue(colossus1.getStrikeNumber(ogre2) == 2);
+        assertEquals(3, colossus1.getStrikeNumber(gargoyle1));
+        assertEquals(2, colossus1.getStrikeNumber(ogre1));
+        assertEquals(2, colossus1.getStrikeNumber(ogre2));
 
         colossus1.findCarries(gargoyle1);
-        assertTrue(battle.getCarryTargets().size() == 2);
-        assertTrue(colossus1.getPenaltyOptions().size() == 0);
+        assertEquals(2, battle.getCarryTargets().size());
+        assertEquals(0, colossus1.getPenaltyOptions().size());
 
         colossus1.findCarries(ogre1);
-        assertTrue(battle.getCarryTargets().size() == 1);
-        assertTrue(colossus1.getPenaltyOptions().size() == 2);
+        assertEquals(1, battle.getCarryTargets().size());
+        assertEquals(2, colossus1.getPenaltyOptions().size());
         Iterator<PenaltyOption> it = colossus1.getPenaltyOptions().iterator();
         PenaltyOption po = it.next();
-        assertTrue(po.getCarryTargets().size() == 2);
+        assertEquals(2, po.getCarryTargets().size());
 
         colossus1.findCarries(ogre2);
-        assertTrue(battle.getCarryTargets().size() == 1);
-        assertTrue(colossus1.getPenaltyOptions().size() == 2);
+        assertEquals(1, battle.getCarryTargets().size());
+        assertEquals(2, colossus1.getPenaltyOptions().size());
         it = colossus1.getPenaltyOptions().iterator();
         po = it.next();
-        assertTrue(po.getCarryTargets().size() == 2);
+        assertEquals(2, po.getCarryTargets().size());
     }
 }
