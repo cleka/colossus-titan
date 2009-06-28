@@ -12,7 +12,7 @@ import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
-import net.sf.colossus.game.actions.AddCreatureEvent;
+import net.sf.colossus.game.actions.AddCreatureAction;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
@@ -163,7 +163,7 @@ public class History
      * TODO reconsider name
      * TODO decide if we should move it all into one big handleEvent(GameEvent) method
      */
-    void addCreatureEvent(AddCreatureEvent event, int turn)
+    void addCreatureEvent(AddCreatureAction event, int turn)
     {
         if (loading)
         {
@@ -567,7 +567,7 @@ public class History
             if (!legion.getPlayer().getDeadBeforeSave())
             {
                 server.allTellAddCreature(
-                    new AddCreatureEvent(legion,
+                    new AddCreatureAction(legion,
                     creatureType), false);
             }
             LOGGER.finest("Legion '" + markerId + "' now contains "

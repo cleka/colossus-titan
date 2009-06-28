@@ -8,11 +8,11 @@ import net.sf.colossus.variant.CreatureType;
 
 // TODO why is there only one recruiter? Does it imply knowledge about how many creatures are needed?
 // Since there is always N of one type that could work.
-public class RecruitEvent extends AddCreatureEvent
+public class Recruitment extends AddCreatureAction
 {
     private final CreatureType recruiter;
 
-    public RecruitEvent(Legion legion, CreatureType recruited,
+    public Recruitment(Legion legion, CreatureType recruited,
         CreatureType recruiter)
     {
         super(legion, recruited);
@@ -47,7 +47,7 @@ public class RecruitEvent extends AddCreatureEvent
     {
         return String
             .format(
-                "RecruitEvent: recruit creature of type %s into legion %s",
+            "Recruitment of creature of type %s into legion %s",
             getRecruited(), getLegion())
             + (getRecruiter() != null ? ", recruiter type is "
                 + getRecruiter() : "");

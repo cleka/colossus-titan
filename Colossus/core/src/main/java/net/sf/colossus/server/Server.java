@@ -35,9 +35,9 @@ import net.sf.colossus.game.Phase;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.Proposal;
-import net.sf.colossus.game.actions.AddCreatureEvent;
-import net.sf.colossus.game.actions.RecruitEvent;
-import net.sf.colossus.game.actions.SummonEvent;
+import net.sf.colossus.game.actions.AddCreatureAction;
+import net.sf.colossus.game.actions.Recruitment;
+import net.sf.colossus.game.actions.Summoning;
 import net.sf.colossus.util.BuildInfo;
 import net.sf.colossus.util.ErrorUtils;
 import net.sf.colossus.util.Glob;
@@ -1550,7 +1550,7 @@ public final class Server extends Thread implements IServer
         client.doReinforce(legion);
     }
 
-    public void doSummon(SummonEvent event)
+    public void doSummon(Summoning event)
     {
         if (!isActivePlayer())
         {
@@ -1565,7 +1565,7 @@ public final class Server extends Thread implements IServer
      * if recruiting with nothing, recruiterName is a non-null String
      * that contains "null".
      */
-    public void doRecruit(RecruitEvent event)
+    public void doRecruit(Recruitment event)
     {
         IClient client = getClient(getPlayer());
 
@@ -1646,7 +1646,7 @@ public final class Server extends Thread implements IServer
     }
 
     // TODO should use RecruitEvent
-    void didRecruit(AddCreatureEvent event, CreatureType recruiter)
+    void didRecruit(AddCreatureAction event, CreatureType recruiter)
     {
         allUpdatePlayerInfo();
 
@@ -2359,7 +2359,7 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    void allTellAddCreature(AddCreatureEvent event,
+    void allTellAddCreature(AddCreatureAction event,
         boolean updateHistory)
     {
         Iterator<IClient> it = clients.iterator();

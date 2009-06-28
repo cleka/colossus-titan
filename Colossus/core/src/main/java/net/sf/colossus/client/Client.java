@@ -28,8 +28,8 @@ import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.Proposal;
 import net.sf.colossus.game.SummonInfo;
-import net.sf.colossus.game.actions.RecruitEvent;
-import net.sf.colossus.game.actions.SummonEvent;
+import net.sf.colossus.game.actions.Recruitment;
+import net.sf.colossus.game.actions.Summoning;
 import net.sf.colossus.gui.ClientGUI;
 import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.server.GameServerSide;
@@ -544,7 +544,7 @@ public final class Client implements IClient, IOracle, IVariant
         }
         else
         {
-            SummonEvent event = new SummonEvent(summonInfo.getTarget(),
+            Summoning event = new Summoning(summonInfo.getTarget(),
                 summonInfo.getDonor(), summonInfo.getUnit());
             server.doSummon(event);
         }
@@ -1654,7 +1654,7 @@ public final class Client implements IClient, IOracle, IVariant
             .getVariant().getCreatureByName(recruiterName);
         // Call server even if some arguments are null, to get past
         // reinforcement.
-        server.doRecruit(new RecruitEvent(legion, recruited, recruiter));
+        server.doRecruit(new Recruitment(legion, recruited, recruiter));
     }
 
     /** Always needs to call server.doRecruit(), even if no recruit is

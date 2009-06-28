@@ -6,8 +6,8 @@ import java.util.List;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.PlayerColor;
-import net.sf.colossus.game.actions.RecruitEvent;
-import net.sf.colossus.game.actions.SummonEvent;
+import net.sf.colossus.game.actions.Recruitment;
+import net.sf.colossus.game.actions.Summoning;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
@@ -40,10 +40,10 @@ public interface IServer
      *
      * @param event The summon event or null if summoning is not wanted.
      */
-    public void doSummon(SummonEvent event);
+    public void doSummon(Summoning event);
 
     // TODO extend or subclass event to include recruiter
-    public void doRecruit(RecruitEvent event);
+    public void doRecruit(Recruitment event);
 
     public void engage(MasterHex hex);
 

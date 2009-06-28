@@ -23,8 +23,8 @@ import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
-import net.sf.colossus.game.actions.RecruitEvent;
-import net.sf.colossus.game.actions.SummonEvent;
+import net.sf.colossus.game.actions.Recruitment;
+import net.sf.colossus.game.actions.Summoning;
 import net.sf.colossus.util.ErrorUtils;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.InstanceTracker;
@@ -353,14 +353,14 @@ final class ClientHandler implements IClient
             }
             Legion donor = resolveLegion(args.remove(0));
             CreatureType creatureType = resolveCreatureType(args.remove(0));
-            server.doSummon(new SummonEvent(legion, donor, creatureType));
+            server.doSummon(new Summoning(legion, donor, creatureType));
         }
         else if (method.equals(Constants.doRecruit))
         {
             Legion legion = resolveLegion(args.remove(0));
             CreatureType recruited = resolveCreatureType(args.remove(0));
             CreatureType recruiter = resolveCreatureType(args.remove(0));
-            server.doRecruit(new RecruitEvent(legion, recruited, recruiter));
+            server.doRecruit(new Recruitment(legion, recruited, recruiter));
         }
         else if (method.equals(Constants.engage))
         {

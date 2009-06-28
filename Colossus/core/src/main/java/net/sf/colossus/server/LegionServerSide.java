@@ -13,7 +13,7 @@ import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
-import net.sf.colossus.game.actions.AcquireEvent;
+import net.sf.colossus.game.actions.Acquisition;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
 
@@ -131,7 +131,7 @@ public final class LegionServerSide extends Legion implements
                         + " acquired one " + angelType);
                     game.getServer()
                         .allTellAddCreature(
-                            new AcquireEvent(this, angelType), true);
+                            new Acquisition(this, angelType), true);
                 }
                 else
                 {

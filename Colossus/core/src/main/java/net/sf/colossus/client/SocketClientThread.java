@@ -25,8 +25,8 @@ import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
-import net.sf.colossus.game.actions.RecruitEvent;
-import net.sf.colossus.game.actions.SummonEvent;
+import net.sf.colossus.game.actions.Recruitment;
+import net.sf.colossus.game.actions.Summoning;
 import net.sf.colossus.server.IServer;
 import net.sf.colossus.util.BuildInfo;
 import net.sf.colossus.util.ErrorUtils;
@@ -1201,7 +1201,7 @@ final class SocketClientThread extends Thread implements IServer,
             + angelType);
     }
 
-    public void doSummon(SummonEvent event)
+    public void doSummon(Summoning event)
     {
         if (event == null)
         {
@@ -1215,7 +1215,7 @@ final class SocketClientThread extends Thread implements IServer,
         }
     }
 
-    public void doRecruit(RecruitEvent event)
+    public void doRecruit(Recruitment event)
     {
         CreatureType recruiter = event.getRecruiter();
         CreatureType recruited = event.getRecruited();

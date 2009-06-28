@@ -17,7 +17,7 @@ import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
-import net.sf.colossus.game.actions.UndoSummonEvent;
+import net.sf.colossus.game.actions.SummonUndo;
 import net.sf.colossus.util.CompareDoubles;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.HazardTerrain;
@@ -789,7 +789,7 @@ public final class BattleServerSide extends Battle
                 if (donor != null)
                 {
                     donor.addCreature(critter.getType(), false);
-                    server.allTellAddCreature(new UndoSummonEvent(donor,
+                    server.allTellAddCreature(new SummonUndo(donor,
                         critter.getType()), true);
                     LOGGER.log(Level.INFO, "undosummon critter " + critter
                         + " back to marker " + donor + "");

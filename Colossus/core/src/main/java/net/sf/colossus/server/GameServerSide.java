@@ -32,8 +32,8 @@ import net.sf.colossus.game.Phase;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.Proposal;
-import net.sf.colossus.game.actions.AddCreatureEvent;
-import net.sf.colossus.game.actions.SummonEvent;
+import net.sf.colossus.game.actions.AddCreatureAction;
+import net.sf.colossus.game.actions.Summoning;
 import net.sf.colossus.server.BattleServerSide.AngelSummoningStates;
 import net.sf.colossus.util.InstanceTracker;
 import net.sf.colossus.util.Split;
@@ -2502,7 +2502,7 @@ public final class GameServerSide extends Game
      *
      * TODO get rid of downcasts
      */
-    void doSummon(SummonEvent event)
+    void doSummon(Summoning event)
     {
         PlayerServerSide player = (PlayerServerSide)getActivePlayer();
 
@@ -3416,7 +3416,7 @@ public final class GameServerSide extends Game
     }
 
     // History wrappers.  Time to start obeying the Law of Demeter.
-    void addCreatureEvent(AddCreatureEvent event)
+    void addCreatureEvent(AddCreatureAction event)
     {
         lastRecruitTurnNumber = turnNumber;
         history.addCreatureEvent(event, turnNumber);

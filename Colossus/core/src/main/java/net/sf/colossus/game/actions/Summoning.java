@@ -6,11 +6,11 @@ import net.sf.colossus.game.Legion;
 import net.sf.colossus.variant.CreatureType;
 
 
-public class SummonEvent extends AddCreatureEvent
+public class Summoning extends AddCreatureAction
 {
     private final Legion donor;
 
-    public SummonEvent(Legion targetLegion, Legion donor,
+    public Summoning(Legion targetLegion, Legion donor,
         CreatureType summonedCreature)
     {
         super(targetLegion, summonedCreature);
@@ -33,7 +33,7 @@ public class SummonEvent extends AddCreatureEvent
     {
         return String
             .format(
-                "SummonEvent: summon creature of type %s from legion %s into legion %s",
+            "Summoning of creature of type %s from legion %s into legion %s",
                 getAddedCreatureType(), getLegion(), getDonor());
     }
 }

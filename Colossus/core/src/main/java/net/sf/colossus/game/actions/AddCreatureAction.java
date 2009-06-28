@@ -5,18 +5,18 @@ import net.sf.colossus.variant.CreatureType;
 
 
 /**
- * An event emitted whenever a creature gets added to a legion.
+ * An event modelling the addition of a creature to a legion.
  *
  * This is meant to be used only as interface or through subclasses.
  *
  * TODO make abstract once History handles the subclasses properly
  */
-public class AddCreatureEvent extends LegionEvent implements
-    RevealEvent
+public class AddCreatureAction extends LegionAction implements
+    RevealingAction
 {
     private final CreatureType creatureType;
 
-    public AddCreatureEvent(Legion legion,
+    public AddCreatureAction(Legion legion,
         CreatureType creatureType)
     {
         super(legion);
@@ -51,7 +51,7 @@ public class AddCreatureEvent extends LegionEvent implements
     public String toString()
     {
         return String.format(
-            "AddCreatureEvent: add creature of type %s to legion %s",
+            "AddCreatureAction: add creature of type %s to legion %s",
             getAddedCreatureType(), getLegion());
     }
 }

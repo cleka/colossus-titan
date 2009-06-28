@@ -5,9 +5,9 @@ import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.variant.CreatureType;
 
-public class UndoSummonEvent extends AddCreatureEvent
+public class SummonUndo extends AddCreatureAction
 {
-    public UndoSummonEvent(Legion legion, CreatureType creatureType)
+    public SummonUndo(Legion legion, CreatureType creatureType)
     {
         super(legion, creatureType);
     }
@@ -21,9 +21,8 @@ public class UndoSummonEvent extends AddCreatureEvent
     @Override
     public String toString()
     {
-        return String
-            .format(
-                "UndoSummonEvent: return creature of type %s into legion %s by undoing a summon",
-                getAddedCreatureType(), getLegion());
+        return String.format(
+            "Creature of type %s returned into legion %s by undoing a summon",
+            getAddedCreatureType(), getLegion());
     }
 }

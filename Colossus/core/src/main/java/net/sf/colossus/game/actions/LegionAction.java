@@ -5,16 +5,16 @@ import net.sf.colossus.game.Legion;
 
 
 /**
- * A base class for all event affecting a single legion in the game.
+ * A base class for all actions affecting a single legion in the game.
  *
  * This exists only for implementation purposes and is not intended to
  * be instantiated directly.
  */
-public abstract class LegionEvent implements GameEvent
+public abstract class LegionAction implements GameAction
 {
     protected final Legion legion;
 
-    public LegionEvent(Legion legion)
+    public LegionAction(Legion legion)
     {
         this.legion = legion;
     }

@@ -5,9 +5,9 @@ import net.sf.colossus.game.Legion;
 import net.sf.colossus.variant.CreatureType;
 
 
-public class AcquireEvent extends AddCreatureEvent
+public class Acquisition extends AddCreatureAction
 {
-    public AcquireEvent(Legion legion, CreatureType creatureType)
+    public Acquisition(Legion legion, CreatureType creatureType)
     {
         super(legion, creatureType);
     }
@@ -22,7 +22,7 @@ public class AcquireEvent extends AddCreatureEvent
     public String toString()
     {
         return String.format(
-            "AcquireEvent: acquire creature of type %s in legion %s",
+            "Acquisition of creature of type %s in legion %s",
             getAddedCreatureType(), getLegion());
     }
 }
