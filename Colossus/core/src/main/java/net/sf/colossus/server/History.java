@@ -12,7 +12,7 @@ import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
-import net.sf.colossus.game.events.AddCreatureEvent;
+import net.sf.colossus.game.actions.AddCreatureEvent;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;

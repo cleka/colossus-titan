@@ -1,4 +1,4 @@
-package net.sf.colossus.game.events;
+package net.sf.colossus.game.actions;
 
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.Legion;
