@@ -51,6 +51,7 @@ public class CarryTest extends TestCase
     {
         game = GameServerSide.makeNewGameServerSide();
         VariantSupport.loadVariantByName("Default", true);
+        assertEquals("Default", game.getVariant().getName());
 
         red = game.addPlayer("Red", "SimpleAI");
         blue = game.addPlayer("Blue", "SimpleAI");
@@ -71,7 +72,8 @@ public class CarryTest extends TestCase
 
     public void testCarries()
     {
-        MasterHex hex = game.getVariant().getMasterBoard().getHexByLabel("35"); // Desert
+        MasterHex hex = game.getVariant().getMasterBoard().getHexByLabel("35");
+        assertEquals("Desert", hex.getTerrain().getId());
 
         attacker = new LegionServerSide("Rd03", null, hex, hex, red, game,
             centaur, centaur, lion, colossus);
