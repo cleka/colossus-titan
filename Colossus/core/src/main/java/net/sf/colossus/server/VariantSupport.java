@@ -232,7 +232,7 @@ public final class VariantSupport
             loadedVariant = tryLoadVariant(tempVariantName, tempVarFilename,
                 tempVarDirectory, serverSide);
         }
-        catch (VariantLoadError vle)
+        catch (VariantLoadException vle)
         {
             String task = vle.getMessage();
             String message = "Trying to load variant '"
@@ -248,7 +248,7 @@ public final class VariantSupport
                     Constants.defaultVARFile, Constants.defaultDirName,
                     serverSide);
             }
-            catch (VariantLoadError vle2)
+            catch (VariantLoadException vle2)
             {
                 String task2 = vle2.getMessage();
 
@@ -282,7 +282,7 @@ public final class VariantSupport
      */
     private static Variant tryLoadVariant(String tempVariantName,
         String tempVarFilename, String tempVarDirectory, boolean serverSide)
-        throws VariantLoadError
+        throws VariantLoadException
     {
         if (loadedVariant && varFilename.equals(tempVarFilename)
             && varDirectory.equals(tempVarDirectory))
@@ -413,7 +413,7 @@ public final class VariantSupport
         }
         catch (Exception e)
         {
-            VariantLoadError vle = new VariantLoadError(task, e);
+            VariantLoadException vle = new VariantLoadException(task, e);
             CURRENT_VARIANT = null;
             throw vle;
         }
@@ -425,9 +425,9 @@ public final class VariantSupport
      * A helper class to store the exception that happened during
      * VariantLoading together with the task during which that happened.
      */
-    public static class VariantLoadError extends Error
+    private static class VariantLoadException extends Exception
     {
-        public VariantLoadError(String message, Throwable e)
+        public VariantLoadException(String message, Throwable e)
         {
             super(message, e);
         }
