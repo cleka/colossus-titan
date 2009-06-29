@@ -143,8 +143,7 @@ public final class VariantSupport
      * @return The loaded variant.
      */
 
-    public static Variant loadVariantByFile(java.io.File varFile,
-        boolean serverSide)
+    public static Variant loadVariantByFile(File varFile, boolean serverSide)
     {
         String tempVarFilename = varFile.getName();
         String tempVarDirectory = varFile.getParentFile().getAbsolutePath();
