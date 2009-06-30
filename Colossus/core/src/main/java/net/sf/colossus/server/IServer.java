@@ -118,4 +118,7 @@ public interface IServer
     public void checkServerConnection();
 
     public void clientConfirmedCatchup();
+
+    public void joinGame(String playerName);
+
 }

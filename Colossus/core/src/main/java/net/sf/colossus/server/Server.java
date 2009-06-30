@@ -2841,4 +2841,17 @@ public final class Server extends Thread implements IServer
     {
         return game;
     }
+
+    public void replyToRequestGameInfo()
+    {
+        processingCH.tellInitialGameInfo(game.getVariant().getName(),
+            getGame().getPreliminaryPlayerNames());
+    }
+
+    public void joinGame(String playerName)
+    {
+        // @TODO: move to outside Select loop
+        //   => notify main thread to do this?
+        startGameIfAllPlayers();
+    }
 }

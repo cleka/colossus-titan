@@ -1,6 +1,8 @@
 package net.sf.colossus.client;
 
 
+import java.util.Collection;
+
 import net.sf.colossus.server.IServer;
 
 
@@ -17,6 +19,10 @@ public interface IServerConnection
     public void setClient(Client client);
 
     public String getReasonFail();
+
+    public String getVariantNameForInit();
+
+    public Collection<String> getPreliminaryPlayerNames();
 
     public void startThread();
 

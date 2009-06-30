@@ -223,6 +223,7 @@ public final class VariantSupport
         if (tempVariantName == null)
         {
             LOGGER.severe("variantName must not be null!");
+            Thread.dumpStack();
             return null;
         }
 

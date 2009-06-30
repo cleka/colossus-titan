@@ -126,6 +126,23 @@ public class Game
         return Collections.unmodifiableCollection(players);
     }
 
+    /**
+     * Get a list of preliminary player names, during game startup / clients
+     * connecting. Preliminary, because some of them might change their name
+     * later (e.g. the "byColor" ones).
+     * @return List of player names
+     */
+    public Collection<String> getPreliminaryPlayerNames()
+    {
+        Collection<String> prePlayerNames = new ArrayList<String>();
+        assert players.size() != 0 : "getPreliminaryPlayerNames called before player info set (size==0)!";
+        for (Player p : Collections.unmodifiableCollection(players))
+        {
+            prePlayerNames.add(p.getName());
+        }
+        return prePlayerNames;
+    }
+
     public int getNumPlayers()
     {
         assert players.size() != 0 : "getNumPlayers called before player info set (size==0)!";
@@ -466,13 +483,13 @@ public class Game
 
     /**
      * Finds the first legion in a hex not belonging to a certain player.
-     * 
+     *
      * Note that there is no assumption that the player has a legion in that
      * location itself. This method is e.g. used to evaluate moves in the AI.
-     * 
+     *
      * @param masterHex the hex where to look for enemy regions. Not null.
      * @param player the player whose enemies we are looking for. Not null.
-     * 
+     *
      * @return the first legion that is in the specified hex and does not
      *         belong to the given player, null if no such legion exists
      */

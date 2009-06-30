@@ -11,6 +11,8 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -63,6 +65,9 @@ final class SocketClientThread extends Thread implements IServer,
     private String reasonFail = null;
     private String initialLine = null;
 
+    private String variantNameForInit;
+    private Collection<String> preliminaryPlayerNames;
+
     private final Object isWaitingLock = new Object();
     private boolean isWaiting = false;
 
@@ -102,7 +107,7 @@ final class SocketClientThread extends Thread implements IServer,
 
         try
         {
-            task = "creating Socket to connect to " + host + ":" + port;
+            task = "Creating Socket to connect to " + host + ":" + port;
             LOGGER.log(Level.FINEST, "Next: " + task);
             socket = new Socket(host, port);
 
@@ -110,23 +115,85 @@ final class SocketClientThread extends Thread implements IServer,
             LOGGER.info("Client socket receive buffer size for Client "
                 + initialName + " is " + receiveBufferSize);
 
-            task = "preparing PrintWriter";
-            LOGGER.log(Level.FINEST, "Next: " + task);
-            out = new PrintWriter(socket.getOutputStream(), true);
-
-            task = "signing on";
-            LOGGER.log(Level.FINEST, "Next: " + task);
-            signOn(initialName, isRemote, IServer.CLIENT_VERSION, BuildInfo
-                .getFullBuildInfoString());
-
-            task = "preparing BufferedReader";
+            task = "Preparing BufferedReader";
             LOGGER.log(Level.FINEST, "Next: " + task);
             in = new BufferedReader(new InputStreamReader(socket
                 .getInputStream()));
 
-            task = "try initial read";
+            task = "Waiting for prompt";
             LOGGER.log(Level.FINEST, "Next: " + task);
-            tryInitialRead();
+            waitForPrompt();
+
+            task = "Preparing PrintWriter";
+            LOGGER.log(Level.FINEST, "Next: " + task);
+            out = new PrintWriter(socket.getOutputStream(), true);
+
+            task = "Sending signOn message";
+            LOGGER.log(Level.FINEST, "Next: " + task);
+            signOn(initialName, isRemote, IServer.CLIENT_VERSION, BuildInfo
+                .getFullBuildInfoString());
+
+            String line;
+            task = "Waiting for signOn acknowledge";
+            LOGGER.log(Level.FINEST, "Next: " + task);
+            boolean signonOk = false;
+            while (!signonOk)
+            {
+                line = in.readLine();
+                if (line.startsWith("Ack: signOn"))
+                {
+                    LOGGER.fine("Got SignOn ACK: '" + line + "' - ok!");
+                    signonOk = true;
+                }
+                else if (line.startsWith(Constants.nak))
+                {
+                    reasonFail = "SignOn rejected with NAK: " + line;
+                    return;
+                }
+                else if (line.startsWith(Constants.log))
+                {
+                    // XXX TODO Handle better
+                    // Earlier/Normally this would be forwarded to Client to
+                    // give it to the logger / to LogWindow, but Client is not
+                    // up / available yet.
+                    LOGGER.info("ServerLog: " + line);
+                }
+                else
+                {
+                    LOGGER.warning("Ignoring unexpected line from server: '"
+                        + line + "'");
+                }
+            }
+
+            task = "Requesting GameInfo";
+            LOGGER.log(Level.FINEST, "Next: " + task);
+            requestGameInfo();
+
+            task = "Waiting for GameInfo";
+            LOGGER.log(Level.FINEST, "Next: " + task);
+
+            boolean gotInfo = false;
+            while (!gotInfo)
+            {
+                line = in.readLine();
+
+                if (line.startsWith(Constants.gameInitInfo))
+                {
+                    LOGGER.fine("Got initGameInfo: '" + line + "' - ok!");
+                    parseLine(line);
+                    gotInfo = true;
+                }
+                else if (line.startsWith(Constants.nak))
+                {
+                    reasonFail = "GameInfo request got NAK: " + line;
+                    return;
+                }
+                else if (line.startsWith(Constants.log))
+                {
+                    // XXX TODO Handle better
+                    LOGGER.info("ServerLog: " + line);
+                }
+            }
 
             reasonFail = null;
         }
@@ -224,7 +291,7 @@ final class SocketClientThread extends Thread implements IServer,
         }
     }
 
-    public void tryInitialRead() throws SocketTimeoutException,
+    public void waitForPrompt() throws SocketTimeoutException,
         SocketException, IOException
     {
         // Directly after connect we should get some first message
@@ -234,7 +301,7 @@ final class SocketClientThread extends Thread implements IServer,
         initialLine = in.readLine();
         if (initialLine.startsWith("SignOn:"))
         {
-            LOGGER.log(Level.INFO, "Got prompt - ok!");
+            LOGGER.fine("Got prompt: '" + initialLine + "' - ok!");
             initialLine = null;
         }
         // ... but after we got first data, during game it might take
@@ -248,6 +315,16 @@ final class SocketClientThread extends Thread implements IServer,
     public String getReasonFail()
     {
         return reasonFail;
+    }
+
+    public String getVariantNameForInit()
+    {
+        return variantNameForInit;
+    }
+
+    public Collection<String> getPreliminaryPlayerNames()
+    {
+        return Collections.unmodifiableCollection(this.preliminaryPlayerNames);
     }
 
     public IServer getIServer()
@@ -540,8 +617,10 @@ final class SocketClientThread extends Thread implements IServer,
 
     private void callMethod(String method, List<String> args)
     {
-        LOGGER.finer("Client '" + client.getOwningPlayer().getName()
-            + "' processing message: " + method);
+        // getName() is the Thread name. Using this here because owningPlayer
+        // (which was used so far here) might not be up yet.
+        LOGGER.finer("Client(SCT) '" + getName() + "' processing message: "
+            + method);
 
         if (method.equals(Constants.tellMovementRoll))
         {
@@ -1056,6 +1135,13 @@ final class SocketClientThread extends Thread implements IServer,
             client.tellWhatsHappening(message);
         }
 
+        else if (method.equals(Constants.gameInitInfo))
+        {
+            this.variantNameForInit = args.remove(0);
+            String nameList = args.remove(0);
+            this.preliminaryPlayerNames = Split.split(Glob.sep, nameList);
+        }
+
         else if (method.equals(Constants.askConfirmCatchUp))
         {
             client.confirmWhenCaughtUp();
@@ -1073,8 +1159,7 @@ final class SocketClientThread extends Thread implements IServer,
             LOGGER.log(Level.SEVERE, "Bogus packet (Client, method: " + method
                 + ", args: " + args + ")");
         }
-        LOGGER.finer("Client '" + client.getOwningPlayer().getName()
-            + "' finished method processing");
+        LOGGER.finer("Client '" + getName() + "' finished method processing");
     }
 
     private BattleHex resolveBattleHex(String hexLabel)
@@ -1169,6 +1254,12 @@ final class SocketClientThread extends Thread implements IServer,
     {
         out.println(Constants.signOn + sep + loginName + sep + isRemote + sep
             + version + sep + buildInfo);
+    }
+
+    // Setup method
+    private void requestGameInfo()
+    {
+        out.println(Constants.requestGameInfo);
     }
 
     /** Set the thread name to playerName */
@@ -1394,6 +1485,11 @@ final class SocketClientThread extends Thread implements IServer,
     public void clientConfirmedCatchup()
     {
         sendToServer(Constants.catchupConfirmation);
+    }
+
+    public void joinGame(String playerName)
+    {
+        sendToServer(Constants.joinGame + sep + playerName);
     }
 
     private MasterHex resolveHex(String label)

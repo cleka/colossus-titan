@@ -11,6 +11,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -56,6 +57,7 @@ final class ClientHandler implements IClient
     private final SocketChannel socketChannel;
     private final SelectionKey selectionKey;
     private String playerName;
+    private String signonName;
 
     private boolean isGone = false;
     private boolean withdrawnAlready = false;
@@ -141,10 +143,12 @@ final class ClientHandler implements IClient
                     LOGGER.finest("before processing cmd '" + line + "'");
                     List<String> li = Split.split(sep, line);
                     String method = li.remove(0);
-                    if (playerName == null && !method.equals(Constants.signOn))
+                    if (signonName == null && !method.equals(Constants.signOn))
                     {
                         LOGGER
-                            .log(Level.SEVERE, "First packet must be signOn");
+                            .log(Level.SEVERE,
+                                "First packet must be signOn, but it is "
+                                    + method);
                     }
                     else
                     {
@@ -279,14 +283,16 @@ final class ClientHandler implements IClient
     {
         if (method.equals(Constants.signOn))
         {
-            String tmpPlayerName = args.remove(0);
+            String signonTryName = args.remove(0);
             boolean remote = Boolean.valueOf(args.remove(0)).booleanValue();
             int clientVersion;
             String buildInfo;
             if (args.size() < 2)
             {
-                LOGGER.info("Connecting client did not send version/build "
-                    + "info - treating that as version -1, build info NONE.");
+                LOGGER.info("Connecting client with signonName "
+                    + signonTryName
+                    + " did not send version/build info - "
+                    + "treating that as version -1, build info NONE.");
                 clientVersion = -1;
                 buildInfo = "NONE";
             }
@@ -295,24 +301,39 @@ final class ClientHandler implements IClient
                 clientVersion = Integer.parseInt(args.remove(0));
                 buildInfo = args.remove(0);
             }
-            String reasonFail = server.addClient(this, tmpPlayerName, remote,
+            String reasonFail = server.addClient(this, signonTryName, remote,
                 clientVersion, buildInfo);
             if (reasonFail == null)
             {
-                // this setPlayerName is only send for the reason that the client
-                // expects a response quickly
-                setPlayerName(tmpPlayerName);
-                // @TODO: move to outside Select loop
-                //   => notify main thread to do this?
-                server.startGameIfAllPlayers();
+                sendToClient("Ack: signOn");
+                this.signonName = signonTryName;
             }
             else
             {
-                LOGGER.info("Rejecting client " + tmpPlayerName);
+                LOGGER.info("Rejecting client " + signonTryName);
                 nak("SignOn", reasonFail);
             }
-            InstanceTracker.setId(this, tmpPlayerName);
+            InstanceTracker.setId(this, signonTryName);
         }
+        else if (method.equals(Constants.joinGame))
+        {
+            String playerName = args.remove(0);
+            if (!playerName.equals(signonName))
+            {
+                LOGGER.severe("Joining game with different name '"
+                    + playerName + "' than signonName + '" + signonName
+                    + "' is currently not supported!");
+                return;
+            }
+            setPlayerName(signonName);
+            server.joinGame(signonName);
+
+        }
+        else if (method.equals(Constants.requestGameInfo))
+        {
+            server.replyToRequestGameInfo();
+        }
+
         else if (method.equals(Constants.fixName))
         {
             String newName = args.remove(0);
@@ -1012,6 +1033,14 @@ final class ClientHandler implements IClient
     public void setBoardActive(boolean val)
     {
         sendToClient(Constants.boardActive + sep + val);
+    }
+
+    public void tellInitialGameInfo(String variantName,
+        Collection<String> playerNames)
+    {
+        String allPlayerNames = Glob.glob(playerNames);
+        sendToClient(Constants.gameInitInfo + sep + variantName + sep
+            + allPlayerNames);
     }
 
     public void confirmWhenCaughtUp()

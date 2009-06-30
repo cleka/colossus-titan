@@ -260,6 +260,17 @@ public final class Client implements IClient, IOracle, IVariant
         IServerConnection conn = SocketClientThread.createConnection(host,
             port, playerName, remote);
 
+        // TODO For now, needed only if remote client.
+        // One day in future, everty client should perhaps do this to get his own
+        // copy of the variant (instead of static access).
+        // Or local clients get the Variant object passed in to here...
+
+        if (remote)
+        {
+            String variantName = conn.getVariantNameForInit();
+            VariantSupport.loadVariantByName(variantName, true);
+        }
+
         return new Client(playerName, playerType, whatNextMgr,
             theServer, byWebClient, noOptionsFile, createGUI, loader, conn);
     }
@@ -307,10 +318,22 @@ public final class Client implements IClient, IOracle, IVariant
     {
         assert playerName != null;
 
+        Collection<String> playerNamesList = conn.getPreliminaryPlayerNames();
+
+        String[] playerNames = new String[playerNamesList.size()];
+        int i = 0;
+        for (String name : playerNamesList)
+        {
+            playerNames[i++] = name;
+        }
+
+        // TODO can we change all Game constructors to List or Collection?
+        // Those Array[]s are annoying...
+
         // TODO IVariantKnower is only temporary until game properly always
         //      knows the Variant right from the start on
         // TODO still dummy arguments
-        this.game = new GameClientSide(null, new String[0],
+        this.game = new GameClientSide(null, playerNames,
             new VariantKnower());
 
         // TODO give it to constructor right away? Not changing it right now,
@@ -319,6 +342,8 @@ public final class Client implements IClient, IOracle, IVariant
         // Game outside ( = then we can't give Client to Game constructor)
         // or create Game inside Client (then we can pass in the Client).
         game.setClient(this);
+
+        conn.startThread();
 
         this.connection = conn;
         connection.setClient(this);
@@ -369,7 +394,7 @@ public final class Client implements IClient, IOracle, IVariant
 
         this.server = connection.getIServer();
 
-        connection.startThread();
+        server.joinGame(playerName);
 
         TerrainRecruitLoader.setCaretaker(getGame().getCaretaker());
         CustomRecruitBase.addCaretakerClientSide(getGame().getCaretaker());
