@@ -15,7 +15,6 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.ObjectCreationException;
 import net.sf.colossus.util.StaticResourceLoader;
 import net.sf.colossus.variant.AllCreatureType;
@@ -50,7 +49,8 @@ public class CreatureLoader implements AllCreatureType
 
     // we need to cast since JDOM is not generified
     @SuppressWarnings("unchecked")
-    public void fillCreatureLoader(InputStream creIS)
+    public void fillCreatureLoader(InputStream creIS,
+        List<String> varDirectoriesList)
     {
         SAXBuilder builder = new SAXBuilder();
         try
@@ -66,7 +66,7 @@ public class CreatureLoader implements AllCreatureType
             List<Element> lcreatures = root.getChildren("creature");
             for (Element el : lcreatures)
             {
-                handleCreature(el);
+                handleCreature(el, varDirectoriesList);
             }
         }
         catch (JDOMException ex)
@@ -99,8 +99,8 @@ public class CreatureLoader implements AllCreatureType
     }
 
     @SuppressWarnings("boxing")
-    private void handleCreature(Element el) throws JDOMException,
-        ObjectCreationException
+    private void handleCreature(Element el, List<String> varDirectoriesList)
+        throws JDOMException, ObjectCreationException
     {
         String name = el.getAttributeValue("name");
         int power = el.getAttribute("power").getIntValue();
@@ -173,7 +173,7 @@ public class CreatureLoader implements AllCreatureType
             parameters[15] = plural_name;
             parameters[16] = base_color;
             creature = (CreatureType)StaticResourceLoader.getNewObject(custom_class,
-                VariantSupport.getVarDirectoriesList(), parameters);
+                varDirectoriesList, parameters);
         }
         this.creatures.add(creature);
         this.byName.put(name, creature);

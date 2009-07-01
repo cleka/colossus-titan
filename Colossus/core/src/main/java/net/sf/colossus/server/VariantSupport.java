@@ -449,7 +449,7 @@ public final class VariantSupport
                 {
                     throw new FileNotFoundException(creaturesName);
                 }
-                creatureLoader.fillCreatureLoader(creIS);
+                creatureLoader.fillCreatureLoader(creIS, directories);
             }
         }
         catch (Exception e)
