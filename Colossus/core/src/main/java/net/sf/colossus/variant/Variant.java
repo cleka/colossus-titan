@@ -140,6 +140,7 @@ public class Variant
      *
      * TODO in the long run noone should really need this since the names shouldn't
      * be passed around by themselves
+     * ... except for resolving name that came over network... (Clemens)
      *
      * @param name Name of a creature type. Not null.
      * @return CreatureType with the given name, null no such creature type.
@@ -147,13 +148,44 @@ public class Variant
     public CreatureType getCreatureByName(final String name)
     {
         assert name != null;
+        if (name.equals("null"))
+        {
+            LOGGER.severe("Attempt to resolve String 'null' to CreatureType");
+            Thread.dumpStack();
+        }
+        if (name.equals("Anything"))
+        {
+            // TODO they should be properly handled
+            LOGGER
+                .warning("Attempt to resolve String 'Anything' to CreatureType");
+
+            // Thread.dumpStack();
+            /*
+            WARNING: Could not find creature with name Anything
+            java.lang.Exception: Stack trace
+                    at java.lang.Thread.dumpStack(Thread.java:1158)
+                    at net.sf.colossus.variant.Variant.getCreatureByName(Variant.java:163)
+                    at net.sf.colossus.game.RecruitGraph.numberOfRecruiterNeeded(RecruitGraph.java:412)
+                    at net.sf.colossus.xmlparser.TerrainRecruitLoader.anonymousRecruitLegal(TerrainRecruitLoader.java:977)
+                    at net.sf.colossus.server.GameServerSide.anonymousRecruitLegal(GameServerSide.java:1991)
+                    at net.sf.colossus.server.GameServerSide.doRecruit(GameServerSide.java:2010)
+                    at net.sf.colossus.server.Server.doRecruit(Server.java:1613)
+                    at net.sf.colossus.server.ClientHandler.callMethod(ClientHandler.java:384)
+                    at net.sf.colossus.server.ClientHandler.doCallMethodInTryBlock(ClientHandler.java:267)
+                    at net.sf.colossus.server.ClientHandler.processInput(ClientHandler.java:155)
+                    at net.sf.colossus.server.Server.waitOnSelector(Server.java:427)
+                    at net.sf.colossus.server.Server.run(Server.java:179)
+            */
+            return null;
+        }
+
         String lowerCaseName = name.toLowerCase();
         CreatureType result = creatureTypeByNameCache.get(lowerCaseName);
         if (result == null)
         {
             // TODO find every case where this happens and get rid of it,
             // we should be able to assert a result
-            LOGGER.info("Could not find creature with name " + name);
+            LOGGER.warning("Could not find creature with name " + name);
         }
         return result;
     }
