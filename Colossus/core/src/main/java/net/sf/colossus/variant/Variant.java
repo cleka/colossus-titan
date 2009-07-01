@@ -150,14 +150,13 @@ public class Variant
         assert name != null;
         if (name.equals("null"))
         {
-            LOGGER.severe("Attempt to resolve String 'null' to CreatureType");
+            LOGGER.warning("Attempt to resolve String 'null' to CreatureType");
             Thread.dumpStack();
         }
         if (name.equals("Anything"))
         {
             // TODO they should be properly handled
-            LOGGER
-                .warning("Attempt to resolve String 'Anything' to CreatureType");
+            LOGGER.info("Attempt to resolve 'Anything' to CreatureType");
 
             // Thread.dumpStack();
             /*
