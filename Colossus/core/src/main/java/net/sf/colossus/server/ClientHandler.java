@@ -380,7 +380,7 @@ final class ClientHandler implements IClient
         {
             Legion legion = resolveLegion(args.remove(0));
             CreatureType recruited = resolveCreatureType(args.remove(0));
-            CreatureType recruiter = resolveCreatureType(args.remove(0));
+            CreatureType recruiter = resolveCreatureTypeNullOk(args.remove(0));
             server.doRecruit(new Recruitment(legion, recruited, recruiter));
         }
         else if (method.equals(Constants.engage))
@@ -521,9 +521,10 @@ final class ClientHandler implements IClient
             String hexLabel = args.remove(0);
             EntrySide entrySide = EntrySide.fromLabel(args.remove(0));
             boolean teleport = Boolean.valueOf(args.remove(0)).booleanValue();
-            String teleportingLord = args.remove(0);
+            CreatureType teleportingLord = resolveCreatureTypeNullOk(args
+                .remove(0));
             server.doMove(resolveLegion(markerId), resolveMasterHex(hexLabel),
-                entrySide, teleport, resolveCreatureType(teleportingLord));
+                entrySide, teleport, teleportingLord);
         }
         else if (method.equals(Constants.assignColor))
         {
@@ -577,6 +578,19 @@ final class ClientHandler implements IClient
     private CreatureType resolveCreatureType(String name)
     {
         return server.getGame().getVariant().getCreatureByName(name);
+    }
+
+    /**
+     * There are cases where "null" comes over network and is not meant to
+     * be resolved to a CreatureType, namely teleportingLord if no teleport
+     * and null recruiter.
+     * TODO What to do with the "Anything"?
+     * @param name
+     * @return CreatureType for that name, or null if name is "null"
+     */
+    private CreatureType resolveCreatureTypeNullOk(String name)
+    {
+        return name.equals("null") ? null : resolveCreatureType(name);
     }
 
     private void withdrawIfNeeded()
