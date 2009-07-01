@@ -601,9 +601,11 @@ public class TerrainRecruitLoader implements IVariantInitializer
         {
             if (!checked)
             {
-                checked = true;
                 if (isConcreteCreature(name))
                 {
+                    // TODO avoid static access to VariantSupport
+                    // (get variant passed in, -OR- after loading make a loop
+                    // that resolves all of them (and has variant passed in)
                     creature = VariantSupport.getCurrentVariant()
                         .getCreatureByName(name);
                 }
@@ -611,6 +613,8 @@ public class TerrainRecruitLoader implements IVariantInitializer
                 {
                     creature = null;
                 }
+                // set to true AFTERwards to avoid potential race condition
+                checked = true;
             }
             assert (creature != null);
             return creature;
