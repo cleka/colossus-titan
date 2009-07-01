@@ -2100,14 +2100,6 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         {
             board.reqFocus();
             defaultCursor();
-            // TODO move that entirely to server to skip muster phase if there
-            // is nothing to do?
-            // BUT THEN... no, because cleanupNegotiationDialog etc.
-            // should be done
-            if (client.noRecruitActionPossible())
-            {
-                client.doneWithRecruits();
-            }
         }
         updateStatusScreen();
     }
