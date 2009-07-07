@@ -1671,9 +1671,10 @@ public final class Server extends Thread implements IServer
             {
                 recruiters.add(recruiter);
             }
-            game.revealEvent(true, null, event.getLegion(), recruiters);
+            game.revealEvent(true, null, event.getLegion(), recruiters,
+                Constants.reasonRecruiter);
         }
-        game.addCreatureEvent(event);
+        game.addCreatureEvent(event, Constants.reasonRecruited);
     }
 
     void undidRecruit(Legion legion, CreatureType recruit)
@@ -1685,7 +1686,7 @@ public final class Server extends Thread implements IServer
             IClient client = it.next();
             client.undidRecruit(legion, recruit);
         }
-        game.removeCreatureEvent(legion, recruit);
+        game.undoRecruitEvent(legion);
     }
 
     public void engage(MasterHex hex)
@@ -2359,8 +2360,8 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    void allTellAddCreature(AddCreatureAction event,
-        boolean updateHistory)
+    void allTellAddCreature(AddCreatureAction event, boolean updateHistory,
+        String reason)
     {
         Iterator<IClient> it = clients.iterator();
         while (it.hasNext())
@@ -2372,7 +2373,7 @@ public final class Server extends Thread implements IServer
         }
         if (updateHistory)
         {
-            game.addCreatureEvent(event);
+            game.addCreatureEvent(event, reason);
         }
     }
 
@@ -2399,7 +2400,8 @@ public final class Server extends Thread implements IServer
             IClient client = it.next();
             client.revealCreatures(legion, legion.getCreatureTypes(), reason);
         }
-        game.revealEvent(true, null, legion, legion.getCreatureTypes());
+        game
+            .revealEvent(true, null, legion, legion.getCreatureTypes(), reason);
     }
 
     /** pass to all clients the 'revealEngagedCreatures' message,
@@ -2419,7 +2421,8 @@ public final class Server extends Thread implements IServer
             client.revealEngagedCreatures(legion, legion.getCreatureTypes(),
                 isAttacker, reason);
         }
-        game.revealEvent(true, null, legion, legion.getCreatureTypes());
+        game
+            .revealEvent(true, null, legion, legion.getCreatureTypes(), reason);
     }
 
     /** Call from History during load game only */
@@ -2443,7 +2446,7 @@ public final class Server extends Thread implements IServer
         }
         List<Player> li = new ArrayList<Player>();
         li.add(player);
-        game.revealEvent(false, li, legion, legion.getCreatureTypes());
+        game.revealEvent(false, li, legion, legion.getCreatureTypes(), reason);
     }
 
     /** Call from History during load game only */
@@ -2492,7 +2495,7 @@ public final class Server extends Thread implements IServer
             IClient client = it.next();
             client.revealCreatures(legion, creatureNames, reason);
         }
-        game.revealEvent(true, null, legion, creatureNames);
+        game.revealEvent(true, null, legion, creatureNames, reason);
     }
 
     // XXX Disallow these in network games?

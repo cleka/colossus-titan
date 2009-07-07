@@ -8,11 +8,13 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.actions.AddCreatureAction;
+import net.sf.colossus.game.actions.Recruitment;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
@@ -135,6 +137,15 @@ public class History
             {
                 LOGGER.finest("Flush Redo to History: skipping " + name);
             }
+            else if (name.equals("Recruit") || name.equals("UndoRecruit"))
+            {
+                // Skipping for now, because there are also the addCreature,
+                // removeCreature and reveal Events still in history.
+                // TODO make the Recruit/UndoRecruit history events during
+                // replay properly, get rid of the "side effect" type of
+                // entries in save game.
+                LOGGER.finest("Flush Redo to History: skipping " + name);
+            }
             else
             {
                 root.addContent(el);
@@ -163,7 +174,7 @@ public class History
      * TODO reconsider name
      * TODO decide if we should move it all into one big handleEvent(GameEvent) method
      */
-    void addCreatureEvent(AddCreatureAction event, int turn)
+    void addCreatureEvent(AddCreatureAction event, int turn, String reason)
     {
         if (loading)
         {
@@ -174,6 +185,7 @@ public class History
         element
             .setAttribute("creatureName", event.getAddedCreatureType().getName());
         element.setAttribute("turn", "" + turn);
+        element.setAttribute("reason", reason);
         recentEvents.add(element);
     }
 
@@ -226,7 +238,8 @@ public class History
     }
 
     void revealEvent(boolean allPlayers, List<Player> players,
-        Legion legion, List<CreatureType> creatures, int turn)
+        Legion legion,
+        List<CreatureType> creatures, int turn, String reason)
     {
         if (loading)
         {
@@ -251,6 +264,7 @@ public class History
         event.setAttribute("markerId", legion.getMarkerId());
         event.setAttribute("allPlayers", "" + allPlayers);
         event.setAttribute("turn", "" + turn);
+        event.setAttribute("reason", reason);
         if (!allPlayers)
         {
             Element viewers = new Element("viewers");
@@ -335,7 +349,8 @@ public class History
         recentEvents.add(event);
     }
 
-    void recruitEvent(Legion legion)
+    void recruitEvent(Legion legion, CreatureType recruit,
+        CreatureType recruiter)
     {
         if (loading)
         {
@@ -343,6 +358,22 @@ public class History
         }
 
         Element event = new Element("Recruit");
+        event.setAttribute("markerId", legion.getMarkerId());
+        event.setAttribute("recruit", recruit.getName());
+        event.setAttribute("recruiter", recruiter == null ? "null" : recruiter
+            .getName());
+
+        recentEvents.add(event);
+    }
+
+    void undoRecruitEvent(Legion legion)
+    {
+        if (loading)
+        {
+            return;
+        }
+
+        Element event = new Element("UndoRecruit");
         event.setAttribute("markerId", legion.getMarkerId());
 
         recentEvents.add(event);
@@ -404,7 +435,26 @@ public class History
     void fireEventFromElement(Server server, Element el)
     {
         GameServerSide game = server.getGame();
-        if (el.getName().equals("Reveal"))
+        String eventName = el.getName();
+        String reasonPerhaps = el.getAttributeValue("reason");
+        String reason = (reasonPerhaps != null && !reasonPerhaps
+            .equals("null")) ? reasonPerhaps : "<undefinedReason>";
+        if (eventName.equals("Reveal") && isRedo
+            && reason.equals(Constants.reasonRecruiter))
+        {
+            // Skip this because we redo the full recruit event
+            // TODO
+            LOGGER.finest("Skipping Reveal event (reason " + reason
+                + ") during redo.");
+        }
+        else if (eventName.equals("AddCreature") && isRedo
+            && reason.equals(Constants.reasonRecruited))
+        {
+            // Skip this because we redo the full recruit event
+            LOGGER.finest("Skipping AddCreature event (reason " + reason
+                + ") during redo.");
+        }
+        else if (eventName.equals("Reveal"))
         {
             String allPlayers = el.getAttributeValue("allPlayers");
             boolean all = allPlayers != null && allPlayers.equals("true");
@@ -450,7 +500,9 @@ public class History
             {
                 legion = player.getLegionByMarkerId(markerId);
             }
-            String reason = "<unknown>";
+            // TODO Now we get the reason from history element - does this
+            // change effect/break anything?
+            // String reason = "<unknown>";
             if (((PlayerServerSide)player).getDeadBeforeSave())
             {
                 // Skip for players that will be dead by end of replay
@@ -465,7 +517,7 @@ public class History
                     creatures, reason);
             }
         }
-        else if (el.getName().equals("Split"))
+        else if (eventName.equals("Split"))
         {
             String parentId = el.getAttributeValue("parentId");
             String childId = el.getAttributeValue("childId");
@@ -528,7 +580,7 @@ public class History
                 server.allTellDidSplit(parentLegion, childLegion, turn, false);
             }
         }
-        else if (el.getName().equals("Merge"))
+        else if (eventName.equals("Merge"))
         {
             String splitoffId = el.getAttributeValue("splitoffId");
             String survivorId = el.getAttributeValue("survivorId");
@@ -551,11 +603,13 @@ public class History
             }
             splitoff.remove(false, false);
         }
-        else if (el.getName().equals("AddCreature"))
+        else if (eventName.equals("AddCreature"))
         {
             String markerId = el.getAttributeValue("markerId");
             String creatureName = el.getAttributeValue("creatureName");
-            String reason = "<unknown>";
+            // TODO Now we get the reason from history element - does this
+            // change effect/break anything?
+            // String reason = "<unknown>";
             LOGGER.finer("Adding creature '" + creatureName
                 + "' to legion with markerId '" + markerId + "', reason '"
                 + reason + "'");
@@ -566,18 +620,19 @@ public class History
             // Skip for players that will be dead by end of replay
             if (!legion.getPlayer().getDeadBeforeSave())
             {
-                server.allTellAddCreature(
-                    new AddCreatureAction(legion,
-                    creatureType), false);
+                server.allTellAddCreature(new AddCreatureAction(legion,
+                    creatureType), false, reason);
             }
             LOGGER.finest("Legion '" + markerId + "' now contains "
                 + legion.getCreatures());
         }
-        else if (el.getName().equals("RemoveCreature"))
+        else if (eventName.equals("RemoveCreature"))
         {
             String markerId = el.getAttributeValue("markerId");
             String creatureName = el.getAttributeValue("creatureName");
-            String reason = "<unknown>";
+            // TODO Now we get the reason from history element - does this
+            // change effect/break anything?
+            // String reason = "<unknown>";
             LOGGER.finer("Removing creature '" + creatureName
                 + "' from legion with markerId '" + markerId + "', reason '"
                 + reason + "'");
@@ -620,7 +675,7 @@ public class History
                 LOGGER.finer("Legion '" + markerId + "' removed");
             }
         }
-        else if (el.getName().equals("PlayerElim"))
+        else if (eventName.equals("PlayerElim"))
         {
             String playerName = el.getAttributeValue("name");
             String slayerName = el.getAttributeValue("slayer");
@@ -635,7 +690,7 @@ public class History
             server.allUpdatePlayerInfo();
             server.allTellPlayerElim(player, slayer, false);
         }
-        else if (el.getName().equals("MovementRoll"))
+        else if (eventName.equals("MovementRoll"))
         {
             String playerName = el.getAttributeValue("playerName");
             Player player = game.getPlayerByName(playerName);
@@ -645,7 +700,7 @@ public class History
             game.movementRollEvent(player, roll);
             server.allTellMovementRoll(roll);
         }
-        else if (el.getName().equals("Move"))
+        else if (eventName.equals("Move"))
         {
             String markerId = el.getAttributeValue("markerId");
             String lordName = el.getAttributeValue("revealedLord");
@@ -654,8 +709,8 @@ public class History
             String entrySideName = el.getAttributeValue("entrySide");
 
             LegionServerSide legion = game.getLegionByMarkerId(markerId);
-            CreatureType revealedLord = game.getVariant().getCreatureByName(
-                lordName);
+            CreatureType revealedLord = lordName.equals("null") ? null : game
+                .getVariant().getCreatureByName(lordName);
             MasterHex newHex = server.getGame().getVariant().getMasterBoard()
                 .getHexByLabel(newHexLabel);
             EntrySide entrySide = EntrySide.fromLabel(entrySideName);
@@ -668,7 +723,7 @@ public class History
             server.doMove(legion, newHex, entrySide, teleport, revealedLord);
             server.restoreProcessingCH();
         }
-        else if (el.getName().equals("UndoMove"))
+        else if (eventName.equals("UndoMove"))
         {
             String markerId = el.getAttributeValue("markerId");
             LegionServerSide legion = game.getLegionByMarkerId(markerId);
@@ -678,9 +733,37 @@ public class History
             server.undoMove(legion);
             server.restoreProcessingCH();
         }
+        else if (eventName.equals("Recruit"))
+        {
+            String markerId = el.getAttributeValue("markerId");
+            String recruitName = el.getAttributeValue("recruit");
+            String recruiterName = el.getAttributeValue("recruiter");
+            LegionServerSide legion = game.getLegionByMarkerId(markerId);
+            CreatureType recruit = game.getVariant().getCreatureByName(
+                recruitName);
+            CreatureType recruiter = recruiterName.equals("null") ? null
+                : game.getVariant().getCreatureByName(recruiterName);
+
+            LOGGER.finest("Recruit redo event: \n" + " marker " + markerId
+                + " recruit " + recruit + " recruiter " + recruiter);
+            server.overrideProcessingCH(legion.getPlayer());
+            server.doRecruit(new Recruitment(legion, recruit, recruiter));
+            server.restoreProcessingCH();
+        }
+        else if (eventName.equals("UndoRecruit"))
+        {
+            String markerId = el.getAttributeValue("markerId");
+            LegionServerSide legion = game.getLegionByMarkerId(markerId);
+            LOGGER
+                .finest("UndoRecruit redo event: \n" + " marker "
+                + markerId);
+            server.overrideProcessingCH(legion.getPlayer());
+            server.undoRecruit(legion);
+            server.restoreProcessingCH();
+        }
         else
         {
-            LOGGER.warning("Unknown Redo element " + el.getName());
+            LOGGER.warning("Unknown Redo element " + eventName);
         }
     }
 

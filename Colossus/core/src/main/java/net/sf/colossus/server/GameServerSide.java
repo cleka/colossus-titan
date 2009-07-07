@@ -2045,6 +2045,8 @@ public final class GameServerSide extends Game
                     + (numRecruiters > 1 ? recruiter.getPluralName()
                         : recruiter.getName())));
 
+            recruitEvent(legion, recruit, recruiter);
+
             // Recruits are one to a customer.
             legion.setRecruit(recruit);
             reinforcing = false;
@@ -2522,7 +2524,7 @@ public final class GameServerSide extends Game
 
             server.allTellRemoveCreature(donor, angel, true,
                 Constants.reasonSummon);
-            server.allTellAddCreature(event, true);
+            server.allTellAddCreature(event, true, Constants.reasonSummon);
 
             server.allTellDidSummon(legion, donor, angel);
 
@@ -3416,10 +3418,10 @@ public final class GameServerSide extends Game
     }
 
     // History wrappers.  Time to start obeying the Law of Demeter.
-    void addCreatureEvent(AddCreatureAction event)
+    void addCreatureEvent(AddCreatureAction event, String reason)
     {
         lastRecruitTurnNumber = turnNumber;
-        history.addCreatureEvent(event, turnNumber);
+        history.addCreatureEvent(event, turnNumber, reason);
     }
 
     void removeCreatureEvent(Legion legion, CreatureType creature)
@@ -3437,11 +3439,11 @@ public final class GameServerSide extends Game
         history.mergeEvent(splitoffId, survivorId, turnNumber);
     }
 
-    void revealEvent(boolean allPlayers, List<Player> players,
-        Legion legion, List<CreatureType> creatureNames)
+    void revealEvent(boolean allPlayers, List<Player> players, Legion legion,
+        List<CreatureType> creatureNames, String reason)
     {
         history.revealEvent(allPlayers, players, legion, creatureNames,
-            turnNumber);
+            turnNumber, reason);
     }
 
     void playerElimEvent(Player player, Player slayer)
@@ -3464,6 +3466,17 @@ public final class GameServerSide extends Game
     void legionUndoMoveEvent(Legion legion)
     {
         history.legionUndoMoveEvent(legion);
+    }
+
+    void recruitEvent(Legion legion, CreatureType recruit,
+        CreatureType recruiter)
+    {
+        history.recruitEvent(legion, recruit, recruiter);
+    }
+
+    void undoRecruitEvent(Legion legion)
+    {
+        history.undoRecruitEvent(legion);
     }
 
     INotifyWebServer getNotifyWebServer()
