@@ -3278,6 +3278,7 @@ public final class GameServerSide extends Game
 
         if (gameShouldContinue())
         {
+            gameSaver.commitPointReached();
             server.nextEngagement();
         }
     }
