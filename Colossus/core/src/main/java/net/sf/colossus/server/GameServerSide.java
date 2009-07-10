@@ -1857,14 +1857,22 @@ public final class GameServerSide extends Game
     private long numberValue(String filename)
     {
         StringBuilder numberPart = new StringBuilder();
+        boolean foundFirstDigit = false;
+        boolean done = false;
 
-        for (int i = 0; i < filename.length(); i++)
+        for (int i = 0; i < filename.length() && !done; i++)
         {
             char ch = filename.charAt(i);
 
             if (Character.isDigit(ch))
             {
                 numberPart.append(ch);
+                foundFirstDigit = true;
+            }
+            else if (foundFirstDigit)
+            {
+                // Found first non-digit after digits block - done.
+                done = true;
             }
         }
         try
