@@ -17,6 +17,7 @@ import net.sf.colossus.common.Options;
 import net.sf.colossus.common.WhatNextManager;
 import net.sf.colossus.common.WhatNextManager.WhatToDoNext;
 import net.sf.colossus.guiutil.DebugMethods;
+import net.sf.colossus.server.GameLoading;
 import net.sf.colossus.server.GameServerSide;
 import net.sf.colossus.server.VariantKnower;
 import net.sf.colossus.util.BuildInfo;
@@ -660,11 +661,20 @@ public final class Start
 
                 if (loadFileName != null && loadFileName.length() > 0)
                 {
-                    GameServerSide game = new GameServerSide(
-                        getWhatNextManager(), serverOptions, null,
-                        new VariantKnower());
-                    serverOptions.clearPlayerInfo();
-                    game.loadGame(loadFileName);
+                    GameLoading loader = new GameLoading();
+                    boolean ok = loader.loadGame(loadFileName);
+                    if (ok)
+                    {
+                        GameServerSide game = new GameServerSide(
+                            getWhatNextManager(), serverOptions, null,
+                            new VariantKnower());
+                        serverOptions.clearPlayerInfo();
+                        game.loadGame(loader.getRoot());
+                    }
+                    else
+                    {
+                        LOGGER.severe("GameLoading returned false!");
+                    }
                 }
                 else
                 {

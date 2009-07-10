@@ -1,11 +1,9 @@
 package net.sf.colossus.server;
 
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -37,7 +35,6 @@ import net.sf.colossus.game.actions.Summoning;
 import net.sf.colossus.server.BattleServerSide.AngelSummoningStates;
 import net.sf.colossus.util.InstanceTracker;
 import net.sf.colossus.util.Split;
-import net.sf.colossus.util.StaticResourceLoader;
 import net.sf.colossus.util.ViableEntityManager;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
@@ -49,12 +46,8 @@ import net.sf.colossus.webclient.RunGameInSameJVM;
 import net.sf.colossus.webclient.WebClient;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
-import org.jdom.Attribute;
-import org.jdom.CDATA;
 import org.jdom.DataConversionException;
-import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
 
 
 /**
@@ -1368,139 +1361,19 @@ public final class GameServerSide extends Game
         gameSaver.saveGameWithErrorHandling(filename, autoSave);
     }
 
-    /**
-     * Try to load a game from saveDirName/filename.
-     *
-     * If the filename is "--latest" then load the latest savegame found in saveDirName.
-     */
     // JDOM lacks generics, so we need casts
     @SuppressWarnings("unchecked")
-    public void loadGame(String filename)
+    public void loadGame(Element root)
     {
-        File file = null;
-
-        if (filename.equals("--latest"))
-        {
-            File dir = new File(Constants.SAVE_DIR_NAME);
-
-            if (!dir.exists() || !dir.isDirectory())
-            {
-                LOGGER.log(Level.SEVERE, "No saves directory");
-                dispose();
-                return;
-            }
-            String[] filenames = dir.list(new XMLSnapshotFilter());
-
-            if (filenames.length < 1)
-            {
-                LOGGER.log(Level.SEVERE,
-                    "No XML savegames found in saves directory");
-                dispose();
-                return;
-            }
-            file = new File(Constants.SAVE_DIR_NAME
-                + latestSaveFilename(filenames));
-        }
-        else if (filename.indexOf("/") >= 0 || filename.indexOf("\\") >= 0)
-        {
-            // Already a full path
-            file = new File(filename);
-        }
-        else
-        {
-            file = new File(Constants.SAVE_DIR_NAME + filename);
-        }
-
-        if (!file.exists())
-        {
-            String tryXMLFile = file.getPath() + ".xml";
-            File xmlFile = new File(tryXMLFile);
-            if (xmlFile.exists())
-            {
-                LOGGER.warning("Given filename does not exist - loading "
-                    + "instead the one with .xml appended to the name!");
-                file = xmlFile;
-            }
-            else
-            {
-                LOGGER.severe("Cannot load saved game: file " + file.getPath()
-                    + " does not exist!");
-                return;
-            }
-        }
 
         try
         {
-            LOGGER.info("Loading game from " + file);
-            SAXBuilder builder = new SAXBuilder();
-            Document doc = builder.build(file);
-
-            Element root = doc.getRootElement();
-            Attribute ver = root.getAttribute("version");
-
-            if (!ver.getValue().equals(Constants.XML_SNAPSHOT_VERSION))
-            {
-                LOGGER.severe("Can't load this savegame version.");
-                // TODO not only would this fail to load quietly, it also fails
-                // to fail quietly rather noisily by causing an NPE in dispose().
-                dispose();
-                return;
-            }
 
             // Reset flags that are not in the savegame file.
             clearFlags();
             loadingGame = true;
 
-            Element el = root.getChild("Variant");
-            Attribute dir = el.getAttribute("dir");
-            Attribute fil = el.getAttribute("file");
-
-            Attribute namAttr = el.getAttribute("name");
-            String varName = null;
-            if (namAttr != null)
-            {
-                varName = namAttr.getValue();
-            }
-
-            VariantSupport.freshenVariant(fil.getValue(), dir.getValue());
-
-            // then load data files
-            List<Element> datafilesElements = root.getChildren("DataFile");
-            Iterator<Element> it = datafilesElements.iterator();
-            while (it.hasNext())
-            {
-                Element dea = it.next();
-                String mapKey = dea.getAttributeValue("DataFileKey");
-                List<?> contentList = dea.getContent();
-                if (contentList.size() > 0)
-                {
-                    String content = ((CDATA)contentList.get(0)).getText();
-                    LOGGER.finest("DataFileKey: " + mapKey
-                        + " DataFileContent :\n" + content);
-                    StaticResourceLoader
-                        .putIntoFileCache(mapKey, content.getBytes());
-                }
-                else
-                {
-                    StaticResourceLoader.putIntoFileCache(mapKey, new byte[0]);
-                }
-            }
-
-            // we're server, but the file generation process has been done
-            // by loading the savefile.
-            Variant variant = VariantSupport.loadVariant(varName, fil
-                .getValue(), dir.getValue(), false);
-            setVariant(variant);
-            // old save games (before r3360, 09/2008) do not save the
-            // variant name - retrieve it back from VariantSupport.
-            // TODO remove this one day?
-            if (varName == null)
-            {
-                varName = VariantSupport.getVariantName();
-            }
-            options.setOption(Options.variant, varName);
-
-            el = root.getChild("TurnNumber");
+            Element el = root.getChild("TurnNumber");
             turnNumber = Integer.parseInt(el.getTextTrim());
             // not quite the same as it was when saved, but the idea of lastRTN
             // is only to prevent stresstest games from hanging forever...
@@ -1514,7 +1387,7 @@ public final class GameServerSide extends Game
 
             Element ct = root.getChild("Caretaker");
             List<Element> kids = ct.getChildren();
-            it = kids.iterator();
+            Iterator<Element> it = kids.iterator();
 
             while (it.hasNext())
             {
@@ -1538,11 +1411,8 @@ public final class GameServerSide extends Game
             // Players
             List<Element> playerElements = root.getChildren("Player");
 
-            it = playerElements.iterator();
-            while (it.hasNext())
+            for (Element pla : playerElements)
             {
-                Element pla = it.next();
-
                 String name = pla.getAttribute("name").getValue();
                 String type = pla.getAttribute("type").getValue();
 
@@ -1851,62 +1721,6 @@ public final class GameServerSide extends Game
             allOk = allOk && ((PlayerServerSide)player).resyncBackupData();
         }
         return allOk;
-    }
-
-    /** Extract and return the numeric part of a filename. */
-    private long numberValue(String filename)
-    {
-        StringBuilder numberPart = new StringBuilder();
-        boolean foundFirstDigit = false;
-        boolean done = false;
-
-        for (int i = 0; i < filename.length() && !done; i++)
-        {
-            char ch = filename.charAt(i);
-
-            if (Character.isDigit(ch))
-            {
-                numberPart.append(ch);
-                foundFirstDigit = true;
-            }
-            else if (foundFirstDigit)
-            {
-                // Found first non-digit after digits block - done.
-                done = true;
-            }
-        }
-        try
-        {
-            return Long.parseLong(numberPart.toString());
-        }
-        catch (NumberFormatException e)
-        {
-            return -1L;
-        }
-    }
-
-    /** Find the save filename with the highest numerical value.
-     (1000000000.sav comes after 999999999.sav) */
-    private String latestSaveFilename(String[] filenames)
-    {
-        return Collections.max(Arrays.asList(filenames),
-            new Comparator<String>()
-            {
-                public int compare(String s1, String s2)
-                {
-                    long diff = (numberValue(s1) - numberValue(s2));
-
-                    if (diff > Integer.MAX_VALUE)
-                    {
-                        return Integer.MAX_VALUE;
-                    }
-                    if (diff < Integer.MIN_VALUE)
-                    {
-                        return Integer.MIN_VALUE;
-                    }
-                    return (int)diff;
-                }
-            });
     }
 
     /**

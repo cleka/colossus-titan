@@ -2508,7 +2508,8 @@ public final class Server extends Thread implements IServer
 
     public void loadGame(String filename)
     {
-        game.loadGame(filename);
+        LOGGER.warning("Got from client via socket the request to load a game"
+            + ", but 'via Socket' is not supported any more! Ignoring it.");
     }
 
     // This was earlier called from Client via network message
