@@ -4,6 +4,7 @@ package net.sf.colossus.client;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -677,6 +678,23 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
         CreatureInfoList splitList = new CreatureInfoList();
 
         computeSplit(childSize, knownKeep, knownSplit, keepList, splitList);
+
+        // If both children have same height, in 50% of the cases mix it up
+        // which child gets the "split off" content and which the "to keep".
+
+        if (getHeight() == 2 * childSize)
+        {
+            // A creative way to produce a random boolean value:
+            long now = new Date().getTime();
+            boolean swapKeepAndSplit = ((now % 17) % 2 == 1);
+
+            if (swapKeepAndSplit)
+            {
+                CreatureInfoList swapTmp = keepList;
+                keepList = splitList;
+                splitList = swapTmp;
+            }
+        }
 
         child1 = new PredictSplitNode(markerId, turn, keepList, this, variant);
         child2 = new PredictSplitNode(otherLegion.getMarkerId(), turn,
