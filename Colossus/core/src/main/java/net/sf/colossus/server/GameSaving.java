@@ -39,17 +39,11 @@ public class GameSaving
     private final Options options;
 
     /**
-     *  snapshot of game data (caretaker, players with Legions) at the last
+     *  snapshot of game data (caretaker, players, legions, ...) at the last
      *  "commit point", initially those are taken only at start of a phase.
      *  (Later this might be also after each completed engagement/battle).
      *  Savegame contains then this snapshot plus the redo-Data which was
      *  additionally done after that.
-     *
-     *  TODO This whole idea of "snapshot at start of phase and redoLog for
-     *  all what happens after that" is right now (2009-06-15) just in the
-     *  beginning (changed overall methods to support that idea but otherwise
-     *  save game content is still same as before).
-     *
      */
     private Element phaseStartSnapshot;
 
