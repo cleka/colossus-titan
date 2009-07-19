@@ -193,6 +193,12 @@ public class NullClientGUI implements IClientGUI
 
     }
 
+    public void actOnGameStarting()
+    {
+        // TODO Auto-generated method stub
+
+    }
+
     public void actOnSetupSplit()
     {
         // TODO Auto-generated method stub

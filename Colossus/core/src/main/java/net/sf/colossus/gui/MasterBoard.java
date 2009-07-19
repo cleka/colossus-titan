@@ -402,6 +402,12 @@ public final class MasterBoard extends JPanel
         return true;
     }
 
+    public void enableSaveActions()
+    {
+        saveGameAction.setEnabled(true);
+        saveGameAsAction.setEnabled(true);
+    }
+
     /**
      * Ask user in a dialog box, whether he wants to save game despite the
      * fact that game is currently in a phase for which loading the saved game
@@ -977,6 +983,9 @@ public final class MasterBoard extends JPanel
         mi.setMnemonic(KeyEvent.VK_N);
         if (!client.isRemote())
         {
+            // saving not possible during game setup phase; enable later
+            saveGameAction.setEnabled(false);
+            saveGameAsAction.setEnabled(false);
             mi = fileMenu.add(loadGameAction);
             mi.setMnemonic(KeyEvent.VK_L);
             mi = fileMenu.add(saveGameAction);

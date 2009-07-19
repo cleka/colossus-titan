@@ -1812,6 +1812,12 @@ public final class Client implements IClient, IOracle, IVariant
      */
     public void setupTurnState(Player activePlayer, int turnNumber)
     {
+        // "turn state is first time initialized" means also the game setup
+        // is completed. GUI might now e.g. enable game saving menu actions.
+        if (game.isTurnStateStillUninitialized())
+        {
+            gui.actOnGameStarting();
+        }
         game.setActivePlayer(activePlayer);
         game.setTurnNumber(turnNumber);
 

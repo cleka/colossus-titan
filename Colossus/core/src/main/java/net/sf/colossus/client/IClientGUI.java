@@ -239,6 +239,8 @@ public interface IClientGUI
 
     public abstract void actOnTurnOrPlayerChange(Client c, int turnNr, Player p);
 
+    public abstract void actOnGameStarting();
+
     public abstract void actOnSetupSplit();
 
     public abstract void actOnSetupMuster();

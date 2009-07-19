@@ -2009,6 +2009,14 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         eventViewer.turnOrPlayerChange(client, turnNr, player);
     }
 
+    public void actOnGameStarting()
+    {
+        if (!client.isRemote())
+        {
+            board.enableSaveActions();
+        }
+    }
+
     public void actOnSetupSplit()
     {
         // TODO probably this can be removed?

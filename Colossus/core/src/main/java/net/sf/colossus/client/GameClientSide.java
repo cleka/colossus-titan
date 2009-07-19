@@ -208,6 +208,15 @@ public class GameClientSide extends Game implements IOracle
         return activePlayer;
     }
 
+    /**
+     * ActivePlayer is set first time to something different than "noone"
+     * when setupTurnState is called first time.
+     * @return true if activePlayer is still "noone".
+     */
+    public boolean isTurnStateStillUninitialized()
+    {
+        return activePlayer.equals(noone);
+    }
 
     public void initBattle(MasterHex hex, int battleTurnNumber,
         Player battleActivePlayer, BattlePhase battlePhase, Legion attacker,
