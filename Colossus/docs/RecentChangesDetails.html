@@ -13,11 +13,74 @@
 This describes the recent changes in some more detail than just the
 one-line-info on the main pages "News" section.
 
-<h3>January 6, 2009: Public Testing Build from r3541</h3>
-<p>Changes since last Public Testing Build (2008-11-21):</p>
-<p>Some small user-visible changes this time, some cleanup 
-   and some work on the "WebSercer/WebClient"</p>
-
+<h3>July 20, 2009: Public Build from r4440+</h3>
+<p>
+Yeah, it's been a long time since last Public Build. It might look we have 
+been in winter sleep, but in fact in last 8 months we have done more changes 
+(1000+ new revisions committed) than in last 5 years (for comparison: r2500 was in April 2004).</p>
+<p>
+But most of those changes were internal cleanup, refactoring, rewriting
+some parts to make future changes easier and less error-prone, and so on;
+and not so much directly user-visible changes and bugfixes.</p>
+<p><font color="red">
+<b>This new Build is incompatible (in all three aspects: "Save Game"-files, 
+   Server/Client communication and Variant files) with the previous Public Build!</b></font></p>
+<p>This means you can't load old saved games from earlier version, 
+   and when playing over network one can't use previous' versions Network Client 
+   to connect to a game running with new version aned vice versa.</p>
+<p>
+Below the highlights since last Public Testing Build (2008-10-29):</p>
+<ul>
+<li>A new AI type "ExperimentalAI". It uses some kind of genetic algorithm to find better
+    "optimal battle move" combination (evaluating really all theoretically possible 
+    combinations would simply take too long)</i>
+<li>Added "Battle Dice Rolls history/scrolling functionality" 
+    (thanks to Bruce for that!)</li>
+<li>Added a Battle generator tool (mostly for internal use)</li>
+<li>BattleLandsGenerator including BattleLandRandomizer now functional again (were broken for years)</li>
+<li>Improvements to game loading error handling (from cmdline: wrong filename, 
+    tolerate missing .xml extention, ...)</li>
+<li>Changes to save game format, now version 2</li>
+<li>"One todo done. 1.21 gigatodos still to go."</li>
+<li>Fixed: 2057072 If game in trouble, "Save" might not work either:
+    File => Save Game and Save Game As now done directly via "localServer"
+    object, instead of via network message as earlier.</li>
+<li>Added Tim Hoban's patch for #2352320, HumanHater being under-aggressive
+    against other AIs. (Reworked onlyAIsRemain a bit.)</li>
+<li>Improvements to "Public Game Server". But: No, it's still not ready to use yet :-/</li>
+<li>Fixed: 2675045 NPE during createSummonAngel after Negotiation + related cleanup</li>
+<li>Added Maven building. We have now a Continuous Integration build running which 
+    creates site report (copy paste detector, dependencies, ...).</li>
+<li>Basic functionality to suspend/resume a game, e.g./especially when AI's are playing.</li>
+<li>Fixed:  Not all angel summons allowed - ID: 2316688</li>
+<li>Changes to <b>Help - About</b> dialog:
+<ul>
+    <li>More informative build info (timestamp + user + revision instead of just revision)</li>
+    <li>LogDirectory now derived from actual logging-property (instead of simply assuming it's still system temp dir)</li>
+    <li>Dialog has now a meaningful title</li>
+</ul></li>
+<li>Also Game Setup (Get Players) dialog shows now the build info/version 
+    (version is only properly set in official builds).</li>
+<li>New Save Game format: includes now additionally a "redo" log part</li>
+<li>Whole Save/Load game tragedy now in better shape:
+<ul>
+    <li>Saving of game now reliable for all situations except <i>during</i> engagements/battles. 
+        I.e. one can save at any time during split, move or recruit, or between engagements/battles.</li>
+    <li>When Saving, the splits/moves/recruits done since phase start "Done" can now be undone.</li>
+    <li>Done button in correct state accordingly.</li>
+    <li>Warning message when attempting to save during an engagement or battle: 
+        this will not result in a save game from which one could continue playing.</li>
+</ul></li>
+<li>Added "autoDone" option (when nothing to recruit at all, or after last engagement).</li>
+<li>Make SplitPrediction for equal-height children with 50% probability swap "keep" 
+    or "split off". So, e.g. for initial split now it does not blindly assume any more 
+    that the Titan stays in original legion and Angel is split off.</li>
+<li>SaveGame and SaveGameAs menu items/actions stay disabled until game setup is completed.</li>
+<li>Work ongoing to get Colossus part of Fedora (e.g. using now self-written 
+    simple option parser instead of werken.opt)</li>
+</ul>
+<p>
+<i>January 6, 2009: Changes listed below were already in Public Testing Build from r3541</i>
 <ul>
 <li>Fixed the problem that Quit in WebClient did not really directly Quit</li>
 <li>Fixed: 2322870 Bogus packet (only half message written and then fully)</li>
@@ -34,17 +97,12 @@ one-line-info on the main pages "News" section.
     "Custom variant: remote players? load game? instructions!"</li>
 </ul>
 
-<hr></hr>
-
-<h3>November 21, 2008: Public Testing Build from r3500</h3>
-<p>Changes since last Public Build (2008-10-29):</p>
-<p>Not much user-visible changes this time, lot of cleanup.</p>
-
+<i>November 21, 2008: Changes listed below were already in Public Testing Build from r3500</i>
 <ul>
 <li>Several improvements to speed up loading of saved games:
 <ul><li>Do not send events of legions of players that will be dead at the end</li>
     <li>Skip Caretaker Display and some other screen updates</li>
-</ul>
+</ul></li>
 <li>Quite some changes to things reported by "FindBugs" tool</li>
 <li>Added in File Menu new item "Check Connection"</li>
 <li>Fixed: 2128216 NW Stresstest opens GUI window and hangs</li>
@@ -52,6 +110,8 @@ one-line-info on the main pages "News" section.
     send some message immediately after accepting the client</li>
 <li>Improved handling for remote clients one game end with AutoQuit</li>    
 </ul>
+
+<hr></hr>
 
 <h3>October 29, 2008: Public Build from r3455</h3>
 <p>Changes since last Public Build (2008-10-10):</p>
@@ -343,6 +403,3 @@ Most relevant changes:
   </ul>
 </li>
 </ul>
-
-
-
