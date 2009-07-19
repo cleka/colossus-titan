@@ -393,7 +393,7 @@ public final class MasterBoard extends JPanel
      *
      * @return True if saving at this point is fully reliable
      */
-    private boolean saveCurrentlyPossible()
+    private boolean isSavingCurrentlyUseful()
     {
         if (gui.getGame().isEngagementOngoing())
         {
@@ -695,14 +695,16 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                if (!saveCurrentlyPossible())
+                boolean proceed = true;
+                if (!isSavingCurrentlyUseful())
                 {
-                    boolean proceedAnyway = saveAnywayDialog();
-                    if (proceedAnyway)
-                    {
-                        gui.menuSaveGame(null);
-                    }
+                    proceed = saveAnywayDialog();
                 }
+                if (proceed)
+                {
+                    gui.menuSaveGame(null);
+                }
+
             }
         };
 
@@ -711,6 +713,15 @@ public final class MasterBoard extends JPanel
             // TODO: Need a confirmation dialog on overwrite?
             public void actionPerformed(ActionEvent e)
             {
+                if (!isSavingCurrentlyUseful())
+                {
+                    boolean proceed = saveAnywayDialog();
+                    if (!proceed)
+                    {
+                        return;
+                    }
+                }
+
                 File savesDir = new File(Constants.SAVE_DIR_NAME);
                 if (!savesDir.exists())
                 {
