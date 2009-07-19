@@ -644,4 +644,16 @@ public class Game
     {
         return phase;
     }
+
+    public boolean isEngagementOngoing()
+    {
+        if (isPhase(Phase.FIGHT) && battleSite != null)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 }

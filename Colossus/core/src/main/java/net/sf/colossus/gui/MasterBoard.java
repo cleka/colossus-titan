@@ -382,6 +382,48 @@ public final class MasterBoard extends JPanel
         }
     }
 
+    /**
+     * Decide whether game is currently in a state that saving is currently
+     * possible / reliable, i.e. reloading it would result in a game that can
+     * be continued.
+     * Saving is currently not reliable while any engagement is ongoing
+     * (both negotiation and battle phases, up to summon/acquire.
+     * Only just before any new engagement is picked (or waiting for
+     * Done with Engagements) is currently (2009-07) working.
+     *
+     * @return True if saving at this point is fully reliable
+     */
+    private boolean saveCurrentlyPossible()
+    {
+        if (gui.getGame().isEngagementOngoing())
+        {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Ask user in a dialog box, whether he wants to save game despite the
+     * fact that game is currently in a phase for which loading the saved game
+     * might not be properly loadable (during an engagement, for example)
+     *
+     * @return True if saving shall be done anyway
+     */
+    private boolean saveAnywayDialog()
+    {
+        String[] options = new String[2];
+        options[0] = "OK";
+        options[1] = "Cancel";
+        int answer = JOptionPane.showOptionDialog(masterFrame,
+            "Saving at this moment will not result in a consistent / properly"
+                + " loadable save game file. Do you want to save anyway?",
+            "Save at this phase not implemented!",
+            JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null,
+            options, options[1]);
+
+        return (answer == JOptionPane.OK_OPTION);
+    }
+
     private void setupActions()
     {
         clearRecruitChitsAction = new AbstractAction(clearRecruitChits)
@@ -653,7 +695,14 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                gui.menuSaveGame(null);
+                if (!saveCurrentlyPossible())
+                {
+                    boolean proceedAnyway = saveAnywayDialog();
+                    if (proceedAnyway)
+                    {
+                        gui.menuSaveGame(null);
+                    }
+                }
             }
         };
 
