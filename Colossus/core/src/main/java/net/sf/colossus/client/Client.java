@@ -1802,13 +1802,7 @@ public final class Client implements IClient, IOracle, IVariant
     }
 
     /**
-     * Currently called by SetupSplit, because this implies also
-     * a player and perhaps turn change.
-     *
-     * Additionally might be called by server if we load a game outside the
-     * split phase, where active player and turn are usually set.
-     *
-     * TODO call always by server explicitly?
+     * Called by server when activePlayer changes
      */
     public void setupTurnState(Player activePlayer, int turnNumber)
     {
@@ -1826,9 +1820,6 @@ public final class Client implements IClient, IOracle, IVariant
 
     public void setupSplit(Player activePlayer, int turnNumber)
     {
-        // This implies also Player and perhaps Turn change
-        // TODO perhaps server should send this explicitly?
-        setupTurnState(activePlayer, turnNumber);
         resetLegionMovesAndRecruitData();
 
         // Now the actual setup split stuff
