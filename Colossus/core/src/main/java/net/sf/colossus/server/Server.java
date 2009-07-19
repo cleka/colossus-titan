@@ -1106,12 +1106,6 @@ public final class Server extends Thread implements IServer
                 // set in player
                 player.setName(uName);
             }
-            // set playerName + thread name in ClientHandler, and send
-            // playerName to client:
-            // It's necessary to send to client only for that reason, that
-            // it otherwise might time out if it does not get quick response
-            // (5 seconds) from server to it's initial signOn request
-            setPlayerName(player, uName);
         }
     }
 
