@@ -362,7 +362,7 @@ final class ClientHandler implements IClient
             String markerId = args.remove(0);
             String angelType = args.remove(0);
             server.acquireAngel(resolveLegion(markerId),
-                resolveCreatureType(angelType));
+                resolveCreatureTypeNullOk(angelType));
         }
         else if (method.equals(Constants.doSummon))
         {
@@ -582,10 +582,10 @@ final class ClientHandler implements IClient
 
     /**
      * There are cases where "null" comes over network and is not meant to
-     * be resolved to a CreatureType, namely teleportingLord if no teleport
-     * and null recruiter.
+     * be resolved to a CreatureType, namely:
+     * teleportingLord if no teleport; null recruiter; decline Acquire.
      * TODO What to do with the "Anything"?
-     * @param name
+     * @param name Name of the creatureType to find, might be "null"
      * @return CreatureType for that name, or null if name is "null"
      */
     private CreatureType resolveCreatureTypeNullOk(String name)
@@ -617,6 +617,10 @@ final class ClientHandler implements IClient
         //       on the network) to indicate that a summon was skipped. To disallow
         //       having the null values in here we would need to introduce a new
         //       network message such as "doneSummoning".
+        // Comment (Clemens): one day I would like to get Summon as part of
+        // the move phase, not as "do it or decline it request" from server.
+        // When we get there, there is no need for null nor for explicit
+        // doneSummoning.
         if (markerId.equals("null"))
         {
             return null;
