@@ -1358,7 +1358,7 @@ public final class Client implements IClient, IOracle, IVariant
             LOGGER
                 .severe("Attacker in game differs from attacker given in askNegotiate!");
         }
-        if (getAttacker() != attacker)
+        if (getDefender() != defender)
         {
             LOGGER
                 .severe("Defender in game differs from defender given in askNegotiate!");
