@@ -2116,14 +2116,14 @@ public final class Client implements IClient, IOracle, IVariant
     // TODO placeholder, move at some point fully to Game ?
     public Legion getDefender()
     {
-        return game.getDefender();
+        return game.getEngagement().getDefendingLegion();
     }
 
     // public for IOracle
     // TODO placeholder, move at some point fully to Game ?
     public Legion getAttacker()
     {
-        return game.getAttacker();
+        return game.getEngagement().getAttackingLegion();
     }
 
     // public for IOracle
@@ -2133,7 +2133,7 @@ public final class Client implements IClient, IOracle, IVariant
         {
             return null;
         }
-        return game.getBattleSite();
+        return game.getEngagement().getLocation();
     }
 
     public BattlePhase getBattlePhase()

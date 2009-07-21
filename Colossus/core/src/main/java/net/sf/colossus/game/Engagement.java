@@ -9,6 +9,8 @@ import net.sf.colossus.variant.MasterHex;
  *  Holds the basic data for an engagement.
  *
  *  TODO: use also on server side.
+ *
+ *  TODO: unify with EngagementResults.Engagement
  */
 public class Engagement
 {
@@ -20,28 +22,33 @@ public class Engagement
      */
     private final Legion attacker;
     private final Legion defender;
-    private final MasterHex battleSite;
+    private final MasterHex location;
 
     public Engagement(MasterHex hex, Legion attacker, Legion defender)
     {
-        this.battleSite = hex;
+        this.location = hex;
         this.attacker = attacker;
         this.defender = defender;
         LOGGER.info("A new engagement: hex " + hex + " attacker " + attacker
             + " defender " + defender);
     }
 
-    public MasterHex getBattleSite()
+    public MasterHex getLocation()
     {
-        return battleSite;
+        return location;
     }
 
-    public Legion getDefender()
+    public String getLocationLabel()
+    {
+        return location.getLabel();
+    }
+
+    public Legion getDefendingLegion()
     {
         return defender;
     }
 
-    public Legion getAttacker()
+    public Legion getAttackingLegion()
     {
         return attacker;
     }

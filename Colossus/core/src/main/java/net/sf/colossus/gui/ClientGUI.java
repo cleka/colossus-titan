@@ -428,8 +428,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             battleBoard.dispose();
             battleBoard = null;
         }
-        battleBoard = new BattleBoard(this, client.getBattleSite(), client
-            .getAttacker(), client.getDefender());
+        battleBoard = new BattleBoard(this, getGame().getEngagement());
     }
 
     public void setStrikeNumbers(BattleUnit striker,

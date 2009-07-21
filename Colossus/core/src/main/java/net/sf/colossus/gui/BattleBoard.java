@@ -45,14 +45,13 @@ import net.sf.colossus.common.Options;
 import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.BattleUnit;
-import net.sf.colossus.game.Legion;
+import net.sf.colossus.game.Engagement;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.guiutil.KFrame;
 import net.sf.colossus.guiutil.SaveWindow;
 import net.sf.colossus.server.LegionServerSide;
 import net.sf.colossus.util.StaticResourceLoader;
 import net.sf.colossus.variant.BattleHex;
-import net.sf.colossus.variant.MasterHex;
 
 
 /**
@@ -145,15 +144,16 @@ public final class BattleBoard extends KFrame
         }
     }
 
-    public BattleBoard(final ClientGUI gui, MasterHex masterHex,
-        Legion attacker, Legion defender)
+    public BattleBoard(final ClientGUI gui, final Engagement engagement)
     {
         super(); // title will be set later
 
         this.gui = gui;
 
-        String attackerMarkerId = attacker.getMarkerId();
-        String defenderMarkerId = defender.getMarkerId();
+        String attackerMarkerId = engagement.getAttackingLegion()
+            .getMarkerId();
+        String defenderMarkerId = engagement.getDefendingLegion()
+            .getMarkerId();
 
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
@@ -198,8 +198,8 @@ public final class BattleBoard extends KFrame
         }
         setLocation(location);
 
-        battleMap = new BattleMap(getClient(), masterHex, attackerMarkerId,
-            defenderMarkerId, gui);
+        battleMap = new BattleMap(getClient(), engagement.getLocation(),
+            attackerMarkerId, defenderMarkerId, gui);
         contentPane.add(new JScrollPane(battleMap), BorderLayout.CENTER);
         battleMap.addMouseListener(new MouseAdapter()
         {
@@ -240,7 +240,7 @@ public final class BattleBoard extends KFrame
             + LegionServerSide.getMarkerName(attackerMarkerId) + " ("
             + attackerMarkerId + ") attacks "
             + LegionServerSide.getMarkerName(defenderMarkerId) + " ("
-            + defenderMarkerId + ") in " + masterHex.getLabel();
+            + defenderMarkerId + ") in " + engagement.getLocationLabel();
 
         setTitle(getInfoText());
 
@@ -257,8 +257,10 @@ public final class BattleBoard extends KFrame
         // so I keep them like that, for now.
         updatePhaseAndTurn();
 
-        setBattleMarkerLocation(false, "X" + attacker.getEntrySide().ordinal());
-        setBattleMarkerLocation(true, "X" + defender.getEntrySide().ordinal());
+        setBattleMarkerLocation(false, "X"
+            + engagement.getAttackingLegion().getEntrySide().ordinal());
+        setBattleMarkerLocation(true, "X"
+            + engagement.getDefendingLegion().getEntrySide().ordinal());
         reqFocus();
     }
 

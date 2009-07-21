@@ -255,17 +255,17 @@ public class Game
 
     public MasterHex getBattleSite()
     {
-        return engagement.getBattleSite();
+        return engagement.getLocation();
     }
 
     public Legion getDefender()
     {
-        return engagement.getDefender();
+        return engagement.getDefendingLegion();
     }
 
     public Legion getAttacker()
     {
-        return engagement.getAttacker();
+        return engagement.getAttackingLegion();
     }
 
     /**
