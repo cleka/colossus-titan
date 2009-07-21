@@ -81,6 +81,7 @@ abstract class AbstractAI implements AI
     {
         this.variant = v;
     }
+
     final public CreatureType getVariantRecruitHint(LegionClientSide legion,
         MasterHex hex, List<CreatureType> recruits)
     {
@@ -156,8 +157,8 @@ abstract class AbstractAI implements AI
         return enemyMap;
     }
 
-    final protected int getNumberOfWaysToTerrain(Legion legion,
-        MasterHex hex, String terrainTypeName)
+    final protected int getNumberOfWaysToTerrain(Legion legion, MasterHex hex,
+        String terrainTypeName)
     {
         int total = 0;
         for (int roll = 1; roll <= 6; roll++)
@@ -226,7 +227,7 @@ abstract class AbstractAI implements AI
                 continue;
             }
             Set<BattleHex> set = client.findStrikes(critter.getTag());
-            for (BattleHex targetHex: set)
+            for (BattleHex targetHex : set)
             {
                 BattleCritter target = getBattleUnit(targetHex);
                 int dice = client.getStrike().getDice(critter, target);
@@ -313,7 +314,8 @@ abstract class AbstractAI implements AI
      * Return true if the legion could recruit or acquire something
      * better than its worst creature in hexLabel.
      */
-    final protected boolean couldRecruitUp(Legion legion, MasterHex hex, Legion enemy)
+    final protected boolean couldRecruitUp(Legion legion, MasterHex hex,
+        Legion enemy)
     {
         CreatureType weakest = legion.getCreatureTypes().get(
             legion.getHeight() - 1);
@@ -322,10 +324,10 @@ abstract class AbstractAI implements AI
         if (!recruits.isEmpty())
         {
             CreatureType bestRecruit = recruits.get(recruits.size() - 1);
-            if (bestRecruit != null &&
-                    getHintedRecruitmentValue(bestRecruit, legion,
-                    hintSectionUsed) >
-                    getHintedRecruitmentValue(weakest, legion, hintSectionUsed))
+            if (bestRecruit != null
+                && getHintedRecruitmentValue(bestRecruit, legion,
+                    hintSectionUsed) > getHintedRecruitmentValue(weakest,
+                    legion, hintSectionUsed))
             {
                 return true;
             }
@@ -354,19 +356,17 @@ abstract class AbstractAI implements AI
                         .getCreatureByName(creatureName);
                     if ((bestRecruit == null)
                         || (getHintedRecruitmentValue(tempRecruit, legion,
-                            hintSectionUsed) >=
-                            getHintedRecruitmentValue(bestRecruit, legion,
-                            hintSectionUsed)))
+                            hintSectionUsed) >= getHintedRecruitmentValue(
+                            bestRecruit, legion, hintSectionUsed)))
                     {
                         bestRecruit = tempRecruit;
                     }
                 }
                 nextScore += arv;
             }
-            if (bestRecruit != null &&
-                getHintedRecruitmentValue(bestRecruit, legion,
-                    hintSectionUsed) >
-                getHintedRecruitmentValue(weakest,
+            if (bestRecruit != null
+                && getHintedRecruitmentValue(bestRecruit, legion,
+                    hintSectionUsed) > getHintedRecruitmentValue(weakest,
                     legion, hintSectionUsed))
             {
                 return true;
@@ -389,12 +389,11 @@ abstract class AbstractAI implements AI
         List<IVariantHint.AIStyle> styles)
     {
         return creature.getPointValue()
-            + VariantSupport
-                .getHintedRecruitmentValueOffset(creature, styles);
+            + VariantSupport.getHintedRecruitmentValueOffset(creature, styles);
     }
 
     protected final int getHintedRecruitmentValue(CreatureType creature,
-            Legion legion, List<IVariantHint.AIStyle> styles)
+        Legion legion, List<IVariantHint.AIStyle> styles)
     {
         if (!creature.isTitan())
         {
@@ -403,9 +402,8 @@ abstract class AbstractAI implements AI
         Player player = legion.getPlayer();
         int power = player.getTitanPower();
         int skill = creature.getSkill();
-        return power * skill *
-                VariantSupport
-                .getHintedRecruitmentValueOffset(creature, styles);
+        return power * skill
+            * VariantSupport.getHintedRecruitmentValueOffset(creature, styles);
     }
 
     /** Various constants used by the AIs code for creature evaluation.
@@ -441,12 +439,13 @@ abstract class AbstractAI implements AI
                 break;
             }
         }
-        LOGGER.finest("Opponent " + (honc ? "has" : "doesn't have") +
-                " native(s) from " + terrain.getName());
+        LOGGER.finest("Opponent " + (honc ? "has" : "doesn't have")
+            + " native(s) from " + terrain.getName());
         return honc;
     }
 
-    final protected int rangeToClosestOpponent(final BattleHex hex) {
+    final protected int rangeToClosestOpponent(final BattleHex hex)
+    {
         int range = Constants.BIGNUM;
         for (BattleCritter critter : client.getInactiveBattleUnits())
         {
@@ -726,8 +725,8 @@ abstract class AbstractAI implements AI
         final int difference; // difference from sitting still
         final ValueRecorder why; // explain value
 
-        MoveInfo(Legion legion, MasterHex hex, int value,
-            int difference, ValueRecorder why)
+        MoveInfo(Legion legion, MasterHex hex, int value, int difference,
+            ValueRecorder why)
         {
             this.legion = legion;
             this.hex = hex;
@@ -764,7 +763,7 @@ abstract class AbstractAI implements AI
             {
                 if (creature2.getType().equals(creature.getType()))
                 {
-                    count ++;
+                    count++;
                 }
             }
         }

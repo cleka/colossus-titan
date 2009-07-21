@@ -1,5 +1,6 @@
 package net.sf.colossus.ai;
 
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -17,14 +18,15 @@ import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.RecruitingSubTree;
 import net.sf.colossus.variant.Variant;
 
+
 /**
  *
  * @author Romain Dolbeau
  */
 public class BasicObjectiveHelper implements IObjectiveHelper
 {
-    private static final Logger LOGGER = Logger.getLogger(
-            BasicObjectiveHelper.class.getName());
+    private static final Logger LOGGER = Logger
+        .getLogger(BasicObjectiveHelper.class.getName());
     private final ObjectiveEvalConstants oec;
     private final Client client;
     private final AbstractAI ai;
@@ -48,25 +50,24 @@ public class BasicObjectiveHelper implements IObjectiveHelper
         for (Creature lcritter : attacker.getCreatures())
         {
             int count = ai.countCreatureAccrossAllLegionFromPlayer(lcritter);
-            if (!lcritter.isLord() && !lcritter.isDemiLord() &&
-                    ((creature == null) || (count < mcount)))
+            if (!lcritter.isLord() && !lcritter.isDemiLord()
+                && ((creature == null) || (count < mcount)))
             {
                 creature = lcritter;
                 mcount = count;
             }
         }
 
-        LOGGER.finest("Less Common choice: " + (creature != null ? creature.
-                getName() : "(NOBODY)"));
+        LOGGER.finest("Less Common choice: "
+            + (creature != null ? creature.getName() : "(NOBODY)"));
 
-        List<AllThereIsToKnowAboutYourCreature> overkill =
-                new ArrayList<AllThereIsToKnowAboutYourCreature>();
+        List<AllThereIsToKnowAboutYourCreature> overkill = new ArrayList<AllThereIsToKnowAboutYourCreature>();
         for (Creature lcritter : attacker.getCreatures())
         {
             if (!lcritter.isTitan())
             {
-                overkill.add(new AllThereIsToKnowAboutYourCreature(ai, lcritter,
-                        attacker));
+                overkill.add(new AllThereIsToKnowAboutYourCreature(ai,
+                    lcritter, attacker));
             }
         }
         Collections.sort(overkill, HEURISTIC_ORDER);
@@ -76,8 +77,8 @@ public class BasicObjectiveHelper implements IObjectiveHelper
         {
             buf.append("\t" + atitkayc.toString() + "\n");
         }
-        LOGGER.finest("AllThereIsToKnowAboutYourCreature order:\n" + buf.
-                toString());
+        LOGGER.finest("AllThereIsToKnowAboutYourCreature order:\n"
+            + buf.toString());
 
         if (overkill.size() > 0)
         {
@@ -86,7 +87,8 @@ public class BasicObjectiveHelper implements IObjectiveHelper
 
         if (creature != null)
         {
-            return new AllThereIsToKnowAboutYourCreature(ai, creature, attacker);
+            return new AllThereIsToKnowAboutYourCreature(ai, creature,
+                attacker);
         }
 
         return null;
@@ -94,10 +96,8 @@ public class BasicObjectiveHelper implements IObjectiveHelper
 
     private List<TacticalObjective> commonObjective(Legion myself)
     {
-        List<TacticalObjective> lListObjectives =
-                new ArrayList<TacticalObjective>();
-        Map<CreatureType, Creature> toConsider =
-                new TreeMap<CreatureType, Creature>();
+        List<TacticalObjective> lListObjectives = new ArrayList<TacticalObjective>();
+        Map<CreatureType, Creature> toConsider = new TreeMap<CreatureType, Creature>();
 
         for (Creature lcritter : myself.getCreatures())
         { // at most one entry per CreatureType ...
@@ -107,33 +107,24 @@ public class BasicObjectiveHelper implements IObjectiveHelper
         for (CreatureType creature : toConsider.keySet())
         {
             Creature lcritter = toConsider.get(creature);
-            if (!lcritter.isLord() && RecruitingSubTree.isADeadEnd(variant,
-                    lcritter.getType()))
+            if (!lcritter.isLord()
+                && RecruitingSubTree.isADeadEnd(variant, lcritter.getType()))
             {
                 lListObjectives.add(new CreatureAttackTacticalObjective(
-                        oec.FIRST_WAVE_ATTACK_PRIORITY,
-                        client,
-                        myself,
-                        lcritter,
-                        ai, ai.bec));
+                    oec.FIRST_WAVE_ATTACK_PRIORITY, client, myself, lcritter,
+                    ai, ai.bec));
             }
             else if (lcritter.isLord() && !lcritter.isTitan())
             {
                 lListObjectives.add(new CreatureAttackTacticalObjective(
-                        oec.FIRST_WAVE_ATTACK_PRIORITY,
-                        client,
-                        myself,
-                        lcritter,
-                        ai, ai.bec));
+                    oec.FIRST_WAVE_ATTACK_PRIORITY, client, myself, lcritter,
+                    ai, ai.bec));
             }
             else if (!lcritter.isTitan())
             {
                 lListObjectives.add(new CreatureAttackTacticalObjective(
-                        oec.SECOND_WAVE_ATTACK_PRIORITY,
-                        client,
-                        myself,
-                        lcritter,
-                        ai, ai.bec));
+                    oec.SECOND_WAVE_ATTACK_PRIORITY, client, myself, lcritter,
+                    ai, ai.bec));
             }
         }
 
@@ -145,8 +136,7 @@ public class BasicObjectiveHelper implements IObjectiveHelper
      */
     public List<TacticalObjective> attackerObjective()
     {
-        List<TacticalObjective> lListObjectives =
-                new ArrayList<TacticalObjective>();
+        List<TacticalObjective> lListObjectives = new ArrayList<TacticalObjective>();
         lListObjectives.addAll(commonObjective(client.getAttacker()));
         Creature toKill = null;
         for (Creature lcritter : client.getDefender().getCreatures())
@@ -154,11 +144,8 @@ public class BasicObjectiveHelper implements IObjectiveHelper
             if (lcritter.isTitan())
             {
                 lListObjectives.add(new DestroyCreatureTacticalObjective(
-                        oec.DESTROY_TITAN_PRIORITY,
-                        client,
-                        client.getDefender(),
-                        lcritter,
-                        1));
+                    oec.DESTROY_TITAN_PRIORITY, client, client.getDefender(),
+                    lcritter, 1));
             }
             else
             {
@@ -180,20 +167,15 @@ public class BasicObjectiveHelper implements IObjectiveHelper
             if (lcritter.isTitan())
             {
                 lListObjectives.add(new PreserveCreatureTacticalObjective(
-                        oec.ATTACKER_PRESERVE_TITAN_PRIORITY,
-                        client,
-                        client.getAttacker(),
-                        lcritter));
+                    oec.ATTACKER_PRESERVE_TITAN_PRIORITY, client, client
+                        .getAttacker(), lcritter));
             }
         }
         if (toKill != null)
         {
             lListObjectives.add(new DestroyCreatureTacticalObjective(
-                    oec.DESTROY_IMPORTANT_CRITTER_PRIORITY,
-                    client,
-                    client.getDefender(),
-                    toKill,
-                    1));
+                oec.DESTROY_IMPORTANT_CRITTER_PRIORITY, client, client
+                    .getDefender(), toKill, 1));
         }
         for (TacticalObjective to : lListObjectives)
         {
@@ -204,19 +186,15 @@ public class BasicObjectiveHelper implements IObjectiveHelper
 
     public List<TacticalObjective> defenderObjective()
     {
-        List<TacticalObjective> lListObjectives =
-                new ArrayList<TacticalObjective>();
+        List<TacticalObjective> lListObjectives = new ArrayList<TacticalObjective>();
         lListObjectives.addAll(commonObjective(client.getDefender()));
         for (Creature lcritter : client.getAttacker().getCreatures())
         {
             if (lcritter.isTitan())
             {
                 lListObjectives.add(new DestroyCreatureTacticalObjective(
-                        oec.DESTROY_TITAN_PRIORITY,
-                        client,
-                        client.getAttacker(),
-                        lcritter,
-                        1));
+                    oec.DESTROY_TITAN_PRIORITY, client, client.getAttacker(),
+                    lcritter, 1));
             }
         }
         for (Creature lcritter : client.getDefender().getCreatures())
@@ -224,22 +202,17 @@ public class BasicObjectiveHelper implements IObjectiveHelper
             if (lcritter.isTitan())
             {
                 lListObjectives.add(new PreserveCreatureTacticalObjective(
-                        oec.DEFENDER_PRESERVE_TITAN_PRIORITY,
-                        client,
-                        client.getDefender(),
-                        lcritter));
+                    oec.DEFENDER_PRESERVE_TITAN_PRIORITY, client, client
+                        .getDefender(), lcritter));
             }
         }
-        AllThereIsToKnowAboutYourCreature toKill =
-                findCreatureToDestroyInAttacker();
+        AllThereIsToKnowAboutYourCreature toKill = findCreatureToDestroyInAttacker();
         if (toKill != null)
         {
             lListObjectives.add(new DestroyCreatureTacticalObjective(
-                    oec.DESTROY_IMPORTANT_CRITTER_PRIORITY,
-                    client,
-                    client.getAttacker(),
-                    toKill.creature,
-                    Math.min(toKill.stackNumber, toKill.numberNeededHere)));
+                oec.DESTROY_IMPORTANT_CRITTER_PRIORITY, client, client
+                    .getAttacker(), toKill.creature, Math.min(
+                    toKill.stackNumber, toKill.numberNeededHere)));
         }
         for (TacticalObjective to : lListObjectives)
         {
@@ -257,11 +230,12 @@ public class BasicObjectiveHelper implements IObjectiveHelper
         final float FIRST_WAVE_ATTACK_PRIORITY = 1.f;
         final float SECOND_WAVE_ATTACK_PRIORITY = 0.5f;
     }
+
     private static final Comparator<AllThereIsToKnowAboutYourCreature> HEURISTIC_ORDER = new Comparator<AllThereIsToKnowAboutYourCreature>()
     {
         private int avoidNullPointerException(
-                AllThereIsToKnowAboutYourCreature c1,
-                AllThereIsToKnowAboutYourCreature c2)
+            AllThereIsToKnowAboutYourCreature c1,
+            AllThereIsToKnowAboutYourCreature c2)
         {
             if ((c1.bestRecruit != null) && (c2.bestRecruit == null))
             {
@@ -273,13 +247,13 @@ public class BasicObjectiveHelper implements IObjectiveHelper
             }
             if ((c1.bestRecruit != null) && (c2.bestRecruit != null))
             {
-                if (c1.bestRecruit.getPointValue() > c2.bestRecruit.
-                        getPointValue())
+                if (c1.bestRecruit.getPointValue() > c2.bestRecruit
+                    .getPointValue())
                 {
                     return 1;
                 }
-                if (c1.bestRecruit.getPointValue() < c2.bestRecruit.
-                        getPointValue())
+                if (c1.bestRecruit.getPointValue() < c2.bestRecruit
+                    .getPointValue())
                 {
                     return -1;
                 }
@@ -296,7 +270,7 @@ public class BasicObjectiveHelper implements IObjectiveHelper
         }
 
         public int compare(AllThereIsToKnowAboutYourCreature c1,
-                AllThereIsToKnowAboutYourCreature c2)
+            AllThereIsToKnowAboutYourCreature c2)
         {
             if (!c1.thisStackHasBetter && c2.thisStackHasBetter)
             {
@@ -314,11 +288,13 @@ public class BasicObjectiveHelper implements IObjectiveHelper
                     return result;
                 }
             }
-            if (c1.isImmediatelyUsefulKilling && !c2.isImmediatelyUsefulKilling)
+            if (c1.isImmediatelyUsefulKilling
+                && !c2.isImmediatelyUsefulKilling)
             {
                 return 1;
             }
-            if (!c1.isImmediatelyUsefulKilling && c2.isImmediatelyUsefulKilling)
+            if (!c1.isImmediatelyUsefulKilling
+                && c2.isImmediatelyUsefulKilling)
             {
                 return -1;
             }
@@ -377,22 +353,23 @@ public class BasicObjectiveHelper implements IObjectiveHelper
             buf.append(creature.getName());
             buf.append(" playerNumber=" + playerNumber);
             buf.append(" stackNumber=" + stackNumber);
-            buf.append(" bestRecruit=" + (bestRecruit != null ? bestRecruit.
-                    getName() : "(NONE)"));
+            buf.append(" bestRecruit="
+                + (bestRecruit != null ? bestRecruit.getName() : "(NONE)"));
             buf.append(" numberNeededHere=" + numberNeededHere);
             buf.append(" thisStackHasBetter=" + thisStackHasBetter);
-            buf.append(" isImmediatelyUsefulKilling=" +
-                    isImmediatelyUsefulKilling);
+            buf.append(" isImmediatelyUsefulKilling="
+                + isImmediatelyUsefulKilling);
             buf.append(" onlyThisStackHasIt=" + onlyThisStackHasIt);
             return buf.toString();
         }
 
         AllThereIsToKnowAboutYourCreature(AbstractAI ai, Creature creature,
-                Legion legion)
+            Legion legion)
         {
             this.creature = creature;
             MasterBoardTerrain terrain = legion.getCurrentHex().getTerrain();
-            playerNumber = ai.countCreatureAccrossAllLegionFromPlayer(creature);
+            playerNumber = ai
+                .countCreatureAccrossAllLegionFromPlayer(creature);
             int count = 0;
             for (Creature creature2 : legion.getCreatures())
             {
@@ -403,7 +380,7 @@ public class BasicObjectiveHelper implements IObjectiveHelper
             }
             stackNumber = count;
             recruits = RecruitingSubTree.getAllInAllSubtreesIgnoringSpecials(
-                    variant, creature.getType());
+                variant, creature.getType());
             CreatureType temp = null;
             for (CreatureType ct : recruits)
             {
@@ -421,7 +398,7 @@ public class BasicObjectiveHelper implements IObjectiveHelper
             }
             bestRecruit = temp;
             int nnh = terrain.getRecruitingSubTree().maximumNumberNeededOf(
-                    creature.getType(), legion.getCurrentHex());
+                creature.getType(), legion.getCurrentHex());
             if (nnh == -1)
             {
                 numberNeededHere = Constants.BIGNUM;

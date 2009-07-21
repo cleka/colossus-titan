@@ -22,8 +22,8 @@ import org.jdom.input.SAXBuilder;
  */
 public class MainVarFileLoader
 {
-    private static final Logger LOGGER = Logger.getLogger(MainVarFileLoader.class
-        .getName());
+    private static final Logger LOGGER = Logger
+        .getLogger(MainVarFileLoader.class.getName());
 
     private String map;
     private String ter;

@@ -1,5 +1,6 @@
 package net.sf.colossus.util;
 
+
 /**
  * An integer value, along with a detailed record of how and why
  * the value has the value it has.

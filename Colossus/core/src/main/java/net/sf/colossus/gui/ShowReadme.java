@@ -1,7 +1,6 @@
 package net.sf.colossus.gui;
 
 
-
 import java.awt.Dimension;
 import java.awt.GridLayout;
 

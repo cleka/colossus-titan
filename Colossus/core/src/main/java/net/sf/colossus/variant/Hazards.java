@@ -66,10 +66,8 @@ public abstract class Hazards implements HazardConstants
 
     public Hazards(String name, char code,
         EffectOnMovement effectOnGroundMovement,
-        EffectOnMovement effectOnFlyerMovement,
-        CombatEffect defenseEffect,
-        CombatEffect attackEffect,
-        CombatEffect rangedDefenseEffect,
+        EffectOnMovement effectOnFlyerMovement, CombatEffect defenseEffect,
+        CombatEffect attackEffect, CombatEffect rangedDefenseEffect,
         CombatEffect rangedAttackEffect,
         RangeStrikeSpecialEffect RangeStrikeSpecial,
         SpecialEffect terrainSpecial)
@@ -78,7 +76,7 @@ public abstract class Hazards implements HazardConstants
         this.code = code;
         this.effectOnGroundMovement = effectOnGroundMovement;
         this.effectOnFlyerMovement = effectOnFlyerMovement;
-        
+
         this.defenseEffect = defenseEffect;
         this.attackEffect = attackEffect;
         this.rangedDefenseEffect = rangedDefenseEffect;

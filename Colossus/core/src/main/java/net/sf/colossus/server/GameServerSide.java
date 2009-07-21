@@ -122,7 +122,8 @@ public final class GameServerSide extends Game
         WhatNextManager whatNextManager = new WhatNextManager(startOptions);
 
         Options serverOptions = new Options("UnitTest", true);
-        return new GameServerSide(whatNextManager, serverOptions, null, new VariantKnower());
+        return new GameServerSide(whatNextManager, serverOptions, null,
+            new VariantKnower());
     }
 
     /** The normal constructor to be used everywhere
@@ -313,7 +314,6 @@ public final class GameServerSide extends Game
                 + " failed, reason " + e.getMessage());
         }
     }
-
 
     /**
      * Update the dead and available counts for a creature type on all clients.
@@ -1098,8 +1098,7 @@ public final class GameServerSide extends Game
                 + "])");
             return;
         }
-        if (getOption(Options.autoStop) && onlyAIsRemain()
-            && !isGameOver())
+        if (getOption(Options.autoStop) && onlyAIsRemain() && !isGameOver())
         {
             LOGGER.info("Not advancing because no humans remain");
             setGameOver(true, "All humans eliminated");
@@ -2517,8 +2516,7 @@ public final class GameServerSide extends Game
             }
         }
 
-        Legion newLegion = ((LegionServerSide)parent)
-            .split(creaturesToSplit,
+        Legion newLegion = ((LegionServerSide)parent).split(creaturesToSplit,
             childId);
         if (newLegion == null)
         {
@@ -3279,8 +3277,7 @@ public final class GameServerSide extends Game
         history.movementRollEvent(player, roll);
     }
 
-    void legionMoveEvent(Legion legion, MasterHex newHex,
-        EntrySide entrySide,
+    void legionMoveEvent(Legion legion, MasterHex newHex, EntrySide entrySide,
         boolean teleport, CreatureType lord)
     {
         history.legionMoveEvent(legion, newHex, entrySide, teleport, lord);

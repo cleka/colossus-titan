@@ -363,8 +363,7 @@ public class Creature
         }
         else
         {
-            assert (getHits() < getPower()) :
-                    "Oups, making NOT dead but should be";
+            assert (getHits() < getPower()) : "Oups, making NOT dead but should be";
         }
     }
 
@@ -476,15 +475,15 @@ public class Creature
                 excess = tmp_hits - getPower();
                 tmp_hits = getPower();
             }
-            LOGGER.log(Level.INFO,
-                    "Critter " + getDescription() + ": " + oldhits + " + " +
-                    damage + " => " + tmp_hits + "; " + excess + " excess");
+            LOGGER.log(Level.INFO, "Critter " + getDescription() + ": "
+                + oldhits + " + " + damage + " => " + tmp_hits + "; " + excess
+                + " excess");
             // Check for death.
             if (tmp_hits >= getPower())
             {
-                LOGGER.log(Level.INFO,
-                        "Critter " + getDescription() + " is now dead: (hits=" +
-                        tmp_hits + " > power=" + getPower() + ")");
+                LOGGER.log(Level.INFO, "Critter " + getDescription()
+                    + " is now dead: (hits=" + tmp_hits + " > power="
+                    + getPower() + ")");
                 setDead(true);
             }
             setHits(tmp_hits);

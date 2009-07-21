@@ -452,22 +452,19 @@ public class RevealEvent
         else if (eventType == eventPlayerChange)
         {
             msg = "Revealing event: Player change, now player "
-                + getPlayer().getName()
-                + ", Turn " + getTurn();
+                + getPlayer().getName() + ", Turn " + getTurn();
         }
         else if (eventType == eventMulligan)
         {
             msg = "Revealing event: Player " + getPlayer().getName()
-                + ", Turn "
-                + getTurn() + " took mulligan;"
-                + " old=" + oldRoll + ", new=" + newRoll;
+                + ", Turn " + getTurn() + " took mulligan;" + " old="
+                + oldRoll + ", new=" + newRoll;
         }
         else if (eventType == eventMoveRoll)
         {
             msg = "Revealing event: Player " + getPlayer().getName()
-                + ", Turn "
-                + getTurn()
-                + " had movement roll: " + " old=" + oldRoll;
+                + ", Turn " + getTurn() + " had movement roll: " + " old="
+                + oldRoll;
         }
 
         else

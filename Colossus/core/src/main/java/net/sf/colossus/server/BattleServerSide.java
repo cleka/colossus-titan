@@ -70,8 +70,8 @@ public final class BattleServerSide extends Battle
     private int pointsScored = 0;
 
     BattleServerSide(GameServerSide game, Legion attacker, Legion defender,
-        LegionTags activeLegionTag, MasterHex masterHex,
-        int turnNumber, BattlePhase phase)
+        LegionTags activeLegionTag, MasterHex masterHex, int turnNumber,
+        BattlePhase phase)
     {
         super(game, attacker, defender, masterHex);
 
@@ -291,8 +291,7 @@ public final class BattleServerSide extends Battle
                 // IF the attacker makes it to the end of his first movement
                 // phase without conceding, even if he left all legions
                 // off-board, the defender can recruit.
-                if (activeLegionTag == LegionTags.ATTACKER
-                    && !conceded)
+                if (activeLegionTag == LegionTags.ATTACKER && !conceded)
                 {
                     attackerEntered = true;
                 }
@@ -490,9 +489,9 @@ public final class BattleServerSide extends Battle
      *  for all legal destinations.  Do not double back.  If ignoreMobileAllies
      *  is true, pretend that allied creatures that can move out of the
      *  way are not there. */
-    private Set<BattleHex> findMoves(BattleHex hex, CreatureServerSide critter,
-        boolean flies, int movesLeft, int cameFrom,
-        boolean ignoreMobileAllies, boolean first)
+    private Set<BattleHex> findMoves(BattleHex hex,
+        CreatureServerSide critter, boolean flies, int movesLeft,
+        int cameFrom, boolean ignoreMobileAllies, boolean first)
     {
         Set<BattleHex> set = new HashSet<BattleHex>();
         for (int i = 0; i < 6; i++)
@@ -1221,8 +1220,10 @@ public final class BattleServerSide extends Battle
         }
         else if (showMoves(critter, false).contains(hex))
         {
-            LOGGER.log(Level.INFO, critter.getName() + " moves from "
-                + critter.getCurrentHex().getLabel() + " to " + hex.getLabel());
+            LOGGER
+                .log(Level.INFO, critter.getName() + " moves from "
+                    + critter.getCurrentHex().getLabel() + " to "
+                    + hex.getLabel());
             critter.moveToHex(hex, true);
             return true;
         }
@@ -1234,9 +1235,9 @@ public final class BattleServerSide extends Battle
                 + critter.getCurrentHex().getLabel()
                 + " tried to illegally move to " + hex.getLabel() + " in "
                 + getLocation().getTerrain() + " ("
-                + getAttackingLegion().getMarkerId()
-                + " attacking " + getDefendingLegion().getMarkerId() + ", active: "
-                + markerId + ")");
+                + getAttackingLegion().getMarkerId() + " attacking "
+                + getDefendingLegion().getMarkerId() + ", active: " + markerId
+                + ")");
             return false;
         }
     }
@@ -1277,6 +1278,7 @@ public final class BattleServerSide extends Battle
         }
         return false;
     }
+
     @Override
     protected boolean isOccupied(BattleHex hex)
     {
@@ -1286,8 +1288,10 @@ public final class BattleServerSide extends Battle
     CreatureServerSide getCritter(BattleHex hex)
     {
         assert hex != null;
-        for(CreatureServerSide creature: getAllCritters()) {
-            if(hex.equals(creature.getCurrentHex())) {
+        for (CreatureServerSide creature : getAllCritters())
+        {
+            if (hex.equals(creature.getCurrentHex()))
+            {
                 return creature;
             }
         }

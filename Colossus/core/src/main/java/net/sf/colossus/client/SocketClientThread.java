@@ -736,8 +736,7 @@ final class SocketClientThread extends Thread implements IServer,
             String names = args.remove(0);
             String reason = args.isEmpty() ? "<Unknown>" : args.remove(0);
             client.revealEngagedCreatures(resolveLegion(markerId),
-                resolveCreatureTypes(names),
-                isAttacker, reason);
+                resolveCreatureTypes(names), isAttacker, reason);
         }
         else if (method.equals(Constants.removeDeadBattleChits))
         {
@@ -1009,10 +1008,11 @@ final class SocketClientThread extends Thread implements IServer,
                 splitLegionHasForcedMove = Boolean.valueOf(args.remove(0))
                     .booleanValue();
             }
-            client.didMove(resolveLegion(markerId),
-                resolveHex(startingHexLabel), resolveHex(currentHexLabel),
-                EntrySide.fromLabel(entrySideLabel), teleport,
-                resolveCreatureType(teleportingLord),
+            client
+                .didMove(resolveLegion(markerId),
+                    resolveHex(startingHexLabel), resolveHex(currentHexLabel),
+                    EntrySide.fromLabel(entrySideLabel), teleport,
+                    resolveCreatureType(teleportingLord),
                     splitLegionHasForcedMove);
         }
         else if (method.equals(Constants.undidMove))
@@ -1301,8 +1301,8 @@ final class SocketClientThread extends Thread implements IServer,
         }
         else
         {
-        sendToServer(Constants.doSummon + sep + event.getLegion() + sep
-            + event.getDonor() + sep + event.getAddedCreatureType());
+            sendToServer(Constants.doSummon + sep + event.getLegion() + sep
+                + event.getDonor() + sep + event.getAddedCreatureType());
         }
     }
 

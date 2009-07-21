@@ -18,6 +18,7 @@ import net.sf.colossus.game.BattleUnit;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.util.HTMLColor;
 
+
 public class GUIBattleChit extends Chit
 {
     private static final Logger LOGGER = Logger.getLogger(GUIBattleChit.class

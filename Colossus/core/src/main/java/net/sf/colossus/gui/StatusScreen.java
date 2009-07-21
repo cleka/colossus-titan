@@ -1,7 +1,6 @@
 package net.sf.colossus.gui;
 
 
-
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -280,8 +279,7 @@ final class StatusScreen extends KDialog
         if (gui.getGameClientSide().isBattleOngoing())
         {
             battleActivePlayerLabel.setText(gui.getGameClientSide()
-                .getBattleActivePlayer()
-                .getName());
+                .getBattleActivePlayer().getName());
             int battleTurnNumber = gui.getGameClientSide()
                 .getBattleTurnNumber();
             String battleTurn = "";

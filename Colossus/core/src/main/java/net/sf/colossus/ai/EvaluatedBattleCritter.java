@@ -1,8 +1,10 @@
 package net.sf.colossus.ai;
 
+
 import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
+
 
 /**
  *

@@ -1,7 +1,6 @@
 package net.sf.colossus.gui;
 
 
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -109,8 +108,7 @@ final class PickRecruit extends KDialog
             });
 
             int count = gui.getGame().getCaretaker()
-                .getAvailableCount(
-                recruit);
+                .getAvailableCount(recruit);
             JLabel countLabel = new JLabel(Integer.toString(count));
             countLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             vertPane.add(countLabel);

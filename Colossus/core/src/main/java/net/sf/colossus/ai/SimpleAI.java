@@ -272,8 +272,8 @@ public class SimpleAI extends AbstractAI
 
     public void reinforce(Legion legion)
     {
-        CreatureType recruit = chooseRecruit(((LegionClientSide)legion), legion
-        .getCurrentHex(), false);
+        CreatureType recruit = chooseRecruit(((LegionClientSide)legion),
+            legion.getCurrentHex(), false);
         String recruitName = null;
         String recruiterName = null;
         if (recruit != null)
@@ -371,8 +371,7 @@ public class SimpleAI extends AbstractAI
                         .getEnemyLegions(hex, player).size() == 0)
                     {
                         safeMoves++;
-                        if (!goodRecruit
-                            && couldRecruitUp(legion, hex, null))
+                        if (!goodRecruit && couldRecruitUp(legion, hex, null))
                         {
                             goodRecruit = true;
                         }
@@ -549,7 +548,6 @@ public class SimpleAI extends AbstractAI
         return weakestTwoCritters;
     }
 
-
     // From Hugh Moore:
     //
     // It really depends on how many players there are and how good I
@@ -635,16 +633,15 @@ public class SimpleAI extends AbstractAI
         {
             if (Dice.rollDie() <= 3)
             {
-                splitoffs.add(variant.getCreatureByName(
-                    Constants.titan));
+                splitoffs.add(variant.getCreatureByName(Constants.titan));
                 splitoffs.add(startCre[1]);
                 splitoffs.add(startCre[1]);
                 splitoffs.add(splitCreature);
             }
             else
             {
-                splitoffs.add(variant.getCreatureByName(
-                    variant.getPrimaryAcquirable()));
+                splitoffs.add(variant.getCreatureByName(variant
+                    .getPrimaryAcquirable()));
                 splitoffs.add(nonsplitCreature);
                 splitoffs.add(nonsplitCreature);
                 splitoffs.add(splitCreature);
@@ -654,13 +651,12 @@ public class SimpleAI extends AbstractAI
         {
             if (Dice.rollDie() <= 3)
             {
-                splitoffs.add(variant.getCreatureByName(
-                    Constants.titan));
+                splitoffs.add(variant.getCreatureByName(Constants.titan));
             }
             else
             {
-                splitoffs.add(variant.getCreatureByName(
-                    variant.getPrimaryAcquirable()));
+                splitoffs.add(variant.getCreatureByName(variant
+                    .getPrimaryAcquirable()));
             }
 
             if (Dice.rollDie() <= 3)
@@ -693,16 +689,15 @@ public class SimpleAI extends AbstractAI
         {
             if (Dice.rollDie() <= 3)
             {
-                splitoffs.add(variant.getCreatureByName(
-                    Constants.titan));
+                splitoffs.add(variant.getCreatureByName(Constants.titan));
                 splitoffs.add(nonsplitCreature);
                 splitoffs.add(nonsplitCreature);
                 splitoffs.add(startCre[1]);
             }
             else
             {
-                splitoffs.add(variant.getCreatureByName(
-                    variant.getPrimaryAcquirable()));
+                splitoffs.add(variant.getCreatureByName(variant
+                    .getPrimaryAcquirable()));
                 splitoffs.add(splitCreature);
                 splitoffs.add(splitCreature);
                 splitoffs.add(startCre[1]);
@@ -712,13 +707,12 @@ public class SimpleAI extends AbstractAI
         {
             if (Dice.rollDie() <= 3)
             {
-                splitoffs.add(variant.getCreatureByName(
-                    Constants.titan));
+                splitoffs.add(variant.getCreatureByName(Constants.titan));
             }
             else
             {
-                splitoffs.add(variant.getCreatureByName(
-                    variant.getPrimaryAcquirable()));
+                splitoffs.add(variant.getCreatureByName(variant
+                    .getPrimaryAcquirable()));
             }
 
             if (Dice.rollDie() <= 3)
@@ -805,8 +799,7 @@ public class SimpleAI extends AbstractAI
         if (client.getTurnNumber() == 1
             && player.getMulligansLeft() > 0
             && (client.getGame().getMovementRoll() == 2 || client.getGame()
-                .getMovementRoll() == 5)
-            && !client.tookMulligan())
+                .getMovementRoll() == 5) && !client.tookMulligan())
         {
             client.mulligan();
             // TODO Need to wait for new movement roll.
@@ -912,15 +905,13 @@ public class SimpleAI extends AbstractAI
     {
         for (Legion legion : player.getLegions())
         {
-            List<Legion> friendlyLegions = client
-                .getGameClientSide()
+            List<Legion> friendlyLegions = client.getGameClientSide()
                 .getFriendlyLegions(legion.getCurrentHex(), player);
 
             if (friendlyLegions.size() > 1
-                && !client.getMovement().listNormalMoves(legion,
-                    legion.getCurrentHex(),
-                        client.getGame().getMovementRoll())
-                    .isEmpty())
+                && !client.getMovement()
+                    .listNormalMoves(legion, legion.getCurrentHex(),
+                        client.getGame().getMovementRoll()).isEmpty())
             {
                 // Pick the legion in this hex whose best move has the
                 // least difference with its sitStillValue, scaled by
@@ -1055,8 +1046,8 @@ public class SimpleAI extends AbstractAI
      * hexes, so we probably can't remove it]
      */
     private int evaluateMove(LegionClientSide legion, MasterHex hex,
-        boolean moved,
-        Map<MasterHex, List<Legion>>[] enemyAttackMap, ValueRecorder value)
+        boolean moved, Map<MasterHex, List<Legion>>[] enemyAttackMap,
+        ValueRecorder value)
     {
         // Avoid using MIN_VALUE and MAX_VALUE because of possible overflow.
         final int WIN_GAME = Integer.MAX_VALUE / 2;
@@ -1065,8 +1056,7 @@ public class SimpleAI extends AbstractAI
         //int value = 0;
         // consider making an attack
         final Legion enemyLegion = client.getGameClientSide()
-            .getFirstEnemyLegion(hex, legion
-            .getPlayer());
+            .getFirstEnemyLegion(hex, legion.getPlayer());
 
         if (enemyLegion != null)
         {
@@ -1083,10 +1073,9 @@ public class SimpleAI extends AbstractAI
                     // we score a fraction of a basic acquirable
                     value
                         .add(
-                            ((variant
-                                .getCreatureByName(variant.getPrimaryAcquirable()))
-                        .getPointValue() * enemyPointValue)
-                        / getAcqStepValue(),
+                            ((variant.getCreatureByName(variant
+                                .getPrimaryAcquirable())).getPointValue() * enemyPointValue)
+                                / getAcqStepValue(),
                             "Fraction Basic Acquirable");
                     // plus a fraction of a titan strength
                     // TODO Should be by variant
@@ -1145,8 +1134,7 @@ public class SimpleAI extends AbstractAI
                     }
                     // don't do this if we'll lose our only summonable group
                     // and won't score enough points to make up for it
-                    else if (legion.hasSummonable()
-                        && !haveOtherSummonables
+                    else if (legion.hasSummonable() && !haveOtherSummonables
                         && enemyPointValue < getAcqStepValue() * .88)
                     {
                         value.add(LOSE_LEGION + 5, "Lose Legion");
@@ -1156,10 +1144,8 @@ public class SimpleAI extends AbstractAI
                         // we score a fraction of a basic acquirable
                         value
                             .add(
-                                ((variant
-                                    .getCreatureByName(variant
-                                        .getPrimaryAcquirable()))
-                                    .getPointValue() * enemyPointValue)
+                                ((variant.getCreatureByName(variant
+                                    .getPrimaryAcquirable())).getPointValue() * enemyPointValue)
                                     / getAcqStepValue(),
                                 "Fraction Basic Acquirable 2");
                         // plus a fraction of a titan strength
@@ -1346,8 +1332,7 @@ public class SimpleAI extends AbstractAI
                 // this would be essentially minimax but ignoring the
                 // others players ability to move.
                 Legion enemy = client.getGameClientSide().getFirstEnemyLegion(
-                    nextHex, legion
-                    .getPlayer());
+                    nextHex, legion.getPlayer());
 
                 if (enemy != null
                     && estimateBattleResults(legion, enemy, nextHex) != WIN_WITH_MINIMAL_LOSSES)
@@ -2063,8 +2048,7 @@ public class SimpleAI extends AbstractAI
         {
             // Don't know the power, so just estimate.
             LOGGER.warning("Called SimpleAI.getCombatValue() for Titan");
-            return 6 * variant
-                .getCreatureByName("Titan").getSkill();
+            return 6 * variant.getCreatureByName("Titan").getSkill();
         }
 
         int val = (creature).getPointValue();
@@ -2089,9 +2073,7 @@ public class SimpleAI extends AbstractAI
 
     private int getTitanCombatValue(int power)
     {
-        int val = power
-            * variant.getCreatureByName("Titan")
-                .getSkill();
+        int val = power * variant.getCreatureByName("Titan").getSkill();
         if (power < 9)
         {
             val -= (6 + 2 * (9 - power));
@@ -2293,9 +2275,9 @@ public class SimpleAI extends AbstractAI
             if (!moveList.isEmpty())
             {
                 CritterMove cm2 = moveList.get(0);
-                 /* LOGGER.finest("Moving " + critter.getDescription() + " to "
-                   + cm2.getEndingHex().getLabel() + " (startingHexLabel was "
-                   + cm.getStartingHex().getLabel() + ")"); */
+                /* LOGGER.finest("Moving " + critter.getDescription() + " to "
+                  + cm2.getEndingHex().getLabel() + " (startingHexLabel was "
+                  + cm.getStartingHex().getLabel() + ")"); */
                 client.tryBattleMove(cm2);
             }
         }
@@ -2528,8 +2510,7 @@ public class SimpleAI extends AbstractAI
         for (BattleHex hex : moves)
         {
             ValueRecorder why = new ValueRecorder();
-            CritterMove cm = new CritterMove(critter, currentHex,
-                hex);
+            CritterMove cm = new CritterMove(critter, currentHex, hex);
 
             // Need to move the critter to evaluate.
             critter.moveToHex(hex);
@@ -2718,8 +2699,8 @@ public class SimpleAI extends AbstractAI
                 * getCombatValue(critter, terrain), "StayingOffboard");
             return;
         }
-        PowerSkill ps = calcBonus(critter.getCreatureType(), hex
-        .getTerrain().getName(), true);
+        PowerSkill ps = calcBonus(critter.getCreatureType(), hex.getTerrain()
+            .getName(), true);
         int native_power = ps.getPowerAttack() + (ps.getPowerDefend() + power);
         int native_skill = ps.getSkillAttack() + ps.getSkillDefend();
         // Add for sitting in favorable terrain.
@@ -2891,7 +2872,8 @@ public class SimpleAI extends AbstractAI
                     .intValue();
                 if (numAttackingThisTarget > 1)
                 {
-                    value.add(bec.GANG_UP_ON_CREATURE, "GangUpOnCreature RangeStrike");
+                    value.add(bec.GANG_UP_ON_CREATURE,
+                        "GangUpOnCreature RangeStrike");
                 }
             }
         }
@@ -2983,7 +2965,8 @@ public class SimpleAI extends AbstractAI
                     .intValue();
                 if (numAttackingThisTarget > 1)
                 {
-                    value.add(bec.GANG_UP_ON_CREATURE, "GangUpOnCreature Strike");
+                    value.add(bec.GANG_UP_ON_CREATURE,
+                        "GangUpOnCreature Strike");
                 }
             }
 
@@ -2998,13 +2981,17 @@ public class SimpleAI extends AbstractAI
 
         if (legion.equals(client.getAttacker()))
         {
-            value.add(bec.ATTACKER_KILL_SCALE_FACTOR * killValue, "AttackerKillValueScaled");
-            value.add(bec.KILLABLE_TARGETS_SCALE_FACTOR * numKillableTargets, "AttackerNumKillable");
+            value.add(bec.ATTACKER_KILL_SCALE_FACTOR * killValue,
+                "AttackerKillValueScaled");
+            value.add(bec.KILLABLE_TARGETS_SCALE_FACTOR * numKillableTargets,
+                "AttackerNumKillable");
         }
         else
         {
-            value.add(bec.DEFENDER_KILL_SCALE_FACTOR * killValue, "DefenderKillValueScaled");
-            value.add(bec.KILLABLE_TARGETS_SCALE_FACTOR * numKillableTargets, "DefenderNumKillable");
+            value.add(bec.DEFENDER_KILL_SCALE_FACTOR * killValue,
+                "DefenderKillValueScaled");
+            value.add(bec.KILLABLE_TARGETS_SCALE_FACTOR * numKillableTargets,
+                "DefenderNumKillable");
         }
 
         int hits = critter.getHits();
@@ -3055,15 +3042,16 @@ public class SimpleAI extends AbstractAI
         final BattleHex hex = critter.getCurrentHex();
         final int turn = client.getBattleTurnNumber();
 
-        PowerSkill ps = calcBonus(critter.getCreatureType(), hex
-        .getTerrain().getName(), true);
+        PowerSkill ps = calcBonus(critter.getCreatureType(), hex.getTerrain()
+            .getName(), true);
 
         int native_power = ps.getPowerAttack() + (ps.getPowerDefend() + power);
         int native_skill = ps.getSkillAttack() + ps.getSkillDefend();
 
         evaluateCritterMove_Terrain(critter, value, terrain, hex, power, skill);
 
-        if (hex.isEntrance()) {
+        if (hex.isEntrance())
+        {
             return value.getValue();
         }
 

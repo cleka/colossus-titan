@@ -1,11 +1,13 @@
 package net.sf.colossus.ai;
 
+
 import java.util.logging.Logger;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.game.Battle;
 import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
+
 
 /** The tactical objective of killing a certain number of a specific
  * CreatureType.
@@ -22,16 +24,16 @@ import net.sf.colossus.game.Legion;
  */
 class DestroyCreatureTacticalObjective extends AbstractTacticalObjective
 {
-    private static final Logger LOGGER = Logger.getLogger(
-            DestroyCreatureTacticalObjective.class.getName());
+    private static final Logger LOGGER = Logger
+        .getLogger(DestroyCreatureTacticalObjective.class.getName());
     private final Creature critter;
     private final Legion killlegion;
     private final Client client;
     private final int count;
     private final int number;
 
-    DestroyCreatureTacticalObjective(float priority, Client client, Legion killlegion,
-            Creature critter, int number)
+    DestroyCreatureTacticalObjective(float priority, Client client,
+        Legion killlegion, Creature critter, int number)
     {
         super(priority);
         this.number = number;
@@ -41,9 +43,9 @@ class DestroyCreatureTacticalObjective extends AbstractTacticalObjective
         count = killlegion.numCreature(critter.getType());
         if (count < number)
         {
-            LOGGER.warning("Trying to kill + number + "  + critter.getName()
-                    + " but there is only " + count + " in "
-                    + killlegion.getMarkerId());
+            LOGGER.warning("Trying to kill + number + " + critter.getName()
+                + " but there is only " + count + " in "
+                + killlegion.getMarkerId());
         }
     }
 
@@ -71,15 +73,14 @@ class DestroyCreatureTacticalObjective extends AbstractTacticalObjective
                 for (BattleCritter aCritter : client.getActiveBattleUnits())
                 {
                     int range = Battle.getRange(dCritter.getCurrentHex(),
-                            aCritter.getCurrentHex(), false);
+                        aCritter.getCurrentHex(), false);
                     if (range == 2)
                     {
                         lcount += aCritter.getPointValue();
                     }
                     else if (aCritter.isRangestriker()
-                          && (range <= aCritter.getSkill())
-                          && (aCritter.useMagicMissile()
-                           || (!dCritter.isLord())))
+                        && (range <= aCritter.getSkill())
+                        && (aCritter.useMagicMissile() || (!dCritter.isLord())))
                     {
                         lcount += aCritter.getPointValue() / 2;
                     }

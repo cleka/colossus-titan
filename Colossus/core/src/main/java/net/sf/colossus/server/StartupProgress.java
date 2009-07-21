@@ -1,7 +1,6 @@
 package net.sf.colossus.server;
 
 
-
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.TextArea;

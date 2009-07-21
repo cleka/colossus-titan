@@ -54,8 +54,8 @@ import org.jdom.Element;
  */
 public final class StaticResourceLoader
 {
-    private static final Logger LOGGER = Logger.getLogger(StaticResourceLoader.class
-        .getName());
+    private static final Logger LOGGER = Logger
+        .getLogger(StaticResourceLoader.class.getName());
 
     public static final String FILESERVER_IGNOREFAIL_SIGNAL = "~/~Ignore-Fail~/~";
 

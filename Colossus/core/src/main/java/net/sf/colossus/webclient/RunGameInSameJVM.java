@@ -21,7 +21,6 @@ public class RunGameInSameJVM extends Thread implements IGameRunner,
     private static final Logger LOGGER = Logger
         .getLogger(RunGameInSameJVM.class.getName());
 
-
     /** To exchange data between us and the GetPlayersWeb dialog
      *  when game is started locally
      */
@@ -45,7 +44,8 @@ public class RunGameInSameJVM extends Thread implements IGameRunner,
         this.webClient = webClient;
 
         gi.setGameRunner(this);
-        LOGGER.info("RunGameInSameJVM for gameId " + gi.getGameId() + " created.");
+        LOGGER.info("RunGameInSameJVM for gameId " + gi.getGameId()
+            + " created.");
 
         startHandler = new StartGameForWebclient(whatNextManager);
 

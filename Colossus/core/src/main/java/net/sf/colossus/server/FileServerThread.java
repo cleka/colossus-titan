@@ -30,8 +30,7 @@ final class FileServerThread extends Thread
 
     private ServerSocket fileServer;
 
-    private static final String separator =
-        StaticResourceLoader.REQUEST_TOKEN_SEPARATOR;
+    private static final String separator = StaticResourceLoader.REQUEST_TOKEN_SEPARATOR;
 
     private final Server server;
     private final int port;
@@ -151,13 +150,13 @@ final class FileServerThread extends Thread
                         // this yet), make the client one day submit the
                         // ignore-fail signal, and remove this
                         //  markersFileName/README temporary hack.
-/*
-                        if (filename.startsWith(Constants.markersNameFile)
-                            || filename.startsWith("README"))
-                        {
-                            ignoreFail = true;
-                        }
-*/
+                        /*
+                                                if (filename.startsWith(Constants.markersNameFile)
+                                                    || filename.startsWith("README"))
+                                                {
+                                                    ignoreFail = true;
+                                                }
+                        */
                         byte[] data = StaticResourceLoader.getBytesFromFile(
                             filename, li, true, ignoreFail);
 

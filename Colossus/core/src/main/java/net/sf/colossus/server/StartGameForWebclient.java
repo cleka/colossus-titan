@@ -1,10 +1,12 @@
 package net.sf.colossus.server;
 
+
 import java.util.logging.Logger;
 
 import net.sf.colossus.common.IStartHandler;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.common.WhatNextManager;
+
 
 public class StartGameForWebclient implements IStartHandler
 {
@@ -14,7 +16,6 @@ public class StartGameForWebclient implements IStartHandler
     private final WhatNextManager whatNextManager;
     private GameServerSide game;
     private String username;
-
 
     public StartGameForWebclient(WhatNextManager whatNextMgr)
     {

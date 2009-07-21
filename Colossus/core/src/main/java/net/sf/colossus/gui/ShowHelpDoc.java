@@ -1,7 +1,6 @@
 package net.sf.colossus.gui;
 
 
-
 import javax.swing.JTextArea;
 
 import net.sf.colossus.guiutil.KFrame;

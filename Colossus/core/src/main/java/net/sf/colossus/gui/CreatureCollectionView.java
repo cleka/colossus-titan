@@ -1,7 +1,6 @@
 package net.sf.colossus.gui;
 
 
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -215,8 +214,7 @@ class CreatureCollectionView extends KDialog
                     type);
                 int maxcount = type.getMaxCount();
                 int deadCount = gui.getGame().getCaretaker()
-                    .getDeadCount(
-                    type);
+                    .getDeadCount(type);
                 int inGameCount = maxcount - (deadCount + count);
 
                 // safety check
@@ -337,9 +335,9 @@ class CreatureCollectionView extends KDialog
         }
 
         int minX = minSingleX * 5;
-        int minY = ((CHIT_SIZE + 8 + (2 * (int) baseLabel.getPreferredSize().
-                getHeight())) * ((gui.getGame().getVariant().
-                getCreatureTypes().size() + 4) / 5))
+        int minY = ((CHIT_SIZE + 8 + (2 * (int)baseLabel.getPreferredSize()
+            .getHeight())) * ((gui.getGame().getVariant().getCreatureTypes()
+            .size() + 4) / 5))
             + CHIT_SIZE;
 
         return new Dimension(minX, minY);

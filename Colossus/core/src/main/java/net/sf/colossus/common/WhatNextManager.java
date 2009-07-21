@@ -70,6 +70,7 @@ public class WhatNextManager
         LOGGER.log(Level.INFO, "howManyGamesLeft now " + howManyGamesLeft);
         return howManyGamesLeft;
     }
+
     /**
      * Trigger a timed Quit, which will (by using a demon thread) terminate
      * the JVM after a timeout (currently 10 seconds)

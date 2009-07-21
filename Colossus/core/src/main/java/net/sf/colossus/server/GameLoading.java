@@ -20,6 +20,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 
+
 public class GameLoading
 {
     private static final Logger LOGGER = Logger.getLogger(GameLoading.class
@@ -97,8 +98,7 @@ public class GameLoading
             }
             String name = latestSaveFilename(filenames);
             System.out.println("name " + name);
-            file = new File(Constants.SAVE_DIR_NAME
-                + name);
+            file = new File(Constants.SAVE_DIR_NAME + name);
         }
         else if (filename.indexOf("/") >= 0 || filename.indexOf("\\") >= 0)
         {
@@ -180,7 +180,6 @@ public class GameLoading
 
             VariantSupport.freshenVariant(fil.getValue(), dir.getValue());
 
-
             // then load data files
             List<Element> datafilesElements = root.getChildren("DataFile");
             Iterator<Element> it = datafilesElements.iterator();
@@ -194,8 +193,8 @@ public class GameLoading
                     String content = ((CDATA)contentList.get(0)).getText();
                     LOGGER.finest("DataFileKey: " + mapKey
                         + " DataFileContent :\n" + content);
-                    StaticResourceLoader
-                        .putIntoFileCache(mapKey, content.getBytes());
+                    StaticResourceLoader.putIntoFileCache(mapKey, content
+                        .getBytes());
                 }
                 else
                 {
@@ -205,8 +204,8 @@ public class GameLoading
 
             // we're server, but the file generation process has been done
             // by loading the savefile.
-            this.variant = VariantSupport.loadVariant(varName, fil
-                .getValue(), dir.getValue(), false);
+            this.variant = VariantSupport.loadVariant(varName, fil.getValue(),
+                dir.getValue(), false);
 
         }
         catch (Exception e)

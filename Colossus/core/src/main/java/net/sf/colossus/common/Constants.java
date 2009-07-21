@@ -49,8 +49,8 @@ public final class Constants
     // Constants for savegames
 
     /** Must include trailing slash. */
-    public static final String SAVE_DIR_NAME = DEFAULT_COLOSSUS_HOME + File.separator
-        + "saves" + File.separator;
+    public static final String SAVE_DIR_NAME = DEFAULT_COLOSSUS_HOME
+        + File.separator + "saves" + File.separator;
     public static final String XML_EXTENSION = ".xml";
     public static final String XML_SNAPSHOT_START = "snap";
     public static final String XML_SNAPSHOT_VERSION = "13";
@@ -138,7 +138,7 @@ public final class Constants
     public static final String defaultAI = anyAI;
     public static final String[] aiArray = { "SimpleAI", "CowardSimpleAI",
         "RationalAI", "HumanHaterRationalAI", "MilvangAI", "ExperimentalAI"
-        // , "ParallelEvaluatorAI"
+    // , "ParallelEvaluatorAI"
     };
 
     // Auto play for human players uses SimpleAI:

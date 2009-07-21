@@ -20,8 +20,7 @@ public class RemoteLogHandler extends Handler
     public RemoteLogHandler()
     {
         super();
-        net.sf.colossus.util.InstanceTracker.register(this,
-            "TheServerRLH");
+        net.sf.colossus.util.InstanceTracker.register(this, "TheServerRLH");
     }
 
     public boolean requiresLayout()

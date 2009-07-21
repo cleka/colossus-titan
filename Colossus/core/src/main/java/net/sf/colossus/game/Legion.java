@@ -488,8 +488,6 @@ public abstract class Legion
         return true;
     }
 
-
-
     /**
      * Data for one pending decision. For example, for crossing the 500
      * there will be a decision, whether the player takes for this legion

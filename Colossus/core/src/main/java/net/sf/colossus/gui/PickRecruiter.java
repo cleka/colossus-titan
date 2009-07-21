@@ -1,7 +1,6 @@
 package net.sf.colossus.gui;
 
 
-
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -94,8 +93,7 @@ final class PickRecruiter extends KDialog
         {
             if (potentialRecruiterName.equals(Constants.titan))
             {
-                potentialRecruiterName = legion.getPlayer()
-                    .getTitanBasename();
+                potentialRecruiterName = legion.getPlayer().getTitanBasename();
             }
             final String realRecruiterName = potentialRecruiterName;
             Chit chit = new Chit(scale, realRecruiterName);

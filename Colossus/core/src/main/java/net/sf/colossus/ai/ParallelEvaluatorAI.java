@@ -1,5 +1,6 @@
 package net.sf.colossus.ai;
 
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -11,6 +12,7 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.common.Constants;
+
 
 /**
  * DON'T USE THAT ONE YET.
@@ -34,8 +36,8 @@ import net.sf.colossus.common.Constants;
  */
 public class ParallelEvaluatorAI extends ExperimentalAI // NO_UCD
 {
-    private static final Logger LOGGER = Logger.getLogger(
-            ParallelEvaluatorAI.class.getName());
+    private static final Logger LOGGER = Logger
+        .getLogger(ParallelEvaluatorAI.class.getName());
 
     public ParallelEvaluatorAI(Client client)
     {
@@ -60,12 +62,13 @@ public class ParallelEvaluatorAI extends ExperimentalAI // NO_UCD
             Timer timer = new Timer();
             this.timeIsUp = false;
             final int MS_PER_S = 1000;
-            if (timeLimit < Constants.MIN_AI_TIME_LIMIT || timeLimit >
-                    Constants.MAX_AI_TIME_LIMIT)
+            if (timeLimit < Constants.MIN_AI_TIME_LIMIT
+                || timeLimit > Constants.MAX_AI_TIME_LIMIT)
             {
                 timeLimit = Constants.DEFAULT_AI_TIME_LIMIT;
             }
-            timer.schedule(new ThreadedTriggerTimeIsUp(), MS_PER_S * timeLimit);
+            timer
+                .schedule(new ThreadedTriggerTimeIsUp(), MS_PER_S * timeLimit);
             return timer;
         }
 
@@ -77,7 +80,6 @@ public class ParallelEvaluatorAI extends ExperimentalAI // NO_UCD
                 timeIsUp = true;
             }
         }
-
 
         private final Iterator<LegionMove> iterator;
 
@@ -118,13 +120,15 @@ public class ParallelEvaluatorAI extends ExperimentalAI // NO_UCD
                     {
                         bestScore = score;
                         best = lm;
-                        LOGGER.finest("INTERMEDIATE Best legion move: " + lm.
-                                getStringWithEvaluation() + " (" + score + ")");
+                        LOGGER.finest("INTERMEDIATE Best legion move: "
+                            + lm.getStringWithEvaluation() + " (" + score
+                            + ")");
                     }
                     else
                     {
-                        LOGGER.finest("INTERMEDIATE      legion move: " + lm.
-                                getStringWithEvaluation() + " (" + score + ")");
+                        LOGGER.finest("INTERMEDIATE      legion move: "
+                            + lm.getStringWithEvaluation() + " (" + score
+                            + ")");
                     }
 
                     count++;
@@ -133,24 +137,27 @@ public class ParallelEvaluatorAI extends ExperimentalAI // NO_UCD
                     {
                         if (count >= MIN_ITERATIONS)
                         {
-                            LOGGER.finest("findBestLegionMove() time up after " +
-                                    count + " iterations");
+                            LOGGER
+                                .finest("findBestLegionMove() time up after "
+                                    + count + " iterations");
                             break;
                         }
                         else
                         {
-                            LOGGER.finest("findBestLegionMove() time up after " +
-                                    count +
-                                    " iterations, but we keep searching until " +
-                                    MIN_ITERATIONS);
+                            LOGGER
+                                .finest("findBestLegionMove() time up after "
+                                    + count
+                                    + " iterations, but we keep searching until "
+                                    + MIN_ITERATIONS);
                         }
                     }
                 }
             }
             findBestLegionMoveTimer.cancel();
-            LOGGER.finer("Best legion move of " + count + " checked (turn " +
-                    client.getBattleTurnNumber() + "): " + ((best == null) ? "none "
-                    : best.getStringWithEvaluation()) + " (" + bestScore + ")");
+            LOGGER.finer("Best legion move of " + count + " checked (turn "
+                + client.getBattleTurnNumber() + "): "
+                + ((best == null) ? "none " : best.getStringWithEvaluation())
+                + " (" + bestScore + ")");
         }
     }
 
@@ -169,17 +176,20 @@ public class ParallelEvaluatorAI extends ExperimentalAI // NO_UCD
 
         Iterator<LegionMove> iterator = legionMoves.iterator();
 
-        for (int i = 0 ; i < NTHREADS ; i++) {
+        for (int i = 0; i < NTHREADS; i++)
+        {
             threads[i] = new findBestLegionMoveThread(iterator);
             LOGGER.finest("Starting Thread number " + i);
             threads[i].start();
         }
-        for (int i = 0 ; i < NTHREADS ; i++) {
+        for (int i = 0; i < NTHREADS; i++)
+        {
             try
             {
                 threads[i].join();
                 bests[i] = threads[i].best;
-            } catch (InterruptedException ex)
+            }
+            catch (InterruptedException ex)
             {
                 LOGGER.log(Level.SEVERE, null, ex);
             }
@@ -206,8 +216,8 @@ public class ParallelEvaluatorAI extends ExperimentalAI // NO_UCD
         }
         LOGGER.finer("// Best legion move (turn "
             + client.getBattleTurnNumber() + "): "
-            + (best == null ? "none": best.getStringWithEvaluation())
-            + " (" + (best == null ? "-" : (""+best.getValue())) + ")");
+            + (best == null ? "none" : best.getStringWithEvaluation()) + " ("
+            + (best == null ? "-" : ("" + best.getValue())) + ")");
         return best;
     }
 }

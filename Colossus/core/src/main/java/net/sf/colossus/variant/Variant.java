@@ -45,7 +45,6 @@ public class Variant
     private final int titanImprove;
     private final int titanTeleport;
 
-
     /**
      * A map for fast lookup of creatures by their name.
      *
@@ -221,7 +220,6 @@ public class Variant
         return summonableCreatureTypes;
     }
 
-
     /**
      * Used internally to record the Acquirable name, points needed for
      * recruiting, and the list of terrains in which the Acquirable dwells.
@@ -329,8 +327,8 @@ public class Variant
      * terrain, for this amount of points.
      * @see #getAcquirableRecruitmentsValue()
      */
-    public List<String> getRecruitableAcquirableList(
-        MasterBoardTerrain t, int value)
+    public List<String> getRecruitableAcquirableList(MasterBoardTerrain t,
+        int value)
     {
         List<String> al = new ArrayList<String>();
         if ((value % getAcquirableRecruitmentsValue()) != 0)
@@ -408,5 +406,3 @@ public class Variant
         return 7;
     }
 }
-
-

@@ -8,7 +8,6 @@ import java.io.InputStreamReader;
 import net.sf.colossus.util.InstanceTracker;
 
 
-
 /**
  *  some small methods helpful during development,
  *  to wait before program ends to see object instance
@@ -120,8 +119,7 @@ public class DebugMethods
 
                 if (line.equals("f"))
                 {
-                    DummyFrameWithMenu f1 = new DummyFrameWithMenu(
-                        "" + cnt);
+                    DummyFrameWithMenu f1 = new DummyFrameWithMenu("" + cnt);
                     cnt++;
 
                     try

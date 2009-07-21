@@ -22,17 +22,15 @@ public class HazardHexside extends Hazards
 
     public HazardHexside(String name, char code,
         EffectOnMovement effectOnGroundMovement,
-        EffectOnMovement effectOnFlyerMovement,
-        CombatEffect defenseEffect,
-        CombatEffect attackEffect,
-        CombatEffect rangedDefenseEffect,
+        EffectOnMovement effectOnFlyerMovement, CombatEffect defenseEffect,
+        CombatEffect attackEffect, CombatEffect rangedDefenseEffect,
         CombatEffect rangedAttackEffect,
         RangeStrikeSpecialEffect RangeStrikeSpecial,
         SpecialEffect terrainSpecial)
     {
         super(name, code, effectOnGroundMovement, effectOnFlyerMovement,
-            defenseEffect, attackEffect, rangedDefenseEffect, rangedAttackEffect,
-            RangeStrikeSpecial, terrainSpecial);
+            defenseEffect, attackEffect, rangedDefenseEffect,
+            rangedAttackEffect, RangeStrikeSpecial, terrainSpecial);
         HEXSIDE_MAP.put(name, this);
         HEXSIDE_MAP_UGLY.put(new Character(code), this);
     }
@@ -62,49 +60,74 @@ public class HazardHexside extends Hazards
         return HEXSIDE_MAP.values();
     }
 
-    public static final HazardHexside NOTHING = new HazardHexside("Nothing",
-        ' ', EffectOnMovement.FREEMOVE, EffectOnMovement.FREEMOVE,
+    public static final HazardHexside NOTHING = new HazardHexside(
+        "Nothing",
+        ' ',
+        EffectOnMovement.FREEMOVE,
+        EffectOnMovement.FREEMOVE,
         new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
         new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
         new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
         new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
         RangeStrikeSpecialEffect.RANGESTRIKEFREE, SpecialEffect.NOSPECIAL);
 
-    public static final HazardHexside DUNE = new HazardHexside("Dune", 'd',
-        EffectOnMovement.FREEMOVE, EffectOnMovement.FREEMOVE,
-        new CombatEffect(EffectOnStrike.POWERPENALTY, ScopeOfEffectOnStrike.FOREIGNERS, 1),
-        new CombatEffect(EffectOnStrike.POWERBONUS, ScopeOfEffectOnStrike.NATIVES, 2),
+    public static final HazardHexside DUNE = new HazardHexside(
+        "Dune",
+        'd',
+        EffectOnMovement.FREEMOVE,
+        EffectOnMovement.FREEMOVE,
+        new CombatEffect(EffectOnStrike.POWERPENALTY,
+            ScopeOfEffectOnStrike.FOREIGNERS, 1),
+        new CombatEffect(EffectOnStrike.POWERBONUS,
+            ScopeOfEffectOnStrike.NATIVES, 2),
         new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
         new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
         RangeStrikeSpecialEffect.RANGESTRIKEOCCUPIED, SpecialEffect.NOSPECIAL);
 
-    public static final HazardHexside CLIFF = new HazardHexside("Cliff", 'c',
-        EffectOnMovement.BLOCKALL, EffectOnMovement.FREEMOVE,
+    public static final HazardHexside CLIFF = new HazardHexside(
+        "Cliff",
+        'c',
+        EffectOnMovement.BLOCKALL,
+        EffectOnMovement.FREEMOVE,
         new CombatEffect(EffectOnStrike.BLOCKED, ScopeOfEffectOnStrike.ALL, 0),
         new CombatEffect(EffectOnStrike.BLOCKED, ScopeOfEffectOnStrike.ALL, 0),
         new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
         new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
         RangeStrikeSpecialEffect.RANGESTRIKEOCCUPIED, SpecialEffect.NOSPECIAL);
 
-    public static final HazardHexside SLOPE = new HazardHexside("Slope", 's',
-        EffectOnMovement.SLOWFOREIGNER, EffectOnMovement.FREEMOVE,
-        new CombatEffect(EffectOnStrike.SKILLPENALTY, ScopeOfEffectOnStrike.FOREIGNERS, 1),
-        new CombatEffect(EffectOnStrike.POWERBONUS, ScopeOfEffectOnStrike.NATIVES, 1),
+    public static final HazardHexside SLOPE = new HazardHexside(
+        "Slope",
+        's',
+        EffectOnMovement.SLOWFOREIGNER,
+        EffectOnMovement.FREEMOVE,
+        new CombatEffect(EffectOnStrike.SKILLPENALTY,
+            ScopeOfEffectOnStrike.FOREIGNERS, 1),
+        new CombatEffect(EffectOnStrike.POWERBONUS,
+            ScopeOfEffectOnStrike.NATIVES, 1),
         new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
         new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
         RangeStrikeSpecialEffect.RANGESTRIKEOCCUPIED, SpecialEffect.NOSPECIAL);
 
-    public static final HazardHexside TOWER = new HazardHexside("Tower", 'w',
-        EffectOnMovement.SLOWALL, EffectOnMovement.FREEMOVE,
-        new CombatEffect(EffectOnStrike.SKILLBONUS, ScopeOfEffectOnStrike.ALL, 1),
-        new CombatEffect(EffectOnStrike.SKILLPENALTY, ScopeOfEffectOnStrike.ALL, 1),
-        new CombatEffect(EffectOnStrike.SKILLPENALTY, ScopeOfEffectOnStrike.ALL, 1),
+    public static final HazardHexside TOWER = new HazardHexside(
+        "Tower",
+        'w',
+        EffectOnMovement.SLOWALL,
+        EffectOnMovement.FREEMOVE,
+        new CombatEffect(EffectOnStrike.SKILLBONUS, ScopeOfEffectOnStrike.ALL,
+            1),
+        new CombatEffect(EffectOnStrike.SKILLPENALTY,
+            ScopeOfEffectOnStrike.ALL, 1),
+        new CombatEffect(EffectOnStrike.SKILLPENALTY,
+            ScopeOfEffectOnStrike.ALL, 1),
         new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
         RangeStrikeSpecialEffect.RANGESTRIKEWALL, SpecialEffect.NOSPECIAL);
 
     // TODO Verify
-    public static final HazardHexside RIVER = new HazardHexside("River", 'r',
-        EffectOnMovement.BLOCKFOREIGNER, EffectOnMovement.FREEMOVE,
+    public static final HazardHexside RIVER = new HazardHexside(
+        "River",
+        'r',
+        EffectOnMovement.BLOCKFOREIGNER,
+        EffectOnMovement.FREEMOVE,
         new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
         new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
         new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),

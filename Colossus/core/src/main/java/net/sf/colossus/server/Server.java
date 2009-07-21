@@ -936,11 +936,8 @@ public final class Server extends Thread implements IServer
                 : "newer");
             logToStartLog("WARNING: Client version mismatch detected!!!\n"
                 + "One client attempted to join with player name "
-                + playerName
-                + ", using different ("
-                + diffWhat
-                + ") client version: "
-                + clientVersion
+                + playerName + ", using different (" + diffWhat
+                + ") client version: " + clientVersion
                 + " - trying it anyway.");
             disableAutoCloseStartupLog();
             LOGGER.warning("Client " + playerName + " uses Client Version: "
@@ -1149,7 +1146,7 @@ public final class Server extends Thread implements IServer
         ErrorUtils.showErrorDialog(startLog.getFrame(),
             "Loading game failed!",
             "Loading, replay of history and comparison between saved "
-            + "state and replay result failed!!\n\n"
+                + "state and replay result failed!!\n\n"
                 + "Click Abort on the Startup Progress Dialog to return to "
                 + "Game setup dialog to start a different or new one.");
     }
@@ -1589,10 +1586,10 @@ public final class Server extends Thread implements IServer
             if (!((LegionServerSide)event.getLegion()).canRecruit())
             {
                 int size = event.getLegion().getHeight();
-                LOGGER.severe("Illegal legion " + event.getLegion() + " (height="
-                    + size + ") for recruit: " + event.getAddedCreatureType().getName()
-                    + " recruiterName "
-                    + recruiterName);
+                LOGGER.severe("Illegal legion " + event.getLegion()
+                    + " (height=" + size + ") for recruit: "
+                    + event.getAddedCreatureType().getName()
+                    + " recruiterName " + recruiterName);
                 client.nak(Constants.doRecruit, "Illegal recruit");
             }
 
@@ -1619,8 +1616,7 @@ public final class Server extends Thread implements IServer
                         + event.getLegion().getMarkerId()
                         + " recruit: "
                         + event.getAddedCreatureType().getName()
-                        + " recruiterName "
-                        + recruiterName);
+                        + " recruiterName " + recruiterName);
                 client.nak(Constants.doRecruit, "Illegal recruit");
             }
         }
@@ -1645,9 +1641,9 @@ public final class Server extends Thread implements IServer
         allUpdatePlayerInfo();
 
         int numRecruiters = (recruiter == null ? 0 : TerrainRecruitLoader
-            .numberOfRecruiterNeeded(recruiter, event.getAddedCreatureType(), event
-                .getLegion().getCurrentHex().getTerrain(), event.getLegion()
-                .getCurrentHex()));
+            .numberOfRecruiterNeeded(recruiter, event.getAddedCreatureType(),
+                event.getLegion().getCurrentHex().getTerrain(), event
+                    .getLegion().getCurrentHex()));
         Iterator<IClient> it = clients.iterator();
         while (it.hasNext())
         {

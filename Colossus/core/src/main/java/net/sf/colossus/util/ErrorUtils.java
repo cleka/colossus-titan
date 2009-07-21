@@ -1,5 +1,6 @@
 package net.sf.colossus.util;
 
+
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
@@ -163,7 +164,6 @@ public class ErrorUtils
         // as method name says...
         exitIfStresstest();
 
-
         /* During functional testing, don't bother to show message,
          * instead log it and return immediately:
          */
@@ -233,15 +233,19 @@ public class ErrorUtils
     {
         JFrame f = new JFrame(frameTitle);
         Box panel = new Box(BoxLayout.Y_AXIS);
-        panel.add(new JLabel("This is a dummy frame. It is only created in order to display"));
-        panel.add(new JLabel("a message dialog box, which without this frame might be hidden"));
-        panel.add(new JLabel("behind some other window(s) and is easily missed, because it does"));
+        panel.add(new JLabel(
+            "This is a dummy frame. It is only created in order to display"));
+        panel.add(new JLabel(
+            "a message dialog box, which without this frame might be hidden"));
+        panel
+            .add(new JLabel(
+                "behind some other window(s) and is easily missed, because it does"));
         panel.add(new JLabel("not show up in the task bar..."));
         f.getContentPane().add(panel);
         f.pack();
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        f.setLocation(new Point(d.width / 2 - f.getSize().width / 2,
-            d.height / 2 - f.getSize().height / 2));
+        f.setLocation(new Point(d.width / 2 - f.getSize().width / 2, d.height
+            / 2 - f.getSize().height / 2));
         f.setVisible(true);
         f.requestFocus();
 
@@ -257,7 +261,7 @@ public class ErrorUtils
             cbAccess.setClipboardContents(message);
             ok = true;
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             // Whatever happened here, it does not matter, at least
             // it's not important enough to spoil any higher level
@@ -267,4 +271,3 @@ public class ErrorUtils
         return ok;
     }
 }
-

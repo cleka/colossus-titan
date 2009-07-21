@@ -1,7 +1,6 @@
 package net.sf.colossus.gui;
 
 
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -364,7 +363,8 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
         }
         if (favorites != null)
         {
-            favoriteColors = PlayerColor.getByName(Split.split(',', favorites));
+            favoriteColors = PlayerColor
+                .getByName(Split.split(',', favorites));
         }
         else
         {
@@ -511,7 +511,8 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
 
     private void addColor(PlayerColor color)
     {
-        Color realColor = HTMLColor.stringToColor(color.getName() + "Colossus");
+        Color realColor = HTMLColor
+            .stringToColor(color.getName() + "Colossus");
         JButton button = new JButton(color.getName());
         button.setBackground(realColor);
         int sum = realColor.getRed() + realColor.getGreen()
@@ -582,7 +583,8 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
             {
                 if (newValue != oldValue)
                 {
-                    net.sf.colossus.util.StaticResourceLoader.purgeImageCache();
+                    net.sf.colossus.util.StaticResourceLoader
+                        .purgeImageCache();
                     options.setOption(Options.scale, newValue);
                 }
                 oldValue = newValue;

@@ -1,11 +1,13 @@
 package net.sf.colossus.ai;
 
+
 import java.util.logging.Logger;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.game.Battle;
 import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
+
 
 /** The tactical objective of preserving all of a specific CreatureType.
  *
@@ -23,15 +25,15 @@ import net.sf.colossus.game.Legion;
  */
 class PreserveCreatureTacticalObjective extends AbstractTacticalObjective
 {
-    private static final Logger LOGGER = Logger.getLogger(
-            PreserveCreatureTacticalObjective.class.getName());
+    private static final Logger LOGGER = Logger
+        .getLogger(PreserveCreatureTacticalObjective.class.getName());
     private final Creature critter;
     private final Legion liveLegion;
     private final Client client;
     private final int count;
 
-    PreserveCreatureTacticalObjective(float priority, Client client, Legion liveLegion,
-            Creature critter)
+    PreserveCreatureTacticalObjective(float priority, Client client,
+        Legion liveLegion, Creature critter)
     {
         super(priority);
         this.critter = critter;
@@ -40,8 +42,8 @@ class PreserveCreatureTacticalObjective extends AbstractTacticalObjective
         count = liveLegion.numCreature(critter.getType());
         if (count <= 0)
         {
-            LOGGER.warning("Trying to preserve all " + critter.getName() +
-                    " but there isn't any in " + liveLegion.getMarkerId());
+            LOGGER.warning("Trying to preserve all " + critter.getName()
+                + " but there isn't any in " + liveLegion.getMarkerId());
         }
     }
 
@@ -69,15 +71,14 @@ class PreserveCreatureTacticalObjective extends AbstractTacticalObjective
                 for (BattleCritter aCritter : client.getInactiveBattleUnits())
                 {
                     int range = Battle.getRange(dCritter.getCurrentHex(),
-                            aCritter.getCurrentHex(), false);
+                        aCritter.getCurrentHex(), false);
                     if (range == 2)
                     {
                         lcount += aCritter.getPointValue();
                     }
                     else if (aCritter.isRangestriker()
-                          && (range <= aCritter.getSkill())
-                          && (aCritter.useMagicMissile()
-                           || (!dCritter.isLord())))
+                        && (range <= aCritter.getSkill())
+                        && (aCritter.useMagicMissile() || (!dCritter.isLord())))
                     {
                         lcount += aCritter.getPointValue() / 2;
                     }

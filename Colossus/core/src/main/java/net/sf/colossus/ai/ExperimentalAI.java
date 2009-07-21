@@ -1,5 +1,6 @@
 package net.sf.colossus.ai;
 
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -75,12 +76,11 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
         return r;
     }
 
-
     /** this computes the special case of the Titan critter */
     @Override
     protected void evaluateCritterMove_Titan(final BattleCritter critter,
-            ValueRecorder value, final MasterBoardTerrain terrain,
-            final BattleHex hex, final Legion legion, final int turn)
+        ValueRecorder value, final MasterBoardTerrain terrain,
+        final BattleHex hex, final Legion legion, final int turn)
     {
         if (hex.isEntrance())
         {
@@ -92,64 +92,62 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
         // don't just sit back and wait for a time loss.
         if (!critter.isTitan())
         {
-            LOGGER.warning(
-                    "evaluateCritterMove_Titan called on non-Titan critter");
+            LOGGER
+                .warning("evaluateCritterMove_Titan called on non-Titan critter");
             return;
         }
         if (terrain.isTower() && legion.equals(client.getDefender()))
         {
             // Stick to the center of the tower.
             value.add(bec.TITAN_TOWER_HEIGHT_BONUS * hex.getElevation(),
-                    "TitanTowerHeightBonus");
+                "TitanTowerHeightBonus");
         }
         else
         {
             if (legion.equals(client.getDefender()))
             {
                 // defending titan is a coward.
-                value.add(bec.TITAN_FORWARD_EARLY_PENALTY *
-                        6 - rangeToClosestOpponent(hex),
-                        "Defending TitanForwardEarlyPenalty");
+                value.add(bec.TITAN_FORWARD_EARLY_PENALTY * 6
+                    - rangeToClosestOpponent(hex),
+                    "Defending TitanForwardEarlyPenalty");
                 for (int i = 0; i < 6; i++)
                 {
                     BattleHex neighbor = hex.getNeighbor(i);
-                    if (neighbor == null /* Edge of the map */ || neighbor.
-                            getTerrain().blocksGround() || (neighbor.getTerrain().
-                            isGroundNativeOnly() && !hasOpponentNativeCreature(
-                            neighbor.getTerrain())))
+                    if (neighbor == null /* Edge of the map */
+                        || neighbor.getTerrain().blocksGround()
+                        || (neighbor.getTerrain().isGroundNativeOnly() && !hasOpponentNativeCreature(neighbor
+                            .getTerrain())))
                     {
-                        value.add(
-                                bec.TITAN_BY_EDGE_OR_BLOCKINGHAZARD_BONUS,
-                                "Defending TitanByEdgeOrBlockingHazard (" + i +
-                                ")");
+                        value.add(bec.TITAN_BY_EDGE_OR_BLOCKINGHAZARD_BONUS,
+                            "Defending TitanByEdgeOrBlockingHazard (" + i
+                                + ")");
                     }
                 }
             }
             else
             {
                 // attacking titan should progressively involve itself
-                value.add(Math.round((((float) 4. - turn) /
-                        (float) 3.) *
-                        bec.TITAN_FORWARD_EARLY_PENALTY *
-                        ((float) 6. - rangeToClosestOpponent(hex))),
-                        "Progressive TitanForwardEarlyPenalty");
+                value.add(Math.round((((float)4. - turn) / (float)3.)
+                    * bec.TITAN_FORWARD_EARLY_PENALTY
+                    * ((float)6. - rangeToClosestOpponent(hex))),
+                    "Progressive TitanForwardEarlyPenalty");
                 for (int i = 0; i < 6; i++)
                 {
                     BattleHex neighbor = hex.getNeighbor(i);
-                    if (neighbor == null /* Edge of the map */ || neighbor.
-                            getTerrain().blocksGround() || (neighbor.getTerrain().
-                            isGroundNativeOnly() && !hasOpponentNativeCreature(
-                            neighbor.getTerrain())))
+                    if (neighbor == null /* Edge of the map */
+                        || neighbor.getTerrain().blocksGround()
+                        || (neighbor.getTerrain().isGroundNativeOnly() && !hasOpponentNativeCreature(neighbor
+                            .getTerrain())))
                     {
                         // being close to the edge is not a disavantage, even late
                         // in the battle, so min is 0 point.
-                        value.add(
-                                Math.round(
-                                (Math.max(((float) 4. - turn) /
-                                (float) 3., (float) 0.) *
-                                bec.TITAN_BY_EDGE_OR_BLOCKINGHAZARD_BONUS)),
-                                "Progressive TitanByEdgeOrBlockingHazard (" + i +
-                                ")");
+                        value
+                            .add(
+                                Math
+                                    .round((Math.max(((float)4. - turn)
+                                        / (float)3., (float)0.) * bec.TITAN_BY_EDGE_OR_BLOCKINGHAZARD_BONUS)),
+                                "Progressive TitanByEdgeOrBlockingHazard ("
+                                    + i + ")");
                     }
                 }
             }
@@ -189,26 +187,26 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
             }
             if (range != preferredRange)
             {
-                value.add(bec.DEFENDER_FORWARD_EARLY_PENALTY * Math.abs(range -
-                        preferredRange),
-                        "DefenderForwardEarlyPenalty");
+                value.add(bec.DEFENDER_FORWARD_EARLY_PENALTY
+                    * Math.abs(range - preferredRange),
+                    "DefenderForwardEarlyPenalty");
             }
             for (int i = 0; i < 6; i++)
             {
                 BattleHex neighbor = hex.getNeighbor(i);
-                if (neighbor == null /* Edge of the map */ || neighbor.
-                        getTerrain().blocksGround() || (neighbor.getTerrain().
-                        isGroundNativeOnly() && !hasOpponentNativeCreature(
-                        neighbor.getTerrain())))
+                if (neighbor == null /* Edge of the map */
+                    || neighbor.getTerrain().blocksGround()
+                    || (neighbor.getTerrain().isGroundNativeOnly() && !hasOpponentNativeCreature(neighbor
+                        .getTerrain())))
                 {
                     value.add(bec.DEFENDER_BY_EDGE_OR_BLOCKINGHAZARD_BONUS,
-                            "DefenderByEdgeOrBlockingHazard (" + i + ")");
+                        "DefenderByEdgeOrBlockingHazard (" + i + ")");
                 }
-                else if (neighbor.getTerrain().isDamagingToNonNative() &&
-                        !hasOpponentNativeCreature(neighbor.getTerrain()))
+                else if (neighbor.getTerrain().isDamagingToNonNative()
+                    && !hasOpponentNativeCreature(neighbor.getTerrain()))
                 {
                     value.add(bec.DEFENDER_BY_DAMAGINGHAZARD_BONUS,
-                            "DefenderByDamagingHazard (" + i + ")");
+                        "DefenderByDamagingHazard (" + i + ")");
                 }
             }
         }
@@ -254,11 +252,13 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
             }
             if (numCanBeReached == 1) // TODO: Rangestriker
             {
-                value.add(bec.DEF__AT_MOST_ONE_IS_REACHABLE, "Def_AtMostOneIsReachable");
+                value.add(bec.DEF__AT_MOST_ONE_IS_REACHABLE,
+                    "Def_AtMostOneIsReachable");
             }
             if (maxThatCanReach == 1) // TODO: Rangestriker
             {
-                value.add(bec.DEF__NOONE_IS_GANGBANGED, "Def_NoOneIsGangbanged");
+                value.add(bec.DEF__NOONE_IS_GANGBANGED,
+                    "Def_NoOneIsGangbanged");
             }
             if (nobodyGetsHurt) // TODO: Rangestriker
             {
@@ -284,7 +284,8 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
         super.initBattle();
         if (client.getMyEngagedLegion() != null)
         {
-            IObjectiveHelper helper = new BasicObjectiveHelper(client, this, variant);
+            IObjectiveHelper helper = new BasicObjectiveHelper(client, this,
+                variant);
             if (client.getMyEngagedLegion().equals(client.getDefender()))
             {
                 listObjectives = helper.defenderObjective();
@@ -304,8 +305,8 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
         {
             for (TacticalObjective to : listObjectives)
             {
-                LOGGER.info("Objective:" + to.getDescription() + " -> " + to.
-                        objectiveAttained());
+                LOGGER.info("Objective:" + to.getDescription() + " -> "
+                    + to.objectiveAttained());
             }
             listObjectives = null;
         }

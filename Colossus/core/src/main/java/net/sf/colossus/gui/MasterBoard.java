@@ -1,7 +1,6 @@
 package net.sf.colossus.gui;
 
 
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -274,8 +273,7 @@ public final class MasterBoard extends JPanel
                     Options.dubiousAsBlanks);
                 final JPanel panel = new LegionInfoPanel(legion, scale,
                     PANEL_MARGIN, PANEL_PADDING, true, gui.getViewMode(),
-                    client.isMyLegion(legion),
-                    dubiousAsBlanks, true);
+                    client.isMyLegion(legion), dubiousAsBlanks, true);
                 add(panel);
                 legionFlyouts[i] = panel;
 
@@ -857,8 +855,7 @@ public final class MasterBoard extends JPanel
                     + "Colossus home:  " + colossusHome + "\n"
                     + "Log directory:  " + logDirectory + "\n"
                     + "java.version:   " + System.getProperty("java.version"),
-                    "About Colossus",
-                    JOptionPane.INFORMATION_MESSAGE);
+                    "About Colossus", JOptionPane.INFORMATION_MESSAGE);
             }
         };
 
@@ -1357,8 +1354,8 @@ public final class MasterBoard extends JPanel
         {
             return;
         }
-        List<Legion> legions = gui.getGameClientSide()
-            .getLegionsByHex(masterHex);
+        List<Legion> legions = gui.getGameClientSide().getLegionsByHex(
+            masterHex);
 
         int numLegions = legions.size();
         if (numLegions == 0)
@@ -1483,7 +1480,8 @@ public final class MasterBoard extends JPanel
     {
         List<String> directories = new ArrayList<String>();
         directories.add(Constants.defaultDirName
-            + StaticResourceLoader.getPathSeparator() + Constants.imagesDirName);
+            + StaticResourceLoader.getPathSeparator()
+            + Constants.imagesDirName);
 
         String[] iconNames = {
             Constants.masterboardIconImage,
@@ -1492,8 +1490,8 @@ public final class MasterBoard extends JPanel
             Constants.masterboardIconSubscript + "-Subscript-"
                 + Constants.masterboardIconTextColor };
 
-        Image image = StaticResourceLoader.getCompositeImage(iconNames, directories,
-            60, 60);
+        Image image = StaticResourceLoader.getCompositeImage(iconNames,
+            directories, 60, 60);
 
         if (image == null)
         {

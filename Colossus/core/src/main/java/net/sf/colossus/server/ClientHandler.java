@@ -290,8 +290,7 @@ final class ClientHandler implements IClient
             if (args.size() < 2)
             {
                 LOGGER.info("Connecting client with signonName "
-                    + signonTryName
-                    + " did not send version/build info - "
+                    + signonTryName + " did not send version/build info - "
                     + "treating that as version -1, build info NONE.");
                 clientVersion = -1;
                 buildInfo = "NONE";
@@ -748,8 +747,7 @@ final class ClientHandler implements IClient
     }
 
     public void revealCreatures(Legion legion,
-        final List<CreatureType> creatures,
-        String reason)
+        final List<CreatureType> creatures, String reason)
     {
         sendToClient(Constants.revealCreatures + sep + legion.getMarkerId()
             + sep + Glob.glob(creatures) + sep + reason);
@@ -769,8 +767,7 @@ final class ClientHandler implements IClient
     {
         sendToClient(Constants.revealEngagedCreatures + sep
             + legion.getMarkerId() + sep + isAttacker + sep
-            + Glob.glob(creatures)
-            + sep + reason);
+            + Glob.glob(creatures) + sep + reason);
     }
 
     public void removeDeadBattleChits()

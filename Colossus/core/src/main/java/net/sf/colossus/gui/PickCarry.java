@@ -1,7 +1,6 @@
 package net.sf.colossus.gui;
 
 
-
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -33,8 +32,7 @@ final class PickCarry extends KDialog implements ActionListener
     private final SaveWindow saveWindow;
 
     /** Each choice is a String of form "Warbear in Plains Hex G3" */
-    PickCarry(JFrame parentFrame, ClientGUI clientGui,
-        int carryDamage,
+    PickCarry(JFrame parentFrame, ClientGUI clientGui, int carryDamage,
         Set<String> choices)
     {
         super(parentFrame, "Apply " + carryDamage

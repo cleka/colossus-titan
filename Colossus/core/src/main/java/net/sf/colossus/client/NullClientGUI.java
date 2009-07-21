@@ -250,7 +250,7 @@ public class NullClientGUI implements IClientGUI
     }
 
     public void actOnTellStrikeResults(boolean wasCarry, int strikeNumber,
-        List<String> rolls,BattleCritter striker, BattleCritter target)
+        List<String> rolls, BattleCritter striker, BattleCritter target)
     {
         // TODO Auto-generated method stub
 
@@ -264,8 +264,8 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public void actOnUndidRecruitPart(Legion legion,
-        boolean wasReinforcement, int turnNumber)
+    public void actOnUndidRecruitPart(Legion legion, boolean wasReinforcement,
+        int turnNumber)
     {
         // TODO Auto-generated method stub
 
@@ -452,8 +452,7 @@ public class NullClientGUI implements IClientGUI
     }
 
     public void eventViewerRevealCreatures(Legion legion,
-        List<CreatureType> creatures,
-        String reason)
+        List<CreatureType> creatures, String reason)
     {
         // TODO Auto-generated method stub
 
@@ -584,8 +583,7 @@ public class NullClientGUI implements IClientGUI
     }
 
     public void revealEngagedCreatures(Legion legion,
-        List<CreatureType> creatures,
-        boolean isAttacker, String reason)
+        List<CreatureType> creatures, boolean isAttacker, String reason)
     {
         // TODO Auto-generated method stub
 

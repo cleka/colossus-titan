@@ -1,7 +1,6 @@
 package net.sf.colossus.appmain;
 
 
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -107,8 +106,8 @@ public final class GetPlayers extends KFrame
     private final SaveWindow saveWindow;
 
     /** Clear options to abort */
-    public GetPlayers(final Options options, Object mutex, WhatNextManager whatNextMgr,
-        boolean byWebClient)
+    public GetPlayers(final Options options, Object mutex,
+        WhatNextManager whatNextMgr, boolean byWebClient)
     {
         super("Game Setup");
 
@@ -572,7 +571,8 @@ public final class GetPlayers extends KFrame
         options
             .setOption(Options.variantFileWithFullPath, varFileWithFullPath);
 
-        String prop = (String)doc.getProperty(StaticResourceLoader.KEY_CONTENT_TYPE);
+        String prop = (String)doc
+            .getProperty(StaticResourceLoader.KEY_CONTENT_TYPE);
         readme.setContentType(prop);
         readme.setDocument(doc);
         if (oldMaxPlayers != VariantSupport.getMaxPlayers())
@@ -581,7 +581,6 @@ public final class GetPlayers extends KFrame
         }
 
     }
-
 
     private void setRunningOnLabel(int port)
     {
@@ -933,7 +932,8 @@ public final class GetPlayers extends KFrame
         {
             if (!byWebClient)
             {
-                whatNextManager.setWhatToDoNext(WhatToDoNext.START_GAME, false);
+                whatNextManager
+                    .setWhatToDoNext(WhatToDoNext.START_GAME, false);
                 stOptions.setOption(Options.serveAtPort, serveAtPort);
                 options.setOption(Options.serveAtPort, serveAtPort);
             }

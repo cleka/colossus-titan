@@ -1,5 +1,6 @@
 package net.sf.colossus.game;
 
+
 import java.util.logging.Logger;
 
 import net.sf.colossus.variant.MasterHex;

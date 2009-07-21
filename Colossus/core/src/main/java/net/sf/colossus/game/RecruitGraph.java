@@ -102,8 +102,7 @@ public class RecruitGraph
         {
             if (graph.getCaretaker() != null)
             {
-                CreatureType type = graph.getVariant()
-                    .getCreatureByName(cre);
+                CreatureType type = graph.getVariant().getCreatureByName(cre);
                 return graph.getCaretaker().getAvailableCount(type);
             }
             else
@@ -319,7 +318,8 @@ public class RecruitGraph
                 RecruitVertex v = e.getDestination();
                 String creName = s.getCreatureName();
 
-                int already = (legion == null ? 0 : ((LegionClientSide)legion).numCreature(creName));
+                int already = (legion == null ? 0 : ((LegionClientSide)legion)
+                    .numCreature(creName));
 
                 /* only explore if
                  (1) not already visited
@@ -355,6 +355,7 @@ public class RecruitGraph
     {
         return variantKnower.getTheCurrentVariant();
     }
+
     /**
      * Give the List of RecruitEdge where the given creature is the source.
      * @param  cre Name of the recruiting creature
@@ -409,10 +410,8 @@ public class RecruitGraph
     {
         List<RecruitEdge> allEdge = getIncomingEdges(recruit);
         RecruitVertex source = getVertex(recruiter);
-        CreatureType recruiterCre = getVariant()
-            .getCreatureByName(recruiter);
-        CreatureType recruitCre = getVariant()
-            .getCreatureByName(recruit);
+        CreatureType recruiterCre = getVariant().getCreatureByName(recruiter);
+        CreatureType recruitCre = getVariant().getCreatureByName(recruit);
         // if the recruiter is a special such as Anything, avoid
         // crashing with NullPointerException
         boolean isLord = (recruiterCre == null ? false : recruiterCre.isLord());
@@ -578,7 +577,7 @@ public class RecruitGraph
      * @return The recruit.
      */
     public CreatureType getRecruitFromRecruiterTerrainNumber(CreatureType cre,
-            MasterBoardTerrain t, int number)
+        MasterBoardTerrain t, int number)
     {
         List<RecruitEdge> outgoing = getOutgoingEdges(cre.getName());
         CreatureType v2 = null;
@@ -592,8 +591,7 @@ public class RecruitGraph
             if ((e.getNumber() == number) && (e.getTerrain().equals(t)))
             {
                 v2 = getVariant().getCreatureByName(
-                    e.
-                        getDestination().getCreatureName());
+                    e.getDestination().getCreatureName());
             }
         }
         return v2;
@@ -608,16 +606,15 @@ public class RecruitGraph
      */
     public CreatureType getBestPossibleRecruitEver(String cre, Legion legion)
     {
-        CreatureType best = getVariant()
-                .getCreatureByName(cre);
+        CreatureType best = getVariant().getCreatureByName(cre);
         int maxVP = -1;
         List<RecruitVertex> all = traverse(cre, legion);
         Iterator<RecruitVertex> it = all.iterator();
         while (it.hasNext())
         {
             RecruitVertex v2 = it.next();
-            CreatureType creature = getVariant()
-                .getCreatureByName(v2.getCreatureName());
+            CreatureType creature = getVariant().getCreatureByName(
+                v2.getCreatureName());
             int vp = (creature == null ? -1 : creature.getPointValue());
             if (vp > maxVP)
             {

@@ -1,5 +1,6 @@
 package net.sf.colossus.client;
 
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -19,6 +20,7 @@ import net.sf.colossus.util.Predicate;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
+
 
 public class BattleClientSide extends Battle
 {

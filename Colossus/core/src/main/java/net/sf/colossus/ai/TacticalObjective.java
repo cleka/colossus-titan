@@ -1,5 +1,6 @@
 package net.sf.colossus.ai;
 
+
 /**
  *
  * @author Romain Dolbeau

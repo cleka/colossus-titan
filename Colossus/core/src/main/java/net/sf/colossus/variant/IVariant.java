@@ -4,7 +4,6 @@ package net.sf.colossus.variant;
 import java.util.List;
 
 
-
 /**
  *  Defined for which methods we currently abuse the Client to forward the
  *  question about variant specific information to static methods in

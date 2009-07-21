@@ -67,7 +67,8 @@ public final class BattleMap extends HexMap
         GUIBattleHex hex = getGUIHexByModelHex(battleHex);
         Rectangle rect = hex.getBounds();
         Point point;
-        if ("X1".equals(battleHex.getLabel()) || "X4".equals(battleHex.getLabel()))
+        if ("X1".equals(battleHex.getLabel())
+            || "X4".equals(battleHex.getLabel()))
         {
             point = new Point(rect.x, rect.height + rect.y);
         }

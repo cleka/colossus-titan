@@ -1,7 +1,6 @@
 package net.sf.colossus.gui;
 
 
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -271,8 +270,7 @@ public final class BattleBoard extends KFrame
         // This checks only if its a chit of the active player
         // But that's ok, this here is called only if it's own phase
         boolean ownChit = (battleChit != null && getGame().getPlayerByTag(
-            battleChit.getTag()).equals(
-                getGame().getBattleActivePlayer()));
+            battleChit.getTag()).equals(getGame().getBattleActivePlayer()));
 
         boolean ownChit2 = (battleChit != null && battleChit.getBattleUnit()
             .getLegion().getPlayer().equals(getGame().getBattleActivePlayer()));
@@ -352,8 +350,8 @@ public final class BattleBoard extends KFrame
         {
             public void actionPerformed(ActionEvent e)
             {
-                new BattleTerrainHazardWindow(BattleBoard.this, gui,
-                    battleMap.getMasterHex());
+                new BattleTerrainHazardWindow(BattleBoard.this, gui, battleMap
+                    .getMasterHex());
             }
         };
         undoLastAction = new AbstractAction(undoLast)
@@ -568,7 +566,8 @@ public final class BattleBoard extends KFrame
     {
         List<String> directories = new ArrayList<String>();
         directories.add(Constants.defaultDirName
-            + StaticResourceLoader.getPathSeparator() + Constants.imagesDirName);
+            + StaticResourceLoader.getPathSeparator()
+            + Constants.imagesDirName);
 
         String[] iconNames = {
             Constants.battlemapIconImage,
@@ -577,8 +576,8 @@ public final class BattleBoard extends KFrame
             Constants.battlemapIconSubscript + "-Subscript-"
                 + Constants.battlemapIconTextColor };
 
-        Image image = StaticResourceLoader.getCompositeImage(iconNames, directories,
-            60, 60);
+        Image image = StaticResourceLoader.getCompositeImage(iconNames,
+            directories, 60, 60);
 
         if (image == null)
         {
@@ -597,8 +596,7 @@ public final class BattleBoard extends KFrame
     {
         // iterate through list backwards, so the topmost chit is found
         List<GUIBattleChit> chits = gui.getGUIBattleChits();
-        ListIterator<GUIBattleChit> it = chits
-            .listIterator(chits.size());
+        ListIterator<GUIBattleChit> it = chits.listIterator(chits.size());
         while (it.hasPrevious())
         {
             GUIBattleChit battleChit = it.previous();
@@ -967,16 +965,15 @@ public final class BattleBoard extends KFrame
         {
             return;
         }
-        dicePanel.addValues("Battle Phase "
-            + getGame().getBattleTurnNumber(),
-            getGame()
-            .getBattleActivePlayer().getName(), strikerDesc, targetDesc,
-            targetNumber, rolls);
+        dicePanel.addValues("Battle Phase " + getGame().getBattleTurnNumber(),
+            getGame().getBattleActivePlayer().getName(), strikerDesc,
+            targetDesc, targetNumber, rolls);
         dicePanel.showLastRoll();
     }
 
     // TODO get rid of this, is is only introduced for refactoring purposes
-    public BattleHex getBattleHexByLabel(String hexLabel) {
+    public BattleHex getBattleHexByLabel(String hexLabel)
+    {
         return battleMap.getHexByLabel(hexLabel);
     }
 

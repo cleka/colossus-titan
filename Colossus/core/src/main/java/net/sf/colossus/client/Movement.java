@@ -363,8 +363,7 @@ public final class Movement
         {
             // Mark every hex containing an enemy stack that does not
             // already contain a friendly stack.
-            for (Legion other : client.getGame().getEnemyLegions(
-                player))
+            for (Legion other : client.getGame().getEnemyLegions(player))
             {
                 MasterHex otherHex = other.getCurrentHex();
                 if (!client.getGame().isEngagement(otherHex))

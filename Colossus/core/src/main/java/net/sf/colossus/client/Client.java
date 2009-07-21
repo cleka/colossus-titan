@@ -176,7 +176,6 @@ public final class Client implements IClient, IOracle, IVariant
     // TODO: could go into owningPlayer, BUT tricky right now as long as
     // owningPlayer is created twice (once fake and later for real)...
 
-
     private Movement movement;
     private BattleMovement battleMovement;
     private Strike strike;
@@ -238,8 +237,7 @@ public final class Client implements IClient, IOracle, IVariant
     public static synchronized Client createClient(String host, int port,
         String playerName, String playerType, WhatNextManager whatNextMgr,
         Server theServer, boolean byWebClient, boolean noOptionsFile,
-        boolean createGUI)
-    throws ConnectionInitException
+        boolean createGUI) throws ConnectionInitException
     {
         /* TODO Clients on same machine could share the instance
          * (proper synchronization needed, of course).
@@ -272,8 +270,8 @@ public final class Client implements IClient, IOracle, IVariant
             VariantSupport.loadVariantByName(variantName, true);
         }
 
-        return new Client(playerName, playerType, whatNextMgr,
-            theServer, byWebClient, noOptionsFile, createGUI, loader, conn);
+        return new Client(playerName, playerType, whatNextMgr, theServer,
+            byWebClient, noOptionsFile, createGUI, loader, conn);
     }
 
     /**
@@ -334,8 +332,7 @@ public final class Client implements IClient, IOracle, IVariant
         // TODO IVariantKnower is only temporary until game properly always
         //      knows the Variant right from the start on
         // TODO still dummy arguments
-        this.game = new GameClientSide(null, playerNames,
-            new VariantKnower());
+        this.game = new GameClientSide(null, playerNames, new VariantKnower());
 
         // TODO give it to constructor right away? Not changing it right now,
         // first do the "create SCT and Variant outside Client (and Game??)
@@ -570,8 +567,8 @@ public final class Client implements IClient, IOracle, IVariant
         }
         else
         {
-            Summoning event = new Summoning(summonInfo.getTarget(),
-                summonInfo.getDonor(), summonInfo.getUnit());
+            Summoning event = new Summoning(summonInfo.getTarget(), summonInfo
+                .getDonor(), summonInfo.getUnit());
             server.doSummon(event);
         }
         gui.actOnDoSummon();
@@ -937,8 +934,7 @@ public final class Client implements IClient, IOracle, IVariant
         {
             LOGGER.log(Level.SEVERE, "No legion with markerId '" + markerId
                 + "'" + " (for player " + player + "), turn = "
-                + getTurnNumber()
-                + " in client " + getOwningPlayer());
+                + getTurnNumber() + " in client " + getOwningPlayer());
         }
         assert legion != null : "No legion with markerId '" + markerId + "'"
             + " (for player " + player + "), turn = " + getTurnNumber()
@@ -1005,7 +1001,8 @@ public final class Client implements IClient, IOracle, IVariant
 
     }
 
-    public void removeCreature(Legion legion, CreatureType creature, String reason)
+    public void removeCreature(Legion legion, CreatureType creature,
+        String reason)
     {
         if (legion == null || creature == null)
         {
@@ -1036,8 +1033,7 @@ public final class Client implements IClient, IOracle, IVariant
      * */
 
     public void revealCreatures(Legion legion,
-        final List<CreatureType> creatures,
-        String reason)
+        final List<CreatureType> creatures, String reason)
     {
         gui.eventViewerRevealCreatures(legion, creatures, reason);
 
@@ -1597,7 +1593,6 @@ public final class Client implements IClient, IOracle, IVariant
         game.initBattle(hex, battleTurnNumber, battleActivePlayer,
             battlePhase, attacker, defender);
 
-
         if (options.getOption(Options.autoPlay))
         {
             ai.initBattle();
@@ -1955,8 +1950,8 @@ public final class Client implements IClient, IOracle, IVariant
         // before, this makes auto-recruit stop working also for human
         // when they did win against all others and continue playing
         // (just for growing bigger creatures ;-)
-        if (options.getOption(Options.autoRecruit) && isAlive()
-            && isMyTurn() && game.isPhase(Phase.MUSTER))
+        if (options.getOption(Options.autoRecruit) && isAlive() && isMyTurn()
+            && game.isPhase(Phase.MUSTER))
         {
             // Note that this fires all doRecruit calls in one row,
             // i.e. does NOT wait for callback from server.
@@ -2069,7 +2064,6 @@ public final class Client implements IClient, IOracle, IVariant
     {
         return game.getBattle();
     }
-
 
     /** Used for both strike and strikeback. */
     public void setupBattleFight(BattlePhase battlePhase,
@@ -2377,8 +2371,7 @@ public final class Client implements IClient, IOracle, IVariant
         List<CreatureType> lords = new ArrayList<CreatureType>();
 
         // Titan teleport
-        List<Legion> legions = getGame().getLegionsByHex(
-            hex);
+        List<Legion> legions = getGame().getLegionsByHex(hex);
         if (!legions.isEmpty())
         {
             Legion legion0 = legions.get(0);
@@ -2704,8 +2697,7 @@ public final class Client implements IClient, IOracle, IVariant
             CreatureType possibleRecruiter = it.next();
             int needed = TerrainRecruitLoader.numberOfRecruiterNeeded(
                 possibleRecruiter, recruit, terrain, hex);
-            if (needed < 1
-                || needed > legion.numCreature(possibleRecruiter))
+            if (needed < 1 || needed > legion.numCreature(possibleRecruiter))
             {
                 // Zap this possible recruiter.
                 it.remove();
@@ -3038,8 +3030,7 @@ public final class Client implements IClient, IOracle, IVariant
         List<CreatureType> results)
     {
         LOGGER.log(Level.FINER, "Client.doSplit " + parent + " "
-            + childMarkerId
-            + " " + Glob.glob(",", results));
+            + childMarkerId + " " + Glob.glob(",", results));
         server.doSplit(parent, childMarkerId, results);
     }
 

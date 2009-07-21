@@ -137,7 +137,7 @@ public abstract class GUIHex<H extends Hex> extends JComponent
     }
 
     protected double[] getCliffOrArrowsPositionXArray(int j, double vx1,
-            double vx2, double theta)
+        double vx2, double theta)
     {
         double[] x = new double[3];
         double x0; // first focus point
@@ -151,7 +151,7 @@ public abstract class GUIHex<H extends Hex> extends JComponent
     }
 
     protected double[] getCliffOrArrowsPositionYArray(int j, double vy1,
-            double vy2, double theta)
+        double vy2, double theta)
     {
         double[] y = new double[3];
         double y0; // first focus point
@@ -164,8 +164,8 @@ public abstract class GUIHex<H extends Hex> extends JComponent
         return y;
     }
 
-    protected double[] getWallOrSlopePositionXArray(int j, double vx1, double vx2,
-            double theta, int size)
+    protected double[] getWallOrSlopePositionXArray(int j, double vx1,
+        double vx2, double theta, int size)
     {
         double[] x = new double[4];
         double x0; // first focus point
@@ -180,8 +180,8 @@ public abstract class GUIHex<H extends Hex> extends JComponent
         return x;
     }
 
-    protected double[] getWallOrSlopePositionYArray(int j, double vy1, double vy2,
-            double theta, int size)
+    protected double[] getWallOrSlopePositionYArray(int j, double vy1,
+        double vy2, double theta, int size)
     {
         double[] y = new double[4];
         double y0; // first focus point

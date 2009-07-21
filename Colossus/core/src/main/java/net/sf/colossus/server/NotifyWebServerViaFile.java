@@ -26,7 +26,6 @@ public class NotifyWebServerViaFile implements INotifyWebServer
     private static final Logger LOGGER = Logger
         .getLogger(NotifyWebServerViaFile.class.getName());
 
-
     private final String flagFilename;
     private PrintWriter out;
     private File flagFile = null;

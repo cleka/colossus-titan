@@ -268,7 +268,8 @@ public interface IClientGUI
     public abstract void resetStrikeNumbers();
 
     public abstract void actOnTellStrikeResults(boolean wasCarry,
-        int strikeNumber, List<String> rolls,BattleCritter striker, BattleCritter target);
+        int strikeNumber, List<String> rolls, BattleCritter striker,
+        BattleCritter target);
 
     public abstract void highlightCrittersWithTargets();
 

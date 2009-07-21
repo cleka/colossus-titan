@@ -48,8 +48,7 @@ public enum BattlePhase
     private final boolean isMovePhase;
     private final boolean isFightPhase;
 
-    private BattlePhase(String name, boolean isMovePhase,
-        boolean isFightPhase)
+    private BattlePhase(String name, boolean isMovePhase, boolean isFightPhase)
     {
         this.name = name;
         this.isMovePhase = isMovePhase;

@@ -1,7 +1,6 @@
 package net.sf.colossus.gui;
 
 
-
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -59,9 +58,8 @@ final class ShowBattleMap extends HexMap
             + neighbors.get(EntrySide.RIGHT) + ", "
             + EntrySide.BOTTOM.getLabel() + ": "
             + neighbors.get(EntrySide.BOTTOM) + ", "
-            + EntrySide.LEFT.getLabel() + ": "
-            + neighbors.get(EntrySide.LEFT) + ")";
-
+            + EntrySide.LEFT.getLabel() + ": " + neighbors.get(EntrySide.LEFT)
+            + ")";
 
         final KDialog dialog = new KDialog(parentFrame, "Battle Map for "
             + hex.getHexModel().getTerrainName() + " " + hex.getHexModel()
@@ -75,8 +73,8 @@ final class ShowBattleMap extends HexMap
         String text = neighbors.get(EntrySide.LEFT);
         if (!text.equals(NoLandText))
         {
-            leftButton = new JButton("<HTML>" + EntrySide.LEFT.getLabel() + ":<BR>"
-                + text + "</HTML>");
+            leftButton = new JButton("<HTML>" + EntrySide.LEFT.getLabel()
+                + ":<BR>" + text + "</HTML>");
             leftButton.setEnabled(false);
             contentPane.add(leftButton);
         }
@@ -84,8 +82,8 @@ final class ShowBattleMap extends HexMap
         text = neighbors.get(EntrySide.BOTTOM);
         if (!text.equals(NoLandText))
         {
-            bottomButton = new JButton("<HTML>" + EntrySide.BOTTOM.getLabel() + ":<BR>"
-                + text + "</HTML>");
+            bottomButton = new JButton("<HTML>" + EntrySide.BOTTOM.getLabel()
+                + ":<BR>" + text + "</HTML>");
             bottomButton.setEnabled(false);
             contentPane.add(bottomButton);
         }

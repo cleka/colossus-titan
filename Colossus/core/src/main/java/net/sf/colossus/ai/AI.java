@@ -63,7 +63,8 @@ public interface AI
     void retryFailedBattleMoves(List<CritterMove> bestMoveOrder);
 
     /** pick an entry side */
-    EntrySide pickEntrySide(MasterHex hex, Legion legion, Set<EntrySide> entrySides);
+    EntrySide pickEntrySide(MasterHex hex, Legion legion,
+        Set<EntrySide> entrySides);
 
     /** pick an engagement to resolve */
     MasterHex pickEngagement();

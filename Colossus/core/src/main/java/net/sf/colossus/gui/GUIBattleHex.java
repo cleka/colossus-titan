@@ -373,8 +373,8 @@ public class GUIBattleHex extends GUIHex<BattleHex>
     {
         Image overlay = null;
         List<String> directories = VariantSupport.getImagesDirectoriesList();
-        overlay = StaticResourceLoader.getImage(name + imagePostfix, directories,
-            width, height);
+        overlay = StaticResourceLoader.getImage(name + imagePostfix,
+            directories, width, height);
         return overlay;
     }
 

@@ -1,13 +1,16 @@
 package net.sf.colossus.game;
 
+
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
+
 
 /**
  *
  * @author Romain Dolbeau
  */
-public interface BattleCritter {
+public interface BattleCritter
+{
 
     CreatureType getCreatureType();
 

@@ -1,5 +1,6 @@
 package net.sf.colossus.server;
 
+
 import net.sf.colossus.variant.IVariantKnower;
 import net.sf.colossus.variant.Variant;
 

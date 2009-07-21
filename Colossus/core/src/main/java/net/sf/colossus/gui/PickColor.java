@@ -1,7 +1,6 @@
 package net.sf.colossus.gui;
 
 
-
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -114,7 +113,8 @@ final class PickColor extends KDialog
         Logger logger = Logger.getLogger(PickColor.class.getName());
         List<PlayerColor> colorsLeft = Arrays.asList(PlayerColor.values());
         Options options = new Options("Player");
-        PlayerColor color = pickColor(new JFrame(), "Player", colorsLeft, options);
+        PlayerColor color = pickColor(new JFrame(), "Player", colorsLeft,
+            options);
         logger.info("Picked " + color.getName());
         System.exit(0);
     }

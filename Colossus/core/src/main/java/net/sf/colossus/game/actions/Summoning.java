@@ -31,9 +31,8 @@ public class Summoning extends AddCreatureAction
     @Override
     public String toString()
     {
-        return String
-            .format(
+        return String.format(
             "Summoning of creature of type %s from legion %s into legion %s",
-                getAddedCreatureType(), getLegion(), getDonor());
+            getAddedCreatureType(), getLegion(), getDonor());
     }
 }

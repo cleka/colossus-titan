@@ -38,8 +38,8 @@ import net.sf.colossus.guiutil.SaveWindow;
 @SuppressWarnings("serial")
 public class NetworkClientDialog extends KFrame
 {
-    private static final Logger LOGGER = Logger.getLogger(NetworkClientDialog.class
-        .getName());
+    private static final Logger LOGGER = Logger
+        .getLogger(NetworkClientDialog.class.getName());
 
     private final Object mutex;
     private final Options netclientOptions;

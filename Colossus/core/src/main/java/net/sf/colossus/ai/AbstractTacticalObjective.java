@@ -1,11 +1,13 @@
 package net.sf.colossus.ai;
 
+
 /** Abstract implementation of TacticalObjective, handling the priority
  * stuff to avoid duplication.
  *
  * @author Romain Dolbeau
  */
-public abstract class AbstractTacticalObjective implements TacticalObjective {
+public abstract class AbstractTacticalObjective implements TacticalObjective
+{
     private float priority;
 
     public AbstractTacticalObjective(float priority)

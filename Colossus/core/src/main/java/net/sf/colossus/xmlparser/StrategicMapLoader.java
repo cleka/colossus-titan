@@ -77,8 +77,7 @@ public class StrategicMapLoader
             .getTerrainById(terrainId);
         if (terrain == null)
         {
-            LOGGER.warning("Null terrain in " + label
-                + ", trying Plains");
+            LOGGER.warning("Null terrain in " + label + ", trying Plains");
             terrain = TerrainRecruitLoader.getTerrainById("Plains");
         }
         MasterHex hex = new MasterHex(label, terrain, xpos, ypos);

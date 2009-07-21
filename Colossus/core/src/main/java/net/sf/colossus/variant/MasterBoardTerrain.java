@@ -377,7 +377,8 @@ public class MasterBoardTerrain implements Comparable<MasterBoardTerrain>
         this.recruitingSubTree = rst;
     }
 
-    public IRecruiting getRecruitingSubTree() {
+    public IRecruiting getRecruitingSubTree()
+    {
         return recruitingSubTree;
     }
 
@@ -513,8 +514,7 @@ public class MasterBoardTerrain implements Comparable<MasterBoardTerrain>
         return startList != null;
     }
 
-    public void setHazardNumberMap(
-        Map<HazardTerrain, Integer> hazardNumberMap)
+    public void setHazardNumberMap(Map<HazardTerrain, Integer> hazardNumberMap)
     {
         this.hazardNumberMap = hazardNumberMap;
     }

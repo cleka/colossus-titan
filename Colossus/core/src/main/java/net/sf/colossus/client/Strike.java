@@ -884,8 +884,8 @@ public final class Strike
                 // Non-native striking up slope: -1
                 // Striking up across wall: -1
                 // TODO Tower vs. Wall ...
-                if ((hazard == HazardHexside.SLOPE && !striker.getCreatureType()
-                    .isNativeSlope())
+                if ((hazard == HazardHexside.SLOPE && !striker
+                    .getCreatureType().isNativeSlope())
                     || hazard == HazardHexside.TOWER)
                 {
                     attackerSkill--;
@@ -947,8 +947,8 @@ public final class Strike
         {
             // Strike number can be modified directly by terrain.
             strikeNumber += terrain.getSkillBonusStruckIn(striker
-                .getCreatureType().isNativeIn(terrain), target.getCreatureType()
-                .isNativeIn(terrain));
+                .getCreatureType().isNativeIn(terrain), target
+                .getCreatureType().isNativeIn(terrain));
         }
         else
         {
@@ -956,7 +956,8 @@ public final class Strike
             //     non-magicMissile: +1
             if (terrain.equals(HazardTerrain.BRAMBLES)
                 && target.getCreatureType().isNativeIn(HazardTerrain.BRAMBLES)
-                && !striker.getCreatureType().isNativeIn(HazardTerrain.BRAMBLES)
+                && !striker.getCreatureType().isNativeIn(
+                    HazardTerrain.BRAMBLES)
                 && !striker.getCreatureType().useMagicMissile())
             {
                 strikeNumber++;

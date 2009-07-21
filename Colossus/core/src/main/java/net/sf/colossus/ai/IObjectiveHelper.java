@@ -1,6 +1,8 @@
 package net.sf.colossus.ai;
 
+
 import java.util.List;
+
 
 /**
  *
@@ -9,5 +11,6 @@ import java.util.List;
 interface IObjectiveHelper
 {
     List<TacticalObjective> attackerObjective();
+
     List<TacticalObjective> defenderObjective();
 }

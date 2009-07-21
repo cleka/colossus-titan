@@ -236,8 +236,8 @@ public final class VariantSupport
         catch (VariantLoadException vle)
         {
             String task = vle.getMessage();
-            String message = "Trying to load variant '"
-                + tempVariantName + "' failed " + "(task='" + task + "')."
+            String message = "Trying to load variant '" + tempVariantName
+                + "' failed " + "(task='" + task + "')."
                 + "\nI will try to load variant 'Default' instead...";
             String title = "Variant loading failed!";
             LOGGER.warning(message);
@@ -309,8 +309,8 @@ public final class VariantSupport
             directories.add(tempVarDirectory);
             directories.add(Constants.defaultDirName);
             task = "Load variant file \"" + tempVarFilename + "\"";
-            InputStream varIS = StaticResourceLoader.getInputStream(tempVarFilename,
-                directories);
+            InputStream varIS = StaticResourceLoader.getInputStream(
+                tempVarFilename, directories);
             if (varIS == null)
             {
                 throw new FileNotFoundException(tempVarFilename);
@@ -356,7 +356,8 @@ public final class VariantSupport
                 {
                     recruitsFileName = Constants.defaultTERFile;
                 }
-                LOGGER.log(Level.FINEST, "Variant using TER " + recruitsFileName);
+                LOGGER.log(Level.FINEST, "Variant using TER "
+                    + recruitsFileName);
 
                 hintName = mvfLoader.getHintName();
                 LOGGER.log(Level.FINEST, "Variant using hint " + hintName);
@@ -367,7 +368,8 @@ public final class VariantSupport
             directories = new ArrayList<String>();
             directories.add(tempVarDirectory);
             task = "getDocument README*";
-            varREADME = StaticResourceLoader.getDocument("README", directories);
+            varREADME = StaticResourceLoader
+                .getDocument("README", directories);
 
             /* OK, what is the proper order here ?
              * We should start with HazardTerrain & HazardHexside, but those
@@ -480,7 +482,8 @@ public final class VariantSupport
                     "Failed to insert warning about missing readme into Document object",
                     e);
         }
-        txtdoc.putProperty(StaticResourceLoader.KEY_CONTENT_TYPE, "text/plain");
+        txtdoc
+            .putProperty(StaticResourceLoader.KEY_CONTENT_TYPE, "text/plain");
         return txtdoc;
     }
 
@@ -572,7 +575,8 @@ public final class VariantSupport
 
             // Clemens: started working on that.
             //  =>  partly now done via the IVariantInitializer
-            terrainRecruitLoader = new TerrainRecruitLoader(terIS, creatureTypes);
+            terrainRecruitLoader = new TerrainRecruitLoader(terIS,
+                creatureTypes);
         }
         catch (Exception e)
         {
@@ -600,8 +604,9 @@ public final class VariantSupport
             singleDirectory.add(it.previous());
             try
             {
-                InputStream mmfIS = StaticResourceLoader.getInputStreamIgnoreFail(
-                    Constants.markersNameFile, singleDirectory);
+                InputStream mmfIS = StaticResourceLoader
+                    .getInputStreamIgnoreFail(Constants.markersNameFile,
+                        singleDirectory);
                 if (mmfIS != null)
                 {
                     allNames.load(mmfIS);
@@ -692,8 +697,7 @@ public final class VariantSupport
     }
 
     public synchronized static List<CreatureType> getInitialSplitHint(
-        MasterHex hex,
-        List<IVariantHint.AIStyle> aiStyles)
+        MasterHex hex, List<IVariantHint.AIStyle> aiStyles)
     {
         if (aihl != null)
         {

@@ -190,7 +190,7 @@ abstract public class CustomRecruitBase implements ICustomRecruitBase
      * @return A List of possible special Recruiters in this hex.
      */
     abstract public List<CreatureType> getPossibleSpecialRecruiters(
-         MasterHex hex);
+        MasterHex hex);
 
     /**
      * List creatures that can be recruited in this terrain
@@ -200,8 +200,7 @@ abstract public class CustomRecruitBase implements ICustomRecruitBase
      * BalrogRecruitment.java in Balrog variant directory)
      * @return A List of possible special Recruits in this hex.
      */
-    abstract public List<CreatureType> getPossibleSpecialRecruits(
-         MasterHex hex);
+    abstract public List<CreatureType> getPossibleSpecialRecruits(MasterHex hex);
 
     /**
      * Number of recruiters needed to get a recruit

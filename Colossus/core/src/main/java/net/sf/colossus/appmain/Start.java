@@ -71,6 +71,7 @@ public final class Start
     {
         return whatNextManager;
     }
+
     public WhatToDoNext getWhatToDoNext()
     {
         return whatNextManager.getWhatToDoNext();
@@ -194,8 +195,8 @@ public final class Start
             //   ( = would end up same host).
 
             Set<String> dummy = new TreeSet<String>();
-            String preferred = NetworkClientDialog.initServerNames(hostname, dummy,
-                netclientOptions);
+            String preferred = NetworkClientDialog.initServerNames(hostname,
+                dummy, netclientOptions);
             hostname = preferred;
             dummy.clear();
         }
@@ -280,30 +281,36 @@ public final class Start
         {
             if (cl.optIsSet('c'))
             {
-                whatNextManager.setWhatToDoNext(WhatToDoNext.START_NET_CLIENT, false);
+                whatNextManager.setWhatToDoNext(WhatToDoNext.START_NET_CLIENT,
+                    false);
             }
             else if (cl.optIsSet('w'))
             {
-                whatNextManager.setWhatToDoNext(WhatToDoNext.START_WEB_CLIENT, false);
+                whatNextManager.setWhatToDoNext(WhatToDoNext.START_WEB_CLIENT,
+                    false);
             }
             else
             {
-                whatNextManager.setWhatToDoNext(WhatToDoNext.START_GAME, false);
+                whatNextManager
+                    .setWhatToDoNext(WhatToDoNext.START_GAME, false);
             }
         }
         else
         {
             if (cl.optIsSet('c'))
             {
-                whatNextManager.setWhatToDoNext(WhatToDoNext.NET_CLIENT_DIALOG, false);
+                whatNextManager.setWhatToDoNext(
+                    WhatToDoNext.NET_CLIENT_DIALOG, false);
             }
             else if (cl.optIsSet('w'))
             {
-                whatNextManager.setWhatToDoNext(WhatToDoNext.START_WEB_CLIENT, false);
+                whatNextManager.setWhatToDoNext(WhatToDoNext.START_WEB_CLIENT,
+                    false);
             }
             else
             {
-                whatNextManager.setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
+                whatNextManager.setWhatToDoNext(
+                    WhatToDoNext.GET_PLAYERS_DIALOG, false);
             }
         }
     }
@@ -333,7 +340,8 @@ public final class Start
                 LOGGER.log(Level.WARNING, "Start waiting for GetPlayers "
                     + "to complete, wait interrupted?");
                 // just to be sure to do something useful there...
-                whatNextManager.setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
+                whatNextManager.setWhatToDoNext(
+                    WhatToDoNext.GET_PLAYERS_DIALOG, false);
             }
         }
         mutex = null;
@@ -630,7 +638,8 @@ public final class Start
                 whatNextManager.decrementHowManyGamesLeft();
 
                 // TODO is this re-setting it needed?
-                whatNextManager.setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
+                whatNextManager.setWhatToDoNext(
+                    WhatToDoNext.GET_PLAYERS_DIALOG, false);
                 int port = startOptions.getIntOption(Options.serveAtPort);
                 serverOptions.setOption(Options.serveAtPort, port);
                 String webGameFlagFileName = startOptions
@@ -642,7 +651,8 @@ public final class Start
                 if (webGameFlagFileName != null
                     && !webGameFlagFileName.equals(""))
                 {
-                    whatNextManager.setWhatToDoNext(WhatToDoNext.QUIT_ALL, false);
+                    whatNextManager.setWhatToDoNext(WhatToDoNext.QUIT_ALL,
+                        false);
                     game.setFlagFilename(webGameFlagFileName);
                 }
                 game.startNewGameAndWaitUntilOver(null);
@@ -653,7 +663,8 @@ public final class Start
                 whatNextManager.decrementHowManyGamesLeft();
 
                 // TODO is this re-setting it needed?
-                whatNextManager.setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
+                whatNextManager.setWhatToDoNext(
+                    WhatToDoNext.GET_PLAYERS_DIALOG, false);
                 int port = startOptions.getIntOption(Options.serveAtPort);
                 serverOptions.setOption(Options.serveAtPort, port);
                 String loadFileName = startOptions
@@ -694,11 +705,13 @@ public final class Start
                 // after that come back to NetClient dialog.
                 if (oneClientRunOnly)
                 {
-                    whatNextManager.setWhatToDoNext(WhatToDoNext.QUIT_ALL, false);
+                    whatNextManager.setWhatToDoNext(WhatToDoNext.QUIT_ALL,
+                        false);
                 }
                 else
                 {
-                    whatNextManager.setWhatToDoNext(WhatToDoNext.NET_CLIENT_DIALOG, false);
+                    whatNextManager.setWhatToDoNext(
+                        WhatToDoNext.NET_CLIENT_DIALOG, false);
                 }
                 dontWait = startNetClient(startOptions);
             }
@@ -706,7 +719,8 @@ public final class Start
             else if (getWhatToDoNext() == WhatToDoNext.START_WEB_CLIENT)
             {
                 // By default get back to Main dialog.
-                whatNextManager.setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
+                whatNextManager.setWhatToDoNext(
+                    WhatToDoNext.GET_PLAYERS_DIALOG, false);
 
                 String hostname = startOptions
                     .getStringOption(Options.webServerHost);
@@ -714,7 +728,8 @@ public final class Start
                 String login = startOptions
                     .getStringOption(Options.webClientLogin);
                 String password = null;
-                new WebClient(getWhatNextManager(), hostname, port, login, password);
+                new WebClient(getWhatNextManager(), hostname, port, login,
+                    password);
             }
 
             // User clicked Quit in GetPlayers (this loop round),
@@ -766,11 +781,13 @@ public final class Start
                     .getStringOption(Options.loadGameFileName);
                 if (loadFileName != null)
                 {
-                    whatNextManager.setWhatToDoNext(WhatToDoNext.LOAD_GAME, false);
+                    whatNextManager.setWhatToDoNext(WhatToDoNext.LOAD_GAME,
+                        false);
                 }
                 else
                 {
-                    whatNextManager.setWhatToDoNext(WhatToDoNext.START_GAME, false);
+                    whatNextManager.setWhatToDoNext(WhatToDoNext.START_GAME,
+                        false);
                 }
             }
             else
@@ -798,7 +815,8 @@ public final class Start
                 LOGGER.log(Level.WARNING, "Start waiting for GetPlayers "
                     + "to complete, wait interrupted?");
                 // just to be sure to do something useful there...
-                whatNextManager.setWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
+                whatNextManager.setWhatToDoNext(
+                    WhatToDoNext.GET_PLAYERS_DIALOG, false);
             }
         }
         mutex = null;

@@ -4,7 +4,6 @@
 package net.sf.colossus.gui;
 
 
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -157,8 +156,7 @@ public final class ShowCreatureDetails extends KDialog
         _trSpan(s, "Flier", creature.isFlier() ? "yes" : "no");
         _trSpan(s, "Summonable", creature.isSummonable() ? "yes" : "no");
         // TODO Instead show full list of "where and for each multiple of X
-        _trSpan(s, "Acquirable",
-            variant.isAcquirable(creature) ? "yes" : "no");
+        _trSpan(s, "Acquirable", variant.isAcquirable(creature) ? "yes" : "no");
         _trSpan(s, _low("Lord"), creature.isLordOrDemiLord() ? (creature
             .isLord() ? "<u><b>Lord</b></u>" : "<b>Demi-Lord</b>")
             : _low("no"));
@@ -199,8 +197,8 @@ public final class ShowCreatureDetails extends KDialog
             for (int ri = 0; ri < recruiters.size(); ri++)
             {
                 final CreatureType recruiter = recruiters.get(ri);
-                int num = ivariant.numberOfRecruiterNeeded(
-                    recruiter, creature, terrain, null);
+                int num = ivariant.numberOfRecruiterNeeded(recruiter,
+                    creature, terrain, null);
                 if (num == 1 && creature.getMaxCount() == 1
                     && recruiter.getName().equals(creature.getName()))
                 {
@@ -249,8 +247,8 @@ public final class ShowCreatureDetails extends KDialog
             for (int ri = 0; ri < recruits.size(); ri++)
             {
                 final CreatureType recruit = recruits.get(ri);
-                int num = ivariant.numberOfRecruiterNeeded(
-                    creature, recruit, terrain, null);
+                int num = ivariant.numberOfRecruiterNeeded(creature, recruit,
+                    terrain, null);
                 if (num == 1 && creature.getMaxCount() == 1
                     && recruit.getName().equals(creature.getName()))
                 {

@@ -62,8 +62,7 @@ public final class LegionServerSide extends Legion implements
     {
         super(player, markerId, currentHex);
         assert markerId != null : "MarkerId must not be null";
-        assert (parent == null) || !markerId.equals(parent.getMarkerId()) :
-            "Parent can not have the same markerId as we have";
+        assert (parent == null) || !markerId.equals(parent.getMarkerId()) : "Parent can not have the same markerId as we have";
         assert startingHex != null : "Legion needs to start on some hex";
         assert game != null : "Legion needs to be part of some game";
         assert game == player.getGame() : "Legion needs to be part of the same game as its player";
@@ -276,8 +275,7 @@ public final class LegionServerSide extends Legion implements
         }
     }
 
-    void moveToHex(MasterHex hex, EntrySide entrySide,
-        boolean teleported,
+    void moveToHex(MasterHex hex, EntrySide entrySide, boolean teleported,
         CreatureType teleportingLord)
     {
         PlayerServerSide player = getPlayer();
@@ -487,8 +485,8 @@ public final class LegionServerSide extends Legion implements
      *  legion.  Do not actually remove it, to prevent co-modification
      *  errors.  Do not disband the legion if empty, since the critter
      *  has not actually been removed. */
-    void prepareToRemoveCritter(Creature critter,
-        boolean returnToStacks, boolean updateHistory)
+    void prepareToRemoveCritter(Creature critter, boolean returnToStacks,
+        boolean updateHistory)
     {
         if (critter == null || !getCreatures().contains(critter))
         {
@@ -633,8 +631,8 @@ public final class LegionServerSide extends Legion implements
         PlayerServerSide player = getPlayer();
 
         player.selectMarkerId(newMarkerId);
-        LegionServerSide newLegion = new LegionServerSide(newMarkerId,
-            this, getCurrentHex(), getCurrentHex(), getPlayer(), game);
+        LegionServerSide newLegion = new LegionServerSide(newMarkerId, this,
+            getCurrentHex(), getCurrentHex(), getPlayer(), game);
 
         Iterator<CreatureType> it = creatures.iterator();
         while (it.hasNext())
@@ -679,11 +677,13 @@ public final class LegionServerSide extends Legion implements
         // Titan teleport
         if (game.getNumEnemyLegions(hex, getPlayer()) >= 1)
         {
-                for (Creature creature : getCreatures())
+            for (Creature creature : getCreatures())
+            {
+                if (creature.isTitan())
                 {
-                    if(creature.isTitan()) {
-                    lords.add(creature.getType());}
+                    lords.add(creature.getType());
                 }
+            }
         }
 
         // Tower teleport

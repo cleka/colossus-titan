@@ -87,8 +87,7 @@ public class RevealedCreature
     @Override
     public String toString()
     {
-        String infoString = getName()
-            + ": "
+        String infoString = getName() + ": "
             + (didRecruit ? "did recruit; " : "")
             + (wasRecruited ? "was recruited; " : "")
             + (wasReinforced ? "was reinforced; " : "")

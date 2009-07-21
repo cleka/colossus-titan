@@ -1990,8 +1990,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         boolean ok = true;
         GameInfo gi = findGameById(gameId);
 
-        gameRunner = new RunGameInSameJVM(gi, whatNextManager,
-            username, this);
+        gameRunner = new RunGameInSameJVM(gi, whatNextManager, username, this);
         gameRunner.start();
 
         return ok;
@@ -2008,7 +2007,6 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     {
         server.informStartedByPlayer(this.startedGameId);
     }
-
 
     public void setLocalServer(Server server)
     {
@@ -2177,7 +2175,6 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             boolean noOptionsFile = false;
             // System.out.println("in webclient, before new Client for username "
             //     + username);
-
 
             gc = Client.createClient(hostingHost, p, username, type,
                 whatNextManager, localServer, true, noOptionsFile, true);

@@ -1,5 +1,6 @@
 package net.sf.colossus.variant;
 
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.common.Constants;
 
+
 /**
  * The recruiting sub-tree in a terrain (or several terrains)
  * @author Romain Dolbeau
@@ -17,8 +19,8 @@ import net.sf.colossus.common.Constants;
 public class RecruitingSubTree implements IRecruiting
 {
 
-    private static final Logger LOGGER = Logger.getLogger(
-            RecruitingSubTree.class.getName());
+    private static final Logger LOGGER = Logger
+        .getLogger(RecruitingSubTree.class.getName());
 
     private static class RecruiterAndRecruit
     {
@@ -39,30 +41,31 @@ public class RecruitingSubTree implements IRecruiting
             {
                 return false;
             }
-            RecruiterAndRecruit rar = (RecruiterAndRecruit) o;
-            return this.getRecruiter().equals(rar.getRecruiter()) &&
-                    this.getRecruit().equals(rar.getRecruit());
+            RecruiterAndRecruit rar = (RecruiterAndRecruit)o;
+            return this.getRecruiter().equals(rar.getRecruiter())
+                && this.getRecruit().equals(rar.getRecruit());
         }
 
         @Override
         public int hashCode()
         {
             int hash = 3;
-            hash =
-                    31 * hash +
-                    (this.getRecruiter() != null ? this.getRecruiter().hashCode()
+            hash = 31
+                * hash
+                + (this.getRecruiter() != null ? this.getRecruiter()
+                    .hashCode() : 0);
+            hash = 31
+                * hash
+                + (this.getRecruit() != null ? this.getRecruit().hashCode()
                     : 0);
-            hash =
-                    31 * hash +
-                    (this.getRecruit() != null ? this.getRecruit().hashCode() : 0);
             return hash;
         }
 
         @Override
         public String toString()
         {
-            return getRecruiter().getName() + " recruits " + getRecruit().
-                    getName();
+            return getRecruiter().getName() + " recruits "
+                + getRecruit().getName();
         }
 
         /**
@@ -81,20 +84,14 @@ public class RecruitingSubTree implements IRecruiting
             return recruit;
         }
     }
-    private final Map<RecruiterAndRecruit, Integer> regular =
-            new HashMap<RecruiterAndRecruit, Integer>();
-    private final Map<CreatureType, Integer> any =
-            new HashMap<CreatureType, Integer>();
-    private final Map<CreatureType, Integer> anyNonLord =
-            new HashMap<CreatureType, Integer>();
-    private final Map<CreatureType, Integer> anyLord =
-            new HashMap<CreatureType, Integer>();
-    private final Map<CreatureType, Integer> anyDemiLord =
-            new HashMap<CreatureType, Integer>();
-    private final Set<ICustomRecruitBase> allCustom =
-            new HashSet<ICustomRecruitBase>();
-    private final Set<CreatureType> allRecruits =
-            new TreeSet<CreatureType>();
+
+    private final Map<RecruiterAndRecruit, Integer> regular = new HashMap<RecruiterAndRecruit, Integer>();
+    private final Map<CreatureType, Integer> any = new HashMap<CreatureType, Integer>();
+    private final Map<CreatureType, Integer> anyNonLord = new HashMap<CreatureType, Integer>();
+    private final Map<CreatureType, Integer> anyLord = new HashMap<CreatureType, Integer>();
+    private final Map<CreatureType, Integer> anyDemiLord = new HashMap<CreatureType, Integer>();
+    private final Set<ICustomRecruitBase> allCustom = new HashSet<ICustomRecruitBase>();
+    private final Set<CreatureType> allRecruits = new TreeSet<CreatureType>();
     private boolean completed = false;
     private final AllCreatureType creatureTypes;
 
@@ -155,7 +152,7 @@ public class RecruitingSubTree implements IRecruiting
     }
 
     private boolean isRegularAncestorOf(final CreatureType a,
-            final CreatureType b, final Set<CreatureType> checked)
+        final CreatureType b, final Set<CreatureType> checked)
     {
         if (regular.containsKey(new RecruiterAndRecruit(a, b)))
         {
@@ -212,8 +209,8 @@ public class RecruitingSubTree implements IRecruiting
                     checked.add(b);
                     if (isRegularAncestorOf(b, a, checked))
                     {
-                        LOGGER.finest("Completing: adding " + a.getName() +
-                                " to " + b.getName());
+                        LOGGER.finest("Completing: adding " + a.getName()
+                            + " to " + b.getName());
                         extra.add(rar);
                     }
                 }
@@ -236,14 +233,14 @@ public class RecruitingSubTree implements IRecruiting
     }
 
     public void addRegular(CreatureType recruiter, CreatureType recruit,
-            int number)
+        int number)
     {
         assert recruit != null : "Oups, recruit must not be null";
         assert recruiter != null : "Oups, recruiter must not be null";
         assert number > 0 : "Oups, number should be > 0";
         assert !recruit.isTitan() : "Oups, can't recruit Titan";
-        regular.put(new RecruiterAndRecruit(recruiter, recruit),
-                new Integer(number));
+        regular.put(new RecruiterAndRecruit(recruiter, recruit), new Integer(
+            number));
         // should recruiter by a recruitable, completeGraph will take care
         allRecruits.add(recruit);
     }
@@ -300,37 +297,37 @@ public class RecruitingSubTree implements IRecruiting
     }
 
     public int numberOfRecruiterNeeded(CreatureType recruiter,
-            CreatureType recruit, MasterHex hex)
+        CreatureType recruit, MasterHex hex)
     {
         int number = Constants.BIGNUM;
         /* LOGGER.finest("Start for recruiter and recruit : " +
                 recruiter.getName() + " & " + recruit.getName()); */
         if (recruiter.equals(recruit))
         {
-            LOGGER.finest("Recruiter and recruit are identical = 1 " +
-                    recruiter.getName() + " & " + recruit.getName());
+            LOGGER.finest("Recruiter and recruit are identical = 1 "
+                + recruiter.getName() + " & " + recruit.getName());
             number = 1;
         }
         RecruiterAndRecruit rar = new RecruiterAndRecruit(recruiter, recruit);
         if (regular.keySet().contains(rar))
         {
-            LOGGER.finest("Recruiter and recruit are regular = " + regular.get(
-                    rar) + " " + recruiter.getName() + " & " +
-                    recruit.getName());
+            LOGGER.finest("Recruiter and recruit are regular = "
+                + regular.get(rar) + " " + recruiter.getName() + " & "
+                + recruit.getName());
             number = Math.min(number, regular.get(rar).intValue());
         }
         if (any.keySet().contains(recruit))
         {
-            LOGGER.finest("Recruit in any = " + regular.get(rar) + " " +
-                    recruit.getName());
+            LOGGER.finest("Recruit in any = " + regular.get(rar) + " "
+                + recruit.getName());
             number = Math.min(number, any.get(recruit).intValue());
         }
         if (!recruiter.isLord() && !recruiter.isDemiLord())
         {
             if (anyNonLord.keySet().contains(recruit))
             {
-                LOGGER.finest("Recruit in anyNonLord = " + regular.get(rar) +
-                        " " + recruit.getName());
+                LOGGER.finest("Recruit in anyNonLord = " + regular.get(rar)
+                    + " " + recruit.getName());
                 number = Math.min(number, anyNonLord.get(recruit).intValue());
             }
         }
@@ -338,8 +335,8 @@ public class RecruitingSubTree implements IRecruiting
         {
             if (anyLord.keySet().contains(recruit))
             {
-                LOGGER.finest("Recruit in anyLord = " + regular.get(rar) + " " +
-                        recruit.getName());
+                LOGGER.finest("Recruit in anyLord = " + regular.get(rar) + " "
+                    + recruit.getName());
                 number = Math.min(number, anyLord.get(recruit).intValue());
             }
         }
@@ -347,8 +344,8 @@ public class RecruitingSubTree implements IRecruiting
         {
             if (anyDemiLord.keySet().contains(recruit))
             {
-                LOGGER.finest("Recruit in anyDemiLord = " + regular.get(rar) +
-                        " " + recruit.getName());
+                LOGGER.finest("Recruit in anyDemiLord = " + regular.get(rar)
+                    + " " + recruit.getName());
                 number = Math.min(number, anyDemiLord.get(recruit).intValue());
             }
         }
@@ -356,13 +353,12 @@ public class RecruitingSubTree implements IRecruiting
         {
             LOGGER.finest("Checking with CRB " + crb.getClass().getName());
             number = Math.min(number, crb.numberOfRecruiterNeeded(recruiter,
-                    recruit, hex));
+                recruit, hex));
         }
         return number;
     }
 
-    public Set<CreatureType> getPossibleRecruits(
-            MasterHex hex)
+    public Set<CreatureType> getPossibleRecruits(MasterHex hex)
     {
         Set<CreatureType> possibleRecruits = new TreeSet<CreatureType>();
 
@@ -376,8 +372,7 @@ public class RecruitingSubTree implements IRecruiting
         return possibleRecruits;
     }
 
-    public Set<CreatureType> getPossibleRecruiters(
-            MasterHex hex)
+    public Set<CreatureType> getPossibleRecruiters(MasterHex hex)
     {
         if (!any.keySet().isEmpty())
         {
@@ -447,8 +442,7 @@ public class RecruitingSubTree implements IRecruiting
         for (CreatureType rec : allRecruits)
         {
             int num = this.numberOfRecruiterNeeded(ct, rec, hex);
-            if ((num < Constants.BIGNUM) &&
-                (num > max))
+            if ((num < Constants.BIGNUM) && (num > max))
             {
                 max = num;
             }
@@ -460,7 +454,8 @@ public class RecruitingSubTree implements IRecruiting
     {
         for (MasterBoardTerrain terrain : variant.getTerrains())
         {
-            RecruitingSubTree r = (RecruitingSubTree)terrain.getRecruitingSubTree();
+            RecruitingSubTree r = (RecruitingSubTree)terrain
+                .getRecruitingSubTree();
             for (RecruiterAndRecruit rar : r.regular.keySet())
             {
                 if (rar.getRecruiter().equals(creature))
@@ -480,7 +475,7 @@ public class RecruitingSubTree implements IRecruiting
         Variant variant, CreatureType creature)
     {
         Set<CreatureType> results = new TreeSet<CreatureType>();
-        Map<MasterBoardTerrain,Set<CreatureType>> checked = new HashMap<MasterBoardTerrain,Set<CreatureType>>();
+        Map<MasterBoardTerrain, Set<CreatureType>> checked = new HashMap<MasterBoardTerrain, Set<CreatureType>>();
         results.addAll(getAllInAllSubtreesIgnoringSpecialsRec(variant,
             checked, creature));
         return results;
@@ -497,29 +492,32 @@ public class RecruitingSubTree implements IRecruiting
         {
             if (checked.get(terrain) == null)
             {
-                checked.put(terrain,new TreeSet<CreatureType>());
+                checked.put(terrain, new TreeSet<CreatureType>());
             }
-            RecruitingSubTree r = (RecruitingSubTree)terrain.getRecruitingSubTree();
+            RecruitingSubTree r = (RecruitingSubTree)terrain
+                .getRecruitingSubTree();
             for (RecruiterAndRecruit rar : r.regular.keySet())
             {
-                RecruiterAndRecruit backward = new RecruiterAndRecruit(rar.getRecruit(), rar.getRecruiter());
+                RecruiterAndRecruit backward = new RecruiterAndRecruit(rar
+                    .getRecruit(), rar.getRecruiter());
                 if (r.regular.keySet().contains(backward))
                 { // don't go backward ; we assume backward is the cheapest way.
-                     if ((r.regular.get(rar) >=1) &&
-                         (r.regular.get(backward) < Constants.BIGNUM) &&
-                         (r.regular.get(rar) < r.regular.get(backward)))
-                     {
-                         continue;
-                     }
-                  // also downgrade in point is backward (this doesn't catch Troll -> Ranger)
-                  // but it should have been catched above
-                  // note that this still won't catch C->A if A->B, B->C, and PV(A)==PV(B)==PV(C)
-                     if ((r.regular.get(rar) ==1) &&
-                         (r.regular.get(backward) < Constants.BIGNUM) &&
-                         rar.getRecruit().getPointValue() < backward.getRecruit().getPointValue())
-                     {
-                         continue;
-                     }
+                    if ((r.regular.get(rar) >= 1)
+                        && (r.regular.get(backward) < Constants.BIGNUM)
+                        && (r.regular.get(rar) < r.regular.get(backward)))
+                    {
+                        continue;
+                    }
+                    // also downgrade in point is backward (this doesn't catch Troll -> Ranger)
+                    // but it should have been catched above
+                    // note that this still won't catch C->A if A->B, B->C, and PV(A)==PV(B)==PV(C)
+                    if ((r.regular.get(rar) == 1)
+                        && (r.regular.get(backward) < Constants.BIGNUM)
+                        && rar.getRecruit().getPointValue() < backward
+                            .getRecruit().getPointValue())
+                    {
+                        continue;
+                    }
                 }
                 else
                 {

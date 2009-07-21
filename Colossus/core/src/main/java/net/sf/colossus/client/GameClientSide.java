@@ -290,7 +290,6 @@ public class GameClientSide extends Game implements IOracle
         }
     }
 
-
     /** Return a list of Strings.  Use the proper string for titans and
      *  unknown creatures. */
     // public for IOracle

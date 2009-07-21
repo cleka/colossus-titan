@@ -5,6 +5,7 @@ import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.variant.CreatureType;
 
+
 public class SummonUndo extends AddCreatureAction
 {
     public SummonUndo(Legion legion, CreatureType creatureType)

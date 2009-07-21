@@ -177,8 +177,8 @@ public class CreatureServerSide extends Creature
         setCurrentHex(getStartingHex());
         LOGGER.log(Level.INFO, getName() + " undoes move and returns to "
             + getStartingHex());
-        battle.getGame().getServer().allTellBattleMove(tag,
-            formerHexLabel, getCurrentHex(), true);
+        battle.getGame().getServer().allTellBattleMove(tag, formerHexLabel,
+            getCurrentHex(), true);
     }
 
     boolean canStrike(Creature target)
@@ -251,12 +251,11 @@ public class CreatureServerSide extends Creature
              * below in your logfile, then it isn't correct ;-)
              */
             int checkStrikingPower = getStrikingPower(target, hex
-                .getElevation(), targetHex.getElevation(),
-                hex.getTerrain(), targetHex.getTerrain(),
-                hex.getHexsideHazard(BattleServerSide.getDirection(hex,
-                    targetHex, false)),
-                targetHex.getHexsideHazard(BattleServerSide.getDirection(
-                    targetHex, hex, false)));
+                .getElevation(), targetHex.getElevation(), hex.getTerrain(),
+                targetHex.getTerrain(), hex.getHexsideHazard(BattleServerSide
+                    .getDirection(hex, targetHex, false)), targetHex
+                    .getHexsideHazard(BattleServerSide.getDirection(targetHex,
+                        hex, false)));
 
             if (checkStrikingPower != dice)
             {
@@ -323,25 +322,27 @@ public class CreatureServerSide extends Creature
              * below in your logfile, then it isn't correct ;-)
              */
             int checkStrikingSkill = getStrikingSkill(target, hex
-                .getElevation(), targetHex.getElevation(),
-                hex.getTerrain(), targetHex.getTerrain(),
-                hex.getHexsideHazard(BattleServerSide.getDirection(hex,
-                    targetHex, false)),
-                targetHex.getHexsideHazard(BattleServerSide.getDirection(
-                    targetHex, hex, false)));
+                .getElevation(), targetHex.getElevation(), hex.getTerrain(),
+                targetHex.getTerrain(), hex.getHexsideHazard(BattleServerSide
+                    .getDirection(hex, targetHex, false)), targetHex
+                    .getHexsideHazard(BattleServerSide.getDirection(targetHex,
+                        hex, false)));
 
             if (checkStrikingSkill != attackerSkill)
             {
-                LOGGER.warning(String.format("For creature %s striking %s from %s(%d) to %s(%d) via %s/%s, " +
-                		"we calculated %d as attacker skill, but getStrikingSkill says %d",
-                    this, target, hex.getTerrain(), Integer
+                LOGGER
+                    .warning(String
+                        .format(
+                            "For creature %s striking %s from %s(%d) to %s(%d) via %s/%s, "
+                                + "we calculated %d as attacker skill, but getStrikingSkill says %d",
+                            this, target, hex.getTerrain(), Integer
                                 .valueOf(hex.getElevation()), targetHex
                                 .getTerrain(), Integer.valueOf(targetHex
-                                .getElevation()),
-                    hex.getHexsideHazard(BattleServerSide.getDirection(hex,
-                        targetHex, false)),
-                    targetHex.getHexsideHazard(BattleServerSide.getDirection(
-                        targetHex, hex, false)), Integer
+                                .getElevation()), hex
+                                .getHexsideHazard(BattleServerSide
+                                    .getDirection(hex, targetHex, false)),
+                            targetHex.getHexsideHazard(BattleServerSide
+                                .getDirection(targetHex, hex, false)), Integer
                                 .valueOf(attackerSkill), Integer
                                 .valueOf(checkStrikingSkill)));
             }
@@ -711,9 +712,9 @@ public class CreatureServerSide extends Creature
             }
         }
 
-        LOGGER.log(Level.INFO, getName() + " in " + getCurrentHex() + " strikes "
-            + target.getDescription() + " with strike number " + strikeNumber
-            + ", rolling: " + rollString + ": " + damage
+        LOGGER.log(Level.INFO, getName() + " in " + getCurrentHex()
+            + " strikes " + target.getDescription() + " with strike number "
+            + strikeNumber + ", rolling: " + rollString + ": " + damage
             + (damage == 1 ? " hit" : " hits"));
 
         int carryDamage = target.wound(damage);

@@ -1,7 +1,6 @@
 package net.sf.colossus.gui;
 
 
-
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -88,7 +87,8 @@ final class SplitLegion extends KDialog
 
         setBackground(Color.lightGray);
 
-        addWindowListener(new WindowAdapter(){
+        addWindowListener(new WindowAdapter()
+        {
             @Override
             public void windowClosing(WindowEvent e)
             {
@@ -122,7 +122,8 @@ final class SplitLegion extends KDialog
             final Chit chit = new Chit(scale, imageName);
             oldChits.add(chit);
             oldBox.add(chit);
-            chit.addMouseListener(new MouseAdapter(){
+            chit.addMouseListener(new MouseAdapter()
+            {
                 @Override
                 public void mousePressed(MouseEvent e)
                 {
@@ -157,7 +158,8 @@ final class SplitLegion extends KDialog
         button1 = new JButton("Done");
         button1.setEnabled(false);
         button1.setMnemonic(KeyEvent.VK_D);
-        button1.addActionListener(new ActionListener(){
+        button1.addActionListener(new ActionListener()
+        {
             public void actionPerformed(ActionEvent e)
             {
                 if (!isSplitLegal(true))
@@ -165,13 +167,14 @@ final class SplitLegion extends KDialog
                     return;
                 }
                 returnSplitResults();
-          }
+            }
         });
         buttonBox.add(button1);
 
         button2 = new JButton("Cancel");
         button2.setMnemonic(KeyEvent.VK_C);
-        button2.addActionListener(new ActionListener(){
+        button2.addActionListener(new ActionListener()
+        {
             public void actionPerformed(ActionEvent e)
             {
                 cancel();
@@ -271,7 +274,8 @@ final class SplitLegion extends KDialog
             {
                 if (showMessage)
                 {
-                    gui.showMessageDialogAndWait("Each stack must have one lord.");
+                    gui
+                        .showMessageDialogAndWait("Each stack must have one lord.");
                 }
                 return false;
             }

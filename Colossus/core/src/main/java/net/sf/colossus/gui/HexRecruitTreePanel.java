@@ -1,5 +1,6 @@
 package net.sf.colossus.gui;
 
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.MouseAdapter;
@@ -94,8 +95,8 @@ public class HexRecruitTreePanel extends Box
         terrainLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         add(terrainLabel);
 
-        List<CreatureType> creatures = ivariant.getPossibleRecruits(
-            terrain, hex);
+        List<CreatureType> creatures = ivariant.getPossibleRecruits(terrain,
+            hex);
         Iterator<CreatureType> it = creatures.iterator();
         boolean firstTime = true;
         int scale = 4 * Scale.get();
@@ -113,8 +114,8 @@ public class HexRecruitTreePanel extends Box
             }
             else
             {
-                numToRecruit = ivariant.numberOfRecruiterNeeded(
-                    prevCreature, creature, terrain, hex);
+                numToRecruit = ivariant.numberOfRecruiterNeeded(prevCreature,
+                    creature, terrain, hex);
             }
 
             JLabel numToRecruitLabel = new JLabel("");
@@ -159,8 +160,7 @@ public class HexRecruitTreePanel extends Box
         {
             CreatureType type = chitToCreatureMap.get(source);
             ShowCreatureDetails creatureWindow = new ShowCreatureDetails(
-                this.parentFrame, type, null, null, this.variant,
-                gui);
+                this.parentFrame, type, null, null, this.variant, gui);
             creatureWindows.add(creatureWindow);
         }
         else

@@ -409,8 +409,8 @@ public class RationalAI extends SimpleAI
 
             while ((currentScore + pointValue) >= nextScore)
             {
-                List<String> ral = variant
-                    .getRecruitableAcquirableList(terrain, nextScore);
+                List<String> ral = variant.getRecruitableAcquirableList(
+                    terrain, nextScore);
                 Iterator<String> it = ral.iterator();
 
                 while (it.hasNext())
@@ -672,8 +672,8 @@ public class RationalAI extends SimpleAI
         final double val;
         final boolean noMove;
 
-        LegionBoardMove(Legion legion, MasterHex fromHex,
-            MasterHex toHex, double val, boolean noMove)
+        LegionBoardMove(Legion legion, MasterHex fromHex, MasterHex toHex,
+            double val, boolean noMove)
         {
             this.legion = legion;
             this.fromHex = fromHex;
@@ -946,8 +946,7 @@ public class RationalAI extends SimpleAI
          */
         for (Legion legion : player.getLegions())
         {
-            List<Legion> friendlyLegions = client
-                .getGameClientSide()
+            List<Legion> friendlyLegions = client.getGameClientSide()
                 .getFriendlyLegions(legion.getCurrentHex(), player);
 
             if (friendlyLegions.size() > 1)
@@ -957,8 +956,7 @@ public class RationalAI extends SimpleAI
         }
         for (MasterHex hex : unsplitHexes)
         {
-            List<Legion> friendlyLegions = client
-                .getGameClientSide()
+            List<Legion> friendlyLegions = client.getGameClientSide()
                 .getFriendlyLegions(hex, player);
 
             // pick just any legion for asking the getMovement
@@ -1080,8 +1078,7 @@ public class RationalAI extends SimpleAI
                 for (MasterHex targetHex : set)
                 {
                     // The set of moves includes still hexes occupied by our own legions.
-                    List<Legion> targetOwnLegions = client
-                        .getGameClientSide()
+                    List<Legion> targetOwnLegions = client.getGameClientSide()
                         .getFriendlyLegions(targetHex, player);
                     if (targetOwnLegions.size() == 0)
                     {
@@ -1146,8 +1143,7 @@ public class RationalAI extends SimpleAI
         MasterHex bestHex = null;
         for (MasterHex targetHex : minValueMoves)
         {
-            List<Legion> targetOwnLegions = client
-                .getGameClientSide()
+            List<Legion> targetOwnLegions = client.getGameClientSide()
                 .getFriendlyLegions(targetHex, player);
             if (targetOwnLegions.size() == 0)
             {
@@ -1691,8 +1687,7 @@ public class RationalAI extends SimpleAI
         int value = 0;
         // consider making an attack
         final Legion defender = client.getGameClientSide()
-            .getFirstEnemyLegion(hex, attacker
-            .getPlayer());
+            .getFirstEnemyLegion(hex, attacker.getPlayer());
 
         if (defender != null)
         {
@@ -1742,8 +1737,8 @@ public class RationalAI extends SimpleAI
     }
 
     /** Memoizing wrapper for evaluateMoveInner */
-    private int evaluateMove(Legion legion, MasterHex hex,
-        int canRecruitHere, int depth, boolean addHexRisk)
+    private int evaluateMove(Legion legion, MasterHex hex, int canRecruitHere,
+        int depth, boolean addHexRisk)
     {
         String sep = "~";
         String key = "" + legion + sep + hex + sep + canRecruitHere + sep

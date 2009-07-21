@@ -236,7 +236,6 @@ public class Game
         this.gameOverMessage = message;
     }
 
-
     public void setEngagementData(MasterHex hex, Legion attacker,
         Legion defender)
     {
@@ -497,8 +496,8 @@ public class Game
      */
     public Legion getFirstEnemyLegion(MasterHex masterHex, Player player)
     {
-        assert masterHex != null: "Hex needs to be specified";
-        assert player != null: "Player needs to be specified";
+        assert masterHex != null : "Hex needs to be specified";
+        assert player != null : "Player needs to be specified";
         for (Legion legion : getAllEnemyLegions(player))
         {
             if (masterHex.equals(legion.getCurrentHex()))
@@ -582,7 +581,6 @@ public class Game
         }
         return false;
     }
-
 
     /**
      * Return a set of all other unengaged legions of the legion's player

@@ -1,7 +1,6 @@
 package net.sf.colossus.gui;
 
 
-
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -285,7 +284,8 @@ final class EventViewer extends KDialog
         cb.setSelected(selected);
         cb.setAlignmentX(Component.LEFT_ALIGNMENT);
         cb.setAlignmentY(Component.TOP_ALIGNMENT);
-        cb.addItemListener(new ItemListener(){
+        cb.addItemListener(new ItemListener()
+        {
             public void itemStateChanged(ItemEvent e)
             {
                 boolean selected = (e.getStateChange() == ItemEvent.SELECTED);
@@ -346,7 +346,8 @@ final class EventViewer extends KDialog
                 }
 
                 updatePanels(false);
-            }});
+            }
+        });
         pane.add(cb);
     }
 
@@ -493,9 +494,10 @@ final class EventViewer extends KDialog
         }
 
         maxTurnsDisplayExpiringBox = new JComboBox(Choices);
-        maxTurnsDisplayExpiringBox.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent e)
+        maxTurnsDisplayExpiringBox.addActionListener(new ActionListener()
         {
+            public void actionPerformed(ActionEvent e)
+            {
                 String value = (String)maxTurnsDisplayExpiringBox
                     .getSelectedItem();
                 options.setOption(evMaxTurns, value);
@@ -508,7 +510,8 @@ final class EventViewer extends KDialog
                     maxTurns = Integer.parseInt(value);
                 }
                 updatePanels(true);
-                }});
+            }
+        });
         maxTurnsDisplayExpiringBox.setSelectedItem(maxTurnsOptString);
         miscPane.add(new JLabel("Display max. (turns):"));
         miscPane.add(maxTurnsDisplayExpiringBox);
@@ -820,16 +823,14 @@ final class EventViewer extends KDialog
 
         attackerEventLegion = new RevealEvent(client, turnNumber,
             getActivePlayer(), RevealEvent.eventBattle,
-            attacker
-                .getMarkerId(), attacker.getHeight(),
+            attacker.getMarkerId(), attacker.getHeight(),
             new ArrayList<RevealedCreature>(), null, 0);
         attackerEventLegion.setEventInfo(Constants.reasonBattleStarts);
         attackerEventLegion.setRealPlayer(attacker.getPlayer());
 
         defenderEventLegion = new RevealEvent(client, turnNumber,
             getActivePlayer(), RevealEvent.eventBattle,
-            defender
-                .getMarkerId(), defender.getHeight(),
+            defender.getMarkerId(), defender.getHeight(),
             new ArrayList<RevealedCreature>(), null, 0);
 
         defenderEventLegion.setEventInfo(Constants.reasonBattleStarts);
@@ -1091,8 +1092,7 @@ final class EventViewer extends KDialog
                 1);
             rcList.add(rc);
             newEvent(RevealEvent.eventAcquire, legion.getMarkerId(),
-                newHeight, rcList,
-                null, 0);
+                newHeight, rcList, null, 0);
 
             if (attackerEventLegion == null || defenderEventLegion == null)
             {
@@ -1102,8 +1102,7 @@ final class EventViewer extends KDialog
                     + client.getTurnNumber() + " player "
                     + client.getActivePlayer().getName() + " phase "
                     + client.getPhase() + " markerid " + legion.getMarkerId()
-                    + " marker owner"
-                    + legion.getPlayer().getName()
+                    + " marker owner" + legion.getPlayer().getName()
                     + "last engagement were" + " attacker "
                     + lastAttackerEventLegion.getMarkerId() + " defender "
                     + lastDefenderEventLegion.getMarkerId());
@@ -1143,8 +1142,7 @@ final class EventViewer extends KDialog
             LOGGER.log(Level.FINEST, "During battle, remove creature " + type
                 + " from attacker legion " + legion);
 
-            attackerEventLegion.setCreatureDied(type, attacker
-                .getHeight());
+            attackerEventLegion.setCreatureDied(type, attacker.getHeight());
         }
 
         else if (defender != null && defenderEventLegion != null
@@ -1152,8 +1150,7 @@ final class EventViewer extends KDialog
         {
             LOGGER.log(Level.FINEST, "During battle, remove creature " + type
                 + " from defender legion " + legion);
-            defenderEventLegion.setCreatureDied(type, defender
-                .getHeight());
+            defenderEventLegion.setCreatureDied(type, defender.getHeight());
         }
     }
 

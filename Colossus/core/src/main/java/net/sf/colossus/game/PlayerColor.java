@@ -22,10 +22,9 @@ public enum PlayerColor
     BLACK("Black", "Bk", KeyEvent.VK_B), BLUE("Blue", "Bu", KeyEvent.VK_L), BROWN(
         "Brown", "Br", KeyEvent.VK_O), GOLD("Gold", "Gd", KeyEvent.VK_G), GREEN(
         "Green", "Gr", KeyEvent.VK_E), RED("Red", "Rd", KeyEvent.VK_R), ORANGE(
-        "Orange", "Or", KeyEvent.VK_A), PURPLE("Purple", "Pu",
-        KeyEvent.VK_P), SILVER("Silver", "Si", KeyEvent.VK_S), SKY("Sky",
-        "Sk", KeyEvent.VK_K), PINE("Pine", "Pi", KeyEvent.VK_N), INDIGO(
-        "Indigo", "In", KeyEvent.VK_I);
+        "Orange", "Or", KeyEvent.VK_A), PURPLE("Purple", "Pu", KeyEvent.VK_P), SILVER(
+        "Silver", "Si", KeyEvent.VK_S), SKY("Sky", "Sk", KeyEvent.VK_K), PINE(
+        "Pine", "Pi", KeyEvent.VK_N), INDIGO("Indigo", "In", KeyEvent.VK_I);
 
     private final String name;
     private final String shortName;

@@ -1,9 +1,6 @@
 package net.sf.colossus.server;
 
 
-
-
-
 public interface INotifyWebServer
 {
 

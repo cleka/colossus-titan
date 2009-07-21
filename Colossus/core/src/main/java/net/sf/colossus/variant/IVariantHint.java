@@ -56,8 +56,7 @@ public interface IVariantHint
      *         skipped.
      */
     public CreatureType getRecruitHint(MasterBoardTerrain terrain,
-        IOracleLegion legion, List<CreatureType> recruits,
-        IHintOracle oracle,
+        IOracleLegion legion, List<CreatureType> recruits, IHintOracle oracle,
         List<AIStyle> aiStyles);
 
     /**

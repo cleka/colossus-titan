@@ -1,6 +1,8 @@
 package net.sf.colossus.variant;
 
+
 import java.util.Set;
+
 
 /**
  * Interface for recruiting. All recruiting should go through one of those.
@@ -16,12 +18,14 @@ public interface IRecruiting
      * @return The number of recruiter needed to obtain a recruit in hex
      */
     public int numberOfRecruiterNeeded(CreatureType recruiter,
-            CreatureType recruit, MasterHex hex);
+        CreatureType recruit, MasterHex hex);
+
     /** Return all the CreatureType that can be (somehow) recruited in the hex.
      * @param hex The hexagon to consider
      * @return All CreatureType that can be recruited in hex
      */
     public Set<CreatureType> getPossibleRecruits(MasterHex hex);
+
     /** Return all the CreatureType that can be recruits (something) in the hex.
      * @param hex The hexagon to consider
      * @return All CreatureType that can recruit in hex

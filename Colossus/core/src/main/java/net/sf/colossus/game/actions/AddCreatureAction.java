@@ -1,5 +1,6 @@
 package net.sf.colossus.game.actions;
 
+
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.variant.CreatureType;
 
@@ -11,13 +12,11 @@ import net.sf.colossus.variant.CreatureType;
  *
  * TODO make abstract once History handles the subclasses properly
  */
-public class AddCreatureAction extends LegionAction implements
-    RevealingAction
+public class AddCreatureAction extends LegionAction implements RevealingAction
 {
     private final CreatureType creatureType;
 
-    public AddCreatureAction(Legion legion,
-        CreatureType creatureType)
+    public AddCreatureAction(Legion legion, CreatureType creatureType)
     {
         super(legion);
         this.creatureType = creatureType;

@@ -271,7 +271,8 @@ public class HexMap extends JPanel
                         h[i][j].setNeighbor(1, h[i + 1][j - ((i + 1) & 1)]);
                     }
 
-                    if (i < 5 && j + (i & 1) < 6 && VISIBLE_HEXES[i + 1][j + (i & 1)])
+                    if (i < 5 && j + (i & 1) < 6
+                        && VISIBLE_HEXES[i + 1][j + (i & 1)])
                     {
                         h[i][j].setNeighbor(2, h[i + 1][j + (i & 1)]);
                     }
@@ -281,7 +282,8 @@ public class HexMap extends JPanel
                         h[i][j].setNeighbor(3, h[i][j + 1]);
                     }
 
-                    if (i > 0 && j + (i & 1) < 6 && VISIBLE_HEXES[i - 1][j + (i & 1)])
+                    if (i > 0 && j + (i & 1) < 6
+                        && VISIBLE_HEXES[i - 1][j + (i & 1)])
                     {
                         h[i][j].setNeighbor(4, h[i - 1][j + (i & 1)]);
                     }
@@ -480,7 +482,8 @@ public class HexMap extends JPanel
 
             if (getSubtitle() != null)
             {
-                g.setFont(StaticResourceLoader.DEFAULT_FONT.deriveFont((float)24));
+                g.setFont(StaticResourceLoader.DEFAULT_FONT
+                    .deriveFont((float)24));
                 fm = g.getFontMetrics();
                 int tma2 = fm.getMaxAscent();
                 bounds = fm.getStringBounds(getSubtitle(), g);

@@ -203,8 +203,8 @@ class Chit extends JPanel
     {
         ImageIcon tempIcon = null;
         List<String> directories = VariantSupport.getImagesDirectoriesList();
-        tempIcon = StaticResourceLoader.getImageIcon(imageFilename, directories,
-            scale, scale);
+        tempIcon = StaticResourceLoader.getImageIcon(imageFilename,
+            directories, scale, scale);
         if (tempIcon == null)
         {
             LOGGER.log(Level.SEVERE, "Couldn't get image :" + imageFilename);
@@ -219,8 +219,8 @@ class Chit extends JPanel
     private static Image getImage(String[] imageFilenames, int scale)
     {
         List<String> directories = VariantSupport.getImagesDirectoriesList();
-        Image composite = StaticResourceLoader.getCompositeImage(imageFilenames,
-            directories, scale, scale);
+        Image composite = StaticResourceLoader.getCompositeImage(
+            imageFilenames, directories, scale, scale);
         return composite;
     }
 

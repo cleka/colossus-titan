@@ -184,7 +184,6 @@ public final class Options implements IOptions
 
     private final Map<String, List<Listener>> listeners = new HashMap<String, List<Listener>>();
 
-
     public Options(String owner, String customPath, boolean noFile,
         boolean readOnly)
     {

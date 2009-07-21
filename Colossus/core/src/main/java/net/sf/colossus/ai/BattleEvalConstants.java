@@ -1,5 +1,6 @@
 package net.sf.colossus.ai;
 
+
 /**
  * Various constants used by the AIs code for battle evaluation.
  * Each specific AI should be able to override them

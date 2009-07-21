@@ -41,9 +41,10 @@ public class CreatureLoader implements AllCreatureType
         .getName());
     private static final String currentVersion = "2";
     private final SortedSet<CreatureType> creatures;
-    private final Map<String,CreatureType> byName = new TreeMap<String,CreatureType>();
+    private final Map<String, CreatureType> byName = new TreeMap<String, CreatureType>();
 
-    public CreatureLoader() {
+    public CreatureLoader()
+    {
         this.creatures = new TreeSet<CreatureType>();
     }
 
@@ -172,8 +173,8 @@ public class CreatureLoader implements AllCreatureType
             parameters[14] = count;
             parameters[15] = plural_name;
             parameters[16] = base_color;
-            creature = (CreatureType)StaticResourceLoader.getNewObject(custom_class,
-                varDirectoriesList, parameters);
+            creature = (CreatureType)StaticResourceLoader.getNewObject(
+                custom_class, varDirectoriesList, parameters);
         }
         this.creatures.add(creature);
         this.byName.put(name, creature);
@@ -181,7 +182,8 @@ public class CreatureLoader implements AllCreatureType
 
     public List<CreatureType> getCreatureTypesAsList()
     {
-        return Collections.unmodifiableList(new ArrayList<CreatureType>(this.creatures));
+        return Collections.unmodifiableList(new ArrayList<CreatureType>(
+            this.creatures));
     }
 
     public SortedSet<CreatureType> getCreatureTypes()

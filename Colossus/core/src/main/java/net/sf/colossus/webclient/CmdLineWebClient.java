@@ -1,5 +1,6 @@
 package net.sf.colossus.webclient;
 
+
 import java.util.logging.Logger;
 
 
@@ -14,7 +15,6 @@ public class CmdLineWebClient
 {
     private static final Logger LOGGER = Logger
         .getLogger(CmdLineWebClient.class.getName());
-
 
     public CmdLineWebClient()
     {

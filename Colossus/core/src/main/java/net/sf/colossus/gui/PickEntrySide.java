@@ -54,7 +54,8 @@ final class PickEntrySide extends HexMap
             leftButton = new JButton(EntrySide.LEFT.getLabel());
             leftButton.setMnemonic(KeyEvent.VK_L);
             contentPane.add(leftButton);
-            leftButton.addActionListener(new ActionListener(){
+            leftButton.addActionListener(new ActionListener()
+            {
                 public void actionPerformed(ActionEvent e)
                 {
                     cleanup(EntrySide.LEFT);
@@ -67,7 +68,8 @@ final class PickEntrySide extends HexMap
             bottomButton = new JButton(EntrySide.BOTTOM.getLabel());
             bottomButton.setMnemonic(KeyEvent.VK_B);
             contentPane.add(bottomButton);
-            bottomButton.addActionListener(new ActionListener(){
+            bottomButton.addActionListener(new ActionListener()
+            {
                 public void actionPerformed(ActionEvent e)
                 {
                     cleanup(EntrySide.BOTTOM);
@@ -80,7 +82,8 @@ final class PickEntrySide extends HexMap
             rightButton = new JButton(EntrySide.RIGHT.getLabel());
             rightButton.setMnemonic(KeyEvent.VK_R);
             contentPane.add(rightButton);
-            rightButton.addActionListener(new ActionListener(){
+            rightButton.addActionListener(new ActionListener()
+            {
                 public void actionPerformed(ActionEvent e)
                 {
                     cleanup(EntrySide.RIGHT);
@@ -88,7 +91,8 @@ final class PickEntrySide extends HexMap
             });
         }
 
-        dialog.addWindowListener(new WindowAdapter(){
+        dialog.addWindowListener(new WindowAdapter()
+        {
             @Override
             public void windowClosing(WindowEvent e)
             {

@@ -431,8 +431,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         battleBoard = new BattleBoard(this, getGame().getEngagement());
     }
 
-    public void setStrikeNumbers(BattleUnit striker,
-        Set<BattleHex> targetHexes)
+    public void setStrikeNumbers(BattleUnit striker, Set<BattleHex> targetHexes)
     {
         for (BattleHex targetHex : targetHexes)
         {
@@ -1131,8 +1130,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         }
     }
 
-    public void actOnUndidRecruitPart(Legion legion,
-        boolean wasReinforcement, int turnNumber)
+    public void actOnUndidRecruitPart(Legion legion, boolean wasReinforcement,
+        int turnNumber)
     {
         int eventType = wasReinforcement ? RevealEvent.eventReinforce
             : RevealEvent.eventRecruit;
@@ -2253,8 +2252,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
                     return hex.equals(battleChit.getBattleUnit()
                         .getCurrentHex());
                 }
-            }
-        );
+            });
     }
 
     public GUIBattleChit getGUIBattleChit(BattleHex hex)
@@ -2269,8 +2267,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         return null;
     }
 
-    public void actOnPlaceNewChit(String imageName,
-        BattleUnit battleUnit, BattleHex hex)
+    public void actOnPlaceNewChit(String imageName, BattleUnit battleUnit,
+        BattleHex hex)
     {
         Legion legion = battleUnit.getLegion();
         PlayerColor playerColor = legion.getPlayer().getColor();
@@ -2301,7 +2299,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     }
 
     public void actOnTellStrikeResults(boolean wasCarry, int strikeNumber,
-        List<String> rolls,BattleCritter striker, BattleCritter target)
+        List<String> rolls, BattleCritter striker, BattleCritter target)
     {
         if (battleBoard != null)
         {

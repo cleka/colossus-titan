@@ -1,7 +1,6 @@
 package net.sf.colossus.util;
 
 
-
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
@@ -21,22 +20,24 @@ import java.io.IOException;
 
 public final class ClipBoardAccess implements ClipboardOwner
 {
-    public static void main (String...  aArguments)
+    public static void main(String... aArguments)
     {
         ClipBoardAccess cbAccess = new ClipBoardAccess();
-        
+
         //display what is currently on the clipboard
-        System.out.println("Clipboard contains:" + cbAccess.getClipboardContents());
+        System.out.println("Clipboard contains:"
+            + cbAccess.getClipboardContents());
 
         //change the contents and then re-display
         cbAccess.setClipboardContents("blah, blah, blah");
-        System.out.println("Clipboard contains:" + cbAccess.getClipboardContents());
+        System.out.println("Clipboard contains:"
+            + cbAccess.getClipboardContents());
     }
 
     /**
      * Empty implementation of the ClipboardOwner interface.
      */
-    public void lostOwnership( Clipboard aClipboard, Transferable aContents)
+    public void lostOwnership(Clipboard aClipboard, Transferable aContents)
     {
         //do nothing
     }
@@ -64,13 +65,14 @@ public final class ClipBoardAccess implements ClipboardOwner
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         //odd: the Object param of getContents is not currently used
         Transferable contents = clipboard.getContents(null);
-        
-        if (contents != null 
+
+        if (contents != null
             && contents.isDataFlavorSupported(DataFlavor.stringFlavor))
         {
             try
             {
-                result = (String)contents.getTransferData(DataFlavor.stringFlavor);
+                result = (String)contents
+                    .getTransferData(DataFlavor.stringFlavor);
             }
             catch (UnsupportedFlavorException ex)
             {
@@ -86,5 +88,4 @@ public final class ClipBoardAccess implements ClipboardOwner
         }
         return result;
     }
-} 
-
+}

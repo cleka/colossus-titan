@@ -73,7 +73,6 @@ public class TerrainRecruitLoader implements IVariantInitializer
     /** Amount of points needed for Titan Teleport. */
     private int titanTeleport = 400;
 
-
     /**
      * Map a terrain to a list of recruits.
      *
@@ -255,7 +254,8 @@ public class TerrainRecruitLoader implements IVariantInitializer
 
     // we need to cast since JDOM is not generified
     @SuppressWarnings("unchecked")
-    public TerrainRecruitLoader(InputStream terIS, AllCreatureType creatureTypes)
+    public TerrainRecruitLoader(InputStream terIS,
+        AllCreatureType creatureTypes)
     {
         this.creatureTypes = creatureTypes;
         SAXBuilder builder = new SAXBuilder();
@@ -379,17 +379,18 @@ public class TerrainRecruitLoader implements IVariantInitializer
         terrain.setRecruitingSubTree(rst);
     }
 
-    private RecruitingSubTree buildRecruitingSubTree(List<RecruitNumber> rl, boolean regularRecruit)
+    private RecruitingSubTree buildRecruitingSubTree(List<RecruitNumber> rl,
+        boolean regularRecruit)
     {
         RecruitingSubTree rst = new RecruitingSubTree(this.creatureTypes);
         RecruitNumber recruiter = null;
         for (RecruitNumber recruit : rl)
         {
-            if (recruit.getName().equals(Keyword_Anything) ||
-                recruit.getName().equals(Keyword_AnyNonLord) ||
-                recruit.getName().equals(Keyword_Lord) ||
-                recruit.getName().equals(Keyword_DemiLord) ||
-                recruit.getName().equals("Titan"))
+            if (recruit.getName().equals(Keyword_Anything)
+                || recruit.getName().equals(Keyword_AnyNonLord)
+                || recruit.getName().equals(Keyword_Lord)
+                || recruit.getName().equals(Keyword_DemiLord)
+                || recruit.getName().equals("Titan"))
             {
                 recruiter = recruit;
                 continue;
@@ -400,8 +401,10 @@ public class TerrainRecruitLoader implements IVariantInitializer
                 recruiter = null;
                 continue;
             }
-            if (recruit.getNumber() < 0) {
-                assert regularRecruit == false : "Oups, number for recruit is " + recruit.getNumber() + " but regularRecruit is true";
+            if (recruit.getNumber() < 0)
+            {
+                assert regularRecruit == false : "Oups, number for recruit is "
+                    + recruit.getNumber() + " but regularRecruit is true";
                 recruiter = recruit;
                 continue;
             }
@@ -409,35 +412,32 @@ public class TerrainRecruitLoader implements IVariantInitializer
             {
                 if (recruiter.getName().equals(Keyword_Anything))
                 {
-                    rst.addAny(creatureTypes.getCreatureTypeByName(
-                            recruit.getName()),
-                            recruit.getNumber());
+                    rst.addAny(creatureTypes.getCreatureTypeByName(recruit
+                        .getName()), recruit.getNumber());
                 }
                 else if (recruiter.getName().equals(Keyword_AnyNonLord))
                 {
-                    rst.addNonLord(creatureTypes.getCreatureTypeByName(
-                            recruit.getName()),
-                            recruit.getNumber());
+                    rst.addNonLord(creatureTypes.getCreatureTypeByName(recruit
+                        .getName()), recruit.getNumber());
                 }
                 else if (recruiter.getName().equals(Keyword_Lord))
                 {
-                    rst.addLord(creatureTypes.getCreatureTypeByName(
-                            recruit.getName()),
-                            recruit.getNumber());
+                    rst.addLord(creatureTypes.getCreatureTypeByName(recruit
+                        .getName()), recruit.getNumber());
                 }
                 else if (recruiter.getName().equals(Keyword_DemiLord))
                 {
-                    rst.addDemiLord(creatureTypes.getCreatureTypeByName(
-                            recruit.getName()),
-                            recruit.getNumber());
+                    rst.addDemiLord(creatureTypes
+                        .getCreatureTypeByName(recruit.getName()), recruit
+                        .getNumber());
                 }
                 else
                 {
-                    rst.addRegular(creatureTypes.getCreatureTypeByName(
-                            recruiter.getName()),
-                            creatureTypes.getCreatureTypeByName(
-                            recruit.getName()),
-                            recruit.getNumber());
+                    rst
+                        .addRegular(creatureTypes
+                            .getCreatureTypeByName(recruiter.getName()),
+                            creatureTypes.getCreatureTypeByName(recruit
+                                .getName()), recruit.getNumber());
                 }
             }
             recruiter = recruit;
@@ -819,13 +819,13 @@ public class TerrainRecruitLoader implements IVariantInitializer
             }
         }
 
-        Set<CreatureType> theSet = terrain.getRecruitingSubTree().
-                getPossibleRecruits(hex);
+        Set<CreatureType> theSet = terrain.getRecruitingSubTree()
+            .getPossibleRecruits(hex);
         Set<CreatureType> theSet2 = new TreeSet<CreatureType>(result);
         if (!theSet.equals(theSet2))
         {
-            LOGGER.warning("Oups, discrepancy between old (graph-based) and " +
-                    "new (RST-based) values for getPossibleRecruits");
+            LOGGER.warning("Oups, discrepancy between old (graph-based) and "
+                + "new (RST-based) values for getPossibleRecruits");
             LOGGER.warning("Old one is:");
             for (CreatureType ct : theSet2)
             {
@@ -918,13 +918,13 @@ public class TerrainRecruitLoader implements IVariantInitializer
             }
         }
 
-        Set<CreatureType> theSet = terrain.getRecruitingSubTree().
-                getPossibleRecruiters(hex);
+        Set<CreatureType> theSet = terrain.getRecruitingSubTree()
+            .getPossibleRecruiters(hex);
         Set<CreatureType> theSet2 = new TreeSet<CreatureType>(re);
         if (!theSet.equals(theSet2))
         {
-            LOGGER.warning("Oups, discrepancy between old (graph-based) and " +
-                    "new (RST-based) values for getPossibleRecruiters");
+            LOGGER.warning("Oups, discrepancy between old (graph-based) and "
+                + "new (RST-based) values for getPossibleRecruiters");
             LOGGER.warning("Old one is:");
             for (CreatureType ct : theSet2)
             {
@@ -959,17 +959,19 @@ public class TerrainRecruitLoader implements IVariantInitializer
         int g_value = graph.numberOfRecruiterNeeded(recruiter.getName(),
             recruit.getName(), terrain, hex);
 
-        int theNumber = terrain.getRecruitingSubTree().numberOfRecruiterNeeded(
-                recruiter, recruit, hex);
+        int theNumber = terrain.getRecruitingSubTree()
+            .numberOfRecruiterNeeded(recruiter, recruit, hex);
 
-        if (g_value != theNumber) {
-            LOGGER.warning("Oups, discrepancy between old (graph-based) and "+
-                    "new (RST-based) values for numberOfRecruiterNeeded ; " +
-                    "old is " + g_value + " while new is " + theNumber +
-                    " when " + recruiter.getName() + " recruits " +
-                    recruit.getName() + " in " + terrain.getId() + " on hex " +
-                    hex.getLabel());
-            LOGGER.warning("The RST is\n" + terrain.getRecruitingSubTree().toString());
+        if (g_value != theNumber)
+        {
+            LOGGER.warning("Oups, discrepancy between old (graph-based) and "
+                + "new (RST-based) values for numberOfRecruiterNeeded ; "
+                + "old is " + g_value + " while new is " + theNumber
+                + " when " + recruiter.getName() + " recruits "
+                + recruit.getName() + " in " + terrain.getId() + " on hex "
+                + hex.getLabel());
+            LOGGER.warning("The RST is\n"
+                + terrain.getRecruitingSubTree().toString());
         }
 
         return g_value;
@@ -1018,7 +1020,6 @@ public class TerrainRecruitLoader implements IVariantInitializer
     {
         return acquirableList;
     }
-
 
     public static class NullTerrainRecruitLoader implements
         IVariantInitializer

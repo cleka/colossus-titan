@@ -45,8 +45,7 @@ public class Recruitment extends AddCreatureAction
     @Override
     public String toString()
     {
-        return String
-            .format(
+        return String.format(
             "Recruitment of creature of type %s into legion %s",
             getRecruited(), getLegion())
             + (getRecruiter() != null ? ", recruiter type is "

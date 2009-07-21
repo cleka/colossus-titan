@@ -182,8 +182,8 @@ public class History
         }
         Element element = new Element("AddCreature");
         element.setAttribute("markerId", event.getLegion().getMarkerId());
-        element
-            .setAttribute("creatureName", event.getAddedCreatureType().getName());
+        element.setAttribute("creatureName", event.getAddedCreatureType()
+            .getName());
         element.setAttribute("turn", "" + turn);
         element.setAttribute("reason", reason);
         recentEvents.add(element);
@@ -237,8 +237,7 @@ public class History
         recentEvents.add(event);
     }
 
-    void revealEvent(boolean allPlayers, List<Player> players,
-        Legion legion,
+    void revealEvent(boolean allPlayers, List<Player> players, Legion legion,
         List<CreatureType> creatures, int turn, String reason)
     {
         if (loading)
@@ -254,10 +253,9 @@ public class History
             // TODO if this case can happen in a regular game no warning
             // should be logged
             LOGGER.log(Level.WARNING, "Called revealEvent(" + allPlayers
-                + ", "
-                + (players != null ? players.toString() : "-null-")
-                + ", " + legion + ", " + creatures.toString() + ", "
-                + turn + ") with empty creatureNames");
+                + ", " + (players != null ? players.toString() : "-null-")
+                + ", " + legion + ", " + creatures.toString() + ", " + turn
+                + ") with empty creatureNames");
             return;
         }
         Element event = new Element("Reveal");
@@ -318,8 +316,7 @@ public class History
         recentEvents.add(event);
     }
 
-    void legionMoveEvent(Legion legion, MasterHex newHex,
-        EntrySide entrySide,
+    void legionMoveEvent(Legion legion, MasterHex newHex, EntrySide entrySide,
         boolean teleport, CreatureType lord)
     {
         if (loading)
@@ -513,8 +510,8 @@ public class History
             }
             else
             {
-                server.oneRevealLegion(game.getPlayerByName(playerName), legion,
-                    creatures, reason);
+                server.oneRevealLegion(game.getPlayerByName(playerName),
+                    legion, creatures, reason);
             }
         }
         else if (eventName.equals("Split"))
@@ -556,9 +553,8 @@ public class History
                 LOGGER.severe("During replay of history: child legion "
                     + childId + " should not " + "exist yet (turn=" + turn
                     + ")!!\n" + "Exists already with: "
-                    + Glob.glob(",", childLegion.getCreatureTypes())
-                    + " but " + "should now be created with creatures: "
-                    + creatures);
+                    + Glob.glob(",", childLegion.getCreatureTypes()) + " but "
+                    + "should now be created with creatures: " + creatures);
 
                 childLegion.remove();
             }
@@ -654,8 +650,8 @@ public class History
             }
 
             // don't use disbandIfEmpty parameter since that'll fire another history event
-            CreatureType removedCritter = legion.removeCreature(game.
-                getVariant().getCreatureByName(creatureName), false, false);
+            CreatureType removedCritter = legion.removeCreature(game
+                .getVariant().getCreatureByName(creatureName), false, false);
 
             // Skip for players that will be dead by end of replay
             // Skip if removedCritter is null => removeCreature did not find it,
@@ -715,9 +711,9 @@ public class History
                 .getHexByLabel(newHexLabel);
             EntrySide entrySide = EntrySide.fromLabel(entrySideName);
             boolean teleport = tele != null && tele.equals("true");
-            LOGGER.finest("Legion Move redo event: \n" + " marker "
-                + markerId + ", lordName " + revealedLord + " teleported "
-                + teleport + " to hex " + newHex.getLabel() + " entrySide "
+            LOGGER.finest("Legion Move redo event: \n" + " marker " + markerId
+                + ", lordName " + revealedLord + " teleported " + teleport
+                + " to hex " + newHex.getLabel() + " entrySide "
                 + entrySide.toString());
             server.overrideProcessingCH(legion.getPlayer());
             server.doMove(legion, newHex, entrySide, teleport, revealedLord);
@@ -755,8 +751,7 @@ public class History
             String markerId = el.getAttributeValue("markerId");
             LegionServerSide legion = game.getLegionByMarkerId(markerId);
             LOGGER
-                .finest("UndoRecruit redo event: \n" + " marker "
-                + markerId);
+                .finest("UndoRecruit redo event: \n" + " marker " + markerId);
             server.overrideProcessingCH(legion.getPlayer());
             server.undoRecruit(legion);
             server.restoreProcessingCH();
