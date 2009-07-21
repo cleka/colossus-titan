@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.sf.colossus.game.Battle;
 import net.sf.colossus.game.BattlePhase;
+import net.sf.colossus.game.Engagement;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 
@@ -23,6 +24,8 @@ import net.sf.colossus.game.Player;
 public interface IOracle
 {
     Battle getBattle();
+
+    Engagement getEngagement();
 
     int getTurnNumber();
 

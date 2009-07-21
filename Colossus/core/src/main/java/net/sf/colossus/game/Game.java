@@ -75,13 +75,7 @@ public class Game
     private boolean gameOver = false;
     private String gameOverMessage = null;
 
-    /**
-     *  If a battle is ongoing, the masterBoard hex, attacker and defender
-     */
-    private Legion attacker;
-    private Legion defender;
-    private MasterHex battleSite;
-
+    private Engagement engagement;
 
     /**
      * Create a Game object.
@@ -246,24 +240,32 @@ public class Game
     public void setEngagementData(MasterHex hex, Legion attacker,
         Legion defender)
     {
-        this.battleSite = hex;
-        this.attacker = attacker;
-        this.defender = defender;
+        this.engagement = new Engagement(hex, attacker, defender);
+    }
+
+    public void clearEngagementData()
+    {
+        this.engagement = null;
+    }
+
+    public Engagement getEngagement()
+    {
+        return this.engagement;
     }
 
     public MasterHex getBattleSite()
     {
-        return battleSite;
+        return engagement.getBattleSite();
     }
 
     public Legion getDefender()
     {
-        return defender;
+        return engagement.getDefender();
     }
 
     public Legion getAttacker()
     {
-        return attacker;
+        return engagement.getAttacker();
     }
 
     /**
@@ -647,7 +649,7 @@ public class Game
 
     public boolean isEngagementOngoing()
     {
-        if (isPhase(Phase.FIGHT) && battleSite != null)
+        if (isPhase(Phase.FIGHT) && engagement != null)
         {
             return true;
         }

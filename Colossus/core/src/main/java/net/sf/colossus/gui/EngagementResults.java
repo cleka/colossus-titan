@@ -464,9 +464,9 @@ final class EngagementResults extends KDialog
             this.defenderStartingContents = defenderStartingContents;
             this.attackerStartingCertainities = attackerStartingCertainities;
             this.defenderStartingCertainities = defenderStartingCertainities;
-            this.hexLabel = oracle.getBattle().getLocation().getLabel();
-            this.attacker = oracle.getBattle().getAttackingLegion();
-            this.defender = oracle.getBattle().getDefendingLegion();
+            this.hexLabel = oracle.getEngagement().getBattleSite().getLabel();
+            this.attacker = oracle.getEngagement().getAttacker();
+            this.defender = oracle.getEngagement().getDefender();
             this.gameTurn = oracle.getTurnNumber();
 
             this.attackerEndingContents = oracle

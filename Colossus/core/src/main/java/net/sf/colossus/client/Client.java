@@ -20,6 +20,7 @@ import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.BattleUnit;
 import net.sf.colossus.game.Creature;
+import net.sf.colossus.game.Engagement;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
@@ -551,7 +552,7 @@ public final class Client implements IClient, IOracle, IVariant
         int points, int turns)
     {
         gui.actOnTellEngagementResults(winner, method, points, turns);
-        game.setEngagementData(null, null, null);
+        game.clearEngagementData();
     }
 
     /** Legion target summons unit from Legion donor.
@@ -2106,6 +2107,11 @@ public final class Client implements IClient, IOracle, IVariant
         return game.getBattleActiveLegion();
     }
 
+    public Engagement getEngagement()
+    {
+        return game.getEngagement();
+    }
+
     // public for IOracle
     // TODO placeholder, move at some point fully to Game ?
     public Legion getDefender()
@@ -2120,14 +2126,13 @@ public final class Client implements IClient, IOracle, IVariant
         return game.getAttacker();
     }
 
-    public boolean isBattleOngoing()
-    {
-        return game.isBattleOngoing();
-    }
-
     // public for IOracle
     public MasterHex getBattleSite()
     {
+        if (game.getEngagement() == null)
+        {
+            return null;
+        }
         return game.getBattleSite();
     }
 
