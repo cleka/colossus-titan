@@ -58,7 +58,7 @@ class CreatureAttackTacticalObjective extends AbstractTacticalObjective
 
     /** This is mostly a copy/paste from the EvaluateCritterMove_Strike
      * and EvaluateCritterMove_Rangestrike  functions in SimpleAI. This is
-     * known. The goal is indeed to replace  the big hardwired functions in
+     * known. The goal is indeed to replace the big hardwired functions in
      * SimpleAI by a bunch of objectives, so we can tweak what critter does
      * what in an easier way.
      */
