@@ -291,6 +291,9 @@ public final class VariantSupport
             return CURRENT_VARIANT;
         }
 
+        // As long as this is static, only server may do this, not the
+        // local clients.
+        // TODO What about the remote clients? Shouldn't they do it too?
         if (serverSide)
         {
             StaticResourceLoader.purgeImageCache();

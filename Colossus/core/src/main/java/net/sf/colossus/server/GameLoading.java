@@ -5,17 +5,13 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.common.Constants;
-import net.sf.colossus.util.StaticResourceLoader;
 import net.sf.colossus.variant.Variant;
 
 import org.jdom.Attribute;
-import org.jdom.CDATA;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
@@ -163,9 +159,6 @@ public class GameLoading
             }
 
             Element el = root.getChild("Variant");
-            Attribute dir = el.getAttribute("dir");
-            Attribute fil = el.getAttribute("file");
-
             Attribute namAttr = el.getAttribute("name");
             String varName = null;
             if (namAttr != null)
@@ -178,35 +171,7 @@ public class GameLoading
                 return false;
             }
 
-            VariantSupport.freshenVariant(fil.getValue(), dir.getValue());
-
-            // then load data files
-            List<Element> datafilesElements = root.getChildren("DataFile");
-            Iterator<Element> it = datafilesElements.iterator();
-            while (it.hasNext())
-            {
-                Element dea = it.next();
-                String mapKey = dea.getAttributeValue("DataFileKey");
-                List<?> contentList = dea.getContent();
-                if (contentList.size() > 0)
-                {
-                    String content = ((CDATA)contentList.get(0)).getText();
-                    LOGGER.finest("DataFileKey: " + mapKey
-                        + " DataFileContent :\n" + content);
-                    StaticResourceLoader.putIntoFileCache(mapKey, content
-                        .getBytes());
-                }
-                else
-                {
-                    StaticResourceLoader.putIntoFileCache(mapKey, new byte[0]);
-                }
-            }
-
-            // we're server, but the file generation process has been done
-            // by loading the savefile.
-            this.variant = VariantSupport.loadVariant(varName, fil.getValue(),
-                dir.getValue(), false);
-
+            this.variant = VariantSupport.loadVariantByName(varName, true);
         }
         catch (Exception e)
         {
