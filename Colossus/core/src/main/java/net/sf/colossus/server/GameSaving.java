@@ -20,7 +20,6 @@ import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.util.ErrorUtils;
-import net.sf.colossus.util.StaticResourceLoader;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 
@@ -143,8 +142,6 @@ public class GameSaving
         Element redoLogElement = game.getHistory().getNewRedoLogElement();
         root.addContent(redoLogElement);
 
-        addDataFiles(root);
-
         // Battle stuff
 
         // TODO engagmentInProgress? BattleInProgress? ...
@@ -201,7 +198,7 @@ public class GameSaving
     /**
      * Helper method, returns "null" if given string is null;
      * used by dumpLegion.
-     * @param in
+     * @param in the string to "null"ify if needed
      * @return "null" or the string itself
      */
     private String notnull(String in)
@@ -216,8 +213,8 @@ public class GameSaving
     /**
      * Dump the given legion to an XML element
      * @param legion For which legion to dump the data
-     * @param inBattle Whether this legion is currently involved in an
-     * ogoing battle (i.e. battle data needs to be dumped too)
+     * @param inBattle Whether this legion is currently involved into an
+     * ongoing battle (i.e. battle data needs to be dumped too)
      * @return An XML Element with all Legion data
      */
     private Element dumpLegion(LegionServerSide legion, boolean inBattle)
@@ -302,17 +299,6 @@ public class GameSaving
                                 .getBattle().getDefendingLegion())));
             }
             root.addContent(el);
-        }
-    }
-
-    private void addDataFiles(Element root)
-    {
-        // Dump the file cache, so that generated files are preserved
-        Iterator<Element> itEl = StaticResourceLoader.getFileCacheDump()
-            .iterator();
-        while (itEl.hasNext())
-        {
-            root.addContent(itEl.next());
         }
     }
 
