@@ -136,8 +136,6 @@ public class GameLoading
      * @param file The file from which to load the game
      * @return True if load was successful, otherwise false
      */
-    // JDOM lacks generics, so we need casts
-    @SuppressWarnings("unchecked")
     public boolean loadGameFromFile(File file)
     {
         try
