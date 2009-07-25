@@ -113,6 +113,12 @@ public final class MasterBoard extends JPanel
     private Point lastPoint;
 
     /**
+     * Show the message that "saving during engagement/battle will store the
+     * last commit point" only once each game - flag that it has been shown
+     */
+    private boolean saveDuringEngagementDialogMessageShown = false;
+
+    /**
      *  List of markers which are currently on the board,
      *  for painting in z-order => the end of the list is on top.
      *
@@ -407,23 +413,33 @@ public final class MasterBoard extends JPanel
     }
 
     /**
-     * Ask user in a dialog box, whether he wants to save game despite the
-     * fact that game is currently in a phase for which loading the saved game
-     * might not be properly loadable (during an engagement, for example)
+     * Inform the user that saving during an engagement will save the last
+     * commit point, so loading it will re-set game to just before the
+     * engagement was started.
+     * Only if user closes the dialog, no save will be done.
      *
      * @return True if saving shall be done anyway
      */
-    private boolean saveAnywayDialog()
+    private boolean saveDuringEngagementDialog()
     {
-        String[] options = new String[2];
+        if (saveDuringEngagementDialogMessageShown)
+        {
+            return true;
+        }
+
+        saveDuringEngagementDialogMessageShown = true;
+
+        String[] options = new String[1];
         options[0] = "OK";
-        options[1] = "Cancel";
         int answer = JOptionPane.showOptionDialog(masterFrame,
-            "Saving at this moment will not result in a consistent / properly"
-                + " loadable save game file. Do you want to save anyway?",
+            "Saving/Loading of game state while an engagement or battle "
+                + "is ongoing is not implemented!\n"
+                + "Saved game will store the game state "
+                + "from the point just before the engagement started.\n\n"
+                + "(this message will only be shown once in each game)",
             "Save at this phase not implemented!",
-            JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null,
-            options, options[1]);
+            JOptionPane.OK_OPTION,
+                JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
 
         return (answer == JOptionPane.OK_OPTION);
     }
@@ -700,9 +716,9 @@ public final class MasterBoard extends JPanel
             public void actionPerformed(ActionEvent e)
             {
                 boolean proceed = true;
-                if (!isSavingCurrentlyUseful())
+                if (gui.getGame().isEngagementOngoing())
                 {
-                    proceed = saveAnywayDialog();
+                    proceed = saveDuringEngagementDialog();
                 }
                 if (proceed)
                 {
@@ -717,9 +733,9 @@ public final class MasterBoard extends JPanel
             // TODO: Need a confirmation dialog on overwrite?
             public void actionPerformed(ActionEvent e)
             {
-                if (!isSavingCurrentlyUseful())
+                if (gui.getGame().isEngagementOngoing())
                 {
-                    boolean proceed = saveAnywayDialog();
+                    boolean proceed = saveDuringEngagementDialog();
                     if (!proceed)
                     {
                         return;

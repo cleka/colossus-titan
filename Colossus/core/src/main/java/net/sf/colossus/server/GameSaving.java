@@ -140,15 +140,23 @@ public class GameSaving
         // otherwise there is trouble during loading.
         // System.out.println("- Adding redoLog");
         Element redoLogElement = game.getHistory().getNewRedoLogElement();
+
+        // temporary solution - the save game file will basically be same state
+        // as it was before engagement started
+        if (game.isEngagementInProgress())
+        {
+            redoLogElement = new Element("Redo");
+        }
         root.addContent(redoLogElement);
 
         // Battle stuff
 
-        // TODO engagmentInProgress? BattleInProgress? ...
+        /* Disabled until it works properly
         if (game.isEngagementInProgress() && game.getBattle() != null)
         {
             addBattleData(root);
         }
+        */
 
         return root;
     }
