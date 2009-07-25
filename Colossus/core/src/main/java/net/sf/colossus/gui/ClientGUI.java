@@ -205,9 +205,14 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         return options;
     }
 
-    private boolean isReplayOngoing()
+    boolean isReplayOngoing()
     {
-        return client.isReplayOngoing();
+        return getClient().isReplayOngoing();
+    }
+
+    boolean isRedoOngoing()
+    {
+        return getClient().isRedoOngoing();
     }
 
     /*
@@ -1004,7 +1009,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     {
         // TODO move if block to eventviewer itself?
         // Not during replay, but during redo:
-        if (!isReplayOngoing() || client.isRedoOngoing())
+        if (!isReplayOngoing() || isRedoOngoing())
         {
             eventViewerNewSplitEvent(turn, parent, child);
         }
@@ -1328,7 +1333,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void actOnTellRedoChange()
     {
-        if (client.isRedoOngoing())
+        if (isRedoOngoing())
         {
             // TODO perhaps needed only temporary. Once we get the proper
             // order setupPhase, redo, kickPhase this should not be needed here.
@@ -1740,7 +1745,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     {
         // TODO move if block to eventviewer itself?
         // Not during replay, but during redo:
-        if (!isReplayOngoing() || getClient().isRedoOngoing())
+        if (!isReplayOngoing() || isRedoOngoing())
         {
             eventViewer.tellMovementRoll(roll);
         }
