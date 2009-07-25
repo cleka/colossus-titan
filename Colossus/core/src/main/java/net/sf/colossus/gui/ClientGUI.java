@@ -108,17 +108,6 @@ public class ClientGUI implements IClientGUI, GUICallbacks
      */
     private final LinkedList<Object> undoStack = new LinkedList<Object>();
 
-    /**
-     * When loading a game, at the point server sends us the replay is now
-     * over, Client tells us to set this flag here.
-     * Then server sends us the redoLog events, which are stored to the
-     * undoStack.
-     * Next will then come the "setupXxxxxhase" which would normally reset
-     * the undoStack, but in this case we do not want that, so this flag here
-     * indicates to suppress this reset.
-     */
-    private boolean dontClearUndoStack = false;
-
     private final List<GUIBattleChit> battleChits = new ArrayList<GUIBattleChit>();
 
     /** Information on the current moving legion. */
@@ -1333,33 +1322,12 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void actOnTellRedoChange()
     {
-        if (isRedoOngoing())
-        {
-            // TODO perhaps needed only temporary. Once we get the proper
-            // order setupPhase, redo, kickPhase this should not be needed here.
-            clearUndoStack();
-        }
-        else
-        {
-            // Set flag for next setupPhase to not clear the undo stack
-            dontClearUndoStack = true;
-        }
-
+        // Nothing to do right now (was needed temporarily)
     }
 
-    // TODO this is just a hack.
-    // Instead of this flag, setupPhase which clears the undoStack should be
-    // done first and then the processing of the redo elements.
     private void clearUndoStack()
     {
-        if (dontClearUndoStack)
-        {
-            dontClearUndoStack = false;
-        }
-        else
-        {
-            undoStack.clear();
-        }
+        undoStack.clear();
     }
 
     private Object popUndoStack()
