@@ -1002,6 +1002,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     public void actOnDidSplit(int turn, Legion parent, Legion child,
         MasterHex hex)
     {
+        // TODO move if block to eventviewer itself?
         // Not during replay, but during redo:
         if (!isReplayOngoing() || client.isRedoOngoing())
         {
@@ -1737,7 +1738,12 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void acOnTellMovementRoll(int roll)
     {
-        eventViewer.tellMovementRoll(roll);
+        // TODO move if block to eventviewer itself?
+        // Not during replay, but during redo:
+        if (!isReplayOngoing() || getClient().isRedoOngoing())
+        {
+            eventViewer.tellMovementRoll(roll);
+        }
 
         if (movementDie == null || roll != movementDie.getLastRoll())
         {
