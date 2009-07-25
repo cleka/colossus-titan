@@ -1709,7 +1709,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         board.setPhaseInfo(message);
     }
 
-    public void acOnTellMovementRoll(int roll)
+    public void actOnTellMovementRoll(int roll)
     {
         // TODO move if block to eventviewer itself?
         // Not during replay, but during redo:
@@ -1717,6 +1717,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         {
             eventViewer.tellMovementRoll(roll);
         }
+
+        board.setupTitleForMovementRoll(roll);
 
         if (movementDie == null || roll != movementDie.getLastRoll())
         {

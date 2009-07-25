@@ -184,7 +184,7 @@ public interface IClientGUI
 
     public abstract void tellWhatsHappening(String message);
 
-    public abstract void acOnTellMovementRoll(int roll);
+    public abstract void actOnTellMovementRoll(int roll);
 
     /* pass revealed info to EventViewer and
      * additionally remember the images list for later, the engagement report

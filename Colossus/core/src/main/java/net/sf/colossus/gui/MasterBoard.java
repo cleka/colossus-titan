@@ -1245,8 +1245,8 @@ public final class MasterBoard extends JPanel
 
     void setupMoveMenu()
     {
-        setupPhasePreparations("Movement Roll: "
-            + gui.getGame().getMovementRoll());
+        // tellMovementRoll comes later, so here only a text without the roll
+        setupPhasePreparations("Movement (not rolled yet)");
 
         if (gui.isMyTurn())
         {
@@ -1265,6 +1265,13 @@ public final class MasterBoard extends JPanel
         {
             setupAsInactivePlayer("moves");
         }
+    }
+
+    // Needs to be updated afterwards, because during setupPhase
+    // (when the title update is done) the roll is not known yet
+    void setupTitleForMovementRoll(int roll)
+    {
+        setTitleInfoText("Movement Roll: " + roll);
     }
 
     void setupFightMenu()

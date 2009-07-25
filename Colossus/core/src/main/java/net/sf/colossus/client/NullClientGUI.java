@@ -685,7 +685,7 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public void acOnTellMovementRoll(int roll)
+    public void actOnTellMovementRoll(int roll)
     {
         // TODO Auto-generated method stub
 
