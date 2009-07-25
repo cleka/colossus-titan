@@ -386,26 +386,6 @@ public final class MasterBoard extends JPanel
         }
     }
 
-    /**
-     * Decide whether game is currently in a state that saving is currently
-     * possible / reliable, i.e. reloading it would result in a game that can
-     * be continued.
-     * Saving is currently not reliable while any engagement is ongoing
-     * (both negotiation and battle phases, up to summon/acquire.
-     * Only just before any new engagement is picked (or waiting for
-     * Done with Engagements) is currently (2009-07) working.
-     *
-     * @return True if saving at this point is fully reliable
-     */
-    private boolean isSavingCurrentlyUseful()
-    {
-        if (gui.getGame().isEngagementOngoing())
-        {
-            return false;
-        }
-        return true;
-    }
-
     public void enableSaveActions()
     {
         saveGameAction.setEnabled(true);

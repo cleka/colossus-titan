@@ -151,12 +151,15 @@ public class GameSaving
 
         // Battle stuff
 
-        /* Disabled until it works properly
         if (game.isEngagementInProgress() && game.getBattle() != null)
         {
-            addBattleData(root);
+            /* Disabled until it works properly */
+            boolean featureProperlyEnabled = false;
+            if (featureProperlyEnabled)
+            {
+                addBattleData(root);
+            }
         }
-        */
 
         return root;
     }
