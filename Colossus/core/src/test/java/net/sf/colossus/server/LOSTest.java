@@ -747,4 +747,38 @@ public class LOSTest extends TestCase
             .getCurrentHex()));
         assertEquals(5, hydra2.getStrikeNumber(hydra1));
     }
+
+    public void testLOS8()
+    {
+        LOGGER.log(Level.FINEST, "testLOS8()");
+        setupForVariant("Default");
+
+        MasterHex hex = game.getVariant().getMasterBoard().getHexByLabel("7"); // Desert
+
+        defender = new LegionServerSide("Gr03", null, hex, hex, green, game,
+            ranger);
+        attacker = new LegionServerSide("Bk03", null, hex, hex, black, game,
+            hydra);
+
+        game.getPlayerByName("Green").addLegion(defender);
+        game.getPlayerByName("Black").addLegion(attacker);
+
+        attacker.setEntrySide(EntrySide.RIGHT);
+
+        battle = new BattleServerSide(game, attacker, defender,
+            BattleServerSide.LegionTags.ATTACKER, hex, 1, BattlePhase.FIGHT);
+
+        Creature hydra = defender.getCritter(0);
+        Creature ranger = attacker.getCritter(0);
+
+        placeCreature(ranger, "D4");
+        placeCreature(hydra, "D1");
+
+        // should be blocked: even from cliff may not RS over a dune
+        // Current implementation is not working correctly
+        //   - see 2820231 Illegal rangestrike
+        // assertTrue(battle.isLOSBlocked(ranger.getCurrentHex(), hydra
+        //    .getCurrentHex()));
+
+    }
 }
