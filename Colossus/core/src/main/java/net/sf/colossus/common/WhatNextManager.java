@@ -38,6 +38,12 @@ public class WhatNextManager
         this.whatToDoNext = whatToDoNext;
         LOGGER.log(Level.FINEST, "Set what to do next to "
             + whatToDoNext.toString());
+        System.out
+            .println("set what to do next to " + whatToDoNext.toString());
+        if (whatToDoNext.equals(WhatToDoNext.QUIT_ALL))
+        {
+            Thread.dumpStack();
+        }
         if (triggerQuitTimer)
         {
             triggerTimedQuit();
@@ -135,18 +141,18 @@ public class WhatNextManager
                 + "Ok, it's time to do System.exit()...");
             System.exit(1);
         }
+    }
 
-        public static void sleepFor(long millis)
+    public static void sleepFor(long millis)
+    {
+        try
         {
-            try
-            {
-                Thread.sleep(millis);
-            }
-            catch (InterruptedException e)
-            {
-                LOGGER.log(Level.FINEST,
-                    "InterruptException caught... ignoring it...");
-            }
+            Thread.sleep(millis);
+        }
+        catch (InterruptedException e)
+        {
+            LOGGER.log(Level.FINEST,
+                "InterruptException caught... ignoring it...");
         }
     }
 
