@@ -285,7 +285,7 @@
        to cleaning up and ignoring files in the VCS. It would be better to collect all generated
        artifacts somewhere in the build directories and then zip those together with sources that
        need to be deployed. -->
-  <target name="dist" depends="clean,buildInfo,init,sign"
+  <target name="dist" depends="clean,init,buildInfo,signall"
   description="Make zip file for user download">
     <zip zipfile="${ZIPFILE}" basedir="."
     excludes="build/**, target/**, **/*.sav, **/*.zip, **/*.bak, **/*javadoc*/*, *Keystore*, *cfg, *properties*, BattlelandsRandomizer.jar, .*, **/*.ps, **/*.aux, **/*.bbl, **/*.bib, **/*.blg, **/*.log, **/*.old, tmp/**, libs/build/**"/>
@@ -372,7 +372,7 @@
 
   <!--  public-build ("Official" public build) -->
   <target name="remote-inst-public-build"
-  depends="clean,init,signall,dist"
+  depends="dist"
   description="copy files into public-build -directory under htdocs tree on SF">
 
     <exec executable="rsync">
@@ -396,7 +396,7 @@
 
   <!--  public-testing (Public testing build, usually from trunk-head.) -->
   <target name="remote-inst-public-testing"
-  depends="clean,init,signall"
+  depends="dist"
   description="copy files into public-testing -directory under htdocs tree on SF">
 
     <exec executable="rsync">
@@ -417,7 +417,7 @@
           "happens-only-for-user-but-not-developer-" type of bug.
       -->
   <target name="remote-inst-special-build"
-  depends="clean,init,signall"
+  depends="dist"
   description="copy files into special-build -directory under htdocs tree on SF">
 
     <exec executable="rsync">
