@@ -2810,7 +2810,25 @@ public final class Client implements IClient, IOracle, IVariant
         if (!isRemote())
         {
             localServer.setGuiSuspendOngoing(false);
-            server.stopGame();
+            /* Calling it locally is "safer". If the stopGame is sent via the
+             * socket connection, the call of disposeClientOriginated below
+             * might be handled so fast, that it's connection closed exception
+             * on server side causes the server to handle a withdrawal for it.
+             * And if there is only two players AND autoQuit is set, this might
+             * terminate the application despite the fact that one wanted to do
+             * e.g. New Game or Load Game.
+             */
+            localServer.stopGame();
+        }
+        else
+        {
+            // If remote clients do New Game etc, this does not directly cause
+            // the server to do anything as above, so: stopGame commented out.
+
+            // If after this remote client gone there is only one player left,
+            // i.e. game is then over, server side will act accordingly.
+
+            //server.stopGame();
         }
         disposeClientOriginated();
     }
