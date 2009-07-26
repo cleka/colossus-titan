@@ -38,12 +38,6 @@ public class WhatNextManager
         this.whatToDoNext = whatToDoNext;
         LOGGER.log(Level.FINEST, "Set what to do next to "
             + whatToDoNext.toString());
-        System.out
-            .println("set what to do next to " + whatToDoNext.toString());
-        if (whatToDoNext.equals(WhatToDoNext.QUIT_ALL))
-        {
-            Thread.dumpStack();
-        }
         if (triggerQuitTimer)
         {
             triggerTimedQuit();
