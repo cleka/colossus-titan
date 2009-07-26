@@ -886,6 +886,15 @@ public final class MasterBoard extends JPanel
     {
         String propName = "java.util.logging.FileHandler.pattern";
         String logPattern = LogManager.getLogManager().getProperty(propName);
+
+        // Replace %t with Java's idea of system temp directory:
+        if (logPattern.startsWith("%t"))
+        {
+            String tempDir = System.getProperty("java.io.tmpdir");
+            logPattern = tempDir + logPattern.substring(2);
+        }
+
+        // get only the directory part:
         String logDirectory = logPattern;
         try
         {
