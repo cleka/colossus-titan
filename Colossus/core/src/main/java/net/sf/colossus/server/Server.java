@@ -1310,7 +1310,13 @@ public final class Server extends Thread implements IServer
             waitingToCatchup.clear();
             for (IClient client : clients)
             {
-                waitingToCatchup.add(client);
+                // Do not wait for clients that are already gone, e.g. when
+                // one remote disconnected this might cause a withdrawal
+                // which might cause GameOver.
+                if (!((ClientHandler)client).isGone())
+                {
+                    waitingToCatchup.add(client);
+                }
             }
 
             /* better to do the sending not inside the notify. It *might*
