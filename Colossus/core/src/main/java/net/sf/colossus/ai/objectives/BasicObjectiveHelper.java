@@ -22,7 +22,8 @@ import net.sf.colossus.variant.Variant;
 
 
 /**
- *
+ * A naive (basic!) implementation of @IObjectiveHelper.
+ * This is still mostly for testing the code.
  * @author Romain Dolbeau
  */
 public class BasicObjectiveHelper implements IObjectiveHelper

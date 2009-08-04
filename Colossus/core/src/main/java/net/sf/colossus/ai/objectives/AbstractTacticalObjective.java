@@ -1,7 +1,7 @@
 package net.sf.colossus.ai.objectives;
 
 
-/** Abstract implementation of TacticalObjective, handling the priority
+/** Abstract implementation of @TacticalObjective, handling the priority
  * stuff to avoid duplication.
  *
  * @author Romain Dolbeau

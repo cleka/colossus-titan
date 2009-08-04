@@ -2,7 +2,9 @@ package net.sf.colossus.ai.objectives;
 
 
 /**
- *
+ * Interface for a tactical (i.e. when fighting on battlelands) objective.
+ * The idea is to set 'objectives' for tha AI to attain when fighting,
+ * and then try to bias the moves of the AIs toward achieving said objectives.
  * @author Romain Dolbeau
  */
 public interface TacticalObjective
@@ -13,7 +15,7 @@ public interface TacticalObjective
      */
     boolean objectiveAttained();
 
-    /** How much does he 'current situation' contributes to the objective.
+    /** How much does the 'current situation' contributes to the objective.
      * The actual value is currently added to the overall evaluation
      * of the whole legion move.
      * @return How much does he 'current situation' contributes to the objective
