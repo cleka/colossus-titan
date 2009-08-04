@@ -1,6 +1,7 @@
 package net.sf.colossus.ai;
 
 
+import net.sf.colossus.ai.helper.LegionMove;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;

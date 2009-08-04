@@ -1,6 +1,8 @@
 package net.sf.colossus.ai;
 
 
+import net.sf.colossus.ai.helper.LegionMove;
+import net.sf.colossus.ai.helper.OnTheFlyLegionMove;
 import net.sf.colossus.ai.objectives.TacticalObjective;
 import net.sf.colossus.ai.objectives.IObjectiveHelper;
 import net.sf.colossus.ai.objectives.BasicObjectiveHelper;

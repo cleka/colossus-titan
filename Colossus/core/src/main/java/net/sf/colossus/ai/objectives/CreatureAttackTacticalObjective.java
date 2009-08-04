@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import net.sf.colossus.ai.AbstractAI;
-import net.sf.colossus.ai.BattleEvalConstants;
+import net.sf.colossus.ai.helper.BattleEvalConstants;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.Creature;

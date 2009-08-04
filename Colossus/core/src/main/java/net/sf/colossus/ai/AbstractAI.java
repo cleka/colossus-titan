@@ -1,6 +1,8 @@
 package net.sf.colossus.ai;
 
 
+import net.sf.colossus.ai.helper.LegionMove;
+import net.sf.colossus.ai.helper.BattleEvalConstants;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -591,7 +593,7 @@ public abstract class AbstractAI implements AI
      *  This return a LegionMove, made of one CritterMove per
      *  MoveList. The CritterMove is selected by the index.
      */
-    final static LegionMove makeLegionMove(int[] indexes,
+    final public static LegionMove makeLegionMove(int[] indexes,
         List<List<CritterMove>> critterMoves)
     {
         LegionMove lm = new LegionMove();

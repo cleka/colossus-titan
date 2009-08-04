@@ -1,6 +1,7 @@
-package net.sf.colossus.ai;
+package net.sf.colossus.ai.helper;
 
 
+import net.sf.colossus.ai.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -21,7 +22,7 @@ import net.sf.colossus.variant.BattleHex;
 
 /**
  * On-the-fly generation of the Collection of all possible LegionMove.
- * This doesn't full respect the Collection interface:
+ * This doesn't fully respect the Collection interface:
  * The random generation may fail before all elements have been returned,
  * so to iterators may return different subsets of the entire collection.
  * Also, this may cause size() to return a value higher than what is really
@@ -30,7 +31,7 @@ import net.sf.colossus.variant.BattleHex;
  * @author Romain Dolbeau
  */
 @SuppressWarnings("boxing")
-class OnTheFlyLegionMove implements Collection<LegionMove>
+public class OnTheFlyLegionMove implements Collection<LegionMove>
 {
 
     /** Maximum number of try before giving up generating a new element.
@@ -71,7 +72,7 @@ class OnTheFlyLegionMove implements Collection<LegionMove>
     private final List<List<CritterMove>> allCritterMoves;
     private final int mysize;
 
-    OnTheFlyLegionMove(final List<List<CritterMove>> acm)
+    public OnTheFlyLegionMove(final List<List<CritterMove>> acm)
     {
         allCritterMoves = acm;
 

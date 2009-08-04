@@ -1,4 +1,4 @@
-package net.sf.colossus.ai;
+package net.sf.colossus.ai.helper;
 
 
 import java.util.ArrayList;
@@ -23,41 +23,41 @@ public class LegionMove implements Comparable<LegionMove>
     private String lmeval = null;
     private int value;
 
-    void add(CritterMove cm)
+    public void add(CritterMove cm)
     {
         critterMoves.add(cm);
     }
 
-    List<CritterMove> getCritterMoves()
+    public List<CritterMove> getCritterMoves()
     {
         return Collections.unmodifiableList(critterMoves);
     }
 
-    void resetEvaluate()
+    public void resetEvaluate()
     {
         evaluation = null;
         lmeval = null;
         value = Integer.MIN_VALUE;
     }
 
-    int getValue()
+    public int getValue()
     {
         return value;
     }
 
-    void setValue(int v)
+    public void setValue(int v)
     {
         value = v;
     }
 
-    void setEvaluate(CritterMove cm, String val)
+    public void setEvaluate(CritterMove cm, String val)
     {
         if (evaluation == null)
             evaluation = new HashMap<CritterMove, String>();
         evaluation.put(cm, val);
     }
 
-    void setEvaluate(String val)
+    public void setEvaluate(String val)
     {
         lmeval = val;
     }
