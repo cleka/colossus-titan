@@ -1,4 +1,4 @@
-package net.sf.colossus.ai;
+package net.sf.colossus.ai.objectives;
 
 
 /**

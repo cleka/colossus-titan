@@ -51,12 +51,12 @@ import net.sf.colossus.variant.Variant;
  * Also contains extracted code from RationalAI:
  * @author Bruce Sherrod, David Ripton, Romain Dolbeau, Corwin Joy
  */
-abstract class AbstractAI implements AI
+public abstract class AbstractAI implements AI
 {
     final static private Logger LOGGER = Logger.getLogger(AbstractAI.class
         .getName());
 
-    final protected BattleEvalConstants bec = new BattleEvalConstants();
+    final public BattleEvalConstants bec = new BattleEvalConstants();
     final protected CreatureValueConstants cvc = new CreatureValueConstants();
     /** The Client we're working for. */
     final protected Client client;
@@ -190,7 +190,7 @@ abstract class AbstractAI implements AI
      * Return a map of target hex label to number
      * of friendly creatures that can strike it
      */
-    final protected Map<BattleHex, Integer> findStrikeMap()
+    final public Map<BattleHex, Integer> findStrikeMap()
     {
         Map<BattleHex, Integer> map = new HashMap<BattleHex, Integer>();
         for (BattleCritter critter : client.getActiveBattleUnits())
@@ -260,7 +260,7 @@ abstract class AbstractAI implements AI
      * @param terrain The terrain on which the value is requested, or null.
      * @return The 'kill value' value of the critter, on terrain if non-null
      */
-    protected int getKillValue(final BattleCritter battleCritter,
+    public int getKillValue(final BattleCritter battleCritter,
         final MasterBoardTerrain terrain)
     {
         return getKillValue(battleCritter.getCreatureType(), terrain);
@@ -752,7 +752,7 @@ abstract class AbstractAI implements AI
         return client.getBattle().getBattleUnit(hex);
     }
 
-    protected int countCreatureAccrossAllLegionFromPlayer(Creature creature)
+    final public int countCreatureAccrossAllLegionFromPlayer(Creature creature)
     {
         Player player = creature.getPlayer();
         int count = 0;

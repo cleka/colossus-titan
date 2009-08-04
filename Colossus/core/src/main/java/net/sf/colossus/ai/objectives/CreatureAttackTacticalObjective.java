@@ -2,13 +2,15 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package net.sf.colossus.ai;
+package net.sf.colossus.ai.objectives;
 
 
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import net.sf.colossus.ai.AbstractAI;
+import net.sf.colossus.ai.BattleEvalConstants;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.Creature;

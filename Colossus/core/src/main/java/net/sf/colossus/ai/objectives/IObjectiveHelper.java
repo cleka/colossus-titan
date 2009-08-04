@@ -1,4 +1,4 @@
-package net.sf.colossus.ai;
+package net.sf.colossus.ai.objectives;
 
 
 import java.util.List;
@@ -8,7 +8,7 @@ import java.util.List;
  *
  * @author Romain Dolbeau
  */
-interface IObjectiveHelper
+public interface IObjectiveHelper
 {
     List<TacticalObjective> attackerObjective();
 

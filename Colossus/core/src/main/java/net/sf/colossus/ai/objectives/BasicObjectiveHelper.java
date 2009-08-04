@@ -1,4 +1,4 @@
-package net.sf.colossus.ai;
+package net.sf.colossus.ai.objectives;
 
 
 import java.util.ArrayList;
@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Logger;
+
+import net.sf.colossus.ai.AbstractAI;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.Creature;
@@ -32,7 +34,7 @@ public class BasicObjectiveHelper implements IObjectiveHelper
     private final AbstractAI ai;
     private final Variant variant;
 
-    BasicObjectiveHelper(Client client, AbstractAI ai, Variant variant)
+    public BasicObjectiveHelper(Client client, AbstractAI ai, Variant variant)
     {
         this.client = client;
         this.ai = ai;

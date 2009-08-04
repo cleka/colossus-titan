@@ -1,4 +1,4 @@
-package net.sf.colossus.ai;
+package net.sf.colossus.ai.objectives;
 
 
 /** Abstract implementation of TacticalObjective, handling the priority

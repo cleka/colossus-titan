@@ -1,6 +1,9 @@
 package net.sf.colossus.ai;
 
 
+import net.sf.colossus.ai.objectives.TacticalObjective;
+import net.sf.colossus.ai.objectives.IObjectiveHelper;
+import net.sf.colossus.ai.objectives.BasicObjectiveHelper;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
