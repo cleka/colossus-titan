@@ -320,6 +320,11 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
         super.initBattle();
         if (client.getMyEngagedLegion() != null)
         {
+            /* TODO: Objectives are never uupdated during Battle, which is
+             * inherently broken. For instance, both defender recruit at turn 4
+             * and attacker's summoned angel won't have specific objective,
+             * when it's likely they should attack.
+             */
             IObjectiveHelper helper = new BasicObjectiveHelper(client, this,
                 variant);
             if (client.getMyEngagedLegion().equals(client.getDefender()))
