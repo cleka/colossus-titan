@@ -2826,7 +2826,7 @@ public class SimpleAI extends AbstractAI
     }
 
     @SuppressWarnings("unused")
-    private void evaluateCritterMove_Rangestrike(final BattleCritter critter,
+    protected void evaluateCritterMove_Rangestrike(final BattleCritter critter,
         final Map<BattleHex, Integer> strikeMap, ValueRecorder value,
         final MasterBoardTerrain terrain, final BattleHex hex,
         final int power, final int skill, final LegionClientSide legion,
@@ -2886,7 +2886,7 @@ public class SimpleAI extends AbstractAI
     }
 
     @SuppressWarnings("unused")
-    private void evaluateCritterMove_Strike(final BattleCritter critter,
+    protected void evaluateCritterMove_Strike(final BattleCritter critter,
         final Map<BattleHex, Integer> strikeMap, ValueRecorder value,
         final MasterBoardTerrain terrain, final BattleHex hex,
         final int power, final int skill, final LegionClientSide legion,

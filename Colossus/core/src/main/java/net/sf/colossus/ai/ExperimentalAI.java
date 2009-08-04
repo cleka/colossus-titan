@@ -9,6 +9,7 @@ import net.sf.colossus.ai.objectives.BasicObjectiveHelper;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.Client;
@@ -217,6 +218,35 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
         }
     }
 
+    /**
+     * "Does nothing" override of evaluateCritterMove_Strike in @SimpleAI.
+     * The job of that one is handled (supposedly better... I wish) by
+     * the objectives code.
+     */
+    @Override
+    protected void evaluateCritterMove_Strike(final BattleCritter critter,
+        final Map<BattleHex, Integer> strikeMap, ValueRecorder value,
+        final MasterBoardTerrain terrain, final BattleHex hex,
+        final int power, final int skill, final LegionClientSide legion,
+        final int turn, final Set<BattleHex> targetHexes)
+        {
+            return;
+        }
+    /**
+     * "Does nothing" override of evaluateCritterMove_Rangestrike in @SimpleAI.
+     * The job of that one is handled (supposedly better... I wish) by
+     * the objectives code.
+     */
+    @Override
+    protected void evaluateCritterMove_Rangestrike(final BattleCritter critter,
+        final Map<BattleHex, Integer> strikeMap, ValueRecorder value,
+        final MasterBoardTerrain terrain, final BattleHex hex,
+        final int power, final int skill, final LegionClientSide legion,
+        final int turn, final Set<BattleHex> targetHexes)
+    {
+        return;
+    }
+
     @Override
     protected int evaluateLegionBattleMoveAsAWhole(LegionMove lm,
         Map<BattleHex, Integer> strikeMap, ValueRecorder value)
@@ -274,8 +304,9 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
         {
             for (TacticalObjective to : listObjectives)
             {
-                int temp = to.situationContributeToTheObjective();
-                value.add(temp, "Objective: " + to.getDescription());
+                ValueRecorder temp = to.situationContributeToTheObjective();
+                temp.setScale(to.getPriority());
+                value.add(temp);
             }
         }
         return value.getValue();

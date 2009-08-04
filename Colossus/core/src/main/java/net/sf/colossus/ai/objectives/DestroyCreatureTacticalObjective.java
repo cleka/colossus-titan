@@ -7,6 +7,7 @@ import net.sf.colossus.game.Battle;
 import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
+import net.sf.colossus.util.ValueRecorder;
 
 
 /** The tactical objective of killing a certain number of a specific
@@ -58,40 +59,48 @@ class DestroyCreatureTacticalObjective extends AbstractTacticalObjective
         return false;
     }
 
-    public int situationContributeToTheObjective()
+    public ValueRecorder situationContributeToTheObjective()
     {
-        int mcount = 0;
+        ValueRecorder value = new ValueRecorder(getDescription());
         if (objectiveAttained())
         {
-            return 0;
+            return value;
         }
         for (BattleCritter dCritter : client.getInactiveBattleUnits())
         {
             if (dCritter.getCreatureType().equals(critter.getType()))
             {
-                int lcount = 0;
+                ValueRecorder lvalue = new ValueRecorder(getDescription());
                 for (BattleCritter aCritter : client.getActiveBattleUnits())
                 {
                     int range = Battle.getRange(dCritter.getCurrentHex(),
                         aCritter.getCurrentHex(), false);
                     if (range == 2)
                     {
-                        lcount += aCritter.getPointValue();
+                        lvalue.add(aCritter.getPointValue(),
+                                   "Attacker" +
+                                   aCritter.getCreatureType().getName() +
+                                   "CanStrike" +
+                                   critter.getType().getName());
                     }
                     else if (aCritter.isRangestriker()
                         && (range <= aCritter.getSkill())
                         && (aCritter.useMagicMissile() || (!dCritter.isLord())))
                     {
-                        lcount += aCritter.getPointValue() / 2;
+                        lvalue.add(aCritter.getPointValue() / 2,
+                                   "Attacker" +
+                                   aCritter.getCreatureType().getName() +
+                                   "CanRangeStrike" +
+                                   critter.getType().getName());
                     }
                 }
-                if (lcount > mcount)
+                if (lvalue.getValue() > value.getValue())
                 {
-                    mcount = lcount;
+                    value = lvalue;
                 }
             }
         }
-        return Math.round(mcount * getPriority());
+        return value;
     }
 
     public String getDescription()

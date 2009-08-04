@@ -93,7 +93,7 @@ public class LegionMove implements Comparable<LegionMove>
         }
         if (lmeval != null)
             cmStrings.add(" {" + lmeval + "}");
-        return Glob.glob(", ", cmStrings);
+        return Glob.glob(", \n", cmStrings);
     }
 
     @Override

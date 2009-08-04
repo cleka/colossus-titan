@@ -64,9 +64,9 @@ class CreatureAttackTacticalObjective extends AbstractTacticalObjective
      * SimpleAI by a bunch of objectives, so we can tweak what critter does
      * what in an easier way.
      */
-    public int situationContributeToTheObjective()
+    public ValueRecorder situationContributeToTheObjective()
     {
-        ValueRecorder value = new ValueRecorder();
+        ValueRecorder value = new ValueRecorder(getDescription());
         final MasterBoardTerrain terrain = client.getBattleSite().getTerrain();
         final int turn = client.getBattleTurnNumber();
         int which = 0;
@@ -279,11 +279,7 @@ class CreatureAttackTacticalObjective extends AbstractTacticalObjective
                 }
             }
         }
-        if (value.getValue() > 0)
-        {
-            LOGGER.finest("Current situation: " + value.toString());
-        }
-        return Math.round(value.getValue() * getPriority());
+        return value;
     }
 
     public String getDescription()

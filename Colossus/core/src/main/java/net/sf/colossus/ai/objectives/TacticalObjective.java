@@ -1,5 +1,7 @@
 package net.sf.colossus.ai.objectives;
 
+import net.sf.colossus.util.ValueRecorder;
+
 
 /**
  * Interface for a tactical (i.e. when fighting on battlelands) objective.
@@ -20,7 +22,7 @@ public interface TacticalObjective
      * of the whole legion move.
      * @return How much does he 'current situation' contributes to the objective
      */
-    int situationContributeToTheObjective();
+    ValueRecorder situationContributeToTheObjective();
 
     /** Get the current priority of this objective.
      *
