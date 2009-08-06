@@ -24,6 +24,7 @@
 
   <property file="local_build.properties"/>
   <property file="build.properties"/>
+  <property name="release.version" value="SNAPSHOT"/>
 	
   <!-- classpaths -->
   <path id="project.class.path">
@@ -354,6 +355,7 @@
       <entry key="os.name" value="${os.name}"/>
       <entry key="os.arch" value="${os.arch}"/>
       <entry key="os.version" value="${os.version}"/>
+      <entry key="release.version" value="${release.version}"/>
     </propertyfile>
   </target>
   <!-- Tasks from here down are only needed for installation on the web site. -->

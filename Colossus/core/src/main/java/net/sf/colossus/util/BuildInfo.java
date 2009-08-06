@@ -16,42 +16,48 @@ public class BuildInfo
     private static final Logger LOGGER = Logger.getLogger(BuildInfo.class
         .getName());
 
-    public static String getBuildInfo(boolean full)
+    private static final Properties BUILD_PROPERTIES = new Properties();
+    static
     {
+        // first set some defaults, they get replaced if loading succeeds
+        BUILD_PROPERTIES.setProperty("release.version", "unknown");
+        BUILD_PROPERTIES.setProperty("svn.revision.max-with-flags", "unknown");
+        BUILD_PROPERTIES.setProperty("build.timestamp", "unknown");
+        BUILD_PROPERTIES.setProperty("username", "unknown");
+        ClassLoader cl = BuildInfo.class.getClassLoader();
+        InputStream is = cl.getResourceAsStream("META-INF/build.properties");
+        if (is != null)
+        {
         try
         {
-            Properties buildInfo = new Properties();
-            ClassLoader cl = BuildInfo.class.getClassLoader();
-            InputStream is = cl
-                .getResourceAsStream("META-INF/build.properties");
-            if (is == null)
-            {
-                LOGGER.log(Level.INFO, "No build information available.");
-                return "UNKNOWN";
+            BUILD_PROPERTIES.load(is);
             }
-            buildInfo.load(is);
-            String revInfo = buildInfo
-                .getProperty("svn.revision.max-with-flags");
-            String timeStamp = buildInfo.getProperty("build.timestamp");
-            String byUser = buildInfo.getProperty("username");
+            catch (IOException e)
+            {
+                LOGGER.log(Level.WARNING, "Failed to load build properties.",
+                    e);
+            }
+        }
+    }
 
-            String buildInfoString;
-            if (full)
-            {
-                buildInfoString = "Built " + timeStamp + " by " + byUser
-                    + " from revision " + revInfo;
-            }
-            else
-            {
-                buildInfoString = revInfo;
-            }
-            return buildInfoString;
-        }
-        catch (IOException ex)
+    public static String getBuildInfo(boolean full)
+    {
+        String revInfo = BUILD_PROPERTIES
+            .getProperty("svn.revision.max-with-flags");
+        String timeStamp = BUILD_PROPERTIES.getProperty("build.timestamp");
+        String byUser = BUILD_PROPERTIES.getProperty("username");
+
+        String buildInfoString;
+        if (full)
         {
-            LOGGER.log(Level.WARNING, "Problem reading build info file", ex);
+            buildInfoString = timeStamp + " by " + byUser
+                + " from revision " + revInfo;
         }
-        return "UNKNOWN";
+        else
+        {
+            buildInfoString = revInfo;
+        }
+        return buildInfoString;
     }
 
     /**
@@ -77,4 +83,16 @@ public class BuildInfo
         return getBuildInfo(false);
     }
 
+    /**
+     * Retrieves the version of Colossus we are running.
+     *
+     * This returns either a version number for an official release or
+     * "SNAPSHOT" otherwise.
+     *
+     * @return The release version of the Colossus instance
+     */
+    public static String getReleaseVersion()
+    {
+        return BUILD_PROPERTIES.getProperty("release.version");
+    }
 }

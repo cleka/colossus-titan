@@ -847,7 +847,8 @@ public final class MasterBoard extends JPanel
                 String logDirectory = getLogDirectory();
 
                 JOptionPane.showMessageDialog(masterFrame, ""
-                    + "Colossus build: " + buildInfo + "\n"
+                    + "Colossus Version: " + BuildInfo.getReleaseVersion()
+                    + "\n" + "Build: " + buildInfo + "\n"
                     + "Colossus home:  " + colossusHome + "\n"
                     + "Log directory:  " + logDirectory + "\n"
                     + "java.version:   " + System.getProperty("java.version"),
