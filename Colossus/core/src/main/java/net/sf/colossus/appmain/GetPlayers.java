@@ -597,7 +597,8 @@ public final class GetPlayers extends KFrame
             // it's for the displaying in GUI only.
             LOGGER.log(Level.WARNING, ex.toString(), ex);
         }
-        String runningOnString = "Running Colossus (revision "
+        String runningOnString = "Running Colossus Version "
+            + BuildInfo.getReleaseVersion() + " (revision "
             + BuildInfo.getRevisionInfoString() + ") on " + hostString
             + ", port " + port;
         runningOnLabel.setText(runningOnString);
