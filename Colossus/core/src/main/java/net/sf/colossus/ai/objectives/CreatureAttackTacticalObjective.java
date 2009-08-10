@@ -7,7 +7,6 @@ package net.sf.colossus.ai.objectives;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import net.sf.colossus.ai.AbstractAI;
 import net.sf.colossus.ai.helper.BattleEvalConstants;
@@ -28,8 +27,6 @@ import net.sf.colossus.variant.MasterBoardTerrain;
  */
 class CreatureAttackTacticalObjective extends AbstractTacticalObjective
 {
-    private static final Logger LOGGER = Logger
-        .getLogger(CreatureAttackTacticalObjective.class.getName());
     private final Creature creature;
     private final Legion liveLegion;
     private final Client client;
