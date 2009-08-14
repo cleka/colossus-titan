@@ -969,7 +969,7 @@ public class TerrainRecruitLoader implements IVariantInitializer
                 + "old is " + g_value + " while new is " + theNumber
                 + " when " + recruiter.getName() + " recruits "
                 + recruit.getName() + " in " + terrain.getId() + " on hex "
-                + hex.getLabel());
+                + (hex != null ? hex.getLabel() : "[hex is null]"));
             LOGGER.warning("The RST is\n"
                 + terrain.getRecruitingSubTree().toString());
         }
