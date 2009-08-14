@@ -888,6 +888,11 @@ public final class MasterBoard extends JPanel
         String propName = "java.util.logging.FileHandler.pattern";
         String logPattern = LogManager.getLogManager().getProperty(propName);
 
+        if (logPattern == null)
+        {
+            return "<UNKNOWN> (system property "
+                + " \"java.util.logging.FileHandler.pattern\" is not set?)";
+        }
         // Replace %t with Java's idea of system temp directory:
         if (logPattern.startsWith("%t"))
         {
