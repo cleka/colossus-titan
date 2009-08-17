@@ -101,8 +101,9 @@ SimpleAI would do it.
 <li><a HREF="#Auto_pick_entry_sides">Auto pick entry sides</a></li>
 <li><a HREF="#Auto_forced_strike">Auto forced strike</a></li>
 <li><a HREF="#Auto_carry_single">Auto carry single</a></li>
-<li><a HREF="#Auto_angestrike_single">Auto rangestrike single</a></li>
+<li><a HREF="#Auto_rangestrike_single">Auto rangestrike single</a></li>
 <li><a HREF="#Auto_summon_angels">Auto summon angels</a></li>
+<li><a HREF="#Auto_done">Auto done</a></li>
 <li><a HREF="#Auto_acquire angels">Auto acquire angels</a></li>
 <li><a HREF="#Auto_recruit">Auto recruit</a></li>
 <li><a HREF="#Auto_pick_recruiters">Auto pick recruiters</a></li>
@@ -148,7 +149,7 @@ for you. (Those are still mandatory, but it's your choice where to strike).
 
 Similar to the above, if there is only one possible carry target for excess hits (more hits than needed to kill the primary target).
 
-<h3><a NAME="#Auto_angestrike_single">Autoplay - Auto rangestrike single</a></h3>
+<h3><a NAME="#Auto_rangestrike_single">Autoplay - Auto rangestrike single</a></h3>
 
 Similar to the above, if there is only one possible rangestrike
 target.  One notable difference is, rangestrikes are not mandatory -
@@ -164,6 +165,19 @@ There might be situations when you want not to summon (especially the
 after battle summon), e.g. to muster something stronger
 instead. Usually the AI should decide "right" in this case but...
 
+<h3><a NAME="#Auto_done">Autoplay - Auto done</a></h3>
+
+With this enabled, you don't need to click "Done" in some situations 
+where there is nothing else you can do. Right now, this covers the two cases:
+<ul>
+<li>After the last engagement</li>
+<li>A recruit phase in which is no recruit action at all</li>
+</ul>
+
+If there is something to recruit, then this will <b>not</b> automatically 
+finish the recruit phase after the last recruiting was done, 
+neither whether you did it or Auto-recruit did it.  
+  
 <h3><a NAME="#Auto_acquire angels">Autoplay - Auto acquire angels</a></h3>
 
 Will automatically acquire the angel(s) after a won battle. Uses also
@@ -519,7 +533,7 @@ You can define an order of favorite colors here. See
 <i>
 Created January 2008.
 <br>
-Last updated January 10, 2008 by CleKa
+Last updated August 17, 2009 by CleKa
 </i>
 </body>
 </html>
