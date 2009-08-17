@@ -502,7 +502,8 @@ public final class LegionServerSide extends Legion implements
         }
         if (updateHistory)
         {
-            game.removeCreatureEvent(this, critter.getType());
+            game.removeCreatureEvent(this, critter.getType(),
+                Constants.reasonKilled);
         }
     }
 

@@ -1683,6 +1683,7 @@ public final class Server extends Thread implements IServer
             client.undidRecruit(legion, recruit);
         }
         game.undoRecruitEvent(legion);
+        game.removeCreatureEvent(legion, recruit, Constants.reasonRecruited);
     }
 
     public void engage(MasterHex hex)
@@ -2384,7 +2385,7 @@ public final class Server extends Thread implements IServer
         }
         if (updateHistory)
         {
-            game.removeCreatureEvent(legion, creature);
+            game.removeCreatureEvent(legion, creature, reason);
         }
     }
 

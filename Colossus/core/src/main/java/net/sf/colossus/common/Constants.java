@@ -266,6 +266,7 @@ public final class Constants
     public static final String reasonEngaged = "Engaged";
     public static final String reasonConcession = "Concession";
     public static final String reasonFled = "Fled";
+    public static final String reasonKilled = "Killed";
 
     // From server to client
     public static final String tellEngagement = "tellEngagement";

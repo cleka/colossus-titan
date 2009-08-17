@@ -189,7 +189,8 @@ public class History
         recentEvents.add(element);
     }
 
-    void removeCreatureEvent(Legion legion, CreatureType creature, int turn)
+    void removeCreatureEvent(Legion legion, CreatureType creature, int turn,
+        String reason)
     {
         if (loading)
         {
@@ -199,6 +200,7 @@ public class History
         event.setAttribute("markerId", legion.getMarkerId());
         event.setAttribute("creatureName", creature.getName());
         event.setAttribute("turn", "" + turn);
+        event.setAttribute("reason", reason);
         recentEvents.add(event);
     }
 
@@ -449,6 +451,13 @@ public class History
         {
             // Skip this because we redo the full recruit event
             LOGGER.finest("Skipping AddCreature event (reason " + reason
+                + ") during redo.");
+        }
+        else if (eventName.equals("RemoveCreature") && isRedo
+            && reason.equals(Constants.reasonRecruited))
+        {
+            // Skip this because we redo the full recruit event
+            LOGGER.finest("Skipping RemoveCreature event (reason " + reason
                 + ") during redo.");
         }
         else if (eventName.equals("Reveal"))
