@@ -300,6 +300,10 @@ public class RecruitingSubTree implements IRecruiting
         CreatureType recruit, MasterHex hex)
     {
         int number = Constants.BIGNUM;
+        if (!getPossibleRecruits(hex).contains(recruit))
+        {
+            return number;
+        }
         /* LOGGER.finest("Start for recruiter and recruit : " +
                 recruiter.getName() + " & " + recruit.getName()); */
         if (recruiter.equals(recruit))
@@ -364,10 +368,17 @@ public class RecruitingSubTree implements IRecruiting
 
         possibleRecruits.addAll(allRecruits);
 
-        for (ICustomRecruitBase cri : allCustom)
+        if (hex == null)
         {
-            List<CreatureType> temp = cri.getPossibleSpecialRecruits(hex);
-            possibleRecruits.addAll(temp);
+            LOGGER.finer("Hex is null, ignoring special recruits.");
+        }
+        else
+        {
+            for (ICustomRecruitBase cri : allCustom)
+            {
+                List<CreatureType> temp = cri.getPossibleSpecialRecruits(hex);
+                possibleRecruits.addAll(temp);
+            }
         }
         return possibleRecruits;
     }
