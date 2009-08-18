@@ -82,6 +82,7 @@ public final class Server extends Thread implements IServer
 
     /** Number of player clients we're waiting for. */
     private int waitingForPlayers;
+    private String lastConnectedPlayer = null;
     private int spectators = 0;
 
     /** Server socket port. */
@@ -169,8 +170,8 @@ public final class Server extends Thread implements IServer
     @Override
     public void run()
     {
-        // boolean gotAll = waitForClients();
-        waitForClients();
+        boolean gotAll = waitForClients();
+        game.actOnWaitForClientsCompleted(gotAll);
 
         int timeout = timeoutDuringGame;
         int disposeRound = 0;
@@ -505,6 +506,11 @@ public final class Server extends Thread implements IServer
 
     private void stopAccepting() throws IOException
     {
+        if (acceptKey == null)
+        {
+            LOGGER.warning("request to stopAccepting but acceptKey is null!");
+            return;
+        }
         LOGGER.info("Canceling connection accepting key.");
         acceptKey.cancel();
         acceptKey = null;
@@ -1010,7 +1016,10 @@ public final class Server extends Thread implements IServer
             logToStartLog((remote ? "Remote" : "Local") + " player " + name
                 + " signed on.");
             game.getNotifyWebServer().gotClient(player.getName(), remote);
-            waitingForPlayers--;
+            if (--waitingForPlayers == 0)
+            {
+                lastConnectedPlayer = name;
+            }
             LOGGER.info("Decremented waitingForPlayers to "
                 + waitingForPlayers);
 
@@ -1035,10 +1044,12 @@ public final class Server extends Thread implements IServer
         return null;
     }
 
-    public void startGameIfAllPlayers()
+    public void startGameIfAllPlayers(String playerName)
     {
-        if (waitingForPlayers <= 0)
+        // if (waitingForPlayers <= 0)
+        if (playerName != null && playerName.equals(lastConnectedPlayer))
         {
+            lastConnectedPlayer = null;
             stopAcceptingFlag = true;
             if (game.isLoadingGame())
             {
@@ -1078,6 +1089,11 @@ public final class Server extends Thread implements IServer
                 startLog.setCompleted();
             }
         }
+    }
+
+    public int getClientCount()
+    {
+        return clients.size();
     }
 
     private void addRemoteClient(final IClient client, final Player player)
@@ -2853,6 +2869,6 @@ public final class Server extends Thread implements IServer
     {
         // @TODO: move to outside Select loop
         //   => notify main thread to do this?
-        startGameIfAllPlayers();
+        startGameIfAllPlayers(playerName);
     }
 }

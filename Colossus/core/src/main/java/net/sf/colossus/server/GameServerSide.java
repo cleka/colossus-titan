@@ -209,6 +209,7 @@ public final class GameServerSide extends Game
             server.setObsolete();
             server.disposeAllClients();
         }
+
         server = new Server(this, whatNextManager, getPort());
         if (startingWebClient != null)
         {
@@ -220,12 +221,8 @@ public final class GameServerSide extends Game
         {
             server.initFileServer();
             server.initSocketServer();
-            server.start();
-            notifyWebServer.readyToAcceptClients();
 
-            createLocalClients();
-
-            boolean gotAll = true;
+            boolean gotAll = startServerAndWaitUntilNotifiedThatWaitForClientsCompleted();
             if (gotAll)
             {
                 ViableEntityManager.register(this, "Server/Game " + gameId);
@@ -257,6 +254,51 @@ public final class GameServerSide extends Game
             LOGGER.log(Level.SEVERE, "Server initialization got Exception "
                 + e.getMessage(), e);
         }
+    }
+
+    Object waitForClientsMutex = new Object();
+    boolean serverGotAll = false;
+
+    public void actOnWaitForClientsCompleted(boolean gotAll)
+    {
+        synchronized (waitForClientsMutex)
+        {
+            serverGotAll = gotAll;
+            waitForClientsMutex.notify();
+        }
+    }
+
+    /* All between start the server and waiting for being notified is done
+     * inside one synchronized block, so that server cannot notify us
+     * before we are waiting on the mutex.
+     */
+    private boolean startServerAndWaitUntilNotifiedThatWaitForClientsCompleted()
+    {
+        Runnable doCreateClients = new Runnable()
+        {
+            public void run()
+            {
+                createLocalClients();
+            }
+        };
+        Thread doCreateClientsThread = new Thread(doCreateClients);
+
+        synchronized (waitForClientsMutex)
+        {
+            server.start();
+            notifyWebServer.readyToAcceptClients();
+            doCreateClientsThread.start();
+            try
+            {
+                waitForClientsMutex.wait();
+            }
+            catch (InterruptedException e)
+            {
+                LOGGER.warning("main thread waiting for all clients to "
+                    + "connect got InterruptedException: " + e);
+            }
+        }
+        return serverGotAll;
     }
 
     public void createLocalClients()
@@ -449,7 +491,7 @@ public final class GameServerSide extends Game
 
         if (!server.isServerRunning())
         {
-            // Startup Failed: clean up
+            LOGGER.warning("Server startup failed: doing cleanup!");
             server.cleanup();
             server = null;
             return false;
