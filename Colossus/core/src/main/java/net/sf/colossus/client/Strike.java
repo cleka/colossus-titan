@@ -293,7 +293,7 @@ public final class Strike
             {
                 strikerAtop = true;
                 totalObstacles++;
-                if (hexside == 'c')
+                if (hexside == 'c' || hexside == 'd')
                 {
                     strikerAtopCliff = true;
                 }
@@ -303,7 +303,7 @@ public final class Strike
             {
                 midObstacle = true;
                 totalObstacles++;
-                if (hexside2 == 'c')
+                if (hexside2 == 'c' || hexside2 == 'd')
                 {
                     midCliff = true;
                 }
@@ -320,7 +320,7 @@ public final class Strike
             {
                 midObstacle = true;
                 totalObstacles++;
-                if (hexside == 'c')
+                if (hexside == 'c' || hexside == 'd')
                 {
                     midCliff = true;
                 }
@@ -335,7 +335,7 @@ public final class Strike
             {
                 targetAtop = true;
                 totalObstacles++;
-                if (hexside2 == 'c')
+                if (hexside2 == 'c' || hexside2 == 'd')
                 {
                     targetAtopCliff = true;
                 }
@@ -346,7 +346,7 @@ public final class Strike
                 return true;
             }
 
-            if (midCliff && !strikerAtopCliff && !targetAtopCliff)
+            if (midCliff && (!strikerAtopCliff || !targetAtopCliff))
             {
                 return true;
             }
@@ -382,7 +382,8 @@ public final class Strike
             {
                 midObstacle = true;
                 totalObstacles++;
-                if (hexside == 'c' || hexside2 == 'c')
+                if (hexside == 'c' || hexside2 == 'c' || hexside == 'd' ||
+                    hexside2 == 'd')
                 {
                     midCliff = true;
                 }

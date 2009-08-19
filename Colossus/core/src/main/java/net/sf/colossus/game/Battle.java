@@ -392,7 +392,7 @@ abstract public class Battle
             {
                 strikerAtop = true;
                 totalObstacles++;
-                if (hexside == 'c')
+                if (hexside == 'c' || hexside == 'd')
                 {
                     strikerAtopCliff = true;
                 }
@@ -401,7 +401,7 @@ abstract public class Battle
             {
                 midObstacle = true;
                 totalObstacles++;
-                if (hexside2 == 'c')
+                if (hexside2 == 'c' || hexside2 == 'd')
                 {
                     midCliff = true;
                 }
@@ -417,7 +417,7 @@ abstract public class Battle
             {
                 midObstacle = true;
                 totalObstacles++;
-                if (hexside == 'c')
+                if (hexside == 'c' || hexside == 'd')
                 {
                     midCliff = true;
                 }
@@ -430,7 +430,7 @@ abstract public class Battle
             {
                 targetAtop = true;
                 totalObstacles++;
-                if (hexside2 == 'c')
+                if (hexside2 == 'c' || hexside2 == 'd')
                 {
                     targetAtopCliff = true;
                 }
@@ -439,7 +439,7 @@ abstract public class Battle
             {
                 return true;
             }
-            if (midCliff && !strikerAtopCliff && !targetAtopCliff)
+            if (midCliff && (!strikerAtopCliff || !targetAtopCliff))
             {
                 return true;
             }
@@ -467,7 +467,8 @@ abstract public class Battle
             {
                 midObstacle = true;
                 totalObstacles++;
-                if (hexside == 'c' || hexside2 == 'c')
+                if (hexside == 'c' || hexside2 == 'c' || hexside == 'd' || 
+                    hexside2 == 'd')
                 {
                     midCliff = true;
                 }
