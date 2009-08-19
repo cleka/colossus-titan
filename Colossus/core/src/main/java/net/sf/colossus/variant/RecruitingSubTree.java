@@ -300,7 +300,14 @@ public class RecruitingSubTree implements IRecruiting
         CreatureType recruit, MasterHex hex)
     {
         int number = Constants.BIGNUM;
-        if (!getPossibleRecruits(hex).contains(recruit))
+
+        /* WARNING: do not call getPossibleRecruits() from here,
+         * even if this look hackish.
+         * getPossibleRecruits() can provoke a Caretaker update,
+         * which tries to push informations to clients. If this
+         * has been called from a client, /deadlock/
+         */
+        if ((hex == null) && !allRecruits.contains(recruit))
         {
             return number;
         }
@@ -362,6 +369,10 @@ public class RecruitingSubTree implements IRecruiting
         return number;
     }
 
+    /** WARNING: This function, trough the CustomRecruitBase, can
+     * cause a caretaker update. It should not be called under circumstances
+     * where this update is bad.
+     */
     public Set<CreatureType> getPossibleRecruits(MasterHex hex)
     {
         Set<CreatureType> possibleRecruits = new TreeSet<CreatureType>();
