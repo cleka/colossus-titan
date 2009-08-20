@@ -438,7 +438,7 @@ public class GameInfo
         return playerList.substring(0);
     }
 
-    public boolean isEnrolled(User newUser)
+    public boolean reEnrollIfNecessary(User newUser)
     {
         String newName = newUser.getName();
         Iterator<User> it = players.iterator();

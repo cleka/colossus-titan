@@ -437,7 +437,7 @@ public class WebServer implements IWebServer, IRunWebServer
 
         for (GameInfo gi : proposedGames.values())
         {
-            if (gi.isEnrolled(newUser))
+            if (gi.reEnrollIfNecessary(newUser))
             {
                 LOGGER.log(Level.FINEST, "Telling user " + newUser.getName()
                     + " that he is still enrolled in game " + gi.getGameId());
