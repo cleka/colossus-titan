@@ -77,7 +77,14 @@ public class GameTableModel extends AbstractTableModel
                 break;
 
             case 3:
-                o = humanReadableTime(gi.getStartTime());
+                if (gi.isScheduledGame())
+                {
+                    o = humanReadableTime(gi.getStartTime());
+                }
+                else
+                {
+                    o = "-instantly-";
+                }
                 break;
 
             case 4:
