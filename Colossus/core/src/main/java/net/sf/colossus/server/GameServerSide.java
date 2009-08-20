@@ -393,7 +393,6 @@ public final class GameServerSide extends Game
         server.waitUntilGameFinishes();
         server.cleanup();
         server = null;
-
         ViableEntityManager.unregister(this);
     }
 
@@ -438,9 +437,12 @@ public final class GameServerSide extends Game
         boolean ok = newGame(hostingPlayer);
 
         if (ok)
+
         {
-            // Main thread has now nothing to do any more, can wait
-            // until game finishes.
+            // Main thread (or the Runnable when started by WebClient locally?)
+            // has now nothing to do any more, can wait until game finishes.
+
+            // TODO if runnable by WebClient, is there even need to wait ?
             cleanupWhenGameOver();
         }
         return ok;
@@ -1149,6 +1151,16 @@ public final class GameServerSide extends Game
         if (gameShouldContinue())
         {
             phaseAdvancer.advancePhase();
+        }
+    }
+
+    @Override
+    public void setGameOver(boolean gameOver, String message)
+    {
+        super.setGameOver(gameOver, message);
+        if (startingWebClient != null)
+        {
+            startingWebClient.informLocallyGameOver();
         }
     }
 

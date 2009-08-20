@@ -2008,6 +2008,11 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         server.informStartedByPlayer(this.startedGameId);
     }
 
+    public void informLocallyGameOver()
+    {
+        server.informLocallyGameOver(this.startedGameId);
+    }
+
     public void setLocalServer(Server server)
     {
         localServer = server;

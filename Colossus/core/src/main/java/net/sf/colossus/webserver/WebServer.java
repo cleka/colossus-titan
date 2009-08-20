@@ -686,6 +686,14 @@ public class WebServer implements IWebServer, IRunWebServer
         proposedGamesListModified = true;
     }
 
+    public void informLocallyGameOver(String gameId)
+    {
+        LOGGER.info("WebServer informLocallyGameOver id " + gameId);
+        GameInfo gi = findFromRunningGames(gameId);
+        unregisterGamePlayerPC(gi);
+        LOGGER.info("WebServer informLocallyGameOver id " + gameId + " ENDS");
+    }
+
     public void updateUserCounts()
     {
         int connected = User.getLoggedInCount();
@@ -817,6 +825,20 @@ public class WebServer implements IWebServer, IRunWebServer
         return proposedGames.get(gameId);
     }
 
+    private GameInfo findFromRunningGames(String gameId)
+    {
+        GameInfo foundGi = null;
+        for (GameInfo gi : runningGames)
+        {
+            if (gi.getGameId().equals(gameId))
+            {
+                foundGi = gi;
+                break;
+            }
+        }
+        return foundGi;
+    }
+
     private IGameRunner getGameOnServer(GameInfo gi)
     {
         assert gi != null : "Cannot find GameOnServer for GameInfo that is null!";
@@ -904,6 +926,40 @@ public class WebServer implements IWebServer, IRunWebServer
 
         updateGUI();
 
+    }
+
+    /*
+     * unregister a game from runningGames,
+     * keep in endingGames until it's reaped
+     */
+
+    public void unregisterGamePlayerPC(GameInfo gi)
+    {
+        if (gi == null)
+        {
+            LOGGER
+                .warning("unregisterGamePlayerPC called with a null GameInfo object?");
+            return;
+        }
+
+        synchronized (runningGames)
+        {
+            LOGGER.log(Level.FINEST, "trying to remove...");
+            if (runningGames.contains(gi))
+            {
+                LOGGER.log(Level.FINEST, "removing...");
+                runningGames.remove(gi);
+            }
+            else
+            {
+                LOGGER.warning("runningGames does not contain game "
+                    + gi.getGameId());
+            }
+        }
+        gi.setState(GameState.ENDING);
+        allTellGameInfo(gi);
+
+        updateGUI();
     }
 
     private void readGamesFromFile(String filename,

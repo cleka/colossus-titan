@@ -645,6 +645,11 @@ public class WebClientSocketThread extends Thread implements IWebServer
         send(StartedByPlayer + sep + gameId);
     }
 
+    public void informLocallyGameOver(String gameId)
+    {
+        send(LocallyGameOver + sep + gameId);
+    }
+
     public void startGameOnPlayerHost(String gameId, String hostingPlayer,
         String playerHost, int port)
     {

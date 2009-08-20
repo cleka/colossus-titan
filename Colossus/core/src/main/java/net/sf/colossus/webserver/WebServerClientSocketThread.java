@@ -411,6 +411,12 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             server.informStartedByPlayer(gameId);
         }
 
+        else if (command.equals(IWebServer.LocallyGameOver))
+        {
+            String gameId = tokens[1];
+            server.informLocallyGameOver(gameId);
+        }
+
         else if (command.equals(IWebServer.ChatSubmit))
         {
             String chatId = tokens[1];

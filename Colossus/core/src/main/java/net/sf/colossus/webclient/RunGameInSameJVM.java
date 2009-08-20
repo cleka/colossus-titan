@@ -43,6 +43,7 @@ public class RunGameInSameJVM extends Thread implements IGameRunner,
         this.username = username;
         this.webClient = webClient;
 
+        setName("RunGameInSameJVM gameId " + gi.getGameId());
         gi.setGameRunner(this);
         LOGGER.info("RunGameInSameJVM for gameId " + gi.getGameId()
             + " created.");
@@ -101,7 +102,6 @@ public class RunGameInSameJVM extends Thread implements IGameRunner,
         LOGGER.info("Initiating the local game starting");
         initiatingWebClient = getWebClient();
         startHandler.startWebGameLocally(presetOptions, username);
-
     }
 
     public void tellServerToInformOtherPlayers()

@@ -80,9 +80,17 @@ public final class Server extends Thread implements IServer
     // list of SocketChannels that are currently active
     private final List<SocketChannel> activeSocketChannelList = new ArrayList<SocketChannel>();
 
-    /** Number of player clients we're waiting for. */
+    /** Number of player clients we're waiting for to *connect* */
     private int waitingForPlayers;
-    private String lastConnectedPlayer = null;
+
+    /** Number of player clients we're waiting for to *join*
+     *  - when last one has joined, then kick of newGame2() or loadGame2()
+     */
+    private int waitingForPlayersToJoin = 0;
+
+    /** Semaphor for synchronized access to waitingForPlayersToJoin */
+    private final Object wfptjSemaphor = new Object();
+
     private int spectators = 0;
 
     /** Server socket port. */
@@ -164,6 +172,7 @@ public final class Server extends Thread implements IServer
         }
 
         waitingForPlayers = game.getNumLivingPlayers();
+        initWaitingForPlayersToJoin(waitingForPlayers);
         InstanceTracker.register(this, "only one");
     }
 
@@ -1016,11 +1025,9 @@ public final class Server extends Thread implements IServer
             logToStartLog((remote ? "Remote" : "Local") + " player " + name
                 + " signed on.");
             game.getNotifyWebServer().gotClient(player.getName(), remote);
-            if (--waitingForPlayers == 0)
-            {
-                lastConnectedPlayer = name;
-            }
-            LOGGER.info("Decremented waitingForPlayers to "
+            --waitingForPlayers;
+
+            LOGGER.info("Decremented waitingForPlayers (to connect) to "
                 + waitingForPlayers);
 
             if (waitingForPlayers > 0)
@@ -1044,50 +1051,76 @@ public final class Server extends Thread implements IServer
         return null;
     }
 
-    public void startGameIfAllPlayers(String playerName)
+    /**
+     *  When the last player has *joined* (not just connected), he calls this
+     *  here, and this will proceed with either loadGame2() or newGame2().
+     */
+    public void startGame()
     {
-        // if (waitingForPlayers <= 0)
-        if (playerName != null && playerName.equals(lastConnectedPlayer))
+        stopAcceptingFlag = true;
+        if (game.isLoadingGame())
         {
-            lastConnectedPlayer = null;
-            stopAcceptingFlag = true;
-            if (game.isLoadingGame())
+            logToStartLog("Loading game, sending replay data to clients...");
+            boolean ok = game.loadGame2();
+            if (ok)
             {
-                logToStartLog("Loading game, sending replay data to clients...");
-                boolean ok = game.loadGame2();
-                if (ok)
-                {
-                    logToStartLog("Waiting for clients to catch up with replay data...\n");
-                }
-                else
-                {
-                    logToStartLog("Loading/Replay failed!!\n");
-                    if (Options.isFunctionalTest())
-                    {
-                        ErrorUtils
-                            .setErrorDuringFunctionalTest("Loading/Replay failed!");
-                        game.stopAllDueToFunctionalTestCompleted();
-                    }
-                    else
-                    {
-                        logToStartLog("\n-- Press Abort button "
-                            + "to return to Start Game dialog --\n");
-                        loadFailed();
-                    }
-                    return;
-                }
+                logToStartLog("Waiting for clients to catch up with replay data...\n");
             }
             else
             {
-                game.newGame2();
+                logToStartLog("Loading/Replay failed!!\n");
+                if (Options.isFunctionalTest())
+                {
+                    ErrorUtils
+                        .setErrorDuringFunctionalTest("Loading/Replay failed!");
+                    game.stopAllDueToFunctionalTestCompleted();
+                }
+                else
+                {
+                    logToStartLog("\n-- Press Abort button "
+                        + "to return to Start Game dialog --\n");
+                    loadFailed();
+                }
+                return;
             }
+        }
+        else
+        {
+            game.newGame2();
+        }
 
-            logToStartLog("\nStarting the game now.\n");
-            game.getNotifyWebServer().gameStartupCompleted();
-            if (startLog != null)
-            {
-                startLog.setCompleted();
-            }
+        logToStartLog("\nStarting the game now.\n");
+        game.getNotifyWebServer().gameStartupCompleted();
+        if (startLog != null)
+        {
+            startLog.setCompleted();
+        }
+    }
+
+    /**
+     *  Initialize the number of players we wait for to join (thread-safe)
+     *
+     *  @param count the number of players that are expected to join
+     */
+    private void initWaitingForPlayersToJoin(int count)
+    {
+        synchronized (wfptjSemaphor)
+        {
+            waitingForPlayersToJoin = count;
+        }
+    }
+
+    /**
+     *  Decrement the number of players we wait for to join by one in a
+     *  thread-safe way, and return the new value.
+     *
+     *  @return The number of players that still need to join
+     */
+    private int decrementWaitingForPlayersToJoin()
+    {
+        synchronized (wfptjSemaphor)
+        {
+            return --waitingForPlayersToJoin;
         }
     }
 
@@ -2869,6 +2902,16 @@ public final class Server extends Thread implements IServer
     {
         // @TODO: move to outside Select loop
         //   => notify main thread to do this?
-        startGameIfAllPlayers(playerName);
+        int stillMissing = decrementWaitingForPlayersToJoin();
+        if (stillMissing == 0)
+        {
+            LOGGER
+                .info("waitingForPlayersToJoin now zero - calling startGame.");
+            startGame();
+        }
+        else
+        {
+            LOGGER.info("waitingForPlayersToJoin now " + stillMissing);
+        }
     }
 }

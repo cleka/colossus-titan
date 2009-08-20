@@ -19,6 +19,7 @@ public interface IWebServer
     public static final String Start = "start";
     public static final String StartAtPlayer = "startAtPlayer";
     public static final String StartedByPlayer = "startedByPlayer";
+    public static final String LocallyGameOver = "locallyGameOver";
     public static final String Cancel = "cancel";
     public static final String ChatSubmit = "chatsubmit";
     public static final String ShutdownServer = "shutdownserver";
@@ -65,6 +66,8 @@ public interface IWebServer
     // Game started on players computer, tell WebServer that
     // he can inform all WebClient that game started successfully
     public void informStartedByPlayer(String gameId);
+
+    public void informLocallyGameOver(String gameId);
 
     public void chatSubmit(String chatId, String sender, String message);
 

@@ -35,7 +35,7 @@ public class StartGameForWebclient implements IStartHandler
         {
             public void run()
             {
-                getGame().newGame(getHostingUsername());
+                getGame().startNewGameAndWaitUntilOver(getHostingUsername());
             }
         };
         new Thread(doNewGame).start();

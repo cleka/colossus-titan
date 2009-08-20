@@ -611,6 +611,7 @@ final class SocketClientThread extends Thread implements IServer,
             List<String> li = Split.split(sep, s);
 
             String method = li.remove(0);
+
             callMethod(method, li);
         }
     }
