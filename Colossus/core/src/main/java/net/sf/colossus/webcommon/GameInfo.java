@@ -119,14 +119,22 @@ public class GameInfo
     // ================= now the stuff for the client side ===============
 
     // used on client side, to restore a proposed game sent by server
-    public GameInfo(String gameId)
+    public GameInfo(String gameId, boolean onServer)
     {
         this.gameId = gameId;
+        if (onServer)
+        {
+            int intGameId = Integer.parseInt(gameId);
+            if (nextFreeGameId <= intGameId)
+            {
+                nextFreeGameId = intGameId + 1;
+            }
+        }
         this.players = new ArrayList<User>();
     }
 
     public static GameInfo fromString(String[] tokens,
-        HashMap<String, GameInfo> games)
+        HashMap<String, GameInfo> games, boolean fromFile)
     {
         GameInfo gi;
 
@@ -142,7 +150,7 @@ public class GameInfo
         }
         else
         {
-            gi = new GameInfo(gameId);
+            gi = new GameInfo(gameId, fromFile);
             games.put(key, gi);
             // System.out.println("Creating a new one GameInfo ");
         }

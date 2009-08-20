@@ -421,8 +421,8 @@ public class WebServer implements IWebServer, IRunWebServer
         proposedGames.put(gi.getGameId(), gi);
         proposedGamesListModified = true;
 
-        // System.out.println("Game " + gi.getGameId()
-        //     + " was proposed. Adding to list.");
+        LOGGER.info("Game " + gi.getGameId()
+            + " was proposed. Adding to list.");
 
         updateGUI();
         allTellGameInfo(gi);
@@ -998,7 +998,7 @@ public class WebServer implements IWebServer, IRunWebServer
                     // to be the command name:
                     String lineWithCmd = "Dummy" + sep + line;
                     String[] tokens = lineWithCmd.split(sep);
-                    GameInfo.fromString(tokens, proposedGames);
+                    GameInfo.fromString(tokens, proposedGames, true);
 
                 }
             }

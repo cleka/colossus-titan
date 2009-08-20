@@ -381,7 +381,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
                 {
                     HashMap<String, GameInfo> gameHash = webClient
                         .getGameHash();
-                    GameInfo gi = GameInfo.fromString(tokens, gameHash);
+                    GameInfo gi = GameInfo.fromString(tokens, gameHash, false);
 
                     webClient.gameInfo(gi);
                 }

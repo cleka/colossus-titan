@@ -190,7 +190,7 @@ public class GameTableModel extends AbstractTableModel
         GameInfo gi = data.get(row);
         if (gi == null)
         {
-            gi = new GameInfo("");
+            gi = new GameInfo("", false);
 
         }
         switch (col)
