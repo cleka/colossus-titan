@@ -20,6 +20,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -116,6 +117,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
     private final static int NotLoggedIn = 1;
     private final static int LoggedIn = 2;
+    // ENrolled to an instant game
     private final static int Enrolled = 3;
     private final static int Playing = 4;
     // private final static int PlayingButDead = 5;
@@ -804,6 +806,24 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         // The panel with all GUI stuff needed to schedule a game:
         Box schedulingPanel = new Box(BoxLayout.Y_AXIS);
         schedulingPanel.setAlignmentY(Box.TOP_ALIGNMENT);
+
+        Calendar now = Calendar.getInstance(myLocale);
+
+        DateFormat df = DateFormat
+            .getDateInstance(DateFormat.MEDIUM, myLocale);
+        df.setTimeZone(TimeZone.getDefault());
+        df.setLenient(false);
+        String nowDateString = df.format(now.getTime());
+
+        DateFormat tf = DateFormat.getTimeInstance(DateFormat.SHORT, myLocale);
+        tf.setTimeZone(TimeZone.getDefault());
+        tf.setLenient(false);
+        String nowTimeString = tf.format(now.getTime());
+
+        schedulingPanel
+            .add(makeTextBox(nonBoldLabel("Current date and time is:  "
+                + nowDateString + "  " + nowTimeString)));
+
         schedulingPanel
             .add(makeTextBox(nonBoldLabel("Give a start date and time (dd.mm.yyyy and hh:mm) "
                 + "and a minimum duration in minutes:")));
@@ -812,10 +832,18 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         Box schedulePanel = new Box(BoxLayout.X_AXIS);
         schedulePanel.add(new JLabel("Start at: "));
 
-        atDateField = new JTextField("27.11.2008");
+        int days = 0;
+        int hours = 24;
+
+        Calendar defaultStart = getNowPlusOffset(now, days, hours);
+        String defaultStartDateString = df.format(defaultStart.getTime());
+
+        atDateField = new JTextField(defaultStartDateString);
         schedulePanel.add(atDateField);
 
-        atTimeField = new JTextField("10:00");
+        String defaultStartTimeString = tf.format(defaultStart.getTime());
+
+        atTimeField = new JTextField(defaultStartTimeString);
         schedulePanel.add(atTimeField);
 
         schedulePanel.add(new JLabel(" Duration: "));
@@ -973,6 +1001,30 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         addRadioButton(scheduleModes, group, TYPE_SCHEDULED, current,
             iListener);
 
+    }
+    /**
+     * Determine a point in time given amount of days and hours from now.
+     * Round it to a full hour (down if min <= 10, next hour otherwise).
+     *
+     * @param days
+     * @param hours
+     * @return
+     */
+    private Calendar getNowPlusOffset(Calendar now, int days, int hours)
+    {
+        Calendar nowPlusOffset = now;
+        nowPlusOffset.add(Calendar.DAY_OF_MONTH, days);
+        nowPlusOffset.add(Calendar.HOUR_OF_DAY, hours);
+
+        // Round to full hour: down if <= 10
+        int min = nowPlusOffset.get(Calendar.MINUTE);
+        if (min > 10)
+        {
+            nowPlusOffset.add(Calendar.HOUR_OF_DAY, 1);
+        }
+        nowPlusOffset.set(Calendar.MINUTE, 0);
+
+        return nowPlusOffset;
     }
 
     public void reactOnScheduleRadioButtonChange(ItemEvent e)
