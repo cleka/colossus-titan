@@ -2423,7 +2423,17 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
                                 // System.out
                                 //     .println("Got a running game, replacing in run game list and remove in inst game list");
                                 replaceInTable(runGameTable, game);
-                                instGameDataModel.removeGame(game.getGameId());
+                                if (game.isScheduledGame())
+                                {
+                                    schedGameDataModel.removeGame(game
+                                        .getGameId());
+                                }
+                                else
+                                {
+                                    instGameDataModel.removeGame(game
+                                        .getGameId());
+                                }
+
                                 break;
 
                             case ENDING:
