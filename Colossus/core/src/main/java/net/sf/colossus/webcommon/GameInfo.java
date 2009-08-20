@@ -464,6 +464,20 @@ public class GameInfo
         return found;
     }
 
+    public boolean isEnrolled(String searchName)
+    {
+        boolean found = false;
+        for (User u : players)
+        {
+            if (searchName.equals(u.getName()))
+            {
+                found = true;
+                break;
+            }
+        }
+        return found;
+    }
+
     public void setPlayerList(ArrayList<User> playerlist)
     {
         players = playerlist;
