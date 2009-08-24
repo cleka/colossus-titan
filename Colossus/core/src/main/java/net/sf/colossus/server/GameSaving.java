@@ -19,6 +19,7 @@ import net.sf.colossus.common.Options;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Player;
+import net.sf.colossus.util.BuildInfo;
 import net.sf.colossus.util.ErrorUtils;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
@@ -127,6 +128,8 @@ public class GameSaving
     {
         Element root = new Element("ColossusSnapshot");
         root.setAttribute("version", Constants.XML_SNAPSHOT_VERSION);
+        root.setAttribute("createdByRelease", BuildInfo.getReleaseVersion()
+            + " (" + BuildInfo.getRevisionInfoString() + ")");
 
         // System.out.println("- Adding snapshot data from last commit point");
         addSnapshotData(root, this.phaseStartSnapshot);
