@@ -1946,27 +1946,25 @@ public final class Client implements IClient, IOracle, IVariant
 
     private void kickMuster()
     {
-        // I changed the "&& !game.isGameOver()" to "&& I am not dead";
-        // before, this makes auto-recruit stop working also for human
-        // when they did win against all others and continue playing
-        // (just for growing bigger creatures ;-)
-        if (options.getOption(Options.autoRecruit) && isAlive() && isMyTurn()
-            && game.isPhase(Phase.MUSTER))
+        if (game.isPhase(Phase.MUSTER) && isMyTurn() && isAlive())
         {
-            // Note that this fires all doRecruit calls in one row,
-            // i.e. does NOT wait for callback from server.
-            ai.muster();
-
-            // For autoRecruit alone, do not automatically say we are done.
-            // Allow humans to override. But full autoPlay be done.
-            if (options.getOption(Options.autoPlay))
-            {
-                doneWithRecruits();
-            }
-            else if (options.getOption(Options.autoDone)
+            if (options.getOption(Options.autoDone)
                 && noRecruitActionPossible())
             {
                 doneWithRecruits();
+            }
+            else if (options.getOption(Options.autoRecruit))
+            {
+                // Note that this fires all doRecruit calls in one row,
+                // i.e. does NOT wait for callback from server.
+                ai.muster();
+
+                // For autoRecruit alone, do not automatically say we are done.
+                // Allow humans to override. But full autoPlay be done.
+                if (options.getOption(Options.autoPlay))
+                {
+                    doneWithRecruits();
+                }
             }
         }
     }
