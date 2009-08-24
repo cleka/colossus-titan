@@ -1763,6 +1763,7 @@ public final class GameServerSide extends Game
         }
 
         server.allRequestConfirmCatchup("KickstartGame");
+        updateCaretakerDisplays();
         return ok;
     }
 
