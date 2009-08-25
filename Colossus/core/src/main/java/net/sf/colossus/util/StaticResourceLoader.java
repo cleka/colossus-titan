@@ -1046,7 +1046,8 @@ public final class StaticResourceLoader
      * @param directories List of directories to search (in order).
      * @param color Color to use.
      * @return An Image composed of the content of the file,
-     *     with the transparent part filled the the given color.
+     *     with the opaque part filled the the given color, and everythin else
+     *     white. The alpha channel (aka transparency) is untouched.
      */
     private static Image createColorizedImage(String filename, Color color,
         List<String> directories, int width, int height)
