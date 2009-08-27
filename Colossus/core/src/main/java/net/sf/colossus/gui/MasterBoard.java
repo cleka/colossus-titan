@@ -340,7 +340,7 @@ public final class MasterBoard extends JPanel
         addMouseListener(new MasterBoardMouseHandler());
         addMouseMotionListener(new MasterBoardMouseMotionHandler());
         this.iph = new InfoPopupHandler(client);
-        masterFrame.addKeyListener(this.iph);
+        this.addKeyListener(this.iph);
 
         setupGUIHexes();
         setupActions();
