@@ -90,20 +90,37 @@ abstract public class CustomRecruitBase implements ICustomRecruitBase
         serverGame = g;
     }
 
-    synchronized protected final void setCount(CreatureType type, int newCount)
+    synchronized protected final void setCount(CreatureType type,
+        int newCount, boolean reset)
     {
         // first update all known CaretakerInfo (if we're client(s))
         Iterator<Caretaker> it = allCaretakerInfo.iterator();
         while (it.hasNext())
         {
             Caretaker ci = it.next();
-            ci.setAvailableCount(type, newCount);
+            if (reset)
+            {
+                ci.setAvailableCount(type, 0);
+                ci.setDeadCount(type, 0);
+            }
+            else
+            {
+                ci.setAvailableCount(type, newCount);
+            }
         }
         // update the Caretaker if we're server
         if (serverGame != null)
         {
-            // first update the server's count
-            serverGame.getCaretaker().setAvailableCount(type, newCount);
+            Caretaker ci = serverGame.getCaretaker();
+            if (reset)
+            {
+                ci.setAvailableCount(type, 0);
+                ci.setDeadCount(type, 0);
+            }
+            else
+            {
+                ci.setAvailableCount(type, newCount);
+            }
         }
     }
 

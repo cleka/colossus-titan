@@ -834,7 +834,7 @@ public final class Client implements IClient, IOracle, IVariant
         this.strike = null;
         playersNotInitialized = true;
 
-        CustomRecruitBase.reset();
+        CustomRecruitBase.resetAllInstances();
     }
 
     /** Called from BattleBoard to leave carry mode. */

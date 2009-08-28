@@ -1418,6 +1418,7 @@ public final class GameServerSide extends Game
     @SuppressWarnings("unchecked")
     public void loadGame(Element root)
     {
+        CustomRecruitBase.resetAllInstances();
 
         try
         {

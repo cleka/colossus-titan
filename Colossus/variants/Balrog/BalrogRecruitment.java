@@ -179,7 +179,7 @@ public class BalrogRecruitment extends CustomRecruitBase
         int difference = nowNumber - alreadyNumber;
         int newcount = getCount(cre) + difference;
 
-        setCount(cre, newcount);
+        setCount(cre, newcount, false);
 
         if (difference > 0)
         {
@@ -214,7 +214,29 @@ public class BalrogRecruitment extends CustomRecruitBase
     @Override
     protected void resetInstance()
     {
-        LOGGER.finest("CUSTOM: resetting " + getClass().getName());
+        LOGGER.finest("CUSTOM: resetting instance " + getClass().getName());
         playerToOldScore.clear();
+        resetAllBalrogCounts();
+    }
+
+    protected void resetAllBalrogCounts()
+    {
+        LOGGER.finest("CUSTOM: Resetting all Balrog counts");
+        Set<MasterHex> towerSet = VariantSupport.getCurrentVariant()
+            .getMasterBoard().getTowerSet();
+        for (MasterHex tower : towerSet)
+        {
+            resetBalrogCount(tower);
+        }
+    }
+
+    private void resetBalrogCount(MasterHex tower)
+    {
+        String name = balrogPrefix + tower.getLabel();
+        CreatureBalrog cre = (CreatureBalrog)VariantSupport
+            .getCurrentVariant().getCreatureByName(name);
+        LOGGER.info("Setting count for " + name + " to 0.");
+        cre.setNewMaxCount(0);
+        setCount(cre, 0, true);
     }
 }
