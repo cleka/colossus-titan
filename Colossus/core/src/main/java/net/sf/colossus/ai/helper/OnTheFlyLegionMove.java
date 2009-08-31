@@ -390,6 +390,7 @@ public class OnTheFlyLegionMove implements Collection<LegionMove>
             int total = 0;
             for (int i = 0; i < dim; i++)
             {
+                actual[i] = 0;
                 counts[i] = i + 2;
                 if (counts[i] > daddy.allCritterMoves.get(i).size())
                 {
@@ -401,6 +402,11 @@ public class OnTheFlyLegionMove implements Collection<LegionMove>
             int count = beingdone.keySet().size();
             LOGGER.finer("Firstfill generated " + count + " out of " + total
                 + " checked");
+            if (count <= 0)
+            {
+                LOGGER.warning(
+                        "Firstfill generated 0 combinations. This is bad.");
+            }
             return count;
         }
 
@@ -490,9 +496,21 @@ public class OnTheFlyLegionMove implements Collection<LegionMove>
             int length = byValues.size();
             if (length <= 0)
             {
-                LOGGER
-                    .warning("getParent called but byValues has no element.");
-                return null;
+                LOGGER.warning("getParent called but byValues has no element.");
+
+                System.err.println("Dumping....");
+                Thread.dumpStack();
+                for (int i = 0; i < daddy.allCritterMoves.size(); i++)
+                {
+                    System.err.println("# of moves @ " + i + " = " + daddy.allCritterMoves.get(i).
+                            size());
+                    for (int j = 0; j < daddy.allCritterMoves.get(i).size(); j++)
+                    {
+                        System.err.println("Move for " + i + "/" + j + " is " + daddy.allCritterMoves.get(i).
+                                get(j).toString());
+                    }
+                }
+                System.exit(-50);
             }
             if (rand.nextInt(100) < percentRandom)
             {
