@@ -385,7 +385,7 @@ public final class PlayerServerSide extends Player implements
 
         // Update number of creatures in status window.
         getGame().getServer().allUpdatePlayerInfo();
-        getGame().getServer().undidRecruit(legion, recruit);
+        getGame().getServer().undidRecruit(legion, recruit, false);
     }
 
     /**
@@ -410,7 +410,7 @@ public final class PlayerServerSide extends Player implements
 
         // We don't do the allUpdatePlayerInfo() here, because the remove
         // is done later by iterator (so amounts are not even changed yet)
-        getGame().getServer().undidRecruit(legion, recruit);
+        getGame().getServer().undidRecruit(legion, recruit, true);
     }
 
     void undoSplit(Legion splitoff)

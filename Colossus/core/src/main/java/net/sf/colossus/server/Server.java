@@ -1722,7 +1722,7 @@ public final class Server extends Thread implements IServer
         game.addCreatureEvent(event, Constants.reasonRecruited);
     }
 
-    void undidRecruit(Legion legion, CreatureType recruit)
+    void undidRecruit(Legion legion, CreatureType recruit, boolean reinforced)
     {
         allUpdatePlayerInfo();
         Iterator<IClient> it = clients.iterator();
@@ -1732,7 +1732,9 @@ public final class Server extends Thread implements IServer
             client.undidRecruit(legion, recruit);
         }
         game.undoRecruitEvent(legion);
-        game.removeCreatureEvent(legion, recruit, Constants.reasonRecruited);
+        String reason = reinforced ? Constants.reasonReinforced
+            : Constants.reasonRecruited;
+        game.removeCreatureEvent(legion, recruit, reason);
     }
 
     public void engage(MasterHex hex)

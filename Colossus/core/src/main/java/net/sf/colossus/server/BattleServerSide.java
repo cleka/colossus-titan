@@ -771,10 +771,11 @@ public final class BattleServerSide extends Battle
 
     private void cleanupOneDeadCritter(Creature critter)
     {
-        Legion legion = critter.getLegion();
+        LegionServerSide legion = (LegionServerSide)critter.getLegion();
         LegionServerSide donor = null;
+        boolean reinforced = false;
 
-        PlayerServerSide player = (PlayerServerSide)legion.getPlayer();
+        PlayerServerSide player = legion.getPlayer();
 
         // After turn 1, off-board creatures are returned to the
         // stacks or the legion they were summoned from, with
@@ -805,9 +806,10 @@ public final class BattleServerSide extends Battle
             }
             else
             {
-                // This reinforcment doesn't count.
+                // This reinforcement doesn't count.
                 // Tell legion to do undo the reinforcement and trigger
                 // sending of needed messages to clients:
+                reinforced = true;
                 player.undoReinforcement(legion);
             }
         }
@@ -829,14 +831,26 @@ public final class BattleServerSide extends Battle
             }
         }
 
-        // If an angel or archangel was returned to its donor instead of
-        // the stack, then don't put it back on the stack.
-        ((LegionServerSide)legion).prepareToRemoveCritter(critter,
-            donor == null, true);
+        if (donor != null)
+        {
+            // If an angel or archangel was returned to its donor instead of
+            // the stack, then don't put it back on the stack.
+            legion.prepareToRemoveCritter(critter, false, true);
+        }
+        else if (reinforced)
+        {
+            // undoReinforce does the remove already ( = back to caretaker)
+            // and also creates the removeCreatureEvent.
+            // legion.prepareToRemoveCritter(critter, false, true);
+        }
+        else
+        {
+            legion.prepareToRemoveCritter(critter, true, true);
+        }
 
         if (critter.isTitan())
         {
-            ((PlayerServerSide)legion.getPlayer()).eliminateTitan();
+            (legion.getPlayer()).eliminateTitan();
         }
     }
 

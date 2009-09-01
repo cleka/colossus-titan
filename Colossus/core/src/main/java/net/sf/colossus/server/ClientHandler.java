@@ -378,7 +378,8 @@ final class ClientHandler implements IClient
         else if (method.equals(Constants.doRecruit))
         {
             Legion legion = resolveLegion(args.remove(0));
-            CreatureType recruited = resolveCreatureType(args.remove(0));
+            // Refusing a reinforcement sends as "recruited" null.
+            CreatureType recruited = resolveCreatureTypeNullOk(args.remove(0));
             CreatureType recruiter = resolveCreatureTypeNullOk(args.remove(0));
             server.doRecruit(new Recruitment(legion, recruited, recruiter));
         }
