@@ -322,6 +322,20 @@ public class Game
         return list;
     }
 
+    public int getNumLivingCreatures(CreatureType type)
+    {
+        int livingCount = 0;
+        for (Player player : players)
+        {
+            List<? extends Legion> legions = player.getLegions();
+            for (Legion legion : legions)
+            {
+                livingCount += legion.numCreature(type);
+            }
+        }
+        return livingCount;
+    }
+
     public List<Legion> getLegionsByHex(MasterHex masterHex)
     {
         assert masterHex != null : "No hex given to find legions on.";

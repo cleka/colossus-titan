@@ -5,13 +5,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import net.sf.colossus.variant.CreatureType;
 
 
 /**
  *  The caretaker tracks the number of creatures still available and those dead.
- *  
+ *
  *  For each creature type the number of creatures still available for mustering and
  *  the number of creatures already dead is stored. The latter function means this
  *  version of a caretaker integrates what is called a 'graveyard' in a normal Titan
@@ -19,6 +20,9 @@ import net.sf.colossus.variant.CreatureType;
  */
 public class Caretaker
 {
+    private static final Logger LOGGER = Logger.getLogger(Caretaker.class
+        .getName());
+
     /**
      * Callback interface for listening to changes to the numbers.
      */
@@ -26,10 +30,10 @@ public class Caretaker
     {
         /**
          * Called whenever a change to the availability of a single creature type occurs.
-         * 
-         * This is not called by the {@link Caretaker} on a full update but only on smaller 
+         *
+         * This is not called by the {@link Caretaker} on a full update but only on smaller
          * changes.
-         * 
+         *
          * @param type The creature type for which the count is changed.
          * @param availableCount The new number of available creatures of this type.
          */
@@ -38,10 +42,10 @@ public class Caretaker
 
         /**
          * Called whenever a change to the number of dead creatures of a single type occurs.
-         * 
-         * This is not called by the {@link Caretaker} on a full update but only on smaller 
+         *
+         * This is not called by the {@link Caretaker} on a full update but only on smaller
          * changes.
-         * 
+         *
          * @param type The creature type for which the count is changed.
          * @param deadCount The new number of dead creatures of this type.
          */
@@ -55,12 +59,12 @@ public class Caretaker
         public void fullUpdate();
     }
 
-    /** 
+    /**
      * Map of creature types to the number of available creatures.
      */
     private final Map<CreatureType, Integer> creatureAvailableCounts = new HashMap<CreatureType, Integer>();
 
-    /** 
+    /**
      * Map of creature types to the number of dead creatures.
      */
     private final Map<CreatureType, Integer> creatureDeadCounts = new HashMap<CreatureType, Integer>();
@@ -114,6 +118,30 @@ public class Caretaker
     public int getAvailableCount(CreatureType type)
     {
         return creatureAvailableCounts.get(type).intValue();
+    }
+
+    public void adjustAvailableCount(CreatureType type)
+    {
+        int total = type.getMaxCount();
+        int dead = getDeadCount(type);
+        int alive = game.getNumLivingCreatures(type);
+
+        int avail = total - (dead + alive);
+
+        if (avail < 0)
+        {
+            LOGGER.warning("available for " + type.getName() + " can't be "
+                + avail + "! Setting it to 0.");
+            avail = 0;
+        }
+        if (getAvailableCount(type) != avail)
+        {
+            LOGGER.info("Caretaker counts for " + type.getName()
+                + ": adjusting avail to " + avail
+                + " dead=" + dead
+                + " inGame=" + alive + " total=" + total);
+            setAvailableCount(type, avail);
+        }
     }
 
     public int getDeadCount(CreatureType type)
@@ -180,8 +208,8 @@ public class Caretaker
         setDeadCount(type, getDeadCount(type) + 1);
     }
 
-    /** 
-     * Move dead non-Titan immortals back to stacks. 
+    /**
+     * Move dead non-Titan immortals back to stacks.
      */
     public void resurrectImmortals()
     {
@@ -193,8 +221,8 @@ public class Caretaker
                 if (dead > 0)
                 {
                     int live = getAvailableCount(type);
-                    // Don't use setCount() / setDeadCount(), because we 
-                    // want to update displays only at the end. 
+                    // Don't use setCount() / setDeadCount(), because we
+                    // want to update displays only at the end.
                     creatureAvailableCounts.put(type, Integer.valueOf(live
                         + dead));
                     creatureDeadCounts.put(type, Integer.valueOf(0));

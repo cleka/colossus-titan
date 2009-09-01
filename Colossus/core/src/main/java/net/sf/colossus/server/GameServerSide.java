@@ -1261,8 +1261,11 @@ public final class GameServerSide extends Game
                 }
             }
 
-            /* notify all CustomRecruitBase object that we change the
-             active player, for bookkeeping purpose */
+            // TODO Used only by Balrog, and for Balrog it should rather be
+            // done directly whenever score of a player changes
+            /* notify all CustomRecruitBase objects that we change the
+             * active player, for bookkeeping purpose
+             */
             CustomRecruitBase.everyoneAdvanceTurn(activePlayerNum);
 
             setPhase(Phase.SPLIT);
@@ -1419,6 +1422,7 @@ public final class GameServerSide extends Game
     public void loadGame(Element root)
     {
         CustomRecruitBase.resetAllInstances();
+        CustomRecruitBase.setGame(this);
 
         try
         {
@@ -1449,11 +1453,10 @@ public final class GameServerSide extends Game
                 String creatureName = el.getAttribute("name").getValue();
                 int remaining = el.getAttribute("remaining").getIntValue();
                 int dead = el.getAttribute("dead").getIntValue();
-                CreatureType creature = getVariant().getCreatureByName(
+                CreatureType type = getVariant().getCreatureByName(
                     creatureName);
-
-                getCaretaker().setAvailableCount(creature, remaining);
-                getCaretaker().setDeadCount(creature, dead);
+                getCaretaker().setAvailableCount(type, remaining);
+                getCaretaker().setDeadCount(type, dead);
             }
 
             players.clear();
@@ -1762,6 +1765,8 @@ public final class GameServerSide extends Game
             battle.setServer(getServer());
             battle.init();
         }
+
+        CustomRecruitBase.initCustomVariantForAllCRBs();
 
         server.allRequestConfirmCatchup("KickstartGame");
         updateCaretakerDisplays();

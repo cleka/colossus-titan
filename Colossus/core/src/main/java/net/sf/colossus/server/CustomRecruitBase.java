@@ -64,6 +64,21 @@ abstract public class CustomRecruitBase implements ICustomRecruitBase
         }
     }
 
+    protected synchronized void initCustomVariant()
+    {
+        // nothing to do, only Balrog needs this
+    }
+
+    synchronized static public final void initCustomVariantForAllCRBs()
+    {
+        Iterator<CustomRecruitBase> it = allCustomRecruitBase.iterator();
+        while (it.hasNext())
+        {
+            CustomRecruitBase crb = it.next();
+            crb.initCustomVariant();
+        }
+    }
+
     synchronized public static final void everyoneAdvanceTurn(
         int newActivePlayer)
     {
@@ -93,6 +108,10 @@ abstract public class CustomRecruitBase implements ICustomRecruitBase
     synchronized protected final void setCount(CreatureType type,
         int newCount, boolean reset)
     {
+        // TODO Should only update server side, and propagate to all
+        // clients via messages.
+        // The way it's done now will probably fail for remote clients.
+
         // first update all known CaretakerInfo (if we're client(s))
         Iterator<Caretaker> it = allCaretakerInfo.iterator();
         while (it.hasNext())
@@ -121,6 +140,23 @@ abstract public class CustomRecruitBase implements ICustomRecruitBase
             {
                 ci.setAvailableCount(type, newCount);
             }
+        }
+    }
+
+    synchronized protected final void adjustAvailableCount(CreatureType type)
+    {
+        // first update all known CaretakerInfo (if we're client(s))
+        Iterator<Caretaker> it = allCaretakerInfo.iterator();
+        while (it.hasNext())
+        {
+            Caretaker ci = it.next();
+            ci.adjustAvailableCount(type);
+        }
+        // update the Caretaker if we're server
+        if (serverGame != null)
+        {
+            Caretaker ci = serverGame.getCaretaker();
+            ci.adjustAvailableCount(type);
         }
     }
 

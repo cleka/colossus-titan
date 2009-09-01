@@ -196,7 +196,9 @@ public class CreatureType implements Comparable<CreatureType>
         return maxCount;
     }
 
-    /** Only called on Titans after numPlayers is known. */
+    /** Only called on Titans after numPlayers is known.
+     *  08/2009 Clemens: And on Balrogs when players scores raise.
+     */
     public void setMaxCount(int maxCount)
     {
         this.maxCount = maxCount;

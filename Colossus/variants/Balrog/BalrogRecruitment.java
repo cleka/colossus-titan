@@ -2,10 +2,7 @@ package Balrog;
 
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -31,13 +28,7 @@ public class BalrogRecruitment extends CustomRecruitBase
     private static final Logger LOGGER = Logger
         .getLogger(BalrogRecruitment.class.getName());
 
-    /**
-     * Maps a player to their previous points count.
-     */
-    private final Map<Player, Integer> playerToOldScore = Collections
-        .synchronizedMap(new HashMap<Player, Integer>());
-
-    private final static int balrogValue = 300;
+    private final static int balrogValue = 50;
     private final static String balrogPrefix = "Balrog";
 
     @Override
@@ -112,6 +103,12 @@ public class BalrogRecruitment extends CustomRecruitBase
     }
 
     @Override
+    protected synchronized void initCustomVariant()
+    {
+        changeOfTurn(0);
+    }
+
+    @Override
     protected void changeOfTurn(int newActivePlayer)
     {
         Set<MasterHex> towerSet = VariantSupport.getCurrentVariant()
@@ -126,73 +123,40 @@ public class BalrogRecruitment extends CustomRecruitBase
     }
 
     /** The magic function that add more Balrogs to the Caretaker when
-     * experience points goes up.
+     *  players score points goes up.
      */
     private synchronized void updateBalrogCount(MasterHex tower)
     {
-        String name = balrogPrefix + tower.getLabel();
-
-        Player pi = findPlayerWithStartingTower(tower);
-
-        if (pi == null)
+        Player player = findPlayerWithStartingTower(tower);
+        if (player == null)
         {
             LOGGER.finest("CUSTOM: no player info for hex " + tower);
             return;
         }
 
-        int oldscore;
-        int newscore;
-        int alreadyNumber;
-        int nowNumber;
-
-        synchronized (playerToOldScore)
+        if (player.isDead())
         {
-            Integer score = playerToOldScore.remove(pi);
-
-            if (score == null)
-            {
-                oldscore = 0;
-            }
-            else
-            {
-                oldscore = score.intValue();
-            }
-            newscore = pi.getScore();
-
-            playerToOldScore.put(pi, Integer.valueOf(newscore));
-
-            alreadyNumber = (oldscore / balrogValue);
-            nowNumber = (newscore / balrogValue);
+            LOGGER.finest("INIT CUSTOM: player " + player.getName()
+                + " is dead - doing nothing for hex " + tower);
+            return;
         }
 
-        if (!VariantSupport.getCurrentVariant().isCreature(name))
+        String creatureName = balrogPrefix + tower.getLabel();
+        if (!VariantSupport.getCurrentVariant().isCreature(creatureName))
         {
-            LOGGER.severe("CUSTOM: Balrog by the name of " + name
+            LOGGER.severe("CUSTOM: Balrog by the name of " + creatureName
                 + " doesn't exist !");
             return;
         }
 
-        CreatureType cre = VariantSupport.getCurrentVariant()
-            .getCreatureByName(name);
-        ((CreatureBalrog)cre).setNewMaxCount(nowNumber);
+        CreatureType type = VariantSupport.getCurrentVariant()
+            .getCreatureByName(creatureName);
 
-        int difference = nowNumber - alreadyNumber;
-        int newcount = getCount(cre) + difference;
+        int score = player.getScore();
+        int maxCountShouldBe = (score / balrogValue);
 
-        setCount(cre, newcount, false);
-
-        if (difference > 0)
-        {
-            LOGGER.finest("CUSTOM: Pushing the total number of " + name
-                + " from " + alreadyNumber + " to " + nowNumber
-                + " (new available count is: " + newcount + ")");
-        }
-        else if (difference < 0)
-        {
-            LOGGER.warning("CUSTOM: DIMINISHING the total number of " + name
-                + " from " + alreadyNumber + " to " + nowNumber
-                + " (new available count is: " + newcount + ")");
-        }
+        type.setMaxCount(maxCountShouldBe);
+        adjustAvailableCount(type);
     }
 
     private Player findPlayerWithStartingTower(MasterHex tower)
@@ -215,7 +179,6 @@ public class BalrogRecruitment extends CustomRecruitBase
     protected void resetInstance()
     {
         LOGGER.finest("CUSTOM: resetting instance " + getClass().getName());
-        playerToOldScore.clear();
         resetAllBalrogCounts();
     }
 
@@ -236,7 +199,7 @@ public class BalrogRecruitment extends CustomRecruitBase
         CreatureBalrog cre = (CreatureBalrog)VariantSupport
             .getCurrentVariant().getCreatureByName(name);
         LOGGER.info("Setting count for " + name + " to 0.");
-        cre.setNewMaxCount(0);
+        cre.setMaxCount(0);
         setCount(cre, 0, true);
     }
 }
