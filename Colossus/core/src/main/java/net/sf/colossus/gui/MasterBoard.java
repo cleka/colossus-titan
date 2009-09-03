@@ -369,6 +369,12 @@ public final class MasterBoard extends JPanel
 
         masterFrame.pack();
         masterFrame.setVisible(true);
+
+        // it seems Board needs to request at least once focus,
+        // otherwise the pop-up keys (Legion FlyOuts) do not work.
+        // YES; here we really mean this.requestFocus(), not the one which
+        // does it only if stealFocus option is enabled.
+        requestFocus();
     }
 
     // For HotSeatMode
@@ -378,7 +384,7 @@ public final class MasterBoard extends JPanel
         {
             masterFrame.setExtendedState(JFrame.NORMAL);
             masterFrame.repaint();
-            reqFocus();
+            maybeRequestFocusAndToFront();
         }
         else
         {
@@ -1246,7 +1252,7 @@ public final class MasterBoard extends JPanel
 
             bottomBar.setPhase("Split stacks");
             highlightTallLegions();
-            requestFocus();
+            maybeRequestFocusAndToFront();
         }
         else
         {
@@ -1270,7 +1276,7 @@ public final class MasterBoard extends JPanel
 
             bottomBar.setPhase("Movement");
             highlightUnmovedLegions();
-            reqFocus();
+            maybeRequestFocusAndToFront();
         }
         else
         {
@@ -1301,7 +1307,7 @@ public final class MasterBoard extends JPanel
 
             bottomBar.setPhase("Resolve Engagements");
             highlightEngagements();
-            reqFocus();
+            maybeRequestFocusAndToFront();
         }
         else
         {
@@ -1328,7 +1334,7 @@ public final class MasterBoard extends JPanel
 
             bottomBar.setPhase("Muster Recruits");
             highlightPossibleRecruitLegionHexes();
-            reqFocus();
+            maybeRequestFocusAndToFront();
         }
         else
         {
@@ -2247,7 +2253,11 @@ public final class MasterBoard extends JPanel
         repaint();
     }
 
-    void reqFocus()
+    /**
+     * If and only if stealFocus option is enabled, this does both
+     * requestFocus and getFrame().toFront().
+     */
+    void maybeRequestFocusAndToFront()
     {
         if (gui.getOptions().getOption(Options.stealFocus))
         {

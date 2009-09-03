@@ -350,7 +350,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         setupGUIOptionListeners();
         syncCheckboxes();
 
-        board.reqFocus();
+        board.maybeRequestFocusAndToFront();
     }
 
     public void setChosenDevice(GraphicsDevice chosen)
@@ -729,7 +729,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     {
         if (isMyTurn())
         {
-            board.reqFocus();
+            board.maybeRequestFocusAndToFront();
         }
         board.highlightEngagements();
     }
@@ -2020,7 +2020,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             {
                 board.disableDoneAction("Split legions in first round");
             }
-            board.reqFocus();
+            board.maybeRequestFocusAndToFront();
             defaultCursor();
 
             // TODO I believe the code below is meant for the purpose:
@@ -2085,7 +2085,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         board.setupMusterMenu();
         if (isMyTurn())
         {
-            board.reqFocus();
+            board.maybeRequestFocusAndToFront();
             defaultCursor();
         }
         updateStatusScreen();
