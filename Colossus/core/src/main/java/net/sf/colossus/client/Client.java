@@ -1671,6 +1671,12 @@ public final class Client implements IClient, IOracle, IVariant
     {
         CreatureType recruited = (recruitName == null) ? null : game
             .getVariant().getCreatureByName(recruitName);
+
+        // TODO solve this better?
+        if ("none".equals(recruiterName))
+        {
+            recruiterName = null;
+        }
         CreatureType recruiter = (recruiterName == null) ? null : game
             .getVariant().getCreatureByName(recruiterName);
         // Call server even if some arguments are null, to get past
