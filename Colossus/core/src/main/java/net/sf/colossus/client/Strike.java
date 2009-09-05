@@ -293,7 +293,7 @@ public final class Strike
             {
                 strikerAtop = true;
                 totalObstacles++;
-                if (hexside == 'c' || hexside == 'd')
+                if (hexside == 'c')
                 {
                     strikerAtopCliff = true;
                 }
@@ -335,7 +335,7 @@ public final class Strike
             {
                 targetAtop = true;
                 totalObstacles++;
-                if (hexside2 == 'c' || hexside2 == 'd')
+                if (hexside2 == 'c')
                 {
                     targetAtopCliff = true;
                 }
