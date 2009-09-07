@@ -125,7 +125,7 @@ public class BalrogRecruitment extends CustomRecruitBase
     /** The magic function that add more Balrogs to the Caretaker when
      *  players score points goes up.
      */
-    private synchronized void updateBalrogCount(MasterHex tower)
+    private void updateBalrogCount(MasterHex tower)
     {
         Player player = findPlayerWithStartingTower(tower);
         if (player == null)
