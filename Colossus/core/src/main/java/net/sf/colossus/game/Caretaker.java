@@ -94,6 +94,8 @@ public class Caretaker
         }
         for (CreatureType type : game.getVariant().getCreatureTypes())
         {
+            // We don't need synchronized access here, because this happens
+            // only at game start, not during game
             creatureAvailableCounts.put(type, Integer.valueOf(type
                 .getMaxCount()));
             creatureDeadCounts.put(type, Integer.valueOf(0));
@@ -104,7 +106,20 @@ public class Caretaker
     public void setAvailableCount(CreatureType type, int availableCount)
     {
         assert type != null : "Can not update counts unless creature type given";
-        creatureAvailableCounts.put(type, Integer.valueOf(availableCount));
+        // TODO get rid of synchronized access
+        // Synchronized access is needed only because of Balrog.
+        // If Balrog count update would be done together with score change,
+        // instead of only "primarily during turn change",
+        // (so it's needed additionally after engagement as part of lookup
+        //  for special possible recruits, "because in engagement phase one
+        //  or Balrogs might have been created")
+        // and/or every if client has it's own caretaker, recruit graph,
+        // and custom recruit base,
+        // then this whole synchronized access could be dropped.
+        synchronized (creatureAvailableCounts)
+        {
+            creatureAvailableCounts.put(type, Integer.valueOf(availableCount));
+        }
         triggerOneAvailabilityCount(type, availableCount);
     }
 
@@ -117,7 +132,10 @@ public class Caretaker
 
     public int getAvailableCount(CreatureType type)
     {
-        return creatureAvailableCounts.get(type).intValue();
+        synchronized (creatureAvailableCounts)
+        {
+            return creatureAvailableCounts.get(type).intValue();
+        }
     }
 
     public void adjustAvailableCount(CreatureType type)
@@ -134,11 +152,13 @@ public class Caretaker
                 + avail + "! Setting it to 0.");
             avail = 0;
         }
+
+        // We don't need synchronized access here, because get and set
+        // do that
         if (getAvailableCount(type) != avail)
         {
             LOGGER.info("Caretaker counts for " + type.getName()
-                + ": adjusting avail to " + avail
-                + " dead=" + dead
+                + ": adjusting avail to " + avail + " dead=" + dead
                 + " inGame=" + alive + " total=" + total);
             setAvailableCount(type, avail);
         }
@@ -223,6 +243,9 @@ public class Caretaker
                     int live = getAvailableCount(type);
                     // Don't use setCount() / setDeadCount(), because we
                     // want to update displays only at the end.
+
+                    // We don't need synchronized access here, because Balrog
+                    // is not immortal
                     creatureAvailableCounts.put(type, Integer.valueOf(live
                         + dead));
                     creatureDeadCounts.put(type, Integer.valueOf(0));
