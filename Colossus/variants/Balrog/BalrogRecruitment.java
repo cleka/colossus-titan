@@ -28,7 +28,7 @@ public class BalrogRecruitment extends CustomRecruitBase
     private static final Logger LOGGER = Logger
         .getLogger(BalrogRecruitment.class.getName());
 
-    private final static int balrogValue = 50;
+    private final static int balrogValue = 300;
     private final static String balrogPrefix = "Balrog";
 
     @Override
