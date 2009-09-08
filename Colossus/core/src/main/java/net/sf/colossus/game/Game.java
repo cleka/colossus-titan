@@ -15,7 +15,6 @@ import java.util.logging.Logger;
 import net.sf.colossus.util.CollectionHelper;
 import net.sf.colossus.util.Predicate;
 import net.sf.colossus.variant.CreatureType;
-import net.sf.colossus.variant.IVariantKnower;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;
@@ -34,7 +33,7 @@ public class Game
     /**
      * The variant played in this game.
      */
-    private Variant variant;
+    private final Variant variant;
 
     /**
      * The state of the different players in the game.
@@ -45,12 +44,6 @@ public class Game
      * The caretaker takes care of managing the available and dead creatures.
      */
     private final Caretaker caretaker;
-
-    /**
-     * Some object to ask about current variant, in case / as long as it is
-     * not properly passed in right away.
-     */
-    private final IVariantKnower variantKnower;
 
     /**
      * The current turn number. Advance when every player has done his move
@@ -80,38 +73,21 @@ public class Game
     /**
      * Create a Game object.
      *
-     * @param variant The variant object, might right now still be null (game
-     *        is created before Client gets/knows the variant name)
+     * @param variant The variant object, not null
      * @param playerNames Names of the players, not used yet
-     * @param variantKnower An object to ask for the current variant, will be
-     *        called first time someone asks Variant from Game.
      */
-    public Game(Variant variant, String[] playerNames,
-        IVariantKnower variantKnower)
+    public Game(Variant variant, String[] playerNames)
     {
-        // NOTE variant/variantKnower needs to be assigned before caretaker,
-        // because caretaker asks Game for the variant
-        this.variant = variant;
-        this.variantKnower = variantKnower;
+        assert variant != null : "Can't create game with null variant!";
 
+        this.variant = variant;
         this.caretaker = new Caretaker(this);
         this.phase = Phase.INIT;
     }
 
     public Variant getVariant()
     {
-        if (variant == null)
-        {
-            // TODO temporary solution until all game creations pass in the
-            //      used variant right away
-            variant = variantKnower.getTheCurrentVariant();
-        }
         return variant;
-    }
-
-    protected void setVariant(Variant variant)
-    {
-        this.variant = variant;
     }
 
     public Collection<Player> getPlayers()

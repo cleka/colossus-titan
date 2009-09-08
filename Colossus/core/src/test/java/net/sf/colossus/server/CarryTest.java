@@ -12,6 +12,7 @@ import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
+import net.sf.colossus.variant.Variant;
 
 
 /**
@@ -49,8 +50,9 @@ public class CarryTest extends TestCase
     @Override
     protected void setUp()
     {
-        game = GameServerSide.makeNewGameServerSide();
-        VariantSupport.loadVariantByName("Default", true);
+        Variant variant = VariantSupport.loadVariantByName("Default", true);
+        game = GameServerSide.makeNewGameServerSide(variant);
+
         assertEquals("Default", game.getVariant().getName());
 
         red = game.addPlayer("Red", "SimpleAI");

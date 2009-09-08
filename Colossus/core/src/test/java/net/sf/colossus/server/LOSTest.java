@@ -13,6 +13,7 @@ import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
+import net.sf.colossus.variant.Variant;
 
 
 /**
@@ -64,8 +65,8 @@ public class LOSTest extends TestCase
 
     private void setupForVariant(String variantName)
     {
-        VariantSupport.loadVariantByName(variantName, true);
-        game = GameServerSide.makeNewGameServerSide();
+        Variant v = VariantSupport.loadVariantByName(variantName, true);
+        game = GameServerSide.makeNewGameServerSide(v);
         createPlayersAndCreatures();
     }
 

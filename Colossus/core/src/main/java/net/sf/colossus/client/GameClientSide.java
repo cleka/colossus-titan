@@ -10,7 +10,6 @@ import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.util.Split;
-import net.sf.colossus.variant.IVariantKnower;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;
 
@@ -33,16 +32,14 @@ public class GameClientSide extends Game implements IOracle
 
     private BattleClientSide battle = null;
 
-    public GameClientSide(Variant variant, String[] playerNames,
-        IVariantKnower variantKnower)
+    public GameClientSide(Variant variant, String[] playerNames)
     {
-        super(variant, playerNames, variantKnower);
+        super(variant, playerNames);
 
         // TODO fix this dummy constructor args
         this.noone = new PlayerClientSide(this, "", 0);
 
         this.activePlayer = noone;
-
     }
 
     public void setClient(Client client)

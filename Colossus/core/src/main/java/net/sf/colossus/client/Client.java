@@ -36,7 +36,6 @@ import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.server.GameServerSide;
 import net.sf.colossus.server.IServer;
 import net.sf.colossus.server.Server;
-import net.sf.colossus.server.VariantKnower;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.InstanceTracker;
@@ -48,6 +47,7 @@ import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.IVariant;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
+import net.sf.colossus.variant.Variant;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
@@ -244,6 +244,7 @@ public final class Client implements IClient, IOracle, IVariant
          */
         ResourceLoader loader;
         boolean remote;
+        Variant variant;
 
         if (theServer == null)
         {
@@ -259,26 +260,27 @@ public final class Client implements IClient, IOracle, IVariant
         IServerConnection conn = SocketClientThread.createConnection(host,
             port, playerName, remote);
 
-        // TODO For now, needed only if remote client.
-        // One day in future, everty client should perhaps do this to get his own
-        // copy of the variant (instead of static access).
+        // TODO For now, loading the variant is needed only if remote client.
+        // One day in future, every client should perhaps do this to get his
+        // own instance of the variant (instead of static access).
         // Or local clients get the Variant object passed in to here...
 
-        if (remote)
+        if (theServer == null)
         {
             String variantName = conn.getVariantNameForInit();
-            VariantSupport.loadVariantByName(variantName, true);
+            variant = VariantSupport.loadVariantByName(variantName, true);
+        }
+        else
+        {
+            variant = theServer.getGame().getVariant();
         }
 
         return new Client(playerName, playerType, whatNextMgr, theServer,
-            byWebClient, noOptionsFile, createGUI, loader, conn);
+            byWebClient, noOptionsFile, createGUI, loader, conn, variant);
     }
 
     /**
      * Client is the main hub for info exchange on client side.
-     *
-     * @param host The host to which SocketClientThread shall connect
-     * @param port The port to which SocketClientThread shall connect
      * @param playerName Name of the player (might still be one of the
      *                   <byXXX> templates
      * @param playerType Type of player, e.g. Human, Network, or some
@@ -293,6 +295,8 @@ public final class Client implements IClient, IOracle, IVariant
      *                  might override that e.g. in stresstest)
      * @param resLoader The ResourceLoader object that gives us access to
      *                  load images, files etc (from disk or from server)
+     * @param conn      The connection to server (so far, SocketClientThread)
+     * @param variant The variant instance
      */
 
     /* TODO Now Client creates the Game (GameClientSide) instance.
@@ -313,7 +317,7 @@ public final class Client implements IClient, IOracle, IVariant
     public Client(String playerName, String playerType,
         WhatNextManager whatNextMgr, Server theServer, boolean byWebClient,
         boolean noOptionsFile, boolean createGUI, ResourceLoader resLoader,
-        IServerConnection conn)
+        IServerConnection conn, Variant variant)
     {
         assert playerName != null;
 
@@ -329,13 +333,11 @@ public final class Client implements IClient, IOracle, IVariant
         // TODO can we change all Game constructors to List or Collection?
         // Those Array[]s are annoying...
 
-        // TODO IVariantKnower is only temporary until game properly always
-        //      knows the Variant right from the start on
-        // TODO still dummy arguments
-        this.game = new GameClientSide(null, playerNames, new VariantKnower());
+        // TODO playerNames is still a dummy argument
+        this.game = new GameClientSide(variant, playerNames);
 
         // TODO give it to constructor right away? Not changing it right now,
-        // first do the "create SCT and Variant outside Client (and Game??)
+        // first do the "create SCT and Variant (and Game??) outside Client
         // and pass them in" and see then whether it's better to create the
         // Game outside ( = then we can't give Client to Game constructor)
         // or create Game inside Client (then we can pass in the Client).

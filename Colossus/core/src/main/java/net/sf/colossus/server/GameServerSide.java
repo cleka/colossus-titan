@@ -38,7 +38,6 @@ import net.sf.colossus.util.Split;
 import net.sf.colossus.util.ViableEntityManager;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
-import net.sf.colossus.variant.IVariantKnower;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;
@@ -116,28 +115,26 @@ public final class GameServerSide extends Game
     /** Shortcut for UnitTests,
      *  to create a Game with dummy input objects on the fly.
      */
-    static GameServerSide makeNewGameServerSide()
+    static GameServerSide makeNewGameServerSide(Variant variant)
     {
         Options startOptions = new Options(Constants.OPTIONS_START);
         WhatNextManager whatNextManager = new WhatNextManager(startOptions);
 
         Options serverOptions = new Options("UnitTest", true);
-        return new GameServerSide(whatNextManager, serverOptions, null,
-            new VariantKnower());
+        return new GameServerSide(whatNextManager, serverOptions, variant);
     }
 
     /** The normal constructor to be used everywhere
-     *
+     * @param serverOptions The server side options, initialized from the
+     * GetPlayers dialog and/or command line options.
      * @param startObj  The 'Start' object that started this game, and thus
      * manages the main control flow which thing to do 'next' when this game
      * is over.
-     * @param serverOptions The server side options, initialized from the
-     * GetPlayers dialog and/or command line options.
      */
     public GameServerSide(WhatNextManager whatNextMgr, Options serverOptions,
-        Variant variant, IVariantKnower variantKnower)
+        Variant variant)
     {
-        super(variant, new String[0], variantKnower);
+        super(variant, new String[0]);
         // later perhaps from command line, GUI, or WebServer set it?
         gameId = "#" + (gameCounter++);
         this.whatNextManager = whatNextMgr;

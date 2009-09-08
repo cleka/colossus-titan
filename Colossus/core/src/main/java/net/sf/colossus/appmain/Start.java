@@ -19,9 +19,10 @@ import net.sf.colossus.common.WhatNextManager.WhatToDoNext;
 import net.sf.colossus.guiutil.DebugMethods;
 import net.sf.colossus.server.GameLoading;
 import net.sf.colossus.server.GameServerSide;
-import net.sf.colossus.server.VariantKnower;
+import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.BuildInfo;
 import net.sf.colossus.util.ViableEntityManager;
+import net.sf.colossus.variant.Variant;
 import net.sf.colossus.webclient.WebClient;
 
 
@@ -646,8 +647,12 @@ public final class Start
                     .getStringOption(Options.webFlagFileName);
                 startOptions.removeOption(Options.webFlagFileName);
 
+                String variantName = serverOptions
+                    .getStringOption(Options.variant);
+                Variant variant = VariantSupport.loadVariantByName(
+                    variantName, true);
                 GameServerSide game = new GameServerSide(getWhatNextManager(),
-                    serverOptions, null, new VariantKnower());
+                    serverOptions, variant);
                 if (webGameFlagFileName != null
                     && !webGameFlagFileName.equals(""))
                 {
@@ -677,8 +682,8 @@ public final class Start
                     if (ok)
                     {
                         GameServerSide game = new GameServerSide(
-                            getWhatNextManager(), serverOptions, null,
-                            new VariantKnower());
+                            getWhatNextManager(), serverOptions, loader
+                                .getVariant());
                         serverOptions.clearPlayerInfo();
                         game.loadGame(loader.getRoot());
                     }

@@ -8,6 +8,7 @@ import net.sf.colossus.common.Options;
 import net.sf.colossus.common.TestConstants;
 import net.sf.colossus.common.WhatNextManager;
 import net.sf.colossus.util.ErrorUtils;
+import net.sf.colossus.variant.Variant;
 
 public class StartDefaultTest extends TestCase
 {
@@ -40,8 +41,9 @@ public class StartDefaultTest extends TestCase
             CUSTOM_PATH, false, true);
         serverOptions.loadOptions();
 
+        Variant variant = VariantSupport.loadVariantByName("Default", true);
         GameServerSide game = new GameServerSide(whatNextManager,
-            serverOptions, null, new VariantKnower());
+            serverOptions, variant);
 
         game.startNewGameAndWaitUntilOver(null);
 

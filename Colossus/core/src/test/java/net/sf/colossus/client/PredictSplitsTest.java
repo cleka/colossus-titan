@@ -10,7 +10,6 @@ import junit.framework.TestCase;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
-import net.sf.colossus.server.VariantKnower;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
@@ -65,7 +64,7 @@ public class PredictSplitsTest extends TestCase
         .getLogger(PredictSplitsTest.class.getName());
 
     private static final Player player = new Player(new Game(null,
-        new String[] {}, new VariantKnower()), "Tester", 1);
+        new String[] {}), "Tester", 1);
 
     private static class TestLegion extends Legion
     {
