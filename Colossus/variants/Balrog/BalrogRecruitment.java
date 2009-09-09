@@ -79,7 +79,7 @@ public class BalrogRecruitment extends CustomRecruitBase
         catch (ConcurrentModificationException e)
         {
             // TODO Fix this properly
-            LOGGER.warning("Harmless: ConcurrentModificationException while "
+            LOGGER.info("ConcurrentModificationException while "
                 + "doing updateBalrogCount() - ignoring it.");
             /*
              * This is just a workaround to prevent the game crashing/hanging.
