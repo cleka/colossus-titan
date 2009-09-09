@@ -778,7 +778,7 @@ public class LOSTest extends TestCase
         // should be blocked: even from cliff may not RS over a dune
         // Current implementation is not working correctly
         //   - see 2820231 Illegal rangestrike
-        assertFalse(battle.isLOSBlocked(ranger.getCurrentHex(), 
+        assertTrue(battle.isLOSBlocked(ranger.getCurrentHex(), 
                    hydra.getCurrentHex()));
 
     }
