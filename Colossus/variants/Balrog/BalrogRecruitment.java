@@ -2,6 +2,7 @@ package Balrog;
 
 
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -71,7 +72,25 @@ public class BalrogRecruitment extends CustomRecruitBase
 
         // need to update, as we might have earned points in the Engagement
         // phase and recruit in the Recruit phase
-        updateBalrogCount(hex);
+        try
+        {
+            updateBalrogCount(hex);
+        }
+        catch (ConcurrentModificationException e)
+        {
+            // TODO Fix this properly
+            LOGGER.warning("Harmless: ConcurrentModificationException while "
+                + "doing updateBalrogCount() - ignoring it.");
+            /*
+             * This is just a workaround to prevent the game crashing/hanging.
+             * To fix this properly would involve lot of changes at various
+             * places for which I right now simply do not have the time.
+             * Or do not want to spend time.
+             *
+             * See the bug report 2855208: "Balrog exception in V0.9.2"
+             * for details.
+             */
+        }
 
         String name = balrogPrefix + hex.getLabel();
         List<CreatureType> allBalrogs = CreatureBalrog.getAllBalrogs();
