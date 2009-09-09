@@ -916,7 +916,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
         Box startButtonPane = new Box(BoxLayout.X_AXIS);
         startButtonPane.add(startButton);
-        startButtonPane.add(startLocallyButton);
+        // startButtonPane.add(startLocallyButton);
         startButtonPane.add(Box.createHorizontalGlue());
 
         gamesCards = new JPanel(new CardLayout());
