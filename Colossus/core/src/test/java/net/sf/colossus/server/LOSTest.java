@@ -773,13 +773,13 @@ public class LOSTest extends TestCase
         Creature ranger = attacker.getCritter(0);
 
         placeCreature(ranger, "D4");
-        placeCreature(hydra, "D1");
+        placeCreature(hydra, "A1");
 
         // should be blocked: even from cliff may not RS over a dune
         // Current implementation is not working correctly
         //   - see 2820231 Illegal rangestrike
-        // assertTrue(battle.isLOSBlocked(ranger.getCurrentHex(), hydra
-        //    .getCurrentHex()));
+        assertFalse(battle.isLOSBlocked(ranger.getCurrentHex(), 
+                   hydra.getCurrentHex()));
 
     }
 }
