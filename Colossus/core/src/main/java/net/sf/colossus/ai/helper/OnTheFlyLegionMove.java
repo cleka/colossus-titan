@@ -67,6 +67,11 @@ public class OnTheFlyLegionMove implements Collection<LegionMove>
      * This helps diversifying the gene pool.
      */
     final static private int SPONTANEOUS_GENERATION_PERCENT = 5;
+    /** Amount of memory needed before a refill.
+     * This avoid crashing low-mem JVM.
+     * The constant part is of the pulled-out-of-a-hat variety.
+     */
+    final static private long MIN_MEMORY_REFILL = 10 * 1024 * REFILL_SIZE;
     private static final Logger LOGGER = Logger
         .getLogger(OnTheFlyLegionMove.class.getName());
     private final List<List<CritterMove>> allCritterMoves;
@@ -301,7 +306,47 @@ public class OnTheFlyLegionMove implements Collection<LegionMove>
             }
             if (beingdone.isEmpty() && !abort)
             {
-                refill(REFILL_SIZE);
+                int real_refill_size = REFILL_SIZE;
+                long freemem = Runtime.getRuntime().freeMemory();
+                LOGGER.finest("Memory available (before GC) = " + freemem +
+                        " bytes (" + freemem / (1024 * 1024) + " MiB)");
+                Runtime.getRuntime().gc();
+                freemem = Runtime.getRuntime().freeMemory();
+                LOGGER.finest("Memory available (after GC) = " + freemem +
+                        " bytes (" + freemem / (1024 * 1024) + " MiB)");
+                /* Don't refill is there's not much memory left. What will
+                 * already have will do
+                 */
+                if (freemem < (MIN_MEMORY_REFILL))
+                {
+                    LOGGER.warning("Memory is still low (" + freemem +
+                            " bytes), no more refill.");
+                }
+                else
+                {
+                    /* If we're a bit short on memory, do smaller refill
+                     * so that we don't overuse the memory.
+                     * Also, this avoids spending too much time in the GC
+                     * next time.
+                     */
+                    if (freemem < (2 * MIN_MEMORY_REFILL))
+                    {
+                        real_refill_size /= 6;
+                    }
+                    else if (freemem < (3 * MIN_MEMORY_REFILL))
+                    {
+                        real_refill_size /= 4;
+                    }
+                    else if (freemem < (4 * MIN_MEMORY_REFILL))
+                    {
+                        real_refill_size /= 3;
+                    }
+                    else if (freemem < (6 * MIN_MEMORY_REFILL))
+                    {
+                        real_refill_size /= 2;
+                    }
+                    refill(real_refill_size);
+                }
             }
             return (!beingdone.isEmpty());
         }
