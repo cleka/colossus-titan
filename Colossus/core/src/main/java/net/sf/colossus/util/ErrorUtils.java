@@ -40,7 +40,7 @@ public class ErrorUtils
      * @param e An exception that was caught somewhere
      * @return A string object containing all the stack trace lines.
      */
-    public static String makeStackTraceString(Exception e)
+    public static String makeStackTraceString(Throwable e)
     {
         StringWriter sw = new StringWriter();
         e.printStackTrace(new PrintWriter(sw, true));

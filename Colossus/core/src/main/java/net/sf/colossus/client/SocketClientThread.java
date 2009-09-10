@@ -455,6 +455,25 @@ final class SocketClientThread extends Thread implements IServer,
                 "\n^^^^^^^^^^\nSCT.run() major try/catch???\n", e);
             setWaiting(false);
         }
+
+        // catch this (e.g. out of memory error), so that the user know that
+        // something is seriously wrong, ...
+        catch (VirtualMachineError vme)
+        {
+            String message = "Woooah! A Fatal JVM error was caught while "
+                + "processing in client " + client.getOwningPlayer().getName()
+                + " the input line:\n    === " + fromServer + " ===\n"
+                + "\nStack trace:\n" + ErrorUtils.makeStackTraceString(vme)
+                + "\n\nGame might be unstable or hang from now on...";
+            LOGGER.severe(message);
+            ErrorUtils.showExceptionDialog(null, message, "Fatal JVM Error!",
+                true);
+            setWaiting(false);
+            // ... but throw again because all hope is lost anyway, and e.g.
+            // assertions and so on (stresstest) should proceed to outside
+            // as before.
+            throw (vme);
+        }
     }
 
     private void setWaiting(boolean val)
