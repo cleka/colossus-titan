@@ -267,7 +267,7 @@ do
     echo -e "\n$timestamp: Starting game #$i as variant $variant"
     echo -e "$CR\n$timestamp: Starting game #$i as variant $variant$CR" >> $TEST_WORKDIR/log
     
-    CMD="java -ea -Djava.util.logging.config.file=$LOGCONFIG $FORCEBOARD $INTERNALROUNDS -Xmx128M -jar Colossus.jar -i$AIs $remoteclients -q -g -S -d 1 --variant $variant $1 $2 $3 $4 $5 $6 $7 $8 $9"
+    CMD="java -ea -Djava.util.logging.config.file=$LOGCONFIG $FORCEBOARD $INTERNALROUNDS -Xmx256M -jar Colossus.jar -i$AIs $remoteclients -q -g -S -d 1 --variant $variant $1 $2 $3 $4 $5 $6 $7 $8 $9"
     echo $CMD
     echo -e "$CMD$CR" >> $TEST_WORKDIR/log 2>&1
     nice -$niceness $CMD >> $TEST_WORKDIR/log 2>&1;

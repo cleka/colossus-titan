@@ -74,7 +74,7 @@ while true
 do 
     echo -e "\nStarting client $playername again\n" 
     echo -e "$CR\nStarting client $playername again$CR" >> $LOG
-    CMD="java -Djava.util.logging.config.file=logging.properties $INTERNALROUNDS -Xmx128M -jar Colossus.jar -c -m $playername -g -q $1 $2 $3 $4 $5 $6 $7 $8 $9"
+    CMD="java -Djava.util.logging.config.file=logging.properties $INTERNALROUNDS -Xmx256M -jar Colossus.jar -c -m $playername -g -q $1 $2 $3 $4 $5 $6 $7 $8 $9"
     echo $CMD
     echo $CMD >> $LOG 2>&1
     $CMD      >> $LOG 2>&1
