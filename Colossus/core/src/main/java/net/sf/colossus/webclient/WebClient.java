@@ -225,6 +225,10 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
     private final ArrayList<GameInfo> gamesUpdates = new ArrayList<GameInfo>();
 
+    /**
+     * NOTE: shared with SocketThread, because WCST needs it to restore
+     * game tokens to an GameInfo object
+     */
     private final HashMap<String, GameInfo> gameHash = new HashMap<String, GameInfo>();
 
     private JPanel gamesTablesPanel;
@@ -1335,7 +1339,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
         // email is null: WCST does login
         wcst = new WebClientSocketThread(this, hostname, port, username,
-            password, force, null, null);
+            password, force, null, null, gameHash);
         WcstException e = wcst.getException();
         if (e == null)
         {
@@ -1397,7 +1401,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         // 2) email is NOT null: WCST does register first instead
         // 3) otherwise: normal login
         wcst = new WebClientSocketThread(this, hostname, port, username,
-            password, force, email, confCode);
+            password, force, email, confCode, gameHash);
 
         WcstException e = wcst.getException();
         if (e == null)
@@ -2630,7 +2634,10 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
         else if (command.equals("Shutdown Server"))
         {
-            server.shutdownServer();
+            if (isAdmin())
+            {
+                server.shutdownServer();
+            }
         }
 
         else if (source == autoGSNothingRB || source == autoGSHideRB

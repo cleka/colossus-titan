@@ -44,4 +44,7 @@ public interface IWebClient
 
     public void chatDeliver(String chatId, long when, String sender,
         String message, boolean resent);
+
+    public void connectionReset(boolean forcedLogout);
+
 }

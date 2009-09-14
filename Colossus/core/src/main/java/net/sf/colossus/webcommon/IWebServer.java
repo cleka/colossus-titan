@@ -23,6 +23,7 @@ public interface IWebServer
     public static final String Cancel = "cancel";
     public static final String ChatSubmit = "chatsubmit";
     public static final String ShutdownServer = "shutdownserver";
+    public static final String Echo = "echo";
 
     public static String generalChatName = "#general";
 

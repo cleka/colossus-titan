@@ -35,7 +35,8 @@ public class WebClientSocketThread extends Thread implements IWebServer
     private static final Logger LOGGER = Logger
         .getLogger(WebClientSocketThread.class.getName());
 
-    private WebClient webClient = null;
+    private IWebClient webClient = null;
+    private final HashMap<String, GameInfo> gameHash;
 
     private String hostname = null;
     private final int port;
@@ -58,10 +59,11 @@ public class WebClientSocketThread extends Thread implements IWebServer
 
     public WebClientSocketThread(WebClient wcGUI, String hostname, int port,
         String username, String password, boolean force, String email,
-        String confCode)
+        String confCode, HashMap<String, GameInfo> gameHash)
     {
         super("WebClientSocketThread for user " + username);
         this.webClient = wcGUI;
+        this.gameHash = gameHash;
         this.hostname = hostname;
         LOGGER.info("WCST constructor: user " + username + " host " + hostname
             + " port " + port + " password " + password);
@@ -72,6 +74,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
         this.force = force;
         this.email = email;
         this.ackWaiter = new AckWaiter();
+
 
         net.sf.colossus.util.InstanceTracker
             .register(this, "WCST " + username);
@@ -379,10 +382,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
                 }
                 else if (command.equals(IWebClient.gameInfo))
                 {
-                    HashMap<String, GameInfo> gameHash = webClient
-                        .getGameHash();
-                    GameInfo gi = GameInfo.fromString(tokens, gameHash, false);
-
+                    GameInfo gi = restoreGameInfo(tokens);
                     webClient.gameInfo(gi);
                 }
                 else if (command.equals(IWebClient.userInfo))
@@ -456,7 +456,16 @@ public class WebClientSocketThread extends Thread implements IWebServer
                 {
                     if (webClient != null)
                     {
-                        webClient.showAnswer(fromServer);
+                        if (webClient instanceof WebClient)
+                        {
+                            ((WebClient)webClient).showAnswer(fromServer);
+                        }
+                        /*
+                        else if (webClient instanceof WebClient)
+                        {
+                            ((WebClient)webClient).showAnswer(fromServer);
+                        }
+                        */
                     }
                 }
 
@@ -487,6 +496,12 @@ public class WebClientSocketThread extends Thread implements IWebServer
         }
 
         cleanup();
+    }
+
+    private GameInfo restoreGameInfo(String[] tokens)
+    {
+        GameInfo gi = GameInfo.fromString(tokens, gameHash, false);
+        return gi;
     }
 
     private void cleanup()
@@ -666,10 +681,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
 
     public void shutdownServer()
     {
-        if (webClient.isAdmin())
-        {
-            send(IWebServer.ShutdownServer);
-        }
+        send(IWebServer.ShutdownServer);
     }
 
     public void submitAnyText(String text)

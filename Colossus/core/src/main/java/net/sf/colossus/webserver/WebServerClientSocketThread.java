@@ -456,9 +456,21 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
                     + " requested shutdown - ignored.");
             }
         }
+        else if (command.equals(IWebServer.Echo))
+        {
+            if (user.isAdmin())
+            {
+                sendToClient(fromClient);
+            }
+            else
+            {
+                LOGGER.log(Level.INFO, "Non-admin user " + user.getName()
+                    + " used echo command - ignored.");
+            }
+        }
         else
         {
-            LOGGER.log(Level.INFO, "Unexpected command '" + command
+            LOGGER.log(Level.WARNING, "Unexpected command '" + command
                 + "' from client");
             ok = false;
         }
@@ -618,5 +630,11 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             + ": " + chatId + ", " + sender + ": " + message);
         sendToClient(chatDeliver + sep + chatId + sep + when + sep + sender
             + sep + message + sep + resent);
+    }
+
+    public void connectionReset(boolean forcedLogout)
+    {
+        // Not really needed here, only on client side.
+        // Only implemented to satisfy the interface
     }
 }
