@@ -392,7 +392,7 @@
     <!--- TODO how to do this for the two other builds, or do at all? 
                    Or use the download feature on SF site instead? -->
     <exec executable="rsync">
-            <arg line="-a ${ZIPFILE} ${SERVER}:${DOWNLOAD_DIR}" />
+            <arg line="-a --chmod=ug=rw,o=r ${ZIPFILE} ${SERVER}:${DOWNLOAD_DIR}" />
     </exec>
   </target>
 
@@ -413,11 +413,15 @@
     <exec executable="rsync">
       <arg line="-a --chmod=ug=rw,o=r docs/* ${SERVER}:${HTML_DIR}/public-testing/docs/" />
     </exec>
+    <exec executable="rsync">
+      <arg line="-a --chmod=ug=rw,o=r ${ZIPFILE} ${SERVER}:${HTML_DIR}/public-testing/${ZIPFILE}" />
+    </exec>
   </target>
+
   <!--  special-build (testing copy to play around e.g. with the rsync stuff 
-          or make a special build for someone to troubleshoot a
-          "happens-only-for-user-but-not-developer-" type of bug.
-      -->
+        or make a special build for someone to troubleshoot a
+        "happens-only-for-user-but-not-developer-" type of bug.
+    -->
   <target name="remote-inst-special-build"
   depends="dist"
   description="copy files into special-build -directory under htdocs tree on SF">
@@ -434,6 +438,10 @@
     <exec executable="rsync">
       <arg line="-a --chmod=ug=rw,o=r docs/* ${SERVER}:${HTML_DIR}/special-build/docs/" />
     </exec>
+    <exec executable="rsync">
+      <arg line="-a --chmod=ug=rw,o=r ${ZIPFILE} ${SERVER}:${HTML_DIR}/special-build/${ZIPFILE}" />
+    </exec>
+  	
   </target>
 
   <target name="remote-inst-web"
