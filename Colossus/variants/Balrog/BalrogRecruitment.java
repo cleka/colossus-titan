@@ -72,25 +72,7 @@ public class BalrogRecruitment extends CustomRecruitBase
 
         // need to update, as we might have earned points in the Engagement
         // phase and recruit in the Recruit phase
-        try
-        {
-            updateBalrogCount(hex);
-        }
-        catch (ConcurrentModificationException e)
-        {
-            // TODO Fix this properly
-            LOGGER.info("ConcurrentModificationException while "
-                + "doing updateBalrogCount() - ignoring it.");
-            /*
-             * This is just a workaround to prevent the game crashing/hanging.
-             * To fix this properly would involve lot of changes at various
-             * places for which I right now simply do not have the time.
-             * Or do not want to spend time.
-             *
-             * See the bug report 2855208: "Balrog exception in V0.9.2"
-             * for details.
-             */
-        }
+        updateBalrogCount3(hex);
 
         String name = balrogPrefix + hex.getLabel();
         List<CreatureType> allBalrogs = CreatureBalrog.getAllBalrogs();
@@ -137,10 +119,37 @@ public class BalrogRecruitment extends CustomRecruitBase
         // to a different Player
         for (MasterHex tower : towerSet)
         {
-            updateBalrogCount(tower);
+            updateBalrogCount3(tower);
         }
     }
 
+    private void updateBalrogCount3(MasterHex tower)
+    {
+        for (int i = 0; i < 3; i++)
+        {
+          try
+          {
+                updateBalrogCount(tower);
+                return;
+          }
+          catch (ConcurrentModificationException e)
+          {
+             // TODO Fix this properly
+             LOGGER.info("ConcurrentModificationException while "
+                + "doing updateBalrogCount() - ignoring it.");
+             /*
+              * This is just a workaround to prevent the game crashing/hanging.
+              * To fix this properly would involve lot of changes at various
+              * places for which I right now simply do not have the time.
+              * Or do not want to spend time.
+              *
+              * See the bug report 2855208: "Balrog exception in V0.9.2"
+              * for details.
+              */
+          }
+        }
+        return;
+    }
     /** The magic function that add more Balrogs to the Caretaker when
      *  players score points goes up.
      */
