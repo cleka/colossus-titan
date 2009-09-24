@@ -401,17 +401,28 @@ public final class GetPlayers extends KFrame
             options.setOption(Options.variant, variantName);
             options
                 .setOption(Options.variantFileWithFullPath, variantFullPath);
+
         }
         else
         {
-            // This should never happen...
-            LOGGER
-                .severe("Unexpected else case? Invalid variant name, perhaps?");
+            LOGGER.warning("Invalid variant! Resetting to Default.");
 
             variantName = Constants.variantArray[0];
             variantFullPath = "null";
             options.setOption(Options.variant, variantName);
             options.setOption(Options.variantFileWithFullPath, "null");
+
+            int oldMaxPlayers = VariantSupport.getMaxPlayers();
+            actOnVariantChange(oldMaxPlayers, variantName);
+            // This should never happen...
+            /*           LOGGER
+                           .severe("Unexpected else case? Invalid variant name, perhaps?");
+
+                       variantName = Constants.variantArray[0];
+                       variantFullPath = "null";
+                       options.setOption(Options.variant, variantName);
+                       options.setOption(Options.variantFileWithFullPath, "null");
+             */
         }
 
         variantPane.add(variantBox);
