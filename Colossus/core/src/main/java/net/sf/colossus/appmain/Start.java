@@ -685,7 +685,7 @@ public final class Start
                             getWhatNextManager(), serverOptions, loader
                                 .getVariant());
                         serverOptions.clearPlayerInfo();
-                        game.loadGame(loader.getRoot());
+                        game.loadGameAndWaitUntilOver(loader.getRoot());
                     }
                     else
                     {

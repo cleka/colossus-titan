@@ -1414,7 +1414,6 @@ public final class GameServerSide extends Game
         gameSaver.saveGameWithErrorHandling(filename, autoSave);
     }
 
-
     public boolean loadGameAndWaitUntilOver(Element root)
     {
         boolean ok = loadGame(root);
