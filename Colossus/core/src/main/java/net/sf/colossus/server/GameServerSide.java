@@ -1414,16 +1414,30 @@ public final class GameServerSide extends Game
         gameSaver.saveGameWithErrorHandling(filename, autoSave);
     }
 
+
+    public boolean loadGameAndWaitUntilOver(Element root)
+    {
+        boolean ok = loadGame(root);
+        if (ok)
+        {
+            // Main thread (or the Runnable when started by WebClient locally?)
+            // has now nothing to do any more, can wait until game finishes.
+
+            // TODO if runnable by WebClient, is there even need to wait ?
+            cleanupWhenGameOver();
+        }
+        return ok;
+    }
+
     // JDOM lacks generics, so we need casts
     @SuppressWarnings("unchecked")
-    public void loadGame(Element root)
+    public boolean loadGame(Element root)
     {
         CustomRecruitBase.resetAllInstances();
         CustomRecruitBase.setGame(this);
 
         try
         {
-
             // Reset flags that are not in the savegame file.
             clearFlags();
             loadingGame = true;
@@ -1588,24 +1602,34 @@ public final class GameServerSide extends Game
             initServer();
             // Remaining stuff has been moved to loadGame2()
 
+            if (!server.isServerRunning())
+            {
+                LOGGER.warning("Server startup failed: doing cleanup!");
+                server.cleanup();
+                server = null;
+
+                return false;
+            }
+
             // Some more stuff is done from loadGame2() when the last
             // expected client has connected.
-            // Main thread has now nothing to do any more, can wait
-            // until game finishes.
-            cleanupWhenGameOver();
+
+            // Inform caller that loading and starting game went ok:
+            return true;
         }
+
         catch (RuntimeException rte)
         {
             LOGGER.log(Level.SEVERE, "RuntimeException!! "
                 + "While trying to load (corrupt?) savegame", rte);
             dispose();
-            return;
+            return false;
         }
         catch (Exception ex)
         {
             LOGGER.log(Level.SEVERE, "Tried to load corrupt savegame", ex);
             dispose();
-            return;
+            return false;
         }
     }
 
