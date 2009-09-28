@@ -110,8 +110,8 @@ public final class ShowCreatureDetails extends KDialog
 
         Collection<HazardTerrain> terrainHazards = HazardTerrain
             .getAllHazardTerrains();
-        Collection<HazardHexside> hexsideHazards = HazardHexside
-            .getAllHazardHexsides();
+        // Collection<HazardHexside> hexsideHazards = HazardHexside
+        //    .getAllHazardHexsides();
 
         this.hazards = new ArrayList<Hazards>();
         hazards.addAll(terrainHazards);
