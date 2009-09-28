@@ -287,15 +287,20 @@ public final class ShowCreatureDetails extends KDialog
         //
         _section(s, "Battle");
         //   subtable title
+        String explanation = "For a target in Plains (with same skill as "
+            + "attacking " + creature.getName() + "), the <br> table below "
+            + "shows nr of dice to roll and which rolled numbers are hits.";
         s.append(MessageFormat.format(
             "<tr><td bgcolor=#dddddd colspan={0}>{1}</td></tr>", new Object[] {
                 "" + (HazardTerrain.getAllHazardTerrains().size() + 2),
-                "Target in Plains", }));
+                explanation, }));
         SimulatedCritter critter = new SimulatedCritter(creature,
             HazardTerrain.getDefaultTerrain());
         SimulatedCritter other = new SimulatedCritter(creature, HazardTerrain
             .getDefaultTerrain());
-        //   hazards row 1
+
+        // =============================================================
+        // hazards row 1
         s.append("<tr><td ROWSPAN=2 align=right>" + creature.getName()
             + " in</td><td></td>");
         for (Iterator<HazardTerrain> iterator = HazardTerrain
@@ -317,7 +322,9 @@ public final class ShowCreatureDetails extends KDialog
                         colspan }));
         }
         s.append("</tr>");
-        //   hazards row 2
+
+        // =============================================================
+        // hazards row 2
         s.append("<tr>");
         for (Iterator<HazardTerrain> iterator = HazardTerrain
             .getAllHazardTerrains().iterator(); iterator.hasNext();)
@@ -336,9 +343,11 @@ public final class ShowCreatureDetails extends KDialog
             }
         }
         s.append("</tr>");
+
+        // =============================================================
         //   the info: the table content
-        //   ... my strike power
-        s.append("<tr><th nowrap>my Strike Power</th>");
+        //   ... how many dice to roll
+        s.append("<tr><th nowrap>Dice count</th>");
         for (HazardTerrain terrain : HazardTerrain.getAllHazardTerrains())
         {
             critter.setNewHazardHex(terrain);
@@ -348,8 +357,10 @@ public final class ShowCreatureDetails extends KDialog
                     "" + critter.getSimulatedPower(other), }));
         }
         s.append("<td bgcolor=#dddddd></td></tr>");
-        //   ... my strike skill
-        s.append("<tr><th nowrap>my Strike Skill</th>");
+
+        // =============================================================
+        //   ... hit treshold
+        s.append("<tr><th nowrap>Hit if >=</th>");
         for (HazardTerrain terrain : HazardTerrain.getAllHazardTerrains())
         {
             critter.setNewHazardHex(terrain);
@@ -360,7 +371,7 @@ public final class ShowCreatureDetails extends KDialog
         }
         s.append("<td bgcolor=#dddddd></td></tr>");
 
-        // XCV ...work in progress...
+        // TODO ...work in progress...
         // towi ...work in progress...
         //
         //   add stuff here if you like
