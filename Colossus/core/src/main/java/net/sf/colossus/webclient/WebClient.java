@@ -82,7 +82,7 @@ import net.sf.colossus.webcommon.GameInfo.GameState;
  *
  *  @author Clemens Katzer
  */
-public class WebClient extends KFrame implements ActionListener, IWebClient
+public class WebClient extends KFrame implements IWebClient
 {
     private static final Logger LOGGER = Logger.getLogger(WebClient.class
         .getName());
@@ -700,12 +700,26 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         loginPane.add(passwordField);
 
         loginLogoutButton = new JButton(LoginButtonText);
-        loginLogoutButton.addActionListener(this);
+        loginLogoutButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                loginLogoutButtonAction(e.getActionCommand());
+            }
+        });
+
         loginLogoutButton.setEnabled(true);
         loginPane.add(loginLogoutButton);
 
         quitButton = new JButton(quitButtonText);
-        quitButton.addActionListener(this);
+        quitButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                quitButtonAction();
+            }
+        });
+
         quitButton.setEnabled(true);
         loginPane.add(quitButton);
 
@@ -725,13 +739,28 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
         boolean alos = this.options.getOption(AutoLoginCBText);
         autologinCB = new JCheckBox(AutoLoginCBText, alos);
-        autologinCB.addActionListener(this);
+        autologinCB.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                options.setOption(AutoLoginCBText, autologinCB.isSelected());
+            }
+        });
+
         loginPane.add(autologinCB);
         loginPane.add(new JLabel(""));
 
         boolean algp = this.options.getOption(AutoGamePaneCBText);
         autoGamePaneCB = new JCheckBox(AutoGamePaneCBText, algp);
-        autoGamePaneCB.addActionListener(this);
+        autoGamePaneCB.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                options.setOption(AutoGamePaneCBText, autoGamePaneCB
+                    .isSelected());
+            }
+        });
+
         loginPane.add(autoGamePaneCB);
         loginPane.add(new JLabel(""));
 
@@ -739,7 +768,13 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         registerOrPasswordLabel = new JLabel(createAccountLabelText);
         // Button can show: createAccountButtonText or chgPasswordButtonText
         registerOrPasswordButton = new JButton(createAccountButtonText);
-        registerOrPasswordButton.addActionListener(this);
+        registerOrPasswordButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                registerOrPasswordButtonAction(e.getActionCommand());
+            }
+        });
 
         loginPane.add(registerOrPasswordLabel);
         loginPane.add(registerOrPasswordButton);
@@ -871,11 +906,25 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         proposeGamePane.add(pcButtonPane);
         pcButtonPane.add(new JLabel(""));
         proposeButton = new JButton(ProposeButtonText);
-        proposeButton.addActionListener(this);
+        proposeButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                proposeButtonAction();
+            }
+        });
+
         proposeButton.setEnabled(false);
         pcButtonPane.add(proposeButton);
         cancelButton = new JButton(CancelButtonText);
-        cancelButton.addActionListener(this);
+        cancelButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                cancelButtonAction();
+            }
+        });
+
         cancelButton.setEnabled(false);
         pcButtonPane.add(cancelButton);
 
@@ -892,12 +941,25 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         JPanel euButtonPane = new JPanel(new GridLayout(0, 3));
         euButtonPane.add(new JLabel(""));
         enrollButton = new JButton(EnrollButtonText);
-        enrollButton.addActionListener(this);
+        enrollButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                enrollButtonAction();
+            }
+        });
         enrollButton.setEnabled(false);
         euButtonPane.add(enrollButton);
 
         unenrollButton = new JButton(UnenrollButtonText);
-        unenrollButton.addActionListener(this);
+        unenrollButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                unenrollButtonAction();
+            }
+        });
+
         unenrollButton.setEnabled(false);
         euButtonPane.add(unenrollButton);
         joinGamePane.add(euButtonPane);
@@ -911,11 +973,25 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         // scheduled games, will be added later based on the "current"
         // value of the radiobutton.
         startButton = new JButton(StartButtonText);
-        startButton.addActionListener(this);
+        startButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                startButtonAction();
+            }
+        });
+
         startButton.setEnabled(false);
 
         startLocallyButton = new JButton(StartLocallyButtonText);
-        startLocallyButton.addActionListener(this);
+        startLocallyButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                startLocallyButtonAction();
+            }
+        });
+
         startLocallyButton.setEnabled(false);
 
         Box startButtonPane = new Box(BoxLayout.X_AXIS);
@@ -1104,7 +1180,15 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
         variantBox = new JComboBox(Constants.variantArray);
         variantBox.setSelectedItem(variantName);
-        variantBox.addActionListener(this);
+        variantBox.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                options.setOption(Options.variant, (String)variantBox
+                    .getSelectedItem());
+            }
+        });
+
         preferencesPane.add(new JLabel("Select variant:"));
         preferencesPane.add(variantBox);
 
@@ -1118,7 +1202,15 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
         viewmodeBox = new JComboBox(Options.viewModeArray);
         viewmodeBox.setSelectedItem(viewmodeName);
-        viewmodeBox.addActionListener(this);
+        viewmodeBox.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                options.setOption(Options.viewMode, (String)viewmodeBox
+                    .getSelectedItem());
+            }
+        });
+
         preferencesPane.add(new JLabel("Select view mode:"));
         preferencesPane.add(viewmodeBox);
 
@@ -1132,7 +1224,15 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
         eventExpiringBox = new JComboBox(Options.eventExpiringChoices);
         eventExpiringBox.setSelectedItem(eventExpiringVal);
-        eventExpiringBox.addActionListener(this);
+        eventExpiringBox.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                options.setOption(Options.eventExpiring,
+                    (String)eventExpiringBox.getSelectedItem());
+            }
+        });
+
         preferencesPane.add(new JLabel("Events expire after (turns):"));
         preferencesPane.add(eventExpiringBox);
 
@@ -1142,11 +1242,27 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             .getOption(Options.unlimitedMulligans);
         unlimitedMulligansCB = new JCheckBox(Options.unlimitedMulligans,
             unlimitedMulligans);
-        unlimitedMulligansCB.addActionListener(this);
+        unlimitedMulligansCB.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                options.setOption(Options.unlimitedMulligans,
+                    unlimitedMulligansCB.isSelected());
+            }
+        });
+
         boolean balancedTowers = options.getOption(Options.balancedTowers);
         balancedTowersCB = new JCheckBox(Options.balancedTowers,
             balancedTowers);
-        balancedTowersCB.addActionListener(this);
+        balancedTowersCB.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                options.setOption(Options.balancedTowers, balancedTowersCB
+                    .isSelected());
+            }
+        });
+
         checkboxPane.add(unlimitedMulligansCB);
         checkboxPane.add(balancedTowersCB);
 
@@ -1231,10 +1347,15 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         hideClientPanel.setAlignmentX(Box.LEFT_ALIGNMENT);
 
         hideButton = new JButton(HideButtonText);
-        hideButton.setAlignmentX(Box.LEFT_ALIGNMENT);
-
-        hideButton.addActionListener(this);
+        hideButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                hideButtonAction();
+            }
+        });
         hideButton.setEnabled(false);
+        hideButton.setAlignmentX(Box.LEFT_ALIGNMENT);
         hideClientPanel.add(hideButton);
         hideButtonText = new JLabel(CantHideText);
         hideClientPanel.add(hideButtonText);
@@ -1251,9 +1372,18 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         autoDoButtonPane.add(autoGSHideRB);
         autoDoButtonPane.add(autoGSCloseRB);
 
-        autoGSNothingRB.addActionListener(this);
-        autoGSHideRB.addActionListener(this);
-        autoGSCloseRB.addActionListener(this);
+        ActionListener autoGSActionListener = new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                options
+                    .setOption(optAutoGameStartAction, e.getActionCommand());
+            }
+        };
+
+        autoGSNothingRB.addActionListener(autoGSActionListener);
+        autoGSHideRB.addActionListener(autoGSActionListener);
+        autoGSCloseRB.addActionListener(autoGSActionListener);
 
         ButtonGroup autoGSActionGroup = new ButtonGroup();
         autoGSActionGroup.add(autoGSNothingRB);
@@ -1317,16 +1447,28 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         adminPane.add(commandField);
 
         debugSubmitButton = new JButton("Submit");
-        debugSubmitButton.addActionListener(this);
-        adminPane.add(debugSubmitButton);
+        debugSubmitButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                debugSubmitButtonAction();
+            }
+        });
         debugSubmitButton.setEnabled(false);
+        adminPane.add(debugSubmitButton);
 
         adminPane.add(new JLabel("Server answered:"));
         receivedField = new JLabel("");
         adminPane.add(receivedField);
 
         shutdownButton = new JButton("Shutdown Server");
-        shutdownButton.addActionListener(this);
+        shutdownButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                shutdownButtonAction();
+            }
+        });
         adminPane.add(shutdownButton);
 
         adminTab.add(adminPane);
@@ -2577,129 +2719,14 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         tabbedPane.setSelectedComponent(serverTab);
     }
 
-    // ========================= Event Handling stuff ======================
-
-    public void actionPerformed(ActionEvent e)
-    {
-        Object source = e.getSource();
-
-        if (source == proposeButton)
-        {
-            proposeButtonAction();
-        }
-
-        else if (source == enrollButton)
-        {
-            enrollButtonAction();
-        }
-        else if (source == unenrollButton)
-        {
-            unenrollButtonAction();
-        }
-
-        else if (source == cancelButton)
-        {
-            cancelButtonAction();
-        }
-
-        else if (source == startButton)
-        {
-            startButtonAction();
-        }
-
-        else if (source == startLocallyButton)
-        {
-            startLocallyButtonAction();
-        }
-
-        else if (source == hideButton)
-        {
-            setVisible(false);
-        }
-        else if (source == quitButton)
-        {
-            quitButtonAction();
-        }
-        else if (source == loginLogoutButton)
-        {
-            loginLogoutButtonAction(e.getActionCommand());
-        }
-
-        else if (source == registerOrPasswordButton)
-        {
-            registerOrPasswordButtonAction(e.getActionCommand());
-        }
-
-        // development/debug purposes only
-        else if (source == debugSubmitButton)
-        {
-            debugSubmitButtonAction();
-        }
-
-        else if (source == autologinCB)
-        {
-            options.setOption(AutoLoginCBText, autologinCB.isSelected());
-        }
-        else if (source == autoGamePaneCB)
-        {
-            options.setOption(AutoGamePaneCBText, autoGamePaneCB.isSelected());
-        }
-
-        else if (source == shutdownButton)
-        {
-            shutdownButtonAction();
-        }
-
-        else if (source == autoGSNothingRB || source == autoGSHideRB
-            || source == autoGSCloseRB)
-        {
-            options.setOption(optAutoGameStartAction, e.getActionCommand());
-        }
-
-        else if (source == variantBox)
-        {
-            options.setOption(Options.variant, (String)variantBox
-                .getSelectedItem());
-            // don't care here - we read it when user does the propose action
-        }
-
-        else if (source == viewmodeBox)
-        {
-            options.setOption(Options.viewMode, (String)viewmodeBox
-                .getSelectedItem());
-        }
-
-        else if (source == eventExpiringBox)
-        {
-            options.setOption(Options.eventExpiring, (String)eventExpiringBox
-                .getSelectedItem());
-        }
-
-        else if (source == balancedTowersCB)
-        {
-            options.setOption(Options.balancedTowers, balancedTowersCB
-                .isSelected());
-        }
-
-        else if (source == unlimitedMulligansCB)
-        {
-            options.setOption(Options.unlimitedMulligans, unlimitedMulligansCB
-                .isSelected());
-        }
-
-        else
-        // A combo box was changed.
-        {
-            // Only combo boxes are variant and view mode.
-            // We don't react on their change right now;
-            // rather, we read the current state then when
-            // user presses Propose game button.
-        }
-    }
-
 
     // ======================================================================
     // Below methods are called my GUI event listeners
+
+    private void hideButtonAction()
+    {
+        setVisible(false);
+    }
 
     private void quitButtonAction()
     {
