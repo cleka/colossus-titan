@@ -166,7 +166,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
     private JTextField commandField;
     private JLabel receivedField;
 
-    private JButton loginButton;
+    private JButton loginLogoutButton;
     private JButton quitButton;
 
     private JCheckBox autologinCB;
@@ -699,10 +699,10 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         // passwordField.addActionListener(this);
         loginPane.add(passwordField);
 
-        loginButton = new JButton(LoginButtonText);
-        loginButton.addActionListener(this);
-        loginButton.setEnabled(true);
-        loginPane.add(loginButton);
+        loginLogoutButton = new JButton(LoginButtonText);
+        loginLogoutButton.addActionListener(this);
+        loginLogoutButton.setEnabled(true);
+        loginPane.add(loginLogoutButton);
 
         quitButton = new JButton(quitButtonText);
         quitButton.addActionListener(this);
@@ -1756,7 +1756,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         }
 
         // Server tab
-        loginButton.setText(state != NotLoggedIn ? LogoutButtonText
+        loginLogoutButton.setText(state != NotLoggedIn ? LogoutButtonText
             : LoginButtonText);
 
         if (state != NotLoggedIn)
@@ -2581,88 +2581,35 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
 
     public void actionPerformed(ActionEvent e)
     {
-        String command = e.getActionCommand();
         Object source = e.getSource();
 
         if (source == proposeButton)
         {
-            int min = ((Integer)spinner1.getValue()).intValue();
-            int target = ((Integer)spinner2.getValue()).intValue();
-            int max = ((Integer)spinner3.getValue()).intValue();
-
-            boolean scheduled = getScheduledGamesMode();
-            long startAt = scheduled ? getStartTime() : -1;
-            int duration = getDuration();
-            String summaryText = getSummaryText();
-
-            do_proposeGame(variantBox.getSelectedItem().toString(),
-                viewmodeBox.getSelectedItem().toString(), startAt, duration,
-                summaryText, eventExpiringBox.getSelectedItem().toString(),
-                unlimitedMulligansCB.isSelected(), balancedTowersCB
-                    .isSelected(), min, target, max);
+            proposeButtonAction();
         }
 
         else if (source == enrollButton)
         {
-            String selectedGameId = getSelectedGameId();
-            if (selectedGameId != null)
-            {
-                boolean ok = doEnroll(selectedGameId);
-                if (ok)
-                {
-                    // instGameTable.setEnabled(false);
-                }
-            }
+            enrollButtonAction();
         }
         else if (source == unenrollButton)
         {
-            String selectedGameId = getSelectedGameId();
-            if (selectedGameId != null)
-            {
-                boolean ok = doUnenroll(selectedGameId);
-                if (ok)
-                {
-                    schedGameTable.setEnabled(true);
-                    instGameTable.setEnabled(true);
-                }
-            }
+            unenrollButtonAction();
         }
 
         else if (source == cancelButton)
         {
-            String selectedGameId = getSelectedGameId();
-            if (selectedGameId != null)
-            {
-                doCancel(selectedGameId);
-            }
+            cancelButtonAction();
         }
 
         else if (source == startButton)
         {
-            String selectedGameId = getSelectedGameId();
-            if (selectedGameId != null)
-            {
-                boolean ok = doStart(selectedGameId);
-                if (ok)
-                {
-                    schedGameTable.setEnabled(false);
-                    instGameTable.setEnabled(false);
-                }
-            }
+            startButtonAction();
         }
 
         else if (source == startLocallyButton)
         {
-            String selectedGameId = getSelectedGameId();
-            if (selectedGameId != null)
-            {
-                boolean ok = doStartLocally(selectedGameId);
-                if (ok)
-                {
-                    schedGameTable.setEnabled(false);
-                    instGameTable.setEnabled(false);
-                }
-            }
+            startLocallyButtonAction();
         }
 
         else if (source == hideButton)
@@ -2671,16 +2618,24 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         }
         else if (source == quitButton)
         {
-            doQuit();
+            quitButtonAction();
         }
-        else if (command.equals(LoginButtonText))
+        else if (source == loginLogoutButton)
         {
-            doLogin();
+            loginLogoutButtonAction(e.getActionCommand());
         }
-        else if (command.equals(LogoutButtonText))
+
+        else if (source == registerOrPasswordButton)
         {
-            doLogout();
+            registerOrPasswordButtonAction(e.getActionCommand());
         }
+
+        // development/debug purposes only
+        else if (source == debugSubmitButton)
+        {
+            debugSubmitButtonAction();
+        }
+
         else if (source == autologinCB)
         {
             options.setOption(AutoLoginCBText, autologinCB.isSelected());
@@ -2690,39 +2645,15 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             options.setOption(AutoGamePaneCBText, autoGamePaneCB.isSelected());
         }
 
-        else if (source == registerOrPasswordButton)
+        else if (source == shutdownButton)
         {
-            // createAccountButtonText chgPasswordButtonText
-            if (command.equals(createAccountButtonText))
-            {
-                doRegisterOrPasswordDialog(true);
-            }
-            else if (command.equals(chgPasswordButtonText))
-            {
-                doRegisterOrPasswordDialog(false);
-            }
-        }
-
-        // development/debug purposes only
-        else if (source == debugSubmitButton)
-        {
-            String text = commandField.getText();
-            ((WebClientSocketThread)server).submitAnyText(text);
-            commandField.setText("");
-        }
-
-        else if (command.equals("Shutdown Server"))
-        {
-            if (isAdmin())
-            {
-                server.shutdownServer();
-            }
+            shutdownButtonAction();
         }
 
         else if (source == autoGSNothingRB || source == autoGSHideRB
             || source == autoGSCloseRB)
         {
-            options.setOption(optAutoGameStartAction, command);
+            options.setOption(optAutoGameStartAction, e.getActionCommand());
         }
 
         else if (source == variantBox)
@@ -2764,5 +2695,141 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
             // rather, we read the current state then when
             // user presses Propose game button.
         }
+    }
+
+
+    // ======================================================================
+    // Below methods are called my GUI event listeners
+
+    private void quitButtonAction()
+    {
+        doQuit();
+    }
+
+    private void loginLogoutButtonAction(String command)
+    {
+        if (command.equals(LoginButtonText))
+        {
+            doLogin();
+        }
+        else if (command.equals(LogoutButtonText))
+        {
+            doLogout();
+        }
+        else
+        {
+            LOGGER.warning("unexpected command " + command
+                + " on LoginButton?");
+        }
+    }
+
+    private void shutdownButtonAction()
+    {
+        if (isAdmin())
+        {
+            server.shutdownServer();
+        }
+    }
+
+    private void debugSubmitButtonAction()
+    {
+        String text = commandField.getText();
+        ((WebClientSocketThread)server).submitAnyText(text);
+        commandField.setText("");
+    }
+
+    private void registerOrPasswordButtonAction(String command)
+    {
+        // createAccountButtonText chgPasswordButtonText
+        if (command.equals(createAccountButtonText))
+        {
+            doRegisterOrPasswordDialog(true);
+        }
+        else if (command.equals(chgPasswordButtonText))
+        {
+            doRegisterOrPasswordDialog(false);
+        }
+    }
+
+    private void startLocallyButtonAction()
+    {
+        String selectedGameId = getSelectedGameId();
+        if (selectedGameId != null)
+        {
+            boolean ok = doStartLocally(selectedGameId);
+            if (ok)
+            {
+                schedGameTable.setEnabled(false);
+                instGameTable.setEnabled(false);
+            }
+        }
+    }
+
+    private void startButtonAction()
+    {
+        String selectedGameId = getSelectedGameId();
+        if (selectedGameId != null)
+        {
+            boolean ok = doStart(selectedGameId);
+            if (ok)
+            {
+                schedGameTable.setEnabled(false);
+                instGameTable.setEnabled(false);
+            }
+        }
+    }
+
+    private void cancelButtonAction()
+    {
+        String selectedGameId = getSelectedGameId();
+        if (selectedGameId != null)
+        {
+            doCancel(selectedGameId);
+        }
+    }
+
+    private void unenrollButtonAction()
+    {
+        String selectedGameId = getSelectedGameId();
+        if (selectedGameId != null)
+        {
+            boolean ok = doUnenroll(selectedGameId);
+            if (ok)
+            {
+                schedGameTable.setEnabled(true);
+                instGameTable.setEnabled(true);
+            }
+        }
+    }
+
+    private void enrollButtonAction()
+    {
+        String selectedGameId = getSelectedGameId();
+        if (selectedGameId != null)
+        {
+            boolean ok = doEnroll(selectedGameId);
+            if (ok)
+            {
+                // instGameTable.setEnabled(false);
+            }
+        }
+    }
+
+    private void proposeButtonAction()
+    {
+        int min = ((Integer)spinner1.getValue()).intValue();
+        int target = ((Integer)spinner2.getValue()).intValue();
+        int max = ((Integer)spinner3.getValue()).intValue();
+
+        boolean scheduled = getScheduledGamesMode();
+        long startAt = scheduled ? getStartTime() : -1;
+        int duration = getDuration();
+        String summaryText = getSummaryText();
+
+        do_proposeGame(variantBox.getSelectedItem().toString(), viewmodeBox
+            .getSelectedItem().toString(), startAt, duration, summaryText,
+            eventExpiringBox.getSelectedItem().toString(),
+            unlimitedMulligansCB.isSelected(), balancedTowersCB.isSelected(),
+            min, target, max);
     }
 }
