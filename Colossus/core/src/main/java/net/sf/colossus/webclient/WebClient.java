@@ -1605,19 +1605,15 @@ public class WebClient extends KFrame implements IWebClient
 
     private void doQuit()
     {
-        Client gc = gameClient;
-
-        if (gc != null)
+        if (gameClient != null)
         {
             // Game client handles confirmation if necessary,
             // asks what to do next, and sets startObj accordingly,
             // and it also disposes this WebClient window.
-            gc.getGUI().doConfirmAndQuit();
-            gc = null;
+            gameClient.getGUI().doConfirmAndQuit();
         }
         else
         {
-
             whatNextManager.setWhatToDoNext(WhatToDoNext.QUIT_ALL, true);
             dispose();
         }
