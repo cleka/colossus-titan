@@ -562,7 +562,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         }
         else
         {
-            actualUpdateGUI();
+            doUpdateGUI();
         }
     }
 
@@ -1552,7 +1552,7 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         {
             public void run()
             {
-                actualUpdateGUI();
+                doUpdateGUI();
             }
         });
 
@@ -1581,134 +1581,213 @@ public class WebClient extends KFrame implements ActionListener, IWebClient
         return id;
     }
 
-    // this should always be called inside a invokeLater (i.e. in EDT)!!
-    public void actualUpdateGUI()
+    private String makeWindowTitleForState(int state)
     {
-        // Many settings are only "loggedIn or not" specific - those first:
-        if (state == NotLoggedIn)
+        switch (state)
         {
-            loginButton.setText(LoginButtonText);
-            generalChat.setLoginState(false, server, username);
+            case NotLoggedIn:
+                return "(not logged in)";
 
-            registerOrPasswordLabel.setText(createAccountLabelText);
-            registerOrPasswordButton.setText(createAccountButtonText);
+            case LoggedIn:
+                return username + " (logged in)";
+
+            case Enrolled:
+                return username + " (enrolled)";
+
+            case Playing:
+                return username + " (playing)";
+
+            default:
+                return "<window title - undefined state?>";
+        }
+    }
+
+    private String makeInfoTextForState(int state)
+    {
+        switch (state)
+        {
+            case NotLoggedIn:
+                return needLoginText;
+
+            case LoggedIn:
+                return enrollText;
+
+            case Enrolled:
+                return enrolledText;
+
+            case Playing:
+                return playingText;
+
+            default:
+                return "<info text - undefined state?>";
+        }
+
+    }
+
+    // TODO mostly duplicate with makeWindowTitleForState
+    private String makeStatusTextForState(int state)
+    {
+        switch (state)
+        {
+            case NotLoggedIn:
+                return "not logged in";
+
+            case LoggedIn:
+                return "logged in as " + username;
+
+            case Enrolled:
+                return "As " + username + " - enrolled to game "
+                    + enrolledGameId;
+
+            case Playing:
+                return "As " + username + " - playing game " + enrolledGameId;
+
+            default:
+                return "<info text - undefined state?>";
+        }
+
+    }
+
+    private boolean checkIfCouldStartOnServer(int state)
+    {
+        switch(state)
+        {
+            case Enrolled:
+                GameInfo gi = findGameById(enrolledGameId);
+                if (gi != null)
+                {
+                    if (gi.getEnrolledCount().intValue() >= gi.getMin().intValue())
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    LOGGER.warning("Huuuh? UpdateGUI, Enrolled, but get game "
+                        + "from hash for enrolledGameId is null??");
+                }
+                return false;
+
+            case NotLoggedIn:
+            case LoggedIn:
+            case Playing:
+            default:
+                return false;
+        }
+
+    }
+
+    private boolean checkIfCouldCancel(int state)
+    {
+        if (state == LoggedIn)
+        {
+            String selectedGameId = getSelectedGameId();
+            if (selectedGameId != null && isOwner(selectedGameId))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
         else
         {
-            loginButton.setText(LogoutButtonText);
-            generalChat.setLoginState(true, server, username);
+            return false;
+        }
+    }
+
+    private boolean checkIfCouldEnroll(int state)
+    {
+        if (state == LoggedIn && getSelectedGameId() != null)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    private boolean checkIfCouldUnenroll(int state)
+    {
+        // TODO: need to check which is selected; inst. vs. scheduled?
+        if (state == Enrolled)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+
+    // this should always be called inside a invokeLater (i.e. in EDT)!!
+    public void doUpdateGUI()
+    {
+        // =============================================================
+        // First calculate new state for all kind of things...
+
+        String newTitle = makeWindowTitleForState(state);
+        String newInfoText = makeInfoTextForState(state);
+        String newStatusText = makeStatusTextForState(state);
+
+        boolean couldPropose = (state == LoggedIn);
+        boolean couldDebugSubmit = (state == LoggedIn);
+        boolean couldCancel = checkIfCouldCancel(state);
+        boolean couldEnroll = checkIfCouldEnroll(state);
+        boolean couldUnenroll = checkIfCouldUnenroll(state);
+        boolean couldStartOnServer = checkIfCouldStartOnServer(state);
+        // feature currently disabled (( => hardcoded to false)):
+        boolean couldStartLocally = false;
+
+
+        // ----------------------------------------------------------------
+        // ... and now actually change the GUI
+
+        if (!newTitle.equals(""))
+        {
+            this.setTitle(windowTitle + " " + newTitle);
+        }
+
+        // Server tab
+        loginButton.setText(state != NotLoggedIn ? LogoutButtonText
+            : LoginButtonText);
+
+        if (state != NotLoggedIn)
+        {
             registerOrPasswordLabel.setText(chgPasswordLabelText);
             registerOrPasswordButton.setText(chgPasswordButtonText);
         }
-
-        // Now the ones which are more specific
-        if (state == NotLoggedIn)
-        {
-            proposeButton.setEnabled(false);
-            enrollButton.setEnabled(false);
-            unenrollButton.setEnabled(false);
-            cancelButton.setEnabled(false);
-            startButton.setEnabled(false);
-            startLocallyButton.setEnabled(false);
-            debugSubmitButton.setEnabled(false);
-            instGameTable.setEnabled(true);
-
-            infoTextLabel.setText(needLoginText);
-            statusLabel.setText("Status: not logged in");
-            userinfoLabel.setText("Userinfo: " + getUserinfoText());
-            this.setTitle(windowTitle + "(not logged in)");
-        }
-        else if (state == LoggedIn)
-        {
-            String selectedGameId = getSelectedGameId();
-            if (selectedGameId == null)
-            {
-                enrollButton.setEnabled(false);
-                cancelButton.setEnabled(false);
-            }
-            else
-            {
-                enrollButton.setEnabled(true);
-                if (isOwner(selectedGameId))
-                {
-                    cancelButton.setEnabled(true);
-                }
-                else
-                {
-                    cancelButton.setEnabled(false);
-                }
-            }
-            startButton.setEnabled(false);
-            startLocallyButton.setEnabled(false);
-            proposeButton.setEnabled(true);
-            unenrollButton.setEnabled(false);
-
-            debugSubmitButton.setEnabled(true);
-            instGameTable.setEnabled(true);
-
-            infoTextLabel.setText(enrollText);
-            statusLabel.setText("Status: logged in as " + username);
-            userinfoLabel.setText("Userinfo: " + getUserinfoText());
-            this.setTitle(windowTitle + " " + username + " (logged in)");
-
-        }
-        else if (state == Enrolled)
-        {
-            proposeButton.setEnabled(false);
-            enrollButton.setEnabled(false);
-            unenrollButton.setEnabled(true);
-            debugSubmitButton.setEnabled(true);
-            instGameTable.setEnabled(false);
-            cancelButton.setEnabled(false);
-
-            GameInfo gi = findGameById(enrolledGameId);
-            if (gi != null)
-            {
-                if (gi.getEnrolledCount().intValue() >= gi.getMin().intValue())
-                {
-                    startButton.setEnabled(true);
-                    startLocallyButton.setEnabled(true);
-                }
-
-                else
-                {
-                    startButton.setEnabled(false);
-                    startLocallyButton.setEnabled(false);
-                }
-            }
-            else
-            {
-                LOGGER.log(Level.WARNING,
-                    "Huuuh? UpdateGUI, get game from hash null??");
-            }
-
-            infoTextLabel.setText(enrolledText);
-            userinfoLabel.setText("Userinfo: " + getUserinfoText());
-            statusLabel.setText("Status: As " + username
-                + " - enrolled to game " + enrolledGameId);
-            this.setTitle(windowTitle + " " + username + " (enrolled)");
-        }
-        else if (state == Playing)
-        {
-            proposeButton.setEnabled(false);
-            enrollButton.setEnabled(false);
-            unenrollButton.setEnabled(false);
-            cancelButton.setEnabled(false);
-            startButton.setEnabled(false);
-            startLocallyButton.setEnabled(false);
-            debugSubmitButton.setEnabled(false);
-            instGameTable.setEnabled(true);
-
-            infoTextLabel.setText(playingText);
-            userinfoLabel.setText("Userinfo: " + getUserinfoText());
-            statusLabel.setText("Status: As " + username + " - playing game "
-                + enrolledGameId);
-            this.setTitle(windowTitle + " " + username + " (playing)");
-        }
         else
         {
-            LOGGER.log(Level.WARNING, "Web Client - Bogus state " + state);
+            registerOrPasswordLabel.setText(createAccountLabelText);
+            registerOrPasswordButton.setText(createAccountButtonText);
         }
+
+        // Games tab
+        userinfoLabel.setText("Userinfo: " + getUserinfoText());
+        statusLabel.setText("Status: " + newStatusText);
+        infoTextLabel.setText(newInfoText);
+
+        proposeButton.setEnabled(couldPropose);
+        cancelButton.setEnabled(couldCancel);
+        enrollButton.setEnabled(couldEnroll);
+        unenrollButton.setEnabled(couldUnenroll);
+
+        startButton.setEnabled(couldStartOnServer);
+        startLocallyButton.setEnabled(couldStartLocally);
+
+        // Chat tab
+        generalChat.setLoginState(state != NotLoggedIn, server, username);
+
+        // Admin tab
+        debugSubmitButton.setEnabled(couldDebugSubmit);
     }
 
     // SocketThread needs this to find games when "reinstantiating" it
