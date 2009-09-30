@@ -523,6 +523,7 @@ public class WebServer implements IWebServer, IRunWebServer
         String gameId = gi.getGameId();
         // System.out.println("tellEnrolledGameStarted adds it to running");
         proposedGames.remove(gameId);
+        proposedGamesListModified = true;
         runningGames.add(gi);
         // System.out.println("Running: " + runningGames.toString());
         updateGUI();
@@ -561,7 +562,6 @@ public class WebServer implements IWebServer, IRunWebServer
                 allTellGameInfo(gi);
                 IWebClient client = (IWebClient)user.getThread();
                 client.didEnroll(gameId, user.getName());
-                proposedGamesListModified = true;
             }
         }
     }
