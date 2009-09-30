@@ -13,10 +13,8 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -81,7 +79,9 @@ public class WebServer implements IWebServer, IRunWebServer
 
     private ServerSocket serverSocket;
 
-    private final List<ChatMessage> lastNChatMessages = new ArrayList<ChatMessage>();
+    private final ChatChannel generalChat = new ChatChannel(
+        IWebServer.generalChatName);
+
 
     public static void main(String[] args)
     {
@@ -149,10 +149,7 @@ public class WebServer implements IWebServer, IRunWebServer
         LOGGER.log(Level.INFO, "Server started: port " + port
             + ", maxClients " + maxClients);
 
-        long now = new Date().getTime();
-        ChatMessage startMsg = new ChatMessage(IWebServer.generalChatName,
-            now, "SYSTEM", "WebServer started. Welcome!!");
-        storeMessage(lastNChatMessages, startMsg);
+        generalChat.createWelcomeMessage();
 
         if (runGUI)
         {
@@ -726,54 +723,26 @@ public class WebServer implements IWebServer, IRunWebServer
 
     public void chatSubmit(String chatId, String sender, String message)
     {
-        if (chatId.equals(IWebServer.generalChatName))
-        {
-            Iterator<User> it = User.getLoggedInUsersIterator();
-            while (it.hasNext())
-            {
-                User u = it.next();
-                IWebClient client = (IWebClient)u.getThread();
-                long now = new Date().getTime();
-                ChatMessage msg = new ChatMessage(chatId, now, sender, message);
-                storeMessage(lastNChatMessages, msg);
-                client.chatDeliver(chatId, now, sender, message, false);
-            }
-        }
-        else
+        if (!chatId.equals(IWebServer.generalChatName))
         {
             LOGGER.log(Level.WARNING, "Chat for chatId " + chatId
                 + " not implemented.");
+            return;
         }
+        generalChat.createStoreAndDeliverMessage(sender, message);
     }
 
     public void tellLastChatMessagesToOne(WebServerClientSocketThread cst,
         String chatId)
     {
-        List<ChatMessage> messageList;
-        if (chatId.equals(IWebServer.generalChatName))
-        {
-            messageList = lastNChatMessages;
-        }
-        else
+        if (!chatId.equals(IWebServer.generalChatName))
         {
             LOGGER.log(Level.WARNING, "tellLastChatMessagesToOne: "
                 + "illegal chat id " + chatId + " - doing nothing");
             return;
         }
-        IWebClient client = cst;
 
-        synchronized (messageList)
-        {
-            Iterator<ChatMessage> it = messageList.iterator();
-            while (it.hasNext())
-            {
-                ChatMessage m = it.next();
-                client.chatDeliver(m.getChatId(), m.getWhen(), m.getSender(),
-                    m.getMessage(), true);
-            }
-            long now = new Date().getTime();
-            client.chatDeliver(chatId, now, null, null, true);
-        }
+        generalChat.tellLastMessagesToOne(cst);
     }
 
     public void logout()
@@ -1179,53 +1148,4 @@ public class WebServer implements IWebServer, IRunWebServer
         }
     }
 
-    private static class ChatMessage
-    {
-        String chatId;
-        long when;
-        String sender;
-        String message;
-
-        public ChatMessage(String chatId, long when, String sender,
-            String message)
-        {
-            this.chatId = chatId;
-            this.when = when;
-            this.sender = sender;
-            this.message = message;
-        }
-
-        public String getChatId()
-        {
-            return this.chatId;
-        }
-
-        public long getWhen()
-        {
-            return this.when;
-        }
-
-        public String getSender()
-        {
-            return this.sender;
-        }
-
-        public String getMessage()
-        {
-            return this.message;
-        }
-    }
-
-    private void storeMessage(List<ChatMessage> list, ChatMessage msg)
-    {
-        synchronized (list)
-        {
-            list.add(msg);
-            if (list.size() > WebServerConstants.keepLastNMessages)
-            {
-                // if longer than max, remove oldest one
-                list.remove(0);
-            }
-        }
-    }
 }
