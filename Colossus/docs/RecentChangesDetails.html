@@ -13,6 +13,23 @@
 This describes the recent changes in some more detail than just the
 one-line-info on the main pages "News" section.
 
+<h3>October 2, 2009: Public Testing Build / Release 0.9.3beta from r4551</h3>
+<p>
+Bugfixes and corrections
+<ul>
+<li>Fixed: 2859914 Balrog placement ignores score (aka: Balrog every 300 again, not 50)</li>
+<li>Fixed: 2864790 Aborting load game with remote player - No GetPlayers dialog</li>
+<li>Fixed: 2838276 "my Strike Skill" is wrong for nonnatives to bramble 
+    (actually, just improved the dialog to make it's meaning clearer)</li>
+<li>Fixed: 2855208 Balrog exception in V0.9.2 (ConcurrentModificationException)</li>
+<li>Probably fixed: 2864777 Illegal rangestrike over walls</li>
+<li>Max Heap size now 256MB</li>
+<li>If invalid variant name is in config file, show a warning and reset to Default 
+    instead of hanging with NPE</li>
+</ul>
+
+<hr></hr>
+
 <h3>September 6, 2009: Release 0.9.2 from r4519</h3>
 <p>
 More bugfixes and corrections
@@ -145,8 +162,6 @@ Below the highlights since last Public Build (2008-10-29):</p>
     send some message immediately after accepting the client</li>
 <li>Improved handling for remote clients one game end with AutoQuit</li>    
 </ul>
-
-<hr></hr>
 
 <h3>October 29, 2008: Public Build from r3455</h3>
 <p>Changes since last Public Build (2008-10-10):</p>
