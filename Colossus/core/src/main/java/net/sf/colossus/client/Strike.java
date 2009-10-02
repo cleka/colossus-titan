@@ -263,30 +263,23 @@ public final class Strike
     {
         boolean targetAtop = false;
         boolean targetAtopCliff = false;
-
         if (currentHex == finalHex)
         {
             return false;
         }
-
         // Offboard hexes are not allowed.
         if (currentHex.getXCoord() == -1 || finalHex.getXCoord() == -1)
         {
             return true;
         }
-
         int direction = getDirection(currentHex, finalHex, left);
-
         BattleHex nextHex = currentHex.getNeighbor(direction);
-
         if (nextHex == null)
         {
             return true;
         }
-
         char hexside = currentHex.getHexsideHazard(direction).getCode();
         char hexside2 = currentHex.getOppositeHazard(direction).getCode();
-
         if (currentHex == initialHex)
         {
             if (isObstacle(hexside))
@@ -340,22 +333,18 @@ public final class Strike
                     targetAtopCliff = true;
                 }
             }
-
             if (midChit && !targetAtopCliff)
             {
                 return true;
             }
-
             if (midCliff && (!strikerAtopCliff || !targetAtopCliff))
             {
                 return true;
             }
-
             if (midObstacle && !strikerAtop && !targetAtop)
             {
                 return true;
             }
-
             // If there are three slopes, striker and target must each
             //     be atop one.
             if (totalObstacles >= 3 && (!strikerAtop || !targetAtop)
@@ -363,7 +352,6 @@ public final class Strike
             {
                 return true;
             }
-
             // Success!
             return false;
         }
@@ -373,11 +361,10 @@ public final class Strike
             if (midChit)
             {
                 // We're not in the initial or final hex, and we have already
-                // marked an mid battleChit, so it's not adjacent to the base of a
+                // marked a mid chit, so it's not adjacent to the base of a
                 // cliff that the target is atop.
                 return true;
             }
-
             if (isObstacle(hexside) || isObstacle(hexside2))
             {
                 midObstacle = true;
@@ -389,12 +376,10 @@ public final class Strike
                 }
             }
         }
-
         if (nextHex.blocksLineOfSight())
         {
             return true;
         }
-
         // Creatures block LOS, unless both striker and target are at higher
         //     elevation than the creature, or unless the creature is at
         //     the base of a cliff and the striker or target is atop it.

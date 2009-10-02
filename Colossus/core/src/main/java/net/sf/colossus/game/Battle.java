@@ -407,6 +407,7 @@ abstract public class Battle
                 }
                 if (hexside2 == 'w')
                 {
+                    // Down a wall -- blocked
                     return true;
                 }
             }
@@ -423,6 +424,7 @@ abstract public class Battle
                 }
                 if (hexside == 'w')
                 {
+                    // Down a wall -- blocked
                     return true;
                 }
             }
@@ -447,19 +449,23 @@ abstract public class Battle
             {
                 return true;
             }
+             // If there are three slopes, striker and target must each
+            //     be atop one.
             if (totalObstacles >= 3 && (!strikerAtop || !targetAtop)
                 && (!strikerAtopCliff && !targetAtopCliff))
             {
                 return true;
             }
+            // Success!
             return false;
         }
         else
+        // not leaving first or entering last hex
         {
             if (midChit)
             {
                 // We're not in the initial or final hex, and we have already
-                // marked an mid chit, so it's not adjacent to the base of a
+                // marked a mid chit, so it's not adjacent to the base of a
                 // cliff that the target is atop.
                 return true;
             }
