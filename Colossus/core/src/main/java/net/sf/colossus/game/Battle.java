@@ -346,14 +346,14 @@ abstract public class Battle
                 .abs(xDist)))
         {
             return isLOSBlockedDir(hex1, hex1, hex2, true, strikeElevation,
-                false, false, false, false, false, false, false, 0, 0)
+                false, false, false, false, false, false, 0, 0)
                 && isLOSBlockedDir(hex1, hex1, hex2, false, strikeElevation,
-                    false, false, false, false, false, false, false, 0, 0);
+                    false, false, false, false, false, false, 0, 0);
         }
         else
         {
             return isLOSBlockedDir(hex1, hex1, hex2, toLeft(xDist, yDist),
-                strikeElevation, false, false, false, false, false, false, 
+                strikeElevation, false, false, false, false, false, 
                 false, 0, 0);
         }
     }
@@ -365,14 +365,12 @@ abstract public class Battle
     protected boolean isLOSBlockedDir(BattleHex initialHex,
         BattleHex currentHex, BattleHex finalHex, boolean left,
         int strikeElevation, boolean strikerAtop, boolean strikerAtopCliff,
-        boolean strikerAtopWall, boolean strikerBeneathWall,
-        boolean midObstacle, boolean midCliff, boolean midChit,
-        int totalObstacles, int totalWalls)
+        boolean strikerAtopWall, boolean midObstacle, boolean midCliff,
+        boolean midChit, int totalObstacles, int totalWalls)
     {
         boolean targetAtop = false;
         boolean targetAtopCliff = false;
         boolean targetAtopWall = false;
-        boolean targetBeneathWall = false;
         if (currentHex == finalHex)
         {
             return false;
@@ -416,8 +414,7 @@ abstract public class Battle
                 }
                 else if (hexside2 == 'w')
                 {
-                    strikerBeneathWall = true;
-                    totalWalls++;
+                    return true;
                 }
             }
         }
@@ -433,8 +430,7 @@ abstract public class Battle
                 }
                 else if (hexside == 'w')
                 {
-                    totalWalls++;
-                    targetBeneathWall = true;
+                    return true;
                 }
             }
             if (isObstacle(hexside2))
@@ -477,10 +473,6 @@ abstract public class Battle
                 {
                     return true;
                 }
-                if (strikerBeneathWall || targetBeneathWall)
-                {
-                    return true;
-                }
             }
             // Success!
             return false;
@@ -520,8 +512,7 @@ abstract public class Battle
         }
         return isLOSBlockedDir(initialHex, nextHex, finalHex, left,
             strikeElevation, strikerAtop, strikerAtopCliff, strikerAtopWall,
-            strikerBeneathWall, midObstacle, midCliff, midChit, 
-            totalObstacles, totalWalls);
+            midObstacle, midCliff, midChit, totalObstacles, totalWalls);
     }
 
     /**
@@ -626,13 +617,13 @@ abstract public class Battle
                 .getElevation());
             // Hexspine; try unblocked side(s)
             if (isLOSBlockedDir(hex1, hex1, hex2, true, strikeElevation,
-                false, false, false, false, false, false, false, 0, 0))
+                false, false, false, false, false, false, 0, 0))
             {
                 return computeSkillPenaltyRangestrikeThroughDir(hex1, hex2, c,
                     false, 0);
             }
             else if (isLOSBlockedDir(hex1, hex1, hex2, false, strikeElevation,
-                false, false, false, false, false, false, false, 0, 0))
+                false, false, false, false, false, false, 0, 0))
             {
                 return computeSkillPenaltyRangestrikeThroughDir(hex1, hex2, c,
                     true, 0);

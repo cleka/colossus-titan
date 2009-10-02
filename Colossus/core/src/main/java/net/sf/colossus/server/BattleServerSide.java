@@ -1193,12 +1193,12 @@ public final class BattleServerSide extends Battle
                 .getElevation());
             // Hexspine; try unblocked side(s)
             if (isLOSBlockedDir(hex1, hex1, hex2, true, strikeElevation,
-                false, false, false, false, false, false, false, 0, 0))
+                false, false, false, false, false, false, 0, 0))
             {
                 return countBrambleHexesDir(hex1, hex2, false, 0);
             }
             else if (isLOSBlockedDir(hex1, hex1, hex2, false, strikeElevation,
-                false, false, false, false, false, false, false, 0, 0))
+                false, false, false, false, false, false, 0, 0))
             {
                 return countBrambleHexesDir(hex1, hex2, true, 0);
             }
