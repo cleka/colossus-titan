@@ -1,8 +1,6 @@
 package net.sf.colossus.ai;
 
 
-import net.sf.colossus.ai.helper.LegionMove;
-import net.sf.colossus.ai.helper.BattleEvalConstants;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -15,6 +13,8 @@ import java.util.Random;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import net.sf.colossus.ai.helper.BattleEvalConstants;
+import net.sf.colossus.ai.helper.LegionMove;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.CritterMove;
 import net.sf.colossus.client.LegionClientSide;
@@ -232,9 +232,9 @@ public abstract class AbstractAI implements AI
             for (BattleHex targetHex : set)
             {
                 BattleCritter target = getBattleUnit(targetHex);
-                int dice = client.getStrike().getDice(critter, target);
-                int strikeNumber = client.getStrike().getStrikeNumber(critter,
-                    target);
+                int dice = client.getBattle().getDice(critter, target, client);
+                int strikeNumber = client.getBattle().getStrikeNumber(critter,
+                    target, client);
                 double h = Probs.meanHits(dice, strikeNumber);
                 if (map.containsKey(target))
                 {

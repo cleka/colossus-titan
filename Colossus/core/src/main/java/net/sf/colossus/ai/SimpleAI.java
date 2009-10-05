@@ -1,7 +1,6 @@
 package net.sf.colossus.ai;
 
 
-import net.sf.colossus.ai.helper.LegionMove;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -17,6 +16,7 @@ import java.util.TimerTask;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
+import net.sf.colossus.ai.helper.LegionMove;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.CritterMove;
 import net.sf.colossus.client.LegionClientSide;
@@ -2859,8 +2859,9 @@ public class SimpleAI extends AbstractAI
             {
                 value.add(bec.RANGESTRIKE_TITAN, "RangestrikeTitan");
             }
-            int strikeNum = client.getStrike()
-                .getStrikeNumber(critter, target);
+            int strikeNum = client.getBattle()
+                .getStrikeNumber(critter,
+                target, client);
             if (strikeNum <= 4 - skill + target.getSkill())
             {
                 penalty = false;
@@ -2941,9 +2942,10 @@ public class SimpleAI extends AbstractAI
 
             // Reward being next to an enemy that we can probably
             // kill this turn.
-            int dice = client.getStrike().getDice(critter, target);
-            int strikeNum = client.getStrike()
-                .getStrikeNumber(critter, target);
+            int dice = client.getBattle().getDice(critter, target, client);
+            int strikeNum = client.getBattle()
+                .getStrikeNumber(critter,
+                target, client);
             double meanHits = Probs.meanHits(dice, strikeNum);
             if (meanHits + target.getHits() >= target.getPower())
             {
@@ -2973,9 +2975,10 @@ public class SimpleAI extends AbstractAI
 
             // Penalize damage that we can take this turn,
             {
-                dice = client.getStrike().getDice(target, critter);
-                strikeNum = client.getStrike()
-                    .getStrikeNumber(target, critter);
+                dice = client.getBattle().getDice(target, critter, client);
+                strikeNum = client.getBattle()
+                    .getStrikeNumber(target,
+                    critter, client);
                 hitsExpected += Probs.meanHits(dice, strikeNum);
             }
         }

@@ -126,9 +126,9 @@ class CreatureAttackTacticalObjective extends AbstractTacticalObjective
 
                         // Reward being next to an enemy that we can probably
                         // kill this turn.
-                        int dice = client.getStrike().getDice(critter, target);
-                        int strikeNum = client.getStrike().getStrikeNumber(
-                            critter, target);
+                        int dice = client.getBattle().getDice(critter, target, client);
+                        int strikeNum = client.getBattle().getStrikeNumber(
+                            critter, target, client);
                         double meanHits = Probs.meanHits(dice, strikeNum);
                         if (meanHits + target.getHits() >= target.getPower())
                         {
@@ -159,9 +159,9 @@ class CreatureAttackTacticalObjective extends AbstractTacticalObjective
 
                         // Penalize damage that we can take this turn,
                         {
-                            dice = client.getStrike().getDice(target, critter);
-                            strikeNum = client.getStrike().getStrikeNumber(
-                                target, critter);
+                            dice = client.getBattle().getDice(target, critter, client);
+                            strikeNum = client.getBattle().getStrikeNumber(
+                                target, critter, client);
                             hitsExpected += Probs.meanHits(dice, strikeNum);
                         }
                     }
@@ -249,8 +249,8 @@ class CreatureAttackTacticalObjective extends AbstractTacticalObjective
                             value.add(bec.RANGESTRIKE_TITAN, desc
                                 + ": RangestrikeTitan");
                         }
-                        int strikeNum = client.getStrike().getStrikeNumber(
-                            critter, target);
+                        int strikeNum = client.getBattle().getStrikeNumber(
+                            critter, target, client);
                         if (strikeNum <= 4 - skill + target.getSkill())
                         {
                             penalty = false;
