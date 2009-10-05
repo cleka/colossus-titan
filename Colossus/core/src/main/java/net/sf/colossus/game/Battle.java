@@ -59,8 +59,10 @@ abstract public class Battle
 
     /**
      * Caller must ensure that yDist != 0
+     * 
+     * TODO Temporarily public because n.s.c.client.Strike needs it
      */
-    protected static boolean toLeft(double xDist, double yDist)
+    public static boolean toLeft(double xDist, double yDist)
     {
         double ratio = xDist / yDist;
         if (ratio >= 1.5 || (ratio >= 0 && ratio <= 0.75)

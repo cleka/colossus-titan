@@ -216,26 +216,6 @@ public final class Strike
         return min;
     }
 
-    /**
-     * WARNING: this is a duplication from code in Battle ; caller should use
-     * a Battle instance instead.
-     * @deprecated Should use an extension of Battle instead of Strike
-     */
-    @Deprecated
-    private static boolean toLeft(double xDist, double yDist)
-    {
-        double ratio = xDist / yDist;
-        if (ratio >= 1.5 || (ratio >= 0 && ratio <= .75)
-            || (ratio >= -1.5 && ratio <= -.75))
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
     /*
      * WARNING: this is a duplication from code in Battle ; caller should use
      * a Battle instance instead.
@@ -460,15 +440,15 @@ public final class Strike
         {
             // Hexspine; try both sides.
             return (isLOSBlockedDir(hex1, hex1, hex2, true, strikeElevation,
-                false, false, false, false, false, false, 0, 0) && 
-                isLOSBlockedDir(hex1, hex1, hex2, false, strikeElevation, 
+                false, false, false, false, false, false, 0, 0) &&
+                isLOSBlockedDir(hex1, hex1, hex2, false, strikeElevation,
                 false, false, false, false, false, false, 0, 0));
         }
         else
         {
-            return isLOSBlockedDir(hex1, hex1, hex2, toLeft(xDist, yDist),
-                strikeElevation, false, false, false, false, false, 
-                false, 0, 0);
+            return isLOSBlockedDir(hex1, hex1, hex2, Battle.toLeft(
+                xDist, yDist), strikeElevation, false, false, false, false,
+                false, false, 0, 0);
         }
     }
 
@@ -514,155 +494,11 @@ public final class Strike
         return true;
     }
 
-    /** Return the hexside direction of the path from hex1 to hex2.
-     *  Sometimes two directions are possible.  If the left parameter
-     *  is set, the direction further left will be given.  Otherwise,
-     *  the direction further right will be given.
-     * WARNING: this is a duplication from code in Battle ; caller should use
-     * a Battle instance instead.
-     * @deprecated Should use an extension of Battle instead of Strike
-     */
-    @Deprecated
+    // TODO get rid of this when noone here needs it any more
     private static int getDirection(BattleHex hex1, BattleHex hex2,
         boolean left)
     {
-        if (hex1 == hex2)
-        {
-            return -1;
-        }
-
-        int x1 = hex1.getXCoord();
-        double y1 = hex1.getYCoord();
-        int x2 = hex2.getXCoord();
-        double y2 = hex2.getYCoord();
-
-        // Offboard creatures are not allowed.
-        if (x1 == -1 || x2 == -1)
-        {
-            return -1;
-        }
-
-        // Hexes with odd X coordinates are pushed down half a hex.
-        if ((x1 & 1) == 1)
-        {
-            y1 += 0.5;
-        }
-        if ((x2 & 1) == 1)
-        {
-            y2 += 0.5;
-        }
-
-        int xDist = x2 - x1;
-        double yDist = y2 - y1;
-        double xDistAndAHalf = 1.5 * xDist;
-
-        if (xDist >= 0)
-        {
-            if (yDist > xDistAndAHalf)
-            {
-                return 3;
-            }
-            else if (CompareDoubles.almostEqual(yDist, xDistAndAHalf))
-            {
-                if (left)
-                {
-                    return 2;
-                }
-                else
-                {
-                    return 3;
-                }
-            }
-            else if (yDist < -xDistAndAHalf)
-            {
-                return 0;
-            }
-            else if (CompareDoubles.almostEqual(yDist, -xDistAndAHalf))
-            {
-                if (left)
-                {
-                    return 0;
-                }
-                else
-                {
-                    return 1;
-                }
-            }
-            else if (yDist > 0)
-            {
-                return 2;
-            }
-            else if (yDist < 0)
-            {
-                return 1;
-            }
-            else
-            // yDist == 0
-            {
-                if (left)
-                {
-                    return 1;
-                }
-                else
-                {
-                    return 2;
-                }
-            }
-        }
-        else
-        // xDist < 0
-        {
-            if (yDist < xDistAndAHalf)
-            {
-                return 0;
-            }
-            else if (CompareDoubles.almostEqual(yDist, xDistAndAHalf))
-            {
-                if (left)
-                {
-                    return 5;
-                }
-                else
-                {
-                    return 0;
-                }
-            }
-            else if (yDist > -xDistAndAHalf)
-            {
-                return 3;
-            }
-            else if (CompareDoubles.almostEqual(yDist, -xDistAndAHalf))
-            {
-                if (left)
-                {
-                    return 3;
-                }
-                else
-                {
-                    return 4;
-                }
-            }
-            else if (yDist > 0)
-            {
-                return 4;
-            }
-            else if (yDist < 0)
-            {
-                return 5;
-            }
-            else
-            // yDist == 0
-            {
-                if (left)
-                {
-                    return 4;
-                }
-                else
-                {
-                    return 5;
-                }
-            }
-        }
+        return Battle.getDirection(hex1, hex2, left);
     }
 
     /** Return the number of intervening bramble hexes.  If LOS is along a
@@ -769,7 +605,8 @@ public final class Strike
         }
         else
         {
-            return countBrambleHexesDir(hex1, hex2, toLeft(xDist, yDist), 0);
+            return countBrambleHexesDir(hex1, hex2, Battle
+                .toLeft(xDist, yDist), 0);
         }
     }
 
