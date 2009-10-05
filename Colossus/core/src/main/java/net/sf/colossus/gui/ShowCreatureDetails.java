@@ -592,12 +592,24 @@ public final class ShowCreatureDetails extends KDialog
             hex.setHexsideHazard(0, hexside);
         }
 
+        // TODO This is somewhat dubious: it calls getDice which is defined
+        //      only in CreatureServerSide (but ShowCreatureDetails is a client
+        //      side thing!!)
+        //      The methods that shows the "battle" properties (dice and
+        //      strikeNr) sets hazards directly on the creature, it's hex
+        //      or hazard hexside, so that data looked up from within creature
+        //      returns the wanted value; but it circumvents the use of the
+        //      battle instance variable which CreatureServerSide has
+        //      (and when reading CSS one might believe this "battle" is
+        //      "in use" in all cases...)
         /** power of this creature hitting target. */
         public int getSimulatedDiceCount(final Creature target)
         {
             return getDice(target);
         }
 
+        // TODO same dubious thing that hazard properties are set but
+        //      battle might be actually null.
         /** skill of this creature hitting target. */
         public int getSimulatedStrikeNr(final Creature target)
         {
