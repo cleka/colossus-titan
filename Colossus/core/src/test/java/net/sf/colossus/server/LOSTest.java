@@ -414,8 +414,6 @@ public class LOSTest extends TestCase
             .getCurrentHex()));
         assertTrue(!battle.isLOSBlocked(ranger4.getCurrentHex(), ranger1
             .getCurrentHex()));
-        assertTrue(battle.isLOSBlocked(ranger2.getCurrentHex(), ranger4
-            .getCurrentHex()));
         assertTrue(battle.isLOSBlocked(ranger4.getCurrentHex(), ranger2
             .getCurrentHex()));
     }
