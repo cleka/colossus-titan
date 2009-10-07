@@ -90,7 +90,14 @@ public final class PlayerServerSide extends Player implements
 
         if (type.endsWith(Constants.anyAI))
         {
-            int whichAI = Dice.rollDie(Constants.numAITypes) - 1;
+            int aiCount = Constants.numAITypes;
+            // Do not choose an ExperimentalAI as "A Random AI" in user games,
+            // but in stresstest we DO want to test them.
+            if (!Options.isStresstest())
+            {
+                aiCount--;
+            }
+            int whichAI = Dice.rollDie(aiCount) - 1;
             type = Constants.aiArray[whichAI];
         }
 
