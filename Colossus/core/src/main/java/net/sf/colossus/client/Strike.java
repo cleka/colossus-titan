@@ -285,7 +285,7 @@ public final class Strike
                 {
                     midCliff = true;
                 }
-                else if (hexside == 'w')
+                else if (hexside2 == 'w')
                 {
                     return true;
                 }
@@ -315,7 +315,7 @@ public final class Strike
                 {
                     targetAtopCliff = true;
                 }
-                else if (hexside == 'w')
+                else if (hexside2 == 'w')
                 {
                     totalWalls++;
                     targetAtopWall = true;

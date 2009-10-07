@@ -443,7 +443,7 @@ abstract public class Battle
                 {
                     targetAtopCliff = true;
                 }
-                else if (hexside == 'w')
+                else if (hexside2 == 'w')
                 {
                     totalWalls++;
                     targetAtopWall = true;
