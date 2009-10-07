@@ -1,7 +1,6 @@
 package net.sf.colossus.ai.helper;
 
 
-import net.sf.colossus.ai.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -15,8 +14,10 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
+import net.sf.colossus.ai.AbstractAI;
 import net.sf.colossus.client.CritterMove;
 import net.sf.colossus.util.DevRandom;
+import net.sf.colossus.util.ErrorUtils;
 import net.sf.colossus.variant.BattleHex;
 
 
@@ -555,6 +556,12 @@ public class OnTheFlyLegionMove implements Collection<LegionMove>
                                 get(j).toString());
                     }
                 }
+
+                ErrorUtils.showErrorDialog(null,
+                    "Experimenal AI data inconsistency!",
+                    "During AI OnTheFlyLegionMove calculation, encountered a "
+                    + "'getParent called but byValues has no element' "
+                    + "situation. Can't continue - application will exit!");
                 System.exit(-50);
             }
             if (rand.nextInt(100) < percentRandom)
