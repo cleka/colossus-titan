@@ -85,7 +85,7 @@ public class CarryTest extends TestCase
         game.getPlayerByName("Red").addLegion(attacker);
         game.getPlayerByName("Blue").addLegion(defender);
 
-        attacker.setEntrySide(EntrySide.values()[5]);
+        attacker.setEntrySide(EntrySide.LEFT);
 
         battle = new BattleServerSide(game, attacker, defender,
             BattleServerSide.LegionTags.DEFENDER, hex, 2,
@@ -156,7 +156,7 @@ public class CarryTest extends TestCase
         game.getPlayerByName("Red").addLegion(attacker);
         game.getPlayerByName("Blue").addLegion(defender);
 
-        attacker.setEntrySide(EntrySide.values()[5]);
+        attacker.setEntrySide(EntrySide.LEFT);
 
         battle = new BattleServerSide(game, attacker, defender,
             BattleServerSide.LegionTags.ATTACKER, hex, 3,

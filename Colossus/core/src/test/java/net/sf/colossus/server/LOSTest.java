@@ -111,7 +111,7 @@ public class LOSTest extends TestCase
         game.getPlayerByName("Red").addLegion(defender);
         game.getPlayerByName("Blue").addLegion(attacker);
 
-        attacker.setEntrySide(EntrySide.values()[1]);
+        attacker.setEntrySide(EntrySide.RIGHT);
 
         battle = new BattleServerSide(game, attacker, defender,
             BattleServerSide.LegionTags.ATTACKER, hex, 1,
@@ -156,7 +156,7 @@ public class LOSTest extends TestCase
         game.getPlayerByName("Green").addLegion(defender);
         game.getPlayerByName("Black").addLegion(attacker);
 
-        attacker.setEntrySide(EntrySide.values()[5]);
+        attacker.setEntrySide(EntrySide.LEFT);
 
         battle = new BattleServerSide(game, attacker, defender,
             BattleServerSide.LegionTags.ATTACKER, hex, 1,
@@ -301,7 +301,7 @@ public class LOSTest extends TestCase
         game.getPlayerByName("Green").addLegion(defender);
         game.getPlayerByName("Black").addLegion(attacker);
 
-        attacker.setEntrySide(EntrySide.values()[3]);
+        attacker.setEntrySide(EntrySide.BOTTOM);
 
         battle = new BattleServerSide(game, attacker, defender,
             BattleServerSide.LegionTags.ATTACKER, hex, 1,
@@ -433,7 +433,7 @@ public class LOSTest extends TestCase
         game.getPlayerByName("Green").addLegion(defender);
         game.getPlayerByName("Black").addLegion(attacker);
 
-        attacker.setEntrySide(EntrySide.values()[3]);
+        attacker.setEntrySide(EntrySide.BOTTOM);
 
         battle = new BattleServerSide(game, attacker, defender,
             BattleServerSide.LegionTags.ATTACKER, hex, 1,
@@ -549,7 +549,7 @@ public class LOSTest extends TestCase
         game.getPlayerByName("Green").addLegion(defender);
         game.getPlayerByName("Black").addLegion(attacker);
 
-        attacker.setEntrySide(EntrySide.values()[5]);
+        attacker.setEntrySide(EntrySide.LEFT);
 
         battle = new BattleServerSide(game, attacker, defender,
             BattleServerSide.LegionTags.ATTACKER, hex, 2,
@@ -640,7 +640,7 @@ public class LOSTest extends TestCase
         game.getPlayerByName("Green").addLegion(defender);
         game.getPlayerByName("Black").addLegion(attacker);
 
-        attacker.setEntrySide(EntrySide.values()[5]);
+        attacker.setEntrySide(EntrySide.LEFT);
 
         battle = new BattleServerSide(game, attacker, defender,
             BattleServerSide.LegionTags.ATTACKER, hex, 2,
@@ -730,7 +730,7 @@ public class LOSTest extends TestCase
         game.getPlayerByName("Green").addLegion(defender);
         game.getPlayerByName("Black").addLegion(attacker);
 
-        attacker.setEntrySide(EntrySide.values()[5]);
+        attacker.setEntrySide(EntrySide.LEFT);
 
         battle = new BattleServerSide(game, attacker, defender,
             BattleServerSide.LegionTags.ATTACKER, hex, 1,
@@ -778,7 +778,7 @@ public class LOSTest extends TestCase
         // should be blocked: even from cliff may not RS over a dune
         // Current implementation is not working correctly
         //   - see 2820231 Illegal rangestrike
-        assertTrue(battle.isLOSBlocked(ranger.getCurrentHex(), 
+        assertTrue(battle.isLOSBlocked(ranger.getCurrentHex(),
                    hydra.getCurrentHex()));
 
     }
@@ -799,7 +799,7 @@ public class LOSTest extends TestCase
         game.getPlayerByName("Green").addLegion(defender);
         game.getPlayerByName("Black").addLegion(attacker);
 
-        attacker.setEntrySide(EntrySide.values()[3]);
+        attacker.setEntrySide(EntrySide.BOTTOM);
 
         battle = new BattleServerSide(game, attacker, defender,
             BattleServerSide.LegionTags.ATTACKER, hex, 1,
@@ -809,11 +809,6 @@ public class LOSTest extends TestCase
 
         Creature cyclops1 = attacker.getCritter(0);
         Creature gorgon1 = attacker.getCritter(1);
-        Creature gorgon2 = attacker.getCritter(2);
-        Creature gorgon3 = attacker.getCritter(3);
-        Creature gorgon4 = attacker.getCritter(4);
-        Creature ranger3 = attacker.getCritter(5);
-        Creature ranger4 = attacker.getCritter(6);
 
         placeCreature(ranger2, "D4");
 
