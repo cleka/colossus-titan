@@ -827,5 +827,8 @@ public class LOSTest extends TestCase
 
         assertTrue(battle.isLOSBlocked(gorgon1.getCurrentHex(), ranger2
             .getCurrentHex()));
+
+        assertTrue(battle.isLOSBlocked(cyclops1.getCurrentHex(), ranger2
+            .getCurrentHex()));
     }
 }
