@@ -782,4 +782,50 @@ public class LOSTest extends TestCase
                    hydra.getCurrentHex()));
 
     }
+
+    public void testLOS9()
+    {
+        LOGGER.log(Level.FINEST, "testLOS9()");
+        setupForVariant("Default");
+
+        MasterHex hex = game.getVariant().getMasterBoard()
+            .getHexByLabel("100"); // Tower
+
+        defender = new LegionServerSide("Gr03", null, hex, hex, green, game,
+            centaur, lion, ranger, ranger);
+        attacker = new LegionServerSide("Bk03", null, hex, hex, black, game,
+            cyclops, gorgon, gorgon, gorgon, gorgon, ranger, ranger);
+
+        game.getPlayerByName("Green").addLegion(defender);
+        game.getPlayerByName("Black").addLegion(attacker);
+
+        attacker.setEntrySide(EntrySide.values()[3]);
+
+        battle = new BattleServerSide(game, attacker, defender,
+            BattleServerSide.LegionTags.ATTACKER, hex, 1,
+            BattlePhase.FIGHT);
+
+        Creature ranger2 = defender.getCritter(3);
+
+        Creature cyclops1 = attacker.getCritter(0);
+        Creature gorgon1 = attacker.getCritter(1);
+        Creature gorgon2 = attacker.getCritter(2);
+        Creature gorgon3 = attacker.getCritter(3);
+        Creature gorgon4 = attacker.getCritter(4);
+        Creature ranger3 = attacker.getCritter(5);
+        Creature ranger4 = attacker.getCritter(6);
+
+        placeCreature(ranger2, "D4");
+
+        placeCreature(cyclops1, "D2");
+        placeCreature(gorgon1, "C2");
+
+        assertTrue(battle.isLOSBlocked(ranger2.getCurrentHex(), cyclops1
+            .getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(ranger2.getCurrentHex(), gorgon1
+            .getCurrentHex()));
+
+        assertTrue(battle.isLOSBlocked(gorgon1.getCurrentHex(), ranger2
+            .getCurrentHex()));
+    }
 }
