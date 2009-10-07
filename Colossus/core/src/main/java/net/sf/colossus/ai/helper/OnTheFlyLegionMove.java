@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.ai.AbstractAI;
 import net.sf.colossus.client.CritterMove;
+import net.sf.colossus.common.Options;
 import net.sf.colossus.util.DevRandom;
 import net.sf.colossus.util.ErrorUtils;
 import net.sf.colossus.variant.BattleHex;
@@ -320,8 +321,13 @@ public class OnTheFlyLegionMove implements Collection<LegionMove>
                  */
                 if (freemem < (MIN_MEMORY_REFILL))
                 {
-                    LOGGER.warning("Memory is still low (" + freemem +
-                            " bytes), no more refill.");
+                    // Yeah, I know about that memory issue, and really don't
+                    // want them to spoil my stresstest statistics...
+                    if (!Options.isStresstest())
+                    {
+                        LOGGER.warning("Memory is still low (" + freemem
+                            + " bytes), no more refill.");
+                    }
                 }
                 else
                 {
