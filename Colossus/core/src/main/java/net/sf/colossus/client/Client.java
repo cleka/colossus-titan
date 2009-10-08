@@ -882,8 +882,40 @@ public final class Client implements IClient, IOracle, IVariant
     {
         if (isMyBattlePhase() && options.getOption(Options.autoForcedStrike))
         {
-            return strike.makeForcedStrikes(options
+            return strikeMakeForcedStrikes(options
                 .getOption(Options.autoRangeSingle));
+        }
+        return false;
+    }
+
+    private boolean strikeMakeForcedStrikes(boolean autoRangeSingle)
+    {
+        if (getBattlePhase() == null)
+        {
+            LOGGER.log(Level.SEVERE,
+                "Called Strike.makeForcedStrikes() when there is no battle");
+            return false;
+        }
+        else if (!getBattlePhase().isFightPhase() && !isMyBattlePhase())
+        {
+            LOGGER.log(Level.SEVERE,
+                "Called Strike.makeForcedStrikes() in wrong phase");
+            return false;
+        }
+
+        for (BattleCritter battleUnit : getActiveBattleUnits())
+        {
+            if (!battleUnit.hasStruck())
+            {
+                Set<BattleHex> set = getBattle().findStrikes(battleUnit,
+                    autoRangeSingle, this);
+                if (set.size() == 1)
+                {
+                    BattleHex hex = set.iterator().next();
+                    strike(battleUnit.getTag(), hex);
+                    return true;
+                }
+            }
         }
         return false;
     }
@@ -2307,13 +2339,13 @@ public final class Client implements IClient, IOracle, IVariant
     // TODO move to Battle
     public Set<BattleHex> findCrittersWithTargets()
     {
-        return strike.findCrittersWithTargets();
+        return getBattle().findCrittersWithTargets(this);
     }
 
     // TODO move to Battle
     public Set<BattleHex> findStrikes(int tag)
     {
-        return strike.findStrikes(tag);
+        return getBattle().findStrikes(tag, this);
     }
 
     // Mostly for SocketClientThread

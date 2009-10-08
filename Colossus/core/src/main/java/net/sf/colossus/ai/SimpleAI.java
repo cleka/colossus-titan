@@ -1912,7 +1912,7 @@ public class SimpleAI extends AbstractAI
     {
         for (BattleCritter critter : client.getActiveBattleUnits())
         {
-            if (client.getStrike().canStrike(critter, target))
+            if (client.getBattle().canStrike(critter, target, client))
             {
                 return critter;
             }
@@ -2769,7 +2769,7 @@ public class SimpleAI extends AbstractAI
         // Attacker, non-titan, needs to charge.
         // Head for enemy creatures.
         value.add(bec.ATTACKER_DISTANCE_FROM_ENEMY_PENALTY
-            * client.getStrike().minRangeToEnemy(critter),
+            * client.getBattle().minRangeToEnemy(critter),
             "AttackerDistanceFromEnemyPenalty");
     }
 

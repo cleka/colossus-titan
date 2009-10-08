@@ -1,10 +1,13 @@
 package net.sf.colossus.client;
 
 
+
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import net.sf.colossus.common.Constants;
@@ -26,6 +29,25 @@ import net.sf.colossus.variant.HazardTerrain;
 import net.sf.colossus.variant.MasterHex;
 
 
+/**
+ *  Contains a lot of Battle related data
+ *
+ *  Currently contains also many methods that were earlier in "Strike.java"
+ *  (client package).
+ *  First moved to here to make it easier to unify them with the server side
+ *  version or possibly even with Battle from game package.
+ *
+ *  TODO One handicap right now is isInContact(...)
+ *
+ *  This method is used by getDice, getAttackerSkill and getStrikeNumber;
+ *  they ask this from Client (and thus need client as argument).
+ *  On server side, those methods are in CreatureServerSide
+ *  (do they belong there?? IMHO not, because those calls are valid to
+ *  to only during a battle, which might not always be the case and nothing
+ *  prevents calling it then) and CreatureServerSide is able to resolve that
+ *  question by itself.
+ *
+ */
 public class BattleClientSide extends Battle
 {
     private static final Logger LOGGER = Logger
@@ -609,6 +631,479 @@ public class BattleClientSide extends Battle
             return countBrambleHexesDir(hex1, hex2, Battle
                 .toLeft(xDist, yDist), 0);
         }
+    }
+
+    // TODO move all this strike stuff to BattleClientSide / Battle
+    public Set<BattleHex> findStrikes(int tag, Client client)
+    {
+        BattleCritter battleUnit = getBattleUnit(tag);
+        return findStrikes(battleUnit, true, client);
+    }
+
+    @SuppressWarnings("unused")
+    private Set<BattleHex> nosuchmethodfindStrikes(BattleCritter battleUnit,
+        boolean dummy)
+    {
+        LOGGER.severe("called crappy dummy method!");
+        return null;
+    }
+
+    /** Return the set of hexes with critters that have
+     *  valid strike targets.
+     * @param client TODO*/
+    Set<BattleHex> findCrittersWithTargets(Client client)
+    {
+        Set<BattleHex> set = new HashSet<BattleHex>();
+        for (BattleCritter battleUnit : getActiveBattleUnits())
+        {
+            if (countStrikes(battleUnit, true, client) > 0)
+            {
+                set.add(battleUnit.getCurrentHex());
+            }
+        }
+
+        return set;
+    }
+
+    private int countStrikes(BattleCritter battleUnit, boolean rangestrike,
+        Client client)
+    {
+        return findStrikes(battleUnit, rangestrike, client).size();
+    }
+
+    public boolean canStrike(BattleCritter striker, BattleCritter target,
+        Client client)
+    {
+        BattleHex targetHex = target.getCurrentHex();
+        return findStrikes(striker, true, client).contains(targetHex);
+    }
+
+    /** Return a set of hexes containing targets that the
+     *  critter may strike.  Only include rangestrikes if rangestrike
+     *  is true. */
+    public Set<BattleHex> findStrikes(BattleCritter battleUnit,
+        boolean rangestrike, Client client)
+    {
+        Set<BattleHex> set = new HashSet<BattleHex>();
+
+        // Each creature may strike only once per turn.
+        if (battleUnit.hasStruck())
+        {
+            return set;
+        }
+        // Offboard creatures can't strike.
+        if (battleUnit.getCurrentHex().getLabel().startsWith("X"))
+        {
+            return set;
+        }
+
+        boolean inverted = battleUnit.isDefender();
+        BattleHex currentHex = battleUnit.getCurrentHex();
+
+        boolean adjacentEnemy = false;
+
+        // First mark and count normal strikes.
+        for (int i = 0; i < 6; i++)
+        {
+            // Adjacent creatures separated by a cliff are not engaged.
+            if (!currentHex.isCliff(i))
+            {
+                BattleHex targetHex = currentHex.getNeighbor(i);
+                if (targetHex != null && isOccupied(targetHex)
+                    && !targetHex.isEntrance())
+                {
+                    BattleCritter target = getBattleUnit(targetHex);
+                    if (target.isDefender() != inverted)
+                    {
+                        adjacentEnemy = true;
+                        if (!target.isDead())
+                        {
+                            set.add(targetHex);
+                        }
+                    }
+                }
+            }
+        }
+
+        CreatureType creature = battleUnit.getCreatureType();
+
+        // Then do rangestrikes if applicable.  Rangestrikes are not allowed
+        // if the creature can strike normally, so only look for them if
+        // no targets have yet been found.
+        if (rangestrike && !adjacentEnemy && creature.isRangestriker()
+            && getBattlePhase() != BattlePhase.STRIKEBACK)
+        {
+            for (BattleCritter target : getInactiveBattleUnits())
+            {
+                if (!target.isDead())
+                {
+                    BattleHex targetHex = target.getCurrentHex();
+                    if (isRangestrikePossible(battleUnit, target, client))
+                    {
+                        set.add(targetHex);
+                    }
+                }
+            }
+        }
+        return set;
+    }
+
+    /** Return true if the rangestrike is possible.
+     * @param client TODO*/
+    /*
+     * WARNING: this is a duplication from code in Battle ; caller should use
+     * a Battle instance instead.
+     * @deprecated Should use an extension of Battle instead of Strike, with
+     *   extension of Creature instead of BattleCritter and extra BattleHex
+     */
+    @Deprecated
+    private boolean isRangestrikePossible(BattleCritter striker,
+        BattleCritter target, Client client)
+    {
+        CreatureType creature = striker.getCreatureType();
+        CreatureType targetCreature = target.getCreatureType();
+
+        BattleHex currentHex = striker.getCurrentHex();
+        BattleHex targetHex = target.getCurrentHex();
+
+        if (currentHex.isEntrance() || targetHex.isEntrance())
+        {
+            return false;
+        }
+
+        int range = Battle.getRange(currentHex, targetHex, false);
+        int skill = creature.getSkill();
+
+        if (range > skill)
+        {
+            return false;
+        }
+
+        // Only magicMissile can rangestrike at range 2, rangestrike Lords,
+        // or rangestrike without LOS.
+        else if (!creature.useMagicMissile()
+            && (range < 3 || targetCreature.isLord() || isLOSBlocked3(client,
+                currentHex, targetHex)))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    @SuppressWarnings("deprecation")
+    private boolean isLOSBlocked3(Client client, BattleHex currentHex,
+        BattleHex targetHex)
+    {
+        boolean strikeIsLOSBlocked = client.getStrike().isLOSBlocked(currentHex,
+            targetHex);
+
+        boolean bcsIsLOSBlocked = isLOSBlocked(currentHex, targetHex);
+
+        boolean bssIsLOSBlocked = super.isLOSBlocked(currentHex, targetHex);
+
+        if (strikeIsLOSBlocked != bcsIsLOSBlocked
+            || strikeIsLOSBlocked != bssIsLOSBlocked
+            || bssIsLOSBlocked != bcsIsLOSBlocked)
+        {
+            LOGGER.warning("\n"
+                + "Strike.LOSBlocked: " + strikeIsLOSBlocked + "\n"
+                + "BtleCS.LOSBlocked: " + bcsIsLOSBlocked + "\n"
+                + "Battle.LOSBlocked: " + bssIsLOSBlocked + "\n" );
+        }
+        return strikeIsLOSBlocked;
+
+    }
+    /*
+     * TODO When it feels safe, remove the validating call to
+     *      the old isLOSBlockedClientSide method and use only the one
+     *      from game.Battle.
+     */
+    @Override
+    public boolean isLOSBlocked(BattleHex currentHex, BattleHex targetHex)
+    {
+        return isLOSBlockedClientSide(currentHex,
+            targetHex);
+    }
+
+    public boolean superIsLOSBlocked(BattleHex currentHex, BattleHex targetHex)
+    {
+        // The version in game.Battle, which came from server side
+        boolean isBlocked = super.isLOSBlocked(currentHex, targetHex);
+        return isBlocked;
+    }
+
+    /** Check to see if the LOS from hex1 to hex2 is blocked.  If the LOS
+     *  lies along a hexspine, check both and return true only if both are
+     *  blocked.
+     *  This is the version that was earlier in Strike.java (client package).
+     *
+     *  TODO unify with game.Battle version and if it's safe that they
+     *  are identical move up / get rid of this one here
+     *
+     * @deprecated Duplicate with game.Battke (=parent)
+     */
+    @Deprecated
+    private boolean isLOSBlockedClientSide(BattleHex hex1, BattleHex hex2)
+    {
+        if (hex1 == hex2)
+        {
+            return false;
+        }
+
+        int x1 = hex1.getXCoord();
+        double y1 = hex1.getYCoord();
+        int x2 = hex2.getXCoord();
+        double y2 = hex2.getYCoord();
+
+        // Offboard hexes are not allowed.
+        if (x1 == -1 || x2 == -1)
+        {
+            return true;
+        }
+
+        // Hexes with odd X coordinates are pushed down half a hex.
+        if ((x1 & 1) == 1)
+        {
+            y1 += 0.5;
+        }
+        if ((x2 & 1) == 1)
+        {
+            y2 += 0.5;
+        }
+
+        double xDist = x2 - x1;
+        double yDist = y2 - y1;
+
+        // Creatures below the level of the strike do not block LOS.
+        int strikeElevation = Math.min(hex1.getElevation(), hex2
+            .getElevation());
+
+        if (CompareDoubles.almostEqual(yDist, 0.0)
+            || CompareDoubles.almostEqual(Math.abs(yDist), 1.5 * Math
+                .abs(xDist)))
+        {
+            // Hexspine; try both sides.
+            return (isLOSBlockedDirClientSide(hex1, hex1, hex2, true,
+                strikeElevation, false, false, false, false, false, false, 0,
+                0) && isLOSBlockedDirClientSide(hex1, hex1, hex2,
+                false,
+                strikeElevation, false, false, false, false, false, false, 0,
+                0));
+        }
+        else
+        {
+            return isLOSBlockedDirClientSide(hex1, hex1, hex2, Battle.toLeft(
+                xDist, yDist), strikeElevation, false, false, false, false,
+                false, false, 0, 0);
+        }
+    }
+
+    /** Check LOS, going to the left of hexspines if argument left is true,
+     *  or to the right if it is false.
+     *
+     *  TODO unify with game.Battle version and if it's safe that they
+     *  are identical move up / get rid of this one here
+     *
+     * @deprecated
+     */
+    @Deprecated
+    private boolean isLOSBlockedDirClientSide(BattleHex initialHex,
+        BattleHex currentHex, BattleHex finalHex, boolean left,
+        int strikeElevation, boolean strikerAtop, boolean strikerAtopCliff,
+        boolean strikerAtopWall, boolean midObstacle, boolean midCliff,
+        boolean midChit, int totalObstacles, int totalWalls)
+    {
+        boolean targetAtop = false;
+        boolean targetAtopCliff = false;
+        boolean targetAtopWall = false;
+        if (currentHex == finalHex)
+        {
+            return false;
+        }
+        // Offboard hexes are not allowed.
+        if (currentHex.getXCoord() == -1 || finalHex.getXCoord() == -1)
+        {
+            return true;
+        }
+        int direction = BattleClientSide.getDirection(currentHex, finalHex,
+            left);
+        BattleHex nextHex = currentHex.getNeighbor(direction);
+        if (nextHex == null)
+        {
+            return true;
+        }
+        char hexside = currentHex.getHexsideHazard(direction).getCode();
+        char hexside2 = currentHex.getOppositeHazard(direction).getCode();
+        if (currentHex == initialHex)
+        {
+            if (isObstacle(hexside))
+            {
+                strikerAtop = true;
+                totalObstacles++;
+                if (hexside == 'c')
+                {
+                    strikerAtopCliff = true;
+                }
+                else if (hexside == 'w')
+                {
+                    strikerAtopWall = true;
+                    totalWalls++;
+                }
+            }
+
+            if (isObstacle(hexside2))
+            {
+                midObstacle = true;
+                totalObstacles++;
+                if (hexside2 == 'c' || hexside2 == 'd')
+                {
+                    midCliff = true;
+                }
+                else if (hexside2 == 'w')
+                {
+                    return true;
+                }
+            }
+        }
+        else if (nextHex == finalHex)
+        {
+            if (isObstacle(hexside))
+            {
+                midObstacle = true;
+                totalObstacles++;
+                if (hexside == 'c' || hexside == 'd')
+                {
+                    midCliff = true;
+                }
+                else if (hexside == 'w')
+                {
+                    return true;
+                }
+            }
+
+            if (isObstacle(hexside2))
+            {
+                targetAtop = true;
+                totalObstacles++;
+                if (hexside2 == 'c')
+                {
+                    targetAtopCliff = true;
+                }
+                else if (hexside2 == 'w')
+                {
+                    totalWalls++;
+                    targetAtopWall = true;
+                }
+            }
+            if (midChit && !targetAtopCliff)
+            {
+                return true;
+            }
+            if (midCliff && (!strikerAtopCliff || !targetAtopCliff))
+            {
+                return true;
+            }
+            if (midObstacle && !strikerAtop && !targetAtop)
+            {
+                return true;
+            }
+            // If there are three slopes, striker and target must each
+            //     be atop one.
+            if (totalObstacles >= 3 && (!strikerAtop || !targetAtop)
+                && (!strikerAtopCliff && !targetAtopCliff))
+            {
+                return true;
+            }
+            if (totalWalls >= 2)
+            {
+                if (!(strikerAtopWall || targetAtopWall))
+                {
+                    return true;
+                }
+            }
+            // Success!
+            return false;
+        }
+        else
+        // not leaving first or entering last hex
+        {
+            if (midChit)
+            {
+                // We're not in the initial or final hex, and we have already
+                // marked a mid chit, so it's not adjacent to the base of a
+                // cliff that the target is atop.
+                return true;
+            }
+            if (isObstacle(hexside) || isObstacle(hexside2))
+            {
+                midObstacle = true;
+                totalObstacles++;
+                if (hexside == 'c' || hexside2 == 'c' || hexside == 'd'
+                    || hexside2 == 'd')
+                {
+                    midCliff = true;
+                }
+            }
+        }
+        if (nextHex.blocksLineOfSight())
+        {
+            return true;
+        }
+        // Creatures block LOS, unless both striker and target are at higher
+        //     elevation than the creature, or unless the creature is at
+        //     the base of a cliff and the striker or target is atop it.
+        if (isOccupied(nextHex)
+            && nextHex.getElevation() >= strikeElevation
+            && (!strikerAtopCliff || currentHex != initialHex))
+        {
+            midChit = true;
+        }
+
+        return isLOSBlockedDirClientSide(initialHex, nextHex, finalHex, left,
+            strikeElevation, strikerAtop, strikerAtopCliff, strikerAtopWall,
+            midObstacle, midCliff, midChit, totalObstacles, totalWalls);
+    }
+
+    /** Return the titan range (inclusive at both ends) from the critter to the
+     *  closest enemy critter.  Return OUT_OF_RANGE if there are none.
+     *
+     * // BEGIN OLD COMMENT (when it was in Strike.java):
+     * WARNING: this is a duplication from code in Battle ; caller should use
+     * a Battle instance instead.
+     * @deprecated Should use an extension of Battle instead of Strike
+     * // END OLD COMMENT
+     *
+     * Now this is moved from Strike to BattleClientSide.
+     * IMHO this is not a total duplicate of a method in Battle: Battle
+     * does not have a minRangeToEnemy, just minRange between concrete hexes,
+     * which IS actually called here.
+     * TODO can they be unified? Or move to e.g. some class in ai.helper package?
+     */
+    @Deprecated
+    public int minRangeToEnemy(BattleCritter battleUnit)
+    {
+        BattleHex hex = battleUnit.getCurrentHex();
+        int min = Constants.OUT_OF_RANGE;
+
+        for (BattleCritter target : getBattleUnits())
+        {
+            if (battleUnit.isDefender() != target.isDefender())
+            {
+                BattleHex targetHex = target.getCurrentHex();
+                int range = Battle.getRange(hex, targetHex, false);
+                // Exit early if adjacent.
+                if (range == 2)
+                {
+                    return range;
+                }
+                else if (range < min)
+                {
+                    min = range;
+                }
+            }
+        }
+        return min;
     }
 
 }

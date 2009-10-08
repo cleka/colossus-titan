@@ -398,7 +398,7 @@ public final class Strike
      * @deprecated Should use an extension of Battle instead of Strike
      */
     @Deprecated
-    private boolean isLOSBlocked(BattleHex hex1, BattleHex hex2)
+    public boolean isLOSBlocked(BattleHex hex1, BattleHex hex2)
     {
         if (hex1 == hex2)
         {

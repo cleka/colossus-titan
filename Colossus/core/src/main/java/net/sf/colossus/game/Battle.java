@@ -219,7 +219,7 @@ abstract public class Battle
      * @deprecated This is the realm of HazardEdge, not direct use of hexside
      */
     @Deprecated
-    private static boolean isObstacle(char hexside)
+    protected static boolean isObstacle(char hexside)
     {
         return (hexside != ' ') && (hexside != 'r');
     }
