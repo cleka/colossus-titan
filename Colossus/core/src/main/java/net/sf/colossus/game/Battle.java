@@ -59,7 +59,7 @@ abstract public class Battle
 
     /**
      * Caller must ensure that yDist != 0
-     * 
+     *
      * TODO Temporarily public because n.s.c.client.Strike needs it
      */
     public static boolean toLeft(double xDist, double yDist)
@@ -93,7 +93,7 @@ abstract public class Battle
         int x2 = hex2.getXCoord();
         double y2 = hex2.getYCoord();
         // Offboard creatures are not allowed.
-        if (x1 == -1 || x2 == -1)
+        if (hex1.isEntrance() || hex2.isEntrance())
         {
             return -1;
         }
@@ -228,7 +228,7 @@ abstract public class Battle
         int count = previousCount;
 
         // Offboard hexes are not allowed.
-        if (hex1.getXCoord() == -1 || hex2.getXCoord() == -1)
+        if (hex1.isEntrance() || hex2.isEntrance())
         {
             return Constants.BIGNUM;
         }
@@ -275,8 +275,7 @@ abstract public class Battle
         double y2 = hex2.getYCoord();
 
         // Offboard hexes are not allowed.
-        if (CompareDoubles.almostEqual(x1, -1.0)
-            || CompareDoubles.almostEqual(x2, -1))
+        if (hex1.isEntrance() || hex2.isEntrance())
         {
             return Constants.BIGNUM;
         }
@@ -433,7 +432,7 @@ abstract public class Battle
         int x2 = hex2.getXCoord();
         double y2 = hex2.getYCoord();
         // Offboard hexes are not allowed.
-        if (x1 == -1 || x2 == -1)
+        if (hex1.isEntrance() || hex2.isEntrance())
         {
             return true;
         }
@@ -463,7 +462,7 @@ abstract public class Battle
         else
         {
             return isLOSBlockedDir(hex1, hex1, hex2, toLeft(xDist, yDist),
-                strikeElevation, false, false, false, false, false, 
+                strikeElevation, false, false, false, false, false,
                 false, 0, 0);
         }
     }
@@ -486,7 +485,7 @@ abstract public class Battle
             return false;
         }
         // Offboard hexes are not allowed.
-        if (currentHex.getXCoord() == -1 || finalHex.getXCoord() == -1)
+        if (currentHex.isEntrance() || finalHex.isEntrance())
         {
             return true;
         }
@@ -601,7 +600,7 @@ abstract public class Battle
             {
                 midObstacle = true;
                 totalObstacles++;
-                if (hexside == 'c' || hexside2 == 'c' || hexside == 'd' || 
+                if (hexside == 'c' || hexside2 == 'c' || hexside == 'd' ||
                     hexside2 == 'd')
                 {
                     midCliff = true;
@@ -652,7 +651,7 @@ abstract public class Battle
         int count = previousCount;
 
         // Offboard hexes are not allowed.
-        if (hex1.getXCoord() == -1 || hex2.getXCoord() == -1)
+        if (hex1.isEntrance() || hex2.isEntrance())
         {
             return Constants.BIGNUM;
         }
@@ -701,7 +700,7 @@ abstract public class Battle
         double y2 = hex2.getYCoord();
 
         // Offboard hexes are not allowed.
-        if (x1 == -1 || x2 == -1)
+        if (hex1.isEntrance() || hex2.isEntrance())
         {
             return Constants.BIGNUM;
         }
