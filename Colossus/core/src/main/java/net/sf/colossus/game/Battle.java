@@ -215,6 +215,114 @@ abstract public class Battle
         }
     }
 
+    /** Return the number of intervening bramble hexes.  If LOS is along a
+     *  hexspine, go left if argument left is true, right otherwise.  If
+     *  LOS is blocked, return a large number.
+     * @deprecated another function with explicit reference to Bramble
+     * that should be fixed.
+     */
+    @Deprecated
+    private int countBrambleHexesDir(BattleHex hex1, BattleHex hex2,
+        boolean left, int previousCount)
+    {
+        int count = previousCount;
+
+        // Offboard hexes are not allowed.
+        if (hex1.getXCoord() == -1 || hex2.getXCoord() == -1)
+        {
+            return Constants.BIGNUM;
+        }
+
+        int direction = getDirection(hex1, hex2, left);
+
+        BattleHex nextHex = hex1.getNeighbor(direction);
+        if (nextHex == null)
+        {
+            return Constants.BIGNUM;
+        }
+
+        if (nextHex == hex2)
+        {
+            // Success!
+            return count;
+        }
+
+        // Add one if it's bramble.
+        if (nextHex.getTerrain().equals(HazardTerrain.BRAMBLES))
+        {
+            count++;
+        }
+
+        return countBrambleHexesDir(nextHex, hex2, left, count);
+    }
+
+    /** Return the number of intervening bramble hexes.  If LOS is along a
+     * hexspine and there are two choices, pick the lower one.
+     * @deprecated another function with explicit reference to Bramble
+     * that should be fixed.
+     */
+    @Deprecated
+    public int countBrambleHexes(BattleHex hex1, BattleHex hex2)
+    {
+        if (hex1 == hex2)
+        {
+            return 0;
+        }
+
+        int x1 = hex1.getXCoord();
+        double y1 = hex1.getYCoord();
+        int x2 = hex2.getXCoord();
+        double y2 = hex2.getYCoord();
+
+        // Offboard hexes are not allowed.
+        if (CompareDoubles.almostEqual(x1, -1.0)
+            || CompareDoubles.almostEqual(x2, -1))
+        {
+            return Constants.BIGNUM;
+        }
+
+        // Hexes with odd X coordinates are pushed down half a hex.
+        if ((x1 & 1) == 1)
+        {
+            y1 += 0.5;
+        }
+        if ((x2 & 1) == 1)
+        {
+            y2 += 0.5;
+        }
+
+        double xDist = x2 - x1;
+        double yDist = y2 - y1;
+
+        if (CompareDoubles.almostEqual(yDist, 0.0)
+            || CompareDoubles.almostEqual(Math.abs(yDist), 1.5 * Math
+                .abs(xDist)))
+        {
+            int strikeElevation = Math.min(hex1.getElevation(), hex2
+                .getElevation());
+            // Hexspine; try unblocked side(s).
+            if (isLOSBlockedDir(hex1, hex1, hex2, true, strikeElevation,
+                false, false, false, false, false, false, 0, 0))
+            {
+                return countBrambleHexesDir(hex1, hex2, false, 0);
+            }
+            else if (isLOSBlockedDir(hex1, hex1, hex2, false, strikeElevation,
+                false, false, false, false, false, false, 0, 0))
+            {
+                return countBrambleHexesDir(hex1, hex2, true, 0);
+            }
+            else
+            {
+                return Math.min(countBrambleHexesDir(hex1, hex2, true, 0),
+                    countBrambleHexesDir(hex1, hex2, false, 0));
+            }
+        }
+        else
+        {
+            return countBrambleHexesDir(hex1, hex2, toLeft(xDist, yDist), 0);
+        }
+    }
+
     /**
      * @deprecated This is the realm of HazardEdge, not direct use of hexside
      */
