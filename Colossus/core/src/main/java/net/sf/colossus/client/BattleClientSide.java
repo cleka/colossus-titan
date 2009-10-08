@@ -782,7 +782,7 @@ public class BattleClientSide extends Battle
         // Only magicMissile can rangestrike at range 2, rangestrike Lords,
         // or rangestrike without LOS.
         else if (!creature.useMagicMissile()
-            && (range < 3 || targetCreature.isLord() || isLOSBlocked3(client,
+            && (range < 3 || targetCreature.isLord() || isLOSBlocked2(
                 currentHex, targetHex)))
         {
             return false;
@@ -791,46 +791,24 @@ public class BattleClientSide extends Battle
         return true;
     }
 
-    @SuppressWarnings("deprecation")
-    private boolean isLOSBlocked3(Client client, BattleHex currentHex,
-        BattleHex targetHex)
-    {
-        boolean strikeIsLOSBlocked = client.getStrike().isLOSBlocked(currentHex,
-            targetHex);
-
-        boolean bcsIsLOSBlocked = isLOSBlocked(currentHex, targetHex);
-
-        boolean bssIsLOSBlocked = super.isLOSBlocked(currentHex, targetHex);
-
-        if (strikeIsLOSBlocked != bcsIsLOSBlocked
-            || strikeIsLOSBlocked != bssIsLOSBlocked
-            || bssIsLOSBlocked != bcsIsLOSBlocked)
-        {
-            LOGGER.warning("\n"
-                + "Strike.LOSBlocked: " + strikeIsLOSBlocked + "\n"
-                + "BtleCS.LOSBlocked: " + bcsIsLOSBlocked + "\n"
-                + "Battle.LOSBlocked: " + bssIsLOSBlocked + "\n" );
-        }
-        return strikeIsLOSBlocked;
-
-    }
     /*
      * TODO When it feels safe, remove the validating call to
      *      the old isLOSBlockedClientSide method and use only the one
      *      from game.Battle.
      */
-    @Override
-    public boolean isLOSBlocked(BattleHex currentHex, BattleHex targetHex)
-    {
-        return isLOSBlockedClientSide(currentHex,
-            targetHex);
-    }
 
-    public boolean superIsLOSBlocked(BattleHex currentHex, BattleHex targetHex)
+    private boolean isLOSBlocked2(BattleHex currentHex, BattleHex targetHex)
     {
-        // The version in game.Battle, which came from server side
-        boolean isBlocked = super.isLOSBlocked(currentHex, targetHex);
-        return isBlocked;
+        boolean bcsIsLOSBlocked = isLOSBlockedClientSide(currentHex, targetHex);
+        boolean bssIsLOSBlocked = super.isLOSBlocked(currentHex, targetHex);
+
+        if (bcsIsLOSBlocked != bssIsLOSBlocked)
+        {
+            LOGGER.warning("Different result for LOS check:\n"
+                + "Battle.          isLOSBlocked says: " + bssIsLOSBlocked
+                + "BattleClientSide.isLOSBlocked says: " + bcsIsLOSBlocked);
+        }
+        return bcsIsLOSBlocked;
     }
 
     /** Check to see if the LOS from hex1 to hex2 is blocked.  If the LOS
@@ -841,7 +819,7 @@ public class BattleClientSide extends Battle
      *  TODO unify with game.Battle version and if it's safe that they
      *  are identical move up / get rid of this one here
      *
-     * @deprecated Duplicate with game.Battke (=parent)
+     * @deprecated Duplicate with game.Battle (=parent)
      */
     @Deprecated
     private boolean isLOSBlockedClientSide(BattleHex hex1, BattleHex hex2)
@@ -905,7 +883,7 @@ public class BattleClientSide extends Battle
      *  TODO unify with game.Battle version and if it's safe that they
      *  are identical move up / get rid of this one here
      *
-     * @deprecated
+     * @deprecated Duplicate with game.Battle (=parent)
      */
     @Deprecated
     private boolean isLOSBlockedDirClientSide(BattleHex initialHex,

@@ -178,7 +178,6 @@ public final class Client implements IClient, IOracle, IVariant
 
     private Movement movement;
     private BattleMovement battleMovement;
-    private Strike strike;
 
     private final Server localServer;
 
@@ -366,7 +365,6 @@ public final class Client implements IClient, IOracle, IVariant
 
         this.movement = new Movement(this);
         this.battleMovement = new BattleMovement(this);
-        this.strike = new Strike(this);
 
         ViableEntityManager.register(this, "Client " + playerName);
         InstanceTracker.register(this, "Client " + playerName);
@@ -833,7 +831,6 @@ public final class Client implements IClient, IOracle, IVariant
         movement.dispose();
         this.movement = null;
         this.battleMovement = null;
-        this.strike = null;
         playersNotInitialized = true;
 
         CustomRecruitBase.resetAllInstances();
@@ -2786,11 +2783,6 @@ public final class Client implements IClient, IOracle, IVariant
     public Movement getMovement()
     {
         return movement;
-    }
-
-    public Strike getStrike()
-    {
-        return strike;
     }
 
     /** Return a set of hexLabels. */
