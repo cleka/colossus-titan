@@ -1912,7 +1912,7 @@ public class SimpleAI extends AbstractAI
     {
         for (BattleCritter critter : client.getActiveBattleUnits())
         {
-            if (client.getBattle().canStrike(critter, target, client))
+            if (client.getBattle().canStrike(critter, target))
             {
                 return critter;
             }

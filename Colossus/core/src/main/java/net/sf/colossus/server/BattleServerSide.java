@@ -978,10 +978,14 @@ public final class BattleServerSide extends Battle
         return false;
     }
 
-    /** Return a set of hex labels for hexes containing targets that the
-     *  critter may strike.  Only include rangestrikes if rangestrike
-     *  is true. */
-    Set<String> findStrikes(CreatureServerSide critter, boolean rangestrike)
+   /**
+     *  Return a set of hex LABELS containing targets that the critter may strike
+     *
+     *  @param battleUnit the striking creature
+     *  @param rangestrike Whether to include rangestrike targets
+     *  @return a set of hexes containing targets
+     */
+    Set<String> findTargets(CreatureServerSide critter, boolean rangestrike)
     {
         Set<String> set = new HashSet<String>();
 

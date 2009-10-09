@@ -524,30 +524,23 @@ public class BattleClientSide extends Battle
         return strikeNumber;
     }
 
-    // TODO move all this strike stuff to BattleClientSide / Battle
-    public Set<BattleHex> findStrikes(int tag, Client client)
+    // TODO pull up?
+    public Set<BattleHex> findStrikes(int tag)
     {
         BattleCritter battleUnit = getBattleUnit(tag);
-        return findStrikes(battleUnit, true, client);
-    }
-
-    @SuppressWarnings("unused")
-    private Set<BattleHex> nosuchmethodfindStrikes(BattleCritter battleUnit,
-        boolean dummy)
-    {
-        LOGGER.severe("called crappy dummy method!");
-        return null;
+        return findTargets(battleUnit, true);
     }
 
     /** Return the set of hexes with critters that have
      *  valid strike targets.
-     * @param client TODO*/
+     *  @param client The client.
+     */
     Set<BattleHex> findCrittersWithTargets(Client client)
     {
         Set<BattleHex> set = new HashSet<BattleHex>();
         for (BattleCritter battleUnit : getActiveBattleUnits())
         {
-            if (countStrikes(battleUnit, true, client) > 0)
+            if (findTargets(battleUnit, true).size() > 0)
             {
                 set.add(battleUnit.getCurrentHex());
             }
@@ -556,24 +549,29 @@ public class BattleClientSide extends Battle
         return set;
     }
 
-    private int countStrikes(BattleCritter battleUnit, boolean rangestrike,
-        Client client)
-    {
-        return findStrikes(battleUnit, rangestrike, client).size();
-    }
-
-    public boolean canStrike(BattleCritter striker, BattleCritter target,
-        Client client)
+    /**
+     *  Tell whether a given creature can strike (rangestrike included)
+     *  the given potential target
+     *
+     *  @param striker The creature striking
+     *  @param target The potential target
+     *  @return whether striking target is a valid strike
+     */
+    public boolean canStrike(BattleCritter striker, BattleCritter target)
     {
         BattleHex targetHex = target.getCurrentHex();
-        return findStrikes(striker, true, client).contains(targetHex);
+        return findTargets(striker, true).contains(targetHex);
     }
 
-    /** Return a set of hexes containing targets that the
-     *  critter may strike.  Only include rangestrikes if rangestrike
-     *  is true. */
-    public Set<BattleHex> findStrikes(BattleCritter battleUnit,
-        boolean rangestrike, Client client)
+    /**
+     *  Return a set of hexes containing targets that the critter may strike
+     *
+     *  @param battleUnit the striking creature
+     *  @param rangestrike Whether to include rangestrike targets
+     *  @return a set of hexes containing targets
+     */
+    public Set<BattleHex> findTargets(BattleCritter battleUnit,
+        boolean rangestrike)
     {
         Set<BattleHex> set = new HashSet<BattleHex>();
 
@@ -629,7 +627,7 @@ public class BattleClientSide extends Battle
                 if (!target.isDead())
                 {
                     BattleHex targetHex = target.getCurrentHex();
-                    if (isRangestrikePossible(battleUnit, target, client))
+                    if (isRangestrikePossible(battleUnit, target))
                     {
                         set.add(targetHex);
                     }
@@ -640,7 +638,7 @@ public class BattleClientSide extends Battle
     }
 
     /** Return true if the rangestrike is possible.
-     * @param client TODO*/
+     *
     /*
      * WARNING: this is a duplication from code in Battle ; caller should use
      * a Battle instance instead.
@@ -649,7 +647,7 @@ public class BattleClientSide extends Battle
      */
     @Deprecated
     private boolean isRangestrikePossible(BattleCritter striker,
-        BattleCritter target, Client client)
+        BattleCritter target)
     {
         CreatureType creature = striker.getCreatureType();
         CreatureType targetCreature = target.getCreatureType();

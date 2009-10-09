@@ -904,8 +904,8 @@ public final class Client implements IClient, IOracle, IVariant
         {
             if (!battleUnit.hasStruck())
             {
-                Set<BattleHex> set = getBattle().findStrikes(battleUnit,
-                    autoRangeSingle, this);
+                Set<BattleHex> set = getBattle().findTargets(battleUnit,
+                    autoRangeSingle);
                 if (set.size() == 1)
                 {
                     BattleHex hex = set.iterator().next();
@@ -2342,7 +2342,7 @@ public final class Client implements IClient, IOracle, IVariant
     // TODO move to Battle
     public Set<BattleHex> findStrikes(int tag)
     {
-        return getBattle().findStrikes(tag, this);
+        return getBattle().findStrikes(tag);
     }
 
     // Mostly for SocketClientThread

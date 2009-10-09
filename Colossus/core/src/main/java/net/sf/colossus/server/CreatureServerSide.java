@@ -184,12 +184,12 @@ public class CreatureServerSide extends Creature
     boolean canStrike(Creature target)
     {
         String hexLabel = target.getCurrentHex().getLabel();
-        return battle.findStrikes(this, true).contains(hexLabel);
+        return battle.findTargets(this, true).contains(hexLabel);
     }
 
     /** Return the number of dice that will be rolled when striking this
      *  target, including modifications for terrain.
-     * WARNING: this is duplicated in Strike
+     * WARNING: this is duplicated in BattleClientSide
      */
     @SuppressWarnings("deprecation")
     protected int getDice(Creature target)
@@ -268,7 +268,7 @@ public class CreatureServerSide extends Creature
         return dice;
     }
 
-    /** WARNING: this is duplicated in Strike */
+    /** WARNING: this is duplicated in BattleClientSide */
     @SuppressWarnings("deprecation")
     private int getAttackerSkill(Creature target)
     {
@@ -425,7 +425,7 @@ public class CreatureServerSide extends Creature
         return battle.countBrambleHexes(getCurrentHex(), targetHex);
     }
 
-    /** WARNING: this is duplicated in Strike */
+    /** WARNING: this is duplicated in BattleClientSide */
     @SuppressWarnings("deprecation")
     protected int getStrikeNumber(Creature target)
     {
