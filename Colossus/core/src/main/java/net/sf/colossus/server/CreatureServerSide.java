@@ -181,10 +181,13 @@ public class CreatureServerSide extends Creature
             getCurrentHex(), true);
     }
 
+    // TODO change to deal with target critters, instead of hexes?
+    // Need to check also client side copies of similar functionality ;
+    // on first glance looks they would be better with creatures as well.
     boolean canStrike(Creature target)
     {
-        String hexLabel = target.getCurrentHex().getLabel();
-        return battle.findTargets(this, true).contains(hexLabel);
+        return battle.findTargetHexes(this, true).contains(
+            target.getCurrentHex());
     }
 
     /** Return the number of dice that will be rolled when striking this

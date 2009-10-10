@@ -978,16 +978,17 @@ public final class BattleServerSide extends Battle
         return false;
     }
 
-   /**
-     *  Return a set of hex LABELS containing targets that the critter may strike
-     *
-     *  @param battleUnit the striking creature
-     *  @param rangestrike Whether to include rangestrike targets
-     *  @return a set of hexes containing targets
-     */
-    Set<String> findTargets(CreatureServerSide critter, boolean rangestrike)
+    /**
+      *  Return a set of hexes containing targets that the critter may strike
+      *
+      *  @param battleUnit the striking creature
+      *  @param rangestrike Whether to include rangestrike targets
+      *  @return a set of hexes containing targets
+      */
+    Set<BattleHex> findTargetHexes(CreatureServerSide critter,
+        boolean rangestrike)
     {
-        Set<String> set = new HashSet<String>();
+        Set<BattleHex> set = new HashSet<BattleHex>();
 
         // Each creature may strike only once per turn.
         if (critter.hasStruck())
@@ -1015,7 +1016,7 @@ public final class BattleServerSide extends Battle
                         adjacentEnemy = true;
                         if (!target.isDead())
                         {
-                            set.add(targetHex.getLabel());
+                            set.add(targetHex);
                         }
                     }
                 }
@@ -1037,7 +1038,7 @@ public final class BattleServerSide extends Battle
                     if (isRangestrikePossible(critter, target, currentHex,
                         targetHex))
                     {
-                        set.add(targetHex.getLabel());
+                        set.add(targetHex);
                     }
                 }
             }
