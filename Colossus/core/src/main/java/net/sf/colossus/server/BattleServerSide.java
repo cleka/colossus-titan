@@ -1176,23 +1176,17 @@ public final class BattleServerSide extends Battle
         return critters;
     }
 
-    // TODO get rid of String-based access
-    private boolean isOccupied(String hexLabel)
+    @Override
+    protected boolean isOccupied(BattleHex hex)
     {
         for (Creature critter : getAllCritters())
         {
-            if (hexLabel.equals(critter.getCurrentHex().getLabel()))
+            if (hex.equals(critter.getCurrentHex()))
             {
                 return true;
             }
         }
         return false;
-    }
-
-    @Override
-    protected boolean isOccupied(BattleHex hex)
-    {
-        return isOccupied(hex.getLabel());
     }
 
     CreatureServerSide getCritter(BattleHex hex)
