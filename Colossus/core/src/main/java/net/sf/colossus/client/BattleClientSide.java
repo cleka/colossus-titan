@@ -186,10 +186,11 @@ public class BattleClientSide extends Battle
         }
     }
 
-    public BattleUnit createBattleUnit(String imageName, boolean inverted,
+    public BattleUnit createBattleUnit(String imageName, boolean isDefender,
         int tag, BattleHex hex, CreatureType type, Legion legion)
     {
-        BattleUnit battleUnit = new BattleUnit(imageName, inverted, tag, hex,
+        BattleUnit battleUnit = new BattleUnit(imageName, isDefender, tag,
+            hex,
             type, legion);
         battleUnits.add(battleUnit);
 
@@ -586,7 +587,7 @@ public class BattleClientSide extends Battle
             return set;
         }
 
-        boolean inverted = battleUnit.isDefender();
+        boolean isDefender = battleUnit.isDefender();
         BattleHex currentHex = battleUnit.getCurrentHex();
 
         boolean adjacentEnemy = false;
@@ -602,7 +603,7 @@ public class BattleClientSide extends Battle
                     && !targetHex.isEntrance())
                 {
                     BattleCritter target = getBattleUnit(targetHex);
-                    if (target.isDefender() != inverted)
+                    if (target.isDefender() != isDefender)
                     {
                         adjacentEnemy = true;
                         if (!target.isDead())
