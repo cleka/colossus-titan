@@ -525,13 +525,6 @@ public class BattleClientSide extends Battle
         return strikeNumber;
     }
 
-    // TODO pull up?
-    public Set<BattleHex> findStrikes(int tag)
-    {
-        BattleCritter battleUnit = getBattleUnit(tag);
-        return findTargets(battleUnit, true);
-    }
-
     /** Return the set of hexes with critters that have
      *  valid strike targets.
      *  @param client The client.
@@ -553,6 +546,7 @@ public class BattleClientSide extends Battle
     /**
      *  Tell whether a given creature can strike (rangestrike included)
      *  the given potential target
+     *  TODO duplicated in CreatureServerSide
      *
      *  @param striker The creature striking
      *  @param target The potential target
@@ -564,8 +558,17 @@ public class BattleClientSide extends Battle
         return findTargets(striker, true).contains(targetHex);
     }
 
+    // Not a candidate to pull up: tag-to-BattleUnit resolving is
+    // purely a client side issue. Even resolve-data-from-network issue?
+    public Set<BattleHex> findTargets(int tag)
+    {
+        BattleCritter battleUnit = getBattleUnit(tag);
+        return findTargets(battleUnit, true);
+    }
+
     /**
      *  Return a set of hexes containing targets that the critter may strike
+     *  TODO duplicated in BattleServerSide
      *
      *  @param battleUnit the striking creature
      *  @param rangestrike Whether to include rangestrike targets

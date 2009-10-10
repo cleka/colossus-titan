@@ -2342,7 +2342,7 @@ public final class Client implements IClient, IOracle, IVariant
     // TODO move to Battle
     public Set<BattleHex> findStrikes(int tag)
     {
-        return getBattle().findStrikes(tag);
+        return getBattle().findTargets(tag);
     }
 
     // Mostly for SocketClientThread
