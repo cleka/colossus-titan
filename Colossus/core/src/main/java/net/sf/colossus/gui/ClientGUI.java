@@ -774,6 +774,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     private void setupGUIOptionListeners()
     {
+        GUIHex.setAntialias(options.getOption(Options.antialias));
         options.addListener(Options.antialias, new IOptions.Listener()
         {
             @Override
@@ -781,9 +782,12 @@ public class ClientGUI implements IClientGUI, GUICallbacks
                 boolean newValue)
             {
                 GUIHex.setAntialias(newValue);
+                options.setOption(Options.antialias, newValue);
                 repaintAllWindows();
             }
         });
+
+        GUIHex.setOverlay(options.getOption(Options.useOverlay));
         options.addListener(Options.useOverlay, new IOptions.Listener()
         {
             @Override
@@ -791,6 +795,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
                 boolean newValue)
             {
                 GUIHex.setOverlay(newValue);
+                options.setOption(Options.useOverlay, newValue);
                 if (board != null)
                 {
                     board.repaintAfterOverlayChanged();
@@ -808,6 +813,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
                         .getNumberForRecruitChitSelection(newValue);
                 }
             });
+
+        CreatureType.setNoBaseColor(options.getOption(Options.noBaseColor));
         options.addListener(Options.noBaseColor, new IOptions.Listener()
         {
             @Override
@@ -815,10 +822,14 @@ public class ClientGUI implements IClientGUI, GUICallbacks
                 boolean newValue)
             {
                 CreatureType.setNoBaseColor(newValue);
+                options.setOption(Options.noBaseColor, newValue);
                 net.sf.colossus.util.StaticResourceLoader.purgeImageCache();
                 repaintAllWindows();
             }
         });
+
+        GUIBattleChit.setUseColoredBorders(options
+            .getOption(Options.useColoredBorders));
         options.addListener(Options.useColoredBorders, new IOptions.Listener()
         {
             @Override
@@ -826,9 +837,11 @@ public class ClientGUI implements IClientGUI, GUICallbacks
                 boolean newValue)
             {
                 GUIBattleChit.setUseColoredBorders(newValue);
+                options.setOption(Options.useColoredBorders, newValue);
                 repaintAllWindows();
             }
         });
+
         options.addListener(Options.showCaretaker, new IOptions.Listener()
         {
             @Override
