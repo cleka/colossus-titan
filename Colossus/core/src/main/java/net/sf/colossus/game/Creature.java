@@ -95,6 +95,12 @@ public class Creature
         return type;
     }
 
+    // Just for implementing BattleCritter. TODO Unify ?
+    public CreatureType getCreatureType()
+    {
+        return getType();
+    }
+
     /**
      * Calculates the Striking Power of this Creature when striking directly at
      * target under the circumstances in parameters.
@@ -214,18 +220,23 @@ public class Creature
     {
         if (isTitan())
         {
-            Player player = getPlayer();
-            if (player != null)
-            {
-                return player.getTitanPower();
-            }
-            else
-            {
-                // Just in case player is dead.
-                return 6;
-            }
+            return getTitanPower();
         }
         return getType().getPower();
+    }
+
+    public int getTitanPower()
+    {
+        Player player = getPlayer();
+        if (player != null)
+        {
+            return player.getTitanPower();
+        }
+        else
+        {
+            // Just in case player is dead.
+            return 6;
+        }
     }
 
     public String getMarkerId()
@@ -456,8 +467,11 @@ public class Creature
         return getType().useMagicMissile();
     }
 
-    /** Apply damage to this critter.  Return the amount of excess damage
-     *  done, which may sometimes carry to another target. */
+    public boolean wouldDieFrom(int additionalDamage)
+    {
+        return (this.hits + additionalDamage >= getPower());
+    }
+
     /**
      * Apply damage to this critter.  Return the amount of excess damage
      * done, which may sometimes carry to another target.

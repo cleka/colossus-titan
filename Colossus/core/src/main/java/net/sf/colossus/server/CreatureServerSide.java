@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.game.Battle;
+import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.variant.BattleHex;
@@ -37,7 +38,7 @@ import net.sf.colossus.variant.HazardTerrain;
  * @author David Ripton
  * @author Romain Dolbeau
  */
-public class CreatureServerSide extends Creature
+public class CreatureServerSide extends Creature implements BattleCritter
 {
     private static final Logger LOGGER = Logger
         .getLogger(CreatureServerSide.class.getName());
@@ -82,9 +83,29 @@ public class CreatureServerSide extends Creature
         this.legion = legion;
     }
 
-    int getTag()
+    public int getTag()
     {
         return tag;
+    }
+
+    public boolean isDefender()
+    {
+        assert legion != null : "Legion must be set when calling isDefender()!";
+
+        if (legion.equals(battle.getDefendingLegion()))
+        {
+            return true;
+        }
+        else if (legion.equals(battle.getAttackingLegion()))
+        {
+            return false;
+        }
+        else
+        {
+            LOGGER
+                .severe("this creatures legion is neither attacking nor defending legion?");
+            return false;
+        }
     }
 
     BattleServerSide getBattle()
