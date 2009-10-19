@@ -1,4 +1,4 @@
-package net.sf.colossus.client;
+package net.sf.colossus.game;
 
 
 import java.util.HashSet;
@@ -6,9 +6,6 @@ import java.util.Set;
 
 import net.sf.colossus.common.IOptions;
 import net.sf.colossus.common.Options;
-import net.sf.colossus.game.Battle;
-import net.sf.colossus.game.BattleCritter;
-import net.sf.colossus.game.Game;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterBoardTerrain;
@@ -26,13 +23,13 @@ import net.sf.colossus.variant.MasterBoardTerrain;
  */
 
 // XXX Massively duplicated code.  Merge later.
-final class BattleMovement
+final public class BattleMovement
 {
     private final Game game;
 
     private final IOptions options;
 
-    BattleMovement(Game game, IOptions options)
+    public BattleMovement(Game game, IOptions options)
     {
         this.game = game;
         this.options = options;
