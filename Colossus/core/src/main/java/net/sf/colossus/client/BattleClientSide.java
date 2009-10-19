@@ -322,15 +322,7 @@ public class BattleClientSide extends Battle
         BattleHex targetHex = target.getCurrentHex();
         CreatureType striker = battleUnit.getCreatureType();
 
-        int dice;
-        if (striker.isTitan())
-        {
-            dice = battleUnit.getTitanPower();
-        }
-        else
-        {
-            dice = striker.getPower();
-        }
+        int dice = battleUnit.getPower();
 
         boolean rangestrike = !client.isInContact(battleUnit, true);
         HazardTerrain terrain = hex.getTerrain();

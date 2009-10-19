@@ -123,6 +123,10 @@ public class GUIBattleChit extends Chit
     {
         if (dead)
         {
+            // TODO this looks like a bad trick: set chit's hit to 0 so that
+            // no number is painted. Shouldn't that "paint nr or not" rather
+            // in chit itself decide based on "hits" whether to paint the
+            // number?
             this.hits = 0;
         }
         // Chit.setDead() triggers repaint

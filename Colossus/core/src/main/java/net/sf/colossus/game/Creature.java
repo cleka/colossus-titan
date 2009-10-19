@@ -235,6 +235,7 @@ public class Creature
         else
         {
             // Just in case player is dead.
+            LOGGER.warning("asked for Titan power of dead (null) player!");
             return 6;
         }
     }

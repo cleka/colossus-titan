@@ -6,7 +6,6 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.common.Constants;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 
@@ -63,21 +62,6 @@ public final class BattleUnit implements BattleCritter
         this.legion = legion;
     }
 
-    public String deriveCreatureNameFromId()
-    {
-        String id = getId();
-        if (id == null)
-        {
-            LOGGER.log(Level.SEVERE, "Chit.getId() returned null id ?");
-            return null;
-        }
-        else if (id.startsWith(Constants.titan))
-        {
-            id = Constants.titan;
-        }
-        return id;
-    }
-
     public Legion getLegion()
     {
         return legion;
@@ -101,6 +85,7 @@ public final class BattleUnit implements BattleCritter
 
     public boolean wouldDieFrom(int hits)
     {
+        // TODO what if critter / creature is already dead anyway?
         return (hits + getHits() >= getPower());
     }
 
@@ -109,6 +94,10 @@ public final class BattleUnit implements BattleCritter
         this.dead = dead;
         if (dead)
         {
+            // TODO is this "if dead, set hits to 0" still needed?
+            // Probably originated from the GUI issue, don't paint a damage nr
+            // on a dead chit, but nowadays GUIBattleChit takes care of that
+            // by itself (I believe).
             setHits(0);
             // setHits() calls notifyListeners
         }
@@ -210,15 +199,50 @@ public final class BattleUnit implements BattleCritter
     }
 
     // TODO copied from Chit - replace or let Creature deal with it
+
+    // TODO this validation against "via legion and player" (that's how
+    // Creature.java is doing it) is only temporary; on the long run get
+    // rid of the parsing based method.
+
     public int getTitanPower()
+    {
+        int parsedPower = getIdBasedTitanPower();
+        int playerBasedPower = getTitanPowerViaLegionAndPlayer();
+
+        if (playerBasedPower != parsedPower)
+        {
+            LOGGER.warning("id/parsing based power is " + parsedPower
+                + ", but Power via Legion and Player is " + playerBasedPower);
+        }
+        return playerBasedPower;
+
+    }
+
+    public int getIdBasedTitanPower()
     {
         if (!id.startsWith("Titan-"))
         {
+            LOGGER.warning("Asked Titan Power from non-Titan BattleUnit '"
+                + getCreatureType() + "'!");
             return -1;
         }
         String[] parts = id.split("-");
-        int power = Integer.parseInt(parts[1]);
-        return power;
+        return Integer.parseInt(parts[1]);
+    }
+
+    public int getTitanPowerViaLegionAndPlayer()
+    {
+        Player player = legion.getPlayer();
+        if (player != null)
+        {
+            return player.getTitanPower();
+        }
+        else
+        {
+            // Just in case player is dead.
+            LOGGER.warning("asked for Titan power of dead (null) player!");
+            return 6;
+        }
     }
 
     public int getSkill()
