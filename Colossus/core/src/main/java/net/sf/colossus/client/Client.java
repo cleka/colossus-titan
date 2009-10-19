@@ -17,7 +17,6 @@ import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.common.WhatNextManager;
 import net.sf.colossus.game.BattleCritter;
-import net.sf.colossus.game.BattleMovement;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.BattleUnit;
 import net.sf.colossus.game.Creature;
@@ -365,13 +364,12 @@ public final class Client implements IClient, IOracle, IVariant
         this.ai = createAI(playerType);
 
         this.movement = new Movement(this);
+        this.battleMovement = new BattleMovement(this);
 
         ViableEntityManager.register(this, "Client " + playerName);
         InstanceTracker.register(this, "Client " + playerName);
 
         options = new Options(playerName, noOptionsFile);
-
-        this.battleMovement = new BattleMovement(game, options);
 
         if (createGUI)
         {
@@ -2157,7 +2155,6 @@ public final class Client implements IClient, IOracle, IVariant
         return game.getEngagement().getAttackingLegion();
     }
 
-    // TODO move to Game
     // public for IOracle
     public MasterHex getBattleSite()
     {

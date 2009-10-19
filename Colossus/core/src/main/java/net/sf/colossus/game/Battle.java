@@ -55,7 +55,7 @@ abstract public class Battle
      * @param hex The hex whose occupancy is being checked
      * @return Whether the hex is occupied by a critter/creature/chit/...
      */
-    abstract public boolean isOccupied(BattleHex hex);
+    abstract protected boolean isOccupied(BattleHex hex);
 
     /**
      * Caller must ensure that yDist != 0
@@ -771,12 +771,4 @@ abstract public class Battle
     {
         return location;
     }
-
-    public abstract boolean isInContact(BattleCritter critter, boolean coundDead);
-
-    public abstract Legion getBattleActiveLegion();
-
-    public abstract int getBattleTurnNumber();
-
-    public abstract BattleUnit getBattleUnit(BattleHex hex);
- }
+}

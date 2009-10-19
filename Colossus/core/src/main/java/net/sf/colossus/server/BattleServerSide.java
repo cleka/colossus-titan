@@ -13,9 +13,7 @@ import java.util.logging.Logger;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.game.Battle;
-import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.BattlePhase;
-import net.sf.colossus.game.BattleUnit;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
@@ -485,7 +483,6 @@ public final class BattleServerSide extends Battle
         this.carryDamage = carryDamage;
     }
 
-    // TODO Use the game / client side version instead
     /** Recursively find moves from this hex.  Return a set of string hex IDs
      *  for all legal destinations.  Do not double back.  If ignoreMobileAllies
      *  is true, pretend that allied creatures that can move out of the
@@ -555,8 +552,6 @@ public final class BattleServerSide extends Battle
         return set;
     }
 
-    // TODO Use the game / client side version instead
-
     /** This method is called by the defender on turn 1 in a
      *  Startlisted Terrain,
      *  so we know that there are no enemies on board, and all allies
@@ -577,8 +572,6 @@ public final class BattleServerSide extends Battle
         }
         return set;
     }
-
-    // TODO Use the game / client side version instead
 
     /**
      * Find all legal moves for this critter.
@@ -1184,7 +1177,7 @@ public final class BattleServerSide extends Battle
     }
 
     @Override
-    public boolean isOccupied(BattleHex hex)
+    protected boolean isOccupied(BattleHex hex)
     {
         for (Creature critter : getAllCritters())
         {
@@ -1208,33 +1201,5 @@ public final class BattleServerSide extends Battle
         }
         // TODO check if this is feasible, otherwise assert false here
         return null;
-    }
-
-    @Override
-    public Legion getBattleActiveLegion()
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public int getBattleTurnNumber()
-    {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
-    public BattleUnit getBattleUnit(BattleHex hex)
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public boolean isInContact(BattleCritter critter, boolean coundDead)
-    {
-        // TODO Auto-generated method stub
-        return false;
     }
 }
