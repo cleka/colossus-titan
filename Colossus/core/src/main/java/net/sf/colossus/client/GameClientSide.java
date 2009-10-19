@@ -30,8 +30,6 @@ public class GameClientSide extends Game implements IOracle
 
     private Player activePlayer;
 
-    private BattleClientSide battle = null;
-
     public GameClientSide(Variant variant, String[] playerNames)
     {
         super(variant, playerNames);
@@ -127,7 +125,7 @@ public class GameClientSide extends Game implements IOracle
 
     public Player getPlayerByTag(int tag)
     {
-        BattleUnit battleUnit = battle.getBattleUnit(tag);
+        BattleUnit battleUnit = getBattleCS().getBattleUnit(tag);
         assert battleUnit != null : "Illegal value for tag parameter";
 
         return battleUnit.getLegion().getPlayer();
@@ -220,12 +218,12 @@ public class GameClientSide extends Game implements IOracle
         Legion defender)
     {
         this.battle = new BattleClientSide(this, attacker, defender, hex);
-        battle.init(battleTurnNumber, battleActivePlayer, battlePhase);
+        getBattleCS().init(battleTurnNumber, battleActivePlayer, battlePhase);
     }
 
     public BattleClientSide getBattleCS()
     {
-        return battle;
+        return (BattleClientSide)battle;
     }
 
     public boolean isBattleOngoing()
@@ -236,37 +234,37 @@ public class GameClientSide extends Game implements IOracle
     public BattlePhase getBattlePhase()
     {
         assert battle != null : "No battle phase if there is no battle!";
-        return battle.getBattlePhase();
+        return getBattleCS().getBattlePhase();
     }
 
     public void setBattlePhase(BattlePhase battlePhase)
     {
-        battle.setBattlePhase(battlePhase);
+        getBattleCS().setBattlePhase(battlePhase);
     }
 
     public boolean isBattlePhase(BattlePhase phase)
     {
-        return battle.getBattlePhase() == phase;
+        return getBattleCS().getBattlePhase() == phase;
     }
 
     public void setBattleActivePlayer(Player battleActivePlayer)
     {
-        battle.setBattleActivePlayer(battleActivePlayer);
+        getBattleCS().setBattleActivePlayer(battleActivePlayer);
     }
 
     public void setBattleTurnNumber(int battleTurnNumber)
     {
-        battle.setBattleTurnNumber(battleTurnNumber);
+        getBattleCS().setBattleTurnNumber(battleTurnNumber);
     }
 
     public int getBattleTurnNumber()
     {
-        return battle.getBattleTurnNumber();
+        return getBattleCS().getBattleTurnNumber();
     }
 
     public Legion getBattleActiveLegion()
     {
-        return battle.getBattleActiveLegion();
+        return getBattleCS().getBattleActiveLegion();
     }
 
     public Player getBattleActivePlayer()
@@ -275,14 +273,14 @@ public class GameClientSide extends Game implements IOracle
         {
             return null;
         }
-        return battle.getBattleActivePlayer();
+        return getBattleCS().getBattleActivePlayer();
     }
 
     public void cleanupBattle()
     {
         if (battle != null)
         {
-            battle.cleanupBattle();
+            getBattleCS().cleanupBattle();
             battle = null;
         }
     }

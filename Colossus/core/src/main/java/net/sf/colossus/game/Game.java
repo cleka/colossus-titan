@@ -70,6 +70,8 @@ public class Game
 
     private Engagement engagement;
 
+    protected Battle battle = null;
+
     /**
      * Create a Game object.
      *
@@ -226,6 +228,11 @@ public class Game
     public Engagement getEngagement()
     {
         return this.engagement;
+    }
+
+    public Battle getBattle()
+    {
+        return this.battle;
     }
 
     public MasterHex getBattleSite()

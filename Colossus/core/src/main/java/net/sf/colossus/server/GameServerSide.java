@@ -81,7 +81,6 @@ public final class GameServerSide extends Game
 
     private boolean loadingGame;
     private boolean replayOngoing = false;
-    private BattleServerSide battle;
     private Server server;
     // Negotiation
     private final Set<Proposal> attackerProposals = new HashSet<Proposal>();
@@ -1581,10 +1580,10 @@ public final class GameServerSide extends Game
 
                 battle = new BattleServerSide(this, attacker, defender,
                     activeLegionTag, engagementHex, battleTurnNum, battlePhase);
-                battle.setSummonState(summonState);
-                battle.setCarryDamage(carryDamage);
-                battle.setDriftDamageApplied(driftDamageApplied);
-                battle.setCarryTargets(carryTargets);
+                getBattleSS().setSummonState(summonState);
+                getBattleSS().setCarryDamage(carryDamage);
+                getBattleSS().setDriftDamageApplied(driftDamageApplied);
+                getBattleSS().setCarryTargets(carryTargets);
             }
 
             // Backup Legion data and wipe it out, so that history
@@ -1782,8 +1781,8 @@ public final class GameServerSide extends Game
 
         if (battle != null)
         {
-            battle.setServer(getServer());
-            battle.init();
+            getBattleSS().setServer(getServer());
+            getBattleSS().init();
         }
 
         CustomRecruitBase.initCustomVariantForAllCRBs();
@@ -2437,7 +2436,7 @@ public final class GameServerSide extends Game
         // Need to call this regardless to advance past the summon phase.
         if (battle != null)
         {
-            battle.finishSummoningAngel(player.hasSummoned());
+            getBattleSS().finishSummoningAngel(player.hasSummoned());
             summoning = false;
         }
         else
@@ -2449,7 +2448,7 @@ public final class GameServerSide extends Game
 
     BattleServerSide getBattleSS()
     {
-        return battle;
+        return (BattleServerSide)battle;
     }
 
     boolean isBattleInProgress()
@@ -2470,7 +2469,7 @@ public final class GameServerSide extends Game
     void finishBattle(MasterHex masterHex, boolean attackerEntered,
         int points, int turnDone)
     {
-        battle.cleanRefs();
+        getBattleSS().cleanRefs();
         battle = null;
         server.allCleanupBattle();
         LegionServerSide battleWinner = null;
@@ -2807,7 +2806,7 @@ public final class GameServerSide extends Game
     {
         if (battleInProgress)
         {
-            battle.concede(attacker.getPlayer());
+            getBattleSS().concede(attacker.getPlayer());
         }
         else
         {
@@ -2913,7 +2912,7 @@ public final class GameServerSide extends Game
 
             battle = new BattleServerSide(this, attacker, defender,
                 BattleServerSide.LegionTags.DEFENDER, hex, 1, BattlePhase.MOVE);
-            battle.init();
+            getBattleSS().init();
         }
     }
 
