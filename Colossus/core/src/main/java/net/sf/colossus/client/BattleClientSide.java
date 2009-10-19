@@ -80,7 +80,7 @@ public class BattleClientSide extends Battle
     }
 
     @Override
-    protected boolean isOccupied(BattleHex hex)
+    public boolean isOccupied(BattleHex hex)
     {
         for (BattleCritter battleUnit : getBattleUnits())
         {
@@ -103,6 +103,7 @@ public class BattleClientSide extends Battle
         this.battleTurnNumber = battleTurnNumber;
     }
 
+    @Override
     public int getBattleTurnNumber()
     {
         return battleTurnNumber;
@@ -122,6 +123,7 @@ public class BattleClientSide extends Battle
         battleActivePlayer = ((GameClientSide)game).getNoonePlayer();
     }
 
+    @Override
     public Legion getBattleActiveLegion()
     {
         if (battleActivePlayer.equals(getDefendingLegion().getPlayer()))
@@ -254,6 +256,7 @@ public class BattleClientSide extends Battle
             });
     }
 
+    @Override
     public BattleUnit getBattleUnit(BattleHex hex)
     {
         List<BattleUnit> lBattleUnits = getBattleUnits(hex);
@@ -717,4 +720,10 @@ public class BattleClientSide extends Battle
         return min;
     }
 
+    @Override
+    public boolean isInContact(BattleCritter critter, boolean countDead)
+    {
+        // dummy
+        return true;
+    }
 }

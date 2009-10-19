@@ -4,15 +4,22 @@ package net.sf.colossus.client;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.sf.colossus.common.IOptions;
 import net.sf.colossus.common.Options;
+import net.sf.colossus.game.Battle;
 import net.sf.colossus.game.BattleCritter;
+import net.sf.colossus.game.Game;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterBoardTerrain;
 
 
 /**
- * Class BattleMovement does client-side battle move calculations.
+ * Class BattleMovement does battle move calculations;
+ * originated from client side;
+ *
+ * TODO Move up to become the common one, and use the methods here
+ * instead of the pendants in BattleServerSide.
  *
  * @author David Ripton
  * @author Romain Dolbeau
@@ -21,11 +28,14 @@ import net.sf.colossus.variant.MasterBoardTerrain;
 // XXX Massively duplicated code.  Merge later.
 final class BattleMovement
 {
-    private final Client client;
+    private final Game game;
 
-    BattleMovement(Client client)
+    private final IOptions options;
+
+    BattleMovement(Game game, IOptions options)
     {
-        this.client = client;
+        this.game = game;
+        this.options = options;
     }
 
     /** Recursively find moves from this hex.  Return a set of all
@@ -33,6 +43,9 @@ final class BattleMovement
     private Set<BattleHex> findMoves(BattleHex hex, CreatureType creature,
         boolean flies, int movesLeft, int cameFrom, boolean first)
     {
+        final boolean cumulativeSlow = options.getOption(Options.cumulativeSlow);
+        final boolean oneHexAllowed = options.getOption(Options.oneHexAllowed);
+
         Set<BattleHex> set = new HashSet<BattleHex>();
         for (int i = 0; i < 6; i++)
         {
@@ -45,13 +58,12 @@ final class BattleMovement
                     int reverseDir = (i + 3) % 6;
                     int entryCost;
 
-                    BattleCritter bogey = client.getBattleCS().getBattleUnit(
+                    BattleCritter bogey = game.getBattle().getBattleUnit(
                         neighbor);
                     if (bogey == null)
                     {
                         entryCost = neighbor.getEntryCost(creature,
-                            reverseDir, client.getOptions().getOption(
-                                Options.cumulativeSlow));
+                            reverseDir, cumulativeSlow);
                     }
                     else
                     {
@@ -59,8 +71,7 @@ final class BattleMovement
                     }
 
                     if ((entryCost != BattleHex.IMPASSIBLE_COST)
-                        && ((entryCost <= movesLeft) || (first && client
-                            .getOptions().getOption(Options.oneHexAllowed))))
+                        && ((entryCost <= movesLeft) || (first && oneHexAllowed)))
                     {
                         // Mark that hex as a legal move.
                         set.add(neighbor);
@@ -96,12 +107,12 @@ final class BattleMovement
      */
     private Set<BattleHex> findUnoccupiedStartlistHexes()
     {
-        MasterBoardTerrain terrain = client.getBattleSite().getTerrain();
+        MasterBoardTerrain terrain = game.getBattleSite().getTerrain();
         Set<BattleHex> set = new HashSet<BattleHex>();
         for (String hexLabel : terrain.getStartList())
         {
             BattleHex hex = terrain.getHexByLabel(hexLabel);
-            if (!client.isOccupied(hex))
+            if (!game.getBattle().isOccupied(hex))
             {
                 set.add(hex);
             }
@@ -110,22 +121,23 @@ final class BattleMovement
     }
 
     /** Find all legal moves for this critter.*/
-    public Set<BattleHex> showMoves(BattleCritter battleUnit)
+    public Set<BattleHex> showMoves(BattleCritter critter)
     {
+        final Battle battle = game.getBattle();
         Set<BattleHex> set = new HashSet<BattleHex>();
-        if (!battleUnit.hasMoved() && !client.isInContact(battleUnit, false))
+        if (!critter.hasMoved() && !battle.isInContact(critter, false))
         {
-            if (client.getBattleSite().getTerrain().hasStartList()
-                && (client.getBattleTurnNumber() == 1)
-                && client.getGameClientSide().getBattleActiveLegion().equals(
-                    client.getDefender()))
+            if (game.getBattleSite().getTerrain().hasStartList()
+                && (battle.getBattleTurnNumber() == 1)
+                && battle.getBattleActiveLegion().equals(
+                        battle.getDefendingLegion()))
             {
                 set = findUnoccupiedStartlistHexes();
             }
             else
             {
-                CreatureType creature = battleUnit.getCreatureType();
-                BattleHex hex = battleUnit.getCurrentHex();
+                CreatureType creature = critter.getCreatureType();
+                BattleHex hex = critter.getCurrentHex();
                 set = findMoves(hex, creature, creature.isFlier(), creature
                     .getSkill(), -1, true);
             }
