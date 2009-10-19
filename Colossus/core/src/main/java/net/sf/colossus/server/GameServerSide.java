@@ -2447,7 +2447,7 @@ public final class GameServerSide extends Game
         }
     }
 
-    BattleServerSide getBattle()
+    BattleServerSide getBattleSS()
     {
         return battle;
     }

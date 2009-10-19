@@ -23,7 +23,7 @@ import net.sf.colossus.game.Player;
  */
 public interface IOracle
 {
-    Battle getBattle();
+    Battle getBattleCS();
 
     Engagement getEngagement();
 

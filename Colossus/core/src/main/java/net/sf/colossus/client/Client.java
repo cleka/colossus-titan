@@ -854,13 +854,13 @@ public final class Client implements IClient, IOracle, IVariant
     // TODO move to Game or Battle
     public List<BattleUnit> getActiveBattleUnits()
     {
-        return getBattle().getActiveBattleUnits();
+        return getBattleCS().getActiveBattleUnits();
     }
 
     // TODO move to Game or Battle
     public List<BattleUnit> getInactiveBattleUnits()
     {
-        return getBattle().getInactiveBattleUnits();
+        return getBattleCS().getInactiveBattleUnits();
     }
 
     public void aiDoneWithStrikes()
@@ -904,7 +904,7 @@ public final class Client implements IClient, IOracle, IVariant
         {
             if (!battleUnit.hasStruck())
             {
-                Set<BattleHex> set = getBattle().findTargets(battleUnit,
+                Set<BattleHex> set = getBattleCS().findTargets(battleUnit,
                     autoRangeSingle);
                 if (set.size() == 1)
                 {
@@ -1083,7 +1083,7 @@ public final class Client implements IClient, IOracle, IVariant
 
     public void removeDeadBattleChits()
     {
-        for (BattleUnit battleUnit : getBattle().getBattleUnits())
+        for (BattleUnit battleUnit : getBattleCS().getBattleUnits())
         {
             if (battleUnit.isDead())
             {
@@ -1106,7 +1106,7 @@ public final class Client implements IClient, IOracle, IVariant
             }
         }
 
-        getBattle().removeDeadBattleChits();
+        getBattleCS().removeDeadBattleChits();
 
         gui.repaintBattleBoard();
     }
@@ -1130,7 +1130,7 @@ public final class Client implements IClient, IOracle, IVariant
         CreatureType type = getGame().getVariant().getCreatureByName(
             bareImageName);
 
-        BattleUnit battleUnit = getBattle().createBattleUnit(imageName,
+        BattleUnit battleUnit = getBattleCS().createBattleUnit(imageName,
             inverted, tag, hex, type, legion);
 
         gui.actOnPlaceNewChit(imageName, battleUnit, hex);
@@ -1439,7 +1439,7 @@ public final class Client implements IClient, IOracle, IVariant
     // TODO move to Battle / BattleClientSide
     public boolean isOccupied(BattleHex hex)
     {
-        return !getBattle().getBattleUnits(hex).isEmpty();
+        return !getBattleCS().getBattleUnits(hex).isEmpty();
     }
 
     public void tellStrikeResults(int strikerTag, int targetTag,
@@ -1447,7 +1447,7 @@ public final class Client implements IClient, IOracle, IVariant
         boolean wasCarry, int carryDamageLeft,
         Set<String> carryTargetDescriptions)
     {
-        BattleCritter battleUnit = getBattle().getBattleUnit(strikerTag);
+        BattleCritter battleUnit = getBattleCS().getBattleUnit(strikerTag);
         if (battleUnit != null)
         {
             battleUnit.setStruck(true);
@@ -1455,8 +1455,8 @@ public final class Client implements IClient, IOracle, IVariant
 
         gui.disposePickCarryDialog();
 
-        BattleUnit targetUnit = getBattle().getBattleUnit(targetTag);
-        BattleCritter targetCritter = getBattle().getBattleUnit(targetTag);
+        BattleUnit targetUnit = getBattleCS().getBattleUnit(targetTag);
+        BattleCritter targetCritter = getBattleCS().getBattleUnit(targetTag);
 
         gui.actOnTellStrikeResults(wasCarry, strikeNumber, rolls, battleUnit,
             targetUnit);
@@ -2023,7 +2023,7 @@ public final class Client implements IClient, IOracle, IVariant
     public void setupBattleSummon(Player battleActivePlayer,
         int battleTurnNumber)
     {
-        getBattle().setupPhase(BattlePhase.SUMMON, battleActivePlayer,
+        getBattleCS().setupPhase(BattlePhase.SUMMON, battleActivePlayer,
             battleTurnNumber);
         gui.actOnSetupBattleSummon();
     }
@@ -2031,7 +2031,7 @@ public final class Client implements IClient, IOracle, IVariant
     public void setupBattleRecruit(Player battleActivePlayer,
         int battleTurnNumber)
     {
-        getBattle().setupPhase(BattlePhase.RECRUIT, battleActivePlayer,
+        getBattleCS().setupPhase(BattlePhase.RECRUIT, battleActivePlayer,
             battleTurnNumber);
         gui.actOnSetupBattleRecruit();
     }
@@ -2040,14 +2040,14 @@ public final class Client implements IClient, IOracle, IVariant
     {
         // TODO clean up order of stuff here
 
-        getBattle().setBattleActivePlayer(battleActivePlayer);
-        getBattle().setBattleTurnNumber(battleTurnNumber);
+        getBattleCS().setBattleActivePlayer(battleActivePlayer);
+        getBattleCS().setBattleTurnNumber(battleTurnNumber);
 
         // Just in case the other player started the battle
         // really quickly.
         gui.cleanupNegotiationDialogs();
-        getBattle().resetAllBattleMoves();
-        getBattle().setBattlePhase(BattlePhase.MOVE);
+        getBattleCS().resetAllBattleMoves();
+        getBattleCS().setBattlePhase(BattlePhase.MOVE);
 
         gui.actOnSetupBattleMove();
 
@@ -2095,16 +2095,16 @@ public final class Client implements IClient, IOracle, IVariant
         kickBattleMove();
     }
 
-    public BattleClientSide getBattle()
+    public BattleClientSide getBattleCS()
     {
-        return game.getBattle();
+        return game.getBattleCS();
     }
 
     /** Used for both strike and strikeback. */
     public void setupBattleFight(BattlePhase battlePhase,
         Player battleActivePlayer)
     {
-        getBattle().setupBattleFight(battlePhase, battleActivePlayer);
+        getBattleCS().setupBattleFight(battlePhase, battleActivePlayer);
         gui.actOnSetupBattleFight();
         doAutoStrikes();
     }
@@ -2239,7 +2239,7 @@ public final class Client implements IClient, IOracle, IVariant
                 markBattleMoveSuccessful(tag, endingHex);
             }
         }
-        BattleCritter battleUnit = getBattle().getBattleUnit(tag);
+        BattleCritter battleUnit = getBattleCS().getBattleUnit(tag);
         if (battleUnit != null)
         {
             battleUnit.setCurrentHex(endingHex);
@@ -2284,7 +2284,7 @@ public final class Client implements IClient, IOracle, IVariant
                 BattleHex neighbor = hex.getNeighbor(i);
                 if (neighbor != null)
                 {
-                    BattleCritter other = getBattle().getBattleUnit(neighbor);
+                    BattleCritter other = getBattleCS().getBattleUnit(neighbor);
                     if (other != null
                         && (other.isDefender() != battleUnit.isDefender())
                         && (countDead || !other.isDead()))
@@ -2336,13 +2336,13 @@ public final class Client implements IClient, IOracle, IVariant
     // TODO move to Battle
     public Set<BattleHex> findCrittersWithTargets()
     {
-        return getBattle().findCrittersWithTargets(this);
+        return getBattleCS().findCrittersWithTargets(this);
     }
 
     // TODO move to Battle
     public Set<BattleHex> findStrikes(int tag)
     {
-        return getBattle().findTargets(tag);
+        return getBattleCS().findTargets(tag);
     }
 
     // Mostly for SocketClientThread

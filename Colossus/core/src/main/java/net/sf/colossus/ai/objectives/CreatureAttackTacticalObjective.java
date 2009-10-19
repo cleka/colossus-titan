@@ -98,7 +98,7 @@ class CreatureAttackTacticalObjective extends AbstractTacticalObjective
 
                     for (BattleHex targetHex : targetHexes)
                     {
-                        BattleCritter target = client.getBattle()
+                        BattleCritter target = client.getBattleCS()
                             .getBattleUnit(targetHex);
 
                         // Reward being next to enemy titans.  (Banzai!)
@@ -126,8 +126,8 @@ class CreatureAttackTacticalObjective extends AbstractTacticalObjective
 
                         // Reward being next to an enemy that we can probably
                         // kill this turn.
-                        int dice = client.getBattle().getDice(critter, target, client);
-                        int strikeNum = client.getBattle().getStrikeNumber(
+                        int dice = client.getBattleCS().getDice(critter, target, client);
+                        int strikeNum = client.getBattleCS().getStrikeNumber(
                             critter, target, client);
                         double meanHits = Probs.meanHits(dice, strikeNum);
                         if (meanHits + target.getHits() >= target.getPower())
@@ -159,8 +159,8 @@ class CreatureAttackTacticalObjective extends AbstractTacticalObjective
 
                         // Penalize damage that we can take this turn,
                         {
-                            dice = client.getBattle().getDice(target, critter, client);
-                            strikeNum = client.getBattle().getStrikeNumber(
+                            dice = client.getBattleCS().getDice(target, critter, client);
+                            strikeNum = client.getBattleCS().getStrikeNumber(
                                 target, critter, client);
                             hitsExpected += Probs.meanHits(dice, strikeNum);
                         }
@@ -242,14 +242,14 @@ class CreatureAttackTacticalObjective extends AbstractTacticalObjective
                     boolean penalty = true;
                     for (BattleHex targetHex : targetHexes)
                     {
-                        BattleCritter target = client.getBattle()
+                        BattleCritter target = client.getBattleCS()
                             .getBattleUnit(targetHex);
                         if (target.isTitan())
                         {
                             value.add(bec.RANGESTRIKE_TITAN, desc
                                 + ": RangestrikeTitan");
                         }
-                        int strikeNum = client.getBattle().getStrikeNumber(
+                        int strikeNum = client.getBattleCS().getStrikeNumber(
                             critter, target, client);
                         if (strikeNum <= 4 - skill + target.getSkill())
                         {

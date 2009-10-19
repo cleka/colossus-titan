@@ -569,7 +569,7 @@ final class ClientHandler implements IClient
 
     private BattleHex resolveBattleHex(String hexLabel)
     {
-        return server.getGame().getBattle().getLocation().getTerrain()
+        return server.getGame().getBattleSS().getLocation().getTerrain()
             .getHexByLabel(hexLabel);
     }
 

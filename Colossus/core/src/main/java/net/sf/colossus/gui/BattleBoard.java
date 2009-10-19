@@ -400,7 +400,7 @@ public final class BattleBoard extends KFrame
                 if (isMovePhase())
                 {
                     if (!gui.getOptions().getOption(Options.autoPlay)
-                        && getGame().getBattle().anyOffboardCreatures()
+                        && getGame().getBattleCS().anyOffboardCreatures()
                         && !confirmLeavingCreaturesOffboard())
                     {
                         return;

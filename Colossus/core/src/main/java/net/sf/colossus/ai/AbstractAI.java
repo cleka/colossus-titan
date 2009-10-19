@@ -232,8 +232,8 @@ public abstract class AbstractAI implements AI
             for (BattleHex targetHex : set)
             {
                 BattleCritter target = getBattleUnit(targetHex);
-                int dice = client.getBattle().getDice(critter, target, client);
-                int strikeNumber = client.getBattle().getStrikeNumber(critter,
+                int dice = client.getBattleCS().getDice(critter, target, client);
+                int strikeNumber = client.getBattleCS().getStrikeNumber(critter,
                     target, client);
                 double h = Probs.meanHits(dice, strikeNumber);
                 if (map.containsKey(target))
@@ -751,7 +751,7 @@ public abstract class AbstractAI implements AI
     // TODO get directly, not via Client
     protected BattleUnit getBattleUnit(BattleHex hex)
     {
-        return client.getBattle().getBattleUnit(hex);
+        return client.getBattleCS().getBattleUnit(hex);
     }
 
     final public int countCreatureAccrossAllLegionFromPlayer(Creature creature)

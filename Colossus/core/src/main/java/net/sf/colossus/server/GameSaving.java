@@ -154,7 +154,7 @@ public class GameSaving
 
         // Battle stuff
 
-        if (game.isEngagementInProgress() && game.getBattle() != null)
+        if (game.isEngagementInProgress() && game.getBattleSS() != null)
         {
             /* Disabled until it works properly */
             boolean featureProperlyEnabled = false;
@@ -308,9 +308,9 @@ public class GameSaving
                 el
                     .addContent(dumpLegion(legion,
                         game.isBattleInProgress()
-                            && (legion == game.getBattle()
+                            && (legion == game.getBattleSS()
                                 .getAttackingLegion() || legion == game
-                                .getBattle().getDefendingLegion())));
+                                .getBattleSS().getDefendingLegion())));
             }
             root.addContent(el);
         }
@@ -320,23 +320,23 @@ public class GameSaving
     {
         Element bat = new Element("Battle");
 
-        bat.setAttribute("masterHexLabel", game.getBattle().getLocation()
+        bat.setAttribute("masterHexLabel", game.getBattleSS().getLocation()
             .getLabel());
-        bat.setAttribute("turnNumber", "" + game.getBattle().getTurnNumber());
+        bat.setAttribute("turnNumber", "" + game.getBattleSS().getTurnNumber());
         bat.setAttribute("activePlayer", ""
-            + game.getBattle().getActivePlayer().getName());
+            + game.getBattleSS().getActivePlayer().getName());
         bat.setAttribute("phase", ""
-            + game.getBattle().getBattlePhase().ordinal());
+            + game.getBattleSS().getBattlePhase().ordinal());
         bat
             .setAttribute("summonState", ""
-                + game.getBattle().getSummonState());
+                + game.getBattleSS().getSummonState());
         bat
             .setAttribute("carryDamage", ""
-                + game.getBattle().getCarryDamage());
+                + game.getBattleSS().getCarryDamage());
         bat.setAttribute("driftDamageApplied", ""
-            + game.getBattle().isDriftDamageApplied());
+            + game.getBattleSS().isDriftDamageApplied());
 
-        for (BattleHex hex : game.getBattle().getCarryTargets())
+        for (BattleHex hex : game.getBattleSS().getCarryTargets())
         {
             Element ct = new Element("CarryTarget");
             ct.addContent(hex.getLabel());

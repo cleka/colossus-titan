@@ -223,7 +223,7 @@ public class GameClientSide extends Game implements IOracle
         battle.init(battleTurnNumber, battleActivePlayer, battlePhase);
     }
 
-    public BattleClientSide getBattle()
+    public BattleClientSide getBattleCS()
     {
         return battle;
     }

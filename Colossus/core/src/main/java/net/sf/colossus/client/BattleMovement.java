@@ -45,7 +45,7 @@ final class BattleMovement
                     int reverseDir = (i + 3) % 6;
                     int entryCost;
 
-                    BattleCritter bogey = client.getBattle().getBattleUnit(
+                    BattleCritter bogey = client.getBattleCS().getBattleUnit(
                         neighbor);
                     if (bogey == null)
                     {

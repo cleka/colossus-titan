@@ -901,9 +901,9 @@ public final class Server extends Thread implements IServer
 
     private boolean isBattleActivePlayer()
     {
-        return game.getBattle() != null
-            && game.getBattle().getActivePlayer() != null
-            && getPlayer().equals(game.getBattle().getActivePlayer());
+        return game.getBattleSS() != null
+            && game.getBattleSS().getActivePlayer() != null
+            && getPlayer().equals(game.getBattleSS().getActivePlayer());
     }
 
     /**
@@ -1252,7 +1252,7 @@ public final class Server extends Thread implements IServer
                 + " illegally called leaveCarryMode()");
             return;
         }
-        BattleServerSide battle = game.getBattle();
+        BattleServerSide battle = game.getBattleSS();
         battle.leaveCarryMode();
     }
 
@@ -1267,7 +1267,7 @@ public final class Server extends Thread implements IServer
             return;
         }
 
-        BattleServerSide battle = game.getBattle();
+        BattleServerSide battle = game.getBattleSS();
         if (!battle.getBattlePhase().isMovePhase())
         {
             LOGGER.severe(getPlayerName()
@@ -1283,7 +1283,7 @@ public final class Server extends Thread implements IServer
 
     public void doneWithStrikes()
     {
-        BattleServerSide battle = game.getBattle();
+        BattleServerSide battle = game.getBattleSS();
         if (!isBattleActivePlayer())
         {
             LOGGER.severe(getPlayerName()
@@ -1482,7 +1482,7 @@ public final class Server extends Thread implements IServer
 
     void allSetupBattleSummon()
     {
-        BattleServerSide battle = game.getBattle();
+        BattleServerSide battle = game.getBattleSS();
         for (IClient client : clients)
         {
             client.setupBattleSummon(battle.getActivePlayer(), battle
@@ -1492,7 +1492,7 @@ public final class Server extends Thread implements IServer
 
     void allSetupBattleRecruit()
     {
-        BattleServerSide battle = game.getBattle();
+        BattleServerSide battle = game.getBattleSS();
         for (IClient client : clients)
         {
             client.setupBattleRecruit(battle.getActivePlayer(), battle
@@ -1502,7 +1502,7 @@ public final class Server extends Thread implements IServer
 
     void allSetupBattleMove()
     {
-        BattleServerSide battle = game.getBattle();
+        BattleServerSide battle = game.getBattleSS();
         for (IClient client : clients)
         {
             client.setupBattleMove(battle.getActivePlayer(), battle
@@ -1512,7 +1512,7 @@ public final class Server extends Thread implements IServer
 
     void allSetupBattleFight()
     {
-        BattleServerSide battle = game.getBattle();
+        BattleServerSide battle = game.getBattleSS();
         for (IClient client : clients)
         {
             if (battle != null)
@@ -1528,7 +1528,7 @@ public final class Server extends Thread implements IServer
         for (IClient client : clients)
         {
             client.placeNewChit(critter.getName(), critter.getLegion().equals(
-                game.getBattle().getDefendingLegion()), critter.getTag(),
+                game.getBattleSS().getDefendingLegion()), critter.getTag(),
                 critter.getCurrentHex());
         }
     }
@@ -1679,9 +1679,9 @@ public final class Server extends Thread implements IServer
         // Need to always call this to keep game from hanging.
         if (game.getPhase() == Phase.FIGHT)
         {
-            if (game.getBattle() != null)
+            if (game.getBattleSS() != null)
             {
-                game.getBattle().doneReinforcing();
+                game.getBattleSS().doneReinforcing();
             }
             else
             {
@@ -1853,7 +1853,7 @@ public final class Server extends Thread implements IServer
             client.nak(Constants.doBattleMove, "Wrong player");
             return;
         }
-        boolean moved = game.getBattle().doMove(tag, hex);
+        boolean moved = game.getBattleSS().doMove(tag, hex);
         if (!moved)
         {
             LOGGER.severe("Battle move failed");
@@ -1881,7 +1881,7 @@ public final class Server extends Thread implements IServer
             client.nak(Constants.strike, "Wrong player");
             return;
         }
-        BattleServerSide battle = game.getBattle();
+        BattleServerSide battle = game.getBattleSS();
         if (battle == null)
         {
             LOGGER.severe("null battle in Server.strike()");
@@ -1935,7 +1935,7 @@ public final class Server extends Thread implements IServer
                 .severe(getPlayerName() + " illegally called applyCarries()");
             return;
         }
-        BattleServerSide battle = game.getBattle();
+        BattleServerSide battle = game.getBattleSS();
         CreatureServerSide ourTarget = battle.getCritter(hex);
         battle.applyCarries(ourTarget);
     }
@@ -1948,7 +1948,7 @@ public final class Server extends Thread implements IServer
                 + " illegally called undoBattleMove()");
             return;
         }
-        game.getBattle().undoMove(hex);
+        game.getBattleSS().undoMove(hex);
     }
 
     void allTellStrikeResults(CreatureServerSide striker,
@@ -2018,7 +2018,7 @@ public final class Server extends Thread implements IServer
     /** Takes a Set of PenaltyOptions. */
     void askChooseStrikePenalty(SortedSet<PenaltyOption> penaltyOptions)
     {
-        Player player = game.getBattle().getActivePlayer();
+        Player player = game.getBattleSS().getActivePlayer();
         IClient client = getClient(player);
         List<String> choices = new ArrayList<String>();
         Iterator<PenaltyOption> it = penaltyOptions.iterator();
@@ -2055,7 +2055,7 @@ public final class Server extends Thread implements IServer
 
     void allInitBattle(MasterHex masterHex)
     {
-        BattleServerSide battle = game.getBattle();
+        BattleServerSide battle = game.getBattleSS();
         Iterator<IClient> it = clients.iterator();
         while (it.hasNext())
         {
