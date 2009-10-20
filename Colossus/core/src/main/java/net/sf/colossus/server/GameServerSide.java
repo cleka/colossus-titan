@@ -1578,8 +1578,8 @@ public final class GameServerSide extends Game
                     activeLegionTag = BattleServerSide.LegionTags.DEFENDER;
                 }
 
-                battle = new BattleServerSide(this, attacker, defender,
-                    activeLegionTag, engagementHex, battlePhase);
+                createBattle(attacker, defender, activeLegionTag, engagementHex,
+                    battlePhase);
                 getBattleSS().setBattleTurnNumber(battleTurnNum);
                 getBattleSS().setSummonState(summonState);
                 getBattleSS().setCarryDamage(carryDamage);
@@ -1630,6 +1630,14 @@ public final class GameServerSide extends Game
             dispose();
             return false;
         }
+    }
+
+    public void createBattle(Legion attacker, Legion defender,
+        BattleServerSide.LegionTags activeLegionTag, MasterHex engagementHex,
+        BattlePhase battlePhase)
+    {
+        battle = new BattleServerSide(this, attacker, defender,
+            activeLegionTag, engagementHex, battlePhase);
     }
 
     // JDOM lacks generics, so we need casts
@@ -2911,8 +2919,8 @@ public final class GameServerSide extends Game
             server.allRevealEngagedLegion(defender, false,
                 Constants.reasonBattleStarts);
 
-            battle = new BattleServerSide(this, attacker, defender,
-                BattleServerSide.LegionTags.DEFENDER, hex, BattlePhase.MOVE);
+            createBattle(attacker, defender, BattleServerSide.LegionTags.DEFENDER, hex,
+                BattlePhase.MOVE);
             getBattleSS().init();
         }
     }

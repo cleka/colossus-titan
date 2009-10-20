@@ -113,8 +113,9 @@ public class LOSTest extends TestCase
 
         attacker.setEntrySide(EntrySide.RIGHT);
 
-        battle = new BattleServerSide(game, attacker, defender,
+        game.createBattle(attacker, defender,
             BattleServerSide.LegionTags.ATTACKER, hex, BattlePhase.FIGHT);
+        battle = game.getBattleSS();
 
         Creature centaur1 = defender.getCritter(0);
         Creature gargoyle1 = defender.getCritter(1);
@@ -157,8 +158,9 @@ public class LOSTest extends TestCase
 
         attacker.setEntrySide(EntrySide.LEFT);
 
-        battle = new BattleServerSide(game, attacker, defender,
+        game.createBattle(attacker, defender,
             BattleServerSide.LegionTags.ATTACKER, hex, BattlePhase.FIGHT);
+        battle = game.getBattleSS();
 
         Creature centaur1 = defender.getCritter(0);
         Creature centaur2 = defender.getCritter(1);
@@ -301,8 +303,9 @@ public class LOSTest extends TestCase
 
         attacker.setEntrySide(EntrySide.BOTTOM);
 
-        battle = new BattleServerSide(game, attacker, defender,
+        game.createBattle(attacker, defender,
             BattleServerSide.LegionTags.ATTACKER, hex, BattlePhase.FIGHT);
+        battle = game.getBattleSS();
 
         Creature centaur1 = defender.getCritter(0);
         Creature lion1 = defender.getCritter(1);
@@ -432,8 +435,9 @@ public class LOSTest extends TestCase
 
         attacker.setEntrySide(EntrySide.BOTTOM);
 
-        battle = new BattleServerSide(game, attacker, defender,
+        game.createBattle(attacker, defender,
             BattleServerSide.LegionTags.ATTACKER, hex, BattlePhase.FIGHT);
+        battle = game.getBattleSS();
 
         Creature centaur1 = defender.getCritter(0);
         Creature centaur2 = defender.getCritter(1);
@@ -547,8 +551,9 @@ public class LOSTest extends TestCase
 
         attacker.setEntrySide(EntrySide.LEFT);
 
-        battle = new BattleServerSide(game, attacker, defender,
+        game.createBattle(attacker, defender,
             BattleServerSide.LegionTags.ATTACKER, hex, BattlePhase.FIGHT);
+        battle = game.getBattleSS();
 
         Creature troll1 = defender.getCritter(0);
         Creature troll2 = defender.getCritter(1);
@@ -637,8 +642,9 @@ public class LOSTest extends TestCase
 
         attacker.setEntrySide(EntrySide.LEFT);
 
-        battle = new BattleServerSide(game, attacker, defender,
+        game.createBattle(attacker, defender,
             BattleServerSide.LegionTags.ATTACKER, hex, BattlePhase.FIGHT);
+        battle = game.getBattleSS();
 
         Creature dragon1 = defender.getCritter(0);
         Creature dragon2 = defender.getCritter(1);
@@ -726,8 +732,9 @@ public class LOSTest extends TestCase
 
         attacker.setEntrySide(EntrySide.LEFT);
 
-        battle = new BattleServerSide(game, attacker, defender,
+        game.createBattle(attacker, defender,
             BattleServerSide.LegionTags.ATTACKER, hex, BattlePhase.FIGHT);
+        battle = game.getBattleSS();
 
         Creature hydra1 = defender.getCritter(0);
         CreatureServerSide hydra2 = attacker.getCritter(0);
@@ -759,8 +766,9 @@ public class LOSTest extends TestCase
 
         attacker.setEntrySide(EntrySide.RIGHT);
 
-        battle = new BattleServerSide(game, attacker, defender,
+        game.createBattle(attacker, defender,
             BattleServerSide.LegionTags.ATTACKER, hex, BattlePhase.FIGHT);
+        battle = game.getBattleSS();
 
         Creature hydra = defender.getCritter(0);
         Creature ranger = attacker.getCritter(0);
@@ -794,8 +802,9 @@ public class LOSTest extends TestCase
 
         attacker.setEntrySide(EntrySide.BOTTOM);
 
-        battle = new BattleServerSide(game, attacker, defender,
+        game.createBattle(attacker, defender,
             BattleServerSide.LegionTags.ATTACKER, hex, BattlePhase.FIGHT);
+        battle = game.getBattleSS();
 
         Creature ranger2 = defender.getCritter(3);
 
