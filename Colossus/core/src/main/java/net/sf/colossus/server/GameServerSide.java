@@ -17,6 +17,7 @@ import java.util.logging.Logger;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.Client.ConnectionInitException;
 import net.sf.colossus.common.Constants;
+import net.sf.colossus.common.IOptions;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.common.WhatNextManager;
 import net.sf.colossus.common.WhatNextManager.WhatToDoNext;
@@ -3315,6 +3316,11 @@ public final class GameServerSide extends Game
         player.rollMovement();
         server.kickPhase();
         return player.getMovementRoll();
+    }
+
+    IOptions getOptions()
+    {
+        return options;
     }
 
     boolean getOption(String optname)

@@ -11,7 +11,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.common.Constants;
-import net.sf.colossus.common.Options;
 import net.sf.colossus.game.Battle;
 import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.BattlePhase;
@@ -20,7 +19,6 @@ import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.actions.SummonUndo;
 import net.sf.colossus.variant.BattleHex;
-import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 
 
@@ -67,6 +65,8 @@ public final class BattleServerSide extends Battle
     private final PhaseAdvancer phaseAdvancer = new BattlePhaseAdvancer();
     private int pointsScored = 0;
 
+    private final BattleMovementServerSide battleMovement;
+
     BattleServerSide(GameServerSide game, Legion attacker, Legion defender,
         LegionTags activeLegionTag, MasterHex masterHex, BattlePhase phase)
     {
@@ -75,6 +75,9 @@ public final class BattleServerSide extends Battle
         this.server = game.getServer();
         this.activeLegionTag = activeLegionTag;
         this.phase = phase;
+
+        this.battleMovement = new BattleMovementServerSide(game.getOptions(),
+            getGame());
 
         // Set defender's entry side opposite attacker's.
         defender.setEntrySide(attacker.getEntrySide().getOpposingSide());
@@ -185,6 +188,12 @@ public final class BattleServerSide extends Battle
     public GameServerSide getGame()
     {
         return (GameServerSide)super.getGame();
+    }
+
+    // TODO perhaps temporary, only for BattleMovementServerSide right now
+    public boolean isDefenderActive()
+    {
+        return activeLegionTag == LegionTags.DEFENDER;
     }
 
     @Override
@@ -480,121 +489,6 @@ public final class BattleServerSide extends Battle
     void setCarryDamage(int carryDamage)
     {
         this.carryDamage = carryDamage;
-    }
-
-    /** Recursively find moves from this hex.  Return a set of string hex IDs
-     *  for all legal destinations.  Do not double back.  If ignoreMobileAllies
-     *  is true, pretend that allied creatures that can move out of the
-     *  way are not there. */
-    private Set<BattleHex> findMoves(BattleHex hex,
-        CreatureServerSide critter, boolean flies, int movesLeft,
-        int cameFrom, boolean ignoreMobileAllies, boolean first)
-    {
-        Set<BattleHex> set = new HashSet<BattleHex>();
-        for (int i = 0; i < 6; i++)
-        {
-            // Do not double back.
-            if (i != cameFrom)
-            {
-                BattleHex neighbor = hex.getNeighbor(i);
-                if (neighbor != null)
-                {
-                    int reverseDir = (i + 3) % 6;
-                    int entryCost;
-
-                    CreatureServerSide bogey = getCreatureSS(neighbor);
-                    if (bogey == null
-                        || (ignoreMobileAllies
-                            && bogey.getMarkerId().equals(
-                                critter.getMarkerId()) && !bogey
-                            .isInContact(false)))
-                    {
-                        entryCost = neighbor.getEntryCost(critter.getType(),
-                            reverseDir, getGame().getOption(
-                                Options.cumulativeSlow));
-                    }
-                    else
-                    {
-                        entryCost = BattleHex.IMPASSIBLE_COST;
-                    }
-
-                    if ((entryCost != BattleHex.IMPASSIBLE_COST)
-                        && ((entryCost <= movesLeft) || (first && getGame()
-                            .getOption(Options.oneHexAllowed))))
-                    {
-                        // Mark that hex as a legal move.
-                        set.add(neighbor);
-
-                        // If there are movement points remaining, continue
-                        // checking moves from there.  Fliers skip this
-                        // because flying is more efficient.
-                        if (!flies && movesLeft > entryCost)
-                        {
-                            set.addAll(findMoves(neighbor, critter, flies,
-                                movesLeft - entryCost, reverseDir,
-                                ignoreMobileAllies, false));
-                        }
-                    }
-
-                    // Fliers can fly over any hex for 1 movement point,
-                    // but some Hex cannot be flown over by some creatures.
-                    if (flies && movesLeft > 1
-                        && neighbor.canBeFlownOverBy(critter.getType()))
-                    {
-                        set.addAll(findMoves(neighbor, critter, flies,
-                            movesLeft - 1, reverseDir, ignoreMobileAllies,
-                            false));
-                    }
-                }
-            }
-        }
-        return set;
-    }
-
-    /** This method is called by the defender on turn 1 in a
-     *  Startlisted Terrain,
-     *  so we know that there are no enemies on board, and all allies
-     *  are mobile.
-     */
-    private Set<BattleHex> findUnoccupiedStartlistHexes(
-        boolean ignoreMobileAllies, MasterBoardTerrain terrain)
-    {
-        assert terrain != null;
-        Set<BattleHex> set = new HashSet<BattleHex>();
-        for (String hexLabel : terrain.getStartList())
-        {
-            BattleHex hex = terrain.getHexByLabel(hexLabel);
-            if (ignoreMobileAllies || !isOccupied(hex))
-            {
-                set.add(hex);
-            }
-        }
-        return set;
-    }
-
-    /**
-     * Find all legal moves for this critter.
-     */
-    private Set<BattleHex> showMoves(CreatureServerSide critter,
-        boolean ignoreMobileAllies)
-    {
-        Set<BattleHex> set = new HashSet<BattleHex>();
-        if (!critter.hasMoved() && !critter.isInContact(false))
-        {
-            if (getLocation().getTerrain().hasStartList() && (battleTurnNumber == 1)
-                && activeLegionTag == LegionTags.DEFENDER)
-            {
-                set = findUnoccupiedStartlistHexes(ignoreMobileAllies,
-                    getLocation().getTerrain());
-            }
-            else
-            {
-                set = findMoves(critter.getCurrentHex(), critter, critter
-                    .isFlier(), critter.getSkill(), -1, ignoreMobileAllies,
-                    true);
-            }
-        }
-        return set;
     }
 
     void undoMove(BattleHex hex)
@@ -1128,7 +1022,7 @@ public final class BattleServerSide extends Battle
             critter.moveToHex(hex, true);
             return true;
         }
-        else if (showMoves(critter, false).contains(hex))
+        else if (battleMovement.showMoves(critter, false).contains(hex))
         {
             LOGGER
                 .log(Level.INFO, critter.getName() + " moves from "
