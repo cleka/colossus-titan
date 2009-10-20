@@ -232,9 +232,9 @@ public abstract class AbstractAI implements AI
             for (BattleHex targetHex : set)
             {
                 BattleCritter target = getBattleUnit(targetHex);
-                int dice = client.getBattleCS().getDice(critter, target, client);
+                int dice = client.getBattleCS().getDice(critter, target);
                 int strikeNumber = client.getBattleCS().getStrikeNumber(critter,
-                    target, client);
+                    target);
                 double h = Probs.meanHits(dice, strikeNumber);
                 if (map.containsKey(target))
                 {

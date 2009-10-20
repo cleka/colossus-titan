@@ -134,7 +134,7 @@ public class CreatureServerSide extends Creature implements BattleCritter
                 BattleHex neighbor = hex.getNeighbor(i);
                 if (neighbor != null)
                 {
-                    CreatureServerSide other = battle.getCritter(neighbor);
+                    CreatureServerSide other = battle.getCreatureSS(neighbor);
                     if (other != null && other.getPlayer() != getPlayer()
                         && (countDead || !other.isDead()))
                     {
@@ -167,7 +167,7 @@ public class CreatureServerSide extends Creature implements BattleCritter
                 BattleHex neighbor = hex.getNeighbor(i);
                 if (neighbor != null)
                 {
-                    CreatureServerSide other = battle.getCritter(neighbor);
+                    CreatureServerSide other = battle.getCreatureSS(neighbor);
                     if (other != null && other.getPlayer() != getPlayer()
                         && (countDead || !other.isDead()))
                     {
@@ -658,7 +658,7 @@ public class CreatureServerSide extends Creature implements BattleCritter
         final int dice = getDice(target);
         final int strikeNumber = getStrikeNumber(target);
 
-        CreatureServerSide victim = battle.getCritter(neighbor);
+        CreatureServerSide victim = battle.getCreatureSS(neighbor);
         if (victim == null || victim.getPlayer() == getPlayer()
             || victim.isDead())
         {

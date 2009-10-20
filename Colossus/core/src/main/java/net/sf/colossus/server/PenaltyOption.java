@@ -154,7 +154,7 @@ final class PenaltyOption implements Comparable<PenaltyOption>
                     sb.append(", ");
                 }
                 first = false;
-                CreatureServerSide critter = striker.getBattle().getCritter(
+                CreatureServerSide critter = striker.getBattle().getCreatureSS(
                     hex);
                 sb.append(critter.getDescription());
             }

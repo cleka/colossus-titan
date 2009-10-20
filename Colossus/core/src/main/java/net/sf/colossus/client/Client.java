@@ -364,7 +364,6 @@ public final class Client implements IClient, IOracle, IVariant
         this.ai = createAI(playerType);
 
         this.movement = new Movement(this);
-        this.battleMovement = new BattleMovement(this);
 
         ViableEntityManager.register(this, "Client " + playerName);
         InstanceTracker.register(this, "Client " + playerName);
@@ -389,6 +388,8 @@ public final class Client implements IClient, IOracle, IVariant
         // And it needs to be in place already when the pickColor and
         // pickMarker requests come from server:
         options.setOption(Options.autoPlay, this.owningPlayer.isAI());
+
+        this.battleMovement = new BattleMovement(options, game);
 
         this.server = connection.getIServer();
 
@@ -1436,12 +1437,6 @@ public final class Client implements IClient, IOracle, IVariant
         server.makeProposal(proposal.toString());
     }
 
-    // TODO move to Battle / BattleClientSide
-    public boolean isOccupied(BattleHex hex)
-    {
-        return !getBattleCS().getBattleUnits(hex).isEmpty();
-    }
-
     public void tellStrikeResults(int strikerTag, int targetTag,
         int strikeNumber, List<String> rolls, int damage, boolean killed,
         boolean wasCarry, int carryDamageLeft,
@@ -2131,11 +2126,6 @@ public final class Client implements IClient, IOracle, IVariant
         return game.getBattleActivePlayer();
     }
 
-    Legion getBattleActiveLegion()
-    {
-        return game.getBattleActiveLegion();
-    }
-
     public Engagement getEngagement()
     {
         return game.getEngagement();
@@ -2158,11 +2148,7 @@ public final class Client implements IClient, IOracle, IVariant
     // public for IOracle
     public MasterHex getBattleSite()
     {
-        if (game.getEngagement() == null)
-        {
-            return null;
-        }
-        return game.getEngagement().getLocation();
+        return game.getBattleSite();
     }
 
     public BattlePhase getBattlePhase()
@@ -2263,39 +2249,9 @@ public final class Client implements IClient, IOracle, IVariant
         gui.actOnApplyCarries(hex);
     }
 
-    // TODO move to Battle
-    /** Return true if there are any enemies adjacent to this battleChit.
-     *  Dead critters count as being in contact only if countDead is true. */
-    public boolean isInContact(BattleCritter battleUnit, boolean countDead)
+    public boolean isInContact(BattleCritter critter, boolean countDead)
     {
-        BattleHex hex = battleUnit.getCurrentHex();
-
-        // Offboard creatures are not in contact.
-        if (hex.isEntrance())
-        {
-            return false;
-        }
-
-        for (int i = 0; i < 6; i++)
-        {
-            // Adjacent creatures separated by a cliff are not in contact.
-            if (!hex.isCliff(i))
-            {
-                BattleHex neighbor = hex.getNeighbor(i);
-                if (neighbor != null)
-                {
-                    BattleCritter other = getBattleCS().getBattleUnit(neighbor);
-                    if (other != null
-                        && (other.isDefender() != battleUnit.isDefender())
-                        && (countDead || !other.isDead()))
-                    {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
+        return game.getBattleCS().isInContact(critter, countDead);
     }
 
     // TODO move to Battle
@@ -2303,11 +2259,11 @@ public final class Client implements IClient, IOracle, IVariant
     public Set<BattleHex> findMobileCritterHexes()
     {
         Set<BattleHex> set = new HashSet<BattleHex>();
-        for (BattleCritter battleUnit : getActiveBattleUnits())
+        for (BattleCritter critter : getActiveBattleUnits())
         {
-            if (!battleUnit.hasMoved() && !isInContact(battleUnit, false))
+            if (!critter.hasMoved() && !isInContact(critter, false))
             {
-                set.add(battleUnit.getCurrentHex());
+                set.add(critter.getCurrentHex());
             }
         }
         return set;

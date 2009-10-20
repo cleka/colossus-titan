@@ -1,6 +1,7 @@
 package net.sf.colossus.game;
 
 
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,6 +25,8 @@ abstract public class Battle
     protected final Legion defender;
     private final MasterHex location;
 
+    protected int battleTurnNumber;
+
     public Battle(Game game, Legion attacker, Legion defender,
         MasterHex location)
     {
@@ -31,6 +34,7 @@ abstract public class Battle
         this.attacker = attacker;
         this.defender = defender;
         this.location = location;
+        this.battleTurnNumber = 1;
     }
 
     public Game getGame()
@@ -48,6 +52,14 @@ abstract public class Battle
         return defender;
     }
 
+    public abstract Legion getBattleActiveLegion();
+
+    /** Get all BattleCritters / BattleUnits
+     *  Abstract because currently implementation is different, but needed
+     *  on both side, e.g. for BattleMovement
+     */
+    protected abstract List<BattleCritter> getAllCritters();
+
     /** Whether the hex is occupied by a critter/creature/chit/...
      * This is abstract because the specific information about critter/...
      * is currently kept in the subclass, but this information is required
@@ -55,7 +67,7 @@ abstract public class Battle
      * @param hex The hex whose occupancy is being checked
      * @return Whether the hex is occupied by a critter/creature/chit/...
      */
-    abstract protected boolean isOccupied(BattleHex hex);
+    abstract public boolean isOccupied(BattleHex hex);
 
     /**
      * Caller must ensure that yDist != 0
@@ -771,4 +783,17 @@ abstract public class Battle
     {
         return location;
     }
+
+    public void setBattleTurnNumber(int battleTurnNumber)
+    {
+        this.battleTurnNumber = battleTurnNumber;
+    }
+
+    public int getBattleTurnNumber()
+    {
+        return battleTurnNumber;
+    }
+
+    public abstract boolean isInContact(BattleCritter striker,
+        boolean countDead);
 }

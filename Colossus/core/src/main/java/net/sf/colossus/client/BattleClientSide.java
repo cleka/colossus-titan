@@ -53,7 +53,6 @@ public class BattleClientSide extends Battle
         .getLogger(BattleClientSide.class.getName());
 
     private BattlePhase battlePhase;
-    private int battleTurnNumber = -1;
     private Player battleActivePlayer;
 
     private final List<BattleUnit> battleUnits = new ArrayList<BattleUnit>();
@@ -80,11 +79,11 @@ public class BattleClientSide extends Battle
     }
 
     @Override
-    protected boolean isOccupied(BattleHex hex)
+    public boolean isOccupied(BattleHex hex)
     {
-        for (BattleCritter battleUnit : getBattleUnits())
+        for (BattleCritter critter : getBattleUnits())
         {
-            if (battleUnit.getCurrentHex().equals(hex))
+            if (hex.equals(critter.getCurrentHex()))
             {
                 return true;
             }
@@ -96,16 +95,6 @@ public class BattleClientSide extends Battle
     public GameClientSide getGameClientSide()
     {
         return (GameClientSide)game;
-    }
-
-    public void setBattleTurnNumber(int battleTurnNumber)
-    {
-        this.battleTurnNumber = battleTurnNumber;
-    }
-
-    public int getBattleTurnNumber()
-    {
-        return battleTurnNumber;
     }
 
     public Player getBattleActivePlayer()
@@ -122,6 +111,7 @@ public class BattleClientSide extends Battle
         battleActivePlayer = ((GameClientSide)game).getNoonePlayer();
     }
 
+    @Override
     public Legion getBattleActiveLegion()
     {
         if (battleActivePlayer.equals(getDefendingLegion().getPlayer()))
@@ -199,9 +189,9 @@ public class BattleClientSide extends Battle
 
     public boolean anyOffboardCreatures()
     {
-        for (BattleCritter battleUnit : getActiveBattleUnits())
+        for (BattleCritter critter : getActiveBattleUnits())
         {
-            if (battleUnit.getCurrentHex().getLabel().startsWith("X"))
+            if (critter.getCurrentHex().getLabel().startsWith("X"))
             {
                 return true;
             }
@@ -235,6 +225,17 @@ public class BattleClientSide extends Battle
                             .getPlayerByTag(battleUnit.getTag()));
                 }
             });
+    }
+
+    @Override
+    public List<BattleCritter> getAllCritters()
+    {
+        List<BattleCritter> critters = new ArrayList<BattleCritter>();
+        for (BattleCritter critter : getBattleUnits())
+        {
+            critters.add(critter);
+        }
+        return critters;
     }
 
     public List<BattleUnit> getBattleUnits()
@@ -315,16 +316,17 @@ public class BattleClientSide extends Battle
      *  WARNING: this is duplicated in CreatureServerSide
      *  (moved from Strike to here)
      */
-    public int getDice(BattleCritter battleUnit, BattleCritter target,
-        Client client)
+    public int getDice(BattleCritter striker, BattleCritter target)
     {
-        BattleHex hex = battleUnit.getCurrentHex();
+        BattleHex hex = striker.getCurrentHex();
         BattleHex targetHex = target.getCurrentHex();
-        CreatureType striker = battleUnit.getCreatureType();
+        // TODO when BattleCritter / BattleUnit would extend Creature,
+        // could ask directly instead of this helper variable
+        CreatureType strikerCreType = striker.getCreatureType();
 
-        int dice = battleUnit.getPower();
+        int dice = striker.getPower();
 
-        boolean rangestrike = !client.isInContact(battleUnit, true);
+        boolean rangestrike = !isInContact(striker, true);
         HazardTerrain terrain = hex.getTerrain();
         if (rangestrike)
         {
@@ -333,7 +335,7 @@ public class BattleClientSide extends Battle
 
             // volcanoNative rangestriking from volcano: +2
             if (terrain.equals(HazardTerrain.VOLCANO)
-                && striker.isNativeIn(terrain))
+                && strikerCreType.isNativeIn(terrain))
             {
                 dice += 2;
             }
@@ -343,7 +345,7 @@ public class BattleClientSide extends Battle
             // Dice can be modified by terrain.
             // volcanoNative striking from volcano: +2
             if (terrain.equals(HazardTerrain.VOLCANO)
-                && striker.isNativeIn(terrain))
+                && strikerCreType.isNativeIn(terrain))
             {
                 dice += 2;
             }
@@ -353,17 +355,18 @@ public class BattleClientSide extends Battle
             HazardHexside hazard = hex.getHexsideHazard(direction);
 
             // Native striking down a dune hexside: +2
-            if (hazard == HazardHexside.DUNE && striker.isNativeDune())
+            if (hazard == HazardHexside.DUNE && strikerCreType.isNativeDune())
             {
                 dice += 2;
             }
             // Native striking down a slope hexside: +1
-            else if (hazard == HazardHexside.SLOPE && striker.isNativeSlope())
+            else if (hazard == HazardHexside.SLOPE
+                && strikerCreType.isNativeSlope())
             {
                 dice++;
             }
             // Non-native striking up a dune hexside: -1
-            else if (!striker.isNativeDune()
+            else if (!strikerCreType.isNativeDune()
                 && hex.getOppositeHazard(direction) == HazardHexside.DUNE)
             {
                 dice--;
@@ -378,14 +381,14 @@ public class BattleClientSide extends Battle
      *  (moved from Strike to here)
      */
     @SuppressWarnings("deprecation")
-    private int getAttackerSkill(BattleCritter striker, BattleCritter target, Client client)
+    private int getAttackerSkill(BattleCritter striker, BattleCritter target)
     {
         BattleHex hex = striker.getCurrentHex();
         BattleHex targetHex = target.getCurrentHex();
 
         int attackerSkill = striker.getSkill();
 
-        boolean rangestrike = !client.isInContact(striker, true);
+        boolean rangestrike = !isInContact(striker, true);
 
         // Skill can be modified by terrain.
         if (!rangestrike)
@@ -465,12 +468,11 @@ public class BattleClientSide extends Battle
     /** WARNING: this is duplicated in CreatureServerSide
      *  (moved from Strike to here)
      */
-    public int getStrikeNumber(BattleCritter striker, BattleCritter target,
-        Client client)
+    public int getStrikeNumber(BattleCritter striker, BattleCritter target)
     {
-        boolean rangestrike = !client.isInContact(striker, true);
+        boolean rangestrike = !isInContact(striker, true);
 
-        int attackerSkill = getAttackerSkill(striker, target, client);
+        int attackerSkill = getAttackerSkill(striker, target);
         int defenderSkill = target.getSkill();
 
         int strikeNumber = 4 - attackerSkill + defenderSkill;
@@ -692,14 +694,14 @@ public class BattleClientSide extends Battle
      * TODO can they be unified? Or move to e.g. some class in ai.helper package?
      */
     @Deprecated
-    public int minRangeToEnemy(BattleCritter battleUnit)
+    public int minRangeToEnemy(BattleCritter critter)
     {
-        BattleHex hex = battleUnit.getCurrentHex();
+        BattleHex hex = critter.getCurrentHex();
         int min = Constants.OUT_OF_RANGE;
 
         for (BattleCritter target : getBattleUnits())
         {
-            if (battleUnit.isDefender() != target.isDefender())
+            if (critter.isDefender() != target.isDefender())
             {
                 BattleHex targetHex = target.getCurrentHex();
                 int range = Battle.getRange(hex, targetHex, false);
@@ -715,6 +717,42 @@ public class BattleClientSide extends Battle
             }
         }
         return min;
+    }
+
+    // TODO pull up to game.Battle
+    /** Return true if there are any enemies adjacent to this battleChit.
+     *  Dead critters count as being in contact only if countDead is true. */
+    @Override
+    public boolean isInContact(BattleCritter striker, boolean countDead)
+    {
+        BattleHex hex = striker.getCurrentHex();
+
+        // Offboard creatures are not in contact.
+        if (hex.isEntrance())
+        {
+            return false;
+        }
+
+        for (int i = 0; i < 6; i++)
+        {
+            // Adjacent creatures separated by a cliff are not in contact.
+            if (!hex.isCliff(i))
+            {
+                BattleHex neighbor = hex.getNeighbor(i);
+                if (neighbor != null)
+                {
+                    BattleCritter other = getBattleUnit(neighbor);
+                    if (other != null
+                        && (other.isDefender() != striker.isDefender())
+                        && (countDead || !other.isDead()))
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
 }

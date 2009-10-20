@@ -431,8 +431,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         {
             GUIBattleChit targetChit = getGUIBattleChit(targetHex);
             BattleUnit target = targetChit.getBattleUnit();
-            int strikeNr = client.getBattleCS().getStrikeNumber(striker, target,
-                client);
+            int strikeNr = client.getBattleCS().getStrikeNumber(striker, target);
             targetChit.setStrikeNumber(strikeNr);
         }
     }

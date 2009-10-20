@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.game.Battle;
+import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
@@ -49,7 +50,6 @@ public final class BattleServerSide extends Battle
 
     private Server server;
     private LegionTags activeLegionTag;
-    private int turnNumber;
     private BattlePhase phase;
     private AngelSummoningStates summonState = AngelSummoningStates.NO_KILLS;
     private int carryDamage;
@@ -68,14 +68,12 @@ public final class BattleServerSide extends Battle
     private int pointsScored = 0;
 
     BattleServerSide(GameServerSide game, Legion attacker, Legion defender,
-        LegionTags activeLegionTag, MasterHex masterHex, int turnNumber,
-        BattlePhase phase)
+        LegionTags activeLegionTag, MasterHex masterHex, BattlePhase phase)
     {
         super(game, attacker, defender, masterHex);
 
         this.server = game.getServer();
         this.activeLegionTag = activeLegionTag;
-        this.turnNumber = turnNumber;
         this.phase = phase;
 
         // Set defender's entry side opposite attacker's.
@@ -189,9 +187,15 @@ public final class BattleServerSide extends Battle
         return (GameServerSide)super.getGame();
     }
 
+    @Override
+    public Legion getBattleActiveLegion()
+    {
+        return getLegion(activeLegionTag);
+    }
+
     Player getActivePlayer()
     {
-        return getLegion(activeLegionTag).getPlayer();
+        return getBattleActiveLegion().getPlayer();
     }
 
     /**
@@ -238,11 +242,6 @@ public final class BattleServerSide extends Battle
     BattlePhase getBattlePhase()
     {
         return phase;
-    }
-
-    int getTurnNumber()
-    {
-        return turnNumber;
     }
 
     private boolean isOver()
@@ -335,13 +334,13 @@ public final class BattleServerSide extends Battle
             {
                 phase = BattlePhase.SUMMON;
                 LOGGER.log(Level.INFO, getActivePlayer()
-                    + "'s battle turn, number " + turnNumber);
+                    + "'s battle turn, number " + battleTurnNumber);
                 again = setupSummon();
             }
             else
             {
-                turnNumber++;
-                if (turnNumber > 7)
+                battleTurnNumber++;
+                if (battleTurnNumber > 7)
                 {
                     timeLoss();
                 }
@@ -352,7 +351,7 @@ public final class BattleServerSide extends Battle
                     if (getActivePlayer() != null)
                     {
                         LOGGER.log(Level.INFO, getActivePlayer()
-                            + "'s battle turn, number " + turnNumber);
+                            + "'s battle turn, number " + battleTurnNumber);
                     }
                 }
             }
@@ -448,7 +447,7 @@ public final class BattleServerSide extends Battle
     private boolean recruitReinforcement()
     {
         LegionServerSide defender = getDefendingLegion();
-        if (turnNumber == 4 && defender.canRecruit())
+        if (battleTurnNumber == 4 && defender.canRecruit())
         {
             LOGGER.log(Level.FINEST, "Calling Game.reinforce()"
                 + " from Battle.recruitReinforcement()");
@@ -503,7 +502,7 @@ public final class BattleServerSide extends Battle
                     int reverseDir = (i + 3) % 6;
                     int entryCost;
 
-                    CreatureServerSide bogey = getCritter(neighbor);
+                    CreatureServerSide bogey = getCreatureSS(neighbor);
                     if (bogey == null
                         || (ignoreMobileAllies
                             && bogey.getMarkerId().equals(
@@ -582,7 +581,7 @@ public final class BattleServerSide extends Battle
         Set<BattleHex> set = new HashSet<BattleHex>();
         if (!critter.hasMoved() && !critter.isInContact(false))
         {
-            if (getLocation().getTerrain().hasStartList() && (turnNumber == 1)
+            if (getLocation().getTerrain().hasStartList() && (battleTurnNumber == 1)
                 && activeLegionTag == LegionTags.DEFENDER)
             {
                 set = findUnoccupiedStartlistHexes(ignoreMobileAllies,
@@ -600,7 +599,7 @@ public final class BattleServerSide extends Battle
 
     void undoMove(BattleHex hex)
     {
-        CreatureServerSide critter = getCritter(hex);
+        CreatureServerSide critter = getCreatureSS(hex);
         if (critter != null)
         {
             critter.undoMove();
@@ -668,8 +667,9 @@ public final class BattleServerSide extends Battle
         if (phase == BattlePhase.FIGHT && !driftDamageApplied)
         {
             driftDamageApplied = true;
-            for (CreatureServerSide critter : getAllCritters())
+            for (BattleCritter c : getAllCritters())
             {
+                CreatureServerSide critter = (CreatureServerSide)c;
                 int dam = critter.getCurrentHex().damageToCreature(
                     critter.getType());
                 if (dam > 0)
@@ -778,7 +778,7 @@ public final class BattleServerSide extends Battle
         // After turn 1, off-board creatures are returned to the
         // stacks or the legion they were summoned from, with
         // no points awarded.
-        if (critter.getCurrentHex().isEntrance() && getTurnNumber() > 1)
+        if (critter.getCurrentHex().isEntrance() && battleTurnNumber > 1)
         {
             if (legion == getAttackingLegion())
             {
@@ -1010,7 +1010,7 @@ public final class BattleServerSide extends Battle
                 BattleHex targetHex = currentHex.getNeighbor(i);
                 if (targetHex != null && isOccupied(targetHex))
                 {
-                    CreatureServerSide target = getCritter(targetHex);
+                    CreatureServerSide target = getCreatureSS(targetHex);
                     if (target.getPlayer() != player)
                     {
                         adjacentEnemy = true;
@@ -1057,7 +1057,7 @@ public final class BattleServerSide extends Battle
         Set<String> set = new HashSet<String>();
         for (BattleHex hex : getCarryTargets())
         {
-            CreatureServerSide critter = getCritter(hex);
+            CreatureServerSide critter = getCreatureSS(hex);
             set.add(critter.getDescription());
         }
         return set;
@@ -1156,13 +1156,14 @@ public final class BattleServerSide extends Battle
     {
         battleOver = true;
         getGame().finishBattle(getLocation(), attackerEntered, pointsScored,
-            turnNumber);
+            battleTurnNumber);
     }
 
+    @Override
     /** Return a list of all critters in the battle. */
-    private List<CreatureServerSide> getAllCritters()
+    protected List<BattleCritter> getAllCritters()
     {
-        List<CreatureServerSide> critters = new ArrayList<CreatureServerSide>();
+        List<BattleCritter> critters = new ArrayList<BattleCritter>();
         LegionServerSide defender = getDefendingLegion();
         if (defender != null)
         {
@@ -1177,9 +1178,9 @@ public final class BattleServerSide extends Battle
     }
 
     @Override
-    protected boolean isOccupied(BattleHex hex)
+    public boolean isOccupied(BattleHex hex)
     {
-        for (Creature critter : getAllCritters())
+        for (BattleCritter critter : getAllCritters())
         {
             if (hex.equals(critter.getCurrentHex()))
             {
@@ -1189,17 +1190,31 @@ public final class BattleServerSide extends Battle
         return false;
     }
 
-    CreatureServerSide getCritter(BattleHex hex)
+    // TODO use getCritter() instead
+    CreatureServerSide getCreatureSS(BattleHex hex)
+    {
+        return (CreatureServerSide)getCritter(hex);
+    }
+
+    public BattleCritter getCritter(BattleHex hex)
     {
         assert hex != null;
-        for (CreatureServerSide creature : getAllCritters())
+        for (BattleCritter critter : getAllCritters())
         {
-            if (hex.equals(creature.getCurrentHex()))
+            if (hex.equals(critter.getCurrentHex()))
             {
-                return creature;
+                return critter;
             }
         }
         // TODO check if this is feasible, otherwise assert false here
         return null;
+    }
+
+    // On server side isInContact is still done by CreatureServerSide
+    @Override
+    public boolean isInContact(BattleCritter striker, boolean countDead)
+    {
+        LOGGER.warning("isInContact not implemented in BattleServerSide!!");
+        return false;
     }
 }

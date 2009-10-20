@@ -92,6 +92,11 @@ public class Game
         return variant;
     }
 
+    public void addPlayer(Player p)
+    {
+        players.add(p);
+    }
+
     public Collection<Player> getPlayers()
     {
         assert players.size() != 0 : "getPlayers called before player info set (size==0)!";
@@ -235,9 +240,14 @@ public class Game
         return this.battle;
     }
 
+    public Legion getBattleActiveLegion()
+    {
+        return battle.getBattleActiveLegion();
+    }
+
     public MasterHex getBattleSite()
     {
-        return engagement.getLocation();
+        return engagement == null ? null : engagement.getLocation();
     }
 
     public Legion getDefender()
@@ -652,5 +662,10 @@ public class Game
         {
             return false;
         }
+    }
+
+    public int getBattleTurnNumber()
+    {
+        return battle.getBattleTurnNumber();
     }
 }

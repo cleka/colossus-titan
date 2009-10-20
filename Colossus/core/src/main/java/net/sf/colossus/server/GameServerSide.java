@@ -413,7 +413,7 @@ public final class GameServerSide extends Game
 
             if (name != null && type != null && !type.equals(Constants.none))
             {
-                addPlayer(name, type);
+                createAndAddPlayer(name, type);
                 LOGGER.info("Added " + type + " player " + name);
             }
         }
@@ -882,12 +882,12 @@ public final class GameServerSide extends Game
         return server;
     }
 
-    PlayerServerSide addPlayer(String name, String shortTypeName)
+    PlayerServerSide createAndAddPlayer(String name, String shortTypeName)
     {
         PlayerServerSide player = new PlayerServerSide(name, this,
             shortTypeName);
 
-        players.add(player);
+        addPlayer(player);
         return player;
     }
 
@@ -1482,7 +1482,7 @@ public final class GameServerSide extends Game
                 String name = pla.getAttribute("name").getValue();
                 String type = pla.getAttribute("type").getValue();
 
-                PlayerServerSide player = addPlayer(name, type);
+                PlayerServerSide player = createAndAddPlayer(name, type);
 
                 String colorName = pla.getAttribute("color").getValue();
                 player.setColor(PlayerColor.getByName(colorName));
@@ -1579,7 +1579,8 @@ public final class GameServerSide extends Game
                 }
 
                 battle = new BattleServerSide(this, attacker, defender,
-                    activeLegionTag, engagementHex, battleTurnNum, battlePhase);
+                    activeLegionTag, engagementHex, battlePhase);
+                getBattleSS().setBattleTurnNumber(battleTurnNum);
                 getBattleSS().setSummonState(summonState);
                 getBattleSS().setCarryDamage(carryDamage);
                 getBattleSS().setDriftDamageApplied(driftDamageApplied);
@@ -2911,7 +2912,7 @@ public final class GameServerSide extends Game
                 Constants.reasonBattleStarts);
 
             battle = new BattleServerSide(this, attacker, defender,
-                BattleServerSide.LegionTags.DEFENDER, hex, 1, BattlePhase.MOVE);
+                BattleServerSide.LegionTags.DEFENDER, hex, BattlePhase.MOVE);
             getBattleSS().init();
         }
     }

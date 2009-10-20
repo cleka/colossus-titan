@@ -57,11 +57,11 @@ public class GameClientSide extends Game implements IOracle
         {
             List<String> data = Split.split(":", infoStrings.get(i));
             String playerName = data.get(1);
-            PlayerClientSide info = new PlayerClientSide(this, playerName, i);
-            players.add(info);
+            PlayerClientSide player = new PlayerClientSide(this, playerName, i);
+            addPlayer(player);
             if (playerName.equals(searchedName))
             {
-                owningPlayer = info;
+                owningPlayer = player;
             }
         }
         return owningPlayer;
@@ -257,14 +257,10 @@ public class GameClientSide extends Game implements IOracle
         getBattleCS().setBattleTurnNumber(battleTurnNumber);
     }
 
+    @Override
     public int getBattleTurnNumber()
     {
         return getBattleCS().getBattleTurnNumber();
-    }
-
-    public Legion getBattleActiveLegion()
-    {
-        return getBattleCS().getBattleActiveLegion();
     }
 
     public Player getBattleActivePlayer()

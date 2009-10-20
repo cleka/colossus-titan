@@ -126,9 +126,9 @@ class CreatureAttackTacticalObjective extends AbstractTacticalObjective
 
                         // Reward being next to an enemy that we can probably
                         // kill this turn.
-                        int dice = client.getBattleCS().getDice(critter, target, client);
+                        int dice = client.getBattleCS().getDice(critter, target);
                         int strikeNum = client.getBattleCS().getStrikeNumber(
-                            critter, target, client);
+                            critter, target);
                         double meanHits = Probs.meanHits(dice, strikeNum);
                         if (meanHits + target.getHits() >= target.getPower())
                         {
@@ -159,9 +159,9 @@ class CreatureAttackTacticalObjective extends AbstractTacticalObjective
 
                         // Penalize damage that we can take this turn,
                         {
-                            dice = client.getBattleCS().getDice(target, critter, client);
+                            dice = client.getBattleCS().getDice(target, critter);
                             strikeNum = client.getBattleCS().getStrikeNumber(
-                                target, critter, client);
+                                target, critter);
                             hitsExpected += Probs.meanHits(dice, strikeNum);
                         }
                     }
@@ -250,7 +250,7 @@ class CreatureAttackTacticalObjective extends AbstractTacticalObjective
                                 + ": RangestrikeTitan");
                         }
                         int strikeNum = client.getBattleCS().getStrikeNumber(
-                            critter, target, client);
+                            critter, target);
                         if (strikeNum <= 4 - skill + target.getSkill())
                         {
                             penalty = false;

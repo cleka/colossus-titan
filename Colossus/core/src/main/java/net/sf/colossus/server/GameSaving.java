@@ -322,7 +322,7 @@ public class GameSaving
 
         bat.setAttribute("masterHexLabel", game.getBattleSS().getLocation()
             .getLabel());
-        bat.setAttribute("turnNumber", "" + game.getBattleSS().getTurnNumber());
+        bat.setAttribute("turnNumber", "" + game.getBattleSS().getBattleTurnNumber());
         bat.setAttribute("activePlayer", ""
             + game.getBattleSS().getActivePlayer().getName());
         bat.setAttribute("phase", ""

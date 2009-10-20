@@ -1486,7 +1486,7 @@ public final class Server extends Thread implements IServer
         for (IClient client : clients)
         {
             client.setupBattleSummon(battle.getActivePlayer(), battle
-                .getTurnNumber());
+                .getBattleTurnNumber());
         }
     }
 
@@ -1496,7 +1496,7 @@ public final class Server extends Thread implements IServer
         for (IClient client : clients)
         {
             client.setupBattleRecruit(battle.getActivePlayer(), battle
-                .getTurnNumber());
+                .getBattleTurnNumber());
         }
     }
 
@@ -1506,7 +1506,7 @@ public final class Server extends Thread implements IServer
         for (IClient client : clients)
         {
             client.setupBattleMove(battle.getActivePlayer(), battle
-                .getTurnNumber());
+                .getBattleTurnNumber());
         }
     }
 
@@ -1903,7 +1903,7 @@ public final class Server extends Thread implements IServer
             client.nak(Constants.strike, "No critter with that tag");
             return;
         }
-        CreatureServerSide strikeTarget = battle.getCritter(hex);
+        CreatureServerSide strikeTarget = battle.getCreatureSS(hex);
         if (strikeTarget == null)
         {
             LOGGER.severe("No target in hex " + hex.getLabel()
@@ -1936,7 +1936,7 @@ public final class Server extends Thread implements IServer
             return;
         }
         BattleServerSide battle = game.getBattleSS();
-        CreatureServerSide ourTarget = battle.getCritter(hex);
+        CreatureServerSide ourTarget = battle.getCreatureSS(hex);
         battle.applyCarries(ourTarget);
     }
 
@@ -2060,7 +2060,7 @@ public final class Server extends Thread implements IServer
         while (it.hasNext())
         {
             IClient client = it.next();
-            client.initBattle(masterHex, battle.getTurnNumber(), battle
+            client.initBattle(masterHex, battle.getBattleTurnNumber(), battle
                 .getActivePlayer(), battle.getBattlePhase(), battle
                 .getAttackingLegion(), battle.getDefendingLegion());
         }

@@ -55,8 +55,8 @@ public class CarryTest extends TestCase
 
         assertEquals("Default", game.getVariant().getName());
 
-        red = game.addPlayer("Red", "SimpleAI");
-        blue = game.addPlayer("Blue", "SimpleAI");
+        red = game.createAndAddPlayer("Red", "SimpleAI");
+        blue = game.createAndAddPlayer("Blue", "SimpleAI");
 
         cyclops = game.getVariant().getCreatureByName("Cyclops");
         troll = game.getVariant().getCreatureByName("Troll");
@@ -88,8 +88,7 @@ public class CarryTest extends TestCase
         attacker.setEntrySide(EntrySide.LEFT);
 
         battle = new BattleServerSide(game, attacker, defender,
-            BattleServerSide.LegionTags.DEFENDER, hex, 2,
-            BattlePhase.FIGHT);
+            BattleServerSide.LegionTags.DEFENDER, hex, BattlePhase.FIGHT);
 
         CreatureServerSide centaur1 = attacker.getCritter(0);
         CreatureServerSide centaur2 = attacker.getCritter(1);
@@ -159,8 +158,7 @@ public class CarryTest extends TestCase
         attacker.setEntrySide(EntrySide.LEFT);
 
         battle = new BattleServerSide(game, attacker, defender,
-            BattleServerSide.LegionTags.ATTACKER, hex, 3,
-            BattlePhase.FIGHT);
+            BattleServerSide.LegionTags.ATTACKER, hex, BattlePhase.FIGHT);
 
         CreatureServerSide warlock1 = attacker.getCritter(0);
         CreatureServerSide warlock2 = attacker.getCritter(1);
