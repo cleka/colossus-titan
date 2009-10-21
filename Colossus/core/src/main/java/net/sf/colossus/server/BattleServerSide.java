@@ -1113,4 +1113,41 @@ public final class BattleServerSide extends Battle
 
         return false;
     }
+
+    /** Return the number of enemy creatures in contact with this critter.
+     *  Dead critters count as being in contact only if countDead is true. */
+    public int numInContact(BattleCritter striker, boolean countDead)
+    {
+        BattleHex hex = striker.getCurrentHex();
+
+        // Offboard creatures are not in contact.
+        if (hex.isEntrance())
+        {
+            return 0;
+        }
+
+        int count = 0;
+        for (int i = 0; i < 6; i++)
+        {
+            // Adjacent creatures separated by a cliff are not in contact.
+            if (!hex.isCliff(i))
+            {
+                BattleHex neighbor = hex.getNeighbor(i);
+                if (neighbor != null)
+                {
+                    BattleCritter other = getCreatureSS(neighbor);
+                    if (other != null
+                        && other.isDefender() != striker.isDefender()
+                        && (countDead || !other.isDead()))
+                    {
+                        count++;
+                    }
+                }
+            }
+        }
+
+        return count;
+    }
+
+
 }

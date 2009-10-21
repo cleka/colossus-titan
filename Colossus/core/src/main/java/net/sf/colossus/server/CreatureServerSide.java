@@ -113,40 +113,6 @@ public class CreatureServerSide extends Creature implements BattleCritter
         return battle;
     }
 
-    /** Return the number of enemy creatures in contact with this critter.
-     *  Dead critters count as being in contact only if countDead is true. */
-    private int numInContact(boolean countDead)
-    {
-        BattleHex hex = getCurrentHex();
-
-        // Offboard creatures are not in contact.
-        if (hex.isEntrance())
-        {
-            return 0;
-        }
-
-        int count = 0;
-        for (int i = 0; i < 6; i++)
-        {
-            // Adjacent creatures separated by a cliff are not in contact.
-            if (!hex.isCliff(i))
-            {
-                BattleHex neighbor = hex.getNeighbor(i);
-                if (neighbor != null)
-                {
-                    CreatureServerSide other = battle.getCreatureSS(neighbor);
-                    if (other != null && other.getPlayer() != getPlayer()
-                        && (countDead || !other.isDead()))
-                    {
-                        count++;
-                    }
-                }
-            }
-        }
-
-        return count;
-    }
-
     /** Most code should use Battle.doMove() instead, since it checks
      *  for legality and logs the move. */
     void moveToHex(BattleHex hexLabel, boolean tellClients)
@@ -364,7 +330,7 @@ public class CreatureServerSide extends Creature implements BattleCritter
             // Non-native rangestrikes: -1 per intervening bramble hex
             if (!isNativeBramble())
             {
-                bramblesPenalty += countBrambleHexes(targetHex);
+                bramblesPenalty += battle.countBrambleHexes(getCurrentHex(), targetHex);
             }
             /* TODO: remove TEST TEST TEST TEST TEST */
             /* computeSkillPenaltyRangestrikeThrough should be used instead of the logic above, but
@@ -414,15 +380,6 @@ public class CreatureServerSide extends Creature implements BattleCritter
         }
 
         return attackerSkill;
-    }
-
-    /** @deprecated another function with explicit reference to Bramble
-     * that should be fixed.
-     */
-    @Deprecated
-    protected int countBrambleHexes(final BattleHex targetHex)
-    {
-        return battle.countBrambleHexes(getCurrentHex(), targetHex);
     }
 
     /** WARNING: this is duplicated in BattleClientSide */
@@ -483,7 +440,7 @@ public class CreatureServerSide extends Creature implements BattleCritter
     {
         battle.leaveCarryMode();
         carryPossible = true;
-        if (numInContact(false) < 2)
+        if (battle.numInContact(this, false) < 2)
         {
             carryPossible = false;
         }
