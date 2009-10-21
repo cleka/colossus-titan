@@ -496,7 +496,10 @@ public final class BattleServerSide extends Battle
         CreatureServerSide critter = getCreatureSS(hex);
         if (critter != null)
         {
+            BattleHex formerHexLabel = critter.getCurrentHex();
             critter.undoMove();
+            getGame().getServer().allTellBattleMove(critter.getTag(),
+                formerHexLabel, critter.getCurrentHex(), true);
         }
         else
         {
@@ -1019,7 +1022,7 @@ public final class BattleServerSide extends Battle
             LOGGER
                 .log(Level.INFO, critter.getDescription() + " does not move");
             // Call moveToHex() anyway to sync client.
-            critter.moveToHex(hex, true);
+            moveCritterToHexAndInformClients(critter, hex);
             return true;
         }
         else if (battleMovement.showMoves(critter, false).contains(hex))
@@ -1028,7 +1031,7 @@ public final class BattleServerSide extends Battle
                 .log(Level.INFO, critter.getName() + " moves from "
                     + critter.getCurrentHex().getLabel() + " to "
                     + hex.getLabel());
-            critter.moveToHex(hex, true);
+            moveCritterToHexAndInformClients(critter, hex);
             return true;
         }
         else
@@ -1044,6 +1047,14 @@ public final class BattleServerSide extends Battle
                 + ")");
             return false;
         }
+    }
+
+    private void moveCritterToHexAndInformClients(CreatureServerSide critter,
+        BattleHex hex)
+    {
+        critter.moveToHex(hex);
+        getGame().getServer().allTellBattleMove(critter.getTag(),
+            critter.getStartingHex(), critter.getCurrentHex(), false);
     }
 
     private void cleanup()

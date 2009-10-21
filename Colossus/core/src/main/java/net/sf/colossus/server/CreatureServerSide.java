@@ -113,26 +113,11 @@ public class CreatureServerSide extends Creature implements BattleCritter
         return battle;
     }
 
-    /** Most code should use Battle.doMove() instead, since it checks
-     *  for legality and logs the move. */
-    void moveToHex(BattleHex hexLabel, boolean tellClients)
-    {
-        super.moveToHex(hexLabel);
-        if (tellClients)
-        {
-            battle.getGame().getServer().allTellBattleMove(tag,
-                getStartingHex(), getCurrentHex(), false);
-        }
-    }
-
     void undoMove()
     {
-        BattleHex formerHexLabel = getCurrentHex();
         setCurrentHex(getStartingHex());
         LOGGER.log(Level.INFO, getName() + " undoes move and returns to "
             + getStartingHex());
-        battle.getGame().getServer().allTellBattleMove(tag, formerHexLabel,
-            getCurrentHex(), true);
     }
 
     // TODO change to deal with target critters, instead of hexes?
