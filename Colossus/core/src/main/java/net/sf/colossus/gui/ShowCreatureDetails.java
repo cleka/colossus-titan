@@ -605,7 +605,7 @@ public final class ShowCreatureDetails extends KDialog
         /** power of this creature hitting target. */
         public int getSimulatedDiceCount(final Creature target)
         {
-            return getDice(target);
+            return getDice(target, false);
         }
 
         // TODO same dubious thing that hazard properties are set but
@@ -613,7 +613,7 @@ public final class ShowCreatureDetails extends KDialog
         /** skill of this creature hitting target. */
         public int getSimulatedStrikeNr(final Creature target)
         {
-            return getStrikeNumber(target);
+            return getStrikeNumber(target, false);
         }
 
         /** color of hex i stand on. */
@@ -666,24 +666,6 @@ public final class ShowCreatureDetails extends KDialog
         public BattleHex getCurrentHex()
         {
             return hex;
-        }
-
-        /** fake -- true or false as wished. TODO */
-        @Override
-        protected boolean isInContact(final boolean countDead)
-        {
-            return true;
-        }
-
-        /** not needed here -- fake returns 0. */
-        /** @deprecated another function with explicit reference to Bramble
-         * that should be fixed.
-         */
-        @Deprecated
-        @Override
-        protected int countBrambleHexes(final BattleHex targetHex)
-        {
-            return 0;
         }
     }
 }

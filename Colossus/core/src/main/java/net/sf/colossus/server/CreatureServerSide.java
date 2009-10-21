@@ -222,7 +222,7 @@ public class CreatureServerSide extends Creature implements BattleCritter
     }
 
     @SuppressWarnings("deprecation")
-    private int getDice(Creature target, boolean rangestrike)
+    public int getDice(Creature target, boolean rangestrike)
     {
         BattleHex hex = getCurrentHex();
         BattleHex targetHex = target.getCurrentHex();
@@ -302,6 +302,11 @@ public class CreatureServerSide extends Creature implements BattleCritter
     @SuppressWarnings("deprecation")
     private int getAttackerSkill(Creature target, boolean rangestrike)
     {
+        // rangestrike calc depends on countBrambleHexes which needs battle.
+        // (it's called when there is no battle by ShowCreatureDetails)
+        assert battle != null || !rangestrike : "getAttackerSkill "
+            + "called for rangestrike when there is no battle!";
+
         BattleHex hex = getCurrentHex();
         BattleHex targetHex = target.getCurrentHex();
 
@@ -454,13 +459,13 @@ public class CreatureServerSide extends Creature implements BattleCritter
     }
 
     /** WARNING: this is duplicated in BattleClientSide */
-    protected int getStrikeNumber(Creature target)
+    public int getStrikeNumber(Creature target)
     {
         return getStrikeNumber(target, !isInContact(true));
     }
 
     @SuppressWarnings("deprecation")
-    private int getStrikeNumber(Creature target, boolean rangestrike)
+    public int getStrikeNumber(Creature target, boolean rangestrike)
     {
         int attackerSkill = getAttackerSkill(target, rangestrike);
         int defenderSkill = target.getSkill();
