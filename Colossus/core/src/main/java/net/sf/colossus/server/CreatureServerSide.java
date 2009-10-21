@@ -147,39 +147,6 @@ public class CreatureServerSide extends Creature implements BattleCritter
         return count;
     }
 
-    /** Return true if there are any enemies adjacent to this critter.
-     *  Dead critters count as being in contact only if countDead is true. */
-    protected boolean isInContact(boolean countDead)
-    {
-        BattleHex hex = getCurrentHex();
-
-        // Offboard creatures are not in contact.
-        if (hex.isEntrance())
-        {
-            return false;
-        }
-
-        for (int i = 0; i < 6; i++)
-        {
-            // Adjacent creatures separated by a cliff are not in contact.
-            if (!hex.isCliff(i))
-            {
-                BattleHex neighbor = hex.getNeighbor(i);
-                if (neighbor != null)
-                {
-                    CreatureServerSide other = battle.getCreatureSS(neighbor);
-                    if (other != null && other.getPlayer() != getPlayer()
-                        && (countDead || !other.isDead()))
-                    {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
-    }
-
     /** Most code should use Battle.doMove() instead, since it checks
      *  for legality and logs the move. */
     void moveToHex(BattleHex hexLabel, boolean tellClients)
@@ -218,7 +185,7 @@ public class CreatureServerSide extends Creature implements BattleCritter
     protected int getDice(Creature target)
     {
         assert battle != null : "getDice called when there is no battle!";
-        return getDice(target, !isInContact(true));
+        return getDice(target, !battle.isInContact(this, true));
     }
 
     @SuppressWarnings("deprecation")
@@ -461,7 +428,7 @@ public class CreatureServerSide extends Creature implements BattleCritter
     /** WARNING: this is duplicated in BattleClientSide */
     public int getStrikeNumber(Creature target)
     {
-        return getStrikeNumber(target, !isInContact(true));
+        return getStrikeNumber(target, !battle.isInContact(this, true));
     }
 
     @SuppressWarnings("deprecation")

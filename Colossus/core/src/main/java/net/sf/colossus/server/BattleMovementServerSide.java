@@ -67,8 +67,9 @@ public class BattleMovementServerSide
                     if (bogey == null
                         || (ignoreMobileAllies
                             && bogey.getMarkerId().equals(
-                                critter.getMarkerId()) && !bogey
-                            .isInContact(false)))
+                                critter.getMarkerId()) && !getBattleSS()
+                            .isInContact(
+                            bogey, false)))
                     {
                         entryCost = neighbor.getEntryCost(critter.getType(),
                             reverseDir, cumulativeSlow);
@@ -138,7 +139,7 @@ public class BattleMovementServerSide
         boolean ignoreMobileAllies)
     {
         Set<BattleHex> set = new HashSet<BattleHex>();
-        if (!critter.hasMoved() && !critter.isInContact(false))
+        if (!critter.hasMoved() && !getBattleSS().isInContact(critter, false))
         {
             if (getBattleSS().getLocation().getTerrain().hasStartList()
                 && (getBattleSS().getBattleTurnNumber() == 1)

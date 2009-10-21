@@ -847,7 +847,7 @@ public final class BattleServerSide extends Battle
         {
             for (CreatureServerSide critter : legion.getCreatures())
             {
-                if (!critter.hasStruck() && critter.isInContact(false))
+                if (!critter.hasStruck() && isInContact(critter, false))
                 {
                     return true;
                 }
@@ -1076,11 +1076,41 @@ public final class BattleServerSide extends Battle
         return (CreatureServerSide)getCritter(hex);
     }
 
-    // On server side isInContact is still done by CreatureServerSide
+    /** Return true if there are any enemies adjacent to this critter.
+     *
+     * @param critter The critter to check whether it is in contact with any enemy critter
+     * @param countDead Dead critters count as being in contact only if countDead is true.
+     */
     @Override
-    public boolean isInContact(BattleCritter striker, boolean countDead)
+    public boolean isInContact(BattleCritter critter, boolean countDead)
     {
-        LOGGER.warning("isInContact not implemented in BattleServerSide!!");
+        BattleHex hex = critter.getCurrentHex();
+
+        // Offboard creatures are not in contact.
+        if (hex.isEntrance())
+        {
+            return false;
+        }
+
+        for (int i = 0; i < 6; i++)
+        {
+            // Adjacent creatures separated by a cliff are not in contact.
+            if (!hex.isCliff(i))
+            {
+                BattleHex neighbor = hex.getNeighbor(i);
+                if (neighbor != null)
+                {
+                    BattleCritter other = getCreatureSS(neighbor);
+                    if (other != null
+                        && other.isDefender() != critter.isDefender()
+                        && (countDead || !other.isDead()))
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+
         return false;
     }
 }
