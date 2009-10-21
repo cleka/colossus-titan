@@ -78,19 +78,6 @@ public class BattleClientSide extends Battle
             this.getAttackingLegion().getEntrySide().getOpposingSide());
     }
 
-    @Override
-    public boolean isOccupied(BattleHex hex)
-    {
-        for (BattleCritter critter : getBattleUnits())
-        {
-            if (hex.equals(critter.getCurrentHex()))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
     // Helper method
     public GameClientSide getGameClientSide()
     {
@@ -255,7 +242,7 @@ public class BattleClientSide extends Battle
             });
     }
 
-    public BattleUnit getBattleUnit(BattleHex hex)
+    public BattleUnit getBattleUnitCS(BattleHex hex)
     {
         List<BattleUnit> lBattleUnits = getBattleUnits(hex);
         if (lBattleUnits.isEmpty())
@@ -263,6 +250,25 @@ public class BattleClientSide extends Battle
             return null;
         }
         return lBattleUnits.get(0);
+    }
+
+    public BattleUnit getBattleUnit(BattleHex hex)
+    {
+        BattleUnit unit = getBattleUnitCS(hex);
+        BattleCritter critter = getCritter(hex);
+
+        if (unit == null && critter == null)
+        {
+            // ok.
+        }
+        else if ( // unit == null && critter != null
+        // || unit != null && critter == null
+        unit != critter)
+        {
+            LOGGER
+                .warning("getBattleUnit(hex) returns different result than getCritter(hex)!");
+        }
+        return unit;
     }
 
     /** Get the BattleUnit with this tag. */

@@ -1054,8 +1054,7 @@ public final class BattleServerSide extends Battle
     }
 
     @Override
-    /** Return a list of all critters in the battle. */
-    protected List<BattleCritter> getAllCritters()
+    public List<BattleCritter> getAllCritters()
     {
         List<BattleCritter> critters = new ArrayList<BattleCritter>();
         LegionServerSide defender = getDefendingLegion();
@@ -1071,37 +1070,10 @@ public final class BattleServerSide extends Battle
         return critters;
     }
 
-    @Override
-    public boolean isOccupied(BattleHex hex)
-    {
-        for (BattleCritter critter : getAllCritters())
-        {
-            if (hex.equals(critter.getCurrentHex()))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
     // TODO use getCritter() instead
     CreatureServerSide getCreatureSS(BattleHex hex)
     {
         return (CreatureServerSide)getCritter(hex);
-    }
-
-    public BattleCritter getCritter(BattleHex hex)
-    {
-        assert hex != null;
-        for (BattleCritter critter : getAllCritters())
-        {
-            if (hex.equals(critter.getCurrentHex()))
-            {
-                return critter;
-            }
-        }
-        // TODO check if this is feasible, otherwise assert false here
-        return null;
     }
 
     // On server side isInContact is still done by CreatureServerSide

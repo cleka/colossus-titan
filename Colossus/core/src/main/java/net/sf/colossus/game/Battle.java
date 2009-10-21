@@ -52,23 +52,6 @@ abstract public class Battle
         return defender;
     }
 
-    public abstract Legion getBattleActiveLegion();
-
-    /** Get all BattleCritters / BattleUnits
-     *  Abstract because currently implementation is different, but needed
-     *  on both side, e.g. for BattleMovement
-     */
-    protected abstract List<BattleCritter> getAllCritters();
-
-    /** Whether the hex is occupied by a critter/creature/chit/...
-     * This is abstract because the specific information about critter/...
-     * is currently kept in the subclass, but this information is required
-     * by several helper function located in the Battle class.
-     * @param hex The hex whose occupancy is being checked
-     * @return Whether the hex is occupied by a critter/creature/chit/...
-     */
-    abstract public boolean isOccupied(BattleHex hex);
-
     /**
      * Caller must ensure that yDist != 0
      *
@@ -794,6 +777,42 @@ abstract public class Battle
         return battleTurnNumber;
     }
 
-    public abstract boolean isInContact(BattleCritter striker,
+    public BattleCritter getCritter(BattleHex hex)
+    {
+        assert hex != null;
+        for (BattleCritter critter : getAllCritters())
+        {
+            if (hex.equals(critter.getCurrentHex()))
+            {
+                return critter;
+            }
+        }
+        // TODO check if this is feasible, otherwise assert false here
+        return null;
+    }
+
+    public boolean isOccupied(BattleHex hex)
+    {
+        for (BattleCritter critter : getAllCritters())
+        {
+            if (hex.equals(critter.getCurrentHex()))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    abstract public Legion getBattleActiveLegion();
+
+    /** Get all BattleCritters / BattleUnits
+     *  Abstract because currently implementation is different, but needed
+     *  on both side, e.g. for BattleMovement
+     */
+    abstract protected List<BattleCritter> getAllCritters();
+
+    abstract public boolean isInContact(BattleCritter striker,
         boolean countDead);
+
+
 }
