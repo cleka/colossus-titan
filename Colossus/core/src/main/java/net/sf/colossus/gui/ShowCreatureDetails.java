@@ -25,8 +25,10 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
 import net.sf.colossus.game.Creature;
+import net.sf.colossus.game.Game;
 import net.sf.colossus.game.RecruitGraph;
 import net.sf.colossus.guiutil.KDialog;
+import net.sf.colossus.server.BattleStrikeServerSide;
 import net.sf.colossus.server.CreatureServerSide;
 import net.sf.colossus.server.LegionServerSide;
 import net.sf.colossus.server.VariantSupport;
@@ -91,6 +93,8 @@ public final class ShowCreatureDetails extends KDialog
 
     private final Collection<Hazards> hazards;
 
+    private final BattleStrikeServerSide battleStrikeSS;
+
     /** pops up the non-modal dialog. info can be updated if needed.
      * @param parentFrame parent frame, i.e. the master board
      * @param creature creature to show detailed info for.
@@ -107,6 +111,9 @@ public final class ShowCreatureDetails extends KDialog
         super(parentFrame, "Creature Info: " + creature.getName(), false);
 
         this.ivariant = clientGui.getClient();
+
+        Game game = clientGui.getClient().getGame();
+        this.battleStrikeSS = new BattleStrikeServerSide(game);
 
         Collection<HazardTerrain> terrainHazards = HazardTerrain
             .getAllHazardTerrains();
@@ -605,7 +612,7 @@ public final class ShowCreatureDetails extends KDialog
         /** power of this creature hitting target. */
         public int getSimulatedDiceCount(final Creature target)
         {
-            return getDice(target, false);
+            return battleStrikeSS.getDice(this, target, false);
         }
 
         // TODO same dubious thing that hazard properties are set but
@@ -613,7 +620,7 @@ public final class ShowCreatureDetails extends KDialog
         /** skill of this creature hitting target. */
         public int getSimulatedStrikeNr(final Creature target)
         {
-            return getStrikeNumber(target, false);
+            return battleStrikeSS.getStrikeNumber(this, target, false);
         }
 
         /** color of hex i stand on. */

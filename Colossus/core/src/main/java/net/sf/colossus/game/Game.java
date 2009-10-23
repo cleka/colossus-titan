@@ -72,6 +72,8 @@ public class Game
 
     protected Battle battle = null;
 
+    private final BattleStrike battleStrike;
+
     /**
      * Create a Game object.
      *
@@ -85,6 +87,8 @@ public class Game
         this.variant = variant;
         this.caretaker = new Caretaker(this);
         this.phase = Phase.INIT;
+
+        this.battleStrike = new BattleStrike(this);
     }
 
     public Variant getVariant()
@@ -667,5 +671,10 @@ public class Game
     public int getBattleTurnNumber()
     {
         return battle.getBattleTurnNumber();
+    }
+
+    public BattleStrike getBattleStrike()
+    {
+        return battleStrike;
     }
 }

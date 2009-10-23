@@ -2859,7 +2859,7 @@ public class SimpleAI extends AbstractAI
             {
                 value.add(bec.RANGESTRIKE_TITAN, "RangestrikeTitan");
             }
-            int strikeNum = client.getBattleCS()
+            int strikeNum = getBattleStrike()
                 .getStrikeNumber(critter,
                 target);
             if (strikeNum <= 4 - skill + target.getSkill())
@@ -2942,8 +2942,8 @@ public class SimpleAI extends AbstractAI
 
             // Reward being next to an enemy that we can probably
             // kill this turn.
-            int dice = client.getBattleCS().getDice(critter, target);
-            int strikeNum = client.getBattleCS()
+            int dice = getBattleStrike().getDice(critter, target);
+            int strikeNum = getBattleStrike()
                 .getStrikeNumber(critter,
                 target);
             double meanHits = Probs.meanHits(dice, strikeNum);
@@ -2975,8 +2975,8 @@ public class SimpleAI extends AbstractAI
 
             // Penalize damage that we can take this turn,
             {
-                dice = client.getBattleCS().getDice(target, critter);
-                strikeNum = client.getBattleCS()
+                dice = getBattleStrike().getDice(target, critter);
+                strikeNum = getBattleStrike()
                     .getStrikeNumber(target,
                     critter);
                 hitsExpected += Probs.meanHits(dice, strikeNum);

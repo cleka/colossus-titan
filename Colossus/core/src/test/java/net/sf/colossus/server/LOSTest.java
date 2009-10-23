@@ -746,7 +746,7 @@ public class LOSTest extends TestCase
 
         assertTrue(!battle.isLOSBlocked(hydra1.getCurrentHex(), hydra2
             .getCurrentHex()));
-        assertEquals(5, hydra2.getStrikeNumber(hydra1));
+        assertEquals(5, game.getBattleStrikeSS().getStrikeNumber(hydra2, hydra1));
     }
 
     public void testLOS8()

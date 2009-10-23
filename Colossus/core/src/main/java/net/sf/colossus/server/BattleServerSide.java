@@ -202,7 +202,7 @@ public final class BattleServerSide extends Battle
         return getLegion(activeLegionTag);
     }
 
-    Player getActivePlayer()
+    Player getBattleActivePlayer()
     {
         return getBattleActiveLegion().getPlayer();
     }
@@ -342,7 +342,7 @@ public final class BattleServerSide extends Battle
             if (activeLegionTag == LegionTags.ATTACKER)
             {
                 phase = BattlePhase.SUMMON;
-                LOGGER.log(Level.INFO, getActivePlayer()
+                LOGGER.log(Level.INFO, getBattleActivePlayer()
                     + "'s battle turn, number " + battleTurnNumber);
                 again = setupSummon();
             }
@@ -357,9 +357,9 @@ public final class BattleServerSide extends Battle
                 {
                     phase = BattlePhase.RECRUIT;
                     again = setupRecruit();
-                    if (getActivePlayer() != null)
+                    if (getBattleActivePlayer() != null)
                     {
-                        LOGGER.log(Level.INFO, getActivePlayer()
+                        LOGGER.log(Level.INFO, getBattleActivePlayer()
                             + "'s battle turn, number " + battleTurnNumber);
                     }
                 }
@@ -521,7 +521,7 @@ public final class BattleServerSide extends Battle
             creature.setDead(true);
         }
 
-        if (legion.getPlayer().equals(getActivePlayer()))
+        if (legion.getPlayer().equals(getBattleActivePlayer()))
         {
             advancePhase();
         }

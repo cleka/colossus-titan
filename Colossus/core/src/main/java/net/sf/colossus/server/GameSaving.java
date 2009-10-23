@@ -324,7 +324,7 @@ public class GameSaving
             .getLabel());
         bat.setAttribute("turnNumber", "" + game.getBattleSS().getBattleTurnNumber());
         bat.setAttribute("activePlayer", ""
-            + game.getBattleSS().getActivePlayer().getName());
+            + game.getBattleSS().getBattleActivePlayer().getName());
         bat.setAttribute("phase", ""
             + game.getBattleSS().getBattlePhase().ordinal());
         bat

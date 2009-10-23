@@ -100,6 +100,7 @@ public final class GameServerSide extends Game
     private final WhatNextManager whatNextManager;
     private History history;
 
+    private final BattleStrikeServerSide battleStrikeSS;
     /**
      * The object that handles the Game Saving procedure
      */
@@ -140,6 +141,7 @@ public final class GameServerSide extends Game
         this.whatNextManager = whatNextMgr;
         this.options = serverOptions;
         this.gameSaver = new GameSaving(this, options);
+        this.battleStrikeSS = new BattleStrikeServerSide(this);
 
         InstanceTracker.register(this, "Game at port " + getPort());
 
@@ -3400,4 +3402,8 @@ public final class GameServerSide extends Game
         return this.notifyWebServer;
     }
 
+    public BattleStrikeServerSide getBattleStrikeSS()
+    {
+        return battleStrikeSS;
+    }
 }

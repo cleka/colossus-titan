@@ -902,8 +902,8 @@ public final class Server extends Thread implements IServer
     private boolean isBattleActivePlayer()
     {
         return game.getBattleSS() != null
-            && game.getBattleSS().getActivePlayer() != null
-            && getPlayer().equals(game.getBattleSS().getActivePlayer());
+            && game.getBattleSS().getBattleActivePlayer() != null
+            && getPlayer().equals(game.getBattleSS().getBattleActivePlayer());
     }
 
     /**
@@ -1485,7 +1485,7 @@ public final class Server extends Thread implements IServer
         BattleServerSide battle = game.getBattleSS();
         for (IClient client : clients)
         {
-            client.setupBattleSummon(battle.getActivePlayer(), battle
+            client.setupBattleSummon(battle.getBattleActivePlayer(), battle
                 .getBattleTurnNumber());
         }
     }
@@ -1495,7 +1495,7 @@ public final class Server extends Thread implements IServer
         BattleServerSide battle = game.getBattleSS();
         for (IClient client : clients)
         {
-            client.setupBattleRecruit(battle.getActivePlayer(), battle
+            client.setupBattleRecruit(battle.getBattleActivePlayer(), battle
                 .getBattleTurnNumber());
         }
     }
@@ -1505,7 +1505,7 @@ public final class Server extends Thread implements IServer
         BattleServerSide battle = game.getBattleSS();
         for (IClient client : clients)
         {
-            client.setupBattleMove(battle.getActivePlayer(), battle
+            client.setupBattleMove(battle.getBattleActivePlayer(), battle
                 .getBattleTurnNumber());
         }
     }
@@ -1518,7 +1518,7 @@ public final class Server extends Thread implements IServer
             if (battle != null)
             {
                 client.setupBattleFight(battle.getBattlePhase(), battle
-                    .getActivePlayer());
+                    .getBattleActivePlayer());
             }
         }
     }
@@ -2018,7 +2018,7 @@ public final class Server extends Thread implements IServer
     /** Takes a Set of PenaltyOptions. */
     void askChooseStrikePenalty(SortedSet<PenaltyOption> penaltyOptions)
     {
-        Player player = game.getBattleSS().getActivePlayer();
+        Player player = game.getBattleSS().getBattleActivePlayer();
         IClient client = getClient(player);
         List<String> choices = new ArrayList<String>();
         Iterator<PenaltyOption> it = penaltyOptions.iterator();
@@ -2061,7 +2061,7 @@ public final class Server extends Thread implements IServer
         {
             IClient client = it.next();
             client.initBattle(masterHex, battle.getBattleTurnNumber(), battle
-                .getActivePlayer(), battle.getBattlePhase(), battle
+                .getBattleActivePlayer(), battle.getBattlePhase(), battle
                 .getAttackingLegion(), battle.getDefendingLegion());
         }
     }

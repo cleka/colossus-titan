@@ -13,14 +13,12 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
-import net.sf.colossus.game.Battle;
 import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardHexside;
-import net.sf.colossus.variant.HazardTerrain;
 
 
 /**
@@ -129,295 +127,6 @@ public class CreatureServerSide extends Creature implements BattleCritter
             target.getCurrentHex());
     }
 
-    /** Return the number of dice that will be rolled when striking this
-     *  target, including modifications for terrain.
-     * WARNING: this is duplicated in BattleClientSide
-     */
-    protected int getDice(Creature target)
-    {
-        assert battle != null : "getDice called when there is no battle!";
-        return getDice(target, !battle.isInContact(this, true));
-    }
-
-    @SuppressWarnings("deprecation")
-    public int getDice(Creature target, boolean rangestrike)
-    {
-        BattleHex hex = getCurrentHex();
-        BattleHex targetHex = target.getCurrentHex();
-
-        int dice = getPower();
-
-        if (rangestrike)
-        {
-            // Divide power in half, rounding down.
-            dice /= 2;
-
-            // volcanoNative rangestriking from volcano: +2
-            if (isNativeVolcano()
-                && hex.getTerrain().equals(HazardTerrain.VOLCANO))
-            {
-                dice += 2;
-            }
-        }
-        else
-        {
-            // Dice can be modified by terrain.
-            // volcanoNative striking from volcano: +2
-            if (isNativeVolcano()
-                && hex.getTerrain().equals(HazardTerrain.VOLCANO))
-            {
-                dice += 2;
-            }
-
-            // Adjacent hex, so only one possible direction.
-            int direction = Battle.getDirection(hex, targetHex, false);
-            HazardHexside hazard = hex.getHexsideHazard(direction);
-
-            // Native striking down a dune hexside: +2
-            if (hazard == HazardHexside.DUNE && isNativeDune())
-            {
-                dice += 2;
-            }
-            // Native striking down a slope hexside: +1
-            else if (hazard == HazardHexside.SLOPE && isNativeSlope())
-            {
-                dice++;
-            }
-            // Non-native striking up a dune hexside: -1
-            else if (!isNativeDune()
-                && hex.getOppositeHazard(direction) == HazardHexside.DUNE)
-            {
-                dice--;
-            }
-
-            /* TODO: remove TEST TEST TEST TEST TEST */
-            /* getStrikingPower should be used instead of the logic above, but
-             * 1) I'm not sure everyone will agree it belongs in Creature
-             * 2) I haven't had time to verify it's correct.
-             * Incidentally, if you're reading this after noticing the warning
-             * below in your logfile, then it isn't correct ;-)
-             */
-            int checkStrikingPower = getStrikingPower(target, hex
-                .getElevation(), targetHex.getElevation(), hex.getTerrain(),
-                targetHex.getTerrain(), hex.getHexsideHazard(BattleServerSide
-                    .getDirection(hex, targetHex, false)), targetHex
-                    .getHexsideHazard(BattleServerSide.getDirection(targetHex,
-                        hex, false)));
-
-            if (checkStrikingPower != dice)
-            {
-                LOGGER.warning("attackerPower says " + dice
-                    + " but checkStrikingPower says " + checkStrikingPower);
-            }
-            /* END TODO: remove TEST TEST TEST TEST TEST */
-        }
-
-        return dice;
-    }
-
-    /** WARNING: this is duplicated in BattleClientSide
-     * @param rangestrike TODO*/
-    @SuppressWarnings("deprecation")
-    private int getAttackerSkill(Creature target, boolean rangestrike)
-    {
-        // rangestrike calc depends on countBrambleHexes which needs battle.
-        // (it's called when there is no battle by ShowCreatureDetails)
-        assert battle != null || !rangestrike : "getAttackerSkill "
-            + "called for rangestrike when there is no battle!";
-
-        BattleHex hex = getCurrentHex();
-        BattleHex targetHex = target.getCurrentHex();
-
-        int attackerSkill = getSkill();
-
-        // Skill can be modified by terrain.
-        if (!rangestrike)
-        {
-            // striking out of possible hazard
-            attackerSkill -= hex.getTerrain().getSkillPenaltyStrikeFrom(
-                this.isNativeTerrain(hex.getTerrain()),
-                target.isNativeTerrain(hex.getTerrain()));
-
-            if (hex.getElevation() > targetHex.getElevation())
-            {
-                // Adjacent hex, so only one possible direction.
-                int direction = BattleServerSide.getDirection(hex, targetHex,
-                    false);
-                HazardHexside hazard = hex.getHexsideHazard(direction);
-
-                // Striking down across wall: +1
-                if (hazard.equals(HazardHexside.TOWER))
-                {
-                    attackerSkill++;
-                }
-            }
-            else if (hex.getElevation() < targetHex.getElevation())
-            {
-                // Adjacent hex, so only one possible direction.
-                int direction = BattleServerSide.getDirection(targetHex, hex,
-                    false);
-                HazardHexside hazard = targetHex.getHexsideHazard(direction);
-                // Non-native striking up slope: -1
-                // Striking up across wall: -1
-                if ((hazard.equals(HazardHexside.SLOPE) && !isNativeSlope())
-                    || hazard.equals(HazardHexside.TOWER))
-                {
-                    attackerSkill--;
-                }
-            }
-            /* TODO: remove TEST TEST TEST TEST TEST */
-            /* getStrikingSkill should be used instead of the logic above, but
-             * 1) I'm not sure everyone will agree it belongs in Creature
-             * 2) I haven't had time to verify it's correct.
-             * Incidentally, if you're reading this after noticing the warning
-             * below in your logfile, then it isn't correct ;-)
-             */
-            int checkStrikingSkill = getStrikingSkill(target, hex
-                .getElevation(), targetHex.getElevation(), hex.getTerrain(),
-                targetHex.getTerrain(), hex.getHexsideHazard(BattleServerSide
-                    .getDirection(hex, targetHex, false)), targetHex
-                    .getHexsideHazard(BattleServerSide.getDirection(targetHex,
-                        hex, false)));
-
-            if (checkStrikingSkill != attackerSkill)
-            {
-                LOGGER
-                    .warning(String
-                        .format(
-                            "For creature %s striking %s from %s(%d) to %s(%d) via %s/%s, "
-                                + "we calculated %d as attacker skill, but getStrikingSkill says %d",
-                            this, target, hex.getTerrain(), Integer
-                                .valueOf(hex.getElevation()), targetHex
-                                .getTerrain(), Integer.valueOf(targetHex
-                                .getElevation()), hex
-                                .getHexsideHazard(BattleServerSide
-                                    .getDirection(hex, targetHex, false)),
-                            targetHex.getHexsideHazard(BattleServerSide
-                                .getDirection(targetHex, hex, false)), Integer
-                                .valueOf(attackerSkill), Integer
-                                .valueOf(checkStrikingSkill)));
-            }
-            /* END TODO: remove TEST TEST TEST TEST TEST */
-        }
-        else if (!useMagicMissile())
-        {
-            // Range penalty
-            /* Range 4 means a penalty of 1 to the attacker.
-             * I hereby extend this so that range 5 means a penalty of 2,
-             * and so one, for creature with higher skill.
-             */
-            int range = BattleServerSide.getRange(hex, targetHex, false);
-            if (range >= 4)
-            {
-                attackerSkill -= (range - 3);
-            }
-            int bramblesPenalty = 0;
-            // Non-native rangestrikes: -1 per intervening bramble hex
-            if (!isNativeBramble())
-            {
-                bramblesPenalty += battle.countBrambleHexes(getCurrentHex(), targetHex);
-            }
-            /* TODO: remove TEST TEST TEST TEST TEST */
-            /* computeSkillPenaltyRangestrikeThrough should be used instead of the logic above, but
-             * 1) I'm not sure everyone will agree it belongs in Battle
-             * 2) I haven't had time to verify it's correct.
-             * Incidentally, if you're reading this after noticing the warning
-             * below in your logfile, then it isn't correct ;-)
-             */
-            int interveningPenalty = battle
-                .computeSkillPenaltyRangestrikeThrough(getCurrentHex(),
-                    targetHex, this);
-            if (interveningPenalty != bramblesPenalty)
-            {
-                LOGGER.warning("bramblesPenalty says " + bramblesPenalty
-                    + " but interveningPenalty says " + interveningPenalty);
-            }
-            /* END TODO: remove TEST TEST TEST TEST TEST */
-
-            attackerSkill -= bramblesPenalty;
-
-            // Rangestrike up across wall: -1 per wall
-            if (targetHex.hasWall())
-            {
-                int heightDeficit = targetHex.getElevation()
-                    - hex.getElevation();
-                if (heightDeficit > 0)
-                {
-                    // Because of the design of the tower map, a strike to
-                    // a higher tower hex always crosses one wall per
-                    // elevation difference.
-                    /* actually this need some better logic, as some Wall are
-                     * in a completely different patterns that the Tower
-                     * nowaday
-                     */
-                    attackerSkill -= heightDeficit;
-                }
-            }
-
-            // Rangestrike into volcano: -1
-            /* actually, it's only for native ... but then non-native are
-             * blocked. Anyway this will should to HazardTerrain someday.
-             */
-            if (targetHex.getTerrain().equals(HazardTerrain.VOLCANO))
-            {
-                attackerSkill--;
-            }
-        }
-
-        return attackerSkill;
-    }
-
-    /** WARNING: this is duplicated in BattleClientSide */
-    public int getStrikeNumber(Creature target)
-    {
-        return getStrikeNumber(target, !battle.isInContact(this, true));
-    }
-
-    @SuppressWarnings("deprecation")
-    public int getStrikeNumber(Creature target, boolean rangestrike)
-    {
-        int attackerSkill = getAttackerSkill(target, rangestrike);
-        int defenderSkill = target.getSkill();
-
-        int strikeNumber = 4 - attackerSkill + defenderSkill;
-
-        HazardTerrain terrain = target.getCurrentHex().getTerrain();
-
-        if (!rangestrike)
-        {
-            // Strike number can be modified directly by terrain.
-            strikeNumber += terrain.getSkillBonusStruckIn(this
-                .isNativeTerrain(terrain), target.isNativeTerrain(terrain));
-        }
-        else
-        {
-            // Native defending in bramble, from rangestrike by a non-native
-            //     non-magicMissile: +1
-            if (terrain.equals(HazardTerrain.BRAMBLES)
-                && target.isNativeBramble() && !isNativeBramble()
-                && !useMagicMissile())
-            {
-                strikeNumber++;
-            }
-
-            // Native defending in stone, from rangestrike by a non-native
-            //     non-magicMissile: +1
-            if (terrain.equals(HazardTerrain.STONE) && target.isNativeStone()
-                && !isNativeStone() && !useMagicMissile())
-            {
-                strikeNumber++;
-            }
-        }
-
-        // Sixes always hit.
-        if (strikeNumber > 6)
-        {
-            strikeNumber = 6;
-        }
-
-        return strikeNumber;
-    }
-
     /** Calculate number of dice and strike number needed to hit target,
      *  and whether any carries and strike penalties are possible.
      *  The actual striking is now deferred to strike2(). */
@@ -430,8 +139,8 @@ public class CreatureServerSide extends Creature implements BattleCritter
             carryPossible = false;
         }
 
-        int strikeNumber = getStrikeNumber(target);
-        int dice = getDice(target);
+        int strikeNumber = game.getBattleStrikeSS().getStrikeNumber(this, target);
+        int dice = game.getBattleStrikeSS().getDice(this, target);
 
         // Carries are only possible if the striker is rolling more dice than
         // the target has hits remaining.
@@ -514,7 +223,7 @@ public class CreatureServerSide extends Creature implements BattleCritter
         penaltyOptions.clear();
 
         // Abort if no carries are possible.
-        if (getDice(target) <= target.getPower() - target.getHits())
+        if (game.getBattleStrikeSS().getDice(this, target) <= target.getPower() - target.getHits())
         {
             return;
         }
@@ -532,7 +241,7 @@ public class CreatureServerSide extends Creature implements BattleCritter
         {
             // Add the non-penalty option as a choice.
             PenaltyOption po = new PenaltyOption(this, target,
-                getDice(target), getStrikeNumber(target));
+                game.getBattleStrikeSS().getDice(this, target), game.getBattleStrikeSS().getStrikeNumber(this, target));
             penaltyOptions.add(po);
 
             // Add all non-penalty carries to every PenaltyOption.
@@ -576,8 +285,8 @@ public class CreatureServerSide extends Creature implements BattleCritter
      *  Side effects on penaltyOptions, Battle.carryTargets */
     private void findCarry(CreatureServerSide target, BattleHex neighbor)
     {
-        final int dice = getDice(target);
-        final int strikeNumber = getStrikeNumber(target);
+        final int dice = game.getBattleStrikeSS().getDice(this, target);
+        final int strikeNumber = game.getBattleStrikeSS().getStrikeNumber(this, target);
 
         CreatureServerSide victim = battle.getCreatureSS(neighbor);
         if (victim == null || victim.getPlayer() == getPlayer()
@@ -585,8 +294,8 @@ public class CreatureServerSide extends Creature implements BattleCritter
         {
             return;
         }
-        int tmpDice = getDice(victim);
-        int tmpStrikeNumber = getStrikeNumber(victim);
+        int tmpDice = game.getBattleStrikeSS().getDice(this, victim);
+        int tmpStrikeNumber = game.getBattleStrikeSS().getStrikeNumber(this, victim);
 
         // Can't actually get a bonus to carry.
         if (tmpDice > dice)
