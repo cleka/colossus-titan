@@ -2025,7 +2025,7 @@ public final class Server extends Thread implements IServer
         while (it.hasNext())
         {
             PenaltyOption po = it.next();
-            striker = po.getStriker();
+            striker = (CreatureServerSide)po.getStriker();
             choices.add(po.toString());
         }
         client.askChooseStrikePenalty(choices);

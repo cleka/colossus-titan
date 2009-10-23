@@ -15,6 +15,7 @@ import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.Creature;
+import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
@@ -40,6 +41,7 @@ public class CreatureServerSide extends Creature implements BattleCritter
 {
     private static final Logger LOGGER = Logger
         .getLogger(CreatureServerSide.class.getName());
+
     // TODO the creature would probably be better off not knowing
     // about the battle
     private BattleServerSide battle;
@@ -81,6 +83,11 @@ public class CreatureServerSide extends Creature implements BattleCritter
         this.legion = legion;
     }
 
+    public Game getGame()
+    {
+        return game;
+    }
+
     public int getTag()
     {
         return tag;
@@ -104,11 +111,6 @@ public class CreatureServerSide extends Creature implements BattleCritter
                 .severe("this creatures legion is neither attacking nor defending legion?");
             return false;
         }
-    }
-
-    BattleServerSide getBattle()
-    {
-        return battle;
     }
 
     void undoMove()
@@ -154,16 +156,11 @@ public class CreatureServerSide extends Creature implements BattleCritter
             findCarries(target);
             if (!penaltyOptions.isEmpty())
             {
-                chooseStrikePenalty();
+                game.getServer().askChooseStrikePenalty(penaltyOptions);
                 return;
             }
         }
         strike2(target, dice, strikeNumber);
-    }
-
-    private void chooseStrikePenalty()
-    {
-        (game).getServer().askChooseStrikePenalty(penaltyOptions);
     }
 
     /** Side effects. */
@@ -180,7 +177,7 @@ public class CreatureServerSide extends Creature implements BattleCritter
         PenaltyOption po = matchingPenaltyOption(prompt);
         if (po != null)
         {
-            CreatureServerSide target = po.getTarget();
+            CreatureServerSide target = (CreatureServerSide)po.getTarget();
             int dice = po.getDice();
             int strikeNumber = po.getStrikeNumber();
             carryPossible = (po.numCarryTargets() >= 1);
@@ -240,8 +237,8 @@ public class CreatureServerSide extends Creature implements BattleCritter
         if (!penaltyOptions.isEmpty())
         {
             // Add the non-penalty option as a choice.
-            PenaltyOption po = new PenaltyOption(this, target,
-                game.getBattleStrikeSS().getDice(this, target), game.getBattleStrikeSS().getStrikeNumber(this, target));
+            PenaltyOption po = new PenaltyOption(game, this,
+                target, game.getBattleStrikeSS().getDice(this, target), game.getBattleStrikeSS().getStrikeNumber(this, target));
             penaltyOptions.add(po);
 
             // Add all non-penalty carries to every PenaltyOption.
@@ -335,8 +332,8 @@ public class CreatureServerSide extends Creature implements BattleCritter
                 }
             }
             // No match, so create a new PenaltyOption.
-            PenaltyOption po = new PenaltyOption(this, target, tmpDice,
-                tmpStrikeNumber);
+            PenaltyOption po = new PenaltyOption(game, this, target,
+                tmpDice, tmpStrikeNumber);
             po.addCarryTarget(neighbor);
             penaltyOptions.add(po);
         }

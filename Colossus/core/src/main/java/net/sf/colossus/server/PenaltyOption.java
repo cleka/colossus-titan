@@ -7,7 +7,9 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.Creature;
+import net.sf.colossus.game.Game;
 import net.sf.colossus.variant.BattleHex;
 
 
@@ -22,15 +24,18 @@ final class PenaltyOption implements Comparable<PenaltyOption>
     private static final Logger LOGGER = Logger.getLogger(PenaltyOption.class
         .getName());
 
-    private final CreatureServerSide striker;
-    private final CreatureServerSide target;
+    private final Game game;
+    // Use BattleCritter instead?
+    private final Creature striker;
+    private final Creature target;
     private final Set<BattleHex> carryTargets = new HashSet<BattleHex>();
     private final int dice;
     private final int strikeNumber;
 
-    PenaltyOption(CreatureServerSide striker, CreatureServerSide target,
-        int dice, int strikeNumber)
+    PenaltyOption(Game game, Creature striker, Creature target, int dice,
+        int strikeNumber)
     {
+        this.game = game;
         this.striker = striker;
         this.target = target;
         this.dice = dice;
@@ -42,12 +47,12 @@ final class PenaltyOption implements Comparable<PenaltyOption>
         }
     }
 
-    CreatureServerSide getStriker()
+    Creature getStriker()
     {
         return striker;
     }
 
-    CreatureServerSide getTarget()
+    Creature getTarget()
     {
         return target;
     }
@@ -62,11 +67,14 @@ final class PenaltyOption implements Comparable<PenaltyOption>
         return strikeNumber;
     }
 
+    // TODO use critters instead of hexes?
+    // Then we would not even need game as instance variable here
     void addCarryTarget(BattleHex carryTarget)
     {
         carryTargets.add(carryTarget);
     }
 
+    // TODO use critters instead of hexes?
     void addCarryTargets(Set<BattleHex> targets)
     {
         carryTargets.addAll(targets);
@@ -154,8 +162,8 @@ final class PenaltyOption implements Comparable<PenaltyOption>
                     sb.append(", ");
                 }
                 first = false;
-                CreatureServerSide target = striker.getBattle().getCreatureSS(
-                    hex);
+                BattleCritter target = game.getBattle()
+                    .getCritter(hex);
                 sb.append(target.getDescription());
             }
         }

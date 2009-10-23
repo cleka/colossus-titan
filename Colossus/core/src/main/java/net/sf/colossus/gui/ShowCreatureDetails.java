@@ -25,11 +25,9 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
 import net.sf.colossus.game.Creature;
-import net.sf.colossus.game.Game;
 import net.sf.colossus.game.RecruitGraph;
 import net.sf.colossus.guiutil.KDialog;
 import net.sf.colossus.server.BattleStrikeServerSide;
-import net.sf.colossus.server.CreatureServerSide;
 import net.sf.colossus.server.LegionServerSide;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.HTMLColor;
@@ -111,9 +109,7 @@ public final class ShowCreatureDetails extends KDialog
         super(parentFrame, "Creature Info: " + creature.getName(), false);
 
         this.ivariant = clientGui.getClient();
-
-        Game game = clientGui.getClient().getGame();
-        this.battleStrikeSS = new BattleStrikeServerSide(game);
+        this.battleStrikeSS = new BattleStrikeServerSide(clientGui.getClient().getGame());
 
         Collection<HazardTerrain> terrainHazards = HazardTerrain
             .getAllHazardTerrains();
@@ -224,6 +220,7 @@ public final class ShowCreatureDetails extends KDialog
         for (MasterBoardTerrain terrain : variant.getTerrains())
         {
             buf = new StringBuilder();
+            // TODO use variant instead?
             List<CreatureType> recruiters = VariantSupport.getCurrentVariant()
                 .getCreatureTypesAsList();
             separator = "";
@@ -274,6 +271,7 @@ public final class ShowCreatureDetails extends KDialog
         for (MasterBoardTerrain terrain : variant.getTerrains())
         {
             buf = new StringBuilder();
+            // TODO use variant instead?
             List<CreatureType> recruits = VariantSupport.getCurrentVariant()
                 .getCreatureTypesAsList();
             separator = "";
@@ -559,13 +557,9 @@ public final class ShowCreatureDetails extends KDialog
      * Figure out what it is really good for and solve the actual problem. Currently
      * it even causes assertion errors since it passes nulls where nulls aren't allowed.
      *
-     * TODO this is the only reference to {@link CreatureServerSide} left in the client
-     * code and it probably doesn't need the specific model. If this should stay, it
-     * should probably changed to use {@link net.sf.colossus.game.Creature} instead.
-     *
      * @author Towi
      */
-    final class SimulatedCritter extends CreatureServerSide
+    final class SimulatedCritter extends Creature
     {
 
         /** catch calls to "underlying" battle hex and proxy it to this. */
@@ -577,7 +571,7 @@ public final class ShowCreatureDetails extends KDialog
             final HazardTerrain hazard)
         {
             super(creature, new LegionServerSide("dummy", null, null, null,
-                null, null), null);
+                null, null));
             setNewHazardHex(hazard);
         }
 
@@ -599,24 +593,12 @@ public final class ShowCreatureDetails extends KDialog
             hex.setHexsideHazard(0, hexside);
         }
 
-        // TODO This is somewhat dubious: it calls getDice which is defined
-        //      only in CreatureServerSide (but ShowCreatureDetails is a client
-        //      side thing!!)
-        //      The methods that shows the "battle" properties (dice and
-        //      strikeNr) sets hazards directly on the creature, it's hex
-        //      or hazard hexside, so that data looked up from within creature
-        //      returns the wanted value; but it circumvents the use of the
-        //      battle instance variable which CreatureServerSide has
-        //      (and when reading CSS one might believe this "battle" is
-        //      "in use" in all cases...)
         /** power of this creature hitting target. */
         public int getSimulatedDiceCount(final Creature target)
         {
             return battleStrikeSS.getDice(this, target, false);
         }
 
-        // TODO same dubious thing that hazard properties are set but
-        //      battle might be actually null.
         /** skill of this creature hitting target. */
         public int getSimulatedStrikeNr(final Creature target)
         {
