@@ -239,14 +239,14 @@ public class Creature
         return legion.getMarkerId();
     }
 
+    public String getName()
+    {
+        return getType().getName();
+    }
+
     public boolean isTitan()
     {
         return getType().isTitan();
-    }
-
-    public BattleHex getCurrentHex()
-    {
-        return currentHex;
     }
 
     public String getDescription()
@@ -259,24 +259,40 @@ public class Creature
         return startingHex;
     }
 
-    public void setCurrentHex(BattleHex hex)
-    {
-        this.currentHex = hex;
-    }
-
     public void setStartingHex(BattleHex hex)
     {
         this.startingHex = hex;
     }
 
-    public String getName()
+    public BattleHex getCurrentHex()
     {
-        return getType().getName();
+        return currentHex;
+    }
+
+    public void setCurrentHex(BattleHex hex)
+    {
+        this.currentHex = hex;
     }
 
     public void moveToHex(BattleHex hex)
     {
         setCurrentHex(hex);
+    }
+
+    public void commitMove()
+    {
+        setStartingHex(getCurrentHex());
+    }
+
+    public boolean hasMoved()
+    {
+        return !getCurrentHex().equals(getStartingHex());
+    }
+
+    // TODO never used?
+    public void setMoved(boolean moved)
+    {
+        assert (moved == hasMoved()) : "Oups, setMoved on immobile Creature";
     }
 
     public boolean isDemiLord()
@@ -304,24 +320,29 @@ public class Creature
         return getType().isLordOrDemiLord();
     }
 
-    public boolean isNativeHexside(HazardHexside hazard)
-    {
-        return getType().isNativeHexside(hazard.getCode());
-    }
-
-    public boolean isNativeTerrain(HazardTerrain t)
-    {
-        return getType().isNativeIn(t);
-    }
-
     public boolean isRangestriker()
     {
         return getType().isRangestriker();
     }
 
+    public boolean useMagicMissile()
+    {
+        return getType().useMagicMissile();
+    }
+
     public boolean isSummonable()
     {
         return getType().isSummonable();
+    }
+
+    public boolean isNativeAt(HazardHexside hexside)
+    {
+        return getType().isNativeAt(hexside);
+    }
+
+    public boolean isNativeIn(HazardTerrain terrain)
+    {
+        return getType().isNativeIn(terrain);
     }
 
     public int getPointValue()
@@ -373,24 +394,9 @@ public class Creature
         }
     }
 
-    public boolean hasMoved()
-    {
-        return !getCurrentHex().equals(getStartingHex());
-    }
-
-    public void setMoved(boolean moved)
-    {
-        assert (moved == hasMoved()) : "Oups, setMoved on immobile Creature";
-    }
-
     public String[] getImageNames()
     {
         return getType().getImageNames();
-    }
-
-    public int getMaxCount()
-    {
-        return getType().getMaxCount();
     }
 
     public String getPluralName()
@@ -398,68 +404,14 @@ public class Creature
         return getType().getPluralName();
     }
 
+    public int getMaxCount()
+    {
+        return getType().getMaxCount();
+    }
+
     public void heal()
     {
         setHits(0);
-    }
-
-    /**
-     * @deprecated all isNative<HazardTerrain> are obsolete, one should use
-     * isNativeTerrain(<HazardTerrain>) instead, with no explicit reference
-     * to the name. This will ease adding new HazardTerrain in variant.
-     */
-    @Deprecated
-    public boolean isNativeBramble()
-    {
-        return getType().isNativeIn(HazardTerrain.BRAMBLES);
-    }
-
-    public boolean isNativeDune()
-    {
-        return getType().isNativeDune();
-    }
-
-    public boolean isNativeRiver()
-    {
-        return getType().isNativeRiver();
-    }
-
-    public boolean isNativeSlope()
-    {
-        return getType().isNativeSlope();
-    }
-
-    /**
-     * @deprecated all isNative<HazardTerrain> are obsolete, one should use
-     * isNativeTerrain(<HazardTerrain>) instead, with no explicit reference
-     * to the name. This will ease adding new HazardTerrain in variant.
-     */
-    @Deprecated
-    public boolean isNativeStone()
-    {
-        return getType().isNativeIn(HazardTerrain.STONE);
-    }
-
-    /**
-     * @deprecated all isNative<HazardTerrain> are obsolete, one should use
-     * isNativeTerrain(<HazardTerrain>) instead, with no explicit reference
-     * to the name. This will ease adding new HazardTerrain in variant.
-     */
-    @Deprecated
-    public boolean isNativeVolcano()
-    {
-        return getType().isNativeIn(HazardTerrain.VOLCANO);
-    }
-
-    @Deprecated
-    public boolean isWaterDwelling()
-    {
-        return getType().isWaterDwelling();
-    }
-
-    public boolean useMagicMissile()
-    {
-        return getType().useMagicMissile();
     }
 
     public boolean wouldDieFrom(int additionalDamage)
@@ -500,8 +452,49 @@ public class Creature
         return excess;
     }
 
-    public void commitMove()
+    /**
+     * @deprecated all isNative<HazardTerrain> are obsolete, one should use
+     * isNativeTerrain(<HazardTerrain>) instead, with no explicit reference
+     * to the name. This will ease adding new HazardTerrain in variant.
+     */
+    @Deprecated
+    public boolean isNativeBramble()
     {
-        setStartingHex(getCurrentHex());
+        return isNativeIn(HazardTerrain.BRAMBLES);
     }
+
+    public boolean isNativeDune()
+    {
+        return isNativeAt(HazardHexside.DUNE);
+    }
+
+    public boolean isNativeRiver()
+    {
+        return isNativeAt(HazardHexside.RIVER);
+    }
+
+    public boolean isNativeSlope()
+    {
+        return isNativeAt(HazardHexside.SLOPE);
+    }
+
+    @Deprecated
+    public boolean isNativeStone()
+    {
+        return isNativeIn(HazardTerrain.STONE);
+    }
+
+    @Deprecated
+    public boolean isNativeVolcano()
+    {
+        return isNativeIn(HazardTerrain.VOLCANO);
+    }
+
+    @Deprecated
+    public boolean isWaterDwelling()
+    {
+        return getType().isWaterDwelling();
+    }
+
+
 }

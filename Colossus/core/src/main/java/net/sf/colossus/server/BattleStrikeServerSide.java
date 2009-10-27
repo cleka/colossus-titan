@@ -138,8 +138,8 @@ public class BattleStrikeServerSide
         {
             // striking out of possible hazard
             attackerSkill -= hex.getTerrain().getSkillPenaltyStrikeFrom(
-                striker.isNativeTerrain(hex.getTerrain()),
-                target.isNativeTerrain(hex.getTerrain()));
+                striker.isNativeIn(hex.getTerrain()),
+                target.isNativeIn(hex.getTerrain()));
 
             if (hex.getElevation() > targetHex.getElevation())
             {
@@ -297,7 +297,7 @@ public class BattleStrikeServerSide
         {
             // Strike number can be modified directly by terrain.
             strikeNumber += terrain.getSkillBonusStruckIn(striker
-                .isNativeTerrain(terrain), target.isNativeTerrain(terrain));
+                .isNativeIn(terrain), target.isNativeIn(terrain));
         }
         else
         {

@@ -203,7 +203,7 @@ public final class ShowCreatureDetails extends KDialog
         }
         for (int idx = 0; idx < HEXSIDES.length; idx++)
         {
-            if (creature.isNativeHexside(HEXSIDES[idx]))
+            if (creature.isNativeAt(HEXSIDES[idx]))
             {
                 buf.append(separator);
                 separator = ", ";

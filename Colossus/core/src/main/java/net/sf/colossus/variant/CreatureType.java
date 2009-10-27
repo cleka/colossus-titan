@@ -293,12 +293,14 @@ public class CreatureType implements Comparable<CreatureType>
         return flies;
     }
 
-    public boolean isNativeHexsideHazard(HazardHexside hazard)
+    public boolean isNativeAt(HazardHexside hazard)
     {
-        return isNativeHexside(hazard.getCode());
+        return isNativeAt(hazard.getCode());
     }
 
-    public boolean isNativeHexside(char h)
+    // TODO get rid of this char based version.
+    // Only used by ShowCreatureDetails nowadays.
+    public boolean isNativeAt(char h)
     {
         switch (h)
         {
