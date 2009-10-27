@@ -23,9 +23,9 @@ public class EvaluatedBattleCritter implements BattleCritter
         currentHex = parent.getCurrentHex();
     }
 
-    public CreatureType getCreatureType()
+    public CreatureType getType()
     {
-        return parent.getCreatureType();
+        return parent.getType();
     }
 
     public BattleHex getCurrentHex()

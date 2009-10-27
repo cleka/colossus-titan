@@ -95,12 +95,6 @@ public class Creature
         return type;
     }
 
-    // Just for implementing BattleCritter. TODO Unify ?
-    public CreatureType getCreatureType()
-    {
-        return getType();
-    }
-
     /**
      * Calculates the Striking Power of this Creature when striking directly at
      * target under the circumstances in parameters.

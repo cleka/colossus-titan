@@ -1189,7 +1189,7 @@ final class EventViewer extends KDialog
     {
         RevealEvent event = (battleUnit.isDefender() ? defenderEventLegion
             : attackerEventLegion);
-        event.setCreatureDied(battleUnit.getCreatureType(), battleUnit
+        event.setCreatureDied(battleUnit.getType(), battleUnit
             .getLegion().getHeight());
     }
 

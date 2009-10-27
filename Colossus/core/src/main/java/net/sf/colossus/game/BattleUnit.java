@@ -156,7 +156,7 @@ public final class BattleUnit implements BattleCritter
         this.struck = struck;
     }
 
-    public CreatureType getCreatureType()
+    public CreatureType getType()
     {
         return creatureType;
     }
@@ -173,17 +173,17 @@ public final class BattleUnit implements BattleCritter
 
     public boolean isTitan()
     {
-        return getCreatureType().isTitan();
+        return getType().isTitan();
     }
 
     public boolean isLord()
     {
-        return getCreatureType().isLord();
+        return getType().isLord();
     }
 
     public boolean isDemiLord()
     {
-        return getCreatureType().isDemiLord();
+        return getType().isDemiLord();
     }
 
     public int getPower()
@@ -194,7 +194,7 @@ public final class BattleUnit implements BattleCritter
         }
         else
         {
-            return getCreatureType().getPower();
+            return getType().getPower();
         }
     }
 
@@ -223,7 +223,7 @@ public final class BattleUnit implements BattleCritter
         if (!id.startsWith("Titan-"))
         {
             LOGGER.warning("Asked Titan Power from non-Titan BattleUnit '"
-                + getCreatureType() + "'!");
+                + getType() + "'!");
             return -1;
         }
         String[] parts = id.split("-");
@@ -247,7 +247,7 @@ public final class BattleUnit implements BattleCritter
 
     public int getSkill()
     {
-        return getCreatureType().getSkill();
+        return getType().getSkill();
     }
 
     public int getPointValue()
@@ -257,18 +257,18 @@ public final class BattleUnit implements BattleCritter
 
     public boolean isRangestriker()
     {
-        return getCreatureType().isRangestriker();
+        return getType().isRangestriker();
     }
 
     public boolean useMagicMissile()
     {
-        return getCreatureType().useMagicMissile();
+        return getType().useMagicMissile();
     }
 
     // TODO does this give plain Titan name or user specific one?
     public String getDescription()
     {
-        return getCreatureType().getName() + " in "
+        return getType().getName() + " in "
             + getCurrentHex().getLabel();
     }
 

@@ -406,7 +406,7 @@ public class BattleClientSide extends Battle
             }
         }
 
-        CreatureType creature = battleUnit.getCreatureType();
+        CreatureType creature = battleUnit.getType();
 
         // Then do rangestrikes if applicable.  Rangestrikes are not allowed
         // if the creature can strike normally, so only look for them if
@@ -441,8 +441,8 @@ public class BattleClientSide extends Battle
     private boolean isRangestrikePossible(BattleCritter striker,
         BattleCritter target)
     {
-        CreatureType creature = striker.getCreatureType();
-        CreatureType targetCreature = target.getCreatureType();
+        CreatureType creature = striker.getType();
+        CreatureType targetCreature = target.getType();
 
         BattleHex currentHex = striker.getCurrentHex();
         BattleHex targetHex = target.getCurrentHex();

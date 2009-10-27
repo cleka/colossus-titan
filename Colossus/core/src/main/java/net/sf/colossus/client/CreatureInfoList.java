@@ -50,7 +50,7 @@ class CreatureInfoList extends ArrayList<CreatureInfo>
         List<CreatureType> list = new ArrayList<CreatureType>();
         for (CreatureInfo ci : this)
         {
-            list.add(ci.getCreatureType());
+            list.add(ci.getType());
         }
         return list;
     }

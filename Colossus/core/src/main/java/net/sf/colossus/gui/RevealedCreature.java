@@ -58,11 +58,6 @@ public class RevealedCreature
         return titanBaseName != null ? titanBaseName : creatureType.getName();
     }
 
-    public CreatureType getCreatureType()
-    {
-        return creatureType;
-    }
-
     public String getPlainName()
     {
         return creatureType.getName();

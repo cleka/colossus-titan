@@ -2021,7 +2021,7 @@ public class SimpleAI extends AbstractAI
         MasterBoardTerrain terrain)
     {
         int val = battleUnit.getPointValue();
-        CreatureType creature = battleUnit.getCreatureType();
+        CreatureType creature = battleUnit.getType();
 
         if (creature.isFlier())
         {
@@ -2535,7 +2535,7 @@ public class SimpleAI extends AbstractAI
         // Show the moves considered.
         StringBuilder buf = new StringBuilder("Considered " + moveList.size()
             + " moves for " + critter.getTag() + " "
-            + critter.getCreatureType().getName() + " in "
+            + critter.getType().getName() + " in "
             + currentHex.getLabel() + ":");
         for (CritterMove cm : moveList)
         {
@@ -2700,14 +2700,14 @@ public class SimpleAI extends AbstractAI
                 * getCombatValue(critter, terrain), "StayingOffboard");
             return;
         }
-        PowerSkill ps = calcBonus(critter.getCreatureType(), hex.getTerrain()
+        PowerSkill ps = calcBonus(critter.getType(), hex.getTerrain()
             .getName(), true);
         int native_power = ps.getPowerAttack() + (ps.getPowerDefend() + power);
         int native_skill = ps.getSkillAttack() + ps.getSkillDefend();
         // Add for sitting in favorable terrain.
         // Subtract for sitting in unfavorable terrain.
         if (hex.isNativeBonusTerrain()
-            && critter.getCreatureType().isNativeIn(hex.getTerrain()))
+            && critter.getType().isNativeIn(hex.getTerrain()))
         {
             value.add(bec.NATIVE_BONUS_TERRAIN, "NativeBonusTerrain");
 
@@ -2736,7 +2736,7 @@ public class SimpleAI extends AbstractAI
         // Critter is not native or the terrain is not beneficial
         {
             if (hex.isNonNativePenaltyTerrain()
-                && (!critter.getCreatureType().isNativeIn(hex.getTerrain())))
+                && (!critter.getType().isNativeIn(hex.getTerrain())))
             {
                 value.add(bec.NON_NATIVE_PENALTY_TERRAIN, "NonNativePenalty");
 
@@ -2751,7 +2751,7 @@ public class SimpleAI extends AbstractAI
 
         /* damage is positive, healing is negative, so we can always add */
         value.add(bec.PENALTY_DAMAGE_TERRAIN
-            * hex.damageToCreature(critter.getCreatureType()),
+            * hex.damageToCreature(critter.getType()),
             "PenaltyDamageTerrain");
     }
 
@@ -2935,7 +2935,7 @@ public class SimpleAI extends AbstractAI
             }
 
             // Attack Warlocks so they don't get Titan
-            if (target.getCreatureType().getName().equals("Warlock"))
+            if (target.getType().getName().equals("Warlock"))
             {
                 value.add(bec.ADJACENT_TO_BUDDY_TITAN, "AdjacentToBuddyTitan");
             }
@@ -3046,7 +3046,7 @@ public class SimpleAI extends AbstractAI
         final BattleHex hex = critter.getCurrentHex();
         final int turn = client.getBattleTurnNumber();
 
-        PowerSkill ps = calcBonus(critter.getCreatureType(), hex.getTerrain()
+        PowerSkill ps = calcBonus(critter.getType(), hex.getTerrain()
             .getName(), true);
 
         int native_power = ps.getPowerAttack() + (ps.getPowerDefend() + power);

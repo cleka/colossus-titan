@@ -66,7 +66,7 @@ class PreserveCreatureTacticalObjective extends AbstractTacticalObjective
         }
         for (BattleCritter dCritter : client.getActiveBattleUnits())
         {
-            if (dCritter.getCreatureType().equals(critter.getType()))
+            if (dCritter.getType().equals(critter.getType()))
             {
                 ValueRecorder lvalue = new ValueRecorder(getDescription());
                 for (BattleCritter aCritter : client.getInactiveBattleUnits())
@@ -77,7 +77,7 @@ class PreserveCreatureTacticalObjective extends AbstractTacticalObjective
                     {
                         lvalue.add(- aCritter.getPointValue(),
                                    "Attacker" +
-                                   aCritter.getCreatureType().getName() +
+                                   aCritter.getType().getName() +
                                    "CanStrike" +
                                    critter.getType().getName());
                     }
@@ -87,7 +87,7 @@ class PreserveCreatureTacticalObjective extends AbstractTacticalObjective
                     {
                         lvalue.add(- aCritter.getPointValue(),
                                    "Attacker" +
-                                   aCritter.getCreatureType().getName() +
+                                   aCritter.getType().getName() +
                                    "CanStrike" +
                                    critter.getType().getName());
                     }

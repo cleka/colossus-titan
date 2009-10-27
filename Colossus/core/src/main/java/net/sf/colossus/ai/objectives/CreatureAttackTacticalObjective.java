@@ -74,7 +74,7 @@ class CreatureAttackTacticalObjective extends AbstractTacticalObjective
             {
                 continue;
             }
-            if (critter.getCreatureType().equals(creature.getType()))
+            if (critter.getType().equals(creature.getType()))
             {
                 final int skill = critter.getSkill();
                 final int power = critter.getPower();
@@ -118,7 +118,7 @@ class CreatureAttackTacticalObjective extends AbstractTacticalObjective
                         }
 
                         // Attack Warlocks so they don't get Titan
-                        if (target.getCreatureType().useMagicMissile())
+                        if (target.getType().useMagicMissile())
                         {
                             value.add(bec.ADJACENT_TO_BUDDY_TITAN, desc
                                 + ": AdjacentToBuddyTitan");

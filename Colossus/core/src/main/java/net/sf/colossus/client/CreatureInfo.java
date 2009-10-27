@@ -99,7 +99,7 @@ class CreatureInfo implements Cloneable
         return sb.toString();
     }
 
-    public CreatureType getCreatureType()
+    public CreatureType getType()
     {
         return type;
     }

@@ -2288,7 +2288,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             return "";
         }
         BattleHex hex = battleUnit.getCurrentHex();
-        return battleUnit.getCreatureType().getName() + " in "
+        return battleUnit.getType().getName() + " in "
             + hex.getDescription();
     }
 

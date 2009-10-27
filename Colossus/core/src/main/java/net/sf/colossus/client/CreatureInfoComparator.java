@@ -14,8 +14,8 @@ final class CreatureInfoComparator implements Comparator<CreatureInfo>,
 {
     public int compare(CreatureInfo info1, CreatureInfo info2)
     {
-        CreatureType creature1 = info1.getCreatureType();
-        CreatureType creature2 = info2.getCreatureType();
+        CreatureType creature1 = info1.getType();
+        CreatureType creature2 = info2.getType();
         int diff = creature2.getKillValue() - creature1.getKillValue();
         if (diff != 0)
         {

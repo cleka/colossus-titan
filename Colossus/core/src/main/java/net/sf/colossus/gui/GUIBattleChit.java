@@ -81,7 +81,7 @@ public class GUIBattleChit extends Chit
             id = Constants.titan;
         }
 
-        String buName = battleUnit.getCreatureType().getName();
+        String buName = battleUnit.getType().getName();
         if (!buName.equals(id))
         {
             LOGGER.warning("own name is " + id + " but battleUnit gave us "
@@ -92,7 +92,7 @@ public class GUIBattleChit extends Chit
 
     public String getDescription()
     {
-        return battleUnit.getCreatureType().getName() + " in "
+        return battleUnit.getType().getName() + " in "
             + battleUnit.getCurrentHex().getLabel();
     }
 

@@ -632,8 +632,8 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
         // make the new creatureInfoLists
         for (CreatureInfo ci : creatures)
         {
-            CreatureType type = ci.getCreatureType();
-            CreatureInfo newinfo = new CreatureInfo(ci.getCreatureType(),
+            CreatureType type = ci.getType();
+            CreatureInfo newinfo = new CreatureInfo(ci.getType(),
                 false, true);
             if (splitoffs.contains(type))
             {
@@ -850,7 +850,7 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
         Iterator<CreatureInfo> it = creatures.iterator();
         // We have already checked height>0, so taking next is ok.
         CreatureInfo ci = it.next();
-        while (!(ci.isCertain() && ci.getCreatureType().equals(type)))
+        while (!(ci.isCertain() && ci.getType().equals(type)))
         {
             assert it.hasNext() : "Tried to remove nonexistant creature";
             ci = it.next();

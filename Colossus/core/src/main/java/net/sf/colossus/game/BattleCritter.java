@@ -12,7 +12,7 @@ import net.sf.colossus.variant.CreatureType;
 public interface BattleCritter
 {
 
-    CreatureType getCreatureType();
+    CreatureType getType();
 
     BattleHex getCurrentHex();
 

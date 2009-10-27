@@ -135,7 +135,7 @@ final class BattleMovement
             }
             else
             {
-                CreatureType type = critter.getCreatureType();
+                CreatureType type = critter.getType();
                 BattleHex hex = critter.getCurrentHex();
                 set = findMoves(hex, type, type.isFlier(), type
                     .getSkill(), -1, true);
