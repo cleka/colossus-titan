@@ -452,49 +452,4 @@ public class Creature
         return excess;
     }
 
-    /**
-     * @deprecated all isNative<HazardTerrain> are obsolete, one should use
-     * isNativeTerrain(<HazardTerrain>) instead, with no explicit reference
-     * to the name. This will ease adding new HazardTerrain in variant.
-     */
-    @Deprecated
-    public boolean isNativeBramble()
-    {
-        return isNativeIn(HazardTerrain.BRAMBLES);
-    }
-
-    public boolean isNativeDune()
-    {
-        return isNativeAt(HazardHexside.DUNE);
-    }
-
-    public boolean isNativeRiver()
-    {
-        return isNativeAt(HazardHexside.RIVER);
-    }
-
-    public boolean isNativeSlope()
-    {
-        return isNativeAt(HazardHexside.SLOPE);
-    }
-
-    @Deprecated
-    public boolean isNativeStone()
-    {
-        return isNativeIn(HazardTerrain.STONE);
-    }
-
-    @Deprecated
-    public boolean isNativeVolcano()
-    {
-        return isNativeIn(HazardTerrain.VOLCANO);
-    }
-
-    @Deprecated
-    public boolean isWaterDwelling()
-    {
-        return getType().isWaterDwelling();
-    }
-
-
 }
