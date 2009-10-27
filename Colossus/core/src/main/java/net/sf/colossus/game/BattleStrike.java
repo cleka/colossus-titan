@@ -1,5 +1,6 @@
 package net.sf.colossus.game;
 
+
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.BattleClientSide;
@@ -11,9 +12,8 @@ import net.sf.colossus.variant.HazardTerrain;
 
 public class BattleStrike
 {
-    private static final Logger LOGGER = Logger
-        .getLogger(BattleStrike.class.getName());
-
+    private static final Logger LOGGER = Logger.getLogger(BattleStrike.class
+        .getName());
 
     private final Game game;
 
@@ -117,7 +117,8 @@ public class BattleStrike
             if (hex.getElevation() > targetHex.getElevation())
             {
                 // Adjacent hex, so only one possible direction.
-                int direction = BattleClientSide.getDirection(hex, targetHex, false);
+                int direction = BattleClientSide.getDirection(hex, targetHex,
+                    false);
                 // TODO the hexside should be called WALL...
                 // Striking down across wall: +1
                 if (hex.getHexsideHazard(direction) == HazardHexside.TOWER)
@@ -128,13 +129,14 @@ public class BattleStrike
             else if (hex.getElevation() < targetHex.getElevation())
             {
                 // Adjacent hex, so only one possible direction.
-                int direction = BattleClientSide.getDirection(targetHex, hex, false);
+                int direction = BattleClientSide.getDirection(targetHex, hex,
+                    false);
                 HazardHexside hazard = targetHex.getHexsideHazard(direction);
                 // Non-native striking up slope: -1
                 // Striking up across wall: -1
                 // TODO Tower vs. Wall ...
-                if ((hazard == HazardHexside.SLOPE && !striker
-                    .getType().isNativeSlope())
+                if ((hazard == HazardHexside.SLOPE && !striker.getType()
+                    .isNativeSlope())
                     || hazard == HazardHexside.TOWER)
                 {
                     attackerSkill--;
@@ -199,9 +201,8 @@ public class BattleStrike
         if (!rangestrike)
         {
             // Strike number can be modified directly by terrain.
-            strikeNumber += terrain.getSkillBonusStruckIn(striker
-                .getType().isNativeIn(terrain), target
-                .getType().isNativeIn(terrain));
+            strikeNumber += terrain.getSkillBonusStruckIn(striker.getType()
+                .isNativeIn(terrain), target.getType().isNativeIn(terrain));
         }
         else
         {
@@ -209,8 +210,7 @@ public class BattleStrike
             //     non-magicMissile: +1
             if (terrain.equals(HazardTerrain.BRAMBLES)
                 && target.getType().isNativeIn(HazardTerrain.BRAMBLES)
-                && !striker.getType().isNativeIn(
-                    HazardTerrain.BRAMBLES)
+                && !striker.getType().isNativeIn(HazardTerrain.BRAMBLES)
                 && !striker.getType().useMagicMissile())
             {
                 strikeNumber++;

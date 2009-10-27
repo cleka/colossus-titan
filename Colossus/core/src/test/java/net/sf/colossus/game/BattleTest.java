@@ -13,6 +13,7 @@ import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;
 
+
 /**
  *
  */
@@ -30,7 +31,6 @@ public class BattleTest extends TestCase
     Battle battle;
     BattleClientSide battleCS;
     BattleServerSide battleSS;
-
 
     /**
      * @param name

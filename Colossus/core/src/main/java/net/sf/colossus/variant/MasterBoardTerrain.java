@@ -463,8 +463,7 @@ public class MasterBoardTerrain implements Comparable<MasterBoardTerrain>
         {
             int count = this.getHazardHexsideCount(hazard);
 
-            if (hazard.isNativeBonusHexside()
-                && (creature).isNativeAt(hazard))
+            if (hazard.isNativeBonusHexside() && (creature).isNativeAt(hazard))
             {
                 bonusHazardSideCount += count;
             }

@@ -322,17 +322,16 @@ public class GameSaving
 
         bat.setAttribute("masterHexLabel", game.getBattleSS().getLocation()
             .getLabel());
-        bat.setAttribute("turnNumber", "" + game.getBattleSS().getBattleTurnNumber());
+        bat.setAttribute("turnNumber", ""
+            + game.getBattleSS().getBattleTurnNumber());
         bat.setAttribute("activePlayer", ""
             + game.getBattleSS().getBattleActivePlayer().getName());
         bat.setAttribute("phase", ""
             + game.getBattleSS().getBattlePhase().ordinal());
-        bat
-            .setAttribute("summonState", ""
-                + game.getBattleSS().getSummonState());
-        bat
-            .setAttribute("carryDamage", ""
-                + game.getBattleSS().getCarryDamage());
+        bat.setAttribute("summonState", ""
+            + game.getBattleSS().getSummonState());
+        bat.setAttribute("carryDamage", ""
+            + game.getBattleSS().getCarryDamage());
         bat.setAttribute("driftDamageApplied", ""
             + game.getBattleSS().isDriftDamageApplied());
 

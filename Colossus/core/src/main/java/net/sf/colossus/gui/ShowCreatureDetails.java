@@ -109,7 +109,8 @@ public final class ShowCreatureDetails extends KDialog
         super(parentFrame, "Creature Info: " + creature.getName(), false);
 
         this.ivariant = clientGui.getClient();
-        this.battleStrikeSS = new BattleStrikeServerSide(clientGui.getClient().getGame());
+        this.battleStrikeSS = new BattleStrikeServerSide(clientGui.getClient()
+            .getGame());
 
         Collection<HazardTerrain> terrainHazards = HazardTerrain
             .getAllHazardTerrains();
@@ -254,17 +255,12 @@ public final class ShowCreatureDetails extends KDialog
             if (buf.length() > 0)
             {
                 Color color = terrain.getColor().brighter();
-                s
-                    .append(MessageFormat
-                        .format(
-                            "<tr><td bgcolor={0}>in {1}</td>"
-                                + "<td colspan={2}><font color=blue>{3}</font></td>"
-                                + "</tr>", new Object[] {
-                                HTMLColor.colorToCode(color),
-                                terrain.getId(),
-                                ""
-                                    + (hazards
-                                        .size() + 1), buf.toString(), }));
+                s.append(MessageFormat.format(
+                    "<tr><td bgcolor={0}>in {1}</td>"
+                        + "<td colspan={2}><font color=blue>{3}</font></td>"
+                        + "</tr>", new Object[] {
+                        HTMLColor.colorToCode(color), terrain.getId(),
+                        "" + (hazards.size() + 1), buf.toString(), }));
             }
         }
         //   out
@@ -299,17 +295,12 @@ public final class ShowCreatureDetails extends KDialog
             if (buf.length() > 0)
             {
                 Color color = terrain.getColor().brighter();
-                s
-                    .append(MessageFormat
-                        .format(
-                            "<tr><td bgcolor={0}>in {1}</td>"
-                                + "<td colspan={2}><font color=green>{3}</font></td>"
-                                + "</tr>", new Object[] {
-                                HTMLColor.colorToCode(color),
-                                terrain.getId(),
-                                ""
-                                    + (hazards
-                                        .size() + 1), buf.toString(), }));
+                s.append(MessageFormat.format(
+                    "<tr><td bgcolor={0}>in {1}</td>"
+                        + "<td colspan={2}><font color=green>{3}</font></td>"
+                        + "</tr>", new Object[] {
+                        HTMLColor.colorToCode(color), terrain.getId(),
+                        "" + (hazards.size() + 1), buf.toString(), }));
             }
         }
 
@@ -360,11 +351,9 @@ public final class ShowCreatureDetails extends KDialog
                 }
             }
             String colspan = "2";
-            s
-                .append(MessageFormat.format(
-                    "<td bgcolor={0} colspan={2}>{1}</td>", new Object[] {
-                        HTMLColor.colorToCode(color), hazardName,
-                        colspan }));
+            s.append(MessageFormat.format(
+                "<td bgcolor={0} colspan={2}>{1}</td>", new Object[] {
+                    HTMLColor.colorToCode(color), hazardName, colspan }));
         }
         s.append("</tr>");
 
@@ -394,9 +383,8 @@ public final class ShowCreatureDetails extends KDialog
             }
             String colspan = "2";
             s.append(MessageFormat.format(
-                "<td bgcolor={0} colspan={2}>{1}</td>",
-                new Object[] { HTMLColor.colorToCode(color),
-                    hazardName, colspan, }));
+                "<td bgcolor={0} colspan={2}>{1}</td>", new Object[] {
+                    HTMLColor.colorToCode(color), hazardName, colspan, }));
             if (iterator.hasNext())
             {
                 iterator.next(); // skip one
@@ -426,8 +414,7 @@ public final class ShowCreatureDetails extends KDialog
                 text = "?";
             }
             s.append(MessageFormat.format("<td bgcolor={0}>{1}</td>",
-                new Object[] { HTMLColor.colorToCode(color),
-                    text, }));
+                new Object[] { HTMLColor.colorToCode(color), text, }));
         }
         s.append("<td bgcolor=#dddddd></td></tr>");
 
@@ -503,8 +490,7 @@ public final class ShowCreatureDetails extends KDialog
      */
     private void _section(StringBuilder s, final String name)
     {
-        s.append("<tr bgcolor=gray><td colspan="
-            + (hazards.size() + 1) + ">");
+        s.append("<tr bgcolor=gray><td colspan=" + (hazards.size() + 1) + ">");
         s.append("<b>" + name + "</b>");
         s.append("</td></tr>");
     }
@@ -512,8 +498,7 @@ public final class ShowCreatureDetails extends KDialog
     /** a headered table row, the data column spans.
      * @param s in/out
      */
-    private void _trSpan(StringBuilder s, final String name,
-        final String value)
+    private void _trSpan(StringBuilder s, final String name, final String value)
     {
         s.append(MessageFormat.format(
             "<tr><th>{0}</th><td colspan={1}>{2}</td></tr>", new Object[] {

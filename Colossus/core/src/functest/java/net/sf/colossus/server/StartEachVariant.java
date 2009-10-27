@@ -1,5 +1,6 @@
 package net.sf.colossus.server;
 
+
 import java.util.logging.Logger;
 
 import junit.framework.TestCase;
@@ -9,6 +10,7 @@ import net.sf.colossus.common.TestConstants;
 import net.sf.colossus.common.WhatNextManager;
 import net.sf.colossus.util.ErrorUtils;
 import net.sf.colossus.variant.Variant;
+
 
 public class StartEachVariant extends TestCase
 {
@@ -42,8 +44,6 @@ public class StartEachVariant extends TestCase
     }
     */
 
-
-
     // TODO nrOfAIs still dummy...
     private void testStartOneVariant(String variantName, int nrOfAIs)
     {
@@ -72,12 +72,10 @@ public class StartEachVariant extends TestCase
             serverOptions, variant);
         game.startNewGameAndWaitUntilOver(null);
 
-        assertFalse("Starting game with variant " + variantName
-            + " failed!",
+        assertFalse("Starting game with variant " + variantName + " failed!",
             ErrorUtils.checkErrorDuringFunctionalTest());
 
         LOGGER.info("OK: starting variant Default COMPLETED.");
     }
-
 
 }

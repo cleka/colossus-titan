@@ -2535,8 +2535,8 @@ public class SimpleAI extends AbstractAI
         // Show the moves considered.
         StringBuilder buf = new StringBuilder("Considered " + moveList.size()
             + " moves for " + critter.getTag() + " "
-            + critter.getType().getName() + " in "
-            + currentHex.getLabel() + ":");
+            + critter.getType().getName() + " in " + currentHex.getLabel()
+            + ":");
         for (CritterMove cm : moveList)
         {
             buf.append(" " + cm.getEndingHex().getLabel());
@@ -2751,8 +2751,7 @@ public class SimpleAI extends AbstractAI
 
         /* damage is positive, healing is negative, so we can always add */
         value.add(bec.PENALTY_DAMAGE_TERRAIN
-            * hex.damageToCreature(critter.getType()),
-            "PenaltyDamageTerrain");
+            * hex.damageToCreature(critter.getType()), "PenaltyDamageTerrain");
     }
 
     /** this compute for non-titan attacking critter */
@@ -2826,11 +2825,12 @@ public class SimpleAI extends AbstractAI
     }
 
     @SuppressWarnings("unused")
-    protected void evaluateCritterMove_Rangestrike(final BattleCritter critter,
-        final Map<BattleHex, Integer> strikeMap, ValueRecorder value,
-        final MasterBoardTerrain terrain, final BattleHex hex,
-        final int power, final int skill, final LegionClientSide legion,
-        final int turn, final Set<BattleHex> targetHexes)
+    protected void evaluateCritterMove_Rangestrike(
+        final BattleCritter critter, final Map<BattleHex, Integer> strikeMap,
+        ValueRecorder value, final MasterBoardTerrain terrain,
+        final BattleHex hex, final int power, final int skill,
+        final LegionClientSide legion, final int turn,
+        final Set<BattleHex> targetHexes)
     {
         if (hex.isEntrance())
         {
@@ -2859,9 +2859,7 @@ public class SimpleAI extends AbstractAI
             {
                 value.add(bec.RANGESTRIKE_TITAN, "RangestrikeTitan");
             }
-            int strikeNum = getBattleStrike()
-                .getStrikeNumber(critter,
-                target);
+            int strikeNum = getBattleStrike().getStrikeNumber(critter, target);
             if (strikeNum <= 4 - skill + target.getSkill())
             {
                 penalty = false;
@@ -2943,9 +2941,7 @@ public class SimpleAI extends AbstractAI
             // Reward being next to an enemy that we can probably
             // kill this turn.
             int dice = getBattleStrike().getDice(critter, target);
-            int strikeNum = getBattleStrike()
-                .getStrikeNumber(critter,
-                target);
+            int strikeNum = getBattleStrike().getStrikeNumber(critter, target);
             double meanHits = Probs.meanHits(dice, strikeNum);
             if (meanHits + target.getHits() >= target.getPower())
             {
@@ -2976,9 +2972,7 @@ public class SimpleAI extends AbstractAI
             // Penalize damage that we can take this turn,
             {
                 dice = getBattleStrike().getDice(target, critter);
-                strikeNum = getBattleStrike()
-                    .getStrikeNumber(target,
-                    critter);
+                strikeNum = getBattleStrike().getStrikeNumber(target, critter);
                 hitsExpected += Probs.meanHits(dice, strikeNum);
             }
         }

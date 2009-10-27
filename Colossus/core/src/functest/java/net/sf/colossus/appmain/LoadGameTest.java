@@ -1,10 +1,12 @@
 package net.sf.colossus.appmain;
 
+
 import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.util.ErrorUtils;
+
 
 public class LoadGameTest extends TestCase
 {

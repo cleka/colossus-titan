@@ -1,5 +1,6 @@
 package net.sf.colossus.tools;
 
+
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Graphics;
@@ -116,18 +117,19 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
     {
         javax.swing.JFileChooser loadFileChooser = new JFileChooser(".");
         loadFileChooser.setFileFilter(new rndFileFilter());
-        loadFileChooser.setDialogTitle(
-                "Choose the RaNDom file to open (or cancel for nothing)");
+        loadFileChooser
+            .setDialogTitle("Choose the RaNDom file to open (or cancel for nothing)");
         int returnVal = loadFileChooser.showOpenDialog(loadFileChooser);
         if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION)
         {
             java.io.File rndFile = loadFileChooser.getSelectedFile();
             String tempRndName = rndFile.getName();
-            String tempRndDirectory = rndFile.getParentFile().getAbsolutePath();
+            String tempRndDirectory = rndFile.getParentFile()
+                .getAbsolutePath();
             List<String> directories = new java.util.ArrayList<String>();
             directories.add(tempRndDirectory);
-            InputStream inputFile = StaticResourceLoader.getInputStream(tempRndName,
-                    directories);
+            InputStream inputFile = StaticResourceLoader.getInputStream(
+                tempRndName, directories);
             if (inputFile != null)
             {
                 doRandomization(h, inputFile);
@@ -141,24 +143,22 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
     {
         JFileChooser loadFileChooser = new JFileChooser();
         loadFileChooser.setFileFilter(new xmlFileFilter());
-        loadFileChooser.setDialogTitle(
-                "Choose the battleland file to open (or cancel for nothing)");
+        loadFileChooser
+            .setDialogTitle("Choose the battleland file to open (or cancel for nothing)");
         int returnVal = loadFileChooser.showOpenDialog(loadFileChooser);
         if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION)
         {
             File loadFileFile = loadFileChooser.getSelectedFile();
             String temploadFileName = loadFileFile.getName();
-            String temploadFileDirectory = loadFileFile.getParentFile().getAbsolutePath();
+            String temploadFileDirectory = loadFileFile.getParentFile()
+                .getAbsolutePath();
             List<String> directories = new ArrayList<String>();
             directories.add(temploadFileDirectory);
-            InputStream inputFile =
-                    net.sf.colossus.util.StaticResourceLoader.getInputStream(
-                    temploadFileName,
-                    directories);
+            InputStream inputFile = net.sf.colossus.util.StaticResourceLoader
+                .getInputStream(temploadFileName, directories);
             if (inputFile != null)
             {
-                BattlelandLoader parser =
-                        new BattlelandLoader(inputFile, h);
+                BattlelandLoader parser = new BattlelandLoader(inputFile, h);
                 try
                 {
                     towerItem.setState(parser.isTower());
@@ -179,7 +179,8 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
                     setBasicName(lMapName);
                     setMapName(lMapName);
                     super.repaint();
-                } catch (Exception e)
+                }
+                catch (Exception e)
                 {
                     System.err.println(e);
                 }
@@ -190,20 +191,19 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
     private void doSaveFile()
     {
         javax.swing.JFileChooser saveFileChooser = new JFileChooser();
-        saveFileChooser.setDialogTitle(
-                "Choose the battleland file to save (or cancel for nothing)");
+        saveFileChooser
+            .setDialogTitle("Choose the battleland file to save (or cancel for nothing)");
         int returnVal = saveFileChooser.showSaveDialog(saveFileChooser);
         if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION)
         {
             java.io.File saveFileFile = saveFileChooser.getSelectedFile();
             String tempsaveFileName = saveFileFile.getName();
-            String tempsaveFileDirectory = saveFileFile.getParentFile().getAbsolutePath();
+            String tempsaveFileDirectory = saveFileFile.getParentFile()
+                .getAbsolutePath();
             List<String> directories = new ArrayList<String>();
             directories.add(tempsaveFileDirectory);
-            OutputStream outputFile =
-                    net.sf.colossus.util.StaticResourceLoader.getOutputStream(
-                    tempsaveFileName,
-                    directories);
+            OutputStream outputFile = net.sf.colossus.util.StaticResourceLoader
+                .getOutputStream(tempsaveFileName, directories);
             if (outputFile != null)
             {
                 String outStr = dumpAsString();
@@ -217,7 +217,8 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
                     setBasicName(lMapName);
                     setMapName(getDisplayName());
                     super.repaint();
-                } catch (Exception e)
+                }
+                catch (Exception e)
                 {
                     System.err.println(e);
                 }
@@ -237,7 +238,8 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
             try
             {
                 printerJob.print();
-            } catch (PrinterException exception)
+            }
+            catch (PrinterException exception)
             {
                 System.err.println("Printing error: " + exception);
             }
@@ -252,7 +254,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
             return Printable.NO_SUCH_PAGE;
         }
 
-        Graphics2D g2 = (Graphics2D) graphics;
+        Graphics2D g2 = (Graphics2D)graphics;
         g2.scale(.5, .5);
 
         g2.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
@@ -411,6 +413,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
             (h.getNeighbor(lastSide)).repaint();
         }
     }
+
     private final AbstractAction showBattlelandAction;
     private final AbstractAction saveBattlelandAsAction;
     private final AbstractAction printBattlelandAction;
@@ -436,8 +439,8 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
 
         public void actionPerformed(ActionEvent e)
         {
-            InputStream inputFile = StaticResourceLoader.getInputStream(filename,
-                    VariantSupport.getVarDirectoriesList());
+            InputStream inputFile = StaticResourceLoader.getInputStream(
+                filename, VariantSupport.getVarDirectoriesList());
             doRandomization(getBattleHexArray(), inputFile);
             setMapName(getDisplayName());
             towerItem.setState(isTower);
@@ -464,7 +467,8 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
             }
         };
 
-        saveBattlelandAsAction = new AbstractAction("Save Battleland as file...")
+        saveBattlelandAsAction = new AbstractAction(
+            "Save Battleland as file...")
         {
 
             public void actionPerformed(ActionEvent e)
@@ -542,13 +546,13 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
 
             public void actionPerformed(ActionEvent e)
             {
-                JCheckBoxMenuItem mi = (JCheckBoxMenuItem) e.getSource();
+                JCheckBoxMenuItem mi = (JCheckBoxMenuItem)e.getSource();
                 isTower = !isTower;
                 mi.setState(isTower);
             }
         };
-        towerItem = (JCheckBoxMenuItem) specialMenu.add(new JCheckBoxMenuItem(
-                towerAction));
+        towerItem = (JCheckBoxMenuItem)specialMenu.add(new JCheckBoxMenuItem(
+            towerAction));
         clearStartListAction = new AbstractAction("Remove StartList")
         {
 
@@ -558,8 +562,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
                 {
                     for (int j = 0; j < h[0].length; j++)
                     {
-                        if ((h[i][j] != null) &&
-                                (h[i][j].isSelected()))
+                        if ((h[i][j] != null) && (h[i][j].isSelected()))
                         {
                             h[i][j].unselect();
                             h[i][j].repaint();
@@ -606,7 +609,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
 
         JMenu randomMenu = new JMenu("Randomize as ");
 
-        final Map<String,String> defaultRandom = new TreeMap<String,String>();
+        final Map<String, String> defaultRandom = new TreeMap<String, String>();
 
         defaultRandom.put("Brush", "Battlelands/Brush.rnd");
         defaultRandom.put("Desert", "Battlelands/Desert.rnd");
@@ -619,14 +622,18 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
         defaultRandom.put("Tower", "Battlelands/Tower.rnd");
         defaultRandom.put("Tundra", "Battlelands/Tundra.rnd");
         defaultRandom.put("Woods", "Battlelands/Woods.rnd");
-        for (String name : defaultRandom.keySet()) {
-            mi = randomMenu.add(new randomizeActionPredef(name, defaultRandom.get(name)));
+        for (String name : defaultRandom.keySet())
+        {
+            mi = randomMenu.add(new randomizeActionPredef(name, defaultRandom
+                .get(name)));
         }
         randomMenu.addSeparator();
         defaultRandom.clear();
         defaultRandom.put("Beach", "Battlelands/Custom_Beach.rnd");
-        for (String name : defaultRandom.keySet()) {
-            mi = randomMenu.add(new randomizeActionPredef(name, defaultRandom.get(name)));
+        for (String name : defaultRandom.keySet())
+        {
+            mi = randomMenu.add(new randomizeActionPredef(name, defaultRandom
+                .get(name)));
         }
         randomMenu.addSeparator();
 
@@ -641,7 +648,8 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
         contentPane.setLayout(new BorderLayout());
         contentPane.add(menuBar, BorderLayout.NORTH);
 
-        addMouseListener(new MouseAdapter(){
+        addMouseListener(new MouseAdapter()
+        {
             @Override
             public void mousePressed(MouseEvent e)
             {
@@ -652,8 +660,8 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
                     Point c = h.findCenter();
                     if (c.y >= lastPoint.y)
                     { // uppper half
-                        if (lastPoint.x >=
-                                ((c.x) + (h.getBounds().x + h.getBounds().width)) / 2)
+                        if (lastPoint.x >= ((c.x) + (h.getBounds().x + h
+                            .getBounds().width)) / 2)
                         {
                             lastSide = 1;
                         }
@@ -668,8 +676,8 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
                     }
                     else
                     { // lower half
-                        if (lastPoint.x >=
-                                ((c.x) + (h.getBounds().x + h.getBounds().width)) / 2)
+                        if (lastPoint.x >= ((c.x) + (h.getBounds().x + h
+                            .getBounds().width)) / 2)
                         {
                             lastSide = 2;
                         }
@@ -682,23 +690,22 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
                             lastSide = 3;
                         }
                     }
-                    if (h.innerContains(lastPoint) ||
-                            (h.getNeighbor(lastSide) == null))
+                    if (h.innerContains(lastPoint)
+                        || (h.getNeighbor(lastSide) == null))
                     { // change content
-                        popupMenuTerrain.show(e.getComponent(),
-                                lastPoint.x,
-                                lastPoint.y);
+                        popupMenuTerrain.show(e.getComponent(), lastPoint.x,
+                            lastPoint.y);
                     }
                     else
                     { // change border
-                        popupMenuBorder.show(e.getComponent(),
-                                lastPoint.x,
-                                lastPoint.y);
+                        popupMenuBorder.show(e.getComponent(), lastPoint.x,
+                            lastPoint.y);
                     }
                 }
             }
         });
-        frame.addWindowListener(new WindowAdapter(){
+        frame.addWindowListener(new WindowAdapter()
+        {
             @Override
             public void windowClosing(WindowEvent e)
             {
@@ -713,30 +720,32 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
 
         popupMenuTerrain = new JPopupMenu("Choose Terrain");
         contentPane.add(popupMenuTerrain);
-        Collection<HazardTerrain> terrains =
-                HazardTerrain.getAllHazardTerrains();
+        Collection<HazardTerrain> terrains = HazardTerrain
+            .getAllHazardTerrains();
         GUIBattleHex tempH = new GUIBattleHex(0, 0, 1, this, 0, 0);
 
         for (HazardTerrain terrain : terrains)
         {
             tempH.getHexModel().setTerrain(terrain);
             mi = popupMenuTerrain.add(new TerrainAction(terrain.getName(),
-                    terrain));
+                terrain));
         }
         popupMenuTerrain.addSeparator();
         for (int i = 0; i < 4; i++)
         {
-            mi = popupMenuTerrain.add(new ElevationAction(
-                    "Set Elevation to: " + i,
-                    i));
+            mi = popupMenuTerrain.add(new ElevationAction("Set Elevation to: "
+                + i, i));
         }
         popupMenuTerrain.addSeparator();
 
-        popupMenuTerrain.add(new CleanAllHexsideAction("Clear my hexsides", true));
-        popupMenuTerrain.add(new CleanAllHexsideAction("Clear my neighbors' hexsides", false));
+        popupMenuTerrain.add(new CleanAllHexsideAction("Clear my hexsides",
+            true));
+        popupMenuTerrain.add(new CleanAllHexsideAction(
+            "Clear my neighbors' hexsides", false));
 
         popupMenuTerrain.addSeparator();
-        AbstractAction select = new AbstractAction("Select/Unselect (StartList)")
+        AbstractAction select = new AbstractAction(
+            "Select/Unselect (StartList)")
         {
 
             public void actionPerformed(ActionEvent e)
@@ -762,8 +771,8 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
         for (HazardHexside hazard : hazardTypes)
         {
             tempH.getHexModel().setHexsideHazard(0, hazard);
-            mi = popupMenuBorder.add(new HexsideAction(tempH.getHexModel().
-                    getHexsideHazard(0).getName(), hazard));
+            mi = popupMenuBorder.add(new HexsideAction(tempH.getHexModel()
+                .getHexsideHazard(0).getName(), hazard));
         }
 
         lastPoint = new Point(0, 0);
@@ -773,7 +782,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements Printable
     private void setMapName(String name)
     {
         mapName = name;
-        frame.setTitle("BattlelandBuilder" +
-            (mapName == null ? "" : ": " + mapName));
+        frame.setTitle("BattlelandBuilder"
+            + (mapName == null ? "" : ": " + mapName));
     }
 }

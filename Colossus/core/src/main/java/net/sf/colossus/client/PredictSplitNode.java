@@ -633,8 +633,7 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
         for (CreatureInfo ci : creatures)
         {
             CreatureType type = ci.getType();
-            CreatureInfo newinfo = new CreatureInfo(ci.getType(),
-                false, true);
+            CreatureInfo newinfo = new CreatureInfo(ci.getType(), false, true);
             if (splitoffs.contains(type))
             {
                 splitList.add(newinfo);

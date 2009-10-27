@@ -133,8 +133,7 @@ public class LOSTest extends TestCase
             .getCurrentHex()));
     }
 
-    private void placeCreature(Creature creature,
-        String battleHexLabel)
+    private void placeCreature(Creature creature, String battleHexLabel)
     {
         MasterBoardTerrain terrain = battle.getLocation().getTerrain();
         BattleHex battleHex = terrain.getHexByLabel(battleHexLabel);
@@ -746,7 +745,8 @@ public class LOSTest extends TestCase
 
         assertTrue(!battle.isLOSBlocked(hydra1.getCurrentHex(), hydra2
             .getCurrentHex()));
-        assertEquals(5, game.getBattleStrikeSS().getStrikeNumber(hydra2, hydra1));
+        assertEquals(5, game.getBattleStrikeSS().getStrikeNumber(hydra2,
+            hydra1));
     }
 
     public void testLOS8()
@@ -779,8 +779,8 @@ public class LOSTest extends TestCase
         // should be blocked: even from cliff may not RS over a dune
         // Current implementation is not working correctly
         //   - see 2820231 Illegal rangestrike
-        assertTrue(battle.isLOSBlocked(ranger.getCurrentHex(),
-                   hydra.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(ranger.getCurrentHex(), hydra
+            .getCurrentHex()));
 
     }
 

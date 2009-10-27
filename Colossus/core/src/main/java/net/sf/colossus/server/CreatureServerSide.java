@@ -141,7 +141,8 @@ public class CreatureServerSide extends Creature implements BattleCritter
             carryPossible = false;
         }
 
-        int strikeNumber = game.getBattleStrikeSS().getStrikeNumber(this, target);
+        int strikeNumber = game.getBattleStrikeSS().getStrikeNumber(this,
+            target);
         int dice = game.getBattleStrikeSS().getDice(this, target);
 
         // Carries are only possible if the striker is rolling more dice than
@@ -220,7 +221,9 @@ public class CreatureServerSide extends Creature implements BattleCritter
         penaltyOptions.clear();
 
         // Abort if no carries are possible.
-        if (game.getBattleStrikeSS().getDice(this, target) <= target.getPower() - target.getHits())
+        if (game.getBattleStrikeSS().getDice(this, target) <= target
+            .getPower()
+            - target.getHits())
         {
             return;
         }
@@ -237,8 +240,9 @@ public class CreatureServerSide extends Creature implements BattleCritter
         if (!penaltyOptions.isEmpty())
         {
             // Add the non-penalty option as a choice.
-            PenaltyOption po = new PenaltyOption(game, this,
-                target, game.getBattleStrikeSS().getDice(this, target), game.getBattleStrikeSS().getStrikeNumber(this, target));
+            PenaltyOption po = new PenaltyOption(game, this, target, game
+                .getBattleStrikeSS().getDice(this, target), game
+                .getBattleStrikeSS().getStrikeNumber(this, target));
             penaltyOptions.add(po);
 
             // Add all non-penalty carries to every PenaltyOption.
@@ -283,7 +287,8 @@ public class CreatureServerSide extends Creature implements BattleCritter
     private void findCarry(CreatureServerSide target, BattleHex neighbor)
     {
         final int dice = game.getBattleStrikeSS().getDice(this, target);
-        final int strikeNumber = game.getBattleStrikeSS().getStrikeNumber(this, target);
+        final int strikeNumber = game.getBattleStrikeSS().getStrikeNumber(
+            this, target);
 
         CreatureServerSide victim = battle.getCreatureSS(neighbor);
         if (victim == null || victim.getPlayer() == getPlayer()
@@ -292,7 +297,8 @@ public class CreatureServerSide extends Creature implements BattleCritter
             return;
         }
         int tmpDice = game.getBattleStrikeSS().getDice(this, victim);
-        int tmpStrikeNumber = game.getBattleStrikeSS().getStrikeNumber(this, victim);
+        int tmpStrikeNumber = game.getBattleStrikeSS().getStrikeNumber(this,
+            victim);
 
         // Can't actually get a bonus to carry.
         if (tmpDice > dice)
@@ -332,8 +338,8 @@ public class CreatureServerSide extends Creature implements BattleCritter
                 }
             }
             // No match, so create a new PenaltyOption.
-            PenaltyOption po = new PenaltyOption(game, this, target,
-                tmpDice, tmpStrikeNumber);
+            PenaltyOption po = new PenaltyOption(game, this, target, tmpDice,
+                tmpStrikeNumber);
             po.addCarryTarget(neighbor);
             penaltyOptions.add(po);
         }

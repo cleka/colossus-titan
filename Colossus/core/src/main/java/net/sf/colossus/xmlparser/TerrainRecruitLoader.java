@@ -473,8 +473,8 @@ public class TerrainRecruitLoader implements IVariantInitializer
         // XXX Random not yet supported:
         TerrainRecruitLoader.strToRnd.put(terrain, null);
 
-        List<StartingNumber> lsn = TerrainRecruitLoader.strToStarters.get(
-                source_terrain);
+        List<StartingNumber> lsn = TerrainRecruitLoader.strToStarters
+            .get(source_terrain);
         if (lsn != null)
         {
             TerrainRecruitLoader.strToStarters.put(terrain, lsn);

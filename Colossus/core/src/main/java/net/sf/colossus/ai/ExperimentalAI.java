@@ -1,17 +1,17 @@
 package net.sf.colossus.ai;
 
 
-import net.sf.colossus.ai.helper.LegionMove;
-import net.sf.colossus.ai.helper.OnTheFlyLegionMove;
-import net.sf.colossus.ai.objectives.TacticalObjective;
-import net.sf.colossus.ai.objectives.IObjectiveHelper;
-import net.sf.colossus.ai.objectives.BasicObjectiveHelper;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import net.sf.colossus.ai.helper.LegionMove;
+import net.sf.colossus.ai.helper.OnTheFlyLegionMove;
+import net.sf.colossus.ai.objectives.BasicObjectiveHelper;
+import net.sf.colossus.ai.objectives.IObjectiveHelper;
+import net.sf.colossus.ai.objectives.TacticalObjective;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.CritterMove;
 import net.sf.colossus.client.LegionClientSide;
@@ -229,20 +229,22 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
         final MasterBoardTerrain terrain, final BattleHex hex,
         final int power, final int skill, final LegionClientSide legion,
         final int turn, final Set<BattleHex> targetHexes)
-        {
-            return;
-        }
+    {
+        return;
+    }
+
     /**
      * "Does nothing" override of evaluateCritterMove_Rangestrike in @SimpleAI.
      * The job of that one is handled (supposedly better... I wish) by
      * the objectives code.
      */
     @Override
-    protected void evaluateCritterMove_Rangestrike(final BattleCritter critter,
-        final Map<BattleHex, Integer> strikeMap, ValueRecorder value,
-        final MasterBoardTerrain terrain, final BattleHex hex,
-        final int power, final int skill, final LegionClientSide legion,
-        final int turn, final Set<BattleHex> targetHexes)
+    protected void evaluateCritterMove_Rangestrike(
+        final BattleCritter critter, final Map<BattleHex, Integer> strikeMap,
+        ValueRecorder value, final MasterBoardTerrain terrain,
+        final BattleHex hex, final int power, final int skill,
+        final LegionClientSide legion, final int turn,
+        final Set<BattleHex> targetHexes)
     {
         return;
     }

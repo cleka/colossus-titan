@@ -310,12 +310,12 @@ public class OnTheFlyLegionMove implements Collection<LegionMove>
             {
                 int real_refill_size = REFILL_SIZE;
                 long freemem = Runtime.getRuntime().freeMemory();
-                LOGGER.finest("Memory available (before GC) = " + freemem +
-                        " bytes (" + freemem / (1024 * 1024) + " MiB)");
+                LOGGER.finest("Memory available (before GC) = " + freemem
+                    + " bytes (" + freemem / (1024 * 1024) + " MiB)");
                 Runtime.getRuntime().gc();
                 freemem = Runtime.getRuntime().freeMemory();
-                LOGGER.finest("Memory available (after GC) = " + freemem +
-                        " bytes (" + freemem / (1024 * 1024) + " MiB)");
+                LOGGER.finest("Memory available (after GC) = " + freemem
+                    + " bytes (" + freemem / (1024 * 1024) + " MiB)");
                 /* Don't refill is there's not much memory left. What will
                  * already have will do
                  */
@@ -456,8 +456,8 @@ public class OnTheFlyLegionMove implements Collection<LegionMove>
                 + " checked");
             if (count <= 0)
             {
-                LOGGER.warning(
-                        "Firstfill generated 0 combinations. This is bad.");
+                LOGGER
+                    .warning("Firstfill generated 0 combinations. This is bad.");
             }
             return count;
         }
@@ -548,26 +548,29 @@ public class OnTheFlyLegionMove implements Collection<LegionMove>
             int length = byValues.size();
             if (length <= 0)
             {
-                LOGGER.warning("getParent called but byValues has no element.");
+                LOGGER
+                    .warning("getParent called but byValues has no element.");
 
                 System.err.println("Dumping....");
                 Thread.dumpStack();
                 for (int i = 0; i < daddy.allCritterMoves.size(); i++)
                 {
-                    System.err.println("# of moves @ " + i + " = " + daddy.allCritterMoves.get(i).
-                            size());
+                    System.err.println("# of moves @ " + i + " = "
+                        + daddy.allCritterMoves.get(i).size());
                     for (int j = 0; j < daddy.allCritterMoves.get(i).size(); j++)
                     {
-                        System.err.println("Move for " + i + "/" + j + " is " + daddy.allCritterMoves.get(i).
-                                get(j).toString());
+                        System.err.println("Move for " + i + "/" + j + " is "
+                            + daddy.allCritterMoves.get(i).get(j).toString());
                     }
                 }
 
-                ErrorUtils.showErrorDialog(null,
-                    "Experimenal AI data inconsistency!",
-                    "During AI OnTheFlyLegionMove calculation, encountered a "
-                    + "'getParent called but byValues has no element' "
-                    + "situation. Can't continue - application will exit!");
+                ErrorUtils
+                    .showErrorDialog(
+                        null,
+                        "Experimenal AI data inconsistency!",
+                        "During AI OnTheFlyLegionMove calculation, encountered a "
+                            + "'getParent called but byValues has no element' "
+                            + "situation. Can't continue - application will exit!");
                 System.exit(-50);
             }
             if (rand.nextInt(100) < percentRandom)

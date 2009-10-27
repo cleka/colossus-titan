@@ -68,8 +68,7 @@ public class BattleMovementServerSide
                         || (ignoreMobileAllies
                             && bogey.getMarkerId().equals(
                                 critter.getMarkerId()) && !getBattleSS()
-                            .isInContact(
-                            bogey, false)))
+                            .isInContact(bogey, false)))
                     {
                         entryCost = neighbor.getEntryCost(critter.getType(),
                             reverseDir, cumulativeSlow);

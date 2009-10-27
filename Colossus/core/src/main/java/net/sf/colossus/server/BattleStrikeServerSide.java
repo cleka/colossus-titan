@@ -1,5 +1,6 @@
 package net.sf.colossus.server;
 
+
 import java.util.logging.Logger;
 
 import net.sf.colossus.game.Battle;
@@ -8,6 +9,7 @@ import net.sf.colossus.game.Game;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.HazardHexside;
 import net.sf.colossus.variant.HazardTerrain;
+
 
 public class BattleStrikeServerSide
 {
@@ -38,8 +40,7 @@ public class BattleStrikeServerSide
 
     /** WARNING: this is currently still duplicated in game.BattleStrike
      */
-    public int getDice(Creature striker, Creature target,
-        boolean rangestrike)
+    public int getDice(Creature striker, Creature target, boolean rangestrike)
     {
         BattleHex hex = striker.getCurrentHex();
         BattleHex targetHex = target.getCurrentHex();
@@ -73,12 +74,14 @@ public class BattleStrikeServerSide
             HazardHexside hazard = hex.getHexsideHazard(direction);
 
             // Native striking down a dune hexside: +2
-            if (hazard == HazardHexside.DUNE && striker.isNativeAt(HazardHexside.DUNE))
+            if (hazard == HazardHexside.DUNE
+                && striker.isNativeAt(HazardHexside.DUNE))
             {
                 dice += 2;
             }
             // Native striking down a slope hexside: +1
-            else if (hazard == HazardHexside.SLOPE && striker.isNativeAt(HazardHexside.SLOPE))
+            else if (hazard == HazardHexside.SLOPE
+                && striker.isNativeAt(HazardHexside.SLOPE))
             {
                 dice++;
             }
@@ -119,8 +122,7 @@ public class BattleStrikeServerSide
      * @param target TODO
      * @param rangestrike TODO*/
     @SuppressWarnings("deprecation")
-    int getAttackerSkill(Creature striker, Creature target,
-        boolean rangestrike)
+    int getAttackerSkill(Creature striker, Creature target, boolean rangestrike)
     {
         // rangestrike calc depends on countBrambleHexes which needs battle.
         // (it's called when there is no battle by ShowCreatureDetails)
@@ -161,7 +163,8 @@ public class BattleStrikeServerSide
                 HazardHexside hazard = targetHex.getHexsideHazard(direction);
                 // Non-native striking up slope: -1
                 // Striking up across wall: -1
-                if ((hazard.equals(HazardHexside.SLOPE) && !striker.isNativeAt(HazardHexside.SLOPE))
+                if ((hazard.equals(HazardHexside.SLOPE) && !striker
+                    .isNativeAt(HazardHexside.SLOPE))
                     || hazard.equals(HazardHexside.TOWER))
                 {
                     attackerSkill--;
@@ -218,8 +221,7 @@ public class BattleStrikeServerSide
             if (!striker.isNativeIn(HazardTerrain.BRAMBLES))
             {
                 bramblesPenalty += getBattle().countBrambleHexes(
-                    striker
-                    .getCurrentHex(), targetHex);
+                    striker.getCurrentHex(), targetHex);
             }
             /* TODO: remove TEST TEST TEST TEST TEST */
             /* computeSkillPenaltyRangestrikeThrough should be used instead of the logic above, but
@@ -301,7 +303,8 @@ public class BattleStrikeServerSide
             // Native defending in bramble, from rangestrike by a non-native
             //     non-magicMissile: +1
             if (terrain.equals(HazardTerrain.BRAMBLES)
-                && target.isNativeIn(HazardTerrain.BRAMBLES) && !striker.isNativeIn(HazardTerrain.BRAMBLES)
+                && target.isNativeIn(HazardTerrain.BRAMBLES)
+                && !striker.isNativeIn(HazardTerrain.BRAMBLES)
                 && !striker.useMagicMissile())
             {
                 strikeNumber++;
@@ -309,8 +312,10 @@ public class BattleStrikeServerSide
 
             // Native defending in stone, from rangestrike by a non-native
             //     non-magicMissile: +1
-            if (terrain.equals(HazardTerrain.STONE) && target.isNativeIn(HazardTerrain.STONE)
-                && !striker.isNativeIn(HazardTerrain.STONE) && !striker.useMagicMissile())
+            if (terrain.equals(HazardTerrain.STONE)
+                && target.isNativeIn(HazardTerrain.STONE)
+                && !striker.isNativeIn(HazardTerrain.STONE)
+                && !striker.useMagicMissile())
             {
                 strikeNumber++;
             }

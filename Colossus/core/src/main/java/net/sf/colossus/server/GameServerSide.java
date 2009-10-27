@@ -1581,8 +1581,8 @@ public final class GameServerSide extends Game
                     activeLegionTag = BattleServerSide.LegionTags.DEFENDER;
                 }
 
-                createBattle(attacker, defender, activeLegionTag, engagementHex,
-                    battlePhase);
+                createBattle(attacker, defender, activeLegionTag,
+                    engagementHex, battlePhase);
                 getBattleSS().setBattleTurnNumber(battleTurnNum);
                 getBattleSS().setSummonState(summonState);
                 getBattleSS().setCarryDamage(carryDamage);
@@ -2922,8 +2922,8 @@ public final class GameServerSide extends Game
             server.allRevealEngagedLegion(defender, false,
                 Constants.reasonBattleStarts);
 
-            createBattle(attacker, defender, BattleServerSide.LegionTags.DEFENDER, hex,
-                BattlePhase.MOVE);
+            createBattle(attacker, defender,
+                BattleServerSide.LegionTags.DEFENDER, hex, BattlePhase.MOVE);
             getBattleSS().init();
         }
     }

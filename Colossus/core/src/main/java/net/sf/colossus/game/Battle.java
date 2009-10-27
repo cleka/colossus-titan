@@ -457,8 +457,8 @@ abstract public class Battle
         else
         {
             return isLOSBlockedDir(hex1, hex1, hex2, toLeft(xDist, yDist),
-                strikeElevation, false, false, false, false, false,
-                false, 0, 0);
+                strikeElevation, false, false, false, false, false, false, 0,
+                0);
         }
     }
 
@@ -564,7 +564,7 @@ abstract public class Battle
             {
                 return true;
             }
-             // If there are three slopes, striker and target must each
+            // If there are three slopes, striker and target must each
             //     be atop one.
             if (totalObstacles >= 3 && (!strikerAtop || !targetAtop)
                 && (!strikerAtopCliff && !targetAtopCliff))
@@ -595,8 +595,8 @@ abstract public class Battle
             {
                 midObstacle = true;
                 totalObstacles++;
-                if (hexside == 'c' || hexside2 == 'c' || hexside == 'd' ||
-                    hexside2 == 'd')
+                if (hexside == 'c' || hexside2 == 'c' || hexside == 'd'
+                    || hexside2 == 'd')
                 {
                     midCliff = true;
                 }
@@ -813,6 +813,5 @@ abstract public class Battle
 
     abstract public boolean isInContact(BattleCritter striker,
         boolean countDead);
-
 
 }

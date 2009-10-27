@@ -268,8 +268,7 @@ public final class BattleUnit implements BattleCritter
     // TODO does this give plain Titan name or user specific one?
     public String getDescription()
     {
-        return getType().getName() + " in "
-            + getCurrentHex().getLabel();
+        return getType().getName() + " in " + getCurrentHex().getLabel();
     }
 
     @Override

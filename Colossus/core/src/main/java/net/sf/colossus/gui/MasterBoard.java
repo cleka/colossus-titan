@@ -423,9 +423,8 @@ public final class MasterBoard extends JPanel
                 + "Saved game will store the game state "
                 + "from the point just before the engagement started.\n\n"
                 + "(this message will only be shown once in each game)",
-            "Save at this phase not implemented!",
-            JOptionPane.OK_OPTION,
-                JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+            "Save at this phase not implemented!", JOptionPane.OK_OPTION,
+            JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
 
         return (answer == JOptionPane.OK_OPTION);
     }
@@ -854,11 +853,11 @@ public final class MasterBoard extends JPanel
 
                 JOptionPane.showMessageDialog(masterFrame, ""
                     + "Colossus Version: " + BuildInfo.getReleaseVersion()
-                    + "\n" + "Build: " + buildInfo + "\n"
-                    + "Colossus home:  " + colossusHome + "\n"
-                    + "Log directory:  " + logDirectory + "\n"
-                    + "java.version:   " + System.getProperty("java.version"),
-                    "About Colossus", JOptionPane.INFORMATION_MESSAGE);
+                    + "\n" + "Build: " + buildInfo + "\n" + "Colossus home:  "
+                    + colossusHome + "\n" + "Log directory:  " + logDirectory
+                    + "\n" + "java.version:   "
+                    + System.getProperty("java.version"), "About Colossus",
+                    JOptionPane.INFORMATION_MESSAGE);
             }
         };
 

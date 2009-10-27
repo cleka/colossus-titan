@@ -1082,6 +1082,7 @@ public class WebClient extends KFrame implements IWebClient
             iListener);
 
     }
+
     /**
      * Determine a point in time given amount of days and hours from now.
      * Round it to a full hour (down if min <= 10, next hour otherwise).
@@ -1788,13 +1789,14 @@ public class WebClient extends KFrame implements IWebClient
 
     private boolean checkIfCouldStartOnServer(int state)
     {
-        switch(state)
+        switch (state)
         {
             case Enrolled:
                 GameInfo gi = findGameById(enrolledGameId);
                 if (gi != null)
                 {
-                    if (gi.getEnrolledCount().intValue() >= gi.getMin().intValue())
+                    if (gi.getEnrolledCount().intValue() >= gi.getMin()
+                        .intValue())
                     {
                         return true;
                     }
@@ -1864,7 +1866,6 @@ public class WebClient extends KFrame implements IWebClient
         }
     }
 
-
     // this should always be called inside a invokeLater (i.e. in EDT)!!
     public void doUpdateGUI()
     {
@@ -1883,7 +1884,6 @@ public class WebClient extends KFrame implements IWebClient
         boolean couldStartOnServer = checkIfCouldStartOnServer(state);
         // feature currently disabled (( => hardcoded to false)):
         boolean couldStartLocally = false;
-
 
         // ----------------------------------------------------------------
         // ... and now actually change the GUI
@@ -2714,7 +2714,6 @@ public class WebClient extends KFrame implements IWebClient
 
         tabbedPane.setSelectedComponent(serverTab);
     }
-
 
     // ======================================================================
     // Below methods are called my GUI event listeners

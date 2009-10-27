@@ -9,6 +9,7 @@ import java.util.List;
 import net.sf.colossus.webcommon.IWebClient;
 import net.sf.colossus.webcommon.User;
 
+
 public class ChatChannel
 {
     // private static final Logger LOGGER = Logger.getLogger(ChatChannel.class
@@ -89,7 +90,6 @@ public class ChatChannel
             client.chatDeliver(chatId, now, null, null, true);
         }
     }
-
 
     static class ChatMessage
     {

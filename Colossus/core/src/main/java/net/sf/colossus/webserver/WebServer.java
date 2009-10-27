@@ -82,7 +82,6 @@ public class WebServer implements IWebServer, IRunWebServer
     private final ChatChannel generalChat = new ChatChannel(
         IWebServer.generalChatName);
 
-
     public static void main(String[] args)
     {
         String optionsFileName = WebServerConstants.defaultOptionsFilename;

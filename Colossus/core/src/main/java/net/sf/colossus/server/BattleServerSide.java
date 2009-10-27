@@ -1160,5 +1160,4 @@ public final class BattleServerSide extends Battle
         return count;
     }
 
-
 }

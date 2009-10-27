@@ -28,9 +28,9 @@ public class BuildInfo
         InputStream is = cl.getResourceAsStream("META-INF/build.properties");
         if (is != null)
         {
-        try
-        {
-            BUILD_PROPERTIES.load(is);
+            try
+            {
+                BUILD_PROPERTIES.load(is);
             }
             catch (IOException e)
             {
@@ -50,8 +50,8 @@ public class BuildInfo
         String buildInfoString;
         if (full)
         {
-            buildInfoString = timeStamp + " by " + byUser
-                + " from revision " + revInfo;
+            buildInfoString = timeStamp + " by " + byUser + " from revision "
+                + revInfo;
         }
         else
         {

@@ -162,8 +162,7 @@ final class PenaltyOption implements Comparable<PenaltyOption>
                     sb.append(", ");
                 }
                 first = false;
-                BattleCritter target = game.getBattle()
-                    .getCritter(hex);
+                BattleCritter target = game.getBattle().getCritter(hex);
                 sb.append(target.getDescription());
             }
         }

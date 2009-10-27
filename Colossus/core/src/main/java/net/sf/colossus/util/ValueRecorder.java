@@ -1,5 +1,6 @@
 package net.sf.colossus.util;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +39,9 @@ public class ValueRecorder implements IValueRecorderItem
         private final int v;
         private final String why;
         private final boolean isReset;
-        TrivialValueRecorderItem(int v, String why, boolean isReset) {
+
+        TrivialValueRecorderItem(int v, String why, boolean isReset)
+        {
             this.v = v;
             this.why = why;
             this.isReset = isReset;
@@ -129,7 +132,8 @@ public class ValueRecorder implements IValueRecorderItem
         return items.isEmpty();
     }
 
-    public String getWhy(String prefix) {
+    public String getWhy(String prefix)
+    {
         StringBuffer buf = new StringBuffer();
         for (IValueRecorderItem item : items)
         {

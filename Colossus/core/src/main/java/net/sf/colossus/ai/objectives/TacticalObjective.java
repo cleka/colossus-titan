@@ -1,5 +1,6 @@
 package net.sf.colossus.ai.objectives;
 
+
 import net.sf.colossus.util.ValueRecorder;
 
 

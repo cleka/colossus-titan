@@ -5,13 +5,13 @@ import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
+
 public class TestConstantsValidation extends TestCase
 {
     private static final Logger LOGGER = Logger
         .getLogger(TestConstantsValidation.class.getName());
 
     private final static String EXPECTED_VARIANT = "Default";
-
 
     public void testPathes()
     {

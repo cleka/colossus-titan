@@ -115,10 +115,14 @@ public class CarryTest extends TestCase
         assertEquals(10, game.getBattleStrikeSS().getDice(hydra1, lion1));
         assertEquals(12, game.getBattleStrikeSS().getDice(hydra1, colossus1));
 
-        assertEquals(5, game.getBattleStrikeSS().getStrikeNumber(hydra1, centaur1));
-        assertEquals(5, game.getBattleStrikeSS().getStrikeNumber(hydra1, centaur2));
-        assertEquals(4, game.getBattleStrikeSS().getStrikeNumber(hydra1, lion1));
-        assertEquals(5, game.getBattleStrikeSS().getStrikeNumber(hydra1, colossus1));
+        assertEquals(5, game.getBattleStrikeSS().getStrikeNumber(hydra1,
+            centaur1));
+        assertEquals(5, game.getBattleStrikeSS().getStrikeNumber(hydra1,
+            centaur2));
+        assertEquals(4, game.getBattleStrikeSS()
+            .getStrikeNumber(hydra1, lion1));
+        assertEquals(5, game.getBattleStrikeSS().getStrikeNumber(hydra1,
+            colossus1));
 
         hydra1.findCarries(centaur1);
         assertEquals(3, battle.getCarryTargets().size());
@@ -186,13 +190,17 @@ public class CarryTest extends TestCase
         assertTrue(colossus1.canStrike(ogre1));
         assertTrue(colossus1.canStrike(ogre2));
 
-        assertEquals(10, game.getBattleStrikeSS().getDice(colossus1, gargoyle1));
+        assertEquals(10, game.getBattleStrikeSS()
+            .getDice(colossus1, gargoyle1));
         assertEquals(10, game.getBattleStrikeSS().getDice(colossus1, ogre1));
         assertEquals(10, game.getBattleStrikeSS().getDice(colossus1, ogre2));
 
-        assertEquals(3, game.getBattleStrikeSS().getStrikeNumber(colossus1, gargoyle1));
-        assertEquals(2, game.getBattleStrikeSS().getStrikeNumber(colossus1, ogre1));
-        assertEquals(2, game.getBattleStrikeSS().getStrikeNumber(colossus1, ogre2));
+        assertEquals(3, game.getBattleStrikeSS().getStrikeNumber(colossus1,
+            gargoyle1));
+        assertEquals(2, game.getBattleStrikeSS().getStrikeNumber(colossus1,
+            ogre1));
+        assertEquals(2, game.getBattleStrikeSS().getStrikeNumber(colossus1,
+            ogre2));
 
         colossus1.findCarries(gargoyle1);
         assertEquals(2, battle.getCarryTargets().size());

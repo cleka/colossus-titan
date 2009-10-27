@@ -5,8 +5,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.util.StaticResourceLoader;
+import net.sf.colossus.variant.BattleHex;
 
 
 /**
@@ -24,8 +24,8 @@ public class BattlelandsRandomizer
         if (arg.length > 0)
         {
             file = arg[0];
-            System.err.println("<!-- BattlelandsRandomizer is using " + file +
-                    " -->");
+            System.err.println("<!-- BattlelandsRandomizer is using " + file
+                + " -->");
         }
         else
         {
@@ -38,7 +38,8 @@ public class BattlelandsRandomizer
         List<String> directories = new ArrayList<String>();
         directories.add(".");
         directories.add("");
-        InputStream inputFile = StaticResourceLoader.getInputStream(file, directories);
+        InputStream inputFile = StaticResourceLoader.getInputStream(file,
+            directories);
 
         BattleHex[][] h = bhm.getBattleHexArray();
         bhm.doRandomization(h, inputFile);

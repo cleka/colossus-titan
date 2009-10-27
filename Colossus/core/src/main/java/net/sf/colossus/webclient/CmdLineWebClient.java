@@ -31,7 +31,6 @@ public class CmdLineWebClient implements IWebClient
     private final String username = "clemens";
     private final String password = "secret";
 
-
     /**
      * NOTE: shared with SocketThread, because WCST needs it to restore
      * game tokens to an GameInfo object
@@ -41,7 +40,6 @@ public class CmdLineWebClient implements IWebClient
     public CmdLineWebClient()
     {
         LOGGER.info("Cmdline WebClient instantiated.");
-
 
     }
 
@@ -189,7 +187,5 @@ public class CmdLineWebClient implements IWebClient
         // TODO Auto-generated method stub
 
     }
-
-
 
 }

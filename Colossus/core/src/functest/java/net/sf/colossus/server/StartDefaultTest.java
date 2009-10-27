@@ -1,5 +1,6 @@
 package net.sf.colossus.server;
 
+
 import java.util.logging.Logger;
 
 import junit.framework.TestCase;
@@ -10,11 +11,11 @@ import net.sf.colossus.common.WhatNextManager;
 import net.sf.colossus.util.ErrorUtils;
 import net.sf.colossus.variant.Variant;
 
+
 public class StartDefaultTest extends TestCase
 {
-    private static final Logger LOGGER = Logger.getLogger(StartDefaultTest.class
-        .getName());
-
+    private static final Logger LOGGER = Logger
+        .getLogger(StartDefaultTest.class.getName());
 
     public StartDefaultTest(String name)
     {

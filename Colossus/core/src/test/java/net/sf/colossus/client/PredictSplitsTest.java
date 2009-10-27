@@ -1482,7 +1482,8 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Ranger"));
         cnl.add(variant.getCreatureByName("Minotaur"));
         ps.getLeaf("Gd07").revealCreatures(cnl);
-        ps.getLeaf("Gd07").removeCreature(variant.getCreatureByName("Minotaur"));
+        ps.getLeaf("Gd07").removeCreature(
+            variant.getCreatureByName("Minotaur"));
         ps.getLeaf("Gd07").removeCreature(variant.getCreatureByName("Angel"));
         ps.getLeaf("Gd07").removeCreature(variant.getCreatureByName("Ranger"));
         ps.getLeaf("Gd07").removeCreature(variant.getCreatureByName("Ranger"));
@@ -1527,8 +1528,10 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Lion"));
         ps.getLeaf("Gd10").revealCreatures(cnl);
         ps.getLeaf("Gd10").addCreature(variant.getCreatureByName("Ranger"));
-        ps.getLeaf("Gd06").removeCreature(variant.getCreatureByName("Centaur"));
-        ps.getLeaf("Gd06").removeCreature(variant.getCreatureByName("Centaur"));
+        ps.getLeaf("Gd06")
+            .removeCreature(variant.getCreatureByName("Centaur"));
+        ps.getLeaf("Gd06")
+            .removeCreature(variant.getCreatureByName("Centaur"));
         ps.printLeaves();
         assertTrue(ps.getLeaf("Gd02").numUncertainCreatures() == 0);
         assertTrue(ps.getLeaf("Gd03").numUncertainCreatures() == 0);
@@ -1809,15 +1812,19 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Gargoyle"));
         cnl.add(variant.getCreatureByName("Gargoyle"));
         aps.getLeaf("Gr10").revealCreatures(cnl);
-        aps.getLeaf("Gr10").removeCreature(variant.getCreatureByName("Cyclops"));
+        aps.getLeaf("Gr10").removeCreature(
+            variant.getCreatureByName("Cyclops"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Gargoyle"));
         cnl.add(variant.getCreatureByName("Gargoyle"));
         aps.getLeaf("Gr10").revealCreatures(cnl);
         aps.getLeaf("Gr10").addCreature(variant.getCreatureByName("Cyclops"));
-        aps.getLeaf("Gr10").removeCreature(variant.getCreatureByName("Cyclops"));
-        aps.getLeaf("Gr10").removeCreature(variant.getCreatureByName("Gargoyle"));
-        aps.getLeaf("Gr10").removeCreature(variant.getCreatureByName("Gargoyle"));
+        aps.getLeaf("Gr10").removeCreature(
+            variant.getCreatureByName("Cyclops"));
+        aps.getLeaf("Gr10").removeCreature(
+            variant.getCreatureByName("Gargoyle"));
+        aps.getLeaf("Gr10").removeCreature(
+            variant.getCreatureByName("Gargoyle"));
         aps.printLeaves();
         assertFalse(ps.getLeaf("Gr02").allCertain());
         assertFalse(ps.getLeaf("Gr11").allCertain());
@@ -2026,8 +2033,10 @@ public class PredictSplitsTest extends TestCase
         aps.getLeaf("Gr08").revealCreatures(cnl);
         aps.getLeaf("Gr08").addCreature(variant.getCreatureByName("Lion"));
         aps.printLeaves();
-        aps.getLeaf("Gr01").removeCreature(variant.getCreatureByName("Gargoyle"));
-        aps.getLeaf("Gr01").removeCreature(variant.getCreatureByName("Gargoyle"));
+        aps.getLeaf("Gr01").removeCreature(
+            variant.getCreatureByName("Gargoyle"));
+        aps.getLeaf("Gr01").removeCreature(
+            variant.getCreatureByName("Gargoyle"));
         aps.printLeaves();
         assertTrue(ps.getLeaf("Gr04").allCertain());
         assertTrue(ps.getLeaf("Gr07").allCertain());
@@ -2071,9 +2080,12 @@ public class PredictSplitsTest extends TestCase
 
         turn = 15;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gr06").removeCreature(variant.getCreatureByName("Cyclops"));
-        aps.getLeaf("Gr06").removeCreature(variant.getCreatureByName("Cyclops"));
-        aps.getLeaf("Gr06").removeCreature(variant.getCreatureByName("Cyclops"));
+        aps.getLeaf("Gr06").removeCreature(
+            variant.getCreatureByName("Cyclops"));
+        aps.getLeaf("Gr06").removeCreature(
+            variant.getCreatureByName("Cyclops"));
+        aps.getLeaf("Gr06").removeCreature(
+            variant.getCreatureByName("Cyclops"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Centaur"));
         aps.getLeaf("Gr02").revealCreatures(cnl);
@@ -2113,9 +2125,11 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Centaur"));
         cnl.add(variant.getCreatureByName("Centaur"));
         aps.getLeaf("Gr02").revealCreatures(cnl);
-        aps.getLeaf("Gr02").removeCreature(variant.getCreatureByName("Centaur"));
+        aps.getLeaf("Gr02").removeCreature(
+            variant.getCreatureByName("Centaur"));
         aps.getLeaf("Gr02").removeCreature(variant.getCreatureByName("Lion"));
-        aps.getLeaf("Gr02").removeCreature(variant.getCreatureByName("Centaur"));
+        aps.getLeaf("Gr02").removeCreature(
+            variant.getCreatureByName("Centaur"));
         aps.printLeaves();
         aps.getLeaf("Gr08").split(2, new TestLegion(player, "Gr12"), turn);
         cnl.clear();
@@ -2171,7 +2185,8 @@ public class PredictSplitsTest extends TestCase
 
         turn = 20;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gr06").removeCreature(variant.getCreatureByName("Gorgon"));
+        aps.getLeaf("Gr06")
+            .removeCreature(variant.getCreatureByName("Gorgon"));
         aps.getLeaf("Gr06").removeCreature(variant.getCreatureByName("Lion"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Cyclops"));
@@ -2450,8 +2465,10 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Centaur"));
         aps.getLeaf("Bk06").revealCreatures(cnl);
         aps.getLeaf("Bk06").addCreature(variant.getCreatureByName("Centaur"));
-        aps.getLeaf("Bk11").removeCreature(variant.getCreatureByName("Gargoyle"));
-        aps.getLeaf("Bk11").removeCreature(variant.getCreatureByName("Gargoyle"));
+        aps.getLeaf("Bk11").removeCreature(
+            variant.getCreatureByName("Gargoyle"));
+        aps.getLeaf("Bk11").removeCreature(
+            variant.getCreatureByName("Gargoyle"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Gargoyle"));
         cnl.add(variant.getCreatureByName("Gargoyle"));
@@ -2481,9 +2498,12 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Centaur"));
         cnl.add(variant.getCreatureByName("Centaur"));
         aps.getLeaf("Br12").revealCreatures(cnl);
-        aps.getLeaf("Br12").removeCreature(variant.getCreatureByName("Centaur"));
-        aps.getLeaf("Bu09").removeCreature(variant.getCreatureByName("Gargoyle"));
-        aps.getLeaf("Bu09").removeCreature(variant.getCreatureByName("Gargoyle"));
+        aps.getLeaf("Br12").removeCreature(
+            variant.getCreatureByName("Centaur"));
+        aps.getLeaf("Bu09").removeCreature(
+            variant.getCreatureByName("Gargoyle"));
+        aps.getLeaf("Bu09").removeCreature(
+            variant.getCreatureByName("Gargoyle"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Warbear"));
         cnl.add(variant.getCreatureByName("Centaur"));
@@ -2695,15 +2715,18 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Ogre"));
         aps.getLeaf("Gd08").revealCreatures(cnl);
         aps.getLeaf("Gd08").removeCreature(variant.getCreatureByName("Ogre"));
-        aps.getLeaf("Rd06").removeCreature(variant.getCreatureByName("Gargoyle"));
+        aps.getLeaf("Rd06").removeCreature(
+            variant.getCreatureByName("Gargoyle"));
         aps.getLeaf("Rd02").removeCreature(variant.getCreatureByName("Angel"));
         aps.getLeaf("Rd06").addCreature(variant.getCreatureByName("Angel"));
-        aps.getLeaf("Rd06").removeCreature(variant.getCreatureByName("Centaur"));
+        aps.getLeaf("Rd06").removeCreature(
+            variant.getCreatureByName("Centaur"));
         aps.getLeaf("Gd08").removeCreature(variant.getCreatureByName("Angel"));
         aps.getLeaf("Gd08").removeCreature(variant.getCreatureByName("Troll"));
         aps.getLeaf("Rd06").removeCreature(variant.getCreatureByName("Angel"));
         aps.getLeaf("Gd08").removeCreature(variant.getCreatureByName("Ogre"));
-        aps.getLeaf("Gd08").removeCreature(variant.getCreatureByName("Guardian"));
+        aps.getLeaf("Gd08").removeCreature(
+            variant.getCreatureByName("Guardian"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Titan"));
         cnl.add(variant.getCreatureByName("Cyclops"));
@@ -2751,8 +2774,10 @@ public class PredictSplitsTest extends TestCase
         aps.getLeaf("Bu12").addCreature(variant.getCreatureByName("Cyclops"));
         aps.getLeaf("Gr01").split(2, new TestLegion(player, "Gr04"), turn);
         aps.getLeaf("Bu01").removeCreature(variant.getCreatureByName("Lion"));
-        aps.getLeaf("Bu01").removeCreature(variant.getCreatureByName("Centaur"));
-        aps.getLeaf("Bu01").removeCreature(variant.getCreatureByName("Centaur"));
+        aps.getLeaf("Bu01").removeCreature(
+            variant.getCreatureByName("Centaur"));
+        aps.getLeaf("Bu01").removeCreature(
+            variant.getCreatureByName("Centaur"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Centaur"));
         cnl.add(variant.getCreatureByName("Centaur"));
@@ -2815,8 +2840,10 @@ public class PredictSplitsTest extends TestCase
         aps.getLeaf("Bk06").revealCreatures(cnl);
         aps.getLeaf("Bk06").addCreature(variant.getCreatureByName("Angel"));
         aps.getLeaf("Gd05").removeCreature(variant.getCreatureByName("Lion"));
-        aps.getLeaf("Gd05").removeCreature(variant.getCreatureByName("Centaur"));
-        aps.getLeaf("Gd05").removeCreature(variant.getCreatureByName("Centaur"));
+        aps.getLeaf("Gd05").removeCreature(
+            variant.getCreatureByName("Centaur"));
+        aps.getLeaf("Gd05").removeCreature(
+            variant.getCreatureByName("Centaur"));
         aps.getLeaf("Gd05").removeCreature(variant.getCreatureByName("Ogre"));
         aps.getLeaf("Bk11").removeCreature(variant.getCreatureByName("Ogre"));
         aps.getLeaf("Bk11").removeCreature(variant.getCreatureByName("Ogre"));
@@ -2842,8 +2869,10 @@ public class PredictSplitsTest extends TestCase
         assertEquals(aps.getLeaf("Gd06").numUncertainCreatures(), 0);
         assertEquals(aps.getLeaf("Gd12").numUncertainCreatures(), 0);
         aps.getLeaf("Bu05").split(2, new TestLegion(player, "Bu10"), turn);
-        aps.getLeaf("Rd02").removeCreature(variant.getCreatureByName("Gargoyle"));
-        aps.getLeaf("Rd02").removeCreature(variant.getCreatureByName("Gargoyle"));
+        aps.getLeaf("Rd02").removeCreature(
+            variant.getCreatureByName("Gargoyle"));
+        aps.getLeaf("Rd02").removeCreature(
+            variant.getCreatureByName("Gargoyle"));
         aps.getLeaf("Rd02").removeCreature(variant.getCreatureByName("Ogre"));
         aps.getLeaf("Rd02").removeCreature(variant.getCreatureByName("Ogre"));
         aps.getLeaf("Rd02").removeCreature(variant.getCreatureByName("Ogre"));
@@ -2873,8 +2902,10 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Unicorn"));
         aps.getLeaf("Br12").revealCreatures(cnl);
         aps.getLeaf("Br12").addCreature(variant.getCreatureByName("Unicorn"));
-        aps.getLeaf("Br09").removeCreature(variant.getCreatureByName("Gargoyle"));
-        aps.getLeaf("Br09").removeCreature(variant.getCreatureByName("Gargoyle"));
+        aps.getLeaf("Br09").removeCreature(
+            variant.getCreatureByName("Gargoyle"));
+        aps.getLeaf("Br09").removeCreature(
+            variant.getCreatureByName("Gargoyle"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Cyclops"));
         cnl.add(variant.getCreatureByName("Cyclops"));
@@ -2977,11 +3008,16 @@ public class PredictSplitsTest extends TestCase
         aps.getLeaf("Br01").merge(aps.getLeaf("Br02"));
         aps.getLeaf("Br12").split(2, new TestLegion(player, "Br06"), turn);
         aps.getLeaf("Br12").merge(aps.getLeaf("Br06"));
-        aps.getLeaf("Gd12").removeCreature(variant.getCreatureByName("Cyclops"));
-        aps.getLeaf("Gd12").removeCreature(variant.getCreatureByName("Cyclops"));
-        aps.getLeaf("Gd12").removeCreature(variant.getCreatureByName("Cyclops"));
-        aps.getLeaf("Gd12").removeCreature(variant.getCreatureByName("Gargoyle"));
-        aps.getLeaf("Gd12").removeCreature(variant.getCreatureByName("Gargoyle"));
+        aps.getLeaf("Gd12").removeCreature(
+            variant.getCreatureByName("Cyclops"));
+        aps.getLeaf("Gd12").removeCreature(
+            variant.getCreatureByName("Cyclops"));
+        aps.getLeaf("Gd12").removeCreature(
+            variant.getCreatureByName("Cyclops"));
+        aps.getLeaf("Gd12").removeCreature(
+            variant.getCreatureByName("Gargoyle"));
+        aps.getLeaf("Gd12").removeCreature(
+            variant.getCreatureByName("Gargoyle"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Titan"));
         cnl.add(variant.getCreatureByName("Behemoth"));
@@ -2998,17 +3034,22 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Troll"));
         cnl.add(variant.getCreatureByName("Troll"));
         aps.getLeaf("Bu02").revealCreatures(cnl);
-        aps.getLeaf("Bk10").removeCreature(variant.getCreatureByName("Warlock"));
+        aps.getLeaf("Bk10").removeCreature(
+            variant.getCreatureByName("Warlock"));
         aps.getLeaf("Bu02").removeCreature(variant.getCreatureByName("Angel"));
-        aps.getLeaf("Bk10").removeCreature(variant.getCreatureByName("Behemoth"));
-        aps.getLeaf("Bu02").removeCreature(variant.getCreatureByName("Ranger"));
-        aps.getLeaf("Bk10").removeCreature(variant.getCreatureByName("Cyclops"));
+        aps.getLeaf("Bk10").removeCreature(
+            variant.getCreatureByName("Behemoth"));
+        aps.getLeaf("Bu02")
+            .removeCreature(variant.getCreatureByName("Ranger"));
+        aps.getLeaf("Bk10").removeCreature(
+            variant.getCreatureByName("Cyclops"));
         aps.getLeaf("Bk06").removeCreature(variant.getCreatureByName("Angel"));
         aps.getLeaf("Bk10").addCreature(variant.getCreatureByName("Angel"));
         aps.getLeaf("Bu02").removeCreature(variant.getCreatureByName("Troll"));
         aps.getLeaf("Bu02").removeCreature(variant.getCreatureByName("Troll"));
         aps.getLeaf("Bk10").removeCreature(variant.getCreatureByName("Angel"));
-        aps.getLeaf("Bu02").removeCreature(variant.getCreatureByName("Guardian"));
+        aps.getLeaf("Bu02").removeCreature(
+            variant.getCreatureByName("Guardian"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Titan"));
         cnl.add(variant.getCreatureByName("Gorgon"));
@@ -3049,9 +3090,12 @@ public class PredictSplitsTest extends TestCase
         aps.getLeaf("Gr01").merge(aps.getLeaf("Gr07"));
         aps.getLeaf("Gr08").split(2, new TestLegion(player, "Gr05"), turn);
         aps.getLeaf("Gr08").merge(aps.getLeaf("Gr05"));
-        aps.getLeaf("Rd09").removeCreature(variant.getCreatureByName("Gargoyle"));
-        aps.getLeaf("Rd09").removeCreature(variant.getCreatureByName("Centaur"));
-        aps.getLeaf("Rd09").removeCreature(variant.getCreatureByName("Centaur"));
+        aps.getLeaf("Rd09").removeCreature(
+            variant.getCreatureByName("Gargoyle"));
+        aps.getLeaf("Rd09").removeCreature(
+            variant.getCreatureByName("Centaur"));
+        aps.getLeaf("Rd09").removeCreature(
+            variant.getCreatureByName("Centaur"));
         aps.getLeaf("Br01").split(2, new TestLegion(player, "Br07"), turn);
         aps.getLeaf("Br01").merge(aps.getLeaf("Br07"));
         aps.getLeaf("Br12").split(2, new TestLegion(player, "Br04"), turn);
@@ -3140,11 +3184,15 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Lion"));
         aps.getLeaf("Gr03").revealCreatures(cnl);
         aps.getLeaf("Gr03").addCreature(variant.getCreatureByName("Lion"));
-        aps.getLeaf("Bk12").removeCreature(variant.getCreatureByName("Warbear"));
+        aps.getLeaf("Bk12").removeCreature(
+            variant.getCreatureByName("Warbear"));
         aps.getLeaf("Bk12").removeCreature(variant.getCreatureByName("Lion"));
-        aps.getLeaf("Bk12").removeCreature(variant.getCreatureByName("Centaur"));
-        aps.getLeaf("Bk12").removeCreature(variant.getCreatureByName("Centaur"));
-        aps.getLeaf("Bk12").removeCreature(variant.getCreatureByName("Centaur"));
+        aps.getLeaf("Bk12").removeCreature(
+            variant.getCreatureByName("Centaur"));
+        aps.getLeaf("Bk12").removeCreature(
+            variant.getCreatureByName("Centaur"));
+        aps.getLeaf("Bk12").removeCreature(
+            variant.getCreatureByName("Centaur"));
         aps.getLeaf("Br01").addCreature(variant.getCreatureByName("Angel"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Unicorn"));
@@ -3251,8 +3299,10 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Ogre"));
         aps.getLeaf("Bu07").revealCreatures(cnl);
         aps.getLeaf("Bu07").removeCreature(variant.getCreatureByName("Troll"));
-        aps.getLeaf("Gr09").removeCreature(variant.getCreatureByName("Gorgon"));
-        aps.getLeaf("Gr09").removeCreature(variant.getCreatureByName("Gargoyle"));
+        aps.getLeaf("Gr09")
+            .removeCreature(variant.getCreatureByName("Gorgon"));
+        aps.getLeaf("Gr09").removeCreature(
+            variant.getCreatureByName("Gargoyle"));
         aps.getLeaf("Bu07").removeCreature(variant.getCreatureByName("Ogre"));
         aps.getLeaf("Gr12").removeCreature(variant.getCreatureByName("Angel"));
         aps.getLeaf("Gr09").addCreature(variant.getCreatureByName("Angel"));
@@ -3263,11 +3313,14 @@ public class PredictSplitsTest extends TestCase
         aps.getLeaf("Bu07").revealCreatures(cnl);
         aps.getLeaf("Bu07").addCreature(variant.getCreatureByName("Troll"));
         aps.getLeaf("Bu07").removeCreature(variant.getCreatureByName("Lion"));
-        aps.getLeaf("Gr09").removeCreature(variant.getCreatureByName("Cyclops"));
-        aps.getLeaf("Gr09").removeCreature(variant.getCreatureByName("Gargoyle"));
+        aps.getLeaf("Gr09").removeCreature(
+            variant.getCreatureByName("Cyclops"));
+        aps.getLeaf("Gr09").removeCreature(
+            variant.getCreatureByName("Gargoyle"));
         aps.getLeaf("Bu07").removeCreature(variant.getCreatureByName("Ogre"));
         aps.getLeaf("Bu07").removeCreature(variant.getCreatureByName("Ogre"));
-        aps.getLeaf("Gr09").removeCreature(variant.getCreatureByName("Cyclops"));
+        aps.getLeaf("Gr09").removeCreature(
+            variant.getCreatureByName("Cyclops"));
         aps.getLeaf("Bu07").removeCreature(variant.getCreatureByName("Troll"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Angel"));
@@ -3296,12 +3349,15 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Centaur"));
         cnl.add(variant.getCreatureByName("Centaur"));
         aps.getLeaf("Gr03").revealCreatures(cnl);
-        aps.getLeaf("Gr03").removeCreature(variant.getCreatureByName("Centaur"));
-        aps.getLeaf("Gr03").removeCreature(variant.getCreatureByName("Centaur"));
+        aps.getLeaf("Gr03").removeCreature(
+            variant.getCreatureByName("Centaur"));
+        aps.getLeaf("Gr03").removeCreature(
+            variant.getCreatureByName("Centaur"));
         aps.getLeaf("Gr03").removeCreature(variant.getCreatureByName("Lion"));
         aps.getLeaf("Gr03").removeCreature(variant.getCreatureByName("Lion"));
         aps.getLeaf("Gr03").removeCreature(variant.getCreatureByName("Lion"));
-        aps.getLeaf("Gr03").removeCreature(variant.getCreatureByName("Centaur"));
+        aps.getLeaf("Gr03").removeCreature(
+            variant.getCreatureByName("Centaur"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Titan"));
         cnl.add(variant.getCreatureByName("Angel"));
@@ -3321,13 +3377,16 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Centaur"));
         aps.getLeaf("Bu09").revealCreatures(cnl);
         aps.getLeaf("Bu09").removeCreature(variant.getCreatureByName("Lion"));
-        aps.getLeaf("Bu09").removeCreature(variant.getCreatureByName("Centaur"));
-        aps.getLeaf("Rd11").removeCreature(variant.getCreatureByName("Cyclops"));
+        aps.getLeaf("Bu09").removeCreature(
+            variant.getCreatureByName("Centaur"));
+        aps.getLeaf("Rd11").removeCreature(
+            variant.getCreatureByName("Cyclops"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Lion"));
         aps.getLeaf("Bu09").revealCreatures(cnl);
         aps.getLeaf("Bu09").addCreature(variant.getCreatureByName("Lion"));
-        aps.getLeaf("Rd11").removeCreature(variant.getCreatureByName("Warlock"));
+        aps.getLeaf("Rd11").removeCreature(
+            variant.getCreatureByName("Warlock"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Lion"));
         cnl.add(variant.getCreatureByName("Lion"));
@@ -3386,11 +3445,13 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Ogre"));
         cnl.add(variant.getCreatureByName("Ogre"));
         aps.getLeaf("Gr05").revealCreatures(cnl);
-        aps.getLeaf("Gr05").removeCreature(variant.getCreatureByName("Gargoyle"));
+        aps.getLeaf("Gr05").removeCreature(
+            variant.getCreatureByName("Gargoyle"));
         aps.getLeaf("Gr05").removeCreature(variant.getCreatureByName("Ogre"));
         aps.getLeaf("Bk10").removeCreature(variant.getCreatureByName("Angel"));
         aps.getLeaf("Gr05").removeCreature(variant.getCreatureByName("Troll"));
-        aps.getLeaf("Bk10").removeCreature(variant.getCreatureByName("Gorgon"));
+        aps.getLeaf("Bk10")
+            .removeCreature(variant.getCreatureByName("Gorgon"));
         aps.getLeaf("Gr05").removeCreature(variant.getCreatureByName("Ogre"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Titan"));
@@ -3411,13 +3472,16 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Lion"));
         cnl.add(variant.getCreatureByName("Lion"));
         aps.getLeaf("Gr12").revealCreatures(cnl);
-        aps.getLeaf("Gr12").removeCreature(variant.getCreatureByName("Cyclops"));
+        aps.getLeaf("Gr12").removeCreature(
+            variant.getCreatureByName("Cyclops"));
         aps.getLeaf("Gr12").removeCreature(variant.getCreatureByName("Lion"));
-        aps.getLeaf("Bk06").removeCreature(variant.getCreatureByName("Ranger"));
+        aps.getLeaf("Bk06")
+            .removeCreature(variant.getCreatureByName("Ranger"));
         aps.getLeaf("Bk10").removeCreature(variant.getCreatureByName("Angel"));
         aps.getLeaf("Bk06").addCreature(variant.getCreatureByName("Angel"));
         aps.getLeaf("Gr12").removeCreature(variant.getCreatureByName("Lion"));
-        aps.getLeaf("Bk06").removeCreature(variant.getCreatureByName("Ranger"));
+        aps.getLeaf("Bk06")
+            .removeCreature(variant.getCreatureByName("Ranger"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Angel"));
         cnl.add(variant.getCreatureByName("Troll"));
@@ -3447,10 +3511,14 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Gargoyle"));
         cnl.add(variant.getCreatureByName("Gargoyle"));
         aps.getLeaf("Gr04").revealCreatures(cnl);
-        aps.getLeaf("Gr04").removeCreature(variant.getCreatureByName("Gargoyle"));
-        aps.getLeaf("Gr04").removeCreature(variant.getCreatureByName("Gargoyle"));
-        aps.getLeaf("Gr04").removeCreature(variant.getCreatureByName("Cyclops"));
-        aps.getLeaf("Gr04").removeCreature(variant.getCreatureByName("Gargoyle"));
+        aps.getLeaf("Gr04").removeCreature(
+            variant.getCreatureByName("Gargoyle"));
+        aps.getLeaf("Gr04").removeCreature(
+            variant.getCreatureByName("Gargoyle"));
+        aps.getLeaf("Gr04").removeCreature(
+            variant.getCreatureByName("Cyclops"));
+        aps.getLeaf("Gr04").removeCreature(
+            variant.getCreatureByName("Gargoyle"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Titan"));
         cnl.add(variant.getCreatureByName("Angel"));
@@ -3527,8 +3595,10 @@ public class PredictSplitsTest extends TestCase
         aps.getLeaf("Gr01").split(2, new TestLegion(player, "Gr03"), turn);
         aps.getLeaf("Gr01").merge(aps.getLeaf("Gr03"));
         aps.getLeaf("Gr08").split(2, new TestLegion(player, "Gr02"), turn);
-        aps.getLeaf("Bu08").removeCreature(variant.getCreatureByName("Gorgon"));
-        aps.getLeaf("Bu08").removeCreature(variant.getCreatureByName("Gorgon"));
+        aps.getLeaf("Bu08")
+            .removeCreature(variant.getCreatureByName("Gorgon"));
+        aps.getLeaf("Bu08")
+            .removeCreature(variant.getCreatureByName("Gorgon"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Behemoth"));
         aps.getLeaf("Br01").revealCreatures(cnl);
@@ -3549,11 +3619,15 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Cyclops"));
         cnl.add(variant.getCreatureByName("Cyclops"));
         aps.getLeaf("Gd04").revealCreatures(cnl);
-        aps.getLeaf("Gd04").removeCreature(variant.getCreatureByName("Gorgon"));
+        aps.getLeaf("Gd04")
+            .removeCreature(variant.getCreatureByName("Gorgon"));
         aps.getLeaf("Bk06").removeCreature(variant.getCreatureByName("Angel"));
-        aps.getLeaf("Gd04").removeCreature(variant.getCreatureByName("Cyclops"));
-        aps.getLeaf("Bk06").removeCreature(variant.getCreatureByName("Wyvern"));
-        aps.getLeaf("Gd04").removeCreature(variant.getCreatureByName("Cyclops"));
+        aps.getLeaf("Gd04").removeCreature(
+            variant.getCreatureByName("Cyclops"));
+        aps.getLeaf("Bk06")
+            .removeCreature(variant.getCreatureByName("Wyvern"));
+        aps.getLeaf("Gd04").removeCreature(
+            variant.getCreatureByName("Cyclops"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Troll"));
         cnl.add(variant.getCreatureByName("Troll"));
@@ -3561,8 +3635,10 @@ public class PredictSplitsTest extends TestCase
         aps.getLeaf("Bk06").revealCreatures(cnl);
         aps.getLeaf("Bk06").addCreature(variant.getCreatureByName("Angel"));
         aps.getLeaf("Br04").removeCreature(variant.getCreatureByName("Lion"));
-        aps.getLeaf("Br04").removeCreature(variant.getCreatureByName("Centaur"));
-        aps.getLeaf("Br04").removeCreature(variant.getCreatureByName("Centaur"));
+        aps.getLeaf("Br04").removeCreature(
+            variant.getCreatureByName("Centaur"));
+        aps.getLeaf("Br04").removeCreature(
+            variant.getCreatureByName("Centaur"));
         aps.printLeaves();
         turn = 21;
         LOGGER.log(Level.FINEST, "Turn " + turn);
@@ -3593,17 +3669,24 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Warlock"));
         cnl.add(variant.getCreatureByName("Warlock"));
         aps.getLeaf("Bu05").revealCreatures(cnl);
-        aps.getLeaf("Gr01").removeCreature(variant.getCreatureByName("Gorgon"));
-        aps.getLeaf("Bu05").removeCreature(variant.getCreatureByName("Warlock"));
-        aps.getLeaf("Gr01").removeCreature(variant.getCreatureByName("Cyclops"));
+        aps.getLeaf("Gr01")
+            .removeCreature(variant.getCreatureByName("Gorgon"));
+        aps.getLeaf("Bu05").removeCreature(
+            variant.getCreatureByName("Warlock"));
+        aps.getLeaf("Gr01").removeCreature(
+            variant.getCreatureByName("Cyclops"));
         aps.getLeaf("Gr09").removeCreature(variant.getCreatureByName("Angel"));
         aps.getLeaf("Gr01").addCreature(variant.getCreatureByName("Angel"));
-        aps.getLeaf("Bu05").removeCreature(variant.getCreatureByName("Warlock"));
+        aps.getLeaf("Bu05").removeCreature(
+            variant.getCreatureByName("Warlock"));
         aps.getLeaf("Gr01").removeCreature(variant.getCreatureByName("Angel"));
         aps.getLeaf("Gr01").removeCreature(variant.getCreatureByName("Troll"));
-        aps.getLeaf("Bu05").removeCreature(variant.getCreatureByName("Warlock"));
-        aps.getLeaf("Gr01").removeCreature(variant.getCreatureByName("Cyclops"));
-        aps.getLeaf("Gr01").removeCreature(variant.getCreatureByName("Cyclops"));
+        aps.getLeaf("Bu05").removeCreature(
+            variant.getCreatureByName("Warlock"));
+        aps.getLeaf("Gr01").removeCreature(
+            variant.getCreatureByName("Cyclops"));
+        aps.getLeaf("Gr01").removeCreature(
+            variant.getCreatureByName("Cyclops"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Titan"));
         cnl.add(variant.getCreatureByName("Warlock"));
@@ -3628,7 +3711,8 @@ public class PredictSplitsTest extends TestCase
         aps.getLeaf("Gd12").addCreature(variant.getCreatureByName("Gorgon"));
         aps.getLeaf("Bu09").removeCreature(variant.getCreatureByName("Lion"));
         aps.getLeaf("Bu09").removeCreature(variant.getCreatureByName("Lion"));
-        aps.getLeaf("Bu09").removeCreature(variant.getCreatureByName("Centaur"));
+        aps.getLeaf("Bu09").removeCreature(
+            variant.getCreatureByName("Centaur"));
         aps.getLeaf("Br01").split(2, new TestLegion(player, "Br07"), turn);
         aps.getLeaf("Br01").merge(aps.getLeaf("Br07"));
         cnl.clear();
@@ -3670,17 +3754,26 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Cyclops"));
         aps.getLeaf("Rd06").revealCreatures(cnl);
         aps.getLeaf("Rd06").removeCreature(variant.getCreatureByName("Angel"));
-        aps.getLeaf("Rd06").removeCreature(variant.getCreatureByName("Behemoth"));
-        aps.getLeaf("Gd03").removeCreature(variant.getCreatureByName("Gorgon"));
-        aps.getLeaf("Rd06").removeCreature(variant.getCreatureByName("Gorgon"));
-        aps.getLeaf("Rd06").removeCreature(variant.getCreatureByName("Gorgon"));
-        aps.getLeaf("Rd06").removeCreature(variant.getCreatureByName("Cyclops"));
-        aps.getLeaf("Gd03").removeCreature(variant.getCreatureByName("Gorgon"));
-        aps.getLeaf("Gd03").removeCreature(variant.getCreatureByName("Serpent"));
+        aps.getLeaf("Rd06").removeCreature(
+            variant.getCreatureByName("Behemoth"));
+        aps.getLeaf("Gd03")
+            .removeCreature(variant.getCreatureByName("Gorgon"));
+        aps.getLeaf("Rd06")
+            .removeCreature(variant.getCreatureByName("Gorgon"));
+        aps.getLeaf("Rd06")
+            .removeCreature(variant.getCreatureByName("Gorgon"));
+        aps.getLeaf("Rd06").removeCreature(
+            variant.getCreatureByName("Cyclops"));
+        aps.getLeaf("Gd03")
+            .removeCreature(variant.getCreatureByName("Gorgon"));
+        aps.getLeaf("Gd03").removeCreature(
+            variant.getCreatureByName("Serpent"));
         aps.getLeaf("Rd06").removeCreature(variant.getCreatureByName("Titan"));
-        aps.getLeaf("Gd03").removeCreature(variant.getCreatureByName("Warlock"));
+        aps.getLeaf("Gd03").removeCreature(
+            variant.getCreatureByName("Warlock"));
         aps.getLeaf("Rd07").removeCreature(variant.getCreatureByName("Angel"));
-        aps.getLeaf("Rd07").removeCreature(variant.getCreatureByName("Cyclops"));
+        aps.getLeaf("Rd07").removeCreature(
+            variant.getCreatureByName("Cyclops"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Titan"));
         cnl.add(variant.getCreatureByName("Behemoth"));
@@ -3710,10 +3803,12 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Cyclops"));
         cnl.add(variant.getCreatureByName("Gargoyle"));
         aps.getLeaf("Gr09").revealCreatures(cnl);
-        aps.getLeaf("Gr09").removeCreature(variant.getCreatureByName("Gargoyle"));
+        aps.getLeaf("Gr09").removeCreature(
+            variant.getCreatureByName("Gargoyle"));
         aps.getLeaf("Bk06").removeCreature(variant.getCreatureByName("Troll"));
         aps.getLeaf("Gr09").removeCreature(variant.getCreatureByName("Angel"));
-        aps.getLeaf("Gr09").removeCreature(variant.getCreatureByName("Cyclops"));
+        aps.getLeaf("Gr09").removeCreature(
+            variant.getCreatureByName("Cyclops"));
         aps.getLeaf("Bk06").removeCreature(variant.getCreatureByName("Angel"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Warbear"));
@@ -3773,7 +3868,8 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Troll"));
         aps.getLeaf("Br06").revealCreatures(cnl);
         aps.getLeaf("Gr08").removeCreature(variant.getCreatureByName("Ogre"));
-        aps.getLeaf("Br06").removeCreature(variant.getCreatureByName("Cyclops"));
+        aps.getLeaf("Br06").removeCreature(
+            variant.getCreatureByName("Cyclops"));
         aps.getLeaf("Gr08").removeCreature(variant.getCreatureByName("Troll"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Troll"));
@@ -3782,7 +3878,8 @@ public class PredictSplitsTest extends TestCase
         aps.getLeaf("Br06").addCreature(variant.getCreatureByName("Ranger"));
         aps.getLeaf("Br06").removeCreature(variant.getCreatureByName("Troll"));
         aps.getLeaf("Gr08").removeCreature(variant.getCreatureByName("Troll"));
-        aps.getLeaf("Br06").removeCreature(variant.getCreatureByName("Ranger"));
+        aps.getLeaf("Br06")
+            .removeCreature(variant.getCreatureByName("Ranger"));
         aps.getLeaf("Br06").removeCreature(variant.getCreatureByName("Troll"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Titan"));
@@ -3806,38 +3903,65 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Angel"));
         cnl.add(variant.getCreatureByName("Warlock"));
         aps.getLeaf("Bu05").revealCreatures(cnl);
-        aps.getLeaf("Bk04").removeCreature(variant.getCreatureByName("Ranger"));
+        aps.getLeaf("Bk04")
+            .removeCreature(variant.getCreatureByName("Ranger"));
         aps.getLeaf("Bu05").removeCreature(variant.getCreatureByName("Angel"));
-        aps.getLeaf("Bu05").removeCreature(variant.getCreatureByName("Warlock"));
-        aps.getLeaf("Bk04").removeCreature(variant.getCreatureByName("Minotaur"));
+        aps.getLeaf("Bu05").removeCreature(
+            variant.getCreatureByName("Warlock"));
+        aps.getLeaf("Bk04").removeCreature(
+            variant.getCreatureByName("Minotaur"));
         aps.getLeaf("Bk04").removeCreature(variant.getCreatureByName("Lion"));
-        aps.getLeaf("Bk04").removeCreature(variant.getCreatureByName("Ranger"));
-        aps.getLeaf("Bk04").removeCreature(variant.getCreatureByName("Ranger"));
+        aps.getLeaf("Bk04")
+            .removeCreature(variant.getCreatureByName("Ranger"));
+        aps.getLeaf("Bk04")
+            .removeCreature(variant.getCreatureByName("Ranger"));
         aps.getLeaf("Bu05").removeCreature(variant.getCreatureByName("Titan"));
         aps.getLeaf("Bk04").removeCreature(variant.getCreatureByName("Lion"));
-        aps.getLeaf("Bu12").removeCreature(variant.getCreatureByName("Guardian"));
-        aps.getLeaf("Bu12").removeCreature(variant.getCreatureByName("Guardian"));
-        aps.getLeaf("Bu12").removeCreature(variant.getCreatureByName("Behemoth"));
-        aps.getLeaf("Bu12").removeCreature(variant.getCreatureByName("Behemoth"));
-        aps.getLeaf("Bu12").removeCreature(variant.getCreatureByName("Gorgon"));
-        aps.getLeaf("Bu10").removeCreature(variant.getCreatureByName("Gorgon"));
-        aps.getLeaf("Bu10").removeCreature(variant.getCreatureByName("Gorgon"));
-        aps.getLeaf("Bu10").removeCreature(variant.getCreatureByName("Cyclops"));
-        aps.getLeaf("Bu10").removeCreature(variant.getCreatureByName("Cyclops"));
-        aps.getLeaf("Bu10").removeCreature(variant.getCreatureByName("Gargoyle"));
-        aps.getLeaf("Bu10").removeCreature(variant.getCreatureByName("Gorgon"));
-        aps.getLeaf("Bu02").removeCreature(variant.getCreatureByName("Gorgon"));
-        aps.getLeaf("Bu02").removeCreature(variant.getCreatureByName("Gorgon"));
-        aps.getLeaf("Bu02").removeCreature(variant.getCreatureByName("Gargoyle"));
-        aps.getLeaf("Bu02").removeCreature(variant.getCreatureByName("Centaur"));
-        aps.getLeaf("Bu02").removeCreature(variant.getCreatureByName("Centaur"));
+        aps.getLeaf("Bu12").removeCreature(
+            variant.getCreatureByName("Guardian"));
+        aps.getLeaf("Bu12").removeCreature(
+            variant.getCreatureByName("Guardian"));
+        aps.getLeaf("Bu12").removeCreature(
+            variant.getCreatureByName("Behemoth"));
+        aps.getLeaf("Bu12").removeCreature(
+            variant.getCreatureByName("Behemoth"));
+        aps.getLeaf("Bu12")
+            .removeCreature(variant.getCreatureByName("Gorgon"));
+        aps.getLeaf("Bu10")
+            .removeCreature(variant.getCreatureByName("Gorgon"));
+        aps.getLeaf("Bu10")
+            .removeCreature(variant.getCreatureByName("Gorgon"));
+        aps.getLeaf("Bu10").removeCreature(
+            variant.getCreatureByName("Cyclops"));
+        aps.getLeaf("Bu10").removeCreature(
+            variant.getCreatureByName("Cyclops"));
+        aps.getLeaf("Bu10").removeCreature(
+            variant.getCreatureByName("Gargoyle"));
+        aps.getLeaf("Bu10")
+            .removeCreature(variant.getCreatureByName("Gorgon"));
+        aps.getLeaf("Bu02")
+            .removeCreature(variant.getCreatureByName("Gorgon"));
+        aps.getLeaf("Bu02")
+            .removeCreature(variant.getCreatureByName("Gorgon"));
+        aps.getLeaf("Bu02").removeCreature(
+            variant.getCreatureByName("Gargoyle"));
+        aps.getLeaf("Bu02").removeCreature(
+            variant.getCreatureByName("Centaur"));
+        aps.getLeaf("Bu02").removeCreature(
+            variant.getCreatureByName("Centaur"));
         aps.getLeaf("Bu02").removeCreature(variant.getCreatureByName("Lion"));
-        aps.getLeaf("Bu04").removeCreature(variant.getCreatureByName("Gorgon"));
-        aps.getLeaf("Bu04").removeCreature(variant.getCreatureByName("Cyclops"));
-        aps.getLeaf("Bu04").removeCreature(variant.getCreatureByName("Cyclops"));
-        aps.getLeaf("Bu04").removeCreature(variant.getCreatureByName("Gorgon"));
-        aps.getLeaf("Bu07").removeCreature(variant.getCreatureByName("Gorgon"));
-        aps.getLeaf("Bu07").removeCreature(variant.getCreatureByName("Cyclops"));
+        aps.getLeaf("Bu04")
+            .removeCreature(variant.getCreatureByName("Gorgon"));
+        aps.getLeaf("Bu04").removeCreature(
+            variant.getCreatureByName("Cyclops"));
+        aps.getLeaf("Bu04").removeCreature(
+            variant.getCreatureByName("Cyclops"));
+        aps.getLeaf("Bu04")
+            .removeCreature(variant.getCreatureByName("Gorgon"));
+        aps.getLeaf("Bu07")
+            .removeCreature(variant.getCreatureByName("Gorgon"));
+        aps.getLeaf("Bu07").removeCreature(
+            variant.getCreatureByName("Cyclops"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Troll"));
         cnl.add(variant.getCreatureByName("Troll"));
@@ -3873,12 +3997,16 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Troll"));
         cnl.add(variant.getCreatureByName("Troll"));
         aps.getLeaf("Gr08").revealCreatures(cnl);
-        aps.getLeaf("Bk10").removeCreature(variant.getCreatureByName("Gorgon"));
+        aps.getLeaf("Bk10")
+            .removeCreature(variant.getCreatureByName("Gorgon"));
         aps.getLeaf("Gr08").removeCreature(variant.getCreatureByName("Troll"));
         aps.getLeaf("Gr08").removeCreature(variant.getCreatureByName("Troll"));
-        aps.getLeaf("Bk10").removeCreature(variant.getCreatureByName("Warlock"));
-        aps.getLeaf("Bk10").removeCreature(variant.getCreatureByName("Cyclops"));
-        aps.getLeaf("Bk10").removeCreature(variant.getCreatureByName("Cyclops"));
+        aps.getLeaf("Bk10").removeCreature(
+            variant.getCreatureByName("Warlock"));
+        aps.getLeaf("Bk10").removeCreature(
+            variant.getCreatureByName("Cyclops"));
+        aps.getLeaf("Bk10").removeCreature(
+            variant.getCreatureByName("Cyclops"));
         aps.getLeaf("Gr08").removeCreature(variant.getCreatureByName("Titan"));
         aps.getLeaf("Gr08").removeCreature(variant.getCreatureByName("Angel"));
         aps.getLeaf("Gr02").removeCreature(variant.getCreatureByName("Ogre"));
@@ -3942,11 +4070,15 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Unicorn"));
         aps.getLeaf("Br12").revealCreatures(cnl);
         aps.getLeaf("Br12").addCreature(variant.getCreatureByName("Guardian"));
-        aps.getLeaf("Br07").removeCreature(variant.getCreatureByName("Cyclops"));
-        aps.getLeaf("Br07").removeCreature(variant.getCreatureByName("Cyclops"));
+        aps.getLeaf("Br07").removeCreature(
+            variant.getCreatureByName("Cyclops"));
+        aps.getLeaf("Br07").removeCreature(
+            variant.getCreatureByName("Cyclops"));
         aps.getLeaf("Bk10").addCreature(variant.getCreatureByName("Angel"));
-        aps.getLeaf("Gd08").removeCreature(variant.getCreatureByName("Centaur"));
-        aps.getLeaf("Gd08").removeCreature(variant.getCreatureByName("Centaur"));
+        aps.getLeaf("Gd08").removeCreature(
+            variant.getCreatureByName("Centaur"));
+        aps.getLeaf("Gd08").removeCreature(
+            variant.getCreatureByName("Centaur"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Wyvern"));
         aps.getLeaf("Bk06").revealCreatures(cnl);
@@ -3965,7 +4097,8 @@ public class PredictSplitsTest extends TestCase
         LOGGER.log(Level.FINEST, "Turn " + turn);
         aps.getLeaf("Bk06").split(2, new TestLegion(player, "Bk02"), turn);
         aps.getLeaf("Gd04").removeCreature(variant.getCreatureByName("Lion"));
-        aps.getLeaf("Gd04").removeCreature(variant.getCreatureByName("Centaur"));
+        aps.getLeaf("Gd04").removeCreature(
+            variant.getCreatureByName("Centaur"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Troll"));
         aps.getLeaf("Bk06").revealCreatures(cnl);
@@ -4013,9 +4146,12 @@ public class PredictSplitsTest extends TestCase
         cnl.clear();
         cnl.add(variant.getCreatureByName("Titan"));
         aps.getLeaf("Bk10").revealCreatures(cnl);
-        aps.getLeaf("Br04").removeCreature(variant.getCreatureByName("Unicorn"));
-        aps.getLeaf("Br04").removeCreature(variant.getCreatureByName("Warbear"));
-        aps.getLeaf("Br04").removeCreature(variant.getCreatureByName("Warbear"));
+        aps.getLeaf("Br04").removeCreature(
+            variant.getCreatureByName("Unicorn"));
+        aps.getLeaf("Br04").removeCreature(
+            variant.getCreatureByName("Warbear"));
+        aps.getLeaf("Br04").removeCreature(
+            variant.getCreatureByName("Warbear"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Wyvern"));
         cnl.add(variant.getCreatureByName("Wyvern"));
@@ -4049,9 +4185,12 @@ public class PredictSplitsTest extends TestCase
         aps.getLeaf("Br01").revealCreatures(cnl);
         aps.getLeaf("Br01").addCreature(variant.getCreatureByName("Serpent"));
         aps.getLeaf("Bk06").split(2, new TestLegion(player, "Bk05"), turn);
-        aps.getLeaf("Gd02").removeCreature(variant.getCreatureByName("Ranger"));
-        aps.getLeaf("Gd02").removeCreature(variant.getCreatureByName("Ranger"));
-        aps.getLeaf("Gd02").removeCreature(variant.getCreatureByName("Ranger"));
+        aps.getLeaf("Gd02")
+            .removeCreature(variant.getCreatureByName("Ranger"));
+        aps.getLeaf("Gd02")
+            .removeCreature(variant.getCreatureByName("Ranger"));
+        aps.getLeaf("Gd02")
+            .removeCreature(variant.getCreatureByName("Ranger"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Ranger"));
         aps.getLeaf("Bk02").revealCreatures(cnl);
@@ -4070,8 +4209,10 @@ public class PredictSplitsTest extends TestCase
         LOGGER.log(Level.FINEST, "Turn " + turn);
         aps.getLeaf("Br01").split(2, new TestLegion(player, "Br07"), turn);
         aps.getLeaf("Gd10").removeCreature(variant.getCreatureByName("Hydra"));
-        aps.getLeaf("Gd10").removeCreature(variant.getCreatureByName("Griffon"));
-        aps.getLeaf("Gd10").removeCreature(variant.getCreatureByName("Griffon"));
+        aps.getLeaf("Gd10").removeCreature(
+            variant.getCreatureByName("Griffon"));
+        aps.getLeaf("Gd10").removeCreature(
+            variant.getCreatureByName("Griffon"));
         aps.getLeaf("Bk10").addCreature(variant.getCreatureByName("Angel"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Ranger"));
@@ -4083,11 +4224,14 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Behemoth"));
         cnl.add(variant.getCreatureByName("Behemoth"));
         aps.getLeaf("Gd07").revealCreatures(cnl);
-        aps.getLeaf("Bk02").removeCreature(variant.getCreatureByName("Ranger"));
-        aps.getLeaf("Gd07").removeCreature(variant.getCreatureByName("Behemoth"));
+        aps.getLeaf("Bk02")
+            .removeCreature(variant.getCreatureByName("Ranger"));
+        aps.getLeaf("Gd07").removeCreature(
+            variant.getCreatureByName("Behemoth"));
         aps.getLeaf("Bk10").removeCreature(variant.getCreatureByName("Angel"));
         aps.getLeaf("Bk02").addCreature(variant.getCreatureByName("Angel"));
-        aps.getLeaf("Gd07").removeCreature(variant.getCreatureByName("Behemoth"));
+        aps.getLeaf("Gd07").removeCreature(
+            variant.getCreatureByName("Behemoth"));
         aps.getLeaf("Bk02").removeCreature(variant.getCreatureByName("Troll"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Angel"));
@@ -4176,18 +4320,21 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Behemoth"));
         cnl.add(variant.getCreatureByName("Behemoth"));
         aps.getLeaf("Br07").revealCreatures(cnl);
-        aps.getLeaf("Br07").removeCreature(variant.getCreatureByName("Behemoth"));
+        aps.getLeaf("Br07").removeCreature(
+            variant.getCreatureByName("Behemoth"));
         aps.getLeaf("Bk02").removeCreature(variant.getCreatureByName("Angel"));
         aps.getLeaf("Bk10").removeCreature(variant.getCreatureByName("Angel"));
         aps.getLeaf("Bk02").addCreature(variant.getCreatureByName("Angel"));
         aps.getLeaf("Bk02").removeCreature(variant.getCreatureByName("Troll"));
-        aps.getLeaf("Br07").removeCreature(variant.getCreatureByName("Behemoth"));
+        aps.getLeaf("Br07").removeCreature(
+            variant.getCreatureByName("Behemoth"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Angel"));
         cnl.add(variant.getCreatureByName("Troll"));
         cnl.add(variant.getCreatureByName("Troll"));
         aps.getLeaf("Bk02").revealCreatures(cnl);
-        aps.getLeaf("Bk02").addCreature(variant.getCreatureByName("Archangel"));
+        aps.getLeaf("Bk02")
+            .addCreature(variant.getCreatureByName("Archangel"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Ranger"));
         aps.getLeaf("Bk05").revealCreatures(cnl);
@@ -4208,9 +4355,12 @@ public class PredictSplitsTest extends TestCase
         aps.getLeaf("Br12").split(2, new TestLegion(player, "Br05"), turn);
         aps.getLeaf("Br12").merge(aps.getLeaf("Br05"));
         aps.getLeaf("Bk05").split(2, new TestLegion(player, "Bk03"), turn);
-        aps.getLeaf("Br04").removeCreature(variant.getCreatureByName("Guardian"));
-        aps.getLeaf("Br04").removeCreature(variant.getCreatureByName("Unicorn"));
-        aps.getLeaf("Br04").removeCreature(variant.getCreatureByName("Unicorn"));
+        aps.getLeaf("Br04").removeCreature(
+            variant.getCreatureByName("Guardian"));
+        aps.getLeaf("Br04").removeCreature(
+            variant.getCreatureByName("Unicorn"));
+        aps.getLeaf("Br04").removeCreature(
+            variant.getCreatureByName("Unicorn"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Ranger"));
         aps.getLeaf("Bk03").revealCreatures(cnl);
@@ -4288,8 +4438,10 @@ public class PredictSplitsTest extends TestCase
         aps.getLeaf("Gd11").merge(aps.getLeaf("Gd04"));
         aps.getLeaf("Br12").split(2, new TestLegion(player, "Br11"), turn);
         aps.getLeaf("Br12").merge(aps.getLeaf("Br11"));
-        aps.getLeaf("Bk01").removeCreature(variant.getCreatureByName("Centaur"));
-        aps.getLeaf("Bk01").removeCreature(variant.getCreatureByName("Centaur"));
+        aps.getLeaf("Bk01").removeCreature(
+            variant.getCreatureByName("Centaur"));
+        aps.getLeaf("Bk01").removeCreature(
+            variant.getCreatureByName("Centaur"));
         aps.printLeaves();
         turn = 45;
         LOGGER.log(Level.FINEST, "Turn " + turn);
@@ -4337,11 +4489,16 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Serpent"));
         aps.getLeaf("Br01").revealCreatures(cnl);
         aps.getLeaf("Br01").addCreature(variant.getCreatureByName("Serpent"));
-        aps.getLeaf("Gd07").removeCreature(variant.getCreatureByName("Guardian"));
-        aps.getLeaf("Gd07").removeCreature(variant.getCreatureByName("Guardian"));
-        aps.getLeaf("Gd11").removeCreature(variant.getCreatureByName("Guardian"));
-        aps.getLeaf("Gd11").removeCreature(variant.getCreatureByName("Guardian"));
-        aps.getLeaf("Gd11").removeCreature(variant.getCreatureByName("Ranger"));
+        aps.getLeaf("Gd07").removeCreature(
+            variant.getCreatureByName("Guardian"));
+        aps.getLeaf("Gd07").removeCreature(
+            variant.getCreatureByName("Guardian"));
+        aps.getLeaf("Gd11").removeCreature(
+            variant.getCreatureByName("Guardian"));
+        aps.getLeaf("Gd11").removeCreature(
+            variant.getCreatureByName("Guardian"));
+        aps.getLeaf("Gd11")
+            .removeCreature(variant.getCreatureByName("Ranger"));
         aps.getLeaf("Gd11").removeCreature(variant.getCreatureByName("Troll"));
         aps.getLeaf("Gd11").removeCreature(variant.getCreatureByName("Troll"));
         aps.getLeaf("Bk06").addCreature(variant.getCreatureByName("Angel"));
@@ -4411,11 +4568,14 @@ public class PredictSplitsTest extends TestCase
         aps.getLeaf("Br01").revealCreatures(cnl);
         aps.getLeaf("Br01").addCreature(variant.getCreatureByName("Behemoth"));
         aps.getLeaf("Bk05").split(2, new TestLegion(player, "Bk07"), turn);
-        aps.getLeaf("Gd09").removeCreature(variant.getCreatureByName("Minotaur"));
+        aps.getLeaf("Gd09").removeCreature(
+            variant.getCreatureByName("Minotaur"));
         aps.getLeaf("Gd09").removeCreature(variant.getCreatureByName("Lion"));
         aps.getLeaf("Gd09").removeCreature(variant.getCreatureByName("Lion"));
-        aps.getLeaf("Gd11").removeCreature(variant.getCreatureByName("Unicorn"));
-        aps.getLeaf("Gd11").removeCreature(variant.getCreatureByName("Warbear"));
+        aps.getLeaf("Gd11").removeCreature(
+            variant.getCreatureByName("Unicorn"));
+        aps.getLeaf("Gd11").removeCreature(
+            variant.getCreatureByName("Warbear"));
         aps.printLeaves();
         turn = 52;
         LOGGER.log(Level.FINEST, "Turn " + turn);
@@ -4433,10 +4593,14 @@ public class PredictSplitsTest extends TestCase
         cnl.clear();
         cnl.add(variant.getCreatureByName("Titan"));
         aps.getLeaf("Bk10").revealCreatures(cnl);
-        aps.getLeaf("Br11").removeCreature(variant.getCreatureByName("Unicorn"));
-        aps.getLeaf("Br11").removeCreature(variant.getCreatureByName("Unicorn"));
-        aps.getLeaf("Br11").removeCreature(variant.getCreatureByName("Warbear"));
-        aps.getLeaf("Br11").removeCreature(variant.getCreatureByName("Minotaur"));
+        aps.getLeaf("Br11").removeCreature(
+            variant.getCreatureByName("Unicorn"));
+        aps.getLeaf("Br11").removeCreature(
+            variant.getCreatureByName("Unicorn"));
+        aps.getLeaf("Br11").removeCreature(
+            variant.getCreatureByName("Warbear"));
+        aps.getLeaf("Br11").removeCreature(
+            variant.getCreatureByName("Minotaur"));
         aps.getLeaf("Bk10").addCreature(variant.getCreatureByName("Angel"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Warbear"));
@@ -4459,13 +4623,20 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Ranger"));
         aps.getLeaf("Gd08").revealCreatures(cnl);
         aps.getLeaf("Gd08").addCreature(variant.getCreatureByName("Guardian"));
-        aps.getLeaf("Gd01").removeCreature(variant.getCreatureByName("Unicorn"));
-        aps.getLeaf("Gd01").removeCreature(variant.getCreatureByName("Warbear"));
-        aps.getLeaf("Gd01").removeCreature(variant.getCreatureByName("Minotaur"));
-        aps.getLeaf("Gd01").removeCreature(variant.getCreatureByName("Minotaur"));
-        aps.getLeaf("Gd01").removeCreature(variant.getCreatureByName("Minotaur"));
-        aps.getLeaf("Gd02").removeCreature(variant.getCreatureByName("Ranger"));
-        aps.getLeaf("Gd02").removeCreature(variant.getCreatureByName("Ranger"));
+        aps.getLeaf("Gd01").removeCreature(
+            variant.getCreatureByName("Unicorn"));
+        aps.getLeaf("Gd01").removeCreature(
+            variant.getCreatureByName("Warbear"));
+        aps.getLeaf("Gd01").removeCreature(
+            variant.getCreatureByName("Minotaur"));
+        aps.getLeaf("Gd01").removeCreature(
+            variant.getCreatureByName("Minotaur"));
+        aps.getLeaf("Gd01").removeCreature(
+            variant.getCreatureByName("Minotaur"));
+        aps.getLeaf("Gd02")
+            .removeCreature(variant.getCreatureByName("Ranger"));
+        aps.getLeaf("Gd02")
+            .removeCreature(variant.getCreatureByName("Ranger"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Giant"));
         cnl.add(variant.getCreatureByName("Warbear"));
@@ -4477,11 +4648,15 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Serpent"));
         cnl.add(variant.getCreatureByName("Angel"));
         aps.getLeaf("Gd09").revealCreatures(cnl);
-        aps.getLeaf("Gd09").removeCreature(variant.getCreatureByName("Serpent"));
+        aps.getLeaf("Gd09").removeCreature(
+            variant.getCreatureByName("Serpent"));
         aps.getLeaf("Bk05").removeCreature(variant.getCreatureByName("Giant"));
-        aps.getLeaf("Bk05").removeCreature(variant.getCreatureByName("Warbear"));
-        aps.getLeaf("Bk02").removeCreature(variant.getCreatureByName("Archangel"));
-        aps.getLeaf("Bk05").addCreature(variant.getCreatureByName("Archangel"));
+        aps.getLeaf("Bk05").removeCreature(
+            variant.getCreatureByName("Warbear"));
+        aps.getLeaf("Bk02").removeCreature(
+            variant.getCreatureByName("Archangel"));
+        aps.getLeaf("Bk05")
+            .addCreature(variant.getCreatureByName("Archangel"));
         aps.getLeaf("Gd09").removeCreature(variant.getCreatureByName("Angel"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Archangel"));
@@ -4547,20 +4722,32 @@ public class PredictSplitsTest extends TestCase
         cnl.clear();
         cnl.add(variant.getCreatureByName("Titan"));
         aps.getLeaf("Bk10").revealCreatures(cnl);
-        aps.getLeaf("Gd12").removeCreature(variant.getCreatureByName("Guardian"));
-        aps.getLeaf("Gd12").removeCreature(variant.getCreatureByName("Gorgon"));
-        aps.getLeaf("Gd12").removeCreature(variant.getCreatureByName("Gorgon"));
-        aps.getLeaf("Gd12").removeCreature(variant.getCreatureByName("Gorgon"));
-        aps.getLeaf("Gd12").removeCreature(variant.getCreatureByName("Gorgon"));
-        aps.getLeaf("Gd12").removeCreature(variant.getCreatureByName("Cyclops"));
-        aps.getLeaf("Gd05").removeCreature(variant.getCreatureByName("Guardian"));
-        aps.getLeaf("Gd05").removeCreature(variant.getCreatureByName("Ranger"));
-        aps.getLeaf("Gd05").removeCreature(variant.getCreatureByName("Ranger"));
-        aps.getLeaf("Gd05").removeCreature(variant.getCreatureByName("Ranger"));
+        aps.getLeaf("Gd12").removeCreature(
+            variant.getCreatureByName("Guardian"));
+        aps.getLeaf("Gd12")
+            .removeCreature(variant.getCreatureByName("Gorgon"));
+        aps.getLeaf("Gd12")
+            .removeCreature(variant.getCreatureByName("Gorgon"));
+        aps.getLeaf("Gd12")
+            .removeCreature(variant.getCreatureByName("Gorgon"));
+        aps.getLeaf("Gd12")
+            .removeCreature(variant.getCreatureByName("Gorgon"));
+        aps.getLeaf("Gd12").removeCreature(
+            variant.getCreatureByName("Cyclops"));
+        aps.getLeaf("Gd05").removeCreature(
+            variant.getCreatureByName("Guardian"));
+        aps.getLeaf("Gd05")
+            .removeCreature(variant.getCreatureByName("Ranger"));
+        aps.getLeaf("Gd05")
+            .removeCreature(variant.getCreatureByName("Ranger"));
+        aps.getLeaf("Gd05")
+            .removeCreature(variant.getCreatureByName("Ranger"));
         aps.getLeaf("Gd05").removeCreature(variant.getCreatureByName("Troll"));
         aps.getLeaf("Bk10").addCreature(variant.getCreatureByName("Angel"));
-        aps.getLeaf("Gd11").removeCreature(variant.getCreatureByName("Griffon"));
-        aps.getLeaf("Gd11").removeCreature(variant.getCreatureByName("Griffon"));
+        aps.getLeaf("Gd11").removeCreature(
+            variant.getCreatureByName("Griffon"));
+        aps.getLeaf("Gd11").removeCreature(
+            variant.getCreatureByName("Griffon"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Troll"));
         cnl.add(variant.getCreatureByName("Troll"));
@@ -4582,8 +4769,10 @@ public class PredictSplitsTest extends TestCase
         turn = 61;
         LOGGER.log(Level.FINEST, "Turn " + turn);
         aps.getLeaf("Bk10").split(2, new TestLegion(player, "Bk09"), turn);
-        aps.getLeaf("Gd07").removeCreature(variant.getCreatureByName("Ranger"));
-        aps.getLeaf("Gd07").removeCreature(variant.getCreatureByName("Ranger"));
+        aps.getLeaf("Gd07")
+            .removeCreature(variant.getCreatureByName("Ranger"));
+        aps.getLeaf("Gd07")
+            .removeCreature(variant.getCreatureByName("Ranger"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Warbear"));
         aps.getLeaf("Bk07").revealCreatures(cnl);
@@ -4609,26 +4798,39 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Unicorn"));
         cnl.add(variant.getCreatureByName("Unicorn"));
         aps.getLeaf("Br12").revealCreatures(cnl);
-        aps.getLeaf("Br12").removeCreature(variant.getCreatureByName("Unicorn"));
-        aps.getLeaf("Br12").removeCreature(variant.getCreatureByName("Unicorn"));
-        aps.getLeaf("Br12").removeCreature(variant.getCreatureByName("Unicorn"));
+        aps.getLeaf("Br12").removeCreature(
+            variant.getCreatureByName("Unicorn"));
+        aps.getLeaf("Br12").removeCreature(
+            variant.getCreatureByName("Unicorn"));
+        aps.getLeaf("Br12").removeCreature(
+            variant.getCreatureByName("Unicorn"));
         aps.getLeaf("Bk10").removeCreature(variant.getCreatureByName("Angel"));
         aps.getLeaf("Bk10").removeCreature(variant.getCreatureByName("Angel"));
-        aps.getLeaf("Bk05").removeCreature(variant.getCreatureByName("Archangel"));
-        aps.getLeaf("Bk10").addCreature(variant.getCreatureByName("Archangel"));
-        aps.getLeaf("Br12").removeCreature(variant.getCreatureByName("Unicorn"));
-        aps.getLeaf("Br12").removeCreature(variant.getCreatureByName("Unicorn"));
-        aps.getLeaf("Bk10").removeCreature(variant.getCreatureByName("Archangel"));
+        aps.getLeaf("Bk05").removeCreature(
+            variant.getCreatureByName("Archangel"));
+        aps.getLeaf("Bk10")
+            .addCreature(variant.getCreatureByName("Archangel"));
+        aps.getLeaf("Br12").removeCreature(
+            variant.getCreatureByName("Unicorn"));
+        aps.getLeaf("Br12").removeCreature(
+            variant.getCreatureByName("Unicorn"));
+        aps.getLeaf("Bk10").removeCreature(
+            variant.getCreatureByName("Archangel"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Titan"));
         cnl.add(variant.getCreatureByName("Angel"));
         cnl.add(variant.getCreatureByName("Warlock"));
         aps.getLeaf("Bk10").revealCreatures(cnl);
-        aps.getLeaf("Bk10").addCreature(variant.getCreatureByName("Archangel"));
-        aps.getLeaf("Gd08").removeCreature(variant.getCreatureByName("Guardian"));
-        aps.getLeaf("Gd08").removeCreature(variant.getCreatureByName("Ranger"));
-        aps.getLeaf("Gd08").removeCreature(variant.getCreatureByName("Ranger"));
-        aps.getLeaf("Gd08").removeCreature(variant.getCreatureByName("Ranger"));
+        aps.getLeaf("Bk10")
+            .addCreature(variant.getCreatureByName("Archangel"));
+        aps.getLeaf("Gd08").removeCreature(
+            variant.getCreatureByName("Guardian"));
+        aps.getLeaf("Gd08")
+            .removeCreature(variant.getCreatureByName("Ranger"));
+        aps.getLeaf("Gd08")
+            .removeCreature(variant.getCreatureByName("Ranger"));
+        aps.getLeaf("Gd08")
+            .removeCreature(variant.getCreatureByName("Ranger"));
         aps.getLeaf("Bk02").addCreature(variant.getCreatureByName("Angel"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Guardian"));
@@ -4642,11 +4844,16 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Warlock"));
         cnl.add(variant.getCreatureByName("Gorgon"));
         aps.getLeaf("Br06").revealCreatures(cnl);
-        aps.getLeaf("Br06").removeCreature(variant.getCreatureByName("Warlock"));
-        aps.getLeaf("Bk03").removeCreature(variant.getCreatureByName("Ranger"));
-        aps.getLeaf("Bk03").removeCreature(variant.getCreatureByName("Ranger"));
-        aps.getLeaf("Br06").removeCreature(variant.getCreatureByName("Warlock"));
-        aps.getLeaf("Br06").removeCreature(variant.getCreatureByName("Gorgon"));
+        aps.getLeaf("Br06").removeCreature(
+            variant.getCreatureByName("Warlock"));
+        aps.getLeaf("Bk03")
+            .removeCreature(variant.getCreatureByName("Ranger"));
+        aps.getLeaf("Bk03")
+            .removeCreature(variant.getCreatureByName("Ranger"));
+        aps.getLeaf("Br06").removeCreature(
+            variant.getCreatureByName("Warlock"));
+        aps.getLeaf("Br06")
+            .removeCreature(variant.getCreatureByName("Gorgon"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Guardian"));
         cnl.add(variant.getCreatureByName("Guardian"));
@@ -4662,9 +4869,12 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Warbear"));
         cnl.add(variant.getCreatureByName("Minotaur"));
         aps.getLeaf("Br07").revealCreatures(cnl);
-        aps.getLeaf("Br07").removeCreature(variant.getCreatureByName("Warbear"));
-        aps.getLeaf("Bk07").removeCreature(variant.getCreatureByName("Warbear"));
-        aps.getLeaf("Br07").removeCreature(variant.getCreatureByName("Minotaur"));
+        aps.getLeaf("Br07").removeCreature(
+            variant.getCreatureByName("Warbear"));
+        aps.getLeaf("Bk07").removeCreature(
+            variant.getCreatureByName("Warbear"));
+        aps.getLeaf("Br07").removeCreature(
+            variant.getCreatureByName("Minotaur"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Warbear"));
         cnl.add(variant.getCreatureByName("Troll"));
@@ -4713,8 +4923,10 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Titan"));
         aps.getLeaf("Gd03").revealCreatures(cnl);
         aps.getLeaf("Gd03").addCreature(variant.getCreatureByName("Warlock"));
-        aps.getLeaf("Br02").removeCreature(variant.getCreatureByName("Minotaur"));
-        aps.getLeaf("Br02").removeCreature(variant.getCreatureByName("Minotaur"));
+        aps.getLeaf("Br02").removeCreature(
+            variant.getCreatureByName("Minotaur"));
+        aps.getLeaf("Br02").removeCreature(
+            variant.getCreatureByName("Minotaur"));
         aps.printLeaves();
         turn = 65;
         LOGGER.log(Level.FINEST, "Turn " + turn);
@@ -4737,14 +4949,19 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Behemoth"));
         aps.getLeaf("Br03").revealCreatures(cnl);
         aps.getLeaf("Br03").removeCreature(variant.getCreatureByName("Angel"));
-        aps.getLeaf("Br03").removeCreature(variant.getCreatureByName("Behemoth"));
+        aps.getLeaf("Br03").removeCreature(
+            variant.getCreatureByName("Behemoth"));
         aps.getLeaf("Bk10").removeCreature(variant.getCreatureByName("Angel"));
         aps.getLeaf("Bk05").removeCreature(variant.getCreatureByName("Angel"));
         aps.getLeaf("Bk10").addCreature(variant.getCreatureByName("Angel"));
-        aps.getLeaf("Br03").removeCreature(variant.getCreatureByName("Behemoth"));
-        aps.getLeaf("Bk10").removeCreature(variant.getCreatureByName("Warlock"));
-        aps.getLeaf("Bk10").removeCreature(variant.getCreatureByName("Warlock"));
-        aps.getLeaf("Br03").removeCreature(variant.getCreatureByName("Behemoth"));
+        aps.getLeaf("Br03").removeCreature(
+            variant.getCreatureByName("Behemoth"));
+        aps.getLeaf("Bk10").removeCreature(
+            variant.getCreatureByName("Warlock"));
+        aps.getLeaf("Bk10").removeCreature(
+            variant.getCreatureByName("Warlock"));
+        aps.getLeaf("Br03").removeCreature(
+            variant.getCreatureByName("Behemoth"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Titan"));
         cnl.add(variant.getCreatureByName("Archangel"));
@@ -4791,10 +5008,14 @@ public class PredictSplitsTest extends TestCase
         aps.getLeaf("Gd03").revealCreatures(cnl);
         aps.getLeaf("Gd03").addCreature(variant.getCreatureByName("Warlock"));
         aps.getLeaf("Bk02").split(2, new TestLegion(player, "Bk01"), turn);
-        aps.getLeaf("Gd05").removeCreature(variant.getCreatureByName("Wyvern"));
-        aps.getLeaf("Gd05").removeCreature(variant.getCreatureByName("Griffon"));
-        aps.getLeaf("Br05").removeCreature(variant.getCreatureByName("Behemoth"));
-        aps.getLeaf("Br05").removeCreature(variant.getCreatureByName("Behemoth"));
+        aps.getLeaf("Gd05")
+            .removeCreature(variant.getCreatureByName("Wyvern"));
+        aps.getLeaf("Gd05").removeCreature(
+            variant.getCreatureByName("Griffon"));
+        aps.getLeaf("Br05").removeCreature(
+            variant.getCreatureByName("Behemoth"));
+        aps.getLeaf("Br05").removeCreature(
+            variant.getCreatureByName("Behemoth"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Warbear"));
         aps.getLeaf("Bk05").revealCreatures(cnl);
@@ -4857,8 +5078,10 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Angel"));
         cnl.add(variant.getCreatureByName("Angel"));
         aps.getLeaf("Bk10").revealCreatures(cnl);
-        aps.getLeaf("Gd01").removeCreature(variant.getCreatureByName("Wyvern"));
-        aps.getLeaf("Gd01").removeCreature(variant.getCreatureByName("Wyvern"));
+        aps.getLeaf("Gd01")
+            .removeCreature(variant.getCreatureByName("Wyvern"));
+        aps.getLeaf("Gd01")
+            .removeCreature(variant.getCreatureByName("Wyvern"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Titan"));
         cnl.add(variant.getCreatureByName("Archangel"));
@@ -4879,8 +5102,10 @@ public class PredictSplitsTest extends TestCase
         cnl.clear();
         cnl.add(variant.getCreatureByName("Titan"));
         aps.getLeaf("Bk10").revealCreatures(cnl);
-        aps.getLeaf("Gd12").removeCreature(variant.getCreatureByName("Guardian"));
-        aps.getLeaf("Gd12").removeCreature(variant.getCreatureByName("Warlock"));
+        aps.getLeaf("Gd12").removeCreature(
+            variant.getCreatureByName("Guardian"));
+        aps.getLeaf("Gd12").removeCreature(
+            variant.getCreatureByName("Warlock"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Wyvern"));
         aps.getLeaf("Bk01").revealCreatures(cnl);
@@ -4906,9 +5131,12 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Serpent"));
         aps.getLeaf("Gd03").revealCreatures(cnl);
         aps.getLeaf("Gd03").addCreature(variant.getCreatureByName("Behemoth"));
-        aps.getLeaf("Bk03").removeCreature(variant.getCreatureByName("Guardian"));
-        aps.getLeaf("Bk03").removeCreature(variant.getCreatureByName("Guardian"));
-        aps.getLeaf("Bk03").removeCreature(variant.getCreatureByName("Ranger"));
+        aps.getLeaf("Bk03").removeCreature(
+            variant.getCreatureByName("Guardian"));
+        aps.getLeaf("Bk03").removeCreature(
+            variant.getCreatureByName("Guardian"));
+        aps.getLeaf("Bk03")
+            .removeCreature(variant.getCreatureByName("Ranger"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Hydra"));
         aps.getLeaf("Bk06").revealCreatures(cnl);
@@ -4964,9 +5192,12 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Wyvern"));
         aps.getLeaf("Gd11").revealCreatures(cnl);
         aps.getLeaf("Gd11").addCreature(variant.getCreatureByName("Wyvern"));
-        aps.getLeaf("Gd11").removeCreature(variant.getCreatureByName("Wyvern"));
-        aps.getLeaf("Gd11").removeCreature(variant.getCreatureByName("Wyvern"));
-        aps.getLeaf("Gd11").removeCreature(variant.getCreatureByName("Wyvern"));
+        aps.getLeaf("Gd11")
+            .removeCreature(variant.getCreatureByName("Wyvern"));
+        aps.getLeaf("Gd11")
+            .removeCreature(variant.getCreatureByName("Wyvern"));
+        aps.getLeaf("Gd11")
+            .removeCreature(variant.getCreatureByName("Wyvern"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Wyvern"));
         aps.getLeaf("Bk02").revealCreatures(cnl);
@@ -5004,17 +5235,24 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Serpent"));
         cnl.add(variant.getCreatureByName("Serpent"));
         aps.getLeaf("Br01").revealCreatures(cnl);
-        aps.getLeaf("Br01").removeCreature(variant.getCreatureByName("Serpent"));
+        aps.getLeaf("Br01").removeCreature(
+            variant.getCreatureByName("Serpent"));
         aps.getLeaf("Bk07").removeCreature(variant.getCreatureByName("Angel"));
         aps.getLeaf("Bk10").addCreature(variant.getCreatureByName("Angel"));
-        aps.getLeaf("Br01").removeCreature(variant.getCreatureByName("Serpent"));
-        aps.getLeaf("Br01").removeCreature(variant.getCreatureByName("Serpent"));
+        aps.getLeaf("Br01").removeCreature(
+            variant.getCreatureByName("Serpent"));
+        aps.getLeaf("Br01").removeCreature(
+            variant.getCreatureByName("Serpent"));
         aps.getLeaf("Bk10").removeCreature(variant.getCreatureByName("Angel"));
         aps.getLeaf("Br01").removeCreature(variant.getCreatureByName("Titan"));
-        aps.getLeaf("Bk10").removeCreature(variant.getCreatureByName("Archangel"));
-        aps.getLeaf("Br01").removeCreature(variant.getCreatureByName("Serpent"));
-        aps.getLeaf("Br05").removeCreature(variant.getCreatureByName("Guardian"));
-        aps.getLeaf("Br05").removeCreature(variant.getCreatureByName("Guardian"));
+        aps.getLeaf("Bk10").removeCreature(
+            variant.getCreatureByName("Archangel"));
+        aps.getLeaf("Br01").removeCreature(
+            variant.getCreatureByName("Serpent"));
+        aps.getLeaf("Br05").removeCreature(
+            variant.getCreatureByName("Guardian"));
+        aps.getLeaf("Br05").removeCreature(
+            variant.getCreatureByName("Guardian"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Titan"));
         cnl.add(variant.getCreatureByName("Angel"));
@@ -5022,16 +5260,21 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Angel"));
         cnl.add(variant.getCreatureByName("Warlock"));
         aps.getLeaf("Bk10").revealCreatures(cnl);
-        aps.getLeaf("Bk10").addCreature(variant.getCreatureByName("Archangel"));
+        aps.getLeaf("Bk10")
+            .addCreature(variant.getCreatureByName("Archangel"));
         aps.getLeaf("Bk10").addCreature(variant.getCreatureByName("Angel"));
-        aps.getLeaf("Gd04").removeCreature(variant.getCreatureByName("Guardian"));
-        aps.getLeaf("Gd04").removeCreature(variant.getCreatureByName("Guardian"));
+        aps.getLeaf("Gd04").removeCreature(
+            variant.getCreatureByName("Guardian"));
+        aps.getLeaf("Gd04").removeCreature(
+            variant.getCreatureByName("Guardian"));
         aps.printLeaves();
         turn = 79;
         LOGGER.log(Level.FINEST, "Turn " + turn);
         aps.getLeaf("Bk10").split(2, new TestLegion(player, "Bk03"), turn);
-        aps.getLeaf("Gd01").removeCreature(variant.getCreatureByName("Guardian"));
-        aps.getLeaf("Gd01").removeCreature(variant.getCreatureByName("Behemoth"));
+        aps.getLeaf("Gd01").removeCreature(
+            variant.getCreatureByName("Guardian"));
+        aps.getLeaf("Gd01").removeCreature(
+            variant.getCreatureByName("Behemoth"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Serpent"));
         aps.getLeaf("Gd03").revealCreatures(cnl);
@@ -5070,9 +5313,12 @@ public class PredictSplitsTest extends TestCase
         turn = 84;
         LOGGER.log(Level.FINEST, "Turn " + turn);
         aps.getLeaf("Bk05").split(2, new TestLegion(player, "Gr06"), turn);
-        aps.getLeaf("Gd08").removeCreature(variant.getCreatureByName("Griffon"));
-        aps.getLeaf("Gd08").removeCreature(variant.getCreatureByName("Griffon"));
-        aps.getLeaf("Gd08").removeCreature(variant.getCreatureByName("Griffon"));
+        aps.getLeaf("Gd08").removeCreature(
+            variant.getCreatureByName("Griffon"));
+        aps.getLeaf("Gd08").removeCreature(
+            variant.getCreatureByName("Griffon"));
+        aps.getLeaf("Gd08").removeCreature(
+            variant.getCreatureByName("Griffon"));
         aps.getLeaf("Bk04").addCreature(variant.getCreatureByName("Angel"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Griffon"));
@@ -5120,9 +5366,12 @@ public class PredictSplitsTest extends TestCase
         LOGGER.log(Level.FINEST, "Turn " + turn);
         aps.getLeaf("Gd03").split(2, new TestLegion(player, "Gd07"), turn);
         aps.getLeaf("Gd03").merge(aps.getLeaf("Gd07"));
-        aps.getLeaf("Bk07").removeCreature(variant.getCreatureByName("Warbear"));
-        aps.getLeaf("Bk07").removeCreature(variant.getCreatureByName("Warbear"));
-        aps.getLeaf("Bk07").removeCreature(variant.getCreatureByName("Warbear"));
+        aps.getLeaf("Bk07").removeCreature(
+            variant.getCreatureByName("Warbear"));
+        aps.getLeaf("Bk07").removeCreature(
+            variant.getCreatureByName("Warbear"));
+        aps.getLeaf("Bk07").removeCreature(
+            variant.getCreatureByName("Warbear"));
         aps.getLeaf("Bk07").removeCreature(variant.getCreatureByName("Troll"));
         aps.getLeaf("Bk07").removeCreature(variant.getCreatureByName("Troll"));
         cnl.clear();
@@ -5142,14 +5391,18 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Serpent"));
         aps.getLeaf("Gd03").revealCreatures(cnl);
         aps.getLeaf("Gd03").addCreature(variant.getCreatureByName("Behemoth"));
-        aps.getLeaf("Gd02").removeCreature(variant.getCreatureByName("Warlock"));
-        aps.getLeaf("Gd02").removeCreature(variant.getCreatureByName("Warlock"));
+        aps.getLeaf("Gd02").removeCreature(
+            variant.getCreatureByName("Warlock"));
+        aps.getLeaf("Gd02").removeCreature(
+            variant.getCreatureByName("Warlock"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Hydra"));
         aps.getLeaf("Gd06").revealCreatures(cnl);
         aps.getLeaf("Gd06").addCreature(variant.getCreatureByName("Griffon"));
-        aps.getLeaf("Gd10").removeCreature(variant.getCreatureByName("Behemoth"));
-        aps.getLeaf("Gd10").removeCreature(variant.getCreatureByName("Behemoth"));
+        aps.getLeaf("Gd10").removeCreature(
+            variant.getCreatureByName("Behemoth"));
+        aps.getLeaf("Gd10").removeCreature(
+            variant.getCreatureByName("Behemoth"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Hydra"));
         cnl.add(variant.getCreatureByName("Hydra"));
@@ -5163,7 +5416,8 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Warlock"));
         aps.getLeaf("Bk03").revealCreatures(cnl);
         aps.getLeaf("Bk03").removeCreature(variant.getCreatureByName("Angel"));
-        aps.getLeaf("Bk03").removeCreature(variant.getCreatureByName("Warlock"));
+        aps.getLeaf("Bk03").removeCreature(
+            variant.getCreatureByName("Warlock"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Hydra"));
         cnl.add(variant.getCreatureByName("Hydra"));
@@ -5182,8 +5436,10 @@ public class PredictSplitsTest extends TestCase
         LOGGER.log(Level.FINEST, "Turn " + turn);
         aps.getLeaf("Gd06").split(2, new TestLegion(player, "Gd09"), turn);
         aps.getLeaf("Gd06").merge(aps.getLeaf("Gd09"));
-        aps.getLeaf("Bk01").removeCreature(variant.getCreatureByName("Wyvern"));
-        aps.getLeaf("Bk01").removeCreature(variant.getCreatureByName("Wyvern"));
+        aps.getLeaf("Bk01")
+            .removeCreature(variant.getCreatureByName("Wyvern"));
+        aps.getLeaf("Bk01")
+            .removeCreature(variant.getCreatureByName("Wyvern"));
         aps.getLeaf("Bk01").removeCreature(variant.getCreatureByName("Troll"));
         aps.printLeaves();
         turn = 98;
@@ -5209,11 +5465,15 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Griffon"));
         cnl.add(variant.getCreatureByName("Griffon"));
         aps.getLeaf("Gd02").revealCreatures(cnl);
-        aps.getLeaf("Gd02").removeCreature(variant.getCreatureByName("Griffon"));
-        aps.getLeaf("Gd02").removeCreature(variant.getCreatureByName("Griffon"));
+        aps.getLeaf("Gd02").removeCreature(
+            variant.getCreatureByName("Griffon"));
+        aps.getLeaf("Gd02").removeCreature(
+            variant.getCreatureByName("Griffon"));
         aps.getLeaf("Bk06").removeCreature(variant.getCreatureByName("Angel"));
-        aps.getLeaf("Bk10").removeCreature(variant.getCreatureByName("Archangel"));
-        aps.getLeaf("Bk06").addCreature(variant.getCreatureByName("Archangel"));
+        aps.getLeaf("Bk10").removeCreature(
+            variant.getCreatureByName("Archangel"));
+        aps.getLeaf("Bk06")
+            .addCreature(variant.getCreatureByName("Archangel"));
         aps.getLeaf("Gd02").removeCreature(variant.getCreatureByName("Angel"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Archangel"));
@@ -5226,8 +5486,10 @@ public class PredictSplitsTest extends TestCase
         cnl.clear();
         cnl.add(variant.getCreatureByName("Angel"));
         aps.getLeaf("Bk02").revealCreatures(cnl);
-        aps.getLeaf("Bk07").removeCreature(variant.getCreatureByName("Griffon"));
-        aps.getLeaf("Bk07").removeCreature(variant.getCreatureByName("Griffon"));
+        aps.getLeaf("Bk07").removeCreature(
+            variant.getCreatureByName("Griffon"));
+        aps.getLeaf("Bk07").removeCreature(
+            variant.getCreatureByName("Griffon"));
         aps.getLeaf("Gd06").removeCreature(variant.getCreatureByName("Hydra"));
         aps.getLeaf("Gd06").removeCreature(variant.getCreatureByName("Hydra"));
         aps.getLeaf("Gd06").removeCreature(variant.getCreatureByName("Hydra"));
@@ -5265,8 +5527,10 @@ public class PredictSplitsTest extends TestCase
         cnl.clear();
         cnl.add(variant.getCreatureByName("Titan"));
         aps.getLeaf("Bk10").revealCreatures(cnl);
-        aps.getLeaf("Gd12").removeCreature(variant.getCreatureByName("Behemoth"));
-        aps.getLeaf("Gd12").removeCreature(variant.getCreatureByName("Warlock"));
+        aps.getLeaf("Gd12").removeCreature(
+            variant.getCreatureByName("Behemoth"));
+        aps.getLeaf("Gd12").removeCreature(
+            variant.getCreatureByName("Warlock"));
         aps.printLeaves();
     }
 
@@ -5342,8 +5606,10 @@ public class PredictSplitsTest extends TestCase
         assertFalse(ps.getLeaf("Bk09").allCertain());
         assertFalse(ps.getLeaf("Bk10").allCertain());
         ps.printLeaves();
-        ps.getLeaf("Bk10").removeCreature(variant.getCreatureByName("Gargoyle"));
-        ps.getLeaf("Bk10").removeCreature(variant.getCreatureByName("Gargoyle"));
+        ps.getLeaf("Bk10").removeCreature(
+            variant.getCreatureByName("Gargoyle"));
+        ps.getLeaf("Bk10").removeCreature(
+            variant.getCreatureByName("Gargoyle"));
         assertTrue(ps.getLeaf("Bk06").allCertain());
         assertTrue(ps.getLeaf("Bk09").allCertain());
         ps.printLeaves();
@@ -5409,10 +5675,12 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Gargoyle"));
         cnl.add(variant.getCreatureByName("Gargoyle"));
         ps.getLeaf("Bk08").revealCreatures(cnl);
-        ps.getLeaf("Bk08").removeCreature(variant.getCreatureByName("Gargoyle"));
+        ps.getLeaf("Bk08").removeCreature(
+            variant.getCreatureByName("Gargoyle"));
         ps.getLeaf("Bk09").removeCreature(variant.getCreatureByName("Angel"));
         ps.getLeaf("Bk08").addCreature(variant.getCreatureByName("Angel"));
-        ps.getLeaf("Bk08").removeCreature(variant.getCreatureByName("Gargoyle"));
+        ps.getLeaf("Bk08").removeCreature(
+            variant.getCreatureByName("Gargoyle"));
         ps.getLeaf("Bk08").removeCreature(variant.getCreatureByName("Angel"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Lion"));
@@ -5455,8 +5723,10 @@ public class PredictSplitsTest extends TestCase
         ps.getLeaf("Bk09").addCreature(variant.getCreatureByName("Griffon"));
         ps.getLeaf("Bk11").removeCreature(variant.getCreatureByName("Lion"));
         ps.getLeaf("Bk11").removeCreature(variant.getCreatureByName("Lion"));
-        ps.getLeaf("Bk11").removeCreature(variant.getCreatureByName("Centaur"));
-        ps.getLeaf("Bk11").removeCreature(variant.getCreatureByName("Centaur"));
+        ps.getLeaf("Bk11")
+            .removeCreature(variant.getCreatureByName("Centaur"));
+        ps.getLeaf("Bk11")
+            .removeCreature(variant.getCreatureByName("Centaur"));
         assertTrue(ps.getLeaf("Bk06").allCertain());
         assertTrue(ps.getLeaf("Bk09").allCertain());
         ps.printLeaves();
@@ -5464,8 +5734,10 @@ public class PredictSplitsTest extends TestCase
         turn = 8;
         LOGGER.log(Level.FINEST, "Turn " + turn);
         ps.getLeaf("Bk09").split(2, new TestLegion(player, "Bk12"), turn);
-        ps.getLeaf("Bk12").removeCreature(variant.getCreatureByName("Gargoyle"));
-        ps.getLeaf("Bk12").removeCreature(variant.getCreatureByName("Centaur"));
+        ps.getLeaf("Bk12").removeCreature(
+            variant.getCreatureByName("Gargoyle"));
+        ps.getLeaf("Bk12")
+            .removeCreature(variant.getCreatureByName("Centaur"));
         assertTrue(ps.getLeaf("Bk06").allCertain());
         assertTrue(ps.getLeaf("Bk09").allCertain());
         ps.printLeaves();
@@ -5865,8 +6137,10 @@ public class PredictSplitsTest extends TestCase
         aps.getLeaf("Bk03").revealCreatures(cnl);
         aps.getLeaf("Bk03").addCreature(variant.getCreatureByName("Ogre"));
         aps.getLeaf("Br12").split(2, new TestLegion(player, "Br10"), turn);
-        aps.getLeaf("Gr10").removeCreature(variant.getCreatureByName("Gargoyle"));
-        aps.getLeaf("Gr10").removeCreature(variant.getCreatureByName("Gargoyle"));
+        aps.getLeaf("Gr10").removeCreature(
+            variant.getCreatureByName("Gargoyle"));
+        aps.getLeaf("Gr10").removeCreature(
+            variant.getCreatureByName("Gargoyle"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Ogre"));
         aps.getLeaf("Br07").revealCreatures(cnl);
@@ -5905,8 +6179,10 @@ public class PredictSplitsTest extends TestCase
 
         turn = 6;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Bk04").removeCreature(variant.getCreatureByName("Gargoyle"));
-        aps.getLeaf("Bk04").removeCreature(variant.getCreatureByName("Gargoyle"));
+        aps.getLeaf("Bk04").removeCreature(
+            variant.getCreatureByName("Gargoyle"));
+        aps.getLeaf("Bk04").removeCreature(
+            variant.getCreatureByName("Gargoyle"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Ogre"));
         cnl.add(variant.getCreatureByName("Ogre"));
@@ -5916,10 +6192,12 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Centaur"));
         cnl.add(variant.getCreatureByName("Centaur"));
         aps.getLeaf("Rd10").revealCreatures(cnl);
-        aps.getLeaf("Rd10").removeCreature(variant.getCreatureByName("Centaur"));
+        aps.getLeaf("Rd10").removeCreature(
+            variant.getCreatureByName("Centaur"));
         aps.getLeaf("Gr07").removeCreature(variant.getCreatureByName("Angel"));
         aps.getLeaf("Gr05").addCreature(variant.getCreatureByName("Angel"));
-        aps.getLeaf("Rd10").removeCreature(variant.getCreatureByName("Centaur"));
+        aps.getLeaf("Rd10").removeCreature(
+            variant.getCreatureByName("Centaur"));
         aps.getLeaf("Gr05").removeCreature(variant.getCreatureByName("Ogre"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Angel"));
@@ -5948,13 +6226,17 @@ public class PredictSplitsTest extends TestCase
         cnl.add(variant.getCreatureByName("Centaur"));
         cnl.add(variant.getCreatureByName("Centaur"));
         aps.getLeaf("Gd07").revealCreatures(cnl);
-        aps.getLeaf("Gd07").removeCreature(variant.getCreatureByName("Centaur"));
-        aps.getLeaf("Bu12").removeCreature(variant.getCreatureByName("Centaur"));
+        aps.getLeaf("Gd07").removeCreature(
+            variant.getCreatureByName("Centaur"));
+        aps.getLeaf("Bu12").removeCreature(
+            variant.getCreatureByName("Centaur"));
         aps.getLeaf("Bu08").removeCreature(variant.getCreatureByName("Angel"));
         aps.getLeaf("Bu12").addCreature(variant.getCreatureByName("Angel"));
-        aps.getLeaf("Bu12").removeCreature(variant.getCreatureByName("Centaur"));
+        aps.getLeaf("Bu12").removeCreature(
+            variant.getCreatureByName("Centaur"));
         aps.getLeaf("Gd07").removeCreature(variant.getCreatureByName("Lion"));
-        aps.getLeaf("Gd07").removeCreature(variant.getCreatureByName("Centaur"));
+        aps.getLeaf("Gd07").removeCreature(
+            variant.getCreatureByName("Centaur"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Titan"));
         cnl.add(variant.getCreatureByName("Angel"));
@@ -5984,9 +6266,11 @@ public class PredictSplitsTest extends TestCase
         aps.getLeaf("Rd03").revealCreatures(cnl);
         aps.getLeaf("Rd03").removeCreature(variant.getCreatureByName("Troll"));
         aps.getLeaf("Gd01").removeCreature(variant.getCreatureByName("Angel"));
-        aps.getLeaf("Rd03").removeCreature(variant.getCreatureByName("Gargoyle"));
+        aps.getLeaf("Rd03").removeCreature(
+            variant.getCreatureByName("Gargoyle"));
         aps.getLeaf("Gd01").removeCreature(variant.getCreatureByName("Ogre"));
-        aps.getLeaf("Rd03").removeCreature(variant.getCreatureByName("Gargoyle"));
+        aps.getLeaf("Rd03").removeCreature(
+            variant.getCreatureByName("Gargoyle"));
         aps.getLeaf("Gd01").removeCreature(variant.getCreatureByName("Troll"));
         cnl.clear();
         cnl.add(variant.getCreatureByName("Troll"));

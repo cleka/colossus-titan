@@ -21,10 +21,8 @@ import net.sf.colossus.variant.MasterBoardTerrain;
  */
 
 // XXX Massively duplicated code.  Merge later.
-
 // YYY Move this up to become game.BattleMovement, and use it on server side
 // as well, instead of the methods in BattleServerSide itself.
-
 final class BattleMovement
 {
     private final Game game;
@@ -137,8 +135,8 @@ final class BattleMovement
             {
                 CreatureType type = critter.getType();
                 BattleHex hex = critter.getCurrentHex();
-                set = findMoves(hex, type, type.isFlier(), type
-                    .getSkill(), -1, true);
+                set = findMoves(hex, type, type.isFlier(), type.getSkill(),
+                    -1, true);
             }
         }
         return set;

@@ -2,6 +2,7 @@ package net.sf.colossus.ai.objectives;
 
 
 import java.util.logging.Logger;
+
 import net.sf.colossus.client.Client;
 import net.sf.colossus.game.Battle;
 import net.sf.colossus.game.BattleCritter;
@@ -75,21 +76,17 @@ class PreserveCreatureTacticalObjective extends AbstractTacticalObjective
                         aCritter.getCurrentHex(), false);
                     if (range == 2)
                     {
-                        lvalue.add(- aCritter.getPointValue(),
-                                   "Attacker" +
-                                   aCritter.getType().getName() +
-                                   "CanStrike" +
-                                   critter.getType().getName());
+                        lvalue.add(-aCritter.getPointValue(), "Attacker"
+                            + aCritter.getType().getName() + "CanStrike"
+                            + critter.getType().getName());
                     }
                     else if (aCritter.isRangestriker()
                         && (range <= aCritter.getSkill())
                         && (aCritter.useMagicMissile() || (!dCritter.isLord())))
                     {
-                        lvalue.add(- aCritter.getPointValue(),
-                                   "Attacker" +
-                                   aCritter.getType().getName() +
-                                   "CanStrike" +
-                                   critter.getType().getName());
+                        lvalue.add(-aCritter.getPointValue(), "Attacker"
+                            + aCritter.getType().getName() + "CanStrike"
+                            + critter.getType().getName());
                     }
                 }
                 if (lvalue.getValue() < value.getValue())

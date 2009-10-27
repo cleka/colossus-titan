@@ -1096,8 +1096,7 @@ public final class Client implements IClient, IOracle, IVariant
                 gui.removeBattleChit(battleUnit);
 
                 // Also remove it from legion.
-                battleUnit.getLegion().removeCreature(
-                    battleUnit.getType());
+                battleUnit.getLegion().removeCreature(battleUnit.getType());
 
                 // And generate EventViewer event:
                 // Note that have to do the legion.removeCreature before this

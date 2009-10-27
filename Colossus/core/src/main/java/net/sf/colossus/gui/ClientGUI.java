@@ -431,7 +431,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         {
             GUIBattleChit targetChit = getGUIBattleChit(targetHex);
             BattleUnit target = targetChit.getBattleUnit();
-            int strikeNr = getGame().getBattleStrike().getStrikeNumber(striker, target);
+            int strikeNr = getGame().getBattleStrike().getStrikeNumber(
+                striker, target);
             targetChit.setStrikeNumber(strikeNr);
         }
     }
@@ -2288,8 +2289,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             return "";
         }
         BattleHex hex = battleUnit.getCurrentHex();
-        return battleUnit.getType().getName() + " in "
-            + hex.getDescription();
+        return battleUnit.getType().getName() + " in " + hex.getDescription();
     }
 
     public void actOnTellStrikeResults(boolean wasCarry, int strikeNumber,

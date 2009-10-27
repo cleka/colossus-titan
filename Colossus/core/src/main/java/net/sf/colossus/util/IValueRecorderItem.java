@@ -3,11 +3,13 @@
 
 package net.sf.colossus.util;
 
+
 /**
  *
  * @author dolbeau
  */
-public interface IValueRecorderItem {
+public interface IValueRecorderItem
+{
 
     /**
      * Get the value.
