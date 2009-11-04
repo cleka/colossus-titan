@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.common.Constants;
+import net.sf.colossus.common.OptionObjectProvider;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Game;
@@ -19,7 +20,7 @@ import net.sf.colossus.variant.MasterHex;
 
 
 /**
- * Class Movement handles client-side masterboard moves.
+ * Class Movement handles optionObjectProvider-side masterboard moves.
  *
  * @author David Ripton
  */
@@ -30,12 +31,12 @@ public final class Movement
     private static final Logger LOGGER = Logger.getLogger(Movement.class
         .getName());
 
-    private Client client;
+    private final OptionObjectProvider optionObjectProvider;
     private final Game game;
 
-    Movement(Client client, Game game)
+    Movement(OptionObjectProvider optionObjectProvider, Game game)
     {
-        this.client = client;
+        this.optionObjectProvider = optionObjectProvider;
         this.game = game;
     }
 
@@ -361,8 +362,8 @@ public final class Movement
         }
 
         // Titan teleport
-        if (((PlayerClientSide)player).canTitanTeleport()
-            && (legion).hasTitan() && titanTeleportAllowed())
+        if (((PlayerClientSide)player).canTitanTeleport() && legion.hasTitan()
+            && titanTeleportAllowed())
         {
             // Mark every hex containing an enemy stack that does not
             // already contain a friendly stack.
@@ -440,18 +441,10 @@ public final class Movement
         return entrySides;
     }
 
-    // TODO is this needed? I added those set to null to clean up to ensure
-    // object freeing... perhaps not needed any more... then also client
-    // could be final...
-    public void dispose()
-    {
-        this.client = null;
-    }
-
     // TODO use listener instead?
     private boolean getOption(String optName)
     {
-        return client.getOptions().getOption(optName);
+        return optionObjectProvider.getOptions().getOption(optName);
     }
 
 }

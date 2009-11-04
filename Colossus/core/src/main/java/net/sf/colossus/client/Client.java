@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import net.sf.colossus.ai.AI;
 import net.sf.colossus.ai.SimpleAI;
 import net.sf.colossus.common.Constants;
+import net.sf.colossus.common.OptionObjectProvider;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.common.WhatNextManager;
 import net.sf.colossus.game.BattleCritter;
@@ -81,7 +82,8 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  *  @author Romain Dolbeau
  */
 @SuppressWarnings("serial")
-public final class Client implements IClient, IOracle, IVariant
+public final class Client implements IClient, IOracle, IVariant,
+    OptionObjectProvider
 {
     private static final Logger LOGGER = Logger.getLogger(Client.class
         .getName());
@@ -176,7 +178,7 @@ public final class Client implements IClient, IOracle, IVariant
     // TODO: could go into owningPlayer, BUT tricky right now as long as
     // owningPlayer is created twice (once fake and later for real)...
 
-    private Movement movement;
+    private final Movement movement;
     private BattleMovement battleMovement;
 
     private final Server localServer;
@@ -829,8 +831,6 @@ public final class Client implements IClient, IOracle, IVariant
      */
     public void doAdditionalCleanup()
     {
-        movement.dispose();
-        this.movement = null;
         this.battleMovement = null;
         playersNotInitialized = true;
 
