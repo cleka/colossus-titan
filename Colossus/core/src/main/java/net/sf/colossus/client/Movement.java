@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.game.EntrySide;
+import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.util.Split;
@@ -30,10 +31,12 @@ public final class Movement
         .getName());
 
     private Client client;
+    private final Game game;
 
-    Movement(Client client)
+    Movement(Client client, Game game)
     {
         this.client = client;
+        this.game = game;
     }
 
     /** Set the entry side relative to the hex label. */
@@ -74,10 +77,10 @@ public final class Movement
         // also a friendly legion there, just stop recursing.
         // Do a check versus fromHexLabel if we are evaluating
         // passing through this hex
-        if (client.getGameClientSide().getEnemyLegions(hex, player).size() > 0
+        if (game.getEnemyLegions(hex, player).size() > 0
             && !hex.equals(fromHex))
         {
-            if (client.getGameClientSide().getFriendlyLegions(hex, player)
+            if (game.getFriendlyLegions(hex, player)
                 .size() == 0)
             {
                 // Set the entry side relative to the hex label.
@@ -95,10 +98,10 @@ public final class Movement
             // This hex is the final destination.  Mark it as legal if
             // it is unoccupied by friendly legions that have already moved.
             // Account for spin cycles.
-            if (client.getGameClientSide().getFriendlyLegions(hex, player)
+            if (game.getFriendlyLegions(hex, player)
                 .size() > 0)
             {
-                List<Legion> legions = client.getGame().getLegionsByHex(hex);
+                List<Legion> legions = game.getLegionsByHex(hex);
                 if (legions.get(0).hasMoved())
                 {
                     return result;
@@ -163,7 +166,7 @@ public final class Movement
         // it is unoccupied.
         Set<MasterHex> result = new HashSet<MasterHex>();
 
-        if (!client.getGameClientSide().isOccupied(hex))
+        if (!game.isOccupied(hex))
         {
             result.add(hex);
         }
@@ -243,7 +246,7 @@ public final class Movement
             String tuple = it.next();
             List<String> parts = Split.split(':', tuple);
             String hexLabel = parts.get(0);
-            result.add(client.getGame().getVariant().getMasterBoard()
+            result.add(game.getVariant().getMasterBoard()
                 .getHexByLabel(hexLabel));
         }
         return result;
@@ -251,12 +254,12 @@ public final class Movement
 
     private boolean towerTeleportAllowed()
     {
-        if (client.getOptions().getOption(Options.noTowerTeleport))
+        if (getOption(Options.noTowerTeleport))
         {
             return false;
         }
-        if (client.getTurnNumber() == 1
-            && client.getOptions().getOption(Options.noFirstTurnTeleport))
+        if (game.getTurnNumber() == 1
+            && getOption(Options.noFirstTurnTeleport))
         {
             return false;
         }
@@ -269,8 +272,8 @@ public final class Movement
         {
             return false;
         }
-        if (client.getTurnNumber() == 1
-            && client.getOptions().getOption(Options.noFirstTurnT2TTeleport))
+        if (game.getTurnNumber() == 1
+            && getOption(Options.noFirstTurnT2TTeleport))
         {
             return false;
         }
@@ -283,7 +286,7 @@ public final class Movement
         {
             return false;
         }
-        if (client.getOptions().getOption(Options.towerToTowerTeleportOnly))
+        if (getOption(Options.towerToTowerTeleportOnly))
         {
             return false;
         }
@@ -292,12 +295,12 @@ public final class Movement
 
     public boolean titanTeleportAllowed()
     {
-        if (client.getOptions().getOption(Options.noTitanTeleport))
+        if (getOption(Options.noTitanTeleport))
         {
             return false;
         }
-        if (client.getTurnNumber() == 1
-            && client.getOptions().getOption(Options.noFirstTurnTeleport))
+        if (game.getTurnNumber() == 1
+            && getOption(Options.noFirstTurnTeleport))
         {
             return false;
         }
@@ -339,10 +342,10 @@ public final class Movement
             if (towerToTowerTeleportAllowed())
             {
                 // Mark every unoccupied tower.
-                for (MasterHex tower : client.getGame().getVariant()
+                for (MasterHex tower : game.getVariant()
                     .getMasterBoard().getTowerSet())
                 {
-                    if (!client.getGameClientSide().isOccupied(tower)
+                    if (!game.isOccupied(tower)
                         && !(tower.equals(hex)))
                     {
                         result.add(tower);
@@ -352,7 +355,7 @@ public final class Movement
             else
             {
                 // Remove nearby towers from set.
-                result.removeAll(client.getGame().getVariant()
+                result.removeAll(game.getVariant()
                     .getMasterBoard().getTowerSet());
             }
         }
@@ -363,10 +366,10 @@ public final class Movement
         {
             // Mark every hex containing an enemy stack that does not
             // already contain a friendly stack.
-            for (Legion other : client.getGame().getEnemyLegions(player))
+            for (Legion other : game.getEnemyLegions(player))
             {
                 MasterHex otherHex = other.getCurrentHex();
-                if (!client.getGame().isEngagement(otherHex))
+                if (!game.isEngagement(otherHex))
                 {
                     result.add(otherHex);
                 }
@@ -383,7 +386,7 @@ public final class Movement
         boolean teleport)
     {
         Set<EntrySide> entrySides = new HashSet<EntrySide>();
-        int movementRoll = client.getGame().getMovementRoll();
+        int movementRoll = game.getMovementRoll();
         MasterHex currentHex = legion.getCurrentHex();
 
         if (teleport)
@@ -393,7 +396,7 @@ public final class Movement
             {
                 // Startlisted terrain only have bottom entry side.
                 // Don't bother finding more than one entry side if unoccupied.
-                if (!client.getGameClientSide().isOccupied(targetHex)
+                if (!game.isOccupied(targetHex)
                     || targetHex.getTerrain().hasStartList())
 
                 {
@@ -428,7 +431,7 @@ public final class Movement
                 String buf = parts.get(1);
                 entrySides.add(EntrySide.fromLabel(buf));
                 // Don't bother finding more than one entry side if unoccupied.
-                if (!client.getGameClientSide().isOccupied(targetHex))
+                if (!game.isOccupied(targetHex))
                 {
                     return entrySides;
                 }
@@ -437,8 +440,18 @@ public final class Movement
         return entrySides;
     }
 
+    // TODO is this needed? I added those set to null to clean up to ensure
+    // object freeing... perhaps not needed any more... then also client
+    // could be final...
     public void dispose()
     {
         this.client = null;
     }
+
+    // TODO use listener instead?
+    private boolean getOption(String optName)
+    {
+        return client.getOptions().getOption(optName);
+    }
+
 }

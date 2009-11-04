@@ -363,7 +363,7 @@ public final class Client implements IClient, IOracle, IVariant
 
         this.ai = createAI(playerType);
 
-        this.movement = new Movement(this);
+        this.movement = new Movement(this, game);
 
         ViableEntityManager.register(this, "Client " + playerName);
         InstanceTracker.register(this, "Client " + playerName);
