@@ -1,4 +1,4 @@
-package net.sf.colossus.client;
+package net.sf.colossus.game;
 
 
 import java.util.HashSet;
@@ -11,16 +11,14 @@ import java.util.logging.Logger;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.OptionObjectProvider;
 import net.sf.colossus.common.Options;
-import net.sf.colossus.game.EntrySide;
-import net.sf.colossus.game.Game;
-import net.sf.colossus.game.Legion;
-import net.sf.colossus.game.Player;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.variant.MasterHex;
 
 
 /**
- * Class Movement handles optionObjectProvider-side masterboard moves.
+ * Class Movement handles client-side masterboard moves
+ * (now pulled up to game; server side code could start using this
+ * instead of the GameServerSide methods).
  *
  * @author David Ripton
  */
@@ -34,7 +32,7 @@ public final class Movement
     private final OptionObjectProvider optionObjectProvider;
     private final Game game;
 
-    Movement(OptionObjectProvider optionObjectProvider, Game game)
+    public Movement(OptionObjectProvider optionObjectProvider, Game game)
     {
         this.optionObjectProvider = optionObjectProvider;
         this.game = game;
@@ -323,7 +321,7 @@ public final class Movement
 
         Set<MasterHex> result = new HashSet<MasterHex>();
         if (hex == null
-            || ((!inAdvance) && (movementRoll != 6 || (legion).hasMoved() || ((PlayerClientSide)player)
+            || (!inAdvance && (movementRoll != 6 || legion.hasMoved() || player
                 .hasTeleported())))
         {
             return result;
@@ -362,7 +360,7 @@ public final class Movement
         }
 
         // Titan teleport
-        if (((PlayerClientSide)player).canTitanTeleport() && legion.hasTitan()
+        if (player.canTitanTeleport() && legion.hasTitan()
             && titanTeleportAllowed())
         {
             // Mark every hex containing an enemy stack that does not
@@ -383,7 +381,8 @@ public final class Movement
     /** Return a Set of Strings "Left" "Right" or "Bottom" describing
      *  possible entry sides.  If the hex is unoccupied, just return
      *  one entry side since it doesn't matter. */
-    Set<EntrySide> listPossibleEntrySides(Legion legion, MasterHex targetHex,
+    public Set<EntrySide> listPossibleEntrySides(Legion legion,
+        MasterHex targetHex,
         boolean teleport)
     {
         Set<EntrySide> entrySides = new HashSet<EntrySide>();
