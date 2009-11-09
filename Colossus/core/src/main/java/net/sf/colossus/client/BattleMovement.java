@@ -28,10 +28,14 @@ final class BattleMovement
     private final Game game;
 
     // TODO instead listener to the option changes
+    // WARNING Option changes from server appear here as string-based,
+    //         so a listener based on the boolean option would not work.
+    //         For now, we just make sure we create BattleMovement after
+    //         all server-to-client-option-sync'ing is completed.
     final boolean cumulativeSlow;
     final boolean oneHexAllowed;
 
-    BattleMovement(IOptions options, Game game)
+    BattleMovement(Game game, IOptions options)
     {
         this.game = game;
 

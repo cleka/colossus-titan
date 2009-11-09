@@ -9,7 +9,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.common.Constants;
-import net.sf.colossus.common.OptionObjectProvider;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.variant.MasterHex;
@@ -29,13 +28,13 @@ public final class Movement
     private static final Logger LOGGER = Logger.getLogger(Movement.class
         .getName());
 
-    private final OptionObjectProvider optionObjectProvider;
     private final Game game;
+    private final Options options;
 
-    public Movement(OptionObjectProvider optionObjectProvider, Game game)
+    public Movement(Game game, Options options)
     {
-        this.optionObjectProvider = optionObjectProvider;
         this.game = game;
+        this.options = options;
     }
 
     /** Set the entry side relative to the hex label. */
@@ -440,10 +439,12 @@ public final class Movement
         return entrySides;
     }
 
-    // TODO use listener instead?
+    // NOTE Using listener would be nicer, but problematic with the
+    // string/boolean issues with options coming from server.
+    // See details in the comment there where Movement is instantiated.
     private boolean getOption(String optName)
     {
-        return optionObjectProvider.getOptions().getOption(optName);
+        return options.getOption(optName);
     }
 
 }

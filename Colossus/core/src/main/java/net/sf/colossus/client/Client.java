@@ -179,7 +179,7 @@ public final class Client implements IClient, IOracle, IVariant,
     // TODO: could go into owningPlayer, BUT tricky right now as long as
     // owningPlayer is created twice (once fake and later for real)...
 
-    private final Movement movement;
+    private Movement movement;
     private BattleMovement battleMovement;
 
     private final Server localServer;
@@ -366,8 +366,6 @@ public final class Client implements IClient, IOracle, IVariant,
 
         this.ai = createAI(playerType);
 
-        this.movement = new Movement(this, game);
-
         ViableEntityManager.register(this, "Client " + playerName);
         InstanceTracker.register(this, "Client " + playerName);
 
@@ -391,8 +389,6 @@ public final class Client implements IClient, IOracle, IVariant,
         // And it needs to be in place already when the pickColor and
         // pickMarker requests come from server:
         options.setOption(Options.autoPlay, this.owningPlayer.isAI());
-
-        this.battleMovement = new BattleMovement(options, game);
 
         this.server = connection.getIServer();
 
@@ -1178,6 +1174,18 @@ public final class Client implements IClient, IOracle, IVariant,
 
     public void initBoard()
     {
+        // SyncOptions is now done, so now we can create movement and
+        // battleMovement which need the options.
+        /* NOTE/WARNING:
+         * using option listeners here would have to be done the *right way*,
+         * because changes from server appear here as string-based,
+         * thus a listener based on the boolean option would not work.
+         * For now, we just make sure we create BattleMovement after all
+         * server-to-client-option-sync'ing is completed.
+         */
+        this.battleMovement = new BattleMovement(game, options);
+        this.movement = new Movement(game, options);
+
         LOGGER.finest(getOwningPlayer().getName() + " Client.initBoard()");
         if (isRemote())
         {
