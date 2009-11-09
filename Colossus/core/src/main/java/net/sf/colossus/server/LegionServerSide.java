@@ -307,8 +307,8 @@ public final class LegionServerSide extends Legion implements
 
     boolean hasConventionalMove()
     {
-        return !game.listNormalMoves(this, getCurrentHex(),
-            getPlayer().getMovementRoll(), false).isEmpty();
+        return game.hasConventionalMove(this, getCurrentHex(), getPlayer()
+            .getMovementRoll(), false);
     }
 
     void undoMove()

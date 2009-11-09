@@ -268,6 +268,12 @@ public final class PlayerServerSide extends Player implements
         }
     }
 
+    // TODO temporary for Movement class; move up to game.Player?
+    public int getMovementRollSS()
+    {
+        return getMovementRoll();
+    }
+
     int getMovementRoll()
     {
         return movementRoll;
