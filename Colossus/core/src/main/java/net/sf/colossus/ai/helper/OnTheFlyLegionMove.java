@@ -280,11 +280,11 @@ public class OnTheFlyLegionMove implements Collection<LegionMove>
                         for (int k = 0; k < li.size(); k++)
                         {
                             BattleHex a = li.get(k).getEndingHex();
+                            Set<Integer> s = new TreeSet<Integer>();
+                            incomps[i][j][k] = s;
+
                             if (!a.isEntrance())
                             {
-                                Set<Integer> s = new TreeSet<Integer>();
-                                incomps[i][j][k] = s;
-
                                 for (int l = 0; l < lj.size(); l++)
                                 {
                                     BattleHex b = lj.get(l).getEndingHex();
