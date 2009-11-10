@@ -25,7 +25,7 @@ import net.sf.colossus.game.Engagement;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
-import net.sf.colossus.game.Movement;
+import net.sf.colossus.game.MovementClientSide;
 import net.sf.colossus.game.Phase;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
@@ -179,7 +179,7 @@ public final class Client implements IClient, IOracle, IVariant,
     // TODO: could go into owningPlayer, BUT tricky right now as long as
     // owningPlayer is created twice (once fake and later for real)...
 
-    private Movement movement;
+    private MovementClientSide movement;
     private BattleMovement battleMovement;
 
     private final Server localServer;
@@ -1184,7 +1184,7 @@ public final class Client implements IClient, IOracle, IVariant,
          * server-to-client-option-sync'ing is completed.
          */
         this.battleMovement = new BattleMovement(game, options);
-        this.movement = new Movement(game, options);
+        this.movement = new MovementClientSide(game, options);
 
         LOGGER.finest(getOwningPlayer().getName() + " Client.initBoard()");
         if (isRemote())
@@ -2744,7 +2744,7 @@ public final class Client implements IClient, IOracle, IVariant,
         return result;
     }
 
-    public Movement getMovement()
+    public MovementClientSide getMovement()
     {
         return movement;
     }

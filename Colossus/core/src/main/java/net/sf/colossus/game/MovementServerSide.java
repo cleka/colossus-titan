@@ -8,45 +8,23 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
-import net.sf.colossus.server.GameServerSide;
 import net.sf.colossus.server.LegionServerSide;
 import net.sf.colossus.server.PlayerServerSide;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.variant.MasterHex;
 
-public class MovementServerSide
+
+public class MovementServerSide extends Movement
 {
     private static final Logger LOGGER = Logger
         .getLogger(MovementServerSide.class.getName());
 
-    private final GameServerSide game;
-    private final Options options;
 
-    public MovementServerSide(GameServerSide game, Options options)
+    public MovementServerSide(Game game, Options options)
     {
+        super(game, options);
+
         LOGGER.finest("MovementServerSide instantiated");
-
-        this.game = game;
-        this.options = options;
-    }
-
-    /** Set the entry side relative to the hex label. */
-    // TODO Duplicated in game.Movement
-    public static EntrySide findEntrySide(MasterHex hex, int cameFrom)
-    {
-        int entrySide = -1;
-        if (cameFrom != -1)
-        {
-            if (hex.getTerrain().hasStartList())
-            {
-                entrySide = 3;
-            }
-            else
-            {
-                entrySide = (6 + cameFrom - hex.getLabelSide()) % 6;
-            }
-        }
-        return EntrySide.values()[entrySide];
     }
 
     /** Return a Set of Strings "Left" "Right" or "Bottom" describing
@@ -349,7 +327,7 @@ public class MovementServerSide
             if (towerToNonTowerTeleportAllowed())
             {
                 result.addAll(findNearbyUnoccupiedHexes(hex, legion, 6,
-                    Constants.NOWHERE, ignoreFriends));
+                    Constants.NOWHERE));
             }
 
             if (towerToTowerTeleportAllowed())
@@ -398,103 +376,6 @@ public class MovementServerSide
         return result;
     }
 
-    /** Recursively find all unoccupied hexes within roll hexes, for
-     *  tower teleport. */
-    private Set<MasterHex> findNearbyUnoccupiedHexes(MasterHex hex,
-        Legion legion, int roll, int cameFrom, boolean ignoreFriends)
-    {
-        // This hex is the final destination.  Mark it as legal if
-        // it is unoccupied.
-        Set<MasterHex> set = new HashSet<MasterHex>();
-        if (!game.isOccupied(hex))
-        {
-            set.add(hex);
-        }
-        if (roll > 0)
-        {
-            for (int i = 0; i < 6; i++)
-            {
-                if (i != cameFrom
-                    && (hex.getExitType(i) != Constants.HexsideGates.NONE || hex
-                        .getEntranceType(i) != Constants.HexsideGates.NONE))
-                {
-                    set.addAll(findNearbyUnoccupiedHexes(hex.getNeighbor(i),
-                        legion, roll - 1, (i + 3) % 6, ignoreFriends));
-                }
-            }
-        }
-        return set;
-    }
-
-    private int findBlock(MasterHex hex)
-    {
-        int block = Constants.ARCHES_AND_ARROWS;
-        for (int j = 0; j < 6; j++)
-        {
-            if (hex.getExitType(j) == Constants.HexsideGates.BLOCK)
-            {
-                // Only this path is allowed.
-                block = j;
-            }
-        }
-        return block;
-    }
-
-
-    private boolean titanTeleportAllowed()
-    {
-        if (options.getOption(Options.noTitanTeleport))
-        {
-            return false;
-        }
-        if (game.getTurnNumber() == 1
-            && options.getOption(Options.noFirstTurnTeleport))
-        {
-            return false;
-        }
-        return true;
-    }
-
-    private boolean towerTeleportAllowed()
-    {
-        if (options.getOption(Options.noTowerTeleport))
-        {
-            return false;
-        }
-        if (game.getTurnNumber() == 1
-            && options.getOption(Options.noFirstTurnTeleport))
-        {
-            return false;
-        }
-        return true;
-    }
-
-    private boolean towerToTowerTeleportAllowed()
-    {
-        if (!towerTeleportAllowed())
-        {
-            return false;
-        }
-        if (game.getTurnNumber() == 1
-            && options.getOption(Options.noFirstTurnT2TTeleport))
-        {
-            return false;
-        }
-        return true;
-    }
-
-    private boolean towerToNonTowerTeleportAllowed()
-    {
-        if (!towerTeleportAllowed())
-        {
-            return false;
-        }
-        if (options.getOption(Options.towerToTowerTeleportOnly))
-        {
-            return false;
-        }
-        return true;
-    }
 
 
 }
