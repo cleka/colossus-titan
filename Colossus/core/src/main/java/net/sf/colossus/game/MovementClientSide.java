@@ -15,14 +15,13 @@ import net.sf.colossus.variant.MasterHex;
 
 
 /**
- * Class Movement handles client-side masterboard moves
- * (now pulled up to game; server side code could start using this
- * instead of the GameServerSide methods).
+ * Class MovementClientSide contains the client-side masterboard move logic.
+ * Some methods already pulled up to game.Movement.
+ * There are still some methods that need pulling up, but they need more
+ * refactoring before that can be done.
  *
  * @author David Ripton
  */
-// XXX There is massive duplication of code between this class and
-// the server-side movement code in Game.  Need to completely refactor.
 public final class MovementClientSide extends Movement
 {
     private static final Logger LOGGER = Logger.getLogger(MovementClientSide.class

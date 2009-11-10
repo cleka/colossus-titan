@@ -1,6 +1,16 @@
 package net.sf.colossus.game;
 
 
+/**
+ * Class Movement has the masterboard move logic - or that part that could
+ * already be unified and pulled up from server/client sides.
+ * There are still some methods that need pulling up, but they need more
+ * refactoring before that can be done.
+ *
+ * @author Clemens Katzer (created the new combined game.Movement class)
+ * @author David Ripton (e.g. original client.Movement class)
+ * @author possibly: Bruce Sherrod, Romain Dolbeau (old server.Game class)
+ */
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -20,6 +30,7 @@ public class Movement
 
     public Movement(Game game, Options options)
     {
+        // just here so that LOGGER is used :)
         LOGGER.finest("Movement instantiated");
 
         this.game = game;
@@ -88,7 +99,6 @@ public class Movement
 
         return result;
     }
-
 
     public boolean titanTeleportAllowed()
     {

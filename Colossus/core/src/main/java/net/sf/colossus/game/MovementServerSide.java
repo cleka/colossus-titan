@@ -14,11 +14,20 @@ import net.sf.colossus.util.Split;
 import net.sf.colossus.variant.MasterHex;
 
 
+/**
+ * Class MovementServerSide contains the server-side masterboard move logic
+ * which has earlier been part of Game(ServerSide).
+ * Some methods already pulled up to game.Movement.
+ * There are still some methods that need pulling up, but they need more
+ * refactoring before that can be done.
+ *
+ * @author David Ripton
+ */
+
 public class MovementServerSide extends Movement
 {
     private static final Logger LOGGER = Logger
         .getLogger(MovementServerSide.class.getName());
-
 
     public MovementServerSide(Game game, Options options)
     {
@@ -30,11 +39,12 @@ public class MovementServerSide extends Movement
     /** Return a Set of Strings "Left" "Right" or "Bottom" describing
      *  possible entry sides.  If the hex is unoccupied, just return
      *  one entry side since it doesn't matter.
-     * @param bm TODO
-     * @param game TODO
-     * @param legion TODO
-     * @param targetHex TODO
-     * @param teleport TODO*/
+     *  @param bm TODO
+     *  @param game TODO
+     *  @param legion TODO
+     *  @param targetHex TODO
+     *  @param teleport TODO
+     */
     public Set<EntrySide> listPossibleEntrySides(Legion legion,
         MasterHex targetHex, boolean teleport)
     {
@@ -109,17 +119,17 @@ public class MovementServerSide extends Movement
     /** Recursively find conventional moves from this hex.
      *  If block >= 0, go only that way.  If block == -1, use arches and
      *  arrows.  If block == -2, use only arrows.  Do not double back in
-     *  the direction you just came from.  Return a set of
-     *  hexLabel:entrySide tuples.
+     *  the direction you just came from.
      *
      *  TODO use proper data structure instead of String serializations
-     * @param game TODO
-     * @param hex TODO
-     * @param legion TODO
-     * @param roll TODO
-     * @param block TODO
-     * @param cameFrom TODO
-     * @param ignoreFriends TODO
+     *  @param game TODO
+     *  @param hex TODO
+     *  @param legion TODO
+     *  @param roll TODO
+     *  @param block TODO
+     *  @param cameFrom TODO
+     *  @param ignoreFriends TODO
+     *  @return a set of hexLabel:entrySide string tuples.
      */
     public Set<String> findNormalMoves(MasterHex hex, Legion legion, int roll,
         int block, int cameFrom, boolean ignoreFriends)
@@ -258,10 +268,10 @@ public class MovementServerSide extends Movement
 
     /** Verify whether this is a valid entry side.
      *
-     * @param legion
-     * @param hex
-     * @param player
-     * @return Reason why it is not a valid entry side, null if valid
+     *  @param legion
+     *  @param hex
+     *  @param player
+     *  @return Reason why it is not a valid entry side, null if valid
      */
     public String isValidEntrySide(Legion legion, MasterHex hex,
         boolean teleport, EntrySide entrySide)
@@ -279,7 +289,9 @@ public class MovementServerSide extends Movement
 
     /** Return set of hexLabels describing where this legion can move
      *  without teleporting.  Include moves currently blocked by friendly
-     *  legions if ignoreFriends is true. */
+     *  legions if ignoreFriends is true.
+     *  @return set of hexlabels
+     */
     public Set<MasterHex> listNormalMoves(Legion legion, MasterHex hex,
         int movementRoll, boolean ignoreFriends)
     {
@@ -308,7 +320,8 @@ public class MovementServerSide extends Movement
     /** Return set of hexLabels describing where this legion can teleport.
      *  Include moves currently blocked by friendly legions if
      *  ignoreFriends is true.
-     * @param game TODO*/
+     *  @return set of hexlabels
+     */
     public Set<MasterHex> listTeleportMoves(Legion legion, MasterHex hex,
         int movementRoll, boolean ignoreFriends)
     {
@@ -375,7 +388,5 @@ public class MovementServerSide extends Movement
         result.remove(null);
         return result;
     }
-
-
 
 }
