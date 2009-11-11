@@ -916,6 +916,12 @@ public final class GameServerSide extends Game
         }
     }
 
+    @Override
+    public int getMovementRoll()
+    {
+        return ((PlayerServerSide)getActivePlayer()).getMovementRoll();
+    }
+
     /**
      * Resolve playerName into Player object. Name might be null,
      * then returns null.
@@ -2288,8 +2294,7 @@ public final class GameServerSide extends Game
         // Verify that the move is legal.
         if (teleport)
         {
-            if ((reason = movementSS.isValidTeleportMove(legion, hex, player,
-                roll)) != null)
+            if ((reason = movementSS.isValidTeleportMove(legion, hex, roll)) != null)
             {
                 return reason;
             }

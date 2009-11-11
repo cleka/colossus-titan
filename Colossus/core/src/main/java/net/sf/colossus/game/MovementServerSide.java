@@ -51,6 +51,13 @@ public class MovementServerSide extends Movement
         Set<EntrySide> entrySides = new HashSet<EntrySide>();
         Player player = legion.getPlayer();
         int movementRoll = ((PlayerServerSide)player).getMovementRollSS();
+        int mmroll2 = game.getMovementRoll();
+        if (movementRoll != mmroll2)
+        {
+            LOGGER.warning("PlayerSS.getMovementRoll returns " + movementRoll
+                + " but Game[SS].getMovementRoll gives " + mmroll2);
+        }
+
         MasterHex currentHex = legion.getCurrentHex();
 
         if (teleport)
@@ -245,15 +252,12 @@ public class MovementServerSide extends Movement
      *
      * @param legion
      * @param hex
-     * @param player
+     * @param roll
      * @return Reason why it is not a valid teleport move, null if valid move
      */
-    public String isValidTeleportMove(Legion legion, MasterHex hex,
-        Player player, int roll)
+    public String isValidTeleportMove(Legion legion, MasterHex hex, int roll)
     {
-        Set<MasterHex> set = listTeleportMoves(legion, legion
-            .getCurrentHex(),
-            roll, false);
+        Set<MasterHex> set = listTeleportMoves(legion, legion.getCurrentHex(), roll, false);
 
         if (!set.contains(hex))
         {
