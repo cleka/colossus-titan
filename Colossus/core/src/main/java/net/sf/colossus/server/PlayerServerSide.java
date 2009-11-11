@@ -296,7 +296,7 @@ public final class PlayerServerSide extends Player implements
         commitMoves();
     }
 
-    void rollMovement()
+    int rollMovement()
     {
         // Only roll if it hasn't already been done.
         if (movementRoll != 0)
@@ -309,8 +309,7 @@ public final class PlayerServerSide extends Player implements
             LOGGER.info(getName() + " rolls a " + movementRoll
                 + " for movement");
         }
-        getGame().getServer().allTellMovementRoll(movementRoll);
-        getGame().movementRollEvent(this, movementRoll);
+        return movementRoll;
     }
 
     void takeMulligan()
