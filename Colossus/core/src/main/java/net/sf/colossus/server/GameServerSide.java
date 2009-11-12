@@ -24,6 +24,7 @@ import net.sf.colossus.common.WhatNextManager.WhatToDoNext;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.Caretaker;
 import net.sf.colossus.game.Creature;
+import net.sf.colossus.game.Dice;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;

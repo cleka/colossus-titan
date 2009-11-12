@@ -15,6 +15,7 @@ import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.Creature;
+import net.sf.colossus.game.Dice;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.variant.BattleHex;
