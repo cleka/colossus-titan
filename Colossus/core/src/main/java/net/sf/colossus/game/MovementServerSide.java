@@ -62,7 +62,7 @@ public class MovementServerSide extends Movement
 
         if (teleport)
         {
-            if (listTeleportMoves(legion, currentHex, movementRoll, false)
+            if (listTeleportMoves(legion, currentHex, movementRoll)
                 .contains(targetHex))
             {
                 // Startlisted terrain only have bottom entry side.
@@ -257,7 +257,7 @@ public class MovementServerSide extends Movement
      */
     public String isValidTeleportMove(Legion legion, MasterHex hex, int roll)
     {
-        Set<MasterHex> set = listTeleportMoves(legion, legion.getCurrentHex(), roll, false);
+        Set<MasterHex> set = listTeleportMoves(legion, legion.getCurrentHex(), roll);
 
         if (!set.contains(hex))
         {
@@ -322,12 +322,10 @@ public class MovementServerSide extends Movement
     }
 
     /** Return set of hexLabels describing where this legion can teleport.
-     *  Include moves currently blocked by friendly legions if
-     *  ignoreFriends is true.
      *  @return set of hexlabels
      */
     public Set<MasterHex> listTeleportMoves(Legion legion, MasterHex hex,
-        int movementRoll, boolean ignoreFriends)
+        int movementRoll)
     {
         Player player = legion.getPlayer();
         Set<MasterHex> result = new HashSet<MasterHex>();
@@ -354,9 +352,7 @@ public class MovementServerSide extends Movement
                     .getTowerSet();
                 for (MasterHex tower : towerSet)
                 {
-                    if ((!game.isOccupied(tower) || (ignoreFriends && game
-                        .getNumEnemyLegions(tower, player) == 0))
-                        && (!(tower.equals(hex))))
+                    if (!game.isOccupied(tower) && (!(tower.equals(hex))))
                     {
                         result.add(tower);
                     }
@@ -383,7 +379,7 @@ public class MovementServerSide extends Movement
             for (Legion other : game.getAllEnemyLegions(player))
             {
                 MasterHex otherHex = other.getCurrentHex();
-                if (!game.isEngagement(otherHex) || ignoreFriends)
+                if (!game.isEngagement(otherHex))
                 {
                     result.add(otherHex);
                 }
