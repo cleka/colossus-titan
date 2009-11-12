@@ -327,8 +327,29 @@ public class MovementServerSide extends Movement
     public Set<MasterHex> listTeleportMoves(Legion legion, MasterHex hex,
         int movementRoll)
     {
+        // TODO validatoion just for a while (2009-11). If nothing comes up
+        // can dump the orig and go one with just the one.
+        Set<MasterHex> set1 = listTeleportMovesOrig(legion, hex, movementRoll);
+        Set<MasterHex> set2 = listTeleportMoves(legion, hex, movementRoll,
+            false);
+        if (!set1.equals(set2))
+        {
+            LOGGER.warning("enhanced method for listTeleportMoves returns "
+                + "different set than original!\nSet1: " + set1.toString()
+                + "\nSet2: " + set2.toString());
+        }
+        return set1;
+    }
+
+    /** Return set of hexLabels describing where this legion can teleport.
+     *  @return set of hexlabels
+     */
+    public Set<MasterHex> listTeleportMovesOrig(Legion legion, MasterHex hex,
+        int movementRoll)
+    {
         Player player = legion.getPlayer();
         Set<MasterHex> result = new HashSet<MasterHex>();
+
         if (movementRoll != 6 || legion.hasMoved() || player.hasTeleported())
         {
             return result;
@@ -347,10 +368,8 @@ public class MovementServerSide extends Movement
 
             if (towerToTowerTeleportAllowed())
             {
-                // Mark every unoccupied tower.
-                Set<MasterHex> towerSet = game.getVariant().getMasterBoard()
-                    .getTowerSet();
-                for (MasterHex tower : towerSet)
+                for (MasterHex tower : game.getVariant().getMasterBoard()
+                    .getTowerSet())
                 {
                     if (!game.isOccupied(tower) && (!(tower.equals(hex))))
                     {
@@ -361,12 +380,8 @@ public class MovementServerSide extends Movement
             else
             {
                 // Remove nearby towers from set.
-                Set<MasterHex> towerSet = game.getVariant().getMasterBoard()
-                    .getTowerSet();
-                for (MasterHex tower : towerSet)
-                {
-                    result.remove(tower);
-                }
+                result.removeAll(game.getVariant().getMasterBoard()
+                    .getTowerSet());
             }
         }
 
@@ -376,7 +391,7 @@ public class MovementServerSide extends Movement
         {
             // Mark every hex containing an enemy stack that does not
             // already contain a friendly stack.
-            for (Legion other : game.getAllEnemyLegions(player))
+            for (Legion other : game.getEnemyLegions(player))
             {
                 MasterHex otherHex = other.getCurrentHex();
                 if (!game.isEngagement(otherHex))

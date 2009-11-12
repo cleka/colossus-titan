@@ -182,78 +182,6 @@ public final class MovementClientSide extends Movement
         return result;
     }
 
-    /** Return set of hexLabels describing where this legion can teleport. */
-    public Set<MasterHex> listTeleportMoves(Legion legion, MasterHex hex,
-        int movementRoll)
-    {
-        return listTeleportMoves(legion, hex, movementRoll, false);
-    }
-
-    /** Return set of hexLabels describing where this legion can teleport. */
-    private Set<MasterHex> listTeleportMoves(Legion legion, MasterHex hex,
-        int movementRoll, boolean inAdvance)
-    {
-        Player player = legion.getPlayer();
-
-        Set<MasterHex> result = new HashSet<MasterHex>();
-        if (hex == null
-            || (!inAdvance && (movementRoll != 6 || legion.hasMoved() || player
-                .hasTeleported())))
-        {
-            return result;
-        }
-
-        // Tower teleport
-        if (hex.getTerrain().isTower() && legion.numLords() > 0
-            && towerTeleportAllowed())
-        {
-            // Mark every unoccupied hex within 6 hexes.
-            if (towerToNonTowerTeleportAllowed())
-            {
-                result.addAll(findNearbyUnoccupiedHexes(hex, legion, 6,
-                    Constants.NOWHERE));
-            }
-
-            if (towerToTowerTeleportAllowed())
-            {
-                // Mark every unoccupied tower.
-                for (MasterHex tower : game.getVariant()
-                    .getMasterBoard().getTowerSet())
-                {
-                    if (!game.isOccupied(tower)
-                        && !(tower.equals(hex)))
-                    {
-                        result.add(tower);
-                    }
-                }
-            }
-            else
-            {
-                // Remove nearby towers from set.
-                result.removeAll(game.getVariant()
-                    .getMasterBoard().getTowerSet());
-            }
-        }
-
-        // Titan teleport
-        if (player.canTitanTeleport() && legion.hasTitan()
-            && titanTeleportAllowed())
-        {
-            // Mark every hex containing an enemy stack that does not
-            // already contain a friendly stack.
-            for (Legion other : game.getEnemyLegions(player))
-            {
-                MasterHex otherHex = other.getCurrentHex();
-                if (!game.isEngagement(otherHex))
-                {
-                    result.add(otherHex);
-                }
-            }
-        }
-        result.remove(null);
-        return result;
-    }
-
     /** Return a Set of Strings "Left" "Right" or "Bottom" describing
      *  possible entry sides.  If the hex is unoccupied, just return
      *  one entry side since it doesn't matter. */
@@ -315,5 +243,14 @@ public final class MovementClientSide extends Movement
         }
         return entrySides;
     }
+
+    /** Return set of hexLabels describing where this legion can teleport. */
+    public Set<MasterHex> listTeleportMoves(Legion legion, MasterHex hex,
+        int movementRoll)
+    {
+        // Call with inAdvance=false
+        return listTeleportMoves(legion, hex, movementRoll, false);
+    }
+
 
 }

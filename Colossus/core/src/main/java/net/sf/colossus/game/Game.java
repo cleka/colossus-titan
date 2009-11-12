@@ -304,21 +304,6 @@ public class Game
         return list;
     }
 
-    /** Return a list of all legions not belonging to player. */
-    public List<Legion> getAllEnemyLegions(Player player)
-    {
-        List<Legion> list = new ArrayList<Legion>();
-        for (Player otherPlayer : players)
-        {
-            if (otherPlayer != player)
-            {
-                List<? extends Legion> legions = otherPlayer.getLegions();
-                list.addAll(legions);
-            }
-        }
-        return list;
-    }
-
     public int getNumLivingCreatures(CreatureType type)
     {
         int livingCount = 0;
@@ -351,7 +336,7 @@ public class Game
     public int getNumEnemyLegions(MasterHex masterHex, Player player)
     {
         int count = 0;
-        for (Legion legion : getAllEnemyLegions(player))
+        for (Legion legion : getEnemyLegions(player))
         {
             if (masterHex.equals(legion.getCurrentHex()))
             {
@@ -387,6 +372,7 @@ public class Game
             });
     }
 
+    /** Return a list of all legions not belonging to player. */
     public List<Legion> getEnemyLegions(final Player player)
     {
         List<Legion> result = new ArrayList<Legion>();
@@ -509,7 +495,7 @@ public class Game
     {
         assert masterHex != null : "Hex needs to be specified";
         assert player != null : "Player needs to be specified";
-        for (Legion legion : getAllEnemyLegions(player))
+        for (Legion legion : getEnemyLegions(player))
         {
             if (masterHex.equals(legion.getCurrentHex()))
             {
