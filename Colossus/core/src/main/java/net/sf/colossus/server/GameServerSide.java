@@ -2037,7 +2037,7 @@ public final class GameServerSide extends Game
     public boolean hasConventionalMove(LegionServerSide legion, MasterHex hex,
         int roll, boolean ignoreFriends)
     {
-        return !movementSS.listNormalMoves(legion, hex, roll, ignoreFriends)
+        return !movementSS.listNormalMoves(legion, hex, roll, ignoreFriends, null, false)
             .isEmpty();
     }
 

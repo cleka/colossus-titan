@@ -2764,7 +2764,7 @@ public final class Client implements IClient, IOracle, IVariant,
     public Set<MasterHex> listTeleportMoves(Legion legion)
     {
         MasterHex hex = legion.getCurrentHex();
-        return movement.listTeleportMovesCS(legion, hex, game.getMovementRoll());
+        return movement.listTeleportMoves(legion, hex, game.getMovementRoll());
     }
 
     /** Return a set of hexLabels. */

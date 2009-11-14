@@ -808,7 +808,7 @@ public class RationalAI extends SimpleAI
             else
             {
                 // only teleport moves
-                set = client.getMovement().listTeleportMovesCS(legion, hex,
+                set = client.getMovement().listTeleportMoves(legion, hex,
                     client.getGame().getMovementRoll());
             }
 
@@ -1819,7 +1819,7 @@ public class RationalAI extends SimpleAI
             Set<MasterHex> normal_moves = client.getMovement()
                 .listNormalMoves(legion, hex, roll);
             Set<MasterHex> tele_moves = client.getMovement()
-                .listTeleportMovesCS(legion, hex, roll);
+                .listTeleportMoves(legion, hex, roll);
             double bestMoveVal = stay_at_hex; // can always stay here
             boolean no_attack = false;
 
