@@ -41,6 +41,7 @@ import net.sf.colossus.common.IOptions;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.game.BattleUnit;
 import net.sf.colossus.game.Legion;
+import net.sf.colossus.game.Phase;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.guiutil.KDialog;
 import net.sf.colossus.variant.CreatureType;
@@ -1285,9 +1286,24 @@ final class EventViewer extends KDialog
 
         if (found == 0)
         {
-            LOGGER.log(Level.SEVERE, "Requested '" + type
-                + "' EVENT to undo (" + parentId + ", " + childId + ", turn "
-                + turn + ") not found");
+            if (type == RevealEvent.eventSplit
+                && client.getPhase() == Phase.MOVE)
+            {
+                // OK. This can happen if game was saved with a split that is
+                // now recombined by the server because the legions didn't have
+                // valid moves. Now it was loaded in move phase, but replay
+                // does (at least for now) NOT replay the actual event, it just
+                // re-sends the add/remove info so that clients get the split
+                // predict info right. Thus there is no such event here in
+                // event viewer that could be undone.
+            }
+            else
+            {
+                LOGGER.log(Level.WARNING, "Requested '"
+                    + RevealEvent.getEventTypeText(type) + "' EVENT to undo ("
+                    + parentId + ", " + childId + ", turn " + turn
+                    + ") not found");
+            }
         }
 
         if (this.visible)
