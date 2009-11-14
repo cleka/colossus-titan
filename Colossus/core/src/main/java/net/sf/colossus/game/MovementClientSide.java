@@ -40,9 +40,11 @@ public final class MovementClientSide extends Movement
      *
      *  TODO get rid of this String serialization and return a proper data
      *       structure
+     * @param ignoreFriends TODO
      */
-    private Set<String> findNormalMoves(MasterHex hex, Legion legion,
-        int roll, int block, int cameFrom, MasterHex fromHex)
+    @Override
+    protected Set<String> findNormalMoves(MasterHex hex, Legion legion,
+        int roll, int block, int cameFrom, MasterHex fromHex, boolean ignoreFriends)
     {
         Set<String> result = new HashSet<String>();
         Player player = legion.getPlayer();
@@ -99,7 +101,7 @@ public final class MovementClientSide extends Movement
         if (block >= 0)
         {
             result.addAll(findNormalMoves(hex.getNeighbor(block), legion,
-                roll - 1, Constants.ARROWS_ONLY, (block + 3) % 6, null));
+                roll - 1, Constants.ARROWS_ONLY, (block + 3) % 6, null, ignoreFriends));
         }
         else if (block == Constants.ARCHES_AND_ARROWS)
         {
@@ -110,7 +112,7 @@ public final class MovementClientSide extends Movement
                     && i != cameFrom)
                 {
                     result.addAll(findNormalMoves(hex.getNeighbor(i), legion,
-                        roll - 1, Constants.ARROWS_ONLY, (i + 3) % 6, null));
+                        roll - 1, Constants.ARROWS_ONLY, (i + 3) % 6, null, ignoreFriends));
 
                 }
             }
@@ -124,7 +126,7 @@ public final class MovementClientSide extends Movement
                     && i != cameFrom)
                 {
                     result.addAll(findNormalMoves(hex.getNeighbor(i), legion,
-                        roll - 1, Constants.ARROWS_ONLY, (i + 3) % 6, null));
+                        roll - 1, Constants.ARROWS_ONLY, (i + 3) % 6, null, ignoreFriends));
                 }
             }
         }
@@ -166,7 +168,7 @@ public final class MovementClientSide extends Movement
         }
 
         Set<String> tuples = findNormalMoves(hex, legion, movementRoll,
-            findBlock(hex), Constants.NOWHERE, fromHex);
+            findBlock(hex), Constants.NOWHERE, fromHex, false);
 
         // Extract just the hexLabels from the hexLabel:entrySide tuples.
         Set<MasterHex> result = new HashSet<MasterHex>();
@@ -182,75 +184,9 @@ public final class MovementClientSide extends Movement
         return result;
     }
 
-    /** Return a Set of Strings "Left" "Right" or "Bottom" describing
-     *  possible entry sides.  If the hex is unoccupied, just return
-     *  one entry side since it doesn't matter. */
-    public Set<EntrySide> listPossibleEntrySides(Legion legion,
-        MasterHex targetHex,
-        boolean teleport)
+    @Override
+    public Set<MasterHex> listTeleportMovesXX(Legion legion, MasterHex hex, int movementRoll)
     {
-        Set<EntrySide> entrySides = new HashSet<EntrySide>();
-        int movementRoll = game.getMovementRoll();
-        MasterHex currentHex = legion.getCurrentHex();
-
-        if (teleport)
-        {
-            if (listTeleportMoves(legion, currentHex, movementRoll).contains(
-                targetHex))
-            {
-                // Startlisted terrain only have bottom entry side.
-                // Don't bother finding more than one entry side if unoccupied.
-                if (!game.isOccupied(targetHex)
-                    || targetHex.getTerrain().hasStartList())
-
-                {
-                    entrySides.add(EntrySide.BOTTOM);
-                    return entrySides;
-                }
-                else
-                {
-                    entrySides.add(EntrySide.BOTTOM);
-                    entrySides.add(EntrySide.LEFT);
-                    entrySides.add(EntrySide.RIGHT);
-                    return entrySides;
-                }
-            }
-            else
-            {
-                return entrySides;
-            }
-        }
-
-        // Normal moves.
-        Set<String> tuples = findNormalMoves(currentHex, legion, movementRoll,
-            findBlock(currentHex), Constants.NOWHERE, null);
-        Iterator<String> it = tuples.iterator();
-        while (it.hasNext())
-        {
-            String tuple = it.next();
-            List<String> parts = Split.split(':', tuple);
-            String hl = parts.get(0);
-            if (hl.equals(targetHex.getLabel()))
-            {
-                String buf = parts.get(1);
-                entrySides.add(EntrySide.fromLabel(buf));
-                // Don't bother finding more than one entry side if unoccupied.
-                if (!game.isOccupied(targetHex))
-                {
-                    return entrySides;
-                }
-            }
-        }
-        return entrySides;
+        return listTeleportMovesCS(legion, hex,movementRoll);
     }
-
-    /** Return set of hexLabels describing where this legion can teleport. */
-    public Set<MasterHex> listTeleportMoves(Legion legion, MasterHex hex,
-        int movementRoll)
-    {
-        // Call with inAdvance=false
-        return listTeleportMoves(legion, hex, movementRoll, false);
-    }
-
-
 }

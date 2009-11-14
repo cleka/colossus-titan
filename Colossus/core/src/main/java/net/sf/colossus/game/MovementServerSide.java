@@ -9,7 +9,6 @@ import java.util.logging.Logger;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.server.LegionServerSide;
-import net.sf.colossus.server.PlayerServerSide;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.variant.MasterHex;
 
@@ -36,110 +35,25 @@ public class MovementServerSide extends Movement
         LOGGER.finest("MovementServerSide instantiated");
     }
 
-    /** Return a Set of Strings "Left" "Right" or "Bottom" describing
-     *  possible entry sides.  If the hex is unoccupied, just return
-     *  one entry side since it doesn't matter.
-     *  @param bm TODO
-     *  @param game TODO
-     *  @param legion TODO
-     *  @param targetHex TODO
-     *  @param teleport TODO
-     */
-    public Set<EntrySide> listPossibleEntrySides(Legion legion,
-        MasterHex targetHex, boolean teleport)
-    {
-        Set<EntrySide> entrySides = new HashSet<EntrySide>();
-        Player player = legion.getPlayer();
-        int movementRoll = ((PlayerServerSide)player).getMovementRollSS();
-        int mmroll2 = game.getMovementRoll();
-        if (movementRoll != mmroll2)
-        {
-            LOGGER.warning("PlayerSS.getMovementRoll returns " + movementRoll
-                + " but Game[SS].getMovementRoll gives " + mmroll2);
-        }
-
-        MasterHex currentHex = legion.getCurrentHex();
-
-        if (teleport)
-        {
-            if (listTeleportMoves(legion, currentHex, movementRoll)
-                .contains(targetHex))
-            {
-                // Startlisted terrain only have bottom entry side.
-                // Don't bother finding more than one entry side if unoccupied.
-                if (!game.isOccupied(targetHex)
-                    || targetHex.getTerrain().hasStartList())
-                {
-                    entrySides.add(EntrySide.BOTTOM);
-                    return entrySides;
-                }
-                else
-                {
-                    entrySides.add(EntrySide.BOTTOM);
-                    entrySides.add(EntrySide.LEFT);
-                    entrySides.add(EntrySide.RIGHT);
-                    return entrySides;
-                }
-            }
-            else
-            {
-                return entrySides;
-            }
-        }
-
-        // Normal moves.
-        Set<String> tuples = findNormalMoves(currentHex, legion,
-            movementRoll,
-            findBlock(currentHex), Constants.NOWHERE, false);
-        Iterator<String> it = tuples.iterator();
-        while (it.hasNext())
-        {
-            String tuple = it.next();
-            List<String> parts = Split.split(':', tuple);
-            String hl = parts.get(0);
-
-            if (hl.equals(targetHex.getLabel()))
-            {
-                String buf = parts.get(1);
-
-                entrySides.add(EntrySide.fromLabel(buf));
-
-                // Clemens 4.10.2007:
-                // This optimization can lead to problems ("Illegal entry side")
-                // in mountains/tundra on a movement roll 4, when client and
-                // server store the items in their Move-hashmaps in different
-                // order (different java version, platform, ... ?)
-                // So, removed this optimization to see whether it fixes the bug:
-                //  [colossus-Bugs-1789116 ] illegal move: 29 plain to 2000 tundra
-                /*
-                 // Don't bother finding more than one entry side if unoccupied.
-                 if (!isOccupied(targetHexLabel))
-                 {
-                 return entrySides;
-                 }
-                 */
-            }
-        }
-        return entrySides;
-    }
-
     /** Recursively find conventional moves from this hex.
      *  If block >= 0, go only that way.  If block == -1, use arches and
      *  arrows.  If block == -2, use only arrows.  Do not double back in
      *  the direction you just came from.
      *
      *  TODO use proper data structure instead of String serializations
-     *  @param game TODO
-     *  @param hex TODO
-     *  @param legion TODO
-     *  @param roll TODO
-     *  @param block TODO
-     *  @param cameFrom TODO
-     *  @param ignoreFriends TODO
+     * @param hex TODO
+     * @param legion TODO
+     * @param roll TODO
+     * @param block TODO
+     * @param cameFrom TODO
+     * @param fromHex TODO
+     * @param ignoreFriends TODO
+     * @param game TODO
      *  @return a set of hexLabel:entrySide string tuples.
      */
+    @Override
     public Set<String> findNormalMoves(MasterHex hex, Legion legion, int roll,
-        int block, int cameFrom, boolean ignoreFriends)
+        int block, int cameFrom, MasterHex fromHex, boolean ignoreFriends)
     {
         Set<String> set = new HashSet<String>();
         Player player = legion.getPlayer();
@@ -191,7 +105,7 @@ public class MovementServerSide extends Movement
         {
             set.addAll(findNormalMoves(hex.getNeighbor(block), legion,
                 roll - 1, Constants.ARROWS_ONLY, (block + 3) % 6,
-                ignoreFriends));
+                fromHex, ignoreFriends));
         }
         else if (block == Constants.ARCHES_AND_ARROWS)
         {
@@ -203,7 +117,7 @@ public class MovementServerSide extends Movement
                 {
                     set.addAll(findNormalMoves(hex.getNeighbor(i), legion,
                         roll - 1, Constants.ARROWS_ONLY, (i + 3) % 6,
-                        ignoreFriends));
+                        fromHex, ignoreFriends));
                 }
             }
         }
@@ -217,7 +131,7 @@ public class MovementServerSide extends Movement
                 {
                     set.addAll(findNormalMoves(hex.getNeighbor(i), legion,
                         roll - 1, Constants.ARROWS_ONLY, (i + 3) % 6,
-                        ignoreFriends));
+                        fromHex, ignoreFriends));
                 }
             }
         }
@@ -257,7 +171,8 @@ public class MovementServerSide extends Movement
      */
     public String isValidTeleportMove(Legion legion, MasterHex hex, int roll)
     {
-        Set<MasterHex> set = listTeleportMoves(legion, legion.getCurrentHex(), roll);
+        Set<MasterHex> set = listTeleportMovesSS(legion, legion
+            .getCurrentHex(), roll);
 
         if (!set.contains(hex))
         {
@@ -268,27 +183,6 @@ public class MovementServerSide extends Movement
                 + hex + "'";
         }
         return null;
-    }
-
-    /** Verify whether this is a valid entry side.
-     *
-     *  @param legion
-     *  @param hex
-     *  @param player
-     *  @return Reason why it is not a valid entry side, null if valid
-     */
-    public String isValidEntrySide(Legion legion, MasterHex hex,
-        boolean teleport, EntrySide entrySide)
-    {
-        Set<EntrySide> legalSides = listPossibleEntrySides(legion,
-            hex, teleport);
-        if (!legalSides.contains(entrySide))
-        {
-            return "EntrySide '" + entrySide + "' is not valid, valid are: "
-                + legalSides.toString();
-        }
-        return null;
-
     }
 
     /** Return set of hexLabels describing where this legion can move
@@ -304,7 +198,7 @@ public class MovementServerSide extends Movement
             return new HashSet<MasterHex>();
         }
         Set<String> tuples = findNormalMoves(hex, legion, movementRoll,
-            findBlock(hex), Constants.NOWHERE, ignoreFriends);
+            findBlock(hex), Constants.NOWHERE, null, ignoreFriends);
 
         // Extract just the hexLabels from the hexLabel:entrySide tuples.
         Set<MasterHex> result = new HashSet<MasterHex>();
@@ -321,87 +215,11 @@ public class MovementServerSide extends Movement
         return result;
     }
 
-    /** Return set of hexLabels describing where this legion can teleport.
-     *  @return set of hexlabels
-     */
-    public Set<MasterHex> listTeleportMoves(Legion legion, MasterHex hex,
+    @Override
+    public Set<MasterHex> listTeleportMovesXX(Legion legion, MasterHex hex,
         int movementRoll)
     {
-        // TODO validatoion just for a while (2009-11). If nothing comes up
-        // can dump the orig and go one with just the one.
-        Set<MasterHex> set1 = listTeleportMovesOrig(legion, hex, movementRoll);
-        Set<MasterHex> set2 = listTeleportMoves(legion, hex, movementRoll,
-            false);
-        if (!set1.equals(set2))
-        {
-            LOGGER.warning("enhanced method for listTeleportMoves returns "
-                + "different set than original!\nSet1: " + set1.toString()
-                + "\nSet2: " + set2.toString());
-        }
-        return set1;
-    }
-
-    /** Return set of hexLabels describing where this legion can teleport.
-     *  @return set of hexlabels
-     */
-    public Set<MasterHex> listTeleportMovesOrig(Legion legion, MasterHex hex,
-        int movementRoll)
-    {
-        Player player = legion.getPlayer();
-        Set<MasterHex> result = new HashSet<MasterHex>();
-
-        if (movementRoll != 6 || legion.hasMoved() || player.hasTeleported())
-        {
-            return result;
-        }
-
-        // Tower teleport
-        if (hex.getTerrain().isTower() && legion.numLords() > 0
-            && towerTeleportAllowed())
-        {
-            // Mark every unoccupied hex within 6 hexes.
-            if (towerToNonTowerTeleportAllowed())
-            {
-                result.addAll(findNearbyUnoccupiedHexes(hex, legion, 6,
-                    Constants.NOWHERE));
-            }
-
-            if (towerToTowerTeleportAllowed())
-            {
-                for (MasterHex tower : game.getVariant().getMasterBoard()
-                    .getTowerSet())
-                {
-                    if (!game.isOccupied(tower) && (!(tower.equals(hex))))
-                    {
-                        result.add(tower);
-                    }
-                }
-            }
-            else
-            {
-                // Remove nearby towers from set.
-                result.removeAll(game.getVariant().getMasterBoard()
-                    .getTowerSet());
-            }
-        }
-
-        // Titan teleport
-        if (player.canTitanTeleport() && legion.hasTitan()
-            && titanTeleportAllowed())
-        {
-            // Mark every hex containing an enemy stack that does not
-            // already contain a friendly stack.
-            for (Legion other : game.getEnemyLegions(player))
-            {
-                MasterHex otherHex = other.getCurrentHex();
-                if (!game.isEngagement(otherHex))
-                {
-                    result.add(otherHex);
-                }
-            }
-        }
-        result.remove(null);
-        return result;
+        return listTeleportMovesSS(legion, hex, movementRoll);
     }
 
 }

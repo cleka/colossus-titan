@@ -2433,11 +2433,22 @@ public final class Client implements IClient, IOracle, IVariant,
             return false;
         }
 
+        EntrySide entrySide = null;
+
         Set<EntrySide> entrySides = movement.listPossibleEntrySides(mover,
             hex, teleport);
-
-        EntrySide entrySide = null;
-        if (options.getOption(Options.autoPickEntrySide))
+        if (entrySides.isEmpty())
+        {
+            LOGGER.warning("Attempted move to " + hex
+                + " but entrySides is empty?");
+            return false;
+        }
+        else if (!game.isOccupied(hex))
+        {
+            // If unoccupied it does not really matter, just take one.
+            entrySide = entrySides.iterator().next();
+        }
+        else if (options.getOption(Options.autoPickEntrySide))
         {
             entrySide = ai.pickEntrySide(hex, mover, entrySides);
         }
@@ -2753,7 +2764,7 @@ public final class Client implements IClient, IOracle, IVariant,
     public Set<MasterHex> listTeleportMoves(Legion legion)
     {
         MasterHex hex = legion.getCurrentHex();
-        return movement.listTeleportMoves(legion, hex, game.getMovementRoll());
+        return movement.listTeleportMovesCS(legion, hex, game.getMovementRoll());
     }
 
     /** Return a set of hexLabels. */
