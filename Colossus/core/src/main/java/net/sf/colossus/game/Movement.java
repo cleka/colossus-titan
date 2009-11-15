@@ -366,6 +366,12 @@ abstract public class Movement
         Set<String> result = new HashSet<String>();
         Player player = legion.getPlayer();
 
+        // TODO is fromHex actually useful?
+        // if (game.getNumEnemyLegions(hex, player) > 0 && !hex.equals(fromHex))
+        // Server side didn't have it at all, and in client side it was not
+        // passed on to the recursive calls. So it's set in first hex anyway,
+        // but in first hex there can't be an enemy legion, or can there?
+        //
         // If there are enemy legions in this hex, mark it
         // as a legal move and stop recursing.  If there is
         // also a friendly legion there, just stop recursing.
@@ -387,6 +393,25 @@ abstract public class Movement
 
         if (roll == 0)
         {
+            // This is the originally server side functionality:
+            // XXX fix
+            // This hex is the final destination.  Mark it as legal if
+            // it is unoccupied by friendly legions.
+            List<? extends Legion> legions = player.getLegions();
+            for (Legion otherLegion : legions)
+            {
+                if (!ignoreFriends && otherLegion != legion
+                    && hex.equals(otherLegion.getCurrentHex()))
+                {
+                    return result;
+                }
+            }
+            /* The part below is how it was in MovementClientSide.
+             * When I tried to use that, the cycle/spin case with split
+             * legions produces NAKs - server thinks the player has valid
+             * conventional moves.
+             */
+            /*
             // This hex is the final destination.  Mark it as legal if
             // it is unoccupied by friendly legions that have already moved.
             // Account for spin cycles.
@@ -400,7 +425,7 @@ abstract public class Movement
                     return result;
                 }
             }
-
+            */
             if (cameFrom != -1)
             {
                 result.add(hex.getLabel() + ":"
@@ -417,7 +442,7 @@ abstract public class Movement
         if (block >= 0)
         {
             result.addAll(findNormalMoves(hex.getNeighbor(block), legion,
-                roll - 1, Constants.ARROWS_ONLY, (block + 3) % 6, fromHex,
+                roll - 1, Constants.ARROWS_ONLY, (block + 3) % 6, null,
                 ignoreFriends));
         }
         else if (block == Constants.ARCHES_AND_ARROWS)
@@ -429,7 +454,7 @@ abstract public class Movement
                     && i != cameFrom)
                 {
                     result.addAll(findNormalMoves(hex.getNeighbor(i), legion,
-                        roll - 1, Constants.ARROWS_ONLY, (i + 3) % 6, fromHex,
+                        roll - 1, Constants.ARROWS_ONLY, (i + 3) % 6, null,
                         ignoreFriends));
                 }
             }
@@ -443,7 +468,7 @@ abstract public class Movement
                     && i != cameFrom)
                 {
                     result.addAll(findNormalMoves(hex.getNeighbor(i), legion,
-                        roll - 1, Constants.ARROWS_ONLY, (i + 3) % 6, fromHex,
+                        roll - 1, Constants.ARROWS_ONLY, (i + 3) % 6, null,
                         ignoreFriends));
                 }
             }
