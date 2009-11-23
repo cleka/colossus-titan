@@ -25,6 +25,7 @@ import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.Caretaker;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Dice;
+import net.sf.colossus.game.Engagement;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
@@ -70,7 +71,7 @@ public final class GameServerSide extends Game
 
     private int activePlayerNum;
     private int lastRecruitTurnNumber;
-    private boolean engagementInProgress;
+    private Engagement engagement = null;
     private boolean battleInProgress;
     private boolean summoning;
     private boolean reinforcing;
@@ -401,7 +402,7 @@ public final class GameServerSide extends Game
 
     private void clearFlags()
     {
-        engagementInProgress = false;
+        engagement = null;
         battleInProgress = false;
         summoning = false;
         reinforcing = false;
@@ -2123,7 +2124,7 @@ public final class GameServerSide extends Game
 
     boolean isEngagementInProgress()
     {
-        return engagementInProgress;
+        return engagement != null;
     }
 
     History getHistory()
@@ -2386,12 +2387,12 @@ public final class GameServerSide extends Game
     {
         // Do not allow clicking on engagements if one is
         // already being resolved.
-        if (isEngagement(hex) && !engagementInProgress)
+        if (isEngagement(hex) && engagement == null)
         {
-            engagementInProgress = true;
             Player player = getActivePlayer();
             Legion attacker = getFirstFriendlyLegion(hex, player);
             Legion defender = getFirstEnemyLegion(hex, player);
+            engagement = new Engagement(hex, attacker, defender);
 
             server.allTellEngagement(hex, attacker, defender);
 
@@ -2417,7 +2418,7 @@ public final class GameServerSide extends Game
         else
         {
             LOGGER.finest("illegal call to Game.engage() "
-                + engagementInProgress);
+                + engagement.toString());
         }
     }
 
@@ -2794,7 +2795,7 @@ public final class GameServerSide extends Game
             return;
         }
 
-        engagementInProgress = false;
+        engagement = null;
 
         server.allUpdatePlayerInfo();
 
