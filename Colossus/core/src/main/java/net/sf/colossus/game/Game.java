@@ -223,7 +223,7 @@ public class Game
         this.gameOverMessage = message;
     }
 
-    public void setEngagementData(MasterHex hex, Legion attacker,
+    public void createEngagement(MasterHex hex, Legion attacker,
         Legion defender)
     {
         this.engagement = new Engagement(hex, attacker, defender);
@@ -232,6 +232,11 @@ public class Game
     public void clearEngagementData()
     {
         this.engagement = null;
+    }
+
+    public boolean isEngagementInProgress()
+    {
+        return this.engagement != null;
     }
 
     public Engagement getEngagement()
@@ -562,7 +567,7 @@ public class Game
     }
     */
 
-    public boolean isEngagement(MasterHex hex)
+    public boolean containsOpposingLegions(MasterHex hex)
     {
         Player player = null;
         for (Legion legion : getLegionsByHex(hex))
@@ -590,7 +595,7 @@ public class Game
         for (Legion legion : player.getLegions())
         {
             if (!legion.equals(summoner) && legion.hasSummonable()
-                && !isEngagement(legion.getCurrentHex()))
+                && !containsOpposingLegions(legion.getCurrentHex()))
             {
                 result.add(legion);
             }

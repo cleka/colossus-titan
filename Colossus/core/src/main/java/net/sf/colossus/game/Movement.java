@@ -221,7 +221,7 @@ abstract public class Movement
             for (Legion other : game.getEnemyLegions(player))
             {
                 MasterHex otherHex = other.getCurrentHex();
-                if (!game.isEngagement(otherHex))
+                if (!game.containsOpposingLegions(otherHex))
                 {
                     result.add(otherHex);
                 }

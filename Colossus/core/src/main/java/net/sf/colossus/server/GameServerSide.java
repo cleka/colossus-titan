@@ -25,7 +25,6 @@ import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.Caretaker;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Dice;
-import net.sf.colossus.game.Engagement;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
@@ -71,7 +70,6 @@ public final class GameServerSide extends Game
 
     private int activePlayerNum;
     private int lastRecruitTurnNumber;
-    private Engagement engagement = null;
     private boolean battleInProgress;
     private boolean summoning;
     private boolean reinforcing;
@@ -402,7 +400,7 @@ public final class GameServerSide extends Game
 
     private void clearFlags()
     {
-        engagement = null;
+        clearEngagementData();
         battleInProgress = false;
         summoning = false;
         reinforcing = false;
@@ -1019,7 +1017,7 @@ public final class GameServerSide extends Game
         // If player quits while engaged, set slayer.
         Player slayer = null;
         Legion legion = player.getTitanLegion();
-        if (legion != null && isEngagement(legion.getCurrentHex()))
+        if (legion != null && containsOpposingLegions(legion.getCurrentHex()))
         {
             slayer = getFirstEnemyLegion(legion.getCurrentHex(), player)
                 .getPlayer();
@@ -2122,11 +2120,6 @@ public final class GameServerSide extends Game
         return battleInProgress;
     }
 
-    boolean isEngagementInProgress()
-    {
-        return engagement != null;
-    }
-
     History getHistory()
     {
         return history;
@@ -2387,13 +2380,13 @@ public final class GameServerSide extends Game
     {
         // Do not allow clicking on engagements if one is
         // already being resolved.
-        if (isEngagement(hex) && engagement == null)
+        if (containsOpposingLegions(hex) && !isEngagementOngoing())
         {
             Player player = getActivePlayer();
             Legion attacker = getFirstFriendlyLegion(hex, player);
             Legion defender = getFirstEnemyLegion(hex, player);
-            engagement = new Engagement(hex, attacker, defender);
 
+            createEngagement(hex, attacker, defender);
             server.allTellEngagement(hex, attacker, defender);
 
             ((LegionServerSide)attacker).sortCritters();
@@ -2418,7 +2411,7 @@ public final class GameServerSide extends Game
         else
         {
             LOGGER.finest("illegal call to Game.engage() "
-                + engagement.toString());
+                + getEngagement().toString());
         }
     }
 
@@ -2795,7 +2788,7 @@ public final class GameServerSide extends Game
             return;
         }
 
-        engagement = null;
+        clearEngagementData();
 
         server.allUpdatePlayerInfo();
 

@@ -541,7 +541,7 @@ public final class Client implements IClient, IOracle, IVariant,
 
     public void tellEngagement(MasterHex hex, Legion attacker, Legion defender)
     {
-        game.setEngagementData(hex, attacker, defender);
+        game.createEngagement(hex, attacker, defender);
         gui.tellEngagement(attacker, defender, getTurnNumber());
     }
 
