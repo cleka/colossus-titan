@@ -2410,8 +2410,17 @@ public final class GameServerSide extends Game
         }
         else
         {
-            LOGGER.finest("illegal call to Game.engage() "
-                + getEngagement().toString());
+            if (getEngagement() != null)
+            {
+                LOGGER.warning("illegal call to Game.engage(): engagement "
+                    + "ongoing: " + getEngagement().toString());
+            }
+            else
+            {
+                LOGGER.warning("illegal call to Game.engage(): "
+                    + "no opponent legion in hex " + hex.getDescription()
+                    + "; hex contains: " + getLegionsByHex(hex).toString());
+            }
         }
     }
 
