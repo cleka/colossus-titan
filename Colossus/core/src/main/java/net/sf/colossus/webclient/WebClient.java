@@ -1004,7 +1004,7 @@ public class WebClient extends KFrame implements IWebClient
 
         // Panel/Table for upcoming instant games:
         instGamesCard = new JPanel(new BorderLayout());
-        instGamesCard.setBorder(new TitledBorder("Proposed Games"));
+        instGamesCard.setBorder(new TitledBorder("Instant Games"));
         instGamesCard.add(
             nonBoldLabel("The following games are accepting players:"),
             BorderLayout.NORTH);
