@@ -799,6 +799,10 @@ public final class Client implements IClient, IOracle, IVariant,
                 // NOT remote, forced closed: just closing without asking
             }
         }
+        else if (closedBy == ClosedByConstant.CLOSED_BY_CLIENT)
+        {
+            // ok, explicitly initiated by user.
+        }
         else
         {
             LOGGER.warning("Unexpected else case?!?");
