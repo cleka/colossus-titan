@@ -777,15 +777,9 @@ public final class Client implements IClient, IOracle, IVariant,
     {
         boolean close = true;
 
-        // I don't use "getPlayerInfo().isAI() here, because if done
-        // so very early, getPlayerInfo delivers null.
-        boolean isAI = true;
-        String pType = options.getStringOption(Options.playerType);
-        if (pType != null
-            && (pType.endsWith("Human") || pType.endsWith("Network")))
-        {
-            isAI = false;
-        }
+        // Defensive: if called too early (owningPlayer not set yet),
+        // assume it's a human to prevent auto.close.
+        boolean isAI = (owningPlayer != null && owningPlayer.isAI());
 
         // AIs in general, and any (local or remote) client during
         // stresstesting should close without asking...
@@ -804,6 +798,10 @@ public final class Client implements IClient, IOracle, IVariant,
             {
                 // NOT remote, forced closed: just closing without asking
             }
+        }
+        else
+        {
+            LOGGER.warning("Unexpected else case?!?");
         }
         return close;
     }
