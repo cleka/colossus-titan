@@ -606,6 +606,11 @@ public class GameInfo
         return;
     }
 
+    public boolean relevantForSaving()
+    {
+        return state.equals(GameState.PROPOSED) || state.equals(GameState.DUE);
+    }
+
     /**
      *  Enum for the possible TYPES of a game
      *  (scheduled or instant, perhaps later also template?)

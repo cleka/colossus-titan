@@ -1005,7 +1005,7 @@ public class WebServer implements IWebServer, IRunWebServer
             throw new RuntimeException("gameFile filename is null!");
         }
 
-        LOGGER.log(Level.FINE, "Storing scheduled games to file " + filename);
+        LOGGER.log(Level.FINE, "Storing proposed games to file " + filename);
 
         PrintWriter out = null;
         try
@@ -1013,8 +1013,11 @@ public class WebServer implements IWebServer, IRunWebServer
             out = new PrintWriter(new FileOutputStream(filename));
             for (GameInfo gi : proposedGames.values())
             {
-                String asString = gi.toString(sep);
-                out.println(asString);
+                if (gi.relevantForSaving())
+                {
+                    String asString = gi.toString(sep);
+                    out.println(asString);
+                }
             }
             out.close();
         }
