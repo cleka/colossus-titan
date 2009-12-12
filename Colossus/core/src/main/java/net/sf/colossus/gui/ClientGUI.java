@@ -1209,10 +1209,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             {
                 board.disableDoneAction("At least one legion must move");
             }
-            // We don't use else if here:
-            // In theory it might be that there is no valid move
-            // even if there was none moved (or all back).
-            if (splitLegionHasForcedMove)
+            else if (splitLegionHasForcedMove)
             {
                 board.disableDoneAction("Split legion needs to move");
             }
