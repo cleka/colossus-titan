@@ -345,6 +345,7 @@ public class WebServer implements IWebServer, IRunWebServer
         while (it.hasNext())
         {
             User u = it.next();
+            u.updateLastOnline();
             WebServerClientSocketThread thread = (WebServerClientSocketThread)u
                 .getThread();
             if (thread == null)

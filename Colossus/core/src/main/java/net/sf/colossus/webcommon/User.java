@@ -50,6 +50,7 @@ public class User
     private String email;
     private boolean isAdmin;
     private String created;
+    private String lastOnline;
     // Only needed during registration:
     private String lastSentConfirmationCode;
 
@@ -69,13 +70,14 @@ public class User
     }
 
     public User(String name, String password, String email, boolean isAdmin,
-        String created, String confCode)
+        String created, String lastOnline, String confCode)
     {
         this.name = name;
         this.password = password;
         this.email = email;
         this.isAdmin = isAdmin;
         this.created = created;
+        this.lastOnline = lastOnline;
         this.lastSentConfirmationCode = confCode;
     }
 
@@ -234,13 +236,14 @@ public class User
         }
         else
         {
-            String created = makeCreatedDate(new Date().getTime());
+            String created = makeUserlineDate(new Date().getTime());
+            String lastOnline = makeUserlineDate(new Date().getTime());
             String cCode = makeConfirmationCode();
             LOGGER.info("Confirmation code for user " + username + " is: "
                 + cCode);
 
             User u = new User(username, password, email, isAdmin, created,
-                cCode);
+                lastOnline, cCode);
 
             String reason = sendConfirmationMail(username, email, cCode,
                 mailObject);
@@ -354,22 +357,27 @@ public class User
         }
     }
 
-    public static final String CREATION_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    public static final String USERLINE_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
-    private static SimpleDateFormat createdDateFormatter = new SimpleDateFormat(
-        CREATION_FORMAT);
+    private static SimpleDateFormat userlineDateFormatter = new SimpleDateFormat(
+        USERLINE_DATE_FORMAT);
 
-    private static String makeCreatedDate(long when)
+    private static String makeUserlineDate(long when)
     {
         Date whenDate = new Date(when);
-        String whenString = createdDateFormatter.format(whenDate);
+        String whenString = userlineDateFormatter.format(whenDate);
         return whenString;
+    }
+
+    public void updateLastOnline()
+    {
+        lastOnline = makeUserlineDate(new Date().getTime());
     }
 
     public static void parseUserLine(String line)
     {
         String[] tokens = line.split(ulSep);
-        if (tokens.length != 5)
+        if (tokens.length != 6)
         {
             LOGGER.log(Level.WARNING, "invalid line '" + line
                 + "' in user file!");
@@ -380,6 +388,7 @@ public class User
         String email = tokens[2].trim();
         String type = tokens[3].trim();
         String created = tokens[4].trim();
+        String lastOnline = tokens[5].trim();
         boolean isAdmin = false;
         if (type.equals(typeAdmin))
         {
@@ -394,7 +403,8 @@ public class User
             LOGGER.log(Level.WARNING, "invalid type '" + type
                 + "' in user file line '" + line + "'");
         }
-        User u = new User(name, password, email, isAdmin, created, "");
+        User u = new User(name, password, email, isAdmin, created, lastOnline,
+            "");
         storeUser(u);
     }
 
@@ -445,7 +455,7 @@ public class User
         String type = (isAdmin ? typeAdmin : typeUser);
 
         String line = this.name + ulSep + password + ulSep + email + ulSep
-            + type + ulSep + created;
+            + type + ulSep + created + ulSep + lastOnline;
         return line;
     }
 
