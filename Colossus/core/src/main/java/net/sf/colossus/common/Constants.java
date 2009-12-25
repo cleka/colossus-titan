@@ -165,7 +165,7 @@ public final class Constants
     public static final int defaultPort = 26567;
 
     // Web clients:
-    public static final String defaultWebServer = "localhost";
+    public static final String defaultWebServer = "play-colossus.net";
     public static final int defaultWebPort = 26766;
 
     public static final int numSavedServerNames = 10;
