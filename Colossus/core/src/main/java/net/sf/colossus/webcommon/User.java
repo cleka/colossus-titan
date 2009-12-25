@@ -189,6 +189,11 @@ public class User
         return userMap.get(nameAllLower);
     }
 
+    public static boolean isUserOnline(User u)
+    {
+        return loggedInUserMap.containsKey(u.getName());
+    }
+
     public static Iterator<User> getLoggedInUsersIterator()
     {
         return loggedInUserMap.values().iterator();

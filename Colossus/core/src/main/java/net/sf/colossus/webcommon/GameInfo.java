@@ -57,6 +57,7 @@ public class GameInfo
     private int min;
     private int target;
     private int max;
+    private int onlineCount;
 
     // next three only needed for scheduled games
     private long startTime = 0;
@@ -102,6 +103,7 @@ public class GameInfo
         this.min = min;
         this.target = target;
         this.max = max;
+        this.onlineCount = 0;
 
         this.startTime = startTime;
         this.duration = duration;
@@ -175,6 +177,7 @@ public class GameInfo
         gi.min = Integer.parseInt(tokens[j++]);
         gi.target = Integer.parseInt(tokens[j++]);
         gi.max = Integer.parseInt(tokens[j++]);
+        gi.onlineCount = Integer.parseInt(tokens[j++]);
 
         int lastIndex = j;
         gi.enrolledPlayers = Integer.parseInt(tokens[lastIndex]);
@@ -209,7 +212,7 @@ public class GameInfo
             + viewmode + sep + startTime + sep + duration + sep + summary
             + sep + eventExpiring + sep + unlimitedMulligans + sep
             + balancedTowers + sep + min + sep + target + sep + max + sep
-            + enrolledPlayers + playerList.toString();
+            + onlineCount + sep + enrolledPlayers + playerList.toString();
 
         return message;
     }
@@ -380,6 +383,15 @@ public class GameInfo
     }
 
     /**
+     * Have enough players enrolled (at least "min")
+     * @return
+     */
+    public boolean allEnrolledOnline()
+    {
+        return onlineCount >= enrolledPlayers;
+    }
+
+    /**
      * Has the scheduled time come?
      * @return true if the game can be started according to schedule
      */
@@ -427,6 +439,16 @@ public class GameInfo
     public Integer getEnrolledCount()
     {
         return Integer.valueOf(enrolledPlayers);
+    }
+
+    public int getOnlineCount()
+    {
+        return onlineCount;
+    }
+
+    public void setOnlineCount(int count)
+    {
+        onlineCount = count;
     }
 
     public void setEnrolledCount(Integer val)
@@ -509,6 +531,33 @@ public class GameInfo
     public void setPlayerList(ArrayList<User> playerlist)
     {
         players = playerlist;
+    }
+
+    /**
+     * When a user logged in or out, this is called for every GameInfo to update
+     * how many of the enrolled players are currently online.
+     *
+     * @return true if the count of online users was changed i.e. GameInfo
+     * needs to be updated to all clients
+     */
+    public boolean updateOnline()
+    {
+        boolean changed = false;
+
+        int found = 0;
+        for (User u : players)
+        {
+            if (User.isUserOnline(u))
+            {
+                found++;
+            }
+        }
+        if (found != onlineCount)
+        {
+            onlineCount = found;
+            changed = true;
+        }
+        return changed;
     }
 
     /*

@@ -1872,7 +1872,8 @@ public class WebClient extends KFrame implements IWebClient
         }
 
         if (gi.isEnrolled(username) && gi.hasEnoughPlayers()
-            && gi.isDue())
+            && gi.isDue()
+            && gi.allEnrolledOnline())
         {
             return true;
         }

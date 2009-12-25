@@ -556,6 +556,7 @@ public class WebServer implements IWebServer, IRunWebServer
             proposedGamesListModified = true;
             if (reasonFail == null)
             {
+                gi.updateOnline();
                 allTellGameInfo(gi);
                 IWebClient client = (IWebClient)user.getThread();
                 client.didEnroll(gameId, user.getName());
@@ -574,6 +575,7 @@ public class WebServer implements IWebServer, IRunWebServer
             proposedGamesListModified = true;
             if (reasonFail == null)
             {
+                gi.updateOnline();
                 allTellGameInfo(gi);
                 IWebClient client = (IWebClient)user.getThread();
                 client.didUnenroll(gameId, user.getName());
@@ -696,6 +698,14 @@ public class WebServer implements IWebServer, IRunWebServer
         int connected = User.getLoggedInCount();
         allTellUserCounts();
         gui.setUserInfo(connected + " users connected.");
+        for (GameInfo gi : proposedGames.values())
+        {
+            boolean changed = gi.updateOnline();
+            if (changed)
+            {
+                allTellGameInfo(gi);
+            }
+        }
     }
 
     public void allTellUserCounts()

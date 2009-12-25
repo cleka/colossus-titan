@@ -357,7 +357,6 @@ public class WebClientSocketThread extends Thread implements IWebServer
             {
                 String[] tokens = fromServer.split(sep, -1);
                 String command = tokens[0];
-
                 if (fromServer.startsWith("ACK: "))
                 {
                     command = tokens[0].substring(5);

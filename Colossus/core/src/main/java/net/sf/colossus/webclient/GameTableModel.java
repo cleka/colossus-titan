@@ -19,9 +19,9 @@ public class GameTableModel extends AbstractTableModel
 {
     private final String[] columnNames = { "#", "state", "by", "when",
         "duration", "info", "Variant", "Viewmode", "Expire", "Mull", "Towers",
-        "min", "target", "max", "actual", "players" };
+        "min", "target", "max", "actual", "players", "online" };
 
-    private final Vector<GameInfo> data = new Vector<GameInfo>(16, 1);
+    private final Vector<GameInfo> data = new Vector<GameInfo>(17, 1);
     private final HashMap<String, Integer> rowIndex = new HashMap<String, Integer>();
     private final Locale myLocale;
 
@@ -134,6 +134,10 @@ public class GameTableModel extends AbstractTableModel
             case 15:
                 o = gi.getPlayerListAsString();
                 break;
+
+            case 16:
+                o = Integer.valueOf(gi.getOnlineCount());
+                break;
         }
         return o;
     }
@@ -166,6 +170,7 @@ public class GameTableModel extends AbstractTableModel
             case 12:
             case 13:
             case 14:
+            case 16:
                 c = Integer.class;
                 break;
 
@@ -263,6 +268,10 @@ public class GameTableModel extends AbstractTableModel
 
             case 15:
                 gi.setPlayerList((ArrayList<User>)value);
+                break;
+
+            case 16:
+                gi.setOnlineCount(((Integer)value).intValue());
                 break;
         }
         fireTableCellUpdated(row, col);
