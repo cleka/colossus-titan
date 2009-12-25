@@ -117,8 +117,8 @@ public class WebClient extends KFrame implements IWebClient
 
     private final static int NotLoggedIn = 1;
     private final static int LoggedIn = 2;
-    // ENrolled to an instant game
-    private final static int Enrolled = 3;
+    // Enrolled to an instant game
+    private final static int EnrolledInstantGame = 3;
     private final static int Playing = 4;
     // private final static int PlayingButDead = 5;
 
@@ -133,7 +133,7 @@ public class WebClient extends KFrame implements IWebClient
     private boolean failedDueToDuplicateLogin = false;
 
     private int state = NotLoggedIn;
-    private String enrolledGameId = null;
+    private String enrolledInstantGameId = null;
     private boolean scheduledGamesMode;
 
     private int usersLoggedIn = 0;
@@ -193,10 +193,13 @@ public class WebClient extends KFrame implements IWebClient
     private JCheckBox unlimitedMulligansCB;
     private JCheckBox balancedTowersCB;
 
+    private JLabel nowDateAndTimeLabel;
     private JTextField atDateField;
     private JTextField atTimeField;
     private JTextField durationField;
     private JTextField summaryText;
+    private DateFormat myDateFormat;
+    private DateFormat myTimeFormat;
 
     private JButton proposeButton;
     private JButton cancelButton;
@@ -436,7 +439,7 @@ public class WebClient extends KFrame implements IWebClient
             if (state == Playing)
             {
                 state = LoggedIn;
-                enrolledGameId = "";
+                enrolledInstantGameId = "";
                 updateGUI();
             }
         }
@@ -814,6 +817,35 @@ public class WebClient extends KFrame implements IWebClient
         return labelBox;
     }
 
+    private void initFormats()
+    {
+        myDateFormat = DateFormat
+            .getDateInstance(DateFormat.MEDIUM, myLocale);
+        myDateFormat.setTimeZone(TimeZone.getDefault());
+        myDateFormat.setLenient(false);
+
+        myTimeFormat = DateFormat.getTimeInstance(DateFormat.SHORT, myLocale);
+        myTimeFormat.setTimeZone(TimeZone.getDefault());
+        myTimeFormat.setLenient(false);
+    }
+
+    private String makeDateTimeInfoString(Calendar now)
+    {
+        String nowDateString = myDateFormat.format(now.getTime());
+        String nowTimeString = myTimeFormat.format(now.getTime());
+
+        String infoString = "Current date and time is:  " + nowDateString
+            + "  " + nowTimeString;
+        return infoString;
+    }
+
+    private void updateDateTimeInfoString()
+    {
+        Calendar now = Calendar.getInstance(myLocale);
+        String nowDateAndTimeInfoString = makeDateTimeInfoString(now);
+        nowDateAndTimeLabel.setText(nowDateAndTimeInfoString);
+    }
+
     private void createCreateGamesTab()
     {
         createGamesTab = new Box(BoxLayout.Y_AXIS);
@@ -848,20 +880,14 @@ public class WebClient extends KFrame implements IWebClient
 
         Calendar now = Calendar.getInstance(myLocale);
 
-        DateFormat df = DateFormat
-            .getDateInstance(DateFormat.MEDIUM, myLocale);
-        df.setTimeZone(TimeZone.getDefault());
-        df.setLenient(false);
-        String nowDateString = df.format(now.getTime());
+        initFormats();
+        String nowDateAndTimeInfoString = makeDateTimeInfoString(now);
 
-        DateFormat tf = DateFormat.getTimeInstance(DateFormat.SHORT, myLocale);
-        tf.setTimeZone(TimeZone.getDefault());
-        tf.setLenient(false);
-        String nowTimeString = tf.format(now.getTime());
-
+        nowDateAndTimeLabel = nonBoldLabel(nowDateAndTimeInfoString);
         schedulingPanel
-            .add(makeTextBox(nonBoldLabel("Current date and time is:  "
-                + nowDateString + "  " + nowTimeString)));
+            .add(makeTextBox(nowDateAndTimeLabel));
+
+        nowDateAndTimeLabel.setText(nowDateAndTimeInfoString);
 
         schedulingPanel
             .add(makeTextBox(nonBoldLabel("Give a start date and time (dd.mm.yyyy and hh:mm) "
@@ -875,12 +901,14 @@ public class WebClient extends KFrame implements IWebClient
         int hours = 24;
 
         Calendar defaultStart = getNowPlusOffset(now, days, hours);
-        String defaultStartDateString = df.format(defaultStart.getTime());
+        String defaultStartDateString = myDateFormat.format(defaultStart
+            .getTime());
 
         atDateField = new JTextField(defaultStartDateString);
         schedulePanel.add(atDateField);
 
-        String defaultStartTimeString = tf.format(defaultStart.getTime());
+        String defaultStartTimeString = myTimeFormat.format(defaultStart
+            .getTime());
 
         atTimeField = new JTextField(defaultStartTimeString);
         schedulePanel.add(atTimeField);
@@ -1157,14 +1185,16 @@ public class WebClient extends KFrame implements IWebClient
         setScheduledGamesMode(switchToScheduling);
         if (switchToScheduling)
         {
+            /*
             JOptionPane
                 .showMessageDialog(
                     this,
                     "Please note! The 'scheduled games' feature is not ready implemented,\n"
                         + "and trying to use it might cause the application to behave unpredictable...",
                     "Feature not ready!", JOptionPane.INFORMATION_MESSAGE);
+            */
         }
-
+        updateGUI();
     }
 
     private void createPreferencesPane()
@@ -1730,7 +1760,7 @@ public class WebClient extends KFrame implements IWebClient
             case LoggedIn:
                 return username + " (logged in)";
 
-            case Enrolled:
+            case EnrolledInstantGame:
                 return username + " (enrolled)";
 
             case Playing:
@@ -1751,7 +1781,7 @@ public class WebClient extends KFrame implements IWebClient
             case LoggedIn:
                 return enrollText;
 
-            case Enrolled:
+            case EnrolledInstantGame:
                 return enrolledText;
 
             case Playing:
@@ -1774,12 +1804,13 @@ public class WebClient extends KFrame implements IWebClient
             case LoggedIn:
                 return "logged in as " + username;
 
-            case Enrolled:
+            case EnrolledInstantGame:
                 return "As " + username + " - enrolled to game "
-                    + enrolledGameId;
+                    + enrolledInstantGameId;
 
             case Playing:
-                return "As " + username + " - playing game " + enrolledGameId;
+                return "As " + username + " - playing game "
+                    + enrolledInstantGameId;
 
             default:
                 return "<info text - undefined state?>";
@@ -1791,8 +1822,8 @@ public class WebClient extends KFrame implements IWebClient
     {
         switch (state)
         {
-            case Enrolled:
-                GameInfo gi = findGameById(enrolledGameId);
+            case EnrolledInstantGame:
+                GameInfo gi = findGameById(enrolledInstantGameId);
                 if (gi != null)
                 {
                     if (gi.getEnrolledCount().intValue() >= gi.getMin()
@@ -1812,13 +1843,43 @@ public class WebClient extends KFrame implements IWebClient
                 }
                 return false;
 
-            case NotLoggedIn:
             case LoggedIn:
+                boolean startPossible = false;
+                String id = getSelectedGameId();
+                if (id != null && isScheduledGameStartable(id))
+                {
+                    startPossible = true;
+                }
+                return startPossible;
+
+            case NotLoggedIn:
             case Playing:
             default:
                 return false;
         }
 
+    }
+
+    private boolean isScheduledGameStartable(String id)
+    {
+        assert id != null : "Not a valid game id: " + id;
+
+        GameInfo gi = findGameById(id);
+
+        if (gi == null)
+        {
+            return false;
+        }
+
+        if (gi.isEnrolled(username) && gi.hasEnoughPlayers()
+            && gi.isDue())
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     private boolean checkIfCouldCancel(int state)
@@ -1843,20 +1904,56 @@ public class WebClient extends KFrame implements IWebClient
 
     private boolean checkIfCouldEnroll(int state)
     {
-        if (state == LoggedIn && getSelectedGameId() != null)
+        if (getScheduledGamesMode())
         {
-            return true;
+            String selectedGameId = getSelectedGameId();
+            if (selectedGameId == null)
+            {
+                return false;
+            }
+            GameInfo gi = findGameById(selectedGameId);
+            if (gi != null && !gi.isEnrolled(username))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
         else
         {
-            return false;
+            if (state == LoggedIn && getSelectedGameId() != null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 
     private boolean checkIfCouldUnenroll(int state)
     {
-        // TODO: need to check which is selected; inst. vs. scheduled?
-        if (state == Enrolled)
+        if (getScheduledGamesMode())
+        {
+            String selectedGameId = getSelectedGameId();
+            if (selectedGameId == null)
+            {
+                return false;
+            }
+            GameInfo gi = findGameById(selectedGameId);
+            if (gi != null && gi.isEnrolled(username))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else if (state == EnrolledInstantGame)
         {
             return true;
         }
@@ -1909,6 +2006,8 @@ public class WebClient extends KFrame implements IWebClient
         }
 
         // Games tab
+        updateDateTimeInfoString();
+
         userinfoLabel.setText("Userinfo: " + getUserinfoText());
         statusLabel.setText("Status: " + newStatusText);
         infoTextLabel.setText(newInfoText);
@@ -2116,12 +2215,16 @@ public class WebClient extends KFrame implements IWebClient
 
     public void doLogout()
     {
-        if (state == Enrolled)
+        if (state == EnrolledInstantGame)
         {
-            doUnenroll(enrolledGameId);
+            doUnenroll(enrolledInstantGameId);
         }
 
         logout();
+
+        schedGameTable.removeAll();
+        instGameTable.removeAll();
+
         state = NotLoggedIn;
         setAdmin(false);
         loginField.setEnabled(true);
@@ -2175,7 +2278,7 @@ public class WebClient extends KFrame implements IWebClient
 
     public void doScheduleDummy()
     {
-        // just a dummay as long as we still have ScheduledGamesTab class...
+        // just a dummy as long as we still have ScheduledGamesTab class...
     }
 
     private void do_proposeGame(String variant, String viewmode, long startAt,
@@ -2300,8 +2403,6 @@ public class WebClient extends KFrame implements IWebClient
 
     public void didEnroll(String gameId, String user)
     {
-        state = Enrolled;
-        enrolledGameId = gameId;
         GameInfo gi = findGameById(gameId);
         boolean scheduled = gi.isScheduledGame();
 
@@ -2312,6 +2413,9 @@ public class WebClient extends KFrame implements IWebClient
         }
         else
         {
+            state = EnrolledInstantGame;
+            enrolledInstantGameId = gameId;
+
             int index = instGameDataModel.getRowIndex(gi).intValue();
             instGameTable.setRowSelectionInterval(index, index);
         }
@@ -2326,7 +2430,7 @@ public class WebClient extends KFrame implements IWebClient
         {
             state = LoggedIn;
         }
-        enrolledGameId = "";
+        enrolledInstantGameId = "";
 
         updateGUI();
     }
@@ -2529,13 +2633,14 @@ public class WebClient extends KFrame implements IWebClient
 
     public void gameCancelled(String gameId, String byUser)
     {
-        if (state == Enrolled && enrolledGameId.equals(gameId))
+        if (state == EnrolledInstantGame
+            && enrolledInstantGameId.equals(gameId))
         {
             String message = "Game " + gameId + " was cancelled by user "
                 + byUser;
             JOptionPane.showMessageDialog(this, message);
             state = LoggedIn;
-            enrolledGameId = "";
+            enrolledInstantGameId = "";
             updateGUI();
         }
 
@@ -2566,7 +2671,7 @@ public class WebClient extends KFrame implements IWebClient
     public void tellGameEnds()
     {
         state = LoggedIn;
-        enrolledGameId = "";
+        enrolledInstantGameId = "";
         updateGUI();
     }
 
@@ -2698,7 +2803,7 @@ public class WebClient extends KFrame implements IWebClient
         JOptionPane.showMessageDialog(this, message);
         setAdmin(false);
         state = NotLoggedIn;
-        enrolledGameId = "";
+        enrolledInstantGameId = "";
         receivedField.setText("Connection reset by server!");
         updateStatus("Not connected", Color.red);
 

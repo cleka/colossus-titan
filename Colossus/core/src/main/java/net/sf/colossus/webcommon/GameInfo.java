@@ -2,6 +2,7 @@ package net.sf.colossus.webcommon;
 
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.logging.Level;
@@ -367,6 +368,25 @@ public class GameInfo
     public void setBalancedTowers(boolean val)
     {
         balancedTowers = val;
+    }
+
+    /**
+     * Have enough players enrolled (at least "min")
+     * @return
+     */
+    public boolean hasEnoughPlayers()
+    {
+        return enrolledPlayers >= min;
+    }
+
+    /**
+     * Has the scheduled time come?
+     * @return true if the game can be started according to schedule
+     */
+    public boolean isDue()
+    {
+        long now = new Date().getTime();
+        return now > startTime;
     }
 
     public Integer getMin()
