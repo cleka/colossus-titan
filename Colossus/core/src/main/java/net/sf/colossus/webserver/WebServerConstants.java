@@ -43,5 +43,5 @@ public final class WebServerConstants
      *  How many messages does chat server cache,
      *  for redisplay to those who just log in
      */
-    public final static int keepLastNMessages = 10;
+    public final static int keepLastNMessages = 50;
 }
