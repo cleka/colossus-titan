@@ -2,8 +2,8 @@ package net.sf.colossus.webserver;
 
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import net.sf.colossus.webcommon.IWebClient;
@@ -62,10 +62,9 @@ public class ChatChannel
 
     private void deliverMessage(ChatMessage msg)
     {
-        Iterator<User> it = User.getLoggedInUsersIterator();
-        while (it.hasNext())
+        Collection<User> users = User.getLoggedInUsers();
+        for (User u : users)
         {
-            User u = it.next();
             IWebClient client = (IWebClient)u.getThread();
             deliverMessageToClient(msg, client, false);
         }

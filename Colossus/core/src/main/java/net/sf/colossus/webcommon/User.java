@@ -9,9 +9,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -132,18 +133,21 @@ public class User
 
     public void setThread(Thread cst)
     {
-        if (cst == null)
+        synchronized (loggedInUserMap)
         {
-            if (loggedInUserMap.containsKey(this.name))
+            if (cst == null)
             {
-                loggedInUserMap.remove(this.name);
+                if (loggedInUserMap.containsKey(this.name))
+                {
+                    loggedInUserMap.remove(this.name);
+                }
             }
+            else
+            {
+                loggedInUserMap.put(this.name, this);
+            }
+            this.thread = cst;
         }
-        else
-        {
-            loggedInUserMap.put(this.name, this);
-        }
-        this.thread = cst;
     }
 
     /**
@@ -180,28 +184,63 @@ public class User
     {
         String name = u.getName();
         String nameAllLower = name.toLowerCase();
-        userMap.put(nameAllLower, u);
+        synchronized (userMap)
+        {
+            userMap.put(nameAllLower, u);
+        }
+    }
+
+    public static Collection<User> getAllUsers()
+    {
+        synchronized (userMap)
+        {
+            Collection<User> c = new LinkedList<User>();
+            c.addAll(userMap.values());
+            return c;
+        }
+    }
+
+    public static int getUserCount()
+    {
+        synchronized (userMap)
+        {
+            return userMap.size();
+        }
     }
 
     public static User findUserByName(String name)
     {
-        String nameAllLower = name.toLowerCase();
-        return userMap.get(nameAllLower);
+        synchronized (userMap)
+        {
+            String nameAllLower = name.toLowerCase();
+            return userMap.get(nameAllLower);
+        }
     }
 
     public static boolean isUserOnline(User u)
     {
-        return loggedInUserMap.containsKey(u.getName());
+        synchronized (loggedInUserMap)
+        {
+            return loggedInUserMap.containsKey(u.getName());
+        }
     }
 
-    public static Iterator<User> getLoggedInUsersIterator()
+    public static Collection<User> getLoggedInUsers()
     {
-        return loggedInUserMap.values().iterator();
+        synchronized (loggedInUserMap)
+        {
+            Collection<User> c = new LinkedList<User>();
+            c.addAll(loggedInUserMap.values());
+            return c;
+        }
     }
 
     public static int getLoggedInCount()
     {
-        return loggedInUserMap.size();
+        synchronized (loggedInUserMap)
+        {
+            return loggedInUserMap.size();
+        }
     }
 
     // still dummy
@@ -232,7 +271,7 @@ public class User
             String problem = "User " + username + " does already exist.";
             return problem;
         }
-        else if (userMap.size() >= maxUsers)
+        else if (getUserCount() >= maxUsers)
         {
             String problem = "Maximum number of accounts )" + maxUsers
                 + ") reached - no more registrations possible,"
@@ -481,11 +520,11 @@ public class User
         {
             out = new PrintWriter(new FileOutputStream(filename));
 
-            Iterator<String> it = userMap.keySet().iterator();
-            while (it.hasNext())
+            Collection<User> users = new LinkedList<User>();
+            users.addAll(getAllUsers());
+
+            for (User user : users)
             {
-                String key = it.next();
-                User user = userMap.get(key);
                 String line = user.makeLine();
                 out.println(line);
             }
@@ -501,7 +540,13 @@ public class User
 
     public static void cleanup()
     {
-        userMap.clear();
-        loggedInUserMap.clear();
+        synchronized (userMap)
+        {
+            userMap.clear();
+        }
+        synchronized (loggedInUserMap)
+        {
+            loggedInUserMap.clear();
+        }
     }
 }

@@ -13,6 +13,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.logging.Level;
@@ -298,6 +299,14 @@ public class WebServer implements IWebServer, IRunWebServer
             {
                 // ok, can log in
             }
+
+            if (!rejected)
+            {
+                WebServerClientSocketThread cst = new WebServerClientSocketThread(
+                    this, clientSocket);
+                cst.start();
+                updateUserCounts();
+            }
         }
         catch (IOException ex)
         {
@@ -317,12 +326,10 @@ public class WebServer implements IWebServer, IRunWebServer
             return false;
         }
 
-        if (!rejected)
+        catch (Throwable any)
         {
-            WebServerClientSocketThread cst = new WebServerClientSocketThread(
-                this, clientSocket);
-            cst.start();
-            updateUserCounts();
+            LOGGER.log(Level.SEVERE,
+                "!!! WebServer waitForUser loop caught throwable: ", any);
         }
 
         return rejected;
@@ -330,21 +337,9 @@ public class WebServer implements IWebServer, IRunWebServer
 
     private void closeAllWscst()
     {
-        ArrayList<User> toDo = new ArrayList<User>();
-
-        // copy them first to own list.
-        // Otherwise we get a ConcurrentModificationException
-        Iterator<User> it2 = User.getLoggedInUsersIterator();
-        while (it2.hasNext())
+        Collection<User> users = User.getLoggedInUsers();
+        for (User u : users)
         {
-            User u = it2.next();
-            toDo.add(u);
-        }
-
-        Iterator<User> it = toDo.iterator();
-        while (it.hasNext())
-        {
-            User u = it.next();
             u.updateLastOnline();
             WebServerClientSocketThread thread = (WebServerClientSocketThread)u
                 .getThread();
@@ -471,10 +466,9 @@ public class WebServer implements IWebServer, IRunWebServer
 
     public void allTellGameInfo(GameInfo gi)
     {
-        Iterator<User> it = User.getLoggedInUsersIterator();
-        while (it.hasNext())
+        Collection<User> users = User.getLoggedInUsers();
+        for (User u : users)
         {
-            User u = it.next();
             IWebClient client = (IWebClient)u.getThread();
             client.gameInfo(gi);
         }
@@ -606,10 +600,9 @@ public class WebServer implements IWebServer, IRunWebServer
                 + gameId);
         }
 
-        Iterator<User> it = User.getLoggedInUsersIterator();
-        while (it.hasNext())
+        Collection<User> users = User.getLoggedInUsers();
+        for (User u : users)
         {
-            User u = it.next();
             IWebClient client = (IWebClient)u.getThread();
             client.gameCancelled(gameId, byUser);
         }
@@ -719,14 +712,22 @@ public class WebServer implements IWebServer, IRunWebServer
             int playing = User.getPlayingCount();
             int dead = User.getDeadCount();
             long ago = 0;
-            String text = "";
 
-            Iterator<User> it = User.getLoggedInUsersIterator();
-            while (it.hasNext())
+            StringBuffer text = new StringBuffer("");
+            Collection<User> users = User.getLoggedInUsers();
+            for (User u : users)
             {
-                User u = it.next();
+                if (text.length() != 0)
+                {
+                    text.append(", ");
+                }
+                text.append(u.getName());
+            }
+            for (User u : users)
+            {
                 IWebClient client = (IWebClient)u.getThread();
-                client.userInfo(loggedin, enrolled, playing, dead, ago, text);
+                client.userInfo(loggedin, enrolled, playing, dead, ago, text
+                    .toString());
             }
         }
     }

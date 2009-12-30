@@ -1700,7 +1700,7 @@ public class WebClient extends KFrame implements IWebClient
         }
         else
         {
-            text = usersLoggedIn + " logged in.";
+            text = usersLoggedIn + " logged in (" + usersText + ").";
             // just to get rid of the "never read locally" warning...:
             String dummy = (usersEnrolled + usersPlaying + usersDead + usersLogoffAgo)
                 + usersText;
