@@ -12,6 +12,8 @@ import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
@@ -684,16 +686,43 @@ public class WebClient extends KFrame implements IWebClient
 
         loginPane.add(new JLabel("Web Server"));
         webserverHostField = new JTextField(this.hostname);
+        webserverHostField.addFocusListener(new FocusAdapter()
+        {
+            @Override
+            public void focusGained(FocusEvent e)
+            {
+                webserverHostField.selectAll();
+            }
+        });
+
         // webserverHostField.addActionListener(this);
         loginPane.add(webserverHostField);
 
         loginPane.add(new JLabel("Port"));
         webserverPortField = new JTextField(this.port + "");
+        webserverPortField.addFocusListener(new FocusAdapter()
+        {
+            @Override
+            public void focusGained(FocusEvent e)
+            {
+                webserverPortField.selectAll();
+            }
+        });
+
         // webserverPortField.addActionListener(this);
         loginPane.add(webserverPortField);
 
         loginPane.add(new JLabel("Login id"));
         loginField = new JTextField(this.login);
+        loginField.addFocusListener(new FocusAdapter()
+        {
+            @Override
+            public void focusGained(FocusEvent e)
+            {
+                loginField.selectAll();
+            }
+        });
+
         // nameField.addActionListener(this);
         loginPane.add(loginField);
 
@@ -701,6 +730,14 @@ public class WebClient extends KFrame implements IWebClient
         passwordField = new JPasswordField(this.password);
         // passwordField.addActionListener(this);
         loginPane.add(passwordField);
+        passwordField.addFocusListener(new FocusAdapter()
+        {
+            @Override
+            public void focusGained(FocusEvent e)
+            {
+                passwordField.selectAll();
+            }
+        });
 
         loginLogoutButton = new JButton(LoginButtonText);
         loginLogoutButton.addActionListener(new ActionListener()
@@ -864,6 +901,14 @@ public class WebClient extends KFrame implements IWebClient
         proposeGamePane.add(Box.createRigidArea(new Dimension(0, 20)));
         proposeGamePane.add(makeTextBox(new JLabel("Summary: ")));
         summaryText = new JTextField(defaultSummaryText);
+        summaryText.addFocusListener(new FocusAdapter()
+        {
+            @Override
+            public void focusGained(FocusEvent e)
+            {
+                summaryText.selectAll();
+            }
+        });
         proposeGamePane.add(summaryText);
 
         ButtonGroup group = new ButtonGroup();

@@ -7,6 +7,8 @@ import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
@@ -62,6 +64,14 @@ class RegisterPasswordPanel extends JDialog
 
         p.add(new JLabel("Login name"));
         rploginField = new JTextField(username);
+        rploginField.addFocusListener(new FocusAdapter()
+        {
+            @Override
+            public void focusGained(FocusEvent e)
+            {
+                rploginField.selectAll();
+            }
+        });
         p.add(rploginField);
 
         // old password only needed in change password
@@ -71,6 +81,14 @@ class RegisterPasswordPanel extends JDialog
             //   fetch email from server and let user change it?
             p.add(new JLabel("Old Password"));
             rpOldPW = new JPasswordField("");
+            rpOldPW.addFocusListener(new FocusAdapter()
+            {
+                @Override
+                public void focusGained(FocusEvent e)
+                {
+                    rpOldPW.selectAll();
+                }
+            });
             p.add(rpOldPW);
         }
         else
@@ -78,15 +96,39 @@ class RegisterPasswordPanel extends JDialog
             // register instead needs an email:
             p.add(new JLabel("Email address"));
             rpEmailField = new JTextField(defaultEmail, 20);
+            rpEmailField.addFocusListener(new FocusAdapter()
+            {
+                @Override
+                public void focusGained(FocusEvent e)
+                {
+                    rpEmailField.selectAll();
+                }
+            });
             p.add(rpEmailField);
         }
 
         p.add(new JLabel("Password"));
         rpNewPW1 = new JPasswordField("");
+        rpNewPW1.addFocusListener(new FocusAdapter()
+        {
+            @Override
+            public void focusGained(FocusEvent e)
+            {
+                rpNewPW1.selectAll();
+            }
+        });
         p.add(rpNewPW1);
 
         p.add(new JLabel("Repeat Password"));
         rpNewPW2 = new JPasswordField("");
+        rpNewPW2.addFocusListener(new FocusAdapter()
+        {
+            @Override
+            public void focusGained(FocusEvent e)
+            {
+                rpNewPW2.selectAll();
+            }
+        });
         p.add(rpNewPW2);
 
         String buttonText = isRegister ? "Create account" : "Change password";
