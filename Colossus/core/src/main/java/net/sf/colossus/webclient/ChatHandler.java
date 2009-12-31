@@ -197,9 +197,8 @@ public class ChatHandler
             {
                 if (!resentMode)
                 {
-                    displayArea.append("\n" + dashes
-                        + " redisplaying last (up to 10) messages " + dashes
-                        + "\n");
+                    displayArea.append("\n" + dashes + " redisplaying last "
+                        + "(currently up to 50) messages " + dashes + "\n");
                 }
                 resentMode = true;
                 lastMsgWhen = when;
