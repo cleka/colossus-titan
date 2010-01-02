@@ -273,6 +273,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
                     user = User.findUserByName(username);
                     loggedIn = true;
                     user.updateLastOnline();
+                    User.storeUsersToFile();
                     ok = true;
                     user.setThread(this);
                     setName("WebServerClientSocketThread " + username);
@@ -349,6 +350,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
         else if (command.equals(IWebServer.Logout))
         {
             user.updateLastOnline();
+            User.storeUsersToFile();
             ok = true;
             done = true;
         }
