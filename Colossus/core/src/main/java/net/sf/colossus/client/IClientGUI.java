@@ -115,7 +115,7 @@ public interface IClientGUI
         MasterHex currentHex, boolean splitLegionHasForcedMove,
         boolean didTeleport);
 
-    public abstract void actOnNextEngagement();
+    public abstract void actOnNoMoreEngagements();
 
     public abstract void alignLegionsMaybe(Legion legion);
 
@@ -179,6 +179,8 @@ public interface IClientGUI
 
     public abstract void actOnTellEngagementResults(Legion winner,
         String method, int points, int turns);
+
+    public abstract void actOnEngagementCompleted();
 
     public abstract void setMulliganOldRoll(int movementRoll);
 

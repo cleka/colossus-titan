@@ -1226,13 +1226,10 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         }
     }
 
-    public void actOnNextEngagement()
+    public void actOnNoMoreEngagements()
     {
-        // TODO move condition to Client?
-        if (client.getGameClientSide().findEngagements().isEmpty())
-        {
-            board.enableDoneAction();
-        }
+        board.setPhaseInfo("Press \"Done\" to end the engagements phase");
+        board.enableDoneAction();
     }
 
     public void alignLegionsMaybe(Legion legion)
@@ -1678,6 +1675,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         highlightBattleSite(client.getBattleSite());
 
         eventViewer.tellEngagement(attacker, defender, turnNumber);
+
+        board.updateEngagementsLeftText();
     }
 
     void highlightBattleSite(MasterHex battleSite)
@@ -1715,6 +1714,11 @@ public class ClientGUI implements IClientGUI, GUICallbacks
                 tellEngagementResultsAttackerLegionCertainities,
                 tellEngagementResultsDefenderLegionCertainities, client
                     .isMyTurn());
+    }
+
+    public void actOnEngagementCompleted()
+    {
+        board.updateEngagementsLeftText();
     }
 
     public void setMulliganOldRoll(int movementRoll)

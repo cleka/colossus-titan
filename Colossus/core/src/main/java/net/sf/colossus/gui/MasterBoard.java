@@ -1302,7 +1302,7 @@ public final class MasterBoard extends JPanel
             takeMulliganAction.setEnabled(false);
             // if there are no engagements, we are kicked to next phase
             // automatically anyway.
-            disableDoneAction("still engagements to resolve");
+            updateEngagementsLeftText();
 
             bottomBar.setPhase("Resolve Engagements");
             highlightEngagements();
@@ -1312,6 +1312,21 @@ public final class MasterBoard extends JPanel
         {
             setupAsInactivePlayer("fights");
         }
+    }
+
+    public void updateEngagementsLeftText()
+    {
+        int count = client.getGame().findEngagements().size();
+        String ongoing = "";
+        MasterHex engagedHex = client.getGame().getBattleSite();
+        if (engagedHex != null)
+        {
+            ongoing = "engaged on " + engagedHex.getDescription()
+                + "; after that ";
+            count--;
+        }
+        disableDoneAction(ongoing + count + " more engagement"
+            + (count == 1 ? "" : "s") + " to resolve");
     }
 
     void setupMusterMenu()

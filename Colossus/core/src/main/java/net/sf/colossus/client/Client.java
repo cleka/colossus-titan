@@ -550,6 +550,7 @@ public final class Client implements IClient, IOracle, IVariant,
     {
         gui.actOnTellEngagementResults(winner, method, points, turns);
         game.clearEngagementData();
+        gui.actOnEngagementCompleted();
     }
 
     /** Legion target summons unit from Legion donor.
@@ -1970,7 +1971,7 @@ public final class Client implements IClient, IOracle, IVariant,
                     else
                     {
                         // Enables the Done button
-                        gui.actOnNextEngagement();
+                        gui.actOnNoMoreEngagements();
                     }
                 }
             }

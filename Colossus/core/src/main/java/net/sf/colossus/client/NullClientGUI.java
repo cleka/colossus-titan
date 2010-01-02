@@ -108,7 +108,7 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public void actOnNextEngagement()
+    public void actOnNoMoreEngagements()
     {
         // TODO Auto-generated method stub
 
@@ -220,6 +220,12 @@ public class NullClientGUI implements IClientGUI
 
     public void actOnTellEngagementResults(Legion winner, String method,
         int points, int turns)
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void actOnEngagementCompleted()
     {
         // TODO Auto-generated method stub
 
