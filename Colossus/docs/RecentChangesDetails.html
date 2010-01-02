@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
-<!-- $Id: $ -->
+
 <html>
   <head>
     <meta name="generator"
@@ -13,6 +13,24 @@
 This describes the recent changes in some more detail than just the
 one-line-info on the main pages "News" section.
 
+<h3>January 2, 2010: Release 0.10.1 from r4646</h3>
+<p>
+Some usability improvements: 
+
+<ul>
+<li>Tell the names of logged in users, not only the number</li>
+<li>PGS: Access to userMaps now synchronized to prevent the hang/crash we had once recently</li>
+<li>PGS/WebClient: Most of the text fields now automatically select all text when they gain focus</li>
+<li>Corrected the text "redisplaying last 50 messages" (from 10 10 50)</li>
+<li>Improved text in MasterBoard BottomBar during engagements phase</li>
+<li>Added options for: when my (masterboard) turn starts, beep and/or bring my masterboard to front</li>
+<li>PGS: when lastOnline was changed (user does login or logoff), write back users file to disk</li>
+<li>When webclient user logs out, cancel proposed instant games he created. Also clear running games table and gameHash.</li>
+</ul>
+
+<p>
+<hr></hr>
+
 <h3>December 25, 2009: Release 0.10.0 from r4635</h3>
 <p>
 Two bugfixes (plus some refactoring done, and fixes to bugs caused by that), and: <b><font color="blue">the Public Game Server is going online now!</font></b>
@@ -23,9 +41,6 @@ Two bugfixes (plus some refactoring done, and fixes to bugs caused by that), and
 <li>New feature: The Public Game Server (aka WebServer/WebClient) functionality is going online now!<br>
     Accordingly, the hostname field in WebClient is now pre-initialized with "play-colossus.net".</li> 
 </ul>
-
-<p>
-<hr></hr>
 
 <h3>October 15, 2009: Release 0.9.3 from r4577</h3>
 <p>
