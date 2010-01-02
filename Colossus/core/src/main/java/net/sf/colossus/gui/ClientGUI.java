@@ -2007,6 +2007,10 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         Player player)
     {
         cleanupNegotiationDialogs();
+        if (isMyTurn())
+        {
+            board.myTurnStartsActions();
+        }
         eventViewer.turnOrPlayerChange(client, turnNr, player);
     }
 

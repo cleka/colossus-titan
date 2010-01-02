@@ -1251,7 +1251,6 @@ public final class MasterBoard extends JPanel
 
             bottomBar.setPhase("Split stacks");
             highlightTallLegions();
-            maybeRequestFocusAndToFront();
         }
         else
         {
@@ -2276,6 +2275,18 @@ public final class MasterBoard extends JPanel
         if (gui.getOptions().getOption(Options.stealFocus))
         {
             requestFocus();
+            getFrame().toFront();
+        }
+    }
+
+    void myTurnStartsActions()
+    {
+        if (gui.getOptions().getOption(Options.turnStartBeep))
+        {
+            getToolkit().beep();
+        }
+        if (gui.getOptions().getOption(Options.turnStartToFront))
+        {
             getFrame().toFront();
         }
     }

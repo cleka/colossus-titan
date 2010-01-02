@@ -266,6 +266,12 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
 
         addCheckBox(windowPane, Options.stealFocus); // KeyEvent.VK_F
 
+        Box notifBox = new Box(BoxLayout.Y_AXIS);
+        notifBox.setBorder(new TitledBorder("Notifications"));
+        addCheckBox(notifBox, Options.turnStartToFront);
+        addCheckBox(notifBox, Options.turnStartBeep);
+        windowPane.add(notifBox, SUBPANEL_CONSTRAINTS);
+
         //   Look & Feel panel in Window tab
         ButtonGroup lfGroup = new ButtonGroup();
         lfBox = new Box(BoxLayout.Y_AXIS);
