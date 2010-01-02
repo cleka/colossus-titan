@@ -2266,11 +2266,15 @@ public class WebClient extends KFrame implements IWebClient
             doUnenroll(enrolledInstantGameId);
         }
 
+        cancelOwnInstantGameOnLogout();
+
         logout();
 
         schedGameTable.removeAll();
         instGameTable.removeAll();
+        runGameTable.removeAll();
 
+        gameHash.clear();
         state = NotLoggedIn;
         setAdmin(false);
         loginField.setEnabled(true);
@@ -2280,6 +2284,19 @@ public class WebClient extends KFrame implements IWebClient
         options.setOption(Options.webClientPassword, this.password);
 
         options.saveOptions();
+    }
+
+    private void cancelOwnInstantGameOnLogout()
+    {
+        for (GameInfo gi : gameHash.values())
+        {
+            if (!gi.isScheduledGame()
+                && gi.getGameState().equals(GameState.PROPOSED)
+                && gi.getInitiator().equals(username))
+            {
+                server.cancelGame(gi.getGameId(), username);
+            }
+        }
     }
 
     private void doRegisterOrPasswordDialog(boolean register)
