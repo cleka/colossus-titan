@@ -1,0 +1,86 @@
+
+<html>
+<head>
+</head>
+<body>
+
+<h1>Public Game Server FAQ</h1>
+
+Or: questions what someone was wondering and/or what I would like the users to know...
+
+<h3>How are there 3 actual, when there are only 2 people online?</h3>
+
+<i>Actual</i> is the number of people enrolled. <i>Online</i> says how many of them are 
+currently also online.
+
+<h4>Instant games vs. Scheduled games</h4>
+
+For scheduled games one can logout and come back later, but stays enrolled (thus there can
+be more enrolled than currently online).
+<p />
+One can be enrolled to as many scheduled games as one wants (it does not even check overlapping times yet)
+<p />
+In contrast, to instant games, when one logs out, is also unenrolled from the game (from 0.10.1 on the game 
+is even canceled when the creator logs out). So for instant games, online will always be same as enrolled.
+<p>
+One can only be enrolled to one instant game at a time.
+<p />
+
+A game can be started when enough players have enrolled to it (actual &gt; min) and they all 
+are online.
+
+If not enough players ( actual >= min) enrolled AND online,  or the time scheduled time has not been
+reached yet, the game can simply not even be started.
+
+<h3>AI players</h3>
+
+<i>"No npcs? I thought it would auto-fill them if not enough people joined..."</i>
+<p>
+Unfortunately not.
+<p>
+AI's (robot players) ( I guess that's what you mean with "npcs" (non
+personal computer ... ?)  cannot be used yet.
+<p>
+The reason for that is the current implementation how games are actually 
+started (in the Colossus application itself) - the would run on the server and eat the CPU there.
+<p>
+As workaround you can login and enroll with one of the ready dummies
+dummy1, dummy2, dummy3 and dummy4 (password same as username)
+And when the boards come up put them to autoplay (= same as SimpleAI),
+and minimize their boards.
+<p>
+<b>Note:</b> You need to use <b>additionally started</b> Colossus instances for them - every 
+started Java instance can only be one player. Logon as another logs off the previous one.
+<p>
+I have already a "start the game on some player's PC" mode implemented
+but it's not fully ready to take it into use. In that mode one can add as many AIs as you wish.
+The problem there is the "NAT" problem (behind a firewall/DSL box that hides
+your real IP address); so this needs configuration on the player's PC/DSL box
+to firewall and NAT to enable the other players to connect to him.
+<p>
+[ Future plans involve also a relay/proxy mode (runs on players PC, but the
+public server acts as relay, and/or a "NAT punch" mode (it's possible to 
+make the other players PCs communicate with the host behind a NAT, they
+just can't initiate the contact by themselves. With the public server as
+"mediator" it could be done). ]
+<p>
+One day I also plan to have a "add AIs to run on "my" PC" mode even if
+game itself runs on the server.
+<p>
+
+<h3>I was looking at the timestamps here in the chat window - I was assuming that it was server time</h3>
+
+No. They are your local time, "naturally". Also the game start schedules
+etc. are shown by the GUI in your local time.
+<p>
+Local time of that server is German time :)
+
+<h3>what happened then? I got logged out of chat, then the entire game XXXXXXed off...</h3>
+
+That should not happen. However, as soon as the game reaches game over state
+the server (game server process) closes the connection.
+But the game client and the "web client" are *totally* distinct things,
+closing the one should not affect the other one.
+<p>
+
+</body>
