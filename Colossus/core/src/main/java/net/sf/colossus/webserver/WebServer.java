@@ -50,6 +50,8 @@ public class WebServer implements IWebServer, IRunWebServer
 
     private final IColossusMail mailObject;
 
+    private final int MIN_FREE_PORTS = 5;
+
     /**
      * Controls whether the GUI is shown or not.
      *
@@ -75,9 +77,10 @@ public class WebServer implements IWebServer, IRunWebServer
     // Used also as separator for storing proposed games to file:
     private final static String sep = IWebServer.WebProtocolSeparator;
 
-    // Server socket port where we listen for WebClient connections
-    private final int port;
+    /** Server port where we listen for WebClient connections */
+    private final int serverPort;
 
+    /** Server actual socket where we listen for WebClient connections */
     private ServerSocket serverSocket;
 
     private final ChatChannel generalChat = new ChatChannel(
@@ -114,7 +117,7 @@ public class WebServer implements IWebServer, IRunWebServer
         this.options = new WebServerOptions(optionsFile);
         options.loadOptions();
 
-        this.port = options
+        this.serverPort = options
             .getIntOptionNoUndef(WebServerConstants.optServerPort);
         this.maxClients = options
             .getIntOptionNoUndef(WebServerConstants.optMaxClients);
@@ -124,9 +127,38 @@ public class WebServer implements IWebServer, IRunWebServer
         int availablePorts = options
             .getIntOptionNoUndef(WebServerConstants.optAvailablePorts);
 
+        if (availablePorts < MIN_FREE_PORTS)
+        {
+            LOGGER.severe("Available ports from cf file is " + availablePorts
+                + " but according to MIN_FREE_PORTS it should be at least "
+                + MIN_FREE_PORTS + "! Exiting.");
+            System.exit(0);
+        }
         mailObject = new ColossusMail(options);
 
         portBookKeeper = new PortBookKeeper(portRangeFrom, availablePorts);
+        int freePorts = portBookKeeper.getFreePortsCount();
+
+        LOGGER.info("Actually free ports: " + freePorts);
+
+        if (freePorts < MIN_FREE_PORTS)
+        {
+            LOGGER.severe("Too few (only " + freePorts
+                + ") free playing ports! Exiting.");
+            System.exit(0);
+        }
+
+        if (freePorts < availablePorts)
+        {
+            LOGGER.warning("Only " + freePorts + " free ports, instead of "
+                + availablePorts);
+        }
+        else if (freePorts < (availablePorts / 2))
+        {
+            LOGGER.severe("Not even half the amount of expected ports ("
+                + freePorts + " of " + availablePorts + ") is free!");
+            System.exit(0);
+        }
 
         // Load users from file:
         String usersFile = options
@@ -146,7 +178,7 @@ public class WebServer implements IWebServer, IRunWebServer
         }
         readGamesFromFile(proposedGamesFilename, proposedGames);
 
-        LOGGER.log(Level.INFO, "Server started: port " + port
+        LOGGER.log(Level.INFO, "Server started: port " + serverPort
             + ", maxClients " + maxClients);
 
         generalChat.createWelcomeMessage();
@@ -170,7 +202,7 @@ public class WebServer implements IWebServer, IRunWebServer
          */
 
         LOGGER.log(Level.FINEST, "WebServer instantiated, maxClients = "
-            + maxClients + " , port = " + port);
+            + maxClients + " , port = " + serverPort);
     }
 
     void runSocketServer()
@@ -178,8 +210,8 @@ public class WebServer implements IWebServer, IRunWebServer
         int socketQueueLen = options
             .getIntOptionNoUndef(WebServerConstants.optSocketQueueLen);
 
-        LOGGER.log(Level.FINEST, "About to create server socket on port "
-            + port);
+        LOGGER.log(Level.FINE, "About to create web server socket on port "
+            + serverPort);
         try
         {
             if (serverSocket != null)
@@ -187,13 +219,14 @@ public class WebServer implements IWebServer, IRunWebServer
                 serverSocket.close();
                 serverSocket = null;
             }
-            serverSocket = new ServerSocket(port, socketQueueLen);
+            serverSocket = new ServerSocket(serverPort, socketQueueLen);
             serverSocket.setReuseAddress(true);
         }
         catch (IOException ex)
         {
-            LOGGER.log(Level.FINEST, "Could not create socket. "
-                + "Configure networking in OS.", ex);
+
+            LOGGER.log(Level.SEVERE, "Could not create socket on port " + serverPort
+                + ": " + ex.getMessage());
             System.exit(1);
         }
 
@@ -263,7 +296,7 @@ public class WebServer implements IWebServer, IRunWebServer
         // accept().
         try
         {
-            Socket socket = new Socket("localhost", port);
+            Socket socket = new Socket("localhost", serverPort);
             socket.close();
         }
         // UnknownHostException, IOException, IllegalBlockingModeException
@@ -620,7 +653,7 @@ public class WebServer implements IWebServer, IRunWebServer
             boolean success = startOneGame(gi);
             proposedGamesListModified = true;
 
-            LOGGER.log(Level.FINEST, "Found gi, got port " + port);
+            LOGGER.log(Level.FINEST, "Found gi, got port " + gi.getPort());
             if (!success)
             {
                 LOGGER.log(Level.SEVERE, "\nstarting/running game " + gameId
@@ -836,7 +869,9 @@ public class WebServer implements IWebServer, IRunWebServer
     {
         boolean success = false;
 
-        int port = portBookKeeper.getFreePort();
+        LOGGER.fine("Calling getFreePort for game " + gi.getGameId());
+
+        int port = portBookKeeper.getFreePort("game " + gi.getGameId());
         if (port == -1)
         {
             LOGGER.log(Level.SEVERE, "No free ports!!");
@@ -844,7 +879,7 @@ public class WebServer implements IWebServer, IRunWebServer
         }
 
         gi.setPort(port);
-        LOGGER.log(Level.FINEST, "startOneGame, id " + gi.getGameId());
+        LOGGER.fine("Using port " + port + " for game " + gi.getGameId());
 
         RunGameInOwnJVM gr = new RunGameInOwnJVM(this, options, gi);
         gi.setGameRunner(gr);
@@ -859,12 +894,13 @@ public class WebServer implements IWebServer, IRunWebServer
         {
             // System.out.println("starting GameRunner thread");
             gr.start();
-            LOGGER.log(Level.FINEST, "Returned from starter");
+            LOGGER.fine("Returned from starter for game " + gi.getGameId());
 
             updateGUI();
         }
 
-        LOGGER.log(Level.FINEST, "port is " + port);
+        LOGGER.fine("Successfully started game " + gi.getGameId()
+            + " on port " + port);
         success = true;
         return success;
     }
@@ -874,31 +910,30 @@ public class WebServer implements IWebServer, IRunWebServer
      * keep in endingGames until it's reaped
      */
 
-    public void unregisterGame(GameInfo st, int port)
+    public void unregisterGame(GameInfo gi, int port)
     {
-        portBookKeeper.releasePort(port);
         //        System.out.println("runningGames: " + runningGames.toString());
         synchronized (runningGames)
         {
             LOGGER.log(Level.FINEST, "trying to remove...");
-            if (runningGames.contains(st))
+            if (runningGames.contains(gi))
             {
                 // System.out.println("removing");
                 LOGGER.log(Level.FINEST, "removing...");
-                runningGames.remove(st);
+                runningGames.remove(gi);
             }
             else
             {
                 LOGGER.warning("runningGames does not contain game "
-                    + st.getGameId());
+                    + gi.getGameId());
             }
         }
         synchronized (endingGames)
         {
-            endingGames.add(st);
+            endingGames.add(gi);
         }
-        st.setState(GameState.ENDING);
-        allTellGameInfo(st);
+        gi.setState(GameState.ENDING);
+        allTellGameInfo(gi);
 
         GameThreadReaper r = new GameThreadReaper();
         r.start();
@@ -1017,7 +1052,7 @@ public class WebServer implements IWebServer, IRunWebServer
             throw new RuntimeException("gameFile filename is null!");
         }
 
-        LOGGER.log(Level.FINE, "Storing proposed games to file " + filename);
+        // LOGGER.log(Level.FINE, "Storing proposed games to file " + filename);
 
         PrintWriter out = null;
         try
@@ -1128,7 +1163,11 @@ public class WebServer implements IWebServer, IRunWebServer
                             try
                             {
                                 ((RunGameInOwnJVM)gos).join();
-                                LOGGER.log(Level.FINE, "        ok, ended...");
+                                LOGGER.log(Level.FINE,
+                                    "        ok, ended... releasing port "
+                                        + gi.getPort());
+                                portBookKeeper.releasePort(gi.getPort(),
+                                    "game " + gi.getGameId());
                             }
                             catch (InterruptedException e)
                             {

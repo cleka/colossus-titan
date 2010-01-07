@@ -20,6 +20,7 @@ public class PortBookKeeper
 
     private final int portRangeFrom;
     private final int availablePorts;
+    private final int freePorts;
 
     private final boolean[] portUsed;
 
@@ -29,14 +30,34 @@ public class PortBookKeeper
         this.availablePorts = availablePorts;
 
         portUsed = new boolean[availablePorts];
+        int freePorts = 0;
 
         for (int i = 0; i < availablePorts; i++)
         {
-            portUsed[i] = false;
+            int port = portRangeFrom + i;
+            boolean free = testWhetherPortFree(port);
+            if (free)
+            {
+                portUsed[i] = false;
+                freePorts++;
+            }
+            else
+            {
+                LOGGER.warning("Free port table initialization: Port " + port
+                    + " seems to be in use! Marking it as in use.");
+                portUsed[i] = true;
+            }
         }
+
+        this.freePorts = freePorts;
     }
 
-    public int getFreePort()
+    public int getFreePortsCount()
+    {
+        return freePorts;
+    }
+
+    public int getFreePort(String purpose)
     {
         int port = -1;
         synchronized (portUsed)
@@ -61,12 +82,36 @@ public class PortBookKeeper
                 }
             }
         }
-        LOGGER.log(Level.FINEST, "reserving port " + port);
+
+        if (port > 0)
+        {
+            LOGGER
+                .log(Level.INFO, "Reserved port " + port + " for " + purpose);
+        }
+
+        ensureSomeFreePortsRemain();
 
         return port;
     }
 
+    /** Check that it's really free, as expected, log a warning if not */
     private boolean testThatPortReallyFree(int port)
+    {
+        if (!testWhetherPortFree(port))
+        {
+            LOGGER.warning("Port " + port
+                + " is supposed to be free but it is not!");
+            portUsed[port] = true;
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+    /** Just check it, whether it's free or not */
+    private boolean testWhetherPortFree(int port)
     {
         boolean ok = false;
         ServerSocket serverSocket = null;
@@ -74,30 +119,68 @@ public class PortBookKeeper
         {
             serverSocket = new ServerSocket(port, 1);
             serverSocket.setReuseAddress(true);
+            serverSocket.close();
             ok = true;
         }
         catch (IOException e)
         {
-            LOGGER.log(Level.WARNING, "testThatPortReallyFree IOException "
-                + "while attempting to open", e);
-        }
+            LOGGER.info("Caught IOException "
+                + "while attempting to creating socket on port " + port);
 
-        try
-        {
-            if (serverSocket != null)
+            String msg = e.getMessage();
+            if (msg == null || !msg.equals("Address already in use: JVM_Bind"))
             {
-                serverSocket.close();
+                LOGGER.log(Level.WARNING,
+                    "Unrecognized exception while checking port " + port
+                        + " whether it is free: ", e);
             }
         }
-        catch (IOException e)
-        {
-            LOGGER.log(Level.WARNING, "testThatPortReallyFree IOException "
-                + "while attempting to close", e);
-        }
+
         return ok;
     }
 
-    public void releasePort(int port)
+    private void ensureSomeFreePortsRemain()
+    {
+        int seemsFree = 0;
+        synchronized (portUsed)
+        {
+            for (int i = 0; i < availablePorts; i += 2)
+            {
+                if (!portUsed[i])
+                {
+                    seemsFree++;
+                }
+            }
+        }
+        if (seemsFree < 3)
+        {
+            LOGGER.info("Only " + seemsFree
+                + " ports are registered as free. Rechecking...");
+
+            reCheckPorts();
+        }
+    }
+
+    private void reCheckPorts()
+    {
+        for (int i = 0; i < availablePorts; i++)
+        {
+            int port = portRangeFrom + i;
+            boolean shouldBeFree = portUsed[i];
+            boolean free = testWhetherPortFree(port);
+            if (free != shouldBeFree)
+            {
+                LOGGER.warning("Port " + port + " was marked as "
+                    + (shouldBeFree ? "free" : "not free")
+                    + " but actually it is " + (free ? "free" : "not free")
+                    + "! Updating table.");
+                portUsed[i] = free;
+            }
+        }
+
+    }
+
+    public void releasePort(int port, String purpose)
     {
         int index = port - portRangeFrom;
         if (index < 0 || index > availablePorts)
@@ -105,9 +188,15 @@ public class PortBookKeeper
             LOGGER.log(Level.WARNING, "attempt to release invalid port "
                 + port + " (index = " + index + ")!");
         }
+        else if (!testWhetherPortFree(port))
+        {
+            LOGGER.log(Level.WARNING, "attempt to release port " + port + " ("
+                + purpose + ") but test indicates that it is still in use!");
+        }
         else
         {
             portUsed[index] = false;
+            LOGGER.info("Released port " + port + " (" + purpose + ")");
         }
     }
 }
