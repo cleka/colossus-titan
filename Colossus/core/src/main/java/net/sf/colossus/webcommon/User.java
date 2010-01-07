@@ -283,7 +283,7 @@ public class User
             String created = makeUserlineDate(new Date().getTime());
             String lastOnline = makeUserlineDate(new Date().getTime());
             String cCode = makeConfirmationCode();
-            LOGGER.info("Confirmation code for user " + username + " is: "
+            LOGGER.fine("Confirmation code for user " + username + " is: "
                 + cCode);
 
             User u = new User(username, password, email, isAdmin, created,
@@ -513,7 +513,7 @@ public class User
             System.exit(1);
         }
 
-        LOGGER.log(Level.FINE, "Storing users back to file " + filename);
+        // LOGGER.log(Level.FINE, "Storing users back to file " + filename);
 
         PrintWriter out = null;
         try
