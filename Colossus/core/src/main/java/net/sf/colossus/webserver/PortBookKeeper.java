@@ -32,7 +32,7 @@ public class PortBookKeeper
         portUsed = new boolean[availablePorts];
         int freePorts = 0;
 
-        for (int i = 0; i < availablePorts; i++)
+        for (int i = 0; i < availablePorts; i += 2)
         {
             int port = portRangeFrom + i;
             boolean free = testWhetherPortFree(port);
@@ -163,7 +163,7 @@ public class PortBookKeeper
 
     private void reCheckPorts()
     {
-        for (int i = 0; i < availablePorts; i++)
+        for (int i = 0; i < availablePorts; i += 2)
         {
             int port = portRangeFrom + i;
             boolean shouldBeFree = portUsed[i];
