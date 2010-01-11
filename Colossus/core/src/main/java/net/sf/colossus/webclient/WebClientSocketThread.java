@@ -448,6 +448,14 @@ public class WebClientSocketThread extends Thread implements IWebServer
                     webClient.chatDeliver(chatId, when, sender, message,
                         resent);
                 }
+
+                else if (command.equals(IWebClient.systemMessage))
+                {
+                    String message = tokens[1];
+                    String title = tokens[2];
+                    boolean error = Boolean.valueOf(tokens[3]).booleanValue();
+                    webClient.deliverSystemMessage(message, title, error);
+                }
                 else if (command.equals(IWebClient.grantAdmin))
                 {
                     webClient.grantAdminStatus();
