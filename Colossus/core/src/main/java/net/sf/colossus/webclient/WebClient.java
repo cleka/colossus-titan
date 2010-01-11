@@ -89,6 +89,8 @@ public class WebClient extends KFrame implements IWebClient
     private static final Logger LOGGER = Logger.getLogger(WebClient.class
         .getName());
 
+    final static int WEB_CLIENT_VERSION = 1;
+
     // TODO make this all based on Locale.getDefault()
     // Initially: use German. To make it variable, need also to set
     // the default values / info texts according to Locale.
@@ -331,6 +333,11 @@ public class WebClient extends KFrame implements IWebClient
             {/* ignore */
             }
         }
+    }
+
+    public int getClientVersion()
+    {
+        return WEB_CLIENT_VERSION;
     }
 
     private void initValues(String hostname, int port, String login,
@@ -2414,7 +2421,7 @@ public class WebClient extends KFrame implements IWebClient
     {
         startButton.setEnabled(false);
         startLocallyButton.setEnabled(false);
-        server.startGame(gameId);
+        server.startGame(gameId, new User(username));
 
         return true;
     }
@@ -2730,6 +2737,13 @@ public class WebClient extends KFrame implements IWebClient
         }
     }
 
+    public void deliverSystemMessage(String title, String message,
+        boolean error)
+    {
+        JOptionPane.showMessageDialog(this, message, title,
+            error ? JOptionPane.ERROR_MESSAGE
+                : JOptionPane.INFORMATION_MESSAGE);
+    }
     // Game Client tells us this when user closes the masterboard
     public void tellGameEnds()
     {

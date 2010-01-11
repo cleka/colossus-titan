@@ -43,6 +43,11 @@ public class CmdLineWebClient implements IWebClient
 
     }
 
+    public int getClientVersion()
+    {
+        return WebClient.WEB_CLIENT_VERSION;
+    }
+
     /**
      * @param args
      */
@@ -125,6 +130,14 @@ public class CmdLineWebClient implements IWebClient
     {
         // TODO Auto-generated method stub
 
+    }
+
+    public void deliverSystemMessage(String message, String title,
+        boolean error)
+    {
+        System.out.println((error ? "ERROR" : "INFO")
+            + " system message: title '" + title + "', message text: '"
+            + message + "'");
     }
 
     public void connectionReset(boolean forcedLogout)

@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import net.sf.colossus.webcommon.GameInfo;
 import net.sf.colossus.webcommon.IWebClient;
 import net.sf.colossus.webcommon.IWebServer;
+import net.sf.colossus.webcommon.User;
 
 
 /**
@@ -284,7 +285,9 @@ public class WebClientSocketThread extends Thread implements IWebServer
             this.in = new BufferedReader(new InputStreamReader(socket
                 .getInputStream()));
 
-            send(Login + sep + username + sep + password + sep + force);
+            int version = webClient.getClientVersion();
+            send(Login + sep + username + sep + password + sep + force + sep
+                + version);
             String fromServer = null;
 
             if ((fromServer = getOneLine()) != null)
@@ -648,9 +651,9 @@ public class WebClientSocketThread extends Thread implements IWebServer
         send(Cancel + sep + gameId + sep + byUser);
     }
 
-    public void startGame(String gameId)
+    public void startGame(String gameId, User byUser)
     {
-        send(Start + sep + gameId);
+        send(Start + sep + gameId + sep + byUser.getName());
     }
 
     public void informStartedByPlayer(String gameId)

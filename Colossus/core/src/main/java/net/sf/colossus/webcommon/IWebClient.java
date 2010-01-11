@@ -22,6 +22,7 @@ public interface IWebClient
     public static final String gameStartsSoon = "gameStartsSoon";
     public static final String gameCancelled = "gameCancelled";
     public static final String chatDeliver = "chatDeliver";
+    public static final String systemMessage = "systemMessage";
 
     public void grantAdminStatus();
 
@@ -46,5 +47,10 @@ public interface IWebClient
         String message, boolean resent);
 
     public void connectionReset(boolean forcedLogout);
+
+    public int getClientVersion();
+
+    public void deliverSystemMessage(String message, String title,
+        boolean error);
 
 }

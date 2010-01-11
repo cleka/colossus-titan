@@ -39,6 +39,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
     private BufferedReader in;
     private PrintWriter out;
     private User user = null;
+    private int clientVersion = 0;
 
     private boolean loggedIn = false;
 
@@ -80,6 +81,11 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
     User getUser()
     {
         return this.user;
+    }
+
+    public int getClientVersion()
+    {
+        return clientVersion;
     }
 
     public synchronized void tellToTerminate()
@@ -240,12 +246,23 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
         {
             LOGGER.log(Level.FINEST, "client attempts login.");
             ok = false;
-            if (tokens.length >= 3)
+            if (tokens.length >= 4)
             {
                 String username = tokens[1];
                 String password = tokens[2];
                 boolean force = Boolean.valueOf(tokens[3]).booleanValue();
+                if (tokens.length >= 5)
+                {
+                    // Only clients version 1 or later send this, otherwise it
+                    // says 0 (default initialization).
+                    clientVersion = Integer.parseInt(tokens[4]);
+                }
 
+                LOGGER.info("User " + username + " clientVersion "
+                    + clientVersion + " attempts login.");
+
+                System.out.println("User " + username + " clientVersion "
+                    + clientVersion + " attempts login.");
                 reason = User.verifyLogin(username, password);
 
                 /*
@@ -292,7 +309,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             }
             else
             {
-                reason = "Username or password missing.";
+                reason = "Username, password or 'force' parameter is missing.";
                 ok = false;
                 done = true;
             }
@@ -406,8 +423,24 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
         }
         else if (command.equals(IWebServer.Start))
         {
+            System.out.println("len " + tokens.length);
             String gameId = tokens[1];
-            server.startGame(gameId);
+            User byUser = user;
+            if (tokens.length >= 3)
+            {
+                String byUserName = tokens[2];
+                if (!byUserName.equals(user.getName()))
+                {
+                    LOGGER.warning("startGame received byUserName is '"
+                        + byUserName + "', but received from user '"
+                        + user.getName() + "'?!?");
+                }
+                else
+                {
+                    byUser = User.findUserByName(byUserName);
+                }
+            }
+            server.startGame(gameId, byUser);
         }
         else if (command.equals(IWebServer.StartAtPlayer))
         {
@@ -645,6 +678,12 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             + ": " + chatId + ", " + sender + ": " + message);
         sendToClient(chatDeliver + sep + chatId + sep + when + sep + sender
             + sep + message + sep + resent);
+    }
+
+    public void deliverSystemMessage(String message, String title,
+        boolean error)
+    {
+        sendToClient(systemMessage + sep + message + sep + title + sep + error);
     }
 
     public void connectionReset(boolean forcedLogout)

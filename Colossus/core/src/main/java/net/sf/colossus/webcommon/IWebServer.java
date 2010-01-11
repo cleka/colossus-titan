@@ -62,7 +62,7 @@ public interface IWebServer
     public void startGameOnPlayerHost(String gameId, String hostingPlayer,
         String playerHost, int port);
 
-    public void startGame(String gameId);
+    public void startGame(String gameId, User user);
 
     // Game started on players computer, tell WebServer that
     // he can inform all WebClient that game started successfully

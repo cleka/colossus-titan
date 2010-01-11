@@ -512,7 +512,6 @@ public class WebServer implements IWebServer, IRunWebServer
     public void tellEnrolledGameStartsSoon(GameInfo gi)
     {
         String gameId = gi.getGameId();
-        gi.setState(GameState.ACTIVATED);
 
         ArrayList<User> players = gi.getPlayers();
         Iterator<User> it = players.iterator();
@@ -647,19 +646,54 @@ public class WebServer implements IWebServer, IRunWebServer
         updateGUI();
     }
 
-    public void startGame(String gameId)
+    public void startGame(String gameId, User byUser)
     {
         GameInfo gi = findByGameId(gameId);
         if (gi != null)
         {
-            boolean success = startOneGame(gi);
+            synchronized (gi)
+            {
+                attemptStartOnServer(gi, byUser);
+            }
+        }
+        else
+        {
+            LOGGER.warning("Did not find a GameInfo for gameId " + gameId
+                + " to start it on the server!");
+        }
+
+    }
+
+    private void attemptStartOnServer(GameInfo gi, User byUser)
+    {
+        if (!gi.isStartable())
+        {
+            LOGGER
+                .warning("User "
+                    + byUser.getName()
+                    + " attempted to start game "
+                    + gi.getGameId()
+                    + ", but it is already running or start attempt in progress (state="
+                    + gi.getGameState() + ")!");
+        }
+        else
+        {
+            gi.markStarting(byUser);
+
+            String reason = startOneGame(gi);
+
             proposedGamesListModified = true;
 
-            LOGGER.log(Level.FINEST, "Found gi, got port " + gi.getPort());
-            if (!success)
+            if (reason == null)
             {
-                LOGGER.log(Level.SEVERE, "\nstarting/running game " + gameId
-                    + " failed!!\n");
+                LOGGER.log(Level.FINE, "Found gi, got port " + gi.getPort());
+            }
+            else
+            {
+                LOGGER.log(Level.SEVERE, "starting/running game "
+                    + gi.getGameId() + " failed!!\n");
+                informAllEnrolledThatStartFailed(gi, reason);
+                gi.cancelStarting();
             }
         }
     }
@@ -711,6 +745,28 @@ public class WebServer implements IWebServer, IRunWebServer
                 + "any game for gameId " + gameId);
         }
         proposedGamesListModified = true;
+    }
+
+    public void informAllEnrolledThatStartFailed(GameInfo gi, String reason)
+    {
+        ArrayList<User> users = gi.getPlayers();
+        for (User u : users)
+        {
+            String message = "Starting game with gameId " + gi.getGameId()
+                + ", initiated by player " + gi.getStartingUser().getName()
+                + " failed; reason: " + reason;
+            LOGGER.info("Informing player " + u.getName() + ", that "
+                + message);
+            IWebClient webClient = (IWebClient)u.getThread();
+            if (webClient.getClientVersion() >= 1)
+            {
+                // for the starting user it's an error, others just info
+                boolean error = u.getName().equals(
+                    gi.getStartingUser().getName());
+                webClient.deliverSystemMessage(message, "Game start failed!",
+                    error);
+            }
+        }
     }
 
     public void informLocallyGameOver(String gameId)
@@ -867,17 +923,19 @@ public class WebServer implements IWebServer, IRunWebServer
         return gr;
     }
 
-    private boolean startOneGame(GameInfo gi)
+    private String startOneGame(GameInfo gi)
     {
-        boolean success = false;
+        // Reason for failure
+        String reason = null;
 
         LOGGER.fine("Calling getFreePort for game " + gi.getGameId());
 
         int port = portBookKeeper.getFreePort("game " + gi.getGameId());
         if (port == -1)
         {
-            LOGGER.log(Level.SEVERE, "No free ports!!");
-            return false;
+            reason = "No free ports!!";
+            LOGGER.log(Level.SEVERE, reason);
+            return reason;
         }
 
         gi.setPort(port);
@@ -889,8 +947,9 @@ public class WebServer implements IWebServer, IRunWebServer
 
         if (!ok)
         {
-            LOGGER.log(Level.WARNING, "makeRunningGame returned false?!?");
-            return false;
+            reason = "makeRunningGame returned false?!?";
+            LOGGER.log(Level.WARNING, reason);
+            return reason;
         }
         else
         {
@@ -903,8 +962,9 @@ public class WebServer implements IWebServer, IRunWebServer
 
         LOGGER.fine("Successfully started game " + gi.getGameId()
             + " on port " + port);
-        success = true;
-        return success;
+
+        // failureReason == null means success
+        return reason;
     }
 
     /*

@@ -39,6 +39,9 @@ public class GameInfo
 
     private GameType type;
     private GameState state;
+    /** temporary backup during startingAttempt */
+    private GameState oldState;
+    private User startingUser = null;
 
     private int portNr = -1;
     private String hostingHost = "";
@@ -678,6 +681,29 @@ public class GameInfo
     public boolean relevantForSaving()
     {
         return state.equals(GameState.PROPOSED) || state.equals(GameState.DUE);
+    }
+
+    public boolean isStartable()
+    {
+        return state.equals(GameState.PROPOSED) || state.equals(GameState.DUE);
+    }
+
+    public void markStarting(User starter)
+    {
+        this.startingUser = starter;
+        this.oldState = state;
+        this.state = GameState.ACTIVATED;
+    }
+
+    public void cancelStarting()
+    {
+        this.state = oldState;
+        this.startingUser = null;
+    }
+
+    public User getStartingUser()
+    {
+        return startingUser;
     }
 
     /**
