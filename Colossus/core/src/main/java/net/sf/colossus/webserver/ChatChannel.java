@@ -1,11 +1,10 @@
 package net.sf.colossus.webserver;
 
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 
+import net.sf.colossus.webcommon.ChatMessage;
 import net.sf.colossus.webcommon.IWebClient;
 import net.sf.colossus.webcommon.User;
 
@@ -16,12 +15,12 @@ public class ChatChannel
     //    .getName());
 
     private final String chatId;
+    private final ChatMsgStorage storage;
 
-    private final List<ChatMessage> lastNChatMessages = new ArrayList<ChatMessage>();
-
-    public ChatChannel(String id)
+    public ChatChannel(String id, WebServerOptions options)
     {
         this.chatId = id;
+        this.storage = new ChatMsgStorage(this, options);
     }
 
     public String getChannelId()
@@ -29,35 +28,26 @@ public class ChatChannel
         return chatId;
     }
 
+    public void dispose()
+    {
+        storage.dispose();
+    }
+
     public void createWelcomeMessage()
     {
         long now = new Date().getTime();
         ChatMessage startMsg = new ChatMessage(this.chatId, now, "SYSTEM",
             "WebServer started. Welcome!!");
-        storeMessage(startMsg);
+        storage.storeMessage(startMsg);
     }
 
     public void createStoreAndDeliverMessage(String sender, String message)
     {
         long now = new Date().getTime();
-        ChatChannel.ChatMessage msg = new ChatChannel.ChatMessage(this.chatId,
+        ChatMessage msg = new ChatMessage(this.chatId,
             now, sender, message);
-        storeMessage(msg);
+        storage.storeMessage(msg);
         deliverMessage(msg);
-    }
-
-    private void storeMessage(ChatChannel.ChatMessage msg)
-    {
-        List<ChatChannel.ChatMessage> list = lastNChatMessages;
-        synchronized (list)
-        {
-            list.add(msg);
-            if (list.size() > WebServerConstants.keepLastNMessages)
-            {
-                // if longer than max, remove oldest one
-                list.remove(0);
-            }
-        }
     }
 
     private void deliverMessage(ChatMessage msg)
@@ -77,54 +67,14 @@ public class ChatChannel
             msg.getMessage(), isResent);
     }
 
-    public void tellLastMessagesToOne(IWebClient client)
+    public synchronized void tellLastMessagesToOne(IWebClient client)
     {
-        synchronized (lastNChatMessages)
+        for (ChatMessage msg : storage.getLastNChatMessages())
         {
-            for (ChatMessage msg : lastNChatMessages)
-            {
-                deliverMessageToClient(msg, client, true);
-            }
-            long now = new Date().getTime();
-            client.chatDeliver(chatId, now, null, null, true);
+            deliverMessageToClient(msg, client, true);
         }
-    }
-
-    static class ChatMessage
-    {
-        String chatId;
-        long when;
-        String sender;
-        String message;
-
-        public ChatMessage(String chatId, long when, String sender,
-            String message)
-        {
-            this.chatId = chatId;
-            this.when = when;
-            this.sender = sender;
-            this.message = message;
-        }
-
-        public String getChatId()
-        {
-            return this.chatId;
-        }
-
-        public long getWhen()
-        {
-            return this.when;
-        }
-
-        public String getSender()
-        {
-            return this.sender;
-        }
-
-        public String getMessage()
-        {
-            return this.message;
-        }
+        long now = new Date().getTime();
+        client.chatDeliver(chatId, now, null, null, true);
     }
 
 }

@@ -83,8 +83,7 @@ public class WebServer implements IWebServer, IRunWebServer
     /** Server actual socket where we listen for WebClient connections */
     private ServerSocket serverSocket;
 
-    private final ChatChannel generalChat = new ChatChannel(
-        IWebServer.generalChatName);
+    private final ChatChannel generalChat;
 
     public static void main(String[] args)
     {
@@ -116,6 +115,7 @@ public class WebServer implements IWebServer, IRunWebServer
     {
         this.options = new WebServerOptions(optionsFile);
         options.loadOptions();
+        this.generalChat = new ChatChannel(IWebServer.generalChatName, options);
 
         this.serverPort = options
             .getIntOptionNoUndef(WebServerConstants.optServerPort);
@@ -249,6 +249,8 @@ public class WebServer implements IWebServer, IRunWebServer
 
         User.storeUsersToFile();
         User.cleanup();
+
+        generalChat.dispose();
 
         gui.shutdown();
         gui = null;

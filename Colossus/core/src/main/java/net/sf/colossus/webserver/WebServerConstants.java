@@ -12,6 +12,9 @@ public final class WebServerConstants
 
     public final static String defaultOptionsFilename = "WebServer.cf";
 
+    /** for now, only used for chat messages storage file(s) */
+    public final static String optDataDirectory = "DataDirectory";
+
     // keys for the options inside the Web Server options file:
     public final static String optServerPort = "ServerPort";
     public final static String optSocketQueueLen = "SocketQueueLen";
