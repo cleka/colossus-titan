@@ -449,12 +449,14 @@ public class WebClientSocketThread extends Thread implements IWebServer
                         resent);
                 }
 
-                else if (command.equals(IWebClient.systemMessage))
+                else if (command.equals(IWebClient.generalMessage))
                 {
-                    String message = tokens[1];
-                    String title = tokens[2];
-                    boolean error = Boolean.valueOf(tokens[3]).booleanValue();
-                    webClient.deliverSystemMessage(message, title, error);
+                    long when = Long.parseLong(tokens[1]);
+                    boolean error = Boolean.valueOf(tokens[2]).booleanValue();
+                    String title = tokens[3];
+                    String message = tokens[4];
+                    webClient.deliverGeneralMessage(when, error, title,
+                        message);
                 }
                 else if (command.equals(IWebClient.grantAdmin))
                 {

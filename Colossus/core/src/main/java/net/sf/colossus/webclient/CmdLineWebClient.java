@@ -132,11 +132,11 @@ public class CmdLineWebClient implements IWebClient
 
     }
 
-    public void deliverSystemMessage(String message, String title,
-        boolean error)
+    public void deliverGeneralMessage(long when, boolean error,
+        String title, String message)
     {
         System.out.println((error ? "ERROR" : "INFO")
-            + " system message: title '" + title + "', message text: '"
+            + " general message: title '" + title + "', message text: '"
             + message + "'");
     }
 

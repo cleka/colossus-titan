@@ -2737,10 +2737,18 @@ public class WebClient extends KFrame implements IWebClient
         }
     }
 
-    public void deliverSystemMessage(String title, String message,
-        boolean error)
+    public void deliverGeneralMessage(long when, boolean error, String title,
+        String message)
     {
-        JOptionPane.showMessageDialog(this, message, title,
+        String whenText = "";
+        if (when != 0)
+        {
+            Calendar now = Calendar.getInstance(myLocale);
+            String nowDateString = myDateFormat.format(now.getTime());
+            String nowTimeString = myTimeFormat.format(now.getTime());
+            whenText = "At " + nowDateString + " " + nowTimeString + ":\n";
+        }
+        JOptionPane.showMessageDialog(this, whenText + message, title,
             error ? JOptionPane.ERROR_MESSAGE
                 : JOptionPane.INFORMATION_MESSAGE);
     }

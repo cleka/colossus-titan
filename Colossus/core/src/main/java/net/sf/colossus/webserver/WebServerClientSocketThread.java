@@ -258,11 +258,9 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
                     clientVersion = Integer.parseInt(tokens[4]);
                 }
 
-                LOGGER.info("User " + username + " clientVersion "
-                    + clientVersion + " attempts login.");
+                LOGGER.info("User " + username
+                    + " attempts login with client version " + clientVersion);
 
-                System.out.println("User " + username + " clientVersion "
-                    + clientVersion + " attempts login.");
                 reason = User.verifyLogin(username, password);
 
                 /*
@@ -423,7 +421,6 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
         }
         else if (command.equals(IWebServer.Start))
         {
-            System.out.println("len " + tokens.length);
             String gameId = tokens[1];
             User byUser = user;
             if (tokens.length >= 3)
@@ -680,10 +677,11 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             + sep + message + sep + resent);
     }
 
-    public void deliverSystemMessage(String message, String title,
-        boolean error)
+    public void deliverGeneralMessage(long when, boolean error, String title,
+        String message)
     {
-        sendToClient(systemMessage + sep + message + sep + title + sep + error);
+        sendToClient(generalMessage + sep + when + sep + error + sep + title
+            + sep + message);
     }
 
     public void connectionReset(boolean forcedLogout)

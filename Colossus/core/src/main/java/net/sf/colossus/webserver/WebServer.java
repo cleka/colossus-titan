@@ -690,8 +690,8 @@ public class WebServer implements IWebServer, IRunWebServer
             }
             else
             {
-                LOGGER.log(Level.SEVERE, "starting/running game "
-                    + gi.getGameId() + " failed!!\n");
+                LOGGER.warning("starting/running game " + gi.getGameId()
+                    + " failed!!");
                 informAllEnrolledThatStartFailed(gi, reason);
                 gi.cancelStarting();
             }
@@ -753,8 +753,8 @@ public class WebServer implements IWebServer, IRunWebServer
         for (User u : users)
         {
             String message = "Starting game with gameId " + gi.getGameId()
-                + ", initiated by player " + gi.getStartingUser().getName()
-                + " failed; reason: " + reason;
+                + " (initiated by player " + gi.getStartingUser().getName()
+                + ") failed. Reason: " + reason;
             LOGGER.info("Informing player " + u.getName() + ", that "
                 + message);
             IWebClient webClient = (IWebClient)u.getThread();
@@ -763,8 +763,10 @@ public class WebServer implements IWebServer, IRunWebServer
                 // for the starting user it's an error, others just info
                 boolean error = u.getName().equals(
                     gi.getStartingUser().getName());
-                webClient.deliverSystemMessage(message, "Game start failed!",
-                    error);
+                // when == 0: do not show a specific time
+                long when = 0;
+                webClient.deliverGeneralMessage(when, error,
+                    "Game start failed!", message);
             }
         }
     }
@@ -934,7 +936,7 @@ public class WebServer implements IWebServer, IRunWebServer
         if (port == -1)
         {
             reason = "No free ports!!";
-            LOGGER.log(Level.SEVERE, reason);
+            LOGGER.warning(reason);
             return reason;
         }
 

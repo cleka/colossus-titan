@@ -22,7 +22,7 @@ public interface IWebClient
     public static final String gameStartsSoon = "gameStartsSoon";
     public static final String gameCancelled = "gameCancelled";
     public static final String chatDeliver = "chatDeliver";
-    public static final String systemMessage = "systemMessage";
+    public static final String generalMessage = "generalMessage";
 
     public void grantAdminStatus();
 
@@ -50,7 +50,7 @@ public interface IWebClient
 
     public int getClientVersion();
 
-    public void deliverSystemMessage(String message, String title,
-        boolean error);
+    public void deliverGeneralMessage(long when, boolean error,
+        String title, String message);
 
 }
