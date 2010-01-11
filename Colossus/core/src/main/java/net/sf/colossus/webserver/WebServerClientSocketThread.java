@@ -174,10 +174,21 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             if (fromClient != null)
             {
                 done = parseLine(fromClient);
-                LOGGER.log(Level.FINEST, "parseLine returns done = " + done);
+                String username = user.getName();
+                if (done)
+                {
+                    LOGGER.finest("user " + username + ": parseLine for '"
+                        + fromClient + "' returns done = " + done);
+                }
+                else
+                {
+                    LOGGER.finest("user " + username + ": parseLine for '"
+                        + fromClient + "' returns done = " + done);
+                }
             }
             else
             {
+                LOGGER.finest("fromClient is null; setting done = true.");
                 done = true;
             }
         }
