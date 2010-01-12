@@ -192,7 +192,6 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
                     LOGGER.warning("Try to get username, but user is null?");
                 }
 
-                username = user.getName();
                 if (done)
                 {
                     LOGGER.finest("user " + username + ": parseLine for '"
