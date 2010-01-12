@@ -193,6 +193,7 @@ public class WebClient extends KFrame implements IWebClient
     private JSpinner spinner1;
     private JSpinner spinner2;
     private JSpinner spinner3;
+    private JLabel maxLabel;
 
     private JCheckBox unlimitedMulligansCB;
     private JCheckBox balancedTowersCB;
@@ -1267,8 +1268,9 @@ public class WebClient extends KFrame implements IWebClient
         {
             public void actionPerformed(ActionEvent e)
             {
-                options.setOption(Options.variant, (String)variantBox
-                    .getSelectedItem());
+                String variant = (String)variantBox.getSelectedItem();
+                options.setOption(Options.variant, variant);
+                updateMaxSpinner(variant);
             }
         });
 
@@ -1386,8 +1388,53 @@ public class WebClient extends KFrame implements IWebClient
         SpinnerNumberModel model3 = new SpinnerNumberModel(max, 2, 6, 1);
         spinner3 = new JSpinner(model3);
         playerSelection.add(spinner3);
+        maxLabel = new JLabel(" max=?");
+        playerSelection.add(maxLabel);
+        updateMaxSpinner(variantName);
 
         preferencesPane.add(playerSelection);
+    }
+
+    private void updateMaxSpinner(String variant)
+    {
+        SpinnerNumberModel model = (SpinnerNumberModel)spinner3.getModel();
+        int newMax = getMaxForVariant(variant);
+        model.setMaximum(new Integer(newMax));
+        maxLabel.setText(" max=" + newMax);
+        adjustToPossibleMax(spinner1, newMax);
+        adjustToPossibleMax(spinner2, newMax);
+        adjustToPossibleMax(spinner3, newMax);
+    }
+
+    private void adjustToPossibleMax(JSpinner spinner, int max)
+    {
+        if (((Integer)spinner.getValue()).intValue() > max)
+        {
+            spinner.setValue(new Integer(max));
+        }
+    }
+
+    private int getMaxForVariant(String variant)
+    {
+        int max = 6;
+        if (variant.equals("Abyssal9"))
+        {
+            max = 9;
+        }
+        else if (variant.equals("Abyssal3") || variant.equals("SmallTitan"))
+        {
+            max = 3;
+        }
+        else if (variant.equals("Beelzebub12")
+            || variant.equals("BeelzeGods12"))
+        {
+            max = 12;
+        }
+        else if (variant.equals("ExtTitan"))
+        {
+            max = 8;
+        }
+        return max;
     }
 
     private void createRunningGamesTab()
