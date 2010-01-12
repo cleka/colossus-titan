@@ -180,7 +180,19 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             if (fromClient != null)
             {
                 done = parseLine(fromClient);
-                String username = user.getName();
+
+                String username = "<unknown>";
+
+                if (user != null)
+                {
+                    username = user.getName();
+                }
+                else
+                {
+                    LOGGER.warning("Try to get username, but user is null?");
+                }
+
+                username = user.getName();
                 if (done)
                 {
                     LOGGER.finest("user " + username + ": parseLine for '"
