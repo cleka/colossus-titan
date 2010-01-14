@@ -50,7 +50,7 @@ public class WebServer implements IWebServer, IRunWebServer
 
     private final IColossusMail mailObject;
 
-    private final int MIN_FREE_PORTS = 5;
+    private final static int MIN_FREE_GAME_PORTS = 5;
 
     /**
      * Controls whether the GUI is shown or not.
@@ -126,32 +126,41 @@ public class WebServer implements IWebServer, IRunWebServer
             .getIntOptionNoUndef(WebServerConstants.optPortRangeFrom);
         int availablePorts = options
             .getIntOptionNoUndef(WebServerConstants.optAvailablePorts);
-
-        if (availablePorts < MIN_FREE_PORTS)
+        if (availablePorts % 2 != 0)
         {
-            LOGGER.severe("Available ports from cf file is " + availablePorts
-                + " but according to MIN_FREE_PORTS it should be at least "
-                + MIN_FREE_PORTS + "! Exiting.");
+            LOGGER.warning("Suspicious option value " + availablePorts
+                + " for available ports - should be an even (nr % 2 == 0) "
+                + "value (every 2nd port is used as file serving port)!");
+        }
+        int availableGamePorts = availablePorts / 2;
+
+        if (availableGamePorts < MIN_FREE_GAME_PORTS)
+        {
+            LOGGER
+                .severe("Available ports from cf file is "
+                    + availableGamePorts
+                    + " but according to MIN_FREE_GAME_PORTS it should be at least "
+                    + MIN_FREE_GAME_PORTS + "! Exiting.");
             System.exit(0);
         }
         mailObject = new ColossusMail(options);
 
         portBookKeeper = new PortBookKeeper(portRangeFrom, availablePorts);
-        int freePorts = portBookKeeper.getFreePortsCount();
+        int freePorts = portBookKeeper.getFreeGamePortsCount();
 
         LOGGER.info("Actually free ports: " + freePorts);
 
-        if (freePorts < MIN_FREE_PORTS)
+        if (freePorts < MIN_FREE_GAME_PORTS)
         {
             LOGGER.severe("Too few (only " + freePorts
                 + ") free playing ports! Exiting.");
             System.exit(0);
         }
 
-        if (freePorts < availablePorts)
+        if (freePorts < availableGamePorts)
         {
             LOGGER.warning("Only " + freePorts + " free ports, instead of "
-                + availablePorts);
+                + availableGamePorts);
         }
         else if (freePorts < (availablePorts / 2))
         {

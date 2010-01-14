@@ -19,9 +19,19 @@ public class PortBookKeeper
         .getName());
 
     private final int portRangeFrom;
-    private final int availablePorts;
-    private final int freePorts;
 
+    /** total nr of free ports according to options file;
+     * but only every 2nd is used as a game port
+     */
+    private final int availablePorts;
+
+    /** Nr of ports that are actually currently available for game serving
+     *  (so, this value == 5 means there can be 5 games)
+     */
+    private final int freeGamePorts;
+
+    /** Bookkeeping which (game) ports are currently in use
+     */
     private final boolean[] portUsed;
 
     public PortBookKeeper(int portRangeFrom, int availablePorts)
@@ -49,12 +59,12 @@ public class PortBookKeeper
             }
         }
 
-        this.freePorts = freePorts;
+        this.freeGamePorts = freePorts;
     }
 
-    public int getFreePortsCount()
+    public int getFreeGamePortsCount()
     {
-        return freePorts;
+        return freeGamePorts;
     }
 
     public int getFreePort(String purpose)
