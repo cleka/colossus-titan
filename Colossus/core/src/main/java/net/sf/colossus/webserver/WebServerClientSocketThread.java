@@ -47,6 +47,13 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
 
     private Thread stopper = null;
 
+    /* During registration request and sending of confirmation code,
+     * we do not have a user yet. The parseLine sets then this variable
+     * according to the username argument which was send from client.
+     */
+    private String unverifiedUsername = null;
+
+
     public WebServerClientSocketThread(WebServer server, Socket socket)
     {
         super("WebServerClientSocketThread");
@@ -187,6 +194,10 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
                 {
                     username = user.getName();
                 }
+                else if (unverifiedUsername != null)
+                {
+                    username = unverifiedUsername;
+                }
                 else
                 {
                     LOGGER.warning("Try to get username, but user is null?");
@@ -253,6 +264,11 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
         String[] tokens = fromClient.split(sep);
         String command = tokens[0];
 
+        if (user == null && unverifiedUsername == null)
+        {
+            unverifiedUsername = "<unknown>";
+        }
+
         if (!loggedIn && command.equals(IWebServer.Login))
         {
             LOGGER.log(Level.FINEST, "client attempts login.");
@@ -260,6 +276,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             if (tokens.length >= 4)
             {
                 String username = tokens[1];
+                unverifiedUsername = username;
                 String password = tokens[2];
                 boolean force = Boolean.valueOf(tokens[3]).booleanValue();
                 if (tokens.length >= 5)
@@ -336,6 +353,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             if (tokens.length >= 2)
             {
                 String username = tokens[1];
+                unverifiedUsername = username;
                 String confCode = tokens[2];
 
                 reason = server.confirmRegistration(username, confCode);
@@ -359,6 +377,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             if (tokens.length >= 3)
             {
                 String username = tokens[1];
+                unverifiedUsername = username;
                 String password = tokens[2];
                 String email = tokens[3];
 
@@ -547,7 +566,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
         }
         else
         {
-            LOGGER.log(Level.FINEST, "NACK: " + command + sep + reason);
+            LOGGER.log(Level.FINE, "NACK: " + command + sep + reason);
             out.println("NACK: " + command + sep + reason);
         }
 
