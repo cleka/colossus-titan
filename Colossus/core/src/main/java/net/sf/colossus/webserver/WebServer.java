@@ -231,7 +231,7 @@ public class WebServer implements IWebServer, IRunWebServer
         }
 
         LOGGER.log(Level.FINEST,
-            "\nUser-server starting up, waiting for clients");
+            "User-server starting up, waiting for clients");
 
         while (!shutdownRequested)
         {
