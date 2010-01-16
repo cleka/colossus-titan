@@ -96,6 +96,8 @@ public class WebClient extends KFrame implements IWebClient
     // the default values / info texts according to Locale.
     final static Locale myLocale = Locale.GERMANY;
 
+    final static String CARD_PROPOSED = "proposed";
+
     final static String TYPE_SCHEDULED = "scheduled";
     final static String TYPE_INSTANTLY = "instantly";
 
@@ -226,7 +228,7 @@ public class WebClient extends KFrame implements IWebClient
     final static String startingText = "Game is starting, MasterBoard should appear soon. Please wait...";
     final static String startedText = "Game was started...";
     final static String waitingText = "Client connected successfully, waiting for all other players. Please wait...";
-    final static String enrolledText = "While enrolled, you can't propose or enroll to other games.";
+    final static String enrolledText = "NOTE: While enrolled to an instant game, you can't propose or enroll to other instant games.";
     final static String playingText = "While playing, you can't propose or enroll to other games.";
 
     private ChatHandler generalChat;
@@ -241,16 +243,11 @@ public class WebClient extends KFrame implements IWebClient
 
     private JPanel gamesTablesPanel;
     private JPanel gamesCards;
-    private JPanel schedGamesCard;
-    private JPanel instGamesCard;
+    private JPanel propGamesCard;
 
-    // scheduled games
-    private JTable schedGameTable;
-    private GameTableModel schedGameDataModel;
-
-    // instant games (can start as soon as enough players have joined):
-    private JTable instGameTable;
-    private GameTableModel instGameDataModel;
+    // proposed games
+    private JTable proposedGameTable;
+    private GameTableModel proposedGameDataModel;
 
     // running games
     private JTable runGameTable;
@@ -449,7 +446,7 @@ public class WebClient extends KFrame implements IWebClient
             if (state == Playing)
             {
                 state = LoggedIn;
-                enrolledInstantGameId = "";
+                enrolledInstantGameId = null;
                 updateGUI();
             }
         }
@@ -467,13 +464,10 @@ public class WebClient extends KFrame implements IWebClient
         atTimeField.setEnabled(scheduled);
         durationField.setEnabled(scheduled);
 
-        if (instGamesCard == null || schedGamesCard == null
-            || gamesCards == null)
+        if (propGamesCard == null || gamesCards == null)
         {
             return;
         }
-        CardLayout cl = (CardLayout)(gamesCards.getLayout());
-        cl.show(gamesCards, scheduled ? TYPE_SCHEDULED : TYPE_INSTANTLY);
     }
 
     public boolean getScheduledGamesMode()
@@ -1050,9 +1044,6 @@ public class WebClient extends KFrame implements IWebClient
         gamesTablesPanel = new JPanel(new BorderLayout());
         createGamesTab.add(gamesTablesPanel);
 
-        // One panel, either the one for instant games, or the one for
-        // scheduled games, will be added later based on the "current"
-        // value of the radiobutton.
         startButton = new JButton(StartButtonText);
         startButton.addActionListener(new ActionListener()
         {
@@ -1083,17 +1074,16 @@ public class WebClient extends KFrame implements IWebClient
         gamesCards = new JPanel(new CardLayout());
         gamesTablesPanel.add(gamesCards, BorderLayout.CENTER);
 
-        // Panel/Table for upcoming instant games:
-        instGamesCard = new JPanel(new BorderLayout());
-        instGamesCard.setBorder(new TitledBorder("Instant Games"));
-        instGamesCard.add(
-            nonBoldLabel("The following games are accepting players:"),
+        // Table for proposed games:
+        propGamesCard = new JPanel(new BorderLayout());
+        propGamesCard.setBorder(new TitledBorder("Proposed Games"));
+        propGamesCard.add(nonBoldLabel("The following games are proposed:"),
             BorderLayout.NORTH);
 
-        instGameDataModel = new GameTableModel(myLocale);
-        instGameTable = new JTable(instGameDataModel);
+        proposedGameDataModel = new GameTableModel(myLocale);
+        proposedGameTable = new JTable(proposedGameDataModel);
 
-        instGameTable.getSelectionModel().addListSelectionListener(
+        proposedGameTable.getSelectionModel().addListSelectionListener(
             new ListSelectionListener()
             {
                 public void valueChanged(ListSelectionEvent e)
@@ -1102,42 +1092,18 @@ public class WebClient extends KFrame implements IWebClient
                 }
             });
 
-        instGameTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        JScrollPane instScrollpane = new JScrollPane(instGameTable);
-        instGamesCard.add(instScrollpane, BorderLayout.CENTER);
-
-        // Table for scheduled games:
-        schedGamesCard = new JPanel(new BorderLayout());
-        schedGamesCard.setBorder(new TitledBorder("Scheduled Games"));
-        schedGamesCard.add(
-            nonBoldLabel("The following are already scheduled:"),
-            BorderLayout.NORTH);
-
-        schedGameDataModel = new GameTableModel(myLocale);
-        schedGameTable = new JTable(schedGameDataModel);
-
-        schedGameTable.getSelectionModel().addListSelectionListener(
-            new ListSelectionListener()
-            {
-                public void valueChanged(ListSelectionEvent e)
-                {
-                    updateGUI();
-                }
-            });
-
-        schedGameTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        JScrollPane schedScrollpane = new JScrollPane(schedGameTable);
-        schedGamesCard.add(schedScrollpane, BorderLayout.CENTER);
+        proposedGameTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        JScrollPane propScrollpane = new JScrollPane(proposedGameTable);
+        propGamesCard.add(propScrollpane, BorderLayout.CENTER);
 
         JPanel dummyCard = new JPanel(new BorderLayout());
         dummyCard.add(Box.createRigidArea(new Dimension(0, 50)));
 
-        gamesCards.add(instGamesCard, TYPE_INSTANTLY);
-        gamesCards.add(schedGamesCard, TYPE_SCHEDULED);
         gamesCards.add(dummyCard, "dummy");
+        gamesCards.add(propGamesCard, CARD_PROPOSED);
 
         CardLayout cl = (CardLayout)gamesCards.getLayout();
-        cl.show(gamesCards, "dummy");
+        cl.show(gamesCards, CARD_PROPOSED);
 
         Box bottomPanel = new Box(BoxLayout.Y_AXIS);
         bottomPanel.add(startButtonPane);
@@ -1236,17 +1202,6 @@ public class WebClient extends KFrame implements IWebClient
             return;
         }
         setScheduledGamesMode(switchToScheduling);
-        if (switchToScheduling)
-        {
-            /*
-            JOptionPane
-                .showMessageDialog(
-                    this,
-                    "Please note! The 'scheduled games' feature is not ready implemented,\n"
-                        + "and trying to use it might cause the application to behave unpredictable...",
-                    "Feature not ready!", JOptionPane.INFORMATION_MESSAGE);
-            */
-        }
         updateGUI();
     }
 
@@ -1777,12 +1732,6 @@ public class WebClient extends KFrame implements IWebClient
             gameClient = null;
         }
 
-        gameHash.clear();
-        synchronized (gamesUpdates)
-        {
-            gamesUpdates.clear();
-        }
-
         ViableEntityManager.unregister(this);
     }
 
@@ -1830,20 +1779,15 @@ public class WebClient extends KFrame implements IWebClient
     {
         String id = null;
 
-        if (getScheduledGamesMode())
+        int selRow = proposedGameTable.getSelectedRow();
+        if (selRow != -1)
         {
-            int selRow = schedGameTable.getSelectedRow();
-            if (selRow != -1)
+            id = (String)proposedGameTable.getValueAt(selRow, 0);
+            if (!gameHash.containsKey(id))
             {
-                id = (String)schedGameTable.getValueAt(selRow, 0);
-            }
-        }
-        else
-        {
-            int selRow = instGameTable.getSelectedRow();
-            if (selRow != -1)
-            {
-                id = (String)instGameTable.getValueAt(selRow, 0);
+                LOGGER.warning("Game with id " + id
+                    + " is not in game hash any more...");
+                return null;
             }
         }
         return id;
@@ -1904,7 +1848,7 @@ public class WebClient extends KFrame implements IWebClient
                 return "logged in as " + username;
 
             case EnrolledInstantGame:
-                return "As " + username + " - enrolled to game "
+                return "As " + username + " - enrolled to instant game "
                     + enrolledInstantGameId;
 
             case Playing:
@@ -1970,8 +1914,7 @@ public class WebClient extends KFrame implements IWebClient
             return false;
         }
 
-        if (gi.isEnrolled(username) && gi.hasEnoughPlayers()
-            && gi.isDue()
+        if (gi.isEnrolled(username) && gi.hasEnoughPlayers() && gi.isDue()
             && gi.allEnrolledOnline())
         {
             return true;
@@ -1982,19 +1925,27 @@ public class WebClient extends KFrame implements IWebClient
         }
     }
 
-    private boolean checkIfCouldCancel(int state)
+    private boolean checkIfCouldPropose()
     {
-        if (state == LoggedIn)
+        if (state == NotLoggedIn)
         {
-            String selectedGameId = getSelectedGameId();
-            if (selectedGameId != null && isOwner(selectedGameId))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean checkIfCouldCancel()
+    {
+        if (state == NotLoggedIn)
+        {
+            return false;
+        }
+
+        String selectedGameId = getSelectedGameId();
+        if (selectedGameId != null && isOwner(selectedGameId))
+        {
+            return true;
         }
         else
         {
@@ -2002,58 +1953,45 @@ public class WebClient extends KFrame implements IWebClient
         }
     }
 
-    private boolean checkIfCouldEnroll(int state)
+    private boolean checkIfCouldEnroll()
     {
-        if (getScheduledGamesMode())
+        if (state == NotLoggedIn)
         {
-            String selectedGameId = getSelectedGameId();
-            if (selectedGameId == null)
-            {
-                return false;
-            }
-            GameInfo gi = findGameById(selectedGameId);
-            if (gi != null && !gi.isEnrolled(username))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return false;
+        }
+
+        String selectedGameId = getSelectedGameId();
+        if (selectedGameId == null)
+        {
+            return false;
+        }
+
+        GameInfo gi = findGameById(selectedGameId);
+        if (gi != null && !gi.isEnrolled(username))
+        {
+            return true;
         }
         else
         {
-            if (state == LoggedIn && getSelectedGameId() != null)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return false;
         }
     }
 
-    private boolean checkIfCouldUnenroll(int state)
+    private boolean checkIfCouldUnenroll()
     {
-        if (getScheduledGamesMode())
+        if (state == NotLoggedIn)
         {
-            String selectedGameId = getSelectedGameId();
-            if (selectedGameId == null)
-            {
-                return false;
-            }
-            GameInfo gi = findGameById(selectedGameId);
-            if (gi != null && gi.isEnrolled(username))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return false;
         }
-        else if (state == EnrolledInstantGame)
+
+        String selectedGameId = getSelectedGameId();
+        if (selectedGameId == null)
+        {
+            return false;
+        }
+
+        GameInfo gi = findGameById(selectedGameId);
+        if (gi != null && gi.isEnrolled(username))
         {
             return true;
         }
@@ -2073,11 +2011,11 @@ public class WebClient extends KFrame implements IWebClient
         String newInfoText = makeInfoTextForState(state);
         String newStatusText = makeStatusTextForState(state);
 
-        boolean couldPropose = (state == LoggedIn);
+        boolean couldPropose = checkIfCouldPropose();
         boolean couldDebugSubmit = (state == LoggedIn);
-        boolean couldCancel = checkIfCouldCancel(state);
-        boolean couldEnroll = checkIfCouldEnroll(state);
-        boolean couldUnenroll = checkIfCouldUnenroll(state);
+        boolean couldCancel = checkIfCouldCancel();
+        boolean couldEnroll = checkIfCouldEnroll();
+        boolean couldUnenroll = checkIfCouldUnenroll();
         boolean couldStartOnServer = checkIfCouldStartOnServer(state);
         // feature currently disabled (( => hardcoded to false)):
         boolean couldStartLocally = false;
@@ -2139,15 +2077,20 @@ public class WebClient extends KFrame implements IWebClient
         GameInfo gi = gameHash.get(gameId);
         if (gi == null)
         {
-            LOGGER.log(Level.SEVERE, "Game from hash is null!!");
+            LOGGER.log(Level.SEVERE, "Game from hash for gameId " + gameId
+                + " is null!!");
+            Thread.dumpStack();
         }
-
         return gi;
     }
 
     private boolean isOwner(String gameId)
     {
         GameInfo gi = findGameById(gameId);
+        if (gi == null)
+        {
+            return false;
+        }
         String initiator = gi.getInitiator();
         return (username.equals(initiator));
     }
@@ -2315,20 +2258,38 @@ public class WebClient extends KFrame implements IWebClient
 
     public void doLogout()
     {
+        /*
+         * Commented out because it caused a problem: if the gameInfo update
+         * from server both for unenroll and cancel both go the gameUpdates
+         * list, it sometimes happened that it re-added it to the table again.
+         */
+        /*
         if (state == EnrolledInstantGame)
         {
-            doUnenroll(enrolledInstantGameId);
+            if (enrolledInstantGameId != null)
+            {
+                doUnenroll(enrolledInstantGameId);
+            }
+            else
+            {
+                LOGGER.warning("state enrolledInstantGame but id is null?");
+            }
         }
-
+        */
         cancelOwnInstantGameOnLogout();
 
         logout();
 
-        schedGameTable.removeAll();
-        instGameTable.removeAll();
-        runGameTable.removeAll();
+        synchronized (gamesUpdates)
+        {
+            gamesUpdates.clear();
+        }
+
+        proposedGameDataModel.resetTable();
+        runGameDataModel.resetTable();
 
         gameHash.clear();
+
         state = NotLoggedIn;
         setAdmin(false);
         loginField.setEnabled(true);
@@ -2342,14 +2303,10 @@ public class WebClient extends KFrame implements IWebClient
 
     private void cancelOwnInstantGameOnLogout()
     {
-        for (GameInfo gi : gameHash.values())
+        GameInfo instantGame = findMyInstantGame();
+        if (instantGame != null)
         {
-            if (!gi.isScheduledGame()
-                && gi.getGameState().equals(GameState.PROPOSED)
-                && gi.getInitiator().equals(username))
-            {
-                server.cancelGame(gi.getGameId(), username);
-            }
+            server.cancelGame(instantGame.getGameId(), username);
         }
     }
 
@@ -2523,18 +2480,13 @@ public class WebClient extends KFrame implements IWebClient
         GameInfo gi = findGameById(gameId);
         boolean scheduled = gi.isScheduledGame();
 
-        if (scheduled)
-        {
-            int index = schedGameDataModel.getRowIndex(gi).intValue();
-            schedGameTable.setRowSelectionInterval(index, index);
-        }
-        else
+        int index = proposedGameDataModel.getRowIndex(gi).intValue();
+        proposedGameTable.setRowSelectionInterval(index, index);
+
+        if (!scheduled)
         {
             state = EnrolledInstantGame;
             enrolledInstantGameId = gameId;
-
-            int index = instGameDataModel.getRowIndex(gi).intValue();
-            instGameTable.setRowSelectionInterval(index, index);
         }
         updateGUI();
     }
@@ -2547,7 +2499,7 @@ public class WebClient extends KFrame implements IWebClient
         {
             state = LoggedIn;
         }
-        enrolledInstantGameId = "";
+        enrolledInstantGameId = null;
 
         updateGUI();
     }
@@ -2753,21 +2705,26 @@ public class WebClient extends KFrame implements IWebClient
         if (state == EnrolledInstantGame
             && enrolledInstantGameId.equals(gameId))
         {
-            String message = "Game " + gameId + " was cancelled by user "
-                + byUser;
-            JOptionPane.showMessageDialog(this, message);
+            if (!byUser.equals(username))
+            {
+                String message = "Game " + gameId + " was cancelled by user "
+                    + byUser;
+                JOptionPane.showMessageDialog(this, message);
+            }
             state = LoggedIn;
-            enrolledInstantGameId = "";
+            enrolledInstantGameId = null;
             updateGUI();
         }
 
-        if (getScheduledGamesMode())
+        /* TODO
+         * Note: We have a risk here, that the invokeLater updateGUI calls
+         * above is executed after we have already removed the game from
+         * the game hash.
+         */
+        proposedGameDataModel.removeGame(gameId);
+        if (gameHash.containsKey(gameId))
         {
-            schedGameDataModel.removeGame(gameId);
-        }
-        else
-        {
-            instGameDataModel.removeGame(gameId);
+            gameHash.remove(gameId);
         }
     }
 
@@ -2799,11 +2756,12 @@ public class WebClient extends KFrame implements IWebClient
             error ? JOptionPane.ERROR_MESSAGE
                 : JOptionPane.INFORMATION_MESSAGE);
     }
+
     // Game Client tells us this when user closes the masterboard
     public void tellGameEnds()
     {
         state = LoggedIn;
-        enrolledInstantGameId = "";
+        enrolledInstantGameId = null;
         updateGUI();
     }
 
@@ -2848,18 +2806,7 @@ public class WebClient extends KFrame implements IWebClient
                         switch (state)
                         {
                             case PROPOSED:
-                                if (game.isScheduledGame())
-                                {
-                                    // System.out
-                                    //    .println("Got a scheduled game, replacing in sched list");
-                                    replaceInTable(schedGameTable, game);
-                                }
-                                else
-                                {
-                                    // System.out
-                                    //     .println("Got an instant game, replacing in instant list");
-                                    replaceInTable(instGameTable, game);
-                                }
+                                replaceInTable(proposedGameTable, game);
                                 break;
 
                             case DUE:
@@ -2881,17 +2828,8 @@ public class WebClient extends KFrame implements IWebClient
                                 // System.out
                                 //     .println("Got a running game, replacing in run game list and remove in inst game list");
                                 replaceInTable(runGameTable, game);
-                                if (game.isScheduledGame())
-                                {
-                                    schedGameDataModel.removeGame(game
-                                        .getGameId());
-                                }
-                                else
-                                {
-                                    instGameDataModel.removeGame(game
-                                        .getGameId());
-                                }
-
+                                proposedGameDataModel.removeGame(game
+                                    .getGameId());
                                 break;
 
                             case ENDING:
@@ -2922,12 +2860,6 @@ public class WebClient extends KFrame implements IWebClient
         table.repaint();
     }
 
-    private void resetTable(JTable table)
-    {
-        GameTableModel model = (GameTableModel)table.getModel();
-        model.resetTable();
-    }
-
     public void connectionReset(boolean forced)
     {
         String message = (forced ? "Some other connection to server with same login name forced your logout."
@@ -2935,18 +2867,20 @@ public class WebClient extends KFrame implements IWebClient
         JOptionPane.showMessageDialog(this, message);
         setAdmin(false);
         state = NotLoggedIn;
-        enrolledInstantGameId = "";
+        enrolledInstantGameId = null;
         receivedField.setText("Connection reset by server!");
         updateStatus("Not connected", Color.red);
 
         loginField.setEnabled(true);
-        gameHash.clear();
         synchronized (gamesUpdates)
         {
             gamesUpdates.clear();
         }
-        resetTable(instGameTable);
-        resetTable(runGameTable);
+        gameHash.clear();
+
+        proposedGameDataModel.resetTable();
+        runGameDataModel.resetTable();
+
         updateGUI();
 
         tabbedPane.setSelectedComponent(serverTab);
@@ -3018,8 +2952,7 @@ public class WebClient extends KFrame implements IWebClient
             boolean ok = doStartLocally(selectedGameId);
             if (ok)
             {
-                schedGameTable.setEnabled(false);
-                instGameTable.setEnabled(false);
+                // proposedGameTable.setEnabled(false);
             }
         }
     }
@@ -3032,8 +2965,7 @@ public class WebClient extends KFrame implements IWebClient
             boolean ok = doStart(selectedGameId);
             if (ok)
             {
-                schedGameTable.setEnabled(false);
-                instGameTable.setEnabled(false);
+                // proposedGameTable.setEnabled(false);
             }
         }
     }
@@ -3043,6 +2975,16 @@ public class WebClient extends KFrame implements IWebClient
         String selectedGameId = getSelectedGameId();
         if (selectedGameId != null)
         {
+
+            GameInfo gi = findGameById(selectedGameId);
+            if (gi == null)
+            {
+                return;
+            }
+            if (gi.isEnrolled(username))
+            {
+                doUnenroll(selectedGameId);
+            }
             doCancel(selectedGameId);
         }
     }
@@ -3055,10 +2997,30 @@ public class WebClient extends KFrame implements IWebClient
             boolean ok = doUnenroll(selectedGameId);
             if (ok)
             {
-                schedGameTable.setEnabled(true);
-                instGameTable.setEnabled(true);
+                // proposedGameTable.setEnabled(true);
             }
         }
+    }
+
+    private GameInfo findMyInstantGame()
+    {
+        for (GameInfo gi : gameHash.values())
+        {
+            if (!gi.isScheduledGame()
+                && gi.getGameState().equals(GameState.PROPOSED)
+                && gi.getInitiator().equals(username))
+            {
+                return gi;
+            }
+        }
+        return null;
+    }
+
+    private void displayOnlyOneInstantGameMessage(String action, String message)
+    {
+        String title = "Can't " + action + " instant game now!";
+        JOptionPane.showMessageDialog(this, message, title,
+            JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void enrollButtonAction()
@@ -3066,16 +3028,55 @@ public class WebClient extends KFrame implements IWebClient
         String selectedGameId = getSelectedGameId();
         if (selectedGameId != null)
         {
-            boolean ok = doEnroll(selectedGameId);
-            if (ok)
+            GameInfo gi = findGameById(selectedGameId);
+            if (gi != null && !gi.isScheduledGame())
             {
-                // instGameTable.setEnabled(false);
+                if (enrolledInstantGameId != null)
+                {
+                    displayOnlyOneInstantGameMessage("enroll to",
+                        "You can only be active for one instant game at a time, "
+                            + "and you are already enrolled to instant game #"
+                            + enrolledInstantGameId + "!");
+                    return;
+                }
+                GameInfo instantGame = findMyInstantGame();
+                if (instantGame != null
+                    && !instantGame.getGameId().equals(selectedGameId))
+                {
+                    displayOnlyOneInstantGameMessage("enroll to",
+                        "You can only be active for one instant game at a time, "
+                            + "and there is already instant game #"
+                            + instantGame.getGameId() + " proposed by you!");
+                    return;
+                }
+                doEnroll(selectedGameId);
             }
         }
     }
 
     private void proposeButtonAction()
     {
+        if (!getScheduledGamesMode())
+        {
+            if (enrolledInstantGameId != null)
+            {
+                displayOnlyOneInstantGameMessage("propose",
+                    "You can only be active for one instant game at a time, "
+                        + "and you are already enrolled to instant game #"
+                        + enrolledInstantGameId + "!");
+                return;
+            }
+            GameInfo instantGame = null;
+            if ((instantGame = findMyInstantGame()) != null)
+            {
+                displayOnlyOneInstantGameMessage("propose",
+                    "You can only be active for one instant game at a time, "
+                        + "and there is already instant game #"
+                        + instantGame.getGameId() + " proposed by you!");
+                return;
+            }
+        }
+
         int min = ((Integer)spinner1.getValue()).intValue();
         int target = ((Integer)spinner2.getValue()).intValue();
         int max = ((Integer)spinner3.getValue()).intValue();
