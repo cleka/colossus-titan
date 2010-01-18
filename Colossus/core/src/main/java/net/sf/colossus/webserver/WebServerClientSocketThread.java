@@ -531,6 +531,28 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
                     + " requested shutdown - ignored.");
             }
         }
+        else if (command.equals(IWebServer.RequestUserAttention))
+        {
+            if (user.isAdmin())
+            {
+                long when = Long.parseLong(tokens[1]);
+                String sender = tokens[2];
+                boolean isAdmin = Boolean.valueOf(tokens[3]).booleanValue();
+                String recipient = tokens[4];
+                String message = tokens[5];
+                int beepCount = Integer.parseInt(tokens[6]);
+                long beepInterval = Long.parseLong(tokens[7]);
+                boolean windows = Boolean.valueOf(tokens[8]).booleanValue();
+
+                server.requestUserAttention(when, sender, isAdmin, recipient,
+                    message, beepCount, beepInterval, windows);
+            }
+            else
+            {
+                LOGGER.warning("Non-admin user " + user.getName()
+                    + " attempted to use RequestUserAttention method!");
+            }
+        }
         else if (command.equals(IWebServer.Echo))
         {
             if (user.isAdmin())
@@ -712,6 +734,14 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
     {
         sendToClient(generalMessage + sep + when + sep + error + sep + title
             + sep + message);
+    }
+
+    public void requestAttention(long when, String byUser,
+        boolean byAdmin, String message, int beepCount, long beepInterval, boolean windows)
+    {
+        sendToClient(requestAttention + sep + when + sep + byUser + sep
+            + byAdmin + sep
+            + message + sep + beepCount + sep + beepInterval + sep + windows);
     }
 
     public void connectionReset(boolean forcedLogout)

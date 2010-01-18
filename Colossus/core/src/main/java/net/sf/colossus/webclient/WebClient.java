@@ -1559,7 +1559,34 @@ public class WebClient extends KFrame implements IWebClient
         });
         adminPane.add(shutdownButton);
 
+        JButton beepButton = new JButton("Beep");
+        beepButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                beepButtonAction();
+            }
+        });
+        adminPane.add(beepButton);
+
         adminTab.add(adminPane);
+    }
+
+    public void beepButtonAction()
+    {
+        if (isAdmin())
+        {
+            long when = new Date().getTime();
+            String sender = username;
+            boolean isAdmin = true;
+            String recipient = "clemens";
+            String message = "You should pay more attention! ;-) ";
+            int beepCount = 3;
+            long beepInterval = 1000;
+            boolean windows = true;
+            server.requestUserAttention(when, sender, isAdmin, recipient,
+                message, beepCount, beepInterval, windows);
+        }
     }
 
     public String createLoginWebClientSocketThread(boolean force)
@@ -2747,6 +2774,49 @@ public class WebClient extends KFrame implements IWebClient
         {
             // chat delivery to chat other than general not implemented
         }
+    }
+
+    public void requestAttention(long when, String byUser, boolean byAdmin,
+        String message, int beepCount, long beepInterval, boolean windows)
+    {
+        String whenText = "";
+        if (when != 0)
+        {
+            Calendar now = Calendar.getInstance(myLocale);
+            String nowDateString = myDateFormat.format(now.getTime());
+            String nowTimeString = myTimeFormat.format(now.getTime());
+            whenText = "At " + nowDateString + " " + nowTimeString;
+        }
+
+        String who = (byAdmin ? "Administrator" : "User") + " '" + byUser;
+        dialogTitle = who + "' requests your attention!";
+        dialogMessage = whenText + ", " + dialogTitle + "\n\n" + message;
+
+        SwingUtilities.invokeLater(new Runnable()
+        {
+            public void run()
+            {
+                showRequestAttentionMessage();
+            }
+        });
+
+        for (int i = 1; i <= beepCount; i++)
+        {
+            getToolkit().beep();
+            if (i < beepCount)
+            {
+                WhatNextManager.sleepFor(beepInterval);
+            }
+        }
+    }
+
+    private static String dialogTitle = "dummy";
+    private static String dialogMessage = "dummy2";
+
+    private void showRequestAttentionMessage()
+    {
+        JOptionPane.showMessageDialog(this, dialogMessage, dialogTitle,
+            JOptionPane.INFORMATION_MESSAGE);
     }
 
     public void deliverGeneralMessage(long when, boolean error, String title,

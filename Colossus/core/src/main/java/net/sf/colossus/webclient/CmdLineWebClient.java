@@ -140,6 +140,17 @@ public class CmdLineWebClient implements IWebClient
             + message + "'");
     }
 
+    public void requestAttention(long when, String byUser, boolean byAdmin,
+        String message, int beepCount, long beepInterval, boolean windows)
+    {
+        String who = (byAdmin ? "Administrator" : "User") + byUser;
+        String title = who + " requests your attention!";
+
+        System.out.println(who + title + "\nMessage text: '" + message
+            + "'\nBeeping " + beepCount + " times with interval "
+            + beepInterval);
+    }
+
     public void connectionReset(boolean forcedLogout)
     {
         // TODO Auto-generated method stub

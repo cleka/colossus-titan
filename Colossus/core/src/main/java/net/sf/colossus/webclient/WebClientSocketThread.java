@@ -458,6 +458,22 @@ public class WebClientSocketThread extends Thread implements IWebServer
                     webClient.deliverGeneralMessage(when, error, title,
                         message);
                 }
+
+                else if (command.equals(IWebClient.requestAttention))
+                {
+                    long when = Long.parseLong(tokens[1]);
+                    String byUser = tokens[2];
+                    boolean byAdmin = Boolean.valueOf(tokens[3])
+                        .booleanValue();
+                    String message = tokens[4];
+                    int beepCount = Integer.parseInt(tokens[5]);
+                    long beepInterval = Long.parseLong(tokens[6]);
+                    boolean windows = Boolean.valueOf(tokens[7])
+                        .booleanValue();
+                    webClient.requestAttention(when, byUser, byAdmin, message,
+                        beepCount, beepInterval, windows);
+                }
+
                 else if (command.equals(IWebClient.grantAdmin))
                 {
                     webClient.grantAdminStatus();
@@ -687,6 +703,17 @@ public class WebClientSocketThread extends Thread implements IWebServer
     {
         String sending = ChatSubmit + sep + chatId + sep + sender + sep
             + message;
+        send(sending);
+    }
+
+    public void requestUserAttention(long when, String sender,
+        boolean isAdmin, String recipient, String message, int beepCount,
+        long beepInterval, boolean windows)
+    {
+        String sending = RequestUserAttention + sep + when + sep + sender
+            + sep + isAdmin + sep + recipient + sep + message + sep
+            + beepCount + sep + beepInterval + sep + windows;
+
         send(sending);
     }
 

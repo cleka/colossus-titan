@@ -780,6 +780,16 @@ public class WebServer implements IWebServer, IRunWebServer
         }
     }
 
+    public void requestUserAttention(long when, String sender,
+        boolean isAdmin, String recipient, String message, int beepCount,
+        long beepInterval, boolean windows)
+    {
+        User user = User.findUserByName(recipient);
+        IWebClient client = (IWebClient)user.getThread();
+        client.requestAttention(when, sender, isAdmin, message, beepCount,
+            beepInterval, windows);
+    }
+
     public void informLocallyGameOver(String gameId)
     {
         LOGGER.info("WebServer informLocallyGameOver id " + gameId);

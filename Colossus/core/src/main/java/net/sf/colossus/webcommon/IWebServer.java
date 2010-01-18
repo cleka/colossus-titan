@@ -24,6 +24,7 @@ public interface IWebServer
     public static final String ChatSubmit = "chatsubmit";
     public static final String ShutdownServer = "shutdownserver";
     public static final String Echo = "echo";
+    public static final String RequestUserAttention = "requestUserAttention";
 
     public static String generalChatName = "#general";
 
@@ -71,6 +72,10 @@ public interface IWebServer
     public void informLocallyGameOver(String gameId);
 
     public void chatSubmit(String chatId, String sender, String message);
+
+    public void requestUserAttention(long when, String sender,
+        boolean isAdmin, String recipient, String message, int beepCount,
+        long beepInterval, boolean windows);
 
     // public void submitAnyText(String text);
 
