@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -240,6 +241,8 @@ public class WebClient extends KFrame implements IWebClient
      * game tokens to an GameInfo object
      */
     private final HashMap<String, GameInfo> gameHash = new HashMap<String, GameInfo>();
+
+    private final HashSet<String> deletedGames = new HashSet<String>();
 
     private JPanel gamesTablesPanel;
     private JPanel gamesCards;
@@ -2072,6 +2075,12 @@ public class WebClient extends KFrame implements IWebClient
         return gameHash;
     }
 
+    private GameInfo findGameByIdNoComplaint(String gameId)
+    {
+        GameInfo gi = gameHash.get(gameId);
+        return gi;
+    }
+
     private GameInfo findGameById(String gameId)
     {
         GameInfo gi = gameHash.get(gameId);
@@ -2221,6 +2230,7 @@ public class WebClient extends KFrame implements IWebClient
         if (message == null)
         {
             state = LoggedIn;
+            enrolledInstantGameId = null;
             loginField.setEnabled(false);
             updateGUI();
 
@@ -2702,29 +2712,27 @@ public class WebClient extends KFrame implements IWebClient
 
     public void gameCancelled(String gameId, String byUser)
     {
+        deletedGames.add(gameId);
+
+        GameInfo gi = findGameByIdNoComplaint(gameId);
+        if (gi != null)
+        {
+            // Remove it from table
+            handleGameInfoUpdates(gi);
+        }
+
         if (state == EnrolledInstantGame
             && enrolledInstantGameId.equals(gameId))
         {
             if (!byUser.equals(username))
             {
-                String message = "Game " + gameId + " was cancelled by user "
-                    + byUser;
+                String message = "Instant game " + gameId
+                    + " was cancelled by user " + byUser;
                 JOptionPane.showMessageDialog(this, message);
             }
             state = LoggedIn;
             enrolledInstantGameId = null;
             updateGUI();
-        }
-
-        /* TODO
-         * Note: We have a risk here, that the invokeLater updateGUI calls
-         * above is executed after we have already removed the game from
-         * the game hash.
-         */
-        proposedGameDataModel.removeGame(gameId);
-        if (gameHash.containsKey(gameId))
-        {
-            gameHash.remove(gameId);
         }
     }
 
@@ -2786,11 +2794,21 @@ public class WebClient extends KFrame implements IWebClient
      **/
     public void gameInfo(GameInfo gi)
     {
+        if (deletedGames.contains(gi.getGameId()))
+        {
+            LOGGER.info("Still GameInfo update to gameId " + gi.getGameId()
+                + " - ignoring it.");
+            return;
+        }
+        handleGameInfoUpdates(gi);
+    }
+
+    private void handleGameInfoUpdates(GameInfo gi)
+    {
         synchronized (gamesUpdates)
         {
             gamesUpdates.add(gi);
         }
-
         SwingUtilities.invokeLater(new Runnable()
         {
             public void run()
@@ -2801,6 +2819,12 @@ public class WebClient extends KFrame implements IWebClient
                     while (it.hasNext())
                     {
                         GameInfo game = it.next();
+                        String gameId = game.getGameId();
+                        if (deletedGames.contains(gameId))
+                        {
+                            proposedGameDataModel.removeGame(gameId);
+                            break;
+                        }
                         GameState state = game.getGameState();
 
                         switch (state)
@@ -3010,7 +3034,15 @@ public class WebClient extends KFrame implements IWebClient
                 && gi.getGameState().equals(GameState.PROPOSED)
                 && gi.getInitiator().equals(username))
             {
-                return gi;
+                if (deletedGames.contains(gi.getGameId()))
+                {
+                    LOGGER.finest("For GameId " + gi.getGameId()
+                        + ", found one myInstantGame but it's deleted...");
+                }
+                else
+                {
+                    return gi;
+                }
             }
         }
         return null;
@@ -3049,8 +3081,8 @@ public class WebClient extends KFrame implements IWebClient
                             + instantGame.getGameId() + " proposed by you!");
                     return;
                 }
-                doEnroll(selectedGameId);
             }
+            doEnroll(selectedGameId);
         }
     }
 

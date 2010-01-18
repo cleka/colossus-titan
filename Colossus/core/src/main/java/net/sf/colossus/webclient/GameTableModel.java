@@ -283,7 +283,6 @@ public class GameTableModel extends AbstractTableModel
         data.add(gi);
         String gameId = gi.getGameId();
         rowIndex.put(gameId, Integer.valueOf(nextIndex));
-
         fireTableRowsUpdated(nextIndex, nextIndex);
         return nextIndex;
     }
