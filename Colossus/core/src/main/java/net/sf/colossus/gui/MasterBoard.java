@@ -1898,7 +1898,12 @@ public final class MasterBoard extends JPanel
         else if (phase == Phase.FIGHT)
         {
             // If we're fighting and there is an engagement here, resolve it.
-            client.engage(hex);
+
+            if (gui.getGame().containsOpposingLegions(hex)
+                && !gui.getGame().isEngagementOngoing())
+            {
+                client.engage(hex);
+            }
         }
     }
 
