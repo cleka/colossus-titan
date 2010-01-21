@@ -2831,7 +2831,21 @@ public final class GameServerSide extends Game
         if (gameShouldContinue())
         {
             gameSaver.commitPointReached();
-            server.nextEngagement();
+            if (getActivePlayer().isDead())
+            {
+                LOGGER.info("Active player " + getActivePlayer().getName()
+                    + " is dead; automatically doing advancePhase for him.");
+                if (findEngagements().size() > 0)
+                {
+                    LOGGER.warning("Still engagements left: "
+                        + findEngagements());
+                }
+                advancePhase(Phase.FIGHT, getActivePlayer());
+            }
+            else
+            {
+                server.nextEngagement();
+            }
         }
     }
 
