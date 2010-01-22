@@ -13,6 +13,38 @@
 This describes the recent changes in some more detail than just the
 one-line-info on the main pages "News" section.
 
+<h3>January 22, 2010: Release 0.10.2 from r467x</h3>
+<p>
+Some usability and stability improvements: 
+<ul>
+<li>If active player dies during battle, server side automatically advances to 
+    next player instead of waiting for player finish engagements phase.
+    This is related to: "2934399 Turn incomplete in multi-player"</li>
+<li>Proposed Games table shows now always both instant and scheduled games, 
+    not the ones or the others depending on the radiobutton as earlier.
+    Also the action buttons for propose and enroll are active for instant 
+    games even if one has an instant game proposed or enrolled,
+    now just a popup dialog tells then that and why one can't enroll to or 
+    propose an instant game right now</li>
+<li>WebClient: when variant changes and new variants max player count differs 
+    from previous, then adjust maxSpinner.maxValue (and all spinners current 
+    values, if needed)</li>
+<li>Added some Public Game Server FAQ document (pretty empty still)</li>
+<li>WebClient sends now some Client side version so server knows which 
+    features client can handle</li>
+<li>Prevent some problems when several players tried to start same game 
+    at almost same time. Games would stay hanging, eventually no more games possible</li>
+<li>Prevent the illegally called engage() and other warnings and errors</li>
+<li>Added some "general notification to user" functionality (popup dialog + beep)
+   (so far only admin can send those)</li>
+<li>Eliminated the discrepancy between free ports / free game ports which 
+    caused a warning on startup of the game server</li>
+<li>Fixed the remove/cancel game issues, that it was not deleted from table, 
+    or caused exceptions, or whatever</li>
+</ul>
+<p>
+<hr></hr>
+
 <h3>January 2, 2010: Release 0.10.1 from r4646</h3>
 <p>
 Some usability improvements: 
@@ -29,7 +61,6 @@ Some usability improvements:
 </ul>
 
 <p>
-<hr></hr>
 
 <h3>December 25, 2009: Release 0.10.0 from r4635</h3>
 <p>
