@@ -1559,6 +1559,18 @@ public class WebClient extends KFrame implements IWebClient
         });
         adminPane.add(shutdownButton);
 
+        JTextField notifyMessage = new JTextField();
+        adminPane.add(notifyMessage);
+        Box notifyPane = new Box(BoxLayout.X_AXIS);
+        notifyPane.add(new JLabel("User:"));
+        JTextField notifyUser = new JTextField();
+        notifyPane.add(notifyUser);
+        notifyPane.add(new JLabel("beep count:"));
+        JTextField beepCount = new JTextField();
+        notifyPane.add(beepCount);
+        notifyPane.add(new JLabel("beep interval:"));
+        JTextField beepInterval = new JTextField();
+        notifyPane.add(beepInterval);
         JButton beepButton = new JButton("Beep");
         beepButton.addActionListener(new ActionListener()
         {
@@ -1567,7 +1579,8 @@ public class WebClient extends KFrame implements IWebClient
                 beepButtonAction();
             }
         });
-        adminPane.add(beepButton);
+        notifyPane.add(beepButton);
+        adminPane.add(notifyPane);
 
         adminTab.add(adminPane);
     }
