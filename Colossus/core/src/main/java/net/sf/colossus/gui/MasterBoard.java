@@ -58,6 +58,7 @@ import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
+import net.sf.colossus.appmain.WelcomeDialog;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.common.Constants;
@@ -165,6 +166,7 @@ public final class MasterBoard extends JPanel
     private static final String about = "About";
     private static final String viewReadme = "Show Variant Readme";
     private static final String viewHelpDoc = "Options Documentation";
+    private static final String viewWelcome = "Show Welcome message";
 
     private AbstractAction newGameAction;
     private AbstractAction loadGameAction;
@@ -194,6 +196,7 @@ public final class MasterBoard extends JPanel
     private AbstractAction aboutAction;
     private AbstractAction viewReadmeAction;
     private AbstractAction viewHelpDocAction;
+    private AbstractAction viewWelcomeAction;
 
     private boolean playerLabelDone;
 
@@ -883,6 +886,14 @@ public final class MasterBoard extends JPanel
                 showHelpDoc = new ShowHelpDoc();
             }
         };
+        viewWelcomeAction = new AbstractAction(viewWelcome)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                WelcomeDialog.showWelcomeDialog();
+            }
+        };
+
     }
 
     // Derive the logDirectory from the FileHandler.pattern property
@@ -1105,6 +1116,7 @@ public final class MasterBoard extends JPanel
         mi.setMnemonic(KeyEvent.VK_V);
 
         mi = helpMenu.add(viewHelpDocAction);
+        mi = helpMenu.add(viewWelcomeAction);
     }
 
     /**

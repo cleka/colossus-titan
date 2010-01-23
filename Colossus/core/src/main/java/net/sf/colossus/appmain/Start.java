@@ -877,6 +877,9 @@ public final class Start
         // be able to clean up the while object tree. We will see :)
         startObject = null;
 
+        WelcomeDialog.disposeDialogIfNecessary();
+
+
         // ==================================================================
         // Application-ending related processing, mostly for debug purposes
 

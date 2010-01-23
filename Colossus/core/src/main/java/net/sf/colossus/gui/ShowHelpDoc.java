@@ -42,8 +42,18 @@ public final class ShowHelpDoc extends KFrame
             + "  Documentation for the Battle Map Window (features and usage) "
             + "can be found from page: \n"
             + "     http://colossus.sourceforge.net/docs/BattleFeatures.html"
-            + "\n\n" + "  Eventually one day this may become a proper help "
-            + "browsing here...\n";
+            + "\n\n"
+            + "  Documentation for the so-called \"WebClient\" can be found "
+            + "from page: \n"
+            + "     http://colossus.sourceforge.net/docs/WebClient.html"
+            + "\n\n"
+            + "  Some more general information about the Colossus Public Game Server "
+            + "can be found from page: \n"
+            + "     http://colossus.sourceforge.net/docs/"
+            + "Colossus-Public-Game-Server.html"
+            + "\n\n"
+            + "  Eventually one day this may become a proper help "
+            + "browsing here...\n\n\n";
 
         JTextArea contentPanel = new JTextArea(text, 16, 60);
 

@@ -542,6 +542,8 @@ public final class GetPlayers extends KFrame
             }
         });
         setVisible(true);
+
+        WelcomeDialog.showWelcomeDialogMaybe(options);
     }
 
     private void actOnVariantChange(int oldMaxPlayers, String newVarName)

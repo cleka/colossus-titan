@@ -114,6 +114,8 @@ public final class Options implements IOptions
     public static final String showEventViewer = "Show event window";
     public static final String showLogWindow = "Show log window";
     public static final String showWebClient = "Show web client";
+    public static final String suppressedWelcomeDialog = "Suppressed Welcome Dialog";
+
     public static final String showEngagementResults = "Show engagement results";
     public static final String useOverlay = "Use Graphical Overlay";
     public static final String noBaseColor = "Use black overlay on Chits";
