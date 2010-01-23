@@ -26,6 +26,11 @@ Some usability and stability improvements:
 <li>WebClient: when variant changes and new variants max player count differs 
     from previous, then adjust maxSpinner.maxValue (and all spinners current 
     values, if needed)</li>
+<li>Removed keyboard shortcuts 'C' and 'D' in concede dialog</li>
+<li>Added a "Welcome Dialog" which will be displayed once for each new release.
+    This time it will inform about the Colossus Public Game Server.</li>
+<li>Added confirmation dialog if there are still possible recruits not taken
+    (Feature Request: 2937616 Muster discard "Are you sure")</li>    
 <li>Added some Public Game Server FAQ document (pretty empty still)</li>
 <li>WebClient sends now some Client side version so server knows which 
     features client can handle</li>
@@ -33,7 +38,7 @@ Some usability and stability improvements:
     at almost same time. Games would stay hanging, eventually no more games possible</li>
 <li>Prevent the illegally called engage() and other warnings and errors</li>
 <li>Added some "general notification to user" functionality (popup dialog + beep)
-   (so far only admin can send those)</li>
+    (so far only admin can send those)</li>
 <li>Eliminated the discrepancy between free ports / free game ports which 
     caused a warning on startup of the game server</li>
 <li>Fixed the remove/cancel game issues, that it was not deleted from table, 
