@@ -7,7 +7,6 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Iterator;
@@ -72,7 +71,7 @@ final class Concede extends KDialog
         contentPane.add(buttonPane);
 
         JButton button1 = new JButton(flee ? "Flee" : "Concede");
-        button1.setMnemonic(flee ? KeyEvent.VK_F : KeyEvent.VK_C);
+        // button1.setMnemonic(flee ? KeyEvent.VK_F : KeyEvent.VK_C);
         buttonPane.add(button1);
         button1.addActionListener(new ActionListener()
         {
@@ -84,7 +83,7 @@ final class Concede extends KDialog
         });
 
         JButton button2 = new JButton(flee ? "Don't Flee" : "Don't Concede");
-        button2.setMnemonic(KeyEvent.VK_D);
+        // button2.setMnemonic(KeyEvent.VK_D);
         buttonPane.add(button2);
         button2.addActionListener(new ActionListener()
         {
