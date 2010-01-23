@@ -527,7 +527,7 @@ public final class MasterBoard extends JPanel
                     doneWithPhaseAction.setEnabled(false);
                     // ... because response from server might set it
                     // to enabled again
-                    client.doneWithPhase();
+                    doneWithPhase();
                 }
             }
         };
@@ -538,7 +538,7 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                client.doneWithPhase();
+                doneWithPhase();
             }
         };
         // make this always be available
@@ -1224,6 +1224,77 @@ public final class MasterBoard extends JPanel
                     guiHexArray[i][j] = null;
                 }
             }
+        }
+    }
+
+
+    /**
+     * Finishes the current phase.
+     *
+     * Depending on the current phase this method dispatches to
+     * the different done methods.
+     *
+     * @see Client#doneWithSplits()
+     * @see Client#doneWithMoves()
+     * @see Client#doneWithEngagements()()
+     * @see Client#doneWithRecruits()()
+     */
+    private void doneWithPhase()
+    {
+        if (gui.getGame().isPhase(Phase.SPLIT))
+        {
+            client.doneWithSplits();
+        }
+        else if (gui.getGame().isPhase(Phase.MOVE))
+        {
+            client.doneWithMoves();
+        }
+        else if (gui.getGame().isPhase(Phase.FIGHT))
+        {
+            client.doneWithEngagements();
+        }
+        else if (gui.getGame().isPhase(Phase.MUSTER))
+        {
+            boolean beDone = true;
+            int cnt;
+            if ((cnt = client.getPossibleRecruitHexes().size()) > 0)
+            {
+                String[] options = new String[2];
+                options[0] = "Ok";
+                options[1] = "Cancel";
+                int answer = JOptionPane.showOptionDialog(masterFrame,
+                    "There " + (cnt == 1 ? "is" : "are") + " still " + cnt
+                        + " legion" + (cnt == 1 ? "" : "s")
+                        + " that could recruit but "
+                        + (cnt == 1 ? "doesn't" : "don't") + " do.\n"
+                        + "Really end recruitment phase?",
+                    "Leave some recruits unhandled?",
+                    JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+
+                if (answer == JOptionPane.OK_OPTION)
+                {
+                    beDone = true;
+                }
+                else
+                {
+                    beDone = false;
+                }
+
+            }
+            if (beDone)
+            {
+                client.doneWithRecruits();
+            }
+            else
+            {
+                // dispatcher disabled Done button before calling us here
+                doneWithPhaseAction.setEnabled(true);
+            }
+        }
+        else
+        {
+            throw new IllegalStateException("Client has unknown phase value");
         }
     }
 

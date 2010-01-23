@@ -2872,41 +2872,6 @@ public final class Client implements IClient, IOracle, IVariant,
         }
     }
 
-    /**
-     * Finishes the current phase.
-     *
-     * Depending on the current phase this method dispatches to
-     * the different done methods.
-     *
-     * @see Client#doneWithSplits()
-     * @see Client#doneWithMoves()
-     * @see Client#doneWithEngagements()()
-     * @see Client#doneWithRecruits()()
-     */
-    public void doneWithPhase()
-    {
-        if (game.isPhase(Phase.SPLIT))
-        {
-            doneWithSplits();
-        }
-        else if (game.isPhase(Phase.MOVE))
-        {
-            doneWithMoves();
-        }
-        else if (game.isPhase(Phase.FIGHT))
-        {
-            doneWithEngagements();
-        }
-        else if (game.isPhase(Phase.MUSTER))
-        {
-            doneWithRecruits();
-        }
-        else
-        {
-            throw new IllegalStateException("Client has unknown phase value");
-        }
-    }
-
     public void doneWithSplits()
     {
         if (!isMyTurn())
@@ -2919,7 +2884,7 @@ public final class Client implements IClient, IOracle, IVariant,
 
     }
 
-    private void doneWithMoves()
+    public void doneWithMoves()
     {
         if (!isMyTurn())
         {
@@ -2931,7 +2896,7 @@ public final class Client implements IClient, IOracle, IVariant,
         server.doneWithMoves();
     }
 
-    private void doneWithEngagements()
+    public void doneWithEngagements()
     {
         if (!isMyTurn())
         {
