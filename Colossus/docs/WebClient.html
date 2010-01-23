@@ -6,10 +6,22 @@
     <title>Colossus - Web Client</title>
   </head>
   <body>
+  
+  
 <h1>Colossus - Web Client</h1>
+
+<font color="red" size="+2">Note: this document was not updated since e.g. the 
+scheduled games feature was added (now instant and scheduled games are both 
+on "Create" tab and there is a tab for running games...). 
+So some aspects of this document are outdated!!
+<br>
+Still it should give you a general idea how to use the webclient...
+</font>
+<p>
+  
 <H3>Scope</h3>
 This document describes how to use the Colossus WebClient. The functionality 
-is now available in the public build.
+is part of the normal Colossus application.
 
 <H3>Preface</H3>
 
@@ -26,11 +38,11 @@ interface to connect to it".
 <H2>Using the WebClient</H2>
 
 The WebClient is integrated into the normal Colossus application.
-It can be brought up
-via the button <B>Run Web Client</B> in the "<B>Game Setup</B>" 
-(GetPlayers.java) dialog, or directly with a commandline option, e.g.:
+It can be brought up via the button 
+<B>Run Web Client</B> in the "<B>Game Setup</B>" (GetPlayers.java) dialog, 
+or directly with a commandline option, e.g.:
 <pre>
- <B>run -w</B>
+  <B>run -w</B>
 </pre>
 In the dialog, it forms now together with the <B>Run Network Client</B>
 a new row of buttons (2nd last row) and the
@@ -57,18 +69,21 @@ Usually the game will start on the Login tab, but that can be changed (see below
 First fill in server name or address into the "Web Server" field (and possibly
 the port, if it differs). 
 <P>
-We do not have a permanent server up yet; ask on the developer's mailing list what is
-the status, has someone temporarily running one (privately), etc.
+<i>Quick Update: We have now a public server. Server field must be play-colossus.net 
+and as port should be 26766. Those are also set as defaults if you never used this dialog 
+before.</i>
 <P>
 On first use, a user would usually use the "Register" button to
-create in a small additional window a login (username and password; 
-the email-address
-filled in there is currently not used at all, it's just for 
-completeness already part of the GUI and the data structures).
+create in a small additional window a login (username and password and
+email address. Every time you open the Register dialog, Server will send 
+a confirmation code to that address and ask you for it; type it in as you 
+get it in the mail (three two-digit numbers with spaces in between, 
+e.g. <code>23 53 23</code> ).   
+
 <P><B>NOTE:</B> As address to where the register request is sent it will use 
 the server and port settings from the "main" WebClient window.
 <P>
-After filling in username and password, click <B>Register</B> in that small
+After filling in the data, click <B>Register</B> in that small
 register window.
 
 On success, you are back to the Login pane. Click <B>Login</B> to actually
@@ -151,6 +166,8 @@ missing, perhaps after some time anyway), the game can start.
 <P>
 Details to be clarified for this...
 
+<i>Update: implemented, now in same tab as instant games.<br>
+TODO: update docs... </i>
 
 <H3>"Chat" tab</H3>
 
@@ -159,7 +176,7 @@ agree/ask here, whether someone else is currently online, interested in
 a game (or what kind of game), etc. 
 <P>
 Even if you login and nobody else is currently there, the server
-always keeps the last 10 messages in memory, and sends them to a 
+always keeps the last (currently) 50 messages in memory, and sends them to a 
 newly logged in user. This way you can see, when the last time someone
 else had posted/asked something in chat, or perhaps left a note "I'll be back in ten minutes" or "... back at &lt;some time&gt;".
 <P>
@@ -198,6 +215,7 @@ does not effect the behavior of the WebClient.
 Created October 2007.
 <BR>
 Last updated friday, January 4, 2008 by Clemens Katzer
+Quickly done some most urgent updates January 22, 2010 by Clemens Katzer
 </I>
 </body>
 </html>
