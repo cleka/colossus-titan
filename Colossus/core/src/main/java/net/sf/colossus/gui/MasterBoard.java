@@ -1257,8 +1257,9 @@ public final class MasterBoard extends JPanel
         {
             boolean beDone = true;
             int cnt;
-            if ((cnt = client.getPossibleRecruitHexes().size()) > 0 &&
-                 gui.getOptions().getOption(Options.confirmNotRecruiting))
+            if ((cnt = client.getPossibleRecruitHexes().size()) > 0
+                && gui.getOptions().getOption(
+                    Options.forgottenRecruitsWarning, true))
             {
                 String[] options = new String[2];
                 options[0] = "Ok";
