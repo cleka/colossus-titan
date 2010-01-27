@@ -342,8 +342,9 @@ public final class Options implements IOptions
 
     synchronized public void setOption(String optname, boolean value)
     {
+        boolean undefined = isOptionUndefined(optname);
         boolean oldValue = getOption(optname);
-        if (oldValue != value)
+        if (undefined || oldValue != value)
         {
             setOption(optname, String.valueOf(value));
             triggerBooleanOption(optname, oldValue, value);
@@ -412,6 +413,11 @@ public final class Options implements IOptions
             value = -1;
         }
         return value;
+    }
+
+    public boolean isOptionUndefined(String optname)
+    {
+        return (getStringOption(optname) == null);
     }
 
     synchronized public void removeOption(String optname)
