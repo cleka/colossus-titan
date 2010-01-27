@@ -299,6 +299,10 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
 
         windowPane.add(new JPanel(), FILL_CONSTRAINTS);
 
+        JPanel confirmationPane = new JPanel(new GridBagLayout());
+        tabbedPane.addTab("Confirmations", confirmationPane);
+        addCheckBox(confirmationPane, Options.confirmNotRecruiting);
+
         closeButton = new JButton("Close");
         closeButton.addActionListener(this);
         getContentPane().add(closeButton, BorderLayout.SOUTH);

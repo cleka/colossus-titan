@@ -102,6 +102,7 @@ public final class Options implements IOptions
     public static final String noTitanTeleport = "No Titan Teleport";
 
     public static final String unlimitedMulligans = "Unlimited Mulligans";
+    public static final String confirmNotRecruiting = "Confirm Not Recruiting";
 
     // Display options (client only)
     public static final String stealFocus = "Steal focus";
