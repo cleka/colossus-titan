@@ -2740,7 +2740,7 @@ public final class Client implements IClient, IOracle, IVariant,
         return result;
     }
 
-    /** Return a set of hexLabels with legions that could do a recuit
+    /** Return a set of hexLabels with legions that could do a recruit
      *  or undo recruit. Used for "if there is nothing to do in this recruit
      *  phase, can to autoDone that option is set".
      */
