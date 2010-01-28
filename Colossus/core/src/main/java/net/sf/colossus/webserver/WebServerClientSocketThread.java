@@ -723,8 +723,8 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
     public void chatDeliver(String chatId, long when, String sender,
         String message, boolean resent)
     {
-        LOGGER.log(Level.FINEST, "chatDeliver() to client " + user.getName()
-            + ": " + chatId + ", " + sender + ": " + message);
+        // LOGGER.log(Level.FINEST, "chatDeliver() to client " + user.getName()
+        //    + ": " + chatId + ", " + sender + ": " + message);
         sendToClient(chatDeliver + sep + chatId + sep + when + sep + sender
             + sep + message + sep + resent);
     }

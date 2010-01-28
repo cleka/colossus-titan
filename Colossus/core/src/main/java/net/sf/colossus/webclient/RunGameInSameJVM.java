@@ -172,6 +172,11 @@ public class RunGameInSameJVM extends Thread implements IGameRunner,
         return false;
     }
 
+    public boolean tryToStart()
+    {
+        return true;
+    }
+
     public void setServerNull()
     {
         // TODO Auto-generated method stub

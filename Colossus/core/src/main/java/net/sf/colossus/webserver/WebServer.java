@@ -514,7 +514,10 @@ public class WebServer implements IWebServer, IRunWebServer
         for (User u : users)
         {
             IWebClient client = (IWebClient)u.getThread();
-            client.gameInfo(gi);
+            if (client != null)
+            {
+                client.gameInfo(gi);
+            }
         }
     }
 
@@ -529,8 +532,17 @@ public class WebServer implements IWebServer, IRunWebServer
         {
             User u = it.next();
             IWebClient client = (IWebClient)u.getThread();
-            client.gameInfo(gi);
-            client.gameStartsSoon(gameId);
+            if (client != null)
+            {
+                client.gameInfo(gi);
+                client.gameStartsSoon(gameId);
+            }
+            else
+            {
+                LOGGER.warning("getThread for user " + u.getName()
+                    + " (of game " + gi.getGameId()
+                        + " returned null client!");
+            }
         }
     }
 
@@ -546,12 +558,22 @@ public class WebServer implements IWebServer, IRunWebServer
         {
             User u = it.next();
             IWebClient client = (IWebClient)u.getThread();
-            client.gameInfo(gi);
-            client.gameStartsNow(gameId, port, host);
+            if (client != null)
+            {
+                client.gameInfo(gi);
+                client.gameStartsNow(gameId, port, host);
+            }
+            else
+            {
+                LOGGER
+                    .warning("getThread for user " + u.getName()
+                        + " (of game " + gi.getGameId()
+                        + " returned null client!");
+            }
         }
     }
 
-    public void tellEnrolledGameStarted(GameInfo gi)
+    public void gameStarted(GameInfo gi)
     {
         gi.setState(GameState.RUNNING);
         String gameId = gi.getGameId();
@@ -562,16 +584,7 @@ public class WebServer implements IWebServer, IRunWebServer
         // System.out.println("Running: " + runningGames.toString());
         updateGUI();
 
-        for (User u : gi.getPlayers())
-        {
-            IWebClient client = (IWebClient)u.getThread();
-            // might be null, for example if automatic
-            // "on game start close web client" is in use
-            if (client != null)
-            {
-                client.gameInfo(gi);
-            }
-        }
+        allTellGameInfo(gi);
     }
 
     public void gameFailed(GameInfo gi, String reason)
@@ -626,7 +639,7 @@ public class WebServer implements IWebServer, IRunWebServer
 
         if (gi == null)
         {
-            LOGGER.warning("Attempt to cancel game with id " + gameId
+            LOGGER.info("Attempt to cancel game with id " + gameId
                 + " but no GameInfo found for that id.");
             return;
         }
@@ -634,6 +647,7 @@ public class WebServer implements IWebServer, IRunWebServer
         IGameRunner gr = gi.getGameRunner();
         if (gr != null)
         {
+            gi.setGameRunner(null);
             gr.setServerNull();
             gr.start(); // does nothing, just to get it GC'd and finalized
         }
@@ -647,7 +661,10 @@ public class WebServer implements IWebServer, IRunWebServer
         for (User u : users)
         {
             IWebClient client = (IWebClient)u.getThread();
-            client.gameCancelled(gameId, byUser);
+            if (client != null)
+            {
+                client.gameCancelled(gameId, byUser);
+            }
         }
 
         proposedGames.remove(gi.getGameId());
@@ -746,7 +763,7 @@ public class WebServer implements IWebServer, IRunWebServer
         GameInfo gi = findByGameId(gameId);
         if (gi != null)
         {
-            tellEnrolledGameStarted(gi);
+            gameStarted(gi);
         }
         else
         {
@@ -852,6 +869,7 @@ public class WebServer implements IWebServer, IRunWebServer
                 + " not implemented.");
             return;
         }
+        LOGGER.finest("Chat msg from user " + sender + ": message");
         generalChat.createStoreAndDeliverMessage(sender, message);
     }
 
@@ -975,7 +993,7 @@ public class WebServer implements IWebServer, IRunWebServer
         else
         {
             // System.out.println("starting GameRunner thread");
-            gr.start();
+            gr.tryToStart();
             LOGGER.fine("Returned from starter for game " + gi.getGameId());
 
             updateGUI();

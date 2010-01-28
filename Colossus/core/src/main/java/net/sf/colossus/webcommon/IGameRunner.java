@@ -19,6 +19,8 @@ public interface IGameRunner
 
     void setServerNull();
 
+    public boolean tryToStart();
+
     /**
      *  Waits until socket is up, i.e. game is ready to accept clients.
      */

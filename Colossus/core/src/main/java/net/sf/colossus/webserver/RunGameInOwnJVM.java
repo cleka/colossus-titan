@@ -49,6 +49,7 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
     private String colossusJar;
 
     private File flagFile;
+    private boolean alreadyStarted;
 
     public RunGameInOwnJVM(IRunWebServer server, WebServerOptions options,
         GameInfo gi)
@@ -57,6 +58,7 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
         this.options = options;
         this.gi = gi;
         this.gameId = gi.getGameId();
+        this.alreadyStarted = false;
     }
 
     public boolean makeRunningGame()
@@ -96,6 +98,23 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
     public void setServerNull()
     {
         this.server = null;
+    }
+
+    public boolean tryToStart()
+    {
+        synchronized (this)
+        {
+            if (alreadyStarted)
+            {
+                return false;
+            }
+            else
+            {
+                alreadyStarted = true;
+                this.start();
+                return true;
+            }
+        }
     }
 
     @Override
@@ -248,7 +267,7 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
             if (ok)
             {
                 // RUNNING
-                server.tellEnrolledGameStarted(gi);
+                server.gameStarted(gi);
             }
             else
             {
