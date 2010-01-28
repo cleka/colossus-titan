@@ -166,7 +166,7 @@ public class ChatMsgStorage
 
     private void parseMsgLine(String line)
     {
-        String[] tokens = line.split(SEP);
+        String[] tokens = line.split(SEP, 4);
         if (tokens.length != 4)
         {
             LOGGER.log(Level.WARNING, "invalid line '" + line
