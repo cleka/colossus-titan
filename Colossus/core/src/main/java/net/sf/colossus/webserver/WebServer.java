@@ -324,8 +324,6 @@ public class WebServer implements IWebServer, IRunWebServer
         try
         {
             clientSocket = serverSocket.accept();
-            LOGGER.log(Level.FINEST, "Got client connection from "
-                + clientSocket.getInetAddress().toString());
             LOGGER.log(Level.FINEST, "Got client connection from IP: "
                 + clientSocket.getInetAddress().toString());
 
