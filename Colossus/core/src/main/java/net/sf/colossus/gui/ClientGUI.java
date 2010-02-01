@@ -1650,22 +1650,14 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     {
         if (getGame().getDefender().equals(ally))
         {
-            System.out.println("ally - I am defender");
-
             if (options.getOption(Options.turnStartBeep))
             {
-                System.out.println("beep");
                 board.getToolkit().beep();
             }
             if (options.getOption(Options.turnStartToFront))
             {
-                System.out.println("to front");
                 board.getFrame().toFront();
             }
-        }
-        else
-        {
-            System.out.println("not defender...");
         }
     }
 
