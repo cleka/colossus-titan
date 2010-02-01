@@ -1637,11 +1637,36 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     public void showConcede(Client client, Legion ally, Legion enemy)
     {
         Concede.concede(this, board.getFrame(), ally, enemy);
+        myTurnNotificationActions(ally);
     }
 
     public void showFlee(Client client, Legion ally, Legion enemy)
     {
         Concede.flee(this, board.getFrame(), ally, enemy);
+        myTurnNotificationActions(ally);
+    }
+
+    private void myTurnNotificationActions(Legion ally)
+    {
+        if (getGame().getDefender().equals(ally))
+        {
+            System.out.println("ally - I am defender");
+
+            if (options.getOption(Options.turnStartBeep))
+            {
+                System.out.println("beep");
+                board.getToolkit().beep();
+            }
+            if (options.getOption(Options.turnStartToFront))
+            {
+                System.out.println("to front");
+                board.getFrame().toFront();
+            }
+        }
+        else
+        {
+            System.out.println("not defender...");
+        }
     }
 
     public void initShowEngagementResults()
