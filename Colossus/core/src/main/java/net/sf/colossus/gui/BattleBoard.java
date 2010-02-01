@@ -509,9 +509,6 @@ public final class BattleBoard extends KFrame
 
         mi = phaseMenu.add(concedeBattleAction);
         mi.setMnemonic(KeyEvent.VK_C);
-        // Let's keep this away until better solution (option)
-        // to avoid accidental concede while chatting...
-        // mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0));
 
         if (isMyBattleTurn())
         {
