@@ -185,6 +185,11 @@ public class WebClient extends KFrame implements IWebClient
     private JButton debugSubmitButton;
     private JButton shutdownButton;
 
+    private JTextField notifyMessageField;
+    private JTextField notifyUserField;
+    private JTextField beepCountField;
+    private JTextField beepIntervalField;
+
     private JLabel statusField;
     private String statusText = "";
 
@@ -1559,18 +1564,18 @@ public class WebClient extends KFrame implements IWebClient
         });
         adminPane.add(shutdownButton);
 
-        JTextField notifyMessage = new JTextField();
-        adminPane.add(notifyMessage);
+        notifyMessageField = new JTextField();
+        adminPane.add(notifyMessageField);
         Box notifyPane = new Box(BoxLayout.X_AXIS);
-        notifyPane.add(new JLabel("User:"));
-        JTextField notifyUser = new JTextField();
-        notifyPane.add(notifyUser);
-        notifyPane.add(new JLabel("beep count:"));
-        JTextField beepCount = new JTextField();
-        notifyPane.add(beepCount);
-        notifyPane.add(new JLabel("beep interval:"));
-        JTextField beepInterval = new JTextField();
-        notifyPane.add(beepInterval);
+        notifyPane.add(new JLabel("User: "));
+        notifyUserField = new JTextField();
+        notifyPane.add(notifyUserField);
+        notifyPane.add(new JLabel("beep count: "));
+        beepCountField = new JTextField();
+        notifyPane.add(beepCountField);
+        notifyPane.add(new JLabel("beep interval (ms): "));
+        beepIntervalField = new JTextField();
+        notifyPane.add(beepIntervalField);
         JButton beepButton = new JButton("Beep");
         beepButton.addActionListener(new ActionListener()
         {
@@ -1585,6 +1590,7 @@ public class WebClient extends KFrame implements IWebClient
         adminTab.add(adminPane);
     }
 
+
     public void beepButtonAction()
     {
         if (isAdmin())
@@ -1592,10 +1598,10 @@ public class WebClient extends KFrame implements IWebClient
             long when = new Date().getTime();
             String sender = username;
             boolean isAdmin = true;
-            String recipient = "clemens";
-            String message = "You should pay more attention! ;-) ";
-            int beepCount = 3;
-            long beepInterval = 1000;
+            String recipient = notifyUserField.getText();
+            String message = notifyMessageField.getText();
+            int beepCount = Integer.parseInt(beepCountField.getText());
+            long beepInterval = Long.parseLong(beepIntervalField.getText());
             boolean windows = true;
             server.requestUserAttention(when, sender, isAdmin, recipient,
                 message, beepCount, beepInterval, windows);

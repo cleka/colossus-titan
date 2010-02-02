@@ -801,8 +801,30 @@ public class WebServer implements IWebServer, IRunWebServer
     {
         User user = User.findUserByName(recipient);
         IWebClient client = (IWebClient)user.getThread();
-        client.requestAttention(when, sender, isAdmin, message, beepCount,
-            beepInterval, windows);
+        if (client != null)
+        {
+            client.requestAttention(when, sender, isAdmin, message, beepCount,
+                beepInterval, windows);
+        }
+        else
+        {
+            User senderUser = User.findUserByName(sender);
+            IWebClient senderClient = (IWebClient)senderUser.getThread();
+            if (senderClient != null)
+            {
+                long when2 = 0;
+                senderClient.deliverGeneralMessage(when2, true,
+                    "Notification request failed!", "Request notifying user "
+                        + recipient
+                        + " failed! No client for that user found.");
+            }
+            else
+            {
+                LOGGER.warning("requestUserAttention did not find client "
+                    + "for recipient " + recipient + " but didn't find client"
+                    + " to send error message to sender either!");
+            }
+        }
     }
 
     public void informLocallyGameOver(String gameId)
