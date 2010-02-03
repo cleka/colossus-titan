@@ -1960,6 +1960,9 @@ public final class Client implements IClient, IOracle, IVariant,
             else
             {
                 gui.defaultCursor();
+                /* TODO the whole Done with Engagements is nowadays probably,
+                 * obsolete, server does advancePhase automatically
+                 */
                 if (game.findEngagements().size() == 0)
                 {
                     if (options.getOption(Options.autoDone))
@@ -2896,6 +2899,10 @@ public final class Client implements IClient, IOracle, IVariant,
         server.doneWithMoves();
     }
 
+    /* TODO the whole Done with Engagements is nowadays probably,
+     * obsolete, server does advancePhase automatically.
+     * Check also GUI classes accordingly!
+     */
     public void doneWithEngagements()
     {
         if (!isMyTurn())
