@@ -1919,7 +1919,8 @@ public class WebClient extends KFrame implements IWebClient
                 if (gi != null)
                 {
                     if (gi.getEnrolledCount().intValue() >= gi.getMin()
-                        .intValue())
+                        .intValue()
+                        && gi.getGameState().equals(GameState.PROPOSED))
                     {
                         return true;
                     }
