@@ -526,6 +526,14 @@ public class WebServer implements IWebServer, IRunWebServer
         ArrayList<User> players = gi.getPlayers();
         Iterator<User> it = players.iterator();
 
+        // should have been set, but who knows...
+        String byUserName = "unknown";
+        User byUser = gi.getStartingUser();
+        if (byUser != null)
+        {
+            byUserName = byUser.getName();
+        }
+
         while (it.hasNext())
         {
             User u = it.next();
@@ -533,7 +541,7 @@ public class WebServer implements IWebServer, IRunWebServer
             if (client != null)
             {
                 client.gameInfo(gi);
-                client.gameStartsSoon(gameId);
+                client.gameStartsSoon(gameId, byUserName);
             }
             else
             {

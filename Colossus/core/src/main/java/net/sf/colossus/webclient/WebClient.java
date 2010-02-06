@@ -129,6 +129,8 @@ public class WebClient extends KFrame implements IWebClient
     private final static int Playing = 4;
     // private final static int PlayingButDead = 5;
 
+    private GameInfo startingGame = null;
+
     // boundaries which port nr user may enter in the ServerPort field:
     private final static int minPort = 1;
     private final static int maxPort = 65535;
@@ -231,7 +233,6 @@ public class WebClient extends KFrame implements IWebClient
     private JLabel infoTextLabel;
     final static String needLoginText = "You need to login to browse or propose Games.";
     final static String enrollText = "Propose or Enroll, and when enough players have enrolled, one of them can press 'Start'.";
-    final static String startingText = "Game is starting, MasterBoard should appear soon. Please wait...";
     final static String startedText = "Game was started...";
     final static String waitingText = "Client connected successfully, waiting for all other players. Please wait...";
     final static String enrolledText = "NOTE: While enrolled to an instant game, you can't propose or enroll to other instant games.";
@@ -1882,7 +1883,6 @@ public class WebClient extends KFrame implements IWebClient
             default:
                 return "<info text - undefined state?>";
         }
-
     }
 
     // TODO mostly duplicate with makeWindowTitleForState
@@ -2058,7 +2058,18 @@ public class WebClient extends KFrame implements IWebClient
         // First calculate new state for all kind of things...
 
         String newTitle = makeWindowTitleForState(state);
-        String newInfoText = makeInfoTextForState(state);
+        String newInfoText;
+        if (startingGame != null)
+        {
+            newInfoText = "Game was started by user "
+                + startingGame.getStartingUser().getName()
+                + "; MasterBoard should appear soon. Please wait...";
+        }
+        else
+        {
+            newInfoText = makeInfoTextForState(state);
+        }
+
         String newStatusText = makeStatusTextForState(state);
 
         boolean couldPropose = checkIfCouldPropose();
@@ -2434,9 +2445,6 @@ public class WebClient extends KFrame implements IWebClient
         df.setTimeZone(TimeZone.getDefault());
         df.setLenient(false);
 
-        // System.out.println("default locale    is " + Locale.getDefault());
-        // System.out.println("default time zone is " + TimeZone.getDefault());
-
         try
         {
             Date whenDate = df.parse(schedule);
@@ -2561,19 +2569,15 @@ public class WebClient extends KFrame implements IWebClient
         updateGUI();
     }
 
-    public void gameStartsSoon(String gameId)
+    public void gameStartsSoon(String gameId, String startUser)
     {
-        startButton.setEnabled(false);
-        startLocallyButton.setEnabled(false);
-        infoTextLabel.setText(startingText);
-    }
-
-    // TODO Remove?
-    public void gameStarted(String gameId)
-    {
-        startButton.setEnabled(false);
-        startLocallyButton.setEnabled(false);
-        infoTextLabel.setText(startedText);
+        GameInfo gi = findGameById(gameId);
+        if (gi != null)
+        {
+            gi.markStarting(new User(startUser));
+            startingGame = gi;
+        }
+        updateGUI();
     }
 
     private final Object comingUpMutex = new Object();
@@ -2652,8 +2656,6 @@ public class WebClient extends KFrame implements IWebClient
                 }
             };
             new Thread(r).start();
-            // System.out
-            //     .println("++ Runnable to start the Game Client now started...\n");
         }
     }
 
@@ -2681,13 +2683,18 @@ public class WebClient extends KFrame implements IWebClient
             }
 
             boolean noOptionsFile = false;
-            // System.out.println("in webclient, before new Client for username "
-            //     + username);
 
             gc = Client.createClient(hostingHost, p, username, type,
                 whatNextManager, localServer, true, noOptionsFile, true);
 
+            // Right now this waitingText is probably directly overwritten by
+            // updateGUI putting there again the startingText (started by player ...)
+            // but I don't want to fix even that still today...
+
+            // TODO make this behave properly...
+
             infoTextLabel.setText(waitingText);
+
             setGameClient(gc);
             gc.getGUI().setWebClient(this);
 
@@ -2699,9 +2706,7 @@ public class WebClient extends KFrame implements IWebClient
                 {
                     try
                     {
-                        // System.out.println("before comingUpMutex.wait()");
                         comingUpMutex.wait();
-                        // System.out.println("after  comingUpMutex.wait()");
                     }
                     catch (InterruptedException e)
                     {
@@ -2715,6 +2720,7 @@ public class WebClient extends KFrame implements IWebClient
             }
 
             timeoutStartup.cancel();
+            startingGame = null;
 
             if (clientIsUp)
             {
@@ -2928,19 +2934,12 @@ public class WebClient extends KFrame implements IWebClient
                                 break;
 
                             case STARTING:
-                                infoTextLabel.setText(startingText);
                                 break;
 
                             case READY_TO_CONNECT:
-
                                 break;
 
                             case RUNNING:
-                                startButton.setEnabled(false);
-                                startLocallyButton.setEnabled(false);
-                                infoTextLabel.setText(startedText);
-                                // System.out
-                                //     .println("Got a running game, replacing in run game list and remove in inst game list");
                                 replaceInTable(runGameTable, game);
                                 proposedGameDataModel.removeGame(game
                                     .getGameId());

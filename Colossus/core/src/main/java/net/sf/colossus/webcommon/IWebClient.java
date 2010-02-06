@@ -38,9 +38,7 @@ public interface IWebClient
 
     public void gameStartsNow(String gameId, int port, String hostingHost);
 
-    public void gameStartsSoon(String gameId);
-
-    public void gameStarted(String gameId);
+    public void gameStartsSoon(String gameId, String startUser);
 
     public void gameCancelled(String gameId, String byUser);
 

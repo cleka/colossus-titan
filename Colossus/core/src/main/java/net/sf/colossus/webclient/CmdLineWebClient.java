@@ -181,19 +181,13 @@ public class CmdLineWebClient implements IWebClient
 
     }
 
-    public void gameStarted(String gameId)
-    {
-        // TODO Auto-generated method stub
-
-    }
-
     public void gameStartsNow(String gameId, int port, String hostingHost)
     {
         // TODO Auto-generated method stub
 
     }
 
-    public void gameStartsSoon(String gameId)
+    public void gameStartsSoon(String gameId, String byUser)
     {
         // TODO Auto-generated method stub
 

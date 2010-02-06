@@ -704,20 +704,15 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
         sendToClient(gameInfo + sep + gi.toString(sep));
     }
 
-    public void gameStartsSoon(String gameId)
+    public void gameStartsSoon(String gameId, String byUser)
     {
-        sendToClient(gameStartsSoon + sep + gameId);
+        sendToClient(gameStartsSoon + sep + gameId + sep + byUser);
     }
 
     public void gameStartsNow(String gameId, int port, String hostingHost)
     {
         sendToClient(gameStartsNow + sep + gameId + sep + port + sep
             + hostingHost);
-    }
-
-    public void gameStarted(String gameId)
-    {
-        sendToClient(gameStarted + sep + gameId);
     }
 
     public void chatDeliver(String chatId, long when, String sender,

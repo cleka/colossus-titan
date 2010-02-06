@@ -418,24 +418,19 @@ public class WebClientSocketThread extends Thread implements IWebServer
                     webClient.gameCancelled(gameId, byUser);
                 }
 
+                else if (command.equals(IWebClient.gameStartsSoon))
+                {
+                    String gameId = tokens[1];
+                    String startUser = tokens[2];
+                    webClient.gameStartsSoon(gameId, startUser);
+                }
+
                 else if (command.equals(IWebClient.gameStartsNow))
                 {
                     String gameId = tokens[1];
                     int port = Integer.parseInt(tokens[2]);
                     String host = tokens[3];
                     webClient.gameStartsNow(gameId, port, host);
-                }
-
-                else if (command.equals(IWebClient.gameStartsSoon))
-                {
-                    String gameId = tokens[1];
-                    webClient.gameStartsSoon(gameId);
-                }
-
-                else if (command.equals(IWebClient.gameStarted))
-                {
-                    String gameId = tokens[1];
-                    webClient.gameStarted(gameId);
                 }
 
                 else if (command.equals(IWebClient.chatDeliver))
