@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 <!-- $Id: $ -->
 <html>
-  <head>
+<head>
     <meta name="generator"
     content="HTML Tidy for Linux/x86 (vers 1st July 2002), see www.w3.org" />
     <title>Colossus: Recent changes</title>
@@ -9,29 +9,25 @@
 
 <body>
 
-<h1>Release Note for Colossus 0.10.2 (betas)</h1>
-
-<h3>February 1, 2010: Release 0.10.2beta2 from r4693</h3>
-
-More usability and stability improvements: 
+<h1>Release Note for Colossus 0.10.2</h1>
+<p/>
+Usability and stability improvements: 
 <ul>
+<li>Eliminated the "Done" after Engagements phase altogether</li>
+<li>When game was started by any player, in all enrolled players clients disable
+    the Start button and show a text that game was started and by whom</li>
+<li>On WebServer start, initialize the nextFreeGameId based on highest existing
+    game directory</li>
 <li>Disable the "C" shortcut for Concede on the BattleBoard to prevent 
-    accidental Concede when typeing a "c" in the chat</li>     
+    accidental Concede when typing a "c" in the chat</li>     
 <li>Added option to be asked for confirmation when leaving legions 
     that could recruit without recuiting (by default enabled)</li>
 <li>Added that the beep and toFront for "my turn starts" are also done as defender
-    when Flee or Concede dialog is presented.</li>
+    when Flee or Concede dialog is presented</li>
 <li>WebServer writes all chat messages to a textfile</li>
 <li>Fix: When WebClient game starts, inform also not enrolled clients so that
     they move it to the Running Games table</li>
 <li>Fix: Prevent concurrentModificationExceptions for chat messages on WebServer side</li>
-</ul>
-<p />
-
-<h3>January 23, 2010: Release 0.10.2beta from r4676</h3>
-
-Some usability and stability improvements: 
-<ul>
 <li>If active player dies during battle, server side automatically advances to 
     next player instead of waiting for player finish engagements phase.
     This is related to: "2934399 Turn incomplete in multi-player"</li>
@@ -62,6 +58,7 @@ Some usability and stability improvements:
 <li>Fixed the remove/cancel game issues, that it was not deleted from table, 
     or caused exceptions, or whatever</li>
 </ul>
+
 <p />
 </body>
 </html>

@@ -13,21 +13,25 @@
 This describes the recent changes in some more detail than just the
 one-line-info on the main pages "News" section.
 
-<h3>February 3, 2010: Release 0.10.2from r47xx</h3>
+<h3>February 6, 2010: Release 0.10.2 from r4699</h3>
 <p/>
 Usability and stability improvements: 
 <ul>
 <li>Eliminated the "Done" after Engagements phase altogether</li>
+<li>When game was started by any player, in all enrolled players clients disable
+    the Start button and show a text that game was started and by whom</li>
+<li>On WebServer start, initialize the nextFreeGameId based on highest existing
+    game directory</li>
 </ul>
 <i>The following were already in 0.10.2beta2 from r4693 (February 1, 2010)</i>
 <p/>
 <ul>
 <li>Disable the "C" shortcut for Concede on the BattleBoard to prevent 
-    accidental Concede when typeing a "c" in the chat</li>     
+    accidental Concede when typing a "c" in the chat</li>     
 <li>Added option to be asked for confirmation when leaving legions 
     that could recruit without recuiting (by default enabled)</li>
 <li>Added that the beep and toFront for "my turn starts" are also done as defender
-    when Flee or Concede dialog is presented.</li>
+    when Flee or Concede dialog is presented</li>
 <li>WebServer writes all chat messages to a textfile</li>
 <li>Fix: When WebClient game starts, inform also not enrolled clients so that
     they move it to the Running Games table</li>
