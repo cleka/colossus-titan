@@ -1109,6 +1109,9 @@ public class WebServer implements IWebServer, IRunWebServer
     private void readGamesFromFile(String filename,
         HashMap<String, GameInfo> proposedGames)
     {
+        int maximumFileId = getMaximumGameIdFromFiles();
+        GameInfo.setNextFreeGameId(maximumFileId + 1);
+
         try
         {
             File gamesFile = new File(filename);
@@ -1330,4 +1333,37 @@ public class WebServer implements IWebServer, IRunWebServer
         }
     }
 
+    private int getMaximumGameIdFromFiles()
+    {
+        int maxId = 1;
+
+        String workFilesBaseDir = options
+            .getStringOption(WebServerConstants.optWorkFilesBaseDir);
+        File baseDir = new File(workFilesBaseDir);
+        if (baseDir.isDirectory())
+        {
+            String[] names = baseDir.list();
+            if (names != null && names.length > 0)
+            {
+                for (int i = 0; i < names.length; i++)
+                {
+                    String name = names[i];
+                    try
+                    {
+                        int number = Integer.parseInt(name);
+                        if (number > maxId)
+                        {
+                            maxId = number;
+                        }
+                    }
+                    catch (NumberFormatException e)
+                    {
+                        // Ignore non-number filenames
+                    }
+                }
+            }
+        }
+
+        return maxId;
+    }
 }

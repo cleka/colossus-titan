@@ -85,7 +85,17 @@ public class GameInfo
         this.players = new ArrayList<User>();
     }
 
-    private synchronized int getNextFreeGameId()
+    /** Server calls this to set it high enough that existing directories
+     *  in games work directory are not overwritten
+     *
+     *  @param id Next games should have higher number than given id
+     */
+    public static void setNextFreeGameId(int id)
+    {
+        nextFreeGameId = id;
+    }
+
+    private static int getNextFreeGameId()
     {
         return nextFreeGameId++;
     }
