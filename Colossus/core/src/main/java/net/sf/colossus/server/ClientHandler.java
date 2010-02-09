@@ -633,11 +633,10 @@ final class ClientHandler implements IClient
         if (isGone || socketChannel == null)
         {
             // do not send any more
-            /*
-             LOGGER.log(Level.WARNING,
-             "Attempt to send to player " + playerName +
-             " when client connection already gone - message: " + message);
-             */
+            LOGGER
+                .info("Attempt to send to player " + playerName
+                    + " when client connection already gone - message: "
+                    + message);
         }
         else
         {

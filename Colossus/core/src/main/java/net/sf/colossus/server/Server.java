@@ -1376,13 +1376,7 @@ public final class Server extends Thread implements IServer
                 }
             }
 
-            /* better to do the sending not inside the notify. It *might*
-             * happen that the sendTo goes an extra way around the wait on
-             * selector if the queue is just full and if that reply would
-             * want to e.g. remove already from waitingToCatchup list
-             * (which is blocked by the sync. up here) we have a deadlock...
-             */
-            for (IClient client : clients)
+            for (IClient client : waitingToCatchup)
             {
                 client.confirmWhenCaughtUp();
             }
