@@ -239,21 +239,20 @@ final class ClientHandler implements IClient
         {
             LOGGER.log(Level.WARNING, "EncondingException '" + e.getMessage()
                 + "'" + " was thrown while encoding String '" + msg + "'"
-                + " for writing it to" + " channel for player " + playerName);
+                + " for writing it to" + " channel for player " + playerName
+                + "; details follow", e);
         }
         catch (IOException ioe)
         {
             LOGGER.log(Level.WARNING, "IOException '" + ioe.getMessage() + "'"
                 + " was thrown while writing String '" + msg + "'"
-                + " to channel for player " + playerName);
+                + " to channel for player " + playerName
+                    + "; details follow:", ioe);
 
-            // TODO Would like to do withdraw and disconnect here, but they
-            // can't be used because they wd/disconn. the processingPlayer,
-            // i.e. the player for which data was just read from socket.
-            //
+
             isGone = true;
-            // TODO take care that also withdraw is done for player "this"
-            //withdrawIfNeeded();
+            withdrawnAlready = true;
+            server.withdrawFromGame(playerName);
             server.disposeClientHandler(this);
         }
         Thread.yield();
@@ -600,8 +599,8 @@ final class ClientHandler implements IClient
             LOGGER.log(Level.FINE,
                 "Client disconnected without explicit withdraw - "
                     + "doing automatic withdraw for player " + playerName);
-            server.withdrawFromGame();
             withdrawnAlready = true;
+            server.withdrawFromGame();
         }
     }
 

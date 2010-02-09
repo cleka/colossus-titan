@@ -1778,6 +1778,15 @@ public final class Server extends Thread implements IServer
 
     public void concede(Legion legion)
     {
+        // Should not happen but at least once did - legion was just
+        // eliminated and player still conceded?
+        if (legion == null)
+        {
+            LOGGER.warning(getPlayerName()
+                + " illegally called concede(): null legion!");
+            return;
+        }
+
         // TODO the next line can throw NPEs when quitting the game
         if (!getPlayer().equals(legion.getPlayer()))
         {
@@ -1791,6 +1800,16 @@ public final class Server extends Thread implements IServer
 
     public void doNotConcede(Legion legion)
     {
+        // Can this happen? Just to be sure, similar as in Concede(legion).
+        // Should not happen but at least once did - legion was just
+        // eliminated and player still conceded?
+        if (legion == null)
+        {
+            LOGGER.warning(getPlayerName()
+                + " illegally called doNotconcede(): null legion!");
+            return;
+        }
+
         if (!getPlayer().equals(legion.getPlayer()))
         {
             LOGGER.warning(getPlayerName()
@@ -2268,6 +2287,9 @@ public final class Server extends Thread implements IServer
         }
     }
 
+    /** Withdraw the currently active player
+     *  (if it is a real one, and withdrawal still makes sense).
+     */
     public void withdrawFromGame()
     {
         if (obsolete || game == null || game.isGameOver())
@@ -2282,8 +2304,44 @@ public final class Server extends Thread implements IServer
         }
 
         Player player = getPlayer();
-
         game.handlePlayerWithdrawal(player);
+    }
+
+    /** Withdraw a specific player of which we know only the name; e.g.
+     *  when one clientHandler when trying to write to another clientHandler
+     *  encountered closed socket.
+     *  @param playerName Name of the player to withdraw
+     */
+    public void withdrawFromGame(String playerName)
+    {
+        LOGGER.info("Withdrawal for specific player " + playerName
+            + " requested.");
+
+        if (obsolete || game == null || game.isGameOver())
+        {
+            LOGGER.finest("No need for withdraw - game over etc.");
+            return;
+        }
+
+        // spectators or rejected clients:
+        if (playerName == null || playerName.startsWith("spectator"))
+        {
+            LOGGER.finest("No need for withdraw - null player or spectator.");
+            return;
+        }
+
+        Player player = game.getPlayerByName(playerName);
+        if (player != null)
+        {
+            LOGGER.finest("Doing game.handlePlayerWithdrawal for "
+                + playerName);
+            game.handlePlayerWithdrawal(player);
+        }
+        else
+        {
+            LOGGER.warning("Can't do game.handlePlayerWithdrawal for "
+                + playerName + " because getPlayerName gave null player!");
+        }
     }
 
     // client will dispose itself soon,
