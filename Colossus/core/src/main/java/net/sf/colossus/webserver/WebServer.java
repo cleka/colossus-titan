@@ -897,7 +897,7 @@ public class WebServer implements IWebServer, IRunWebServer
                 + " not implemented.");
             return;
         }
-        LOGGER.finest("Chat msg from user " + sender + ": message");
+        LOGGER.finest("Chat msg from user " + sender + ": " + message);
         generalChat.createStoreAndDeliverMessage(sender, message);
     }
 

@@ -582,7 +582,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             }
             else
             {
-                LOGGER.log(Level.FINEST, "ACK: " + command + sep + reason);
+                // LOGGER.log(Level.FINEST, "ACK: " + command + sep + reason);
                 out.println("ACK: " + command + sep + reason);
             }
         }
