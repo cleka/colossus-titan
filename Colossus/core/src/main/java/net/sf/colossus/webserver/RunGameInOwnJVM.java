@@ -263,7 +263,7 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
             server.tellEnrolledGameStartsNow(gi, hostingHost, port);
             server.allTellGameInfo(gi);
 
-            boolean ok = waitUntilGameStartedSuccessfully(10);
+            boolean ok = waitUntilGameStartedSuccessfully(30);
             if (ok)
             {
                 // RUNNING
@@ -428,13 +428,13 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
         int connected = 0;
         int checkInterval = 1000; // every second
 
-        for (int i = 0; !ok && i < timeout; i++)
+        for (int i = 0; !ok && i < timeout;)
         {
             line = waitForLine(in, checkInterval);
             if (line == null)
             {
-                // Wait til next round. If case is only needed to prevent
-                // the else-ifs to check against null pointer.
+                // Didn't get anything => readLine timeout hit
+                i++;
             }
             else if (line.startsWith("Client connected: "))
             {
@@ -444,12 +444,10 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
             {
                 ok = true;
             }
-
             else if (line.startsWith("Game Startup Completed"))
             {
                 ok = true;
             }
-
             if (connected >= gi.getPlayers().size())
             {
                 ok = true;
