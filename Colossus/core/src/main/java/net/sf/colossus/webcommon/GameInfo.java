@@ -519,11 +519,17 @@ public class GameInfo
         it = null;
         if (found)
         {
-            LOGGER.log(Level.FINEST, "reEnroll: Adding new user to players.");
             players.add(newUser);
+            LOGGER.finest("Re-Enrolled user " + newName + " to game "
+                + getGameId());
+            LOGGER.finest("Players now: " + getPlayerListAsString());
+        }
+        else
+        {
+            LOGGER.finest("User " + newName + " not in game " + getGameId()
+                + " - nothing to do.");
         }
 
-        LOGGER.log(Level.FINEST, "Players now: " + players.toString());
         return found;
     }
 
