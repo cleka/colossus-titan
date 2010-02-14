@@ -655,7 +655,7 @@ public class WebServer implements IWebServer, IRunWebServer
         {
             gi.setGameRunner(null);
             gr.setServerNull();
-            gr.start(); // does nothing, just to get it GC'd and finalized
+            gr.tryToStart(); // does nothing, just to get it GC'd and finalized
         }
         else
         {
