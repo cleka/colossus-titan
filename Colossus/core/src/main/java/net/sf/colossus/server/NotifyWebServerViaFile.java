@@ -63,8 +63,8 @@ public class NotifyWebServerViaFile implements INotifyWebServer
     {
         if (active)
         {
-            out.println("Client (type " + (remote ? "remote" : "local")
-                + ") connected: " + playerName);
+            out.println((remote ? "Remote" : "Local") + " client connected: "
+                + playerName);
         }
     }
 
