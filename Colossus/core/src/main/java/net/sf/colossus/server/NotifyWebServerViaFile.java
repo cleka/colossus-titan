@@ -65,7 +65,6 @@ public class NotifyWebServerViaFile implements INotifyWebServer
         {
             out.println("Client (type " + (remote ? "remote" : "local")
                 + ") connected: " + playerName);
-            out.flush();
         }
     }
 
@@ -74,7 +73,6 @@ public class NotifyWebServerViaFile implements INotifyWebServer
         if (active)
         {
             out.println("All clients connected");
-            out.flush();
         }
     }
 
@@ -83,7 +81,6 @@ public class NotifyWebServerViaFile implements INotifyWebServer
         if (active)
         {
             out.println("Game Startup Completed");
-            out.flush();
         }
     }
 
@@ -102,8 +99,7 @@ public class NotifyWebServerViaFile implements INotifyWebServer
             flagFile = new File(flagFilename);
             try
             {
-                // flagFile.createNewFile();
-                out = new PrintWriter(new FileWriter(flagFile));
+                out = new PrintWriter(new FileWriter(flagFile), true);
             }
             catch (IOException e)
             {
