@@ -306,8 +306,9 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
         {
             LOGGER.log(Level.WARNING, "Game " + gameId
                 + " ended but flagfile " + flagFile.toString()
-                + " does still exist...? Deleting it...");
-            flagFile.delete();
+                + " does still exist...? Renaming it...");
+            flagFile.renameTo(new File(flagFile.getParent(),
+                "flagfile.away"));
         }
         else
         {
