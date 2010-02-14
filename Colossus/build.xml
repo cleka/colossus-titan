@@ -42,7 +42,7 @@
     <property name="build.compiler" value="modern" />
     <property name="HTML_DIR"
     value="/home/groups/c/co/colossus/htdocs" />
-    <property name="DOWNLOAD_DIR" value="${HTML_DIR}/download" />
+    <property name="DOWNLOAD_DIR" value="/home/pfs/project/c/co/colossus" />
     <property name="DOCS_DIR" value="${HTML_DIR}/docs" />
     <property name="LIBS_DIR" value="${HTML_DIR}/libs" />
     <property name="ZIPFILE" value="Colossus.${DSTAMP}.zip" />
@@ -286,7 +286,7 @@
        to cleaning up and ignoring files in the VCS. It would be better to collect all generated
        artifacts somewhere in the build directories and then zip those together with sources that
        need to be deployed. -->
-  <target name="dist" depends="clean,init,buildInfo,signall"
+  <target name="dist" depends="clean,init,buildInfo,webjar,signall"
   description="Make zip file for user download">
     <zip zipfile="${ZIPFILE}" basedir="."
     excludes="build/**, target/**, **/*.sav, **/*.zip, **/*.bak, **/*javadoc*/*, *Keystore*, *cfg, *properties*, BattlelandsRandomizer.jar, .*, **/*.ps, **/*.aux, **/*.bbl, **/*.bib, **/*.blg, **/*.log, **/*.old, tmp/**, libs/build/**"/>
