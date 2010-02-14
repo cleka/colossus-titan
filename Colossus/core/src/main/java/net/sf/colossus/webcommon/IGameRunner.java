@@ -17,8 +17,6 @@ public interface IGameRunner
 
     String getHostingHost();
 
-    void setServerNull();
-
     public boolean tryToStart();
 
     /**

@@ -38,7 +38,7 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
     private int hostingPort;
     private String hostingHost;
 
-    private IRunWebServer server;
+    private final IRunWebServer server;
     private final WebServerOptions options;
     private final GameInfo gi;
     private final String gameId;
@@ -87,17 +87,6 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
     public String getHostingHost()
     {
         return hostingHost;
-    }
-
-    // used when cancelling: set to null and then start(),
-    // then the run() method calls only the client dummy which
-    // is a do-nothing operation.
-    // If start() is not run, the GameInfo object will never get
-    // garbage collected and finalized.
-
-    public void setServerNull()
-    {
-        this.server = null;
     }
 
     public boolean tryToStart()
