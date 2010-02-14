@@ -421,12 +421,14 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
         for (int i = 0; !ok && i < timeout;)
         {
             line = waitForLine(in, checkInterval);
+            LOGGER.info("GOT: " + line);
             if (line == null)
             {
                 // Didn't get anything => readLine timeout hit
                 i++;
             }
-            else if (line.startsWith("Client connected: "))
+            else if (line.startsWith("Local client connected: ")
+                || line.startsWith("Remote client connected: "))
             {
                 connected++;
             }
