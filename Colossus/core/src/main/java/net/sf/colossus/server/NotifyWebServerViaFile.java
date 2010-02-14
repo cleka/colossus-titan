@@ -112,11 +112,11 @@ public class NotifyWebServerViaFile implements INotifyWebServer
 
     private void removeFlagfile()
     {
-        out.close();
         if (active)
         {
             try
             {
+                out.close();
                 flagFile.delete();
             }
             catch (Exception e)
