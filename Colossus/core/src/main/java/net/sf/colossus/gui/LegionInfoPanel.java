@@ -26,7 +26,7 @@ public final class LegionInfoPanel extends JPanel
 
     public LegionInfoPanel(LegionClientSide legion, int scale, int margin,
         int padding, boolean usePlayerColor, int viewMode, boolean isMyLegion,
-        boolean dubiousAsBlanks, boolean showLegionValue)
+        boolean dubiousAsBlanks, boolean showLegionValue, boolean showMarker)
     {
         boolean contentCertain = false;
         boolean hideAll = false;
@@ -35,7 +35,7 @@ public final class LegionInfoPanel extends JPanel
         {
             contentCertain = true;
             viewAll(legion, usePlayerColor, scale, margin, padding,
-                dubiousAsBlanks, hideAll, showLegionValue);
+                dubiousAsBlanks, hideAll, showLegionValue, showMarker);
         }
         else if (viewMode == Options.viewableOwnNum)
         {
@@ -43,13 +43,13 @@ public final class LegionInfoPanel extends JPanel
             {
                 contentCertain = true;
                 viewAll(legion, usePlayerColor, scale, margin, padding,
-                    dubiousAsBlanks, hideAll, showLegionValue);
+                    dubiousAsBlanks, hideAll, showLegionValue, showMarker);
             }
             else
             {
                 hideAll = true;
                 viewAll(legion, usePlayerColor, scale, margin, padding, false,
-                    hideAll, showLegionValue);
+                    hideAll, showLegionValue, showMarker);
             }
         }
         else if (viewMode == Options.viewableEverNum)
@@ -59,7 +59,7 @@ public final class LegionInfoPanel extends JPanel
             // thus we can use the splitPrediction to decide what is
             // "has ever been shown or can be concluded".
             viewAll(legion, usePlayerColor, scale, margin, padding,
-                dubiousAsBlanks, hideAll, showLegionValue);
+                dubiousAsBlanks, hideAll, showLegionValue, showMarker);
         }
         else
         {
@@ -116,7 +116,7 @@ public final class LegionInfoPanel extends JPanel
 
     private void viewAll(LegionClientSide legion, boolean usePlayerColor,
         int scale, int margin, int padding, boolean dubiousAsBlanks,
-        boolean hideAll, boolean showLegionValue)
+        boolean hideAll, boolean showLegionValue, boolean showMarker)
     {
         setLayout(null);
 
@@ -132,8 +132,6 @@ public final class LegionInfoPanel extends JPanel
         int effectiveChitSize = 0; // Chit treats scale as a hint,
         // actual size might differ
 
-        // We could add the marker, if we want:
-        boolean showMarker = false;
         if (showMarker)
         {
             Chit marker = new Chit(scale, legion.getMarkerId(), false, true,

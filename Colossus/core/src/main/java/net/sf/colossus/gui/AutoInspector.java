@@ -88,9 +88,11 @@ class AutoInspector extends KDialog
         assertEDT();
         scrollPane.getViewport().removeAll();
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        boolean showMarker = gui.getOptions().getOption(Options.showMarker);
 
         LegionInfoPanel liPanel = new LegionInfoPanel(legion, 4 * Scale.get(),
-            5, 2, false, viewMode, isMyLegion, dubiousAsBlanks, false);
+            5, 2, false, viewMode, isMyLegion, dubiousAsBlanks, false,
+            showMarker);
         panel.add(liPanel);
         String valueText = liPanel.getValueText();
         String ownerText = isMyLegion ? "" : " ["

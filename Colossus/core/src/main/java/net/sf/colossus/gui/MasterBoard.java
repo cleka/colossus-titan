@@ -283,9 +283,12 @@ public final class MasterBoard extends JPanel
 
                 boolean dubiousAsBlanks = gui.getOptions().getOption(
                     Options.dubiousAsBlanks);
+                boolean showMarker = gui.getOptions().getOption(
+                    Options.showMarker);
+
                 final JPanel panel = new LegionInfoPanel(legion, scale,
                     PANEL_MARGIN, PANEL_PADDING, true, gui.getViewMode(),
-                    client.isMyLegion(legion), dubiousAsBlanks, true);
+                    client.isMyLegion(legion), dubiousAsBlanks, true, showMarker);
                 add(panel);
                 legionFlyouts[i] = panel;
 
@@ -1004,6 +1007,7 @@ public final class MasterBoard extends JPanel
         int viewMode = gui.getViewMode();
         boolean dubiousAsBlanks = gui.getOptions().getOption(
             Options.dubiousAsBlanks);
+        boolean showMarker = gui.getOptions().getOption(Options.showMarker);
 
         List<Legion> legions = gui.getGame().getLegionsByHex(hex.getHexModel());
         for (Legion legion : legions)
@@ -1015,7 +1019,7 @@ public final class MasterBoard extends JPanel
             markerPoint.setLocation(markerPoint.x + chitScale, markerPoint.y);
             new ShowLegion(masterFrame, (LegionClientSide)legion, markerPoint,
                 scrollPane, 4 * Scale.get(), viewMode, client
-                    .isMyLegion(legion), dubiousAsBlanks);
+                    .isMyLegion(legion), dubiousAsBlanks, showMarker);
         }
     }
 
@@ -1908,9 +1912,11 @@ public final class MasterBoard extends JPanel
                     int viewMode = gui.getViewMode();
                     boolean dubiousAsBlanks = gui.getOptions().getOption(
                         Options.dubiousAsBlanks);
+                    boolean showMarker = gui.getOptions().getOption(
+                        Options.showMarker);
                     new ShowLegion(masterFrame, legion, point, scrollPane,
                         4 * Scale.get(), viewMode, client.isMyLegion(legion),
-                        dubiousAsBlanks);
+                        dubiousAsBlanks, showMarker);
                     return;
                 }
                 else if (client.isMyLegion(legion))

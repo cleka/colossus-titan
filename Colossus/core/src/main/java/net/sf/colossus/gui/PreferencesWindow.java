@@ -258,6 +258,7 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
         boolean avail = (gui.getViewMode() == Options.viewableEverNum);
         addCheckBox(miscPane, Options.dubiousAsBlanks, avail, false);
         // , KeyEvent.VK_D);
+        addCheckBox(miscPane, Options.showMarker);
         viewPane.add(new JPanel(), FILL_CONSTRAINTS);
 
         // Window tab

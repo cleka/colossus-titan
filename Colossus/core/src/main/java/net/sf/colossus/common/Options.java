@@ -63,6 +63,7 @@ public final class Options implements IOptions
     public static final String variantFileWithFullPath = "Variant full path";
     public static final String viewMode = "ViewMode";
     public static final String dubiousAsBlanks = "Uncertain as blank (Autoinspector etc.)";
+    public static final String showMarker = "Show Marker (Autoinspector etc.)";
 
     // Web Client specific:
     public static final String minPlayersWeb = "Min Players Web Client";

@@ -162,6 +162,9 @@ public final class PlayerDetailsDialog extends KDialog
         result.add(new JLabel("Content"), LABEL_CONSTRAINT);
         result.add(new JPanel(), HORIZONTAL_FILL_CONSTRAINT);
 
+        boolean dubiousAsBlanks = gui.getOptions().getOption(
+            Options.dubiousAsBlanks);
+
         for (LegionClientSide legion : player.getLegions())
         {
             result.add(new Marker(2 * Scale.get(), legion.getMarkerId()),
@@ -170,7 +173,7 @@ public final class PlayerDetailsDialog extends KDialog
                 LABEL_CONSTRAINT);
             result.add(new LegionInfoPanel(legion, 2 * Scale.get(), 0, 0,
                 true, gui.getViewMode(), gui.getClient().isMyLegion(legion),
-                gui.getOptions().getOption(Options.dubiousAsBlanks), true),
+                dubiousAsBlanks, true, false),
                 LABEL_CONSTRAINT);
             result.add(new JPanel(), HORIZONTAL_FILL_CONSTRAINT);
         }

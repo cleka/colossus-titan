@@ -24,7 +24,7 @@ final class ShowLegion extends KDialog
 {
     ShowLegion(JFrame parentFrame, LegionClientSide legion, Point point,
         JScrollPane pane, int scale, int viewMode, boolean isMyLegion,
-        boolean dubiousAsBlanks)
+        boolean dubiousAsBlanks, boolean showMarker)
     {
         super(parentFrame, legion.getMarkerId(), false);
 
@@ -45,7 +45,7 @@ final class ShowLegion extends KDialog
         });
 
         LegionInfoPanel liPanel = new LegionInfoPanel(legion, scale, 5, 2,
-            false, viewMode, isMyLegion, dubiousAsBlanks, false);
+            false, viewMode, isMyLegion, dubiousAsBlanks, false, showMarker);
         getContentPane().add(liPanel);
 
         String valueText = liPanel.getValueText();
