@@ -104,6 +104,7 @@ public final class MasterBoard extends JPanel
     private ShowHelpDoc showHelpDoc;
     private JMenu phaseMenu;
     private JPopupMenu popupMenu;
+    private JPopupMenu popupMenuWithLegions;
     private Map<String, JCheckBoxMenuItem> checkboxes = new HashMap<String, JCheckBoxMenuItem>();
     private JPanel[] legionFlyouts;
 
@@ -159,6 +160,7 @@ public final class MasterBoard extends JPanel
     private static final String viewFullRecruitTree = "View Full Recruit Tree";
     private static final String viewHexRecruitTree = "View Hex Recruit Tree";
     private static final String viewBattleMap = "View Battle Map";
+    private static final String viewLegions = "View Legion(s)";
 
     private static final String chooseScreen = "Choose Screen For Info Windows";
     private static final String preferences = "Preferences...";
@@ -188,6 +190,7 @@ public final class MasterBoard extends JPanel
     private AbstractAction viewFullRecruitTreeAction;
     private AbstractAction viewHexRecruitTreeAction;
     private AbstractAction viewBattleMapAction;
+    private AbstractAction viewLegionsAction;
 
     private AbstractAction chooseScreenAction;
 
@@ -347,7 +350,7 @@ public final class MasterBoard extends JPanel
 
         setupGUIHexes();
         setupActions();
-        setupPopupMenu();
+        setupPopupMenus();
         setupTopMenu();
 
         scrollPane = new JScrollPane(this);
@@ -615,6 +618,20 @@ public final class MasterBoard extends JPanel
                 {
                     new ShowBattleMap(masterFrame, gui, hex);
                 }
+            }
+        };
+
+        viewLegionsAction = new AbstractAction(viewLegions)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                if (lastPoint == null)
+                {
+                    LOGGER.warning("Action viewLegions called but "
+                        + "lastPoint is null.");
+                    return;
+                }
+                MasterBoard.this.viewLegions(lastPoint);
             }
         };
 
@@ -951,7 +968,7 @@ public final class MasterBoard extends JPanel
         quitGameAction.actionPerformed(null);
     }
 
-    private void setupPopupMenu()
+    private void setupPopupMenus()
     {
         popupMenu = new JPopupMenu();
         contentPane.add(popupMenu);
@@ -961,6 +978,45 @@ public final class MasterBoard extends JPanel
 
         mi = popupMenu.add(viewBattleMapAction);
         mi.setMnemonic(KeyEvent.VK_B);
+
+        popupMenuWithLegions = new JPopupMenu();
+        contentPane.add(popupMenu);
+
+        mi = popupMenuWithLegions.add(viewHexRecruitTreeAction);
+        mi.setMnemonic(KeyEvent.VK_R);
+
+        mi = popupMenuWithLegions.add(viewBattleMapAction);
+        mi.setMnemonic(KeyEvent.VK_B);
+
+        mi = popupMenuWithLegions.add(viewLegionsAction);
+        mi.setMnemonic(KeyEvent.VK_L);
+
+    }
+
+    public void viewLegions(Point point)
+    {
+        GUIMasterHex hex = getHexContainingPoint(point);
+        if (hex == null)
+        {
+            return;
+        }
+
+        int viewMode = gui.getViewMode();
+        boolean dubiousAsBlanks = gui.getOptions().getOption(
+            Options.dubiousAsBlanks);
+
+        List<Legion> legions = gui.getGame().getLegionsByHex(hex.getHexModel());
+        for (Legion legion : legions)
+        {
+            Marker marker = legionToMarkerMap.get(legion);
+            int chitScale = marker.getBounds().width;
+            Point markerPoint = marker.getLocation();
+            // upper right corner
+            markerPoint.setLocation(markerPoint.x + chitScale, markerPoint.y);
+            new ShowLegion(masterFrame, (LegionClientSide)legion, markerPoint,
+                scrollPane, 4 * Scale.get(), viewMode, client
+                    .isMyLegion(legion), dubiousAsBlanks);
+        }
     }
 
     private ItemListener itemHandler = new MasterBoardItemHandler();
@@ -1878,8 +1934,19 @@ public final class MasterBoard extends JPanel
                 if (isPopupButton(e))
                 {
                     lastPoint = point;
-                    popupMenu.setLabel(hex.getHexModel().getDescription());
-                    popupMenu.show(e.getComponent(), point.x, point.y);
+                    if (gui.getGame().getLegionsByHex(hex.getHexModel())
+                        .size() > 0)
+                    {
+                        popupMenuWithLegions.setLabel(hex.getHexModel()
+                            .getDescription());
+                        popupMenuWithLegions.show(e.getComponent(), point.x,
+                            point.y);
+                    }
+                    else
+                    {
+                        popupMenu.setLabel(hex.getHexModel().getDescription());
+                        popupMenu.show(e.getComponent(), point.x, point.y);
+                    }
                     return;
                 }
 
