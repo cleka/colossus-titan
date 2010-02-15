@@ -619,7 +619,7 @@ public final class MasterBoard extends JPanel
                 GUIMasterHex hex = getHexContainingPoint(lastPoint);
                 if (hex != null)
                 {
-                    new ShowBattleMap(masterFrame, gui, hex);
+                    showBattleMap(hex);
                 }
             }
         };
@@ -969,6 +969,11 @@ public final class MasterBoard extends JPanel
     public void doQuitGameAction()
     {
         quitGameAction.actionPerformed(null);
+    }
+
+    public void showBattleMap(GUIMasterHex hex)
+    {
+        new ShowBattleMap(masterFrame, gui, hex);
     }
 
     private void setupPopupMenus()

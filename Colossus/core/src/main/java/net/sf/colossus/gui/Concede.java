@@ -38,6 +38,9 @@ final class Concede extends KDialog
     private Point location;
     private final ClientGUI gui;
     private final Legion ally;
+    private final Legion attacker;
+    private final Legion defender;
+
     private final SaveWindow saveWindow;
 
     private Concede(ClientGUI clientGui, JFrame parentFrame, Legion ally,
@@ -63,7 +66,34 @@ final class Concede extends KDialog
         this.gui = clientGui;
         this.ally = ally;
 
+        if (ally.hasMoved())
+        {
+            this.attacker = ally;
+            this.defender = enemy;
+        }
+        else
+        {
+            this.attacker = enemy;
+            this.defender = ally;
+        }
+
         setBackground(Color.lightGray);
+
+        /*
+        EntrySide entrySide = attacker.getEntrySide();
+        int direction = findDirectionForEntrySide(defender.getCurrentHex(),
+            entrySide);
+        MasterHex neighborHex = defender.getCurrentHex()
+            .getNeighbor(direction);
+        String neighborHexText = neighborHex.getDescription();
+        */
+
+        contentPane.add(new JLabel(attacker.getMarkerId() + " attacks "
+            + defender.getMarkerId() + " in "
+            + defender.getCurrentHex().getDescription() + ", entering from "
+            + attacker.getEntrySide().getLabel()
+        // + " (" + neighborHexText + ")"
+            ));
 
         showLegion(ally);
         showLegion(enemy);
@@ -76,7 +106,6 @@ final class Concede extends KDialog
         buttonPane.add(button1);
         button1.addActionListener(new ActionListener()
         {
-
             public void actionPerformed(ActionEvent e)
             {
                 cleanup(true);
@@ -88,13 +117,26 @@ final class Concede extends KDialog
         buttonPane.add(button2);
         button2.addActionListener(new ActionListener()
         {
-
             public void actionPerformed(ActionEvent e)
             {
                 cleanup(false);
 
             }
         });
+
+        JButton button3 = new JButton("Show Battle Map");
+        button3.setMnemonic(KeyEvent.VK_M);
+        buttonPane.add(button3);
+        button3.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                GUIMasterHex hex = gui.getBoard().getGUIHexByMasterHex(
+                    attacker.getCurrentHex());
+                gui.getBoard().showBattleMap(hex);
+            }
+        });
+
 
         pack();
 
@@ -116,6 +158,44 @@ final class Concede extends KDialog
         setVisible(true);
         repaint();
     }
+
+    /* DOES NOT WORK YET :-(
+
+    private int findDirectionForEntrySide(MasterHex hex,
+        EntrySide wantedEntrySide)
+    {
+        int direction = -1;
+        int i;
+        for (i = 0; i < 6 && direction == -1; i++)
+        {
+            System.out.println("labelside: " + hex.getLabelSide());
+            int esNr = (hex.getLabelSide() - i + 6) % 6;
+            EntrySide tmp = EntrySide.values()[esNr];
+
+            if (tmp == null)
+            {
+                System.out.println("trying direction " + i + " tmp is null");
+                continue;
+            }
+            else
+            {
+                System.out.println("trying direction " + i + " esNr=" + esNr
+                    + " estmp = "
+                    + tmp.getLabel());
+
+                if (tmp.getLabel() != null
+                    && tmp.getLabel().equals(wantedEntrySide.getLabel()))
+                {
+                    direction = i;
+                    System.out.println("FOUND: i=" + i + " esNr = " + esNr
+                        + " side " + tmp);
+                }
+            }
+        }
+
+        return direction;
+    }
+    */
 
     private void showLegion(Legion legion)
     {
@@ -159,6 +239,11 @@ final class Concede extends KDialog
         Legion enemy)
     {
         new Concede(gui, parentFrame, ally, enemy, true);
+    }
+
+    public Legion getAttacker()
+    {
+        return this.attacker;
     }
 
     private void cleanup(boolean answer)
