@@ -4,6 +4,7 @@ package net.sf.colossus.variant;
 import java.awt.Color;
 
 import net.sf.colossus.common.Constants;
+import net.sf.colossus.game.EntrySide;
 
 
 /**
@@ -101,6 +102,37 @@ public class MasterHex extends Hex
     {
         return labelSide;
     }
+
+    /**
+     * For a given EntrySide, find out which direction that means.
+     * Caller can use that e.g. to figure out what is the neighbor hex
+     * from where an attacker is coming
+     *
+     * TODO should this rather be somewhere else? Since it uses entryside,
+     * it makes variant package depending on game package ...
+     *
+     * @param hex
+     * @param wantedEntrySide
+     * @return The direction towards which that entryside is placed
+     */
+    public int findDirectionForEntrySide(EntrySide wantedEntrySide)
+    {
+        int i;
+        for (i = 0; i < 6; i++)
+        {
+            int esNr = (6 + i - getLabelSide()) % 6;
+            EntrySide esTmp = EntrySide.values()[esNr];
+
+            if (esTmp != null && esTmp.getLabel() != null
+                && esTmp.getLabel().equals(wantedEntrySide.getLabel()))
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
 
     public void setLabelSide(int labelSide)
     {

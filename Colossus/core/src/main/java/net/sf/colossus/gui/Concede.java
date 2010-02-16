@@ -21,10 +21,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.sf.colossus.client.LegionClientSide;
+import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.guiutil.KDialog;
 import net.sf.colossus.guiutil.SaveWindow;
 import net.sf.colossus.server.LegionServerSide;
+import net.sf.colossus.variant.MasterHex;
 
 
 /**
@@ -79,20 +81,18 @@ final class Concede extends KDialog
 
         setBackground(Color.lightGray);
 
-        /*
+        MasterHex hex = defender.getCurrentHex();
         EntrySide entrySide = attacker.getEntrySide();
-        int direction = findDirectionForEntrySide(defender.getCurrentHex(),
-            entrySide);
-        MasterHex neighborHex = defender.getCurrentHex()
-            .getNeighbor(direction);
-        String neighborHexText = neighborHex.getDescription();
-        */
+        int direction = hex.findDirectionForEntrySide(entrySide);
+
+        MasterHex neighborHex = hex.getNeighbor(direction);
 
         contentPane.add(new JLabel(attacker.getMarkerId() + " attacks "
             + defender.getMarkerId() + " in "
-            + defender.getCurrentHex().getDescription() + ", entering from "
-            + attacker.getEntrySide().getLabel()
-        // + " (" + neighborHexText + ")"
+            + hex.getDescription()
+            + ", entering from "
+            + attacker.getEntrySide().getLabel() + " (" + neighborHex.getDescription()
+            + ")"
             ));
 
         showLegion(ally);
@@ -120,7 +120,6 @@ final class Concede extends KDialog
             public void actionPerformed(ActionEvent e)
             {
                 cleanup(false);
-
             }
         });
 
@@ -158,44 +157,6 @@ final class Concede extends KDialog
         setVisible(true);
         repaint();
     }
-
-    /* DOES NOT WORK YET :-(
-
-    private int findDirectionForEntrySide(MasterHex hex,
-        EntrySide wantedEntrySide)
-    {
-        int direction = -1;
-        int i;
-        for (i = 0; i < 6 && direction == -1; i++)
-        {
-            System.out.println("labelside: " + hex.getLabelSide());
-            int esNr = (hex.getLabelSide() - i + 6) % 6;
-            EntrySide tmp = EntrySide.values()[esNr];
-
-            if (tmp == null)
-            {
-                System.out.println("trying direction " + i + " tmp is null");
-                continue;
-            }
-            else
-            {
-                System.out.println("trying direction " + i + " esNr=" + esNr
-                    + " estmp = "
-                    + tmp.getLabel());
-
-                if (tmp.getLabel() != null
-                    && tmp.getLabel().equals(wantedEntrySide.getLabel()))
-                {
-                    direction = i;
-                    System.out.println("FOUND: i=" + i + " esNr = " + esNr
-                        + " side " + tmp);
-                }
-            }
-        }
-
-        return direction;
-    }
-    */
 
     private void showLegion(Legion legion)
     {
