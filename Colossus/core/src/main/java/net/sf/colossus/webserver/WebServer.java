@@ -603,19 +603,36 @@ public class WebServer implements IWebServer, IRunWebServer
 
     public void enrollUserToGame(String gameId, String username)
     {
-        GameInfo gi = findByGameId(gameId);
         User user = User.findUserByName(username);
-
+        GameInfo gi = findByGameId(gameId);
         if (gi != null)
         {
-            String reasonFail = gi.enroll(user);
-            proposedGamesListModified = true;
-            if (reasonFail == null)
+            synchronized(gi)
             {
-                gi.updateOnline();
-                allTellGameInfo(gi);
-                IWebClient client = (IWebClient)user.getThread();
-                client.didEnroll(gameId, user.getName());
+                if (!gi.isStarting())
+                {
+                    String reasonFail = gi.enroll(user);
+                    proposedGamesListModified = true;
+                    if (reasonFail == null)
+                    {
+                        gi.updateOnline();
+                        allTellGameInfo(gi);
+                        IWebClient client = (IWebClient)user.getThread();
+                        client.didEnroll(gameId, user.getName());
+                    }
+                }
+                else
+                {
+                    IWebClient webClient = (IWebClient)user.getThread();
+                    if (webClient != null)
+                    {
+                        String message = "Enrolling to " + gi.getGameId()
+                            + " failed, game is already starting.";
+                        long when = 0;
+                        webClient.deliverGeneralMessage(when, false,
+                            "Can't enroll!", message);
+                    }
+                }
             }
         }
     }

@@ -711,6 +711,11 @@ public class GameInfo
         this.state = GameState.ACTIVATED;
     }
 
+    public boolean isStarting()
+    {
+        return startingUser != null;
+    }
+
     public void cancelStarting()
     {
         this.state = oldState;
