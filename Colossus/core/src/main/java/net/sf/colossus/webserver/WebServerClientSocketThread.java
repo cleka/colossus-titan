@@ -2,10 +2,12 @@ package net.sf.colossus.webserver;
 
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.InterruptedIOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketException;
@@ -65,7 +67,9 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
     {
         try
         {
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+            PrintWriter out = new PrintWriter(new BufferedWriter(
+                new OutputStreamWriter(socket.getOutputStream())), true);
+
             out.println(tooManyUsers);
             out.println(connectionClosed);
             // give client some time to process the response
@@ -134,7 +138,8 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
         {
             is = socket.getInputStream();
             in = new BufferedReader(new InputStreamReader(is));
-            out = new PrintWriter(socket.getOutputStream(), true);
+            out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
+                socket.getOutputStream())), true);
         }
         catch (IOException ex)
         {

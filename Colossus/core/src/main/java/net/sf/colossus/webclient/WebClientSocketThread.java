@@ -2,8 +2,10 @@ package net.sf.colossus.webclient;
 
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.ConnectException;
 import java.net.Socket;
@@ -139,7 +141,8 @@ public class WebClientSocketThread extends Thread implements IWebServer
         try
         {
             socket = new Socket(hostname, port);
-            out = new PrintWriter(socket.getOutputStream(), true);
+            out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
+                socket.getOutputStream())), true);
         }
         catch (UnknownHostException e)
         {
