@@ -61,6 +61,7 @@ final class ClientHandler implements IClient
 
     private boolean isGone = false;
     private boolean withdrawnAlready = false;
+    private int isGoneMessageRepeated = 0;
 
     private static final String sep = Constants.protocolTermSeparator;
 
@@ -633,10 +634,14 @@ final class ClientHandler implements IClient
         if (isGone || socketChannel == null)
         {
             // do not send any more
-            LOGGER
-                .info("Attempt to send to player " + playerName
+
+            if (isGoneMessageRepeated < 3)
+            {
+                LOGGER.info("Attempt to send to player " + playerName
                     + " when client connection already gone - message: "
                     + message);
+                isGoneMessageRepeated++;
+            }
         }
         else
         {
