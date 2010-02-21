@@ -233,15 +233,18 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
     private void superviseGameStartup()
     {
         // ACTIVATED
-        server.tellEnrolledGameStartsSoon(gi);
         LOGGER.log(Level.FINEST,
-            "Seems starting game went ok, informing enrolled players!");
+            "Seems starting game process went ok, sending gameStartsSoon "
+                + "to enrolled players: "
+                + gi.getPlayerListAsString());
+        server.tellEnrolledGameStartsSoon(gi);
 
         int timeout = 30; // seconds
         boolean up = waitUntilReadyToAcceptClients(timeout);
         if (up)
         {
-            LOGGER.log(Level.FINEST, "Game is up - informing clients!");
+            LOGGER.log(Level.FINEST,
+                "Game is ready to accept clients - sending gameStartsNow.");
             // READY_TO_CONNECT
 
             int port = gi.getPort();

@@ -540,6 +540,8 @@ public class WebServer implements IWebServer, IRunWebServer
             IWebClient client = (IWebClient)u.getThread();
             if (client != null)
             {
+                LOGGER.finest("Sending gameStartsSoon to client for user "
+                    + u.getName());
                 client.gameInfo(gi);
                 client.gameStartsSoon(gameId, byUserName);
             }
@@ -620,9 +622,17 @@ public class WebServer implements IWebServer, IRunWebServer
                         IWebClient client = (IWebClient)user.getThread();
                         client.didEnroll(gameId, user.getName());
                     }
+                    else
+                    {
+                        LOGGER.info("Player " + username
+                            + " failed to enroll to game " + gameId
+                            + ", reason=" + reasonFail);
+                    }
                 }
                 else
                 {
+                    LOGGER.warning("Player " + username
+                        + " tried to enroll but game is already starting!");
                     IWebClient webClient = (IWebClient)user.getThread();
                     if (webClient != null)
                     {
@@ -644,20 +654,42 @@ public class WebServer implements IWebServer, IRunWebServer
 
         if (gi != null)
         {
-            String reasonFail = gi.unenroll(user);
-            proposedGamesListModified = true;
-            if (reasonFail == null)
+            synchronized(gi)
             {
-                gi.updateOnline();
-                allTellGameInfo(gi);
-                IWebClient client = (IWebClient)user.getThread();
-                client.didUnenroll(gameId, user.getName());
+                if (gi.isStarting())
+                {
+                    LOGGER.warning("Player " + username
+                        + " tried to unenroll from game " + gameId
+                        + ", but it is already starting.");
+                    IWebClient webClient = (IWebClient)user.getThread();
+                    if (webClient != null)
+                    {
+                        String message = "Unenrolling from " + gi.getGameId()
+                            + " failed, game is already starting.";
+                        long when = 0;
+                        webClient.deliverGeneralMessage(when, false,
+                            "Can't unenroll!", message);
+                    }
+                }
+                else
+                {
+                    String reasonFail = gi.unenroll(user);
+                    proposedGamesListModified = true;
+                    if (reasonFail == null)
+                    {
+                        gi.updateOnline();
+                        allTellGameInfo(gi);
+                        IWebClient client = (IWebClient)user.getThread();
+                        client.didUnenroll(gameId, user.getName());
+                    }
+                }
             }
         }
     }
 
     public void cancelGame(String gameId, String byUser)
     {
+        LOGGER.info("User " + byUser + " requests to cancel game " + gameId);
         GameInfo gi = findByGameId(gameId);
 
         if (gi == null)
