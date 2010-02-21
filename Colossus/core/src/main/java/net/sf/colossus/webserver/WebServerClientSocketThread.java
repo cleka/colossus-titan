@@ -213,11 +213,13 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
                     LOGGER.finest("user " + username + ": parseLine for '"
                         + fromClient + "' returns done = " + done);
                 }
+                /*
                 else
                 {
                     LOGGER.finest("user " + username + ": parseLine for '"
                         + fromClient + "' returns done = " + done);
                 }
+                */
             }
             else
             {
