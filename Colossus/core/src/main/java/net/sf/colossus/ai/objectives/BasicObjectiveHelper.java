@@ -53,6 +53,16 @@ public class BasicObjectiveHelper implements IObjectiveHelper
         for (Creature lcritter : attacker.getCreatures())
         {
             int count = ai.countCreatureAccrossAllLegionFromPlayer(lcritter);
+            if (count == 0)
+            {
+                LOGGER.warning("Strange, we have at least a " +
+                        lcritter.getName() + " in legion " +
+                        attacker.getMarkerId() + " yet 0 in total...");
+            }
+            LOGGER.finest("Found " + count + " " + lcritter.getName() +
+                        " in all ; we have " +
+                        attacker.numCreature(lcritter.getType()) +
+                        " in here");
             if (!lcritter.isLord() && !lcritter.isDemiLord()
                 && ((creature == null) || (count < mcount)))
             {
