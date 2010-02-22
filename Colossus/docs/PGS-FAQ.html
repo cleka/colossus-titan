@@ -6,17 +6,165 @@
 
 <h1>Public Game Server FAQ</h1>
 
-Or: questions what someone was wondering and/or what I would like the users to know...
+Or: questions what someone was wondering in the chat ... - and/or, what I would like the users to know...
 
-<h3>How are there 3 actual, when there are only 2 people online?</h3>
+<h2>Contents:</h2>
+
+<a href="#WatchGames">Is it possible to watch a game others are playing ("spectator")?</a><br>
+<a href="#LostConnection">What to do when my computer lost network connection?</a><br>
+<a href="#RobotPlayerJumpIn">Could a robot player jump in for a player that lost connection and he takes the control back 
+later when he reconnected?</a><br>
+<a href="#TwoGames">Can I play two games at the same time?</a><br>
+<a href="#AddingAIs">What about AI players?</a><br>
+<a href="#ActualVsOnline">Games table: How are there 3 actual, when there are only 2 people online?</a><br>
+<a href="#InstantVsScheduled">What are Instant games and Scheduled games?</a><br>
+<a href="#LocalVsServerTime">I was looking at the timestamps here in the chat window - I was assuming that it was server time</a><br>
+<a href="#LogoffChatGameBroken">"What happened then? I got logged out of chat, then the entire game XXXXXXed off..."</a><br>
+
+<p>
+More to be added over time... perhaps...
+<p>
+
+<hr>
+
+<h2><a name="WatchGames">Is it possible to watch a game others are playing ("spectator")?</a></h2>
+
+No, that is not implemented yet, and since it is definitely not "that simple" to implement, 
+it might not be one of the next things to be added.
+
+<h2><a name="LostConnection">What to do when my computer lost network connection?</a></h2>
+
+Bad luck. As soon as the server notices that it has lost connection to a player, 
+it automatically does a "withdraw" for that player. (Unfortunately there are even cases
+where server doesn't even notice it, and/or the withdraw does not fully happen, but 
+I am working on that.)
+<p>
+I know that is frustrating, but improving this situation is something between medium 
+and major issue, not likely to happen "any time soon". Well, who knows, but ...
+<p />
+<b>Once</b> the "watch ongoing games as spectator" would work, <b>then</b> it would 
+need "only a little more extra work" to make the server also able to handle "connection lost" 
+case in a better way;
+e.g. querying from other players "Player XXX lost connection - do you want to wait
+or kick him out?", and/or kick the "lost" player permanently out after a certain timeout,
+e.g. 3 minutes if he hasn't connected back in that time.
+<p>
+I think this is necessary, otherwise there is a risk that a player gets disconnected,
+can't reconnect at all (permanent network problems, angry wife destroyed the computer,
+house burned down, ... etc. ;-), and the game would be stuck forever for the other players.
+
+<h2><a name="RobotPlayerJumpIn">Could a robot player jump in for a player that lost connection and he takes the control back 
+later when he reconnected?</a></h2>
+
+No, that is not (easily) possible. The reason is, that AIs must run on client side, 
+otherwise they would eat too much CPU on the server (see below). But that's the point, 
+the client is just gone :-(
+<p>
+So, in theory, it could be implemented in a way that in any of the other participating
+players client an AI player is fired off and taking over; but that would need quite some tricks
+as well. Not to mention that the "connect to an ongoing game (as watcher, or re-connect)"
+functionality is basically a pre-requisite to make this here happen.
+<p>
+So, I would not recommend you to "wait for this" - unless you have <b>a lot of patience</b> :o)
+
+
+<h2><a name="TwoGames">Can I play two games at the same time?</a></h2>
+
+No and yes. I think it is not that nice for the other players, and thus I did not make
+any effort to support it "easily". However, you can achieve it with some tricks, so read on.
+<p>
+The principle limitation is, that inside one running Colossus instance (one Java process, 
+or JVM) can be played only one game - certain data structures (especially the variant 
+information, like MasterBoard layout, creatures and their stats and recruiting tree, 
+Battle lands, ...) are global (static, in Java talk), and thus starting a new game 
+in same JVM (started Colossus) will destroy the data of the ongoing game.
+<p />
+As a side note, having an AI for same game is in theory possible, since they "need to see" 
+the same variant data, including the caretakers values, like "how many are left of a 
+certain creature?".
+ 
+<p>
+That said, you can do the following:
+<p>
+<ol>
+<li>Start one Colossus WebClient, join and start a game in that WebClient. </li>
+<li>You can close that WebClient now [but it is not necessary].<br />
+    To close it, for example click the "close window" (often a "x"-like symbol) 
+    on upper right corner, or have on the <b>Running Games</b> tab the radio button
+    "When game starts, automatically:" set to "Close WebClient".</li>
+<li>Start another new Colossus application, and start the WebClient there, and you
+    can log in with same user name (!)</li>
+<li>(If you did not close the first one, it will now ask you whether to forcefully 
+    log out the other connection. Go ahead, it does not harm the started game.)</li>
+<li>Now that you are connected with the new WebClient, you can enroll to another game
+    and play in that one.</li>
+</ol>
+
+<b>Note:</b> One day there might be game specific chat channels, i.e. beside the "General chat" there would be 
+a channel "#1007" for game 1007 and so on. When we get there... you probably can't chat in both games then. We will see ;-)
+
+
+<h2><a name="AddingAIs">What about AI players?</a></h2>
+
+<i>"No npcs? I thought it would auto-fill them if not enough people joined..."</i>
+<p>
+Unfortunately not yet. But that would be the goal one day, yes.
+<p>
+AI's (robot players) ( I guess that's what the asking person meant with "npcs" (non
+personal computer ... ?)  cannot be used yet ("straight forwardly"), but read on.
+<p>
+The reason for that is the current implementation how games are actually 
+started (in the Colossus application itself) - they would run on the server and eat 
+the CPU there - so that would be very bad.
+<p>
+As workaround you can login and enroll with one or more of the ready dummies
+dummy1, dummy2, dummy3 and dummy4 (password same as username)
+and when the board(s) come up put them to autoplay (= same as SimpleAI),
+and minimize their boards 
+(same principle as <a href="#TwoGames">Can I play two games at the same time?</a>). 
+<p>
+<b>Note:</b> You need to use <b>additionally started</b> Colossus instances for them - every 
+started Java instance will start just one player. Logging on as another player name will
+log off the previous webclient connection, so you can't have both (your real player, and the 
+dummy player) online at same time, which is necessary if they shall play in same game.
+<p>
+I have already a "start the game on some player's PC" mode implemented
+but it's not fully ready to take it into use. In that mode one will then be able to add as 
+many AIs as one wishes.
+<p>
+The problem with this functionality is the "NAT" problem (behind a firewall/DSL box that hides
+your real IP address); so this needs configuration on the player's PC/DSL box
+to firewall and NAT to enable the other players to connect to him.... (<i>that is the age-old
+problem why playing Colossus online without a public server was and is so difficult</i>).
+<p>
+[ Future plans involve also a relay/proxy mode (runs on players PC, but the
+public server acts as relay, and/or a "NAT punch" mode (it's possible to 
+make the other players PCs communicate with the host behind a NAT, they
+just can't initiate the contact by themselves. With the public server as
+"mediator" it could be done). ]
+<p>
+One day I also plan to have a "add AIs to run on "my" PC" mode even if
+game itself runs on the server...
+<p>
+
+   
+<h2><a name="ActualVsOnline">Games table: How are there 3 actual, when there are only 2 people online?</a></h2>
 
 <i>Actual</i> is the number of people enrolled. <i>Online</i> says how many of them are 
 currently also online.
 
-<h4>Instant games vs. Scheduled games</h4>
+<h2><a name="InstantVsScheduled">What are Instant games and Scheduled games?</a></h2>
 
+<b>Scheduled games</b> are meant to be scheduled quite a while beforehand, for example for
+"next saturday, 22.00" (your time. All times you see in WebClient are calculated to
+your time zone).
+<p>
+<b>Instant games</b> are meant to "can be started as soon as enough players have enrolled
+to them".
+<p>
 For scheduled games one can logout and come back later, but stays enrolled (thus there can
-be more enrolled than currently online).
+be more enrolled than currently online). For instant games, if one logs out, one is 
+automatically unenrolled (think about it... it makes sense).
 <p />
 One can be enrolled to as many scheduled games as one wants (it does not even check overlapping times yet)
 <p />
@@ -29,58 +177,33 @@ One can only be enrolled to one instant game at a time.
 A game can be started when enough players have enrolled to it (actual &gt; min) and they all 
 are online.
 
-If not enough players ( actual >= min) enrolled AND online,  or the time scheduled time has not been
-reached yet, the game can simply not even be started.
+If not enough players ( actual >= min) enrolled <b>and</b> online, or the time scheduled 
+time has not been reached yet, the game can simply not even be started.
 
-<h3>AI players</h3>
-
-<i>"No npcs? I thought it would auto-fill them if not enough people joined..."</i>
-<p>
-Unfortunately not.
-<p>
-AI's (robot players) ( I guess that's what you mean with "npcs" (non
-personal computer ... ?)  cannot be used yet.
-<p>
-The reason for that is the current implementation how games are actually 
-started (in the Colossus application itself) - the would run on the server and eat the CPU there.
-<p>
-As workaround you can login and enroll with one of the ready dummies
-dummy1, dummy2, dummy3 and dummy4 (password same as username)
-And when the boards come up put them to autoplay (= same as SimpleAI),
-and minimize their boards.
-<p>
-<b>Note:</b> You need to use <b>additionally started</b> Colossus instances for them - every 
-started Java instance can only be one player. Logon as another logs off the previous one.
-<p>
-I have already a "start the game on some player's PC" mode implemented
-but it's not fully ready to take it into use. In that mode one can add as many AIs as you wish.
-The problem there is the "NAT" problem (behind a firewall/DSL box that hides
-your real IP address); so this needs configuration on the player's PC/DSL box
-to firewall and NAT to enable the other players to connect to him.
-<p>
-[ Future plans involve also a relay/proxy mode (runs on players PC, but the
-public server acts as relay, and/or a "NAT punch" mode (it's possible to 
-make the other players PCs communicate with the host behind a NAT, they
-just can't initiate the contact by themselves. With the public server as
-"mediator" it could be done). ]
-<p>
-One day I also plan to have a "add AIs to run on "my" PC" mode even if
-game itself runs on the server.
-<p>
-
-<h3>I was looking at the timestamps here in the chat window - I was assuming that it was server time</h3>
+<h2><a name="LocalVsServerTime">I was looking at the timestamps here in the chat window - I was assuming that it was server time</a></h2>
 
 No. They are your local time, "naturally". Also the game start schedules
 etc. are shown by the GUI in your local time.
 <p>
 Local time of that server is German time :)
 
-<h3>what happened then? I got logged out of chat, then the entire game XXXXXXed off...</h3>
+<h2><a name="LogoffChatGameBroken">"What happened then? I got logged out of chat, then the entire game XXXXXXed off..."</a></h2>
 
-That should not happen. However, as soon as the game reaches game over state
-the server (game server process) closes the connection.
-But the game client and the "web client" are *totally* distinct things,
-closing the one should not affect the other one.
+That should not happen. However, as soon as the game reaches game over state,
+the server side (game server process) closes the connection.
+But the game client and the "web client" are *totally* separate things,
+<b>closing</b> the one should not affect the other one.
+<p>
+<b>Note</b> that the <b>Quit</b> button on the WebClient (server tab, i.e. there where is 
+user name, password, Login/Logout button is) is really <b>quitting</b> the <u>whole</u> 
+application; 
+to just close the WebClient window but leave the ongoing game up, close the WebClient
+with the "x"-like symbol usually on upper right corner. 
 <p>
 
+<hr>
+<p>
+<i>Created and last updated February 22, 2010 by CleKa</i>
+<p>
 </body>
+</html>
