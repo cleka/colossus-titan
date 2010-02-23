@@ -98,6 +98,8 @@ public abstract class AbstractObjectiveHelper implements IObjectiveHelper {
         final boolean isImmediatelyUsefulKilling;
         /** Whether this creature type appears in this stack, and in this stack only */
         final boolean onlyThisStackHasIt;
+        /** How many are left in the Caretaker's stack */
+        final int numberLeftToRecruit;
 
         @Override
         public String toString()
@@ -113,6 +115,7 @@ public abstract class AbstractObjectiveHelper implements IObjectiveHelper {
             buf.append(" isImmediatelyUsefulKilling="
                 + isImmediatelyUsefulKilling);
             buf.append(" onlyThisStackHasIt=" + onlyThisStackHasIt);
+            buf.append(" numberLeftToRecruit=" + numberLeftToRecruit);
             return buf.toString();
         }
 
@@ -192,6 +195,9 @@ public abstract class AbstractObjectiveHelper implements IObjectiveHelper {
             {
                 onlyThisStackHasIt = false;
             }
+
+            numberLeftToRecruit = ai.getCaretaker().getAvailableCount(
+                    creature.getType());
         }
     }
 }
