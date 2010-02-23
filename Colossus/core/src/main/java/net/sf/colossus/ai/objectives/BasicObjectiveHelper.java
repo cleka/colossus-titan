@@ -6,17 +6,14 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Logger;
 
 import net.sf.colossus.ai.AbstractAI;
 import net.sf.colossus.client.Client;
-import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.variant.CreatureType;
-import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.RecruitingSubTree;
 import net.sf.colossus.variant.Variant;
 
@@ -26,21 +23,14 @@ import net.sf.colossus.variant.Variant;
  * This is still mostly for testing the code.
  * @author Romain Dolbeau
  */
-public class BasicObjectiveHelper implements IObjectiveHelper
+public class BasicObjectiveHelper extends AbstractObjectiveHelper
 {
     private static final Logger LOGGER = Logger
         .getLogger(BasicObjectiveHelper.class.getName());
-    private final ObjectiveEvalConstants oec;
-    private final Client client;
-    private final AbstractAI ai;
-    private final Variant variant;
 
     public BasicObjectiveHelper(Client client, AbstractAI ai, Variant variant)
     {
-        this.client = client;
-        this.ai = ai;
-        this.variant = variant;
-        oec = new ObjectiveEvalConstants();
+        super(client, ai, variant);
     }
 
     /** really stupid heuristic */
@@ -75,14 +65,8 @@ public class BasicObjectiveHelper implements IObjectiveHelper
             + (creature != null ? creature.getName() : "(NOBODY)"));
 
         List<AllThereIsToKnowAboutYourCreature> overkill = new ArrayList<AllThereIsToKnowAboutYourCreature>();
-        for (Creature lcritter : attacker.getCreatures())
-        {
-            if (!lcritter.isTitan())
-            {
-                overkill.add(new AllThereIsToKnowAboutYourCreature(ai,
-                    lcritter, attacker));
-            }
-        }
+
+        overkill.addAll(attackerToKnowledge.values());
         Collections.sort(overkill, HEURISTIC_ORDER);
 
         StringBuffer buf = new StringBuffer();
@@ -234,16 +218,6 @@ public class BasicObjectiveHelper implements IObjectiveHelper
         return lListObjectives;
     }
 
-    protected class ObjectiveEvalConstants
-    {
-        final float DESTROY_TITAN_PRIORITY = 5.f;
-        final float ATTACKER_PRESERVE_TITAN_PRIORITY = 2.f;
-        final float DEFENDER_PRESERVE_TITAN_PRIORITY = 5.f;
-        final float DESTROY_IMPORTANT_CRITTER_PRIORITY = 1.f;
-        final float FIRST_WAVE_ATTACK_PRIORITY = 1.f;
-        final float SECOND_WAVE_ATTACK_PRIORITY = 0.5f;
-    }
-
     private static final Comparator<AllThereIsToKnowAboutYourCreature> HEURISTIC_ORDER = new Comparator<AllThereIsToKnowAboutYourCreature>()
     {
         private int avoidNullPointerException(
@@ -347,111 +321,4 @@ public class BasicObjectiveHelper implements IObjectiveHelper
         }
     };
 
-    class AllThereIsToKnowAboutYourCreature
-    {
-        final Creature creature;
-        final int playerNumber;
-        final int stackNumber;
-        final Set<CreatureType> recruits;
-        final CreatureType bestRecruit;
-        final int numberNeededHere;
-        final boolean thisStackHasBetter;
-        final boolean isImmediatelyUsefulKilling;
-        final boolean onlyThisStackHasIt;
-
-        @Override
-        public String toString()
-        {
-            StringBuffer buf = new StringBuffer();
-            buf.append(creature.getName());
-            buf.append(" playerNumber=" + playerNumber);
-            buf.append(" stackNumber=" + stackNumber);
-            buf.append(" bestRecruit="
-                + (bestRecruit != null ? bestRecruit.getName() : "(NONE)"));
-            buf.append(" numberNeededHere=" + numberNeededHere);
-            buf.append(" thisStackHasBetter=" + thisStackHasBetter);
-            buf.append(" isImmediatelyUsefulKilling="
-                + isImmediatelyUsefulKilling);
-            buf.append(" onlyThisStackHasIt=" + onlyThisStackHasIt);
-            return buf.toString();
-        }
-
-        AllThereIsToKnowAboutYourCreature(AbstractAI ai, Creature creature,
-            Legion legion)
-        {
-            this.creature = creature;
-            MasterBoardTerrain terrain = legion.getCurrentHex().getTerrain();
-            playerNumber = ai
-                .countCreatureAccrossAllLegionFromPlayer(creature);
-            int count = 0;
-            for (Creature creature2 : legion.getCreatures())
-            {
-                if (creature.getType().equals(creature2.getType()))
-                {
-                    count++;
-                }
-            }
-            stackNumber = count;
-            recruits = RecruitingSubTree.getAllInAllSubtreesIgnoringSpecials(
-                variant, creature.getType());
-            CreatureType temp = null;
-            for (CreatureType ct : recruits)
-            {
-                if (temp == null)
-                {
-                    temp = ct;
-                }
-                else
-                {
-                    if (temp.getPointValue() < ct.getPointValue())
-                    {
-                        temp = ct;
-                    }
-                }
-            }
-            bestRecruit = temp;
-            int nnh = terrain.getRecruitingSubTree().maximumNumberNeededOf(
-                creature.getType(), legion.getCurrentHex());
-            if (nnh == -1)
-            {
-                numberNeededHere = Constants.BIGNUM;
-            }
-            else
-            {
-                numberNeededHere = nnh;
-            }
-            boolean hasBetter = false;
-            for (CreatureType recruit : recruits)
-            {
-                if (recruit.getPointValue() > creature.getPointValue())
-                {
-                    for (Creature c : legion.getCreatures())
-                    {
-                        if (c.getType().equals(recruit))
-                        {
-                            hasBetter = true;
-                        }
-                    }
-                }
-            }
-            thisStackHasBetter = hasBetter;
-
-            if (!hasBetter && (numberNeededHere == stackNumber))
-            {
-                isImmediatelyUsefulKilling = true;
-            }
-            else
-            {
-                isImmediatelyUsefulKilling = false;
-            }
-            if (playerNumber == stackNumber)
-            {
-                onlyThisStackHasIt = true;
-            }
-            else
-            {
-                onlyThisStackHasIt = false;
-            }
-        }
-    }
 }

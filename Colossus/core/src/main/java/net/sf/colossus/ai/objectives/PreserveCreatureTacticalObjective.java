@@ -100,6 +100,7 @@ class PreserveCreatureTacticalObjective extends AbstractTacticalObjective
 
     public String getDescription()
     {
-        return "Preserving all " + critter.getName();
+        return "Preserving all " + critter.getName() +
+                " (" + getPriority() + ")";
     }
 }
