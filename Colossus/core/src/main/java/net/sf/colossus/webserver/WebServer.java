@@ -656,7 +656,10 @@ public class WebServer implements IWebServer, IRunWebServer
         {
             synchronized(gi)
             {
-                if (gi.isStarting())
+                // TODO HACK!! don't check for now, otherwise can't unenroll
+                // from games that failed to start.
+                boolean preventUnenroll = false;
+                if (gi.isStarting() && preventUnenroll)
                 {
                     LOGGER.warning("Player " + username
                         + " tried to unenroll from game " + gameId
