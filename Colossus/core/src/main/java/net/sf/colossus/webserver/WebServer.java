@@ -382,7 +382,7 @@ public class WebServer implements IWebServer, IRunWebServer
         Collection<User> users = User.getLoggedInUsers();
         for (User u : users)
         {
-            u.updateLastOnline();
+            u.updateLastLogout();
             WebServerClientSocketThread thread = (WebServerClientSocketThread)u
                 .getThread();
             if (thread == null)

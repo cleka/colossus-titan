@@ -51,7 +51,11 @@ public class User
     private String email;
     private boolean isAdmin;
     private String created;
-    private String lastOnline;
+    private String lastLogin;
+    private String lastLogout;
+    private long onlineSecs;
+    private long sessionStarted = -1L;
+
     // Only needed during registration:
     private String lastSentConfirmationCode;
 
@@ -70,16 +74,31 @@ public class User
         this.name = name;
     }
 
-    public User(String name, String password, String email, boolean isAdmin,
-        String created, String lastOnline, String confCode)
+    private User(String name, String password, String email, boolean isAdmin,
+        String created, String lastLogin, String lastLogout, long onlineSecs)
     {
         this.name = name;
         this.password = password;
         this.email = email;
         this.isAdmin = isAdmin;
-        this.created = created;
-        this.lastOnline = lastOnline;
-        this.lastSentConfirmationCode = confCode;
+
+        if (created == null)
+        {
+            String now = makeUserlineDate(new Date().getTime());
+            this.created = now;
+            this.lastLogin = now;
+            this.lastLogout = now;
+            this.lastSentConfirmationCode = makeConfirmationCode();
+            this.onlineSecs = 0;
+        }
+        else
+        {
+            this.created = created;
+            this.lastLogin = lastLogin;
+            this.lastLogout = lastLogout;
+            this.lastSentConfirmationCode = "";
+            this.onlineSecs = onlineSecs;
+        }
     }
 
     public String getName()
@@ -280,14 +299,11 @@ public class User
         }
         else
         {
-            String created = makeUserlineDate(new Date().getTime());
-            String lastOnline = makeUserlineDate(new Date().getTime());
-            String cCode = makeConfirmationCode();
+            User u = new User(username, password, email, isAdmin, null, null,
+                null, 0);
+            String cCode = u.getLastConfirmationCode();
             LOGGER.fine("Confirmation code for user " + username + " is: "
                 + cCode);
-
-            User u = new User(username, password, email, isAdmin, created,
-                lastOnline, cCode);
 
             String reason = sendConfirmationMail(username, email, cCode,
                 mailObject);
@@ -413,15 +429,42 @@ public class User
         return whenString;
     }
 
-    public void updateLastOnline()
+    public void updateLastLogin()
     {
-        lastOnline = makeUserlineDate(new Date().getTime());
+        sessionStarted = new Date().getTime();
+        lastLogin = makeUserlineDate(sessionStarted);
+    }
+
+    public void updateLastLogout()
+    {
+        long sessionEnded = new Date().getTime();
+        long duration = (sessionEnded - sessionStarted) / 1000;
+        if (duration >= 0 && sessionStarted > 0)
+        {
+            onlineSecs += duration;
+            LOGGER.info("User " + name + " was " + duration
+                + " seconds online, total now " + onlineSecs);
+        }
+        else
+        {
+            LOGGER.warning("SessionDuration or sessionStarted for user "
+                + name + " negative? Started=" + sessionStarted + ", Ended="
+                + sessionEnded + ", duration=" + duration
+                + ", previously onlineSecs=" + onlineSecs);
+        }
+        lastLogout = makeUserlineDate(sessionEnded);
+        sessionStarted = -1;
     }
 
     public static void parseUserLine(String line)
     {
         String[] tokens = line.split(ulSep);
-        if (tokens.length != 6)
+        if (tokens.length == 6)
+        {
+            String newLine = line + ulSep + tokens[5] + ulSep + "0";
+            tokens = newLine.split(ulSep);
+        }
+        if (tokens.length != 8)
         {
             LOGGER.log(Level.WARNING, "invalid line '" + line
                 + "' in user file!");
@@ -432,7 +475,10 @@ public class User
         String email = tokens[2].trim();
         String type = tokens[3].trim();
         String created = tokens[4].trim();
-        String lastOnline = tokens[5].trim();
+        String lastLogin = tokens[5].trim();
+        String lastLogout = tokens[6].trim();
+        long onlineSecs = Long.parseLong(tokens[7]);
+
         boolean isAdmin = false;
         if (type.equals(typeAdmin))
         {
@@ -447,8 +493,8 @@ public class User
             LOGGER.log(Level.WARNING, "invalid type '" + type
                 + "' in user file line '" + line + "'");
         }
-        User u = new User(name, password, email, isAdmin, created, lastOnline,
-            "");
+        User u = new User(name, password, email, isAdmin, created, lastLogin,
+            lastLogout, onlineSecs);
         storeUser(u);
     }
 
@@ -499,7 +545,8 @@ public class User
         String type = (isAdmin ? typeAdmin : typeUser);
 
         String line = this.name + ulSep + password + ulSep + email + ulSep
-            + type + ulSep + created + ulSep + lastOnline;
+            + type + ulSep + created + ulSep + lastLogin + ulSep + lastLogout
+            + ulSep + onlineSecs;
         return line;
     }
 
