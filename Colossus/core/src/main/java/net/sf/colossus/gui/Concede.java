@@ -12,6 +12,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -36,6 +38,9 @@ import net.sf.colossus.variant.MasterHex;
  */
 final class Concede extends KDialog
 {
+    private static final Logger LOGGER = Logger.getLogger(Concede.class
+        .getName());
+
     private final boolean flee;
     private Point location;
     private final ClientGUI gui;
@@ -85,15 +90,33 @@ final class Concede extends KDialog
         EntrySide entrySide = attacker.getEntrySide();
         int direction = hex.findDirectionForEntrySide(entrySide);
 
-        MasterHex neighborHex = hex.getNeighbor(direction);
+        StringBuffer infoText = new StringBuffer();
+        try
+        {
+            MasterHex neighborHex = hex.getNeighbor(direction);
+            String neighborHexInfo;
+            if (neighborHex != null)
+            {
+                neighborHexInfo = neighborHex.getDescription();
+            }
+            else
+            {
+                neighborHexInfo = "[No hex there - perhaps teleport?]";
+            }
 
-        contentPane.add(new JLabel(attacker.getMarkerId() + " attacks "
-            + defender.getMarkerId() + " in "
-            + hex.getDescription()
-            + ", entering from "
-            + attacker.getEntrySide().getLabel() + " (" + neighborHex.getDescription()
-            + ")"
-            ));
+            infoText.append(attacker.getMarkerId() + " attacks ");
+            infoText.append(defender.getMarkerId() + " in ");
+            infoText.append(hex.getDescription() + ", entering from ");
+            infoText.append(attacker.getEntrySide().getLabel() + " (");
+            infoText.append(neighborHexInfo + ")");
+        }
+        catch (Exception e)
+        {
+            LOGGER
+                .log(Level.WARNING, "Exception during infoTextCreation: ", e);
+        }
+
+        contentPane.add(new JLabel(infoText.toString()));
 
         showLegion(ally);
         showLegion(enemy);
