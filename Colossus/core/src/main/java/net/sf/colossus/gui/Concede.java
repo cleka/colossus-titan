@@ -118,8 +118,8 @@ final class Concede extends KDialog
 
         contentPane.add(new JLabel(infoText.toString()));
 
-        showLegion(ally);
-        showLegion(enemy);
+        showLegion(ally, true);
+        showLegion(enemy, false);
 
         JPanel buttonPane = new JPanel();
         contentPane.add(buttonPane);
@@ -181,7 +181,7 @@ final class Concede extends KDialog
         repaint();
     }
 
-    private void showLegion(Legion legion)
+    private void showLegion(Legion legion, boolean dead)
     {
         Box pane = new Box(BoxLayout.X_AXIS);
         pane.setAlignmentX(0);
@@ -209,6 +209,7 @@ final class Concede extends KDialog
         {
             String imageName = it.next();
             Chit chit = new Chit(scale, imageName);
+            chit.setDead(dead);
             pane.add(chit);
         }
     }
