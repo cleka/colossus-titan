@@ -58,7 +58,7 @@ final class Concede extends KDialog
             + ally.getCurrentHex().getDescription() + "?", false);
 
         Container contentPane = getContentPane();
-        contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
+        contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 
         addWindowListener(new WindowAdapter()
         {
@@ -116,40 +116,48 @@ final class Concede extends KDialog
                 .log(Level.WARNING, "Exception during infoTextCreation: ", e);
         }
 
-        contentPane.add(new JLabel(infoText.toString()));
+        JLabel label1 = new JLabel(infoText.toString());
+        contentPane.add(label1);
+        label1.setAlignmentX(CENTER_ALIGNMENT);
 
-        showLegion(ally, true);
-        showLegion(enemy, false);
+        Box allyPane = showLegion(ally, true);
+        Box enemyPane = showLegion(enemy, false);
+
+        Box legionsPane = new Box(BoxLayout.PAGE_AXIS);
+        legionsPane.setAlignmentX(CENTER_ALIGNMENT);
+        legionsPane.add(allyPane);
+        legionsPane.add(enemyPane);
+        getContentPane().add(legionsPane);
+
+        int resultingPoints = ((LegionClientSide)ally).getPointValue();
+        if (flee)
+        {
+            resultingPoints /= 2;
+        }
+        int score = enemy.getPlayer().getScore();
+        int newScore = score + resultingPoints;
+
+        StringBuffer infoText2 = new StringBuffer("");
+        infoText2.append("This will give player "
+            + enemy.getPlayer().getName() + "  " + resultingPoints
+            + " points, " + "i.e. increase the score from " + score + " to "
+            + newScore + ".");
+
+        JLabel label2 = new JLabel(infoText2.toString());
+        contentPane.add(label2);
+        contentPane.add(label2);
+        label2.setAlignmentX(CENTER_ALIGNMENT);
 
         JPanel buttonPane = new JPanel();
+        buttonPane.setAlignmentX(CENTER_ALIGNMENT);
         contentPane.add(buttonPane);
 
-        JButton button1 = new JButton(flee ? "Flee" : "Concede");
-        button1.setMnemonic(flee ? KeyEvent.VK_F : KeyEvent.VK_C);
-        buttonPane.add(button1);
-        button1.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                cleanup(true);
-            }
-        });
+        JButton showMapButton = new JButton("Show Battle Map");
+        showMapButton.setMnemonic(KeyEvent.VK_M);
+        getRootPane().setDefaultButton(showMapButton);
 
-        JButton button2 = new JButton(flee ? "Don't Flee" : "Don't Concede");
-        button2.setMnemonic(KeyEvent.VK_D);
-        buttonPane.add(button2);
-        button2.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                cleanup(false);
-            }
-        });
-
-        JButton button3 = new JButton("Show Battle Map");
-        button3.setMnemonic(KeyEvent.VK_M);
-        buttonPane.add(button3);
-        button3.addActionListener(new ActionListener()
+        buttonPane.add(showMapButton);
+        showMapButton.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent e)
             {
@@ -159,6 +167,28 @@ final class Concede extends KDialog
             }
         });
 
+        JButton doItButton = new JButton(flee ? "Flee" : "Concede");
+        doItButton.setMnemonic(flee ? KeyEvent.VK_F : KeyEvent.VK_C);
+        buttonPane.add(doItButton);
+        doItButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                cleanup(true);
+            }
+        });
+
+        JButton dontDoitButton = new JButton(flee ? "Don't Flee"
+            : "Don't Concede");
+        dontDoitButton.setMnemonic(KeyEvent.VK_D);
+        buttonPane.add(dontDoitButton);
+        dontDoitButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                cleanup(false);
+            }
+        });
 
         pack();
 
@@ -181,7 +211,7 @@ final class Concede extends KDialog
         repaint();
     }
 
-    private void showLegion(Legion legion, boolean dead)
+    private Box showLegion(Legion legion, boolean dead)
     {
         Box pane = new Box(BoxLayout.X_AXIS);
         pane.setAlignmentX(0);
@@ -212,6 +242,8 @@ final class Concede extends KDialog
             chit.setDead(dead);
             pane.add(chit);
         }
+
+        return pane;
     }
 
     static void concede(ClientGUI gui, JFrame parentFrame, Legion ally,
