@@ -15,12 +15,15 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.game.EntrySide;
@@ -49,6 +52,9 @@ final class Concede extends KDialog
     private final Legion defender;
 
     private final SaveWindow saveWindow;
+
+    private final JButton showMapButton;
+
 
     private Concede(ClientGUI clientGui, JFrame parentFrame, Legion ally,
         Legion enemy, boolean flee)
@@ -152,7 +158,7 @@ final class Concede extends KDialog
         buttonPane.setAlignmentX(CENTER_ALIGNMENT);
         contentPane.add(buttonPane);
 
-        JButton showMapButton = new JButton("Show Battle Map");
+        showMapButton = new JButton("Show Battle Map");
         showMapButton.setMnemonic(KeyEvent.VK_M);
         getRootPane().setDefaultButton(showMapButton);
 
@@ -178,8 +184,7 @@ final class Concede extends KDialog
             }
         });
 
-        JButton dontDoitButton = new JButton(flee ? "Don't Flee"
-            : "Don't Concede");
+        JButton dontDoitButton = new JButton(flee ? "Don't Flee" : "Don't Concede");
         dontDoitButton.setMnemonic(KeyEvent.VK_D);
         buttonPane.add(dontDoitButton);
         dontDoitButton.addActionListener(new ActionListener()
@@ -189,6 +194,21 @@ final class Concede extends KDialog
                 cleanup(false);
             }
         });
+
+        Action doInstead = new AbstractAction()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                Concede.this.notifyConcede();
+            }
+        };
+
+        // Prevent that space triggers the buttons. This frequently happened
+        // when players type in the chat while the concede/flee dialog becomes
+        // displayed, causing them accidentally to flee or concede.
+        preventSpaceAction(doItButton, doInstead);
+        preventSpaceAction(dontDoitButton, doInstead);
+        preventSpaceAction(showMapButton, doInstead);
 
         pack();
 
@@ -211,11 +231,40 @@ final class Concede extends KDialog
         repaint();
     }
 
+    /**
+     * Prevent Space from triggering the firing of the action normally
+     * associated to the given button; trigger the given action instead.
+     * The "normal" action of the button can still be activated with mouse
+     * click or with the mnemonic key (on windows with Alt + the underlined
+     * character)
+     * @param button
+     * @param newAction
+     */
+    private void preventSpaceAction(JButton button, Action newAction)
+    {
+        button.getInputMap().put(KeyStroke.getKeyStroke("SPACE"), "doInstead");
+        button.getActionMap().put("doInstead", newAction);
+    }
+
+    /**
+     * Make the user aware that there is a concede or flee dialog waiting
+     * for response. This is called by the doInsteadAction (which is fired
+     * when SPACE or ENTER is pressed).
+     * Make a beep, requests focus and puts it to front, and sets as default
+     * action the show Battle Map button.
+     */
+    public void notifyConcede()
+    {
+        this.toFront();
+        this.requestFocus();
+        this.showMapButton.requestFocusInWindow();
+        gui.getBoard().getToolkit().beep();
+    }
+
     private Box showLegion(Legion legion, boolean dead)
     {
         Box pane = new Box(BoxLayout.X_AXIS);
-        pane.setAlignmentX(0);
-        getContentPane().add(pane);
+        pane.setAlignmentX(LEFT_ALIGNMENT);
 
         int scale = 4 * Scale.get();
 
@@ -225,7 +274,7 @@ final class Concede extends KDialog
         pane.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
 
         int points = ((LegionClientSide)legion).getPointValue();
-        Box pointsPanel = new Box(BoxLayout.Y_AXIS);
+        Box pointsPanel = new Box(BoxLayout.PAGE_AXIS);
         pointsPanel.setSize(marker.getSize());
         pointsPanel.add(new JLabel("" + points));
         pointsPanel.add(new JLabel("points"));
@@ -242,7 +291,6 @@ final class Concede extends KDialog
             chit.setDead(dead);
             pane.add(chit);
         }
-
         return pane;
     }
 
