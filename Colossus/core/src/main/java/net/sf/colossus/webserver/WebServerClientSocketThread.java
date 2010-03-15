@@ -357,7 +357,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
         else if (!loggedIn && command.equals(IWebServer.ConfirmRegistration))
         {
             ok = false;
-            if (tokens.length >= 2)
+            if (tokens.length >= 3)
             {
                 String username = tokens[1];
                 unverifiedUsername = username;
@@ -381,7 +381,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
         else if (!loggedIn && command.equals(IWebServer.RegisterUser))
         {
             ok = false;
-            if (tokens.length >= 3)
+            if (tokens.length >= 4)
             {
                 String username = tokens[1];
                 unverifiedUsername = username;
