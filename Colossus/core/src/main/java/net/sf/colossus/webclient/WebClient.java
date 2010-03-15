@@ -2976,7 +2976,8 @@ public class WebClient extends KFrame implements IWebClient
     public void connectionReset(boolean forced)
     {
         String message = (forced ? "Some other connection to server with same login name forced your logout."
-            : "Connection reset by server! You are logged out.");
+            : "Connection reset by server! Your WebClient was logged out.\n"
+                + "(A possibly running game is _NOT_ affected by this!)");
         JOptionPane.showMessageDialog(this, message);
         setAdmin(false);
         state = NotLoggedIn;
