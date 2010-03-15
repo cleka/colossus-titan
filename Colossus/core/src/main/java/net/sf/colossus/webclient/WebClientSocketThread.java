@@ -447,6 +447,14 @@ public class WebClientSocketThread extends Thread implements IWebServer
                         resent);
                 }
 
+                else if (command.equals(IWebClient.pingRequest))
+                {
+                    String arg1 = tokens[1];
+                    String arg2 = tokens[2];
+                    String arg3 = tokens[3];
+                    pingResponse(arg1, arg2, arg3);
+                }
+
                 else if (command.equals(IWebClient.generalMessage))
                 {
                     long when = Long.parseLong(tokens[1]);
@@ -702,6 +710,11 @@ public class WebClientSocketThread extends Thread implements IWebServer
         String sending = ChatSubmit + sep + chatId + sep + sender + sep
             + message;
         send(sending);
+    }
+
+    public void pingResponse(String arg1, String arg2, String arg3)
+    {
+        send(PingResponse + sep + arg1 + sep + arg2 + sep + arg3);
     }
 
     public void requestUserAttention(long when, String sender,

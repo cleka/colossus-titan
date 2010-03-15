@@ -11,6 +11,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -42,12 +43,22 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
     private PrintWriter out;
     private User user = null;
     private int clientVersion = 0;
+    private long lastPacketReceived = 0;
+    private int pingsTried = 0;
+    private int idleWarningsSent = 0;
 
     private boolean loggedIn = false;
 
     private final static String sep = IWebServer.WebProtocolSeparator;
 
     private Thread stopper = null;
+
+    private static final long PING_REQUEST_INTERVAL_SECONDS = 60;
+    private static final int PING_MAX_TRIES = 3;
+
+    private static final int IDLE_WARNING_INTERVAL_MINUTES = 10;
+    private static final int IDLE_WARNING_MAXCOUNT = 3;
+
 
     /* During registration request and sending of confirmation code,
      * we do not have a user yet. The parseLine sets then this variable
@@ -94,10 +105,146 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
         return this.user;
     }
 
+    private String getUsername()
+    {
+        if (user != null)
+        {
+            return user.getName();
+        }
+        else
+        {
+            return "<username undefined?>";
+        }
+    }
+
     public int getClientVersion()
     {
         return clientVersion;
     }
+
+    public void requestPingIfNeeded(long now)
+    {
+        long deltaMillis = now - lastPacketReceived;
+
+        if (deltaMillis >= (pingsTried + 1) * PING_REQUEST_INTERVAL_SECONDS
+            * 1000)
+        {
+            // Only clients >= 2 have this feature
+            if (getClientVersion() >= 2)
+            {
+                // too many already done without response => assume dead
+                if (pingsTried >= PING_MAX_TRIES)
+                {
+                    LOGGER.info("After " + pingsTried
+                        + " pings, still no response from client "
+                        + getUsername()
+                        + " - assuming connection lost and closing it.");
+                    String message = "@@@ After " + pingsTried
+                        + " ping requests, still no response from your "
+                        + "WebClientclient - assuming connection problems "
+                        + "and closing connection from server side. @@@";
+                    chatDeliver(IWebServer.generalChatName, now, "SYSTEM",
+                        message, false);
+                    if (!done)
+                    {
+                        // this requestPingIfNeeded code is run in the WatchDog
+                        // thread; the interrupt interrupts the actual
+                        // WebServerClientThread.
+                        this.interrupt();
+                        // prevent from checking the maxIdleMinutes stuff...
+                        return;
+                    }
+                    else
+                    {
+                        LOGGER
+                            .info("done already true, let's skip the interrupting...");
+                    }
+                }
+                // otherwise, send another one
+                else
+                {
+                    LOGGER.fine("Client " + getUsername()
+                        + ": no activity for " + (deltaMillis / 1000f)
+                        + " seconds; " + "requesting "
+                        + (pingsTried + 1)
+                        + ". ping!");
+                    requestPing("dummy1", "dummy2", "dummy3");
+                    pingsTried++;
+                }
+            }
+        }
+        else if (deltaMillis >= pingsTried * PING_REQUEST_INTERVAL_SECONDS
+            * 1000)
+        {
+            // not time for next ping, but still no response
+        }
+        else
+        {
+            // idle time < previous request time: got something
+            pingsTried = 0;
+        }
+        return;
+    }
+
+    /**
+     * Currently this will log out only older clients, because they do not
+     * respond to the ping packets.
+     * TODO in future, distinct between ping packets and all other
+     * activities, and log out user which hasn't done anything and left
+     * WebClient standing around idle for very long.
+     * @param now
+     */
+    public void checkMaxIdleTime(long now)
+    {
+        if (done)
+        {
+            // already gone, probably because we just logged him out because
+            // of too many missing ping requests.
+            return;
+        }
+        long deltaMillis = now - lastPacketReceived;
+        if (user != null && loggedIn)
+        {
+            LOGGER.finest("Checking maxIdleTime of client " + user.getName()
+                + ": " + (deltaMillis / 1000) + " seconds");
+        }
+        else
+        {
+            LOGGER.info("When trying to check maxIdleTime of client, "
+                + "user null or not logged in ?!? ...");
+            return;
+        }
+
+        long idleSeconds = deltaMillis / 1000;
+        int idleMinutes = (int)(idleSeconds / 60);
+
+        if (idleWarningsSent >= IDLE_WARNING_MAXCOUNT)
+        {
+            LOGGER.info("Client " + getUsername() + " has been idle "
+                + idleMinutes + " minutes - logging him out!");
+            String message = "@@@ You have been " + idleMinutes
+                + " minutes idle; server will log you out now! @@@";
+            chatDeliver(IWebServer.generalChatName, now, "SYSTEM", message,
+                false);
+            this.interrupt();
+
+        }
+        else if (idleSeconds >= (idleWarningsSent + 1)
+            * IDLE_WARNING_INTERVAL_MINUTES * 60)
+        {
+            String message = "@@@ You have been " + idleMinutes
+                + " minutes idle; after "
+                + (IDLE_WARNING_MAXCOUNT * IDLE_WARNING_INTERVAL_MINUTES)
+                + " minutes idle time WebClient server will log you out!"
+                + " (Type or do something to prevent that...) @@@";
+            chatDeliver(IWebServer.generalChatName, now, "SYSTEM", message,
+                false);
+            idleWarningsSent++;
+            LOGGER.fine("Idle warning sent to user " + getUsername()
+                + ", idleWarnings now " + idleWarningsSent);
+        }
+    }
+
 
     public synchronized void tellToTerminate()
     {
@@ -113,9 +260,14 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
         done = true;
         try
         {
-            out.println(connectionClosed);
-            is.close();
-            socket.close();
+            if (out != null)
+            {
+                out.println(connectionClosed);
+            }
+            if (socket != null)
+            {
+                socket.close();
+            }
         }
         catch (IOException e)
         {
@@ -191,6 +343,8 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
 
             if (fromClient != null)
             {
+                lastPacketReceived = new Date().getTime();
+
                 done = parseLine(fromClient);
 
                 String username = "<unknown>";
@@ -270,6 +424,11 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
 
         String[] tokens = fromClient.split(sep);
         String command = tokens[0];
+
+        if (!command.equals(IWebServer.PingResponse))
+        {
+            idleWarningsSent = 0;
+        }
 
         if (user == null && unverifiedUsername == null)
         {
@@ -478,7 +637,6 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
         }
         else if (command.equals(IWebServer.StartAtPlayer))
         {
-            // System.out.println("WSCST start at player");
             String gameId = tokens[1];
             String hostingPlayer = tokens[2];
             String playerHost = tokens[3];
@@ -560,6 +718,18 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
                     + " attempted to use RequestUserAttention method!");
             }
         }
+        else if (command.equals(IWebServer.PingResponse))
+        {
+            String name = "<user not defined>";
+            if (user != null)
+            {
+                name = user.getName();
+            }
+
+            LOGGER
+                .info("Received a ping response from user " + name);
+        }
+
         else if (command.equals(IWebServer.Echo))
         {
             if (user.isAdmin())
@@ -744,6 +914,11 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
         sendToClient(requestAttention + sep + when + sep + byUser + sep
             + byAdmin + sep
             + message + sep + beepCount + sep + beepInterval + sep + windows);
+    }
+
+    public void requestPing(String arg1, String arg2, String arg3)
+    {
+        sendToClient(pingRequest + sep + arg1 + sep + arg2 + sep + arg3);
     }
 
     public void connectionReset(boolean forcedLogout)

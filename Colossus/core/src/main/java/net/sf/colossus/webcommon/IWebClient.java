@@ -24,6 +24,7 @@ public interface IWebClient
     public static final String chatDeliver = "chatDeliver";
     public static final String generalMessage = "generalMessage";
     public static final String requestAttention = "requestAttention";
+    public static final String pingRequest = "pingRequest";
 
     public void grantAdminStatus();
 

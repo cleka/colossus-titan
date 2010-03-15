@@ -254,6 +254,28 @@ public class User
         }
     }
 
+    public static String getLoggedInNamesAsString(String useSeparator)
+    {
+        String names = "<none>";
+        String separator = "";
+
+        synchronized (loggedInUserMap)
+        {
+            if (!loggedInUserMap.isEmpty())
+            {
+                StringBuilder list = new StringBuilder("");
+                for (String key : loggedInUserMap.keySet())
+                {
+                    list.append(separator);
+                    list.append(key);
+                    separator = useSeparator;
+                }
+                names = list.toString();
+            }
+        }
+        return names;
+    }
+
     public static int getLoggedInCount()
     {
         synchronized (loggedInUserMap)

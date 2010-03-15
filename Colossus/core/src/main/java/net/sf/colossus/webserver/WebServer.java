@@ -85,6 +85,8 @@ public class WebServer implements IWebServer, IRunWebServer
 
     private final ChatChannel generalChat;
 
+    private final ClientWatchDog watchDog;
+
     public static void main(String[] args)
     {
         String optionsFileName = WebServerConstants.defaultOptionsFilename;
@@ -201,6 +203,10 @@ public class WebServer implements IWebServer, IRunWebServer
             this.gui = new NullWebServerGUI();
         }
 
+        watchDog = new ClientWatchDog();
+        watchDog.start();
+
+
         updateGUI();
         /*
          boolean runGameConsole = false;
@@ -297,6 +303,7 @@ public class WebServer implements IWebServer, IRunWebServer
     public void shutdownServer()
     {
         shutdownRequested = true;
+        watchDog.shutdown();
         closeAllWscst();
         makeDummyConnection();
     }
