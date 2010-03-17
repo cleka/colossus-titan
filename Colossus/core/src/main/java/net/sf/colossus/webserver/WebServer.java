@@ -1041,8 +1041,8 @@ public class WebServer implements IWebServer, IRunWebServer
         IGameRunner gr = gi.getGameRunner();
         if (gr == null)
         {
-            LOGGER.severe("GameInfo with GameId returned null as GameRunner"
-                + gi.getGameId());
+            LOGGER.severe("GameInfo with GameId " + gi.getGameId()
+                + " returned null as GameRunner");
         }
         return gr;
     }

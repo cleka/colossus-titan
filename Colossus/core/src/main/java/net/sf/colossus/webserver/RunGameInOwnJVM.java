@@ -263,8 +263,8 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
             }
             else
             {
-                LOGGER.log(Level.SEVERE,
-                    "  !!! game started but not all clients came in!!!");
+                LOGGER.log(Level.SEVERE, "Game " + gameId
+                    + " started but not all clients came in!!!");
             }
         }
         else
@@ -421,8 +421,11 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
         int connected = 0;
         int checkInterval = 1000; // every second
 
+        StringBuffer names = new StringBuffer("");
+
         for (int i = 0; !ok && i < timeout;)
         {
+            String name = null;
             line = waitForLine(in, checkInterval);
             LOGGER.info("GOT: " + line);
             if (line == null)
@@ -430,9 +433,14 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
                 // Didn't get anything => readLine timeout hit
                 i++;
             }
-            else if (line.startsWith("Local client connected: ")
-                || line.startsWith("Remote client connected: "))
+            else if (line.startsWith("Local client connected: "))
             {
+                name = line.substring(24);
+                connected++;
+            }
+            else if (line.startsWith("Remote client connected: "))
+            {
+                name = line.substring(25);
                 connected++;
             }
             else if (line.startsWith("All clients connected"))
@@ -447,6 +455,15 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
             {
                 ok = true;
             }
+
+            if (name != null)
+            {
+                if (names.length() > 0)
+                {
+                    names.append(", ");
+                }
+                names.append(name);
+            }
         }
 
         if (ok)
@@ -455,9 +472,9 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
         }
         else
         {
-            LOGGER.log(Level.WARNING,
-                "RESULT: game started, but not all clients did connect\n"
-                    + "Got only " + connected + " players");
+            LOGGER.log(Level.WARNING, "Game " + gameId + " started, but not "
+                + " all clients did connect; got only " + connected
+                + " players: " + names.toString());
         }
 
         try
