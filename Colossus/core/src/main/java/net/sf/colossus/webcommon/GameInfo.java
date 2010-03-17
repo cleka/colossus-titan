@@ -454,6 +454,11 @@ public class GameInfo
         return Integer.valueOf(enrolledPlayers);
     }
 
+    public boolean enoughPlayersEnrolled()
+    {
+        return enrolledPlayers >= min;
+    }
+
     public int getOnlineCount()
     {
         return onlineCount;

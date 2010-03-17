@@ -1918,8 +1918,8 @@ public class WebClient extends KFrame implements IWebClient
                 GameInfo gi = findGameById(enrolledInstantGameId);
                 if (gi != null)
                 {
-                    if (gi.getEnrolledCount().intValue() >= gi.getMin()
-                        .intValue()
+                    if (gi.enoughPlayersEnrolled()
+                        && gi.allEnrolledOnline()
                         && gi.getGameState().equals(GameState.PROPOSED))
                     {
                         return true;
