@@ -755,7 +755,15 @@ public class WebServer implements IWebServer, IRunWebServer
 
     private void attemptStartOnServer(GameInfo gi, User byUser)
     {
-        if (!gi.isStartable())
+        if (!gi.allEnrolledOnline())
+        {
+            LOGGER.warning("User " + byUser + " requested to start game "
+                + gi.getGameId()
+                + ", but not all enrolled players are online.");
+            String reason = "Not all enrolled players online!";
+            informAllEnrolledThatStartFailed(gi, reason, byUser);
+        }
+        else if (!gi.isStartable())
         {
             LOGGER
                 .warning("User "
@@ -768,11 +776,8 @@ public class WebServer implements IWebServer, IRunWebServer
         else
         {
             gi.markStarting(byUser);
-
             String reason = startOneGame(gi);
-
             proposedGamesListModified = true;
-
             if (reason == null)
             {
                 LOGGER.log(Level.FINE, "Found gi, got port " + gi.getPort());
@@ -781,7 +786,7 @@ public class WebServer implements IWebServer, IRunWebServer
             {
                 LOGGER.warning("starting/running game " + gi.getGameId()
                     + " failed!!");
-                informAllEnrolledThatStartFailed(gi, reason);
+                informAllEnrolledThatStartFailed(gi, reason, byUser);
                 gi.cancelStarting();
             }
         }
@@ -836,26 +841,39 @@ public class WebServer implements IWebServer, IRunWebServer
         proposedGamesListModified = true;
     }
 
-    public void informAllEnrolledThatStartFailed(GameInfo gi, String reason)
+    public void informAllEnrolledThatStartFailed(GameInfo gi, String reason,
+        User byUser)
     {
         ArrayList<User> users = gi.getPlayers();
+        String message = "Starting game with gameId " + gi.getGameId()
+            + " (initiated by player " + byUser.getName()
+            + ") failed. Reason: " + reason;
+
         for (User u : users)
         {
-            String message = "Starting game with gameId " + gi.getGameId()
-                + " (initiated by player " + gi.getStartingUser().getName()
-                + ") failed. Reason: " + reason;
-            LOGGER.info("Informing player " + u.getName() + ", that "
-                + message);
             IWebClient webClient = (IWebClient)u.getThread();
-            if (webClient.getClientVersion() >= 1)
+            if (webClient == null)
             {
+                LOGGER.info("Skip informing player " + u.getName()
+                    + " (webclient null): " + message);
+
+            }
+            else if (webClient.getClientVersion() >= 1)
+            {
+                LOGGER
+                    .info("Informing player " + u.getName() + ": " + message);
+
                 // for the starting user it's an error, others just info
-                boolean error = u.getName().equals(
-                    gi.getStartingUser().getName());
+                boolean error = u.getName().equals(byUser.getName());
                 // when == 0: do not show a specific time
                 long when = 0;
                 webClient.deliverGeneralMessage(when, error,
                     "Game start failed!", message);
+            }
+            else
+            {
+                LOGGER.info("Skip informing player " + u.getName()
+                    + " (too old webclient): " + message);
             }
         }
     }
