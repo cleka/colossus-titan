@@ -57,7 +57,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
     private static final int PING_MAX_TRIES = 3;
 
     private static final int IDLE_WARNING_INTERVAL_MINUTES = 10;
-    private static final int IDLE_WARNING_MAXCOUNT = 3;
+    private static final int IDLE_WARNING_MAXCOUNT = 12;
 
 
     /* During registration request and sending of confirmation code,
@@ -139,7 +139,8 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
                         + " pings, still no response from client "
                         + getUsername()
                         + " - assuming connection lost and closing it.");
-                    String message = "@@@ After " + pingsTried
+                    String message = "@@@ Hello " + getUsername() + ", after "
+                        + pingsTried
                         + " ping requests, still no response from your "
                         + "WebClientclient - assuming connection problems "
                         + "and closing connection from server side. @@@";
@@ -222,7 +223,8 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
         {
             LOGGER.info("Client " + getUsername() + " has been idle "
                 + idleMinutes + " minutes - logging him out!");
-            String message = "@@@ You have been " + idleMinutes
+            String message = "@@@ Hello " + getUsername() + ", you have been "
+                + idleMinutes
                 + " minutes idle; server will log you out now! @@@";
             chatDeliver(IWebServer.generalChatName, now, "SYSTEM", message,
                 false);
@@ -232,8 +234,8 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
         else if (idleSeconds >= (idleWarningsSent + 1)
             * IDLE_WARNING_INTERVAL_MINUTES * 60)
         {
-            String message = "@@@ You have been " + idleMinutes
-                + " minutes idle; after "
+            String message = "@@@ Hello " + getUsername() + ", you have been "
+                + idleMinutes + " minutes idle; after "
                 + (IDLE_WARNING_MAXCOUNT * IDLE_WARNING_INTERVAL_MINUTES)
                 + " minutes idle time WebClient server will log you out!"
                 + " (Type or do something to prevent that...) @@@";
