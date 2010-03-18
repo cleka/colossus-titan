@@ -776,6 +776,7 @@ public class WebServer implements IWebServer, IRunWebServer
         else
         {
             gi.markStarting(byUser);
+            allTellGameInfo(gi);
             String reason = startOneGame(gi);
             proposedGamesListModified = true;
             if (reason == null)
