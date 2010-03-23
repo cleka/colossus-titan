@@ -58,6 +58,7 @@ final class ClientHandler implements IClient
     private final SelectionKey selectionKey;
     private String playerName;
     private String signonName;
+    private int clientVersion = 0;
 
     private boolean isGone = false;
     private boolean withdrawnAlready = false;
@@ -285,7 +286,6 @@ final class ClientHandler implements IClient
         {
             String signonTryName = args.remove(0);
             boolean remote = Boolean.valueOf(args.remove(0)).booleanValue();
-            int clientVersion;
             String buildInfo;
             if (args.size() < 2)
             {
@@ -1085,6 +1085,9 @@ final class ClientHandler implements IClient
 
     public void pingRequest()
     {
-        sendToClient(Constants.pingRequest);
+        if (clientVersion >= 2)
+        {
+            sendToClient(Constants.pingRequest);
+        }
     }
 }

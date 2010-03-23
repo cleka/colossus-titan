@@ -20,7 +20,8 @@ import net.sf.colossus.variant.MasterHex;
  */
 public interface IServer
 {
-    public static final int CLIENT_VERSION = 1;
+    // New in version 2: replies to pingRequest
+    public static final int CLIENT_VERSION = 2;
 
     // Clients that do not send version yet at all, are treated as version -1.
     // For those, even show on server side an error dialog and refuse them to

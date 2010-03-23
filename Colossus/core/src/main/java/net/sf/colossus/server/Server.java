@@ -949,13 +949,13 @@ public final class Server extends Thread implements IServer
         {
             String diffWhat = (clientVersion < IServer.CLIENT_VERSION ? "older"
                 : "newer");
-            logToStartLog("WARNING: Client version mismatch detected!!!\n"
+            logToStartLog("NOTE: Client version mismatch detected!!!\n"
                 + "One client attempted to join with player name "
                 + playerName + ", using different (" + diffWhat
                 + ") client version: " + clientVersion
                 + " - trying it anyway.");
             disableAutoCloseStartupLog();
-            LOGGER.warning("Client " + playerName + " uses Client Version: "
+            LOGGER.info("Client " + playerName + " uses Client Version: "
                 + clientVersion + " but we would expect "
                 + IServer.CLIENT_VERSION + " - trying it anyway.");
         }
