@@ -37,7 +37,7 @@ public class ClientWatchDog extends Thread
             int cnt = users.size();
             if (cnt > 0)
             {
-                LOGGER.info(cnt + " users logged in (" + names
+                LOGGER.finest(cnt + " users logged in (" + names
                     + "), checking them...");
                 for (User u : users)
                 {
@@ -47,7 +47,7 @@ public class ClientWatchDog extends Thread
                     {
                         long now = new Date().getTime();
                         client.requestPingIfNeeded(now);
-                        client.checkMaxIdleTime(now);
+                        // client.checkMaxIdleTime(now);
                     }
                 }
             }

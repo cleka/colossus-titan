@@ -164,11 +164,13 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
                 // otherwise, send another one
                 else
                 {
+                    /*
                     LOGGER.fine("Client " + getUsername()
                         + ": no activity for " + (deltaMillis / 1000f)
                         + " seconds; " + "requesting "
                         + (pingsTried + 1)
                         + ". ping!");
+                    */
                     requestPing("dummy1", "dummy2", "dummy3");
                     pingsTried++;
                 }
