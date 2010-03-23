@@ -560,6 +560,13 @@ final class ClientHandler implements IClient
         {
             server.clientConfirmedCatchup();
         }
+
+        else if (method.equals(Constants.replyToPing))
+        {
+            LOGGER.fine("Client " + playerName
+                + " replied to ping request - fine!");
+        }
+
         else
         {
             LOGGER.log(Level.SEVERE, "Bogus packet (Server, method: " + method
@@ -1074,5 +1081,10 @@ final class ClientHandler implements IClient
         LOGGER.info("Sending server connection confirmation to client "
             + playerName);
         sendToClient(Constants.serverConnectionOK);
+    }
+
+    public void pingRequest()
+    {
+        sendToClient(Constants.pingRequest);
     }
 }

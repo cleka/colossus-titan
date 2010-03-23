@@ -1174,12 +1174,31 @@ final class SocketClientThread extends Thread implements IServer,
             client.serverConfirmsConnection();
         }
 
+        else if (method.equals(Constants.pingRequest))
+        {
+            LOGGER.finest("Received server ping request in client "
+                + getNameMaybe());
+            replyToPing();
+        }
+
         else
         {
             LOGGER.log(Level.SEVERE, "Bogus packet (Client, method: " + method
                 + ", args: " + args + ")");
         }
         LOGGER.finer("Client '" + getName() + "' finished method processing");
+    }
+
+    private String getNameMaybe()
+    {
+        if (client != null && client.getOwningPlayer() != null)
+        {
+            return client.getOwningPlayer().getName();
+        }
+        else
+        {
+            return "<no client or no owning player name yet>";
+        }
     }
 
     private BattleHex resolveBattleHex(String hexLabel)
@@ -1510,6 +1529,11 @@ final class SocketClientThread extends Thread implements IServer,
     public void joinGame(String playerName)
     {
         sendToServer(Constants.joinGame + sep + playerName);
+    }
+
+    public void replyToPing()
+    {
+        sendToServer(Constants.replyToPing);
     }
 
     private MasterHex resolveHex(String label)

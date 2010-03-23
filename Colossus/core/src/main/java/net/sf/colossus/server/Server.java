@@ -1220,6 +1220,9 @@ public final class Server extends Thread implements IServer
         for (IClient client : clients)
         {
             client.updatePlayerInfo(getPlayerInfo(treatDeadAsAlive));
+            // Temporary, just to make it happen sometimes...
+            // TODO do this properly
+            client.pingRequest();
         }
     }
 

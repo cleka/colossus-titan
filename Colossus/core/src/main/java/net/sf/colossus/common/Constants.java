@@ -251,6 +251,8 @@ public final class Constants
     public static final String askPickFirstMarker = "askPickFirstMarker";
     public static final String catchupConfirmation = "catchupConfirmation";
     public static final String serverConnectionOK = "serverConnectionOK";
+    public static final String pingRequest = "pingRequest";
+    public static final String replyToPing = "replyToPing";
 
     public static final String reasonSplit = "Split";
     public static final String reasonSummon = "Summon";

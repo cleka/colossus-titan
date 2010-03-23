@@ -166,4 +166,6 @@ public interface IClient
     public void nak(String reason, String errmsg);
 
     public void setBoardActive(boolean val);
+
+    public void pingRequest();
 }

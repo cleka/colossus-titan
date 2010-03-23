@@ -3117,6 +3117,11 @@ public final class Client implements IClient, IOracle, IVariant,
         LOGGER.log(Level.INFO, message);
     }
 
+    public void pingRequest()
+    {
+        // Dummy, SocketClientThread handles this already.
+    }
+
     public boolean testBattleMove(BattleCritter battleUnit, BattleHex hex)
     {
         if (showBattleMoves(battleUnit).contains(hex))
