@@ -13,6 +13,44 @@
 This describes the recent changes in some more detail than just the
 one-line-info on the main pages "News" section.
 
+<h3>March 23, 2010: Public Testing Build 0.10.3alpha006 from r4780</h3>
+<p/>
+Usability and stability improvements: 
+
+<ul>
+<li>When right clicking on a masterboard land with legions (but not 
+    clicked a legion itself), popup menu now offers also "Show legion(s)" action.</li>
+<li>Added as option: show the legion marker in autoinspector, 
+    rightclick-shows-legion and shift/ctrl popups</li>    
+<li>Concede/Flee dialog tells "this will give XXX points to ..., 
+    raising the score from xxx to yyy". And some layout improvements.</li>
+<li>In Flee/Concede dialog, disable that Space activates the selected button.
+    Note that Return key activates the "default" action of that dialog, 
+    which is Show Battle Map (which does not harm)</li>
+<li>In Flee/Concede dialog, mark the to-be-killed (= own) legion all as dead.</li>
+<li>In Flee/Concede dialog, added button for Show Battle Map, 
+    and text says from which side attacker enters.</li>
+<li>Lot of fixes related to game starting failing</li>
+<li>Prevent enrolling to a game that is already starting.</li>
+<li>Prevent on server side the starting of a game where not all enrolled players
+    are logged in.</li>
+<li>On WebClient side, for check if game could be started, check also for instant 
+    games that all enrolled players are online.</li>
+<li>Directly after game start was triggered (state set to ACTIVATED), update 
+    GameInfo to _all_ logged-in users (not only enrolled ones), so that they see 
+    there is no point to enroll any more.</li>
+<li>Added a "wishlist and TODO" doc related to Public Game Server</li>
+<li>Improved the popup message which informs that the _WebClient_ connection
+    was closed from server side, game is not affected.</li>
+<li>Some keep-line-alive functionality between WebServer and WebClient</li>
+<li>Some very simple keep-alive functionality also between "real" game server 
+    and client (i.e. actual game, not the WebClient connection)</li>            
+    
+</ul>
+
+<p />
+<hr></hr>
+
 <h3>February 6, 2010: Release 0.10.2 from r4699</h3>
 <p/>
 Usability and stability improvements: 
@@ -73,10 +111,8 @@ Usability and stability improvements:
     or caused exceptions, or whatever</li>
 </ul>
 <p />
-<hr></hr>
-
 <h3>January 2, 2010: Release 0.10.1 from r4646</h3>
-<p>
+<p />
 Some usability improvements: 
 
 <ul>
@@ -93,18 +129,18 @@ Some usability improvements:
 <p />
 
 <h3>December 25, 2009: Release 0.10.0 from r4635</h3>
-<p>
+<p />
 Two bugfixes (plus some refactoring done, and fixes to bugs caused by that), and: <b><font color="blue">the Public Game Server is going online now!</font></b>
 
 <ul>
 <li>Fixed: 2910472 Undo broken when blocking a split</li>
 <li>Fixed: 2894243 ExperimentalAL crashed when unable to enter all creatures and 2873695 Close when AI can't fit on troops (same thing)</li>
-<li>New feature: The Public Game Server (aka WebServer/WebClient) functionality is going online now!<br>
+<li>New feature: The Public Game Server (aka WebServer/WebClient) functionality is going online now!<br />
     Accordingly, the hostname field in WebClient is now pre-initialized with "play-colossus.net".</li> 
 </ul>
 
 <h3>October 15, 2009: Release 0.9.3 from r4577</h3>
-<p>
+<p />
 Again bugfixes and corrections:
 
 <ul>
@@ -131,7 +167,7 @@ Again bugfixes and corrections:
 </ul>
 
 <h3>September 6, 2009: Release 0.9.2 from r4519</h3>
-<p>
+<p />
 More bugfixes and corrections:
 <ul>
 <li>Fixed: 2835558 WARNING: Could not find creature with name none</li>
@@ -148,7 +184,7 @@ More bugfixes and corrections:
 </ul>
 
 <h3>August 17, 2009: Release 0.9.1 / Public Build from r4489</h3>
-<p>
+<p />
 Just a few bugfixes.
 <ul>
 <li>Fixed: 2836720 Resync error during loading saved game (when UndoRecruit had been done)</li>
@@ -172,7 +208,7 @@ and not so much directly user-visible changes and bugfixes.</p>
    Server/Client communication and Variant files) with the previous Public Build!</b></font></p>
 <p>This means you can't load old saved games from earlier version, 
    and when playing over network one can't use previous' versions Network Client 
-   to connect to a game running with new version aned vice versa.</p>
+   to connect to a game running with new version and vice versa.</p>
 <p>
 Below the highlights since last Public Build (2008-10-29):</p>
 <ul>
@@ -191,7 +227,7 @@ Below the highlights since last Public Build (2008-10-29):</p>
 <li>Changes to save game format, now version 2</li>
 <li>"One todo done. 1.21 gigatodos still to go."</li>
 <li>Fixed: 2057072 If game in trouble, "Save" might not work either:
-    File => Save Game and Save Game As now done directly via "localServer"
+    File =&gt; Save Game and Save Game As now done directly via "localServer"
     object, instead of via network message as earlier.</li>
 <li>Added Tim Hoban's patch for #2352320, HumanHater being under-aggressive
     against other AIs. (Reworked onlyAIsRemain a bit.)</li>
@@ -231,7 +267,7 @@ Below the highlights since last Public Build (2008-10-29):</p>
 <li>Work ongoing to get Colossus part of Fedora (e.g. using now self-written 
     simple option parser instead of werken.opt).</li>
 </ul>
-<p>
+<p />
 <i>January 6, 2009: Changes listed below were already in Public Testing Build from r3541</i>
 <ul>
 <li>Fixed the problem that Quit in WebClient did not really directly Quit</li>
@@ -279,7 +315,7 @@ Below the highlights since last Public Build (2008-10-29):</p>
 <li>Fixed: 1900956 Nonentry of summoned or mustered unit</li>
 <li>Fixed: 2167276 Doubled Reinforcements</li>
 <li>Fixed: 2160218 Incorrect bramble effect on rangestrike</li>
-<li>Fixed: CowardSimpleAI constants incorrectly affecting SimpleAI.
+<li>Fixed: CowardSimpleAI constants incorrectly affecting SimpleAI.</li>
 <li>Fixed the "multiple recruits possible" problem reported for Public Testing Build</li>
 <li>Fixed that EventViewer showed all recruitings (after first battle) as "Reinforced"</li>
 <li>Fixed: 1895129 carryover gui issue: should not close with "x"</li>
@@ -327,17 +363,17 @@ Below the highlights since last Public Build (2008-10-29):</p>
 <li>Slightly rephrased text in summon dialog and corrected catched to 
     caught in some method names ;-)</li>
 <li>Tower teleport now only allowed from lands which really have the isTower
-    attribute, not as before if they have a startlist (e.g. Abyssal, Mantio).
+    attribute, not as before if they have a startlist (e.g. Abyssal, Mantio).</li>
 <li>Fixed the server-client communication, now (hopefully) the right way. 
     Several of the mysterious battle and game-end related bugs shouldn't 
-    happen any more, e.g.:</li>
+    happen any more, e.g.:
   <ul>
     <li>Fixed: [ 2072769 ] Game hangs when AI titan killed by AI </li>
     <li>Fixed (most likely):[ 2090150 ] Stack Counter left after a battle</li>
     <li>Fixed: [ 2095361 ] Game hangs when AI Titan killed</li>
     <li>Fixed: [ 2097773 ] Battlemat fails to close</li>
     <li>Fixed: [ 2113621 ] Major battlemap bugs that end gameplay</li>
-  </ul>
+  </ul></li>
 <li>Some corrections and improvements to CreatureDetails dialog</li>
 <li>When user selects Quit, trigger a timer which would do a 
     System.exit() after 10 seconds - to make sure that the java/javaw
@@ -348,14 +384,14 @@ Below the highlights since last Public Build (2008-10-29):</p>
 </ul>
 
 <h3>August 22, 2008, Public Build made from r3332</h3>
-<p>
+<p />
 A lot of things were changed this time. Some of them you as end-user might notice, some not...
-<p>
+<p />
 <b><font color="red">Colossus requires now at least Java 1.5!</font></b>
-<p>
+<p />
 <i>This time the changes in "oldest first" order
    (earlier they were mostly most recent first, or unordered...)</i>
-<p>
+<p />
 <ul>
 <li>Quite some internal cleanup, architectural changes (NIO, less threads, 
     started to share code between server and client instead of duplicate it, 
@@ -367,25 +403,25 @@ A lot of things were changed this time. Some of them you as end-user might notic
     it restores on player change the <b>MasterBoard</b> of the active player and
     minimizes the others. <b>Does not cover the battle maps yet.</b>
     Also the satellites (game status, eventviewer, ...) come and go with 
-    their respective MasterBoard.<br>
+    their respective MasterBoard.<br />
     So, something left to do here...</li>
 <li>The items in the MasterBoard menu which are more like "Preferences" 
     (as opposed to: "actions") are now all moved into an own window 
-    (Window=&gt;Preferences).<br>
+    (Window=&gt;Preferences).<br />
     Documentation for Client is now accordingly split into two files 
     (actions in the menu, and meaning of the various Preferences items)</li>
 <li>Includes now the <a href="WebClient.html">WebClient</a> (and 
-    <a href="WebServer.html">WebServer</a>) functionality.<br>
-    <b>We have the code working, but no server running :-( </b><br>
+    <a href="WebServer.html">WebServer</a>) functionality.<br />
+    <b>We have the code working, but no server running :-( </b><br />
     <u>If you are willing to help organizing something into that direction, 
        don't hesitate to contact us!</u></li>
 <li>Player name in the status screen stays in player's color. This allows
     telling who e.g. the green player was when green is dead.</li>
 <li>Restricted logging to the Colossus classes.</li>
-<li>Added "configure your favorite colors" functionality in Preferences.
+<li>Added "configure your favorite colors" functionality in Preferences.</li>
 <li>It's now possible to close the MasterBoard of a dead player (when several
     human players play on same computer). Earlier this would have quite the whole
-    application. Also the dialogs related to Close and Quit are changed quite much.
+    application. Also the dialogs related to Close and Quit are changed quite much.</li>
 <li>Closing the network client (or when it fails) you are back to the main
     GetPlayers dialog (instead of just whole application gone, as earlier).
     Web client dialog behaves the same.</li>
@@ -460,96 +496,96 @@ Changes so far (just most recent first, i.e. NOT sorted by importance... ;-)
 <li>We have now the <a href="http://colossus.wiki.sourceforge.net/">Wiki 
     pages</a> in use. Mostly for developers, but there there are also web 
     start file(s) for more experimental builds - i.e. already some while 
-    before the public build is done.<BR>
+    before the public build is done.<br />
     For details check out the 
       <a href="http://colossus.wiki.sourceforge.net/ExperimentalBuilds">
-    ExperimentalBuilds</a> wiki page.
+    ExperimentalBuilds</a> wiki page.</li>
 <li>Improvements to Battle Map:
 <ul>
-<li>Shows the die roll needed to hit.
-<li>Shows adjustments (get more/less dice due to hazard or rangestrike)
-<li>Legion markers show near the legions entry side
-<li>Done button, turn+phase+activePlayer indicator
+<li>Shows the die roll needed to hit.</li>
+<li>Shows adjustments (get more/less dice due to hazard or rangestrike)</li>
+<li>Legion markers show near the legions entry side</li>
+<li>Done button, turn+phase+activePlayer indicator</li>
 <li>An own page in the docs folder describes the features of the Battle Map:
     <a href="BattleFeatures.html">Description for the features of the BattleMap window</a>.
     You can also find this page from the documentation index ("The full docs are here.")
-    on Colossus main page.
-    
-</ul>
+    on Colossus main page.</li>
+</ul></li>
 <li>Changes in EventViewer which should eliminate some (harmless?) exception
-    in AWT Event Queue.
+    in AWT Event Queue.</li>
 <li>Vendor tag in Java Web Start file now "Colossus development team"
-    instead of David Ripton.
-<li>Action key and menu item for "Done" now in sync with "Done" button.
+    instead of David Ripton.</li>
+<li>Action key and menu item for "Done" now in sync with "Done" button.</li>
 <li>Default setting for legion visibility now "Ever revealed ..." instead
-    of "Only own".
+    of "Only own".</li>
 <li>Legion info popups: holding shift key, ever each legion will appear a
     small legion flyout showing it's contents, and if known the legion value.
-    Holding control key, they are shown only for own legions.
+    Holding control key, they are shown only for own legions.</li>
 <li>Improvements to "View Battle Map": land name now top-right, so the normal
     "Land name corresponds to land number on MasterBoard" rule applies now.
     Additionally it shows the neighbor lands (both in the title, 
-    and in the map are inactive buttons telling e.g. "Left: Woods 39").
-<li>A LOT of internal cleanup and corrections.
+    and in the map are inactive buttons telling e.g. "Left: Woods 39").</li>
+<li>A LOT of internal cleanup and corrections.</li>
 <li>Slightly improved handling of Save Game if directory "saves/" does
-    not exist yet or can't even be created.
+    not exist yet or can't even be created.</li>
 <li>List of hosts in Network Client now not user dependent any more,
     eliminated one possible NullPointerException (game would hang), and in 
-    the alphabetically sorted list the Most Recently Used one is preselected.
+    the alphabetically sorted list the Most Recently Used one is preselected.</li>
 <li>Some cleanup and fixing for AutoInspector and EventViewer regarding
     initial size, position, and showing/disposing code cleanup;
     size+location were forgotten/reset to default if EventViewer 
-    was left disabled for one full game; now fixed.
+    was left disabled for one full game; now fixed.</li>
 <li>Inspector and show-legion (right-click) window show legion value 
     (and owner, if not own legion) in title; concede and flee dialog also
-    show legion values (=> feature requests [1818878] and [ 503862 ]).
+    show legion values (=&gt; feature requests [1818878] and [ 503862 ]).</li>
 <li>If duplicate player names, tell this as message box, instead of
-    silently just doing *nothing*.
+    silently just doing *nothing*.</li>
 <li>Engagement window collects now all results, no matter whether it is
     enabled or not, and does not forget old results when closed; and if 
-    at game start (saved via options) enabled, it *IS* vsible (even if
-    empty). I.e. it behaves like all other satellite windows.
+    at game start (saved via options) enabled, it *IS* visible (even if
+    empty). I.e. it behaves like all other satellite windows.</li>
 <li>Game Setup window is now a JFrame (instead of being a JDialog as it 
-    was before) which means, it can be minimized, and has own taskbar icon.
+    was before) which means, it can be minimized, and has own taskbar icon.</li>
 <li>EngagementResult and EventViewer windows now handle time-losses
-    properly (before, they just told "won in 8 turns" and "destroyed").
-<li>Updated in documents that recommended Java version is now 1.4.2.
+    properly (before, they just told "won in 8 turns" and "destroyed").</li>
+<li>Updated in documents that recommended Java version is now 1.4.2.</li>
 <li>After the fix for [1769985], when used Load Game button player 
-    types and names were all wiped out. This is now corrected again.
+    types and names were all wiped out. This is now corrected again.</li>
 <li>Most likely fixed now:  [1789116] and [1737239] ("Illegal move" message
-    when going with a 4 up to tundra/mountain).
+    when going with a 4 up to tundra/mountain).</li>
 <li>Fixed: [ 1758248 ] Help - About is now also shown even if autoplay
-    is on.
+    is on.</li>
 </ul>
 <h3>September 6 2007, build r2711</h3>
 Only minor changes:
 <ul>
-<li>Fixing: [ 1769985 ] "Auto quit when game over never changes"<BR>
-In GetPlayer dialog options are also saved when using Load Game, 
-not only when starting new game.
+<li>Fixing: [ 1769985 ] "Auto quit when game over never changes"<br />
+    In GetPlayer dialog options are also saved when using Load Game, 
+    not only when starting new game.</li>
 <li>The dialog box for "Illegal move" tells now a more concrete reason why
-the server considers this move illegal. This is related to [1789116] and 
-[1737239] (attempt to move from Plain 29 to Tundra 2000 and one gets
-this message eventhough this move should be allowed).<BR>
-Hopefully with this improved message this gives a clue what is wrong there.
+    the server considers this move illegal. This is related to [1789116] and 
+    [1737239] (attempt to move from Plain 29 to Tundra 2000 and one gets
+    this message eventhough this move should be allowed).<br />
+    Hopefully with this improved message this gives a clue what is wrong there.</li>
 </ul>
 <h3>July 24 2007, build r2706</h3>
 Most relevant changes:
 <ul>
 <li>MasterBoard menu items significantly rearranged:
   <ul>
-  <li>Player menu now called Autoplay
-  <li>Part of Graphics menu items moved into new "Window" menu 
-  <li>Look & Feel under new Windows menu instead of being own menu
-  </ul>
-<li>"Show all recruit chits" replaced with 4-choice selection whether to show "None", "Strongest", "Recruit Hint", "All".
-<li>Addtional event in EventViewer to show "Masterboard movement roll"
-<li>Various bugfixes
+  <li>Player menu now called Autoplay</li>
+  <li>Part of Graphics menu items moved into new "Window" menu</li> 
+  <li>Look &amp; Feel under new Windows menu instead of being own menu</li>
+  </ul></li>
+<li>"Show all recruit chits" replaced with 4-choice selection whether 
+    to show "None", "Strongest", "Recruit Hint", "All".</li>
+<li>Additional event in EventViewer to show "Masterboard movement roll"</li>
+<li>Various bugfixes</li>
 <li>Documentation updated:
   <ul>
-  <li>Added a doc describing all the <a href="ClientOptions.html">Client side options (in MasterBoard menu)</a>.
-  <li>A document describing all the <a href="GetPlayersOptions.html">options/settings available during game startup (in Get Player selection dialog)</a> was already added few weeks ago.
-  <li>Smaller other updates, corrections, NAME-tag adding in various other HTML-doc files.
+  <li>Added a doc describing all the <a href="ClientOptions.html">Client side options (in MasterBoard menu)</a>.</li>
+  <li>A document describing all the <a href="GetPlayersOptions.html">options/settings available during game startup (in Get Player selection dialog)</a> was already added few weeks ago.</li>
+  <li>Smaller other updates, corrections, NAME-tag adding in various other HTML-doc files.</li>
   </ul>
 </li>
 </ul>
