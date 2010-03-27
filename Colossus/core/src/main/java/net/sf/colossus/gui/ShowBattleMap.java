@@ -54,7 +54,7 @@ final class ShowBattleMap extends HexMap
         assert SwingUtilities.isEventDispatchThread() : "Constructor should be called only on the EDT";
 
         Map<EntrySide, String> neighbors = findOutNeighbors(hex);
-        String neighborsText = EntrySide.RIGHT.getLabel() + ": "
+        String neighborsText = "(" + EntrySide.RIGHT.getLabel() + ": "
             + neighbors.get(EntrySide.RIGHT) + ", "
             + EntrySide.BOTTOM.getLabel() + ": "
             + neighbors.get(EntrySide.BOTTOM) + ", "
