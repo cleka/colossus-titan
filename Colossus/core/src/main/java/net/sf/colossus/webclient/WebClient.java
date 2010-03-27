@@ -471,7 +471,6 @@ public class WebClient extends KFrame implements IWebClient
         scheduledGamesMode = scheduled;
         atDateField.setEnabled(scheduled);
         atTimeField.setEnabled(scheduled);
-        durationField.setEnabled(scheduled);
 
         if (propGamesCard == null || gamesCards == null)
         {
@@ -865,6 +864,15 @@ public class WebClient extends KFrame implements IWebClient
         return labelBox;
     }
 
+    private Box makeTextBox2(Component c, Component c2)
+    {
+        Box labelBox = new Box(BoxLayout.X_AXIS);
+        labelBox.add(c);
+        labelBox.add(c2);
+        labelBox.add(Box.createHorizontalGlue());
+        return labelBox;
+    }
+
     private void initFormats()
     {
         myDateFormat = DateFormat
@@ -882,8 +890,8 @@ public class WebClient extends KFrame implements IWebClient
         String nowDateString = myDateFormat.format(now.getTime());
         String nowTimeString = myTimeFormat.format(now.getTime());
 
-        String infoString = "Current date and time is:  " + nowDateString
-            + "  " + nowTimeString;
+        String infoString = " (current date and time is:  " + nowDateString
+            + "  " + nowTimeString + ")";
         return infoString;
     }
 
@@ -905,12 +913,12 @@ public class WebClient extends KFrame implements IWebClient
         proposeGamePane.setAlignmentX(Box.CENTER_ALIGNMENT);
         proposeGamePane.setBorder(new TitledBorder("Creating games:"));
 
+        // proposeGamePane.add(Box.createRigidArea(new Dimension(0, 10)));
+
         proposeGamePane
             .add(makeTextBox(nonBoldLabel("Set your preferences, fill in "
                 + "the 'Summary' text, then press 'Propose' to create a game:")));
 
-        proposeGamePane.add(Box.createRigidArea(new Dimension(0, 20)));
-        proposeGamePane.add(makeTextBox(new JLabel("Summary: ")));
         summaryText = new JTextField(defaultSummaryText);
         summaryText.addFocusListener(new FocusAdapter()
         {
@@ -920,14 +928,15 @@ public class WebClient extends KFrame implements IWebClient
                 summaryText.selectAll();
             }
         });
-        proposeGamePane.add(summaryText);
+        proposeGamePane
+            .add(makeTextBox2(new JLabel("Summary: "), summaryText));
 
         ButtonGroup group = new ButtonGroup();
-        Box scheduleModes = new Box(BoxLayout.Y_AXIS);
+        Box scheduleModes = new Box(BoxLayout.X_AXIS);
         // NOTE: the actual radioButtons will be added later, see below
 
-        proposeGamePane.add(Box.createRigidArea(new Dimension(0, 20)));
-        proposeGamePane.add(makeTextBox(new JLabel("Choose the start time:")));
+        scheduleModes
+            .add(new JLabel("Choose the when-to-start-type of game: "));
         proposeGamePane.add(makeTextBox(scheduleModes));
 
         // The panel with all GUI stuff needed to schedule a game:
@@ -940,9 +949,6 @@ public class WebClient extends KFrame implements IWebClient
         String nowDateAndTimeInfoString = makeDateTimeInfoString(now);
 
         nowDateAndTimeLabel = nonBoldLabel(nowDateAndTimeInfoString);
-        schedulingPanel
-            .add(makeTextBox(nowDateAndTimeLabel));
-
         nowDateAndTimeLabel.setText(nowDateAndTimeInfoString);
 
         schedulingPanel
@@ -968,22 +974,27 @@ public class WebClient extends KFrame implements IWebClient
 
         atTimeField = new JTextField(defaultStartTimeString);
         schedulePanel.add(atTimeField);
+        schedulePanel.add(nowDateAndTimeLabel);
 
-        schedulePanel.add(new JLabel(" Duration: "));
-        durationField = new JTextField("90");
-        schedulePanel.add(durationField);
-        schedulePanel.setAlignmentY(Box.TOP_ALIGNMENT);
+        schedulePanel.add(Box.createHorizontalGlue());
 
         schedulingPanel.add(schedulePanel);
-        schedulingPanel
-            .add(makeTextBox(nonBoldLabel("(the purpose of the duration value is: ")));
-        schedulingPanel
-            .add(makeTextBox(nonBoldLabel(" one should only enroll to that game if one "
-                + "knows that one "
-                + " will be available for at least that time)")));
-        schedulingPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-
         proposeGamePane.add(schedulingPanel);
+
+        Box durationPanel = new Box(BoxLayout.X_AXIS);
+        durationPanel.add(new JLabel("Duration: "));
+        durationField = new JTextField("90");
+        durationPanel.add(durationField);
+        durationPanel.setAlignmentY(Box.TOP_ALIGNMENT);
+
+        durationPanel
+            .add(makeTextBox(nonBoldLabel(" (the purpose of the duration value is: "
+                + " one should only enroll to that game if one knows that one "
+                + " will be available for at least that time)")));
+        durationPanel.add(Box.createHorizontalGlue());
+
+        proposeGamePane.add(durationPanel);
+        proposeGamePane.add(Box.createRigidArea(new Dimension(0, 10)));
 
         // Panel for the propose + cancel buttons, left most field empty:
         JPanel pcButtonPane = new JPanel(new GridLayout(0, 3));
