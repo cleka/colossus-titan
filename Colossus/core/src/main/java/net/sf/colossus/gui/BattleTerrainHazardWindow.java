@@ -163,6 +163,19 @@ public class BattleTerrainHazardWindow extends KDialog
         vFillConstraints.gridwidth = GridBagConstraints.REMAINDER;
         vFillConstraints.weighty = 1;
         container.add(new JPanel(), vFillConstraints);
+
+        // add a row for info text
+        // TODO should be done better, this is just as first aid....
+        GridBagConstraints vFillConstraints2 = new GridBagConstraints();
+        vFillConstraints2.gridx = 0;
+        vFillConstraints2.gridwidth = GridBagConstraints.REMAINDER;
+        vFillConstraints2.anchor = GridBagConstraints.SOUTHWEST;
+        vFillConstraints2.weighty = 1;
+        JPanel textPanel = new JPanel();
+        JLabel label = new JLabel(
+            "Hold the mouse over a symbol for an explanatory popup text.");
+        textPanel.add(label);
+        container.add(textPanel, vFillConstraints);
     }
 
     private void addHazard(Container container, Hazards hazard)
