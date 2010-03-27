@@ -33,12 +33,12 @@ public class ClientWatchDog extends Thread
         while (!done)
         {
             Collection<User> users = User.getLoggedInUsers();
-            String names = User.getLoggedInNamesAsString(", ");
             int cnt = users.size();
             if (cnt > 0)
             {
-                LOGGER.finest(cnt + " users logged in (" + names
-                    + "), checking them...");
+                // String names = User.getLoggedInNamesAsString(", ");
+                // LOGGER.finest(cnt + " users logged in (" + names
+                //    + "), checking them...");
                 for (User u : users)
                 {
                     WebServerClientSocketThread client = (WebServerClientSocketThread)u
