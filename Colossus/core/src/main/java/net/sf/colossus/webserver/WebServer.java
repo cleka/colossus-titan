@@ -959,8 +959,11 @@ public class WebServer implements IWebServer, IRunWebServer
             for (User u : users)
             {
                 IWebClient client = (IWebClient)u.getThread();
-                client.userInfo(loggedin, enrolled, playing, dead, ago, text
-                    .toString());
+                if (client != null)
+                {
+                    client.userInfo(loggedin, enrolled, playing, dead, ago,
+                        text.toString());
+                }
             }
         }
     }
