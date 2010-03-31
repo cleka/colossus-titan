@@ -356,132 +356,9 @@ public final class Server extends Thread implements IServer
     {
         try
         {
-            if (stopAcceptingFlag)
-            {
-                LOGGER.info("cancelDummy was set...");
-                stopAccepting();
-                stopAcceptingFlag = false;
-            }
-
-            LOGGER.log(Level.FINEST, "before select()");
-            int num = selector.select(timeout);
-            LOGGER.log(Level.FINEST, "select returned, " + num
-                + " channels are ready to be processed.");
-
-            if (handleGuiRequests())
-            {
-                // ok, select returned due to a wakeup call
-            }
-            else if (num == 0)
-            {
-                LOGGER.info("Server side select timeout...");
-            }
-
-            if (forceShutDown)
-            {
-                LOGGER.log(Level.FINEST,
-                    "waitOnSelector: force shutdown now true! num=" + num);
-                stopAccepting();
-                stopServerRunning();
-            }
-
-            Set<SelectionKey> selectedKeys = selector.selectedKeys();
-            Iterator<SelectionKey> readyKeys = selectedKeys.iterator();
-            while (readyKeys.hasNext() && !shuttingDown)
-            {
-                SelectionKey key = readyKeys.next();
-                readyKeys.remove();
-
-                if ((key.readyOps() & SelectionKey.OP_ACCEPT) == SelectionKey.OP_ACCEPT)
-                {
-                    // Accept the new connection
-                    SocketChannel sc = ((ServerSocketChannel)key.channel())
-                        .accept();
-                    sc.configureBlocking(false);
-                    LOGGER.log(Level.FINE, "Accepted: sc = " + sc);
-                    SelectionKey selKey = sc.register(selector,
-                        SelectionKey.OP_READ);
-                    ClientHandler ch = new ClientHandler(this, sc, selKey);
-                    selKey.attach(ch);
-                    // This is sent only for the reason that the client gets
-                    // an initial response quickly.
-                    ch.sendToClient("SignOn: processing");
-                    synchronized (activeSocketChannelList)
-                    {
-                        activeSocketChannelList.add(sc);
-                    }
-                }
-                else if ((key.readyOps() & SelectionKey.OP_READ) == SelectionKey.OP_READ)
-                {
-                    // Read the data
-                    SocketChannel sc = (SocketChannel)key.channel();
-                    ClientHandler ch = (ClientHandler)key.attachment();
-                    if (ch == null)
-                    {
-                        LOGGER.severe("No ClientHandler for socket channel "
-                            + sc);
-                    }
-                    else
-                    {
-                        processingCH = ch;
-
-                        int read = readFromChannel(key, sc);
-                        if (read > 0)
-                        {
-                            byteBuffer.flip();
-                            // NOTE that the following might cause trouble
-                            // if logging is set to FINEST for server,
-                            // and the disconnect does not properly set the
-                            // isGone flag...
-                            LOGGER.finest("* before ch.processInput()");
-                            ch.processInput(byteBuffer);
-                            LOGGER.finest("* after  ch.processInput()");
-                        }
-                        else
-                        {
-                            LOGGER.finest("readFromChannel: 0 bytes read.");
-                        }
-                        processingCH = null;
-                    }
-                }
-                else
-                {
-                    LOGGER.warning("Unexpected type of ready Operation: "
-                        + key.readyOps());
-                }
-            }
-            // just to be sure.
-            selectedKeys.clear();
-
-            synchronized (channelChanges)
-            {
-                // Can't use iterator, because e.g. removal of last human/observer
-                // will add more items to the channelChanges list.
-                while (!channelChanges.isEmpty())
-                {
-                    ClientHandler nextCH = channelChanges.remove(0);
-                    SocketChannel sc = nextCH.getSocketChannel();
-                    SelectionKey key = nextCH.getKey();
-                    if (key == null)
-                    {
-                        LOGGER
-                            .warning("key for to-be-closed-channel is null!");
-                    }
-                    else if (sc.isOpen())
-                    {
-                        // sending dispose and setIsGone is done by ClientHandler
-                        disconnectChannel(sc, key);
-                    }
-                    else
-                    {
-                        // TODO this should not happen, but it does regularly
-                        // - find out why and fix. Until then, just info
-                        // of warning
-                        LOGGER.info("to-be-closed-channel is not open!");
-                    }
-                }
-                channelChanges.clear();
-            }
+            handleOutsideChanges(timeout);
+            handleSelectedKeys();
+            handleChannelChanges();
         }
 
         catch (ClosedChannelException cce)
@@ -501,6 +378,141 @@ public final class Server extends Thread implements IServer
                 + ErrorUtils.makeStackTraceString(e);
             ErrorUtils.showExceptionDialog(null, message, "Exception caught!",
                 false);
+        }
+    }
+
+    private void handleOutsideChanges(int timeout) throws IOException
+    {
+        if (stopAcceptingFlag)
+        {
+            LOGGER.info("cancelDummy was set...");
+            stopAccepting();
+            stopAcceptingFlag = false;
+        }
+
+        LOGGER.log(Level.FINEST, "before select()");
+        int num = selector.select(timeout);
+        LOGGER.log(Level.FINEST, "select returned, " + num
+            + " channels are ready to be processed.");
+
+        if (handleGuiRequests())
+        {
+            // ok, select returned due to a wakeup call
+        }
+        else if (num == 0)
+        {
+            LOGGER.info("Server side select timeout...");
+        }
+
+        if (forceShutDown)
+        {
+            LOGGER.log(Level.FINEST,
+                "waitOnSelector: force shutdown now true! num=" + num);
+            stopAccepting();
+            stopServerRunning();
+        }
+    }
+
+    private void handleSelectedKeys() throws IOException,
+        ClosedChannelException
+    {
+        Set<SelectionKey> selectedKeys = selector.selectedKeys();
+        Iterator<SelectionKey> readyKeys = selectedKeys.iterator();
+        while (readyKeys.hasNext() && !shuttingDown)
+        {
+            SelectionKey key = readyKeys.next();
+            readyKeys.remove();
+
+            if ((key.readyOps() & SelectionKey.OP_ACCEPT) == SelectionKey.OP_ACCEPT)
+            {
+                // Accept the new connection
+                SocketChannel sc = ((ServerSocketChannel)key.channel())
+                    .accept();
+                sc.configureBlocking(false);
+                LOGGER.log(Level.FINE, "Accepted: sc = " + sc);
+                SelectionKey selKey = sc.register(selector,
+                    SelectionKey.OP_READ);
+                ClientHandler ch = new ClientHandler(this, sc, selKey);
+                selKey.attach(ch);
+                // This is sent only for the reason that the client gets
+                // an initial response quickly.
+                ch.sendToClient("SignOn: processing");
+                synchronized (activeSocketChannelList)
+                {
+                    activeSocketChannelList.add(sc);
+                }
+            }
+            else if ((key.readyOps() & SelectionKey.OP_READ) == SelectionKey.OP_READ)
+            {
+                // Read the data
+                SocketChannel sc = (SocketChannel)key.channel();
+                ClientHandler ch = (ClientHandler)key.attachment();
+                if (ch == null)
+                {
+                    LOGGER.severe("No ClientHandler for socket channel " + sc);
+                }
+                else
+                {
+                    processingCH = ch;
+
+                    int read = readFromChannel(key, sc);
+                    if (read > 0)
+                    {
+                        byteBuffer.flip();
+                        // NOTE that the following might cause trouble
+                        // if logging is set to FINEST for server,
+                        // and the disconnect does not properly set the
+                        // isGone flag...
+                        LOGGER.finest("* before ch.processInput()");
+                        ch.processInput(byteBuffer);
+                        LOGGER.finest("* after  ch.processInput()");
+                    }
+                    else
+                    {
+                        LOGGER.finest("readFromChannel: 0 bytes read.");
+                    }
+                    processingCH = null;
+                }
+            }
+            else
+            {
+                LOGGER.warning("Unexpected type of ready Operation: "
+                    + key.readyOps());
+            }
+        }
+        // just to be sure.
+        selectedKeys.clear();
+    }
+
+    private void handleChannelChanges() throws IOException
+    {
+        synchronized (channelChanges)
+        {
+            // Can't use iterator, because e.g. removal of last human/observer
+            // will add more items to the channelChanges list.
+            while (!channelChanges.isEmpty())
+            {
+                ClientHandler nextCH = channelChanges.remove(0);
+                SocketChannel sc = nextCH.getSocketChannel();
+                SelectionKey key = nextCH.getKey();
+                if (key == null)
+                {
+                    LOGGER.warning("key for to-be-closed-channel is null!");
+                }
+                else if (sc.isOpen())
+                {
+                    // sending dispose and setIsGone is done by ClientHandler
+                    disconnectChannel(sc, key);
+                }
+                else
+                {
+                    // TODO this should not happen, but it does regularly
+                    // - find out why and fix. Until then, just info
+                    // of warning
+                    LOGGER.info("to-be-closed-channel is not open!");
+                }
+            }
+            channelChanges.clear();
         }
     }
 
