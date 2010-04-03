@@ -14,6 +14,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.logging.Level;
@@ -977,7 +978,33 @@ public class WebServer implements IWebServer, IRunWebServer
             return;
         }
         LOGGER.finest("Chat msg from user " + sender + ": " + message);
-        generalChat.createStoreAndDeliverMessage(sender, message);
+        if (message.startsWith("/ping"))
+        {
+            handlePing(sender, message);
+        }
+        else
+        {
+            generalChat.createStoreAndDeliverMessage(sender, message);
+        }
+    }
+
+    private void handlePing(String sender, String pingCommand)
+    {
+        long when = new Date().getTime();
+        boolean isAdmin = User.findUserByName(sender).isAdmin();
+        String[] tokens = pingCommand.split(" +", 3);
+        if (tokens.length != 3)
+        {
+            LOGGER.warning("invalid pingCommand '" + pingCommand
+                + "' from user " + sender + "!");
+        }
+        else
+        {
+            String recipient = tokens[1];
+            String message = tokens[2];
+            requestUserAttention(when, sender, isAdmin, recipient, message, 3,
+                500, true);
+        }
     }
 
     public void tellLastChatMessagesToOne(WebServerClientSocketThread cst,
