@@ -10,7 +10,6 @@ import java.awt.LayoutManager;
 import java.awt.Rectangle;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
@@ -21,27 +20,27 @@ import net.sf.colossus.guiutil.INonRecticleJComponent;
 
 
 /**
- * The <code>TrueHexGridLayout</code> class is a layout manager that 
- * lays out a container's components in a grid with alternate rows 
- * offset by a partial grid component.  The vertical gap is automatically sized so that the Hex  
- * components can draw the non base-rectangle portions of the hexes in the gap. This results
- * in a hexagonal tesselation.   
+ * The <code>TrueHexGridLayout</code> class is a layout manager that
+ * lays out a container's components in a grid with alternate rows
+ * offset by a partial grid component.  The vertical gap is automatically
+ * sized so that the Hex components can draw the non base-rectangle portions
+ * of the hexes in the gap. This results in a hexagonal tesselation.
  * <p>
- * When constructed, the layout can start with an indented row or not. The sizing can be done Isometrically or not.
- *     
- * TODO: implement the containers <code>ComponentOrientation</code> property 
- * 
- * If either the Number of Rows or the Number of Columns is set to Zero either by 
- * constructor or the set rows or set columns method, then the grid will be 
- * assumed to be square and layed out as such.  This class is used for battle Hexes.
+ * When constructed, the layout can start with an indented row or not.
+ * The sizing can be done Isometrically or not.
+ *
+ * TODO: implement the containers <code>ComponentOrientation</code> property
+ *
+ * If either the Number of Rows or the Number of Columns is set to Zero either
+ * by constructor or the set rows or set columns method, then the grid will be
+ * assumed to be square and layed out as such.  This class is used for battle
+ * Hexes.
  *
  * @author  Edward Dranathi based loosely on Sun's GridLayout class.
- * 
+ *
  */
 public class TrueHexGridLayout implements LayoutManager
 {
-    private static final Logger LOGGER = Logger
-        .getLogger(TrueHexGridLayout.class.getName());
     int rows;
     int cols;
     boolean indentOddRows;
@@ -72,20 +71,20 @@ public class TrueHexGridLayout implements LayoutManager
 
     }
 
-    /** 
-     * Lays out the specified container using this layout. 
+    /**
+     * Lays out the specified container using this layout.
      * <p>
-     * This method resizes the components in the specified target 
-     * container in order to satisfy the constraints of the 
-     * <code>BattleHexGridLayout</code> object. 
+     * This method resizes the components in the specified target
+     * container in order to satisfy the constraints of the
+     * <code>BattleHexGridLayout</code> object.
      * <p>
-     * This layout manager determines the size of individual 
-     * components by dividing the free space in the container into 
-     * equal-sized portions according to the number of rows and columns 
-     * in the layout. The container's free space equals the container's 
-     * size minus any insets and vertical gap needed. 
-     * All components in the layout are given the same size. 
-     *  
+     * This layout manager determines the size of individual
+     * components by dividing the free space in the container into
+     * equal-sized portions according to the number of rows and columns
+     * in the layout. The container's free space equals the container's
+     * size minus any insets and vertical gap needed.
+     * All components in the layout are given the same size.
+     *
      * @param      parent   the container in which to do the layout
      * @see        java.awt.Container
      * @see        java.awt.Container#doLayout
