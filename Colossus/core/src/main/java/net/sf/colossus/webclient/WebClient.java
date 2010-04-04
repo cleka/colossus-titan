@@ -232,11 +232,11 @@ public class WebClient extends KFrame implements IWebClient
 
     private JLabel infoTextLabel;
     final static String needLoginText = "You need to login to browse or propose Games.";
-    final static String enrollText = "Propose or Enroll, and when enough players have enrolled, one of them can press 'Start'.";
+    final static String enrollText = "Propose or Enroll, and when enough players have enrolled, the game creator can press 'Start'.";
     final static String startedText = "Game was started...";
     final static String waitingText = "Client connected successfully, waiting for all other players. Please wait...";
     final static String enrolledText = "NOTE: While enrolled to an instant game, you can't propose or enroll to other instant games.";
-    final static String playingText = "While playing, you can't propose or enroll to other games.";
+    final static String playingText = "While playing, you can't propose or enroll to other instant games.";
 
     private ChatHandler generalChat;
 
@@ -1921,6 +1921,31 @@ public class WebClient extends KFrame implements IWebClient
 
     }
 
+    /**
+     * Returns true if this user would be allowed to start this game
+     * (given that all other conditions are fulfilled).
+     * Usually the allowed player is the one who created it, but if
+     * that one is not enrolled, the first of the enrolled ones is
+     * allowed then to do it.
+     *
+     * @param gi
+     * @return Whether this player would be allowed to start this game
+     */
+    private boolean isEligibleToStart(GameInfo gi)
+    {
+        if (gi.getInitiator().equals(username))
+        {
+            return true;
+        }
+
+        if (!gi.isEnrolled(gi.getInitiator())
+            && gi.isFirstInEnrolledList(username))
+        {
+            return true;
+        }
+        return false;
+    }
+
     private boolean checkIfCouldStartOnServer(int state)
     {
         switch (state)
@@ -1931,7 +1956,8 @@ public class WebClient extends KFrame implements IWebClient
                 {
                     if (gi.enoughPlayersEnrolled()
                         && gi.allEnrolledOnline()
-                        && gi.getGameState().equals(GameState.PROPOSED))
+                        && gi.getGameState().equals(GameState.PROPOSED)
+                        && isEligibleToStart(gi))
                     {
                         return true;
                     }

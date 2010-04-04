@@ -506,6 +506,15 @@ public class GameInfo
         return playerList.substring(0);
     }
 
+    public boolean isFirstInEnrolledList(String name)
+    {
+        if (players.size() > 0 && players.get(0).getName().equals(name))
+        {
+            return true;
+        }
+        return false;
+    }
+
     public boolean reEnrollIfNecessary(User newUser)
     {
         String newName = newUser.getName();
