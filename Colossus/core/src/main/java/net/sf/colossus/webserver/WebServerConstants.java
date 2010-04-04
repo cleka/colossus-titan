@@ -23,6 +23,7 @@ public final class WebServerConstants
     public final static String optPortRangeFrom = "PortRangeFrom";
     public final static String optAvailablePorts = "AvailablePorts";
 
+    public final static String optLoginMessageFile = "LoginMessageFile";
     public final static String optUsersFile = "UsersFile";
     public final static String optGamesFile = "GamesFile";
     public final static String DEFAULT_GAMES_FILE = "games.dat";

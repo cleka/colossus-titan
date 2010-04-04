@@ -53,15 +53,7 @@ public class WebServer implements IWebServer, IRunWebServer
 
     private final static int MIN_FREE_GAME_PORTS = 5;
 
-    private final static ArrayList<String> messageOfTheDay = new ArrayList<String>();
-
-    static
-    {
-        messageOfTheDay.add("Hello,");
-        messageOfTheDay.add("This is a general information "
-            + "message displayed at every login.");
-    }
-
+    private final static ArrayList<String> loginMessage = new ArrayList<String>();
 
     /**
      * Controls whether the GUI is shown or not.
@@ -202,6 +194,13 @@ public class WebServer implements IWebServer, IRunWebServer
 
         LOGGER.log(Level.INFO, "Server started: port " + serverPort
             + ", maxClients " + maxClients);
+
+        String LoginMessageFilename = options
+            .getStringOption(WebServerConstants.optLoginMessageFile);
+        if (LoginMessageFilename != null)
+        {
+            readLoginMessageFromFile(LoginMessageFilename);
+        }
 
         generalChat.createWelcomeMessage();
 
@@ -1041,9 +1040,50 @@ public class WebServer implements IWebServer, IRunWebServer
         }
 
         generalChat.deliverMessageOfTheDayToClient(chatId, cst,
-            messageOfTheDay);
+            loginMessage);
     }
 
+
+    private void readLoginMessageFromFile(String filename)
+    {
+        try
+        {
+            File loginMessageFile = new File(filename);
+            if (!loginMessageFile.exists())
+            {
+                return;
+            }
+            else
+            {
+                LOGGER.info("Reading login message from file " + filename);
+            }
+
+            loginMessage.clear();
+            BufferedReader loginMessages = new BufferedReader(
+                new InputStreamReader(new FileInputStream(loginMessageFile)));
+
+            String line = null;
+            while ((line = loginMessages.readLine()) != null)
+            {
+                loginMessage.add(line);
+            }
+            loginMessages.close();
+            LOGGER.info("Read " + loginMessage.size() + " lines from file "
+                + filename);
+        }
+        catch (FileNotFoundException e)
+        {
+            LOGGER.log(Level.SEVERE, "Login message file " + filename
+                + " not found!", e);
+        }
+        catch (IOException e)
+        {
+            LOGGER.log(Level.SEVERE,
+                "IOException while reading login message file "
+                + filename + "!", e);
+        }
+
+    }
 
     public void logout()
     {
@@ -1286,13 +1326,13 @@ public class WebServer implements IWebServer, IRunWebServer
         }
         catch (FileNotFoundException e)
         {
-            LOGGER.log(Level.SEVERE, "Users file " + filename + " not found!",
+            LOGGER.log(Level.SEVERE, "Games file " + filename + " not found!",
                 e);
             System.exit(1);
         }
         catch (IOException e)
         {
-            LOGGER.log(Level.SEVERE, "IOException while reading users file "
+            LOGGER.log(Level.SEVERE, "IOException while reading games file "
                 + filename + "!", e);
             System.exit(1);
         }
