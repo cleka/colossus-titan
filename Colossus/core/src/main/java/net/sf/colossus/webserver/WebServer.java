@@ -53,6 +53,16 @@ public class WebServer implements IWebServer, IRunWebServer
 
     private final static int MIN_FREE_GAME_PORTS = 5;
 
+    private final static ArrayList<String> messageOfTheDay = new ArrayList<String>();
+
+    static
+    {
+        messageOfTheDay.add("Hello,");
+        messageOfTheDay.add("This is a general information "
+            + "message displayed at every login.");
+    }
+
+
     /**
      * Controls whether the GUI is shown or not.
      *
@@ -1019,6 +1029,21 @@ public class WebServer implements IWebServer, IRunWebServer
 
         generalChat.tellLastMessagesToOne(cst);
     }
+
+    public void sendMessageOfTheDayToOne(WebServerClientSocketThread cst,
+        String chatId)
+    {
+        if (!chatId.equals(IWebServer.generalChatName))
+        {
+            LOGGER.log(Level.WARNING, "sendMessageOfTheDayToOne: "
+                + "illegal chat id " + chatId + " - doing nothing");
+            return;
+        }
+
+        generalChat.deliverMessageOfTheDayToClient(chatId, cst,
+            messageOfTheDay);
+    }
+
 
     public void logout()
     {

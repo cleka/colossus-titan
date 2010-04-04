@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.logging.Level;
@@ -54,6 +55,21 @@ public class ChatChannel
         synchronized(storage)
         {
             storage.storeMessage(startMsg);
+        }
+    }
+
+
+    /** Send message of the day lines to one client. */
+    public void deliverMessageOfTheDayToClient(String chatId,
+        IWebClient client, ArrayList<String> lines)
+    {
+        long when = new Date().getTime();
+        String sender = "SYSTEM";
+        boolean isResent = false;
+
+        for (String line : lines)
+        {
+            client.chatDeliver(chatId, when, sender, line, isResent);
         }
     }
 
