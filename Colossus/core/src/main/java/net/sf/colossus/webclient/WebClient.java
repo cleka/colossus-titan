@@ -2030,7 +2030,7 @@ public class WebClient extends KFrame implements IWebClient
         }
 
         String selectedGameId = getSelectedGameId();
-        if (selectedGameId != null && isOwner(selectedGameId))
+        if (selectedGameId != null && (isOwner(selectedGameId) || isAdmin()))
         {
             return true;
         }
