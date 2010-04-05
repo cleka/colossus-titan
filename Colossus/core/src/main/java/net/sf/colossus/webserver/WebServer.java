@@ -893,31 +893,51 @@ public class WebServer implements IWebServer, IRunWebServer
         boolean isAdmin, String recipient, String message, int beepCount,
         long beepInterval, boolean windows)
     {
+        IWebClient client = null;
+        String reasonFail = null;
+
         User user = User.findUserByName(recipient);
-        IWebClient client = (IWebClient)user.getThread();
-        if (client != null)
+        if (user != null)
         {
-            client.requestAttention(when, sender, isAdmin, message, beepCount,
-                beepInterval, windows);
-        }
-        else
-        {
-            User senderUser = User.findUserByName(sender);
-            IWebClient senderClient = (IWebClient)senderUser.getThread();
-            if (senderClient != null)
+            client = (IWebClient)user.getThread();
+            if (client != null)
             {
-                long when2 = 0;
-                senderClient.deliverGeneralMessage(when2, true,
-                    "Notification request failed!", "Request notifying user "
-                        + recipient
-                        + " failed! No client for that user found.");
+                client.requestAttention(when, sender, isAdmin, message,
+                    beepCount, beepInterval, windows);
             }
             else
             {
-                LOGGER.warning("requestUserAttention did not find client "
-                    + "for recipient " + recipient + " but didn't find client"
-                    + " to send error message to sender either!");
+                reasonFail = "User " + recipient + " is not online";
             }
+        }
+        else
+        {
+            reasonFail = "Unknown user '" + recipient + "'";
+        }
+
+        if (reasonFail != null)
+        {
+            String failMessage = "Request notifying user " + recipient
+                + " failed: " + reasonFail;
+            informPingFailed(sender, failMessage);
+        }
+    }
+
+    private void informPingFailed(String sender, String failMessage)
+    {
+        User senderUser = User.findUserByName(sender);
+        IWebClient senderClient = (IWebClient)senderUser.getThread();
+        if (senderClient != null)
+        {
+            long when2 = 0;
+            senderClient.deliverGeneralMessage(when2, true,
+                "Notification request failed!", failMessage);
+        }
+        else
+        {
+            LOGGER.warning("requestUserAttention failed (" + failMessage
+                + ") but could not find client"
+                + " to send error message to sender either!");
         }
     }
 
@@ -1002,15 +1022,21 @@ public class WebServer implements IWebServer, IRunWebServer
         long when = new Date().getTime();
         boolean isAdmin = User.findUserByName(sender).isAdmin();
         String[] tokens = pingCommand.split(" +", 3);
-        if (tokens.length != 3)
+        if (tokens.length < 2)
         {
             LOGGER.warning("invalid pingCommand '" + pingCommand
                 + "' from user " + sender + "!");
+            String reasonFail = "Invalid /ping syntax. Use: /ping RECIPIENT [optionally some message]";
+            informPingFailed(sender, reasonFail);
         }
         else
         {
             String recipient = tokens[1];
-            String message = tokens[2];
+            String message = "<no message specified by sender>";
+            if (tokens.length >= 3)
+            {
+                message = tokens[2];
+            }
             requestUserAttention(when, sender, isAdmin, recipient, message, 3,
                 500, true);
         }
