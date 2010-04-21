@@ -138,8 +138,7 @@ public final class LegionClientSide extends Legion implements IOracleLegion
         {
             names.set(j, getPlayer().getTitanBasename());
         }
-        j = names.indexOf(Constants.angel);
-        if (j != -1)
+        while ((j = names.indexOf(Constants.angel)) != -1)
         {
             names.set(j, getPlayer().getAngelBasename());
         }
