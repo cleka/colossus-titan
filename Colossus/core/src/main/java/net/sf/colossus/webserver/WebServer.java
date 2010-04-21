@@ -1007,13 +1007,48 @@ public class WebServer implements IWebServer, IRunWebServer
             return;
         }
         LOGGER.finest("Chat msg from user " + sender + ": " + message);
-        if (message.startsWith("/ping"))
+        if (message.startsWith("/ping \""))
+        {
+            handlePingQuotedName(sender, message);
+        }
+        else if (message.startsWith("/ping"))
         {
             handlePing(sender, message);
         }
         else
         {
             generalChat.createStoreAndDeliverMessage(sender, message);
+        }
+    }
+
+    private void handlePingQuotedName(String sender, String pingCommand)
+    {
+        long when = new Date().getTime();
+        boolean isAdmin = User.findUserByName(sender).isAdmin();
+        //   /ping "
+        //   01234567
+        String args = pingCommand.substring(7);
+        // split at the closing quote, eat up trailing spaces in name and
+        // leading spaces of the message
+        String[] tokens = args.split(" *\" *", 2);
+        if (tokens.length != 2)
+        {
+            LOGGER.warning("invalid pingCommand with quotes '" + pingCommand
+                + "' from user " + sender + "!");
+            String reasonFail = "Invalid /ping syntax. Use: /ping \"RECIPIENT NAME\" [optionally some message]";
+            informPingFailed(sender, reasonFail);
+        }
+        else
+        {
+            String recipient = tokens[0];
+            String message = "<no message specified by sender>";
+            String msg = tokens[1];
+            if (msg != null && !msg.matches(" *"))
+            {
+                message = msg;
+            }
+            requestUserAttention(when, sender, isAdmin, recipient, message, 3,
+                500, true);
         }
     }
 
