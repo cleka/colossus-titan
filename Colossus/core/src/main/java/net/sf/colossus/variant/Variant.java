@@ -178,6 +178,11 @@ public class Variant
         }
 
         String lowerCaseName = name.toLowerCase();
+        // XXX Why do I need to special-case angels but not titans?
+        if (lowerCaseName.startsWith("angel"))
+        {
+            lowerCaseName = "angel";
+        }
         CreatureType result = creatureTypeByNameCache.get(lowerCaseName);
         if (result == null)
         {

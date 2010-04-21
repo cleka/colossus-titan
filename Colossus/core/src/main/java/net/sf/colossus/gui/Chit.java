@@ -95,9 +95,9 @@ class Chit extends JPanel
         this(scale, id, inverted, dubious, dubiousAsBlank, null, client);
     }
 
-    // TODO this is a bit confusing: the id parameter can be either the name of a
-    //      creature type or a markerId (maybe more?). Good thing markerIds have no
-    //      overlap with creature names
+    // TODO this is a bit confusing: the id parameter can be either the name of
+    // a creature type or a markerId (maybe more?). Good thing markerIds have
+    // no overlap with creature names
     private Chit(int scale, String id, boolean inverted, boolean dubious,
         boolean dubiousAsBlank, String[] overlays, Client client)
     {
@@ -163,6 +163,28 @@ class Chit extends JPanel
                 if (dubious)
                 {
                     filenames[4] = "QuestionMarkMask"
+                        + (color.equals("BlackColossus") ? "Red" : "");
+                }
+
+                bufferedImage = getImage(filenames, scale);
+            }
+            else if (id.startsWith("Angel-"))
+            {
+                String[] filenames = new String[5 + (dubious ? 1 : 0)];
+                int power = (VariantSupport.getCurrentVariant()
+                    .getCreatureByName("Angel")).getPower();
+                String color = id.split("-")[2] + "Colossus";
+                filenames[0] = "Plain" + "-" + color;
+                filenames[1] = "AngelMask";
+                filenames[2] = "Power-" + power + "-" + color;
+                int skill = (VariantSupport.getCurrentVariant()
+                    .getCreatureByName("Angel")).getSkill();
+                filenames[3] = "Skill-" + skill + "-" + color;
+                filenames[4] = "Angel-Name-" + color;
+
+                if (dubious)
+                {
+                    filenames[5] = "QuestionMarkMask"
                         + (color.equals("BlackColossus") ? "Red" : "");
                 }
 

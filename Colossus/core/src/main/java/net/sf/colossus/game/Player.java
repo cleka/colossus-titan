@@ -11,6 +11,7 @@ import java.util.TreeSet;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.server.PlayerServerSide;
 import net.sf.colossus.variant.MasterHex;
+import net.sf.colossus.server.VariantSupport;
 
 
 /**
@@ -477,6 +478,23 @@ public class Player
         catch (Exception ex)
         {
             return Constants.titan;
+        }
+    }
+
+    /**
+     * Return the full basename for an angel of this player.
+     */
+    public String getAngelBasename()
+    {
+        try
+        {
+            int power = VariantSupport.getCurrentVariant().getCreatureByName(
+                    "Angel").getPower();
+            return "Angel-" + power + "-" + getColor().getName();
+        }
+        catch (Exception ex)
+        {
+            return Constants.angel;
         }
     }
 }

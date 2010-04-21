@@ -1126,6 +1126,10 @@ public final class Client implements IClient, IOracle, IVariant,
         {
             imageName = legion.getPlayer().getTitanBasename();
         }
+        else if (imageName.equals(Constants.angel))
+        {
+            imageName = legion.getPlayer().getAngelBasename();
+        }
 
         CreatureType type = getGame().getVariant().getCreatureByName(
             bareImageName);

@@ -95,6 +95,10 @@ final class PickRecruiter extends KDialog
             {
                 potentialRecruiterName = legion.getPlayer().getTitanBasename();
             }
+            else if (potentialRecruiterName.equals(Constants.angel))
+            {
+                potentialRecruiterName = legion.getPlayer().getAngelBasename();
+            }
             final String realRecruiterName = potentialRecruiterName;
             Chit chit = new Chit(scale, realRecruiterName);
             recruiterChits.add(chit);

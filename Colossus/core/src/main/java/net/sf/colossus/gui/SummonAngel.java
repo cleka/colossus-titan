@@ -123,6 +123,10 @@ final class SummonAngel extends KDialog
                 {
                     name = legion.getPlayer().getTitanBasename();
                 }
+                else if (name == "Angel")
+                {
+                    name = legion.getPlayer().getAngelBasename();
+                }
                 final Chit chit = new Chit(scale, name);
                 box.add(chit);
                 if (type.isSummonable())
