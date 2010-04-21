@@ -1193,7 +1193,7 @@ public final class StaticResourceLoader
         {
             LOGGER
                 .log(Level.WARNING, prefix + " is not prefix of " + filename);
-            // boil out if we are on a developer box, use default otherwise
+            // bail out if we are on a developer box, use default otherwise
             assert false : "illegal combination for filename and prefix";
             return "black";
         }
