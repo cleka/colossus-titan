@@ -123,7 +123,7 @@ final class SummonAngel extends KDialog
                 {
                     name = legion.getPlayer().getTitanBasename();
                 }
-                else if (name == "Angel")
+                else if (name.equals("Angel"))
                 {
                     name = legion.getPlayer().getAngelBasename();
                 }
