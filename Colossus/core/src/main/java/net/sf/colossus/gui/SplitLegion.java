@@ -265,7 +265,7 @@ final class SplitLegion extends KDialog
                 Chit chit = it.next();
                 String id = chit.getId();
                 if (id.startsWith(Constants.titan)
-                    || id.equals(gui.getGame().getVariant()
+                    || id.startsWith(gui.getGame().getVariant()
                         .getPrimaryAcquirable()))
                 {
                     numLords++;
