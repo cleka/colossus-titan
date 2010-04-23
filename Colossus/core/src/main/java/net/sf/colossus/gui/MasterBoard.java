@@ -1749,9 +1749,8 @@ public final class MasterBoard extends JPanel
             {
                 for (Legion legion : player.getLegions())
                 {
-                    String markerId = legion.getMarkerId();
-                    Marker marker = new Marker(3 * Scale.get(), markerId,
-                        client);
+                    Marker marker = new Marker(3 * Scale.get(),
+                        legion.getLongMarkerId(), client);
                     legionToMarkerMap.put(legion, marker);
                     hexesNeedAligning.add(legion.getCurrentHex());
                 }

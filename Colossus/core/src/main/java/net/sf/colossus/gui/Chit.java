@@ -22,6 +22,7 @@ import javax.swing.JPanel;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.common.Options;
+import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.StaticResourceLoader;
 import net.sf.colossus.variant.CreatureType;
@@ -105,7 +106,14 @@ class Chit extends JPanel
         super((LayoutManager)null);
 
         assert id != null : "Each chit must have an ID set";
-        this.id = id;
+        if (isMarkerId(id))
+        {
+            this.id = id.substring(0, 4);
+        }
+        else
+        {
+            this.id = id;
+        }
         this.inverted = inverted;
         this.client = client;
         Point point = getLocation();
@@ -190,6 +198,27 @@ class Chit extends JPanel
 
                 bufferedImage = getImage(filenames, scale);
             }
+            else if (isMarkerId(id))
+            {
+                // Legion marker
+                // May be of form "Bk03" or form "Bk03-Black"
+                String[] filenames = new String[2];
+                String colorName;
+                if (id.length() >= 5)
+                {
+                    colorName = id.split("-")[1];
+                }
+                else
+                {
+                    String shortColor = id.substring(0, 2);
+                    PlayerColor playerColor =
+                        PlayerColor.getByShortName(shortColor);
+                    colorName = playerColor.getName();
+                }
+                filenames[0] = "Plain" + "-" + colorName + "Colossus";
+                filenames[1] = id.substring(0, 4);
+                bufferedImage = getImage(filenames, scale);
+            }
             else
             {
                 if (overlays == null)
@@ -208,6 +237,15 @@ class Chit extends JPanel
                 }
             }
         }
+    }
+
+    public static boolean isMarkerId(String id)
+    {
+        return (id.length() >= 4 &&
+                id.charAt(0) >= 'A' && id.charAt(0) <= 'Z' &&
+                id.charAt(1) >= 'a' && id.charAt(1) <= 'z' &&
+                id.charAt(2) >= '0' && id.charAt(2) <= '1' &&
+                id.charAt(3) >= '0' && id.charAt(3) <= '9');
     }
 
     public int getTitanPower()

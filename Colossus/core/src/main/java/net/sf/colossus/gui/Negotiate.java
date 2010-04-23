@@ -130,7 +130,7 @@ final class Negotiate extends KDialog
 
         int scale = 4 * Scale.get();
 
-        Marker marker = new Marker(scale, legion.getMarkerId());
+        Marker marker = new Marker(scale, legion.getLongMarkerId());
         pane.add(marker);
         pane.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
 

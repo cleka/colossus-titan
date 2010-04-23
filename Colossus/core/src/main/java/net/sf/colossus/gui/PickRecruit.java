@@ -62,7 +62,7 @@ final class PickRecruit extends KDialog
 
         contentPane.add(legionPane);
 
-        legionMarker = new Marker(scale, legion.getMarkerId());
+        legionMarker = new Marker(scale, legion.getLongMarkerId());
         legionPane.add(legionMarker);
 
         List<String> imageNames = gui.getGameClientSide().getLegionImageNames(

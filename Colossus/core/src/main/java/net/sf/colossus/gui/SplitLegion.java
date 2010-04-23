@@ -107,7 +107,7 @@ final class SplitLegion extends KDialog
         buttonBox = new Box(BoxLayout.X_AXIS);
         contentPane.add(buttonBox);
 
-        oldMarker = new Marker(scale, parent.getMarkerId());
+        oldMarker = new Marker(scale, parent.getLongMarkerId());
         oldBox.add(oldMarker);
         oldBox.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
         oldBox.add(Box.createHorizontalGlue());
@@ -144,7 +144,8 @@ final class SplitLegion extends KDialog
             });
         }
 
-        newMarker = new Marker(scale, selectedMarkerId);
+        newMarker = new Marker(scale, selectedMarkerId + "-" +
+                parent.getPlayer().getColor().getName());
         newBox.add(newMarker);
         newBox.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
         newBox.add(Box.createHorizontalGlue());

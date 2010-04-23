@@ -71,7 +71,7 @@ public final class Marker extends Chit
         super(scale, id, inverted, client);
         setBackground(Color.BLACK);
 
-        if (getId().startsWith("Bk"))
+        if (id.contains("Black") || (id.length() == 4 && id.startsWith("Bk")))
         {
             setBorderColor(Color.white);
         }
@@ -106,9 +106,8 @@ public final class Marker extends Chit
         {
             g2.setColor(Color.RED);
             Rectangle rect = getBounds();
-            g
-                .fillRect(rect.x - 4, rect.y - 4, rect.width + 8,
-                    rect.height + 8);
+            g.fillRect(rect.x - 4, rect.y - 4, rect.width + 8,
+                       rect.height + 8);
         }
         super.paintComponent(g2);
 

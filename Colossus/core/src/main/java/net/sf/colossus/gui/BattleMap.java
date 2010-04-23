@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.HexMap;
+import net.sf.colossus.game.Legion;
 import net.sf.colossus.util.InstanceTracker;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.MasterHex;
@@ -38,17 +39,18 @@ public final class BattleMap extends HexMap
     private final Marker attackerMarker;
     private final Marker defenderMarker;
 
-    // TODO pass Legions instead of markerIds
-    public BattleMap(Client client, MasterHex masterHex,
-        String attackerMarkerId, String defenderMarkerId, ClientGUI gui)
+    public BattleMap(Client client, MasterHex masterHex, Legion attacker,
+                     Legion defender, ClientGUI gui)
     {
         super(masterHex);
 
         this.client = client;
         this.gui = gui;
 
-        attackerMarker = new Marker(3 * Scale.get(), attackerMarkerId, false);
-        defenderMarker = new Marker(3 * Scale.get(), defenderMarkerId, true);
+        attackerMarker = new Marker(3 * Scale.get(),
+          attacker.getLongMarkerId(), false);
+        defenderMarker = new Marker(3 * Scale.get(),
+          defender.getLongMarkerId(), true);
         attackerMarker.setOpaque(false);
         defenderMarker.setOpaque(false);
         attackerMarker.setToolTipText("Attacking Legion");
@@ -57,7 +59,8 @@ public final class BattleMap extends HexMap
         this.add(defenderMarker);
 
         String instanceId = client.getOwningPlayer().getName() + ": "
-            + attackerMarkerId + "/" + defenderMarkerId + " (" + count + ")";
+            + attacker.getMarkerId() + "/" + defender.getMarkerId() +
+            " (" + count + ")";
         count++;
         InstanceTracker.setId(this, instanceId);
     }

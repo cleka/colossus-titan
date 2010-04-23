@@ -187,6 +187,11 @@ public abstract class Legion
         return markerId;
     }
 
+    public String getLongMarkerId()
+    {
+        return markerId + "-" + getPlayer().getColor().getName();
+    }
+
     public boolean hasTitan()
     {
         for (Creature critter : getCreatures())

@@ -111,7 +111,7 @@ final class SummonAngel extends KDialog
         for (Legion donor : sortedDonors)
         {
             Box box = new Box(BoxLayout.X_AXIS);
-            Marker marker = new Marker(scale, donor.getMarkerId());
+            Marker marker = new Marker(scale, donor.getLongMarkerId());
             box.add(Box.createRigidArea(new Dimension(scale / 8, 0)));
             box.add(marker);
             box.add(Box.createRigidArea(new Dimension(scale / 4, 0)));

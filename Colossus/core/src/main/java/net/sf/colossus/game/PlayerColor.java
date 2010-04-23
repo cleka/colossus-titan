@@ -80,6 +80,18 @@ public enum PlayerColor
         return null; // seems to happen when game starts
     }
 
+    public static PlayerColor getByShortName(String shortName)
+    {
+        for (PlayerColor color : values())
+        {
+            if (color.getShortName().equals(shortName))
+            {
+                return color;
+            }
+        }
+        return null;
+    }
+
     public static List<PlayerColor> getByName(List<String> names)
     {
         List<PlayerColor> retVal = new ArrayList<PlayerColor>();

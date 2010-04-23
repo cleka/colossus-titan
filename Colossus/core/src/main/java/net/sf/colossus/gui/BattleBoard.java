@@ -198,7 +198,8 @@ public final class BattleBoard extends KFrame
         setLocation(location);
 
         battleMap = new BattleMap(getClient(), engagement.getLocation(),
-            attackerMarkerId, defenderMarkerId, gui);
+            engagement.getAttackingLegion(), engagement.getDefendingLegion(),
+            gui);
         contentPane.add(new JScrollPane(battleMap), BorderLayout.CENTER);
         battleMap.addMouseListener(new MouseAdapter()
         {

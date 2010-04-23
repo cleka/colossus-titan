@@ -990,8 +990,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     public void actOnTellLegionLocation(Legion legion, MasterHex hex)
     {
         // @TODO: this creates it every time, not only when necessary ?
-        Marker marker = new Marker(3 * Scale.get(), legion.getMarkerId(),
-            client);
+        Marker marker = new Marker(3 * Scale.get(),
+          legion.getLongMarkerId(), client);
         setMarker(legion, marker);
 
         if (!isReplayOngoing())
@@ -1017,8 +1017,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             eventViewerNewSplitEvent(turn, parent, child);
         }
 
-        Marker marker = new Marker(3 * Scale.get(), child.getMarkerId(),
-            client);
+        Marker marker = new Marker(3 * Scale.get(), child.getLongMarkerId(),
+                client);
         setMarker(child, marker);
 
         if (isReplayOngoing())

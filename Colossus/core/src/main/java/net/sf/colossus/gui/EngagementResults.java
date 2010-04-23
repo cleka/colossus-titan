@@ -294,7 +294,7 @@ final class EngagementResults extends KDialog
         this.lastButton.setEnabled(false);
     }
 
-    private Component createLegionComponent(String markerId,
+    private Component createLegionComponent(Legion legion,
         List<String> imageNames, List<Boolean> certainList, boolean isDefender)
     {
         // prepare my box
@@ -305,7 +305,7 @@ final class EngagementResults extends KDialog
         }
         int scale = 3 * Scale.get(); // or 3 or 4?
         // add marker
-        Marker marker = new Marker(scale, markerId);
+        Marker marker = new Marker(scale, legion.getLongMarkerId());
         panel.add(marker);
         panel.add(Box.createHorizontalStrut(5));
         // towi: you want it upside down or not? then remove "false"
@@ -362,22 +362,22 @@ final class EngagementResults extends KDialog
             this.lastButton.setEnabled(current != engagementLog.size() - 1);
 
             this.panelCenter.removeAll();
-            this.panelCenter.add(createLegionComponent(result.attacker
-                .getMarkerId(), result.attackerStartingContents,
+            this.panelCenter.add(createLegionComponent(result.attacker,
+                result.attackerStartingContents,
                 result.attackerStartingCertainities, false));
-            this.panelCenter.add(createLegionComponent(result.defender
-                .getMarkerId(), result.defenderStartingContents,
+            this.panelCenter.add(createLegionComponent(result.defender,
+                result.defenderStartingContents,
                 result.defenderStartingCertainities, true));
             if (result.attacker.equals(result.winner))
             {
-                this.panelCenter.add(createLegionComponent(result.attacker
-                    .getMarkerId(), result.attackerEndingContents,
+                this.panelCenter.add(createLegionComponent(result.attacker,
+                    result.attackerEndingContents,
                     result.attackerEndingCertainties, false));
             }
             else if (result.defender.equals(result.winner))
             {
-                this.panelCenter.add(createLegionComponent(result.defender
-                    .getMarkerId(), result.defenderEndingContents,
+                this.panelCenter.add(createLegionComponent(result.defender,
+                    result.defenderEndingContents,
                     result.defenderEndingCertainties, true));
             }
             else
