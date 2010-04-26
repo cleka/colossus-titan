@@ -1059,8 +1059,7 @@ public class WebServer implements IWebServer, IRunWebServer
         String[] tokens = pingCommand.split(" +", 3);
         if (tokens.length < 2)
         {
-            LOGGER.warning("invalid pingCommand '" + pingCommand
-                + "' from user " + sender + "!");
+            // Just  /ping   : inform about the usage:
             String reasonFail = "Invalid /ping syntax. Use: /ping RECIPIENT [optionally some message]";
             informPingFailed(sender, reasonFail);
         }
