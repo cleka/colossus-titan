@@ -724,6 +724,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
         }
         else if (command.equals(IWebServer.PingResponse))
         {
+            /*
             String name = "<user not defined>";
             if (user != null)
             {
@@ -732,6 +733,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
 
             LOGGER
                 .info("Received a ping response from user " + name);
+            */
         }
 
         else if (command.equals(IWebServer.Echo))
