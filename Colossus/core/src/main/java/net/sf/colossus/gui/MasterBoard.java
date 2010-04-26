@@ -2513,7 +2513,11 @@ public final class MasterBoard extends JPanel
                 }
             });
 
-            add(suspendButton);
+            // Not useful when playing on public server:
+            if (!gui.getStartedByWebClient())
+            {
+                add(suspendButton);
+            }
 
             playerLabel = new JLabel("- player -");
             add(playerLabel);

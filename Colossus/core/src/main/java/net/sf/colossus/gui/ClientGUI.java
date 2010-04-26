@@ -149,6 +149,11 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         this.startedByWebClient = byWebClient;
     }
 
+    public boolean getStartedByWebClient()
+    {
+        return this.startedByWebClient;
+    }
+
     public void setWebClient(WebClient wc)
     {
         this.webClient = wc;
