@@ -518,19 +518,7 @@ public class GameInfo
     public boolean reEnrollIfNecessary(User newUser)
     {
         String newName = newUser.getName();
-        Iterator<User> it = players.iterator();
-        boolean found = false;
-        while (!found && it.hasNext())
-        {
-            User user = it.next();
-            String name = user.getName();
-            if (newName.equals(name))
-            {
-                it.remove();
-                found = true;
-            }
-        }
-        it = null;
+        boolean found = removeIfEnrolled(newName);
         if (found)
         {
             players.add(newUser);
@@ -544,6 +532,33 @@ public class GameInfo
                 + " - nothing to do.");
         }
 
+        return found;
+    }
+
+    /**
+     * TODO remove overlap with isEnrolled
+     *
+     * If user with name "newName" is found, remove it from game, so that
+     * it can be safely enrolled again.
+     * E.g. after user reconnected or accidental double click to enroll button
+     * @param newName
+     * @return Whether user was found
+     */
+    public boolean removeIfEnrolled(String newName)
+    {
+        Iterator<User> it = players.iterator();
+        boolean found = false;
+        while (!found && it.hasNext())
+        {
+            User user = it.next();
+            String name = user.getName();
+            if (newName.equals(name))
+            {
+                it.remove();
+                enrolledPlayers = players.size();
+                found = true;
+            }
+        }
         return found;
     }
 
@@ -599,7 +614,8 @@ public class GameInfo
     public String enroll(User user)
     {
         String reason = null;
-
+        // Just in case, to avoid duplicates (e.g. bounce/double click)
+        removeIfEnrolled(user.getName());
         if (enrolledPlayers < max)
         {
             synchronized (players)
