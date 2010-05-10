@@ -117,6 +117,16 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
         }
     }
 
+    private String getClientInfo()
+    {
+        String ip = "<undef>";
+        if (socket != null && socket.getInetAddress() != null)
+        {
+            ip = socket.getInetAddress().toString();
+        }
+        return getUsername() + " (IP=" + ip + ")";
+    }
+
     public int getClientVersion()
     {
         return clientVersion;
@@ -326,23 +336,30 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             }
             catch (SocketException ex)
             {
+                LOGGER.info("SocketException ('" + ex.getMessage()
+                    + "') in WSCST " + getClientInfo()
+                    + " - setting done to true.");
                 done = true;
             }
             catch (IOException e)
             {
+                LOGGER.warning("IOException ('" + e.getMessage()
+                    + "') in WSCST " + getClientInfo() + " doing nothing...");
                 if (!isInterrupted())
                 {
-                    e.printStackTrace();
+                    LOGGER.log(Level.WARNING, "IOException was NOT caused by "
+                        + "being interrupted? Stack trace:", e);
                 }
                 else
                 {
-                    LOGGER.log(Level.FINEST, "Interrupted");
+                    LOGGER.log(Level.FINEST, "Interrupted - all right.");
                 }
             }
             catch (Exception e)
             {
-                LOGGER.log(Level.SEVERE,
-                    "WebServerClientSocketThread in read loop", e);
+                LOGGER.log(Level.SEVERE, "Exception ('" + e.getMessage()
+                    + "') in WSCST " + getClientInfo(), e);
+
             }
 
             if (fromClient != null)
@@ -387,7 +404,8 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
         }
 
         // Shut down the client.
-        LOGGER.log(Level.FINEST, "(Trying to) shut down the client.");
+        LOGGER.log(Level.FINEST, "(Trying to) shut down the client for user "
+            + getClientInfo());
         try
         {
             out.println(connectionClosed);
@@ -399,12 +417,14 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
                 ex);
         }
 
-        // if did not log in (wrong password, or duplicate name and without force,
-        // user is not set yet.
+        // if login did not succeed (wrong password, or duplicate name and without force),
+        // user will still be null; skipp all this here then:
         if (user != null)
         {
             if (user.getThread() == this)
             {
+                // after here, user is not in loggedInUsersList any more, i.e.
+                // game updates during game cancelling are NOT sent to him.
                 user.setThread(null);
             }
             user = null;
@@ -501,6 +521,8 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
                     ok = true;
                     user.setThread(this);
                     setName("WebServerClientSocketThread " + username);
+                    LOGGER.info("User successfully logged in: "
+                        + getClientInfo());
                 }
             }
             else
@@ -575,6 +597,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
 
         else if (command.equals(IWebServer.Logout))
         {
+            LOGGER.info("Received Logout request from user " + getClientInfo());
             user.updateLastLogout();
             User.storeUsersToFile();
             ok = true;
