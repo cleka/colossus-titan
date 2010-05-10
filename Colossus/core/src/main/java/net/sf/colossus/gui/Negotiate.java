@@ -18,6 +18,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.WindowConstants;
 
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.Legion;
@@ -57,6 +58,8 @@ final class Negotiate extends KDialog
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
 
         setBackground(Color.lightGray);
+        // Don't allow closing without explicit decision:
+        setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
         attackerMarker = showLegion(attacker, attackerChits);
         attackerMarker.addMouseListener(new MouseAdapter()

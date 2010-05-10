@@ -8,8 +8,6 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -24,6 +22,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
+import javax.swing.WindowConstants;
 
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.game.EntrySide;
@@ -66,15 +65,6 @@ final class Concede extends KDialog
         Container contentPane = getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 
-        addWindowListener(new WindowAdapter()
-        {
-            @Override
-            public void windowClosing(WindowEvent e)
-            {
-                cleanup(false);
-            }
-        });
-
         this.flee = flee;
         this.gui = clientGui;
         this.ally = ally;
@@ -91,6 +81,8 @@ final class Concede extends KDialog
         }
 
         setBackground(Color.lightGray);
+        // Don't allow closing without explicit decision:
+        setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
         MasterHex hex = defender.getCurrentHex();
         EntrySide entrySide = attacker.getEntrySide();
