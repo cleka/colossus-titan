@@ -522,6 +522,7 @@ public class GameInfo
         if (found)
         {
             players.add(newUser);
+            enrolledPlayers = players.size();
             LOGGER.finest("Re-Enrolled user " + newName + " to game "
                 + getGameId());
             LOGGER.finest("Players now: " + getPlayerListAsString());
@@ -600,6 +601,9 @@ public class GameInfo
                 found++;
             }
         }
+        // TODO in reEnrollIfNecessary case this is now wrong??
+        // perhaps because in the moment of update user is just not online...
+
         if (found != onlineCount)
         {
             onlineCount = found;
