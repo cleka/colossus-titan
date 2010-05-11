@@ -469,11 +469,12 @@ public class WebServer implements IWebServer, IRunWebServer
             duration, summary, expire, unlimitedMulligans, balancedTowers,
             min, target, max);
 
+        String scheduleType = gi.isScheduledGame() ? "scheduled" : "instant";
+        LOGGER.info("Game " + gi.getGameId() + " (" + scheduleType
+            + ") was proposed by " + initiator + ". Adding to list.");
+
         proposedGames.put(gi.getGameId(), gi);
         proposedGamesListModified = true;
-
-        LOGGER.info("Game " + gi.getGameId()
-            + " was proposed. Adding to list.");
 
         updateGUI();
         allTellGameInfo(gi);
