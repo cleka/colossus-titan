@@ -53,6 +53,8 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
 
     private Thread stopper = null;
 
+    private boolean forcedLogout = false;
+
     private static final long PING_REQUEST_INTERVAL_SECONDS = 60;
     private static final int PING_MAX_TRIES = 3;
 
@@ -427,6 +429,10 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
                 // game updates during game cancelling are NOT sent to him.
                 user.setThread(null);
             }
+            if (!wasForcedLogout())
+            {
+                server.cancelIfNecessary(user);
+            }
             user = null;
         }
 
@@ -491,8 +497,10 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
                  */
                 if (reason == null)
                 {
-                    user = User.findUserByName(username);
-                    WebServerClientSocketThread cst = (WebServerClientSocketThread)user
+                    // Do not set the real user here, otherwise in the re-login case
+                    // the first reject would lead to autoCancelling games, too.
+                    User tmpUser = User.findUserByName(username);
+                    WebServerClientSocketThread cst = (WebServerClientSocketThread)tmpUser
                         .getThread();
                     if (cst != null)
                     {
@@ -824,6 +832,16 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
         return done;
     }
 
+    private void markForcedLogout()
+    {
+        forcedLogout = true;
+    }
+
+    private boolean wasForcedLogout()
+    {
+        return forcedLogout;
+    }
+
     /*
      * Called by another WebSocketClientSocketThread,
      * when user does a login with force flag set;
@@ -842,6 +860,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
 
         try
         {
+            other.markForcedLogout();
             other.sendToClient(IWebClient.forcedLogout);
             try
             {

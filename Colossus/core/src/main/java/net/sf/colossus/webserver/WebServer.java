@@ -481,6 +481,25 @@ public class WebServer implements IWebServer, IRunWebServer
         return gi;
     }
 
+    public void cancelIfNecessary(User user)
+    {
+        LOGGER.info("Checking if any cancelling is needed for user "
+            + user.getName());
+
+        Collection<GameInfo> games = proposedGames.values();
+        for (GameInfo gi : games)
+        {
+            if (!gi.isScheduledGame()
+                && gi.getInitiator().equals(user.getName()))
+            {
+                LOGGER.warning("Auto-cancelling instant game "
+                    + gi.getGameId() + " because initiator " + user.getName()
+                    + " is going to be gone...");
+                cancelGame(gi.getGameId(), user.getName());
+            }
+        }
+    }
+
     public void reEnrollIfNecessary(WebServerClientSocketThread newCst)
     {
         IWebClient client = newCst;
@@ -494,6 +513,7 @@ public class WebServer implements IWebServer, IRunWebServer
                     + " that he is still enrolled in game " + gi.getGameId());
                 // userMap finds already new user for that name
                 client.didEnroll(gi.getGameId(), newUser.getName());
+                allTellGameInfo(gi);
             }
         }
     }
