@@ -652,6 +652,10 @@ final class ClientHandler implements IClient
         }
         else
         {
+            if (false)
+            {
+                server.getRecorder().recordMessageToClient(this, message);
+            }
             sendViaChannel(message);
             if (server == null)
             {

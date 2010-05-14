@@ -65,6 +65,8 @@ public final class Server extends Thread implements IServer
 
     private final WhatNextManager whatNextManager;
 
+    private final MessageRecorder recorder;
+
     /**
      *  Maybe also save things like the originating IP, in case a
      *  connection breaks and we need to authenticate reconnects.
@@ -155,6 +157,7 @@ public final class Server extends Thread implements IServer
         this.game = game;
         this.port = port;
         this.whatNextManager = whatNextMgr;
+        this.recorder = new MessageRecorder();
 
         if (startLog != null)
         {
@@ -2740,6 +2743,10 @@ public final class Server extends Thread implements IServer
             + "client " + getPlayerName() + " - sending confirmation.");
 
         processingCH.serverConfirmsConnection();
+        if (false)
+        {
+            recorder.printMessagesToConsole();
+        }
     }
 
     private final HashSet<IClient> waitingToCatchup = new HashSet<IClient>();
@@ -2984,6 +2991,11 @@ public final class Server extends Thread implements IServer
     public GameServerSide getGame()
     {
         return game;
+    }
+
+    public MessageRecorder getRecorder()
+    {
+        return recorder;
     }
 
     public void replyToRequestGameInfo()
