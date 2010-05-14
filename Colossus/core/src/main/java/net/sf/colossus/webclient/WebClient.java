@@ -223,6 +223,7 @@ public class WebClient extends KFrame implements IWebClient
     private JButton startButton;
     private JButton startLocallyButton;
 
+    private JButton watchButton;
     private JButton hideButton;
     private JLabel hideButtonText;
 
@@ -269,6 +270,7 @@ public class WebClient extends KFrame implements IWebClient
     private final static String LogoutButtonText = "Logout";
     private final static String quitButtonText = "Quit";
     private final static String HideButtonText = "Hide Web Client";
+    private final static String WatchButtonText = "Join game as spectator";
     private final static String CantHideText = "(You can hide web client only if game client is open)";
     private final static String HowtoUnhideText = "You can get web client back from MasterBoard - Window menu";
 
@@ -1442,6 +1444,27 @@ public class WebClient extends KFrame implements IWebClient
         runningGamesTab.add(runningGamesPane);
 
         // ------------------ Hide WebClient stuff ---------------
+
+        Box joinGamePanel = new Box(BoxLayout.Y_AXIS);
+        joinGamePanel.setBorder(new TitledBorder("WatchOngoingGame"));
+
+        watchButton = new JButton(WatchButtonText);
+        watchButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                watchButtonAction();
+            }
+        });
+        watchButton.setEnabled(false);
+        watchButton.setAlignmentX(Box.LEFT_ALIGNMENT);
+        joinGamePanel.add(watchButton);
+
+        if (false)
+        {
+            runningGamesTab.add(Box.createVerticalGlue());
+            runningGamesTab.add(joinGamePanel);
+        }
 
         Box hideClientPanel = new Box(BoxLayout.Y_AXIS);
         hideClientPanel.setBorder(new TitledBorder("Hiding the Web Client"));
@@ -3043,6 +3066,11 @@ public class WebClient extends KFrame implements IWebClient
     private void hideButtonAction()
     {
         setVisible(false);
+    }
+
+    private void watchButtonAction()
+    {
+        System.out.println("Watch button!");
     }
 
     private void quitButtonAction()
