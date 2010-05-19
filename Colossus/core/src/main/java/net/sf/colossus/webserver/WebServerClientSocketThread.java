@@ -823,6 +823,11 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             server.tellAllRunningGamesToOne(this);
             server.tellLastChatMessagesToOne(this, IWebServer.generalChatName);
             server.sendMessageOfTheDayToOne(this, IWebServer.generalChatName);
+            if (clientVersion < 2)
+            {
+                server.sendOldVersionWarningToOne(this, getUsername(),
+                    IWebServer.generalChatName);
+            }
             server.reEnrollIfNecessary(this);
             server.updateUserCounts();
         }

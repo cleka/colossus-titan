@@ -73,6 +73,34 @@ public class ChatChannel
         }
     }
 
+    /** Send message of the day lines to one client. */
+    public void deliverOldVersionWarning(String chatId, String userName,
+        IWebClient client)
+    {
+        long when = new Date().getTime();
+        String sender = "SYSTEM";
+        boolean isResent = false;
+
+        ArrayList<String> lines = new ArrayList<String>();
+        lines.add("");
+        lines
+            .add("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+        lines.add("");
+        lines.add(" Hello " + userName + ", please note:");
+        lines
+            .add(" You are using a Colossus version older than 0.10.3. See message above!");
+        lines.add("");
+        lines
+            .add("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+        lines.add("");
+
+        for (String line : lines)
+        {
+            client.chatDeliver(chatId, when, sender, line, isResent);
+        }
+    }
+
+
     public void createStoreAndDeliverMessage(String sender, String message)
     {
         long now = new Date().getTime();

@@ -1121,6 +1121,17 @@ public class WebServer implements IWebServer, IRunWebServer
             loginMessage);
     }
 
+    public void sendOldVersionWarningToOne(WebServerClientSocketThread cst,
+        String userName, String chatId)
+    {
+        if (!chatId.equals(IWebServer.generalChatName))
+        {
+            LOGGER.log(Level.WARNING, "sendMessageOfTheDayToOne: "
+                + "illegal chat id " + chatId + " - doing nothing");
+            return;
+        }
+        generalChat.deliverOldVersionWarning(chatId, userName, cst);
+    }
 
     private void readLoginMessageFromFile(String filename)
     {
