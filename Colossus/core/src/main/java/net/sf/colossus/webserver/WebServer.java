@@ -9,6 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -1149,7 +1150,8 @@ public class WebServer implements IWebServer, IRunWebServer
 
             loginMessage.clear();
             BufferedReader loginMessages = new BufferedReader(
-                new InputStreamReader(new FileInputStream(loginMessageFile)));
+                new InputStreamReader(new FileInputStream(loginMessageFile),
+                    WebServerConstants.charset));
 
             String line = null;
             while ((line = loginMessages.readLine()) != null)
@@ -1386,7 +1388,7 @@ public class WebServer implements IWebServer, IRunWebServer
                 LOGGER.info("Reading games from file " + filename);
             }
             BufferedReader games = new BufferedReader(new InputStreamReader(
-                new FileInputStream(gamesFile)));
+                new FileInputStream(gamesFile), WebServerConstants.charset));
 
             String line = null;
             while ((line = games.readLine()) != null)
@@ -1406,7 +1408,6 @@ public class WebServer implements IWebServer, IRunWebServer
                     String lineWithCmd = "Dummy" + sep + line;
                     String[] tokens = lineWithCmd.split(sep);
                     GameInfo.fromString(tokens, proposedGames, true);
-
                 }
             }
             games.close();
@@ -1449,7 +1450,9 @@ public class WebServer implements IWebServer, IRunWebServer
         PrintWriter out = null;
         try
         {
-            out = new PrintWriter(new FileOutputStream(filename));
+            out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(
+                filename), WebServerConstants.charset));
+
             for (GameInfo gi : proposedGames.values())
             {
                 if (gi.relevantForSaving())

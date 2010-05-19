@@ -10,6 +10,7 @@ import java.io.PrintWriter;
 import java.net.ConnectException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -59,6 +60,9 @@ public class WebClientSocketThread extends Thread implements IWebServer
     private boolean loggedIn = false;
     private AckWaiter ackWaiter;
     private WcstException failedException = null;
+
+    // TODO also defined in webserver.WebServerConstants!
+    private final Charset charset = Charset.forName("UTF-8");
 
     public WebClientSocketThread(WebClient wcGUI, String hostname, int port,
         String username, String password, boolean force, String email,
@@ -142,7 +146,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
         {
             socket = new Socket(hostname, port);
             out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
-                socket.getOutputStream())), true);
+                socket.getOutputStream(), charset)), true);
         }
         catch (UnknownHostException e)
         {
@@ -181,7 +185,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
         try
         {
             this.in = new BufferedReader(new InputStreamReader(socket
-                .getInputStream()));
+                .getInputStream(), charset));
 
             send(RegisterUser + sep + username + sep + password + sep + email);
             String fromServer = null;
@@ -237,7 +241,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
         try
         {
             this.in = new BufferedReader(new InputStreamReader(socket
-                .getInputStream()));
+                .getInputStream(), charset));
 
             send(ConfirmRegistration + sep + username + sep + confCode);
             String fromServer = null;
@@ -286,7 +290,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
         try
         {
             this.in = new BufferedReader(new InputStreamReader(socket
-                .getInputStream()));
+                .getInputStream(), charset));
 
             int version = webClient.getClientVersion();
             send(Login + sep + username + sep + password + sep + force + sep

@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -92,8 +93,9 @@ public class ChatMsgStorage
         PrintWriter out = null;
         try
         {
-            out = new PrintWriter(new FileOutputStream(new File(
-                usersFileDirectory, filename)));
+            out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(
+                new File(usersFileDirectory, filename)),
+                WebServerConstants.charset));
 
             for (ChatMessage msg : getLastNChatMessages())
             {
@@ -125,7 +127,8 @@ public class ChatMsgStorage
         try
         {
             BufferedReader msgs = new BufferedReader(new InputStreamReader(
-                new FileInputStream(new File(usersFileDirectory, filename))));
+                new FileInputStream(new File(usersFileDirectory, filename)),
+                WebServerConstants.charset));
 
             String line = null;
             while ((line = msgs.readLine()) != null)

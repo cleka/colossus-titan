@@ -1,6 +1,9 @@
 package net.sf.colossus.webserver;
 
 
+import java.nio.charset.Charset;
+
+
 /**
  *  Class WebServerConstants holds constants related to
  *  the Web server, so far only for the config file.
@@ -48,4 +51,7 @@ public final class WebServerConstants
      *  for redisplay to those who just log in
      */
     public final static int keepLastNMessages = 50;
+
+    // TODO also defined in webclient.WebClientSocketThread!
+    public final static Charset charset = Charset.forName("UTF-8");
 }
