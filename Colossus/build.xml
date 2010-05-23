@@ -50,6 +50,25 @@
     <mkdir dir="${build.classes.dir}" />
     <mkdir dir="${testresults.dir}" />
   </target>
+  <target name="createJnlpFiles" depends="init"
+  description="Creates the .jnlp files using the template.jnlp">
+    <path id="cwd">
+      <pathelement location="${basedir}"/>
+    </path>
+    <pathconvert property="codebase" dirsep="/" refid="cwd"/>
+    <copy file="template.jnlp" tofile="win.jnlp" overwrite="true">
+      <filterset>
+        <filter token="codebase" value="file:///${codebase}"/>
+        <filter token="href.jnlp" value="win.jnlp"/>
+      </filterset>
+    </copy>
+    <copy file="template.jnlp" tofile="unix.jnlp" overwrite="true">
+      <filterset>
+        <filter token="codebase" value="file:///${codebase}"/>
+        <filter token="href.jnlp" value="unix.jnlp"/>
+      </filterset>
+    </copy>
+  </target>
   <target name="compile" depends="init"
   description="Compiles Colossus without datatools and variants">
     <javac debug="yes" deprecation="yes" target="${target.level}"
@@ -150,7 +169,7 @@
     <mkdir dir="${build.javadoc.dir}" />
     <javadoc sourcepath="${core.src.dir}" destdir="${build.javadoc.dir}" access="private"/>
   </target>
-  <target name="jar" depends="init,compile,compileVariants"
+  <target name="jar" depends="init,compile,compileVariants,createJnlpFiles"
   description="Make jar file">
     <pathconvert property="manifest.classpath" pathsep=" ">
       <path refid="project.class.path" />
