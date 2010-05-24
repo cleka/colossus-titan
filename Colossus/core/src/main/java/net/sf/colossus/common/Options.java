@@ -95,6 +95,7 @@ public final class Options implements IOptions
     public static final String cumulativeSlow = "Slowing is cumulative";
     public static final String oneHexAllowed = "Always allows one hex";
     public static final String nonRandomBattleDice = "Use non-random battle dice";
+    public static final String autoSansLordBattles = "Need lord for battle control";
 
     public static final String noFirstTurnT2TTeleport = "No tower-to-tower Teleport on first turn";
     public static final String noFirstTurnTeleport = "No Teleport on first turn";

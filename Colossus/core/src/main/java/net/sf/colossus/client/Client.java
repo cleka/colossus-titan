@@ -858,6 +858,36 @@ public final class Client implements IClient, IOracle, IVariant,
         return getBattleCS().getActiveBattleUnits();
     }
 
+    private boolean sansLordAutoBattleApplies()
+    {
+        if (!game.isBattleOngoing())
+        {
+            // Odd: if GUI client tries this when there hasn't been any
+            // battle, seems EDT hangs and never finishes.
+            // So, to prevent that do this here only if there is really
+            // a battle.
+            return false;
+        }
+        if (options.getOption(Options.autoSansLordBattles))
+        {
+            // the option is on.  now check for lordly presence...
+            Legion legion = game.getBattleActiveLegion();
+            for (Creature creature : legion.getCreatures())
+            {
+                CreatureType creatureType = creature.getType();
+                if (creatureType.isLord())
+                {
+                    // if any creature in legion is a lord, no auto battle
+                    return false;
+                }
+            }
+            // not returned yet?  then no lords.  auto battle for this legion
+            return true;
+        }
+        // the option itself is off.  sansLordAutoBattles never applies.
+        return false;
+    }
+
     // TODO move to Game or Battle
     public List<BattleUnit> getInactiveBattleUnits()
     {
@@ -923,7 +953,8 @@ public final class Client implements IClient, IOracle, IVariant,
     {
         if (isMyBattlePhase())
         {
-            if (options.getOption(Options.autoPlay))
+            if (options.getOption(Options.autoPlay)
+                || sansLordAutoBattleApplies())
             {
                 aiPause();
                 boolean struck = makeForcedStrikes();
@@ -1290,7 +1321,7 @@ public final class Client implements IClient, IOracle, IVariant,
      *  or higher strike number) in order to be allowed to carry. */
     public void askChooseStrikePenalty(List<String> choices)
     {
-        if (options.getOption(Options.autoPlay))
+        if (options.getOption(Options.autoPlay) || sansLordAutoBattleApplies())
         {
             String choice = ai.pickStrikePenalty(choices);
             assignStrikePenalty(choice);
@@ -1613,7 +1644,8 @@ public final class Client implements IClient, IOracle, IVariant,
         }
         else
         {
-            if (options.getOption(Options.autoPlay))
+            if (options.getOption(Options.autoPlay)
+                || sansLordAutoBattleApplies())
             {
                 aiPause();
                 ai.handleCarries(carryDamage, carryTargetDescriptions);
@@ -1634,7 +1666,7 @@ public final class Client implements IClient, IOracle, IVariant,
         game.initBattle(hex, battleTurnNumber, battleActivePlayer,
             battlePhase, attacker, defender);
 
-        if (options.getOption(Options.autoPlay))
+        if (options.getOption(Options.autoPlay) || sansLordAutoBattleApplies())
         {
             ai.initBattle();
         }
@@ -1654,7 +1686,7 @@ public final class Client implements IClient, IOracle, IVariant,
 
         gui.actOnCleanupBattle();
 
-        if (options.getOption(Options.autoPlay))
+        if (options.getOption(Options.autoPlay) || sansLordAutoBattleApplies())
         {
             ai.cleanupBattle();
         }
@@ -2012,6 +2044,7 @@ public final class Client implements IClient, IOracle, IVariant,
                 // For autoRecruit alone, do not automatically say we are done.
                 // Allow humans to override. But full autoPlay be done.
                 if (options.getOption(Options.autoPlay))
+                //|| sansLordAutoBattleApplies())
                 {
                     doneWithRecruits();
                 }
@@ -2064,7 +2097,8 @@ public final class Client implements IClient, IOracle, IVariant,
 
         gui.actOnSetupBattleMove();
 
-        if (isMyBattlePhase() && options.getOption(Options.autoPlay))
+        if (isMyBattlePhase()
+            && (options.getOption(Options.autoPlay) || sansLordAutoBattleApplies()))
         {
             bestMoveOrder = ai.battleMove();
             failedBattleMoves = new ArrayList<CritterMove>();
@@ -2238,7 +2272,8 @@ public final class Client implements IClient, IOracle, IVariant,
         if (isMyCritter && !undo)
         {
             rememberForUndo = true;
-            if (options.getOption(Options.autoPlay))
+            if (options.getOption(Options.autoPlay)
+                || sansLordAutoBattleApplies())
             {
                 markBattleMoveSuccessful(tag, endingHex);
             }
