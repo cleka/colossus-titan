@@ -3,12 +3,7 @@
 <!-- To use this you need:
      Sun JDK 1.5+    http://java.sun.com  (currently recommend 1.5.0)
      Ant 1.5+        http://jakarta.apache.org/ant/
-     To sign jarfiles, you need to have a file called usernameKeystore
-        in the main Colossus directory (there where build.xml is;
-          substituting your username for "username"),
-        with an alias matching your username, and you need to put
-        the password for this key in environment var JARPASSWORD.
-        (Ant won't do keyboard password input.)
+     To sign jarfiles, see docs/build.html#keytool for instructions.
      To install a build on the website (normal public build, or one of
      the experimental builds, you need a proper rsync/ssh keys setup.
      Most noticable, you need the ssh public key setup done according SF's
@@ -47,22 +42,29 @@
     <property name="LIBS_DIR" value="${HTML_DIR}/libs" />
     <property name="ZIPFILE" value="Colossus.${DSTAMP}.zip" />
     <property name="SERVER" value="web.sourceforge.net" />
+    <condition property="alias" value="${user.name}" else="ColossusTestSigner">
+      <available file="${user.name}Keystore"/>
+    </condition>
+    <condition property="keystore" value="${user.name}Keystore" else="defaultKeystore">
+      <available file="${user.name}Keystore"/>
+    </condition>
+    <property name="storepass" value="defaultPassword"/>
     <mkdir dir="${build.classes.dir}" />
     <mkdir dir="${testresults.dir}" />
   </target>
-  <target name="createJnlpFiles" depends="init"
-  description="Creates the .jnlp files using the template.jnlp">
+  <target name="genJnlpFiles" depends="init"
+  description="Generates the .jnlp files using the template.jnlp">
     <path id="cwd">
       <pathelement location="${basedir}"/>
     </path>
     <pathconvert property="codebase" dirsep="/" refid="cwd"/>
-    <copy file="template.jnlp" tofile="win.jnlp" overwrite="true">
+    <copy file="templates/template.jnlp" tofile="win.jnlp" overwrite="true">
       <filterset>
         <filter token="codebase" value="file:///${codebase}"/>
         <filter token="href.jnlp" value="win.jnlp"/>
       </filterset>
     </copy>
-    <copy file="template.jnlp" tofile="unix.jnlp" overwrite="true">
+    <copy file="templates/template.jnlp" tofile="unix.jnlp" overwrite="true">
       <filterset>
         <filter token="codebase" value="file:///${codebase}"/>
         <filter token="href.jnlp" value="unix.jnlp"/>
@@ -169,7 +171,7 @@
     <mkdir dir="${build.javadoc.dir}" />
     <javadoc sourcepath="${core.src.dir}" destdir="${build.javadoc.dir}" access="private"/>
   </target>
-  <target name="jar" depends="init,compile,compileVariants,createJnlpFiles"
+  <target name="jar" depends="init,compile,compileVariants"
   description="Make jar file">
     <pathconvert property="manifest.classpath" pathsep=" ">
       <path refid="project.class.path" />
@@ -288,18 +290,19 @@
     includes="**" excludes="*.java" update="true" />
     <chmod file="BattlelandsRandomizer.jar" perm="755" />
   </target>
-  <target name="sign" depends="jar"
+  <target name="sign" depends="jar,genJnlpFiles"
   description="Sign main jar file">
-    <signjar jar="Colossus.jar" alias="${user.name}"
-    keystore="${user.name}Keystore"
-    storepass="${env.JARPASSWORD}" />
+    <echo message="Signing Colossus.jar using keystore=${keystore} and alias=${alias}"/>
+    <signjar jar="Colossus.jar" alias="${alias}"
+    keystore="${keystore}"
+    storepass="${storepass}" />
     <chmod file="Colossus.jar" perm="755" />
   </target>
-  <target name="signall" depends="jar, sign"
+  <target name="signall" depends="sign"
   description="Sign all jar files">
-    <signjar jar="libs/jdom.jar" alias="${user.name}"
-    keystore="${user.name}Keystore"
-    storepass="${env.JARPASSWORD}" />
+    <signjar jar="libs/jdom.jar" alias="${alias}"
+    keystore="${keystore}"
+    storepass="${storepass}" />
   </target>
   <!-- TODO: picking selectively from the base directory is a bit messy, particularly in respect
        to cleaning up and ignoring files in the VCS. It would be better to collect all generated

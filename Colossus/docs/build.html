@@ -105,6 +105,22 @@
     you need to uncompress a jar file on a machine with no jar, try your
     favorite unzip tool. (But this may mess up permissions on a Unix box.) Jar
     comes with the JDK.</p>
+    <h4><a name="keytool">keytool</a></h4>
+    <p>Part of the JDK, keytool is need to generate a keystore that will contain
+    your personal keys used to sign jars.</p>
+    <p>The Ant build.xml file has been configured to use a keystore named
+    <b>${user.name}Keystore</b> which must contain an alias <b>${user.name}</b>.</p>
+    <p>The keystore password will be loaded from the <b>local_build.properties</b>
+    key <b>storepass</b>.</p>
+    <p>To create the keystore file open a command prompt in the Colossus directory
+    and run the following:</p>
+    <pre>
+      keytool -genkey -alias %USERNAME% -validity 999 -keyStore %USERNAME%Keystore -storepass pick_a_password
+    </pre>
+    <p>Follow the prompts to answer the questions and you will have a keystore setup</p>
+    <p>If you are testing locally then a default keystore has been provided 
+    and will be used to dummy sign the jars.</p>
+    <p>The web deployed files must be signed with your keys (and not the dummy ones).</p>  
     <h4>jarsigner</h4>
     <p>Jars can be signed. Jars 
     <b>must</b>
@@ -113,12 +129,7 @@
     certifying authority and get a &quot;real&quot; key that actually
     &quot;proves&quot; that you are who you say you are. The jarsigner tool
     comes with the JDK. To use it, you need to create a personal authentication
-    key, and put it in a keystore file. The 
-    <b>sign</b>
-     target in 
-    <b>build.xml</b>
-     assumes that your key name and keystore filename match your username. If
-    you don&#39;t like this, you can add new targets.</p>
+    key, and put it in a keystore file (See <a href="#keytool">keytool</a> above).</p>
     <h4>zip and unzip tools</h4>
     <p>You need something that can work with the standard zip format. WinZip,
     Info-Zip, PKZip, etc. Info-Zip is free -- most of the others are shareware.
