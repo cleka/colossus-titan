@@ -205,6 +205,22 @@ public abstract class Legion
     }
 
     /**
+     * @return returns the Titan Creature, if this legions has the titan,
+     * or null if it hasn't.
+     */
+    public Creature getTitan()
+    {
+        for (Creature critter : getCreatures())
+        {
+            if (critter.getType().isTitan())
+            {
+                return critter;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Returns the number of creatures in this legion.
      *
      * @return the number of creatures in the legion

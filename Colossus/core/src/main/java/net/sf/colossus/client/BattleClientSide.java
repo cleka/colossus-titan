@@ -174,7 +174,27 @@ public class BattleClientSide extends Battle
     {
         for (BattleCritter critter : getActiveBattleUnits())
         {
-            if (critter.getCurrentHex().getLabel().startsWith("X"))
+            if (isCritterOffboard(critter))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isCritterOffboard(BattleCritter critter)
+    {
+        return critter.getCurrentHex().getLabel().startsWith("X");
+    }
+
+    public boolean isTitanOffboard(Player player)
+    {
+        for (BattleCritter critter : getBattleUnits())
+        {
+            if (critter.isTitan()
+                && isCritterOffboard(critter)
+                && player.equals(getGameClientSide().getPlayerByTag(
+                    critter.getTag())))
             {
                 return true;
             }

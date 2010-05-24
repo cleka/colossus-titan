@@ -530,7 +530,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         client.notifyServer();
     }
 
-    // Used by MasterBoard and by BattleBoard
+    // Used now only by MasterBoard
     void askNewCloseQuitCancel(JFrame frame, boolean fromBattleBoard)
     {
         String[] dialogOptions = new String[4];
@@ -555,6 +555,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             if (fromBattleBoard)
             {
                 client.concede();
+                return;
             }
         }
         if (answer == 0)

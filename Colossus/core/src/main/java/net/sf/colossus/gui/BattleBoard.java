@@ -45,6 +45,7 @@ import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.BattleUnit;
 import net.sf.colossus.game.Engagement;
+import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.guiutil.KFrame;
 import net.sf.colossus.guiutil.SaveWindow;
@@ -94,6 +95,8 @@ public final class BattleBoard extends KFrame
     private final SaveWindow saveWindow;
 
     private final BattleMap battleMap;
+
+    private boolean alreadyConceded = false;
 
     private static class DicePanel extends JPanel
     {
@@ -167,14 +170,14 @@ public final class BattleBoard extends KFrame
             @Override
             public void windowClosing(WindowEvent e)
             {
-                gui.askNewCloseQuitCancel(BattleBoard.this, true);
+                actOnWindowClosingAttempt();
             }
 
             /* Bruno reported the following issue:
              * If one switches to another desktop which game (battle) is
              * ongoing, updates to BattleBoard do not happen and there is no
              * easy way to refresh the BattleBoard when needed.
-             * Now... just minimize and restore, that forces a repain,
+             * Now... just minimize and restore, that forces a repaint,
              * that should solve the problem... I hope ;-) __Clemens.
              */
             @Override
@@ -305,6 +308,76 @@ public final class BattleBoard extends KFrame
         {
             actOnMisclick();
         }
+    }
+
+    private void actOnWindowClosingAttempt()
+    {
+        if (alreadyConceded)
+        {
+            JOptionPane.showMessageDialog(this,
+                "You did alrady concede, but it was not your battle phase!\n"
+                    + "Game waits for your opponent to finish his turn.",
+                "Already conceded!", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        Legion myLegion = gui.getClient().getMyEngagedLegion();
+
+        // for not-involved players, closing battle map/board should not
+        // effect anything, in particular not withdraw the player / close
+        // the whole game etc.
+        // For now, just set board invisible, so that whole cleanup stuff
+        // can work as before.
+        if (myLegion == null)
+        {
+            this.setVisible(false);
+            return;
+        }
+
+        // okay, either attacker or defender legion is ours.
+        boolean hasMyTitan = myLegion.hasTitan();
+        String buttonText = hasMyTitan ? "Concede and Withdraw"
+            : "Concede";
+        String titleText = hasMyTitan ? "Really concede and withdraw?"
+            : "Really concede battle?";
+        String messageText = "Do you want to concede this battle?";
+        if (hasMyTitan)
+        {
+            messageText = messageText
+                + "\n"
+                + "NOTE: Since your legion contains your Titan, conceding "
+                + "this battle means you are eliminated from the game,\n"
+                + "and attacker anyway will get same score has if he "
+                + "had killed you!";
+        }
+
+        if (!gui.getClient().isMyBattlePhase())
+        {
+            messageText = messageText
+                + "\n\nNote: "
+                + "According to the rules, you can concede only during your "
+                + "own battle turn,\ntherefore the active player needs to "
+                + "finish his turn first before your concede takes effect!";
+        }
+        String[] dialogOptions = new String[2];
+        dialogOptions[0] = buttonText;
+        dialogOptions[1] = "Cancel";
+        int answer = JOptionPane
+            .showOptionDialog(this, messageText,
+            titleText, JOptionPane.OK_CANCEL_OPTION,
+            JOptionPane.QUESTION_MESSAGE, null, dialogOptions,
+            dialogOptions[1]);
+
+        if (answer == -1 || answer == 1)
+        {
+            return;
+        }
+
+        if (!gui.getClient().isMyBattlePhase())
+        {
+            alreadyConceded = true;
+        }
+        gui.getClient().concede();
     }
 
     private void setBattleMarkerLocation(boolean isDefender, String hexLabel)
@@ -711,14 +784,26 @@ public final class BattleBoard extends KFrame
 
     private boolean confirmLeavingCreaturesOffboard()
     {
+        String warnTitan = "";
+        if (isMyTitanOffboard())
+        {
+            warnTitan = "\n\nWARNING: If you leave your Titan offboard, "
+                + " you are eliminated from the game!";
+        }
         String[] options = new String[2];
         options[0] = "Yes";
         options[1] = "No";
         int answer = JOptionPane.showOptionDialog(this,
-            "Are you sure you want to leave creatures offboard?",
+            "Are you sure you want to leave creatures offboard?" + warnTitan,
             "Confirm Leaving Creatures Offboard?", JOptionPane.YES_NO_OPTION,
             JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
         return (answer == JOptionPane.YES_OPTION);
+    }
+
+    private boolean isMyTitanOffboard()
+    {
+        return gui.getGameClientSide().getBattleCS().isTitanOffboard(
+            gui.getOwningPlayer());
     }
 
     private void actOnCritter(GUIBattleChit battleChit)
