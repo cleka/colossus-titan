@@ -17,6 +17,7 @@
 <project name="Colossus" default="jar" basedir=".">
   <property environment="env" />
 
+  <property file="${user.home}/colossus_build.properties"/>
   <property file="local_build.properties"/>
   <property file="build.properties"/>
   <property name="release.version" value="SNAPSHOT"/>
