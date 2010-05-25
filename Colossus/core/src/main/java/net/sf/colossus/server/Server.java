@@ -604,18 +604,13 @@ public final class Server extends Thread implements IServer
                 {
                     if (r == -1)
                     {
+                        // Remote entity did shut the socket down.
+                        // Do the same from our end and cancel the channel.
                         processingCH.setIsGone(true);
                         LOGGER.info("EOF on channel for client "
                             + getPlayerName() + " setting isGone true");
-                        // Remote entity did shut the socket down.
-                        // Do the same from our end and cancel the channel.
-
-                        LOGGER
-                            .log(Level.FINE,
-                                "Remote side cleanly closed the connection (r == -1)");
                         withdrawFromGame();
                         disconnectChannel(sc, key);
-
                     }
                     break;
                 }
@@ -646,7 +641,7 @@ public final class Server extends Thread implements IServer
      *  Put the ClientHandler into the queue to be removed
      *  from selector on next possible opportunity
      */
-    void disposeClientHandler(ClientHandler ch)
+    void queueClientHandlerForDisposal(ClientHandler ch)
     {
         if (currentThread().equals(this))
         {
@@ -756,6 +751,15 @@ public final class Server extends Thread implements IServer
         }
     }
 
+    /**
+     * Close the SocketChannel, cancel the selection key and unregister
+     * the SocketChannel from list of active SocketChannels.
+     *
+     * @param sc SocketChannel of the client
+     * @param key Key for that SocketChannel
+     *
+     * @throws IOException
+     */
     private void disconnectChannel(SocketChannel sc, SelectionKey key)
         throws IOException
     {
@@ -2359,8 +2363,8 @@ public final class Server extends Thread implements IServer
     // do not attempt to further read from there.
     public void disconnect()
     {
-        processingCH.setIsGone(true);
-        disposeClientHandler(processingCH);
+        queueClientHandlerForDisposal(processingCH);
+        clientWontConfirmCatchup(processingCH, "Client disconnected.");
     }
 
     public void stopGame()
@@ -2750,6 +2754,34 @@ public final class Server extends Thread implements IServer
 
     private final HashSet<IClient> waitingToCatchup = new HashSet<IClient>();
 
+    /**
+     * Check whether client is currently expected to send a caught-Up
+     * confirmation.
+     * If yes: it won't happen, so act accordingly.
+     * If no : even better so, so just do nothing.
+     * @param reason Reason why client won't send the confirmation
+     *        (typically disconnected or something).
+     */
+    public void clientWontConfirmCatchup(ClientHandler ch, String reason)
+    {
+        String playerName = ch.getPlayerName();
+
+        synchronized (waitingToCatchup)
+        {
+            if (waitingToCatchup.contains(ch))
+            {
+                waitingToCatchup.remove(ch);
+                int remaining = waitingToCatchup.size();
+                LOGGER.info("Client " + playerName + " won't confirm catch-up ("
+                    + reason + "). Remaining: " + remaining);
+                if (remaining <= 0)
+                {
+                    actOnAllCaughtUp();
+                }
+            }
+        }
+    }
+
     public void clientConfirmedCatchup()
     {
         ClientHandler ch = processingCH;
@@ -2772,22 +2804,27 @@ public final class Server extends Thread implements IServer
                 + "Remaining: " + remaining);
             if (remaining <= 0)
             {
-                if (caughtUpAction.equals("KickstartGame"))
-                {
-                    LOGGER.info("All caught up - doing game.kickstartGame()");
-                    game.kickstartGame();
-                }
-                else if (caughtUpAction.equals("DisposeGame"))
-                {
-                    LOGGER.info("All caught up - doing game.dispose()");
-                    game.dispose();
-                }
-                else
-                {
-                    LOGGER
-                        .severe("All clients caught up, but no action set??");
-                }
+                actOnAllCaughtUp();
             }
+        }
+    }
+
+    private void actOnAllCaughtUp()
+    {
+        if (caughtUpAction.equals("KickstartGame"))
+        {
+            LOGGER.info("All caught up - doing game.kickstartGame()");
+            game.kickstartGame();
+        }
+        else if (caughtUpAction.equals("DisposeGame"))
+        {
+            LOGGER.info("All caught up - doing game.dispose()");
+            game.dispose();
+        }
+        else
+        {
+            LOGGER
+                .severe("All clients caught up, but no action set??");
         }
     }
 

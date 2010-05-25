@@ -246,16 +246,18 @@ final class ClientHandler implements IClient
         }
         catch (IOException ioe)
         {
-            LOGGER.log(Level.WARNING, "IOException '" + ioe.getMessage() + "'"
-                + " was thrown while writing String '" + msg + "'"
-                + " to channel for player " + playerName
+            LOGGER.log(Level.WARNING,
+                "IOException '" + ioe.getMessage() + "'"
+                    + " was thrown while writing String '" + msg + "'"
+                    + " to channel for player " + playerName
                     + "; details follow:", ioe);
 
-
-            isGone = true;
+            setIsGone(true);
             withdrawnAlready = true;
             server.withdrawFromGame(playerName);
-            server.disposeClientHandler(this);
+            server.queueClientHandlerForDisposal(this);
+            server.clientWontConfirmCatchup(this,
+                "IO Exception while writing to client " + playerName);
         }
         Thread.yield();
     }
@@ -486,20 +488,17 @@ final class ClientHandler implements IClient
         }
         else if (method.equals(Constants.withdrawFromGame))
         {
-            if (!withdrawnAlready)
-            {
-                withdrawnAlready = true;
-                server.withdrawFromGame();
-            }
+            withdrawIfNeeded(true);
         }
         else if (method.equals(Constants.disconnect))
         {
-            isGone = true;
-            withdrawIfNeeded();
+            setIsGone(true);
+            withdrawIfNeeded(false);
             server.disconnect();
         }
         else if (method.equals(Constants.stopGame))
         {
+            setIsGone(true);
             server.disconnect();
             server.stopGame();
         }
@@ -600,13 +599,26 @@ final class ClientHandler implements IClient
         return name.equals("null") ? null : resolveCreatureType(name);
     }
 
-    private void withdrawIfNeeded()
+    /**
+     * Make sure player is withdrawn from game.
+     * Explicit if via Withdraw message from client, implicit because
+     * of disconnect message or connection problems.
+     * This is just a wrapper for the both situations where for
+     * !withdrawnAlready should be checked
+     *
+     * @param explicit Whether client has requested withdraw explicitly
+     */
+    private void withdrawIfNeeded(boolean explicit)
     {
         if (!withdrawnAlready)
         {
-            LOGGER.log(Level.FINE,
-                "Client disconnected without explicit withdraw - "
-                    + "doing automatic withdraw for player " + playerName);
+            if (!explicit)
+            {
+                LOGGER.log(Level.FINE,
+                    "Client disconnected without explicit withdraw - "
+                        + "doing automatic withdraw (if needed) for player "
+                        + playerName);
+            }
             withdrawnAlready = true;
             server.withdrawFromGame();
         }
@@ -677,6 +689,9 @@ final class ClientHandler implements IClient
 
     // IClient methods to sent requests to client over socket.
 
+    /**
+     * Server side disposes a client (and informs it about it first)
+     */
     public void dispose()
     {
         // Don't do it again
@@ -685,9 +700,11 @@ final class ClientHandler implements IClient
             return;
         }
 
-        isGone = true;
+        setIsGone(true);
         sendViaChannel(Constants.dispose);
-        server.disposeClientHandler(this);
+        server.queueClientHandlerForDisposal(this);
+        server.clientWontConfirmCatchup(this,
+            "Client disposed from server side.");
     }
 
     public void tellEngagement(MasterHex hex, Legion attacker, Legion defender)
