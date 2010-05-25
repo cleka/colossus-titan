@@ -1146,8 +1146,7 @@ public final class Server extends Thread implements IServer
 
     private void addRemoteClient(final IClient client, final Player player)
     {
-        RemoteLogHandler remoteLogHandler = new RemoteLogHandler();
-        remoteLogHandler.setServer(this);
+        RemoteLogHandler remoteLogHandler = new RemoteLogHandler(this);
         LOGGER.addHandler(remoteLogHandler);
         remoteLogHandlers.add(remoteLogHandler);
 
