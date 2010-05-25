@@ -12,14 +12,10 @@ public class RemoteLogHandler extends Handler
 {
     private Server server = null;
 
-    public void setServer(Server server)
-    {
-        this.server = server;
-    }
-
-    public RemoteLogHandler()
+    public RemoteLogHandler(Server server)
     {
         super();
+        this.server = server;
         net.sf.colossus.util.InstanceTracker.register(this, "TheServerRLH");
     }
 
