@@ -137,11 +137,11 @@ class CreatureCollectionView extends KDialog
             setBorder(BorderFactory.createLineBorder(Color.black));
             if (!(type.isTitan()))
             {
-                chit = new Chit(CHIT_SIZE, type.getName());
+                chit = Chit.newCreatureChit(CHIT_SIZE, type);
             }
             else
             {
-                chit = new Chit(CHIT_SIZE, "Titan-0-Black");
+                chit = Chit.newCreatureChit(CHIT_SIZE, "Titan-0-Black");
             }
             chitMap.put(type, chit);
             label = new JLabel(baseString, SwingConstants.CENTER);

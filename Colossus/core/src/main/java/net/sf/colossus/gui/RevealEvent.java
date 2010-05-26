@@ -507,7 +507,8 @@ public class RevealEvent
         }
         try
         {
-            Chit marker = new Chit(scale, markerId);
+            // TODO use Marker class?
+            Chit marker = Chit.newMarkerChit(scale, markerId);
             marker.setAlignmentX(Component.LEFT_ALIGNMENT);
             p.add(marker);
         }
@@ -540,6 +541,7 @@ public class RevealEvent
             try
             {
                 String color = player.getShortColor();
+                // TODO does not work, perhaps I did that overlay stuff wrong?
                 solidMarker = new Chit(scale, color + "Solid");
             }
             catch (Exception e)
@@ -547,14 +549,15 @@ public class RevealEvent
                 LOGGER.log(Level.SEVERE, "While trying to get chit: ", e);
                 // if solid marker does not exist for this color,
                 // use as fallback the Titan chit.
-                solidMarker = new Chit(scale, player.getTitanBasename());
+                solidMarker = Chit.newCreatureChit(scale, player
+                    .getTitanBasename());
             }
         }
         else
         {
             // NOTE: this assumes that this event is for the player in whose
             //       turn this happens:
-            solidMarker = new Chit(scale, mulliganTitanBaseName);
+            solidMarker = Chit.newCreatureChit(scale, mulliganTitanBaseName);
             solidMarker.setAlignmentX(Component.LEFT_ALIGNMENT);
         }
 

@@ -119,7 +119,7 @@ final class SplitLegion extends KDialog
         while (it.hasNext())
         {
             String imageName = it.next();
-            final Chit chit = new Chit(scale, imageName);
+            final Chit chit = Chit.newCreatureChit(scale, imageName);
             oldChits.add(chit);
             oldBox.add(chit);
             chit.addMouseListener(new MouseAdapter()

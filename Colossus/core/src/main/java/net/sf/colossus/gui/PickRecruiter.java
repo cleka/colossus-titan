@@ -74,7 +74,7 @@ final class PickRecruiter extends KDialog
         while (it.hasNext())
         {
             String imageName = it.next();
-            Chit chit = new Chit(scale, imageName);
+            Chit chit = Chit.newCreatureChit(scale, imageName);
             legionPane.add(chit);
         }
 
@@ -100,7 +100,7 @@ final class PickRecruiter extends KDialog
                 potentialRecruiterName = legion.getPlayer().getAngelBasename();
             }
             final String realRecruiterName = potentialRecruiterName;
-            Chit chit = new Chit(scale, realRecruiterName);
+            Chit chit = Chit.newCreatureChit(scale, realRecruiterName);
             recruiterChits.add(chit);
             recruiterPane.add(chit);
             chit.addMouseListener(new MouseAdapter()

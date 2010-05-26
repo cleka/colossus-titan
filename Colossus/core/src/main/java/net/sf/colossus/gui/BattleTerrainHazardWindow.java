@@ -263,7 +263,7 @@ public class BattleTerrainHazardWindow extends KDialog
             {
                 if (creature.isNativeIn((HazardTerrain)hazard))
                 {
-                    Chit chit = new Chit(CREATURE_SIZE, creature.getName());
+                    Chit chit = Chit.newCreatureChit(CREATURE_SIZE, creature);
                     chit.setToolTipText(creature.getName());
                     nativePanel.add(chit);
                 }
@@ -277,7 +277,7 @@ public class BattleTerrainHazardWindow extends KDialog
                     || (hazard.equals(HazardHexside.RIVER) && creature
                         .isNativeRiver()))
                 {
-                    Chit chit = new Chit(CREATURE_SIZE, creature.getName());
+                    Chit chit = Chit.newCreatureChit(CREATURE_SIZE, creature);
                     chit.setToolTipText(creature.getName());
                     nativePanel.add(chit);
                 }
@@ -293,30 +293,30 @@ public class BattleTerrainHazardWindow extends KDialog
         if (hazard.effectOnFlyerMovement
             .equals(HazardConstants.EffectOnMovement.BLOCKALL))
         {
-            flySymbol = new Chit(EFFECT_SIZE, "FlyingBlocked");
+            flySymbol = Chit.newSymbolChit(EFFECT_SIZE, "FlyingBlocked");
             flySymbol.setToolTipText("FlyingBlocked");
         }
         else if (hazard.effectOnFlyerMovement
             .equals(HazardConstants.EffectOnMovement.BLOCKFOREIGNER))
         {
-            flySymbol = new Chit(EFFECT_SIZE, "FlyingNativeOnly");
+            flySymbol = Chit.newSymbolChit(EFFECT_SIZE, "FlyingNativeOnly");
             flySymbol.setToolTipText("Native Flyers Only");
         }
         else if (hazard.effectOnFlyerMovement
             .equals(HazardConstants.EffectOnMovement.SLOWALL))
         {
-            flySymbol = new Chit(EFFECT_SIZE, "FlyingSlow");
+            flySymbol = Chit.newSymbolChit(EFFECT_SIZE, "FlyingSlow");
             flySymbol.setToolTipText("Slows Flying Creatures");
         }
         else if (hazard.effectOnFlyerMovement
             .equals(HazardConstants.EffectOnMovement.SLOWFOREIGNER))
         {
-            flySymbol = new Chit(EFFECT_SIZE, "FlyingNativeSlow");
+            flySymbol = Chit.newSymbolChit(EFFECT_SIZE, "FlyingNativeSlow");
             flySymbol.setToolTipText("Slows Non-Native Flying Creatures");
         }
         else
         {
-            flySymbol = new Chit(EFFECT_SIZE, "FlyingAll");
+            flySymbol = Chit.newSymbolChit(EFFECT_SIZE, "FlyingAll");
             flySymbol.setToolTipText("No effect on Flying Creatures");
         }
         container.add(flySymbol, GBC_NORTHEAST);
@@ -325,30 +325,30 @@ public class BattleTerrainHazardWindow extends KDialog
         if (hazard.effectOnGroundMovement
             .equals(HazardConstants.EffectOnMovement.BLOCKALL))
         {
-            groundSymbol = new Chit(EFFECT_SIZE, "GroundBlocked");
+            groundSymbol = Chit.newSymbolChit(EFFECT_SIZE, "GroundBlocked");
             groundSymbol.setToolTipText("Blocks Ground Movement");
         }
         else if (hazard.effectOnGroundMovement
             .equals(HazardConstants.EffectOnMovement.BLOCKFOREIGNER))
         {
-            groundSymbol = new Chit(EFFECT_SIZE, "GroundNativeOnly");
+            groundSymbol = Chit.newSymbolChit(EFFECT_SIZE, "GroundNativeOnly");
             groundSymbol.setToolTipText("Only Natives may Occupy");
         }
         else if (hazard.effectOnGroundMovement
             .equals(HazardConstants.EffectOnMovement.SLOWFOREIGNER))
         {
-            groundSymbol = new Chit(EFFECT_SIZE, "GroundNativeSlow");
+            groundSymbol = Chit.newSymbolChit(EFFECT_SIZE, "GroundNativeSlow");
             groundSymbol.setToolTipText("NonNatives Slowed");
         }
         else if (hazard.effectOnGroundMovement
             .equals(HazardConstants.EffectOnMovement.SLOWALL))
         {
-            groundSymbol = new Chit(EFFECT_SIZE, "GroundAllSlow");
+            groundSymbol = Chit.newSymbolChit(EFFECT_SIZE, "GroundAllSlow");
             groundSymbol.setToolTipText("Slows Ground Movement");
         }
         else
         {
-            groundSymbol = new Chit(EFFECT_SIZE, "GroundAll");
+            groundSymbol = Chit.newSymbolChit(EFFECT_SIZE, "GroundAll");
             groundSymbol.setToolTipText("No Effect On Ground Movement");
         }
         container.add(groundSymbol, GBC_NORTHWEST);
@@ -360,14 +360,16 @@ public class BattleTerrainHazardWindow extends KDialog
         if (hazard.rangeStrikeSpecial
             .equals(HazardConstants.RangeStrikeSpecialEffect.RANGESTRIKEBLOCKED))
         {
-            rangeStrikeSymbol = new Chit(EFFECT_SIZE, "RangeStrikeBlocked");
+            rangeStrikeSymbol = Chit.newSymbolChit(EFFECT_SIZE,
+                "RangeStrikeBlocked");
             rangeStrikeSymbol
                 .setToolTipText("Blocks normal Rangestrikes-Magic is not blocked");
         }
         else if (hazard.rangeStrikeSpecial
             .equals(HazardConstants.RangeStrikeSpecialEffect.RANGESTRIKEWALL))
         {
-            rangeStrikeSymbol = new Chit(EFFECT_SIZE, "RangeStrikeWall");
+            rangeStrikeSymbol = Chit.newSymbolChit(EFFECT_SIZE,
+                "RangeStrikeWall");
             rangeStrikeSymbol
                 .setToolTipText("Blocks Rangestrikes unless Hazard is"
                     + "occupied by either the Rangestriker or the target.");
@@ -375,14 +377,16 @@ public class BattleTerrainHazardWindow extends KDialog
         else if (hazard.rangeStrikeSpecial
             .equals(HazardConstants.RangeStrikeSpecialEffect.RANGESTRIKESKILLPENALTY))
         {
-            rangeStrikeSymbol = new Chit(EFFECT_SIZE, "RangeStrikeSkill");
+            rangeStrikeSymbol = Chit.newSymbolChit(EFFECT_SIZE,
+                "RangeStrikeSkill");
             rangeStrikeSymbol
                 .setToolTipText("Non Natives to this Hazard sill lose 1 Skill"
                     + "for each hazard of this type being crossed.");
         }
         else
         {
-            rangeStrikeSymbol = new Chit(EFFECT_SIZE, "RangeStrikeFree");
+            rangeStrikeSymbol = Chit.newSymbolChit(EFFECT_SIZE,
+                "RangeStrikeFree");
             rangeStrikeSymbol.setToolTipText("No effect on Rangestrikes.");
         }
         container.add(rangeStrikeSymbol);
@@ -390,13 +394,13 @@ public class BattleTerrainHazardWindow extends KDialog
         if (hazard.terrainSpecial
             .equals(HazardConstants.SpecialEffect.HEALTHDRAIN))
         {
-            Chit special = new Chit(EFFECT_SIZE, "HealthDrain");
+            Chit special = Chit.newSymbolChit(EFFECT_SIZE, "HealthDrain");
             special.setToolTipText("Non natives lose 1 health per turn");
         }
         if (hazard.terrainSpecial
             .equals(HazardConstants.SpecialEffect.HEALTHDRAIN_WATERDWELLER))
         {
-            Chit special = new Chit(EFFECT_SIZE, "HealthDrain");
+            Chit special = Chit.newSymbolChit(EFFECT_SIZE, "HealthDrain");
             special.setToolTipText("Water Dweller lose 1 health per turn");
         }
     }

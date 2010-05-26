@@ -2251,7 +2251,7 @@ public final class MasterBoard extends JPanel
             MasterHex masterHex = legion.getCurrentHex();
             int scale = 2 * Scale.get();
             GUIMasterHex hex = getGUIHexByMasterHex(masterHex);
-            Chit chit = new Chit(scale, legion.getRecruit());
+            Chit chit = Chit.newCreatureChit(scale, legion.getRecruit());
             recruitedChits.put(legion, chit);
             Point startingPoint = hex.getOffCenter();
             Point point = new Point(startingPoint);
@@ -2277,10 +2277,9 @@ public final class MasterBoard extends JPanel
         int num = size;
         for (CreatureType creatureType : imageNameList)
         {
-            String imageName = creatureType.getName();
             int scale = 2 * Scale.get();
             GUIMasterHex hex = getGUIHexByMasterHex(masterHex);
-            Chit chit = new Chit(scale, imageName);
+            Chit chit = Chit.newCreatureChit(scale, creatureType);
             Point startingPoint = hex.getOffCenter();
             Point point = new Point(startingPoint);
             point.x -= scale / 2;

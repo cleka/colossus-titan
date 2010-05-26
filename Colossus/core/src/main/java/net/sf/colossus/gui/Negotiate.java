@@ -143,7 +143,7 @@ final class Negotiate extends KDialog
         while (it.hasNext())
         {
             String imageName = it.next();
-            final Chit chit = new Chit(scale, imageName);
+            final Chit chit = Chit.newCreatureChit(scale, imageName);
             chit.addMouseListener(new MouseAdapter()
             {
                 @Override

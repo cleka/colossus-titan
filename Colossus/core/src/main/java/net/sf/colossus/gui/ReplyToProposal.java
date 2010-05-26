@@ -72,7 +72,7 @@ final class ReplyToProposal extends KDialog implements ActionListener
         while (it.hasNext())
         {
             String imageName = it.next();
-            Chit chit = new Chit(scale, imageName);
+            Chit chit = Chit.newCreatureChit(scale, imageName);
             attackerChits.add(chit);
             attackerPane.add(chit);
         }
@@ -90,7 +90,7 @@ final class ReplyToProposal extends KDialog implements ActionListener
         while (it.hasNext())
         {
             String imageName = it.next();
-            Chit chit = new Chit(scale, imageName);
+            Chit chit = Chit.newCreatureChit(scale, imageName);
             defenderChits.add(chit);
             defenderPane.add(chit);
         }

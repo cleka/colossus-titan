@@ -104,7 +104,9 @@ public class RevealedCreature
             return null;
         }
 
-        Chit creature = new Chit(scale, name);
+        // TODO can't simply use creature type because does getName() here does
+        // special magic for Titans
+        Chit creature = Chit.newCreatureChit(scale, name);
         if (isDead())
         {
             creature.setDead(true);

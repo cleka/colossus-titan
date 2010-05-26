@@ -71,7 +71,7 @@ final class PickRecruit extends KDialog
         while (itName.hasNext())
         {
             String imageName = itName.next();
-            Chit chit = new Chit(scale, imageName);
+            Chit chit = Chit.newCreatureChit(scale, imageName);
             legionChits.add(chit);
             legionPane.add(chit);
         }
@@ -92,7 +92,7 @@ final class PickRecruit extends KDialog
             vertPane.setAlignmentY(0);
             recruitPane.add(vertPane);
 
-            Chit chit = new Chit(scale, recruit.getName());
+            Chit chit = Chit.newCreatureChit(scale, recruit);
             recruitChits.add(chit);
 
             vertPane.add(chit);

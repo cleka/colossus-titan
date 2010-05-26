@@ -65,7 +65,7 @@ final class AcquireAngel extends KDialog
         while (it.hasNext())
         {
             final CreatureType creature = it.next();
-            Chit chit = new Chit(4 * Scale.get(), creature.getName());
+            Chit chit = Chit.newCreatureChit(4 * Scale.get(), creature);
             chits.add(chit);
             contentPane.add(chit);
             chit.addMouseListener(new MouseAdapter()

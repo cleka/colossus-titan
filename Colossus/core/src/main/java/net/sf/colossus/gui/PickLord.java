@@ -44,7 +44,7 @@ final class PickLord extends KDialog
 
         for (final CreatureType creatureType : choices)
         {
-            Chit chit = new Chit(4 * Scale.get(), creatureType.getName());
+            Chit chit = Chit.newCreatureChit(4 * Scale.get(), creatureType);
             chits.add(chit);
             contentPane.add(chit);
             chit.addMouseListener(new MouseAdapter()

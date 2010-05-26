@@ -65,14 +65,63 @@ class Chit extends JPanel
     final static BasicStroke oneWide = new BasicStroke(1);
     private final static BasicStroke threeWide = new BasicStroke(3);
 
+    /**
+     * Factory method for creatures, based on image names
+     * TODO try to get rid of the string bases Creature chits
+     * @param scale
+     * @param id
+     * @return
+     */
+    public static Chit newCreatureChit(int scale, String id)
+    {
+        return new Chit(scale, id);
+    }
+
+    /**
+     * Factory method for creatures, based on CreatureType
+     * @param scale
+     * @param type
+     * @return
+     */
+    public static Chit newCreatureChit(int scale, CreatureType type)
+    {
+        return new Chit(scale, type);
+    }
+
+    // TODO: needed? Could caller use Marker class instead?
+    public static Chit newMarkerChit(int scale, String markerId)
+    {
+        // pull in / clean up the substr(0,4) stuff from below
+        return new Chit(scale, markerId);
+    }
+
+    public static Chit newDiceChit(int scale, String markerId)
+    {
+        return new Chit(scale, markerId);
+    }
+
+    /**
+     * Factory method for icons representing e.g. hazard effects
+     * @param scale
+     * @param id
+     * @return the created Chit
+     */
+    public static Chit newSymbolChit(int scale, String id)
+    {
+        return new Chit(scale, id);
+    }
+
+
+    /**   P l a i n   C o n s t r u c t o r s    **/
+    // to be used mostly by the factory methods
     Chit(int scale, String id)
     {
         this(scale, id, false, false);
     }
 
-    Chit(int scale, CreatureType creature)
+    Chit(int scale, CreatureType creatureType)
     {
-        this(scale, creature.getName());
+        this(scale, creatureType.getName());
     }
 
     Chit(int scale, String id, String[] overlays)
@@ -97,8 +146,10 @@ class Chit extends JPanel
     }
 
     // TODO this is a bit confusing: the id parameter can be either the name of
-    // a creature type or a markerId (maybe more?). Good thing markerIds have
-    // no overlap with creature names
+    // a creature type or a markerId (maybe more? => Or a symbol for hazard effect,
+    // or some dice...).
+    // Good thing markerIds have no overlap with creature names
+    //  (should perhaps use Marker instead plain Chit there?)
     private Chit(int scale, String id, boolean inverted, boolean dubious,
         boolean dubiousAsBlank, String[] overlays, Client client)
     {

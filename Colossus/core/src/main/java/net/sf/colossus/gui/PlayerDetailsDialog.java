@@ -318,7 +318,7 @@ public final class PlayerDetailsDialog extends KDialog
             {
                 chitConstraint = LABEL_CONSTRAINT;
             }
-            result.add(new Chit(2 * Scale.get(), type.getName()),
+            result.add(Chit.newCreatureChit(2 * Scale.get(), type),
                 chitConstraint);
             result.add(new JLabel(count.toString()), VALUE_CONSTRAINT);
             i = (i + 1) % cols;

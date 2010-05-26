@@ -126,7 +126,7 @@ public class HexRecruitTreePanel extends Box
             }
 
             add(numToRecruitLabel);
-            Chit chit = new Chit(scale, creature.getName());
+            Chit chit = Chit.newCreatureChit(scale, creature);
             add(chit);
             chitToCreatureMap.put(chit, creature);
 

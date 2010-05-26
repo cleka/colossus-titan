@@ -127,7 +127,7 @@ final class SummonAngel extends KDialog
                 {
                     name = legion.getPlayer().getAngelBasename();
                 }
-                final Chit chit = new Chit(scale, name);
+                final Chit chit = Chit.newCreatureChit(scale, name);
                 box.add(chit);
                 if (type.isSummonable())
                 {

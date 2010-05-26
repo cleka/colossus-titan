@@ -279,7 +279,7 @@ final class Concede extends KDialog
         while (it.hasNext())
         {
             String imageName = it.next();
-            Chit chit = new Chit(scale, imageName);
+            Chit chit = Chit.newCreatureChit(scale, imageName);
             chit.setDead(dead);
             pane.add(chit);
         }
