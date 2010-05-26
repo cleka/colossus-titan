@@ -122,6 +122,8 @@ public final class Options implements IOptions
     public static final String showEngagementResults = "Show engagement results";
     public static final String useOverlay = "Use Graphical Overlay";
     public static final String noBaseColor = "Use black overlay on Chits";
+    public static final String playerColoredAngels = "Use player colored Angels";
+
     public static final String useColoredBorders = "Use colored borders on Battle Chits";
     public static final String doNotInvertDefender = "Do not invert defender's Battle Chits";
     public static final String showHitThreshold = "Show needed roll for hit";

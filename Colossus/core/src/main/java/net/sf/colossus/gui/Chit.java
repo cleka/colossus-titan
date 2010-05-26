@@ -56,6 +56,8 @@ class Chit extends JPanel
     private boolean border = true;
     private Color borderColor = Color.black;
 
+    private final boolean playerColoredAngel;
+
     /** Flag to paint the chit upside-down. */
     protected final boolean inverted;
 
@@ -167,6 +169,10 @@ class Chit extends JPanel
         }
         this.inverted = inverted;
         this.client = client;
+        // TODO don't get that yet. Refactor all the boolean options
+        // to get them via an IClient or something?
+        this.playerColoredAngel = true;
+
         Point point = getLocation();
 
         // Images are 60x60, so if scale is close to that, avoid
@@ -232,7 +238,9 @@ class Chit extends JPanel
                 String[] filenames = new String[5 + (dubious ? 1 : 0)];
                 int power = (VariantSupport.getCurrentVariant()
                     .getCreatureByName("Angel")).getPower();
-                String color = id.split("-")[2] + "Colossus";
+                String color = playerColoredAngel ? (id.split("-")[2] + "Colossus")
+                    : "giantBlue";
+
                 filenames[0] = "Plain" + "-" + color;
                 filenames[1] = "AngelMask";
                 filenames[2] = "Power-" + power + "-" + color;
