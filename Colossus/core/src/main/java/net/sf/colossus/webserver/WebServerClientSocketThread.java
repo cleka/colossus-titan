@@ -485,8 +485,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
                 LOGGER.info("User " + username
                     + " attempts login with client version " + clientVersion);
 
-                // not in use yet ...
-                if (false && clientVersion < 2)
+                if (clientVersion < 2)
                 {
                     reason = "Your Colossus software is too old. Please upgrade to Release 0.10.3!";
                 }
