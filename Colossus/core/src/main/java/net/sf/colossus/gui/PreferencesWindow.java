@@ -302,8 +302,9 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
 
         JPanel confirmationPane = new JPanel(new GridBagLayout());
         tabbedPane.addTab("Confirmations", confirmationPane);
-        addCheckBox(confirmationPane, Options.forgottenRecruitsWarning, true,
-            true);
+        addCheckBox(confirmationPane, Options.confirmNoRecruit, true, true);
+        addCheckBox(confirmationPane, Options.confirmNoMove, true, true);
+        addCheckBox(confirmationPane, Options.confirmNoSplit, true, true);
 
         closeButton = new JButton("Close");
         closeButton.addActionListener(this);
@@ -601,6 +602,16 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
                 }
                 oldValue = newValue;
             }
+        }
+    }
+
+    public void setCheckBoxValue(String name, boolean value)
+    {
+        JCheckBox cb;
+        cb = prefCheckboxes.get(name);
+        if (cb != null)
+        {
+            cb.setSelected(value);
         }
     }
 }

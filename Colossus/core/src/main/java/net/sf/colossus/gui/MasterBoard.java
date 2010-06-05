@@ -438,6 +438,116 @@ public final class MasterBoard extends JPanel
         return (answer == JOptionPane.OK_OPTION);
     }
 
+    private Constants.ConfirmVals confirmNotRecruitingForAllHexes(int count)
+    {
+        String[] options = new String[3];
+        options[0] = "Yes";
+        options[1] = "No";
+        options[2] = "Don't ask again";
+        int answer;
+        if (count == 1)
+        {
+            answer = JOptionPane
+                .showOptionDialog(
+                    this,
+                    "You have a legion that has not mustered, are you sure you are done?",
+                    "Confirm done recruiting?", JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+        }
+        else
+        {
+            answer = JOptionPane
+                .showOptionDialog(
+                    this,
+                    "You have "
+                        + count
+                        + " legions that have not mustered, are you sure you are done?",
+                    "Confirm done recruiting?", JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+        }
+        if (answer == 0)
+        {
+            return Constants.ConfirmVals.Yes;
+        }
+        if (answer == 1)
+        {
+            return Constants.ConfirmVals.No;
+        }
+        return Constants.ConfirmVals.DoNotAsk;
+    }
+
+    private Constants.ConfirmVals confirmNotMovingForAllHexes(int count)
+    {
+        String[] options = new String[3];
+        options[0] = "Yes";
+        options[1] = "No";
+        options[2] = "Don't ask again";
+        int answer;
+        if (count == 1)
+        {
+            answer = JOptionPane
+                .showOptionDialog(
+                    this,
+                    "You have a legion that has not moved, are you sure you are done?",
+                    "Confirm done moving?", JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+        }
+        else
+        {
+            answer = JOptionPane.showOptionDialog(this, "You have " + count
+                + " legions that have not moved, are you sure you are done?",
+                "Confirm done moving?", JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+        }
+        if (answer == 0)
+        {
+            return Constants.ConfirmVals.Yes;
+        }
+        if (answer == 1)
+        {
+            return Constants.ConfirmVals.No;
+        }
+        return Constants.ConfirmVals.DoNotAsk;
+    }
+
+    private Constants.ConfirmVals confirmNotSplittingAllFullLegions(int count)
+    {
+        String[] options = new String[3];
+        options[0] = "Yes";
+        options[1] = "No";
+        options[2] = "Don't ask again";
+        int answer;
+        if (count == 1)
+        {
+            answer = JOptionPane
+                .showOptionDialog(
+                    this,
+                    "You have a legion with 7 creatures that has not split, are you sure you are done?",
+                    "Confirm done splitting?", JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+        }
+        else
+        {
+            answer = JOptionPane
+                .showOptionDialog(
+                    this,
+                    "You have "
+                        + count
+                        + " legions with 7 creatures that have not split, are you sure you are done?",
+                    "Confirm done splitting?", JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+        }
+        if (answer == 0)
+        {
+            return Constants.ConfirmVals.Yes;
+        }
+        if (answer == 1)
+        {
+            return Constants.ConfirmVals.No;
+        }
+        return Constants.ConfirmVals.DoNotAsk;
+    }
+
     private void setupActions()
     {
         clearRecruitChitsAction = new AbstractAction(clearRecruitChits)
@@ -502,6 +612,11 @@ public final class MasterBoard extends JPanel
                 {
                     gui.undoAllMoves();
                     highlightUnmovedLegions();
+                    if (gui.isMyTurn())
+                    {
+                        bottomBar.setLegionsLeftToMove(client
+                            .legionsNotMoved());
+                    }
                 }
                 else if (phase == Phase.FIGHT)
                 {
@@ -511,6 +626,11 @@ public final class MasterBoard extends JPanel
                 {
                     gui.undoAllRecruits();
                     highlightPossibleRecruitLegionHexes();
+                    if (gui.isMyTurn())
+                    {
+                        bottomBar.setLegionsLeftToMuster(client
+                            .getPossibleRecruitHexes().size());
+                    }
                 }
                 else
                 {
@@ -1306,13 +1426,75 @@ public final class MasterBoard extends JPanel
      */
     private void doneWithPhase()
     {
+        Constants.ConfirmVals answer;
+
         if (gui.getGame().isPhase(Phase.SPLIT))
         {
-            client.doneWithSplits();
+            boolean beDone = true;
+            int cnt;
+            if ((cnt = client.findTallLegionHexes(7).size()) > 0
+                && (client.getOwningPlayer().getMarkersAvailable().size() >= 1)
+                && gui.getOptions().getOption(Options.confirmNoSplit, true))
+            {
+                answer = confirmNotSplittingAllFullLegions(cnt);
+                if (answer == Constants.ConfirmVals.DoNotAsk)
+                {
+                    client.setPreferencesCheckBoxValue(Options.confirmNoSplit,
+                        false);
+                    beDone = true;
+                }
+                else if (answer == Constants.ConfirmVals.No)
+                {
+                    beDone = false;
+                }
+                else
+                {
+                    beDone = true;
+                }
+            }
+            if (beDone)
+            {
+                client.doneWithSplits();
+            }
+            else
+            {
+                // dispatcher disabled Done button before calling us here
+                doneWithPhaseAction.setEnabled(true);
+            }
         }
         else if (gui.getGame().isPhase(Phase.MOVE))
         {
-            client.doneWithMoves();
+            boolean beDone = true;
+            int cnt;
+            if ((cnt = client.legionsNotMoved()) > 0
+                && gui.getOptions().getOption(Options.confirmNoMove, true))
+            {
+                answer = confirmNotMovingForAllHexes(cnt);
+                if (answer == Constants.ConfirmVals.DoNotAsk)
+                {
+                    client.setPreferencesCheckBoxValue(Options.confirmNoMove,
+                        false);
+                    beDone = true;
+                }
+                else if (answer == Constants.ConfirmVals.No)
+                {
+                    beDone = false;
+                }
+                else
+                {
+                    beDone = true;
+                }
+            }
+            if (beDone)
+            {
+                client.doneWithMoves();
+                bottomBar.setLegionsLeftToMove(0);
+            }
+            else
+            {
+                // dispatcher disabled Done button before calling us here
+                doneWithPhaseAction.setEnabled(true);
+            }
         }
         else if (gui.getGame().isPhase(Phase.FIGHT))
         {
@@ -1323,35 +1505,28 @@ public final class MasterBoard extends JPanel
             boolean beDone = true;
             int cnt;
             if ((cnt = client.getPossibleRecruitHexes().size()) > 0
-                && gui.getOptions().getOption(
-                    Options.forgottenRecruitsWarning, true))
+                && gui.getOptions().getOption(Options.confirmNoRecruit, true))
             {
-                String[] options = new String[2];
-                options[0] = "Ok";
-                options[1] = "Cancel";
-                int answer = JOptionPane.showOptionDialog(masterFrame,
-                    "There " + (cnt == 1 ? "is" : "are") + " still " + cnt
-                        + " legion" + (cnt == 1 ? "" : "s")
-                        + " that could recruit but "
-                        + (cnt == 1 ? "doesn't" : "don't") + " do.\n"
-                        + "Really end recruitment phase?",
-                    "Leave some recruits unhandled?",
-                    JOptionPane.OK_CANCEL_OPTION,
-                    JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-
-                if (answer == JOptionPane.OK_OPTION)
+                answer = confirmNotRecruitingForAllHexes(cnt);
+                if (answer == Constants.ConfirmVals.DoNotAsk)
                 {
+                    client.setPreferencesCheckBoxValue(
+                        Options.confirmNoRecruit, false);
                     beDone = true;
                 }
-                else
+                else if (answer == Constants.ConfirmVals.No)
                 {
                     beDone = false;
                 }
-
+                else
+                {
+                    beDone = true;
+                }
             }
             if (beDone)
             {
                 client.doneWithRecruits();
+                bottomBar.setLegionsLeftToMuster(0);
             }
             else
             {
@@ -1424,6 +1599,7 @@ public final class MasterBoard extends JPanel
 
             bottomBar.setPhase("Movement");
             highlightUnmovedLegions();
+            bottomBar.setLegionsLeftToMove(client.legionsNotMoved());
             maybeRequestFocusAndToFront();
         }
         else
@@ -1496,8 +1672,14 @@ public final class MasterBoard extends JPanel
             enableDoneAction();
 
             bottomBar.setPhase("Muster Recruits");
+            bottomBar.setLegionsLeftToMuster(client.getPossibleRecruitHexes()
+                .size());
             highlightPossibleRecruitLegionHexes();
             maybeRequestFocusAndToFront();
+            if (client.getPossibleRecruitHexes().size() < 1)
+            {
+                doneWithPhase();
+            }
         }
         else
         {
@@ -2457,6 +2639,16 @@ public final class MasterBoard extends JPanel
         }
     }
 
+    public void setLegionsLeftToMuster(int legionCount)
+    {
+        bottomBar.setLegionsLeftToMuster(legionCount);
+    }
+
+    public void setLegionsLeftToMove(int legionCount)
+    {
+        bottomBar.setLegionsLeftToMove(legionCount);
+    }
+
     class BottomBar extends JPanel
     {
         private final JLabel playerLabel;
@@ -2476,6 +2668,11 @@ public final class MasterBoard extends JPanel
          */
         private final JLabel todoLabel;
 
+        /*
+         * Displays count of actions still to do. e.g. legions to muster
+         */
+        private final JLabel countLabel;
+
         public void setPlayerName(String s)
         {
             playerLabel.setText(s);
@@ -2494,6 +2691,26 @@ public final class MasterBoard extends JPanel
         public void setReasonForDisabledDone(String reason)
         {
             todoLabel.setText("(" + reason + ")");
+        }
+
+        public void setLegionsLeftToMuster(int legionCount)
+        {
+            if (legionCount == 0)
+                countLabel.setText("");
+            else if (legionCount == 1)
+                countLabel.setText(legionCount + " legion to muster");
+            else
+                countLabel.setText(legionCount + " legions to muster");
+        }
+
+        public void setLegionsLeftToMove(int legionCount)
+        {
+            if (legionCount == 0)
+                countLabel.setText("");
+            else if (legionCount == 1)
+                countLabel.setText(legionCount + " legion to move");
+            else
+                countLabel.setText(legionCount + " legions to move");
         }
 
         public BottomBar()
@@ -2541,6 +2758,9 @@ public final class MasterBoard extends JPanel
 
             todoLabel = new JLabel();
             add(todoLabel);
+
+            countLabel = new JLabel();
+            add(countLabel);
         }
 
         public void toggleSuspend()

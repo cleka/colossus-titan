@@ -104,7 +104,9 @@ public final class Options implements IOptions
     public static final String noTitanTeleport = "No Titan Teleport";
 
     public static final String unlimitedMulligans = "Unlimited Mulligans";
-    public static final String forgottenRecruitsWarning = "Warn about not-taken recruits";
+    public static final String confirmNoRecruit = "Confirm when not all possible recruits taken";
+    public static final String confirmNoMove = "Confirm when not all possible moves made";
+    public static final String confirmNoSplit = "Confirm when not all full legions split";
 
     // Display options (client only)
     public static final String stealFocus = "Steal focus";

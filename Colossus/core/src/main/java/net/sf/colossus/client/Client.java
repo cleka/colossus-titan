@@ -2819,6 +2819,19 @@ public final class Client implements IClient, IOracle, IVariant,
             .getMovementRoll());
     }
 
+    public int legionsNotMoved()
+    {
+        int count = 0;
+
+        for (Legion legion : game.getActivePlayer().getLegions())
+        {
+            if (!legion.hasMoved())
+            {
+                count++;
+            }
+        }
+        return count;
+    }
     public Set<MasterHex> findUnmovedLegionHexes()
     {
         Set<MasterHex> result = new HashSet<MasterHex>();
@@ -3338,5 +3351,10 @@ public final class Client implements IClient, IOracle, IVariant,
         {
             super(reason);
         }
+    }
+
+    public void setPreferencesCheckBoxValue(String name, boolean value)
+    {
+        gui.setPreferencesCheckBoxValue(name, value);
     }
 }

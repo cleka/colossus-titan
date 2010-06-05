@@ -775,4 +775,9 @@ public class NullClientGUI implements IClientGUI
 
     }
 
+    public void setPreferencesCheckBoxValue(String name, boolean value)
+    {
+        // TODO Auto-generated method stub
+
+    }
 }

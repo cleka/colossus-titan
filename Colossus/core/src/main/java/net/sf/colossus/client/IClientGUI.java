@@ -317,4 +317,6 @@ public interface IClientGUI
     public abstract void setLookAndFeel(String text);
 
     public abstract void removeBattleChit(BattleUnit battleUnit);
+
+    public void setPreferencesCheckBoxValue(String name, boolean value);
 }

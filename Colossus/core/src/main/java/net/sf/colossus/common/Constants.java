@@ -61,6 +61,11 @@ public final class Constants
     /** Fake striker id for drift and other hex damage. */
     public static final int HEX_DAMAGE = -1;
 
+    public static enum ConfirmVals
+    {
+        Yes, No, DoNotAsk
+    }
+
     public static enum HexsideGates
     {
         NONE, BLOCK, ARCH, ARROW, ARROWS

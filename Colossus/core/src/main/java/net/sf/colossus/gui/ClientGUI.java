@@ -1077,6 +1077,11 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         if (client.isMyLegion(legion))
         {
             pushUndoStack(legion.getMarkerId());
+            if (!getGameClientSide().isBattleOngoing())
+            {
+                board.setLegionsLeftToMuster(client.getPossibleRecruitHexes()
+                    .size());
+            }
         }
 
         board.addRecruitedChit(legion);
@@ -1152,7 +1157,14 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             : RevealEvent.eventRecruit;
         board.cleanRecruitedChit((LegionClientSide)legion);
         board.highlightPossibleRecruitLegionHexes();
-
+        if (client.isMyLegion(legion))
+        {
+            if (!wasReinforcement)
+            {
+                board.setLegionsLeftToMuster(client.getPossibleRecruitHexes()
+                    .size());
+            }
+        }
         eventViewer.undoEvent(eventType, legion.getMarkerId(), null,
             turnNumber);
     }
@@ -1197,6 +1209,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             {
                 board.enableDoneAction();
             }
+            board.setLegionsLeftToMove(client.legionsNotMoved());
         }
     }
 
@@ -1223,6 +1236,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             {
                 board.enableDoneAction();
             }
+            board.setLegionsLeftToMove(client.legionsNotMoved());
         }
 
         if (didTeleport)
@@ -1386,6 +1400,11 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     {
         eventViewer.undoEvent(RevealEvent.eventSplit, survivor.getMarkerId(),
             splitoff.getMarkerId(), turn);
+    }
+
+    public void setPreferencesCheckBoxValue(String name, boolean value)
+    {
+        preferencesWindow.setCheckBoxValue(name, value);
     }
 
     private void initPreferencesWindow()
@@ -2384,6 +2403,11 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             undoStack.remove(legion.getMarkerId());
         }
         getClient().undoRecruit(legion);
+        if (client.isMyLegion(legion))
+        {
+            board.setLegionsLeftToMuster(client.getPossibleRecruitHexes()
+                .size());
+        }
     }
 
     void undoAllSplits()
@@ -2418,6 +2442,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         {
             String markerId = (String)popUndoStack();
             getClient().undoMove(client.getLegion(markerId));
+            board.setLegionsLeftToMove(client.legionsNotMoved());
         }
     }
 
