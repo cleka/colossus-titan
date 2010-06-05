@@ -469,7 +469,7 @@ public final class MasterBoard extends JPanel
         {
             return Constants.ConfirmVals.Yes;
         }
-        if (answer == 1)
+        if (answer == 1 || answer == -1)
         {
             return Constants.ConfirmVals.No;
         }
@@ -503,7 +503,7 @@ public final class MasterBoard extends JPanel
         {
             return Constants.ConfirmVals.Yes;
         }
-        if (answer == 1)
+        if (answer == 1 || answer == -1)
         {
             return Constants.ConfirmVals.No;
         }
@@ -541,7 +541,7 @@ public final class MasterBoard extends JPanel
         {
             return Constants.ConfirmVals.Yes;
         }
-        if (answer == 1)
+        if (answer == 1 || answer == -1)
         {
             return Constants.ConfirmVals.No;
         }
