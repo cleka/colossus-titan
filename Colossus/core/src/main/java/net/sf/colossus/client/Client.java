@@ -1996,23 +1996,6 @@ public final class Client implements IClient, IOracle, IVariant,
             else
             {
                 gui.defaultCursor();
-                /* TODO the whole Done with Engagements is nowadays probably,
-                 * obsolete, server does advancePhase automatically
-                 */
-                if (game.findEngagements().size() == 0)
-                {
-                    if (options.getOption(Options.autoDone))
-                    {
-                        LOGGER.info("No engagements left, "
-                            + "auto done with engagements");
-                        doneWithEngagements();
-                    }
-                    else
-                    {
-                        // Enables the Done button
-                        gui.actOnNoMoreEngagements();
-                    }
-                }
             }
         }
     }
@@ -2030,8 +2013,7 @@ public final class Client implements IClient, IOracle, IVariant,
     {
         if (game.isPhase(Phase.MUSTER) && isMyTurn() && isAlive())
         {
-            if (options.getOption(Options.autoDone)
-                && noRecruitActionPossible())
+            if (noRecruitActionPossible())
             {
                 doneWithRecruits();
             }
@@ -2050,20 +2032,6 @@ public final class Client implements IClient, IOracle, IVariant,
                 }
             }
         }
-    }
-
-    /**
-     * Check whether any legion has possibility to recruit at all,
-     * no matter whether it could or has already.
-     * If there is none, autoDone can automatically be done with recruit
-     * phase; but if there is something (e.g. autoRecruit has recruited
-     * something, allow human to override/force him to really confirm "Done".
-     *
-     * @return Whether there is any legion that could recruit or undoRecruit
-     */
-    public boolean noRecruitActionPossible()
-    {
-        return getPossibleRecruitActionHexes().isEmpty();
     }
 
     public void setupBattleSummon(Player battleActivePlayer,
@@ -2767,7 +2735,9 @@ public final class Client implements IClient, IOracle, IVariant,
         return strings;
     }
 
-    /** Return a set of hexLabels. */
+    /**
+     * Return a set of hexes with legions that can (still) muster anything.
+     */
     public Set<MasterHex> getPossibleRecruitHexes()
     {
         Set<MasterHex> result = new HashSet<MasterHex>();
@@ -2784,7 +2754,7 @@ public final class Client implements IClient, IOracle, IVariant,
 
     /** Return a set of hexLabels with legions that could do a recruit
      *  or undo recruit. Used for "if there is nothing to do in this recruit
-     *  phase, can to autoDone that option is set".
+     *  phase, muster phase can immediately be "doneWithRecruit".
      */
     private Set<MasterHex> getPossibleRecruitActionHexes()
     {
@@ -2798,6 +2768,20 @@ public final class Client implements IClient, IOracle, IVariant,
             }
         }
         return result;
+    }
+
+    /**
+     * Check whether any legion has possibility to recruit at all,
+     * no matter whether it could or has already.
+     * If there is none, autoDone can automatically be done with recruit
+     * phase; but if there is something (e.g. autoRecruit has recruited
+     * something, allow human to override/force him to really confirm "Done".
+     *
+     * @return Whether there is any legion that could recruit or undoRecruit
+     */
+    public boolean noRecruitActionPossible()
+    {
+        return getPossibleRecruitActionHexes().isEmpty();
     }
 
     public MovementClientSide getMovement()

@@ -204,7 +204,6 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
         addCheckBox(apPane, Options.autoRangeSingle);
         addCheckBox(apPane, Options.autoSummonAngels);
         addCheckBox(apPane, Options.autoAcquireAngels);
-        addCheckBox(apPane, Options.autoDone);
         addCheckBox(apPane, Options.autoRecruit);
         addCheckBox(apPane, Options.autoPickRecruiter);
         addCheckBox(apPane, Options.autoReinforce);

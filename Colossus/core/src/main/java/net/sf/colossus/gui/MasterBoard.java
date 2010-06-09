@@ -1676,10 +1676,6 @@ public final class MasterBoard extends JPanel
                 .size());
             highlightPossibleRecruitLegionHexes();
             maybeRequestFocusAndToFront();
-            if (client.getPossibleRecruitHexes().size() < 1)
-            {
-                doneWithPhase();
-            }
         }
         else
         {
