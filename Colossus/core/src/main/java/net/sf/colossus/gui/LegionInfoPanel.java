@@ -134,8 +134,7 @@ public final class LegionInfoPanel extends JPanel
 
         if (showMarker)
         {
-            Chit marker = new Chit(scale, legion.getMarkerId(), false, true,
-                false, null);
+            Marker marker = new Marker(scale, legion.getLongMarkerId(), false);
             if (effectiveChitSize == 0)
             {
                 // they should be all the same size
