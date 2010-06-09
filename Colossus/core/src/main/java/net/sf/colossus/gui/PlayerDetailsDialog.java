@@ -167,7 +167,7 @@ public final class PlayerDetailsDialog extends KDialog
 
         for (LegionClientSide legion : player.getLegions())
         {
-            result.add(new Marker(2 * Scale.get(), legion.getLongMarkerId()),
+            result.add(new Marker(legion, 2 * Scale.get(), legion.getLongMarkerId()),
                 FIRST_LABEL_CONSTRAINT);
             result.add(new JLabel(legion.getCurrentHex().getLabel()),
                 LABEL_CONSTRAINT);

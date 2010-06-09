@@ -65,7 +65,7 @@ final class PickRecruiter extends KDialog
         String text = "Current content of legion " + legionId + ":";
         legionPane.setBorder(BorderFactory.createTitledBorder(text));
 
-        legionMarker = new Marker(scale, legion.getLongMarkerId());
+        legionMarker = new Marker(legion, scale, legion.getLongMarkerId());
         legionPane.add(legionMarker);
 
         List<String> imageNames = gui.getGameClientSide().getLegionImageNames(

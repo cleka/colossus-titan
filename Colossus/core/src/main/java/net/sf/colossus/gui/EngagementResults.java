@@ -305,7 +305,7 @@ final class EngagementResults extends KDialog
         }
         int scale = 3 * Scale.get(); // or 3 or 4?
         // add marker
-        Marker marker = new Marker(scale, legion.getLongMarkerId());
+        Marker marker = new Marker(legion, scale, legion.getLongMarkerId());
         panel.add(marker);
         panel.add(Box.createHorizontalStrut(5));
         // towi: you want it upside down or not? then remove "false"

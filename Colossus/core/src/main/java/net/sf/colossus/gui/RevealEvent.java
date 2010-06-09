@@ -507,8 +507,9 @@ public class RevealEvent
         }
         try
         {
-            // TODO use Marker class?
-            Marker marker = new Marker(scale, markerId);
+            // Legion might not exist any more (destroyed in engagement)
+            // Legion legion = client.getLegion(markerId);
+            Marker marker = new Marker(null, scale, markerId);
             marker.setAlignmentX(Component.LEFT_ALIGNMENT);
             p.add(marker);
         }

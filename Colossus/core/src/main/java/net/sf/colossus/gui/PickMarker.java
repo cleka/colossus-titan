@@ -66,8 +66,8 @@ final class PickMarker extends KDialog
         while (it.hasNext())
         {
             String markerId = it.next();
-            final Marker marker = new Marker(4 * Scale.get(), markerId + "-" +
-              owner.getColor().getName());
+            final Marker marker = new Marker(null, 4 * Scale.get(), markerId
+                + "-" + owner.getColor().getName());
             markers.add(marker);
             contentPane.add(marker);
             marker.addMouseListener(new MouseAdapter()

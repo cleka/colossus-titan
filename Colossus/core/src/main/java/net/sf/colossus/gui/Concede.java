@@ -260,8 +260,8 @@ final class Concede extends KDialog
 
         int scale = 4 * Scale.get();
 
-        Marker marker = new Marker(scale, legion.getLongMarkerId(),
-          gui.getClient());
+        Marker marker = new Marker(legion, scale, legion.getLongMarkerId(), gui
+                .getClient());
         pane.add(marker);
         pane.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
 

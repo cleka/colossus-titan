@@ -47,10 +47,10 @@ public final class BattleMap extends HexMap
         this.client = client;
         this.gui = gui;
 
-        attackerMarker = new Marker(3 * Scale.get(),
-          attacker.getLongMarkerId(), false);
-        defenderMarker = new Marker(3 * Scale.get(),
-          defender.getLongMarkerId(), true);
+        attackerMarker = new Marker(attacker,
+          3 * Scale.get(), attacker.getLongMarkerId(), false);
+        defenderMarker = new Marker(defender,
+          3 * Scale.get(), defender.getLongMarkerId(), true);
         attackerMarker.setOpaque(false);
         defenderMarker.setOpaque(false);
         attackerMarker.setToolTipText("Attacking Legion");

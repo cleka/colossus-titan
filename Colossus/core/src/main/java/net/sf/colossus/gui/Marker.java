@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.Client;
+import net.sf.colossus.game.Legion;
 
 
 /**
@@ -29,34 +30,54 @@ public final class Marker extends Chit
     private static final Logger LOGGER = Logger.getLogger(Marker.class
         .getName());
 
+    private final Legion legion;
+    private final boolean showHeight;
     private Font font;
     private int fontHeight;
     private int fontWidth;
     String hexLabel;
     private boolean highlight;
 
-    /** Construct a marker without a client.
-     Use this constructor as a bit of documentation when
-     explicitly not wanting a height drawn on the Marker. */
-    Marker(int scale, String id)
+    /* TODO replace the "give client == null argument" stuff with proper
+     * boolean argument. Did not do it now, too many changes already.
+     */
+
+    /*
+     * TODO get rid of markerId argument, derive it from legion argument
+     * here by ourselves.
+     * Not possible yet, at least in SplitLegion, PickMarker and RevealEvent
+     * for legion destroyed in battle there is no child legion yet/any more.
+     */
+
+    /**
+     * Construct a marker without a client.
+     * Use this constructor as a bit of documentation when
+     * explicitly not wanting a height drawn on the Marker.
+     */
+    Marker(Legion legion, int scale, String id)
     {
-        this(scale, id, null, false);
+        this(legion, scale, id, null, false);
     }
 
-    /** Construct a marker without a client and specified inverted display. */
-    Marker(int scale, String id, boolean inverted)
+    /**
+     * Construct a marker without a client and specified inverted display.
+     * @param legion TODO
+     */
+    Marker(Legion legion, int scale, String id, boolean inverted)
     {
-        this(scale, id, null, inverted);
+        this(legion, scale, id, null, inverted);
     }
 
-    /** Construct a marker with a client. By providing a client, a Marker will be
+    /**
+    * Construct a marker with a client. By providing a client, a Marker will be
     * adorned with the height of the stack, when that height is non-zero. A
     * null client will prevent the height from being displayed. Sometimes (on
     * the master board, for example) heights should be shown, and sometimes (in
-    * the engagement window, for example) they should be omitted. */
-    public Marker(int scale, String id, Client client)
+    * the engagement window, for example) they should be omitted.
+    */
+    Marker(Legion legion, int scale, String id, Client client)
     {
-        this(scale, id, client, false);
+        this(legion, scale, id, client, false);
     }
 
     /**
@@ -66,11 +87,13 @@ public final class Marker extends Chit
      * Client != null will add the height of the stack
      * inverted == true will invert the marker
      */
-    private Marker(int scale, String id, Client client, boolean inverted)
+    private Marker(Legion legion, int scale, String id, Client client, boolean inverted)
     {
         super(scale, id, inverted, client);
-        setBackground(Color.BLACK);
+        this.legion = legion;
+        this.showHeight = (client != null);
 
+        setBackground(Color.BLACK);
         if (id.contains("Black") || (id.length() == 4 && id.startsWith("Bk")))
         {
             setBorderColor(Color.white);
@@ -111,12 +134,12 @@ public final class Marker extends Chit
         }
         super.paintComponent(g2);
 
-        if (client == null)
+        if (!showHeight)
         {
             return; //no height labels wanted
         }
 
-        int legionHeight = client.getLegionHeight(getId());
+        int legionHeight = legion.getHeight();
         if (legionHeight == 0)
         {
             return; //don't put a zero on top in the picker
