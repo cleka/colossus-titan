@@ -145,20 +145,27 @@ class Chit extends JPanel
     // or some dice...).
     // Good thing markerIds have no overlap with creature names
     //  (should perhaps use Marker instead plain Chit there?)
-    private Chit(int scale, String id, boolean inverted, boolean dubious,
-        boolean dubiousAsBlank, String[] overlays, Client client)
+    /**
+     * @param idPerhapsWithColor CreatureType id, markerId, or filename of
+     * some picture denoting some symbol (for HazardEffects).
+     * For Markers, Titans and Angels could be of form <id>-<color> and then
+     * they will be painted in that color (e.g. captured markers)
+     */
+    private Chit(int scale, String idPerhapsWithColor, boolean inverted,
+        boolean dubious, boolean dubiousAsBlank, String[] overlays,
+        Client client)
     {
         // LayoutManager null - we want to place things ourselves
         super((LayoutManager)null);
 
-        assert id != null : "Each chit must have an ID set";
-        if (isMarkerId(id))
+        assert idPerhapsWithColor != null : "Each chit must have an ID set";
+        if (isMarkerId(idPerhapsWithColor))
         {
-            this.id = id.substring(0, 4);
+            this.id = idPerhapsWithColor.substring(0, 4);
         }
         else
         {
-            this.id = id;
+            this.id = idPerhapsWithColor;
         }
         this.inverted = inverted;
         this.client = client;
@@ -186,10 +193,10 @@ class Chit extends JPanel
             names[0] = "QuestionMarkMask";
             bufferedImage = getImage(names, scale);
         }
-        else if (VariantSupport.getCurrentVariant().isCreature(id))
+        else if (VariantSupport.getCurrentVariant().isCreature(idPerhapsWithColor))
         {
             CreatureType cre = VariantSupport.getCurrentVariant()
-                .getCreatureByName(id);
+                .getCreatureByName(idPerhapsWithColor);
             String[] names = cre.getImageNames();
             if (dubious)
             {
@@ -206,11 +213,11 @@ class Chit extends JPanel
         }
         else
         {
-            if (id.startsWith("Titan-"))
+            if (idPerhapsWithColor.startsWith("Titan-"))
             {
                 String[] filenames = new String[4 + (dubious ? 1 : 0)];
                 int power = getTitanPower();
-                String color = id.split("-")[2] + "Colossus";
+                String color = idPerhapsWithColor.split("-")[2] + "Colossus";
                 filenames[0] = "Plain" + "-" + color;
                 filenames[1] = "TitanMask";
                 filenames[2] = "Power-" + power + "-" + color;
@@ -226,13 +233,13 @@ class Chit extends JPanel
 
                 bufferedImage = getImage(filenames, scale);
             }
-            else if (id.startsWith("Angel-"))
+            else if (idPerhapsWithColor.startsWith("Angel-"))
             {
                 String[] filenames = new String[5 + (dubious ? 1 : 0)];
                 int power = (VariantSupport.getCurrentVariant()
                     .getCreatureByName("Angel")).getPower();
-                String color = playerColoredAngel ? (id.split("-")[2] + "Colossus")
-                    : "giantBlue";
+                String color = playerColoredAngel ? (idPerhapsWithColor
+                    .split("-")[2] + "Colossus") : "giantBlue";
 
                 filenames[0] = "Plain" + "-" + color;
                 filenames[1] = "AngelMask";
@@ -250,37 +257,37 @@ class Chit extends JPanel
 
                 bufferedImage = getImage(filenames, scale);
             }
-            else if (isMarkerId(id))
+            else if (isMarkerId(idPerhapsWithColor))
             {
                 // Legion marker
                 // May be of form "Bk03" or form "Bk03-Black"
                 String[] filenames = new String[2];
                 String colorName;
-                if (id.length() >= 5)
+                if (idPerhapsWithColor.length() >= 5)
                 {
-                    colorName = id.split("-")[1];
+                    colorName = idPerhapsWithColor.split("-")[1];
                 }
                 else
                 {
-                    String shortColor = id.substring(0, 2);
+                    String shortColor = idPerhapsWithColor.substring(0, 2);
                     PlayerColor playerColor =
                         PlayerColor.getByShortName(shortColor);
                     colorName = playerColor.getName();
                 }
                 filenames[0] = "Plain" + "-" + colorName + "Colossus";
-                filenames[1] = id.substring(0, 4);
+                filenames[1] = idPerhapsWithColor.substring(0, 4);
                 bufferedImage = getImage(filenames, scale);
             }
             else
             {
                 if (overlays == null)
                 {
-                    bufferedImage = getImage(id, scale);
+                    bufferedImage = getImage(idPerhapsWithColor, scale);
                 }
                 else
                 {
                     String[] filenames = new String[overlays.length + 1];
-                    filenames[0] = id;
+                    filenames[0] = idPerhapsWithColor;
                     for (int i = 0; i < overlays.length; i++)
                     {
                         filenames[i + 1] = overlays[i];
