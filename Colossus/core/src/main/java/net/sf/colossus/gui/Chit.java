@@ -90,13 +90,6 @@ class Chit extends JPanel
         return new Chit(scale, type);
     }
 
-    // TODO: needed? Could caller use Marker class instead?
-    public static Chit newMarkerChit(int scale, String markerId)
-    {
-        // pull in / clean up the substr(0,4) stuff from below
-        return new Chit(scale, markerId);
-    }
-
     public static Chit newDiceChit(int scale, String markerId)
     {
         return new Chit(scale, markerId);

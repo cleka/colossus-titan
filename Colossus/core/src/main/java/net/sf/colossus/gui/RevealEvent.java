@@ -508,7 +508,7 @@ public class RevealEvent
         try
         {
             // TODO use Marker class?
-            Chit marker = Chit.newMarkerChit(scale, markerId);
+            Marker marker = new Marker(scale, markerId);
             marker.setAlignmentX(Component.LEFT_ALIGNMENT);
             p.add(marker);
         }
