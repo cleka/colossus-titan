@@ -1089,8 +1089,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
         if (eventViewer != null)
         {
-            eventViewer.recruitEvent(legion.getMarkerId(), (legion)
-                .getHeight(), recruit, recruiters, reason);
+            eventViewer.recruitEvent(legion, recruit, recruiters, reason);
         }
     }
 
@@ -1165,8 +1164,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
                     .size());
             }
         }
-        eventViewer.undoEvent(eventType, legion.getMarkerId(), null,
-            turnNumber);
+        eventViewer.undoEvent(eventType, legion, null, turnNumber);
     }
 
     public boolean chooseWhetherToTeleport()
@@ -1189,8 +1187,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         if (teleport)
         {
             eventViewer.newCreatureRevealEvent(RevealEvent.eventTeleport,
-                legion.getMarkerId(), legion.getHeight(), teleportingLord,
-                null, 0);
+                legion, teleportingLord, null);
         }
 
         board.clearPossibleRecruitChits();
@@ -1241,8 +1238,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
         if (didTeleport)
         {
-            eventViewer.undoEvent(RevealEvent.eventTeleport, legion
-                .getMarkerId(), null, client.getTurnNumber());
+            eventViewer.undoEvent(RevealEvent.eventTeleport, legion, null,
+                client.getTurnNumber());
         }
     }
 
@@ -1392,14 +1389,13 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void eventViewerNewSplitEvent(int turn, Legion parent, Legion child)
     {
-        eventViewer.newSplitEvent(turn, parent.getMarkerId(), parent
-            .getHeight(), null, child.getMarkerId(), child.getHeight());
+        eventViewer.newSplitEvent(turn, parent, null, child);
     }
 
     public void eventViewerUndoEvent(Legion splitoff, Legion survivor, int turn)
     {
-        eventViewer.undoEvent(RevealEvent.eventSplit, survivor.getMarkerId(),
-            splitoff.getMarkerId(), turn);
+        eventViewer
+            .undoEvent(RevealEvent.eventSplit, survivor, splitoff, turn);
     }
 
     public void setPreferencesCheckBoxValue(String name, boolean value)
@@ -1492,9 +1488,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void didSummon(Legion summoner, Legion donor, CreatureType summon)
     {
-        eventViewer.newCreatureRevealEvent(RevealEvent.eventSummon, donor
-            .getMarkerId(), donor.getHeight(), summon, summoner.getMarkerId(),
-            summoner.getHeight());
+        eventViewer.newCreatureRevealEvent(RevealEvent.eventSummon, donor, summon, summoner);
     }
 
     public void repaintBattleBoard()
@@ -2053,7 +2047,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         {
             board.myTurnStartsActions();
         }
-        eventViewer.turnOrPlayerChange(client, turnNr, player);
+        eventViewer.turnOrPlayerChange(turnNr, player);
     }
 
     public void actOnGameStarting()

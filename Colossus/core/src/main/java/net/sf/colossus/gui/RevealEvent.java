@@ -15,8 +15,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
-import net.sf.colossus.client.Client;
 import net.sf.colossus.common.Constants;
+import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.variant.CreatureType;
 
@@ -32,7 +32,6 @@ public class RevealEvent
     private static final Logger LOGGER = Logger.getLogger(RevealEvent.class
         .getName());
 
-    private final Client client;
     private final int turnNumber;
     private final Player player;
     private int eventType;
@@ -44,6 +43,9 @@ public class RevealEvent
     // child legion or summoner (for split or summon events)
     private String markerId2;
     private int height2;
+
+    private final Legion legion1;
+    private final Legion legion2;
 
     // for mulligan:
     private int oldRoll;
@@ -99,48 +101,61 @@ public class RevealEvent
 
     /**
      * TODO replace marker/height combos with Legion objects
+     * --Done.
      * NOTE Can replace only for input, need to store marker and height
      *      from here on, because Legion content will change but we
      *      want to record the original state!
+     * @param legion1 TODO
+     * @param legion2 TODO
      */
-    public RevealEvent(Client client, int turnNumber, Player player,
-        int eventType, String markerId, int height,
-        List<RevealedCreature> knownCreatures, String markerId2, int height2)
+    public RevealEvent(int turnNumber, Player player, int eventType,
+        Legion legion1, List<RevealedCreature> knownCreatures, Legion legion2)
     {
-        if (markerId == null && eventType != eventPlayerChange
+        this.turnNumber = turnNumber;
+        // player in whose turn this event happens.
+        this.player = player;
+        this.eventType = eventType;
+        // affected legion; split: parent; summon: donor
+        this.legion1 = legion1;
+        this.markerId = legion1 != null ? legion1.getLongMarkerId() : null;
+        this.height = legion1 != null ? legion1.getHeight() : 0;
+
+        if (this.markerId == null && eventType != eventPlayerChange
             && eventType != eventTurnChange)
         {
             LOGGER.log(Level.SEVERE, "null marker for event "
                 + getEventTypeText(eventType));
             throw new IllegalArgumentException("Missing markerId");
         }
-        this.client = client;
-        this.turnNumber = turnNumber;
-        // player in whose turn this event happens.
-        this.player = player;
-        this.eventType = eventType;
-        // affected legion; split: parent; summon: donor
-        this.markerId = markerId;
-        this.height = height;
+
         this.knownCreatures = knownCreatures;
         // next 2: child legion or summoner
-        this.markerId2 = markerId2;
-        this.height2 = height2;
+        this.legion2 = legion2;
+        this.markerId2 = legion2 != null ? legion2.getLongMarkerId() : null;
+        this.height2 = legion2 != null ? legion2.getHeight() : 0;
 
         makeCreaturesTitanChangeSafe(knownCreatures);
     }
 
-    // mulligan and movement roll
-    public RevealEvent(Client client, int turnNumber, Player player,
-        int eventType, int oldRoll, int newRoll)
+    // Turn or Player change
+    public RevealEvent(int turnNumber, Player player, int eventType)
     {
-        this.client = client;
+        this(turnNumber, player, eventType, null, null, null);
+    }
+
+    // Mulligan or Movement roll
+    public RevealEvent(int turnNumber, Player player, int eventType,
+        int oldRoll, int newRoll)
+    {
         this.turnNumber = turnNumber;
         this.player = player;
         this.eventType = eventType;
 
         this.oldRoll = oldRoll;
         this.newRoll = newRoll;
+
+        this.legion1 = null;
+        this.legion2 = null;
 
         this.mulliganTitanBaseName = player.getTitanBasename();
     }
@@ -165,9 +180,8 @@ public class RevealEvent
             if (rc != null && rc.getPlainName() != null
                 && rc.getPlainName().equals(Constants.titan))
             {
-                Player player = (realPlayer != null ? realPlayer : client
-                    .getGameClientSide().getPlayerByMarkerId(markerId));
-
+                Player player = (realPlayer != null ? realPlayer : legion1
+                    .getPlayer());
                 if (player == null)
                 {
                     LOGGER.log(Level.SEVERE, "For making titan base name: "
@@ -303,10 +317,11 @@ public class RevealEvent
             {
                 LOGGER.log(Level.WARNING, "got order to kill creature " + name
                     + " in legionEvent " + this.toString()
-                    + " but no such alive creature found!!");
+                    + " but no such alive creature found!! Contains: "
+                    + this.knownCreatures);
             }
         }
-        // client tells us new accurate count how many are still alive.
+        // client told us new accurate count how many are still alive.
         height = newHeight;
     }
 
@@ -383,12 +398,32 @@ public class RevealEvent
         return eventTypeToString[type];
     }
 
-    public String getMarkerId()
+    public Legion getLegion1()
+    {
+        return legion1;
+    }
+
+    public Legion getLegion2()
+    {
+        return legion2;
+    }
+
+    /**
+     * Note that RevealEvents use (currently?) everywhere the long marker id
+     * in order to be able to handle re-colored captured markers properly.
+     * @return The markerId of first involved legion.
+     */
+    public String getLongMarkerId()
     {
         return markerId;
     }
 
-    public String getMarkerId2()
+    /**
+     * Note that RevealEvents use (currently?) everywhere the long marker id
+     * in order to be able to handle re-colored captured markers properly.
+     * @return The markerId of 2nd involved legion.
+     */
+    public String getLongMarkerId2()
     {
         return markerId2;
     }
