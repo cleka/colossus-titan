@@ -12,7 +12,8 @@ final class MovementDie extends Chit
 
     MovementDie(int scale, String id)
     {
-        super(scale, id);
+        // null: no overlays
+        super(scale, id, null);
     }
 
     static String getDieImageName(int roll)

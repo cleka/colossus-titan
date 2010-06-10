@@ -21,6 +21,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
 import net.sf.colossus.client.Client;
+import net.sf.colossus.common.IOptions;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.server.VariantSupport;
@@ -34,6 +35,10 @@ import net.sf.colossus.variant.CreatureType;
  *
  * TODO offer constructors using the Legion instead of strings
  * TODO consider splitting into LegionChit and CreatureChit
+ * TODO Important: All creature (and marker) related Chits should get an
+ * option argument in order to be able to ask for options like
+ * "marker in players original color or now-owning-player's-color
+ * and "angel in traditionl blue or in actual players color".
  *
  * @author David Ripton
  * @author Romain Dolbeau
@@ -48,6 +53,7 @@ class Chit extends JPanel
     private Image bufferedInvertedImage;
     Rectangle rect;
     final Client client; // may be null; set for some subclasses
+    final IOptions options;
 
     /** Flag to mark chit as dead and paint it with an "X" through it. */
     private boolean dead;
@@ -107,7 +113,10 @@ class Chit extends JPanel
     }
 
 
-    /**   P l a i n   C o n s t r u c t o r s    **/
+    /**
+     *           P l a i n   C o n s t r u c t o r s
+     *
+     **/
     // to be used mostly by the factory methods
     Chit(int scale, String id)
     {
@@ -119,9 +128,10 @@ class Chit extends JPanel
         this(scale, creatureType.getName());
     }
 
+    // No client, no options: use only for TerrainEffect symbol or dice!
     Chit(int scale, String id, String[] overlays)
     {
-        this(scale, id, false, false, false, overlays, null);
+        this(scale, id, false, false, false, overlays, null, null);
     }
 
     Chit(int scale, String id, boolean inverted, Client client)
@@ -137,7 +147,8 @@ class Chit extends JPanel
     Chit(int scale, String id, boolean inverted, boolean dubious,
         boolean dubiousAsBlank, Client client)
     {
-        this(scale, id, inverted, dubious, dubiousAsBlank, null, client);
+        this(scale, id, inverted, dubious, dubiousAsBlank, null, client,
+            client != null ? client.getOptions() : null);
     }
 
     // TODO this is a bit confusing: the id parameter can be either the name of
@@ -150,10 +161,11 @@ class Chit extends JPanel
      * some picture denoting some symbol (for HazardEffects).
      * For Markers, Titans and Angels could be of form <id>-<color> and then
      * they will be painted in that color (e.g. captured markers)
+     * @param options TODO
      */
     private Chit(int scale, String idPerhapsWithColor, boolean inverted,
         boolean dubious, boolean dubiousAsBlank, String[] overlays,
-        Client client)
+        Client client, IOptions options)
     {
         // LayoutManager null - we want to place things ourselves
         super((LayoutManager)null);
@@ -168,7 +180,10 @@ class Chit extends JPanel
             this.id = idPerhapsWithColor;
         }
         this.inverted = inverted;
+        this.options = options;
+        // should not be needed any more
         this.client = client;
+
         // TODO don't get that yet. Refactor all the boolean options
         // to get them via an IClient or something?
         this.playerColoredAngel = true;
@@ -378,9 +393,11 @@ class Chit extends JPanel
         super.paintComponent(g2);
         Image image = bufferedImage;
 
+        // TODO options == null is just a quick hack to prevent NPEs in cases
+        // there would not be an options object.
         if (inverted
-            && (client == null || !client.getOptions().getOption(
-                Options.doNotInvertDefender)))
+            && (options == null || !options
+                .getOption(Options.doNotInvertDefender)))
         {
             if (bufferedInvertedImage == null)
             {
@@ -458,14 +475,12 @@ class Chit extends JPanel
         return getPreferredSize();
     }
 
-    // TODO needed public because Client still uses it,
-    // client should at some point not deal with "chits" any more...
-    public boolean isDead()
+    boolean isDead()
     {
         return dead;
     }
 
-    public void setDead(boolean dead)
+    void setDead(boolean dead)
     {
         this.dead = dead;
         repaint();

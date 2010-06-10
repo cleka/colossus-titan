@@ -38,10 +38,6 @@ public final class Marker extends Chit
     String hexLabel;
     private boolean highlight;
 
-    /* TODO replace the "give client == null argument" stuff with proper
-     * boolean argument. Did not do it now, too many changes already.
-     */
-
     /*
      * TODO get rid of markerId argument, derive it from legion argument
      * here by ourselves.
@@ -53,45 +49,66 @@ public final class Marker extends Chit
      * Construct a marker without a client.
      * Use this constructor as a bit of documentation when
      * explicitly not wanting a height drawn on the Marker.
+     *
+     * Use case: The dialogs where legion height is not so important or legion
+     * does not even exist (PickMarker, SplitLegion, in RevealEvent for the
+     * destroyed legion)
      */
     Marker(Legion legion, int scale, String id)
     {
-        this(legion, scale, id, null, false);
+        this(legion, scale, id, null, false, false);
     }
 
     /**
-     * Construct a marker without a client and specified inverted display.
-     * @param legion TODO
+     * Construct a marker with a client (to be able to ask for
+     * doNotInvertOption) but showHeight set to false and
+     * specified inverted display (for defender)
+     *
+     * Use case: Marker on the battle map
+     *
+     * @param client A client, only used to ask for options
      */
-    Marker(Legion legion, int scale, String id, boolean inverted)
+    Marker(Legion legion, int scale, String id, boolean inverted, Client client)
     {
-        this(legion, scale, id, null, inverted);
+        this(legion, scale, id, client, inverted, false);
     }
 
     /**
-    * Construct a marker with a client. By providing a client, a Marker will be
-    * adorned with the height of the stack, when that height is non-zero. A
-    * null client will prevent the height from being displayed. Sometimes (on
-    * the master board, for example) heights should be shown, and sometimes (in
-    * the engagement window, for example) they should be omitted.
-    */
-    Marker(Legion legion, int scale, String id, Client client)
+     * Construct a marker where height is shown - will be asked from legion.
+     * Sometimes (on the master board, for example) heights should be shown,
+     * and sometimes (in some dialogs, especially when there is no real legion
+     * behind it (e.g. pickMarker, splitLegion)) they should be omitted
+     * (or cannot even be asked).
+     *
+     * Use case: Mostly MasterBoard and some dialogs where height is
+     * interesting:  Concede/Flee, Negotiate and replyToProposal
+     *
+     * @param client A client, only used to ask for options
+     */
+    Marker(Legion legion, int scale, String id, Client client,
+        boolean showHeight)
     {
-        this(legion, scale, id, client, false);
+        this(legion, scale, id, client, false, showHeight);
     }
 
     /**
      * Construct a marker
-     * Scale is Scale of chit
-     * id is the marker label (aka BK05)
-     * Client != null will add the height of the stack
-     * inverted == true will invert the marker
+     * @param id the marker label (like Bk05 or Bk05-Green)
+     * @scale the Scale of chit
+     * @param showHeight set true will add the height of the stack
+     * @param inverted set to true (defender legion) will normally invert
+     * the marker but NOT if doNotInvertDefender option is true
      */
-    private Marker(Legion legion, int scale, String id, Client client, boolean inverted)
+    private Marker(Legion legion, int scale, String id, Client client,
+        boolean inverted, boolean showHeight)
     {
         super(scale, id, inverted, client);
+
+        assert (!showHeight || legion != null) : "for showHeight true, "
+            + "legion must not be null!";
+
         this.legion = legion;
-        this.showHeight = (client != null);
+        this.showHeight = showHeight;
 
         setBackground(Color.BLACK);
         if (id.contains("Black") || (id.length() == 4 && id.startsWith("Bk")))
@@ -119,7 +136,6 @@ public final class Marker extends Chit
         highlight = false;
     }
 
-    /** Show the height of the legion if marker.client != NULL. */
     @Override
     public void paintComponent(Graphics g)
     {
@@ -140,10 +156,6 @@ public final class Marker extends Chit
         }
 
         int legionHeight = legion.getHeight();
-        if (legionHeight == 0)
-        {
-            return; //don't put a zero on top in the picker
-        }
         String legionHeightString = Integer.toString(legionHeight);
         LOGGER.log(Level.FINEST, "Height is " + legionHeightString);
 

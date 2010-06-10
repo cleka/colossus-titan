@@ -63,7 +63,7 @@ final class ReplyToProposal extends KDialog implements ActionListener
         contentPane.add(attackerPane);
 
         attackerMarker = new Marker(attacker, scale, attacker
-            .getLongMarkerId(), gui.getClient());
+            .getLongMarkerId(), gui.getClient(), true);
         attackerPane.add(attackerMarker);
 
         List<String> attackerImageNames = gui.getOracle().getLegionImageNames(
@@ -81,7 +81,7 @@ final class ReplyToProposal extends KDialog implements ActionListener
         contentPane.add(defenderPane);
 
         defenderMarker = new Marker(defender, scale, defender.getLongMarkerId(), gui
-                .getClient());
+                .getClient(), true);
         defenderPane.add(defenderMarker);
 
         List<String> defenderImageNames = gui.getOracle().getLegionImageNames(

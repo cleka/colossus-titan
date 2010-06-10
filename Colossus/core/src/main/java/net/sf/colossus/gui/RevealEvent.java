@@ -543,7 +543,7 @@ public class RevealEvent
             {
                 String color = player.getShortColor();
                 // TODO does not work, perhaps I did that overlay stuff wrong?
-                solidMarker = new Chit(scale, color + "Solid");
+                solidMarker = new Chit(scale, color + "Solid", null);
             }
             catch (Exception e)
             {

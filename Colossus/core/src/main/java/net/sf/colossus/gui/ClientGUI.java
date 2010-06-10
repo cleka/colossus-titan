@@ -997,7 +997,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     {
         // @TODO: this creates it every time, not only when necessary ?
         Marker marker = new Marker(legion, 3 * Scale.get(), legion
-            .getLongMarkerId(), client);
+            .getLongMarkerId(), client, (client != null));
         setMarker(legion, marker);
 
         if (!isReplayOngoing())
@@ -1024,7 +1024,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         }
 
         Marker marker = new Marker(child, 3 * Scale.get(),
-                child.getLongMarkerId(), client);
+                child.getLongMarkerId(), client, (client != null));
         setMarker(child, marker);
 
         if (isReplayOngoing())
