@@ -49,8 +49,9 @@ final class SplitLegion extends KDialog
     private final Box newBox;
     private final Box buttonBox;
 
-    private final JButton button1;
-    private final JButton button2;
+    private final JButton doneButton;
+    private final JButton cancelButton;
+    private final JButton skipButton;
 
     private final int totalChits;
     private final int scale;
@@ -76,8 +77,9 @@ final class SplitLegion extends KDialog
             oldBox = null;
             newBox = null;
             buttonBox = null;
-            button1 = null;
-            button2 = null;
+            doneButton = null;
+            cancelButton = null;
+            skipButton = null;
             scale = 0;
             totalChits = 0;
             saveWindow = null;
@@ -157,10 +159,10 @@ final class SplitLegion extends KDialog
             newBox.add(Box.createRigidArea(new Dimension(scale, scale)));
         }
 
-        button1 = new JButton("Done");
-        button1.setEnabled(false);
-        button1.setMnemonic(KeyEvent.VK_D);
-        button1.addActionListener(new ActionListener()
+        doneButton = new JButton("Done");
+        doneButton.setEnabled(false);
+        doneButton.setMnemonic(KeyEvent.VK_D);
+        doneButton.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent e)
             {
@@ -171,18 +173,33 @@ final class SplitLegion extends KDialog
                 returnSplitResults();
             }
         });
-        buttonBox.add(button1);
+        buttonBox.add(doneButton);
 
-        button2 = new JButton("Cancel");
-        button2.setMnemonic(KeyEvent.VK_C);
-        button2.addActionListener(new ActionListener()
+        skipButton = new JButton("Skip");
+        skipButton.setMnemonic(KeyEvent.VK_S);
+        skipButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                markSkip();
+            }
+        });
+        if (gui.getGame().getTurnNumber() > 1)
+        {
+            // not much use to allowing mark as skip in first turn :)
+            buttonBox.add(skipButton);
+        }
+
+        cancelButton = new JButton("Cancel");
+        cancelButton.setMnemonic(KeyEvent.VK_C);
+        cancelButton.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent e)
             {
                 cancel();
             }
         });
-        buttonBox.add(button2);
+        buttonBox.add(cancelButton);
 
         pack();
         saveWindow = new SaveWindow(gui.getOptions(), "SplitLegion");
@@ -229,7 +246,7 @@ final class SplitLegion extends KDialog
         // Account for the marker and the spacer.
         toBox.add(chit, toChits.size() + 1);
 
-        button1.setEnabled(isSplitLegal(false));
+        doneButton.setEnabled(isSplitLegal(false));
 
         pack();
         repaint();
@@ -288,6 +305,14 @@ final class SplitLegion extends KDialog
     private void cancel()
     {
         creaturesToSplit = null;
+        dispose();
+    }
+
+    private void markSkip()
+    {
+        System.out.println("SplitLegion.markSplit()!");
+        // empty list to signal: skip split.
+        creaturesToSplit = new ArrayList<CreatureType>();
         dispose();
     }
 

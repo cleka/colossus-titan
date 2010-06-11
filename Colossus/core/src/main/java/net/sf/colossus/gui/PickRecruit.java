@@ -43,11 +43,20 @@ final class PickRecruit extends KDialog
     private static boolean active;
     private final SaveWindow saveWindow;
 
+    // next two temporary hack!
+    private final ClientGUI gui;
+    private final Legion legion;
+
     private PickRecruit(JFrame parentFrame, List<CreatureType> recruits,
         String hexDescription, Legion legion, ClientGUI gui)
     {
         super(parentFrame, gui.getOwningPlayer().getName()
             + ": Pick Recruit in " + hexDescription, true);
+
+        // Meant to use only temporary for now.
+        // TODO Handle the inform gui to mark as skip in better way
+        this.gui = gui;
+        this.legion = legion;
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         Container contentPane = getContentPane();
@@ -113,6 +122,25 @@ final class PickRecruit extends KDialog
             countLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             vertPane.add(countLabel);
             i++;
+        }
+
+        // Provide the "skip recruit this time for this legion" choice only
+        // for normal recruiting, not for reinforcement.
+        if (!gui.getGameClientSide().isBattleOngoing())
+        {
+            JButton nothingButton = new JButton("Nothing");
+            nothingButton.addActionListener(new ActionListener()
+            {
+                public void actionPerformed(ActionEvent e)
+                {
+                    // TODO Handle this better. Return a "NONE" creatureType and let
+                    // caller take care of things
+                    PickRecruit.this.gui
+                    .markLegionAsSkipRecruit(PickRecruit.this.legion);
+                    dispose();
+                }
+            });
+            recruitPane.add(nothingButton);
         }
 
         JButton cancelButton = new JButton("Cancel");

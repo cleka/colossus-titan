@@ -1074,15 +1074,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     public void actOnDidRecruit(Legion legion, CreatureType recruit,
         List<CreatureType> recruiters, String reason)
     {
-        if (client.isMyLegion(legion))
-        {
-            pushUndoStack(legion.getMarkerId());
-            if (!getGameClientSide().isBattleOngoing())
-            {
-                board.setLegionsLeftToMuster(client.getPossibleRecruitHexes()
-                    .size());
-            }
-        }
+        postRecruitStuff(legion);
 
         board.addRecruitedChit(legion);
         board.highlightPossibleRecruitLegionHexes();
@@ -1090,6 +1082,24 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         if (eventViewer != null)
         {
             eventViewer.recruitEvent(legion, recruit, recruiters, reason);
+        }
+    }
+
+    /**
+     * Do what is needed after recruit (or mark as skip recruit):
+     * push to undo stack, update legions left to muster, hightlight remaining ones,
+     *
+     * @param legion
+     */
+    private void postRecruitStuff(Legion legion)
+    {
+        if (client.isMyLegion(legion))
+        {
+            pushUndoStack(legion.getMarkerId());
+            if (!getGameClientSide().isBattleOngoing())
+            {
+                board.updateLegionsLeftToMusterText();
+            }
         }
     }
 
@@ -1160,8 +1170,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         {
             if (!wasReinforcement)
             {
-                board.setLegionsLeftToMuster(client.getPossibleRecruitHexes()
-                    .size());
+                board.updateLegionsLeftToMusterText();
             }
         }
         eventViewer.undoEvent(eventType, legion, null, turnNumber);
@@ -1206,7 +1215,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             {
                 board.enableDoneAction();
             }
-            board.setLegionsLeftToMove(client.legionsNotMoved());
+            board.updateLegionsLeftToMoveText();
         }
     }
 
@@ -1233,7 +1242,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             {
                 board.enableDoneAction();
             }
-            board.setLegionsLeftToMove(client.legionsNotMoved());
+            board.updateLegionsLeftToMoveText();
         }
 
         if (didTeleport)
@@ -1367,7 +1376,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         return undoStack.removeFirst();
     }
 
-    private void pushUndoStack(Object object)
+    void pushUndoStack(Object object)
     {
         undoStack.addFirst(object);
     }
@@ -1890,7 +1899,25 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     public List<CreatureType> doPickSplitLegion(Legion parent,
         String childMarker)
     {
-        return SplitLegion.splitLegion(this, parent, childMarker);
+        List<CreatureType> creaturesToSplit = SplitLegion.splitLegion(this, parent, childMarker);
+        // null means cancel, empty list to signal "mark as skip".
+        if (creaturesToSplit != null && creaturesToSplit.isEmpty())
+        {
+            markLegionAsSkipSplit(parent);
+            // give back null to client to make client do nothing any more.
+            creaturesToSplit = null;
+        }
+        return creaturesToSplit;
+    }
+
+    private void markLegionAsSkipSplit(Legion legion)
+    {
+        System.out.println("mark legion as skip split: "
+            + legion.getMarkerId());
+        legion.setSkipThisTime(true);
+        pushUndoStack(legion.getMarkerId());
+        board.clearPossibleRecruitChits();
+        board.highlightTallLegions();
     }
 
     public boolean isPickCarryOngoing()
@@ -1977,6 +2004,27 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
         return PickRecruit.pickRecruit(board.getFrame(), recruits,
             hexDescription, legion, this);
+    }
+
+    /**
+     * TODO This is just a HACK.
+     * PickRecruit calls this to mark a legion as that user wants to not
+     * recruit anything this turn.
+     * Better would be, if that dialog could return a "NONE" CreatureType
+     * and the caller does the work cleanly...
+     * (postponed for now because the NONE-CreatureType would be so much
+     * work right now...)
+     * @param legion
+     */
+    public void markLegionAsSkipRecruit(Legion legion)
+    {
+        legion.setSkipThisTime(true);
+        postRecruitStuff(legion);
+        // TODO : if we one day handle skip recruit as a special
+        // "NONE"-CreatureType, show recruit chit and highlight could
+        // both be part of the postRecruit call, highlight not needed
+        // here separately.
+        board.highlightPossibleRecruitLegionHexes();
     }
 
     public String doPickRecruiter(List<String> recruiters,
@@ -2097,7 +2145,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             // then this one here would otherwise automatically do the
             // "doneWithSplit()".
             if ((getOwningPlayer().getMarkersAvailable().size() < 1 || client
-                .findTallLegionHexes(4).isEmpty())
+                .findTallLegionHexes(4, true).isEmpty())
                 && !options.getOption(Options.autoSplit) && isUndoStackEmpty())
             {
                 client.doneWithSplits();
@@ -2381,26 +2429,51 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         battleChits.clear();
     }
 
+    /**
+     * For the topmost item on undo stack, undo the done recruit,
+     * or reset the skipThisTime flag if set.
+     */
     void undoLastRecruit()
     {
         if (!isUndoStackEmpty())
         {
             String markerId = (String)popUndoStack();
-            getClient().undoRecruit(client.getLegion(markerId));
+            Legion legion = client.getLegion(markerId);
+            handleUndoRecruit(legion);
         }
     }
 
+    /**
+     * For a specific clicked legion, undo the done recruit,
+     * or reset the skipThisTime flag if set.
+     * @param legion The legion for which to undo the recruit
+     */
     public void undoRecruit(Legion legion)
     {
         if (undoStack.contains(legion.getMarkerId()))
         {
             undoStack.remove(legion.getMarkerId());
         }
-        getClient().undoRecruit(legion);
-        if (client.isMyLegion(legion))
+        handleUndoRecruit(legion);
+    }
+
+    /**
+     * This does the actual work for undoing a recruit
+     * @param legion The legion for which to undo the recruit
+     */
+    private void handleUndoRecruit(Legion legion)
+    {
+        if (legion.hasRecruited())
         {
-            board.setLegionsLeftToMuster(client.getPossibleRecruitHexes()
-                .size());
+            getClient().undoRecruit(legion);
+        }
+        else
+        {
+            legion.setSkipThisTime(false);
+            if (client.isMyLegion(legion))
+            {
+                board.updateLegionsLeftToMusterText();
+            }
         }
     }
 
@@ -2417,7 +2490,17 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         if (!isUndoStackEmpty())
         {
             String splitoffId = (String)popUndoStack();
-            client.undoSplit(client.getLegion(splitoffId));
+            Legion legion = client.getLegion(splitoffId);
+            if (legion.getSkipThisTime())
+            {
+                legion.setSkipThisTime(false);
+                board.alignLegions(legion.getCurrentHex());
+                board.highlightTallLegions();
+            }
+            else
+            {
+                client.undoSplit(legion);
+            }
         }
     }
 
@@ -2435,8 +2518,16 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         if (!isUndoStackEmpty())
         {
             String markerId = (String)popUndoStack();
-            getClient().undoMove(client.getLegion(markerId));
-            board.setLegionsLeftToMove(client.legionsNotMoved());
+            Legion legion = client.getLegion(markerId);
+            if (legion.hasMoved())
+            {
+                getClient().undoMove(legion);
+            }
+            else
+            {
+                legion.setSkipThisTime(false);
+            }
+            board.updateLegionsLeftToMoveText();
         }
     }
 

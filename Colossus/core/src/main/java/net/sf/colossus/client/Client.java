@@ -1704,15 +1704,20 @@ public final class Client implements IClient, IOracle, IVariant,
     /** Used for human players only.  */
     public void doRecruit(Legion legion)
     {
-        if (isMyTurn() && isMyLegion(legion)
-            && ((LegionClientSide)legion).hasRecruited())
+        if (legion == null || !isMyTurn() || !isMyLegion(legion))
+        {
+            // TODO is it good to return quietly here? It seems the method should
+            // not have been called in the first place
+            return;
+        }
+
+        if (legion.hasRecruited() || legion.getSkipThisTime())
         {
             gui.undoRecruit(legion);
             return;
         }
 
-        if (legion == null || !canRecruit(legion) || !isMyTurn()
-            || !isMyLegion(legion))
+        if (!canRecruit(legion))
         {
             // TODO is it good to return quietly here? It seems the method should
             // not have been called in the first place
@@ -1722,6 +1727,11 @@ public final class Client implements IClient, IOracle, IVariant,
         String hexDescription = legion.getCurrentHex().getDescription();
 
         CreatureType recruit = gui.doPickRecruit(legion, hexDescription);
+        if (legion.getSkipThisTime())
+        {
+            // TODO handle better, see ClientGUI.markLegionAsSkipRecruit
+            return;
+        }
 
         if (recruit == null)
         {
@@ -2736,7 +2746,8 @@ public final class Client implements IClient, IOracle, IVariant,
     }
 
     /**
-     * Return a set of hexes with legions that can (still) muster anything.
+     * Return a set of hexes with legions that can (still) muster anything
+     * and are not marked as skip.
      */
     public Set<MasterHex> getPossibleRecruitHexes()
     {
@@ -2744,7 +2755,7 @@ public final class Client implements IClient, IOracle, IVariant,
 
         for (Legion legion : game.getActivePlayer().getLegions())
         {
-            if (canRecruit(legion))
+            if (canRecruit(legion) && !legion.getSkipThisTime())
             {
                 result.add(legion.getCurrentHex());
             }
@@ -2803,25 +2814,37 @@ public final class Client implements IClient, IOracle, IVariant,
             .getMovementRoll());
     }
 
-    public int legionsNotMoved()
+    /**
+     * Returns how many legions have not moved yet, still need moving
+     *
+     * @param considerSkippedAsMoved If set true (so far everywhere), a legion
+     * marked as skip will be considered as moved.
+     *
+     * @return The number of legions that the user probably still should
+     * consider to to move them
+     */
+    public int legionsNotMoved(boolean considerSkippedAsMoved)
     {
         int count = 0;
 
         for (Legion legion : game.getActivePlayer().getLegions())
         {
-            if (!legion.hasMoved())
+            if (!legion.hasMoved()
+                && !(considerSkippedAsMoved && legion.getSkipThisTime()))
             {
                 count++;
             }
         }
         return count;
     }
-    public Set<MasterHex> findUnmovedLegionHexes()
+
+    public Set<MasterHex> findUnmovedLegionHexes(boolean considerSkippedAsMoved)
     {
         Set<MasterHex> result = new HashSet<MasterHex>();
         for (Legion legion : game.getActivePlayer().getLegions())
         {
-            if (!legion.hasMoved())
+            if (!legion.hasMoved()
+                && !(considerSkippedAsMoved && legion.getSkipThisTime()))
             {
                 result.add(legion.getCurrentHex());
             }
@@ -2829,22 +2852,31 @@ public final class Client implements IClient, IOracle, IVariant,
         return result;
     }
 
-    /** Return a set of hexLabels for the active player's legions with
-     *  7 or more creatures. */
+    /**
+     * Return a set of hexLabels for the active player's legions with
+     * 7 or more creatures, and which are not marked as skip this turn.
+     */
     public Set<MasterHex> findTallLegionHexes()
     {
-        return findTallLegionHexes(7);
+        return findTallLegionHexes(7, false);
     }
 
-    /** Return a set of hexLabels for the active player's legions with
-     *  minHeight or more creatures. */
-    public Set<MasterHex> findTallLegionHexes(int minHeight)
+    /**
+     * Return a set of hexLabels for the active player's legions with
+     * minHeight or more creatures.
+     *
+     * @param ignoreSkipFlag Set to true, legion will be considered even if
+     * it was marked as "skip this time".
+     */
+    public Set<MasterHex> findTallLegionHexes(int minHeight,
+        boolean ignoreSkipFlag)
     {
         Set<MasterHex> result = new HashSet<MasterHex>();
 
         for (Legion legion : game.getActivePlayer().getLegions())
         {
-            if (legion.getHeight() >= minHeight)
+            if (legion.getHeight() >= minHeight
+                && (ignoreSkipFlag || !legion.getSkipThisTime()))
             {
                 result.add(legion.getCurrentHex());
             }

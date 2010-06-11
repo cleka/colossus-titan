@@ -148,6 +148,8 @@ public final class MasterBoard extends JPanel
 
     private static final String clearRecruitChits = "Clear recruit chits";
 
+    private static final String skipLegion = "Skip legion this time";
+
     private static final String undoLast = "Undo";
     private static final String undoAll = "Undo All";
     private static final String doneWithPhase = "Done";
@@ -179,6 +181,7 @@ public final class MasterBoard extends JPanel
     private AbstractAction checkConnectionAction;
 
     private AbstractAction clearRecruitChitsAction;
+    private AbstractAction skipLegionAction;
     private AbstractAction undoLastAction;
     private AbstractAction undoAllAction;
     private AbstractAction doneWithPhaseAction;
@@ -288,7 +291,8 @@ public final class MasterBoard extends JPanel
 
                 final JPanel panel = new LegionInfoPanel(legion, scale,
                     PANEL_MARGIN, PANEL_PADDING, true, gui.getViewMode(),
-                    client.isMyLegion(legion), dubiousAsBlanks, true, showMarker);
+                    client.isMyLegion(legion), dubiousAsBlanks, true,
+                    showMarker);
                 add(panel);
                 legionFlyouts[i] = panel;
 
@@ -561,6 +565,14 @@ public final class MasterBoard extends JPanel
             }
         };
 
+        skipLegionAction = new AbstractAction(skipLegion)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                markLegionSkip();
+            }
+        };
+
         undoLastAction = new AbstractAction(undoLast)
         {
             public void actionPerformed(ActionEvent e)
@@ -591,7 +603,7 @@ public final class MasterBoard extends JPanel
                 }
                 else
                 {
-                    LOGGER.log(Level.SEVERE, "Bogus phase");
+                    LOGGER.log(Level.SEVERE, "Bogus phase for Undo Last");
                 }
             }
         };
@@ -614,8 +626,7 @@ public final class MasterBoard extends JPanel
                     highlightUnmovedLegions();
                     if (gui.isMyTurn())
                     {
-                        bottomBar.setLegionsLeftToMove(client
-                            .legionsNotMoved());
+                        updateLegionsLeftToMoveText();
                     }
                 }
                 else if (phase == Phase.FIGHT)
@@ -628,13 +639,12 @@ public final class MasterBoard extends JPanel
                     highlightPossibleRecruitLegionHexes();
                     if (gui.isMyTurn())
                     {
-                        bottomBar.setLegionsLeftToMuster(client
-                            .getPossibleRecruitHexes().size());
+                        updateLegionsLeftToMusterText();
                     }
                 }
                 else
                 {
-                    LOGGER.log(Level.SEVERE, "Bogus phase");
+                    LOGGER.log(Level.SEVERE, "Bogus phase for Undo All");
                 }
             }
         };
@@ -1134,7 +1144,8 @@ public final class MasterBoard extends JPanel
             Options.dubiousAsBlanks);
         boolean showMarker = gui.getOptions().getOption(Options.showMarker);
 
-        List<Legion> legions = gui.getGame().getLegionsByHex(hex.getHexModel());
+        List<Legion> legions = gui.getGame()
+            .getLegionsByHex(hex.getHexModel());
         for (Legion legion : legions)
         {
             Marker marker = legionToMarkerMap.get(legion);
@@ -1222,6 +1233,10 @@ public final class MasterBoard extends JPanel
         mi = phaseMenu.add(clearRecruitChitsAction);
         mi.setMnemonic(KeyEvent.VK_C);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0));
+
+        mi = phaseMenu.add(skipLegionAction);
+        mi.setMnemonic(KeyEvent.VK_S);
+        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0));
 
         phaseMenu.addSeparator();
 
@@ -1412,7 +1427,6 @@ public final class MasterBoard extends JPanel
         }
     }
 
-
     /**
      * Finishes the current phase.
      *
@@ -1432,7 +1446,7 @@ public final class MasterBoard extends JPanel
         {
             boolean beDone = true;
             int cnt;
-            if ((cnt = client.findTallLegionHexes(7).size()) > 0
+            if ((cnt = client.findTallLegionHexes(7, false).size()) > 0
                 && (client.getOwningPlayer().getMarkersAvailable().size() >= 1)
                 && gui.getOptions().getOption(Options.confirmNoSplit, true))
             {
@@ -1466,7 +1480,7 @@ public final class MasterBoard extends JPanel
         {
             boolean beDone = true;
             int cnt;
-            if ((cnt = client.legionsNotMoved()) > 0
+            if ((cnt = client.legionsNotMoved(true)) > 0
                 && gui.getOptions().getOption(Options.confirmNoMove, true))
             {
                 answer = confirmNotMovingForAllHexes(cnt);
@@ -1599,7 +1613,7 @@ public final class MasterBoard extends JPanel
 
             bottomBar.setPhase("Movement");
             highlightUnmovedLegions();
-            bottomBar.setLegionsLeftToMove(client.legionsNotMoved());
+            updateLegionsLeftToMoveText();
             maybeRequestFocusAndToFront();
         }
         else
@@ -1672,8 +1686,7 @@ public final class MasterBoard extends JPanel
             enableDoneAction();
 
             bottomBar.setPhase("Muster Recruits");
-            bottomBar.setLegionsLeftToMuster(client.getPossibleRecruitHexes()
-                .size());
+            updateLegionsLeftToMusterText();
             highlightPossibleRecruitLegionHexes();
             maybeRequestFocusAndToFront();
         }
@@ -1812,7 +1825,7 @@ public final class MasterBoard extends JPanel
     void highlightUnmovedLegions()
     {
         unselectAllHexes();
-        selectHexes(client.findUnmovedLegionHexes());
+        selectHexes(client.findUnmovedLegionHexes(true));
         repaint();
     }
 
@@ -1928,7 +1941,7 @@ public final class MasterBoard extends JPanel
                 for (Legion legion : player.getLegions())
                 {
                     Marker marker = new Marker(legion, 3 * Scale.get(), legion
-                            .getLongMarkerId(), client, true);
+                        .getLongMarkerId(), client, true);
                     legionToMarkerMap.put(legion, marker);
                     hexesNeedAligning.add(legion.getCurrentHex());
                 }
@@ -2525,6 +2538,46 @@ public final class MasterBoard extends JPanel
         }
     }
 
+    public void markLegionSkip()
+    {
+        Legion activeLegion = null;
+
+        if (gui.getGame().isPhase(Phase.SPLIT))
+        {
+            // Not implemented yet
+            // System.out.println("Mark Legion Skip Split");
+        }
+        else if (gui.getGame().isPhase(Phase.MOVE))
+        {
+            if ((activeLegion = gui.getMover()) != null
+                && !activeLegion.getSkipThisTime() && !activeLegion.hasMoved())
+            {
+                activeLegion.setSkipThisTime(true);
+                gui.pushUndoStack(activeLegion.getMarkerId());
+                updateLegionsLeftToMoveText();
+                clearPossibleRecruitChits();
+                highlightUnmovedLegions();
+                repaint();
+            }
+            else
+            {
+                //  no active legion, or active legion already marked
+            }
+
+        }
+        else if (gui.getGame().isPhase(Phase.MUSTER))
+        {
+            // implemented as part of the PickRecruit dialog
+            // System.out.println("Mark Legion Skip Move Muster");
+
+        }
+        else
+        {
+            LOGGER.warning("Mark Legion Skip not meaningful in phase "
+                + gui.getGame().getPhase());
+        }
+    }
+
     @Override
     public Dimension getMinimumSize()
     {
@@ -2635,14 +2688,15 @@ public final class MasterBoard extends JPanel
         }
     }
 
-    public void setLegionsLeftToMuster(int legionCount)
+    public void updateLegionsLeftToMusterText()
     {
+        int legionCount = client.getPossibleRecruitHexes().size();
         bottomBar.setLegionsLeftToMuster(legionCount);
     }
 
-    public void setLegionsLeftToMove(int legionCount)
+    public void updateLegionsLeftToMoveText()
     {
-        bottomBar.setLegionsLeftToMove(legionCount);
+        bottomBar.setLegionsLeftToMove(client.legionsNotMoved(true));
     }
 
     class BottomBar extends JPanel

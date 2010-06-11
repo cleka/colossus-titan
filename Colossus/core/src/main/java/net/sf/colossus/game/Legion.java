@@ -126,6 +126,11 @@ public abstract class Legion
      */
     private CreatureType recruit;
 
+    /**
+     * Flag to remember a "skip (split|move|recruit) this time"
+     */
+    private boolean skipThisTime = false;
+
     // TODO legions should be created through factory from the player instances
     public Legion(final Player player, String markerId, MasterHex hex)
     {
@@ -233,6 +238,7 @@ public abstract class Legion
     public void setMoved(boolean moved)
     {
         this.moved = moved;
+        this.skipThisTime = false;
     }
 
     public boolean hasMoved()
@@ -248,6 +254,16 @@ public abstract class Legion
     public boolean hasTeleported()
     {
         return teleported;
+    }
+
+    public void setSkipThisTime(boolean skipIt)
+    {
+        this.skipThisTime = skipIt;
+    }
+
+    public boolean getSkipThisTime()
+    {
+        return skipThisTime;
     }
 
     public boolean contains(CreatureType type)
