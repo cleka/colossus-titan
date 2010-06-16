@@ -12,6 +12,8 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -55,7 +57,7 @@ final class ClientHandler implements IClient
 
     private final Server server;
     private final SocketChannel socketChannel;
-    private final SelectionKey selectionKey;
+    private final SelectionKey selectorKey;
     private String playerName;
     private String signonName;
     private int clientVersion = 0;
@@ -90,15 +92,15 @@ final class ClientHandler implements IClient
     {
         this.server = server;
         this.socketChannel = channel;
-        this.selectionKey = selKey;
+        this.selectorKey = selKey;
 
         String tempId = "<no name yet #" + (counter++) + ">";
         InstanceTracker.register(this, tempId);
     }
 
-    public SelectionKey getKey()
+    public SelectionKey getSelectorKey()
     {
-        return selectionKey;
+        return selectorKey;
     }
 
     public SocketChannel getSocketChannel()
@@ -185,57 +187,62 @@ final class ClientHandler implements IClient
         }
     }
 
-    private void sleepFor(long millis)
-    {
-        try
-        {
-            Thread.sleep(millis);
-        }
-        catch (InterruptedException e)
-        {
-            LOGGER.log(Level.FINEST,
-                "sleepFor: InterruptException caught... ignoring it...");
-        }
-    }
-
     private void sendViaChannel(String msg)
     {
         sendViaChannelRaw(msg);
     }
 
-    private void sendViaChannelRaw(String msg)
-    {
-        String dataToSend = msg + "\n";
-        CharBuffer cb = CharBuffer.allocate(dataToSend.length());
-        cb.put(dataToSend);
-        cb.flip();
+    ByteBuffer bb;
+    String encodedMsg; // used only for logging
+    int should;
+    int writtenTotal;
 
+    int previousRetries = 0;
+
+    private long temporarilyInTrouble = -1;
+
+    public boolean isTemporarilyInTrouble()
+    {
+        return (temporarilyInTrouble != -1);
+    }
+
+    public long howLongAlreadyInTrouble()
+    {
+        if (temporarilyInTrouble == -1)
+        {
+            return 0;
+        }
+        long now = new Date().getTime();
+        return now - temporarilyInTrouble;
+    }
+
+    private void setTemporarilyInTrouble()
+    {
+        long now = new Date().getTime();
+        temporarilyInTrouble = now;
+        server.othersTellOneHasNetworkTrouble(this);
+        selectorKey.interestOps(SelectionKey.OP_READ | SelectionKey.OP_WRITE);
+    }
+
+    public void clearTemporarilyInTrouble()
+    {
+        temporarilyInTrouble = -1;
+        server.othersTellOnesTroubleIsOver(this);
+    }
+
+    private void handleEncoding(String msg)
+    {
         try
         {
-            int attempt = 1;
-            ByteBuffer bb = encoder.encode(cb);
-            int should = bb.limit();
-            int writtenTotal = 0;
-            int written = socketChannel.write(bb);
-            writtenTotal += written;
-            while (writtenTotal < should)
-            {
-                int missing = should - (writtenTotal - written);
-                LOGGER.warning("Only written " + written + " (" + writtenTotal
-                    + ") bytes, but should have been " + missing + " ("
-                    + should + ") " + " - sleeping a while and retrying then");
-                int delay = 1;
-                LOGGER.finest("Sleeping " + delay + " second(s) ...");
-                sleepFor(delay * 1000);
-                LOGGER.finest("Slept.");
-                attempt++;
-                written = socketChannel.write(bb);
-                writtenTotal += written;
-            }
-            if (attempt > 1)
-            {
-                LOGGER.info("Now succeeded, attempt = " + attempt);
-            }
+            encodedMsg = msg;
+            String dataToSend = msg + "\n";
+            CharBuffer cb = CharBuffer.allocate(dataToSend.length());
+            cb.put(dataToSend);
+            cb.flip();
+
+            bb = encoder.encode(cb);
+            should = bb.limit();
+            writtenTotal = 0;
         }
         catch (CharacterCodingException e)
         {
@@ -244,18 +251,97 @@ final class ClientHandler implements IClient
                 + " for writing it to" + " channel for player " + playerName
                 + "; details follow", e);
         }
+
+    }
+
+    LinkedList<String> queue = new LinkedList<String>();
+
+    private void sendViaChannelRaw(String msg)
+    {
+        // Something left undone last time. Postpone this here for a moment.
+        // Except if it is null, then caller called us dedicatedly to give
+        // us a chance to finish earlier stuff.
+        if (msg != null)
+        {
+            queue.add(msg);
+        }
+
+        if (isTemporarilyInTrouble())
+        {
+            return;
+        }
+
+        if (previousRetries > 0)
+        {
+            // Try writing old stuff away.
+            attemptWritingToChannel();
+        }
+
+        // If there was no problem and/or now it went well, proceed with new
+        // stuff... if there was.
+        while (previousRetries == 0 && queue.size() > 0)
+        {
+            String queueMsg = queue.poll();
+            handleEncoding(queueMsg);
+            attemptWritingToChannel();
+        }
+
+        if (previousRetries > 0)
+        {
+            setTemporarilyInTrouble();
+        }
+        else
+        {
+            if (isTemporarilyInTrouble())
+            {
+                LOGGER.warning("temporaryInTrouble still true for player "
+                    + getPlayerName() + "? This should never happen.");
+            }
+            temporarilyInTrouble = -1;
+        }
+    }
+
+    private void attemptWritingToChannel()
+    {
+        // Attempt to write away what is in buffer
+        try
+        {
+            int written = socketChannel.write(bb);
+            if (written > 0)
+            {
+                writtenTotal += written;
+            }
+
+            if (writtenTotal < should)
+            {
+                // Not all written
+                previousRetries += 1;
+                LOGGER.warning("trouble writing, temporarily giving up "
+                    + "writing to client " + getPlayerName());
+            }
+            else
+            {
+                // OK, now all was written
+                // TODO nowadays we do only one try, can this be a boolean instead?
+                if (previousRetries > 0)
+                {
+                    LOGGER.info("Now succeeded, attempt = " + previousRetries);
+                }
+                previousRetries = 0;
+            }
+        }
         catch (IOException ioe)
         {
             LOGGER.log(Level.WARNING,
                 "IOException '" + ioe.getMessage() + "'"
-                    + " was thrown while writing String '" + msg + "'"
+                    + " was thrown while writing String '" + encodedMsg + "'"
                     + " to channel for player " + playerName
                     + "; details follow:", ioe);
 
             setIsGone(true);
             withdrawnAlready = true;
             server.withdrawFromGame(playerName);
-            server.queueClientHandlerForDisposal(this);
+            server.queueClientHandlerForChannelChanges(this);
             server.clientWontConfirmCatchup(this,
                 "IO Exception while writing to client " + playerName);
         }
@@ -328,7 +414,6 @@ final class ClientHandler implements IClient
             }
             setPlayerName(signonName);
             server.joinGame(signonName);
-
         }
         else if (method.equals(Constants.requestGameInfo))
         {
@@ -702,7 +787,7 @@ final class ClientHandler implements IClient
 
         setIsGone(true);
         sendViaChannel(Constants.dispose);
-        server.queueClientHandlerForDisposal(this);
+        server.queueClientHandlerForChannelChanges(this);
         server.clientWontConfirmCatchup(this,
             "Client disposed from server side.");
     }
@@ -1111,4 +1196,5 @@ final class ClientHandler implements IClient
             sendToClient(Constants.pingRequest);
         }
     }
+
 }

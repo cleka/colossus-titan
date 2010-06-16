@@ -126,7 +126,8 @@ public final class Server extends Thread implements IServer
     private boolean initiateDisposal = false;
     private String caughtUpAction = "";
 
-    private final int timeoutDuringGame = 0;
+    private final int timeoutDuringStart = 1000;
+    private final int timeoutDuringGame = 1000;
     private final int timeoutDuringShutdown = 1000;
 
     // Earlier I have locked on an Boolean object itself,
@@ -307,7 +308,6 @@ public final class Server extends Thread implements IServer
                 JOptionPane.ERROR_MESSAGE);
 
             System.exit(1);
-
         }
     }
 
@@ -336,7 +336,7 @@ public final class Server extends Thread implements IServer
         serverRunning = true;
         while (waitingForPlayers > 0 && serverRunning && !shuttingDown)
         {
-            waitOnSelector(timeoutDuringGame);
+            waitOnSelector(timeoutDuringStart);
         }
 
         return (waitingForPlayers == 0);
@@ -346,7 +346,6 @@ public final class Server extends Thread implements IServer
     {
         overriddenCH = processingCH;
         processingCH = (ClientHandler)getClient(player);
-
     }
 
     public void restoreProcessingCH()
@@ -362,6 +361,7 @@ public final class Server extends Thread implements IServer
             handleOutsideChanges(timeout);
             handleSelectedKeys();
             handleChannelChanges();
+            repeatTellOneHasNetworkTrouble();
         }
 
         catch (ClosedChannelException cce)
@@ -426,17 +426,18 @@ public final class Server extends Thread implements IServer
             SelectionKey key = readyKeys.next();
             readyKeys.remove();
 
-            if ((key.readyOps() & SelectionKey.OP_ACCEPT) == SelectionKey.OP_ACCEPT)
+            if (key.isAcceptable())
             {
                 // Accept the new connection
                 SocketChannel sc = ((ServerSocketChannel)key.channel())
                     .accept();
                 sc.configureBlocking(false);
                 LOGGER.log(Level.FINE, "Accepted: sc = " + sc);
-                SelectionKey selKey = sc.register(selector,
+                SelectionKey readKey = sc.register(selector,
                     SelectionKey.OP_READ);
-                ClientHandler ch = new ClientHandler(this, sc, selKey);
-                selKey.attach(ch);
+
+                ClientHandler ch = new ClientHandler(this, sc, readKey);
+                readKey.attach(ch);
                 // This is sent only for the reason that the client gets
                 // an initial response quickly.
                 ch.sendToClient("SignOn: processing");
@@ -445,47 +446,85 @@ public final class Server extends Thread implements IServer
                     activeSocketChannelList.add(sc);
                 }
             }
-            else if ((key.readyOps() & SelectionKey.OP_READ) == SelectionKey.OP_READ)
+            else
             {
-                // Read the data
+                boolean anythingDone = false;
+
                 SocketChannel sc = (SocketChannel)key.channel();
                 ClientHandler ch = (ClientHandler)key.attachment();
-                if (ch == null)
+
+                if (ch != null)
                 {
-                    LOGGER.severe("No ClientHandler for socket channel " + sc);
+                    if (key.isReadable())
+                    {
+                        processingCH = ch;
+                        int read = readFromChannel(key, sc);
+                        if (read > 0)
+                        {
+                            byteBuffer.flip();
+                            // NOTE that the following might cause trouble
+                            // if logging is set to FINEST for server,
+                            // and the disconnect does not properly set the
+                            // isGone flag...
+                            // No problem any more as currently "send log
+                            // stuff to remote clients" is removed.
+                            LOGGER.finest("* before ch.processInput()");
+                            ch.processInput(byteBuffer);
+                            LOGGER.finest("* after  ch.processInput()");
+                        }
+                        else
+                        {
+                            LOGGER.finest("readFromChannel: 0 bytes read.");
+                        }
+                        processingCH = null;
+                        anythingDone = true;
+                    }
+
+                    if (key.isValid() && key.isWritable())
+                    {
+                        LOGGER.info("Channel for " + ch.getPlayerName()
+                            + " got writable again.");
+
+                        // unregister write. If next time fails, it will register again.
+                        key.interestOps(SelectionKey.OP_READ);
+
+                        // just call it to flush out what is still there
+                        ch.clearTemporarilyInTrouble();
+                        ch.sendToClient(null);
+
+                        anythingDone = true;
+                    }
+                    if (!anythingDone)
+                    {
+                        // can this happen? Just to be sure...
+                        LOGGER.warning("Unexpected type of ready Operation: "
+                            + key.readyOps());
+                    }
                 }
                 else
                 {
-                    processingCH = ch;
-
-                    int read = readFromChannel(key, sc);
-                    if (read > 0)
-                    {
-                        byteBuffer.flip();
-                        // NOTE that the following might cause trouble
-                        // if logging is set to FINEST for server,
-                        // and the disconnect does not properly set the
-                        // isGone flag...
-                        LOGGER.finest("* before ch.processInput()");
-                        ch.processInput(byteBuffer);
-                        LOGGER.finest("* after  ch.processInput()");
-                    }
-                    else
-                    {
-                        LOGGER.finest("readFromChannel: 0 bytes read.");
-                    }
-                    processingCH = null;
+                    // can this happen? Just to be sure...
+                    LOGGER.warning("ClientHandler for ready key is null?");
                 }
-            }
-            else
-            {
-                LOGGER.warning("Unexpected type of ready Operation: "
-                    + key.readyOps());
             }
         }
         // just to be sure.
         selectedKeys.clear();
     }
+
+    public void sleepFor(long millis)
+    {
+        try
+        {
+            Thread.sleep(millis);
+        }
+        catch (InterruptedException e)
+        {
+            LOGGER.log(Level.FINEST,
+                "sleepFor: InterruptException caught... ignoring it...");
+        }
+    }
+
 
     private void handleChannelChanges() throws IOException
     {
@@ -497,7 +536,7 @@ public final class Server extends Thread implements IServer
             {
                 ClientHandler nextCH = channelChanges.remove(0);
                 SocketChannel sc = nextCH.getSocketChannel();
-                SelectionKey key = nextCH.getKey();
+                SelectionKey key = nextCH.getSelectorKey();
                 if (key == null)
                 {
                     LOGGER.warning("key for to-be-closed-channel is null!");
@@ -641,7 +680,7 @@ public final class Server extends Thread implements IServer
      *  Put the ClientHandler into the queue to be removed
      *  from selector on next possible opportunity
      */
-    void queueClientHandlerForDisposal(ClientHandler ch)
+    void queueClientHandlerForChannelChanges(ClientHandler ch)
     {
         if (currentThread().equals(this))
         {
@@ -757,7 +796,6 @@ public final class Server extends Thread implements IServer
      *
      * @param sc SocketChannel of the client
      * @param key Key for that SocketChannel
-     *
      * @throws IOException
      */
     private void disconnectChannel(SocketChannel sc, SelectionKey key)
@@ -1440,6 +1478,57 @@ public final class Server extends Thread implements IServer
         if (updateHistory)
         {
             game.playerElimEvent(eliminatedPlayer, slayer);
+        }
+    }
+
+    void repeatTellOneHasNetworkTrouble()
+    {
+        ArrayList<ClientHandler> troubleCHs = new ArrayList<ClientHandler>();
+        for (IClient client : clients)
+        {
+            ClientHandler ch = (ClientHandler)client;
+            if (ch.isTemporarilyInTrouble())
+            {
+                troubleCHs.add(ch);
+            }
+        }
+
+        if (!troubleCHs.isEmpty())
+        {
+            for (ClientHandler chInTrouble : troubleCHs)
+            {
+                othersTellOneHasNetworkTrouble(chInTrouble);
+            }
+        }
+    }
+
+    void othersTellOneHasNetworkTrouble(ClientHandler chInTrouble)
+    {
+        String playerInTrouble = chInTrouble.getPlayerName();
+        int howLong = (int)(chInTrouble.howLongAlreadyInTrouble() / 1000L);
+        String message = "Problems writing to client of player "
+            + playerInTrouble + " (" + howLong + " secs) - still trying...";
+        for (IClient client : clients)
+        {
+            if (client != chInTrouble)
+            {
+                client.tellWhatsHappening(message);
+            }
+        }
+    }
+
+    void othersTellOnesTroubleIsOver(ClientHandler chInTrouble)
+    {
+        String name = chInTrouble.getPlayerName();
+        String message = "It seems writing to player " + name
+            + " succeeded now.";
+        for (IClient client : clients)
+        {
+            // no need to inform the troubled one itself...
+            if (client != chInTrouble)
+            {
+                client.tellWhatsHappening(message);
+            }
         }
     }
 
@@ -2363,7 +2452,7 @@ public final class Server extends Thread implements IServer
     // do not attempt to further read from there.
     public void disconnect()
     {
-        queueClientHandlerForDisposal(processingCH);
+        queueClientHandlerForChannelChanges(processingCH);
         clientWontConfirmCatchup(processingCH, "Client disconnected.");
     }
 
