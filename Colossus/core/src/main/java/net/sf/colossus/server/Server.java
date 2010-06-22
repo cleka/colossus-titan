@@ -12,6 +12,7 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -129,6 +130,14 @@ public final class Server extends Thread implements IServer
     private final int timeoutDuringStart = 1000;
     private final int timeoutDuringGame = 1000;
     private final int timeoutDuringShutdown = 1000;
+
+    private final int PING_REQUEST_INTERVAL_SEC = 3;
+
+    /**
+     * How many ms ago last ping round was done.
+     */
+    private long lastPingRound = 0;
+
 
     // Earlier I have locked on an Boolean object itself,
     // which I modify... and when this is done too often,
@@ -362,6 +371,11 @@ public final class Server extends Thread implements IServer
             handleSelectedKeys();
             handleChannelChanges();
             repeatTellOneHasNetworkTrouble();
+            boolean SEND_PING_REQUEST_FLAG = false;
+            if (SEND_PING_REQUEST_FLAG)
+            {
+                allRequestPingIfNeeded();
+            }
         }
 
         catch (ClosedChannelException cce)
@@ -1528,6 +1542,30 @@ public final class Server extends Thread implements IServer
             if (client != chInTrouble)
             {
                 client.tellWhatsHappening(message);
+            }
+        }
+    }
+
+    /**
+     * IF last ping round is at least PING_REQUEST_INTERVAL_SEC seconds ago,
+     * then send a ping request to all clients (except those which are in
+     * trouble anyway).
+     */
+    void allRequestPingIfNeeded()
+    {
+        long now = new Date().getTime();
+        if (now - lastPingRound > 1000 * PING_REQUEST_INTERVAL_SEC)
+        {
+            long ago = (now - lastPingRound) / 1000;
+            LOGGER.info("Last ping round is " + ago
+                + " secs ago - doing another.");
+            lastPingRound = now;
+            for (IClient client : clients)
+            {
+                if (!((ClientHandler)client).isTemporarilyInTrouble())
+                {
+                    client.pingRequest();
+                }
             }
         }
     }
