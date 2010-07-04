@@ -94,6 +94,9 @@ public final class Server extends Thread implements IServer
     /** Semaphor for synchronized access to waitingForPlayersToJoin */
     private final Object wfptjSemaphor = new Object();
 
+    /** Will be set to true after all clients are properly connected */
+    private boolean sendPingRequests = false;
+
     private int spectators = 0;
 
     /** Server socket port. */
@@ -131,7 +134,7 @@ public final class Server extends Thread implements IServer
     private final int timeoutDuringGame = 1000;
     private final int timeoutDuringShutdown = 1000;
 
-    private final int PING_REQUEST_INTERVAL_SEC = 3;
+    private final int PING_REQUEST_INTERVAL_SEC = 30;
 
     /**
      * How many ms ago last ping round was done.
@@ -194,6 +197,7 @@ public final class Server extends Thread implements IServer
     {
         boolean gotAll = waitForClients();
         game.actOnWaitForClientsCompleted(gotAll);
+        sendPingRequests = true;
 
         int timeout = timeoutDuringGame;
         int disposeRound = 0;
@@ -371,8 +375,7 @@ public final class Server extends Thread implements IServer
             handleSelectedKeys();
             handleChannelChanges();
             repeatTellOneHasNetworkTrouble();
-            boolean SEND_PING_REQUEST_FLAG = false;
-            if (SEND_PING_REQUEST_FLAG)
+            if (sendPingRequests)
             {
                 allRequestPingIfNeeded();
             }
@@ -1290,9 +1293,6 @@ public final class Server extends Thread implements IServer
         for (IClient client : clients)
         {
             client.updatePlayerInfo(getPlayerInfo(treatDeadAsAlive));
-            // Temporary, just to make it happen sometimes...
-            // TODO do this properly
-            client.pingRequest();
         }
     }
 
