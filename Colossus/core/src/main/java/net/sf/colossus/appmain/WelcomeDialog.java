@@ -28,10 +28,10 @@ public final class WelcomeDialog extends KFrame
 {
     private final static String title = "Welcome to this new Colossus Release!";
 
-    private final static String CURRENT_WELCOME_KEY = "PGS";
+    private final static String CURRENT_WELCOME_KEY = "0.10.4";
 
-    private final static String colossusPgsUrl = "http://colossus.sourceforge"
-        + ".net/docs/Colossus-Public-Game-Server.html";
+    private final static String colossusRecentChangesDetailsUrl = ""
+        + "http://colossus.sourceforge.net/docs/RecentChangesDetails.html#FeatureExplanations";
 
     private static WelcomeDialog showWelcome = null;
 
@@ -41,15 +41,20 @@ public final class WelcomeDialog extends KFrame
         super(title);
 
         String text = "\n"
-            + "  Did you already notice? We have now a Public Game Server "
-            + "for Colossus!\n\n"
-            + "  There you might find opponents to play against, and the games "
-            + "are hosted on the server\n"
-            + "  - thus none of the players needs to "
-            + "do any hassle with firewall or NAT settings.\n\n"
-            + "  Details you can find here:\n\n"
-            + "      "
-            + colossusPgsUrl
+            + "  Welcome to this new Colossus release 0.10.4!"
+            + "\n\n"
+            + "  New features:\n"
+            + "  - Player-colored angels and captured markers\n"
+            + "  - Optional confirmations if legions were not split/moved/"
+            + "recruited\n"
+            + "  - Possibility to mark a legion as skip (\"I will not "
+            + "split/move/recruit it this turn\")\n"
+            + "  - A mode/option called \"Need Lord for Battle Control\"\n\n"
+            + "  Plus the usual amount of fixes / stability improvements."
+            + "\n\n"
+            + "  The new features are explained in the RecentChangesDetails "
+            + "document:\n      "
+            + colossusRecentChangesDetailsUrl
             + "\n\n"
             + "  Use button below to copy the URL to your clipboard to paste it "
             + "into your browser.\n\n"
@@ -70,7 +75,7 @@ public final class WelcomeDialog extends KFrame
         {
             public void actionPerformed(ActionEvent e)
             {
-                ErrorUtils.copyToClipboard(colossusPgsUrl);
+                ErrorUtils.copyToClipboard(colossusRecentChangesDetailsUrl);
 
                 JOptionPane.showMessageDialog(WelcomeDialog.this,
                     "URL has been copied to your clipboard.", "URL copied!",
