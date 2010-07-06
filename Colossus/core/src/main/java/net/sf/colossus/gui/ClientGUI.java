@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -67,6 +68,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     private final static int CONN_CHECK_TIMEOUT = 5;
 
     private Timer connectionCheckTimer;
+
+    private long lastConnectionCheckPackageSent = -1;
 
     // TODO the naming of these classes is confusing, they should be clearly named
     // as dialogs
@@ -596,6 +599,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
                     timeoutAbortsConnectionCheck();
                 }
             });
+        lastConnectionCheckPackageSent = new Date().getTime();
         connectionCheckTimer.start();
 
         LOGGER.info("Client for player " + getOwningPlayer().getName()
@@ -634,8 +638,12 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         connectionCheckTimer = null;
         if (success)
         {
+            long responseReceivedTime = new Date().getTime();
+            long roundTripTime = responseReceivedTime
+                - lastConnectionCheckPackageSent;
             JOptionPane.showMessageDialog(getMapOrBoardFrame(),
-                "Received confirmation from server - connection to "
+                "Received confirmation from server after " + roundTripTime
+                        + " ms - connection to "
                     + "server is ok!", "Connection check succeeded.",
                 JOptionPane.INFORMATION_MESSAGE);
         }
@@ -646,7 +654,6 @@ public class ClientGUI implements IClientGUI, GUICallbacks
                     + CONN_CHECK_TIMEOUT + " seconds - connection to "
                     + "server is probably broken, or something hangs.",
                 "Connection check failed!", JOptionPane.ERROR_MESSAGE);
-
         }
     }
 
