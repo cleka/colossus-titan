@@ -175,33 +175,14 @@ public class WebServer implements IWebServer, IRunWebServer
             System.exit(0);
         }
 
-        // Load users from file:
-        String usersFile = options
-            .getStringOption(WebServerConstants.optUsersFile);
-        int maxUsers = options.getIntOption(WebServerConstants.optMaxUsers);
-        User.readUsersFromFile(usersFile, maxUsers);
-
-        // Restore proposed games from file:
-        proposedGamesFilename = options
-            .getStringOption(WebServerConstants.optGamesFile);
-        if (proposedGamesFilename == null)
-        {
-            proposedGamesFilename = WebServerConstants.DEFAULT_GAMES_FILE;
-            LOGGER
-                .warning("Filename for storing games not defined in cfg file!"
-                    + " Using default " + proposedGamesFilename);
-        }
-        readGamesFromFile(proposedGamesFilename, proposedGames);
-
         LOGGER.log(Level.INFO, "Server started: port " + serverPort
             + ", maxClients " + maxClients);
 
-        String LoginMessageFilename = options
-            .getStringOption(WebServerConstants.optLoginMessageFile);
-        if (LoginMessageFilename != null)
-        {
-            readLoginMessageFromFile(LoginMessageFilename);
-        }
+        doReadUsersFromFile();
+
+        doReadGamesFromFile();
+
+        doReadLoginMessage();
 
         generalChat.createWelcomeMessage();
 
@@ -229,6 +210,55 @@ public class WebServer implements IWebServer, IRunWebServer
 
         LOGGER.log(Level.FINEST, "WebServer instantiated, maxClients = "
             + maxClients + " , port = " + serverPort);
+    }
+
+    /**
+     *
+     */
+    private void doReadGamesFromFile()
+    {
+        proposedGamesFilename = options
+            .getStringOption(WebServerConstants.optGamesFile);
+        if (proposedGamesFilename == null)
+        {
+            proposedGamesFilename = WebServerConstants.DEFAULT_GAMES_FILE;
+            LOGGER
+                .warning("Filename for storing games not defined in cfg file!"
+                    + " Using default " + proposedGamesFilename);
+        }
+        readGamesFromFile(proposedGamesFilename, proposedGames);
+    }
+
+    /**
+     *
+     */
+    private void doReadUsersFromFile()
+    {
+        String usersFile = options
+            .getStringOption(WebServerConstants.optUsersFile);
+        int maxUsers = options.getIntOption(WebServerConstants.optMaxUsers);
+        User.readUsersFromFile(usersFile, maxUsers);
+    }
+
+    /**
+     *
+     */
+    private void doReadLoginMessage()
+    {
+        String LoginMessageFilename = options
+            .getStringOption(WebServerConstants.optLoginMessageFile);
+        if (LoginMessageFilename != null)
+        {
+            readLoginMessageFromFile(LoginMessageFilename);
+        }
+    }
+
+    /**
+     * Triggered by remode admin connection
+     */
+    public void rereadLoginMessage()
+    {
+        doReadLoginMessage();
     }
 
     void runSocketServer()
@@ -1148,17 +1178,21 @@ public class WebServer implements IWebServer, IRunWebServer
                 LOGGER.info("Reading login message from file " + filename);
             }
 
-            loginMessage.clear();
-            BufferedReader loginMessages = new BufferedReader(
+            ArrayList<String> temp = new ArrayList<String>();
+            BufferedReader loginMessagesReader = new BufferedReader(
                 new InputStreamReader(new FileInputStream(loginMessageFile),
                     WebServerConstants.charset));
 
             String line = null;
-            while ((line = loginMessages.readLine()) != null)
+            while ((line = loginMessagesReader.readLine()) != null)
             {
-                loginMessage.add(line);
+                temp.add(line);
             }
-            loginMessages.close();
+            loginMessagesReader.close();
+
+            loginMessage.clear();
+            loginMessage.addAll(temp);
+
             LOGGER.info("Read " + loginMessage.size() + " lines from file "
                 + filename);
         }

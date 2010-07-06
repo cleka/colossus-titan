@@ -774,6 +774,19 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             */
         }
 
+        else if (command.equals(IWebServer.RereadLoginMessage))
+        {
+            if (user.isAdmin())
+            {
+                server.rereadLoginMessage();
+            }
+            else
+            {
+                LOGGER.log(Level.INFO, "Non-admin user " + user.getName()
+                    + " used rereadLoginMessage command - ignored.");
+            }
+        }
+
         else if (command.equals(IWebServer.Echo))
         {
             if (user.isAdmin())

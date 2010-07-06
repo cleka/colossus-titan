@@ -24,6 +24,7 @@ public interface IWebServer
     public static final String ChatSubmit = "chatsubmit";
     public static final String ShutdownServer = "shutdownserver";
     public static final String Echo = "echo";
+    public static final String RereadLoginMessage = "rereadLoginMessage";
     public static final String RequestUserAttention = "requestUserAttention";
     public static final String PingResponse = "pingResponse";
 
