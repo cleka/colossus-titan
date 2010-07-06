@@ -420,23 +420,24 @@ public final class Client implements IClient, IOracle, IVariant,
         return playerAlive;
     }
 
-    private boolean suspended = false;
+    private boolean paused = false;
 
-    public boolean isSuspended()
+    public boolean isPaused()
     {
-        return suspended;
+        return paused;
     }
 
-    public void setGuiSuspendOngoing(boolean newState)
+    public void setPauseState(boolean newState)
     {
         if (isRemote())
         {
-            LOGGER.info("setGuiSuspendOngoing ignored in remote client");
+            LOGGER
+                .warning("setPauseState should not be possible in remote client!");
         }
         else
         {
-            suspended = newState;
-            localServer.setGuiSuspendOngoing(suspended);
+            paused = newState;
+            localServer.setPauseState(paused);
         }
     }
 
@@ -2888,7 +2889,7 @@ public final class Client implements IClient, IOracle, IVariant,
     {
         if (!isRemote())
         {
-            localServer.setGuiSuspendOngoing(false);
+            localServer.setPauseState(false);
             /* Calling it locally is "safer". If the stopGame is sent via the
              * socket connection, the call of disposeClientOriginated below
              * might be handled so fast, that it's connection closed exception

@@ -1269,13 +1269,13 @@ final class SocketClientThread extends Thread implements IServer,
             LOGGER.finer("Message to server from '"
                 + client.getOwningPlayer().getName() + "':" + message);
             out.println(message);
-            if (client.isSuspended())
+            if (client.isPaused())
             {
-                LOGGER.info("Game in suspended state - "
+                LOGGER.info("Game in \"Pause\" state - "
                     + "sending message anyway.");
                 if (!message.startsWith(Constants.replyToPing))
                 {
-                    client.showMessageDialog("NOTE: Game is suspended "
+                    client.showMessageDialog("NOTE: Game is paused "
                         + "- server will not confirm/react to any of\n"
                         + "your GUI activities (move, split, ...), and thus "
                         + "they will not show effect on the Board yet!");

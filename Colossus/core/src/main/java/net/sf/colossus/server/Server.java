@@ -117,7 +117,7 @@ public final class Server extends Thread implements IServer
     private final Object guiRequestMutex = new Object();
     private boolean guiRequestSaveFlag = false;
     private String guiRequestSaveFilename = null;
-    private boolean guiSuspendOngoing = false;
+    private boolean inPauseState = false;
 
     /* static so that new instance of Server can destroy a
      * previously allocated FileServerThread */
@@ -2811,16 +2811,16 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    public void setGuiSuspendOngoing(boolean newState)
+    public void setPauseState(boolean newState)
     {
         synchronized (guiRequestMutex)
         {
-            if (newState == guiSuspendOngoing)
+            if (newState == inPauseState)
             {
                 return;
             }
-            guiSuspendOngoing = newState;
-            if (guiSuspendOngoing)
+            inPauseState = newState;
+            if (inPauseState)
             {
                 // Just did set it to true, get the selector thread out of
                 // select(), if necessary
@@ -2828,7 +2828,7 @@ public final class Server extends Thread implements IServer
             }
             else
             {
-                // Flag was cleared to end the being-suspended
+                // Flag was cleared to end the pause
                 guiRequestMutex.notify();
             }
         }
@@ -2847,9 +2847,9 @@ public final class Server extends Thread implements IServer
                 guiRequestSaveFilename = null;
                 didSomething = true;
             }
-            else if (guiSuspendOngoing)
+            else if (inPauseState)
             {
-                while (guiSuspendOngoing)
+                while (inPauseState)
                 {
                     try
                     {

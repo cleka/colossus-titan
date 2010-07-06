@@ -2708,7 +2708,7 @@ public final class MasterBoard extends JPanel
          */
         private final JButton doneButton;
 
-        private final JButton suspendButton;
+        private final JButton pauseButton;
 
         /** display the current phase in the bottom bar */
         private final JLabel phaseLabel;
@@ -2769,9 +2769,9 @@ public final class MasterBoard extends JPanel
 
             setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-            String text = gui.getClient().isSuspended() ? "Resume" : "Suspend";
-            suspendButton = new JButton(text);
-            suspendButton.addActionListener(new ActionListener()
+            String text = gui.getClient().isPaused() ? "Continue" : "Pause";
+            pauseButton = new JButton(text);
+            pauseButton.addActionListener(new ActionListener()
             {
                 public void actionPerformed(ActionEvent e)
                 {
@@ -2779,10 +2779,10 @@ public final class MasterBoard extends JPanel
                 }
             });
 
-            // Not useful when playing on public server:
-            if (!gui.getStartedByWebClient())
+            // Not useful in any remote client
+            if (!client.isRemote())
             {
-                add(suspendButton);
+                add(pauseButton);
             }
 
             playerLabel = new JLabel("- player -");
@@ -2815,11 +2815,11 @@ public final class MasterBoard extends JPanel
 
         public void toggleSuspend()
         {
-            boolean oldState = gui.getClient().isSuspended();
+            boolean oldState = gui.getClient().isPaused();
             boolean newState = !oldState;
-            gui.getClient().setGuiSuspendOngoing(newState);
-            String text = gui.getClient().isSuspended() ? "Resume" : "Suspend";
-            suspendButton.setText(text);
+            gui.getClient().setPauseState(newState);
+            String text = gui.getClient().isPaused() ? "Continue" : "Pause";
+            pauseButton.setText(text);
         }
     }
 
