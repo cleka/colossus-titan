@@ -48,7 +48,15 @@ is usually the best to leave the setting to <b>&lt;By color&gt;</b>.
 <hr>
 <h2><a name="ServersideOptions">Options pane (various settings for the game)</a></h2>
 
-<h3>Section "General"</h3>
+Sections: 
+<a href="#General">General</a>, 
+<a href="#Viewability">Viewability of legion and events</a>,
+<a href="#Teleport">Teleport</a>,
+<a href="#Rules">Rules</a>,
+<a href="#AITiming">AI timing</a>
+ 
+
+<h3><a name="General">Section "General"</a></h3>
 Most of those are hopefully self-explaining:
 <ul>
 <li>Autosave
@@ -96,7 +104,7 @@ Game Status, Inspector, Event Viewer etc. all come and go with their
 respective MasterBoard. This needs still some work.
 
 <p>
-<h3>Section "Viewability of legions and events"</h3>
+<h3><a name="Viewability">Section "Viewability of legions and events"</a></h3>
 
 This controls whether one is allowed to view the contents of other
 players legions, and how long the events which reveal such information
@@ -162,7 +170,7 @@ types of events) fewer than the number of turns set in "Events expire after
 (turns)" setting, but not more than those.
 
 
-<h3>Section "Teleport"</h3><p>
+<h3><a name="Teleport">Section "Teleport"</a></h3><p>
 Those are hopefully self-explaining - the named teleport types are or are not 
 allowed.
 <ul>
@@ -173,12 +181,14 @@ allowed.
 <li>No Tower teleport
 </ul>
 
-<h3>Section "Rules"</h3><p>
+<h3><a name="Rules">Section "Rules"</a></h3><p>
 
 <ul>
-<li>Slowing is cumulative
-<li>Always allow one hex
-<li>Use non-random battle dice
+<li>Slowing is cumulative</li>
+<li>Always allow one hex</li>
+<li>Unlimited Mulligans</li>
+<li>Need lord for battle control</li>
+<li>Use non-random battle dice</li>
 </ul>
 
 <b><a name="SlowingCumulative">Slowing is cumulative:</a></b>
@@ -199,15 +209,42 @@ With this option, any creature can enter any non-impassible hex as its
 first move (it will only move one hex), so our 2-skill creature can
 enter our up-slope bramble if it hasn't moved yet.
 <p>
+<b><a name="UnlimitedMulligans">Unlimited Mulligans:</a></b>
+<p>
+If enabled, every player can take as many mulligans as he wants, in any turn (not just turn 1). 
+In multi player game (all humans, e.g. on the Public Game Server), you might turn this on
+and agree beforehand, that it might be used only in Turn 1, or e.g. "only as long as it is
+same roll, or as it is 2 or 5" - one can see from EventViewer if a player used it nevertheless,
+breaching the agreement.  
+<p>
+<b><a name="NeedLordForBattleControl">Need lord for battle control:</a></b>
+<p>
+Bruce Sears came up with this idea and implemented it - it might spice up
+some gaming. If it is enabled, you can control the individual creatures on a battle
+map only, if there is at least one lord in that legion. If there isn't, the AI will
+do the battling. This somewhat resembles/extends the idea, that only a legion without
+lord can flee. ("No boss to watch them, then the subordinates do what they please" ;-)
+<p>
+This effects immediately, i.e. as soon as the last lord is killed, a SimpleAI
+takes over, but if AI summons an angel, you are in charge again.
+<p>
+This mode might affect your strategy, i.e. aiming to have more angels in general,
+having them spread over the legions instead of all in same, etc.
+<p>
+Currently this mode is available only for local games, not on the Public Game Server. If there is 
+sufficient demand to support it there, controls for that can be added to
+the Game Server game proposal GUI.
+<p>
 <b><a name="NonRandomBattleDice">Use non-random battle dice:</a></b>
-this would use always a predefined sequence of rolls (right now:
-4,3,1,6,5,2) for battle dice rolling instead of random numbers. This
-would not necessarily guarantee "more equal chances" to the players,
-as it might still be that the one gets e.g. 6, 5, 2, 4, next player
+<p>
+This will use always a predefined sequence of rolls (right now:
+4,3,1,6,5,2) for battle dice rolling instead of random numbers. Note that 
+this would not necessarily <b>guarantee</b> "more equal chances" to the 
+players, as it might still be that the one gets e.g. 6, 5, 2, 4, next player
 rangestrikes (only 2) gets 3 and 1, first player again the high
 numbers etc. Probably only relevant for debugging purposes.
 
-<h3>Section "AI timing"</h3><p>
+<h3><a name="AITiming">Section "AI timing"</a></h3><p>
 Those values control how long an AI will pause after certain actions and how
 long time it may maximum take for certain steps (calculating what is the best move and so on).
 <hr>
@@ -264,7 +301,7 @@ start a new game, load a previously saved game, or Quit.
 <i>
 Created spring 2007, reflecting the state of Colossus at this time.
 <br>
-Last updated thursday, August 27, 2009 by Clemens Katzer
+Last updated July 6, 2010 by CleKa
 </i>
 </body>
 </html>
