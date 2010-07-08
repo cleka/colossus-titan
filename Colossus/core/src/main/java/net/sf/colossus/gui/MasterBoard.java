@@ -1556,6 +1556,10 @@ public final class MasterBoard extends JPanel
 
     private void setupPhasePreparations(String titleText)
     {
+        if (gui.isMyTurn())
+        {
+            gui.resetAllSkipFlags();
+        }
         unselectAllHexes();
         setTitleInfoText(titleText);
     }

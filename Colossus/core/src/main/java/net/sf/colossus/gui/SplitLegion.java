@@ -310,7 +310,6 @@ final class SplitLegion extends KDialog
 
     private void markSkip()
     {
-        System.out.println("SplitLegion.markSplit()!");
         // empty list to signal: skip split.
         creaturesToSplit = new ArrayList<CreatureType>();
         dispose();

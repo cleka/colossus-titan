@@ -1919,12 +1919,18 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     private void markLegionAsSkipSplit(Legion legion)
     {
-        System.out.println("mark legion as skip split: "
-            + legion.getMarkerId());
         legion.setSkipThisTime(true);
         pushUndoStack(legion.getMarkerId());
         board.clearPossibleRecruitChits();
         board.highlightTallLegions();
+    }
+
+    public void resetAllSkipFlags()
+    {
+        for (Legion l : getOwningPlayer().getLegions())
+        {
+            l.setSkipThisTime(false);
+        }
     }
 
     public boolean isPickCarryOngoing()
