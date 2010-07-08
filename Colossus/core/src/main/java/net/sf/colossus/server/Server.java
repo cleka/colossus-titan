@@ -421,7 +421,7 @@ public final class Server extends Thread implements IServer
         }
         else if (num == 0)
         {
-            LOGGER.info("Server side select timeout...");
+            // LOGGER.info("Server side select timeout...");
         }
 
         if (forceShutDown)
