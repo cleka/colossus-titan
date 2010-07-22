@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.Timer;
@@ -2431,10 +2432,9 @@ public class WebClient extends KFrame implements IWebClient
 
     private void cancelOwnInstantGameOnLogout()
     {
-        GameInfo instantGame = findMyInstantGame();
-        if (instantGame != null)
+        for (GameInfo gi : findMyInstantGames())
         {
-            server.cancelGame(instantGame.getGameId(), username);
+            server.cancelGame(gi.getGameId(), username);
         }
     }
 
@@ -3184,8 +3184,15 @@ public class WebClient extends KFrame implements IWebClient
         }
     }
 
-    private GameInfo findMyInstantGame()
+    /**
+     * Find all "relevant" instant games owned by this player
+     * (relevant means except those who are running, ending or deleted).
+     * Normally there should ever be only one, but in strange cases...
+     * (like, game start failed or something...)
+     */
+    private List<GameInfo> findMyInstantGames()
     {
+        List<GameInfo> list = new ArrayList<GameInfo>();
         for (GameInfo gi : gameHash.values())
         {
             // is instant, is mine, and don't bother about running or ending,
@@ -3196,10 +3203,23 @@ public class WebClient extends KFrame implements IWebClient
                     .getGameState().equals(GameState.ENDING))
                 && !deletedGames.contains(gi.getGameId()))
             {
-                return gi;
+                list.add(gi);
             }
         }
-        return null;
+        return list;
+    }
+
+    /**
+     * If there is at least one instant game by this player,
+     * return it (one of it if many), otherwise null.
+     * Normally there should ever be only one, but in strange cases...
+     * (like, game start failed or something...)
+     * @return The (or: any) instant game or null
+     */
+    private GameInfo ownInstantGameIfAny()
+    {
+        List<GameInfo> list = findMyInstantGames();
+        return list.isEmpty() ? null : list.get(0);
     }
 
     private void displayOnlyOneInstantGameMessage(String action, String message)
@@ -3225,7 +3245,7 @@ public class WebClient extends KFrame implements IWebClient
                             + enrolledInstantGameId + "!");
                     return;
                 }
-                GameInfo instantGame = findMyInstantGame();
+                GameInfo instantGame = ownInstantGameIfAny();
                 if (instantGame != null
                     && !instantGame.getGameId().equals(selectedGameId))
                 {
@@ -3253,7 +3273,7 @@ public class WebClient extends KFrame implements IWebClient
                 return;
             }
             GameInfo instantGame = null;
-            if ((instantGame = findMyInstantGame()) != null)
+            if ((instantGame = ownInstantGameIfAny()) != null)
             {
                 displayOnlyOneInstantGameMessage("propose",
                     "You can only be active for one instant game at a time, "
