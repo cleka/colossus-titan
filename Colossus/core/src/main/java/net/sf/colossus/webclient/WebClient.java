@@ -3188,19 +3188,15 @@ public class WebClient extends KFrame implements IWebClient
     {
         for (GameInfo gi : gameHash.values())
         {
+            // is instant, is mine, and don't bother about running or ending,
+            // nor old ones.
             if (!gi.isScheduledGame()
-                && gi.getGameState().equals(GameState.PROPOSED)
-                && gi.getInitiator().equals(username))
+                && gi.getInitiator().equals(username)
+                && !(gi.getGameState().equals(GameState.RUNNING) || gi
+                    .getGameState().equals(GameState.ENDING))
+                && !deletedGames.contains(gi.getGameId()))
             {
-                if (deletedGames.contains(gi.getGameId()))
-                {
-                    LOGGER.finest("For GameId " + gi.getGameId()
-                        + ", found one myInstantGame but it's deleted...");
-                }
-                else
-                {
-                    return gi;
-                }
+                return gi;
             }
         }
         return null;
