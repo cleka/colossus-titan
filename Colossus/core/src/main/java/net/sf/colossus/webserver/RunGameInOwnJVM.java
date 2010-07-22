@@ -472,7 +472,7 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
         }
         else
         {
-            LOGGER.log(Level.WARNING, "Game " + gameId + " started, but not "
+            LOGGER.log(Level.WARNING, "Game " + gameId + " started, but not"
                 + " all clients did connect; got only " + connected
                 + " players: " + names.toString());
         }
