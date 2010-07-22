@@ -2769,9 +2769,18 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     // called by WebClient
     public void doConfirmAndQuit()
     {
-        // Board does the "Really Quit?" confirmation and initiates
-        // then (if user confirmed) the disposal of everything.
-        board.doQuitGameAction();
+        // In odd situations, e.g. web game did not start properly, the
+        // game client is set in webclient, but board is still null
+        if (board != null)
+        {
+            // Board does the "Really Quit?" confirmation and initiates
+            // then (if user confirmed) the disposal of everything.
+            board.doQuitGameAction();
+        }
+        else
+        {
+            menuQuitGame();
+        }
     }
 
     public void showConnectionClosedMessage()
