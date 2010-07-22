@@ -608,7 +608,8 @@ public final class PlayerServerSide extends Player implements
         List<String> li = new ArrayList<String>();
         li.add(Boolean.toString(!treatDeadAsAlive && isDead()));
         li.add(getName());
-        li.add(getStartingTower().getLabel());
+        li.add(getStartingTower() != null ? getStartingTower().getLabel()
+            : null);
         li.add((getColor() != null) ? getColor().getName() : null);
         li.add(getType());
         li.add(getPlayersElim());
