@@ -2991,12 +2991,15 @@ public class WebClient extends KFrame implements IWebClient
 
                             case DUE:
                             case ACTIVATED:
+                                replaceInTable(proposedGameTable, game);
                                 break;
 
                             case STARTING:
+                                // TODO: state never used anywhere else - remove it ?
                                 break;
 
                             case READY_TO_CONNECT:
+                                replaceInTable(proposedGameTable, game);
                                 break;
 
                             case RUNNING:
