@@ -482,7 +482,11 @@ public class WebServer implements IWebServer, IRunWebServer
 
     public void updateGUI()
     {
-        assert gui != null;
+        if (gui == null)
+        {
+            // skip it if called too early or already going down...
+            return;
+        }
         gui.setScheduledGamesInfo(countProposedGames(true)
             + " scheduled games stored");
         gui.setInstantGamesInfo(countProposedGames(false)
