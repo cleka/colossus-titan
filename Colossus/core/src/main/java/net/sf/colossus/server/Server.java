@@ -221,7 +221,7 @@ public final class Server extends Thread implements IServer
         int disposeRound = 0;
         while (!shuttingDown && disposeRound < 60)
         {
-            waitOnSelector(timeout);
+            waitOnSelector(timeout, false);
             // The following is handling the case that game did initiate
             // the dispose by itself  due to AutoQuit when game over
             if (initiateDisposal)
@@ -368,7 +368,7 @@ public final class Server extends Thread implements IServer
         while (waitingForPlayers > 0 && serverRunning && !shuttingDown)
         {
             LOGGER.info("Waiting for clients, before waitOnSelector()");
-            waitOnSelector(timeoutDuringStart);
+            waitOnSelector(timeoutDuringStart, true);
         }
 
         return (waitingForPlayers == 0);
@@ -386,11 +386,11 @@ public final class Server extends Thread implements IServer
         overriddenCH = null;
     }
 
-    public void waitOnSelector(int timeout)
+    public void waitOnSelector(int timeout, boolean stillWaitingForClients)
     {
         try
         {
-            handleOutsideChanges(timeout);
+            handleOutsideChanges(timeout, stillWaitingForClients);
             handleSelectedKeys();
             handleChannelChanges();
             repeatTellOneHasNetworkTrouble();
@@ -420,7 +420,8 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    private void handleOutsideChanges(int timeout) throws IOException
+    private void handleOutsideChanges(int timeout,
+        boolean stillWaitingForClients) throws IOException
     {
         if (stopAcceptingFlag)
         {
@@ -440,14 +441,19 @@ public final class Server extends Thread implements IServer
         }
         else if (num == 0)
         {
-            LOGGER.info("Server side select timeout...");
-            long now = new Date().getTime();
-            int alreadyTrying = ((int)(now - startInititatedTime)) / 1000;
-            if (gameStartupTimeoutSecs > 0 && alreadyTrying > gameStartupTimeoutSecs)
+            // LOGGER.info("Server side select timeout...");
+            if (stillWaitingForClients)
             {
-                logToStartLog("Waiting for clients timed out - giving up!");
-                LOGGER.warning("Waiting for clients timed out - giving up!");
-                forceShutDown = true;
+                long now = new Date().getTime();
+                int alreadyTrying = ((int)(now - startInititatedTime)) / 1000;
+                if (gameStartupTimeoutSecs > 0
+                    && alreadyTrying > gameStartupTimeoutSecs)
+                {
+                    logToStartLog("Waiting for clients timed out - giving up!");
+                    LOGGER
+                        .warning("Waiting for clients timed out - giving up!");
+                    forceShutDown = true;
+                }
             }
         }
 
