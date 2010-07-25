@@ -422,8 +422,7 @@ final class SocketClientThread extends Thread implements IServer,
                 {
                     try
                     {
-                        LOGGER.finest("Client '"
-                            + client.getOwningPlayer().getName()
+                        LOGGER.finest("Client '" + getNameMaybe()
                             + "' got message from server: " + fromServer);
                         parseLine(fromServer);
                     }
@@ -439,7 +438,7 @@ final class SocketClientThread extends Thread implements IServer,
                 else
                 {
                     LOGGER.warning("Client '"
-                        + client.getOwningPlayer().getName()
+                        + getNameMaybe()
                         + "' got empty message from server?");
                 }
             }
@@ -461,7 +460,7 @@ final class SocketClientThread extends Thread implements IServer,
         catch (VirtualMachineError vme)
         {
             String message = "Woooah! A Fatal JVM error was caught while "
-                + "processing in client " + client.getOwningPlayer().getName()
+                + "processing in client " + getNameMaybe()
                 + " the input line:\n    === " + fromServer + " ===\n"
                 + "\nStack trace:\n" + ErrorUtils.makeStackTraceString(vme)
                 + "\n\nGame might be unstable or hang from now on...";
@@ -1170,7 +1169,7 @@ final class SocketClientThread extends Thread implements IServer,
         else if (method.equals(Constants.serverConnectionOK))
         {
             LOGGER.info("Received server connection OK message from server "
-                + "for player " + client.getOwningPlayer().getName());
+                + "for player " + getNameMaybe());
             client.serverConfirmsConnection();
         }
 
@@ -1193,7 +1192,7 @@ final class SocketClientThread extends Thread implements IServer,
     {
         if (client != null && client.getOwningPlayer() != null)
         {
-            return client.getOwningPlayer().getName();
+            return getNameMaybe();
         }
         else
         {
@@ -1251,12 +1250,12 @@ final class SocketClientThread extends Thread implements IServer,
             // This I call it severe, and log it always,
             // not just an assertion.
             LOGGER.severe("SCT ResolveLegion for " + markerId + " in client "
-                + client.getOwningPlayer().getName() + " gave null!");
+                + getNameMaybe() + " gave null!");
         }
 
         // Peter made this assertion, I guess...
         assert legion != null : "SocketClientThread.resolveLegion(" + markerId
-            + " in client of player " + client.getOwningPlayer().getName()
+            + " in client of player " + getNameMaybe()
             + " returned null!";
 
         return legion;
@@ -1266,8 +1265,8 @@ final class SocketClientThread extends Thread implements IServer,
     {
         if (socket != null)
         {
-            LOGGER.finer("Message to server from '"
-                + client.getOwningPlayer().getName() + "':" + message);
+            LOGGER.finer("Message to server from '" + getNameMaybe() + "':"
+                + message);
             out.println(message);
             if (client.isPaused())
             {
