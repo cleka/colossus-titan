@@ -1978,10 +1978,8 @@ public class WebClient extends KFrame implements IWebClient
                 GameInfo gi = findGameById(enrolledInstantGameId);
                 if (gi != null)
                 {
-                    if (gi.enoughPlayersEnrolled()
-                        && gi.allEnrolledOnline()
-                        && gi.getGameState().equals(GameState.PROPOSED)
-                        && isEligibleToStart(gi))
+                    if (gi.enoughPlayersEnrolled() && gi.allEnrolledOnline()
+                        && gi.isStartable() && isEligibleToStart(gi))
                     {
                         return true;
                     }
@@ -2000,7 +1998,7 @@ public class WebClient extends KFrame implements IWebClient
             case LoggedIn:
                 boolean startPossible = false;
                 String id = getSelectedGameId();
-                if (id != null && isScheduledGameStartable(id))
+                if (id != null && isScheduledGameAndStartable(id))
                 {
                     startPossible = true;
                 }
@@ -2014,7 +2012,7 @@ public class WebClient extends KFrame implements IWebClient
 
     }
 
-    private boolean isScheduledGameStartable(String id)
+    private boolean isScheduledGameAndStartable(String id)
     {
         assert id != null : "Not a valid game id: " + id;
 
@@ -2025,8 +2023,9 @@ public class WebClient extends KFrame implements IWebClient
             return false;
         }
 
-        if (gi.isEnrolled(username) && gi.hasEnoughPlayers() && gi.isDue()
-            && gi.allEnrolledOnline())
+        if (gi.isStartable() && gi.isEnrolled(username)
+            && isEligibleToStart(gi) && gi.isScheduledGame() && gi.isDue()
+            && gi.hasEnoughPlayers() && gi.allEnrolledOnline())
         {
             return true;
         }
