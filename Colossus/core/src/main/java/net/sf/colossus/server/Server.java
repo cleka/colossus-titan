@@ -215,7 +215,10 @@ public final class Server extends Thread implements IServer
         }
         boolean gotAll = waitForClients();
         game.actOnWaitForClientsCompleted(gotAll);
-        sendPingRequests = true;
+        if (!remoteClients.isEmpty())
+        {
+            sendPingRequests = true;
+        }
 
         int timeout = timeoutDuringGame;
         int disposeRound = 0;
