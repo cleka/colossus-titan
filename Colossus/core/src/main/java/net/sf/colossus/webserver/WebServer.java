@@ -1335,26 +1335,33 @@ public class WebServer implements IWebServer, IRunWebServer
         return reason;
     }
 
-    /*
-     * unregister a game from runningGames,
-     * keep in endingGames until it's reaped
+    /**
+     * unregister a game from runningGames (or proposedGames),
+     * and keep in endingGames until it's reaped
      */
-
     public void unregisterGame(GameInfo gi, int port)
     {
-        //        System.out.println("runningGames: " + runningGames.toString());
         synchronized (runningGames)
         {
-            LOGGER.log(Level.FINEST, "trying to remove...");
+            LOGGER.log(Level.FINEST, "unregister: trying to remove...");
             if (runningGames.contains(gi))
             {
-                // System.out.println("removing");
-                LOGGER.log(Level.FINEST, "removing...");
+                LOGGER.log(Level.FINEST, "Removing game " + gi.getGameId()
+                    + " from running games list");
                 runningGames.remove(gi);
+            }
+            // If game starting did not succeed might still be in proposed list
+            else if (proposedGames.containsKey(gi.getGameId()))
+            {
+                LOGGER.log(Level.FINEST, "Removing game " + gi.getGameId()
+                    + " from running proposed games hash");
+                proposedGames.remove(gi.getGameId());
+                proposedGamesListModified = true;
             }
             else
             {
-                LOGGER.warning("runningGames does not contain game "
+                LOGGER
+                    .warning("Neither runningGames nor proposedGames contains game "
                     + gi.getGameId());
             }
         }
@@ -1367,17 +1374,16 @@ public class WebServer implements IWebServer, IRunWebServer
 
         GameThreadReaper r = new GameThreadReaper();
         r.start();
-        LOGGER.log(Level.FINEST, "GameThreadReaper started");
+        LOGGER.log(Level.FINEST, "GameThreadReaper started for game "
+            + gi.getGameId());
 
         updateGUI();
-
     }
 
-    /*
-     * unregister a game from runningGames,
+    /**
+     * unregister a game (run on player's PC) from runningGames,
      * keep in endingGames until it's reaped
      */
-
     public void unregisterGamePlayerPC(GameInfo gi)
     {
         if (gi == null)
@@ -1395,6 +1401,8 @@ public class WebServer implements IWebServer, IRunWebServer
                 LOGGER.log(Level.FINEST, "removing...");
                 runningGames.remove(gi);
             }
+            // TODO: also add the "if start failed check proposed games list, too" here?
+
             else
             {
                 LOGGER.warning("runningGames does not contain game "

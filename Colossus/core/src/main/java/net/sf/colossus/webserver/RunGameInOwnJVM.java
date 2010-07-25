@@ -50,6 +50,7 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
 
     private File flagFile;
     private boolean alreadyStarted;
+    private String reasonStartFailed;
 
     public RunGameInOwnJVM(IRunWebServer server, WebServerOptions options,
         GameInfo gi)
@@ -263,49 +264,62 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
             }
             else
             {
-                LOGGER.log(Level.SEVERE, "Game " + gameId
-                    + " started but not all clients came in!!!");
+                LOGGER.log(Level.SEVERE, "Game " + gameId + " started but "
+                    + reasonStartFailed);
             }
         }
         else
         {
-            LOGGER.log(Level.SEVERE, "game did not came up!!!");
+            reasonStartFailed = "did not reach READY_TO_CONNECT state!";
+            LOGGER.log(Level.SEVERE, "Game " + gameId + " "
+                + reasonStartFailed);
         }
-
     }
 
     private void waitForGameShutdown(Process p, NullDumper ndout,
         NullDumper nderr)
     {
-        try
-        {
-            p.waitFor();
-            ndout.done();
-            nderr.done();
-        }
-        catch (Exception e)
-        {
-            LOGGER
-                .log(Level.SEVERE, "Exception durimg waitForGameShutdown", e);
-        }
-
+        LOGGER.log(Level.FINEST, "Waiting for process for game " + gameId
+            + " to reap it.");
         try
         {
             int exitCode = p.waitFor();
-
             if (exitCode != 0)
             {
                 LOGGER.log(Level.FINEST, "After waitFor... - exit code is "
                     + exitCode);
+                ndout.done();
+                nderr.done();
             }
         }
         catch (InterruptedException e)
         {
             String reason = "InterruptedException";
+            LOGGER.log(Level.WARNING, "InterruptedException " + e.getMessage()
+                + " during waitForGameShutdown", e);
+            server.gameFailed(gi, reason);
+        }
+        catch (Exception e)
+        {
+            String reason = "Exception " + e.getMessage();
+            LOGGER.log(Level.SEVERE, "Exception " + e.getMessage()
+                + " during waitForGameShutdown", e);
             server.gameFailed(gi, reason);
         }
 
-        if (flagFile.exists())
+        if (flagFile.exists() && reasonStartFailed != null)
+        {
+            String message = "Game "
+                + gameId
+                + " ended but flagfile "
+                + flagFile.toString()
+                + " does still exist? "
+                + "Well, start failed, so it's not that surprising. Renaming it...";
+            LOGGER.log(Level.INFO, message);
+            flagFile.renameTo(new File(flagFile.getParent(),
+                "flagfile.startFailed"));
+        }
+        else if (flagFile.exists())
         {
             LOGGER.log(Level.WARNING, "Game " + gameId
                 + " ended but flagfile " + flagFile.toString()
@@ -318,7 +332,8 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
             LOGGER.log(Level.FINEST, "Game " + gameId + " ended and flagfile "
                 + flagFile.toString() + " is gone. Fine!");
         }
-        LOGGER.info("Before unregister game " + gi.getGameId());
+
+        LOGGER.info("Before unregister game " + gameId);
         server.unregisterGame(gi, hostingPort);
     }
 
@@ -396,9 +411,7 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
 
     public boolean waitUntilGameStartedSuccessfully(int timeout)
     {
-        boolean ok = false;
-
-        String line;
+        reasonStartFailed = null;
 
         BufferedReader in = null;
         try
@@ -414,16 +427,18 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
 
         if (in == null)
         {
-            LOGGER.log(Level.SEVERE, "could not open flagfile for reading!!");
+            reasonStartFailed = "could not open flagfile for reading!!";
             return false;
         }
 
         int connected = 0;
         int checkInterval = 1000; // every second
+        String line;
 
         StringBuffer names = new StringBuffer("");
 
-        for (int i = 0; !ok && i < timeout;)
+        boolean done = false;
+        for (int i = 0; !done && i < timeout;)
         {
             String name = null;
             line = waitForLine(in, checkInterval);
@@ -445,15 +460,24 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
             }
             else if (line.startsWith("All clients connected"))
             {
-                ok = true;
+                done = true;
             }
             else if (line.startsWith("Game Startup Completed"))
             {
-                ok = true;
+                done = true;
             }
+            else if (line
+                .startsWith("Waiting for clients timed out - giving up!"))
+            {
+                done = true;
+                reasonStartFailed = "Waiting for clients timed out, "
+                    + "not all clients did connect; got only " + connected
+                    + " players: " + names.toString();
+            }
+
             if (connected >= gi.getPlayers().size())
             {
-                ok = true;
+                done = true;
             }
 
             if (name != null)
@@ -466,15 +490,14 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
             }
         }
 
-        if (ok)
+        if (done && reasonStartFailed == null)
         {
             LOGGER.log(Level.FINEST, "Game started ok - fine!");
         }
         else
         {
-            LOGGER.log(Level.WARNING, "Game " + gameId + " started, but not"
-                + " all clients did connect; got only " + connected
-                + " players: " + names.toString());
+            reasonStartFailed = "not all clients did connect; got only "
+                + connected + " players: " + names.toString();
         }
 
         try
@@ -485,7 +508,7 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
         {
             // ignore
         }
-        return ok;
+        return (reasonStartFailed == null);
     }
 
     private void sleepFor(long millis)

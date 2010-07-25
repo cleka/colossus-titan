@@ -237,6 +237,12 @@ public class NullClientGUI implements IClientGUI
 
     }
 
+    public void actOnGameStartingFailed()
+    {
+        // TODO Auto-generated method stub
+
+    }
+
     public void actOnTellLegionLocation(Legion legion, MasterHex hex)
     {
         // TODO Auto-generated method stub
@@ -526,6 +532,11 @@ public class NullClientGUI implements IClientGUI
     {
         // TODO Auto-generated method stub
 
+    }
+
+    public boolean hasBoard()
+    {
+        return false;
     }
 
     public void initShowEngagementResults()

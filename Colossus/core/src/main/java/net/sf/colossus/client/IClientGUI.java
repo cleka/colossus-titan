@@ -40,6 +40,8 @@ public interface IClientGUI
 
     public abstract void initBoard();
 
+    public abstract boolean hasBoard();
+
     public abstract void actOnInitBattle();
 
     public abstract void updateStatusScreen();
@@ -299,6 +301,8 @@ public interface IClientGUI
 
     public abstract void actOnTellGameOver(String message,
         boolean disposeFollows);
+
+    public abstract void actOnGameStartingFailed();
 
     public abstract void showMessageDialogAndWait(String message);
 

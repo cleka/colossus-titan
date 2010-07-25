@@ -287,6 +287,8 @@ public class GameTableModel extends AbstractTableModel
         return nextIndex;
     }
 
+    // Note that webclient state change code relies on the fact that calling
+    // this for a game that is not in the table does not harm nor complain!
     public void removeGame(String gameId)
     {
         int index = this.findRowIndex(gameId);

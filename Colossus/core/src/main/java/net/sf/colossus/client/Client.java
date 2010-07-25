@@ -793,8 +793,17 @@ public final class Client implements IClient, IOracle, IVariant,
         {
             if (isRemote())
             {
-                gui.showConnectionClosedMessage();
-                close = false;
+                if (gui.hasBoard())
+                {
+                    gui.showConnectionClosedMessage();
+                    close = false;
+                }
+                else
+                {
+                    gui.actOnGameStartingFailed();
+                    // No board - probably startup failed. Simply silently
+                    close = true;
+                }
             }
             else
             {

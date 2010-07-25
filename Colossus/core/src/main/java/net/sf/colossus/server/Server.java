@@ -134,6 +134,8 @@ public final class Server extends Thread implements IServer
     private final int timeoutDuringGame = 1000;
     private final int timeoutDuringShutdown = 1000;
 
+    /** How long in public server games socket shall wait for Clients. */
+    private final static int WEBGAMES_STARTUP_TIMEOUT_SECS = 20;
     private final int PING_REQUEST_INTERVAL_SEC = 30;
 
     /**
@@ -141,6 +143,17 @@ public final class Server extends Thread implements IServer
      */
     private long lastPingRound = 0;
 
+    /**
+     * When server started to listed for clients
+     */
+    private long startInititatedTime = 0;
+
+    /**
+     * Timeout how long server waits for clients before giving up;
+     * in normal/local games 0, meaning forever;
+     * in public server usage set to WEBGAMES_STARTUP_TIMEOUT_SECS
+     */
+    private int gameStartupTimeoutSecs = 0;
 
     // Earlier I have locked on an Boolean object itself,
     // which I modify... and when this is done too often,
@@ -195,6 +208,11 @@ public final class Server extends Thread implements IServer
     @Override
     public void run()
     {
+        startInititatedTime = new Date().getTime();
+        if (game.getNotifyWebServer().isActive())
+        {
+            gameStartupTimeoutSecs = WEBGAMES_STARTUP_TIMEOUT_SECS;
+        }
         boolean gotAll = waitForClients();
         game.actOnWaitForClientsCompleted(gotAll);
         sendPingRequests = true;
@@ -349,6 +367,7 @@ public final class Server extends Thread implements IServer
         serverRunning = true;
         while (waitingForPlayers > 0 && serverRunning && !shuttingDown)
         {
+            LOGGER.info("Waiting for clients, before waitOnSelector()");
             waitOnSelector(timeoutDuringStart);
         }
 
@@ -421,7 +440,15 @@ public final class Server extends Thread implements IServer
         }
         else if (num == 0)
         {
-            // LOGGER.info("Server side select timeout...");
+            LOGGER.info("Server side select timeout...");
+            long now = new Date().getTime();
+            int alreadyTrying = ((int)(now - startInititatedTime)) / 1000;
+            if (gameStartupTimeoutSecs > 0 && alreadyTrying > gameStartupTimeoutSecs)
+            {
+                logToStartLog("Waiting for clients timed out - giving up!");
+                LOGGER.warning("Waiting for clients timed out - giving up!");
+                forceShutDown = true;
+            }
         }
 
         if (forceShutDown)

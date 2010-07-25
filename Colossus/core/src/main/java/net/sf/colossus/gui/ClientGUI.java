@@ -177,6 +177,11 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         return board;
     }
 
+    public boolean hasBoard()
+    {
+        return board != null;
+    }
+
     public Client getClient()
     {
         return client;
@@ -282,8 +287,16 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         {
             if (webClient != null)
             {
-                webClient.notifyComingUp();
+                webClient.notifyComingUp(true);
             }
+        }
+    }
+
+    public void actOnGameStartingFailed()
+    {
+        if (webClient != null)
+        {
+            webClient.notifyComingUp(false);
         }
     }
 

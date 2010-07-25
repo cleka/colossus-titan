@@ -878,8 +878,7 @@ public class WebClient extends KFrame implements IWebClient
 
     private void initFormats()
     {
-        myDateFormat = DateFormat
-            .getDateInstance(DateFormat.MEDIUM, myLocale);
+        myDateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM, myLocale);
         myDateFormat.setTimeZone(TimeZone.getDefault());
         myDateFormat.setLenient(false);
 
@@ -1115,7 +1114,8 @@ public class WebClient extends KFrame implements IWebClient
                 }
             });
 
-        proposedGameTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        proposedGameTable
+            .setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane propScrollpane = new JScrollPane(proposedGameTable);
         propGamesCard.add(propScrollpane, BorderLayout.CENTER);
 
@@ -1625,7 +1625,6 @@ public class WebClient extends KFrame implements IWebClient
 
         adminTab.add(adminPane);
     }
-
 
     public void beepButtonAction()
     {
@@ -2641,14 +2640,26 @@ public class WebClient extends KFrame implements IWebClient
 
     private final Object comingUpMutex = new Object();
     private boolean clientIsUp = false;
+    private boolean clientStartFailed = false;
 
     // Client calls this
-    public void notifyComingUp()
+    public void notifyComingUp(boolean success)
     {
         synchronized (comingUpMutex)
         {
-            clientIsUp = true;
-            comingUpMutex.notify();
+            // skip if timer already did it (perhaps shortly ago)
+            if (!timeIsUp)
+            {
+                if (success)
+                {
+                    clientIsUp = true;
+                }
+                else
+                {
+                    clientStartFailed = true;
+                }
+                comingUpMutex.notify();
+            }
         }
     }
 
@@ -2670,10 +2681,17 @@ public class WebClient extends KFrame implements IWebClient
         @Override
         public void run()
         {
-            timeIsUp = true;
             synchronized (comingUpMutex)
             {
-                comingUpMutex.notify();
+                if (clientIsUp || clientStartFailed)
+                {
+                    // skip, timer was triggered just when start succeeded
+                }
+                else
+                {
+                    timeIsUp = true;
+                    comingUpMutex.notify();
+                }
             }
         }
     }
@@ -2759,7 +2777,7 @@ public class WebClient extends KFrame implements IWebClient
 
             Timer timeoutStartup = setupTimer();
 
-            while (!clientIsUp && !timeIsUp)
+            while (!clientIsUp && !timeIsUp && !clientStartFailed)
             {
                 synchronized (comingUpMutex)
                 {
@@ -2794,6 +2812,7 @@ public class WebClient extends KFrame implements IWebClient
                         + "(probably some other player connecting failed?)",
                     "Starting game failed!", JOptionPane.ERROR_MESSAGE);
                 state = LoggedIn;
+                enrolledInstantGameId = null;
                 updateGUI();
             }
         }
@@ -2980,9 +2999,9 @@ public class WebClient extends KFrame implements IWebClient
                             proposedGameDataModel.removeGame(gameId);
                             break;
                         }
-                        GameState state = game.getGameState();
+                        GameState gameState = game.getGameState();
 
-                        switch (state)
+                        switch (gameState)
                         {
                             case PROPOSED:
                                 replaceInTable(proposedGameTable, game);
@@ -3008,6 +3027,12 @@ public class WebClient extends KFrame implements IWebClient
                                 break;
 
                             case ENDING:
+                                // Normally happens during change to RUNNING,
+                                // but if starting fails, it's changed to
+                                // ENDING immediately. So do it here again.
+                                // If it is not there anymore, no harm done.
+                                proposedGameDataModel.removeGame(game
+                                    .getGameId());
                                 runGameDataModel.removeGame(game.getGameId());
                                 break;
 
@@ -3023,7 +3048,6 @@ public class WebClient extends KFrame implements IWebClient
                 updateGUI();
             }
         });
-
     }
 
     private void replaceInTable(JTable table, GameInfo gi)
