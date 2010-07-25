@@ -1192,7 +1192,7 @@ final class SocketClientThread extends Thread implements IServer,
     {
         if (client != null && client.getOwningPlayer() != null)
         {
-            return getNameMaybe();
+            return client.getOwningPlayer().getName();
         }
         else
         {
