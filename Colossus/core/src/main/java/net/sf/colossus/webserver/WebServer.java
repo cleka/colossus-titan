@@ -705,7 +705,8 @@ public class WebServer implements IWebServer, IRunWebServer
                 else
                 {
                     LOGGER.warning("Player " + username
-                        + " tried to enroll but game is already starting!");
+                        + " tried to enroll to game " + gameId
+                        + " but game is already starting!");
                     IWebClient webClient = (IWebClient)user.getThread();
                     if (webClient != null)
                     {
