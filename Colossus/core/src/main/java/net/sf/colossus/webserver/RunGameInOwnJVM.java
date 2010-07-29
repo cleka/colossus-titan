@@ -279,32 +279,33 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
     private void waitForGameShutdown(Process p, NullDumper ndout,
         NullDumper nderr)
     {
-        LOGGER.log(Level.FINEST, "Waiting for process for game " + gameId
-            + " to reap it.");
         try
         {
+            LOGGER.log(Level.FINEST, "Waiting for process of game " + gameId
+                + " to reap it.");
             int exitCode = p.waitFor();
             if (exitCode != 0)
             {
-                LOGGER.log(Level.FINEST, "After waitFor... - exit code is "
-                    + exitCode);
-                ndout.done();
-                nderr.done();
+                LOGGER.log(Level.WARNING, "Non-zero exit code (" + exitCode
+                    + ") of process for game " + gameId);
             }
-        }
-        catch (InterruptedException e)
-        {
-            String reason = "InterruptedException";
-            LOGGER.log(Level.WARNING, "InterruptedException " + e.getMessage()
-                + " during waitForGameShutdown", e);
-            server.gameFailed(gi, reason);
+            else
+            {
+                LOGGER.log(Level.FINEST, "Exit code of process for game "
+                    + gameId + " is " + exitCode + " - ok!");
+            }
         }
         catch (Exception e)
         {
-            String reason = "Exception " + e.getMessage();
-            LOGGER.log(Level.SEVERE, "Exception " + e.getMessage()
-                + " during waitForGameShutdown", e);
+            String reason = "Exception " + e.getMessage()
+                + " during waitForGameShutdown game " + gameId;
+            LOGGER.log(Level.WARNING, reason, e);
             server.gameFailed(gi, reason);
+        }
+        finally
+        {
+            ndout.done();
+            nderr.done();
         }
 
         if (flagFile.exists() && reasonStartFailed != null)
@@ -596,9 +597,14 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
                     // ignore & end
                     return;
                 }
-                if (line != null && !this.toNull)
+
+                if (!this.toNull)
                 {
                     LOGGER.log(Level.INFO, prefix + line);
+                }
+                if (line == null)
+                {
+                    return;
                 }
             }
         }
