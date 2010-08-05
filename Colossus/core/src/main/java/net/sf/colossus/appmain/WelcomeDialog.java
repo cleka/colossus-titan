@@ -28,7 +28,7 @@ public final class WelcomeDialog extends KFrame
 {
     private final static String title = "Welcome to this new Colossus Release!";
 
-    private final static String CURRENT_WELCOME_KEY = "0.10.4";
+    private final static String CURRENT_WELCOME_KEY = "0.11.0";
 
     private final static String colossusRecentChangesDetailsUrl = ""
         + "http://colossus.sourceforge.net/docs/RecentChangesDetails.html#FeatureExplanations";
@@ -41,7 +41,7 @@ public final class WelcomeDialog extends KFrame
         super(title);
 
         String text = "\n"
-            + "  Welcome to this new Colossus release 0.10.4!"
+            + "  Welcome to this new Colossus release 0.11.0!"
             + "\n\n"
             + "  New features:\n"
             + "  - Player-colored angels and captured markers\n"
