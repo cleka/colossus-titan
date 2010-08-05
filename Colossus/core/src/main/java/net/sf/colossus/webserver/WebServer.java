@@ -522,7 +522,8 @@ public class WebServer implements IWebServer, IRunWebServer
         LOGGER.info("Checking if any cancelling is needed for user "
             + user.getName());
 
-        Collection<GameInfo> games = proposedGames.values();
+        ArrayList<GameInfo> games = new ArrayList<GameInfo>(proposedGames
+            .values());
         for (GameInfo gi : games)
         {
             if (!gi.isScheduledGame()
@@ -541,7 +542,9 @@ public class WebServer implements IWebServer, IRunWebServer
         IWebClient client = newCst;
         User newUser = newCst.getUser();
 
-        for (GameInfo gi : proposedGames.values())
+        ArrayList<GameInfo> games = new ArrayList<GameInfo>(proposedGames
+            .values());
+        for (GameInfo gi : games)
         {
             if (gi.reEnrollIfNecessary(newUser))
             {
@@ -1008,7 +1011,9 @@ public class WebServer implements IWebServer, IRunWebServer
         int connected = User.getLoggedInCount();
         allTellUserCounts();
         gui.setUserInfo(connected + " users connected.");
-        for (GameInfo gi : proposedGames.values())
+        ArrayList<GameInfo> games = new ArrayList<GameInfo>(proposedGames
+            .values());
+        for (GameInfo gi : games)
         {
             boolean changed = gi.updateOnline();
             if (changed)
@@ -1500,7 +1505,9 @@ public class WebServer implements IWebServer, IRunWebServer
             out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(
                 filename), WebServerConstants.charset));
 
-            for (GameInfo gi : proposedGames.values())
+            ArrayList<GameInfo> games = new ArrayList<GameInfo>(proposedGames
+                .values());
+            for (GameInfo gi : games)
             {
                 if (gi.relevantForSaving())
                 {
