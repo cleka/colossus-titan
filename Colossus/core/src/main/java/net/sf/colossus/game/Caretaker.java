@@ -52,6 +52,12 @@ public class Caretaker
         public void creatureTypeDeadCountUpdated(CreatureType type,
             int deadCount);
 
+        /** Called when a change was done on either avail or dead, or both.
+         *
+         * @param type The creature type for which the count is changed.
+         */
+        public void creatureTypeCountsUpdated(CreatureType type);
+
         /**
          * Called after large changes when listeners should perform an update of all
          * inferred information and/or displays.
@@ -200,6 +206,16 @@ public class Caretaker
         }
     }
 
+    private void triggerOneCountUpdate(CreatureType type)
+    {
+        for (ChangeListener listener : listeners)
+        {
+            listener.creatureTypeCountsUpdated(type);
+        }
+    }
+
+
+
     private void triggerFullUpdate()
     {
         for (ChangeListener listener : listeners)
@@ -249,9 +265,10 @@ public class Caretaker
                     creatureAvailableCounts.put(type, Integer.valueOf(live
                         + dead));
                     creatureDeadCounts.put(type, Integer.valueOf(0));
+                    triggerOneCountUpdate(type);
                 }
             }
         }
-        triggerFullUpdate();
+        // triggerFullUpdate();
     }
 }

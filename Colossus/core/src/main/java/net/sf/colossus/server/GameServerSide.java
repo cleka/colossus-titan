@@ -163,6 +163,11 @@ public final class GameServerSide extends Game
                 updateCaretakerDisplaysFor(type);
             }
 
+            public void creatureTypeCountsUpdated(CreatureType type)
+            {
+                updateCaretakerDisplaysFor(type);
+            }
+
             public void fullUpdate()
             {
                 updateCaretakerDisplays();
