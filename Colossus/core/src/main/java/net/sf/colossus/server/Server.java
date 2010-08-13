@@ -236,11 +236,13 @@ public final class Server extends Thread implements IServer
                     timeout = timeoutDuringShutdown;
                     // Requesting all clients to confirm that they have caught
                     // up with the processing of all the messages at game end.
-                    // When all caught up, this will triger game.dispose(),
+                    // When all caught up, this will trigger game.dispose(),
                     //   which which do stopServerRunning,
                     //     which will do stopFileServer, disposeAllClients,
                     //     and set shuttingDown and serverRunning to false.
-                    allRequestConfirmCatchup("DisposeGame");
+                    // Skip those that are "in trouble" ( where ClientHandler
+                    // currently wouldn't in practice send anything anyway...)
+                    allRequestConfirmCatchup("DisposeGame", true);
                 }
                 disposeRound++;
             }
@@ -1467,7 +1469,7 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    void allRequestConfirmCatchup(String action)
+    void allRequestConfirmCatchup(String action, boolean skipInTrouble)
     {
         // First put them all to the list, send messages after that
         synchronized (waitingToCatchup)
@@ -1476,10 +1478,25 @@ public final class Server extends Thread implements IServer
             waitingToCatchup.clear();
             for (IClient client : clients)
             {
+                boolean skip = false;
+
                 // Do not wait for clients that are already gone, e.g. when
                 // one remote disconnected this might cause a withdrawal
                 // which might cause GameOver.
-                if (!((ClientHandler)client).isGone())
+                if (((ClientHandler)client).isGone())
+                {
+                    skip = true;
+                }
+
+                // In some case (currently: during game dispose) do not send
+                // to clients in trouble, they won't respond probably anyway...
+                if (skipInTrouble
+                    && ((ClientHandler)client).isTemporarilyInTrouble())
+                {
+                    skip = true;
+                }
+
+                if (!skip)
                 {
                     waitingToCatchup.add(client);
                 }

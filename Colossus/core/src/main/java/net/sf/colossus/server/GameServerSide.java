@@ -802,7 +802,7 @@ public final class GameServerSide extends Game
         gameSaver.commitPointReached();
         autoSave();
 
-        server.allRequestConfirmCatchup("KickstartGame");
+        server.allRequestConfirmCatchup("KickstartGame", false);
     }
 
     /** Randomize towers by rolling dice and rerolling ties. */
@@ -1834,7 +1834,7 @@ public final class GameServerSide extends Game
 
         CustomRecruitBase.initCustomVariantForAllCRBs();
 
-        server.allRequestConfirmCatchup("KickstartGame");
+        server.allRequestConfirmCatchup("KickstartGame", false);
         updateCaretakerDisplays();
         return ok;
     }
