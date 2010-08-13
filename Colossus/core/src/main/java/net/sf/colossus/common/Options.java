@@ -104,9 +104,6 @@ public final class Options implements IOptions
     public static final String noTitanTeleport = "No Titan Teleport";
 
     public static final String unlimitedMulligans = "Unlimited Mulligans";
-    public static final String confirmNoRecruit = "Confirm when not all possible recruits taken";
-    public static final String confirmNoMove = "Confirm when not all possible moves made";
-    public static final String confirmNoSplit = "Confirm when not all full legions split";
 
     // Those are global options which need to be transferred to clients, even if
     // not set (meaning false), but if Client has them stored from earlier synchronizations
@@ -180,6 +177,11 @@ public final class Options implements IOptions
     public static final String autoPickRecruiter = "Auto pick recruiters";
     public static final String autoReinforce = "Auto reinforce";
     public static final String autoPlay = "Auto play";
+
+    // Confirmations (client only)
+    public static final String confirmNoRecruit = "Confirm when not all possible recruits taken";
+    public static final String confirmNoMove = "Confirm when not all possible moves made";
+    public static final String confirmNoSplit = "Confirm when not all full legions split";
 
     // AI timing options (client only)
     public static final String aiTimeLimit = "AI time limit";
