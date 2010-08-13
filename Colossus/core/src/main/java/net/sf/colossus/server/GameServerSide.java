@@ -608,6 +608,17 @@ public final class GameServerSide extends Game
 
             server.allSyncOption(name, value);
         }
+
+        // Synchronize also some global ones (as 'false') if they are not
+        // defined, to override them on client
+        // (client cfg file might still contain them e.g. from earlier games)
+        for (String optName : Options.globalGameOptions)
+        {
+            if (options.isOptionUndefined(optName))
+            {
+                server.allSyncOption(optName, false);
+            }
+        }
     }
 
     private void assignColors()

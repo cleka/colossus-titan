@@ -108,6 +108,14 @@ public final class Options implements IOptions
     public static final String confirmNoMove = "Confirm when not all possible moves made";
     public static final String confirmNoSplit = "Confirm when not all full legions split";
 
+    // Those are global options which need to be transferred to clients, even if
+    // not set (meaning false), but if Client has them stored from earlier synchronizations
+    // (e.g. removed server.cf file, or now playing on public server)
+    public static final String[] globalGameOptions = { cumulativeSlow,
+        oneHexAllowed, nonRandomBattleDice, autoSansLordBattles,
+        noFirstTurnT2TTeleport, noFirstTurnTeleport, towerToTowerTeleportOnly,
+        noTowerTeleport, noTitanTeleport, unlimitedMulligans };
+
     // Display options (client only)
     public static final String stealFocus = "Steal focus";
     public static final String turnStartBeep = "When my turns starts, beep";
