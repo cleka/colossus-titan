@@ -245,6 +245,7 @@ public final class GetPlayers extends KFrame
         addCheckbox(Options.noTitanTeleport, teleportPane);
         addCheckbox(Options.towerToTowerTeleportOnly, teleportPane);
         addCheckbox(Options.noTowerTeleport, teleportPane);
+        addCheckbox(Options.noFirstTurnWarlockRecruit, teleportPane);
 
         JPanel rulesOptionsPane = new JPanel(new GridLayout(0, 2));
         rulesOptionsPane.setBorder(new TitledBorder("Rules"));

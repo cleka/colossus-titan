@@ -102,6 +102,7 @@ public final class Options implements IOptions
     public static final String towerToTowerTeleportOnly = "Tower-to-Tower Teleport only";
     public static final String noTowerTeleport = "No Tower Teleport";
     public static final String noTitanTeleport = "No Titan Teleport";
+    public static final String noFirstTurnWarlockRecruit = "No Warlock recruiting on first turn";
 
     public static final String unlimitedMulligans = "Unlimited Mulligans";
 

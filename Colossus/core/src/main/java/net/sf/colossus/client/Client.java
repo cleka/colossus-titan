@@ -2682,14 +2682,19 @@ public final class Client implements IClient, IOracle, IVariant,
 
         for (CreatureType creature : tempRecruits)
         {
-            for (CreatureType lesser : recruiters)
+            if (getTurnNumber() != 1
+                || !options.getOption(Options.noFirstTurnWarlockRecruit)
+                || !creature.getName().equals("Warlock"))
             {
-                if ((TerrainRecruitLoader.numberOfRecruiterNeeded(lesser,
-                    creature, terrain, hex) <= ((LegionClientSide)legion)
-                    .numCreature(lesser))
-                    && (recruits.indexOf(creature) == -1))
+                for (CreatureType lesser : recruiters)
                 {
-                    recruits.add(creature);
+                    if ((TerrainRecruitLoader.numberOfRecruiterNeeded(lesser,
+                        creature, terrain, hex) <= ((LegionClientSide)legion)
+                        .numCreature(lesser))
+                        && (recruits.indexOf(creature) == -1))
+                    {
+                        recruits.add(creature);
+                    }
                 }
             }
         }
