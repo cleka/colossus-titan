@@ -183,6 +183,26 @@ public final class Options implements IOptions
     public static final String confirmNoRecruit = "Confirm when not all possible recruits taken";
     public static final String confirmNoMove = "Confirm when not all possible moves made";
     public static final String confirmNoSplit = "Confirm when not all full legions split";
+    public static final String legionMoveConfirmationSubMenu = "Legion Movement Confirmation";
+    public static final String legionMoveConfirmationNoMove = "Any legion has not moved";
+    public static final String legionMoveConfirmationNoUnvisitedMove = "Unvisited legion has not moved";
+    public static final String legionMoveConfirmationNoConfirm = "No movement confirmation";
+
+    public static final int legionMoveConfirmationNumNoConfirm = 0;
+    public static final int legionMoveConfirmationNumMove = 1;
+    public static final int legionMoveConfirmationNumUnvisitedMove = 2;
+
+    public static final String nextSplitSubMenu = "Split Phase Next Key Mouse Click";
+    public static final String nextMove = "Move Phase Next Key Left Click";
+    public static final String nextMuster = "Muster Phase Next Key Left Click";
+    public static final String nextSplitAllSplitable = "Split Phase Visit All Splittable Legions";
+    public static final String nextSplitLeftClick = "Split Phase Next Key Left Click (show markers)";
+    public static final String nextSplitRightClick = "Split Phase Next Key Right Click (show creatures)";
+    public static final String nextSplitNoClick = "Split Phase Next Key No Mouse Click";
+
+    public static final int nextSplitNumNoClick = 0;
+    public static final int nextSplitNumLeftClick = 1;
+    public static final int nextSplitNumRightClick = 2;
 
     // AI timing options (client only)
     public static final String aiTimeLimit = "AI time limit";
@@ -525,6 +545,7 @@ public final class Options implements IOptions
          return text;
      }
      */
+
     // client compares then only numeric modes (easier and faster in runtime)
     // ((can use switch case statement))
     synchronized public int getNumberForRecruitChitSelection(String s)
@@ -550,6 +571,44 @@ public final class Options implements IOptions
         if (s.equals(Options.showRecruitChitsAll))
         {
             val = Options.showRecruitChitsNumAll;
+        }
+        return val;
+    }
+
+    synchronized public int getNumberForLegionMoveConfirmation(String s)
+    {
+        if (s == null || s.equals(""))
+        {
+            return Options.legionMoveConfirmationNumNoConfirm;
+        }
+
+        int val = Options.legionMoveConfirmationNumNoConfirm;
+        if (s.equals(Options.legionMoveConfirmationNoMove))
+        {
+            val = Options.legionMoveConfirmationNumMove;
+        }
+        if (s.equals(Options.legionMoveConfirmationNoUnvisitedMove))
+        {
+            val = Options.legionMoveConfirmationNumUnvisitedMove;
+        }
+        return val;
+    }
+
+    synchronized public int getNumberForNextSplit(String s)
+    {
+        if (s == null || s.equals(""))
+        {
+            return Options.nextSplitNumNoClick;
+        }
+
+        int val = Options.nextSplitNumLeftClick;
+        if (s.equals(Options.nextSplitRightClick))
+        {
+            val = Options.nextSplitNumRightClick;
+        }
+        if (s.equals(Options.nextSplitNoClick))
+        {
+            val = Options.nextSplitNumNoClick;
         }
         return val;
     }

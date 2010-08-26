@@ -131,6 +131,12 @@ public abstract class Legion
      */
     private boolean skipThisTime = false;
 
+    /**
+     * Flag to remember that legion has been visited this phase
+     */
+
+    private boolean visitedThisPhase = false;
+
     // TODO legions should be created through factory from the player instances
     public Legion(final Player player, String markerId, MasterHex hex)
     {
@@ -264,6 +270,16 @@ public abstract class Legion
     public boolean getSkipThisTime()
     {
         return skipThisTime;
+    }
+
+    public void setVisitedThisPhase(boolean visited)
+    {
+        this.visitedThisPhase = visited;
+    }
+
+    public boolean getVisitedThisPhase()
+    {
+        return visitedThisPhase;
     }
 
     public boolean contains(CreatureType type)

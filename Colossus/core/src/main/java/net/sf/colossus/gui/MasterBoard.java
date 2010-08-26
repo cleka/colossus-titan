@@ -1,6 +1,7 @@
 package net.sf.colossus.gui;
 
 
+import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -10,6 +11,8 @@ import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -149,6 +152,7 @@ public final class MasterBoard extends JPanel
     private static final String clearRecruitChits = "Clear recruit chits";
 
     private static final String skipLegion = "Skip legion this time";
+    private static final String nextLegion = "Next legion";
 
     private static final String undoLast = "Undo";
     private static final String undoAll = "Undo All";
@@ -182,6 +186,7 @@ public final class MasterBoard extends JPanel
 
     private AbstractAction clearRecruitChitsAction;
     private AbstractAction skipLegionAction;
+    private AbstractAction nextLegionAction;
     private AbstractAction undoLastAction;
     private AbstractAction undoAllAction;
     private AbstractAction doneWithPhaseAction;
@@ -442,33 +447,24 @@ public final class MasterBoard extends JPanel
         return (answer == JOptionPane.OK_OPTION);
     }
 
-    private Constants.ConfirmVals confirmNotRecruitingForAllHexes(int count)
+    private Constants.ConfirmVals confirmDialog(String text, int count)
     {
         String[] options = new String[3];
         options[0] = "Yes";
         options[1] = "No";
         options[2] = "Don't ask again";
         int answer;
+        String message = "You have ";
         if (count == 1)
-        {
-            answer = JOptionPane
-                .showOptionDialog(
-                    this,
-                    "You have a legion that has not mustered, are you sure you are done?",
-                    "Confirm done recruiting?", JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-        }
+            message = message + "a legion ";
         else
-        {
-            answer = JOptionPane
-                .showOptionDialog(
-                    this,
-                    "You have "
-                        + count
-                        + " legions that have not mustered, are you sure you are done?",
-                    "Confirm done recruiting?", JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-        }
+            message = message + count + " legions ";
+
+        answer = JOptionPane.showOptionDialog(this, message + text
+            + ", are you sure you are done?", "Confirm done?",
+            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+            options, options[1]);
+
         if (answer == 0)
         {
             return Constants.ConfirmVals.Yes;
@@ -480,77 +476,6 @@ public final class MasterBoard extends JPanel
         return Constants.ConfirmVals.DoNotAsk;
     }
 
-    private Constants.ConfirmVals confirmNotMovingForAllHexes(int count)
-    {
-        String[] options = new String[3];
-        options[0] = "Yes";
-        options[1] = "No";
-        options[2] = "Don't ask again";
-        int answer;
-        if (count == 1)
-        {
-            answer = JOptionPane
-                .showOptionDialog(
-                    this,
-                    "You have a legion that has not moved, are you sure you are done?",
-                    "Confirm done moving?", JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-        }
-        else
-        {
-            answer = JOptionPane.showOptionDialog(this, "You have " + count
-                + " legions that have not moved, are you sure you are done?",
-                "Confirm done moving?", JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-        }
-        if (answer == 0)
-        {
-            return Constants.ConfirmVals.Yes;
-        }
-        if (answer == 1 || answer == -1)
-        {
-            return Constants.ConfirmVals.No;
-        }
-        return Constants.ConfirmVals.DoNotAsk;
-    }
-
-    private Constants.ConfirmVals confirmNotSplittingAllFullLegions(int count)
-    {
-        String[] options = new String[3];
-        options[0] = "Yes";
-        options[1] = "No";
-        options[2] = "Don't ask again";
-        int answer;
-        if (count == 1)
-        {
-            answer = JOptionPane
-                .showOptionDialog(
-                    this,
-                    "You have a legion with 7 creatures that has not split, are you sure you are done?",
-                    "Confirm done splitting?", JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-        }
-        else
-        {
-            answer = JOptionPane
-                .showOptionDialog(
-                    this,
-                    "You have "
-                        + count
-                        + " legions with 7 creatures that have not split, are you sure you are done?",
-                    "Confirm done splitting?", JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-        }
-        if (answer == 0)
-        {
-            return Constants.ConfirmVals.Yes;
-        }
-        if (answer == 1 || answer == -1)
-        {
-            return Constants.ConfirmVals.No;
-        }
-        return Constants.ConfirmVals.DoNotAsk;
-    }
 
     private void setupActions()
     {
@@ -570,6 +495,142 @@ public final class MasterBoard extends JPanel
             public void actionPerformed(ActionEvent e)
             {
                 markLegionSkip();
+            }
+        };
+
+        nextLegionAction = new AbstractAction(nextLegion)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                Phase phase = client.getPhase();
+                if ((phase == Phase.MOVE || phase == Phase.SPLIT || phase == Phase.MUSTER))
+                {
+                    boolean allSplitableLegions = false;
+                    Player player = gui.getClient().getActivePlayer();
+
+                    if (phase == Phase.SPLIT)
+                    {
+                        Set<String> markersAvailable = player
+                            .getMarkersAvailable();
+                        // Need a legion marker to split.
+                        if (markersAvailable.size() < 1)
+                        {
+                            return;
+                        }
+                        // On the first turn, can only split once, the 8 count legion
+                        // Need flag set to false, or, after splitting, next will then
+                        // cycle through the two size 4 legions.
+                        allSplitableLegions = client.getTurnNumber() == 1 ? false
+                            : gui.getOptions().getOption(
+                                Options.nextSplitAllSplitable, true);
+                    }
+
+                    boolean first = true;
+                    boolean found = false;
+                    Point point = null;
+                    String markerId = null;
+                    String curMarkerId = client.getCurrentLegionMarkerId();
+                    Legion nextLegion = null;
+                    if (curMarkerId != null)
+                        nextLegion = client.getLegion(curMarkerId);
+
+                    for (Legion legion : player.getLegions())
+                    {
+                        if (first)
+                        {
+                            // Handle case where current legion is not in set
+                            // or current legion is last entry in set
+                            if ((phase == Phase.MOVE && !legion.hasMoved()) ||
+ (phase == Phase.SPLIT
+                                    && !allSplitableLegions && (legion
+                                    .getHeight() >= 7))
+                                || (phase == Phase.SPLIT
+                                    && allSplitableLegions && (legion
+                                    .getHeight() >= 4))
+                                ||
+                                (phase == Phase.MUSTER && client.canRecruit(legion)))
+                            {
+                                nextLegion = legion;
+                                first = false;
+                            }
+                        }
+                        if (found && !legion.getSkipThisTime())
+                        {
+                            if ((phase == Phase.MOVE && !legion.hasMoved()) ||
+ (phase == Phase.SPLIT
+                                    && !allSplitableLegions && (legion
+                                    .getHeight() == 7))
+                                || (phase == Phase.SPLIT
+                                    && allSplitableLegions && (legion
+                                    .getHeight() >= 4))
+                                ||
+                                (phase == Phase.MUSTER && client.canRecruit(legion)))
+                            {
+                                nextLegion = legion;
+                                break;
+                            }
+                        }
+                        markerId = legion.getMarkerId();
+                        if (markerId.equals(curMarkerId))
+                        {
+                            found = true;
+                        }
+                    }
+                    if (!first)
+                    {
+                        LegionClientSide newCurLegion = client
+                            .getLegion(nextLegion.getMarkerId());
+                        MasterHex newHex = newCurLegion.getCurrentHex();
+                        GUIMasterHex newGHex = getGUIHexByMasterHex(newHex);
+                        point = newGHex.findCenter();
+                        try
+                        {
+                            Robot robot = new Robot();
+                            Rectangle rect = new Rectangle(point.x - 250,
+                                point.y - 250, 500, 500);
+                            scrollRectToVisible(rect);
+                            SwingUtilities.convertPointToScreen(point,
+                                MasterBoard.this);
+                            robot.mouseMove(point.x, point.y);
+
+                            client.setCurrentLegionMarkerId(nextLegion
+                                .getMarkerId());
+
+                            if ((phase == Phase.MUSTER && gui.getOptions()
+                                .getOption(Options.nextMuster, true))
+                                || (phase == Phase.MOVE && gui.getOptions()
+                                    .getOption(Options.nextMove, true))
+                                || (phase == Phase.SPLIT && (gui
+                                    .getNextSplitClickMode() == Options.nextSplitNumLeftClick)))
+                            {
+                                actOnLegion(newCurLegion, nextLegion
+                                    .getCurrentHex());
+                            }
+                            else if (phase == Phase.SPLIT
+                                && (gui.getNextSplitClickMode() == Options.nextSplitNumRightClick))
+                            {
+                                int viewMode = gui.getViewMode();
+                                LegionClientSide clientSideLegion = client
+                                    .getLegion(nextLegion.getMarkerId());
+
+                                new ShowLegion(masterFrame, clientSideLegion,
+                                    point, scrollPane, 4 * Scale.get(),
+                                    viewMode, client
+                                        .isMyLegion(clientSideLegion),
+ false,
+                                    true);
+                            }
+                        }
+                        catch (AWTException exception)
+                        {
+                            LOGGER.log(Level.WARNING, "Robot creation failed");
+                        }
+                    }
+                }
+                else
+                {
+                    return;
+                }
             }
         };
 
@@ -1238,6 +1299,10 @@ public final class MasterBoard extends JPanel
         mi.setMnemonic(KeyEvent.VK_S);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0));
 
+        mi = phaseMenu.add(nextLegionAction);
+        mi.setMnemonic(KeyEvent.VK_N);
+        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, 0));
+
         phaseMenu.addSeparator();
 
         mi = phaseMenu.add(undoLastAction);
@@ -1450,7 +1515,9 @@ public final class MasterBoard extends JPanel
                 && (client.getOwningPlayer().getMarkersAvailable().size() >= 1)
                 && gui.getOptions().getOption(Options.confirmNoSplit, true))
             {
-                answer = confirmNotSplittingAllFullLegions(cnt);
+                answer = confirmDialog(
+                    (cnt == 1) ? "with 7 creatures that has not split"
+                        : "with 7 creatures that have not split", cnt);
                 if (answer == Constants.ConfirmVals.DoNotAsk)
                 {
                     client.setPreferencesCheckBoxValue(Options.confirmNoSplit,
@@ -1479,24 +1546,55 @@ public final class MasterBoard extends JPanel
         else if (gui.getGame().isPhase(Phase.MOVE))
         {
             boolean beDone = true;
-            int cnt;
-            if ((cnt = client.legionsNotMoved(true)) > 0
-                && gui.getOptions().getOption(Options.confirmNoMove, true))
+            int mcModeInt = gui.getLegionMoveConfirmationMode();
+
+            if ((mcModeInt == Options.legionMoveConfirmationNumMove) || (mcModeInt == Options.legionMoveConfirmationNumUnvisitedMove))
             {
-                answer = confirmNotMovingForAllHexes(cnt);
-                if (answer == Constants.ConfirmVals.DoNotAsk)
+                int legionStatus[] = { 0, 0, 0, 0 };
+                int cnt;
+
+                answer = Constants.ConfirmVals.No;
+
+                client.legionsNotMoved(legionStatus);
+                if (mcModeInt == Options.legionMoveConfirmationNumUnvisitedMove)
                 {
-                    client.setPreferencesCheckBoxValue(Options.confirmNoMove,
-                        false);
-                    beDone = true;
-                }
-                else if (answer == Constants.ConfirmVals.No)
-                {
-                    beDone = false;
+                    cnt = legionStatus[Constants.legionStatusNotVisitedSkippedBlocked];
+                    if (cnt > 0)
+                    {
+                        answer = confirmDialog(
+                            (cnt == 1) ? "that has not moved or been visited"
+                                : "that have not moved or been visited", cnt);
+                    }
                 }
                 else
                 {
-                    beDone = true;
+                    cnt = legionStatus[Constants.legionStatusCount]
+                        - legionStatus[Constants.legionStatusMoved];
+                    if (cnt > 0)
+                    {
+                        answer = confirmDialog(
+                            (cnt == 1) ? "that has not moved"
+                        : "that have not moved", cnt);
+                    }
+                }
+                beDone = true;
+                if (cnt > 0)
+                {
+                    if (answer == Constants.ConfirmVals.DoNotAsk)
+                    {
+                        client.setPreferencesRadioButtonValue(
+                            Options.legionMoveConfirmationNoMove, false);
+                        client.setPreferencesRadioButtonValue(
+                            Options.legionMoveConfirmationNoUnvisitedMove,
+                            false);
+                        client.setPreferencesRadioButtonValue(
+                            Options.legionMoveConfirmationNoConfirm, true);
+                        beDone = true;
+                    }
+                    else if (answer == Constants.ConfirmVals.No)
+                    {
+                        beDone = false;
+                    }
                 }
             }
             if (beDone)
@@ -1521,7 +1619,8 @@ public final class MasterBoard extends JPanel
             if ((cnt = client.getPossibleRecruitHexes().size()) > 0
                 && gui.getOptions().getOption(Options.confirmNoRecruit, true))
             {
-                answer = confirmNotRecruitingForAllHexes(cnt);
+                answer = confirmDialog((cnt == 1) ? "that has not mustered"
+                    : "that have not mustered", cnt);
                 if (answer == Constants.ConfirmVals.DoNotAsk)
                 {
                     client.setPreferencesCheckBoxValue(
@@ -1558,7 +1657,7 @@ public final class MasterBoard extends JPanel
     {
         if (gui.isMyTurn())
         {
-            gui.resetAllSkipFlags();
+            gui.resetAllLegionFlags();
         }
         unselectAllHexes();
         setTitleInfoText(titleText);
@@ -2097,6 +2196,7 @@ public final class MasterBoard extends JPanel
             Point point = e.getPoint();
             Marker marker = getMarkerAtPoint(point);
             GUIMasterHex hex = getHexContainingPoint(point);
+
             if (marker != null)
             {
                 String markerId = marker.getId();
@@ -2209,6 +2309,10 @@ public final class MasterBoard extends JPanel
         }
         else if (phase == Phase.MOVE)
         {
+            legion.setVisitedThisPhase(true);
+            updateLegionsLeftToMoveText();
+            client.setCurrentLegionMarkerId(legion.getMarkerId());
+
             // Allow spin cycle by clicking on chit again.
             if (legion.equals(gui.getMover()))
             {
@@ -2700,7 +2804,9 @@ public final class MasterBoard extends JPanel
 
     public void updateLegionsLeftToMoveText()
     {
-        bottomBar.setLegionsLeftToMove(client.legionsNotMoved(true));
+        int legionStatus[] = { 0, 0, 0, 0 };
+        client.legionsNotMoved(legionStatus);
+        bottomBar.setLegionsStatus(legionStatus);
     }
 
     class BottomBar extends JPanel
@@ -2755,6 +2861,56 @@ public final class MasterBoard extends JPanel
                 countLabel.setText(legionCount + " legion to muster");
             else
                 countLabel.setText(legionCount + " legions to muster");
+        }
+
+        public void setLegionsStatus(int legionStatus[])
+        {
+            int unmoved = legionStatus[Constants.legionStatusCount]
+                - legionStatus[Constants.legionStatusMoved];
+            if (unmoved > 0)
+            {
+                String labelText = legionStatus[Constants.legionStatusCount]
+                    + " legions:  " + unmoved
+                    + (unmoved == 1 ? " has not moved" : " have not moved");
+                if (legionStatus[Constants.legionStatusBlocked] > 0)
+                {
+                    if (unmoved == 1)
+                    {
+                        labelText = labelText + ", it is blocked";
+                    }
+                    else
+                    {
+                        labelText = labelText
+                            + ", "
+                            + legionStatus[Constants.legionStatusBlocked]
+                            + (legionStatus[Constants.legionStatusBlocked] == 1 ? " of those is blocked"
+                                : " of those are blocked");
+                    }
+                }
+                if (legionStatus[Constants.legionStatusNotVisitedSkippedBlocked] > 0)
+                {
+                    if (unmoved == 1)
+                    {
+                        labelText = labelText
+                            + ", it has not been visited or skipped";
+                    }
+                    else
+                    {
+                        labelText = labelText
+                            + ", "
+                            + legionStatus[Constants.legionStatusNotVisitedSkippedBlocked]
+                            + (legionStatus[Constants.legionStatusNotVisitedSkippedBlocked] == 1 ? " of those has not been visited or skipped"
+                                : " of those have not been visited or skipped");
+                    }
+                }
+                labelText = labelText + ".";
+                countLabel.setText(labelText);
+            }
+            else
+            {
+                countLabel.setText(legionStatus[Constants.legionStatusCount]
+                    + " legions, all have moved");
+            }
         }
 
         public void setLegionsLeftToMove(int legionCount)

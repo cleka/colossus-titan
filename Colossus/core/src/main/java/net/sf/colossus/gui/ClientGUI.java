@@ -125,6 +125,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     // TODO change to enums...
     private int viewMode;
     private int recruitChitMode;
+    private int legionMoveConfirmationMode;
+    private int nextSplitClickMode;
 
     private boolean gameOverMessageAlreadyShown = false;
 
@@ -280,6 +282,32 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             options.removeOption(Options.showAllRecruitChits);
         }
         recruitChitMode = options.getNumberForRecruitChitSelection(rcMode);
+
+        String mcMode = options
+            .getStringOption(Options.legionMoveConfirmationSubMenu);
+        if (mcMode == null || mcMode.equals(""))
+        {
+            mcMode = options.legionMoveConfirmationNoUnvisitedMove;
+            // initialize new option
+            options.setOption(Options.legionMoveConfirmationSubMenu, mcMode);
+            // clean up obsolete option from cfg file
+            options.removeOption(Options.confirmNoMove);
+        }
+
+        legionMoveConfirmationMode = options
+            .getNumberForLegionMoveConfirmation(mcMode);
+
+        String nextSplitMode = options
+            .getStringOption(Options.nextSplitSubMenu);
+        if (nextSplitMode == null || nextSplitMode.equals(""))
+        {
+            nextSplitMode = options.nextSplitLeftClick;
+            // initialize new option
+            options.setOption(Options.nextSplitSubMenu, nextSplitMode);
+            // clean up obsolete option from cfg file
+        }
+
+        nextSplitClickMode = options.getNumberForNextSplit(nextSplitMode);
 
         ensureEdtSetupClientGUI();
 
@@ -780,6 +808,16 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         return recruitChitMode;
     }
 
+    public int getLegionMoveConfirmationMode()
+    {
+        return legionMoveConfirmationMode;
+    }
+
+    public int getNextSplitClickMode()
+    {
+        return nextSplitClickMode;
+    }
+
     public void addPossibleRecruitChits(LegionClientSide legion,
         Set<MasterHex> hexes)
     {
@@ -839,6 +877,28 @@ public class ClientGUI implements IClientGUI, GUICallbacks
                         .getNumberForRecruitChitSelection(newValue);
                 }
             });
+
+        options.addListener(Options.legionMoveConfirmationSubMenu,
+            new IOptions.Listener()
+            {
+                @Override
+                public void stringOptionChanged(String optname,
+                    String oldValue, String newValue)
+                {
+                    legionMoveConfirmationMode = options
+                        .getNumberForLegionMoveConfirmation(newValue);
+                }
+            });
+
+        options.addListener(Options.nextSplitSubMenu, new IOptions.Listener()
+        {
+            @Override
+            public void stringOptionChanged(String optname, String oldValue,
+                String newValue)
+            {
+                nextSplitClickMode = options.getNumberForNextSplit(newValue);
+            }
+        });
 
         CreatureType.setNoBaseColor(options.getOption(Options.noBaseColor));
         options.addListener(Options.noBaseColor, new IOptions.Listener()
@@ -1432,6 +1492,11 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         preferencesWindow.setCheckBoxValue(name, value);
     }
 
+    public void setPreferencesRadioButtonValue(String name, boolean value)
+    {
+        preferencesWindow.setRadioButtonValue(name, value);
+    }
+
     private void initPreferencesWindow()
     {
         if (preferencesWindow == null)
@@ -1938,11 +2003,12 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         board.highlightTallLegions();
     }
 
-    public void resetAllSkipFlags()
+    public void resetAllLegionFlags()
     {
         for (Legion l : getOwningPlayer().getLegions())
         {
             l.setSkipThisTime(false);
+            l.setVisitedThisPhase(false);
         }
     }
 

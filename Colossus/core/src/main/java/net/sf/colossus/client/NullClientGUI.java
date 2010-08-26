@@ -498,6 +498,18 @@ public class NullClientGUI implements IClientGUI
         return 0;
     }
 
+    public int getLegionMoveConfirmationMode()
+    {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    public int getNextSplitClickMode()
+    {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
     public int getViewMode()
     {
         // TODO Auto-generated method stub
@@ -791,4 +803,11 @@ public class NullClientGUI implements IClientGUI
         // TODO Auto-generated method stub
 
     }
+
+    public void setPreferencesRadioButtonValue(String name, boolean value)
+    {
+        // TODO Auto-generated method stub
+
+    }
+
 }

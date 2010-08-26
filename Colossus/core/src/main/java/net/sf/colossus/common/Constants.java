@@ -350,4 +350,8 @@ public final class Constants
     public static final String erMethodTimeLoss = "timeloss";
     public static final String erMethodNegotiate = "negotiate";
 
+    public static final int legionStatusCount = 0;
+    public static final int legionStatusMoved = 1;
+    public static final int legionStatusNotVisitedSkippedBlocked = 2;
+    public static final int legionStatusBlocked = 3;
 }

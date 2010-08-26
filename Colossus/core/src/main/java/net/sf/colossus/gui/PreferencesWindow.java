@@ -93,9 +93,12 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
     private Options options;
     private final ClientGUI gui;
     private final Map<String, JCheckBox> prefCheckboxes = new HashMap<String, JCheckBox>();
+    private final Map<String, JRadioButton> prefRadioButtons = new HashMap<String, JRadioButton>();
     private JButton closeButton;
     private Box lfBox; // Look & Feel
     private Box rcModes; // Recruit Chit modes
+    private Box mcModes; // Move confirmation modes
+    private Box nextSplitModes; // Modes for next key during split phase
     private JPanel favColorPane;
     private int activePaneIndex;
     private List<PlayerColor> favoriteColors;
@@ -148,6 +151,7 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
         cont.add(rb, CONTROL_CONSTRAINTS);
         boolean selected = (text.equals(current));
         rb.setSelected(selected);
+        prefRadioButtons.put(text, rb);
     }
 
     private void addButton(Container cont, String name, ActionListener al)
@@ -299,11 +303,44 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
 
         windowPane.add(new JPanel(), FILL_CONSTRAINTS);
 
+        JPanel nextPane = new JPanel(new GridBagLayout());
+        tabbedPane.addTab("Next key", nextPane);
+        addCheckBox(nextPane, Options.nextMove, true, true);
+        addCheckBox(nextPane, Options.nextMuster, true, true);
+        addCheckBox(nextPane, Options.nextSplitAllSplitable, true, true);
+        ButtonGroup nextSplitButtonGroup = new ButtonGroup();
+        nextSplitModes = new Box(BoxLayout.Y_AXIS);
+        nextSplitModes.setBorder(new TitledBorder(Options.nextSplitSubMenu));
+        nextSplitModes.setAlignmentX(LEFT_ALIGNMENT);
+        nextPane.add(nextSplitModes, SUBPANEL_CONSTRAINTS);
+        String nextSplitCur = options
+            .getStringOption(Options.nextSplitSubMenu);
+        addRadioButton(nextSplitModes, nextSplitButtonGroup,
+            Options.nextSplitNoClick, "", nextSplitCur);
+        addRadioButton(nextSplitModes, nextSplitButtonGroup,
+            Options.nextSplitLeftClick, "", nextSplitCur);
+        addRadioButton(nextSplitModes, nextSplitButtonGroup,
+            Options.nextSplitRightClick, "", nextSplitCur);
+
         JPanel confirmationPane = new JPanel(new GridBagLayout());
         tabbedPane.addTab("Confirmations", confirmationPane);
         addCheckBox(confirmationPane, Options.confirmNoRecruit, true, true);
-        addCheckBox(confirmationPane, Options.confirmNoMove, true, true);
         addCheckBox(confirmationPane, Options.confirmNoSplit, true, true);
+        ButtonGroup moveButtonGroup = new ButtonGroup();
+        mcModes = new Box(BoxLayout.Y_AXIS);
+        mcModes.setBorder(new TitledBorder(
+            Options.legionMoveConfirmationSubMenu));
+        mcModes.setAlignmentX(LEFT_ALIGNMENT);
+        confirmationPane.add(mcModes, SUBPANEL_CONSTRAINTS);
+        String legionMoveCur = options
+            .getStringOption(Options.legionMoveConfirmationSubMenu);
+
+        addRadioButton(mcModes, moveButtonGroup,
+            Options.legionMoveConfirmationNoMove, "", legionMoveCur);
+        addRadioButton(mcModes, moveButtonGroup,
+            Options.legionMoveConfirmationNoUnvisitedMove, "", legionMoveCur);
+        addRadioButton(mcModes, moveButtonGroup,
+            Options.legionMoveConfirmationNoConfirm, "", legionMoveCur);
 
         closeButton = new JButton("Close");
         closeButton.addActionListener(this);
@@ -473,6 +510,21 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
             {
                 gui.setLookAndFeel(text);
             }
+            else if (sourceJC.getParent() == mcModes)
+            {
+                if (text != null)
+                {
+                    options.setOption(Options.legionMoveConfirmationSubMenu,
+                        text);
+                }
+            }
+            else if (sourceJC.getParent() == nextSplitModes)
+            {
+                if (text != null)
+                {
+                    options.setOption(Options.nextSplitSubMenu, text);
+                }
+            }
         }
     }
 
@@ -611,6 +663,16 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
         if (cb != null)
         {
             cb.setSelected(value);
+        }
+    }
+
+    public void setRadioButtonValue(String name, boolean value)
+    {
+        JRadioButton rb;
+        rb = prefRadioButtons.get(name);
+        if (rb != null)
+        {
+            rb.setSelected(value);
         }
     }
 }

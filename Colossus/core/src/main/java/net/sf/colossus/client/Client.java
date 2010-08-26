@@ -427,6 +427,18 @@ public final class Client implements IClient, IOracle, IVariant,
         return paused;
     }
 
+    private String currentLegionMarkerId = null;
+
+    public void setCurrentLegionMarkerId(String MarkerId)
+    {
+        currentLegionMarkerId = MarkerId;
+    }
+
+    public String getCurrentLegionMarkerId()
+    {
+        return currentLegionMarkerId;
+    }
+
     public void setPauseState(boolean newState)
     {
         if (isRemote())
@@ -2830,27 +2842,43 @@ public final class Client implements IClient, IOracle, IVariant,
     }
 
     /**
-     * Returns how many legions have not moved yet, still need moving
+     * Returns status of client's legions
      *
-     * @param considerSkippedAsMoved If set true (so far everywhere), a legion
-     * marked as skip will be considered as moved.
+     * @param legionStatus[]  an array of integers with
+     * various status states to be set.  Array should
+     * be initialized to all zeroes
      *
-     * @return The number of legions that the user probably still should
-     * consider to to move them
+     * Current array contents:
+     *   [Constants.legionStatusCount] == count of legions
+     *   [Constants.legionStatusMoved] == legions that have moved
+     *   [Constants.legionStatusBlocked] == unmoved legions with no legal move
+     *   [Constants.legionStatusNotVisitedSkippedBlocked] == legions that have not been moved,
+     *            are not blocked and have not been skipped
      */
-    public int legionsNotMoved(boolean considerSkippedAsMoved)
+    public void legionsNotMoved(int legionStatus[])
     {
-        int count = 0;
-
         for (Legion legion : game.getActivePlayer().getLegions())
         {
-            if (!legion.hasMoved()
-                && !(considerSkippedAsMoved && legion.getSkipThisTime()))
+            legionStatus[Constants.legionStatusCount]++;
+            if (legion.hasMoved())
             {
-                count++;
+                legionStatus[Constants.legionStatusMoved]++;
+            }else
+            {
+                Set<MasterHex> teleport = listTeleportMoves(legion);
+                Set<MasterHex> normal = listNormalMoves(legion);
+                if (teleport.isEmpty() && normal.isEmpty())
+                {
+                    legionStatus[Constants.legionStatusBlocked]++;
+                }else
+                {
+                    if (!legion.getVisitedThisPhase() && !legion.getSkipThisTime())
+                    {
+                        legionStatus[Constants.legionStatusNotVisitedSkippedBlocked]++;
+                    }
+                }
             }
         }
-        return count;
     }
 
     public Set<MasterHex> findUnmovedLegionHexes(boolean considerSkippedAsMoved)
@@ -3387,5 +3415,10 @@ public final class Client implements IClient, IOracle, IVariant,
     public void setPreferencesCheckBoxValue(String name, boolean value)
     {
         gui.setPreferencesCheckBoxValue(name, value);
+    }
+
+    public void setPreferencesRadioButtonValue(String name, boolean value)
+    {
+        gui.setPreferencesRadioButtonValue(name, value);
     }
 }

@@ -69,6 +69,10 @@ public interface IClientGUI
 
     public abstract int getRecruitChitMode();
 
+    public abstract int getLegionMoveConfirmationMode();
+
+    public abstract int getNextSplitClickMode();
+
     public abstract void addPossibleRecruitChits(LegionClientSide legion,
         Set<MasterHex> hexes);
 
@@ -323,4 +327,6 @@ public interface IClientGUI
     public abstract void removeBattleChit(BattleUnit battleUnit);
 
     public void setPreferencesCheckBoxValue(String name, boolean value);
+
+    public void setPreferencesRadioButtonValue(String name, boolean value);
 }
