@@ -2596,7 +2596,9 @@ public final class MasterBoard extends JPanel
         String curMarkerId = client.getCurrentLegionMarkerId();
         Legion nextLegion = null;
         if (curMarkerId != null)
+        {
             nextLegion = client.getLegion(curMarkerId);
+        }
 
         for (Legion legion : player.getLegions())
         {
