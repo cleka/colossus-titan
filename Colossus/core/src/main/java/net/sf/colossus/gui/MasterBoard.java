@@ -2565,9 +2565,10 @@ public final class MasterBoard extends JPanel
     private void jumpToNextUnhandledLegion()
     {
         Phase phase = client.getPhase();
-        if (!(phase == Phase.MOVE || phase == Phase.SPLIT || phase == Phase.MUSTER))
+        if (!(phase == Phase.MOVE || phase == Phase.SPLIT || phase == Phase.MUSTER)
+            || !gui.isMyTurn())
         {
-            // Not Split, Move or Recruit phase - nothing to do.
+            // Not my Split, Move or Recruit phase - nothing to do.
             return;
         }
 
