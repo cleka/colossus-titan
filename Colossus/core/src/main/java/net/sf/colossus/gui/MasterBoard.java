@@ -2631,7 +2631,10 @@ public final class MasterBoard extends JPanel
                     found = true;
                 }
             }
-            if (!first)
+
+            // Eclipse thinks nextLegion might be null ...
+            // to be on safe side, do nothing in that case.
+            if (!first && nextLegion != null)
             {
                 LegionClientSide newCurLegion = client.getLegion(nextLegion
                     .getMarkerId());
