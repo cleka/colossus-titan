@@ -502,135 +502,7 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                Phase phase = client.getPhase();
-                if ((phase == Phase.MOVE || phase == Phase.SPLIT || phase == Phase.MUSTER))
-                {
-                    boolean allSplitableLegions = false;
-                    Player player = gui.getClient().getActivePlayer();
-
-                    if (phase == Phase.SPLIT)
-                    {
-                        Set<String> markersAvailable = player
-                            .getMarkersAvailable();
-                        // Need a legion marker to split.
-                        if (markersAvailable.size() < 1)
-                        {
-                            return;
-                        }
-                        // On the first turn, can only split once, the 8 count legion
-                        // Need flag set to false, or, after splitting, next will then
-                        // cycle through the two size 4 legions.
-                        allSplitableLegions = client.getTurnNumber() == 1 ? false
-                            : gui.getOptions().getOption(
-                                Options.nextSplitAllSplitable, true);
-                    }
-
-                    boolean first = true;
-                    boolean found = false;
-                    Point point = null;
-                    String markerId = null;
-                    String curMarkerId = client.getCurrentLegionMarkerId();
-                    Legion nextLegion = null;
-                    if (curMarkerId != null)
-                        nextLegion = client.getLegion(curMarkerId);
-
-                    for (Legion legion : player.getLegions())
-                    {
-                        if (first)
-                        {
-                            // Handle case where current legion is not in set
-                            // or current legion is last entry in set
-                            if ((phase == Phase.MOVE && !legion.hasMoved()) ||
- (phase == Phase.SPLIT
-                                    && !allSplitableLegions && (legion
-                                    .getHeight() >= 7))
-                                || (phase == Phase.SPLIT
-                                    && allSplitableLegions && (legion
-                                    .getHeight() >= 4))
-                                ||
-                                (phase == Phase.MUSTER && client.canRecruit(legion)))
-                            {
-                                nextLegion = legion;
-                                first = false;
-                            }
-                        }
-                        if (found && !legion.getSkipThisTime())
-                        {
-                            if ((phase == Phase.MOVE && !legion.hasMoved()) ||
- (phase == Phase.SPLIT
-                                    && !allSplitableLegions && (legion
-                                    .getHeight() == 7))
-                                || (phase == Phase.SPLIT
-                                    && allSplitableLegions && (legion
-                                    .getHeight() >= 4))
-                                ||
-                                (phase == Phase.MUSTER && client.canRecruit(legion)))
-                            {
-                                nextLegion = legion;
-                                break;
-                            }
-                        }
-                        markerId = legion.getMarkerId();
-                        if (markerId.equals(curMarkerId))
-                        {
-                            found = true;
-                        }
-                    }
-                    if (!first)
-                    {
-                        LegionClientSide newCurLegion = client
-                            .getLegion(nextLegion.getMarkerId());
-                        MasterHex newHex = newCurLegion.getCurrentHex();
-                        GUIMasterHex newGHex = getGUIHexByMasterHex(newHex);
-                        point = newGHex.findCenter();
-                        try
-                        {
-                            Robot robot = new Robot();
-                            Rectangle rect = new Rectangle(point.x - 250,
-                                point.y - 250, 500, 500);
-                            scrollRectToVisible(rect);
-                            SwingUtilities.convertPointToScreen(point,
-                                MasterBoard.this);
-                            robot.mouseMove(point.x, point.y);
-
-                            client.setCurrentLegionMarkerId(nextLegion
-                                .getMarkerId());
-
-                            if ((phase == Phase.MUSTER && gui.getOptions()
-                                .getOption(Options.nextMuster, true))
-                                || (phase == Phase.MOVE && gui.getOptions()
-                                    .getOption(Options.nextMove, true))
-                                || (phase == Phase.SPLIT && (gui
-                                    .getNextSplitClickMode() == Options.nextSplitNumLeftClick)))
-                            {
-                                actOnLegion(newCurLegion, nextLegion
-                                    .getCurrentHex());
-                            }
-                            else if (phase == Phase.SPLIT
-                                && (gui.getNextSplitClickMode() == Options.nextSplitNumRightClick))
-                            {
-                                int viewMode = gui.getViewMode();
-                                LegionClientSide clientSideLegion = client
-                                    .getLegion(nextLegion.getMarkerId());
-
-                                new ShowLegion(masterFrame, clientSideLegion,
-                                    point, scrollPane, 4 * Scale.get(),
-                                    viewMode, client
-                                        .isMyLegion(clientSideLegion),
- false,
-                                    true);
-                            }
-                        }
-                        catch (AWTException exception)
-                        {
-                            LOGGER.log(Level.WARNING, "Robot creation failed");
-                        }
-                    }
-                }
-                else
-                {
-                    return;
-                }
+                jumpToNextUnhandledLegion();
             }
         };
 
@@ -2683,6 +2555,132 @@ public final class MasterBoard extends JPanel
         {
             LOGGER.warning("Mark Legion Skip not meaningful in phase "
                 + gui.getGame().getPhase());
+        }
+    }
+
+    /**
+     *  user pressed "N". Find the next legion that "deserves" handling, activate
+     *  (as if user had clicked it), and position the mouse cursor over it.
+     */
+    private void jumpToNextUnhandledLegion()
+    {
+        Phase phase = client.getPhase();
+        if ((phase == Phase.MOVE || phase == Phase.SPLIT || phase == Phase.MUSTER))
+        {
+            boolean allSplitableLegions = false;
+            Player player = gui.getClient().getActivePlayer();
+
+            if (phase == Phase.SPLIT)
+            {
+                Set<String> markersAvailable = player.getMarkersAvailable();
+                // Need a legion marker to split.
+                if (markersAvailable.size() < 1)
+                {
+                    return;
+                }
+                // On the first turn, can only split once, the 8 count legion
+                // Need flag set to false, or, after splitting, next will then
+                // cycle through the two size 4 legions.
+                allSplitableLegions = client.getTurnNumber() == 1 ? false
+                    : gui.getOptions().getOption(
+                        Options.nextSplitAllSplitable, true);
+            }
+
+            boolean first = true;
+            boolean found = false;
+            Point point = null;
+            String markerId = null;
+            String curMarkerId = client.getCurrentLegionMarkerId();
+            Legion nextLegion = null;
+            if (curMarkerId != null)
+                nextLegion = client.getLegion(curMarkerId);
+
+            for (Legion legion : player.getLegions())
+            {
+                if (first)
+                {
+                    // Handle case where current legion is not in set
+                    // or current legion is last entry in set
+                    if ((phase == Phase.MOVE && !legion.hasMoved())
+                        || (phase == Phase.SPLIT && !allSplitableLegions && (legion
+                            .getHeight() >= 7))
+                        || (phase == Phase.SPLIT && allSplitableLegions && (legion
+                            .getHeight() >= 4))
+                        || (phase == Phase.MUSTER && client.canRecruit(legion)))
+                    {
+                        nextLegion = legion;
+                        first = false;
+                    }
+                }
+                if (found && !legion.getSkipThisTime())
+                {
+                    if ((phase == Phase.MOVE && !legion.hasMoved())
+                        || (phase == Phase.SPLIT && !allSplitableLegions && (legion
+                            .getHeight() == 7))
+                        || (phase == Phase.SPLIT && allSplitableLegions && (legion
+                            .getHeight() >= 4))
+                        || (phase == Phase.MUSTER && client.canRecruit(legion)))
+                    {
+                        nextLegion = legion;
+                        break;
+                    }
+                }
+                markerId = legion.getMarkerId();
+                if (markerId.equals(curMarkerId))
+                {
+                    found = true;
+                }
+            }
+            if (!first)
+            {
+                LegionClientSide newCurLegion = client.getLegion(nextLegion
+                    .getMarkerId());
+                MasterHex newHex = newCurLegion.getCurrentHex();
+                GUIMasterHex newGHex = getGUIHexByMasterHex(newHex);
+                point = newGHex.findCenter();
+                try
+                {
+                    Robot robot = new Robot();
+                    Rectangle rect = new Rectangle(point.x - 250,
+                        point.y - 250, 500, 500);
+                    scrollRectToVisible(rect);
+                    SwingUtilities.convertPointToScreen(point,
+                        MasterBoard.this);
+                    robot.mouseMove(point.x, point.y);
+
+                    client.setCurrentLegionMarkerId(nextLegion.getMarkerId());
+
+                    if ((phase == Phase.MUSTER && gui.getOptions().getOption(
+                        Options.nextMuster, true))
+                        || (phase == Phase.MOVE && gui.getOptions().getOption(
+                            Options.nextMove, true))
+                        || (phase == Phase.SPLIT && (gui
+                            .getNextSplitClickMode() == Options.nextSplitNumLeftClick)))
+                    {
+                        actOnLegion(newCurLegion, nextLegion.getCurrentHex());
+                    }
+                    else if (phase == Phase.SPLIT
+                        && (gui.getNextSplitClickMode() == Options.nextSplitNumRightClick))
+                    {
+                        int viewMode = gui.getViewMode();
+                        LegionClientSide clientSideLegion = client
+                            .getLegion(nextLegion.getMarkerId());
+
+                        new ShowLegion(masterFrame, clientSideLegion, point,
+                            scrollPane, 4 * Scale.get(), viewMode, client
+                                .isMyLegion(clientSideLegion), false, true);
+                    }
+                }
+                catch (AWTException exception)
+                {
+                    LOGGER.log(Level.WARNING, "Robot creation failed");
+                }
+            }
+        }
+        else
+        {
+            // Not Split, Move or Recruit phase - nothing to do.
+            return;
         }
     }
 
