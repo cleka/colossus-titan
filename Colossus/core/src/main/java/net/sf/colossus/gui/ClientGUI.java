@@ -287,7 +287,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             .getStringOption(Options.legionMoveConfirmationSubMenu);
         if (mcMode == null || mcMode.equals(""))
         {
-            mcMode = options.legionMoveConfirmationNoUnvisitedMove;
+            mcMode = Options.legionMoveConfirmationNoUnvisitedMove;
             // initialize new option
             options.setOption(Options.legionMoveConfirmationSubMenu, mcMode);
             // clean up obsolete option from cfg file
@@ -301,7 +301,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             .getStringOption(Options.nextSplitSubMenu);
         if (nextSplitMode == null || nextSplitMode.equals(""))
         {
-            nextSplitMode = options.nextSplitLeftClick;
+            nextSplitMode = Options.nextSplitLeftClick;
             // initialize new option
             options.setOption(Options.nextSplitSubMenu, nextSplitMode);
             // clean up obsolete option from cfg file
