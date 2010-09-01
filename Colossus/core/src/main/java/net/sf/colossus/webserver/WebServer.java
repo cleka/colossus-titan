@@ -551,6 +551,8 @@ public class WebServer implements IWebServer, IRunWebServer
                 LOGGER.log(Level.FINEST, "Telling user " + newUser.getName()
                     + " that he is still enrolled in game " + gi.getGameId());
                 // userMap finds already new user for that name
+                LOGGER.fine("Player " + newUser.getName()
+                    + " re-enrolled to game " + gi.getGameId());
                 client.didEnroll(gi.getGameId(), newUser.getName());
                 allTellGameInfo(gi);
             }
@@ -696,6 +698,8 @@ public class WebServer implements IWebServer, IRunWebServer
                         gi.updateOnline();
                         allTellGameInfo(gi);
                         IWebClient client = (IWebClient)user.getThread();
+                        LOGGER.fine("Player " + username
+                            + " enrolled to game " + gameId);
                         client.didEnroll(gameId, user.getName());
                     }
                     else
@@ -760,6 +764,8 @@ public class WebServer implements IWebServer, IRunWebServer
                         gi.updateOnline();
                         allTellGameInfo(gi);
                         IWebClient client = (IWebClient)user.getThread();
+                        LOGGER.fine("Player " + username
+                            + " unenrolled from game " + gameId);
                         client.didUnenroll(gameId, user.getName());
                     }
                 }
