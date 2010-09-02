@@ -1141,7 +1141,7 @@ final class EventViewer extends KDialog
         defenderEventLegion.removeReinforcedCreature(turn, creature.getName());
     }
 
-    public void removeCreature(Legion legion, CreatureType type)
+    public void removeCreature(Legion legion, CreatureType type, String reason)
     {
         if (attackerEventLegion == null && defenderEventLegion == null)
         {
@@ -1164,6 +1164,12 @@ final class EventViewer extends KDialog
             LOGGER.log(Level.FINEST, "During battle, remove creature " + type
                 + " from defender legion " + legion);
             defenderEventLegion.setCreatureDied(type, defender.getHeight());
+        }
+
+        else if (reason.equals(Constants.reasonSummon))
+        {
+            // ok, nothing to do - this is about removing the summoned angel
+            // from the donor legion, there is no event legion for that.
         }
 
         else

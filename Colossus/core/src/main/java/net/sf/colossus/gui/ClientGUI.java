@@ -1199,7 +1199,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         }
         else
         {
-            eventViewer.removeCreature(legion, type);
+            eventViewer.removeCreature(legion, type, reason);
         }
     }
 
