@@ -115,7 +115,19 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
 
     private void runInOwnJVM()
     {
-        File gameDir = new File(workFilesBaseDir, gameId);
+        // Figure out the ??00-??99 part of the path:
+        int intGameId = Integer.parseInt(gameId);
+        int hundreds = intGameId - (intGameId % 100);
+        Integer h00 = Integer.valueOf(hundreds);
+        Integer h99 = Integer.valueOf(hundreds + 99);
+        String dir0099Part = String.format("%04d-%04d", h00, h99);
+
+        // E.g. game 6789 will be stored as workFilesBaseDir/6700-6799/6789
+        String dirPath = workFilesBaseDir + File.separator + dir0099Part;
+
+        // force to be at least 4 digits, i.e. 0049 for game 49:
+        String gameId4s = String.format("%04d", Integer.valueOf(intGameId));
+        File gameDir = new File(dirPath, gameId4s);
         gameDir.mkdirs();
 
         String fileName = "Game." + gameId + ".running.flag";

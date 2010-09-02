@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.sf.colossus.webcommon.GameInfo;
 import net.sf.colossus.webcommon.IColossusMail;
@@ -1656,32 +1658,91 @@ public class WebServer implements IWebServer, IRunWebServer
         }
     }
 
+    /**
+     * Searches the game directory tree for highest game number for which
+     * a game directory had been earlier created.
+     * Tree is expected to have groups per each 100 games; example:
+     *
+     * base
+     * base/nn00-nn99
+     * base/nn00-nn99/nn00
+     * base/nn00-nn99/nn04
+     * base/nn00-nn99/nn98
+     * base/mm00-mm99/mm12
+     * base/mm00-mm99/mm87
+     *
+     * Eventually, when we reach gameId 10000+, groupdirs will have the form
+     * base/kkk00-kkk99
+     * base/kkk00-kkk99/kkk02
+     * base/kkk00-kkk99/kkk87
+     *
+     * Example, if last created game dir was 6789  ( "base/6700-6799/6789" ),
+     * this returns 6789.
+     *
+     * @return The highest game number for which a directory already exists,
+     * (otherwise 0 if therre is no dir at all)
+     */
     private int getMaximumGameIdFromFiles()
     {
-        int maxId = 1;
+        // Server will create next as maxId + 1
+        int maxId = 0;
 
         String workFilesBaseDir = options
             .getStringOption(WebServerConstants.optWorkFilesBaseDir);
         File baseDir = new File(workFilesBaseDir);
         if (baseDir.isDirectory())
         {
-            String[] names = baseDir.list();
-            if (names != null && names.length > 0)
+            String maxGroup = null;
+            int maxNumber = -1;
+
+            Pattern p = Pattern.compile("(\\d+)-\\d+");
+
+            String[] dirNames = baseDir.list();
+            if (dirNames != null && dirNames.length > 0)
             {
-                for (int i = 0; i < names.length; i++)
+                for (int grp = 0; grp < dirNames.length; grp++)
                 {
-                    String name = names[i];
-                    try
+                    String dirName = dirNames[grp];
+                    Matcher m = p.matcher(dirName);
+                    if (m.matches())
                     {
-                        int number = Integer.parseInt(name);
-                        if (number > maxId)
+                        String firstNumber = m.group(1);
+                        int number = Integer.parseInt(firstNumber);
+                        if (number > maxNumber)
                         {
-                            maxId = number;
+                            maxNumber = number;
+                            maxGroup = dirName;
                         }
                     }
-                    catch (NumberFormatException e)
+                }
+
+                if (maxGroup != null)
+                {
+                    File groupDir = new File(baseDir, maxGroup);
+                    if (groupDir.isDirectory())
                     {
-                        // Ignore non-number filenames
+                        String[] names = groupDir.list();
+                        for (int i = 0; i < names.length; i++)
+                        {
+                            String name = names[i];
+                            try
+                            {
+                                int number = Integer.parseInt(name);
+                                if (number > maxId)
+                                {
+                                    maxId = number;
+                                }
+                            }
+                            catch (NumberFormatException e)
+                            {
+                                // Ignore non-number filenames
+                            }
+                        }
+                    }
+                    else
+                    {
+                        LOGGER.severe("Group '" + groupDir
+                            + "' is not a directory?!?");
                     }
                 }
             }
