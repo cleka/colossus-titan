@@ -191,15 +191,6 @@ public final class BattleBoard extends KFrame
         setupTopMenu();
         setupHelpMenu();
 
-        saveWindow = new SaveWindow(gui.getOptions(), "BattleMap");
-
-        Point location = saveWindow.loadLocation();
-        if (location == null)
-        {
-            location = new Point(0, 4 * Scale.get());
-        }
-        setLocation(location);
-
         battleMap = new BattleMap(getClient(), engagement.getLocation(),
             engagement.getAttackingLegion(), engagement.getDefendingLegion(),
             gui);
@@ -253,6 +244,11 @@ public final class BattleBoard extends KFrame
         net.sf.colossus.util.InstanceTracker.setId(this, instanceId);
 
         pack();
+
+        // saveWindow stuff must be called AFTER pack()...
+        saveWindow = new SaveWindow(gui.getOptions(), "BattleBoard");
+        saveWindow.restore(this, new Point(0, 4 * Scale.get()));
+
         setVisible(true);
 
         // @TODO: perhaps those could be done earlier, but in previous code
@@ -1068,5 +1064,15 @@ public final class BattleBoard extends KFrame
     public String toString()
     {
         return "BattleBoard for: " + infoText;
+    }
+
+    @Override
+    public void dispose()
+    {
+        if (saveWindow != null)
+        {
+            saveWindow.save(this);
+        }
+        super.dispose();
     }
 }
