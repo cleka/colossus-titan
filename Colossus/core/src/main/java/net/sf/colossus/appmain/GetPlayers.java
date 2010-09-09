@@ -814,7 +814,7 @@ public final class GetPlayers extends KFrame
         List<String> types = new ArrayList<String>();
         StringBuilder sb = new StringBuilder("");
 
-        for (int i = 0; i < Constants.MAX_MAX_PLAYERS; i++)
+        for (int i = 0; i < VariantSupport.getMaxPlayers(); i++)
         {
             String name = (String)(playerNames[i].getSelectedItem());
             String type = (String)(playerTypes[i].getSelectedItem());
@@ -859,6 +859,20 @@ public final class GetPlayers extends KFrame
                     + (i + 1) + "\n");
             }
 
+        }
+
+        // preserve the non-used ones
+        // (e.g. 7-12 for 6 player variant)
+        for (int i = VariantSupport.getMaxPlayers(); i < Constants.MAX_MAX_PLAYERS; i++)
+        {
+            String name = (String)(playerNames[i].getSelectedItem());
+            String type = (String)(playerTypes[i].getSelectedItem());
+            if (name.length() > 0 && !name.equals(Constants.none)
+                && !type.equals(Constants.none))
+            {
+                options.setOption(Options.playerName + i, name);
+                options.setOption(Options.playerType + i, type);
+            }
         }
 
         if (sb.length() > 0)
