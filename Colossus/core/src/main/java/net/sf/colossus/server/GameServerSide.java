@@ -861,6 +861,38 @@ public final class GameServerSide extends Game
         }
         Collections.sort(numericList);
 
+        // According to tracker item 3059850 "balanced towers in 5 player games":
+        // If only 5 or 4 of 6 towers are used, avoid using either
+        // first or last (100 or 600), because player in tower 100
+        // is even further in disadvantage since player in 600 might
+        // block one of his 3 possible pathways (hexes 41 or 42).
+
+        // For 12, I think it's like the following:
+        // If there is free towers, but more than half of towers are used
+        // ( => there is a case where two neighbored towers will be used)
+        // It seems this applies also to 6  ( 4 > 3, and 3 = 6/2 ).
+        // For Abyssal9, the tower placement and their numbers are so odd,
+        // I don't even attempt to find a logic there...
+
+        if ((numTowers == 6 || numTowers == 12)
+            && numPlayers < numTowers
+            && numPlayers > (numTowers / 2))
+        {
+            int zeroOrOne = Dice.rollDie(2) - 1;
+            boolean whetherFirstOrLast = zeroOrOne == 0 ? true : false;
+            int firstOrLast = (whetherFirstOrLast ? 0 : numTowers - 1);
+
+            Integer removed = numericList.remove(firstOrLast);
+            String message = "With " + towerList.size() + " towers for "
+                + numPlayers + " players, some neighbored towers will be "
+                + "used, thus we don't use first and last together "
+                + "=> Removing" + " tower " + removed + ".";
+            LOGGER.info(message);
+
+            // adjust number of towers
+            numTowers = numericList.size();
+        }
+
         double towersPerPlayer = (double)numTowers / numPlayers;
 
         // First just find a balanced sequence starting at zero.
