@@ -1295,7 +1295,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             {
                 board.enableDoneAction();
             }
-            board.updateLegionsLeftToMoveText();
+            board.updateLegionsLeftToMoveText(true);
         }
     }
 
@@ -1322,7 +1322,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             {
                 board.enableDoneAction();
             }
-            board.updateLegionsLeftToMoveText();
+            board.updateLegionsLeftToMoveText(true);
         }
 
         if (didTeleport)
@@ -2619,7 +2619,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             {
                 legion.setSkipThisTime(false);
             }
-            board.updateLegionsLeftToMoveText();
+            board.updateLegionsLeftToMoveText(true);
         }
     }
 

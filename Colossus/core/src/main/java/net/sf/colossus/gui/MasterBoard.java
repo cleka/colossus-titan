@@ -559,7 +559,7 @@ public final class MasterBoard extends JPanel
                     highlightUnmovedLegions();
                     if (gui.isMyTurn())
                     {
-                        updateLegionsLeftToMoveText();
+                        updateLegionsLeftToMoveText(true);
                     }
                 }
                 else if (phase == Phase.FIGHT)
@@ -1427,7 +1427,7 @@ public final class MasterBoard extends JPanel
 
                 answer = Constants.ConfirmVals.No;
 
-                client.legionsNotMoved(legionStatus);
+                client.legionsNotMoved(legionStatus, true);
                 if (mcModeInt == Options.legionMoveConfirmationNumUnvisitedMove)
                 {
                     cnt = legionStatus[Constants.legionStatusNotVisitedSkippedBlocked];
@@ -1588,7 +1588,7 @@ public final class MasterBoard extends JPanel
 
             bottomBar.setPhase("Movement");
             highlightUnmovedLegions();
-            updateLegionsLeftToMoveText();
+            updateLegionsLeftToMoveText(false);
             maybeRequestFocusAndToFront();
         }
         else
@@ -2182,7 +2182,7 @@ public final class MasterBoard extends JPanel
         else if (phase == Phase.MOVE)
         {
             legion.setVisitedThisPhase(true);
-            updateLegionsLeftToMoveText();
+            updateLegionsLeftToMoveText(true);
             client.setCurrentLegionMarkerId(legion.getMarkerId());
 
             // Allow spin cycle by clicking on chit again.
@@ -2534,7 +2534,7 @@ public final class MasterBoard extends JPanel
             {
                 activeLegion.setSkipThisTime(true);
                 gui.pushUndoStack(activeLegion.getMarkerId());
-                updateLegionsLeftToMoveText();
+                updateLegionsLeftToMoveText(true);
                 clearPossibleRecruitChits();
                 highlightUnmovedLegions();
                 repaint();
@@ -2811,10 +2811,14 @@ public final class MasterBoard extends JPanel
         bottomBar.setLegionsLeftToMuster(legionCount);
     }
 
-    public void updateLegionsLeftToMoveText()
+    // When enter Move phase, do not yet have roll, therefore can not
+    // determine which units are blocked.  Attempting to do so yields
+    // bad results, and a null pointer exception on the first turn, so
+    // send flag to prevent this.
+    public void updateLegionsLeftToMoveText(boolean have_roll)
     {
         int legionStatus[] = { 0, 0, 0, 0 };
-        client.legionsNotMoved(legionStatus);
+        client.legionsNotMoved(legionStatus, have_roll);
         bottomBar.setLegionsStatus(legionStatus);
     }
 

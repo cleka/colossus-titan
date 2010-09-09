@@ -2855,26 +2855,33 @@ public final class Client implements IClient, IOracle, IVariant,
      *   [Constants.legionStatusNotVisitedSkippedBlocked] == legions that have not been moved,
      *            are not blocked and have not been skipped
      */
-    public void legionsNotMoved(int legionStatus[])
+    public void legionsNotMoved(int legionStatus[], boolean have_roll)
     {
         for (Legion legion : game.getActivePlayer().getLegions())
         {
             legionStatus[Constants.legionStatusCount]++;
-            if (legion.hasMoved())
+            // If don't have roll, can't have moved or been marked skipped
+            // Can't tell if blocked
+            if (have_roll == true)
             {
-                legionStatus[Constants.legionStatusMoved]++;
-            }else
-            {
-                Set<MasterHex> teleport = listTeleportMoves(legion);
-                Set<MasterHex> normal = listNormalMoves(legion);
-                if (teleport.isEmpty() && normal.isEmpty())
+                if (legion.hasMoved())
                 {
-                    legionStatus[Constants.legionStatusBlocked]++;
+                    legionStatus[Constants.legionStatusMoved]++;
                 }else
                 {
-                    if (!legion.getVisitedThisPhase() && !legion.getSkipThisTime())
+                    Set<MasterHex> teleport = listTeleportMoves(legion);
+                    Set<MasterHex> normal = listNormalMoves(legion);
+                    if (teleport.isEmpty() && normal.isEmpty())
                     {
-                        legionStatus[Constants.legionStatusNotVisitedSkippedBlocked]++;
+                        legionStatus[Constants.legionStatusBlocked]++;
+                    }
+                    else
+                    {
+                        if (!legion.getVisitedThisPhase()
+                            && !legion.getSkipThisTime())
+                        {
+                            legionStatus[Constants.legionStatusNotVisitedSkippedBlocked]++;
+                        }
                     }
                 }
             }
