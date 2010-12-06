@@ -154,7 +154,7 @@ public class WebServer implements IWebServer, IRunWebServer
         mailObject = new ColossusMail(options);
 
         portBookKeeper = new PortBookKeeper(portRangeFrom, availablePorts);
-        int freePorts = portBookKeeper.getFreeGamePortsCount();
+        int freePorts = portBookKeeper.countFreePorts();
 
         LOGGER.info("Actually free ports: " + freePorts);
 
@@ -1311,7 +1311,7 @@ public class WebServer implements IWebServer, IRunWebServer
 
         LOGGER.fine("Calling getFreePort for game " + gi.getGameId());
 
-        int port = portBookKeeper.getFreePort("game " + gi.getGameId());
+        int port = portBookKeeper.getFreePort(gi);
         if (port == -1)
         {
             reason = "No free ports!!";

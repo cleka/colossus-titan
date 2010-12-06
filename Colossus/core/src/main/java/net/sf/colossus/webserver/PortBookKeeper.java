@@ -3,8 +3,11 @@ package net.sf.colossus.webserver;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import net.sf.colossus.webcommon.GameInfo;
 
 
 /**
@@ -20,67 +23,104 @@ public class PortBookKeeper
 
     private final int portRangeFrom;
 
-    /** total nr of free ports according to options file;
+    /**
+     * total nr of ports we are allowed to use according to options file;
      * but only every 2nd is used as a game port
      */
-    private final int availablePorts;
+    private final int totalPorts;
 
-    /** Nr of ports that are actually currently available for game serving
+    /** Nr of ports that are actually available for game serving
      *  (so, this value == 5 means there can be 5 games)
      */
-    private final int freeGamePorts;
+    private final int gamePorts;
 
     /** Bookkeeping which (game) ports are currently in use
      */
-    private final boolean[] portUsed;
+    private final ArrayList<GameInfo> portInUse;
 
-    public PortBookKeeper(int portRangeFrom, int availablePorts)
+    /**
+     * A placeholder for the bookkeping table, if it's somehow used but we
+     * don't know by what or whom
+     */
+    private final GameInfo NOT_A_REAL_GAME = new GameInfo("00000", true);
+
+    public PortBookKeeper(int portRangeStart, int availablePorts)
     {
-        this.portRangeFrom = portRangeFrom;
-        this.availablePorts = availablePorts;
+        this.portRangeFrom = portRangeStart;
+        this.totalPorts = availablePorts;
+        portInUse = new ArrayList<GameInfo>(totalPorts);
+        for (int i = 0; i < availablePorts; i++)
+        {
+            portInUse.add(i, null);
+        }
 
-        portUsed = new boolean[availablePorts];
         int freePorts = 0;
 
         for (int i = 0; i < availablePorts; i += 2)
         {
-            int port = portRangeFrom + i;
+            int port = realPortForIndex(i);
             boolean free = testWhetherPortFree(port);
             if (free)
             {
-                portUsed[i] = false;
+                markPortFree(port);
                 freePorts++;
             }
             else
             {
                 LOGGER.warning("Free port table initialization: Port " + port
                     + " seems to be in use! Marking it as in use.");
-                portUsed[i] = true;
+                markPortUsed(port, NOT_A_REAL_GAME);
             }
         }
 
-        this.freeGamePorts = freePorts;
+        this.gamePorts = freePorts;
     }
 
-    public int getFreeGamePortsCount()
+    private int realPortForIndex(int portIndex)
     {
-        return freeGamePorts;
+        return portRangeFrom + portIndex;
     }
 
-    public int getFreePort(String purpose)
+    private int indexForRealPort(int portNumber)
     {
+        return portNumber - portRangeFrom;
+    }
+
+    private void markPortUsed(int portNr, GameInfo gi)
+    {
+        portInUse.set(indexForRealPort(portNr), gi);
+    }
+
+    private void markPortFree(int portNr)
+    {
+        portInUse.set(indexForRealPort(portNr), null);
+    }
+
+    private GameInfo getGameAtPort(int portNr)
+    {
+        return portInUse.get(indexForRealPort(portNr));
+    }
+
+    private boolean isPortInUse(int portNr)
+    {
+        return getGameAtPort(portNr) != null;
+    }
+
+    public int getFreePort(GameInfo gi)
+    {
+        String purpose = "game " + gi.getGameId();
         int port = -1;
-        synchronized (portUsed)
+        synchronized (portInUse)
         {
-            for (int i = 0; i < availablePorts && port == -1; i += 2)
+            for (int i = 0; i < totalPorts && port == -1; i += 2)
             {
-                if (!portUsed[i])
+                int tryPort = realPortForIndex(i);
+                if (!isPortInUse(tryPort))
                 {
-                    int tryPort = portRangeFrom + i;
                     boolean ok = testThatPortReallyFree(tryPort);
                     if (ok)
                     {
-                        portUsed[i] = true;
+                        markPortUsed(tryPort, gi);
                         port = tryPort;
                     }
                     else
@@ -104,6 +144,33 @@ public class PortBookKeeper
         return port;
     }
 
+    public int countFreePorts()
+    {
+        int free = 0;
+        synchronized (portInUse)
+        {
+            for (int i = 0; i < totalPorts; i += 2)
+            {
+                int tryPort = realPortForIndex(i);
+                if (!isPortInUse(tryPort))
+                {
+                    boolean ok = testThatPortReallyFree(tryPort);
+                    if (ok)
+                    {
+                        free++;
+                    }
+                    else
+                    {
+                        LOGGER.log(Level.SEVERE, "countFreePorts: port "
+                            + tryPort + " is supposed to be free "
+                            + "but test shows it is in use?");
+                    }
+                }
+            }
+        }
+        return free;
+    }
+
     /** Check that it's really free, as expected, log a warning if not */
     private boolean testThatPortReallyFree(int port)
     {
@@ -111,7 +178,7 @@ public class PortBookKeeper
         {
             LOGGER.warning("Port " + port
                 + " is supposed to be free but it is not!");
-            portUsed[port] = true;
+            markPortUsed(port, NOT_A_REAL_GAME);
             return false;
         }
         else
@@ -152,11 +219,11 @@ public class PortBookKeeper
     private void ensureSomeFreePortsRemain()
     {
         int seemsFree = 0;
-        synchronized (portUsed)
+        synchronized (portInUse)
         {
-            for (int i = 0; i < availablePorts; i += 2)
+            for (int i = 0; i < totalPorts; i += 2)
             {
-                if (!portUsed[i])
+                if (!isPortInUse(realPortForIndex(i)))
                 {
                     seemsFree++;
                 }
@@ -173,10 +240,10 @@ public class PortBookKeeper
 
     private void reCheckPorts()
     {
-        for (int i = 0; i < availablePorts; i += 2)
+        for (int i = 0; i < totalPorts; i += 2)
         {
-            int port = portRangeFrom + i;
-            boolean shouldBeFree = portUsed[i];
+            int port = realPortForIndex(i);
+            boolean shouldBeFree = isPortInUse(port);
             boolean free = testWhetherPortFree(port);
             if (free != shouldBeFree)
             {
@@ -184,7 +251,14 @@ public class PortBookKeeper
                     + (shouldBeFree ? "free" : "not free")
                     + " but actually it is " + (free ? "free" : "not free")
                     + "! Updating table.");
-                portUsed[i] = free;
+                if (free)
+                {
+                    markPortFree(port);
+                }
+                else
+                {
+                    markPortUsed(port, NOT_A_REAL_GAME);
+                }
             }
         }
 
@@ -192,8 +266,8 @@ public class PortBookKeeper
 
     public void releasePort(int port, String purpose)
     {
-        int index = port - portRangeFrom;
-        if (index < 0 || index > availablePorts)
+        int index = indexForRealPort(port);
+        if (index < 0 || index > totalPorts)
         {
             LOGGER.log(Level.WARNING, "attempt to release invalid port "
                 + port + " (index = " + index + ")!");
@@ -205,8 +279,48 @@ public class PortBookKeeper
         }
         else
         {
-            portUsed[index] = false;
+            markPortFree(port);
             LOGGER.info("Released port " + port + " (" + purpose + ")");
         }
+    }
+
+    private String buildPortTableReport()
+    {
+        StringBuilder sb = new StringBuilder("");
+        synchronized (portInUse)
+        {
+            for (int i = 0; i < totalPorts; i += 2)
+            {
+                int tryPort = realPortForIndex(i);
+                if (sb.length() != 0)
+                {
+                    sb.append(", ");
+                }
+                sb.append(tryPort + ": ");
+                GameInfo gi = getGameAtPort(tryPort);
+                if (gi == null)
+                {
+                    sb.append("free");
+                }
+                else
+                {
+                    sb.append(gi.getGameId());
+                }
+            }
+        }
+        return sb.toString();
+    }
+
+
+    public String getStatus()
+    {
+        StringBuilder st = new StringBuilder();
+        st.append("Ports configured/available for games: " + totalPorts + "/"
+            + gamePorts + "; still free for games: "
+                + countFreePorts() + "\n");
+        st.append("Port usage: " + buildPortTableReport());
+        st.append("\n");
+
+        return st.toString();
     }
 }
