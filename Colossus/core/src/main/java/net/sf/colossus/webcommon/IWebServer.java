@@ -27,6 +27,7 @@ public interface IWebServer
     public static final String RereadLoginMessage = "rereadLoginMessage";
     public static final String RequestUserAttention = "requestUserAttention";
     public static final String PingResponse = "pingResponse";
+    public static final String DumpInfo = "dumpInfo";
 
     public static String generalChatName = "#general";
 
@@ -82,6 +83,8 @@ public interface IWebServer
     // public void submitAnyText(String text);
 
     public void shutdownServer();
+
+    public void dumpInfo();
 
     public String changeProperties(String username, String oldPW,
         String newPW, String email, Boolean isAdminObj);

@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.colossus.webcommon.FormatWhen;
 import net.sf.colossus.webcommon.GameInfo;
 import net.sf.colossus.webcommon.IColossusMail;
 import net.sf.colossus.webcommon.IGameRunner;
@@ -93,6 +94,10 @@ public class WebServer implements IWebServer, IRunWebServer
 
     private final ClientWatchDog watchDog;
 
+    private final FormatWhen whenFormatter;
+
+    private PrintWriter dumpInfoFile;
+
     public static void main(String[] args)
     {
         String optionsFileName = WebServerConstants.defaultOptionsFilename;
@@ -124,6 +129,22 @@ public class WebServer implements IWebServer, IRunWebServer
         this.options = new WebServerOptions(optionsFile);
         options.loadOptions();
         this.generalChat = new ChatChannel(IWebServer.generalChatName, options);
+
+        this.whenFormatter = new FormatWhen();
+
+        try
+        {
+            PrintWriter p = new PrintWriter(new FileOutputStream(
+                "dump-info.txt", true));
+            dumpInfoFile = p;
+            dumpInfoFile.println("");
+            dumpInfoFile.println("WebServer started.");
+        }
+        catch (IOException e)
+        {
+            LOGGER.warning("Can't create/append to dump-info.txt");
+            dumpInfoFile = null;
+        }
 
         this.serverPort = options
             .getIntOptionNoUndef(WebServerConstants.optServerPort);
@@ -496,6 +517,65 @@ public class WebServer implements IWebServer, IRunWebServer
         gui.setRunningGamesInfo(runningGames.size() + " running games");
         gui.setEndingGamesInfo(endingGames.size() + " games just ending");
     }
+
+    /**
+     * Dump server state info into a static file, at the moment dump-info.txt
+     */
+    public void dumpInfo()
+    {
+        if (dumpInfoFile != null)
+        {
+            dumpInfo(dumpInfoFile);
+            dumpInfoFile.flush();
+        }
+        else
+        {
+            LOGGER.warning("Can't dump info because dumpInfoFile is null!");
+        }
+    }
+
+    /**
+     * Dump info into given PrintWriter
+     * @param pw PrintWriter for the file to print dump to
+     */
+    public void dumpInfo(PrintWriter pw)
+    {
+        long now = new Date().getTime();
+
+        String nowString = whenFormatter.timeAndDateAsString(now);
+        pw.println("Dump at " + nowString);
+
+        ArrayList<String> igList = new ArrayList<String>();
+        ArrayList<String> sgList = new ArrayList<String>();
+        for (GameInfo gi : proposedGames.values())
+        {
+            (gi.isScheduledGame() ? sgList : igList).add(gi.getGameId());
+        }
+
+        pw.println(sgList.size() + " scheduled games stored: "
+            + sgList.toString());
+        pw.println(igList.size() + " instant games stored:"
+            + igList.toString());
+
+        ArrayList<String> gameList = new ArrayList<String>();
+        for (GameInfo gi : runningGames)
+        {
+            gameList.add(gi.getGameId());
+        }
+        pw.println(runningGames.size() + " running games: "
+            + gameList.toString());
+        gameList.clear();
+        for (GameInfo gi : endingGames)
+        {
+            gameList.add(gi.getGameId());
+        }
+        pw.println(endingGames.size() + " games just ending: "
+            + gameList.toString());
+        pw.println(portBookKeeper.getStatus());
+        pw.println("");
+        pw.println("");
+    }
+
 
     public GameInfo proposeGame(String initiator, String variant,
         String viewmode, long startAt, int duration, String summary,

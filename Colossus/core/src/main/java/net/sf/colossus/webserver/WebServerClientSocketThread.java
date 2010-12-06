@@ -760,6 +760,12 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
                     + " attempted to use RequestUserAttention method!");
             }
         }
+
+        else if (command.equals(IWebServer.DumpInfo))
+        {
+            server.dumpInfo();
+        }
+
         else if (command.equals(IWebServer.PingResponse))
         {
             /*

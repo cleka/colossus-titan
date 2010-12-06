@@ -187,6 +187,7 @@ public class WebClient extends KFrame implements IWebClient
 
     private JButton debugSubmitButton;
     private JButton shutdownButton;
+    private JButton dumpInfoButton;
 
     private JTextField notifyMessageField;
     private JTextField notifyUserField;
@@ -1599,6 +1600,17 @@ public class WebClient extends KFrame implements IWebClient
             }
         });
         adminPane.add(shutdownButton);
+
+        dumpInfoButton = new JButton("Dump Info on Server");
+        dumpInfoButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                dumpInfoButtonAction();
+            }
+        });
+        adminPane.add(dumpInfoButton);
+
 
         notifyMessageField = new JTextField();
         adminPane.add(notifyMessageField);
@@ -3127,6 +3139,11 @@ public class WebClient extends KFrame implements IWebClient
         {
             server.shutdownServer();
         }
+    }
+
+    private void dumpInfoButtonAction()
+    {
+        server.dumpInfo();
     }
 
     private void debugSubmitButtonAction()

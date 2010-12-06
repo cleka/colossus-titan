@@ -737,6 +737,11 @@ public class WebClientSocketThread extends Thread implements IWebServer
         send(IWebServer.ShutdownServer);
     }
 
+    public void dumpInfo()
+    {
+        send(IWebServer.DumpInfo);
+    }
+
     public void submitAnyText(String text)
     {
         if (text.equals("die"))

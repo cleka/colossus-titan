@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package net.sf.colossus.webcommon;
 
@@ -52,4 +52,12 @@ public class FormatWhen
         return timeNow;
     }
 
+    public String timeAndDateAsString(long when)
+    {
+        Date whenDate = new Date(when);
+        String timeNow = timeFormatter.format(whenDate);
+        String dateNow = dateFormatter.format(whenDate);
+
+        return dateNow + " " + timeNow;
+    }
 }
