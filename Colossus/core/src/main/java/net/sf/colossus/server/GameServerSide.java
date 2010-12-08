@@ -127,12 +127,13 @@ public final class GameServerSide extends Game
         return new GameServerSide(whatNextManager, serverOptions, variant);
     }
 
-    /** The normal constructor to be used everywhere
+    /**
+     * The normal constructor to be used everywhere
+     * @param whatNextMgr A WhatNextManager object which manages the main
+     *        control flow which thing to do 'next' when this game is over.
      * @param serverOptions The server side options, initialized from the
-     * GetPlayers dialog and/or command line options.
-     * @param startObj  The 'Start' object that started this game, and thus
-     * manages the main control flow which thing to do 'next' when this game
-     * is over.
+     *        GetPlayers dialog and/or command line options.
+     * @param variant Variant of this game
      */
     public GameServerSide(WhatNextManager whatNextMgr, Options serverOptions,
         Variant variant)

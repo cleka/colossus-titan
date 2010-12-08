@@ -74,7 +74,7 @@ public interface IVariantHint
      * estimating its recruitment value.
      *
      * @param creature Type of the creature
-     * @param style List of AI styles to hint for
+     * @param styles List of AI styles to hint for
      * @return An offset to the Point Value of the creature.
      */
     public int getHintedRecruitmentValueOffset(CreatureType creature,

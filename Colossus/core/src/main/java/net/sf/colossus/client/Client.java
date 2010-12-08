@@ -2844,9 +2844,8 @@ public final class Client implements IClient, IOracle, IVariant,
     /**
      * Returns status of client's legions
      *
-     * @param legionStatus[]  an array of integers with
-     * various status states to be set.  Array should
-     * be initialized to all zeroes
+     * @param legionStatus  an array of integers with various status
+     * states to be set. Array should be initialized to all zeroes
      *
      * Current array contents:
      *   [Constants.legionStatusCount] == count of legions

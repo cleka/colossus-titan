@@ -92,9 +92,9 @@ public class ValueRecorder implements IValueRecorderItem
         value += v;
     }
 
-    /** Augment the value.
+    /**
+     * Augment the value.
      * @param v By how much the value change, and why
-     * @param r The reason of the change.
      */
     public void add(ValueRecorder v)
     {
@@ -103,7 +103,8 @@ public class ValueRecorder implements IValueRecorderItem
         value += v.getValue();
     }
 
-    /** Reset the value to a specific value.
+    /**
+     * Reset the value to a specific value.
      * @param v The new value to use.
      * @param r The reason of the change.
      */

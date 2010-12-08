@@ -172,9 +172,9 @@ public class User
     /**
      * Given a username and password, verifies that the user
      * is allowed to login with that password.
-     * @param String username
-     * @param String password
-     * @returns String reasonLoginFailed, null if login ok
+     * @param username
+     * @param password
+     * @return reasonLoginFailed (String), null if login ok
      **/
     public static String verifyLogin(String username, String password)
     {

@@ -388,7 +388,8 @@ public class GameInfo
 
     /**
      * Have enough players enrolled (at least "min")
-     * @return
+     * @return true or false whether enough (at least 'min') players are
+     *         already enrolled to this game
      */
     public boolean hasEnoughPlayers()
     {
@@ -397,7 +398,7 @@ public class GameInfo
 
     /**
      * Have enough players enrolled (at least "min")
-     * @return
+     * @return true or false whether all enrolled players are online
      */
     public boolean allEnrolledOnline()
     {

@@ -526,9 +526,9 @@ abstract public class Movement
 
     /** Verify whether this is a valid entry side.
     *
-    *  @param legion
-    *  @param hex
-    *  @param player
+    *  @param legion The moving legion
+    *  @param hex The aimed target hex
+    *  @param teleport Whether this is a teleported move
     *  @return Reason why it is not a valid entry side, null if valid
     */
     public String isValidEntrySide(Legion legion, MasterHex hex,

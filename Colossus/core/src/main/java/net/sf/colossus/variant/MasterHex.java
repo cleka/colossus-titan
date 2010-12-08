@@ -111,7 +111,6 @@ public class MasterHex extends Hex
      * TODO should this rather be somewhere else? Since it uses entryside,
      * it makes variant package depending on game package ...
      *
-     * @param hex
      * @param wantedEntrySide
      * @return The direction towards which that entryside is placed
      */

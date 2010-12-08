@@ -78,7 +78,7 @@ class Chit extends JPanel
      * TODO try to get rid of the string bases Creature chits
      * @param scale
      * @param id
-     * @return
+     * @return The newly created CreatureChit
      */
     public static Chit newCreatureChit(int scale, String id)
     {
@@ -89,13 +89,19 @@ class Chit extends JPanel
      * Factory method for creatures, based on CreatureType
      * @param scale
      * @param type
-     * @return
+     * @return The newly created CreatureChit
      */
     public static Chit newCreatureChit(int scale, CreatureType type)
     {
         return new Chit(scale, type);
     }
 
+    /**
+     * Factory method for creatures, based on markerId
+     * @param scale
+     * @param markerId
+     * @return The newly created MarkerChit
+     */
     public static Chit newDiceChit(int scale, String markerId)
     {
         return new Chit(scale, markerId);
