@@ -217,7 +217,12 @@ public class RunGameInSameJVM extends Thread implements IGameRunner,
 
     public void gameStartupCompleted()
     {
-        LOGGER.info("SameJVM: Game Startup Completee!");
+        LOGGER.info("SameJVM: Game Startup completed!");
+    }
+
+    public void gameStartupFailed(String reason)
+    {
+        LOGGER.info("SameJVM: Game Startup Failed, reason: " + reason);
     }
 
     // Probably not really in use right now, just for the interface

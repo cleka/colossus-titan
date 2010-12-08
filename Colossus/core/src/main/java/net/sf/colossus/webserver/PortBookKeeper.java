@@ -265,23 +265,45 @@ public class PortBookKeeper implements IPortProvider
 
     }
 
-    public void releasePort(int port, String purpose)
+    public void releasePort(GameInfo gi)
     {
-        int index = indexForRealPort(port);
-        if (index < 0 || index > totalPorts)
+        int port = gi.getPort();
+        String purpose = "game " + gi.getGameId();
+
+        synchronized (portInUse)
         {
-            LOGGER.log(Level.WARNING, "attempt to release invalid port "
-                + port + " (index = " + index + ")!");
-        }
-        else if (!testWhetherPortFree(port))
-        {
-            LOGGER.log(Level.WARNING, "attempt to release port " + port + " ("
-                + purpose + ") but test indicates that it is still in use!");
-        }
-        else
-        {
-            markPortFree(port);
-            LOGGER.info("Released port " + port + " (" + purpose + ")");
+            GameInfo supposedGI = portInUse.get(indexForRealPort(port));
+
+            int index = indexForRealPort(port);
+            if (index < 0 || index > totalPorts)
+            {
+                LOGGER.log(Level.WARNING, "attempt to release invalid port "
+                    + port + " (index = " + index + ")!");
+            }
+            else if (supposedGI == null)
+            {
+                LOGGER.log(Level.WARNING, "attempt to release port " + port
+                    + " (" + purpose
+                    + ") but port book keeper has not marked port as used!");
+            }
+            else if (supposedGI != gi)
+            {
+                LOGGER.log(Level.WARNING, "attempt to release port " + port
+                    + " (" + purpose
+                    + ") but port book keeper thinks it's used by "
+                    + "a different game: " + supposedGI.getGameId());
+            }
+            else if (!testWhetherPortFree(port))
+            {
+                LOGGER.log(Level.WARNING, "attempt to release port " + port
+                    + " (" + purpose
+                    + ") but test indicates that it is still in use!");
+            }
+            else
+            {
+                markPortFree(port);
+                LOGGER.info("Released port " + port + " (" + purpose + ")");
+            }
         }
     }
 

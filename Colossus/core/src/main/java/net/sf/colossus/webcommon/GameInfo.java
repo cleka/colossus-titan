@@ -738,6 +738,12 @@ public class GameInfo
         return state.equals(GameState.PROPOSED) || state.equals(GameState.DUE);
     }
 
+    public boolean wasAlreadyStarted()
+    {
+        return !(state.equals(GameState.PROPOSED) || state
+            .equals(GameState.DUE));
+    }
+
     public void markStarting(User starter)
     {
         this.startingUser = starter;

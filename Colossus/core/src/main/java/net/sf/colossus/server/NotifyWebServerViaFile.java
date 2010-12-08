@@ -72,7 +72,7 @@ public class NotifyWebServerViaFile implements INotifyWebServer
     {
         if (active)
         {
-            out.println("All clients connected");
+            out.println(ALL_CLIENTS_CONNECTED);
         }
     }
 
@@ -80,7 +80,15 @@ public class NotifyWebServerViaFile implements INotifyWebServer
     {
         if (active)
         {
-            out.println("Game Startup Completed");
+            out.println(GAME_STARTUP_COMPLETED);
+        }
+    }
+
+    public void gameStartupFailed(String reason)
+    {
+        if (active)
+        {
+            out.println(GAME_STARTUP_FAILED + reason);
         }
     }
 

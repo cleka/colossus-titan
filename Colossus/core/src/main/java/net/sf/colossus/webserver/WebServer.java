@@ -715,7 +715,7 @@ public class WebServer implements IWebServer, IRunWebServer
             {
                 LOGGER.warning("getThread for user " + u.getName()
                     + " (of game " + gi.getGameId()
-                        + " returned null client!");
+                        + ") returned null client!");
             }
         }
     }
@@ -742,7 +742,7 @@ public class WebServer implements IWebServer, IRunWebServer
                 LOGGER
                     .warning("getThread for user " + u.getName()
                         + " (of game " + gi.getGameId()
-                        + " returned null client!");
+                        + ") returned null client!");
             }
         }
     }
@@ -873,10 +873,23 @@ public class WebServer implements IWebServer, IRunWebServer
             return;
         }
 
+        if (gi.wasAlreadyStarted())
+        {
+            LOGGER.warning("Attempt to cancel game " + gameId
+                + " but it is/was already starting! Ignoring that attempt.");
+            return;
+        }
+
+        if (gi.getPort() != -1)
+        {
+            portBookKeeper.releasePort(gi);
+        }
+
         IGameRunner gr = gi.getGameRunner();
         if (gr != null)
         {
-            gi.setGameRunner(null);
+            LOGGER.info("For Cancel: game " + gameId
+                + " has already GameRunner, not touching it.");
         }
         else
         {
@@ -947,7 +960,7 @@ public class WebServer implements IWebServer, IRunWebServer
             else
             {
                 LOGGER.warning("starting/running game " + gi.getGameId()
-                    + " failed!!");
+                    + " failed!! Reason: " + reason);
                 informAllEnrolledThatStartFailed(gi, reason, byUser);
                 gi.cancelStarting();
             }
@@ -1395,27 +1408,12 @@ public class WebServer implements IWebServer, IRunWebServer
         // Reason for failure
         String reason = null;
 
-        LOGGER.fine("Calling getFreePort for game " + gi.getGameId());
-
-        int port = portBookKeeper.getFreePort(gi);
-        if (port == -1)
-        {
-            reason = "No free ports!!";
-            LOGGER.warning(reason);
-            return reason;
-        }
-
-        gi.setPort(port);
-        LOGGER.fine("Using port " + port + " for game " + gi.getGameId());
-
         RunGameInOwnJVM gr = new RunGameInOwnJVM(this, options, gi);
-        gi.setGameRunner(gr);
         boolean ok = gr.makeRunningGame();
 
         if (!ok)
         {
-            reason = "makeRunningGame returned false?!?";
-            LOGGER.log(Level.WARNING, reason);
+            reason = gr.getReasonStartFailed();
             return reason;
         }
         else
@@ -1428,7 +1426,7 @@ public class WebServer implements IWebServer, IRunWebServer
         }
 
         LOGGER.fine("Successfully started game " + gi.getGameId()
-            + " on port " + port);
+            + " on port " + gi.getPort());
 
         // failureReason == null means success
         return reason;
@@ -1709,8 +1707,7 @@ public class WebServer implements IWebServer, IRunWebServer
                                 LOGGER.log(Level.FINE,
                                     "        ok, ended... releasing port "
                                         + gi.getPort());
-                                portBookKeeper.releasePort(gi.getPort(),
-                                    "game " + gi.getGameId());
+                                portBookKeeper.releasePort(gi);
                             }
                             catch (InterruptedException e)
                             {

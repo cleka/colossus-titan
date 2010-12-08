@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.common.Options;
+import net.sf.colossus.server.INotifyWebServer;
 import net.sf.colossus.webcommon.GameInfo;
 import net.sf.colossus.webcommon.IGameRunner;
 import net.sf.colossus.webcommon.IRunWebServer;
@@ -60,6 +61,7 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
         this.gi = gi;
         this.gameId = gi.getGameId();
         this.alreadyStarted = false;
+        gi.setGameRunner(this);
     }
 
     public boolean makeRunningGame()
@@ -73,8 +75,20 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
         colossusJar = options
             .getStringOption(WebServerConstants.optColossusJar);
 
-        hostingPort = gi.getPort();
+        LOGGER.fine("Calling getFreePort for game " + gi.getGameId());
+
+        int port = server.getPortProvider().getFreePort(gi);
+        if (port == -1)
+        {
+            reasonStartFailed = "No free ports!!";
+            return false;
+        }
+
+        hostingPort = port;
         hostingHost = gi.getHostingHost();
+
+        gi.setPort(port);
+        LOGGER.fine("Using port " + port + " for game " + gi.getGameId());
 
         this.setName("Game at port " + hostingPort);
         return true;
@@ -88,6 +102,11 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
     public String getHostingHost()
     {
         return hostingHost;
+    }
+
+    public String getReasonStartFailed()
+    {
+        return reasonStartFailed;
     }
 
     public boolean tryToStart()
@@ -471,21 +490,20 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
                 name = line.substring(25);
                 connected++;
             }
-            else if (line.startsWith("All clients connected"))
+            else if (line.startsWith(INotifyWebServer.ALL_CLIENTS_CONNECTED))
             {
                 done = true;
             }
-            else if (line.startsWith("Game Startup Completed"))
+            else if (line.startsWith(INotifyWebServer.GAME_STARTUP_COMPLETED))
             {
                 done = true;
             }
-            else if (line
-                .startsWith("Waiting for clients timed out - giving up!"))
+
+            // TODO: for now there is only one possible reason, handle better!
+            else if (line.startsWith(INotifyWebServer.GAME_STARTUP_FAILED))
             {
                 done = true;
-                reasonStartFailed = "Waiting for clients timed out, "
-                    + "not all clients did connect; got only " + connected
-                    + " players: " + names.toString();
+                reasonStartFailed = "Controlled process reported: " + line;
             }
 
             if (connected >= gi.getPlayers().size())
@@ -507,10 +525,15 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
         {
             LOGGER.log(Level.FINEST, "Game started ok - fine!");
         }
+        else if (done && reasonStartFailed != null)
+        {
+            LOGGER.warning("Failed: " + reasonStartFailed);
+        }
         else
         {
             reasonStartFailed = "not all clients did connect; got only "
                 + connected + " players: " + names.toString();
+            LOGGER.warning("Failed: " + reasonStartFailed);
         }
 
         try

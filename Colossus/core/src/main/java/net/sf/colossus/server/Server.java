@@ -454,9 +454,10 @@ public final class Server extends Thread implements IServer
                 if (gameStartupTimeoutSecs > 0
                     && alreadyTrying > gameStartupTimeoutSecs)
                 {
-                    logToStartLog("Waiting for clients timed out - giving up!");
-                    LOGGER
-                        .warning("Waiting for clients timed out - giving up!");
+                    String reason = "Waiting for clients timed out - giving up!";
+                    LOGGER.warning(reason);
+                    logToStartLog(reason);
+                    game.getNotifyWebServer().gameStartupFailed(reason);
                     forceShutDown = true;
                 }
             }

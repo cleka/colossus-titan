@@ -123,6 +123,12 @@ public class WebClient extends KFrame implements IWebClient
 
     private RegisterPasswordPanel registerPanel;
 
+    private final Object comingUpMutex = new Object();
+    private boolean timeIsUp;
+    private boolean clientIsUp;
+    private boolean clientStartFailed;
+
+
     private final static int NotLoggedIn = 1;
     private final static int LoggedIn = 2;
     // Enrolled to an instant game
@@ -2650,10 +2656,6 @@ public class WebClient extends KFrame implements IWebClient
         updateGUI();
     }
 
-    private final Object comingUpMutex = new Object();
-    private boolean clientIsUp = false;
-    private boolean clientStartFailed = false;
-
     // Client calls this
     public void notifyComingUp(boolean success)
     {
@@ -2675,13 +2677,14 @@ public class WebClient extends KFrame implements IWebClient
         }
     }
 
-    private boolean timeIsUp = false;
-
     private Timer setupTimer()
     {
         // java.util.Timer, not Swing Timer
         Timer timer = new Timer();
         timeIsUp = false;
+        clientStartFailed = false;
+        clientIsUp = false;
+
         long timeout = 60; // secs
 
         timer.schedule(new TriggerTimeIsUp(), timeout * 1000);
