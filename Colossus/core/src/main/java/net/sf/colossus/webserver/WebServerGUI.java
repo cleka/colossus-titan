@@ -4,11 +4,14 @@ package net.sf.colossus.webserver;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
@@ -32,6 +35,7 @@ public class WebServerGUI extends JFrame implements IWebServerGUI
     private final JLabel instantGamesInfo;
     private final JLabel runningGamesInfo;
     private final JLabel endingGamesInfo;
+    private final JButton dumpInfoButton;
 
     public WebServerGUI(WebServer webServer)
     {
@@ -63,6 +67,16 @@ public class WebServerGUI extends JFrame implements IWebServerGUI
 
         endingGamesInfo = new JLabel("No ending games.");
         mainPane.add(endingGamesInfo);
+
+        dumpInfoButton = new JButton("Dump Info");
+        mainPane.add(dumpInfoButton);
+        dumpInfoButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                dumpInfoButtonAction();
+            }
+        });
 
         addWindowListener(new WindowAdapter()
         {
@@ -106,6 +120,11 @@ public class WebServerGUI extends JFrame implements IWebServerGUI
     public void setEndingGamesInfo(String s)
     {
         endingGamesInfo.setText(s);
+    }
+
+    public void dumpInfoButtonAction()
+    {
+        webServer.dumpInfo();
     }
 
     public void cleanup()
