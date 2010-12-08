@@ -8,6 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.webcommon.GameInfo;
+import net.sf.colossus.webcommon.IPortProvider;
 
 
 /**
@@ -16,7 +17,7 @@ import net.sf.colossus.webcommon.GameInfo;
  *
  *  @author Clemens Katzer
  */
-public class PortBookKeeper
+public class PortBookKeeper implements IPortProvider
 {
     private static final Logger LOGGER = Logger.getLogger(PortBookKeeper.class
         .getName());

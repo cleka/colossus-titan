@@ -27,6 +27,7 @@ import net.sf.colossus.webcommon.FormatWhen;
 import net.sf.colossus.webcommon.GameInfo;
 import net.sf.colossus.webcommon.IColossusMail;
 import net.sf.colossus.webcommon.IGameRunner;
+import net.sf.colossus.webcommon.IPortProvider;
 import net.sf.colossus.webcommon.IRunWebServer;
 import net.sf.colossus.webcommon.IWebClient;
 import net.sf.colossus.webcommon.IWebServer;
@@ -499,6 +500,11 @@ public class WebServer implements IWebServer, IRunWebServer
     }
 
     public PortBookKeeper getPortBookKeeper()
+    {
+        return this.portBookKeeper;
+    }
+
+    public IPortProvider getPortProvider()
     {
         return this.portBookKeeper;
     }
