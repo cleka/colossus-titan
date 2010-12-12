@@ -367,11 +367,17 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             if (fromClient != null)
             {
                 lastPacketReceived = new Date().getTime();
-
-                done = parseLine(fromClient);
+                Throwable caught = null;
+                try
+                {
+                    done = parseLine(fromClient);
+                }
+                catch (Throwable t)
+                {
+                    caught = t;
+                }
 
                 String username = "<unknown>";
-
                 if (user != null)
                 {
                     username = user.getName();
@@ -383,6 +389,14 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
                 else
                 {
                     LOGGER.warning("Try to get username, but user is null?");
+                }
+
+                if (caught != null)
+                {
+                    LOGGER.log(Level.SEVERE, "WSCST, during parseline, "
+                        + "for user " + username
+                        + ": caught throwable! Setting done to true.", caught);
+                    done = true;
                 }
 
                 if (done)
