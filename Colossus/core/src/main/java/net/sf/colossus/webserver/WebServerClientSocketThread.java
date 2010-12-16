@@ -93,7 +93,8 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
                 Thread.sleep(500);
             }
             catch (InterruptedException e)
-            {/* ignore */
+            {
+                /* ignore */
             }
             socket.close();
         }
@@ -178,13 +179,6 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
                 // otherwise, send another one
                 else
                 {
-                    /*
-                    LOGGER.fine("Client " + getUsername()
-                        + ": no activity for " + (deltaMillis / 1000f)
-                        + " seconds; " + "requesting "
-                        + (pingsTried + 1)
-                        + ". ping!");
-                    */
                     long requestSentTime = new Date().getTime();
                     requestPing(requestSentTime + "", "dummy2", "dummy3");
                     pingsTried++;
@@ -407,13 +401,6 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
                     LOGGER.finest("user " + username + ": parseLine for '"
                         + fromClient + "' returns done = " + done);
                 }
-                /*
-                else
-                {
-                    LOGGER.finest("user " + username + ": parseLine for '"
-                        + fromClient + "' returns done = " + done);
-                }
-                */
             }
             else
             {
@@ -785,16 +772,6 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
 
         else if (command.equals(IWebServer.PingResponse))
         {
-            /*
-            String name = "<user not defined>";
-            if (user != null)
-            {
-                name = user.getName();
-            }
-
-            LOGGER
-                .info("Received a ping response from user " + name);
-            */
             long requestSentTime = Long.parseLong(tokens[1]);
             String name = getUsername();
             long requestResponseArriveTime = new Date().getTime();
@@ -935,9 +912,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
                         + "interrupt 'other': ", e);
             }
 
-            // LOGGER.log(Level.FINEST, "In CST before join");
             other.join();
-            // LOGGER.log(Level.FINEST, "In CST after  join");
         }
         catch (Exception e)
         {
