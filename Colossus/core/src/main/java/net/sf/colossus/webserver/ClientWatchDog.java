@@ -24,6 +24,7 @@ public class ClientWatchDog extends Thread
 
     public ClientWatchDog()
     {
+        setName("ClientWatchDog");
         done = false;
     }
 
