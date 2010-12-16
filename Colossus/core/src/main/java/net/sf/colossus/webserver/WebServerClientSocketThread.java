@@ -68,12 +68,14 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
      */
     private String unverifiedUsername = null;
 
+    private final RoundtripTimeBookkeeper rttBookKeeper;
 
     public WebServerClientSocketThread(WebServer server, Socket socket)
     {
         super("WebServerClientSocketThread");
         this.server = server;
         this.socket = socket;
+        this.rttBookKeeper = new RoundtripTimeBookkeeper(10);
     }
 
     public static void reject(Socket socket)
@@ -183,7 +185,8 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
                         + (pingsTried + 1)
                         + ". ping!");
                     */
-                    requestPing("dummy1", "dummy2", "dummy3");
+                    long requestSentTime = new Date().getTime();
+                    requestPing(requestSentTime + "", "dummy2", "dummy3");
                     pingsTried++;
                 }
             }
@@ -792,6 +795,14 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             LOGGER
                 .info("Received a ping response from user " + name);
             */
+            long requestSentTime = Long.parseLong(tokens[1]);
+            String name = getUsername();
+            long requestResponseArriveTime = new Date().getTime();
+            long roundtripTime = requestResponseArriveTime - requestSentTime;
+            String msg = "Received a ping response from user " + name
+                + ", request roundtrip time is " + roundtripTime + " ms.";
+            LOGGER.info(msg);
+            rttBookKeeper.storeEntry(requestResponseArriveTime, roundtripTime);
         }
 
         else if (command.equals(IWebServer.RereadLoginMessage))
