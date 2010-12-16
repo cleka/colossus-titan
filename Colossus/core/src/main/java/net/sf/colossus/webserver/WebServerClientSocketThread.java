@@ -147,7 +147,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
                 // too many already done without response => assume dead
                 if (pingsTried >= PING_MAX_TRIES)
                 {
-                    LOGGER.info("After " + pingsTried
+                    LOGGER.warning("After " + pingsTried
                         + " pings, still no response from client "
                         + getUsername()
                         + " - assuming connection lost and closing it.");
@@ -170,7 +170,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
                     else
                     {
                         LOGGER
-                            .info("done already true, let's skip the interrupting...");
+                            .warning("done already true, let's skip the interrupting...");
                     }
                 }
                 // otherwise, send another one
