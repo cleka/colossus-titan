@@ -549,7 +549,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
                     User.storeUsersToFile();
                     ok = true;
                     user.setThread(this);
-                    setName("WebServerClientSocketThread " + username);
+                    setName("WSCST " + username);
                     LOGGER.info("User successfully logged in: "
                         + getClientInfo());
                 }
@@ -940,7 +940,19 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
 
     private void sendToClient(String s)
     {
+        long writeStartedAt = new Date().getTime();
         out.println(s);
+        long elapsedTime = new Date().getTime() - writeStartedAt;
+        if (elapsedTime > 1000)
+        {
+            int len = s.length();
+            len = (len < 30 ? len : 30);
+            String msg = s.substring(0, len);
+            String threadName = Thread.currentThread().getName();
+            LOGGER.warning("Thread " + threadName
+                + " in sendToClient for user " + getUsername() + " took "
+                + elapsedTime + " milliseconds! (" + msg + ")");
+        }
     }
 
     public void grantAdminStatus()
