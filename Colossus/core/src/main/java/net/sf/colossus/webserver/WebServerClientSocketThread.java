@@ -49,6 +49,8 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
 
     private boolean loggedIn = false;
 
+    private boolean connLostWarningLogged = false;
+
     private final static String sep = IWebServer.WebProtocolSeparator;
 
     private Thread stopper = null;
@@ -150,15 +152,20 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
                 // too many already done without response => assume dead
                 if (pingsTried >= PING_MAX_TRIES)
                 {
-                    LOGGER.warning("After " + pingsTried
-                        + " pings, still no response from client "
-                        + getUsername()
-                        + " - assuming connection lost and closing it.");
+                    if (!connLostWarningLogged)
+                    {
+                        connLostWarningLogged = true;
+                        LOGGER.warning("After " + pingsTried
+                            + " pings, still no response from client "
+                            + getUsername()
+                            + " - would assume now connection lost and closing it.");
+                    }
+                    /*
                     String message = "@@@ Hello " + getUsername() + ", after "
-                        + pingsTried
-                        + " ping requests, still no response from your "
-                        + "WebClientclient - assuming connection problems "
-                        + "and closing connection from server side. @@@";
+                    + pingsTried
+                    + " ping requests, still no response from your "
+                    + "WebClientclient - assuming connection problems "
+                    + "and closing connection from server side. @@@";
                     chatDeliver(IWebServer.generalChatName, now, "SYSTEM",
                         message, false);
                     if (!done)
@@ -175,6 +182,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
                         LOGGER
                             .warning("done already true, let's skip the interrupting...");
                     }
+                    */
                 }
                 // otherwise, send another one
                 else
