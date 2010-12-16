@@ -551,6 +551,28 @@ public class WebServer implements IWebServer, IRunWebServer
         String nowString = whenFormatter.timeAndDateAsString(now);
         pw.println("Dump at " + nowString);
 
+        StringBuilder ul = new StringBuilder();
+        Collection<User> users = User.getLoggedInUsers();
+        for (User u : users)
+        {
+            String name;
+            if (u != null)
+            {
+                name = u.getName();
+            }
+            else
+            {
+                name = "<null user?>";
+            }
+            if (ul.length() > 0)
+            {
+                ul.append(", ");
+            }
+            ul.append(name);
+        }
+
+        pw.println(users.size() + " users connected: " + ul.toString());
+
         ArrayList<String> igList = new ArrayList<String>();
         ArrayList<String> sgList = new ArrayList<String>();
         for (GameInfo gi : proposedGames.values())
