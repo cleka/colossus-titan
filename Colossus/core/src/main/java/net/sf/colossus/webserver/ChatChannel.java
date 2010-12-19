@@ -73,6 +73,7 @@ public class ChatChannel
         }
     }
 
+    // TODO is this perhaps obsolete nowadays?
     /** Send message of the day lines to one client. */
     public void deliverOldVersionWarning(String chatId, String userName,
         IWebClient client)
@@ -119,7 +120,7 @@ public class ChatChannel
         Collection<User> users = User.getLoggedInUsers();
         for (User u : users)
         {
-            IWebClient client = (IWebClient)u.getThread();
+            IWebClient client = u.getWebserverClient();
             deliverMessageToClient(msg, client, false);
         }
     }

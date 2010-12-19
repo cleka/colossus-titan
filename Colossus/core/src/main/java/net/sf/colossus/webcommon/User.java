@@ -61,7 +61,7 @@ public class User
 
     private static final HashMap<String, User> pendingRegistrations = new HashMap<String, User>();
 
-    private Thread thread;
+    private IWebClient webserverClient;
     private static final int MAX_RANDOM = 99;
 
     public final static String PROVIDE_CONFCODE = "Provide the confirmation code";
@@ -127,11 +127,6 @@ public class User
         isAdmin = val;
     }
 
-    public Thread getThread()
-    {
-        return this.thread;
-    }
-
     public void setProperties(String pw, String email, Boolean isAdminObj)
     {
         if (pw != null)
@@ -150,11 +145,16 @@ public class User
         }
     }
 
-    public void setThread(Thread cst)
+    public IWebClient getWebserverClient()
+    {
+        return this.webserverClient;
+    }
+
+    public void setWebClient(IWebClient wsc)
     {
         synchronized (loggedInUserMap)
         {
-            if (cst == null)
+            if (wsc == null)
             {
                 if (loggedInUserMap.containsKey(this.name))
                 {
@@ -165,7 +165,7 @@ public class User
             {
                 loggedInUserMap.put(this.name, this);
             }
-            this.thread = cst;
+            this.webserverClient = wsc;
         }
     }
 

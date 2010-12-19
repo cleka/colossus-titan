@@ -3,6 +3,7 @@ package net.sf.colossus.webserver;
 
 import java.awt.GraphicsEnvironment;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -369,7 +370,7 @@ public class WebServer implements IWebServer, IRunWebServer
     {
         shutdownRequested = true;
         watchDog.shutdown();
-        closeAllWscst();
+        closeAllWebServerClientSocketThreads();
         makeDummyConnection();
     }
 
@@ -407,7 +408,7 @@ public class WebServer implements IWebServer, IRunWebServer
             else if (User.getLoggedInCount() >= maxClients)
             {
                 rejected = true;
-                WebServerClientSocketThread.reject(clientSocket);
+                reject(clientSocket);
             }
             else
             {
@@ -416,9 +417,9 @@ public class WebServer implements IWebServer, IRunWebServer
 
             if (!rejected)
             {
-                WebServerClientSocketThread cst = new WebServerClientSocketThread(
+                WebServerClient client = new WebServerClient(
                     this, clientSocket);
-                cst.start();
+                client.startThread();
                 updateUserCounts();
             }
         }
@@ -449,14 +450,48 @@ public class WebServer implements IWebServer, IRunWebServer
         return rejected;
     }
 
-    private void closeAllWscst()
+    private void reject(Socket socket)
+    {
+        try
+        {
+            PrintWriter rejectedClientWriter = new PrintWriter(
+                new BufferedWriter(
+                new OutputStreamWriter(socket.getOutputStream())), true);
+
+            rejectedClientWriter.println(IWebClient.tooManyUsers);
+            rejectedClientWriter.println(IWebClient.connectionClosed);
+            // give client some time to process the response
+            try
+            {
+                Thread.sleep(500);
+            }
+            catch (InterruptedException e)
+            {
+                /* ignore */
+            }
+            socket.close();
+        }
+        catch (IOException ex)
+        {
+            LOGGER.log(Level.WARNING,
+                "Rejecting a user did throw exception: ", ex);
+        }
+    }
+
+    private void closeAllWebServerClientSocketThreads()
     {
         Collection<User> users = User.getLoggedInUsers();
         for (User u : users)
         {
             u.updateLastLogout();
-            WebServerClientSocketThread thread = (WebServerClientSocketThread)u
-                .getThread();
+
+            // TODO: should this really deal directly with the actual
+            // WebServerClientSocketThread, or indirectly via the
+            // WebServerClient instead?
+
+            WebServerClient wsc = (WebServerClient)u.getWebserverClient();
+            WebServerClientSocketThread thread = wsc.getWSCSThread();
+
             if (thread == null)
             {
                 LOGGER.log(Level.FINE,
@@ -479,7 +514,8 @@ public class WebServer implements IWebServer, IRunWebServer
                     + "while tried to interrupt 'other': ", e);
             }
 
-            LOGGER.log(Level.FINEST, "WebServer.closeAllWscst's: before join");
+            LOGGER.log(Level.FINEST,
+                "WebServer.closeAllWebServerClientSocketThreads: before join");
             try
             {
                 thread.join();
@@ -647,10 +683,10 @@ public class WebServer implements IWebServer, IRunWebServer
         }
     }
 
-    public void reEnrollIfNecessary(WebServerClientSocketThread newCst)
+    public void reEnrollIfNecessary(WebServerClient newclient)
     {
-        IWebClient client = newCst;
-        User newUser = newCst.getUser();
+        IWebClient client = newclient;
+        User newUser = newclient.getUser();
 
         ArrayList<GameInfo> games = new ArrayList<GameInfo>(proposedGames
             .values());
@@ -669,11 +705,9 @@ public class WebServer implements IWebServer, IRunWebServer
         }
     }
 
-    public void tellAllGamesFromListToOne(WebServerClientSocketThread cst,
+    public void tellAllGamesFromListToOne(WebServerClient client,
         ArrayList<GameInfo> games)
     {
-        IWebClient client = cst;
-
         Iterator<GameInfo> it = games.iterator();
         while (it.hasNext())
         {
@@ -682,16 +716,16 @@ public class WebServer implements IWebServer, IRunWebServer
         }
     }
 
-    public void tellAllProposedGamesToOne(WebServerClientSocketThread cst)
+    public void tellAllProposedGamesToOne(WebServerClient client)
     {
         ArrayList<GameInfo> list = new ArrayList<GameInfo>(proposedGames
             .values());
-        tellAllGamesFromListToOne(cst, list);
+        tellAllGamesFromListToOne(client, list);
     }
 
-    public void tellAllRunningGamesToOne(WebServerClientSocketThread cst)
+    public void tellAllRunningGamesToOne(WebServerClient client)
     {
-        tellAllGamesFromListToOne(cst, runningGames);
+        tellAllGamesFromListToOne(client, runningGames);
     }
 
     public void allTellGameInfo(GameInfo gi)
@@ -699,7 +733,7 @@ public class WebServer implements IWebServer, IRunWebServer
         Collection<User> users = User.getLoggedInUsers();
         for (User u : users)
         {
-            IWebClient client = (IWebClient)u.getThread();
+            IWebClient client = u.getWebserverClient();
             if (client != null)
             {
                 client.gameInfo(gi);
@@ -725,7 +759,7 @@ public class WebServer implements IWebServer, IRunWebServer
         while (it.hasNext())
         {
             User u = it.next();
-            IWebClient client = (IWebClient)u.getThread();
+            IWebClient client = u.getWebserverClient();
             if (client != null)
             {
                 LOGGER.finest("Sending gameStartsSoon to client for user "
@@ -753,7 +787,7 @@ public class WebServer implements IWebServer, IRunWebServer
         while (it.hasNext())
         {
             User u = it.next();
-            IWebClient client = (IWebClient)u.getThread();
+            IWebClient client = u.getWebserverClient();
             if (client != null)
             {
                 client.gameInfo(gi);
@@ -807,7 +841,7 @@ public class WebServer implements IWebServer, IRunWebServer
                     {
                         gi.updateOnline();
                         allTellGameInfo(gi);
-                        IWebClient client = (IWebClient)user.getThread();
+                        IWebClient client = user.getWebserverClient();
                         LOGGER.fine("Player " + username
                             + " enrolled to game " + gameId);
                         client.didEnroll(gameId, user.getName());
@@ -824,7 +858,7 @@ public class WebServer implements IWebServer, IRunWebServer
                     LOGGER.warning("Player " + username
                         + " tried to enroll to game " + gameId
                         + " but game is already starting!");
-                    IWebClient webClient = (IWebClient)user.getThread();
+                    IWebClient webClient = user.getWebserverClient();
                     if (webClient != null)
                     {
                         String message = "Enrolling to " + gi.getGameId()
@@ -855,7 +889,7 @@ public class WebServer implements IWebServer, IRunWebServer
                     LOGGER.warning("Player " + username
                         + " tried to unenroll from game " + gameId
                         + ", but it is already starting.");
-                    IWebClient webClient = (IWebClient)user.getThread();
+                    IWebClient webClient = user.getWebserverClient();
                     if (webClient != null)
                     {
                         String message = "Unenrolling from " + gi.getGameId()
@@ -873,7 +907,7 @@ public class WebServer implements IWebServer, IRunWebServer
                     {
                         gi.updateOnline();
                         allTellGameInfo(gi);
-                        IWebClient client = (IWebClient)user.getThread();
+                        IWebClient client = user.getWebserverClient();
                         LOGGER.fine("Player " + username
                             + " unenrolled from game " + gameId);
                         client.didUnenroll(gameId, user.getName());
@@ -922,7 +956,7 @@ public class WebServer implements IWebServer, IRunWebServer
         Collection<User> users = User.getLoggedInUsers();
         for (User u : users)
         {
-            IWebClient client = (IWebClient)u.getThread();
+            IWebClient client = u.getWebserverClient();
             if (client != null)
             {
                 client.gameCancelled(gameId, byUser);
@@ -1008,7 +1042,7 @@ public class WebServer implements IWebServer, IRunWebServer
                 LOGGER.info("Informing player " + u.getName()
                     + " that game starts at host of hosting player "
                     + hostingPlayer);
-                IWebClient webClient = (IWebClient)u.getThread();
+                IWebClient webClient = u.getWebserverClient();
                 webClient.gameStartsNow(gameId, port, playerHost);
             }
         }
@@ -1048,7 +1082,7 @@ public class WebServer implements IWebServer, IRunWebServer
 
         for (User u : users)
         {
-            IWebClient webClient = (IWebClient)u.getThread();
+            IWebClient webClient = u.getWebserverClient();
             if (webClient == null)
             {
                 LOGGER.info("Skip informing player " + u.getName()
@@ -1085,7 +1119,7 @@ public class WebServer implements IWebServer, IRunWebServer
         User user = User.findUserByName(recipient);
         if (user != null)
         {
-            client = (IWebClient)user.getThread();
+            client = user.getWebserverClient();
             if (client != null)
             {
                 client.requestAttention(when, sender, isAdmin, message,
@@ -1112,7 +1146,7 @@ public class WebServer implements IWebServer, IRunWebServer
     private void informPingFailed(String sender, String failMessage)
     {
         User senderUser = User.findUserByName(sender);
-        IWebClient senderClient = (IWebClient)senderUser.getThread();
+        IWebClient senderClient = senderUser.getWebserverClient();
         if (senderClient != null)
         {
             long when2 = 0;
@@ -1176,7 +1210,7 @@ public class WebServer implements IWebServer, IRunWebServer
             }
             for (User u : users)
             {
-                IWebClient client = (IWebClient)u.getThread();
+                IWebClient client = u.getWebserverClient();
                 if (client != null)
                 {
                     client.userInfo(loggedin, enrolled, playing, dead, ago,
@@ -1264,7 +1298,7 @@ public class WebServer implements IWebServer, IRunWebServer
         }
     }
 
-    public void tellLastChatMessagesToOne(WebServerClientSocketThread cst,
+    public void tellLastChatMessagesToOne(WebServerClient client,
         String chatId)
     {
         if (!chatId.equals(IWebServer.generalChatName))
@@ -1274,10 +1308,10 @@ public class WebServer implements IWebServer, IRunWebServer
             return;
         }
 
-        generalChat.tellLastMessagesToOne(cst);
+        generalChat.tellLastMessagesToOne(client);
     }
 
-    public void sendMessageOfTheDayToOne(WebServerClientSocketThread cst,
+    public void sendMessageOfTheDayToOne(WebServerClient client,
         String chatId)
     {
         if (!chatId.equals(IWebServer.generalChatName))
@@ -1287,11 +1321,11 @@ public class WebServer implements IWebServer, IRunWebServer
             return;
         }
 
-        generalChat.deliverMessageOfTheDayToClient(chatId, cst,
+        generalChat.deliverMessageOfTheDayToClient(chatId, client,
             loginMessage);
     }
 
-    public void sendOldVersionWarningToOne(WebServerClientSocketThread cst,
+    public void sendOldVersionWarningToOne(WebServerClient client,
         String userName, String chatId)
     {
         if (!chatId.equals(IWebServer.generalChatName))
@@ -1300,7 +1334,7 @@ public class WebServer implements IWebServer, IRunWebServer
                 + "illegal chat id " + chatId + " - doing nothing");
             return;
         }
-        generalChat.deliverOldVersionWarning(chatId, userName, cst);
+        generalChat.deliverOldVersionWarning(chatId, userName, client);
     }
 
     private void readLoginMessageFromFile(String filename)

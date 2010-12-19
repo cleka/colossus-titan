@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.webcommon.IWebClient;
 import net.sf.colossus.webcommon.User;
 
 
@@ -42,12 +43,11 @@ public class ClientWatchDog extends Thread
                 //    + "), checking them...");
                 for (User u : users)
                 {
-                    WebServerClientSocketThread client = (WebServerClientSocketThread)u
-                    .getThread();
+                    IWebClient client = u.getWebserverClient();
                     if (client != null)
                     {
                         long now = new Date().getTime();
-                        client.requestPingIfNeeded(now);
+                        ((WebServerClient)client).requestPingIfNeeded(now);
                         // client.checkMaxIdleTime(now);
                     }
                 }

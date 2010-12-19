@@ -23,6 +23,11 @@ public class RoundtripTimeBookkeeper
         this.LAST_N_TO_KEEP = howManyLastToKeep;
     }
 
+    /**
+     * Create and store one RTT entry
+     * @param requestResponseArriveTime When response arrived
+     * @param roundtripTime Actual roundtrip time
+     **/
     public void storeEntry(long when, long roundtripTime)
     {
         RoundtripTimeEntry entry = new RoundtripTimeEntry(indexCounter++,
