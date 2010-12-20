@@ -11,6 +11,7 @@ import java.net.ConnectException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -429,6 +430,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
                 {
                     String gameId = tokens[1];
                     String startUser = tokens[2];
+                    confirmCommand(command, gameId, startUser, "nothing");
                     webClient.gameStartsSoon(gameId, startUser);
                 }
 
@@ -437,6 +439,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
                     String gameId = tokens[1];
                     int port = Integer.parseInt(tokens[2]);
                     String host = tokens[3];
+                    confirmCommand(command, gameId, port + "", host);
                     webClient.gameStartsNow(gameId, port, host);
                 }
 
@@ -719,6 +722,27 @@ public class WebClientSocketThread extends Thread implements IWebServer
     public void pingResponse(String arg1, String arg2, String arg3)
     {
         send(PingResponse + sep + arg1 + sep + arg2 + sep + arg3);
+    }
+
+    public void sleepFor(long millis)
+    {
+        try
+        {
+            Thread.sleep(millis);
+        }
+        catch (InterruptedException e)
+        {
+            // ignore
+        }
+    }
+
+    public void confirmCommand(String cmd, String arg1, String arg2,
+        String arg3)
+    {
+        sleepFor(200);
+        long now = new Date().getTime();
+        send(ConfirmCommand + sep + now + sep + cmd + sep + arg1 + sep + arg2
+            + sep + arg3);
     }
 
     public void requestUserAttention(long when, String sender,

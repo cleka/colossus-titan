@@ -27,6 +27,8 @@ public interface IWebServer
     public static final String RereadLoginMessage = "rereadLoginMessage";
     public static final String RequestUserAttention = "requestUserAttention";
     public static final String PingResponse = "pingResponse";
+    public static final String ConfirmCommand = "confirmCommand";
+
     public static final String DumpInfo = "dumpInfo";
 
     public static String generalChatName = "#general";

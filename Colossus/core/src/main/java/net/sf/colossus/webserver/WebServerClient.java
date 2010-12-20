@@ -55,6 +55,11 @@ public class WebServerClient implements IWebClient
     private String unverifiedUsername = null;
 
 
+    private long gameStartsNowSent = -1;
+
+    private long gameStartsSoonSent = -1;
+
+
     public WebServerClient(WebServer server, Socket socket)
     {
         // default initialization for clients that do not send this
@@ -478,6 +483,48 @@ public class WebServerClient implements IWebClient
             cst.storeEntry(requestResponseArriveTime, roundtripTime);
         }
 
+        else if (command.equals(IWebServer.ConfirmCommand))
+        {
+            long now = new Date().getTime();
+            // long confirmationSentTime = Long.parseLong(tokens[1]);
+            String cmd = tokens[2];
+            /*
+            String arg1 = tokens[3];
+            String arg2 = tokens[4];
+            String arg3 = tokens[5];
+            */
+            long cmdRTT = 0;
+            if (cmd.equals(gameStartsSoon))
+            {
+                if (gameStartsSoonSent != -1)
+                {
+                    cmdRTT = now - gameStartsSoonSent;
+                }
+                else
+                {
+                    LOGGER.warning("Got ConfirmCommand " + cmd
+                        + " but no cmdSent time set!");
+                }
+                gameStartsSoonSent = -1;
+            }
+            if (cmd.equals(gameStartsNow))
+            {
+                if (gameStartsNowSent != -1)
+                {
+                    cmdRTT = now - gameStartsNowSent;
+                }
+                else
+                {
+                    LOGGER.warning("Got ConfirmCommand " + cmd
+                        + " but no cmdSent time set!");
+                }
+                gameStartsNowSent = -1;
+            }
+
+            LOGGER.info("Got confirmCommand for command " + cmd
+                + " - time between cmd sent and conf got is " + cmdRTT);
+        }
+
         else if (command.equals(IWebServer.RereadLoginMessage))
         {
             if (user.isAdmin())
@@ -665,13 +712,21 @@ public class WebServerClient implements IWebClient
 
     public void gameStartsSoon(String gameId, String byUser)
     {
+        gameStartsSoonSent = new Date().getTime();
         sendToClient(gameStartsSoon + sep + gameId + sep + byUser);
+        long spentTime = new Date().getTime() - gameStartsSoonSent;
+        LOGGER.info("Sending gameStartsSoon took " + spentTime
+            + " milliseconds.");
     }
 
     public void gameStartsNow(String gameId, int port, String hostingHost)
     {
+        gameStartsNowSent = new Date().getTime();
         sendToClient(gameStartsNow + sep + gameId + sep + port + sep
             + hostingHost);
+        long spentTime = new Date().getTime() - gameStartsNowSent;
+        LOGGER.info("Sending gameStartsNow took " + spentTime
+            + " milliseconds.");
     }
 
     public void chatDeliver(String chatId, long when, String sender,
