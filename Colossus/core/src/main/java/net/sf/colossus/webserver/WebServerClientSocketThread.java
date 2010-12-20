@@ -54,6 +54,9 @@ public class WebServerClientSocketThread extends Thread
 
     private boolean forcedLogout = false;
 
+    private boolean done = false;
+    private boolean toldToTerminate = false;
+
 
     /* During registration request and sending of confirmation code,
      * we do not have a user yet. The parseLine sets then this variable
@@ -78,37 +81,53 @@ public class WebServerClientSocketThread extends Thread
         return theClient.getUsername() + " (IP=" + ip + ")";
     }
 
+    // A runnable that will shutdown the whole server
     public void createStopper(Runnable r)
     {
         stopper = new Thread(r);
     }
 
-    public synchronized void tellToTerminate()
+    public void tellToTerminate()
     {
-        this.interrupt();
+        done = true;
+        toldToTerminate = true;
+        closeAndCleanupSocket();
     }
 
-    private boolean done = false;
 
-    @Override
-    public void interrupt()
+    private synchronized void closeAndCleanupSocket()
     {
-        super.interrupt();
-        done = true;
-        try
+        LOGGER.info("close & cleanup for WSCST " + this.getName());
+
+        /*
+         * If we were told to terminate (by another connection of same
+         * user, or by server when server wants to shutdown), then
+         * tellToTerminate did get us out of the readLine by closing socket,
+         * and in this case closeAndCleanup is not needed any more.
+         */
+        if (socket != null)
         {
-            if (out != null)
+            try
             {
                 out.println(IWebClient.connectionClosed);
-            }
-            if (socket != null)
-            {
                 socket.close();
             }
+            catch (IOException e)
+            {
+                LOGGER.log(Level.WARNING, "IOException while socket.close() "
+                    + " is executed by thread "
+                    + Thread.currentThread().getName()
+                    + "socket in " + this.getName(), e);
+            }
+            finally
+            {
+                socket = null;
+            }
         }
-        catch (IOException e)
+        else
         {
-            // quietly close
+            LOGGER.info("No need to close&cleanup in thread " + this.getName()
+                + " - socket already null!");
         }
     }
 
@@ -146,45 +165,56 @@ public class WebServerClientSocketThread extends Thread
             {
                 // when remote admin user requested shutdown, the method
                 // called by parseLine() created the stopper Runnable;
-                // we start that one here, to minimize the risk it tries
-                // to stop ("interrupt") us where we are still processing
-                // instead of being back and blocked in readLine().
+
                 if (stopper != null)
                 {
                     stopper.start();
+                    stopper = null;
                 }
                 fromClient = in.readLine();
             }
+
             catch (InterruptedIOException e)
             {
-                Thread.currentThread().interrupt();
+                LOGGER.log(Level.WARNING,
+                    "run().main loop, InterruptedIOException: ", e);
+                done = true;
             }
             catch (SocketException ex)
             {
-                LOGGER.info("SocketException ('" + ex.getMessage()
-                    + "') in WSCST " + getClientInfo()
-                    + " - setting done to true.");
+                if (toldToTerminate)
+                {
+                    LOGGER.info("OK, toldToTerminate set and we got "
+                        + "SocketException ('" + ex.getMessage()
+                        + "') in WSCST " + getClientInfo()
+                        + " - setting done to true.");
+                }
+                else
+                {
+                    LOGGER.warning("Strange. ToldToTerminate is not set "
+                        + "but we got " + "SocketException ('"
+                        + ex.getMessage() + "') in WSCST " + getClientInfo()
+                        + " - setting done to true anyway.");
+                }
                 done = true;
             }
             catch (IOException e)
             {
-                LOGGER.warning("IOException ('" + e.getMessage()
-                    + "') in WSCST " + getClientInfo() + " doing nothing...");
-                if (!isInterrupted())
+                if (isInterrupted())
                 {
-                    LOGGER.log(Level.WARNING, "IOException was NOT caused by "
-                        + "being interrupted? Stack trace:", e);
+                    LOGGER.log(Level.WARNING, "IOException and isInterrupted "
+                        + "set - ups? Stack trace: ", e);
                 }
                 else
                 {
-                    LOGGER.log(Level.FINEST, "Interrupted - all right.");
+                    LOGGER.log(Level.WARNING, "IOException was NOT caused by "
+                        + "being interrupted? Stack trace: ", e);
                 }
             }
             catch (Exception e)
             {
                 LOGGER.log(Level.SEVERE, "Exception ('" + e.getMessage()
                     + "') in WSCST " + getClientInfo(), e);
-
             }
 
             if (fromClient != null)
@@ -239,20 +269,11 @@ public class WebServerClientSocketThread extends Thread
         // Shut down the client.
         LOGGER.log(Level.FINEST, "(Trying to) shut down the client for user "
             + getClientInfo());
-        try
-        {
-            out.println(IWebClient.connectionClosed);
-            socket.close();
-        }
-        catch (IOException ex)
-        {
-            LOGGER.log(Level.WARNING, "IOException while closing connection",
-                ex);
-        }
+
+        // Will close and cleanup socket, if still needed
+        closeAndCleanupSocket();
 
         theClient.handleLogout();
-
-        socket = null;
     }
 
     /**
@@ -383,32 +404,16 @@ public class WebServerClientSocketThread extends Thread
         {
             other.markForcedLogout();
             other.sendToClient(IWebClient.forcedLogout);
-            try
-            {
-                other.interrupt();
-            }
-            catch (NullPointerException e)
-            {
-                // It's funny. It seems the interrupt above always gives a
-                // null pointer exception, but the interrupting has done
-                // it's job anyway...
-            }
-            catch (Exception e)
-            {
-                LOGGER.log(Level.WARNING,
-                    "Different exception than usual while tried to "
-                        + "interrupt 'other': ", e);
-            }
-
+            other.tellToTerminate();
+            LOGGER.info("Forcing logout, before other.join()");
             other.join();
+            LOGGER.info("Forcing logout, after  other.join()");
         }
         catch (Exception e)
         {
             LOGGER.log(Level.WARNING,
                 "Oups couldn't stop the other WebServerClientSocketThread", e);
         }
-
-        theClient.setLoggedIn(false);
     }
 
     public void clearIdleWarningsSent()

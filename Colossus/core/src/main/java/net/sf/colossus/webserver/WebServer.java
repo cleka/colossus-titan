@@ -490,35 +490,22 @@ public class WebServer implements IWebServer, IRunWebServer
             // WebServerClient instead?
 
             WebServerClient wsc = (WebServerClient)u.getWebserverClient();
-            WebServerClientSocketThread thread = wsc.getWSCSThread();
+            WebServerClientSocketThread cst = wsc.getWSCSThread();
 
-            if (thread == null)
+            if (cst == null)
             {
                 LOGGER.log(Level.FINE,
                     "Thread for user is empty - skipping interrupt and join.");
                 continue;
             }
-            try
-            {
-                thread.interrupt();
-            }
-            catch (NullPointerException e)
-            {
-                // It's funny. It seems the interrupt above always gives a
-                // null pointer exception, but the interrupting has done
-                // it's job anyway...
-            }
-            catch (Exception e)
-            {
-                LOGGER.log(Level.WARNING, "Different exception than usual "
-                    + "while tried to interrupt 'other': ", e);
-            }
+
+            cst.tellToTerminate();
 
             LOGGER.log(Level.FINEST,
                 "WebServer.closeAllWebServerClientSocketThreads: before join");
             try
             {
-                thread.join();
+                cst.join();
             }
             catch (InterruptedException e)
             {
