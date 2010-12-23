@@ -24,6 +24,14 @@ public interface BattleCritter
 
     int getPower();
 
+    int getPoisonDamage();
+
+    int getPoison();
+
+    int getSlows();
+
+    int getSlowed();
+
     int getSkill();
 
     BattleHex getStartingHex();
@@ -57,6 +65,14 @@ public interface BattleCritter
     void setHits(int hits);
 
     void setMoved(boolean moved);
+
+    void setPoisonDamage(int damage);
+
+    void setSlowed(int slowValue);
+
+    void addPoisonDamage(int damage);
+
+    void addSlowed(int slowValue);
 
     void setStruck(boolean struck);
 

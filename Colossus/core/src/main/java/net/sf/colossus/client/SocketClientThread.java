@@ -856,6 +856,12 @@ final class SocketClientThread extends Thread implements IServer,
             String proposalString = args.remove(0);
             client.tellProposal(proposalString);
         }
+        else if (method.equals(Constants.tellSlowResults))
+        {
+            int targetTag = Integer.parseInt(args.remove(0));
+            int slowValue = Integer.parseInt(args.remove(0));
+            client.tellSlowResults(targetTag, slowValue);
+        }
         else if (method.equals(Constants.tellStrikeResults))
         {
             int strikerTag = Integer.parseInt(args.remove(0));

@@ -1505,6 +1505,18 @@ public final class Client implements IClient, IOracle, IVariant,
         server.makeProposal(proposal.toString());
     }
 
+    public void tellSlowResults(int targetTag, int slowValue)
+    {
+        BattleCritter targetCritter = getBattleCS().getBattleUnit(targetTag);
+        if (targetCritter != null)
+        {
+            if (slowValue != 0)
+            {
+                targetCritter.addSlowed(slowValue);
+            }
+        }
+    }
+
     public void tellStrikeResults(int strikerTag, int targetTag,
         int strikeNumber, List<String> rolls, int damage, boolean killed,
         boolean wasCarry, int carryDamageLeft,
@@ -1532,7 +1544,7 @@ public final class Client implements IClient, IOracle, IVariant,
             }
             else
             {
-                if (damage > 0)
+                if (damage != 0) // Can be negative if creature is being healed
                 {
                     targetCritter.setHits(targetUnit.getHits() + damage);
                 }

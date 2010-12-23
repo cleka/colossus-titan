@@ -332,8 +332,8 @@ public class GameSaving
             + game.getBattleSS().getSummonState());
         bat.setAttribute("carryDamage", ""
             + game.getBattleSS().getCarryDamage());
-        bat.setAttribute("driftDamageApplied", ""
-            + game.getBattleSS().isDriftDamageApplied());
+        bat.setAttribute("preStrikeEffectsApplied", ""
+            + game.getBattleSS().arePreStrikeEffectsApplied());
 
         for (BattleHex hex : game.getBattleSS().getCarryTargets())
         {

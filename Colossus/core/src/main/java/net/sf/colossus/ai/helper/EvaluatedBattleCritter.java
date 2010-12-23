@@ -43,6 +43,46 @@ public class EvaluatedBattleCritter implements BattleCritter
         return parent.getHits();
     }
 
+    public int getPoison()
+    {
+        return parent.getPoison();
+    }
+
+    public int getPoisonDamage()
+    {
+        return parent.getPoisonDamage();
+    }
+
+    public void addPoisonDamage(int damage)
+    {
+        parent.addPoisonDamage(damage);
+    }
+
+    public void setPoisonDamage(int damage)
+    {
+        parent.setPoisonDamage(damage);
+    }
+
+    public int getSlowed()
+    {
+        return parent.getSlowed();
+    }
+
+    public void setSlowed(int slowValue)
+    {
+        parent.setSlowed(slowValue);
+    }
+
+    public void addSlowed(int slowValue)
+    {
+        parent.addSlowed(slowValue);
+    }
+
+    public int getSlows()
+    {
+        return parent.getSlows();
+    }
+
     public int getPointValue()
     {
         return parent.getPointValue();

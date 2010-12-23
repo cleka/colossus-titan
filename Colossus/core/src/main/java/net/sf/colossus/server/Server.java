@@ -2236,6 +2236,17 @@ public final class Server extends Thread implements IServer
         }
     }
 
+    void allTellHexSlowResults(CreatureServerSide target, int slowValue)
+    {
+        this.target = target;
+        Iterator<IClient> it = clients.iterator();
+        while (it.hasNext())
+        {
+            IClient client = it.next();
+            client.tellSlowResults(target.getTag(), slowValue);
+        }
+    }
+
     void allTellHexDamageResults(CreatureServerSide target, int damage)
     {
         this.target = target;

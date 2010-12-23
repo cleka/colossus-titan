@@ -978,6 +978,12 @@ final class ClientHandler implements IClient
         sendToClient(Constants.tellProposal + sep + proposalString);
     }
 
+    public void tellSlowResults(int targetTag, int slowValue)
+    {
+        sendToClient(Constants.tellSlowResults + sep + targetTag + sep
+            + slowValue);
+    }
+
     public void tellStrikeResults(int strikerTag, int targetTag,
         int strikeNumber, List<String> rolls, int damage, boolean killed,
         boolean wasCarry, int carryDamageLeft,

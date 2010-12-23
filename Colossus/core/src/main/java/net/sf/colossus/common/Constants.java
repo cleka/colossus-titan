@@ -194,7 +194,8 @@ public final class Constants
      *  alphabetized for easier searching, with Default at the top. */
     public static final String[] variantArray = { "Default", "Abyssal3",
         "Abyssal6", "Abyssal9", "Badlands", "Badlands-JDG", "Balrog",
-        "Beelzebub", "Beelzebub12", "BeelzeGods12", "ExtTitan", "Infinite",
+        "Beelzebub", "Beelzebub12", "BeelzeGods12", "DinoTitan", "ExtTitan",
+        "Infinite",
         "Outlands", "Pantheon", "SmallTitan", "TG-ConceptI", "TG-ConceptII",
         "TG-ConceptIII", "TG-SetII", "TG-SetIII", "TG-Wild", "TitanPlus",
         "Undead", "Unified" };
@@ -313,6 +314,7 @@ public final class Constants
     public static final String askNegotiate = "askNegotiate";
     public static final String tellProposal = "tellProposal";
     public static final String tellStrikeResults = "tellStrikeResults";
+    public static final String tellSlowResults = "tellSlowResults";
     public static final String initBattle = "initBattle";
     public static final String cleanupBattle = "cleanupBattle";
     public static final String nextEngagement = "nextEngagement";

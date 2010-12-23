@@ -838,6 +838,13 @@ public class WebServer implements IWebServer, IRunWebServer
                         LOGGER.info("Player " + username
                             + " failed to enroll to game " + gameId
                             + ", reason=" + reasonFail);
+                        long when = 0;
+                        IWebClient webClient = user.getWebserverClient();
+                        if (webClient != null)
+                        {
+                            webClient.deliverGeneralMessage(when, false,
+                                "Can't enroll!", reasonFail);
+                        }
                     }
                 }
                 else

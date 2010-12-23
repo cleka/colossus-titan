@@ -375,12 +375,28 @@ public class CreatureServerSide extends Creature implements BattleCritter
             + strikeNumber + ", rolling: " + rollString + ": " + damage
             + (damage == 1 ? " hit" : " hits"));
 
-        int carryDamage = target.wound(damage);
+        int carryDamage = target.adjustHits(damage);
         if (!carryPossible)
         {
             carryDamage = 0;
         }
         battle.setCarryDamage(carryDamage);
+
+        if (damage > 0)
+        {
+            // If damaged creature, then may have poisoned
+            // or slowed it as well.
+            int poison = getPoison();
+            if (poison != 0)
+            {
+                target.addPoisonDamage(poison);
+            }
+            int slow = getSlows();
+            if (slow != 0)
+            {
+                target.addSlowed(slow);
+            }
+        }
 
         // Let the attacker choose whether to carry, if applicable.
         if (carryDamage > 0)

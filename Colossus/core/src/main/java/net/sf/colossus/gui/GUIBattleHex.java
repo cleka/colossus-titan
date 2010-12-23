@@ -58,8 +58,8 @@ public class GUIBattleHex extends GUIHex<BattleHex>
     private int cy; /* Y location of upper left Vertex */
 
     // Hex terrain types are:
-    // p, r, s, t, o, v, d, w
-    // plain, bramble, sand, tree, bog, volcano, drift, tower
+    // p, r, s, t, o, v, d, w, g, a
+    // plain, bramble, sand, tree, bog, volcano, drift, tower, spring, tarpit
     // also
     // l
     // lake

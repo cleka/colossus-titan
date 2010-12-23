@@ -1,8 +1,8 @@
 package net.sf.colossus.variant;
 
 
-/** 
- * This holds constants used in Hazard Terrain and Hazard Hexside 
+/**
+ * This holds constants used in Hazard Terrain and Hazard Hexside
  */
 public interface HazardConstants
 {
@@ -15,7 +15,7 @@ public interface HazardConstants
     }
 
     /**
-     * Scope Constants - 
+     * Scope Constants -
      * All - is everyone
      * Natives means Natives vs anyone
      * Patriots means Natives vs Foreigners
@@ -44,7 +44,11 @@ public interface HazardConstants
         /** Drain health from non-native */
         HEALTHDRAIN,
         /** Drain health from water dweller */
-        HEALTHDRAIN_WATERDWELLER
+        HEALTHDRAIN_WATERDWELLER,
+        /** Heal */
+        HEALTHGAIN,
+        /** Persistent slow of creatures */
+        PERMSLOW
     }
 
     /**

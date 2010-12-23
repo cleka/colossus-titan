@@ -56,7 +56,7 @@ public final class BattleServerSide extends Battle
     private boolean battleOver;
     private boolean attackerEntered;
     private boolean conceded;
-    private boolean driftDamageApplied = false;
+    private boolean preStrikeEffectsApplied = false;
 
     /**
      * Set of hexes for valid carry targets
@@ -312,7 +312,7 @@ public final class BattleServerSide extends Battle
                 // phases, not at the end of the player turn.
                 activeLegionTag = (activeLegionTag == LegionTags.ATTACKER) ? LegionTags.DEFENDER
                     : LegionTags.ATTACKER;
-                driftDamageApplied = false;
+                preStrikeEffectsApplied = false;
                 phase = BattlePhase.STRIKEBACK;
                 LOGGER.log(Level.INFO, "Battle phase advances to " + phase);
                 again = setupFight();
@@ -423,7 +423,7 @@ public final class BattleServerSide extends Battle
     private boolean setupFight()
     {
         server.allSetupBattleFight();
-        applyDriftDamage();
+        applyPreStrikeEffects();
         return false;
     }
 
@@ -557,37 +557,48 @@ public final class BattleServerSide extends Battle
         advancePhase();
     }
 
-    private void applyDriftDamage()
+    private void applyPreStrikeEffects()
     {
-        // Drift damage is applied only once per player turn,
-        //    during the strike phase.
-        if (phase == BattlePhase.FIGHT && !driftDamageApplied)
+        // Certain effects are applied once per player turn,
+        // during the strike phase, before the actual strike takes place.
+        // These currently include damage from Drifts, damage from Poison,
+        // healing from Springs and slowing from TarPits
+
+        if (phase == BattlePhase.FIGHT && !preStrikeEffectsApplied)
         {
-            driftDamageApplied = true;
+            preStrikeEffectsApplied = true;
             for (BattleCritter c : getAllCritters())
             {
                 CreatureServerSide critter = (CreatureServerSide)c;
                 int dam = critter.getCurrentHex().damageToCreature(
                     critter.getType());
-                if (dam > 0)
+                dam += critter.getPoisonDamage();
+                if (dam != 0)
                 {
-                    critter.wound(dam);
+                    critter.adjustHits(dam);
                     LOGGER.log(Level.INFO, critter.getDescription()
-                        + " takes Hex damage");
+                        + " preStrikeEffects: " + dam + " adjust to hits");
                     server.allTellHexDamageResults(critter, dam);
+                }
+                int slowValue = critter.getCurrentHex().slowsCreature(
+                    critter.getType());
+                if (slowValue != 0)
+                {
+                    critter.addSlowed(slowValue);
+                    server.allTellHexSlowResults(critter, slowValue);
                 }
             }
         }
     }
 
-    boolean isDriftDamageApplied()
+    boolean arePreStrikeEffectsApplied()
     {
-        return driftDamageApplied;
+        return preStrikeEffectsApplied;
     }
 
-    void setDriftDamageApplied(boolean driftDamageApplied)
+    void setPreStrikeEffectsApplied(boolean preStrikeEffectsApplied)
     {
-        this.driftDamageApplied = driftDamageApplied;
+        this.preStrikeEffectsApplied = preStrikeEffectsApplied;
     }
 
     void leaveCarryMode()
@@ -985,7 +996,7 @@ public final class BattleServerSide extends Battle
             return;
         }
         int dealt = carryDamage;
-        carryDamage = target.wound(carryDamage);
+        carryDamage = target.adjustHits(carryDamage);
         dealt -= carryDamage;
         carryTargets.remove(target.getCurrentHex());
 

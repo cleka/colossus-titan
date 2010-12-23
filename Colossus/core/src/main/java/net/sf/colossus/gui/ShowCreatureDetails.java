@@ -184,6 +184,10 @@ public final class ShowCreatureDetails extends KDialog
         _trSpan(s, "Rangestrike", (creature.isRangestriker() ? "yes" : "no")
             + (creature.useMagicMissile() ? " <b>(magic missiles)</b>" : ""));
         _trSpan(s, "Flier", creature.isFlier() ? "yes" : "no");
+        if (creature.isPoison())
+            _trSpan(s, "Poison", "yes: " + creature.getPoison());
+        else
+            _trSpan(s, "Poison", "no");
         _trSpan(s, "Summonable", creature.isSummonable() ? "yes" : "no");
         // TODO Instead show full list of "where and for each multiple of X
         _trSpan(s, "Acquirable", variant.isAcquirable(creature) ? "yes" : "no");

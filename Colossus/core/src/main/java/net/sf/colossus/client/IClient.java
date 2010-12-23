@@ -90,6 +90,8 @@ public interface IClient
 
     public void tellProposal(String proposalString);
 
+    public void tellSlowResults(int targetTag, int slowValue);
+
     // TODO the last parameter could probably be a list of Creatures
     public void tellStrikeResults(int strikerTag, int targetTag,
         int strikeNumber, List<String> rolls, int damage, boolean killed,

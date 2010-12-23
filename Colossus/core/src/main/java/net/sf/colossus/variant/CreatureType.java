@@ -66,6 +66,10 @@ public class CreatureType implements Comparable<CreatureType>
 
     private int maxCount;
 
+    private final int poison;
+
+    private final int slows;
+
     private final String baseColor;
 
     private final Set<HazardTerrain> nativeTerrains = new HashSet<HazardTerrain>();
@@ -82,7 +86,7 @@ public class CreatureType implements Comparable<CreatureType>
             Boolean magicMissile,
             Boolean summonable, Boolean lord, Boolean demilord,
             Integer maxCount,
-            String pluralName, String baseColor);
+            String pluralName, String baseColor, int poison, int slows);
      * Otherwise the class loading system won't find it. Not that this is
      * really HashSet, not just Set.
      */
@@ -92,7 +96,8 @@ public class CreatureType implements Comparable<CreatureType>
         Set<HazardTerrain> nativeTerrains, boolean nativeSlope,
         boolean nativeRiver, boolean nativeDune, boolean waterDwelling,
         boolean magicMissile, boolean summonable, boolean lord,
-        boolean demilord, int maxCount, String pluralName, String baseColor)
+        boolean demilord, int maxCount, String pluralName, String baseColor,
+        int poison, int slows)
     {
         this.name = name;
         this.pluralName = pluralName;
@@ -114,6 +119,8 @@ public class CreatureType implements Comparable<CreatureType>
         this.demilord = demilord;
         this.maxCount = maxCount;
         this.baseColor = baseColor;
+        this.poison = poison;
+        this.slows = slows;
 
         /* warn about likely inappropriate combinations */
         if (waterDwelling && isNativeDune())
@@ -293,6 +300,16 @@ public class CreatureType implements Comparable<CreatureType>
         return flies;
     }
 
+    public boolean isPoison()
+    {
+        return poison > 0;
+    }
+
+    public boolean slows()
+    {
+        return slows > 0;
+    }
+
     public boolean isNativeAt(HazardHexside hazard)
     {
         return isNativeAt(hazard.getCode());
@@ -370,6 +387,16 @@ public class CreatureType implements Comparable<CreatureType>
         }
     }
 
+    public int getPoison()
+    {
+        return poison;
+    }
+
+    public int getSlows()
+    {
+        return slows;
+    }
+
     /**
      * Get the non-terrainified part of the kill-value.
      *
@@ -403,6 +430,14 @@ public class CreatureType implements Comparable<CreatureType>
         if (isTitan())
         {
             val += 1000;
+        }
+        if (isPoison())
+        {
+            val += 4;
+        }
+        if (slows())
+        {
+            val += 3;
         }
         return val;
     }

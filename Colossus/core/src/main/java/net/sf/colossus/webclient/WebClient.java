@@ -91,7 +91,7 @@ public class WebClient extends KFrame implements IWebClient
     private static final Logger LOGGER = Logger.getLogger(WebClient.class
         .getName());
 
-    final static int WEB_CLIENT_VERSION = 2;
+    final static int WEB_CLIENT_VERSION = 3;
 
     // TODO make this all based on Locale.getDefault()
     // Initially: use German. To make it variable, need also to set

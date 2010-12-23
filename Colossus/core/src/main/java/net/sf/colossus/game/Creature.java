@@ -80,6 +80,8 @@ public class Creature
      * Damage taken
      */
     private int hits = 0;
+    private int poisonDamage = 0;
+    private int slowed = 0;
     private boolean struck;
 
     public Creature(CreatureType type, Legion legion)
@@ -362,6 +364,26 @@ public class Creature
         return hits;
     }
 
+    public int getPoison()
+    {
+        return getType().getPoison();
+    }
+
+    public int getPoisonDamage()
+    {
+        return poisonDamage;
+    }
+
+    public int getSlowed()
+    {
+        return slowed;
+    }
+
+    public int getSlows()
+    {
+        return getType().getSlows();
+    }
+
     public boolean hasStruck()
     {
         return struck;
@@ -370,6 +392,26 @@ public class Creature
     public void setHits(int hits)
     {
         this.hits = hits;
+    }
+
+    public void setPoisonDamage(int damage)
+    {
+        poisonDamage = damage;
+    }
+
+    public void addPoisonDamage(int damage)
+    {
+        poisonDamage += damage;
+    }
+
+    public void setSlowed(int slowValue)
+    {
+        slowed = slowValue;
+    }
+
+    public void addSlowed(int slowValue)
+    {
+        slowed += slowValue;
     }
 
     public void setStruck(boolean struck)
@@ -412,6 +454,8 @@ public class Creature
     public void heal()
     {
         setHits(0);
+        setPoisonDamage(0);
+        setSlowed(0);
     }
 
     public boolean wouldDieFrom(int additionalDamage)
@@ -420,35 +464,32 @@ public class Creature
     }
 
     /**
-     * Apply damage to this critter.  Return the amount of excess damage
+     * Apply damage or healing to this critter.  Return the amount of excess damage
      * done, which may sometimes carry to another target.
      */
-    public int wound(int damage)
+    public int adjustHits(int damage)
     {
         int excess = 0;
-        if (damage > 0)
+        int tmp_hits = getHits();
+        int oldhits = tmp_hits;
+
+        tmp_hits = (tmp_hits + damage) > 0 ? tmp_hits + damage : 0;
+        if (tmp_hits > getPower())
         {
-            int tmp_hits = getHits();
-            int oldhits = tmp_hits;
-            tmp_hits = tmp_hits + damage;
-            if (tmp_hits > getPower())
-            {
-                excess = tmp_hits - getPower();
-                tmp_hits = getPower();
-            }
-            LOGGER.log(Level.INFO, "Critter " + getDescription() + ": "
-                + oldhits + " + " + damage + " => " + tmp_hits + "; " + excess
-                + " excess");
-            // Check for death.
-            if (tmp_hits >= getPower())
-            {
-                LOGGER.log(Level.INFO, "Critter " + getDescription()
-                    + " is now dead: (hits=" + tmp_hits + " > power="
-                    + getPower() + ")");
-                setDead(true);
-            }
-            setHits(tmp_hits);
+            excess = tmp_hits - getPower();
+            tmp_hits = getPower();
         }
+        LOGGER.log(Level.INFO, "Critter " + getDescription() + ": " + oldhits
+            + " + " + damage + " => " + tmp_hits + "; " + excess + " excess");
+        // Check for death.
+        if (tmp_hits >= getPower())
+        {
+            LOGGER.log(Level.INFO, "Critter " + getDescription()
+                + " is now dead: (hits=" + tmp_hits + " > power=" + getPower()
+                + ")");
+            setDead(true);
+        }
+        setHits(tmp_hits);
         return excess;
     }
 

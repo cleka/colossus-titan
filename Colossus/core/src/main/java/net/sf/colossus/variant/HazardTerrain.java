@@ -248,6 +248,28 @@ public class HazardTerrain extends Hazards
         new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
         RangeStrikeSpecialEffect.RANGESTRIKEBLOCKED, SpecialEffect.NOSPECIAL);
 
+    static final HazardTerrain SPRING = new HazardTerrain(
+        "Spring",
+        'g',
+        EffectOnMovement.SLOWFOREIGNER,
+        EffectOnMovement.SLOWFOREIGNER,
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
+        RangeStrikeSpecialEffect.RANGESTRIKEFREE, SpecialEffect.HEALTHGAIN);
+
+    static final HazardTerrain TARPIT = new HazardTerrain(
+        "TarPit",
+        'a',
+        EffectOnMovement.SLOWALL,
+        EffectOnMovement.SLOWALL,
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
+        new CombatEffect(EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0),
+        RangeStrikeSpecialEffect.RANGESTRIKEFREE, SpecialEffect.PERMSLOW);
+
     @Override
     public String toString()
     {
@@ -638,6 +660,22 @@ public class HazardTerrain extends Hazards
     public boolean blocksLineOfSight()
     {
         return rangeStrikeSpecial == RangeStrikeSpecialEffect.RANGESTRIKEBLOCKED;
+    }
+
+    /** Whether this terrain is healing
+     * @return Whether this terrain is healing
+     */
+    public boolean isHealing()
+    {
+        return this.terrainSpecial == SpecialEffect.HEALTHGAIN;
+    }
+
+    /** Whether this terrain slows for the duration of the battle
+     * @return Whether this terrain slows for the duration of the battle
+     */
+    public boolean isSlowingToNonNative()
+    {
+        return this.terrainSpecial == SpecialEffect.PERMSLOW;
     }
 
     /** Whether this terrain is damaging to non-native.

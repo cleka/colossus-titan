@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<terrains>
+    <terrain name="Brush" color="green" regular_recruit="True" >
+        <recruit name="Pachycephalosaur" number="1" />
+        <recruit name="Ceratopsian" number="2" />
+        <recruit name="Triceratops" number="2" />
+    </terrain>
+    <terrain name="Wasteland" color="forestGreen" regular_recruit="True" >
+        <recruit name="Pachycephalosaur" number="1" />
+        <recruit name="Ceratosaurus" number="3" />
+        <recruit name="Allosaur" number="3" />
+        <recruit name="Tyrannosaur" number="3" />
+    </terrain>
+    <terrain name="Swamp" color="blue" regular_recruit="True" >
+        <recruit name="Quetzalcoatlas" number="1" />
+        <recruit name="Wyvern" number="3" />
+        <recruit name="RedDragon" number="2" />
+    </terrain>
+    <terrain name="Hills" color="saddleBrown" regular_recruit="True" >
+        <recruit name="Triceratops" number="1" />
+        <recruit name="Prosauropod" number="2" />
+        <recruit name="Stegosaur" number="2" />
+        <recruit name="Sauropod" number="3" />
+    </terrain>
+    <terrain name="Marsh" color="sienna" regular_recruit="True" >
+        <recruit name="Pterodactyl" number="1" />
+        <recruit name="Pteranodon" number="2" />
+        <recruit name="Quetzalcoatlas" number="2" />
+    </terrain>
+    <terrain name="Plains" color="yellow" regular_recruit="True" >
+        <recruit name="Pterodactyl" number="1" />
+        <recruit name="Pteranodon" number="2" />
+        <recruit name="Archatopteryx" number="2" />
+    </terrain>
+    <terrain name="Lava" color="darkRed" regular_recruit="True" >
+        <recruit name="RedDragon" number="1" />
+        <recruit name="SilverDragon" number="2" />
+        <recruit name="GoldDragon" number="1" />
+    </terrain>
+    <terrain name="Springs" color="indigo" regular_recruit="True" >
+        <recruit name="Anything" number="0" />
+        <recruit name="Crocodile" number="0" />
+        <recruit name="Crocodile" number="1" />
+        <recruit name="Deinosuchus" number="1" />
+        <recruit name="Serpent" number="1" />
+        <recruit name="PoisonSerpent" number="1" />
+        <recruit name="SpittingSerpent" number="1" />
+        <recruit name="WingedSerpent" number="1" />
+        <recruit name="WingedSerpent" number="-1" />
+        <recruit name="Couatl" number="1" />
+    </terrain>
+    <terrain name="Desert" color="orange" regular_recruit="True" >
+        <recruit name="Archatopteryx" number="1" />
+        <recruit name="FlightlessBird" number="3" />
+        <recruit name="RedDragon" number="2" />
+    </terrain>
+<!--  Tower is a special case -->
+    <terrain name="Tower" color="grey" regular_recruit="False" >
+        <recruit name="Anything" number="0" />
+        <recruit name="Eoraptor" number="0" />
+        <recruit name="Anything" number="0" />
+        <recruit name="Pachycephalosaur" number="0" />
+        <recruit name="Anything" number="0" />
+        <recruit name="Pterodactyl" number="0" />
+        <recruit name="AnyNonLord" number="0" />
+        <recruit name="Guardian" number="3" />
+        <recruit name="Titan" number="-1" />
+        <recruit name="Warlock" number="1" />
+        <starting name="Eoraptor" number="2" />
+        <starting name="Pachycephalosaur" number="2" />
+        <starting name="Pterodactyl" number="2" />
+    </terrain>
+    <terrain name="Woods" color="olive" regular_recruit="True" >
+        <recruit name="Eoraptor" number="1" />
+        <recruit name="Velociraptor" number="2" />
+        <recruit name="Ceratosaurus" number="2" />
+    </terrain>
+    <terrain name="Jungle" color="darkGreen" regular_recruit="True" >
+        <recruit name="Eoraptor" number="1" />
+        <recruit name="Triceratops" number="3" />
+        <recruit name="Pachyrhinosaurus" number="2" />
+        <recruit name="Ankylosaur" number="3" />
+    </terrain>
+    <terrain name="Mountains" color="red" regular_recruit="True" >
+        <recruit name="Ceratosaurus" number="1" />
+        <recruit name="Snake" number="2" />
+        <recruit name="SpittingCobra" number="2" />
+        <recruit name="Sauropod" number="2" />
+    </terrain>
+    <acquirable name="Angel" points="100" />
+    <acquirable name="Crocodile" points="100" />
+    <acquirable name="Archangel" points="500" />
+    <titan_improve points="100" />
+    <titan_teleport points="1000" />
+</terrains>

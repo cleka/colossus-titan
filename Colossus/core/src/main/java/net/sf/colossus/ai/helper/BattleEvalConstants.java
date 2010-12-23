@@ -22,6 +22,8 @@ public class BattleEvalConstants
     final public int NON_NATIVE_PENALTY_TERRAIN = -100;
     /** Multiplied by damage (drift is 1) */
     final public int PENALTY_DAMAGE_TERRAIN = -200;
+    /** Multiplied by healing (spring is 1) */
+    final public int BONUS_HEAL_TERRAIN = 100;
     /** Straight value */
     final public int FIRST_RANGESTRIKE_TARGET = 300;
     /** Straight value */

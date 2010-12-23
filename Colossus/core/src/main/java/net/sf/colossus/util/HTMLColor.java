@@ -165,6 +165,11 @@ public final class HTMLColor // NO_UCD
     public static final Color brambleGreen1 = new Color(0, 200, 0);
     public static final Color brambleGreen2 = new Color(0, 150, 0);
 
+    public static final Color springBlue = new Color(50, 100, 225);
+    public static final Color ankylosaurPurple = new Color(117, 70, 136);
+    public static final Color deinosuchusBrown = new Color(193, 121, 43);
+    public static final Color ceratopsianBrown = new Color(181, 181, 81);
+
     // More additions, for Creatures (based on Chit)
     public static final Color ogreRed = new Color(128, 0, 0);
     public static final Color hydraOrange = new Color(255, 132, 21);

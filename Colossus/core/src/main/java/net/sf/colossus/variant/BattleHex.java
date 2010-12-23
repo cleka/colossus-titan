@@ -217,6 +217,14 @@ public class BattleHex extends Hex
         {
             return HTMLColor.dimGray;
         }
+        else if (terrain.equals(HazardTerrain.SPRING))
+        {
+            return HTMLColor.springBlue;
+        }
+        else if (terrain.equals(HazardTerrain.TARPIT))
+        {
+            return HTMLColor.darkSlateGray;
+        }
         else
         {
             return Color.black;
@@ -459,6 +467,26 @@ public class BattleHex extends Hex
     }
 
     /**
+     * Return how much the hex slows the creature for the rest of the battle
+     * @param creature The Creature that may be slowed.
+     * @return How much the Creature is slowed for the rest of the battle.
+     */
+    public int slowsCreature(CreatureType creature)
+    {
+        if (terrain.isSlowingToNonNative() && (!creature.isNativeIn(terrain)))
+        { // Non-native slowed permanently in TarPit
+            return 1;
+        }
+        if (terrain.isHealing())
+        { // Spring cures slowing (washes off tar from TarPits, alleviates effect
+            // from creature if creature that slows is added)
+            return -1;
+        }
+        // default : no slowing !
+        return 0;
+    }
+
+    /**
      * Return how much damage the Creature should take from this Hex.
      * @param creature The Creature that may suffer damage.
      * @return How much damage the Creature should take from being there.
@@ -472,6 +500,10 @@ public class BattleHex extends Hex
         if (terrain.isDamagingToWaterDweller() && (creature.isWaterDwelling()))
         { // Water Dweller (amphibious) take damage in Sand
             return 1;
+        }
+        if (terrain.isHealing())
+        { // All creatures heal in Spring
+            return -1;
         }
         // default : no damage !
         return 0;

@@ -34,6 +34,10 @@ public final class BattleUnit implements BattleCritter
     private final CreatureType creatureType;
     private final Legion legion;
     private int hits = 0;
+    private int poisonDamage = 0;
+    private int poison = 0;
+    private int slows = 0;
+    private int slowed = 0;
     private BattleHex currentHex;
     private BattleHex startingHex;
     private boolean moved;
@@ -81,6 +85,38 @@ public final class BattleUnit implements BattleCritter
     {
         this.hits = hits;
         notifyListeners();
+    }
+
+    public void setPoison(int damage)
+    {
+        this.poison = damage;
+    }
+
+    public void setPoisonDamage(int damage)
+    {
+        this.poisonDamage = damage;
+    }
+
+    public void addPoisonDamage(int damage)
+    {
+        // Poison damage is cumulative, so add to existing value
+        this.poisonDamage += damage;
+    }
+
+    public void setSlowed(int slowValue)
+    {
+        this.slowed = slowValue;
+    }
+
+    public void addSlowed(int slowValue)
+    {
+        // Slowing is cumulative, so add to existing value
+        this.slowed += slowValue;
+    }
+
+    public void setSlows(int slowValue)
+    {
+        this.slows = slowValue;
     }
 
     public boolean wouldDieFrom(int hits)
@@ -253,6 +289,26 @@ public final class BattleUnit implements BattleCritter
     public int getPointValue()
     {
         return getPower() * getSkill();
+    }
+
+    public int getPoison()
+    {
+        return poison;
+    }
+
+    public int getPoisonDamage()
+    {
+        return poisonDamage;
+    }
+
+    public int getSlowed()
+    {
+        return slowed;
+    }
+
+    public int getSlows()
+    {
+        return slows;
     }
 
     public boolean isRangestriker()

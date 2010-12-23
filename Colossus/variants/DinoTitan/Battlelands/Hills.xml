@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<battlemap terrain="Hills" tower="False">
+    <battlehex x="0" y="2" terrain="Plains" elevation="0">
+    </battlehex>
+    <battlehex x="0" y="3" terrain="Plains" elevation="1">
+        <border number="0" type="s" />
+        <border number="1" type="s" />
+        <border number="2" type="s" />
+    </battlehex>
+    <battlehex x="0" y="4" terrain="Plains" elevation="1">
+        <border number="1" type="s" />
+        <border number="2" type="s" />
+    </battlehex>
+    <battlehex x="1" y="1" terrain="Plains" elevation="1">
+        <border number="1" type="s" />
+        <border number="2" type="s" />
+        <border number="3" type="s" />
+        <border number="4" type="s" />
+    </battlehex>
+    <battlehex x="1" y="2" terrain="Plains" elevation="0">
+    </battlehex>
+    <battlehex x="1" y="3" terrain="Plains" elevation="0">
+    </battlehex>
+    <battlehex x="1" y="4" terrain="Plains" elevation="0">
+    </battlehex>
+    <battlehex x="2" y="1" terrain="Plains" elevation="0">
+    </battlehex>
+    <battlehex x="2" y="2" terrain="Plains" elevation="0">
+    </battlehex>
+    <battlehex x="2" y="3" terrain="Plains" elevation="1">
+        <border number="0" type="s" />
+        <border number="3" type="s" />
+        <border number="4" type="s" />
+        <border number="5" type="s" />
+    </battlehex>
+    <battlehex x="2" y="4" terrain="Bog" elevation="0">
+    </battlehex>
+    <battlehex x="2" y="5" terrain="Plains" elevation="1">
+        <border number="0" type="s" />
+        <border number="1" type="s" />
+        <border number="5" type="s" />
+    </battlehex>
+    <battlehex x="3" y="0" terrain="Plains" elevation="1">
+        <border number="2" type="s" />
+        <border number="3" type="s" />
+        <border number="4" type="s" />
+    </battlehex>
+    <battlehex x="3" y="1" terrain="Brambles" elevation="0">
+    </battlehex>
+    <battlehex x="3" y="2" terrain="Plains" elevation="1">
+        <border number="0" type="s" />
+        <border number="1" type="s" />
+        <border number="2" type="s" />
+        <border number="5" type="s" />
+    </battlehex>
+    <battlehex x="3" y="3" terrain="Spring" elevation="1">
+        <border number="1" type="s" />
+        <border number="2" type="s" />
+        <border number="3" type="s" />
+        <border number="4" type="s" />
+    </battlehex>
+    <battlehex x="3" y="4" terrain="Plains" elevation="0">
+    </battlehex>
+    <battlehex x="3" y="5" terrain="Plains" elevation="1">
+        <border number="0" type="s" />
+    </battlehex>
+    <battlehex x="4" y="1" terrain="Plains" elevation="0">
+    </battlehex>
+    <battlehex x="4" y="2" terrain="Plains" elevation="0">
+    </battlehex>
+    <battlehex x="4" y="3" terrain="Plains" elevation="0">
+    </battlehex>
+    <battlehex x="4" y="4" terrain="Plains" elevation="0">
+    </battlehex>
+    <battlehex x="4" y="5" terrain="Brambles" elevation="1">
+        <border number="0" type="s" />
+        <border number="1" type="s" />
+        <border number="5" type="s" />
+    </battlehex>
+    <battlehex x="5" y="1" terrain="Plains" elevation="1">
+        <border number="3" type="s" />
+        <border number="4" type="s" />
+        <border number="5" type="s" />
+    </battlehex>
+    <battlehex x="5" y="2" terrain="Plains" elevation="0">
+    </battlehex>
+    <battlehex x="5" y="3" terrain="Plains" elevation="1">
+        <border number="0" type="s" />
+        <border number="3" type="s" />
+        <border number="4" type="s" />
+        <border number="5" type="s" />
+    </battlehex>
+    <battlehex x="5" y="4" terrain="Plains" elevation="0">
+    </battlehex>
+</battlemap>

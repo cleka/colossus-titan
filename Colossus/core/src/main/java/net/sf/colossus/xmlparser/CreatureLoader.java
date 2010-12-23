@@ -133,6 +133,28 @@ public class CreatureLoader implements AllCreatureType
         String plural_name = el.getAttributeValue("plural_name");
         String base_color = el.getAttributeValue("base_color");
 
+        int poison;
+        try
+        {
+            poison = el.getAttribute("poison").getIntValue();
+        }
+        catch (Exception e)
+        {
+            // Don't fail if older version doesn't have poison
+            poison = 0;
+        }
+
+        int slows;
+        try
+        {
+            slows = el.getAttribute("slows").getIntValue();
+        }
+        catch (Exception e)
+        {
+            // Don't fail if older version doesn't have slows
+            slows = 0;
+        }
+
         String custom_class = el.getAttributeValue("special");
 
         CreatureType creature = null;
@@ -143,19 +165,19 @@ public class CreatureLoader implements AllCreatureType
                 creature = new CreatureTypeTitan(name, power, skill,
                     rangestrikes, flies, nativeTerrains, slope, river, dune,
                     water, magic_missile, summonable, lord, demilord, count,
-                    plural_name, base_color);
+                    plural_name, base_color, poison, slows);
             }
             else
             {
                 creature = new CreatureType(name, power, skill, rangestrikes,
                     flies, nativeTerrains, slope, river, dune, water,
                     magic_missile, summonable, lord, demilord, count,
-                    plural_name, base_color);
+                    plural_name, base_color, poison, slows);
             }
         }
         else
         {
-            Object[] parameters = new Object[17];
+            Object[] parameters = new Object[19];
             parameters[0] = name;
             parameters[1] = power;
             parameters[2] = skill;
@@ -173,6 +195,8 @@ public class CreatureLoader implements AllCreatureType
             parameters[14] = count;
             parameters[15] = plural_name;
             parameters[16] = base_color;
+            parameters[17] = poison;
+            parameters[18] = slows;
             creature = (CreatureType)StaticResourceLoader.getNewObject(
                 custom_class, varDirectoriesList, parameters);
         }

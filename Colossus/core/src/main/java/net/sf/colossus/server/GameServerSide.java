@@ -1588,8 +1588,8 @@ public final class GameServerSide extends Game
                     .valueOf(bat.getAttribute("summonState").getValue());
                 int carryDamage = bat.getAttribute("carryDamage")
                     .getIntValue();
-                boolean driftDamageApplied = bat.getAttribute(
-                    "driftDamageApplied").getBooleanValue();
+                boolean preStrikeEffectsApplied = bat.getAttribute(
+                    "preStrikeEffectsApplied").getBooleanValue();
 
                 List<Element> cts = bat.getChildren("CarryTarget");
                 Set<BattleHex> carryTargets = new HashSet<BattleHex>();
@@ -1622,7 +1622,8 @@ public final class GameServerSide extends Game
                 getBattleSS().setBattleTurnNumber(battleTurnNum);
                 getBattleSS().setSummonState(summonState);
                 getBattleSS().setCarryDamage(carryDamage);
-                getBattleSS().setDriftDamageApplied(driftDamageApplied);
+                getBattleSS().setPreStrikeEffectsApplied(
+                    preStrikeEffectsApplied);
                 getBattleSS().setCarryTargets(carryTargets);
             }
 

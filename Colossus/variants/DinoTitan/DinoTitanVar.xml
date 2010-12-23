@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<variant name="DinoTitan">
+    <strategic_map filename="DinoTitanMap.xml" />
+    <creatures filename="DinoTitanCre.xml" />
+    <terrain_recruits filename="DinoTitanTer.xml" />
+    <hint classname="DinoTitan.DinoTitanHint" />
+    <depends>
+        <depend variant="Abyssal6" />
+        <depend variant="Unified" />
+    </depends>
+</variant>

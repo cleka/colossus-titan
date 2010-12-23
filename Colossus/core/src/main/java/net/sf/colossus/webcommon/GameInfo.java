@@ -620,6 +620,16 @@ public class GameInfo
     {
         String reason = null;
         // Just in case, to avoid duplicates (e.g. bounce/double click)
+        if (variant.equals("DinoTitan"))
+        {
+            IWebClient client = user.getWebserverClient();
+            if (client.getClientVersion() < 3)
+            {
+                reason = "Client does not support this variant, please upgrade!";
+                return reason;
+            }
+        }
+
         removeIfEnrolled(user.getName());
         if (enrolledPlayers < max)
         {

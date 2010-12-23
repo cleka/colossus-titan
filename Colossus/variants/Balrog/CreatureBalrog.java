@@ -41,7 +41,8 @@ public class CreatureBalrog extends CreatureType
         HashSet<HazardTerrain> nativeTerrrains, Boolean nativeSlope,
         Boolean nativeRiver, Boolean nativeDune, Boolean waterDwelling,
         Boolean magicMissile, Boolean summonable, Boolean lord,
-        Boolean demilord, Integer maxCount, String pluralName, String baseColor) // NO_UCD
+        Boolean demilord, Integer maxCount, String pluralName,
+        String baseColor, Integer poison, Integer slows) // NO_UCD
     {
         super(name, power.intValue(), skill.intValue(), rangestrikes
             .booleanValue(), flies.booleanValue(), nativeTerrrains,
@@ -49,7 +50,7 @@ public class CreatureBalrog extends CreatureType
                 .booleanValue(), waterDwelling.booleanValue(), magicMissile
                 .booleanValue(), summonable.booleanValue(), lord
                 .booleanValue(), demilord.booleanValue(), maxCount.intValue(),
-            pluralName, baseColor);
+            pluralName, baseColor, poison.intValue(), slows.intValue());
         LOGGER.finest("Successfully created custom CreatureType " + name
             + " (class " + CreatureBalrog.class.getName() + ")");
         allBalrogs.add(this);
