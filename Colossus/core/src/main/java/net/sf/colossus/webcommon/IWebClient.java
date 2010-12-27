@@ -23,6 +23,7 @@ public interface IWebClient
     public static final String gameCancelled = "gameCancelled";
     public static final String chatDeliver = "chatDeliver";
     public static final String generalMessage = "generalMessage";
+    public static final String systemMessage = "systemMessage";
     public static final String requestAttention = "requestAttention";
     public static final String pingRequest = "pingRequest";
 
@@ -52,6 +53,8 @@ public interface IWebClient
 
     public void deliverGeneralMessage(long when, boolean error,
         String title, String message);
+
+    public void systemMessage(long when, String message);
 
     public void requestAttention(long when, String byUser, boolean byAdmin,
         String message, int beepCount, long beepInterval, boolean windows);

@@ -670,7 +670,16 @@ public class WebServerClient implements IWebClient
 
     public void systemMessage(long now, String message)
     {
-        chatDeliver(IWebServer.generalChatName, now, "SYSTEM", message, false);
+        if (getClientVersion() >= 3)
+        {
+            chatDeliver(IWebServer.generalChatName, now, "SYSTEM", message,
+                false);
+            // sendToClient(systemMessage + sep + now + sep + message);
+        }
+        else
+        {
+            chatDeliver(IWebServer.generalChatName, now, "SYSTEM", message, false);
+        }
     }
 
     private void sendToClient(String s)

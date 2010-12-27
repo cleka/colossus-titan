@@ -1066,6 +1066,25 @@ public class WebServer implements IWebServer, IRunWebServer
         proposedGamesListModified = true;
     }
 
+    public void informAllEnrolledAbout(GameInfo gi, String message)
+    {
+        long when = new Date().getTime();
+        ArrayList<User> users = gi.getPlayers();
+        for (User u : users)
+        {
+            IWebClient webClient = u.getWebserverClient();
+            if (webClient == null)
+            {
+                LOGGER.warning("Skip informing player " + u.getName()
+                    + " (webclient null) about: " + message);
+            }
+            else
+            {
+                webClient.systemMessage(when, message);
+            }
+        }
+    }
+
     public void informAllEnrolledThatStartFailed(GameInfo gi, String reason,
         User byUser)
     {
@@ -1079,9 +1098,8 @@ public class WebServer implements IWebServer, IRunWebServer
             IWebClient webClient = u.getWebserverClient();
             if (webClient == null)
             {
-                LOGGER.info("Skip informing player " + u.getName()
+                LOGGER.warning("Skip informing player " + u.getName()
                     + " (webclient null): " + message);
-
             }
             else if (webClient.getClientVersion() >= 1)
             {
@@ -1097,7 +1115,7 @@ public class WebServer implements IWebServer, IRunWebServer
             }
             else
             {
-                LOGGER.info("Skip informing player " + u.getName()
+                LOGGER.warning("Skip informing player " + u.getName()
                     + " (too old webclient): " + message);
             }
         }

@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,6 +20,7 @@ import net.sf.colossus.server.INotifyWebServer;
 import net.sf.colossus.webcommon.GameInfo;
 import net.sf.colossus.webcommon.IGameRunner;
 import net.sf.colossus.webcommon.IRunWebServer;
+import net.sf.colossus.webcommon.User;
 
 
 /**
@@ -441,6 +444,38 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
         return line;
     }
 
+    private String getMissingPlayers(List<String> names)
+    {
+        StringBuilder missing = new StringBuilder();
+        for (User u : gi.getPlayers())
+        {
+            String uName = u.getName();
+            if (!names.contains(uName))
+            {
+                if (missing.length() > 0)
+                {
+                    missing.append(", ");
+                }
+                missing.append(uName);
+            }
+        }
+        return missing.toString();
+    }
+
+    public String listAsString(List<String> names)
+    {
+        StringBuilder namesSB = new StringBuilder();
+        for (String oneName : names)
+        {
+            if (namesSB.length() > 0)
+            {
+                namesSB.append(", ");
+            }
+            namesSB.append(oneName);
+        }
+        return namesSB.toString();
+    }
+
     public boolean waitUntilGameStartedSuccessfully(int timeout)
     {
         reasonStartFailed = null;
@@ -467,7 +502,7 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
         int checkInterval = 1000; // every second
         String line;
 
-        StringBuffer names = new StringBuffer("");
+        List<String> names = new LinkedList<String>();
 
         boolean done = false;
         for (int i = 0; !done && i < timeout;)
@@ -502,8 +537,22 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
             // TODO: for now there is only one possible reason, handle better!
             else if (line.startsWith(INotifyWebServer.GAME_STARTUP_FAILED))
             {
+                StringBuilder namesSB = new StringBuilder();
+                for (String oneName : names)
+                {
+                    if (namesSB.length() > 0)
+                    {
+                        namesSB.append(", ");
+                    }
+                    namesSB.append(oneName);
+                }
+
                 done = true;
-                reasonStartFailed = "Controlled process reported: " + line;
+                String missingPlayers = getMissingPlayers(names);
+                reasonStartFailed = line + " - connected: "
+                    + namesSB.toString() + "; not connected: "
+                    + missingPlayers;
+                server.informAllEnrolledAbout(gi, reasonStartFailed);
             }
 
             if (connected >= gi.getPlayers().size())
@@ -513,11 +562,10 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
 
             if (name != null)
             {
-                if (names.length() > 0)
-                {
-                    names.append(", ");
-                }
-                names.append(name);
+                names.add(name);
+                String message = "Player " + name + " connected to game "
+                    + gi.getGameId();
+                server.informAllEnrolledAbout(gi, message);
             }
         }
 
@@ -531,8 +579,8 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
         }
         else
         {
-            reasonStartFailed = "not all clients did connect; got only "
-                + connected + " players: " + names.toString();
+            reasonStartFailed = "Start failed? Got only " + connected
+                + " players: " + listAsString(names);
             LOGGER.warning("Failed: " + reasonStartFailed);
         }
 

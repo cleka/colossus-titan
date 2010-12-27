@@ -2954,6 +2954,12 @@ public class WebClient extends KFrame implements IWebClient
                 : JOptionPane.INFORMATION_MESSAGE);
     }
 
+    // TODO instead of to chat, add such stuff to a system log tab or similar
+    public void systemMessage(long when, String message)
+    {
+        generalChat.chatDeliver(when, "SYSTEM", message, false);
+    }
+
     // Game Client tells us this when user closes the masterboard
     public void tellGameEnds()
     {

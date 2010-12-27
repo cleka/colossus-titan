@@ -140,6 +140,11 @@ public class CmdLineWebClient implements IWebClient
             + message + "'");
     }
 
+    public void systemMessage(long when, String message)
+    {
+        System.out.println("System message (" + when + "): '" + message + "'");
+    }
+
     public void requestAttention(long when, String byUser, boolean byAdmin,
         String message, int beepCount, long beepInterval, boolean windows)
     {

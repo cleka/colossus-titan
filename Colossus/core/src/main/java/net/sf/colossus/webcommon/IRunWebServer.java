@@ -25,6 +25,8 @@ public interface IRunWebServer
 
     public void gameFailed(GameInfo gi, String reason);
 
+    public void informAllEnrolledAbout(GameInfo gi, String message);
+
     public void unregisterGame(GameInfo gi, int port);
 
     public IPortProvider getPortProvider();
