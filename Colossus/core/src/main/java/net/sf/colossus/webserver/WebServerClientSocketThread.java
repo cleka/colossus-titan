@@ -57,6 +57,7 @@ public class WebServerClientSocketThread extends Thread
     private boolean done = false;
     private boolean toldToTerminate = false;
 
+    private boolean lastWasLogin = false;
 
     /* During registration request and sending of confirmation code,
      * we do not have a user yet. The parseLine sets then this variable
@@ -94,6 +95,11 @@ public class WebServerClientSocketThread extends Thread
         closeAndCleanupSocket();
     }
 
+    // TODO perhaps only temporary for troubleshooting purposes?
+    public void setLastWasLogin()
+    {
+        lastWasLogin = true;
+    }
 
     private synchronized void closeAndCleanupSocket()
     {
@@ -170,6 +176,12 @@ public class WebServerClientSocketThread extends Thread
                 {
                     stopper.start();
                     stopper = null;
+                }
+                if (lastWasLogin)
+                {
+                    LOGGER.info("WSCST for user " + theClient.getUsername()
+                        + " back for reading next line.");
+                    lastWasLogin = false;
                 }
                 fromClient = in.readLine();
             }

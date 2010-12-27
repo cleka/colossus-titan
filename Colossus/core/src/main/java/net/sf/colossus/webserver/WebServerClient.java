@@ -54,7 +54,6 @@ public class WebServerClient implements IWebClient
 
     private String unverifiedUsername = null;
 
-
     private long gameStartsNowSent = -1;
 
     private long gameStartsSoonSent = -1;
@@ -610,6 +609,9 @@ public class WebServerClient implements IWebClient
             }
             server.reEnrollIfNecessary(this);
             server.updateUserCounts();
+            LOGGER.info("loggedIn postprocessing for user " + user.getName()
+                + " completed!");
+            cst.setLastWasLogin();
         }
 
         server.saveGamesIfNeeded();
