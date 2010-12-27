@@ -373,9 +373,7 @@ public class WebServerClientSocketThread extends Thread
                 // otherwise, send another one
                 else
                 {
-                    long requestSentTime = new Date().getTime();
-                    theClient.requestPing(requestSentTime + "", "dummy2",
-                        "dummy3");
+                    requestPingNow();
                     pingsTried++;
                 }
             }
@@ -391,6 +389,12 @@ public class WebServerClientSocketThread extends Thread
             pingsTried = 0;
         }
         return;
+    }
+
+    public void requestPingNow()
+    {
+        long requestSentTime = new Date().getTime();
+        theClient.requestPing(requestSentTime + "", "dummy2", "dummy3");
     }
 
     private void markForcedLogout()

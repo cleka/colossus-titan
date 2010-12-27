@@ -611,7 +611,11 @@ public class WebServerClient implements IWebClient
             server.updateUserCounts();
             LOGGER.info("loggedIn postprocessing for user " + user.getName()
                 + " completed!");
+            // just before readline() command will print a log message that
+            // thread is now back available to read input from client
             cst.setLastWasLogin();
+            // Request a Ping, so we see when client was earliest able to respond
+            cst.requestPingNow();
         }
 
         server.saveGamesIfNeeded();
@@ -764,6 +768,7 @@ public class WebServerClient implements IWebClient
             + sep + windows);
     }
 
+    // TODO should this be rather totally in clientsocketthread?
     public void requestPing(String arg1, String arg2, String arg3)
     {
         sendToClient(pingRequest + sep + arg1 + sep + arg2 + sep + arg3);
