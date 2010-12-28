@@ -196,9 +196,6 @@ public class WebServerClient implements IWebClient
             if (tokens.length >= 4)
             {
                 String username = tokens[1];
-                LOGGER.log(Level.FINEST, "Client " + username
-                    + " attempts login.");
-
                 unverifiedUsername = username;
                 String password = tokens[2];
                 boolean force = Boolean.valueOf(tokens[3]).booleanValue();
@@ -644,24 +641,21 @@ public class WebServerClient implements IWebClient
         if (otherWsc != null)
         {
             otherCst = otherWsc.getWSCSThread();
-            LOGGER.fine("got otherCST " + otherCst);
-        }
-        else
-        {
-            // LOGGER.fine("otherCST is null ");
         }
 
         if (otherCst != null)
         {
             if (force)
             {
-                LOGGER.finest("User " + username
-                    + " already logged in - forcing Logout");
+                LOGGER.fine("User " + username
+                    + " already logged in ("
+                    + otherCst + ") - forcing Logout");
                 otherCst.forceLogout(otherCst);
             }
             else
             {
-                LOGGER.finest("User " + username + " already logged in "
+                LOGGER.fine("User " + username + " already logged in ("
+                    + otherCst + ") "
                     + "- replying with alreadyLoggedIn reject message");
                 reason = IWebClient.alreadyLoggedIn;
             }

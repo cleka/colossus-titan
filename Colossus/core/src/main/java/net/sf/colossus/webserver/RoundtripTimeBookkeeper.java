@@ -3,13 +3,11 @@ package net.sf.colossus.webserver;
 
 import java.io.PrintWriter;
 import java.util.LinkedList;
-import java.util.logging.Logger;
 
 public class RoundtripTimeBookkeeper
 {
-    private static final Logger LOGGER = Logger
-        .getLogger(RoundtripTimeBookkeeper.class.getName());
-
+    // private static final Logger LOGGER = Logger
+    //    .getLogger(RoundtripTimeBookkeeper.class.getName());
 
     private long indexCounter = 0;
 
@@ -19,7 +17,6 @@ public class RoundtripTimeBookkeeper
 
     public RoundtripTimeBookkeeper(int howManyLastToKeep)
     {
-        LOGGER.info("RoundtripTimeBookkeeper initialized.");
         this.LAST_N_TO_KEEP = howManyLastToKeep;
     }
 

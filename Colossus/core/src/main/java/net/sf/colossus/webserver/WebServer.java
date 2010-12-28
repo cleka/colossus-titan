@@ -311,20 +311,15 @@ public class WebServer implements IWebServer, IRunWebServer
             System.exit(1);
         }
 
-        LOGGER.log(Level.FINEST,
-            "User-server starting up, waiting for clients");
+        LOGGER.log(Level.INFO, "User-server started, waiting for clients");
 
         while (!shutdownRequested)
         {
             boolean rejected = waitForUser();
             if (rejected)
             {
-                LOGGER.log(Level.FINEST, "accepted one client but "
+                LOGGER.log(Level.WARNING, "accepted one client but "
                     + "rejected it - maxClients limit reached.");
-            }
-            else
-            {
-                LOGGER.log(Level.FINEST, "added one client");
             }
         }
 
