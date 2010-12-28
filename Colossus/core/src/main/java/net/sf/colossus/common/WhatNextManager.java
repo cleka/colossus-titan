@@ -73,7 +73,7 @@ public class WhatNextManager
 
     /**
      * Trigger a timed Quit, which will (by using a demon thread) terminate
-     * the JVM after a timeout (currently 10 seconds)
+     * the JVM after a timeout (currently 10 (120) seconds)
      * - unless the JVM has quit already anyway because cleanup has
      * succeeded as planned.
      */
@@ -99,7 +99,7 @@ public class WhatNextManager
 
     /**
      * A demon thread which is started by triggerTimedQuit.
-     * It will then (currently) sleep 10 seconds, and if it is then
+     * It will then (currently) sleep 10 (120) seconds, and if it is then
      * still alive, do a System.exit(1) to terminate the JVM.
      * If, however, the game shutdown proceeded successfully as planned,
      * Start.main() will already have reached it's end and there should
@@ -116,7 +116,12 @@ public class WhatNextManager
         private static final String defaultName = "TimedJvmQuit thread";
         private final String name;
 
-        private final long timeOutInSecs = 10;
+        // For now, on the web server, 120, because there were cases where
+        // in case of a draw Clients did not catch up.
+        // I suspect they are too busy processing all the legion cleanup
+        // (and related updateCreatureCount) messages.
+        // So give them more time for a while.
+        private final long timeOutInSecs = 120;
 
         public TimedJvmQuit()
         {

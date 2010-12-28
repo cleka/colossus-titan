@@ -753,6 +753,10 @@ final class ClientHandler implements IClient
             {
                 server.getRecorder().recordMessageToClient(this, message);
             }
+            if (server.getGame().isGameOver())
+            {
+                LOGGER.info("Sending to " + playerName + ": " + message);
+            }
             sendViaChannel(message);
             if (server == null)
             {
