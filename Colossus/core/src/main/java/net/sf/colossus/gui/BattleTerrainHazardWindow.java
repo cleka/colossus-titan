@@ -391,33 +391,35 @@ public class BattleTerrainHazardWindow extends KDialog
         }
         container.add(rangeStrikeSymbol);
 
+        Chit special = null;
         if (hazard.terrainSpecial
             .equals(HazardConstants.SpecialEffect.HEALTHDRAIN))
         {
-            Chit special = Chit.newSymbolChit(EFFECT_SIZE, "HealthDrain");
+            special = Chit.newSymbolChit(EFFECT_SIZE, "HealthDrain");
             special.setToolTipText("Non natives lose 1 health per turn");
         }
         if (hazard.terrainSpecial
             .equals(HazardConstants.SpecialEffect.HEALTHDRAIN_WATERDWELLER))
         {
-            Chit special = Chit.newSymbolChit(EFFECT_SIZE, "HealthDrain");
+            special = Chit.newSymbolChit(EFFECT_SIZE, "HealthDrain");
             special.setToolTipText("Water Dweller lose 1 health per turn");
         }
         if (hazard.terrainSpecial
             .equals(HazardConstants.SpecialEffect.HEALTHGAIN))
         {
-            Chit special = new Chit(EFFECT_SIZE, "HealthGain");
+            special = new Chit(EFFECT_SIZE, "HealthGain");
             special
                 .setToolTipText("Creatures gain 1 health per turn. Cures slow and poison");
         }
         if (hazard.terrainSpecial
             .equals(HazardConstants.SpecialEffect.PERMSLOW))
         {
-            Chit special = new Chit(EFFECT_SIZE, "PermanentSlow");
+            special = new Chit(EFFECT_SIZE, "PermanentSlow");
             special
                 .setToolTipText("Creatures are slowed 1 per turn for rest of the battle");
         }
-
+        if (special != null)
+            container.add(special);
     }
 
     private void addDefenderInfo(Container container, Hazards hazard)
