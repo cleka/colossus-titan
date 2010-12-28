@@ -184,6 +184,13 @@ public class WebServerClientSocketThread extends Thread
                     lastWasLogin = false;
                 }
                 fromClient = in.readLine();
+                if (connLostWarningLogged)
+                {
+                    LOGGER.warning("In " + this.getName()
+                            + " connLostWarningLogged was set, but received "
+                            + "something from client again: " + fromClient);
+                    connLostWarningLogged = false;
+                }
             }
 
             catch (InterruptedIOException e)
