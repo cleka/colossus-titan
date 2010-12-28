@@ -294,12 +294,15 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
             if (ok)
             {
                 // RUNNING
+                LOGGER.log(Level.FINEST, "Game " + gameId
+                    + " started ok - fine!");
                 server.gameStarted(gi);
             }
             else
             {
-                LOGGER.log(Level.SEVERE, "Game " + gameId + " started but "
+                LOGGER.log(Level.WARNING, "Game " + gameId + ": "
                     + reasonStartFailed);
+                server.informAllEnrolledAbout(gi, reasonStartFailed);
             }
         }
         else
@@ -537,22 +540,8 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
             // TODO: for now there is only one possible reason, handle better!
             else if (line.startsWith(INotifyWebServer.GAME_STARTUP_FAILED))
             {
-                StringBuilder namesSB = new StringBuilder();
-                for (String oneName : names)
-                {
-                    if (namesSB.length() > 0)
-                    {
-                        namesSB.append(", ");
-                    }
-                    namesSB.append(oneName);
-                }
-
+                reasonStartFailed = "Game start reported error!";
                 done = true;
-                String missingPlayers = getMissingPlayers(names);
-                reasonStartFailed = line + " - connected: "
-                    + namesSB.toString() + "; not connected: "
-                    + missingPlayers;
-                server.informAllEnrolledAbout(gi, reasonStartFailed);
             }
 
             if (connected >= gi.getPlayers().size())
@@ -569,19 +558,17 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
             }
         }
 
-        if (done && reasonStartFailed == null)
+        if (reasonStartFailed == null && !done)
         {
-            LOGGER.log(Level.FINEST, "Game started ok - fine!");
+            reasonStartFailed = "Start timed out, done not set? ";
         }
-        else if (done && reasonStartFailed != null)
+
+        if (reasonStartFailed != null)
         {
-            LOGGER.warning("Failed: " + reasonStartFailed);
-        }
-        else
-        {
-            reasonStartFailed = "Start failed? Got only " + connected
-                + " players: " + listAsString(names);
-            LOGGER.warning("Failed: " + reasonStartFailed);
+            String connectedPlayers = listAsString(names);
+            String missingPlayers = getMissingPlayers(names);
+            reasonStartFailed = reasonStartFailed + " Connected: "
+                + connectedPlayers + "; not connected: " + missingPlayers;
         }
 
         try
