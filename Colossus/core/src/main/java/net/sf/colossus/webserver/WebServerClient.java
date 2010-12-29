@@ -475,7 +475,14 @@ public class WebServerClient implements IWebClient
             long roundtripTime = requestResponseArriveTime - requestSentTime;
             String msg = "Received a ping response from user " + name
                 + ", request roundtrip time is " + roundtripTime + " ms.";
-            LOGGER.info(msg);
+            if (roundtripTime > 1000)
+            {
+                LOGGER.warning(msg);
+            }
+            else
+            {
+                LOGGER.info(msg);
+            }
             cst.storeEntry(requestResponseArriveTime, roundtripTime);
         }
 
