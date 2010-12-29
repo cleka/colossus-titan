@@ -641,7 +641,9 @@ public class WebServer implements IWebServer, IRunWebServer
 
         updateGUI();
         allTellGameInfo(gi);
-
+        systemMessageToAll("Game " + gi.getGameId() + " (" + scheduleType
+            + ") was proposed by " + initiator + ": " + gi.getVariant() + ", "
+            + gi.getViewmode());
         return gi;
     }
 
@@ -1076,6 +1078,25 @@ public class WebServer implements IWebServer, IRunWebServer
             else
             {
                 webClient.systemMessage(when, message);
+            }
+        }
+    }
+
+    public void systemMessageToAll(String message)
+    {
+        long when = new Date().getTime();
+        Collection<User> users = User.getLoggedInUsers();
+        for (User u : users)
+        {
+            IWebClient client = u.getWebserverClient();
+            if (client == null)
+            {
+                LOGGER.warning("Skip sending systemMessage to player "
+                    + u.getName() + " (webclient null): " + message);
+            }
+            else
+            {
+                client.systemMessage(when, message);
             }
         }
     }
