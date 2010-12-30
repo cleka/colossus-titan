@@ -1606,7 +1606,7 @@ public class RationalAI extends SimpleAI
                     }
                     else
                     {
-                        // ack! we'll fuck up our titan group
+                        // ack! we'll mess up our titan group
                         // use metric below so that if we have no choice
                         // but to attack we pick the least losing battle
                         value = result.getAttackerDead() * -100;
@@ -1616,7 +1616,7 @@ public class RationalAI extends SimpleAI
                 // (1/4) will usually be about 3 pieces since titan
                 // will be large part of value
                 {
-                    // ack! we'll fuck up our titan group
+                    // ack! we'll mess up our titan group
                     // use metric below so that if we have no choice but to
                     // attack we pick the least losing battle
                     value = -100 + result.getAttackerDead() * -100;

@@ -561,7 +561,7 @@ public class SimpleAI extends AbstractAI
     // good for one reason or another, I may split them.  I never
     // like to split them when I am in tower 3 or 6, for obvious
     // reasons. In two player games, I normally split the gargoyles,
-    // but two player games are fucked up.
+    // but two player games are messed up.
     //
 
     /** Return a list of exactly four creatures (including one lord) to
@@ -1128,7 +1128,7 @@ public class SimpleAI extends AbstractAI
                         }
                         else
                         {
-                            // ack! we'll fuck up our titan group
+                            // ack! we'll mess up our titan group
                             value.add(LOSE_LEGION + 10,
                                 "<Profanity> Our Titan Group");
                         }
