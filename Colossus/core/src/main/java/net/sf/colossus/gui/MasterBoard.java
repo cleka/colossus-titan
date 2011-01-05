@@ -2676,6 +2676,11 @@ public final class MasterBoard extends JPanel
                 || (phase == Phase.SPLIT && (gui.getNextSplitClickMode() == Options.nextSplitNumLeftClick)))
             {
                 actOnLegion(newCurLegion, nextLegion.getCurrentHex());
+                GUIMasterHex hex = getGUIHexByMasterHex(nextLegion
+                    .getCurrentHex());
+                hex.select();
+                hex.setSelectColor(Color.black);
+                hex.repaint();
             }
             else if (phase == Phase.SPLIT
                 && (gui.getNextSplitClickMode() == Options.nextSplitNumRightClick))
