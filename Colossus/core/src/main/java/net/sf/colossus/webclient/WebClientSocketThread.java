@@ -62,6 +62,8 @@ public class WebClientSocketThread extends Thread implements IWebServer
     private AckWaiter ackWaiter;
     private WcstException failedException = null;
 
+    private static int counter = 0;
+
     // TODO also defined in webserver.WebServerConstants!
     private final Charset charset = Charset.forName("UTF-8");
 
@@ -69,7 +71,8 @@ public class WebClientSocketThread extends Thread implements IWebServer
         String username, String password, boolean force, String email,
         String confCode, HashMap<String, GameInfo> gameHash)
     {
-        super("WebClientSocketThread for user " + username);
+        super("WebClientSocketThread for user " + username + "-" + counter);
+        counter++;
         this.webClient = wcGUI;
         this.gameHash = gameHash;
         this.hostname = hostname;
@@ -341,6 +344,9 @@ public class WebClientSocketThread extends Thread implements IWebServer
         }
     }
 
+    // Needed even if instantiation failed, otherwise the GC
+    // won't clean up this thread if it was not run
+    // TODO perhaps that is not needed any more in Java 1.5 ?
     public boolean stillNeedsRun()
     {
         return stillNeedsRun;
@@ -349,16 +355,35 @@ public class WebClientSocketThread extends Thread implements IWebServer
     @Override
     public void run()
     {
+        String threadName = Thread.currentThread().getName();
         stillNeedsRun = false;
         if (this.socket == null)
         {
             // All right. We were just called to get the run()
-            // done, even if the constructor threw exception.
-            // Otherwise the GC won't clean up this thread.
+            // done, even if the constructor threw exception,
+            // for example could not connect.
+            // Socket would be null if server closes us quickly
+            // enough. It seems it can happen that that is not the,
+            // case, so make sure we bail out even if server does not
+            // kick us out quickly enough...
+            LOGGER.info(threadName + ": socket null, cleanup+return");
             cleanup();
             return;
         }
 
+        if (this.failedException != null)
+        {
+            // All right. We were just called to get the run()
+            // done, even if the constructor threw exception.
+            // It seems it can happen that socket == null is not always
+            // the case, so make sure we bail out even if server does not
+            // kick us out quickly enough...
+            LOGGER.info(threadName + ": failedException set, cleanup+return");
+            cleanup();
+            return;
+        }
+
+        LOGGER.info(threadName + ": everything normal, going to run loop!");
         String fromServer = null;
         boolean done = false;
         boolean forcedLogout = false;
