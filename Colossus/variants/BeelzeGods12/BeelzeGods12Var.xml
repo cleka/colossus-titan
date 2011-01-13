@@ -6,6 +6,7 @@
     <terrain_recruits filename="BeelzeGods12Ter.xml" />
     <hint classname="BeelzeGods12.BeelzeGods12Hint" />
     <depends>
+        <depend variant="Default" />
         <depend variant="Beelzebub" />
         <depend variant="Beelzebub12" />
         <depend variant="Pantheon" />

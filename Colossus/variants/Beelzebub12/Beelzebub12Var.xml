@@ -6,6 +6,7 @@
     <terrain_recruits filename="BeelzebubTer.xml" />
     <hint classname="Beelzebub12.Beelzebub12Hint" />
     <depends>
+        <depend variant="Default" />
         <depend variant="Beelzebub" />
 	    <!-- for battlelands Ruins.xml -->
 	    <depend variant="Undead" />
