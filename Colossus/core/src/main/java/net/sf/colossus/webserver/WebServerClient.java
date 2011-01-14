@@ -42,20 +42,32 @@ public class WebServerClient implements IWebClient
 
     private final static String sep = IWebServer.WebProtocolSeparator;
 
+    /** The client socket thread that handled the low-level connection stuff */
     private final WebServerClientSocketThread cst;
 
+    /** The web server object that is managing all WebServerClients */
     private WebServer server;
 
+    /** Whether or not this WebServerClient is at the moment logged in */
     private boolean loggedIn = false;
 
+    /** Client side version */
     private int clientVersion;
 
+    /** The user associated with this WebClient connection */
     private User user = null;
 
+    /**
+     * During registration request and sending of confirmation code,
+     * we do not have a user yet. The parseLine sets then this variable
+     * according to the username argument which was send from client.
+     */
     private String unverifiedUsername = null;
 
+    /** Time when last gameStartsNowSent was sent (in ms since epoch) */
     private long gameStartsNowSent = -1;
 
+    /** Time when last gameStartsSoonSent was sent (in ms since epoch) */
     private long gameStartsSoonSent = -1;
 
 
@@ -240,6 +252,13 @@ public class WebServerClient implements IWebClient
                     cst.setName("WSCST " + username);
                     LOGGER.info("User successfully logged in: "
                         + cst.getClientInfo());
+                }
+                else
+                {
+                    LOGGER.info("Login for " + unverifiedUsername
+                        + " not accepted, setting done to true.");
+                    ok = false;
+                    done = true;
                 }
             }
             else
@@ -590,6 +609,10 @@ public class WebServerClient implements IWebClient
         {
             LOGGER.log(Level.FINE, "NACK: " + command + sep + reason);
             sendToClient("NACK: " + command + sep + reason);
+            if (command.equals(IWebServer.Login))
+            {
+                cst.flushMessages();
+            }
         }
 
         // TODO: why is this done after the if-elseif, and not inside the

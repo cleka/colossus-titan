@@ -2,12 +2,9 @@ package net.sf.colossus.webserver;
 
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.InterruptedIOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.Date;
@@ -26,7 +23,7 @@ import net.sf.colossus.webcommon.IWebClient;
  */
 public class WebServerClientSocketThread extends Thread
 {
-    private static final Logger LOGGER = Logger
+    static final Logger LOGGER = Logger
         .getLogger(WebServerClientSocketThread.class.getName());
 
     private static final long PING_REQUEST_INTERVAL_SECONDS = 60;
@@ -35,6 +32,7 @@ public class WebServerClientSocketThread extends Thread
     private static final int IDLE_WARNING_INTERVAL_MINUTES = 10;
     private static final int IDLE_WARNING_MAXCOUNT = 12;
 
+    // if that is exceeded, a warning if written (afterwards) to the log
     private final long MAX_WRITE_BLOCKTIME_MS = 1000;
 
 
@@ -43,7 +41,7 @@ public class WebServerClientSocketThread extends Thread
     private final RoundtripTimeBookkeeper rttBookKeeper;
 
     private Socket socket;
-    private PrintWriter out;
+    private QueuedSocketWriter writer;
 
     private long lastPacketReceived = 0;
     private int pingsTried = 0;
@@ -60,10 +58,6 @@ public class WebServerClientSocketThread extends Thread
 
     private boolean lastWasLogin = false;
 
-    /* During registration request and sending of confirmation code,
-     * we do not have a user yet. The parseLine sets then this variable
-     * according to the username argument which was send from client.
-     */
 
     public WebServerClientSocketThread(WebServerClient theClient, Socket socket)
     {
@@ -116,7 +110,8 @@ public class WebServerClientSocketThread extends Thread
         {
             try
             {
-                out.println(IWebClient.connectionClosed);
+                writer.sendMessage(IWebClient.connectionClosed);
+                writer.stopWriter();
                 socket.close();
             }
             catch (IOException e)
@@ -155,8 +150,8 @@ public class WebServerClientSocketThread extends Thread
         {
             in = new BufferedReader(new InputStreamReader(socket
                 .getInputStream()));
-            out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
-                socket.getOutputStream())), true);
+            writer = new QueuedSocketWriter(socket);
+            writer.start();
         }
         catch (IOException ex)
         {
@@ -306,7 +301,7 @@ public class WebServerClientSocketThread extends Thread
     public void sendToClient(String s)
     {
         long writeStartedAt = new Date().getTime();
-        out.println(s);
+        writer.sendMessage(s);
         long elapsedTime = new Date().getTime() - writeStartedAt;
         if (elapsedTime > MAX_WRITE_BLOCKTIME_MS)
         {
@@ -318,6 +313,14 @@ public class WebServerClientSocketThread extends Thread
                 + " in sendToClient for user " + theClient.getUsername()
                 + " took " + elapsedTime + " milliseconds! (" + msg + ")");
         }
+    }
+
+    /**
+     * Waits until writer has written all messages
+     */
+    public void flushMessages()
+    {
+        writer.flushMessages();
     }
 
     /**
@@ -509,5 +512,4 @@ public class WebServerClientSocketThread extends Thread
                 + ", idleWarnings now " + idleWarningsSent);
         }
     }
-
 }
