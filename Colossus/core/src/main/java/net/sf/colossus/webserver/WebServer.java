@@ -750,6 +750,7 @@ public class WebServer implements IWebServer, IRunWebServer
                     + u.getName());
                 client.gameInfo(gi);
                 client.gameStartsSoon(gameId, byUserName);
+                ((WebServerClient)client).requestPingNow();
             }
             else
             {
@@ -776,6 +777,7 @@ public class WebServer implements IWebServer, IRunWebServer
             {
                 client.gameInfo(gi);
                 client.gameStartsNow(gameId, port, host);
+                ((WebServerClient)client).requestPingNow();
             }
             else
             {

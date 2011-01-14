@@ -125,6 +125,11 @@ public class WebServerClient implements IWebClient
         cst.requestPingIfNeeded(now);
     }
 
+    public void requestPingNow()
+    {
+        cst.requestPingNow();
+    }
+
     public void setLoggedIn(boolean val)
     {
         this.loggedIn = val;
@@ -470,10 +475,12 @@ public class WebServerClient implements IWebClient
         else if (command.equals(IWebServer.PingResponse))
         {
             long requestSentTime = Long.parseLong(tokens[1]);
+            int counter = Integer.parseInt(tokens[2]);
             String name = getUsername();
             long requestResponseArriveTime = new Date().getTime();
             long roundtripTime = requestResponseArriveTime - requestSentTime;
-            String msg = "Received a ping response from user " + name
+            String msg = "Received ping response #" + counter + " from user "
+                + name
                 + ", request roundtrip time is " + roundtripTime + " ms.";
             if (roundtripTime > 1000)
             {
@@ -619,7 +626,7 @@ public class WebServerClient implements IWebClient
             // thread is now back available to read input from client
             cst.setLastWasLogin();
             // Request a Ping, so we see when client was earliest able to respond
-            cst.requestPingNow();
+            requestPingNow();
         }
 
         server.saveGamesIfNeeded();
@@ -731,7 +738,8 @@ public class WebServerClient implements IWebClient
         gameStartsSoonSent = new Date().getTime();
         sendToClient(gameStartsSoon + sep + gameId + sep + byUser);
         long spentTime = new Date().getTime() - gameStartsSoonSent;
-        LOGGER.info("Sending gameStartsSoon took " + spentTime
+        LOGGER.info("Sending gameStartsSoon to " + getUsername() + " took "
+            + spentTime
             + " milliseconds.");
     }
 
@@ -741,7 +749,8 @@ public class WebServerClient implements IWebClient
         sendToClient(gameStartsNow + sep + gameId + sep + port + sep
             + hostingHost);
         long spentTime = new Date().getTime() - gameStartsNowSent;
-        LOGGER.info("Sending gameStartsNow took " + spentTime
+        LOGGER.info("Sending gameStartsNow to " + getUsername() + " took "
+            + spentTime
             + " milliseconds.");
     }
 

@@ -47,6 +47,7 @@ public class WebServerClientSocketThread extends Thread
 
     private long lastPacketReceived = 0;
     private int pingsTried = 0;
+    private int pingCounter = 0;
     private int idleWarningsSent = 0;
     private boolean connLostWarningLogged = false;
 
@@ -401,7 +402,12 @@ public class WebServerClientSocketThread extends Thread
     public void requestPingNow()
     {
         long requestSentTime = new Date().getTime();
-        theClient.requestPing(requestSentTime + "", "dummy2", "dummy3");
+        theClient.requestPing(requestSentTime + "", (++pingCounter) + "",
+            "dummy3");
+        long spentTime = new Date().getTime() - requestSentTime;
+        LOGGER.info("Sending ping request #" + pingCounter + " to user "
+            + theClient.getUsername() + " took " + spentTime
+            + " milliseconds.");
     }
 
     private void markForcedLogout()
