@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- $Id: $ -->
+<html>
+<head>
+    <meta name="generator"
+    content="HTML Tidy for Linux/x86 (vers 1st July 2002), see www.w3.org" />
+    <title>Colossus: Release Note for 0.12.0</title>
+</head>
+
+<body>
+
+
+<h1>Release Note for Colossus 0.12.0 (-beta1)</h1>
+<p/>
+A new variant, some new features, and the usual amount of fixes and
+changes which hopefully improve network stability.
+<ul>
+<li>A new variant "DinoTitan" added. The creator is looking forward to get
+    feedback about it!</li>
+<li>Added an option to disable Warlock recruiting on the first turn.</li>
+<li>Fixed: 3033654 Battleboard Window (does not remember location nor size).</li>
+<li>Fixed: 2884952 GetPlayers: disabled player names</li>
+<li>Some improvements in confirmation code per comments from developer's 
+    group, addition of a visited flag to legions so that move confirmation
+    is more selective and usable, addition of a next key ('n') for the move, 
+    muster and split phases to move to the next legion that requires action.</li>
+<li>When using the N key to move to the next legion to act on, 
+    highlight the hex of that legion as well as placing the mouse over it.</li>
+<li>Fix for BattleTerrain/Hazards display feature. Fix existing specials 
+    (e.g. Drift) and add new ones for DinoTitan</li>    
+<li>When a game is proposed, send a systemMessage announcing it.</li>
+<li>Better error handling for game starting: 
+    Added a generic "system message" method. Informs now for example about
+    which player did connect ok to starting game, and if failed, report the
+    summary which players connected successfully and which not.</li>
+<li>Synchronize (with value false) the global options that are not defined 
+    (e.g. teleport settings) from server to client to override possibly 
+    existing settings in client side config files.</li>
+<li>Added a RoundtripTimeBookKeeper for Webserver => WebClientC => WebServer 
+    pingRequests/Responses.</li>
+<li>WebServer Client handler has now own writer thread which is fed via 
+    a concurrent queue. Thus delays in writing to one client should not cause
+    other clients to hang any more.</li>
+</ul>
+<p />
+</body>
+</html>
