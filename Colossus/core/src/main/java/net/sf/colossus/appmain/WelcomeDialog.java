@@ -28,10 +28,11 @@ public final class WelcomeDialog extends KFrame
 {
     private final static String title = "Welcome to this new Colossus Release!";
 
-    private final static String CURRENT_WELCOME_KEY = "0.11.0";
+    private final static String CURRENT_WELCOME_KEY = "0.12.0";
 
-    private final static String colossusRecentChangesDetailsUrl = ""
-        + "http://colossus.sourceforge.net/docs/RecentChangesDetails.html#FeatureExplanations";
+    private final static String baseUrl = "http://sourceforge.net/projects/colossus/files";
+    private final static String colossusReleaseNoteUrl = baseUrl
+        + "/Release-0.12.0-beta1/Release-Note-0.12.0-beta1.html/download";
 
     private static WelcomeDialog showWelcome = null;
 
@@ -41,20 +42,17 @@ public final class WelcomeDialog extends KFrame
         super(title);
 
         String text = "\n"
-            + "  Welcome to this new Colossus release 0.11.0!"
+            + "  Welcome to this new Colossus release 0.12.0-beta1!"
             + "\n\n"
             + "  New features:\n"
-            + "  - Player-colored angels and captured markers\n"
-            + "  - Optional confirmations if legions were not split/moved/"
-            + "recruited\n"
-            + "  - Possibility to mark a legion as skip (\"I will not "
-            + "split/move/recruit it this turn\")\n"
-            + "  - A mode/option called \"Need Lord for Battle Control\"\n\n"
+            + "  - New variant Dino-Titan added\n"
+            + "  - New option to disable Warlock recruiting on the first turn\n"
+            + "  - A next key ('n') in the move, muster and split phases to move to the next legion that requires action\n"
+            + "\n"
             + "  Plus the usual amount of fixes / stability improvements."
             + "\n\n"
-            + "  The new features are explained in the RecentChangesDetails "
-            + "document:\n      "
-            + colossusRecentChangesDetailsUrl
+            + "  For a more detailed list of changes see the ReleaseNote document:\n      "
+            + colossusReleaseNoteUrl
             + "\n\n"
             + "  Use button below to copy the URL to your clipboard to paste it "
             + "into your browser.\n\n"
@@ -75,7 +73,7 @@ public final class WelcomeDialog extends KFrame
         {
             public void actionPerformed(ActionEvent e)
             {
-                ErrorUtils.copyToClipboard(colossusRecentChangesDetailsUrl);
+                ErrorUtils.copyToClipboard(colossusReleaseNoteUrl);
 
                 JOptionPane.showMessageDialog(WelcomeDialog.this,
                     "URL has been copied to your clipboard.", "URL copied!",
