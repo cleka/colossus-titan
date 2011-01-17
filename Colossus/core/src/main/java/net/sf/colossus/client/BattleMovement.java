@@ -139,7 +139,7 @@ final class BattleMovement
             {
                 CreatureType type = critter.getType();
                 BattleHex hex = critter.getCurrentHex();
-                set = findMoves(hex, type, type.isFlier(), type.getSkill(),
+                set = findMoves(hex, type, type.isFlier(), type.getSkill() - critter.getSlowed(),
                     -1, true);
             }
         }
