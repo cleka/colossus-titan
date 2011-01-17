@@ -396,7 +396,8 @@ public class BattleTerrainHazardWindow extends KDialog
             .equals(HazardConstants.SpecialEffect.HEALTHDRAIN))
         {
             special = Chit.newSymbolChit(EFFECT_SIZE, "HealthDrain");
-            special.setToolTipText("Non natives lose 1 health per turn");
+            special
+                .setToolTipText("Non natives suffer 1 damage per strike phase");
         }
         if (hazard.terrainSpecial
             .equals(HazardConstants.SpecialEffect.HEALTHDRAIN_WATERDWELLER))
@@ -409,7 +410,7 @@ public class BattleTerrainHazardWindow extends KDialog
         {
             special = new Chit(EFFECT_SIZE, "HealthGain");
             special
-                .setToolTipText("Creatures gain 1 health per turn. Cures slow and poison");
+                .setToolTipText("Heals 1 damage per strike phase. Cures slow and poison");
         }
         if (hazard.terrainSpecial
             .equals(HazardConstants.SpecialEffect.PERMSLOW))
