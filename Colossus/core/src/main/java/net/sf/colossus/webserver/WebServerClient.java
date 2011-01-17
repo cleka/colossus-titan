@@ -609,7 +609,8 @@ public class WebServerClient implements IWebClient
         {
             LOGGER.log(Level.FINE, "NACK: " + command + sep + reason);
             sendToClient("NACK: " + command + sep + reason);
-            if (command.equals(IWebServer.Login))
+            if (command.equals(IWebServer.Login)
+                || command.equals(IWebServer.RegisterUser))
             {
                 cst.flushMessages();
             }
