@@ -313,6 +313,8 @@ public class WebServerClient implements IWebClient
                 String email = tokens[3];
 
                 reason = server.registerUser(username, password, email);
+                // TODO in practice this can never be true.
+                // in best/standard case it will be PROV_CONFCODE
                 if (reason == null)
                 {
                     ok = true;
@@ -609,11 +611,15 @@ public class WebServerClient implements IWebClient
         {
             LOGGER.log(Level.FINE, "NACK: " + command + sep + reason);
             sendToClient("NACK: " + command + sep + reason);
-            if (command.equals(IWebServer.Login)
-                || command.equals(IWebServer.RegisterUser))
-            {
-                cst.flushMessages();
-            }
+        }
+
+        // after them connection will be closed. Make sure everything
+        // from output queue is written first.
+        if (!ok && command.equals(IWebServer.Login)
+            || command.equals(IWebServer.RegisterUser)
+            || command.equals(IWebServer.ConfirmRegistration))
+        {
+            cst.flushMessages();
         }
 
         // TODO: why is this done after the if-elseif, and not inside the
