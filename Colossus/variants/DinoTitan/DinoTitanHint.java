@@ -19,7 +19,7 @@ public class DinoTitanHint extends AbstractHintProvider
 {
     private final CreatureType allosaur;
     private final CreatureType ankylosaur;
-    private final CreatureType archatopteryx;
+    private final CreatureType archaopteryx;
     private final CreatureType ceratopsian;
     private final CreatureType ceratosaurus;
     private final CreatureType crocodile;
@@ -39,6 +39,7 @@ public class DinoTitanHint extends AbstractHintProvider
     private final CreatureType serpent;
     private final CreatureType silverdragon;
     private final CreatureType snake;
+    private final CreatureType spinosaur;
     private final CreatureType spittingcobra;
     private final CreatureType stegosaur;
     private final CreatureType titan;
@@ -54,7 +55,7 @@ public class DinoTitanHint extends AbstractHintProvider
         super(variant);
         this.allosaur = getCreatureType("Allosaur");
         this.ankylosaur = getCreatureType("Ankylosaur");
-        this.archatopteryx = getCreatureType("Archatopteryx");
+        this.archaopteryx = getCreatureType("Archaopteryx");
         this.ceratopsian = getCreatureType("Ceratopsian");
         this.ceratosaurus = getCreatureType("Ceratosaurus");
         this.crocodile = getCreatureType("Crocodile");
@@ -74,6 +75,7 @@ public class DinoTitanHint extends AbstractHintProvider
         this.serpent = getCreatureType("Serpent");
         this.silverdragon = getCreatureType("SilverDragon");
         this.snake = getCreatureType("Snake");
+        this.spinosaur = getCreatureType("Spinosaur");
         this.spittingcobra = getCreatureType("SpittingCobra");
         this.stegosaur = getCreatureType("Stegosaur");
         this.titan = getCreatureType("Titan");
@@ -93,7 +95,7 @@ public class DinoTitanHint extends AbstractHintProvider
         List<AIStyle> aiStyles)
     {
         String terrainId = terrain.getId();
-        if (terrainId.equals("Woods"))
+        if (terrainId.equals("Mountains"))
         {
             // If less than two ceratosaurus, get one
             if (recruits.contains(ceratosaurus)
