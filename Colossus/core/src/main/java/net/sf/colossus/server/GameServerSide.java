@@ -2430,8 +2430,9 @@ public final class GameServerSide extends Game
         {
             if (getEngagement() != null)
             {
-                LOGGER.warning("illegal call to Game.engage(): engagement "
-                    + "ongoing: " + getEngagement().toString());
+                LOGGER.warning("illegal call to Game.engage() for "
+                    + hex.getDescription() + ": engagement " + "ongoing: "
+                    + getEngagement().toString());
             }
             else
             {

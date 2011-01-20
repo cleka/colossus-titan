@@ -30,7 +30,7 @@ public class Engagement
         this.location = hex;
         this.attacker = attacker;
         this.defender = defender;
-        LOGGER.info("A new engagement: hex " + location + " attacker "
+        LOGGER.info("A new engagement: " + location + " attacker "
             + attacker + " defender " + defender);
     }
 
@@ -57,7 +57,7 @@ public class Engagement
     @Override
     public String toString()
     {
-        return "A new engagement: hex " + location + " attacker " + attacker
+        return location + " attacker " + attacker
             + " defender " + defender;
     }
 

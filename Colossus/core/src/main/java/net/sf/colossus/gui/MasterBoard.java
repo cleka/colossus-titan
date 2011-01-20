@@ -118,6 +118,27 @@ public final class MasterBoard extends JPanel
     private Point lastPoint;
 
     /**
+     * engage() has been sent to server but answer (tellEngagement()) not
+     * received yet; mostly we have this, to be able to react properly when
+     * user clicks on an engagement while there is still the server response
+     * missing for the last one
+     */
+    private MasterHex engagingPendingHex = null;
+
+    /**
+     * In that time while we got tellEngagement but nothing else
+     * (bottom bar just tells engaged, but no other visible notice of what's
+     * going on), we might be waiting for the opponent to think about
+     * whether to flee or not. So if user is impatient and clicks a hex
+     * with any (same, or other) engagement, inform him we are already engaged
+     * right now and probably opponent is currently thinking about whether to
+     * flee or not. Once we receive showConcede or showNegotiate messages,
+     * this time window is over, after that we don't say this about the
+     * "perhaps opponent is currently thinking whether to flee" any more.
+     */
+    private boolean defenderFleePhase = false;
+
+    /**
      * Show the message that "saving during engagement/battle will store the
      * last commit point" only once each game - flag that it has been shown
      */
@@ -2199,7 +2220,7 @@ public final class MasterBoard extends JPanel
         }
         else if (phase == Phase.FIGHT)
         {
-            client.doFight(hex);
+            attemptEngage(hex);
         }
         else if (phase == Phase.MUSTER)
         {
@@ -2230,13 +2251,80 @@ public final class MasterBoard extends JPanel
         }
         else if (phase == Phase.FIGHT)
         {
-            // If we're fighting and there is an engagement here, resolve it.
+            attemptEngage(hex);
+        }
+    }
 
-            if (gui.getGame().containsOpposingLegions(hex)
-                && !gui.getGame().isEngagementOngoing())
+    /**
+     * tellEngagement calls this, now "engaging" is not pending, instead
+     * there is a real engagement to be resolved.
+     */
+    public void clearEngagingPending()
+    {
+        engagingPendingHex = null;
+        // so, right now defender might be asked whether he wants to flee
+        defenderFleePhase = true;
+        gui.defaultCursor();
+    }
+
+    /**
+     * We got showConcede or showNegotiate messages, i.e. the phase in which
+     * defender might flee is over, thus the message dialog should not tell
+     * that any more. This client here should now have some dialog or even
+     * the actual battle map anyway.
+     */
+    public void clearDefenderFlee()
+    {
+        defenderFleePhase = false;
+    }
+
+    private void attemptEngage(MasterHex hex)
+    {
+        // If we're in FIGHT phase and there are two opposing legions here,
+        // initiate the engaging; if already engaging or engaged, inform
+        // about that.
+        if (gui.getGame().containsOpposingLegions(hex))
+        {
+            if (gui.getGame().isEngagementOngoing())
             {
+                if (defenderFleePhase)
+                {
+                    JOptionPane.showMessageDialog(masterFrame,
+                        "Already engaged on " + gui.getGame().getEngagement()
+                            + ";\nprobably other player is "
+                            + "asked right now whether to flee.",
+                        "Already engaged!", JOptionPane.INFORMATION_MESSAGE);
+                    gui.getBoard().getToolkit().beep();
+                }
+                else
+                {
+                    // player should now have the concede or negotiate dialog
+                    // or even actual battle, don't show any message any more.
+                }
+            }
+
+            else if (engagingPendingHex != null)
+            {
+                // server.engage() already sent but tellEngagement() not
+                // received yet
+                JOptionPane.showMessageDialog(masterFrame,
+                    "Engagement initiated already on hex "
+                        + engagingPendingHex + ";\n"
+                        + "still waiting for server reply.",
+                    "Already engaging!", JOptionPane.INFORMATION_MESSAGE);
+                gui.getBoard().getToolkit().beep();
+            }
+            else
+            {
+                // nothing yet, ok: engage
+                gui.waitCursor();
+                engagingPendingHex = hex;
                 client.engage(hex);
             }
+        }
+        else
+        {
+            // ignore all other clicks
         }
     }
 

@@ -1734,6 +1734,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void showNegotiate(Legion attacker, Legion defender)
     {
+        board.clearDefenderFlee();
         negotiate = new Negotiate(this, attacker, defender);
     }
 
@@ -1749,6 +1750,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void showConcede(Client client, Legion ally, Legion enemy)
     {
+        board.clearDefenderFlee();
         Concede.concede(this, board.getFrame(), ally, enemy);
         myTurnNotificationActions(ally);
     }
@@ -1807,6 +1809,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         eventViewer.tellEngagement(attacker, defender, turnNumber);
 
         board.updateEngagementsLeftText();
+        board.clearEngagingPending();
     }
 
     void highlightBattleSite(MasterHex battleSite)
