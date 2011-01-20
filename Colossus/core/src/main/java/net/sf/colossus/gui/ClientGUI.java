@@ -1838,6 +1838,10 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         // it would cause trouble.
         cleanupNegotiationDialogs();
 
+        // just in case, make sure this get cleared. Might still be set
+        // if opponent decided to flee.
+        board.clearDefenderFlee();
+
         eventViewer.tellEngagementResults(winner, method, turns);
 
         engagementResults
