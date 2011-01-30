@@ -2540,6 +2540,7 @@ public final class Client implements IClient, IOracle, IVariant,
             }
         }
 
+        gui.setMovePending(mover, mover.getCurrentHex(), hex);
         server.doMove(mover, hex, entrySide, teleport, teleportingLord);
         return true;
     }
@@ -2899,13 +2900,15 @@ public final class Client implements IClient, IOracle, IVariant,
         }
     }
 
-    public Set<MasterHex> findUnmovedLegionHexes(boolean considerSkippedAsMoved)
+    public Set<MasterHex> findUnmovedLegionHexes(
+        boolean considerSkippedAsMoved, HashSet<Legion> pendingLegions)
     {
         Set<MasterHex> result = new HashSet<MasterHex>();
         for (Legion legion : game.getActivePlayer().getLegions())
         {
             if (!legion.hasMoved()
-                && !(considerSkippedAsMoved && legion.getSkipThisTime()))
+                && !(considerSkippedAsMoved && legion.getSkipThisTime())
+                && !pendingLegions.contains(legion))
             {
                 result.add(legion.getCurrentHex());
             }

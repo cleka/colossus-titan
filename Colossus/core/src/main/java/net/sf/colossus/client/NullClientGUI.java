@@ -810,4 +810,17 @@ public class NullClientGUI implements IClientGUI
 
     }
 
+    public void setMovePending(Legion mover, MasterHex currentHex,
+        MasterHex targetHex)
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void setMoveCompleted(Legion mover, MasterHex current,
+        MasterHex target)
+    {
+        // TODO Auto-generated method stub
+
+    }
 }

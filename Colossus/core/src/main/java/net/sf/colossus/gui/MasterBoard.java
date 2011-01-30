@@ -1607,7 +1607,7 @@ public final class MasterBoard extends JPanel
             takeMulliganAction.setEnabled(mullLeft ? true : false);
             disableDoneAction("At least one legion must move");
 
-            bottomBar.setPhase("Movement");
+            setMovementPhase();
             highlightUnmovedLegions();
             updateLegionsLeftToMoveText(false);
             maybeRequestFocusAndToFront();
@@ -1616,6 +1616,11 @@ public final class MasterBoard extends JPanel
         {
             setupAsInactivePlayer("moves");
         }
+    }
+
+    public void setMovementPhase()
+    {
+        bottomBar.setPhase("Movement");
     }
 
     // Needs to be updated afterwards, because during setupPhase
@@ -1821,8 +1826,14 @@ public final class MasterBoard extends JPanel
     void highlightUnmovedLegions()
     {
         unselectAllHexes();
-        selectHexes(client.findUnmovedLegionHexes(true));
+        selectHexes(gui.getStillToMoveHexes());
+        selectHexes(gui.getPendingMoveHexes(), Color.blue);
         repaint();
+    }
+
+    void setPendingText(String text)
+    {
+        bottomBar.setPendingText(text);
     }
 
     /** Select hexes where this legion can move. */
@@ -2952,6 +2963,11 @@ public final class MasterBoard extends JPanel
         public void setPhase(String s)
         {
             phaseLabel.setText(s);
+        }
+
+        public void setPendingText(String text)
+        {
+            phaseLabel.setText(text);
         }
 
         public void setReasonForDisabledDone(String reason)

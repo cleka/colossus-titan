@@ -329,4 +329,11 @@ public interface IClientGUI
     public void setPreferencesCheckBoxValue(String name, boolean value);
 
     public void setPreferencesRadioButtonValue(String name, boolean value);
+
+    // GUI keeps track for which doMove()'s server has not ackknowledged yet
+    public void setMovePending(Legion mover, MasterHex currentHex,
+        MasterHex targetHex);
+
+    public void setMoveCompleted(Legion mover, MasterHex current,
+        MasterHex target);
 }

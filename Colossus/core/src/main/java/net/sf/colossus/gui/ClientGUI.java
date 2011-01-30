@@ -1279,6 +1279,11 @@ public class ClientGUI implements IClientGUI, GUICallbacks
                 legion, teleportingLord, null);
         }
 
+        if (client.isMyLegion(legion))
+        {
+            setMoveCompleted(legion, startingHex, currentHex);
+            updatePendingText();
+        }
         board.clearPossibleRecruitChits();
         board.alignLegions(startingHex);
         board.alignLegions(currentHex);
@@ -2953,6 +2958,106 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     public boolean doMove(MasterHex hex)
     {
         return client.doMove(mover, hex);
+    }
+
+    // GUI keeps track for which doMove()'s server has not ackknowledged yet,
+    // so that we can catch cases when user attempts to click/move them again
+    // (e.g. when server response is slow)
+
+    private class PendingMove
+    {
+        public Legion mover;
+        public MasterHex currentHex;
+        public MasterHex targetHex;
+
+        public PendingMove(Legion mover, MasterHex current, MasterHex target)
+        {
+            this.mover = mover;
+            this.currentHex = current;
+            this.targetHex = target;
+        }
+
+        public boolean matches(Legion mover, MasterHex current,
+            MasterHex target)
+        {
+            return this.mover == mover && this.currentHex.equals(current)
+                && this.targetHex.equals(target);
+        }
+
+        public Legion getLegion()
+        {
+            return mover;
+        }
+    }
+
+    LinkedList<PendingMove> pendingMoves = new LinkedList<PendingMove>();
+    Set<MasterHex> pendingMoveHexes = new HashSet<MasterHex>();
+
+    // doMove was sent to server, store it in list
+    public void setMovePending(Legion mover, MasterHex currentHex,
+        MasterHex targetHex)
+    {
+        // board.visualizeMoveTarget(mover, currentHex, targetHex);
+        PendingMove move = new PendingMove(mover, currentHex, targetHex);
+        pendingMoves.add(move);
+        pendingMoveHexes.add(targetHex);
+        updatePendingText();
+    }
+
+    private void updatePendingText()
+    {
+        int count = pendingMoves.size();
+
+        if (count > 0)
+        {
+            String morePendingText = " (" + count + " move pending)";
+            board.setPendingText(morePendingText);
+        }
+        else
+        {
+            board.setMovementPhase();
+        }
+    }
+
+    public Set<MasterHex> getPendingMoveHexes()
+    {
+        return pendingMoveHexes;
+    }
+
+    public Set<MasterHex> getStillToMoveHexes()
+    {
+        HashSet<Legion> pendingLegions = new HashSet<Legion>();
+        for (PendingMove move : pendingMoves)
+        {
+            pendingLegions.add(move.getLegion());
+        }
+        return client.findUnmovedLegionHexes(true, pendingLegions);
+    }
+
+    // Search and remove this pendingMove from list
+    public void setMoveCompleted(Legion mover, MasterHex current,
+        MasterHex target)
+    {
+        pendingMoveHexes.remove(target);
+        PendingMove foundMove = null;
+        for (PendingMove move : pendingMoves)
+        {
+            if (move.matches(mover, current, target))
+            {
+                foundMove = move;
+                continue;
+            }
+        }
+
+        if (foundMove != null)
+        {
+            pendingMoves.remove(foundMove);
+        }
+        else
+        {
+            LOGGER.warning("Could not find pending move for legion " + mover
+                + " from hex " + current + " to hex " + target);
+        }
     }
 
     public void removeBattleChit(BattleUnit battleUnit)
