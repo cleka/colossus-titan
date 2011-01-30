@@ -2619,6 +2619,12 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     void undoLastMove()
     {
+        if (pendingMoves.size() > 0)
+        {
+            displayNoUndoWhilePendingMovesInfo();
+            return;
+        }
+
         if (!isUndoStackEmpty())
         {
             String markerId = (String)popUndoStack();
@@ -2655,6 +2661,11 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void undoAllMoves()
     {
+        if (pendingMoves.size() > 0)
+        {
+            displayNoUndoWhilePendingMovesInfo();
+            return;
+        }
         board.clearRecruitedChits();
         board.clearPossibleRecruitChits();
         while (!isUndoStackEmpty())
@@ -2669,6 +2680,16 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         {
             undoLastRecruit();
         }
+    }
+
+    private void displayNoUndoWhilePendingMovesInfo()
+    {
+        JOptionPane.showMessageDialog(getMapOrBoardFrame(),
+            "For some moves is still the confirmation from server and "
+                + "screen update missing!\n"
+                + "Undo can't be done beofre all moves are completed "
+                + "(see message beside the Done button).", "Pending Moves!",
+            JOptionPane.INFORMATION_MESSAGE);
     }
 
     public void defaultCursor()
@@ -2957,6 +2978,17 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public boolean doMove(MasterHex hex)
     {
+        for (PendingMove pendingMove : pendingMoves)
+        {
+            if (mover.equals(pendingMove.getLegion()))
+            {
+                JOptionPane.showMessageDialog(getMapOrBoardFrame(),
+                    "Legion already moved, but screen update happens only "
+                        + "after confirmation from server was received.",
+                    "Already moved!", JOptionPane.INFORMATION_MESSAGE);
+                return false;
+            }
+        }
         return client.doMove(mover, hex);
     }
 
@@ -3010,7 +3042,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
         if (count > 0)
         {
-            String morePendingText = " (" + count + " move pending)";
+            String morePendingText = " (" + count + " move"
+                + (count != 1 ? "s" : "") + " pending)";
             board.setPendingText(morePendingText);
         }
         else
