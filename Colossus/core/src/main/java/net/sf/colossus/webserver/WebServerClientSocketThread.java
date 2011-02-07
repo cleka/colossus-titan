@@ -245,7 +245,13 @@ public class WebServerClientSocketThread extends Thread
                     caught = t;
                 }
 
+                long parsingCompletedAt = new Date().getTime();
+                long parsingDuration = parsingCompletedAt - lastPacketReceived;
+                LOGGER.log((parsingDuration > 1000 ? Level.WARNING
+                    : Level.INFO), "Parsing+Processing took "
+                    + parsingDuration + " ms for line " + fromClient);
                 String tmpUsername = "<unknown>";
+
                 if (theClient.getUser() != null)
                 {
                     tmpUsername = theClient.getUsername();
