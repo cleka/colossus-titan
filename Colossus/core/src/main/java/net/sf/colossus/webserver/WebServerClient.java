@@ -503,7 +503,7 @@ public class WebServerClient implements IWebClient
             String msg = "Received ping response #" + counter + " from user "
                 + name
                 + ", request roundtrip time is " + roundtripTime + " ms.";
-            if (roundtripTime > 1000)
+            if (roundtripTime > 3000)
             {
                 LOGGER.warning(msg);
             }
