@@ -303,7 +303,16 @@ public final class BattleServerSide extends Battle
                 }
                 phase = BattlePhase.FIGHT;
                 LOGGER.log(Level.INFO, "Battle phase advances to " + phase);
-                again = setupFight();
+                if (conceded)
+                {
+                    LOGGER
+                        .log(Level.INFO, "Conceded - setting again to true.");
+                    again = true;
+                }
+                else
+                {
+                    again = setupFight();
+                }
             }
 
             else if (phase == BattlePhase.FIGHT)
@@ -315,7 +324,16 @@ public final class BattleServerSide extends Battle
                 preStrikeEffectsApplied = false;
                 phase = BattlePhase.STRIKEBACK;
                 LOGGER.log(Level.INFO, "Battle phase advances to " + phase);
-                again = setupFight();
+                if (conceded)
+                {
+                    LOGGER
+                        .log(Level.INFO, "Conceded - setting again to true.");
+                    again = true;
+                }
+                else
+                {
+                    again = setupFight();
+                }
             }
 
             else if (phase == BattlePhase.STRIKEBACK)
@@ -325,6 +343,14 @@ public final class BattleServerSide extends Battle
                 advanceTurn();
             }
 
+            // Comment related to the 2 if conceded again=true else again=...
+            // blocks above:
+            // If conceded, ripple through all remaining phases automatically.
+            // See also the comment in "void concede(Player player)", which is
+            // related to the bug tracker items
+            // 3133960 and 3160873 ("Conceding battle leads to hung game").
+            // Doing "if (again || conceded)" would leave to strange side
+            // effects (I tried that ;-)
             if (again)
             {
                 advancePhase();
@@ -521,10 +547,19 @@ public final class BattleServerSide extends Battle
             creature.setDead(true);
         }
 
-        if (legion.getPlayer().equals(getBattleActivePlayer()))
-        {
-            advancePhase();
-        }
+        // To fix 3133960 and 3160873 ("Conceding battle leads to hung game"):
+        // Rather be not totally compliant to rules, instead of having
+        // games hung (if player concedes hopeless case, or bails out
+        // (e.g. connection lost), etc.)
+        // TODO Created Feature Request 3182336 to get this back to track, ...
+        // ... eventually.
+        //
+        // if (legion.getPlayer().equals(getBattleActivePlayer()))
+        // {
+        //    advancePhase();
+        // }
+        // To prevent the hang, do it also for not-phasing player:
+        advancePhase();
     }
 
     /** If any creatures were left off-board, kill them.  If they were newly
