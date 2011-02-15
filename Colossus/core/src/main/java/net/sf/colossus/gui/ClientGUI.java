@@ -111,6 +111,10 @@ public class ClientGUI implements IClientGUI, GUICallbacks
      */
     private final LinkedList<Object> undoStack = new LinkedList<Object>();
 
+    private final LinkedList<PendingMove> pendingMoves = new LinkedList<PendingMove>();
+    private final Set<MasterHex> pendingMoveHexes = new HashSet<MasterHex>();
+    private boolean recoveredFromMoveNak = false;
+
     private final List<GUIBattleChit> battleChits = new ArrayList<GUIBattleChit>();
 
     /** Information on the current moving legion. */
@@ -2308,6 +2312,9 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     public void actOnSetupMove()
     {
         clearUndoStack();
+        pendingMoves.clear();
+        pendingMoveHexes.clear();
+        recoveredFromMoveNak = false;
         board.setupMoveMenu();
         // Force showing the updated movement die.
         // taken repaint away because actOnTellMovementRoll does it anyway
@@ -2992,6 +2999,13 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         return client.doMove(mover, hex);
     }
 
+    public void actOnMoveNak()
+    {
+        pendingMoves.clear();
+        pendingMoveHexes.clear();
+        recoveredFromMoveNak = true;
+    }
+
     // GUI keeps track for which doMove()'s server has not ackknowledged yet,
     // so that we can catch cases when user attempts to click/move them again
     // (e.g. when server response is slow)
@@ -3021,9 +3035,6 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             return mover;
         }
     }
-
-    LinkedList<PendingMove> pendingMoves = new LinkedList<PendingMove>();
-    Set<MasterHex> pendingMoveHexes = new HashSet<MasterHex>();
 
     // doMove was sent to server, store it in list
     public void setMovePending(Legion mover, MasterHex currentHex,
@@ -3085,6 +3096,18 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         if (foundMove != null)
         {
             pendingMoves.remove(foundMove);
+        }
+        else if (isRedoOngoing())
+        {
+            // move was probably done before saving
+        }
+        else if (recoveredFromMoveNak)
+        {
+            // ok, recover from Nak wiped out wiped out pendingMoves list
+            // (because one move was sent to server but did not really happen,
+            // and it's hard to figure out which).
+            // This way we loose some "safety checking", but at least no
+            // legal moves are prevented.
         }
         else
         {

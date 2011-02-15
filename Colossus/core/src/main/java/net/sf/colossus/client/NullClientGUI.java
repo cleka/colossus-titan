@@ -64,6 +64,12 @@ public class NullClientGUI implements IClientGUI
 
     }
 
+    public void actOnMoveNak()
+    {
+        // TODO Auto-generated method stub
+
+    }
+
     public void actOnDidRecruit(Legion legion, CreatureType recruit,
         List<CreatureType> recruiters, String reason)
     {

@@ -117,6 +117,8 @@ public interface IClientGUI
         MasterHex currentHex, boolean teleport, CreatureType teleportingLord,
         boolean splitLegionHasForcedMove);
 
+    public void actOnMoveNak();
+
     public abstract void actOnUndidMove(Legion legion, MasterHex formerHex,
         MasterHex currentHex, boolean splitLegionHasForcedMove,
         boolean didTeleport);

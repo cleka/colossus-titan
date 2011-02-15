@@ -1607,6 +1607,7 @@ public final class Client implements IClient, IOracle, IVariant,
         }
         else if (reason.equals(Constants.doMove))
         {
+            gui.actOnMoveNak();
             showMessageDialog(errmsg);
             kickMoves();
         }
@@ -2512,12 +2513,20 @@ public final class Client implements IClient, IOracle, IVariant,
         else
         {
             entrySide = gui.doPickEntrySide(hex, entrySides);
+            if (entrySide == null)
+            {
+                return false;
+            }
         }
 
         CreatureType teleportingLord = null;
         if (teleport)
         {
             teleportingLord = figureTeleportingLord(mover, hex);
+            if (teleportingLord == null)
+            {
+                return false;
+            }
         }
 
         // if this hex is already occupied, return false
