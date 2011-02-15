@@ -32,7 +32,7 @@ public final class WelcomeDialog extends KFrame
 
     private final static String baseUrl = "http://sourceforge.net/projects/colossus/files";
     private final static String colossusReleaseNoteUrl = baseUrl
-        + "/Release-0.12.0-beta1/Release-Note-0.12.0-beta1.html/download";
+        + "/Release-0.12.0";
 
     private static WelcomeDialog showWelcome = null;
 
@@ -42,7 +42,7 @@ public final class WelcomeDialog extends KFrame
         super(title);
 
         String text = "\n"
-            + "  Welcome to this new Colossus release 0.12.0-beta1!"
+            + "  Welcome to this new Colossus release 0.12.0!"
             + "\n\n"
             + "  New features:\n"
             + "  - New variant Dino-Titan added\n"
@@ -51,7 +51,7 @@ public final class WelcomeDialog extends KFrame
             + "\n"
             + "  Plus the usual amount of fixes / stability improvements."
             + "\n\n"
-            + "  For a more detailed list of changes see the ReleaseNote document:\n      "
+            + "  For a more detailed list of changes see the Release Note document in SF download area:\n      "
             + colossusReleaseNoteUrl
             + "\n\n"
             + "  Use button below to copy the URL to your clipboard to paste it "
