@@ -1331,6 +1331,9 @@ public final class Client implements IClient, IOracle, IVariant,
         }
 
         // No point in teleporting if entry side is moot.
+        // (Note that the "what if it's own legion there?" exception as
+        // in pick-entry-side logic is not needed here - can't teleport
+        // to same hex.
         if (!game.isOccupied(hex))
         {
             return false;
@@ -2462,12 +2465,45 @@ public final class Client implements IClient, IOracle, IVariant,
 
     /** If the move looks legal, forward it to server and return true;
      *  otherwise returns false.
+     *  Also let user or AI pick teleporting Lord and/or entry side,
+     *  if relevant.
      */
     public boolean doMove(Legion mover, MasterHex hex)
     {
         if (mover == null)
         {
             return false;
+        }
+
+        // This check was earlier after picking entry side. Logically
+        // it makes more sense to check it first, instead of first let user
+        // pick something and reject move then still.
+        // However technically it's irrelevant, since the "pick target hex"
+        // logic does not even offer same hex if there is another friendly
+        // legion (= after a split)
+        // Doing the check here still anyway, since in Infinite e.g. for some
+        // hexes rolling a 6 allows in theory two entrysides, and to catch
+        // that (prevent it from asking user to pick entry side), need the
+        // number of friendly legions value already early.
+
+        // if this hex is already occupied, return false
+        int friendlyLegions = game.getFriendlyLegions(hex, getActivePlayer())
+            .size();
+        if (hex.equals(mover.getCurrentHex()))
+        {
+            // same hex as starting hex, but it might be occupied by
+            // multiple legions after split
+            if (friendlyLegions > 1)
+            {
+                return false;
+            }
+        }
+        else
+        {
+            if (friendlyLegions > 0)
+            {
+                return false;
+            }
         }
 
         boolean teleport = false;
@@ -2506,6 +2542,13 @@ public final class Client implements IClient, IOracle, IVariant,
             // If unoccupied it does not really matter, just take one.
             entrySide = entrySides.iterator().next();
         }
+        else if (friendlyLegions == 1 && hex.equals(mover.getCurrentHex()))
+        {
+            // it's only we-self there, e.g. on a six in infinite returning
+            // to same hex on two possible ways.
+            // dito: entry side does not really matter, just take one.
+            entrySide = entrySides.iterator().next();
+        }
         else if (options.getOption(Options.autoPickEntrySide))
         {
             entrySide = ai.pickEntrySide(hex, mover, entrySides);
@@ -2524,26 +2567,6 @@ public final class Client implements IClient, IOracle, IVariant,
         {
             teleportingLord = figureTeleportingLord(mover, hex);
             if (teleportingLord == null)
-            {
-                return false;
-            }
-        }
-
-        // if this hex is already occupied, return false
-        int friendlyLegions = game.getFriendlyLegions(hex, getActivePlayer())
-            .size();
-        if (hex.equals(mover.getCurrentHex()))
-        {
-            // same hex as starting hex, but it might be occupied by
-            // multiple legions after split
-            if (friendlyLegions > 1)
-            {
-                return false;
-            }
-        }
-        else
-        {
-            if (friendlyLegions > 0)
             {
                 return false;
             }
