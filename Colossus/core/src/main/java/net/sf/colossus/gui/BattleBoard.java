@@ -601,6 +601,7 @@ public final class BattleBoard extends KFrame
         mi = phaseMenu.add(doneWithPhaseAction);
         mi.setMnemonic(KeyEvent.VK_D);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
+        mi.setEnabled(isMyBattleTurn());
 
         phaseMenu.addSeparator();
 
