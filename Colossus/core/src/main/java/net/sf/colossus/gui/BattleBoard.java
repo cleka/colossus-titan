@@ -814,7 +814,10 @@ public final class BattleBoard extends KFrame
         }
         else if (isFightPhase())
         {
-            gui.getCallbackHandler().leaveCarryMode();
+            if (gui.isPickCarryOngoing())
+            {
+                gui.getCallbackHandler().leaveCarryMode();
+            }
             highlightStrikes(battleChit.getBattleUnit());
         }
     }
@@ -850,7 +853,10 @@ public final class BattleBoard extends KFrame
         else if (isFightPhase())
         {
             selectedCritterTag = -1;
-            gui.getCallbackHandler().leaveCarryMode();
+            if (gui.isPickCarryOngoing())
+            {
+                gui.getCallbackHandler().leaveCarryMode();
+            }
             highlightCrittersWithTargets();
         }
     }
