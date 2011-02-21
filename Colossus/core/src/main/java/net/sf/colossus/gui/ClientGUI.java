@@ -1633,6 +1633,9 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             battleBoard.rescale();
         }
         repaintAllWindows();
+        // highlight legions that could do something,
+        // and e.g. in movephase, set mover to null
+        board.actOnMisclick();
     }
 
     public void disposeInspector()

@@ -1828,6 +1828,7 @@ public final class MasterBoard extends JPanel
         unselectAllHexes();
         selectHexes(gui.getStillToMoveHexes());
         selectHexes(gui.getPendingMoveHexes(), Color.blue);
+        gui.setMover(null);
         repaint();
     }
 
@@ -2066,7 +2067,6 @@ public final class MasterBoard extends JPanel
         else if (phase == Phase.MOVE)
         {
             clearPossibleRecruitChits();
-            gui.setMover(null);
             highlightUnmovedLegions();
         }
         else if (phase == Phase.FIGHT)
