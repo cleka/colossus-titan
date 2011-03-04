@@ -622,12 +622,47 @@ public class WebServer implements IWebServer, IRunWebServer
         pw.println("");
     }
 
+    private GameInfo isInvolvedInInstantGame(String initiatorName)
+    {
+        ArrayList<GameInfo> games = new ArrayList<GameInfo>(proposedGames
+            .values());
+        for (GameInfo gi : games)
+        {
+            if (!gi.isScheduledGame()
+                && (gi.isEnrolled(initiatorName) || gi.getInitiator().equals(
+                    initiatorName)))
+            {
+                return gi;
+            }
+        }
+        return null;
+    }
 
     public GameInfo proposeGame(String initiator, String variant,
         String viewmode, long startAt, int duration, String summary,
         String expire, boolean unlimitedMulligans, boolean balancedTowers,
         int min, int target, int max)
     {
+        if (GameInfo.wouldBeInstantGame(startAt))
+        {
+            GameInfo involvedGame = isInvolvedInInstantGame(initiator);
+            if (involvedGame != null)
+            {
+                LOGGER.warning("User " + initiator
+                    + " proposes instant game, "
+                    + "but user is already involved in instant game "
+                    + involvedGame.getGameId() + "!");
+                // no game created from proposal
+                return null;
+            }
+            else
+            {
+                LOGGER
+                    .info("User " + initiator + " proposed instant game "
+                    + "- not involved in game yet, so that's ok!");
+            }
+        }
+
         GameInfo gi = new GameInfo(initiator, variant, viewmode, startAt,
             duration, summary, expire, unlimitedMulligans, balancedTowers,
             min, target, max);

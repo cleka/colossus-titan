@@ -100,12 +100,22 @@ public class GameInfo
         return nextFreeGameId++;
     }
 
+    public static boolean wouldBeInstantGame(long startTime)
+    {
+        return makeTypeFromStarttime(startTime).equals(GameType.INSTANT);
+    }
+
+    private static GameType makeTypeFromStarttime(long startTime)
+    {
+        return(startTime == -1 ? GameType.INSTANT : GameType.SCHEDULED);
+    }
+
     public GameInfo(String initiator, String variant, String viewmode,
         long startTime, int duration, String summary, String expire,
         boolean unlimitedMulligans, boolean balancedTowers, int min,
         int target, int max)
     {
-        this(startTime == -1 ? GameType.INSTANT : GameType.SCHEDULED);
+        this(makeTypeFromStarttime(startTime));
 
         this.initiator = initiator;
         this.variant = variant;

@@ -626,9 +626,18 @@ public class WebServerClient implements IWebClient
         // proposeGame block?
         // (perhaps because client needs the ACK first??)
 
-        if (command.equals(IWebServer.Propose) && gi != null)
+        if (command.equals(IWebServer.Propose))
         {
-            server.enrollUserToGame(gi.getGameId(), user.getName());
+            if (gi != null)
+            {
+                server.enrollUserToGame(gi.getGameId(), user.getName());
+            }
+            else
+            {
+                long now = new Date().getTime();
+                requestAttention(now, "SYSTEM", true,
+                    "Don't click 'Propose' multiple times!", 1, 500, true);
+            }
         }
 
         if (ok && loggedIn && command.equals(IWebServer.Login))
