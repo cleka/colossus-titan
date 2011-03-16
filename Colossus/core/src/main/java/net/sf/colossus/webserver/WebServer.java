@@ -33,6 +33,7 @@ import net.sf.colossus.webcommon.IRunWebServer;
 import net.sf.colossus.webcommon.IWebClient;
 import net.sf.colossus.webcommon.IWebServer;
 import net.sf.colossus.webcommon.User;
+import net.sf.colossus.webcommon.UserDB;
 import net.sf.colossus.webcommon.GameInfo.GameState;
 
 
@@ -78,6 +79,7 @@ public class WebServer implements IWebServer, IRunWebServer
 
     private final int maxClients;
 
+    private UserDB userDB;
     private final HashMap<String, GameInfo> proposedGames = new HashMap<String, GameInfo>();
 
     private final ArrayList<GameInfo> runningGames = new ArrayList<GameInfo>();
@@ -130,7 +132,6 @@ public class WebServer implements IWebServer, IRunWebServer
     {
         this.options = new WebServerOptions(optionsFile);
         options.loadOptions();
-        this.generalChat = new ChatChannel(IWebServer.generalChatName, options);
 
         this.whenFormatter = new FormatWhen();
 
@@ -209,6 +210,8 @@ public class WebServer implements IWebServer, IRunWebServer
 
         doReadLoginMessage();
 
+        this.generalChat = new ChatChannel(IWebServer.generalChatName,
+            options, userDB);
         generalChat.createWelcomeMessage();
 
         if (runGUI)
@@ -220,7 +223,7 @@ public class WebServer implements IWebServer, IRunWebServer
             this.gui = new NullWebServerGUI();
         }
 
-        watchDog = new ClientWatchDog();
+        watchDog = new ClientWatchDog(userDB);
         watchDog.start();
 
 
@@ -262,7 +265,7 @@ public class WebServer implements IWebServer, IRunWebServer
         String usersFile = options
             .getStringOption(WebServerConstants.optUsersFile);
         int maxUsers = options.getIntOption(WebServerConstants.optMaxUsers);
-        User.readUsersFromFile(usersFile, maxUsers);
+        userDB = new UserDB(usersFile, maxUsers);
     }
 
     /**
@@ -323,8 +326,8 @@ public class WebServer implements IWebServer, IRunWebServer
             }
         }
 
-        User.storeUsersToFile();
-        User.cleanup();
+        writeBackUsers();
+        userDB.cleanup();
 
         generalChat.dispose();
 
@@ -334,6 +337,16 @@ public class WebServer implements IWebServer, IRunWebServer
         portBookKeeper = null;
 
         LOGGER.log(Level.FINE, "Web Server after main loop.");
+    }
+
+    public void writeBackUsers()
+    {
+        userDB.storeUsersToFile();
+    }
+
+    public void updateLoggedinStatus(User u, WebServerClient wsc)
+    {
+        userDB.updateLoggedinStatus(u, wsc);
     }
 
     // called by WebServerGUI.closeWindow() event
@@ -400,7 +413,7 @@ public class WebServer implements IWebServer, IRunWebServer
                 serverSocket.close();
                 return false;
             }
-            else if (User.getLoggedInCount() >= maxClients)
+            else if (userDB.getLoggedInCount() >= maxClients)
             {
                 rejected = true;
                 reject(clientSocket);
@@ -475,7 +488,7 @@ public class WebServer implements IWebServer, IRunWebServer
 
     private void closeAllWebServerClientSocketThreads()
     {
-        Collection<User> users = User.getLoggedInUsers();
+        Collection<User> users = userDB.getLoggedInUsers();
         for (User u : users)
         {
             u.updateLastLogout();
@@ -515,6 +528,21 @@ public class WebServer implements IWebServer, IRunWebServer
     String getPlayerName()
     {
         return Thread.currentThread().getName();
+    }
+
+    public UserDB getUserDB()
+    {
+        return userDB;
+    }
+
+    public User findUserByName(String name)
+    {
+        return userDB.findUserByName(name);
+    }
+
+    public String verifyLogin(String username, String password)
+    {
+        return userDB.verifyLogin(username, password);
     }
 
     public PortBookKeeper getPortBookKeeper()
@@ -570,7 +598,7 @@ public class WebServer implements IWebServer, IRunWebServer
         pw.println("Dump at " + nowString);
 
         StringBuilder ul = new StringBuilder();
-        Collection<User> users = User.getLoggedInUsers();
+        Collection<User> users = userDB.getLoggedInUsers();
         for (User u : users)
         {
             String name;
@@ -749,7 +777,7 @@ public class WebServer implements IWebServer, IRunWebServer
 
     public void allTellGameInfo(GameInfo gi)
     {
-        Collection<User> users = User.getLoggedInUsers();
+        Collection<User> users = userDB.getLoggedInUsers();
         for (User u : users)
         {
             IWebClient client = u.getWebserverClient();
@@ -848,7 +876,7 @@ public class WebServer implements IWebServer, IRunWebServer
 
     public void enrollUserToGame(String gameId, String username)
     {
-        User user = User.findUserByName(username);
+        User user = userDB.findUserByName(username);
         GameInfo gi = findByGameId(gameId);
         if (gi != null)
         {
@@ -860,7 +888,7 @@ public class WebServer implements IWebServer, IRunWebServer
                     proposedGamesListModified = true;
                     if (reasonFail == null)
                     {
-                        gi.updateOnline();
+                        updateOnline(gi);
                         allTellGameInfo(gi);
                         IWebClient client = user.getWebserverClient();
                         LOGGER.fine("Player " + username
@@ -903,7 +931,7 @@ public class WebServer implements IWebServer, IRunWebServer
     public void unenrollUserFromGame(String gameId, String username)
     {
         GameInfo gi = findByGameId(gameId);
-        User user = User.findUserByName(username);
+        User user = userDB.findUserByName(username);
 
         if (gi != null)
         {
@@ -933,7 +961,7 @@ public class WebServer implements IWebServer, IRunWebServer
                     proposedGamesListModified = true;
                     if (reasonFail == null)
                     {
-                        gi.updateOnline();
+                        updateOnline(gi);
                         allTellGameInfo(gi);
                         IWebClient client = user.getWebserverClient();
                         LOGGER.fine("Player " + username
@@ -981,7 +1009,7 @@ public class WebServer implements IWebServer, IRunWebServer
                 + gameId);
         }
 
-        Collection<User> users = User.getLoggedInUsers();
+        Collection<User> users = userDB.getLoggedInUsers();
         for (User u : users)
         {
             IWebClient client = u.getWebserverClient();
@@ -1122,7 +1150,7 @@ public class WebServer implements IWebServer, IRunWebServer
     public void systemMessageToAll(String message)
     {
         long when = new Date().getTime();
-        Collection<User> users = User.getLoggedInUsers();
+        Collection<User> users = userDB.getLoggedInUsers();
         for (User u : users)
         {
             IWebClient client = u.getWebserverClient();
@@ -1181,7 +1209,7 @@ public class WebServer implements IWebServer, IRunWebServer
         IWebClient client = null;
         String reasonFail = null;
 
-        User user = User.findUserByName(recipient);
+        User user = userDB.findUserByName(recipient);
         if (user != null)
         {
             client = user.getWebserverClient();
@@ -1210,7 +1238,7 @@ public class WebServer implements IWebServer, IRunWebServer
 
     private void informPingFailed(String sender, String failMessage)
     {
-        User senderUser = User.findUserByName(sender);
+        User senderUser = userDB.findUserByName(sender);
         IWebClient senderClient = senderUser.getWebserverClient();
         if (senderClient != null)
         {
@@ -1236,15 +1264,15 @@ public class WebServer implements IWebServer, IRunWebServer
 
     public void updateUserCounts()
     {
-        int connected = User.getLoggedInCount();
+        int connected = userDB.getLoggedInCount();
         allTellUserCounts();
         gui.setUserInfo(connected + " users connected.");
         ArrayList<GameInfo> games = new ArrayList<GameInfo>(proposedGames
             .values());
         for (GameInfo gi : games)
         {
-            boolean changed = gi.updateOnline();
-            if (changed)
+            // returns true if changed
+            if (updateOnline(gi))
             {
                 allTellGameInfo(gi);
             }
@@ -1253,18 +1281,18 @@ public class WebServer implements IWebServer, IRunWebServer
 
     public void allTellUserCounts()
     {
-        if (User.getLoggedInCount() > 0)
+        if (userDB.getLoggedInCount() > 0)
         {
-            int loggedin = User.getLoggedInCount();
+            int loggedin = userDB.getLoggedInCount();
 
             // the other five are still dummies.
-            int enrolled = User.getEnrolledCount();
-            int playing = User.getPlayingCount();
-            int dead = User.getDeadCount();
+            int enrolled = userDB.getEnrolledCount();
+            int playing = userDB.getPlayingCount();
+            int dead = userDB.getDeadCount();
             long ago = 0;
 
             StringBuffer text = new StringBuffer("");
-            Collection<User> users = User.getLoggedInUsers();
+            Collection<User> users = userDB.getLoggedInUsers();
             for (User u : users)
             {
                 if (text.length() != 0)
@@ -1311,7 +1339,7 @@ public class WebServer implements IWebServer, IRunWebServer
     private void handlePingQuotedName(String sender, String pingCommand)
     {
         long when = new Date().getTime();
-        boolean isAdmin = User.findUserByName(sender).isAdmin();
+        boolean isAdmin = userDB.findUserByName(sender).isAdmin();
         //   /ping "
         //   01234567
         String args = pingCommand.substring(7);
@@ -1342,7 +1370,7 @@ public class WebServer implements IWebServer, IRunWebServer
     private void handlePing(String sender, String pingCommand)
     {
         long when = new Date().getTime();
-        boolean isAdmin = User.findUserByName(sender).isAdmin();
+        boolean isAdmin = userDB.findUserByName(sender).isAdmin();
         String[] tokens = pingCommand.split(" +", 3);
         if (tokens.length < 2)
         {
@@ -1456,26 +1484,50 @@ public class WebServer implements IWebServer, IRunWebServer
 
     public String registerUser(String username, String password, String email)
     {
-        String reason = User.registerUser(username, password, email,
+        String reason = userDB.registerUser(username, password, email,
             mailObject);
         return reason;
     }
 
     public String confirmRegistration(String username, String confirmationCode)
     {
-        String reason = User.confirmRegistration(username, confirmationCode);
+        String reason = userDB.confirmRegistration(username, confirmationCode);
         return reason;
     }
 
     public String changeProperties(String username, String oldPW,
         String newPW, String email, Boolean isAdminObj)
     {
-        String reason = User.changeProperties(username, oldPW, newPW, email,
+        String reason = userDB.changeProperties(username, oldPW, newPW, email,
             isAdminObj);
         return reason;
     }
 
     // =========== internal workers ============
+
+    /**
+     * When a user logged in or out, this is called for every GameInfo to update
+     * how many of the enrolled players are currently online.
+     * @param userDB TODO
+     *
+     * @return true if the count of online users was changed i.e. GameInfo
+     * needs to be updated to all clients
+     */
+    boolean updateOnline(GameInfo gi)
+    {
+        int found = 0;
+        for (User u : gi.getPlayers())
+        {
+            if (userDB.isUserOnline(u))
+            {
+                found++;
+            }
+        }
+        // TODO in reEnrollIfNecessary case this is now wrong??
+        // perhaps because in the moment of update user is just not online...
+
+        return gi.updateOnlineCount(found);
+    }
 
     private int countProposedGames(boolean shallBeScheduled)
     {

@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.webcommon.IWebClient;
 import net.sf.colossus.webcommon.User;
+import net.sf.colossus.webcommon.UserDB;
 
 
 /**
@@ -21,11 +22,14 @@ public class ClientWatchDog extends Thread
 
     private boolean done;
 
+    private final UserDB userDB;
+
     private static final long CHECK_INTERVAL_SECONDS = 30;
 
-    public ClientWatchDog()
+    public ClientWatchDog(UserDB userDB)
     {
         setName("ClientWatchDog");
+        this.userDB = userDB;
         done = false;
     }
 
@@ -34,7 +38,7 @@ public class ClientWatchDog extends Thread
     {
         while (!done)
         {
-            Collection<User> users = User.getLoggedInUsers();
+            Collection<User> users = userDB.getLoggedInUsers();
             int cnt = users.size();
             if (cnt > 0)
             {

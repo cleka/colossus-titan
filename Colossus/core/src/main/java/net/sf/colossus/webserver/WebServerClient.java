@@ -163,6 +163,7 @@ public class WebServerClient implements IWebClient
                 // after here, user is not in loggedInUsersList any more, i.e.
                 // game updates during game cancelling are NOT sent to him.
                 user.setWebClient(null);
+                server.updateLoggedinStatus(user, null);
 
                 if (!cst.wasForcedLogout())
                 {
@@ -232,7 +233,7 @@ public class WebServerClient implements IWebClient
                 }
                 else
                 {
-                    reason = User.verifyLogin(username, password);
+                    reason = server.verifyLogin(username, password);
                 }
 
                 if (reason == null)
@@ -243,12 +244,14 @@ public class WebServerClient implements IWebClient
                 // login accepted
                 if (reason == null)
                 {
-                    setUser(User.findUserByName(username));
+                    setUser(server.findUserByName(username));
                     loggedIn = true;
                     user.updateLastLogin();
-                    User.storeUsersToFile();
+                    server.writeBackUsers();
                     ok = true;
                     user.setWebClient(this);
+                    server.updateLoggedinStatus(user, this);
+
                     cst.setName("WSCST " + username);
                     LOGGER.info("User successfully logged in: "
                         + cst.getClientInfo());
@@ -341,7 +344,7 @@ public class WebServerClient implements IWebClient
             LOGGER.info("Received Logout request from user "
                 + cst.getClientInfo());
             user.updateLastLogout();
-            User.storeUsersToFile();
+            server.writeBackUsers();
             ok = true;
             done = true;
         }
@@ -399,7 +402,7 @@ public class WebServerClient implements IWebClient
                 }
                 else
                 {
-                    byUser = User.findUserByName(byUserName);
+                    byUser = server.findUserByName(byUserName);
                 }
             }
             server.startGame(gameId, byUser);
@@ -688,7 +691,7 @@ public class WebServerClient implements IWebClient
         // Do not set the real user here, otherwise in the re-login case
         // the first reject would lead to autoCancelling games, too.
         WebServerClientSocketThread otherCst = null;
-        User tmpUser = User.findUserByName(username);
+        User tmpUser = server.findUserByName(username);
         WebServerClient otherWsc = (WebServerClient)tmpUser
             .getWebserverClient();
         if (otherWsc != null)

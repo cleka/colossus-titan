@@ -15,6 +15,7 @@ import net.sf.colossus.webcommon.ChatMessage;
 import net.sf.colossus.webcommon.FormatWhen;
 import net.sf.colossus.webcommon.IWebClient;
 import net.sf.colossus.webcommon.User;
+import net.sf.colossus.webcommon.UserDB;
 
 
 public class ChatChannel
@@ -22,6 +23,7 @@ public class ChatChannel
     private static final Logger LOGGER = Logger.getLogger(ChatChannel.class
         .getName());
 
+    private final UserDB userDB;
     private final String chatId;
     private final ChatMsgStorage storage;
     private final PrintWriter chatLog;
@@ -29,8 +31,9 @@ public class ChatChannel
 
     private final static String doubledashes = "=========================";
 
-    public ChatChannel(String id, WebServerOptions options)
+    public ChatChannel(String id, WebServerOptions options, UserDB userDB)
     {
+        this.userDB = userDB;
         this.chatId = id;
         this.storage = new ChatMsgStorage(this, options);
         this.chatLog = openLogForAppend(options);
@@ -112,12 +115,12 @@ public class ChatChannel
             storage.storeMessage(msg);
         }
         appendToChatlog(msg);
-        deliverMessage(msg);
+        deliverMessage(msg, userDB);
     }
 
-    private void deliverMessage(ChatMessage msg)
+    private void deliverMessage(ChatMessage msg, UserDB userDB)
     {
-        Collection<User> users = User.getLoggedInUsers();
+        Collection<User> users = userDB.getLoggedInUsers();
         for (User u : users)
         {
             IWebClient client = u.getWebserverClient();

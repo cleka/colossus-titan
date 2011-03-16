@@ -593,34 +593,14 @@ public class GameInfo
         players = playerlist;
     }
 
-    /**
-     * When a user logged in or out, this is called for every GameInfo to update
-     * how many of the enrolled players are currently online.
-     *
-     * @return true if the count of online users was changed i.e. GameInfo
-     * needs to be updated to all clients
-     */
-    public boolean updateOnline()
+    public boolean updateOnlineCount(int newCount)
     {
-        boolean changed = false;
-
-        int found = 0;
-        for (User u : players)
+        if (newCount != onlineCount)
         {
-            if (User.isUserOnline(u))
-            {
-                found++;
-            }
+            onlineCount = newCount;
+            return true;
         }
-        // TODO in reEnrollIfNecessary case this is now wrong??
-        // perhaps because in the moment of update user is just not online...
-
-        if (found != onlineCount)
-        {
-            onlineCount = found;
-            changed = true;
-        }
-        return changed;
+        return false;
     }
 
     /*
