@@ -13,8 +13,8 @@ import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.logging.Level;
@@ -96,10 +96,9 @@ final class EventViewer extends KDialog
 
     private boolean visible;
 
-    private final List<RevealEvent> syncdEventList = Collections
-        .synchronizedList(new ArrayList<RevealEvent>());
+    private final List<RevealEvent> eventList = new LinkedList<RevealEvent>();
     private int bookmark = 0;
-    final private ArrayList<JPanel> displayQueue = new ArrayList<JPanel>();
+    final private List<JPanel> displayQueue = new LinkedList<JPanel>();
 
     private int turnNr;
     private Player currentPlayer;
@@ -637,11 +636,11 @@ final class EventViewer extends KDialog
         }
     }
 
-    private synchronized void addEventToList(RevealEvent e)
+    private void addEventToList(RevealEvent e)
     {
-        synchronized (syncdEventList)
+        synchronized (eventList)
         {
-            syncdEventList.add(e);
+            eventList.add(e);
         }
     }
 
@@ -688,7 +687,7 @@ final class EventViewer extends KDialog
     {
         queueSignalRemoveAllForDisplaying();
 
-        synchronized (syncdEventList)
+        synchronized (eventList)
         {
             // if never expires, we never delete, so bookmark stays ok.
             // But if expiring is happening (!= -1) or force is given
@@ -699,15 +698,15 @@ final class EventViewer extends KDialog
                 bookmark = 0;
             }
 
-            if (bookmark > syncdEventList.size())
+            if (bookmark > eventList.size())
             {
                 // sanity check...
                 LOGGER.log(Level.SEVERE, "bookmark " + bookmark
-                    + " out of range, size=" + syncdEventList.size());
+                    + " out of range, size=" + eventList.size());
                 bookmark = 0;
             }
 
-            ListIterator<RevealEvent> it = syncdEventList
+            ListIterator<RevealEvent> it = eventList
                 .listIterator(bookmark);
             while (it.hasNext())
             {
@@ -1232,10 +1231,10 @@ final class EventViewer extends KDialog
         int found = 0;
         if (type == RevealEvent.eventSplit)
         {
-            synchronized (syncdEventList)
+            synchronized (eventList)
             {
-                int last = syncdEventList.size();
-                ListIterator<RevealEvent> it = syncdEventList
+                int last = eventList.size();
+                ListIterator<RevealEvent> it = eventList
                     .listIterator(last);
                 while (it.hasPrevious() && found == 0)
                 {
@@ -1262,10 +1261,10 @@ final class EventViewer extends KDialog
             assert found != 0 : "Mismatch for turnNr of SplitEvent still happens.";
             if (found == 0)
             {
-                synchronized (syncdEventList)
+                synchronized (eventList)
                 {
-                    int last = syncdEventList.size();
-                    ListIterator<RevealEvent> it2 = syncdEventList
+                    int last = eventList.size();
+                    ListIterator<RevealEvent> it2 = eventList
                         .listIterator(last);
                     while (it2.hasPrevious() && found == 0)
                     {
@@ -1288,10 +1287,10 @@ final class EventViewer extends KDialog
             || type == RevealEvent.eventSummon
             || type == RevealEvent.eventTeleport)
         {
-            synchronized (syncdEventList)
+            synchronized (eventList)
             {
-                int last = syncdEventList.size();
-                ListIterator<RevealEvent> it = syncdEventList
+                int last = eventList.size();
+                ListIterator<RevealEvent> it = eventList
                     .listIterator(last);
                 while (it.hasPrevious() && found == 0)
                 {
@@ -1354,9 +1353,9 @@ final class EventViewer extends KDialog
         }
         int purged = 0;
 
-        synchronized (syncdEventList)
+        synchronized (eventList)
         {
-            Iterator<RevealEvent> it = syncdEventList.iterator();
+            Iterator<RevealEvent> it = eventList.iterator();
             boolean done = false;
             while (it.hasNext() && !done)
             {
@@ -1380,9 +1379,9 @@ final class EventViewer extends KDialog
 
     public void cleanup()
     {
-        synchronized (syncdEventList)
+        synchronized (eventList)
         {
-            syncdEventList.clear();
+            eventList.clear();
         }
         synchronized (displayQueue)
         {
