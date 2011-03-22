@@ -67,6 +67,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
      */
     private final static int CONN_CHECK_TIMEOUT = 5;
 
+    private final Object connectionCheckMutex = new Object();
+
     private Timer connectionCheckTimer;
 
     private long lastConnectionCheckPackageSent = -1;
@@ -624,7 +626,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
      *  requests the server to send us a confirmation package,
      *  to confirm that connection is still alive and ok.
      */
-    synchronized void checkServerConnection()
+    void checkServerConnection()
     {
         if (client.isSctAlreadyDown())
         {
@@ -636,6 +638,22 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
             return;
         }
+
+        Runnable checker = new Runnable()
+        {
+            public void run()
+            {
+                synchronized (connectionCheckMutex)
+                {
+                    initiateConnectionCheck();
+                }
+            }
+        };
+        new Thread(checker).start();
+    }
+
+    private void initiateConnectionCheck()
+    {
         connectionCheckTimer = new Timer(1000 * CONN_CHECK_TIMEOUT,
             new ActionListener()
             {
@@ -649,31 +667,43 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
         LOGGER.info("Client for player " + getOwningPlayer().getName()
             + " checking server connection (sending request)");
-
         client.doCheckServerConnection();
     }
 
-    public synchronized void serverConfirmsConnection()
+    public void serverConfirmsConnection()
     {
-        LOGGER.info("Client for player " + getOwningPlayer().getName()
-            + " received confirmation that connection is OK.");
-        finishServerConnectionCheck(true);
+        synchronized (connectionCheckMutex)
+        {
+            LOGGER.info("Client for player " + getOwningPlayer().getName()
+                + " received confirmation that connection is OK.");
+            finishServerConnectionCheck(true);
+        }
     }
 
-    public synchronized void timeoutAbortsConnectionCheck()
+    public void timeoutAbortsConnectionCheck()
     {
-        finishServerConnectionCheck(false);
+        synchronized (connectionCheckMutex)
+        {
+            LOGGER.info("Client for player " + getOwningPlayer().getName()
+                + " - timeout reached, stopping now to wait for the reply.");
+            finishServerConnectionCheck(false);
+        }
     }
 
     /** Cleanup everything related to the serverConnectionCheck timer,
      *  and show a message telling whether it went ok or not.
+     *
+     *  Called by either serverConfirmsConnection() or
+     *  timeoutAbortsConnectionCheck(), which both synchronize on the
+     *  connectionCheckMutex.
+     *
      */
     private void finishServerConnectionCheck(boolean success)
     {
         if (connectionCheckTimer == null)
         {
             // race - the other one came nearly same time, and comes now
-            // after the first one left this synchronized method.
+            // after the first one left this synchronize'd method.
             return;
         }
         if (connectionCheckTimer.isRunning())
