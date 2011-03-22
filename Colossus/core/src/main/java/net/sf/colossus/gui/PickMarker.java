@@ -99,7 +99,7 @@ final class PickMarker extends KDialog
         return markerId;
     }
 
-    static synchronized String pickMarker(JFrame parentFrame, Player owner,
+    static String pickMarker(JFrame parentFrame, Player owner,
         Set<String> markerIds, IOptions options)
     {
         PickMarker pm = new PickMarker(parentFrame, owner, markerIds, options);

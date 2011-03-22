@@ -139,7 +139,7 @@ final class PickRecruiter extends KDialog
         return recruiterName;
     }
 
-    static synchronized String pickRecruiter(JFrame parentFrame,
+    static String pickRecruiter(JFrame parentFrame,
         List<String> recruiters, String hexDescription, Legion legion,
         ClientGUI gui)
     {

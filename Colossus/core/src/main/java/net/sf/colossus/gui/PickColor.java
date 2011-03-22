@@ -91,7 +91,7 @@ final class PickColor extends KDialog
         return color;
     }
 
-    static synchronized PlayerColor pickColor(JFrame parentFrame,
+    static PlayerColor pickColor(JFrame parentFrame,
         String playerName, List<PlayerColor> colorsLeft, IOptions options)
     {
         PickColor pc = new PickColor(parentFrame, playerName, colorsLeft,

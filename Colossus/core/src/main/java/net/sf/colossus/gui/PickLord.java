@@ -79,7 +79,7 @@ final class PickLord extends KDialog
         return lordType;
     }
 
-    static synchronized CreatureType pickLord(IOptions options,
+    static CreatureType pickLord(IOptions options,
         JFrame parentFrame, List<CreatureType> choices)
     {
         PickLord pl = new PickLord(options, parentFrame, choices);

@@ -175,7 +175,7 @@ final class PickRecruit extends KDialog
     }
 
     /** Return the creature recruited, or null if none. */
-    static synchronized CreatureType pickRecruit(JFrame parentFrame,
+    static CreatureType pickRecruit(JFrame parentFrame,
         List<CreatureType> recruits, String hexDescription, Legion legion,
         ClientGUI gui)
     {
