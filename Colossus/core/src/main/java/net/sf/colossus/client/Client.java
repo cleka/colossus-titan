@@ -585,11 +585,13 @@ public final class Client implements IClient, IOracle, IVariant,
                 .getDonor(), summonInfo.getUnit());
             server.doSummon(event);
         }
+        // Highlight engagements and repaint
         gui.actOnDoSummon();
     }
 
     public void didSummon(Legion summoner, Legion donor, CreatureType summon)
     {
+        // Create summon event
         gui.didSummon(summoner, donor, summon);
     }
 

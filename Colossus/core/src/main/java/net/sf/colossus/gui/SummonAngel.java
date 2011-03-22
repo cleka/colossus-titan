@@ -45,20 +45,22 @@ final class SummonAngel extends KDialog
     private static final Logger LOGGER = Logger.getLogger(SummonAngel.class
         .getName());
 
+    private static final String BASE_SUMMON_STRING = ": Summon Angel into Legion ";
+
+    private static boolean active;
+    private static SummonInfo summonInfo = null;
+
     private final Legion target;
     private final List<Chit> sumChitList = new ArrayList<Chit>();
     private final JButton cancelButton;
-    private static boolean active;
-    private static final String baseSummonString = ": Summon Angel into Legion ";
     private final SaveWindow saveWindow;
-    private static SummonInfo summonInfo = null;
     private final Map<Chit, Legion> chitToDonor = new HashMap<Chit, Legion>();
 
     private SummonAngel(ClientGUI gui, Legion legion,
         List<Legion> possibleDonors)
     {
         super(gui.getBoard().getFrame(), gui.getOwningPlayer().getName()
-            + baseSummonString + legion, false);
+            + BASE_SUMMON_STRING + legion, false);
 
         this.target = legion;
 
