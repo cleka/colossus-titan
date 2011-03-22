@@ -706,6 +706,8 @@ public final class Start
             // @TODO: get via startObject instead?
             else if (getWhatToDoNext() == WhatToDoNext.START_NET_CLIENT)
             {
+                whatNextManager.decrementHowManyGamesLeft();
+
                 // by default (if user does not say anything other when ending),
                 // after that come back to NetClient dialog.
                 if (oneClientRunOnly)
