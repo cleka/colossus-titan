@@ -570,7 +570,7 @@ public final class Client implements IClient, IOracle, IVariant,
      *  @param summonInfo A SummonInfo object that contains the values
      *                    for target, donor and unit.
      */
-    private void doSummon(SummonInfo summonInfo)
+    public void doSummon(SummonInfo summonInfo)
     {
         assert summonInfo != null : "SummonInfo object must not be null!";
 
@@ -1283,20 +1283,21 @@ public final class Client implements IClient, IOracle, IVariant,
             // still, do the summon with the default created summonInfo,
             // Server might wait for an answer (so, NOT just return without
             // doing anything).
+            doSummon(summonInfo);
         }
         else
         {
             if (options.getOption(Options.autoSummonAngels))
             {
                 summonInfo = ai.summonAngel(legion, possibleDonors);
+                doSummon(summonInfo);
             }
             else
             {
-                summonInfo = gui.doPickSummonAngel(legion, possibleDonors);
+                gui.doPickSummonAngel(legion, possibleDonors);
+                // GUI does a callback (sends it to server itself).
             }
         }
-
-        doSummon(summonInfo);
     }
 
     /**

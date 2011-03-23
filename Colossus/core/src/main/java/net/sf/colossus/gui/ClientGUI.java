@@ -45,7 +45,6 @@ import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.Proposal;
-import net.sf.colossus.game.SummonInfo;
 import net.sf.colossus.util.CollectionHelper;
 import net.sf.colossus.util.Predicate;
 import net.sf.colossus.variant.BattleHex;
@@ -2024,10 +2023,10 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         board.setBoardActive(val);
     }
 
-    public SummonInfo doPickSummonAngel(Legion legion,
+    public void doPickSummonAngel(Legion legion,
         List<Legion> possibleDonors)
     {
-        return SummonAngel.summonAngel(this, legion, possibleDonors);
+        new SummonAngel(this, legion, possibleDonors);
     }
 
     public List<CreatureType> doPickSplitLegion(Legion parent,

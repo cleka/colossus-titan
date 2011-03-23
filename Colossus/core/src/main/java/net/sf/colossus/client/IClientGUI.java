@@ -13,7 +13,6 @@ import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
-import net.sf.colossus.game.SummonInfo;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
@@ -210,7 +209,7 @@ public interface IClientGUI
 
     public abstract void setBoardActive(boolean val);
 
-    public abstract SummonInfo doPickSummonAngel(Legion legion,
+    public abstract void doPickSummonAngel(Legion legion,
         List<Legion> possibleDonors);
 
     public abstract List<CreatureType> doPickSplitLegion(Legion parent,

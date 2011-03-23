@@ -13,7 +13,6 @@ import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
-import net.sf.colossus.game.SummonInfo;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
@@ -438,11 +437,11 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public SummonInfo doPickSummonAngel(Legion legion,
+    public void doPickSummonAngel(Legion legion,
         List<Legion> possibleDonors)
     {
         // TODO Auto-generated method stub
-        return null;
+
     }
 
     public void engagementResultsMaybeShow()
