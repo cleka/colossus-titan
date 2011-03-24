@@ -84,20 +84,23 @@ final class PickMarker extends KDialog
         pack();
         setBackground(Color.lightGray);
 
+        MouseAdapter mouseListener = new MouseAdapter()
+        {
+            @Override
+            public void mousePressed(MouseEvent e)
+            {
+                Marker marker = (Marker)e.getComponent();
+                cleanup(marker.getId());
+            }
+        };
+
         for (String markerId : markerIds)
         {
-            final Marker marker = new Marker(null, 4 * Scale.get(), markerId
-                + "-" + owner.getColor().getName());
+            Marker marker = new Marker(null, 4 * Scale.get(), markerId + "-"
+                + owner.getColor().getName());
             markers.add(marker);
             contentPane.add(marker);
-            marker.addMouseListener(new MouseAdapter()
-            {
-                @Override
-                public void mousePressed(MouseEvent e)
-                {
-                    cleanup(marker.getId());
-                }
-            });
+            marker.addMouseListener(mouseListener);
         }
 
         pack();
