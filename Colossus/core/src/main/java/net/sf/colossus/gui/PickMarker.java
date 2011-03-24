@@ -10,35 +10,57 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.JFrame;
-
 import net.sf.colossus.common.IOptions;
+import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.guiutil.KDialog;
 import net.sf.colossus.guiutil.SaveWindow;
 
 
 /**
- * Class PickMarker allows a player to pick a legion marker.
+ * Class PickMarker allows a player to pick a legion marker,
+ * either as initial marker or for splitting a legion.
  *
  * @author David Ripton
+ * @author Clemens Katzer
  */
+
+
 final class PickMarker extends KDialog
 {
-    private final List<Marker> markers = new ArrayList<Marker>();
+    private final ClientGUI gui;
+
+    private final Set<String> markerIds;
+
     private final SaveWindow saveWindow;
-    private String markerId;
 
-    PickMarker(JFrame parentFrame, Player owner, Set<String> markerIds,
-        IOptions options)
+    // if null, it's pick initial marker, otherwise it's for split legion
+    private final Legion parent;
+
+
+    PickMarker(ClientGUI gui, Set<String> markerIds, Legion parent)
     {
-        super(parentFrame, owner.getName() + ": Pick Legion Marker", true);
+        super(gui.getBoard().getFrame(), "dummy title", true);
+        this.gui = gui;
+        this.parent = parent;
+        this.markerIds = markerIds;
 
-        markerId = null;
+        IOptions options = gui.getOptions();
+        Player owner = gui.getClient().getOwningPlayer();
+
+        if (parent == null)
+        {
+            setTitle(owner.getName() + ": Pick initial Legion Marker!");
+        }
+        else
+        {
+            setTitle(owner.getName() + ": Pick Marker for new Legion!");
+        }
+
+        List<Marker> markers = new ArrayList<Marker>();
 
         if (markerIds.isEmpty())
         {
@@ -62,10 +84,8 @@ final class PickMarker extends KDialog
         pack();
         setBackground(Color.lightGray);
 
-        Iterator<String> it = markerIds.iterator();
-        while (it.hasNext())
+        for (String markerId : markerIds)
         {
-            String markerId = it.next();
             final Marker marker = new Marker(null, 4 * Scale.get(), markerId
                 + "-" + owner.getColor().getName());
             markers.add(marker);
@@ -94,24 +114,40 @@ final class PickMarker extends KDialog
         setVisible(true);
     }
 
-    private String getMarkerId()
-    {
-        return markerId;
-    }
-
-    static String pickMarker(JFrame parentFrame, Player owner,
-        Set<String> markerIds, IOptions options)
-    {
-        PickMarker pm = new PickMarker(parentFrame, owner, markerIds, options);
-        return pm.getMarkerId();
-    }
-
-    /** Pass the chosen marker id, or null if none are available or
-     *  the player aborts the selection. */
+    /**
+     * If parent != null, it's about split. Make the GUI initiate the
+     * dialog where user chooses creatures to split into new marker.
+     *
+     * If parent is null, it's about the initial split, thus we insist
+     * on getting one, and once one is selected, make the client send
+     * the assignFirstMarker to server.
+     *
+     * @param pickedMarkerId The markerId the user has choosen, or null
+     * if dialog was closed without choosing.
+     *
+     */
     private void cleanup(String pickedMarkerId)
     {
         saveWindow.saveLocation(getLocation());
-        markerId = pickedMarkerId;
         dispose();
+
+        if (parent != null)
+        {
+            // CLient will either initiate the split, or if pickedMarkerId
+            // is null, just forget about it :)
+            gui.getClient().doTheSplitting(parent, pickedMarkerId);
+        }
+        else
+        {
+            if (pickedMarkerId == null)
+            {
+                new PickMarker(gui, markerIds, parent);
+            }
+            else
+            {
+                gui.getClient().assignFirstMarker(pickedMarkerId);
+            }
+        }
     }
+
 }

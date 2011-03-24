@@ -2118,24 +2118,37 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         return color;
     }
 
-    public String doPickMarker(Set<String> markersAvailable)
+    public void doPickSplitMarker(Legion parent, Set<String> markersAvailable)
     {
-        return PickMarker.pickMarker(board.getFrame(), client
-            .getOwningPlayer(), markersAvailable, options);
+        createPickMarkerDialog(this, markersAvailable, parent);
     }
 
-    public String doPickMarkerUntilGotOne(Set<String> markersAvailable)
+    public void doPickInitialMarker(Set<String> markersAvailable)
     {
-        String markerId = null;
         board.setPhaseInfo("Pick initial marker!");
-        do
-        {
-            markerId = doPickMarker(markersAvailable);
-        }
-        while (markerId == null);
-
-        return markerId;
+        createPickMarkerDialog(this, markersAvailable, null);
     }
+
+    public void createPickMarkerDialog(final ClientGUI gui,
+        final Set<String> markerIds, final Legion parent)
+    {
+        if (SwingUtilities.isEventDispatchThread())
+        {
+            new PickMarker(gui, markerIds, parent);
+        }
+        else
+        {
+            SwingUtilities.invokeLater(new Runnable()
+            {
+                public void run()
+                {
+                    new PickMarker(gui, markerIds, parent);
+                }
+            });
+        }
+    }
+
+
 
     public CreatureType doPickRecruit(Legion legion, String hexDescription)
     {

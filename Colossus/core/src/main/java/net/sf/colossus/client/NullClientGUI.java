@@ -399,16 +399,16 @@ public class NullClientGUI implements IClientGUI
         return null;
     }
 
-    public String doPickMarker(Set<String> markersAvailable)
+    public void doPickSplitMarker(Legion parent, Set<String> markersAvailable)
     {
         // TODO Auto-generated method stub
-        return null;
+
     }
 
-    public String doPickMarkerUntilGotOne(Set<String> markersAvailable)
+    public void doPickInitialMarker(Set<String> markersAvailable)
     {
         // TODO Auto-generated method stub
-        return null;
+
     }
 
     public CreatureType doPickRecruit(Legion legion, String hexDescription)

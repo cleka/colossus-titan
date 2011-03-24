@@ -223,9 +223,9 @@ public interface IClientGUI
     public abstract PlayerColor doPickColor(String playerName,
         List<PlayerColor> colorsLeft);
 
-    public abstract String doPickMarker(Set<String> markersAvailable);
+    public abstract void doPickInitialMarker(Set<String> markersAvailable);
 
-    public abstract String doPickMarkerUntilGotOne(Set<String> markersAvailable);
+    public abstract void doPickSplitMarker(Legion parent, Set<String> markersAvailable);
 
     public abstract CreatureType doPickRecruit(Legion legion,
         String hexDescription);

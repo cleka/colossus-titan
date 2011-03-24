@@ -3172,23 +3172,27 @@ public final class Client implements IClient, IOracle, IVariant,
         if (options.getOption(Options.autoPickMarker))
         {
             childId = ai.pickMarker(markersAvailable, getShortColor());
+            doTheSplitting(parent, childId);
         }
         else
         {
-            childId = gui.doPickMarker(markersAvailable);
-        }
-
-        if (childId == null)
-        {
-            return;
-        }
-        List<CreatureType> results = gui.doPickSplitLegion(parent, childId);
-
-        if (results != null)
-        {
-            doSplit(parent, childId, results);
+            gui.doPickSplitMarker(parent, markersAvailable);
         }
     }
+
+    public void doTheSplitting(Legion parent, String childId)
+    {
+        if (childId != null)
+        {
+            List<CreatureType> results = gui.doPickSplitLegion(parent, childId);
+
+            if (results != null)
+            {
+                doSplit(parent, childId, results);
+            }
+        }
+    }
+
 
     /** Called by AI and by doSplit() */
     public void doSplit(Legion parent, String childMarkerId,
@@ -3265,17 +3269,21 @@ public final class Client implements IClient, IOracle, IVariant,
 
     public void askPickFirstMarker()
     {
-        String markerId = null;
-
         Set<String> markersAvailable = getOwningPlayer().getMarkersAvailable();
         if (options.getOption(Options.autoPickMarker))
         {
-            markerId = ai.pickMarker(markersAvailable, getShortColor());
+            String markerId = ai.pickMarker(markersAvailable, getShortColor());
+            assignFirstMarker(markerId);
         }
         else
         {
-            markerId = gui.doPickMarkerUntilGotOne(markersAvailable);
+            gui.doPickInitialMarker(markersAvailable);
         }
+
+    }
+
+    public void assignFirstMarker(String markerId)
+    {
         server.assignFirstMarker(markerId);
     }
 
