@@ -7,7 +7,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.Iterator;
 import java.util.Set;
 
 import javax.swing.JButton;
@@ -24,7 +23,7 @@ import net.sf.colossus.variant.BattleHex;
  * @author David Ripton
  */
 @SuppressWarnings("serial")
-final class PickCarry extends KDialog implements ActionListener
+final class PickCarry extends KDialog
 {
     private final ClientGUI gui;
     private final Set<String> choices;
@@ -45,10 +44,8 @@ final class PickCarry extends KDialog implements ActionListener
 
         addButton(cancel);
 
-        Iterator<String> it = choices.iterator();
-        while (it.hasNext())
+        for (String choice : choices)
         {
-            String choice = it.next();
             addButton(choice);
         }
 
@@ -82,7 +79,14 @@ final class PickCarry extends KDialog implements ActionListener
     private void addButton(String text)
     {
         JButton button = new JButton(text);
-        button.addActionListener(this);
+        button.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                String desc = e.getActionCommand();
+                handleCarryToDescription(desc);
+            }
+        });
         getContentPane().add(button);
     }
 
@@ -132,9 +136,4 @@ final class PickCarry extends KDialog implements ActionListener
         dispose();
     }
 
-    public void actionPerformed(ActionEvent e)
-    {
-        String desc = e.getActionCommand();
-        handleCarryToDescription(desc);
-    }
 }
