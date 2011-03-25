@@ -694,7 +694,7 @@ public final class Client implements IClient, IOracle, IVariant,
         return owningPlayer;
     }
 
-    // TODO probably unnecessary?
+    // Called by server during load, or by ai or gui when they choose it
     public void setColor(PlayerColor color)
     {
         this.color = color;
@@ -3259,11 +3259,18 @@ public final class Client implements IClient, IOracle, IVariant,
                 favoriteColors = new ArrayList<PlayerColor>();
             }
             color = ai.pickColor(colorsLeft, favoriteColors);
+            answerPickColor(color);
         }
         else
         {
-            color = gui.doPickColor(owningPlayer.getName(), colorsLeft);
+            // calls answerPickColor
+            gui.doPickColor(owningPlayer.getName(), colorsLeft);
         }
+    }
+
+    public void answerPickColor(PlayerColor color)
+    {
+        setColor(color);
         server.assignColor(color);
     }
 
@@ -3279,7 +3286,6 @@ public final class Client implements IClient, IOracle, IVariant,
         {
             gui.doPickInitialMarker(markersAvailable);
         }
-
     }
 
     public void assignFirstMarker(String markerId)

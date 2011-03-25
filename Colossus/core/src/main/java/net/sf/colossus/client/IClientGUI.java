@@ -220,7 +220,7 @@ public interface IClientGUI
 
     public abstract boolean isPickCarryOngoing();
 
-    public abstract PlayerColor doPickColor(String playerName,
+    public abstract void doPickColor(String playerName,
         List<PlayerColor> colorsLeft);
 
     public abstract void doPickInitialMarker(Set<String> markersAvailable);

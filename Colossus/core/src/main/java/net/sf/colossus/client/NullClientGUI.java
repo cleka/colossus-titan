@@ -380,11 +380,11 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public PlayerColor doPickColor(String playerName,
+    public void doPickColor(String playerName,
         List<PlayerColor> colorsLeft)
     {
         // TODO Auto-generated method stub
-        return null;
+
     }
 
     public EntrySide doPickEntrySide(MasterHex hex, Set<EntrySide> entrySides)

@@ -595,12 +595,25 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
 
     private void selectColor()
     {
-        PlayerColor c = PickColor.pickColor(this, "You", colorsLeft, options);
-        if (c != null)
+        PickColor.PickColorCallback callback = new PickColor.PickColorCallback()
         {
-            addColor(c);
-            favoriteColors.add(c);
-            colorsLeft.remove(c);
+            @Override
+            public void tellPickedColor(PlayerColor color)
+            {
+                doSomethingWithPickedColor(color);
+            }
+        };
+        // Allow null for cancel
+        new PickColor(this, "You", colorsLeft, options, callback, true);
+    }
+
+    public void doSomethingWithPickedColor(PlayerColor color)
+    {
+        if (color != null)
+        {
+            addColor(color);
+            favoriteColors.add(color);
+            colorsLeft.remove(color);
             saveFavColor();
             this.repaint();
         }

@@ -2104,18 +2104,41 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         }
     }
 
-    public PlayerColor doPickColor(String playerName,
+    public void doPickColor(final String playerName,
+        final List<PlayerColor> colorsLeft)
+    {
+        if (SwingUtilities.isEventDispatchThread())
+        {
+            bringUpPickColorDialog(playerName, colorsLeft);
+        }
+        else
+        {
+            SwingUtilities.invokeLater(new Runnable()
+            {
+                public void run()
+                {
+                    bringUpPickColorDialog(playerName, colorsLeft);
+                }
+            });
+        }
+    }
+
+    public void bringUpPickColorDialog(String playerName,
         List<PlayerColor> colorsLeft)
     {
-        PlayerColor color = null;
         board.setPhaseInfo("Pick a color!");
-        do
+        PickColor.PickColorCallback callback = new PickColor.PickColorCallback()
         {
-            color = PickColor.pickColor(board.getFrame(), playerName,
-                colorsLeft, options);
-        }
-        while (color == null);
-        return color;
+            @Override
+            public void tellPickedColor(PlayerColor color)
+            {
+                // method that passes it on to client
+                answerPickColor(color);
+            }
+        };
+        // Do not allow null: for pick initial color keep asking if one chosen
+        new PickColor(board.getFrame(), playerName, colorsLeft, options,
+            callback, false);
     }
 
     public void doPickSplitMarker(Legion parent, Set<String> markersAvailable)
@@ -3177,6 +3200,11 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     public GUICallbacks getCallbackHandler()
     {
         return this;
+    }
+
+    public void answerPickColor(PlayerColor color)
+    {
+        getClient().answerPickColor(color);
     }
 
     public void leaveCarryMode()

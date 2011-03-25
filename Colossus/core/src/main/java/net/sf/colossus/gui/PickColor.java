@@ -8,7 +8,8 @@ import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Arrays;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -17,7 +18,6 @@ import javax.swing.JFrame;
 
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.IOptions;
-import net.sf.colossus.common.Options;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.guiutil.KDialog;
 import net.sf.colossus.guiutil.SaveWindow;
@@ -31,15 +31,31 @@ import net.sf.colossus.guiutil.SaveWindow;
 @SuppressWarnings("serial")
 final class PickColor extends KDialog
 {
-    private PlayerColor color;
+    private static final Logger LOGGER = Logger.getLogger(PickColor.class
+        .getName());
+
+    private final JFrame parentFrame;
+    private final String playerName;
+    private final List<PlayerColor> colorsLeft;
+    private final IOptions options;
+    private final PickColorCallback callback;
+    private final boolean allowNull;
+
     private final SaveWindow saveWindow;
 
-    private PickColor(JFrame parentFrame, String playerName,
-        List<PlayerColor> colorsLeft, IOptions options)
+    public PickColor(final JFrame parentFrame, final String playerName,
+        final List<PlayerColor> colorsLeft, final IOptions options,
+        final PickColorCallback callback, final boolean allowNull)
     {
         super(parentFrame, playerName + ", Pick a Color", true);
 
-        color = null;
+        this.parentFrame = parentFrame;
+        this.playerName = playerName;
+        this.colorsLeft = colorsLeft;
+        // this.colorsLeft = new ArrayList<PlayerColor>(colorsLeft);
+        this.options = options;
+        this.callback = callback;
+        this.allowNull = allowNull;
 
         setBackground(Color.lightGray);
         pack();
@@ -63,14 +79,24 @@ final class PickColor extends KDialog
                 {
                     public void actionPerformed(ActionEvent e)
                     {
-                        color = PlayerColor.getByName(e.getActionCommand());
-                        saveWindow.saveLocation(getLocation());
-                        dispose();
+                        PlayerColor color = PlayerColor.getByName(e
+                            .getActionCommand());
+                        cleanup(color);
                     }
                 });
                 contentPane.add(button);
             }
         }
+
+        // Don't allow exiting without making a choice, or the game will hang
+        addWindowListener(new WindowAdapter()
+        {
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+                cleanup();
+            }
+        });
 
         pack();
         saveWindow = new SaveWindow(options, "PickColor");
@@ -86,36 +112,35 @@ final class PickColor extends KDialog
         setVisible(true);
     }
 
-    private PlayerColor getColor()
+    public void cleanup()
     {
-        return color;
+        cleanup(null);
     }
 
-    static PlayerColor pickColor(JFrame parentFrame,
-        String playerName, List<PlayerColor> colorsLeft, IOptions options)
+    public void cleanup(PlayerColor color)
     {
-        PickColor pc = new PickColor(parentFrame, playerName, colorsLeft,
-            options);
-        return pc.getColor();
-    }
-
-    static String getColorName(int i)
-    {
-        if (i >= 0 && i < PlayerColor.values().length)
+        saveWindow.saveLocation(getLocation());
+        dispose();
+        if (callback != null)
         {
-            return PlayerColor.values()[i].getName();
+            if (color != null || allowNull)
+            {
+                callback.tellPickedColor(color);
+            }
+            else
+            {
+                new PickColor(parentFrame, playerName, colorsLeft, options,
+                    callback, allowNull);
+            }
         }
-        return null;
+        else
+        {
+            LOGGER.warning("Callback is null !?!??");
+        }
     }
 
-    public static void main(String[] args)
+    public static abstract class PickColorCallback
     {
-        Logger logger = Logger.getLogger(PickColor.class.getName());
-        List<PlayerColor> colorsLeft = Arrays.asList(PlayerColor.values());
-        Options options = new Options("Player");
-        PlayerColor color = pickColor(new JFrame(), "Player", colorsLeft,
-            options);
-        logger.info("Picked " + color.getName());
-        System.exit(0);
+        public abstract void tellPickedColor(PlayerColor color);
     }
 }
