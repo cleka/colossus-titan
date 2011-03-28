@@ -330,6 +330,7 @@ final class SocketClientThread extends Thread implements IServer,
     public void setClient(Client client)
     {
         this.clientThread = new ClientThread(client);
+        clientThread.start();
     }
 
     // Implements the method of the "generic" IServerConnection
@@ -663,7 +664,7 @@ final class SocketClientThread extends Thread implements IServer,
 
         else
         {
-            clientThread.callMethod(method, args);
+            clientThread.enqueue(method, args);
         }
     }
 

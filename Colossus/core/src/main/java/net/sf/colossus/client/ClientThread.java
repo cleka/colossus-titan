@@ -2,9 +2,11 @@ package net.sf.colossus.client;
 
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,22 +38,65 @@ import net.sf.colossus.variant.MasterHex;
  *  @author Clemens Katzer
  */
 
-public class ClientThread
+public class ClientThread extends Thread
 {
     private static final Logger LOGGER = Logger.getLogger(ClientThread.class
         .getName());
 
-    private Client client;
+    private static int threadNumberCounter = 0;
+
+    private final int threadNr;
+
+    private final Client client;
+
+    private final LinkedBlockingQueue<ServerEvent> queue;
+
+    private boolean done = false;
+
+    // if we enable that, things get stuck... (perhaps because logger
+    // of all threads need then to get a lock on the logger too often?)
+    private final boolean LOG_PROCESSING_TIMES = false;
+
+
+    // this is enqueued to get the thread out of the "take()"-waiting
+    private final static ServerEvent END_EVENT = new ClientThread.ServerEvent(
+        0L, "END", new ArrayList<String>());
+
 
     public ClientThread(Client client)
     {
         this.client = client;
+        this.threadNr = nextThreadNumber();
+
+        queue = new LinkedBlockingQueue<ServerEvent>();
+    }
+
+    private static synchronized int nextThreadNumber()
+    {
+        return ++threadNumberCounter;
+    }
+
+    public int getThreadNumber()
+    {
+        return this.threadNr;
+    }
+
+    public void enqueue(String method, List<String> args)
+    {
+        queue.offer(new ServerEvent(ClientThread.getNow(), method, args));
     }
 
     public void dispose()
     {
+        // Get thread out of it's "take" waiting
+        done = true;
+        boolean success = queue.offer(END_EVENT);
+        if (!success)
+        {
+            System.out.println("CT " + getName()
+                + ": failed to offer END signal to queue!");
+        }
         client.dispose();
-        client = null;
     }
 
     public void setClosedByServer()
@@ -71,6 +116,46 @@ public class ClientThread
         }
     }
 
+    @Override
+    public void run()
+    {
+        LOGGER.finest("ClientThread run() started.");
+        while (!done)
+        {
+            ServerEvent event = null;
+            try
+            {
+                event = queue.take();
+                if (event == END_EVENT)
+                {
+                    continue;
+                }
+                event.executionStarts(ClientThread.getNow());
+                callMethod(event.getMethod(), event.getArgs());
+                event.executionCompleted(ClientThread.getNow());
+            }
+            catch (InterruptedException e)
+            {
+                LOGGER.severe("queue.take() interrupted?!?!");
+            }
+
+            if (event != null)
+            {
+                if (LOG_PROCESSING_TIMES)
+                {
+                    event.logProcessing();
+                }
+            }
+            else
+            {
+                LOGGER
+                    .severe("event still null - bailed out with exception??");
+            }
+
+        }
+        LOGGER.finest("ClientThread run() ending.");
+    }
+
     public void notifyUserIfGameIsPaused(String message)
     {
         if (client.isPaused())
@@ -87,7 +172,7 @@ public class ClientThread
         }
     }
 
-    public void callMethod(String method, List<String> args)
+    private void callMethod(String method, List<String> args)
     {
         LOGGER.finer("Client (CT) '" + getNameMaybe()
             + "' processing message: " + method);
@@ -689,4 +774,82 @@ public class ClientThread
         return legion;
     }
 
+    public static long getNow()
+    {
+        return new Date().getTime();
+    }
+
+    public static class ServerEvent
+    {
+        private final long received;
+        private final long enqueued;
+        private long executionStarted;
+        private long executionCompleted;
+
+        private final String method;
+        private final List<String> args;
+
+        public ServerEvent(long received, String method, List<String> args)
+        {
+            this.received = received;
+            this.enqueued = ClientThread.getNow();
+            this.method = method;
+            this.args = new ArrayList<String>(args);
+        }
+
+        public String getMethod()
+        {
+            return method;
+        }
+
+        public List<String> getArgs()
+        {
+            return args;
+        }
+
+        public void executionStarts(long when)
+        {
+            this.executionStarted = when;
+        }
+
+        public long getExecutionStarted()
+        {
+            return this.executionStarted;
+        }
+
+        public void executionCompleted(long when)
+        {
+            this.executionCompleted = when;
+        }
+
+        public long getExecutionCompleted()
+        {
+            return this.executionCompleted;
+        }
+
+        public void logProcessing()
+        {
+            long enqueuing = enqueued - received;
+            long execution = executionCompleted - executionStarted;
+            long inQueue = executionStarted - enqueued;
+            long processing = executionCompleted - received;
+
+            Level loglevel;
+            if (processing > 5000)
+            {
+                loglevel = Level.WARNING;
+            }
+            else
+            {
+                loglevel = Level.FINEST;
+            }
+            ClientThread thisThread = (ClientThread)Thread.currentThread();
+            LOGGER.log(loglevel, "Event " + method + " in thread #"
+                + thisThread.getThreadNumber()
+                + " received at "
+                + received + ": overall processing took: " + processing
+                + "ms (enqueuing took " + enqueuing + "ms, inQueue " + inQueue
+                + "ms, processing took " + execution + "ms)");
+        }
+    }
 }
