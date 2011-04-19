@@ -13,6 +13,21 @@
 This describes the recent changes in some more detail than just the
 one-line-info on the main pages "News" section.
 
+<h3>April 19, 2011: Public Test Build from r5019</h3>
+<p/>
+Two changes which hopefully prevent "client stuck" / "client does not 
+respond to server" cases somewhat.
+<ul>
+<li>On game client side, the reading from network and actual processing of the 
+    received data is now two separate threads; this prevents problems that client 
+    won't reply to server's "Hello, are you still alive?" requests in time.</li>
+<li>On various places removed the "synchronized" access, which did lead at least
+    for some players with Java 1.6 to deadlocks (GUI freezes). </li>
+</ul>
+<p />
+
+<hr></hr>
+
 <h3>March 4, 2011: Release 0.12.1 from r5003</h3>
 <p/>
 Two bugfixes and other minor improvements.
@@ -29,8 +44,6 @@ Two bugfixes and other minor improvements.
 New signing certificate because the one used so far will expire in 2 months &rArr; 
 You will be asked to re-confirm that you trust the publisher!
 <p />
-
-<hr></hr>
 
 <h3>February 15, 2011: Release 0.12.0 from r4995</h3>
 <p/>

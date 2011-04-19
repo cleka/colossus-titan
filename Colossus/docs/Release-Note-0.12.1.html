@@ -4,8 +4,21 @@
 <head>
     <meta name="generator"
     content="HTML Tidy for Linux/x86 (vers 1st July 2002), see www.w3.org" />
-    <title>Colossus: Release Note for 0.12.1</title>
+    <title>Colossus: Release Note for 0.12.1 plus two changes</title>
 </head>
+
+<h1>April 19, 2011: Public Test Build from r5019 on top of 0.12.1</h1>
+<p/>
+Two changes which hopefully prevent "client stuck" / "client does not 
+respond to server" cases somewhat.
+<ul>
+<li>On game client side, the reading from network and actual processing of the 
+    received data is now two separate threads; this prevents problems that client 
+    won't reply to server's "Hello, are you still alive?" requests in time.</li>
+<li>On various places removed the "synchronized" access, which did lead at least
+    for some players with Java 1.6 to deadlocks (GUI freezes). </li>
+</ul>
+<p />
 
 <body>
 <h1>Release Note for Colossus 0.12.1 (March 4, 2011)</h1>
@@ -24,7 +37,6 @@ Two bugfixes and other minor improvements.
 <b>Note: </b><br>
 New signing certificate because the one used so far will expire in 2 months &rArr; You will be asked to re-confirm that you trust the publisher!
 
-<p />
 
 </body>
 </html>

@@ -28,11 +28,11 @@ public final class WelcomeDialog extends KFrame
 {
     private final static String title = "Welcome to this new Colossus Release!";
 
-    private final static String CURRENT_WELCOME_KEY = "0.12.0";
+    private final static String CURRENT_WELCOME_KEY = "0.12.1.x-r5019";
 
     private final static String baseUrl = "http://sourceforge.net/projects/colossus/files";
     private final static String colossusReleaseNoteUrl = baseUrl
-        + "/Release-0.12.0";
+        + "/Release-0.12.1.x-r5019";
 
     private static WelcomeDialog showWelcome = null;
 
@@ -42,12 +42,13 @@ public final class WelcomeDialog extends KFrame
         super(title);
 
         String text = "\n"
-            + "  Welcome to this new Colossus release 0.12.0!"
+            + "  Welcome to this new 'Colossus Public Test Build' 0.12.1.x (r5019)!"
             + "\n\n"
             + "  New features:\n"
             + "  - New variant Dino-Titan added\n"
             + "  - New option to disable Warlock recruiting on the first turn\n"
             + "  - A next key ('n') in the move, muster and split phases to move to the next legion that requires action\n"
+            + "  - the 'plus' in r5019 is on top of above two changes which hopefully prevent some client stuck/client GUI freezes cases\n"
             + "\n"
             + "  Plus the usual amount of fixes / stability improvements."
             + "\n\n"
