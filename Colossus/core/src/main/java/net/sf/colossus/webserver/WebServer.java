@@ -339,6 +339,11 @@ public class WebServer implements IWebServer, IRunWebServer
         LOGGER.log(Level.FINE, "Web Server after main loop.");
     }
 
+    public ChatChannel getGeneralChat()
+    {
+        return this.generalChat;
+    }
+
     public void writeBackUsers()
     {
         userDB.storeUsersToFile();
@@ -1315,28 +1320,10 @@ public class WebServer implements IWebServer, IRunWebServer
 
     public void chatSubmit(String chatId, String sender, String message)
     {
-        if (!chatId.equals(IWebServer.generalChatName))
-        {
-            LOGGER.log(Level.WARNING, "Chat for chatId " + chatId
-                + " not implemented.");
-            return;
-        }
-        LOGGER.finest("Chat msg from user " + sender + ": " + message);
-        if (message.startsWith("/ping \""))
-        {
-            handlePingQuotedName(sender, message);
-        }
-        else if (message.startsWith("/ping"))
-        {
-            handlePing(sender, message);
-        }
-        else
-        {
-            generalChat.createStoreAndDeliverMessage(sender, message);
-        }
+        generalChat.createStoreAndDeliverMessage(sender, message);
     }
 
-    private void handlePingQuotedName(String sender, String pingCommand)
+    public void handlePingQuotedName(String sender, String pingCommand)
     {
         long when = new Date().getTime();
         boolean isAdmin = userDB.findUserByName(sender).isAdmin();
@@ -1367,7 +1354,7 @@ public class WebServer implements IWebServer, IRunWebServer
         }
     }
 
-    private void handlePing(String sender, String pingCommand)
+    public void handlePing(String sender, String pingCommand)
     {
         long when = new Date().getTime();
         boolean isAdmin = userDB.findUserByName(sender).isAdmin();

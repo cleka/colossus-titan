@@ -434,7 +434,7 @@ public class WebServerClient implements IWebClient
             String chatId = tokens[1];
             String sender = tokens[2];
             String message = tokens[3];
-            server.chatSubmit(chatId, sender, message);
+            processChatLine(chatId, sender, message);
         }
         else if (command.equals(IWebServer.ChangePassword))
         {
@@ -675,6 +675,45 @@ public class WebServerClient implements IWebClient
 
         return done;
     }
+
+    public void processChatLine(String chatId, String sender, String message)
+    {
+        if (!chatId.equals(IWebServer.generalChatName))
+        {
+            LOGGER.log(Level.WARNING, "Chat for chatId " + chatId
+                + " not implemented.");
+            return;
+        }
+        LOGGER.finest("Chat msg from user " + sender + ": " + message);
+        String msgAllLower = message.toLowerCase();
+
+        if (msgAllLower.startsWith("/?") || msgAllLower.startsWith("/h")
+            || msgAllLower.startsWith("/help"))
+        {
+            server.getGeneralChat()
+                .sendHelpToClient(msgAllLower, chatId, this);
+        }
+        else if (msgAllLower.startsWith("/ping \""))
+        {
+            server.handlePingQuotedName(sender, message);
+        }
+        else if (msgAllLower.startsWith("/ping"))
+        {
+            server.handlePing(sender, message);
+        }
+        else if (msgAllLower.startsWith("/"))
+        {
+            server.getGeneralChat().handleUnknownCommand(msgAllLower, chatId,
+                this);
+        }
+
+        else
+        {
+            server.chatSubmit(chatId, sender, message);
+        }
+    }
+
+
 
     /**
      * if password is okay, check first whether same user is already

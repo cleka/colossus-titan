@@ -6,8 +6,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,6 +32,29 @@ public class ChatChannel
     private final FormatWhen whenFormatter;
 
     private final static String doubledashes = "=========================";
+
+    private final static String[] chatHelp = new String[] { "Chat help:", "",
+        "/help, /h, /? (show help)", "/ping (notify a certain user)",
+        "/contact (how to contact admin)", "",
+        "Use /help <keyword> for detailed help. E.g. /help ping how to use ping." };
+
+    private final static String[] pingHelp = new String[] {
+        "Using /ping:",
+        "",
+        "To notify another user (it will give some beeps, and display your given message"
+            + "in a popup dialog),",
+        "you can use the /ping command:",
+        "  /ping UserName Here comes the message",
+        "If the user's name contains spaces, it must be within double quotes:",
+        "  /ping \"Lengthy User Name\" Here comes the message" };
+
+    private final static String[] contactHelp = new String[] {
+        "Using /contact:",
+        "",
+        "To contact the administrator of this server, send a mail to lemenssi@nurfuerspam.de.",
+        "We also encourage you to use the \"General\" forum, the bugs tracker or the feature",
+        "request tracker on our project page on Sourceforge:",
+        "  http://sourceforge.net/projects/colossus/" };
 
     public ChatChannel(String id, WebServerOptions options, UserDB userDB)
     {
@@ -61,19 +86,75 @@ public class ChatChannel
         }
     }
 
-
     /** Send message of the day lines to one client. */
     public void deliverMessageOfTheDayToClient(String chatId,
-        IWebClient client, ArrayList<String> lines)
+        IWebClient client, List<String> lines)
+    {
+        sendLinesToClient(chatId, client, lines, false, "SYSTEM");
+    }
+
+    public void handleUnknownCommand(String msgAllLower, String chatId,
+        IWebClient client)
+    {
+        String[] lines = new String[] {
+            "Sorry, '" + msgAllLower + "' is not a recognized command.",
+            "Use /help to get a list of valid commands." };
+        sendLinesToClient(chatId, client, Arrays.asList(lines), true, "");
+    }
+
+    public void sendHelpToClient(String msgAllLower, String chatId,
+        IWebClient client)
+    {
+        List<String> words = Arrays.asList(msgAllLower.split(" +"));
+        if (words.size() == 1)
+        {
+            sendLinesToClient(chatId, client, Arrays.asList(chatHelp), true,
+                "");
+        }
+        else
+        {
+            if (words.get(1).startsWith("/ping")
+                || words.get(1).startsWith("ping"))
+            {
+                sendLinesToClient(chatId, client, Arrays.asList(pingHelp),
+                    true, "");
+            }
+            else if (words.get(1).startsWith("/contact")
+                || words.get(1).startsWith("contact"))
+            {
+                sendLinesToClient(chatId, client, Arrays.asList(contactHelp),
+                    true, "");
+            }
+            else
+            {
+                String[] noSuchHelp = new String[] { "Sorry, no specific help available about '"
+                    + words.get(1) + "'." };
+                sendLinesToClient(chatId, client, Arrays.asList(noSuchHelp),
+                    true, "");
+            }
+        }
+    }
+
+    /** Send an arraylist full of lines to one client. */
+    public void sendLinesToClient(String chatId, IWebClient client,
+        List<String> lines, boolean spacer, String sender)
     {
         long when = new Date().getTime();
-        String sender = "SYSTEM";
         boolean isResent = false;
 
+        if (spacer)
+        {
+            client.chatDeliver(chatId, when, sender, "", isResent);
+        }
         for (String line : lines)
         {
             client.chatDeliver(chatId, when, sender, line, isResent);
         }
+        if (spacer)
+        {
+            client.chatDeliver(chatId, when, sender, "", isResent);
+        }
+
     }
 
     // TODO is this perhaps obsolete nowadays?
@@ -103,7 +184,6 @@ public class ChatChannel
             client.chatDeliver(chatId, when, sender, line, isResent);
         }
     }
-
 
     public void createStoreAndDeliverMessage(String sender, String message)
     {
