@@ -192,6 +192,7 @@ public class WebClient extends KFrame implements IWebClient
     private JButton registerOrPasswordButton;
 
     private JButton debugSubmitButton;
+    private JButton rereadLoginMsgButton;
     private JButton shutdownButton;
     private JButton dumpInfoButton;
 
@@ -1596,6 +1597,16 @@ public class WebClient extends KFrame implements IWebClient
         adminPane.add(new JLabel("Server answered:"));
         receivedField = new JLabel("");
         adminPane.add(receivedField);
+
+        rereadLoginMsgButton = new JButton("Reread Login Message");
+        rereadLoginMsgButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                rereadLoginMsgButtonAction();
+            }
+        });
+        adminPane.add(rereadLoginMsgButton);
 
         shutdownButton = new JButton("Shutdown Server");
         shutdownButton.addActionListener(new ActionListener()
@@ -3139,6 +3150,16 @@ public class WebClient extends KFrame implements IWebClient
         {
             LOGGER.warning("unexpected command " + command
                 + " on LoginButton?");
+        }
+    }
+
+
+
+    private void rereadLoginMsgButtonAction()
+    {
+        if (isAdmin())
+        {
+            server.rereadLoginMessage();
         }
     }
 

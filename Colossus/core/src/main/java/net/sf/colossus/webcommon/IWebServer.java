@@ -84,6 +84,8 @@ public interface IWebServer
 
     // public void submitAnyText(String text);
 
+    public void rereadLoginMessage();
+
     public void shutdownServer();
 
     public void dumpInfo();

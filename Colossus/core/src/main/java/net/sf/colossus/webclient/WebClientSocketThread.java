@@ -786,6 +786,11 @@ public class WebClientSocketThread extends Thread implements IWebServer
         send(IWebServer.ShutdownServer);
     }
 
+    public void rereadLoginMessage()
+    {
+        send(IWebServer.RereadLoginMessage);
+    }
+
     public void dumpInfo()
     {
         send(IWebServer.DumpInfo);
