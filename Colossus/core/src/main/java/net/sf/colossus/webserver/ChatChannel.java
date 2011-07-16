@@ -51,7 +51,7 @@ public class ChatChannel
     private final static String[] contactHelp = new String[] {
         "Using /contact:",
         "",
-        "To contact the administrator of this server, send a mail to lemenssi@nurfuerspam.de.",
+        "To contact the administrator of this server, send a mail to support@play-colossus.net .",
         "We also encourage you to use the \"General\" forum, the bugs tracker or the feature",
         "request tracker on our project page on Sourceforge:",
         "  http://sourceforge.net/projects/colossus/" };
@@ -122,8 +122,7 @@ public class ChatChannel
             else if (words.get(1).startsWith("/contact")
                 || words.get(1).startsWith("contact"))
             {
-                sendLinesToClient(chatId, client, Arrays.asList(contactHelp),
-                    true, "");
+                showContactHelp(chatId, client);
             }
             else
             {
@@ -133,6 +132,16 @@ public class ChatChannel
                     true, "");
             }
         }
+    }
+
+    /**
+     * @param chatId Id of the chat
+     * @param client WebClient connection who requested the contact help
+     */
+    public void showContactHelp(String chatId, IWebClient client)
+    {
+        sendLinesToClient(chatId, client, Arrays.asList(contactHelp),
+            true, "");
     }
 
     /** Send an arraylist full of lines to one client. */

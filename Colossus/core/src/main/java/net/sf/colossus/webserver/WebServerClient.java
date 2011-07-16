@@ -701,6 +701,10 @@ public class WebServerClient implements IWebClient
         {
             server.handlePing(sender, message);
         }
+        else if (msgAllLower.startsWith("/contact"))
+        {
+            server.getGeneralChat().showContactHelp(chatId, this);
+        }
         else if (msgAllLower.startsWith("/"))
         {
             server.getGeneralChat().handleUnknownCommand(msgAllLower, chatId,
