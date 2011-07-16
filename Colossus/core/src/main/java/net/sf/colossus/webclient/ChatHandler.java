@@ -16,6 +16,7 @@ import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 import net.sf.colossus.webcommon.FormatWhen;
 import net.sf.colossus.webcommon.IWebServer;
@@ -217,12 +218,38 @@ public class ChatHandler
     {
         String whenTime = whenFormatter.timeAsString(when);
         String dateChange = whenFormatter.hasDateChanged();
+
+        String doubleDashLine = "";
         if (dateChange != null)
         {
-            displayArea.append("\n" + doubledashes + " " + dateChange + " "
-                + doubledashes + "\n");
+            doubleDashLine = "\n" + doubledashes + " " + dateChange + " "
+                + doubledashes + "\n";
         }
-        displayArea.append(whenTime + " " + sender + ": " + message + "\n");
+
+        final String textToAppend = doubleDashLine + whenTime + " " + sender
+            + ": " + message + "\n";
+
+        if (SwingUtilities.isEventDispatchThread())
+        {
+            appendToDisplayArea(textToAppend);
+        }
+        else
+        {
+            SwingUtilities.invokeLater(new Runnable()
+            {
+                public void run()
+                {
+                    appendToDisplayArea(textToAppend);
+                }
+            });
+        }
+
+    }
+
+    private void appendToDisplayArea(final String textToAppend)
+    {
+        displayArea.append(textToAppend);
+        displayArea.setCaretPosition(displayArea.getDocument().getLength());
         if (displayArea.getLineCount() - 2 > displayArea.getRows())
         {
             displayScrollBar.setValue(displayScrollBar.getMaximum());
