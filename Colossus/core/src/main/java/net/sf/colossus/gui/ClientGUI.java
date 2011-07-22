@@ -1244,6 +1244,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
                 .getCurrentHex());
             hex.repaint();
         }
+        board.actOnEditLegionMaybe(legion);
     }
 
     public void actOnAddCreature(Legion legion, CreatureType creature,
@@ -1255,6 +1256,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
                 .getCurrentHex());
             hex.repaint();
         }
+
+        board.actOnEditLegionMaybe(legion);
 
         eventViewer.addCreature(legion, creature, reason);
     }

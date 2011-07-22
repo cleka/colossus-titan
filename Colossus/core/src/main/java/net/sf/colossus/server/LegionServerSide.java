@@ -362,6 +362,12 @@ public final class LegionServerSide extends Legion implements
         }
     }
 
+    void editRemoveCreature(CreatureType creature)
+    {
+        removeCreature(creature, false, true);
+        game.getCaretaker().putOneBack(creature);
+    }
+
     /*
      * Can't use undoRecruit, because undoRecruit directly removes it,
      * and the iterator in removeAllDead removes as well

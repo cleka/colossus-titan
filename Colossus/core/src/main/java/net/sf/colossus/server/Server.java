@@ -581,7 +581,6 @@ public final class Server extends Thread implements IServer
         }
     }
 
-
     private void handleChannelChanges() throws IOException
     {
         synchronized (channelChanges)
@@ -1948,7 +1947,8 @@ public final class Server extends Thread implements IServer
     {
         if (!isActivePlayer())
         {
-            LOGGER.warning(getPlayerName() + " illegally called engage(): not active player");
+            LOGGER.warning(getPlayerName()
+                + " illegally called engage(): not active player");
             return;
         }
         game.engage(hex);
@@ -2179,7 +2179,8 @@ public final class Server extends Thread implements IServer
         if (!isBattleActivePlayer())
         {
             LOGGER.warning(getPlayerName()
-                + " illegally called undoBattleMove(): " + "not battle active player");
+                + " illegally called undoBattleMove(): "
+                + "not battle active player");
             return;
         }
         game.getBattleSS().undoMove(hex);
@@ -2964,8 +2965,9 @@ public final class Server extends Thread implements IServer
             {
                 waitingToCatchup.remove(ch);
                 int remaining = waitingToCatchup.size();
-                LOGGER.info("Client " + playerName + " won't confirm catch-up ("
-                    + reason + "). Remaining: " + remaining);
+                LOGGER.info("Client " + playerName
+                    + " won't confirm catch-up (" + reason + "). Remaining: "
+                    + remaining);
                 if (remaining <= 0)
                 {
                     actOnAllCaughtUp();
@@ -3015,8 +3017,7 @@ public final class Server extends Thread implements IServer
         }
         else
         {
-            LOGGER
-                .severe("All clients caught up, but no action set??");
+            LOGGER.severe("All clients caught up, but no action set??");
         }
     }
 

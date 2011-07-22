@@ -3491,4 +3491,16 @@ public final class Client implements IClient, IOracle, IVariant,
     {
         gui.setPreferencesRadioButtonValue(name, value);
     }
+
+    public void editAddCreature(String markerId, String creatureType)
+    {
+        localServer.getGame().editModeAddCreature(markerId, creatureType);
+    }
+
+    public void editRemoveCreature(String markerId, String creatureType)
+    {
+        localServer.getGame().editModeRemoveCreature(markerId,
+            creatureType);
+    }
+
 }

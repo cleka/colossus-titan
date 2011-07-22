@@ -105,6 +105,7 @@ public final class MasterBoard extends JPanel
     private KFrame masterFrame;
     private ShowReadme showReadme;
     private ShowHelpDoc showHelpDoc;
+    private JMenu editMenu;
     private JMenu phaseMenu;
     private JPopupMenu popupMenu;
     private JPopupMenu popupMenuWithLegions;
@@ -197,6 +198,9 @@ public final class MasterBoard extends JPanel
     private static final String viewHelpDoc = "Options Documentation";
     private static final String viewWelcome = "Show Welcome message";
 
+    private static final String editLegion = "Edit Legion content";
+    private static final String relocateLegion = "Relocate Legion";
+
     private AbstractAction newGameAction;
     private AbstractAction loadGameAction;
     private AbstractAction saveGameAction;
@@ -204,6 +208,9 @@ public final class MasterBoard extends JPanel
     private AbstractAction closeBoardAction;
     private AbstractAction quitGameAction;
     private AbstractAction checkConnectionAction;
+
+    private AbstractAction editLegionAction;
+    private AbstractAction relocateLegionAction;
 
     private AbstractAction clearRecruitChitsAction;
     private AbstractAction skipLegionAction;
@@ -235,6 +242,11 @@ public final class MasterBoard extends JPanel
     private SaveWindow saveWindow;
 
     private String cachedPlayerName = "<not set yet>";
+
+    private boolean editLegionFlag = false;
+    EditLegion editLegionOngoing = null;
+    private boolean relocateLegionFlag = false;
+
 
     private final class InfoPopupHandler extends KeyAdapter
     {
@@ -998,6 +1010,23 @@ public final class MasterBoard extends JPanel
             }
         };
 
+        editLegionAction = new AbstractAction(editLegion)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                editLegionFlag = true;
+            }
+        };
+
+        relocateLegionAction = new AbstractAction(relocateLegion)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                System.out.println("Relocate legion");
+                relocateLegionFlag = true;
+            }
+        };
+
     }
 
     // Derive the logDirectory from the FileHandler.pattern property
@@ -1177,6 +1206,24 @@ public final class MasterBoard extends JPanel
         mi.setMnemonic(KeyEvent.VK_C);
         mi = fileMenu.add(quitGameAction);
         mi.setMnemonic(KeyEvent.VK_Q);
+
+        // Edit menu
+
+        if (!client.isRemote())
+        {
+            editMenu = new JMenu("Edit");
+            editMenu.setMnemonic(KeyEvent.VK_E);
+            menuBar.add(editMenu);
+
+            mi = editMenu.add(editLegionAction);
+            mi.setMnemonic(KeyEvent.VK_C);
+
+            if (false)
+            {
+                mi = editMenu.add(relocateLegionAction);
+                mi.setMnemonic(KeyEvent.VK_R);
+            }
+        }
 
         // Phase menu
 
@@ -1544,6 +1591,9 @@ public final class MasterBoard extends JPanel
         {
             throw new IllegalStateException("Client has unknown phase value");
         }
+
+        // editLegionAction.setEnabled(false);
+        // relocateLegionAction.setEnabled(false);
     }
 
     private void setupPhasePreparations(String titleText)
@@ -1616,6 +1666,8 @@ public final class MasterBoard extends JPanel
         {
             setupAsInactivePlayer("moves");
         }
+        // editLegionAction.setEnabled(true);
+        // relocateLegionAction.setEnabled(true);
     }
 
     public void setMovementPhase()
@@ -2211,6 +2263,18 @@ public final class MasterBoard extends JPanel
         {
             client.doSplit(legion);
         }
+        else if (phase == Phase.MOVE && editLegionFlag)
+        {
+            viewEditLegion(legion);
+            editLegionFlag = false;
+        }
+
+        else if (phase == Phase.MOVE && relocateLegionFlag)
+        {
+            // new EditLegion(legion);
+            relocateLegionFlag = false;
+        }
+
         else if (phase == Phase.MOVE)
         {
             legion.setVisitedThisPhase(true);
@@ -2265,6 +2329,35 @@ public final class MasterBoard extends JPanel
             attemptEngage(hex);
         }
     }
+
+    public void actOnEditLegionMaybe(Legion legion)
+    {
+        if (editLegionOngoing != null)
+        {
+            editLegionOngoing.dispose();
+            viewEditLegion((LegionClientSide)legion);
+        }
+    }
+
+    /**
+     *
+     * @param legion the legion which shall be edited
+     */
+    public void viewEditLegion(LegionClientSide legion)
+    {
+        int viewMode = gui.getViewMode();
+        boolean dubiousAsBlanks = gui.getOptions().getOption(
+            Options.dubiousAsBlanks);
+        boolean showMarker = gui.getOptions().getOption(Options.showMarker);
+        Marker marker = legionToMarkerMap.get(legion);
+        Point point = marker.getLocation();
+
+        editLegionOngoing = new EditLegion(gui, masterFrame, legion, point,
+            scrollPane, 4 * Scale.get(), viewMode, client.isMyLegion(legion),
+            dubiousAsBlanks, showMarker);
+    }
+
+
 
     /**
      * tellEngagement calls this, now "engaging" is not pending, instead

@@ -34,6 +34,7 @@ import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.Proposal;
 import net.sf.colossus.game.actions.AddCreatureAction;
+import net.sf.colossus.game.actions.EditAddCreature;
 import net.sf.colossus.game.actions.Summoning;
 import net.sf.colossus.server.BattleServerSide.AngelSummoningStates;
 import net.sf.colossus.util.InstanceTracker;
@@ -2006,6 +2007,31 @@ public final class GameServerSide extends Game
             LOGGER.finest("Did not add creature " + recruit.getName()
                 + " - none left in caretaker to take!");
         }
+    }
+
+    public void editModeAddCreature(String markerId,
+        String creatureName)
+    {
+        CreatureType creature = getVariant().getCreatureByName(creatureName);
+        Player player = getPlayerByMarkerId(markerId);
+        LegionServerSide legion = (LegionServerSide)player
+            .getLegionByMarkerId(markerId);
+
+        AddCreatureAction event = new EditAddCreature(legion, creature);
+        legion.addCreature(creature, true);
+        server.allTellAddCreature(event, true, Constants.reasonEdit);
+    }
+
+    public void editModeRemoveCreature(String markerId, String creatureName)
+    {
+        CreatureType creature = getVariant().getCreatureByName(creatureName);
+        Player player = getPlayerByMarkerId(markerId);
+        LegionServerSide legion = (LegionServerSide)player
+            .getLegionByMarkerId(markerId);
+
+        legion.editRemoveCreature(creature);
+        server.allTellRemoveCreature(legion, creature, true,
+            Constants.reasonEdit);
     }
 
     /**

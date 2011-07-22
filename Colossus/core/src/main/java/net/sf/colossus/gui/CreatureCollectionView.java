@@ -42,6 +42,7 @@ class CreatureCollectionView extends KDialog
         .getLogger(CreatureCollectionView.class.getName());
 
     private final ClientGUI gui;
+    private final EditLegion editLegion;
     private static final int CHIT_SIZE = 60;
 
     private boolean gone;
@@ -84,11 +85,18 @@ class CreatureCollectionView extends KDialog
 
     CreatureCollectionView(JFrame frame, ClientGUI clientGui)
     {
+        this(frame, clientGui, null);
+    }
+
+    CreatureCollectionView(JFrame frame, ClientGUI clientGui,
+        EditLegion editLegion)
+    {
         super(frame, "Caretaker's Stacks", false);
         this.parentFrame = frame;
         setFocusable(false);
 
         this.gui = clientGui;
+        this.editLegion = editLegion;
         this.gone = false;
 
         getContentPane().setLayout(new BorderLayout());
@@ -160,10 +168,19 @@ class CreatureCollectionView extends KDialog
                 {
                     if (e.getButton() == MouseEvent.BUTTON1)
                     {
-                        new ShowCreatureDetails(
-                            CreatureCollectionView.this.parentFrame, type,
-                            null, CreatureCollectionView.this.scrollPane, gui
+                        if (editLegion != null)
+                        {
+                            editLegion.selectedCreature(type);
+                            dispose();
+                        }
+                        else
+                        {
+                            new ShowCreatureDetails(
+                                CreatureCollectionView.this.parentFrame, type,
+                                null, CreatureCollectionView.this.scrollPane,
+                                gui
                                 .getGame().getVariant(), gui);
+                        }
                     }
                 }
             });
