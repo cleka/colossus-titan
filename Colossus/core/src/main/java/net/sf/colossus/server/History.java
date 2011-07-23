@@ -633,8 +633,9 @@ public class History
             // Skip for players that will be dead by end of replay
             if (!legion.getPlayer().getDeadBeforeSave())
             {
+                boolean doHistory = (reason.equals(Constants.reasonEdit));
                 server.allTellAddCreature(new AddCreatureAction(legion,
-                    creatureType), false, reason);
+                    creatureType), doHistory, reason);
             }
             LOGGER.finest("Legion '" + markerId + "' now contains "
                 + legion.getCreatures());
@@ -677,8 +678,9 @@ public class History
             if (removedCritter != null
                 && !legion.getPlayer().getDeadBeforeSave())
             {
-                server.allTellRemoveCreature(legion, removedCritter, false,
-                    reason);
+                boolean doHistory = (reason.equals(Constants.reasonEdit));
+                server.allTellRemoveCreature(legion, removedCritter,
+                    doHistory, reason);
             }
             LOGGER.finest("Legion '" + markerId + "' now contains "
                 + legion.getCreatures());
