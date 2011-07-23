@@ -2034,6 +2034,17 @@ public final class GameServerSide extends Game
             Constants.reasonEdit);
     }
 
+    public void editModeRelocateLegion(String markerId, String hexLabel)
+    {
+        Player player = getPlayerByMarkerId(markerId);
+        LegionServerSide legion = (LegionServerSide)player
+            .getLegionByMarkerId(markerId);
+        MasterHex hex = getVariant().getMasterBoard().getHexByLabel(hexLabel);
+        legion.setCurrentHex(hex);
+        server.allTellLegionLocation(legion);
+        history.relocateLegionEvent(legion);
+    }
+
     /**
      * If the legion can acquire (height < 7), find out which acquirable it
      * might get for the pointsToAdd, and fire off the askAcquirable messages.

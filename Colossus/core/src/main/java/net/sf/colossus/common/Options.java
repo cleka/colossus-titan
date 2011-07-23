@@ -105,6 +105,7 @@ public final class Options implements IOptions
     public static final String noFirstTurnWarlockRecruit = "No Warlock recruiting on first turn";
 
     public static final String unlimitedMulligans = "Unlimited Mulligans";
+    public static final String enableEditingMode = "Enable Editing Mode";
 
     // Those are global options which need to be transferred to clients, even if
     // not set (meaning false), but if Client has them stored from earlier synchronizations
@@ -112,7 +113,8 @@ public final class Options implements IOptions
     public static final String[] globalGameOptions = { cumulativeSlow,
         oneHexAllowed, nonRandomBattleDice, autoSansLordBattles,
         noFirstTurnT2TTeleport, noFirstTurnTeleport, towerToTowerTeleportOnly,
-        noTowerTeleport, noTitanTeleport, unlimitedMulligans };
+        noTowerTeleport, noTitanTeleport, unlimitedMulligans,
+        enableEditingMode };
 
     // Display options (client only)
     public static final String stealFocus = "Steal focus";
@@ -213,6 +215,9 @@ public final class Options implements IOptions
     public static final String favoriteLookFeel = "Favorite Look And Feel";
     public static final String serverName = "Server name";
     public static final String activePreferencesTab = "Active preferences tab";
+
+    public static final String editModeActive = "Edit Mode";
+
 
     private final Properties props = new Properties();
     private final String owner; // playerName, or Constants.optionsServerName

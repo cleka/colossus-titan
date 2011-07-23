@@ -2618,6 +2618,12 @@ public final class Client implements IClient, IOracle, IVariant,
 
     }
 
+    public void relocateLegion(Legion legion, MasterHex destination)
+    {
+        localServer.getGame().editModeRelocateLegion(legion.getMarkerId(),
+            destination.getLabel());
+    }
+
     /*
      * Reset the cached reservations.
      * Should be called at begin of each recruit turn, if
@@ -3501,6 +3507,11 @@ public final class Client implements IClient, IOracle, IVariant,
     {
         localServer.getGame().editModeRemoveCreature(markerId,
             creatureType);
+    }
+
+    public void editRelocateLegion(String markerId, String hexLabel)
+    {
+        localServer.getGame().editModeRelocateLegion(markerId, hexLabel);
     }
 
 }

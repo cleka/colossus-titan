@@ -198,9 +198,6 @@ public final class MasterBoard extends JPanel
     private static final String viewHelpDoc = "Options Documentation";
     private static final String viewWelcome = "Show Welcome message";
 
-    private static final String editLegion = "Edit Legion content";
-    private static final String relocateLegion = "Relocate Legion";
-
     private AbstractAction newGameAction;
     private AbstractAction loadGameAction;
     private AbstractAction saveGameAction;
@@ -208,9 +205,6 @@ public final class MasterBoard extends JPanel
     private AbstractAction closeBoardAction;
     private AbstractAction quitGameAction;
     private AbstractAction checkConnectionAction;
-
-    private AbstractAction editLegionAction;
-    private AbstractAction relocateLegionAction;
 
     private AbstractAction clearRecruitChitsAction;
     private AbstractAction skipLegionAction;
@@ -243,9 +237,8 @@ public final class MasterBoard extends JPanel
 
     private String cachedPlayerName = "<not set yet>";
 
-    private boolean editLegionFlag = false;
     EditLegion editLegionOngoing = null;
-    private boolean relocateLegionFlag = false;
+    EditLegion relocateOngoing = null;
 
 
     private final class InfoPopupHandler extends KeyAdapter
@@ -1010,23 +1003,6 @@ public final class MasterBoard extends JPanel
             }
         };
 
-        editLegionAction = new AbstractAction(editLegion)
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                editLegionFlag = true;
-            }
-        };
-
-        relocateLegionAction = new AbstractAction(relocateLegion)
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                System.out.println("Relocate legion");
-                relocateLegionFlag = true;
-            }
-        };
-
     }
 
     // Derive the logDirectory from the FileHandler.pattern property
@@ -1209,20 +1185,14 @@ public final class MasterBoard extends JPanel
 
         // Edit menu
 
-        if (!client.isRemote())
+        if (gui.getOptions().getOption(Options.enableEditingMode)
+            && !client.isRemote())
         {
             editMenu = new JMenu("Edit");
             editMenu.setMnemonic(KeyEvent.VK_E);
             menuBar.add(editMenu);
 
-            mi = editMenu.add(editLegionAction);
-            mi.setMnemonic(KeyEvent.VK_C);
-
-            if (false)
-            {
-                mi = editMenu.add(relocateLegionAction);
-                mi.setMnemonic(KeyEvent.VK_R);
-            }
+            addCheckBox(editMenu, Options.editModeActive, KeyEvent.VK_E);
         }
 
         // Phase menu
@@ -1591,9 +1561,6 @@ public final class MasterBoard extends JPanel
         {
             throw new IllegalStateException("Client has unknown phase value");
         }
-
-        // editLegionAction.setEnabled(false);
-        // relocateLegionAction.setEnabled(false);
     }
 
     private void setupPhasePreparations(String titleText)
@@ -1666,8 +1633,6 @@ public final class MasterBoard extends JPanel
         {
             setupAsInactivePlayer("moves");
         }
-        // editLegionAction.setEnabled(true);
-        // relocateLegionAction.setEnabled(true);
     }
 
     public void setMovementPhase()
@@ -2169,9 +2134,20 @@ public final class MasterBoard extends JPanel
                         Options.dubiousAsBlanks);
                     boolean showMarker = gui.getOptions().getOption(
                         Options.showMarker);
-                    new ShowLegion(masterFrame, legion, point, scrollPane,
-                        4 * Scale.get(), viewMode, client.isMyLegion(legion),
-                        dubiousAsBlanks, showMarker);
+                    if (gui.getOptions().getOption(Options.editModeActive))
+                    {
+                        new EditLegion(gui, masterFrame, legion, point,
+                            scrollPane, 4 * Scale.get(), viewMode, client
+                                .isMyLegion(legion), dubiousAsBlanks,
+                            showMarker);
+                    }
+                    else
+                    {
+                        new ShowLegion(masterFrame, legion, point, scrollPane,
+                            4 * Scale.get(), viewMode, client
+                                .isMyLegion(legion), dubiousAsBlanks,
+                            showMarker);
+                    }
                     return;
                 }
                 else if (client.isMyLegion(legion))
@@ -2263,17 +2239,6 @@ public final class MasterBoard extends JPanel
         {
             client.doSplit(legion);
         }
-        else if (phase == Phase.MOVE && editLegionFlag)
-        {
-            viewEditLegion(legion);
-            editLegionFlag = false;
-        }
-
-        else if (phase == Phase.MOVE && relocateLegionFlag)
-        {
-            // new EditLegion(legion);
-            relocateLegionFlag = false;
-        }
 
         else if (phase == Phase.MOVE)
         {
@@ -2306,7 +2271,16 @@ public final class MasterBoard extends JPanel
     private void actOnHex(MasterHex hex)
     {
         Phase phase = gui.getGame().getPhase();
-        if (phase == Phase.SPLIT)
+
+        if (relocateOngoing != null)
+        {
+            gui.getClient().editRelocateLegion(
+                relocateOngoing.getLegion().getMarkerId(),
+                hex.getLabel());
+            relocateOngoing.dispose();
+            relocateOngoing = null;
+        }
+        else if (phase == Phase.SPLIT)
         {
             highlightTallLegions();
         }
@@ -2332,11 +2306,24 @@ public final class MasterBoard extends JPanel
 
     public void actOnEditLegionMaybe(Legion legion)
     {
-        if (editLegionOngoing != null)
+        if (gui.getOptions().getOption(Options.editModeActive))
         {
-            editLegionOngoing.dispose();
-            viewEditLegion((LegionClientSide)legion);
+            if (editLegionOngoing != null
+                && editLegionOngoing.getLegion().equals(legion))
+            {
+                viewEditLegion((LegionClientSide)legion);
+            }
         }
+    }
+
+    public void setEditOngoing(EditLegion editLegion)
+    {
+        editLegionOngoing = editLegion;
+    }
+
+    public void setRelocateOngoing(EditLegion editLegion)
+    {
+        relocateOngoing = editLegion;
     }
 
     /**

@@ -24,6 +24,7 @@ import javax.swing.JScrollPane;
 
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.common.Options;
+import net.sf.colossus.game.Legion;
 import net.sf.colossus.guiutil.KDialog;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.variant.CreatureType;
@@ -42,6 +43,8 @@ final class EditLegion extends KDialog
 
     private final LegionClientSide legion;
 
+    private final JLabel infoLabel;
+
     EditLegion(ClientGUI gui, JFrame parentFrame, LegionClientSide legion,
         Point point,
         JScrollPane pane, int scale, int viewMode, boolean isMyLegion,
@@ -51,6 +54,8 @@ final class EditLegion extends KDialog
 
         this.gui = gui;
         this.legion = legion;
+
+        this.infoLabel = new JLabel("--some info here--");
 
         if (legion.getImageNames().isEmpty())
         {
@@ -70,8 +75,8 @@ final class EditLegion extends KDialog
 
         getContentPane().setLayout(new BorderLayout());
 
-        getContentPane().add(new JLabel("Click on a creature to remove it"),
-            BorderLayout.NORTH);
+        setNormalText();
+        getContentPane().add(infoLabel, BorderLayout.NORTH);
 
         LegionEditPanel liPanel = new LegionEditPanel(legion, scale, 5, 2,
             false, viewMode, isMyLegion, dubiousAsBlanks, false, showMarker);
@@ -109,9 +114,21 @@ final class EditLegion extends KDialog
         repaint();
     }
 
+    public void setNormalText()
+    {
+        infoLabel.setText("Click on a creature to remove it");
+    }
+
+    public void setRelocateText()
+    {
+        infoLabel.setText("Click on destination hex!");
+    }
+
     public void selectedCreature(CreatureType type)
     {
+        gui.getBoard().setEditOngoing(EditLegion.this);
         gui.getClient().editAddCreature(legion.getMarkerId(), type.getName());
+        dispose();
     }
 
     public void addCreature()
@@ -119,11 +136,15 @@ final class EditLegion extends KDialog
         new CreatureCollectionView(gui.getBoard().getFrame(), gui, this);
     }
 
+    public Legion getLegion()
+    {
+        return legion;
+    }
+
     public void beDone()
     {
         dispose();
     }
-
 
     public final class LegionEditPanel extends JPanel
     {
@@ -337,8 +358,10 @@ final class EditLegion extends KDialog
                     {
                         Chit chit = (Chit)e.getComponent();
                         String id = chit.getId();
+                        gui.getBoard().setEditOngoing(EditLegion.this);
                         gui.getClient().editRemoveCreature(
                             EditLegion.this.legion.getMarkerId(), id);
+                        dispose();
                     }
                 });
 
@@ -355,15 +378,25 @@ final class EditLegion extends KDialog
                 }
             });
             buttonPanel.add(addButton);
+
+            final JButton relocateButton = new JButton("Move");
+            relocateButton.addActionListener(new ActionListener()
+            {
+                public void actionPerformed(ActionEvent e)
+                {
+                    gui.getBoard().setRelocateOngoing(EditLegion.this);
+                    setRelocateText();
+                    relocateButton.setEnabled(false);
+                }
+            });
+            buttonPanel.add(relocateButton);
+
             buttonPanel.setLocation(
                 i * (effectiveChitSize + padding) + margin, margin);
             buttonPanel.setSize(new Dimension(effectiveChitSize,
                 effectiveChitSize));
             i++;
             add(buttonPanel);
-
-
-
 
             if (showLegionValue && allCertain)
             {
@@ -385,7 +418,7 @@ final class EditLegion extends KDialog
             }
 
             setSize(
-                (legion.getImageNames().size() + (showMarker ? 1 : 0) + 2 + (showLegionValue
+                (legion.getImageNames().size() + (showMarker ? 1 : 0) + 1 + (showLegionValue
                     && allCertain ? 1 : 0))
                     * (effectiveChitSize + padding) - padding + 2 * margin,
                 effectiveChitSize + 2 * margin);

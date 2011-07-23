@@ -204,6 +204,14 @@ public class History
         recentEvents.add(event);
     }
 
+    void relocateLegionEvent(Legion legion)
+    {
+        Element event = new Element("RelocateLegion");
+        event.setAttribute("markerId", legion.getMarkerId());
+        event.setAttribute("destination", legion.getCurrentHex().getLabel());
+        recentEvents.add(event);
+    }
+
     void splitEvent(Legion parent, Legion child, List<CreatureType> splitoffs,
         int turn)
     {
@@ -680,6 +688,17 @@ public class History
                 LOGGER.finer("Legion '" + markerId + "' removed");
             }
         }
+
+        else if (eventName.equals("RelocateLegion"))
+        {
+            String markerId = el.getAttributeValue("markerId");
+            String hexLabel = el.getAttributeValue("destination");
+            // Other events come via server from client, and history replay does
+            // the same. This one here came direct via localServer to game, and
+            // thus we keep it the same.
+            game.editModeRelocateLegion(markerId, hexLabel);
+        }
+
         else if (eventName.equals("PlayerElim"))
         {
             String playerName = el.getAttributeValue("name");
