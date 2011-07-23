@@ -29,3 +29,4 @@ fi
 java -Djava.util.logging.config.file=logging.properties  -Dnet.sf.colossus.stressTestRounds=$IROUNDS -Dnet.sf.colossus.forceViewBoard=true -Dnet.sf.colossus.endAfterFirstBattle=true  -Xmx256M -jar Colossus.jar  -gS -q -A $LOADOPTION
 
 # EOF
+
