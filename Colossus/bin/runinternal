@@ -22,10 +22,10 @@ then
   FILE=$1
   echo "Games will start from savegame $FILE."
   shift
-  LOADOPTION=" --load FILE "
+  LOADOPTION=" --load $FILE "
 fi
 
 
-java -Djava.util.logging.config.file=logging.properties  -Dnet.sf.colossus.stressTestRounds=$IROUNDS -Dnet.sf.colossus.forceViewBoard=yes -Dnet.sf.colossus.endAfterFirstBattle=true  -Xmx256M -jar Colossus.jar  -gS -q -A
+java -Djava.util.logging.config.file=logging.properties  -Dnet.sf.colossus.stressTestRounds=$IROUNDS -Dnet.sf.colossus.forceViewBoard=true -Dnet.sf.colossus.endAfterFirstBattle=true  -Xmx256M -jar Colossus.jar  -gS -q -A $LOADOPTION
 
 # EOF
