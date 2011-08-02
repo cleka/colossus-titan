@@ -1,8 +1,8 @@
 package net.sf.colossus.game;
 
 
+import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -47,7 +47,7 @@ public final class BattleUnit implements BattleCritter
     /** Listeners to be informed when something changes, e.g. right now only
      *  GUIBattleChit that needs to repaint if dead or hits change.
      */
-    private final Set<Listener> listeners = new TreeSet<Listener>();
+    private final Set<Listener> listeners = new HashSet<Listener>();
 
     public BattleUnit(String id, boolean defender, int tag,
         BattleHex currentHex, CreatureType type, Legion legion)
