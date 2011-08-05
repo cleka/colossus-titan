@@ -235,6 +235,7 @@ public class WebClient extends KFrame implements IWebClient
     private JButton watchButton;
     private JButton hideButton;
     private JLabel hideButtonText;
+    private JTextField gameNrField;
 
     private JRadioButton autoGSNothingRB;
     private JRadioButton autoGSHideRB;
@@ -1451,6 +1452,33 @@ public class WebClient extends KFrame implements IWebClient
         runningGamesPane.add(runtablescrollpane);
 
         runningGamesTab.add(runningGamesPane);
+
+        if (false)
+        {
+            Box loadSaveGamePanel = new Box(BoxLayout.X_AXIS);
+            gameNrField = new JTextField();
+            gameNrField.setSize(gameNrField.getMinimumSize());
+            loadSaveGamePanel.add(gameNrField);
+            JButton loadGameButton = new JButton("Load Game");
+            loadGameButton.addActionListener(new ActionListener()
+            {
+                public void actionPerformed(ActionEvent e)
+                {
+                    loadGameButtonAction();
+                }
+            });
+
+            loadSaveGamePanel.add(loadGameButton);
+            loadSaveGamePanel.add(Box.createHorizontalGlue());
+            loadSaveGamePanel.setPreferredSize(loadSaveGamePanel
+                .getMinimumSize());
+            loadSaveGamePanel.setSize(loadSaveGamePanel.getMinimumSize());
+            loadSaveGamePanel.setAlignmentY(Box.TOP_ALIGNMENT);
+            runningGamesTab.add(new JLabel("x"));
+            runningGamesTab.add(loadSaveGamePanel);
+            runningGamesTab.add(new JLabel("y"));
+            runningGamesTab.add(Box.createVerticalGlue());
+        }
 
         // ------------------ Hide WebClient stuff ---------------
 
@@ -3129,6 +3157,12 @@ public class WebClient extends KFrame implements IWebClient
     private void watchButtonAction()
     {
         System.out.println("Watch button!");
+    }
+
+    private void loadGameButtonAction()
+    {
+        String number = gameNrField.getText();
+        System.out.println("Load Button, game nr " + number);
     }
 
     private void quitButtonAction()
