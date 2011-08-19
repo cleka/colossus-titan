@@ -24,6 +24,7 @@ import net.sf.colossus.variant.HazardTerrain;
  * @version $Id: BattlelandRandomizerLoader.jj 3995 2009-04-08 14:11:43Z cleka $
  * @see net.sf.colossus.variant.BattleHex
  */
+@SuppressWarnings("all")
 public class BattlelandRandomizerLoader implements
     BattlelandRandomizerLoaderConstants
 {
@@ -2877,7 +2878,7 @@ public class BattlelandRandomizerLoader implements
             }
             catch (LookaheadSuccess ls)
             {
-                // auto generated - ignore                
+                // auto generated - ignore
             }
         }
         jj_rescan = false;
