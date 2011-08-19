@@ -70,11 +70,11 @@ import net.sf.colossus.server.Server;
 import net.sf.colossus.util.ViableEntityManager;
 import net.sf.colossus.webclient.WebClientSocketThread.WcstException;
 import net.sf.colossus.webcommon.GameInfo;
+import net.sf.colossus.webcommon.GameInfo.GameState;
 import net.sf.colossus.webcommon.IGameRunner;
 import net.sf.colossus.webcommon.IWebClient;
 import net.sf.colossus.webcommon.IWebServer;
 import net.sf.colossus.webcommon.User;
-import net.sf.colossus.webcommon.GameInfo.GameState;
 
 
 /**
@@ -1453,7 +1453,8 @@ public class WebClient extends KFrame implements IWebClient
 
         runningGamesTab.add(runningGamesPane);
 
-        if (false)
+        boolean IN_USE_2 = false;
+        if (IN_USE_2)
         {
             Box loadSaveGamePanel = new Box(BoxLayout.X_AXIS);
             gameNrField = new JTextField();
@@ -1497,7 +1498,8 @@ public class WebClient extends KFrame implements IWebClient
         watchButton.setAlignmentX(Box.LEFT_ALIGNMENT);
         joinGamePanel.add(watchButton);
 
-        if (false)
+        boolean IN_USE = false;
+        if (IN_USE)
         {
             runningGamesTab.add(Box.createVerticalGlue());
             runningGamesTab.add(joinGamePanel);
@@ -2758,9 +2760,10 @@ public class WebClient extends KFrame implements IWebClient
             hostingHost = hostname;
         }
 
-        // For now, just always use runnable (that's why the "&& false")
+        // For now, just always use runnable (that's why the "&& IN_USE" which evals to false)
         // TODO Is the runnable necessary?
-        if (startedGameId == null && false)
+        boolean IN_USE = false;
+        if (startedGameId == null && IN_USE)
         {
             // is null means: it was not this webclient that started locally
             startOwnClient(gameId, port, hostingHost);

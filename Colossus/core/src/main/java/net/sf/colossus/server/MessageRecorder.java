@@ -71,6 +71,7 @@ public class MessageRecorder
             this.command = command;
         }
 
+        @SuppressWarnings("unused")
         public IClient getClient()
         {
             return client;
@@ -81,6 +82,7 @@ public class MessageRecorder
             return message;
         }
 
+        @SuppressWarnings("unused")
         public String getCommand()
         {
             return command;

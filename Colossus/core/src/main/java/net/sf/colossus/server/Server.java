@@ -2939,7 +2939,7 @@ public final class Server extends Thread implements IServer
             + "client " + getPlayerName() + " - sending confirmation.");
 
         processingCH.serverConfirmsConnection();
-        if (false)
+        if (Constants.USE_RECORDER)
         {
             recorder.printMessagesToConsole();
         }

@@ -749,7 +749,7 @@ final class ClientHandler implements IClient
         }
         else
         {
-            if (false)
+            if (Constants.USE_RECORDER)
             {
                 server.getRecorder().recordMessageToClient(this, message);
             }

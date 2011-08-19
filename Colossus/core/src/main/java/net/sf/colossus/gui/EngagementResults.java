@@ -308,8 +308,10 @@ final class EngagementResults extends KDialog
         Marker marker = new Marker(legion, scale, legion.getLongMarkerId());
         panel.add(marker);
         panel.add(Box.createHorizontalStrut(5));
-        // towi: you want it upside down or not? then remove "false"
-        final boolean inverse = false && isDefender;
+        // towi: you want it upside down or not?
+        // if yes, then then use the "isDefender" line instead.
+        final boolean inverse = false;
+        // final boolean inverse = isDefender;
         // add chits
         int idx = 0;
         for (String imageName : imageNames)

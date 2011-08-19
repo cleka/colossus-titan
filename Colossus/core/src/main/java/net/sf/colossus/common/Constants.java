@@ -46,6 +46,8 @@ public final class Constants
 
     public static final String CONFIG_VERSION = "Colossus config file version 2";
 
+    public static final boolean USE_RECORDER = false;
+
     // Constants for savegames
 
     /** Must include trailing slash. */

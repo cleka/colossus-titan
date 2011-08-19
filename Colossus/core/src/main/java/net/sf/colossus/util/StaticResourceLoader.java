@@ -72,6 +72,7 @@ public final class StaticResourceLoader
             super(parent);
         }
 
+        @SuppressWarnings("unused")
         ColossusClassLoader()
         {
             super();
