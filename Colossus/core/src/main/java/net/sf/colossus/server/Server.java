@@ -1320,7 +1320,7 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    public void cleanup()
+    public void doCleanup()
     {
         cleanupStartlog();
         game = null;

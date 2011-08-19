@@ -400,7 +400,7 @@ public final class GameServerSide extends Game
     private void cleanupWhenGameOver()
     {
         server.waitUntilGameFinishes();
-        server.cleanup();
+        server.doCleanup();
         server = null;
         ViableEntityManager.unregister(this);
     }
@@ -503,7 +503,7 @@ public final class GameServerSide extends Game
         if (!server.isServerRunning())
         {
             LOGGER.warning("Server startup failed: doing cleanup!");
-            server.cleanup();
+            server.doCleanup();
             server = null;
             return false;
         }
@@ -1645,7 +1645,7 @@ public final class GameServerSide extends Game
             if (!server.isServerRunning())
             {
                 LOGGER.warning("Server startup failed: doing cleanup!");
-                server.cleanup();
+                server.doCleanup();
                 server = null;
 
                 return false;

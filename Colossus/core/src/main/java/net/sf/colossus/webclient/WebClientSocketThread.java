@@ -367,7 +367,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
             // case, so make sure we bail out even if server does not
             // kick us out quickly enough...
             LOGGER.info(threadName + ": socket null, cleanup+return");
-            cleanup();
+            doCleanup();
             return;
         }
 
@@ -379,7 +379,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
             // the case, so make sure we bail out even if server does not
             // kick us out quickly enough...
             LOGGER.info(threadName + ": failedException set, cleanup+return");
-            cleanup();
+            doCleanup();
             return;
         }
 
@@ -560,7 +560,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
             webClient.connectionReset(false);
         }
 
-        cleanup();
+        doCleanup();
     }
 
     private GameInfo restoreGameInfo(String[] tokens)
@@ -569,7 +569,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
         return gi;
     }
 
-    private void cleanup()
+    private void doCleanup()
     {
         if (socket != null)
         {
@@ -590,7 +590,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
 
     public void dispose()
     {
-        cleanup();
+        doCleanup();
     }
 
     private void send(String s)
