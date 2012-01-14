@@ -114,7 +114,7 @@ public final class Options implements IOptions
         oneHexAllowed, nonRandomBattleDice, autoSansLordBattles,
         noFirstTurnT2TTeleport, noFirstTurnTeleport, towerToTowerTeleportOnly,
         noTowerTeleport, noTitanTeleport, unlimitedMulligans,
-        enableEditingMode };
+        noFirstTurnWarlockRecruit, enableEditingMode };
 
     // Display options (client only)
     public static final String stealFocus = "Steal focus";
