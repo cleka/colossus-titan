@@ -91,7 +91,7 @@ public class BasicObjectiveHelper extends AbstractObjectiveHelper
         return null;
     }
 
-    private List<TacticalObjective> commonObjective(Legion myself)
+    protected List<TacticalObjective> commonObjective(Legion myself)
     {
         List<TacticalObjective> lListObjectives = new ArrayList<TacticalObjective>();
         Map<CreatureType, Creature> toConsider = new TreeMap<CreatureType, Creature>();
@@ -107,18 +107,21 @@ public class BasicObjectiveHelper extends AbstractObjectiveHelper
             if (!lcritter.isLord()
                 && RecruitingSubTree.isADeadEnd(variant, lcritter.getType()))
             {
+                LOGGER.info("CommonObjective: " + lcritter.getName() + " is a dead end and non-lord, aka Cannon Fodder");
                 lListObjectives.add(new CreatureAttackTacticalObjective(
                     oec.FIRST_WAVE_ATTACK_PRIORITY, client, myself, lcritter,
                     ai, ai.bec));
             }
             else if (lcritter.isLord() && !lcritter.isTitan())
             {
+                LOGGER.info("CommonObjective: " + lcritter.getName() + " is a non-titan lord, aka Cannon Fodder");
                 lListObjectives.add(new CreatureAttackTacticalObjective(
                     oec.FIRST_WAVE_ATTACK_PRIORITY, client, myself, lcritter,
                     ai, ai.bec));
             }
             else if (!lcritter.isTitan())
             {
+                LOGGER.info("CommonObjective: " + lcritter.getName() + " matters (a bit)...");
                 lListObjectives.add(new CreatureAttackTacticalObjective(
                     oec.SECOND_WAVE_ATTACK_PRIORITY, client, myself, lcritter,
                     ai, ai.bec));

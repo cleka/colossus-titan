@@ -9,8 +9,8 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.ai.helper.LegionMove;
 import net.sf.colossus.ai.helper.OnTheFlyLegionMove;
-import net.sf.colossus.ai.objectives.BasicObjectiveHelper;
 import net.sf.colossus.ai.objectives.IObjectiveHelper;
+import net.sf.colossus.ai.objectives.SecondObjectiveHelper;
 import net.sf.colossus.ai.objectives.TacticalObjective;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.CritterMove;
@@ -327,7 +327,7 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
              * and attacker's summoned angel won't have specific objective,
              * when it's likely they should attack.
              */
-            IObjectiveHelper helper = new BasicObjectiveHelper(client, this,
+            IObjectiveHelper helper = new SecondObjectiveHelper(client, this,
                 variant);
             if (client.getMyEngagedLegion().equals(client.getDefender()))
             {

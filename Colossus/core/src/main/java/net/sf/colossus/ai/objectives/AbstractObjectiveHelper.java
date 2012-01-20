@@ -92,14 +92,18 @@ public abstract class AbstractObjectiveHelper implements IObjectiveHelper {
         final int numberNeededHere;
         /** Whether the current Legion already has something better in the recruit tree (of this terrain) */
         final boolean thisStackHasBetter;
-        /** Whether it's immeditaly useful to kill, i.e. we already hane enough to
-         * recruit and nothing better.
+        /** Whether it's immediately useful to kill, i.e. we already have just enough to
+         * recruit and nothing better in this terrain.
          */
         final boolean isImmediatelyUsefulKilling;
         /** Whether this creature type appears in this stack, and in this stack only */
         final boolean onlyThisStackHasIt;
         /** How many are left in the Caretaker's stack */
         final int numberLeftToRecruit;
+        /** Whether we can still recruit here or we are already out of luck (always true if we can't recruit here...) */
+        final boolean enoughLeftToRecruitHere;
+        /** Whether we can still recruit here  with no room to spare (always true if we can't recruit here...) */
+        final boolean justEnoughLeftToRecruitHere;
 
         @Override
         public String toString()
@@ -198,6 +202,14 @@ public abstract class AbstractObjectiveHelper implements IObjectiveHelper {
 
             numberLeftToRecruit = ai.getCaretaker().getAvailableCount(
                     creature.getType());
+
+            if (numberNeededHere < Constants.BIGNUM) {
+                enoughLeftToRecruitHere = (stackNumber + numberLeftToRecruit) >= numberNeededHere;
+                justEnoughLeftToRecruitHere = (stackNumber + numberLeftToRecruit) == numberNeededHere;
+            } else {
+                enoughLeftToRecruitHere = true;
+                justEnoughLeftToRecruitHere = true;
+            }
         }
     }
 }
