@@ -32,8 +32,11 @@ import net.sf.colossus.variant.MasterHex;
  * This way, it should be able to read all data in time so that no
  * data pile up, and reply to ping requests almost instantly.
  *
- * This is still work in progress: for now it's only separated the method
- * calling into this own class but it's still the same thread execution.
+ * ClientThread gets most of messages to parse already via a queue.
+ * Should also sending use a queue, and/or, the sending methods be
+ * inside ClientThread, and SocketClientThread merely provide the
+ * sendToServer method (which could be implemented differently e.g.
+ * in a "send via queue, instead of via socket", for local clients)?
  *
  *  @author Clemens Katzer
  */
