@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ColossusSnapshot version="13" createdByRelease="unknown (unknown)">
+  <Variant dir="Default" file="DefaultVar.xml" name="Default" />
+  <TurnNumber>1</TurnNumber>
+  <CurrentPlayer>1</CurrentPlayer>
+  <CurrentPhase>1</CurrentPhase>
+  <Caretaker>
+    <Creature name="Angel" remaining="15" dead="0" />
+    <Creature name="Archangel" remaining="6" dead="0" />
+    <Creature name="Behemoth" remaining="18" dead="0" />
+    <Creature name="Centaur" remaining="19" dead="0" />
+    <Creature name="Colossus" remaining="10" dead="0" />
+    <Creature name="Cyclops" remaining="27" dead="0" />
+    <Creature name="Dragon" remaining="18" dead="0" />
+    <Creature name="Gargoyle" remaining="15" dead="0" />
+    <Creature name="Giant" remaining="18" dead="0" />
+    <Creature name="Gorgon" remaining="25" dead="0" />
+    <Creature name="Griffon" remaining="18" dead="0" />
+    <Creature name="Guardian" remaining="6" dead="0" />
+    <Creature name="Hydra" remaining="10" dead="0" />
+    <Creature name="Lion" remaining="28" dead="0" />
+    <Creature name="Minotaur" remaining="21" dead="0" />
+    <Creature name="Ogre" remaining="19" dead="0" />
+    <Creature name="Ranger" remaining="28" dead="0" />
+    <Creature name="Serpent" remaining="10" dead="0" />
+    <Creature name="Troll" remaining="27" dead="0" />
+    <Creature name="Unicorn" remaining="12" dead="0" />
+    <Creature name="Warbear" remaining="21" dead="0" />
+    <Creature name="Warlock" remaining="6" dead="0" />
+    <Creature name="Wyvern" remaining="18" dead="0" />
+    <Creature name="Titan" remaining="0" dead="0" />
+  </Caretaker>
+  <Player name="inactive" type="net.sf.colossus.ai.Human" color="Green" startingTower="600" score="0" dead="false" mulligansLeft="1" colorsElim="" summoned="false">
+    <Legion name="Gr07" currentHex="134" startingHex="134" moved="false" entrySide="5" parent="null" recruitName="null" battleTally="0">
+      <Creature name="Angel" />
+      <Creature name="Gargoyle" />
+      <Creature name="Gargoyle" />
+      <Creature name="Centaur" />
+      <Creature name="Cyclops" />
+    </Legion>
+    <Legion name="Gr12" currentHex="36" startingHex="36" moved="false" entrySide="1" parent="Gr07" recruitName="null" battleTally="0">
+      <Creature name="Titan" />
+      <Creature name="Centaur" />
+      <Creature name="Ogre" />
+      <Creature name="Ogre" />
+      <Creature name="Troll" />
+    </Legion>
+  </Player>
+  <Player name="active" type="net.sf.colossus.ai.Human" color="Red" startingTower="400" score="0" dead="false" mulligansLeft="1" colorsElim="" summoned="false">
+    <Legion name="Rd05" currentHex="400" startingHex="400" moved="false" entrySide="6" parent="null" recruitName="null" battleTally="0">
+      <Creature name="Titan" />
+      <Creature name="Angel" />
+      <Creature name="Ogre" />
+      <Creature name="Ogre" />
+      <Creature name="Centaur" />
+      <Creature name="Centaur" />
+      <Creature name="Gargoyle" />
+      <Creature name="Gargoyle" />
+    </Legion>
+  </Player>
+  <Player name="Black" type="net.sf.colossus.ai.SimpleAI" color="Black" startingTower="200" score="0" dead="false" mulligansLeft="1" colorsElim="" summoned="false">
+    <Legion name="Bk04" currentHex="200" startingHex="200" moved="false" entrySide="6" parent="null" recruitName="null" battleTally="0">
+      <Creature name="Titan" />
+      <Creature name="Angel" />
+      <Creature name="Ogre" />
+      <Creature name="Ogre" />
+      <Creature name="Centaur" />
+      <Creature name="Centaur" />
+      <Creature name="Gargoyle" />
+      <Creature name="Gargoyle" />
+    </Legion>
+  </Player>
+  <History>
+    <Reveal markerId="Gr07" allPlayers="true" turn="1" reason="Initial">
+      <creatures>
+        <creature>Titan</creature>
+        <creature>Angel</creature>
+        <creature>Ogre</creature>
+        <creature>Ogre</creature>
+        <creature>Centaur</creature>
+        <creature>Centaur</creature>
+        <creature>Gargoyle</creature>
+        <creature>Gargoyle</creature>
+      </creatures>
+    </Reveal>
+    <Reveal markerId="Rd05" allPlayers="true" turn="1" reason="Initial">
+      <creatures>
+        <creature>Titan</creature>
+        <creature>Angel</creature>
+        <creature>Ogre</creature>
+        <creature>Ogre</creature>
+        <creature>Centaur</creature>
+        <creature>Centaur</creature>
+        <creature>Gargoyle</creature>
+        <creature>Gargoyle</creature>
+      </creatures>
+    </Reveal>
+    <Reveal markerId="Bk04" allPlayers="true" turn="1" reason="Initial">
+      <creatures>
+        <creature>Titan</creature>
+        <creature>Angel</creature>
+        <creature>Ogre</creature>
+        <creature>Ogre</creature>
+        <creature>Centaur</creature>
+        <creature>Centaur</creature>
+        <creature>Gargoyle</creature>
+        <creature>Gargoyle</creature>
+      </creatures>
+    </Reveal>
+    <Split parentId="Gr07" childId="Gr12" turn="1">
+      <splitoffs>
+        <creature>Titan</creature>
+        <creature>Centaur</creature>
+        <creature>Ogre</creature>
+        <creature>Ogre</creature>
+      </splitoffs>
+    </Split>
+    <Reveal markerId="Gr07" allPlayers="false" turn="1" reason="Split">
+      <viewers>
+        <viewer>inactive</viewer>
+      </viewers>
+      <creatures>
+        <creature>Angel</creature>
+        <creature>Gargoyle</creature>
+        <creature>Gargoyle</creature>
+        <creature>Centaur</creature>
+      </creatures>
+    </Reveal>
+    <Reveal markerId="Gr12" allPlayers="false" turn="1" reason="Split">
+      <viewers>
+        <viewer>inactive</viewer>
+      </viewers>
+      <creatures>
+        <creature>Titan</creature>
+        <creature>Centaur</creature>
+        <creature>Ogre</creature>
+        <creature>Ogre</creature>
+      </creatures>
+    </Reveal>
+    <MovementRoll playerName="inactive" roll="3" />
+    <Reveal markerId="Gr12" allPlayers="true" turn="1" reason="Recruiter">
+      <creatures>
+        <creature>Ogre</creature>
+        <creature>Ogre</creature>
+      </creatures>
+    </Reveal>
+    <AddCreature markerId="Gr12" creatureName="Troll" turn="1" reason="Recruited" />
+    <Reveal markerId="Gr07" allPlayers="true" turn="1" reason="Recruiter">
+      <creatures>
+        <creature>Gargoyle</creature>
+        <creature>Gargoyle</creature>
+      </creatures>
+    </Reveal>
+    <AddCreature markerId="Gr07" creatureName="Cyclops" turn="1" reason="Recruited" />
+  </History>
+  <Redo />
+</ColossusSnapshot>
+

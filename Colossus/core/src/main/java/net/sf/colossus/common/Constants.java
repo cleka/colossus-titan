@@ -182,6 +182,9 @@ public final class Constants
     public static final String loadGame = "Load game";
     public static final String saveGame = "Save game";
     public static final String quitGame = "Quit Game";
+    public static final String fakeDisconnect = "Fake Disconnect";
+    public static final String fakeDisconnectByServer = "Fake Disconnect (by server)";
+    public static final String tryReconnect = "Try to reconnect";
     public static final String closeBoard = "Close MasterBoard";
     public static final String checkConnection = "Check connection";
 
@@ -261,6 +264,8 @@ public final class Constants
     public static final String serverConnectionOK = "serverConnectionOK";
     public static final String pingRequest = "pingRequest";
     public static final String replyToPing = "replyToPing";
+    public static final String requestSyncDelta = "requestSyncDelta";
+    public static final String confirmCommitPoint = "confirmCommitPoint";
 
     public static final String reasonSplit = "Split";
     public static final String reasonSummon = "Summon";
@@ -347,6 +352,7 @@ public final class Constants
     public static final String boardActive = "boardActive";
     public static final String askConfirmCatchUp = "askConfirmCatchUp";
     public static final String gameInitInfo = "gameInitInfo";
+    public static final String commitPoint = "commitPoint";
 
     // engagement resolved, methods:
     public static final String erMethodFlee = "flee";

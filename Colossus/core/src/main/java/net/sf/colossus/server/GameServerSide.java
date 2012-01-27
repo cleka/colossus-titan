@@ -64,7 +64,7 @@ import org.jdom.Element;
  * @author Bruce Sherrod
  * @author Romain Dolbeau
  */
-public final class GameServerSide extends Game
+public class GameServerSide extends Game
 {
     private static final Logger LOGGER = Logger.getLogger(GameServerSide.class
         .getName());
@@ -126,6 +126,28 @@ public final class GameServerSide extends Game
 
         Options serverOptions = new Options("UnitTest", true);
         return new GameServerSide(whatNextManager, serverOptions, variant);
+    }
+
+    /**
+     * For more complicated functional tests
+     * @param whatNextMgr
+     * @param serverOptions
+     * @param variant
+     * @return
+     */
+    static public GameServerSide newGameServerSide(
+        WhatNextManager whatNextMgr,
+        Options serverOptions, Variant variant)
+    {
+        if (Options.isFunctionalTest())
+        {
+            return new GameServerSideTestAccess(whatNextMgr, serverOptions,
+                variant);
+        }
+        else
+        {
+            return new GameServerSide(whatNextMgr, serverOptions, variant);
+        }
     }
 
     /**
@@ -356,14 +378,23 @@ public final class GameServerSide extends Game
 
         try
         {
-            Client.createClient("127.0.0.1", getPort(), playerName, type,
+            Client c = Client.createClient("127.0.0.1", getPort(), playerName,
+                type,
                 whatNextManager, server, false, dontUseOptionsFile, createGUI);
+            storeLocalClient(playerName, c);
         }
         catch (ConnectionInitException e)
         {
             LOGGER.warning("Creating local client for player " + playerName
                 + " failed, reason " + e.getMessage());
         }
+    }
+
+    protected void storeLocalClient(String playerName, Client c)
+    {
+        LOGGER.finest("Created local client with name " + playerName
+            + ", isNull: " + (c == null));
+        // Dummy in here, does something in GameServerSideTestAccess
     }
 
     /**
@@ -395,6 +426,11 @@ public final class GameServerSide extends Game
         {
             updateCaretakerDisplaysFor(type);
         }
+    }
+
+    protected void waitUntilGameFinishes()
+    {
+        server.waitUntilGameFinishes();
     }
 
     private void cleanupWhenGameOver()
@@ -1140,14 +1176,22 @@ public final class GameServerSide extends Game
         LOGGER.info("All clients have caught up with loading/replay or "
             + "pickColor, now kicking off the Game!");
 
-        if (Options.isFunctionalTest())
+        if (Options.isStartupTest())
         {
+            LOGGER.info("IS ONLY A STARTUP TEST!");
             stopAllDueToFunctionalTestCompleted();
         }
         else
         {
+            notifyTestCaseGameIsUpNow();
+            LOGGER.info("NOT A STARTUP TEST - kickstarting game!");
             server.kickPhase();
         }
+    }
+
+    protected void notifyTestCaseGameIsUpNow()
+    {
+        // dummy in here, overriden in Test Access
     }
 
     /**

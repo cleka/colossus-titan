@@ -630,6 +630,19 @@ public final class Options implements IOptions
         return functionalTestOngoing;
     }
 
+    private static boolean startupTestOngoing = false;
+
+    public static void setStartupTest(boolean val)
+    {
+        setFunctionalTest(val);
+        startupTestOngoing = val;
+    }
+
+    public static boolean isStartupTest()
+    {
+        return startupTestOngoing;
+    }
+
     private static String propNameStresstestRounds = "net.sf.colossus.stressTestRounds";
 
     public static boolean isStresstest()

@@ -50,7 +50,7 @@ public class StartEachVariant extends TestCase
         LOGGER.info("test: starting variant " + variantName + " with "
             + nrOfAIs + "AIs");
 
-        Options.setFunctionalTest(true);
+        Options.setStartupTest(true);
         ErrorUtils.clearErrorDuringFunctionalTest();
 
         // noFile argument true, we never want the START options to be saved.

@@ -431,7 +431,7 @@ public final class Server extends Thread implements IServer
         if (stopAcceptingFlag)
         {
             LOGGER.info("cancelDummy was set...");
-            stopAccepting();
+            // stopAccepting();
             stopAcceptingFlag = false;
         }
 
@@ -492,6 +492,7 @@ public final class Server extends Thread implements IServer
                 SelectionKey readKey = sc.register(selector,
                     SelectionKey.OP_READ);
 
+                LOGGER.info("Another client accepted.");
                 ClientHandler ch = new ClientHandler(this, sc, readKey);
                 readKey.attach(ch);
                 // This is sent only for the reason that the client gets
@@ -703,7 +704,7 @@ public final class Server extends Thread implements IServer
                         processingCH.setIsGone(true);
                         LOGGER.info("EOF on channel for client "
                             + getPlayerName() + " setting isGone true");
-                        withdrawFromGame();
+                        withdrawFromGameIfRelevant();
                         disconnectChannel(sc, key);
                     }
                     break;
@@ -721,7 +722,7 @@ public final class Server extends Thread implements IServer
 
                 // The remote forcibly/unexpectedly closed the connection,
                 // cancel the selection key and close the channel.
-                withdrawFromGame();
+                withdrawFromGameIfRelevant();
                 disconnectChannel(sc, key);
                 return 0;
             }
@@ -729,6 +730,33 @@ public final class Server extends Thread implements IServer
 
         LOGGER.log(Level.FINEST, "Read " + read + " bytes from " + sc);
         return read;
+    }
+
+    /**
+     * Some problem with the connection.
+     * If client seems to support reconnect, mark CH to be temp. disconnected,
+     * otherwise take care of the proper withdrawal.
+     */
+    private void withdrawFromGameIfRelevant()
+    {
+        if (isWithdrawalIrrelevant())
+        {
+            return;
+        }
+
+        if (processingCH.supportsReconnect())
+        {
+            LOGGER.warning("EOF on channel for client " + getPlayerName()
+                + " - skipping withDraw, waiting for reconnect attempt.");
+            processingCH.setTemporarilyDisconnected();
+            return;
+        }
+        else
+        {
+            LOGGER.warning("EOF on channel for client " + getPlayerName()
+                + " - can't reconnect, withDraw and Disconnecting.");
+            withdrawFromGame();
+        }
     }
 
     /**
@@ -765,7 +793,7 @@ public final class Server extends Thread implements IServer
     {
         synchronized (waitUntilOverMutex)
         {
-            waitUntilOverMutex.notify();
+            waitUntilOverMutex.notifyAll();
         }
     }
 
@@ -1030,6 +1058,8 @@ public final class Server extends Thread implements IServer
     String addClient(final IClient client, final String playerName,
         final boolean remote, final int clientVersion, String buildInfo)
     {
+        boolean isReconnect = false;
+
         LOGGER.info("Server.addClient() called with: " + "playerName: '"
             + playerName + "', remote: '" + remote + "', client version '"
             + clientVersion + "', client build info: '" + buildInfo + "'");
@@ -1086,6 +1116,9 @@ public final class Server extends Thread implements IServer
             player = game.getPlayerByNameIgnoreNull(playerName);
         }
 
+        LOGGER
+            .info("\nTrying to identify player/client for new connection which identifies itself as player "
+                + playerName);
         String name = "<undefined>";
         if (player == null && playerName.equalsIgnoreCase("spectator"))
         {
@@ -1102,15 +1135,32 @@ public final class Server extends Thread implements IServer
                 + " - rejected, because no such player is expected!");
             return "No player with name " + playerName + " expected.";
         }
-        else if (clientMap.containsKey(player))
+        /*
+         *  The special Re-Connect case starts here:
+         */
+        else if (isReconnectAttempt(player))
         {
-            LOGGER.warning("Could not add client, "
-                + "because Player for playerName " + playerName
-                + " had already signed on.");
-            logToStartLog("NOTE: One client attempted to join with player name "
-                + playerName
-                + " - rejected, because same player name already " + "joined.");
-            return "Other player with same name already connected.";
+            ClientHandler ch = (ClientHandler)clientMap.get(player);
+            if (ch != null && ch.getPlayerName().equals(player.getName()))
+            {
+                isReconnect = true;
+                LOGGER.info("All right, reconnection of disconnected player!");
+                ((ClientHandler)client).cloneRedoQueue(ch);
+                clientMap.remove(player);
+                clients.remove(ch);
+                // clientMap.put(player, client);
+            }
+            else
+            {
+                LOGGER.warning("Could not add client, "
+                    + "because Player for playerName " + playerName
+                    + " had already signed on.");
+                logToStartLog("NOTE: One client attempted to join with player name "
+                    + playerName
+                    + " - rejected, because same player name already "
+                    + "joined.");
+                return "Other player with same name already connected.";
+            }
         }
         else
         {
@@ -1132,7 +1182,13 @@ public final class Server extends Thread implements IServer
             addRemoteClient(client, player);
         }
 
-        if (player != null)
+        if (player != null && isReconnect)
+        {
+            logToStartLog("\nPlayer " + player.getName()
+                + " reconnected, game can continue now.\n");
+
+        }
+        else if (player != null)
         {
             logToStartLog((remote ? "Remote" : "Local") + " player " + name
                 + " signed on.");
@@ -1163,6 +1219,18 @@ public final class Server extends Thread implements IServer
         return null;
     }
 
+    private boolean isReconnectAttempt(Player player)
+    {
+        IClient client = clientMap.get(player);
+
+        if (client != null
+            && ((ClientHandler)client).isTemporarilyDisconnected())
+        {
+            return true;
+        }
+        return false;
+    }
+
     /**
      *  When the last player has *joined* (not just connected), he calls this
      *  here, and this will proceed with either loadGame2() or newGame2().
@@ -1181,7 +1249,7 @@ public final class Server extends Thread implements IServer
             else
             {
                 logToStartLog("Loading/Replay failed!!\n");
-                if (Options.isFunctionalTest())
+                if (Options.isStartupTest())
                 {
                     ErrorUtils
                         .setErrorDuringFunctionalTest("Loading/Replay failed!");
@@ -2495,12 +2563,17 @@ public final class Server extends Thread implements IServer
         }
     }
 
+    public boolean isWithdrawalIrrelevant()
+    {
+        return (obsolete || game == null || game.isGameOver());
+    }
+
     /** Withdraw the currently active player
      *  (if it is a real one, and withdrawal still makes sense).
      */
     public void withdrawFromGame()
     {
-        if (obsolete || game == null || game.isGameOver())
+        if (isWithdrawalIrrelevant())
         {
             return;
         }
@@ -3233,6 +3306,14 @@ public final class Server extends Thread implements IServer
             getGame().getPreliminaryPlayerNames());
     }
 
+    public void requestSyncDelta(int lastReceivedMessageNr)
+    {
+        LOGGER
+            .info("Client requests sync for delta after reconnect, last msg nr was "
+                + lastReceivedMessageNr);
+        processingCH.syncAfterReconnect(lastReceivedMessageNr);
+    }
+
     public void joinGame(String playerName)
     {
         // @TODO: move to outside Select loop
@@ -3248,5 +3329,12 @@ public final class Server extends Thread implements IServer
         {
             LOGGER.info("waitingForPlayersToJoin now " + stillMissing);
         }
+    }
+
+    public void fakeDisconnectClient(String name)
+    {
+        Player p = game.getPlayerByName(name);
+        IClient client = clientMap.get(p);
+        ((ClientHandler)client).fakeDisconnectClient();
     }
 }

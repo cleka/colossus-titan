@@ -65,6 +65,7 @@ final class ClientHandler implements IClient
     private boolean isGone = false;
     private boolean withdrawnAlready = false;
     private int isGoneMessageRepeated = 0;
+    private boolean temporarilyDisconnected = false;
 
     private static final String sep = Constants.protocolTermSeparator;
 
@@ -82,6 +83,13 @@ final class ClientHandler implements IClient
     private final Charset charset = Charset.forName(CHARSET_NAME);
     private final CharsetEncoder encoder = charset.newEncoder();
     private final CharsetDecoder decoder = charset.newDecoder();
+
+    // sync-when-disconnected stuff
+    private int messageCounter = 0;
+    private int commitPointCounter = 0;
+
+    private final ArrayList<MessageForClient> redoQueue = new ArrayList<MessageForClient>(
+        50);
 
     // Note that the client (SocketClientThread) sends ack every
     // CLIENT_CTR_ACK_EVERY messages (currently 20)
@@ -119,6 +127,23 @@ final class ClientHandler implements IClient
     public void setIsGone(boolean val)
     {
         this.isGone = val;
+    }
+
+    public void setTemporarilyDisconnected()
+    {
+        temporarilyDisconnected = true;
+    }
+
+    /* Not really needed at the moment; every reconnect creates a new ClientHandler
+    private void clearTemporarilyDisconnected()
+    {
+        temporarilyDisconnected = false;
+    }
+    */
+
+    public boolean isTemporarilyDisconnected()
+    {
+        return temporarilyDisconnected;
     }
 
     // Called by Server's select reader
@@ -192,6 +217,141 @@ final class ClientHandler implements IClient
         sendViaChannelRaw(msg);
     }
 
+    /**
+     * here starts some stuff needed for the "synchronization in disconnect case"
+     */
+    private class MessageForClient
+    {
+        private final int messageNumber;
+        private final int commitNumber;
+        private final String message;
+
+        public MessageForClient(int messageNr, int commitNr, String message)
+        {
+            this.messageNumber = messageNr;
+            this.commitNumber = commitNr;
+            this.message = message;
+        }
+
+        public int getMessageNr()
+        {
+            return messageNumber;
+        }
+
+        public int getCommitNumber()
+        {
+            return commitNumber;
+        }
+
+        public String getMessage()
+        {
+            return message;
+        }
+    }
+
+    private void enqueueToRedoQueue(int messageNr, String message)
+    {
+        if (supportsReconnect())
+        {
+            redoQueue.add(new MessageForClient(messageNr,
+                (isCommitPoint ? commitPointCounter : 0), message));
+        }
+    }
+
+    private boolean isCommitPoint = false;
+
+    private void commitPoint()
+    {
+        if (supportsReconnect())
+        {
+            commitPointCounter++;
+            isCommitPoint = true;
+            sendToClient(Constants.commitPoint + sep + commitPointCounter
+                + sep + messageCounter);
+            isCommitPoint = false;
+        }
+    }
+
+    /**
+     * Remove the messages in redoQueue prior to given commit point
+     * @param confirmedNr Commit point from which we now know that client has
+     * successfully received it
+     */
+    private void confirmCommitPoint(int confirmedNr)
+    {
+        int found = -1;
+        int size = redoQueue.size();
+        for(int i = 0; i < size && found == -1; i++)
+        {
+            MessageForClient mfc = redoQueue.get(i);
+            if (mfc.getCommitNumber() == confirmedNr)
+            {
+                found = i;
+            }
+        }
+
+        if (found != -1)
+        {
+            /*
+             * TODO: If we would subclass ArrayList, could use the more
+             * efficient method removeRange (it is "protected")
+             */
+            int deleted = 0;
+            for (int i = 0; i <= found; i++)
+            {
+                deleted++;
+                redoQueue.get(0);
+                redoQueue.remove(0);
+            }
+        }
+    }
+
+    public boolean supportsReconnect()
+    {
+        return clientVersion >= IServer.CLIENT_VERSION_CAN_RECONNECT;
+    }
+
+    public void cloneRedoQueue(ClientHandler oldCH)
+    {
+        // Remove the reconnect-related messages
+        redoQueue.clear();
+        redoQueue.addAll(oldCH.redoQueue);
+        commitPointCounter = oldCH.commitPointCounter;
+    }
+
+    /**
+     * Re-send all data after the message nr from which we know client got it
+     *
+     * @param lastReceivedMessageNr Last messagewhich client did still receive
+     */
+    public void syncAfterReconnect(int lastReceivedMessageNr)
+    {
+        // to get client out of initial readlines loop, to get it into
+        // normal "read from socket and parse line" loop
+        setPlayerName(signonName);
+
+        int size = redoQueue.size();
+        for (int i = 0; i < size; i++)
+        {
+            MessageForClient mfc = redoQueue.get(i);
+            int queueMsgNr = mfc.getMessageNr();
+            if (queueMsgNr > lastReceivedMessageNr)
+            {
+                String message = mfc.getMessage();
+                sendViaChannelRaw(message);
+                messageCounter = queueMsgNr;
+            }
+        }
+    }
+
+    /**
+     * only for testing/development purposes
+     */
+    public void fakeDisconnectClient()
+    {
+        LOGGER.warning("fake disconnect by server side not implemented yet.");
+    }
+
     ByteBuffer bb;
     String encodedMsg; // used only for logging
     int should;
@@ -254,6 +414,10 @@ final class ClientHandler implements IClient
 
     }
 
+    /** The queue in which messages are stored, until they were really written.
+     *  Usually empty; stuff piles up only when writing to socket fails,
+     *  e.g. network or client too slow.
+     */
     LinkedList<String> queue = new LinkedList<String>();
 
     private void sendViaChannelRaw(String msg)
@@ -338,12 +502,19 @@ final class ClientHandler implements IClient
                     + " to channel for player " + playerName
                     + "; details follow:", ioe);
 
-            setIsGone(true);
-            withdrawnAlready = true;
-            server.withdrawFromGame(playerName);
-            server.queueClientHandlerForChannelChanges(this);
-            server.clientWontConfirmCatchup(this,
-                "IO Exception while writing to client " + playerName);
+            if (this.supportsReconnect())
+            {
+                setTemporarilyDisconnected();
+            }
+            else
+            {
+                setIsGone(true);
+                withdrawnAlready = true;
+                server.withdrawFromGame(playerName);
+                server.queueClientHandlerForChannelChanges(this);
+                server.clientWontConfirmCatchup(this,
+                    "IO Exception while writing to client " + playerName);
+            }
         }
         Thread.yield();
     }
@@ -640,6 +811,12 @@ final class ClientHandler implements IClient
             server.checkServerConnection();
         }
 
+        else if (method.equals(Constants.requestSyncDelta))
+        {
+            int lastReceivedMsgNr = Integer.parseInt(args.remove(0));
+            server.requestSyncDelta(lastReceivedMsgNr);
+        }
+
         else if (method.equals(Constants.catchupConfirmation))
         {
             server.clientConfirmedCatchup();
@@ -649,6 +826,12 @@ final class ClientHandler implements IClient
         {
             LOGGER.fine("Client " + playerName
                 + " replied to ping request - fine!");
+        }
+
+        else if (method.equals(Constants.confirmCommitPoint))
+        {
+            int cpNr = Integer.parseInt(args.remove(0));
+            confirmCommitPoint(cpNr);
         }
 
         else
@@ -735,10 +918,12 @@ final class ClientHandler implements IClient
     // Wrapper for all the send-over-socket methods:
     public void sendToClient(String message)
     {
+        enqueueToRedoQueue(messageCounter, message);
+        messageCounter++;
+
         if (isGone || socketChannel == null)
         {
             // do not send any more
-
             if (isGoneMessageRepeated < 3)
             {
                 LOGGER.info("Attempt to send to player " + playerName
@@ -758,6 +943,7 @@ final class ClientHandler implements IClient
                 LOGGER.info("Sending to " + playerName + ": " + message);
             }
             sendViaChannel(message);
+
             if (server == null)
             {
                 LOGGER.severe("server null");
@@ -1038,28 +1224,33 @@ final class ClientHandler implements IClient
 
     public void setupTurnState(Player activePlayer, int turnNumber)
     {
+        commitPoint();
         sendToClient(Constants.setupTurnState + sep + activePlayer.getName()
             + sep + turnNumber);
     }
 
     public void setupSplit(Player activePlayer, int turnNumber)
     {
+        commitPoint();
         sendToClient(Constants.setupSplit + sep + activePlayer.getName() + sep
             + turnNumber);
     }
 
     public void setupMove()
     {
+        commitPoint();
         sendToClient(Constants.setupMove);
     }
 
     public void setupFight()
     {
+        commitPoint();
         sendToClient(Constants.setupFight);
     }
 
     public void setupMuster()
     {
+        commitPoint();
         sendToClient(Constants.setupMuster);
     }
 
@@ -1201,7 +1392,7 @@ final class ClientHandler implements IClient
 
     public void pingRequest()
     {
-        if (clientVersion >= 2)
+        if (clientVersion >= IServer.CLIENT_VERSION_UNDERSTANDS_PING)
         {
             sendToClient(Constants.pingRequest);
         }

@@ -22,7 +22,7 @@ public class LoadGameTest extends TestCase
 
     public void testLoadSimple3PlayerGame()
     {
-        Options.setFunctionalTest(true);
+        Options.setStartupTest(true);
         ErrorUtils.clearErrorDuringFunctionalTest();
         String fileName = makeFullPath("3-players-no-recruit.xml");
         LOGGER.info("Filename: " + fileName);
@@ -36,7 +36,7 @@ public class LoadGameTest extends TestCase
 
     public void testLoadGameWithRecruit()
     {
-        Options.setFunctionalTest(true);
+        Options.setStartupTest(true);
         ErrorUtils.clearErrorDuringFunctionalTest();
         String fileName = makeFullPath("Simple-6-players.xml");
         LOGGER.info("Filename: " + fileName);

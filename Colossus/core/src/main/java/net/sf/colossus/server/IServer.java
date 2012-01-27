@@ -21,11 +21,15 @@ import net.sf.colossus.variant.MasterHex;
 public interface IServer
 {
     // New in version 2: replies to pingRequest
-    public static final int CLIENT_VERSION = 2;
+    // New in version 3: ability to reconnect (simple case only, so far)
+    public static final int CLIENT_VERSION = 3;
+
+    public static final int CLIENT_VERSION_UNDERSTANDS_PING = 2;
+    public static final int CLIENT_VERSION_CAN_RECONNECT = 3;
 
     // Clients that do not send version yet at all, are treated as version -1.
     // For those, even show on server side an error dialog and refuse them to
-    // connect.
+    // connect. Thus, minimum "meaningful version" at the moment is zero.
     public static final int MINIMUM_CLIENT_VERSION = 0;
 
     public void leaveCarryMode();

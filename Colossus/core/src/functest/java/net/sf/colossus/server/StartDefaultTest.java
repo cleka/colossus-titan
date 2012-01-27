@@ -27,7 +27,7 @@ public class StartDefaultTest extends TestCase
     public void testStartDefault()
     {
         LOGGER.info("test: starting Default variant.");
-        Options.setFunctionalTest(true);
+        Options.setStartupTest(true);
         ErrorUtils.clearErrorDuringFunctionalTest();
 
         // noFile argument true, we never want the START options to be saved.

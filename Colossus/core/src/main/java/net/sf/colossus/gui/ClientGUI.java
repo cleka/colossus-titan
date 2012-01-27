@@ -2973,6 +2973,9 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         }
     }
 
+    /**
+     * This is for permanent, non-reversible closed connections
+     */
     public void showConnectionClosedMessage()
     {
         defaultCursor();

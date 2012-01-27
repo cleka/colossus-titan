@@ -651,8 +651,8 @@ public final class Start
                     .getStringOption(Options.variant);
                 Variant variant = VariantSupport.loadVariantByName(
                     variantName, true);
-                GameServerSide game = new GameServerSide(getWhatNextManager(),
-                    serverOptions, variant);
+                GameServerSide game = GameServerSide.newGameServerSide(
+                    getWhatNextManager(), serverOptions, variant);
                 if (webGameFlagFileName != null
                     && !webGameFlagFileName.equals(""))
                 {
@@ -681,9 +681,9 @@ public final class Start
                     boolean ok = loader.loadGame(loadFileName);
                     if (ok)
                     {
-                        GameServerSide game = new GameServerSide(
-                            getWhatNextManager(), serverOptions, loader
-                                .getVariant());
+                        GameServerSide game = GameServerSide
+                            .newGameServerSide(getWhatNextManager(),
+                                serverOptions, loader.getVariant());
                         serverOptions.clearPlayerInfo();
                         game.loadGameAndWaitUntilOver(loader.getRoot());
                     }

@@ -55,6 +55,14 @@ final class SocketClientThread extends Thread implements IServer,
     private boolean selfInterrupted = false;
     private boolean serverReceiveTimedout = false;
 
+    /**
+     * Those are stored at the moment only to be able to reconnect
+     */
+    private String host;
+    private int port;
+    private String playerName;
+    private boolean remote;
+
     private final static String sep = Constants.protocolTermSeparator;
 
     private String reasonFail = null;
@@ -65,6 +73,8 @@ final class SocketClientThread extends Thread implements IServer,
 
     private final Object isWaitingLock = new Object();
     private boolean isWaiting = false;
+
+    private int ownMessageCounter = -1;
 
     public static SocketClientThread createConnection(String host, int port,
         String playerName, boolean remote) throws ConnectionInitException
@@ -91,10 +101,47 @@ final class SocketClientThread extends Thread implements IServer,
         return conn;
     }
 
+    public static SocketClientThread recreateConnection(
+        SocketClientThread connection) throws ConnectionInitException
+    {
+        String host = connection.host;
+        int port = connection.port;
+        String playerName = connection.playerName;
+        boolean remote = connection.remote;
+
+        LOGGER.info("SCT: trying recreateConnection to host " + host
+            + " at port " + port + ".");
+        SocketClientThread conn = new SocketClientThread(host, port,
+            playerName, remote);
+
+        String reasonFail = conn.getReasonFail();
+        if (reasonFail != null)
+        {
+            // If this failed here, it is usually a "could not connect"-problem
+            // (wrong host or port or server not yet up).
+            // In this case we just do cleanup and end.
+
+            LOGGER.warning("Client startup failed: " + reasonFail);
+            if (!Options.isStresstest())
+            {
+                String title = "Socket initialialization failed!";
+                ErrorUtils.showErrorDialog(null, title, reasonFail);
+            }
+            throw new ConnectionInitException(reasonFail);
+        }
+
+        return conn;
+    }
+
     SocketClientThread(String host, int port, String initialName,
         boolean isRemote)
     {
         super("Client " + initialName);
+
+        this.host = host;
+        this.port = port;
+        this.playerName = initialName;
+        this.remote = isRemote;
 
         InstanceTracker.register(this, "SCT " + initialName);
 
@@ -187,6 +234,11 @@ final class SocketClientThread extends Thread implements IServer,
                 {
                     // XXX TODO Handle better
                     LOGGER.info("ServerLog: " + line);
+                }
+                else
+                {
+                    LOGGER.warning("SCT " + getNameMaybe() + " got '" + line
+                        + "' but no use for it ...");
                 }
             }
 
@@ -430,6 +482,14 @@ final class SocketClientThread extends Thread implements IServer,
                                 + ex.toString() + "\n" + ex.getMessage()
                                 + "\nline=" + fromServer, ex);
                     }
+
+                    // increment it now, so that during parsing of next it has right value.
+                    // It's not safe to do it inside parseLine after processing, because it
+                    // would be omitted if an exception occurs.
+                    if (ownMessageCounter != -1)
+                    {
+                        ownMessageCounter++;
+                    }
                 }
                 else
                 {
@@ -439,7 +499,11 @@ final class SocketClientThread extends Thread implements IServer,
                 }
             }
 
-            LOGGER.log(Level.FINEST,
+            if (fromServer == null)
+            {
+                LOGGER.info("** SCT after loop, got null line from Server!");
+            }
+            LOGGER.log(Level.FINE,
                 "Clean end of SocketClientThread while loop");
         }
 
@@ -526,6 +590,11 @@ final class SocketClientThread extends Thread implements IServer,
                 LOGGER.log(Level.SEVERE, "SCT SocketClientThread " + getName()
                     + ", got Exception ", ex);
                 goingDown = true;
+            }
+            catch (Exception any)
+            {
+                LOGGER.log(Level.SEVERE, "SCT SocketClientThread " + getName()
+                    + ", got Any Exception ", any);
             }
         }
         setWaiting(false);
@@ -618,6 +687,11 @@ final class SocketClientThread extends Thread implements IServer,
         // Now cleanup things go same way as if server would have send dispose.
     }
 
+    public int getMessageCounter()
+    {
+        return ownMessageCounter;
+    }
+
     private synchronized void parseLine(String s)
     {
         if (!goingDown)
@@ -637,6 +711,36 @@ final class SocketClientThread extends Thread implements IServer,
             LOGGER.finest("Received server ping request in SCT of client "
                 + getName());
             replyToPing();
+        }
+        else if (method.equals(Constants.commitPoint))
+        {
+            int commitPointNr = Integer.parseInt(args.remove(0));
+            int messageNr = Integer.parseInt(args.remove(0));
+
+            if (ownMessageCounter == -1)
+            {
+                LOGGER.fine("...initializing own counter in commit point #"
+                    + commitPointNr);
+                ownMessageCounter = messageNr;
+            }
+            if (messageNr == ownMessageCounter)
+            {
+                LOGGER.finest("Client " + getNameMaybe()
+                    + " received commit point "
+                    + commitPointNr + " msg Nr " + messageNr
+                    + " own counter " + ownMessageCounter);
+            }
+            else
+            {
+                LOGGER.warning("Client " + getNameMaybe()
+                    + " received commit point "
+                    + commitPointNr + " msg Nr " + messageNr
+                    + " own counter " + ownMessageCounter);
+                ownMessageCounter = messageNr;
+            }
+            sendToServer(Constants.confirmCommitPoint + sep
+                + commitPointNr);
+
         }
         else if (method.equals(Constants.gameInitInfo))
         {
@@ -684,12 +788,10 @@ final class SocketClientThread extends Thread implements IServer,
     {
         if (socket != null)
         {
-            LOGGER.finer("Message to server from '" + getNameMaybe() + "':"
-                + message);
+            LOGGER.finest("Message from SCT '" + getNameMaybe()
+                + "' to server:" + message);
             out.println(message);
-
             clientThread.notifyUserIfGameIsPaused(message);
-
         }
         else
         {
@@ -944,11 +1046,31 @@ final class SocketClientThread extends Thread implements IServer,
         sendToServer(Constants.joinGame + sep + playerName);
     }
 
+    public void requestSyncDelta(int msgNr)
+    {
+        sendToServer(Constants.requestSyncDelta + sep + msgNr);
+    }
+
     public void replyToPing()
     {
         out.println(Constants.replyToPing);
         // sendToServer(Constants.replyToPing);
     }
 
+    public void fakeDisconnect()
+    {
+        LOGGER.fine("In SCT " + getNameMaybe() + ": doing fake disconnect!");
+        try
+        {
+            LOGGER.fine("Shutting down output next...");
+            socket.shutdownOutput();
+            LOGGER.fine("shutdownOutput done... and still alive :)");
+        }
+        catch (IOException e)
+        {
+            LOGGER
+                .warning("Hm, did fake disconnect and this time got IOException?");
+        }
+    }
 
 }

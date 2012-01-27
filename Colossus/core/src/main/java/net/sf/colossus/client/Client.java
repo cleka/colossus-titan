@@ -453,6 +453,41 @@ public final class Client implements IClient, IOracle, IVariant,
         }
     }
 
+    public void fakeDisconnect()
+    {
+        LOGGER.warning("LOOK OUT! - client " + getOwningPlayer().getName()
+            + " doing fake disconnect now...");
+        ((SocketClientThread)connection).fakeDisconnect();
+    }
+
+    public void fakeDisconnectByServer()
+    {
+        localServer.fakeDisconnectClient(owningPlayer.getName());
+    }
+
+    public void tryReconnect()
+    {
+        try
+        {
+            int lastMsgNr = ((SocketClientThread)this.connection)
+                .getMessageCounter();
+            IServerConnection conn = SocketClientThread
+                .recreateConnection((SocketClientThread)connection);
+            gotDisposeAlready = false;
+            this.connection = conn;
+            this.server = connection.getIServer();
+            connection.setClient(this);
+            connection.startThread();
+            connection.requestSyncDelta(lastMsgNr);
+
+        }
+        catch (ConnectionInitException e)
+        {
+            LOGGER.info("reconnect attempted but got ConnectionInitException "
+                + e);
+        }
+    }
+
     public void doCheckServerConnection()
     {
         server.checkServerConnection();
@@ -830,7 +865,10 @@ public final class Client implements IClient, IOracle, IVariant,
         }
         else
         {
-            LOGGER.warning("Unexpected else case?!?");
+            LOGGER.warning("Seems server unexpectedly closed connection. "
+                + "Let's stay around for a while...");
+            tryAutomaticReconnect();
+            close = false;
         }
         return close;
     }
@@ -859,6 +897,12 @@ public final class Client implements IClient, IOracle, IVariant,
         playersNotInitialized = true;
 
         CustomRecruitBase.resetAllInstances();
+    }
+
+    private void tryAutomaticReconnect()
+    {
+        LOGGER.info("Initiating automatic reconnect!");
+        tryReconnect();
     }
 
     /** Called from BattleBoard to leave carry mode. */

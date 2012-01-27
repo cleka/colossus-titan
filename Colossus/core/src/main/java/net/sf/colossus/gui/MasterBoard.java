@@ -39,8 +39,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -204,6 +204,9 @@ public final class MasterBoard extends JPanel
     private AbstractAction saveGameAsAction;
     private AbstractAction closeBoardAction;
     private AbstractAction quitGameAction;
+    private AbstractAction fakeDisconnectAction;
+    private AbstractAction fakeDisconnectByServerAction;
+    private AbstractAction tryReconnectAction;
     private AbstractAction checkConnectionAction;
 
     private AbstractAction clearRecruitChitsAction;
@@ -766,6 +769,34 @@ public final class MasterBoard extends JPanel
             }
         };
 
+        fakeDisconnectAction = new AbstractAction(Constants.fakeDisconnect)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                LOGGER.info("Fake disconnect by client!");
+                client.fakeDisconnect();
+            }
+        };
+
+        fakeDisconnectByServerAction = new AbstractAction(
+            Constants.fakeDisconnectByServer)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                LOGGER.info("Fake disconnect init by server!");
+                gui.getClient().fakeDisconnectByServer();
+            }
+        };
+
+        tryReconnectAction = new AbstractAction(Constants.tryReconnect)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                LOGGER.info("Menu-triggered trying reconnect!");
+                client.tryReconnect();
+            }
+        };
+
         newGameAction = new AbstractAction(Constants.newGame)
         {
             public void actionPerformed(ActionEvent e)
@@ -1182,6 +1213,15 @@ public final class MasterBoard extends JPanel
         mi.setMnemonic(KeyEvent.VK_C);
         mi = fileMenu.add(quitGameAction);
         mi.setMnemonic(KeyEvent.VK_Q);
+
+        mi = fileMenu.add(fakeDisconnectAction);
+        mi.setMnemonic(KeyEvent.VK_Y);
+
+        mi = fileMenu.add(fakeDisconnectByServerAction);
+        mi.setMnemonic(KeyEvent.VK_Z);
+
+        mi = fileMenu.add(tryReconnectAction);
+        mi.setMnemonic(KeyEvent.VK_R);
 
         // Edit menu
 
@@ -2722,7 +2762,6 @@ public final class MasterBoard extends JPanel
             {
                 //  no active legion, or active legion already marked
             }
-
         }
         else if (gui.getGame().isPhase(Phase.MUSTER))
         {
@@ -3232,7 +3271,13 @@ public final class MasterBoard extends JPanel
             bottomBar.setPhase("Unable to continue game");
             disableDoneAction("connection to server lost");
         }
-        makeDoneCloseWindow();
+        // makeDoneCloseWindow();
+    }
+
+    public void setReconnectedMessage()
+    {
+        bottomBar.setPhase("-suspended-");
+        disableDoneAction("Connection restored - resyc needed....");
     }
 
     public void setReplayMode()
@@ -3252,12 +3297,22 @@ public final class MasterBoard extends JPanel
             + client.getTurnNumber() + " : " + text);
     }
 
+    public void setTempDisconnectedState(String message)
+    {
+        setTitleInfoText("Problem -- " + message);
+        bottomBar.setPhase("Problem: " + message);
+        disableDoneAction("connection with server interrupted");
+    }
+
     public void setGameOverState(String message)
     {
         setTitleInfoText("Game Over -- " + message);
         bottomBar.setPhase("Game Over: " + message);
         disableDoneAction("connection closed from server side");
-        makeDoneCloseWindow();
+        if (gui.getOwningPlayerName().equals("bla"))
+        {
+            makeDoneCloseWindow();
+        }
     }
 
     public void setPhaseInfo(String message)
