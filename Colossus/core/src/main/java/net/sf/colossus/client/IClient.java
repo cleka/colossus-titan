@@ -170,4 +170,6 @@ public interface IClient
     public void setBoardActive(boolean val);
 
     public void pingRequest();
+
+    public void messageFromServer(String message);
 }

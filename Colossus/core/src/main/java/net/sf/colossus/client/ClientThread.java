@@ -687,6 +687,12 @@ public class ClientThread extends Thread
             client.tellWhatsHappening(message);
         }
 
+        else if (method.equals(Constants.messageFromServer))
+        {
+            String message = args.remove(0);
+            client.messageFromServer(message);
+        }
+
         else if (method.equals(Constants.askConfirmCatchUp))
         {
             client.confirmWhenCaughtUp();

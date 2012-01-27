@@ -483,8 +483,13 @@ public final class Client implements IClient, IOracle, IVariant,
         }
         catch (ConnectionInitException e)
         {
-            LOGGER.info("reconnect attempted but got ConnectionInitException "
+            LOGGER
+                .warning("reconnect attempted but got ConnectionInitException "
                 + e);
+            String message = "Connection to server was interrupted; immediate automatic reconnecting failed.\n\n"
+                + "Try it again (from File Menu) after a few seconds.\n"
+                + "But if that does not succeed, well, bad luck:-(";
+            gui.showMessageDialogAndWait(message);
         }
     }
 
@@ -865,9 +870,12 @@ public final class Client implements IClient, IOracle, IVariant,
         }
         else
         {
-            LOGGER.warning("Seems server unexpectedly closed connection. "
-                + "Let's stay around for a while...");
-            tryAutomaticReconnect();
+            LOGGER.warning("Network connection was unexpectedly closed. "
+                + "Trying to reconnect after 1 second ...");
+            // give it some time...
+            WhatNextManager.sleepFor(1000);
+            LOGGER.info("Initiating automatic reconnect!");
+            tryReconnect();
             close = false;
         }
         return close;
@@ -897,12 +905,6 @@ public final class Client implements IClient, IOracle, IVariant,
         playersNotInitialized = true;
 
         CustomRecruitBase.resetAllInstances();
-    }
-
-    private void tryAutomaticReconnect()
-    {
-        LOGGER.info("Initiating automatic reconnect!");
-        tryReconnect();
     }
 
     /** Called from BattleBoard to leave carry mode. */
@@ -1757,6 +1759,11 @@ public final class Client implements IClient, IOracle, IVariant,
         }
 
         gui.actOnInitBattle();
+    }
+
+    public void messageFromServer(String message)
+    {
+        gui.showMessageDialogAndWait(message);
     }
 
     public void showMessageDialog(String message)

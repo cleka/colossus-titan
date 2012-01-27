@@ -1398,4 +1398,9 @@ final class ClientHandler implements IClient
         }
     }
 
+    public void messageFromServer(String message)
+    {
+        sendToClient(Constants.messageFromServer + sep + message);
+    }
+
 }

@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -425,6 +426,8 @@ public final class Server extends Thread implements IServer
         }
     }
 
+    private final Set<Player> forcedWithdraws = new TreeSet<Player>();
+
     private void handleOutsideChanges(int timeout,
         boolean stillWaitingForClients) throws IOException
     {
@@ -439,6 +442,34 @@ public final class Server extends Thread implements IServer
         int num = selector.select(timeout);
         LOGGER.log(Level.FINEST, "select returned, " + num
             + " channels are ready to be processed.");
+
+        if (!forcedWithdraws.isEmpty())
+        {
+            for (Player p : forcedWithdraws)
+            {
+                ClientHandler ch = (ClientHandler)clientMap.get(p);
+                if (!ch.isTemporarilyDisconnected())
+                {
+                    LOGGER.info("Skipping forced withdraw for player "
+                        + p.getName()
+                        + ": player is reconnected with a new ClientHandler!");
+                }
+                else if (isWithdrawalIrrelevant())
+                {
+                    LOGGER.info("Skipping forced withdraw for player "
+                        + p.getName() + ": is irrelevant.");
+                }
+                else
+                {
+                    LOGGER.info("Forced withdraw for player "
+                        + p.getName());
+                    String message = "You were too long disconnected - Game did automatic withdraw! Sorry.";
+                    game.handlePlayerWithdrawal(p);
+                    ch.messageFromServer(message);
+                }
+            }
+            forcedWithdraws.clear();
+        }
 
         if (handleGuiRequests())
         {
@@ -749,6 +780,7 @@ public final class Server extends Thread implements IServer
             LOGGER.warning("EOF on channel for client " + getPlayerName()
                 + " - skipping withDraw, waiting for reconnect attempt.");
             processingCH.setTemporarilyDisconnected();
+            triggerWithdrawIfDoesNotReconnect(getPlayer(), 30000, 5);
             return;
         }
         else
@@ -757,6 +789,31 @@ public final class Server extends Thread implements IServer
                 + " - can't reconnect, withDraw and Disconnecting.");
             withdrawFromGame();
         }
+    }
+
+    private void triggerWithdrawIfDoesNotReconnect(final Player p,
+        final long intervalLen, final int intervals)
+    {
+        Runnable r = new Runnable()
+        {
+            public void run()
+            {
+                LOGGER.info("Initiating delayed withdraw for player "
+                    + p.getName());
+                for (int i = 0; i < intervals; i++)
+                {
+                    WhatNextManager.sleepFor(intervalLen);
+
+                    int remaining = intervals - i;
+                    LOGGER.fine("countdown for withdraw: " + remaining
+                        + " intervals of " + intervalLen + " ms left.");
+                }
+                LOGGER.info("Time's up! Withdrawing player " + p.getName());
+                forcedWithdraws.add(p);
+                selector.wakeup();
+            }
+        };
+        new Thread(r).start();
     }
 
     /**

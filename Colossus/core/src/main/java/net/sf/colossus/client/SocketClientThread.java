@@ -111,6 +111,7 @@ final class SocketClientThread extends Thread implements IServer,
 
         LOGGER.info("SCT: trying recreateConnection to host " + host
             + " at port " + port + ".");
+
         SocketClientThread conn = new SocketClientThread(host, port,
             playerName, remote);
 
@@ -121,12 +122,14 @@ final class SocketClientThread extends Thread implements IServer,
             // (wrong host or port or server not yet up).
             // In this case we just do cleanup and end.
 
-            LOGGER.warning("Client startup failed: " + reasonFail);
+            LOGGER.warning("Reconnecting to server failed: " + reasonFail);
+            /*
             if (!Options.isStresstest())
             {
                 String title = "Socket initialialization failed!";
                 ErrorUtils.showErrorDialog(null, title, reasonFail);
             }
+            */
             throw new ConnectionInitException(reasonFail);
         }
 
