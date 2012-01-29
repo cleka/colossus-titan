@@ -1295,6 +1295,7 @@ public final class MasterBoard extends JPanel
         addCheckBox(windowMenu, Options.showAutoInspector, KeyEvent.VK_I);
         addCheckBox(windowMenu, Options.showEventViewer, KeyEvent.VK_E);
         addCheckBox(windowMenu, Options.showLogWindow, KeyEvent.VK_L);
+        addCheckBox(windowMenu, Options.showConnectionLogWindow, KeyEvent.VK_O);
 
         // full recruit tree
         mi = windowMenu.add(viewFullRecruitTreeAction);

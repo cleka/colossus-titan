@@ -629,6 +629,12 @@ public class NullClientGUI implements IClientGUI
 
     }
 
+    public void appendToConnectionLog(String s)
+    {
+        // TODO Auto-generated method stub
+
+    }
+
     public void setBoardActive(boolean val)
     {
         // TODO Auto-generated method stub

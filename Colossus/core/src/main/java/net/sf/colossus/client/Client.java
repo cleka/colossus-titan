@@ -403,6 +403,11 @@ public final class Client implements IClient, IOracle, IVariant,
 
     }
 
+    public void appendToConnectionLog(String s)
+    {
+        gui.appendToConnectionLog(s);
+    }
+
     public boolean isRemote()
     {
         return (localServer == null);
@@ -469,16 +474,19 @@ public final class Client implements IClient, IOracle, IVariant,
     {
         try
         {
+            appendToConnectionLog("Trying reconnect...");
             int lastMsgNr = ((SocketClientThread)this.connection)
                 .getMessageCounter();
             IServerConnection conn = SocketClientThread
                 .recreateConnection((SocketClientThread)connection);
+            appendToConnectionLog("Connection succeeded, initiating sync...");
             gotDisposeAlready = false;
             this.connection = conn;
             this.server = connection.getIServer();
             connection.setClient(this);
             connection.startThread();
             connection.requestSyncDelta(lastMsgNr);
+            appendToConnectionLog("Sync completed!");
 
         }
         catch (ConnectionInitException e)

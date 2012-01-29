@@ -172,4 +172,6 @@ public interface IClient
     public void pingRequest();
 
     public void messageFromServer(String message);
+
+    public void appendToConnectionLog(String s);
 }

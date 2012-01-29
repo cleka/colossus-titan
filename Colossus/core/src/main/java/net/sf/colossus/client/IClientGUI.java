@@ -316,6 +316,8 @@ public interface IClientGUI
 
     public abstract void showConnectionClosedMessage();
 
+    public abstract void appendToConnectionLog(String s);
+
     // At least the following two are from gui package classes,
     // not from Client directly.
 

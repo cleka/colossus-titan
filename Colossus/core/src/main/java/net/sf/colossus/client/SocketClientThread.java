@@ -102,27 +102,26 @@ final class SocketClientThread extends Thread implements IServer,
     }
 
     public static SocketClientThread recreateConnection(
-        SocketClientThread connection) throws ConnectionInitException
+        SocketClientThread previousConnection) throws ConnectionInitException
     {
-        String host = connection.host;
-        int port = connection.port;
-        String playerName = connection.playerName;
-        boolean remote = connection.remote;
+        String host = previousConnection.host;
+        int port = previousConnection.port;
+        String playerName = previousConnection.playerName;
+        boolean remote = previousConnection.remote;
 
         LOGGER.info("SCT: trying recreateConnection to host " + host
             + " at port " + port + ".");
 
-        SocketClientThread conn = new SocketClientThread(host, port,
+        SocketClientThread newConn = new SocketClientThread(host, port,
             playerName, remote);
 
-        String reasonFail = conn.getReasonFail();
+        String reasonFail = newConn.getReasonFail();
         if (reasonFail != null)
         {
-            // If this failed here, it is usually a "could not connect"-problem
-            // (wrong host or port or server not yet up).
-            // In this case we just do cleanup and end.
-
             LOGGER.warning("Reconnecting to server failed: " + reasonFail);
+            previousConnection
+                .appendToConnectionLog("SCT.recreateConnection failed! Reason: "
+                    + reasonFail);
             /*
             if (!Options.isStresstest())
             {
@@ -133,7 +132,7 @@ final class SocketClientThread extends Thread implements IServer,
             throw new ConnectionInitException(reasonFail);
         }
 
-        return conn;
+        return newConn;
     }
 
     SocketClientThread(String host, int port, String initialName,
@@ -367,6 +366,14 @@ final class SocketClientThread extends Thread implements IServer,
         return reasonFail;
     }
 
+    public void appendToConnectionLog(String s)
+    {
+        if (clientThread != null)
+        {
+            clientThread.appendToConnectionLog(s);
+        }
+    }
+
     public String getVariantNameForInit()
     {
         return variantNameForInit;
@@ -579,7 +586,7 @@ final class SocketClientThread extends Thread implements IServer,
                 }
                 else
                 {
-                    clientThread.setClosedByServer();
+                    // clientThread.setClosedByServer();
                     LOGGER
                         .log(Level.WARNING, "SCT SocketClientThread "
                             + getName() + ": got SocketException "
@@ -591,7 +598,7 @@ final class SocketClientThread extends Thread implements IServer,
             catch (IOException ex)
             {
                 LOGGER.log(Level.SEVERE, "SCT SocketClientThread " + getName()
-                    + ", got Exception ", ex);
+                    + ", got an IOException ", ex);
                 goingDown = true;
             }
             catch (Exception any)
@@ -1062,12 +1069,21 @@ final class SocketClientThread extends Thread implements IServer,
 
     public void fakeDisconnect()
     {
+        if (socket == null)
+        {
+            LOGGER.info("Socket already null, can't fake disconnect...");
+            return;
+        }
         LOGGER.fine("In SCT " + getNameMaybe() + ": doing fake disconnect!");
         try
         {
+            clientThread.appendToConnectionLog("Disconnecting...");
             LOGGER.fine("Shutting down output next...");
-            socket.shutdownOutput();
+            socket.close();
+            // socket.shutdownOutput();
+            // socket.shutdownInput();
             LOGGER.fine("shutdownOutput done... and still alive :)");
+            clientThread.appendToConnectionLog("Disconnected...");
         }
         catch (IOException e)
         {

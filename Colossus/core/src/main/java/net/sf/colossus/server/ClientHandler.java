@@ -342,6 +342,7 @@ final class ClientHandler implements IClient
                 messageCounter = queueMsgNr;
             }
         }
+        commitPoint();
     }
 
     /**
@@ -1110,8 +1111,17 @@ final class ClientHandler implements IClient
         sendToClient(Constants.setPlayerName + sep + playerName);
     }
 
+    public String getSignonName()
+    {
+        return this.signonName;
+    }
+
     public String getPlayerName()
     {
+        if (this.playerName == null)
+        {
+            LOGGER.warning("CH.playerName still null, returning signOnName '" + signonName + "'");
+        }
         return this.playerName;
     }
 
@@ -1403,4 +1413,8 @@ final class ClientHandler implements IClient
         sendToClient(Constants.messageFromServer + sep + message);
     }
 
+    public void appendToConnectionLog(String s)
+    {
+        // dummy, only needed on client side
+    }
 }

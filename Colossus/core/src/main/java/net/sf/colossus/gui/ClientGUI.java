@@ -83,6 +83,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     private EventViewer eventViewer;
     private PreferencesWindow preferencesWindow;
     private LogWindow logWindow;
+    private ConnectionLogWindow connectionLogWindow;
     private PickCarry pickCarryDialog = null;
 
     // For negotiation.  (And AI battle.)
@@ -981,6 +982,18 @@ public class ClientGUI implements IClientGUI, GUICallbacks
                 syncCheckboxes();
             }
         });
+        options.addListener(Options.showConnectionLogWindow,
+            new IOptions.Listener()
+            {
+                @Override
+                public void booleanOptionChanged(String optname,
+                    boolean oldValue, boolean newValue)
+                {
+                    showOrHideConnectionLogWindow(newValue);
+                    syncCheckboxes();
+                }
+            });
+
         options.addListener(Options.showStatusScreen, new IOptions.Listener()
         {
             @Override
@@ -1742,6 +1755,16 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         }
     }
 
+    private void disposeConnectionLogWindow()
+    {
+        if (connectionLogWindow != null)
+        {
+            connectionLogWindow.setVisible(false);
+            connectionLogWindow.dispose();
+            connectionLogWindow = null;
+        }
+    }
+
     private void disposeEventViewer()
     {
         if (eventViewer != null)
@@ -1991,6 +2014,41 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         {
             disposeLogWindow();
         }
+    }
+
+    private void showOrHideConnectionLogWindow(boolean show)
+    {
+        if (show)
+        {
+            if (connectionLogWindow == null)
+            {
+                // the logger with the empty name is parent to all loggers
+                // and thus catches all messages
+                connectionLogWindow = new ConnectionLogWindow(options);
+            }
+            else
+            {
+                connectionLogWindow.setVisible(true);
+            }
+        }
+        else
+        {
+            if (connectionLogWindow != null)
+            {
+                connectionLogWindow.setVisible(false);
+            }
+
+        }
+    }
+
+    public void appendToConnectionLog(String s)
+    {
+        // Create or make visible, if needed:
+        if (connectionLogWindow == null)
+        {
+            showOrHideConnectionLogWindow(true);
+        }
+        connectionLogWindow.append(s);
     }
 
     // TODO why is syncCheckBoxes is called to sync *all* checkboxes in each
@@ -2833,6 +2891,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
         client.cleanupBattle();
         disposeLogWindow();
+        disposeConnectionLogWindow();
         disposeMovementDie();
         disposeStatusScreen();
         disposeEventViewer();

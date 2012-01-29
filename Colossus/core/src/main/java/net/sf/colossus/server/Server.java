@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -79,7 +78,7 @@ public final class Server extends Thread implements IServer
     private final List<RemoteLogHandler> remoteLogHandlers = new ArrayList<RemoteLogHandler>();
 
     /** Map of players to their clients. */
-    private final Map<Player, IClient> clientMap = new HashMap<Player, IClient>();
+    private final Map<Player, IClient> playerToClientMap = new HashMap<Player, IClient>();
 
     // list of SocketChannels that are currently active
     private final List<SocketChannel> activeSocketChannelList = new ArrayList<SocketChannel>();
@@ -426,7 +425,19 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    private final Set<Player> forcedWithdraws = new TreeSet<Player>();
+    public class WithdrawInfo
+    {
+        public long deadline;
+        public ClientHandler ch;
+
+        public WithdrawInfo(long when, ClientHandler ch)
+        {
+            this.deadline = when;
+            this.ch = ch;
+        }
+    }
+
+    private final Map<String, WithdrawInfo> forcedWithdraws = new HashMap<String, WithdrawInfo>();
 
     private void handleOutsideChanges(int timeout,
         boolean stillWaitingForClients) throws IOException
@@ -445,30 +456,28 @@ public final class Server extends Thread implements IServer
 
         if (!forcedWithdraws.isEmpty())
         {
-            for (Player p : forcedWithdraws)
+            Set<String> keys = forcedWithdraws.keySet();
+            for (String name : keys)
             {
-                ClientHandler ch = (ClientHandler)clientMap.get(p);
-                if (!ch.isTemporarilyDisconnected())
+                WithdrawInfo info = forcedWithdraws.get(name);
+                long now = new Date().getTime();
+                int timeLeft = (int)((info.deadline - now) / 1000);
+                if (timeLeft > 0)
                 {
-                    LOGGER.info("Skipping forced withdraw for player "
-                        + p.getName()
-                        + ": player is reconnected with a new ClientHandler!");
-                }
-                else if (isWithdrawalIrrelevant())
-                {
-                    LOGGER.info("Skipping forced withdraw for player "
-                        + p.getName() + ": is irrelevant.");
+                    LOGGER.fine("forcedWithdraw for player " + name + ": "
+                        + timeLeft + " seconds left.");
                 }
                 else
                 {
-                    LOGGER.info("Forced withdraw for player "
-                        + p.getName());
+                    LOGGER.info("Forced withdraw for player " + name);
+                    forcedWithdraws.remove(name);
+
                     String message = "You were too long disconnected - Game did automatic withdraw! Sorry.";
-                    game.handlePlayerWithdrawal(p);
-                    ch.messageFromServer(message);
+                    info.ch.messageFromServer(message);
+
+                    game.handlePlayerWithdrawal(game.getPlayerByName(name));
                 }
             }
-            forcedWithdraws.clear();
         }
 
         if (handleGuiRequests())
@@ -775,31 +784,64 @@ public final class Server extends Thread implements IServer
             return;
         }
 
-        if (processingCH.supportsReconnect())
+        try
         {
-            LOGGER.warning("EOF on channel for client " + getPlayerName()
-                + " - skipping withDraw, waiting for reconnect attempt.");
-            processingCH.setTemporarilyDisconnected();
-            triggerWithdrawIfDoesNotReconnect(getPlayer(), 30000, 5);
-            return;
+            if (processingCH.supportsReconnect())
+            {
+                LOGGER.warning("EOF on channel for client " + getPlayerName()
+                    + " - skipping withDraw, waiting for reconnect attempt.");
+                processingCH.setTemporarilyDisconnected();
+                triggerWithdrawIfDoesNotReconnect(30000, 5);
+                return;
+            }
+            else
+            {
+                LOGGER.warning("EOF on channel for client " + getPlayerName()
+                    + " - can't reconnect, withDraw and Disconnecting.");
+                withdrawFromGame();
+            }
         }
-        else
+        // just in case. To make sure the disconnect one level up really happens, no matter what.
+        catch (Exception e)
         {
-            LOGGER.warning("EOF on channel for client " + getPlayerName()
-                + " - can't reconnect, withDraw and Disconnecting.");
-            withdrawFromGame();
+            LOGGER.log(Level.SEVERE,
+                "Exception while withdrawFromGameIfRelevant: ", e);
         }
     }
 
-    private void triggerWithdrawIfDoesNotReconnect(final Player p,
-        final long intervalLen, final int intervals)
+    private void triggerWithdrawIfDoesNotReconnect(final long intervalLen,
+        final int intervals)
     {
+        final ClientHandler currentProcessingCH = processingCH;
+        String withdrawName = currentProcessingCH.getPlayerName();
+
+        LOGGER.info("Initiating delayed withdraw for player " + withdrawName
+            + " intervalLen = " + intervalLen + " count " + intervals);
+        LOGGER.info("Time's up! Withdrawing player " + withdrawName);
+        long when = new Date().getTime() + 30000;
+        forcedWithdraws.put(withdrawName, new WithdrawInfo(when,
+            currentProcessingCH));
+    }
+
+    /**
+     * Called when EOF encountered on a clienthandler. Store which is the currently
+     * processed CH, and after a timeout withdraw that player.
+     * @param intervalLen
+     * @param intervals
+     */
+    /*
+    private void old_triggerWithdrawIfDoesNotReconnect(final long intervalLen,
+        final int intervals)
+    {
+        final ClientHandler currentProcessingCH = processingCH;
         Runnable r = new Runnable()
         {
             public void run()
             {
+                String withdrawName = currentProcessingCH.getPlayerName();
+
                 LOGGER.info("Initiating delayed withdraw for player "
-                    + p.getName());
+                    + withdrawName);
                 for (int i = 0; i < intervals; i++)
                 {
                     WhatNextManager.sleepFor(intervalLen);
@@ -808,13 +850,14 @@ public final class Server extends Thread implements IServer
                     LOGGER.fine("countdown for withdraw: " + remaining
                         + " intervals of " + intervalLen + " ms left.");
                 }
-                LOGGER.info("Time's up! Withdrawing player " + p.getName());
-                forcedWithdraws.add(p);
+                LOGGER.info("Time's up! Withdrawing player " + withdrawName);
+                forcedWithdraws.add(withdrawName);
                 selector.wakeup();
             }
         };
         new Thread(r).start();
     }
+    */
 
     /**
      *  Put the ClientHandler into the queue to be removed
@@ -1023,7 +1066,7 @@ public final class Server extends Thread implements IServer
 
     private boolean anyNonAiSocketsLeft()
     {
-        if (clientMap.isEmpty())
+        if (playerToClientMap.isEmpty())
         {
             return false;
         }
@@ -1167,6 +1210,10 @@ public final class Server extends Thread implements IServer
         else if (remote)
         {
             player = game.findNetworkPlayer(playerName);
+            if (player == null)
+            {
+                player = game.getPlayerByNameIgnoreNull(playerName);
+            }
         }
         else
         {
@@ -1197,15 +1244,21 @@ public final class Server extends Thread implements IServer
          */
         else if (isReconnectAttempt(player))
         {
-            ClientHandler ch = (ClientHandler)clientMap.get(player);
-            if (ch != null && ch.getPlayerName().equals(player.getName()))
+            ClientHandler existingCH = (ClientHandler)playerToClientMap.get(player);
+            if (existingCH != null && existingCH.getPlayerName().equals(player.getName()))
             {
                 isReconnect = true;
                 LOGGER.info("All right, reconnection of disconnected player!");
-                ((ClientHandler)client).cloneRedoQueue(ch);
-                clientMap.remove(player);
-                clients.remove(ch);
-                // clientMap.put(player, client);
+                ((ClientHandler)client).cloneRedoQueue(existingCH);
+                playerToClientMap.remove(player);
+                clients.remove(existingCH);
+                LOGGER.info("Removing player with name " + player.getName()
+                    + " from forcedWithDrawlist. Size was "
+                    + forcedWithdraws.size());
+                forcedWithdraws.remove(player.getName());
+                LOGGER.info("Removed  player with name " + player.getName()
+                    + " from forcedWithDrawlist. Size now "
+                    + forcedWithdraws.size());
             }
             else
             {
@@ -1225,9 +1278,30 @@ public final class Server extends Thread implements IServer
         }
 
         clients.add(client);
+
+        /*
+        // Note, actually last joined client signonName will always be still null...
+         *
+        System.out.println("\n\n******\nclients contains now "
+            + clients.size() + " clients.");
+        for (IClient c : clients)
+        {
+            String displayName = "unknown";
+            if ((c != null) && ((ClientHandler)c).getPlayerName() != null)
+            {
+                displayName = ((ClientHandler)c).getPlayerName();
+            }
+            else if (c != null && ((ClientHandler)c).getSignonName() != null)
+            {
+                displayName = ((ClientHandler)c).getSignonName();
+            }
+            System.out.println("Client: " + displayName + " .");
+        }
+        */
+
         if (player != null)
         {
-            clientMap.put(player, client);
+            playerToClientMap.put(player, client);
         }
         else
         {
@@ -1278,10 +1352,9 @@ public final class Server extends Thread implements IServer
 
     private boolean isReconnectAttempt(Player player)
     {
-        IClient client = clientMap.get(player);
+        IClient client = playerToClientMap.get(player);
 
-        if (client != null
-            && ((ClientHandler)client).isTemporarilyDisconnected())
+        if (client != null)
         {
             return true;
         }
@@ -1413,7 +1486,7 @@ public final class Server extends Thread implements IServer
             client.dispose();
         }
         clients.clear();
-        clientMap.clear();
+        playerToClientMap.clear();
         remoteClients.clear();
 
         LOGGER.fine("Removing all loggers...");
@@ -1549,9 +1622,9 @@ public final class Server extends Thread implements IServer
 
     private IClient getClient(Player player)
     {
-        if (clientMap.containsKey(player))
+        if (playerToClientMap.containsKey(player))
         {
-            return clientMap.get(player);
+            return playerToClientMap.get(player);
         }
         else
         {
@@ -3391,7 +3464,7 @@ public final class Server extends Thread implements IServer
     public void fakeDisconnectClient(String name)
     {
         Player p = game.getPlayerByName(name);
-        IClient client = clientMap.get(p);
+        IClient client = playerToClientMap.get(p);
         ((ClientHandler)client).fakeDisconnectClient();
     }
 }

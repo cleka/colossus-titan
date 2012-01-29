@@ -783,6 +783,11 @@ public class ClientThread extends Thread
         return legion;
     }
 
+    public void appendToConnectionLog(String s)
+    {
+        client.appendToConnectionLog(s);
+    }
+
     public static long getNow()
     {
         return new Date().getTime();
