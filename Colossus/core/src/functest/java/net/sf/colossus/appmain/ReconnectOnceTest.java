@@ -41,7 +41,7 @@ public class ReconnectOnceTest extends TestCase
 
         LOGGER.finest("before disconnect");
         Client c = game.getClientForName("inactive");
-        c.fakeDisconnect();
+        c.enforcedDisconnect();
 
         WhatNextManager.sleepFor(2000);
 
@@ -71,7 +71,7 @@ public class ReconnectOnceTest extends TestCase
         game.showLocalClients();
 
         Client c = game.getClientForName("active");
-        c.fakeDisconnect();
+        c.enforcedDisconnect();
 
         WhatNextManager.sleepFor(2000);
 

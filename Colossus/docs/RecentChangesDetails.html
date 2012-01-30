@@ -13,10 +13,16 @@
 This describes the recent changes in some more detail than just the
 one-line-info on the main pages "News" section.
 
-<h3>August 2, 2011: Public Test Build from r5033</h3>
+<h3>Januar 30, 2012: Public Test Build from r5061</h3>
 <p/>
-Some smaller fixes and addings. This build can be considered as "0.10.2 Release Candidate".
+Reconnect after shortly interrupted network connections, plus some smaller fixes and addings. 
+This build can be considered as "0.13.0 Release Candidate 1".
 <ul>
+<li>If game client encounters connection closed (short network instabilities), it will try to 
+    reconnect after a second, and will catch up/synchronize to get messages/events that happened 
+    while being disconnected.
+    BUT, if client crashes/hangs, one can NOT restart a client from scratch and rejoin.</li>
+<li>Fixed: 3473842 No Warlock on first turn option not sync'd from web server.</li>
 <li>Fixed: 3384824 Java 7 update breaks the code.</li>
 <li>Added some simple "Editing" functionality (by default not visible: 
     https://sourceforge.net/apps/trac/colossus/wiki/CheatMode).</li>
