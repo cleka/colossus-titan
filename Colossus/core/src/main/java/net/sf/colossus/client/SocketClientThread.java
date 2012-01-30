@@ -1067,7 +1067,7 @@ final class SocketClientThread extends Thread implements IServer,
         // sendToServer(Constants.replyToPing);
     }
 
-    public void fakeDisconnect()
+    public void enforcedDisconnect()
     {
         if (socket == null)
         {

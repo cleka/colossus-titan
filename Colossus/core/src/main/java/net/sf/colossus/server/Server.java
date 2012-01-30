@@ -3461,7 +3461,7 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    public void fakeDisconnectClient(String name)
+    public void enforcedDisconnectClient(String name)
     {
         Player p = game.getPlayerByName(name);
         IClient client = playerToClientMap.get(p);

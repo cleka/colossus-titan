@@ -204,8 +204,8 @@ public final class MasterBoard extends JPanel
     private AbstractAction saveGameAsAction;
     private AbstractAction closeBoardAction;
     private AbstractAction quitGameAction;
-    private AbstractAction fakeDisconnectAction;
-    private AbstractAction fakeDisconnectByServerAction;
+    private AbstractAction enforcedDisconnectAction;
+    private AbstractAction enforcedDisconnectByServerAction;
     private AbstractAction tryReconnectAction;
     private AbstractAction checkConnectionAction;
 
@@ -769,22 +769,22 @@ public final class MasterBoard extends JPanel
             }
         };
 
-        fakeDisconnectAction = new AbstractAction(Constants.fakeDisconnect)
+        enforcedDisconnectAction = new AbstractAction(Constants.enforcedDisconnect)
         {
             public void actionPerformed(ActionEvent e)
             {
                 LOGGER.info("Fake disconnect by client!");
-                client.fakeDisconnect();
+                client.enforcedDisconnect();
             }
         };
 
-        fakeDisconnectByServerAction = new AbstractAction(
-            Constants.fakeDisconnectByServer)
+        enforcedDisconnectByServerAction = new AbstractAction(
+            Constants.enforcedDisconnectByServer)
         {
             public void actionPerformed(ActionEvent e)
             {
-                LOGGER.info("Fake disconnect init by server!");
-                gui.getClient().fakeDisconnectByServer();
+                LOGGER.info("Enforcing disconnect by server!");
+                gui.getClient().enforcedDisconnectByServer();
             }
         };
 
@@ -1214,11 +1214,15 @@ public final class MasterBoard extends JPanel
         mi = fileMenu.add(quitGameAction);
         mi.setMnemonic(KeyEvent.VK_Q);
 
-        mi = fileMenu.add(fakeDisconnectAction);
+        mi = fileMenu.add(enforcedDisconnectAction);
         mi.setMnemonic(KeyEvent.VK_Y);
 
-        mi = fileMenu.add(fakeDisconnectByServerAction);
-        mi.setMnemonic(KeyEvent.VK_Z);
+        boolean _DISCONNECT_BY_SERVER = false; // not implemented yet
+        if (!client.isRemote() && _DISCONNECT_BY_SERVER)
+        {
+            mi = fileMenu.add(enforcedDisconnectByServerAction);
+            mi.setMnemonic(KeyEvent.VK_Z);
+        }
 
         mi = fileMenu.add(tryReconnectAction);
         mi.setMnemonic(KeyEvent.VK_R);

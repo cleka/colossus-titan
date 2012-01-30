@@ -458,16 +458,16 @@ public final class Client implements IClient, IOracle, IVariant,
         }
     }
 
-    public void fakeDisconnect()
+    public void enforcedDisconnect()
     {
         LOGGER.warning("LOOK OUT! - client " + getOwningPlayer().getName()
             + " doing fake disconnect now...");
-        ((SocketClientThread)connection).fakeDisconnect();
+        ((SocketClientThread)connection).enforcedDisconnect();
     }
 
-    public void fakeDisconnectByServer()
+    public void enforcedDisconnectByServer()
     {
-        localServer.fakeDisconnectClient(owningPlayer.getName());
+        localServer.enforcedDisconnectClient(owningPlayer.getName());
     }
 
     public void tryReconnect()

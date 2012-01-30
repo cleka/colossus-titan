@@ -121,7 +121,8 @@ public class WhatNextManager
         // I suspect they are too busy processing all the legion cleanup
         // (and related updateCreatureCount) messages.
         // So give them more time for a while.
-        private final long timeOutInSecs = 120;
+        // try 30, reconnect causes server to hang (not cleanly exit itself) at the moment
+        private final long timeOutInSecs = 30;
 
         public TimedJvmQuit()
         {
