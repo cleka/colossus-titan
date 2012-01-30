@@ -28,11 +28,11 @@ public final class WelcomeDialog extends KFrame
 {
     private final static String title = "Welcome to this new Colossus Release!";
 
-    private final static String CURRENT_WELCOME_KEY = "0.12.1.x-r5019";
+    private final static String CURRENT_WELCOME_KEY = "0.13.0-RC1-r5061";
 
     private final static String baseUrl = "http://sourceforge.net/projects/colossus/files";
     private final static String colossusReleaseNoteUrl = baseUrl
-        + "/Release-0.12.1.x-r5019";
+        + "/Release-0.13.0-RC1-r5061";
 
     private static WelcomeDialog showWelcome = null;
 
@@ -42,21 +42,22 @@ public final class WelcomeDialog extends KFrame
         super(title);
 
         String text = "\n"
-            + "  Welcome to this new 'Colossus Public Test Build' 0.12.1.x (r5019)!"
+            + "  Welcome to this new 'Colossus Public Test Build' 0.13.0 (Release Candidate 1 from r5061)!"
             + "\n\n"
             + "  New features:\n"
-            + "  - New variant Dino-Titan added\n"
-            + "  - New option to disable Warlock recruiting on the first turn\n"
-            + "  - A next key ('n') in the move, muster and split phases to move to the next legion that requires action\n"
-            + "  - the 'plus' in r5019 is on top of above two changes which hopefully prevent some client stuck/client GUI freezes cases\n"
-            + "\n"
-            + "  Plus the usual amount of fixes / stability improvements."
+            + "  - Game Client be able to reconnect after short network outages\n"
+            + "  - plus the usual amount of fixes / stability improvements."
             + "\n\n"
+            + "  (Note: For this public test build, there's nothing put to SF download area, Recent Changes document is\n"
+            + "  available from same page where the WebStart file is.)"
+            + "\n\n"
+            /*
             + "  For a more detailed list of changes see the Release Note document in SF download area:\n      "
             + colossusReleaseNoteUrl
             + "\n\n"
             + "  Use button below to copy the URL to your clipboard to paste it "
             + "into your browser.\n\n"
+            */
             + "  This \"Welcome Dialog\" will only be shown once for every "
             + "new release;\n"
             + "  (you can find this welcome message also from the "
