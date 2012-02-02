@@ -1695,6 +1695,7 @@ public final class Client implements IClient, IOracle, IVariant,
         else if (reason.equals(Constants.doneWithStrikes))
         {
             showMessageDialog(errmsg);
+            gui.highlightCrittersWithTargets();
         }
         else if (reason.equals(Constants.doneWithEngagements))
         {
