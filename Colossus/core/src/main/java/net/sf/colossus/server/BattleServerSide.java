@@ -889,7 +889,7 @@ public final class BattleServerSide extends Battle
         }
     }
 
-    private boolean isForcedStrikeRemaining()
+    public boolean isForcedStrikeRemaining()
     {
         LegionServerSide legion = getActiveLegion();
         if (legion != null)
@@ -905,20 +905,11 @@ public final class BattleServerSide extends Battle
         return false;
     }
 
-    /** Return true if okay, or false if forced strikes remain. */
-    boolean doneWithStrikes()
+    /** Checks now all at same place in Server */
+    void doneWithStrikes()
     {
-        // Advance only if there are no unresolved strikes.
-        if (!isForcedStrikeRemaining() && phase.isFightPhase())
-        {
-            commitStrikes();
-            advancePhase();
-            return true;
-        }
-
-        LOGGER.log(Level.SEVERE, server.getPlayerName()
-            + " called battle.doneWithStrikes() illegally");
-        return false;
+        commitStrikes();
+        advancePhase();
     }
 
     /**

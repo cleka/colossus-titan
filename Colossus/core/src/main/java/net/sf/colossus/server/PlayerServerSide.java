@@ -392,6 +392,8 @@ public final class PlayerServerSide extends Player implements
             LOGGER.log(Level.SEVERE,
                 "Player.undoRecruit: Nothing to unrecruit for legion "
                     + legion.getMarkerId());
+            LOGGER.info(getGame().getServer().processingCH
+                .dumpLastProcessedLines());
             return;
         }
         ((LegionServerSide)legion).undoRecruit();

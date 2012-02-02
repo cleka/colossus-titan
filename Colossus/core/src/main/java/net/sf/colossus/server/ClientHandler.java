@@ -91,6 +91,10 @@ final class ClientHandler implements IClient
     private final ArrayList<MessageForClient> redoQueue = new ArrayList<MessageForClient>(
         50);
 
+    private final static int MAX_KEEP_LINES = 5;
+    private final ArrayList<String> recentlyProcessedLines = new ArrayList<String>(
+        MAX_KEEP_LINES);
+
     // Note that the client (SocketClientThread) sends ack every
     // CLIENT_CTR_ACK_EVERY messages (currently 20)
     // The two values above and the client value must fit together
@@ -525,6 +529,11 @@ final class ClientHandler implements IClient
     {
         try
         {
+            while (recentlyProcessedLines.size() >= MAX_KEEP_LINES)
+            {
+                recentlyProcessedLines.remove(0);
+            }
+            recentlyProcessedLines.add(line);
             callMethod(method, li);
         }
         catch (Exception e)
@@ -535,11 +544,24 @@ final class ClientHandler implements IClient
                 + "\nStack trace:\n" + ErrorUtils.makeStackTraceString(e)
                 + "\n\nGame might be unstable or hang from now on...";
             LOGGER.severe(message);
+            LOGGER.info(dumpLastProcessedLines());
             ErrorUtils.showExceptionDialog(null, message, "Exception caught!",
                 true);
         }
     }
 
+    public String dumpLastProcessedLines()
+    {
+        StringBuffer sb = new StringBuffer("## Last " + MAX_KEEP_LINES
+            + " processed lines were:");
+        int i = 0;
+        for (String rLine : recentlyProcessedLines)
+        {
+            i++;
+            sb.append("\n      #" + i + ": " + rLine);
+        }
+        return sb.toString();
+    }
     private void callMethod(String method, List<String> args)
     {
         if (method.equals(Constants.signOn))

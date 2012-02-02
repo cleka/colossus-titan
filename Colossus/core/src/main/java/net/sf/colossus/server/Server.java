@@ -1221,7 +1221,7 @@ public final class Server extends Thread implements IServer
         }
 
         LOGGER
-            .info("\nTrying to identify player/client for new connection which identifies itself as player "
+            .info("Trying to identify player/client for new connection which identifies itself as player "
                 + playerName);
         String name = "<undefined>";
         if (player == null && playerName.equalsIgnoreCase("spectator"))
@@ -1573,6 +1573,7 @@ public final class Server extends Thread implements IServer
             LOGGER
                 .warning(getPlayerName()
                     + " illegally called doneWithBattleMoves(): not battle active player");
+            LOGGER.info(processingCH.dumpLastProcessedLines());
             getClient(getPlayer()).nak(Constants.doneWithBattleMoves,
                 "Illegal attempt to end phase (wrong player)");
             return;
@@ -1583,6 +1584,7 @@ public final class Server extends Thread implements IServer
         {
             LOGGER.warning(getPlayerName()
                 + " illegally called doneWithBattleMoves(): not move phase");
+            LOGGER.info(processingCH.dumpLastProcessedLines());
             getClient(getPlayer()).nak(
                 Constants.doneWithBattleMoves,
                 "Illegal attempt to end phase (wrong phase "
@@ -1594,30 +1596,41 @@ public final class Server extends Thread implements IServer
 
     public void doneWithStrikes()
     {
+        String reason = isDoneWithStrikesOk();
+        if (reason != null)
+        {
+            LOGGER.warning(getPlayerName()
+                + " illegally called doneWithStrikes(): " + reason);
+            LOGGER.info(processingCH.dumpLastProcessedLines());
+            getClient(getPlayer()).nak(Constants.doneWithStrikes, reason);
+        }
+        else
+        {
+            game.getBattleSS().doneWithStrikes();
+        }
+    }
+
+    /**
+     * Validates that it it OK to be "done with strikes" now for executing player
+     * @return reason why it's not OK; null if all is ok
+     */
+    private String isDoneWithStrikesOk()
+    {
         BattleServerSide battle = game.getBattleSS();
         if (!isBattleActivePlayer())
         {
-            LOGGER
-                .warning(getPlayerName()
-                    + " illegally called doneWithStrikes(): not battle active player");
-            getClient(getPlayer()).nak(Constants.doneWithStrikes,
-                "Wrong player");
+            return "Not Battle Active player";
         }
         else if (!battle.getBattlePhase().isFightPhase())
         {
-            LOGGER.warning(getPlayerName()
-                + " illegally called doneWithStrikes(): wrong phase");
-            getClient(getPlayer()).nak(Constants.doneWithStrikes,
-                "Wrong phase");
+            return "Not a fight phase: battle phase is "
+                + battle.getBattlePhase().toString();
         }
-        else if (!battle.doneWithStrikes())
+        else if (battle.isForcedStrikeRemaining())
         {
-            LOGGER
-                .warning(getPlayerName()
-                    + " illegally called doneWithStrikes(): forced strikes remain");
-            getClient(getPlayer()).nak(Constants.doneWithStrikes,
-                "Forced strikes remain");
+            return "Forced strikes remain";
         }
+        return null;
     }
 
     private IClient getClient(Player player)
