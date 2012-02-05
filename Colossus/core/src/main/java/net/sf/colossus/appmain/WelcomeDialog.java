@@ -28,11 +28,11 @@ public final class WelcomeDialog extends KFrame
 {
     private final static String title = "Welcome to this new Colossus Release!";
 
-    private final static String CURRENT_WELCOME_KEY = "0.13.0-RC1-r5061";
+    private final static String CURRENT_WELCOME_KEY = "0.13.0";
 
     private final static String baseUrl = "http://sourceforge.net/projects/colossus/files";
     private final static String colossusReleaseNoteUrl = baseUrl
-        + "/Release-0.13.0-RC1-r5061";
+        + "/Release-0.13.0";
 
     private static WelcomeDialog showWelcome = null;
 
@@ -42,22 +42,18 @@ public final class WelcomeDialog extends KFrame
         super(title);
 
         String text = "\n"
-            + "  Welcome to this new 'Colossus Public Test Build' 0.13.0 (Release Candidate 1 from r5061)!"
+            + "  Welcome to this new 'Colossus Public Test Build' 0.13.0!"
             + "\n\n"
             + "  New features:\n"
-            + "  - Game Client be able to reconnect after short network outages\n"
-            + "  - plus the usual amount of fixes / stability improvements."
-            + "\n\n"
-            + "  (Note: For this public test build, there's nothing put to SF download area, Recent Changes document is\n"
-            + "  available from same page where the WebStart file is.)"
-            + "\n\n"
-            /*
+            + "  - Game Client be able to reconnect after short network problems.\n"
+            + "  - If client gets nak for done with strikes, after dialog highlight critters with targets.\n"
+            + "  - plus the usual amount of fixes / stability improvements.\n"
+            + "\n"
             + "  For a more detailed list of changes see the Release Note document in SF download area:\n      "
             + colossusReleaseNoteUrl
             + "\n\n"
             + "  Use button below to copy the URL to your clipboard to paste it "
             + "into your browser.\n\n"
-            */
             + "  This \"Welcome Dialog\" will only be shown once for every "
             + "new release;\n"
             + "  (you can find this welcome message also from the "
