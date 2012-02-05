@@ -3157,7 +3157,7 @@ public final class Server extends Thread implements IServer
         processingCH.serverConfirmsConnection();
         if (Constants.USE_RECORDER)
         {
-            recorder.printMessagesToConsole();
+            recorder.printMessagesToConsole(processingCH);
         }
     }
 

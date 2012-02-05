@@ -36,20 +36,23 @@ public class MessageRecorder
         messages.add(message);
     }
 
-    public void printMessagesToConsole()
+    public void printMessagesToConsole(IClient client)
     {
         System.out.println("\n");
         System.out.println("BEGIN messages");
         System.out.println("==============");
         for (Message message : messages)
         {
-            String messageText = message.getText();
-            String shortText = messageText;
-            if (messageText.length() > 50)
+            if (message.getClient().equals(client))
             {
-                shortText = messageText.substring(0, 47) + "...";
+                String messageText = message.getText();
+                String shortText = messageText;
+                if (messageText.length() > 500)
+                {
+                    shortText = messageText.substring(0, 497) + "...";
+                }
+                System.out.println(shortText);
             }
-            System.out.println(shortText);
         }
         System.out.println("END   messages\n\n");
     }
