@@ -4,17 +4,23 @@
 <head>
     <meta name="generator"
     content="HTML Tidy for Linux/x86 (vers 1st July 2002), see www.w3.org" />
-    <title>Colossus: Release Note for 0.12.1 plus two changes</title>
+    <title>Colossus: Release Note for 0.13.0</title>
 </head>
+<body>
 
-<h1>January 30, 2012: Public Test Build from r5061</h1>
+<h1>February 5, 2012: Release 0.13.0 from r5073</h1>
 <p/>
-Reconnect after shortly interrupted network connections, plus some smaller fixes and addings. 
-This build can be considered as <b>"0.13.0 Release Candidate"</b>.
+Ability to reconnect after shortly interrupted network connections; two changes which hopefully prevent
+ "client stuck" / "client does not respond to server" cases somewhat, 
+plus some smaller fixes and addings.<br>
+<ul>
+<li>If client gets nak for done with strikes, after dialog highlight critters with targets.</li>
+</ul>
+<i>The following were already part of previous Public Test Build(s):</i>
 <ul>
 <li>If game client encounters connection closed (short network instabilities), it will try to 
     reconnect after a second, and will catch up/synchronize to get messages/events that happened 
-    while being disconnected.
+    while being disconnected.<br>
     BUT, if client crashes/hangs, one can NOT restart a client from scratch and rejoin.</li>
 <li>Fixed: 3473842 No Warlock on first turn option not sync'd from web server.</li>
 <li>Fixed: 3384824 Java 7 update breaks the code.</li>
@@ -24,11 +30,6 @@ This build can be considered as <b>"0.13.0 Release Candidate"</b>.
     several lines came from server within short time (e.g. /help output).</li>
 <li>Some other small stuff became visible to users already earlier due to the fact 
     when versions were installed to Public Server (e.g. /help, /contact stuff).</li>          
-</ul>
-
-<p/>
-<i>The following were already part of previous Public Test Build:</i>
-<ul>
 <li>On game client side, the reading from network and actual processing of the 
     received data is now two separate threads; this prevents problems that client 
     won't reply to server's "Hello, are you still alive?" requests in time.</li>
@@ -36,24 +37,6 @@ This build can be considered as <b>"0.13.0 Release Candidate"</b>.
     for some players with Java 1.6 to deadlocks (GUI freezes). </li>
 </ul>
 <p />
-
-<body>
-<h1>Release Note for Colossus 0.12.1 (March 4, 2011)</h1>
-<p/>
-Two bugfixes and other minor improvements.
-<p />
-<ul>
-<li>Fixed: 3184301 "Pick Entry Side" when not required.</li>
-<li>Fixed: 3184700 Wrong phase when selecting creature to move.</li>
-<li>Prevent on server side that user could propose several (instant)
-    games in the delay time until reponse to first propose is back to him.</li>
-<li>On BattleMap, Done menu item now disabled when it's not that players turn.</li>
-<li>After undo move and rescale, clear mover legion and rehighlight 
-    legions that can move.</li>
-</ul>
-<b>Note: </b><br>
-New signing certificate because the one used so far will expire in 2 months &rArr; You will be asked to re-confirm that you trust the publisher!
-
 
 </body>
 </html>
