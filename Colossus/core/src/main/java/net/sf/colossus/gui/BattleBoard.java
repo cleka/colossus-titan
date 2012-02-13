@@ -308,6 +308,13 @@ public final class BattleBoard extends KFrame
 
     private void actOnWindowClosingAttempt()
     {
+        if (gui.getClient().isRemote() && gui.getGame().isGameOver())
+        {
+            // silently close
+            gui.getClient().cleanupBattle();
+            return;
+        }
+
         if (alreadyConceded)
         {
             JOptionPane.showMessageDialog(this,
