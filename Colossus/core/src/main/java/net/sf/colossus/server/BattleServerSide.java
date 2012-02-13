@@ -1054,7 +1054,7 @@ public final class BattleServerSide extends Battle
         }
 
         // Allow null moves.
-        if (hex.equals(critter.getCurrentHex()))
+        if (!critter.hasMoved() && hex.equals(critter.getCurrentHex()))
         {
             LOGGER
                 .log(Level.INFO, critter.getDescription() + " does not move");
@@ -1078,7 +1078,7 @@ public final class BattleServerSide extends Battle
             LOGGER.log(Level.WARNING, critter.getName() + " in "
                 + critter.getCurrentHex().getLabel()
                 + " tried to illegally move to " + hex.getLabel() + " in "
-                + getLocation().getTerrain() + " ("
+                + getLocation().getTerrain().getDisplayName() + " ("
                 + getAttackingLegion().getMarkerId() + " attacking "
                 + getDefendingLegion().getMarkerId() + ", active: " + markerId
                 + ")");

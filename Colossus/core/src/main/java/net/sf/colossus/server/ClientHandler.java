@@ -315,6 +315,11 @@ final class ClientHandler implements IClient
         return clientVersion >= IServer.CLIENT_VERSION_CAN_RECONNECT;
     }
 
+    public boolean canHandleBattleMoveNak()
+    {
+        return clientVersion >= 4;
+    }
+
     public void cloneRedoQueue(ClientHandler oldCH)
     {
         // Remove the reconnect-related messages

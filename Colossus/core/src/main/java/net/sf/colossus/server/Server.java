@@ -2299,8 +2299,18 @@ public final class Server extends Thread implements IServer
         boolean moved = game.getBattleSS().doMove(tag, hex);
         if (!moved)
         {
-            LOGGER.severe("Battle move failed");
-            client.nak(Constants.doBattleMove, "Illegal move");
+            if (processingCH.canHandleBattleMoveNak())
+            {
+                LOGGER.info("Battle move failed - giving Client a nak "
+                    + "doBattleMove (illegal move)");
+                client.nak(Constants.doBattleMove, "Illegal move");
+            }
+            else
+            {
+                LOGGER
+                    .info("Battle move failed - skipping the nak for "
+                        + "doBattleMove (illegal move) because client can't handle it");
+            }
         }
     }
 

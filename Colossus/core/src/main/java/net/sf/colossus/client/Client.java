@@ -1678,7 +1678,7 @@ public final class Client implements IClient, IOracle, IVariant,
         }
         else if (reason.equals(Constants.doBattleMove))
         {
-            handleFailedBattleMove();
+            handleFailedBattleMove(errmsg);
         }
         else if (reason.equals(Constants.doneWithBattleMoves))
         {
@@ -2322,24 +2322,31 @@ public final class Client implements IClient, IOracle, IVariant,
         kickBattleMove();
     }
 
-    private void handleFailedBattleMove()
+    private void handleFailedBattleMove(String errmsg)
     {
         LOGGER.log(Level.FINEST, owningPlayer.getName()
             + "handleFailedBattleMove");
-        if (bestMoveOrder != null)
+        if (options.getOption(Options.autoPlay) || sansLordAutoBattleApplies())
         {
-            Iterator<CritterMove> it = bestMoveOrder.iterator();
-            if (it.hasNext())
+            if (bestMoveOrder != null)
             {
-                CritterMove cm = it.next();
-                it.remove();
-                if (failedBattleMoves != null)
+                Iterator<CritterMove> it = bestMoveOrder.iterator();
+                if (it.hasNext())
                 {
-                    failedBattleMoves.add(cm);
+                    CritterMove cm = it.next();
+                    it.remove();
+                    if (failedBattleMoves != null)
+                    {
+                        failedBattleMoves.add(cm);
+                    }
                 }
             }
+            kickBattleMove();
         }
-        kickBattleMove();
+        else
+        {
+            gui.showMessageDialogAndWait(errmsg);
+        }
     }
 
     public void tellBattleMove(int tag, BattleHex startingHex,
