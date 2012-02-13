@@ -1459,9 +1459,17 @@ public final class Client implements IClient, IOracle, IVariant,
         engage(hex);
     }
 
+    // TODO: handle better (Mock, extend Client class?)
+    public boolean testCaseAutoDontFlee = false;
+
     public void askConcede(Legion ally, Legion enemy)
     {
-        if (options.getOption(Options.autoConcede))
+        if (testCaseAutoDontFlee)
+        {
+            LOGGER.fine("askConcede: test case auto-answers 'doNotConcede'");
+            server.doNotConcede(ally);
+        }
+        else if (options.getOption(Options.autoConcede))
         {
             answerConcede(ally, ai.concede(ally, enemy));
         }
@@ -1473,7 +1481,12 @@ public final class Client implements IClient, IOracle, IVariant,
 
     public void askFlee(Legion ally, Legion enemy)
     {
-        if (options.getOption(Options.autoFlee))
+        if (testCaseAutoDontFlee)
+        {
+            LOGGER.fine("askFlee: test case auto-answers 'doNotFlee'");
+            server.doNotFlee(ally);
+        }
+        else if (options.getOption(Options.autoFlee))
         {
             answerFlee(ally, ai.flee(ally, enemy));
         }
@@ -1507,6 +1520,9 @@ public final class Client implements IClient, IOracle, IVariant,
         }
     }
 
+    // TODO: handle better (Mock, extend Client class?)
+    public boolean testCaseAutoDenyNegotiate = false;
+
     public void askNegotiate(Legion attacker, Legion defender)
     {
         if (getAttacker() != attacker)
@@ -1527,6 +1543,10 @@ public final class Client implements IClient, IOracle, IVariant,
                 true, false, null, null);
 
             makeProposal(proposal);
+        }
+        else if (testCaseAutoDenyNegotiate)
+        {
+            fight(attacker.getCurrentHex());
         }
         else
         {
