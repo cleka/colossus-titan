@@ -668,13 +668,14 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
                     return;
                 }
 
-                if (!this.toNull)
-                {
-                    LOGGER.log(Level.INFO, prefix + line);
-                }
                 if (line == null)
                 {
                     return;
+                }
+
+                if (!this.toNull)
+                {
+                    LOGGER.log(Level.INFO, prefix + line);
                 }
             }
         }
