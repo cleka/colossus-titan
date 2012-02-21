@@ -815,10 +815,18 @@ public final class Server extends Thread implements IServer
         final ClientHandler currentProcessingCH = processingCH;
         String withdrawName = currentProcessingCH.getPlayerName();
 
+        if (forcedWithdraws.containsKey(withdrawName))
+        {
+            LOGGER.warning("Removing _still_ existing entry for '"
+                + withdrawName
+                + "' from forcedWithdraws list.");
+            forcedWithdraws.remove(withdrawName);
+        }
         LOGGER.info("Initiating delayed withdraw for player " + withdrawName
             + " intervalLen = " + intervalLen + " count " + intervals);
-        LOGGER.info("Time's up! Withdrawing player " + withdrawName);
-        long when = new Date().getTime() + 30000;
+        // TODO intervals x len is just a relict from earlier implementation
+        //  - now it simply waits total time. Clean up?
+        long when = new Date().getTime() + (intervals * intervalLen);
         forcedWithdraws.put(withdrawName, new WithdrawInfo(when,
             currentProcessingCH));
     }
