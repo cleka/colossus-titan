@@ -2135,7 +2135,8 @@ public class WebClient extends KFrame implements IWebClient
         }
 
         GameInfo gi = findGameById(selectedGameId);
-        if (gi != null && !gi.isEnrolled(username))
+        // only if not enrolled yet, and still in PROPOSED or DUE state
+        if (gi != null && !gi.isEnrolled(username) && gi.isStartable())
         {
             return true;
         }
