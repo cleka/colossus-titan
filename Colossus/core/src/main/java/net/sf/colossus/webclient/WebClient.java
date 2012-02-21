@@ -244,7 +244,7 @@ public class WebClient extends KFrame implements IWebClient
     private JLabel infoTextLabel;
     final static String needLoginText = "You need to login to browse or propose Games.";
     final static String enrollText = "Propose or Enroll, and when enough players have enrolled, the game creator can press 'Start'.";
-    final static String startedText = "Game was started...";
+    final static String startClickedText = "Request to start game was sent to server, please wait...";
     final static String waitingText = "Client connected successfully, waiting for all other players. Please wait...";
     final static String enrolledText = "NOTE: While enrolled to an instant game, you can't propose or enroll to other instant games.";
     final static String playingText = "While playing, you can't propose or enroll to other instant games.";
@@ -2607,6 +2607,10 @@ public class WebClient extends KFrame implements IWebClient
     {
         startButton.setEnabled(false);
         startLocallyButton.setEnabled(false);
+        cancelButton.setEnabled(false);
+        unenrollButton.setEnabled(false);
+        // TODO better handle with changing state, but not today...
+        infoTextLabel.setText(startClickedText);
         server.startGame(gameId, new User(username));
 
         return true;
