@@ -394,6 +394,10 @@ public class WebServerClient implements IWebClient
             if (tokens.length >= 3)
             {
                 String byUserName = tokens[2];
+                if (byUserName.equalsIgnoreCase(user.getName()))
+                {
+                    byUserName = user.getName();
+                }
                 if (!byUserName.equals(user.getName()))
                 {
                     LOGGER.warning("startGame received byUserName is '"
