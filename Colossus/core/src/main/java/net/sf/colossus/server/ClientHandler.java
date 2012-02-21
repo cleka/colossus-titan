@@ -69,6 +69,10 @@ final class ClientHandler implements IClient
 
     private static final String sep = Constants.protocolTermSeparator;
 
+    // for optimization, do not re-send if exactly identical to the one sent
+    // last time.
+    private String previousInfoStringsString = "";
+
     private static int counter = 0;
 
     private String incompleteInput = "";
@@ -1047,7 +1051,16 @@ final class ClientHandler implements IClient
 
     public void updatePlayerInfo(List<String> infoStrings)
     {
-        sendToClient(Constants.updatePlayerInfo + sep + Glob.glob(infoStrings));
+        String infoStringsString = Glob.glob(infoStrings);
+        if (previousInfoStringsString.equals(infoStringsString))
+        {
+            LOGGER.info("Skipping the re-send of identical player infos.");
+        }
+        else
+        {
+            sendToClient(Constants.updatePlayerInfo + sep + infoStringsString);
+            previousInfoStringsString = infoStringsString;
+        }
     }
 
     public void setColor(PlayerColor color)
