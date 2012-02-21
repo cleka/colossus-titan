@@ -1154,6 +1154,7 @@ final class ClientHandler implements IClient
         if (this.playerName == null)
         {
             LOGGER.warning("CH.playerName still null, returning signOnName '" + signonName + "'");
+            return this.signonName;
         }
         return this.playerName;
     }
