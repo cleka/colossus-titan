@@ -2788,7 +2788,7 @@ public final class Server extends Thread implements IServer
 
     // client will dispose itself soon,
     // do not attempt to further read from there.
-    public void disconnect()
+    public void sendDisconnect()
     {
         queueClientHandlerForChannelChanges(processingCH);
         clientWontConfirmCatchup(processingCH, "Client disconnected.");

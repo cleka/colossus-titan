@@ -783,13 +783,13 @@ final class ClientHandler implements IClient
                 + getPlayerName() + " - calling 'withdrawIfNeeded'.");
             setIsGone(true);
             withdrawIfNeeded(false);
-            server.disconnect();
+            server.sendDisconnect();
         }
 
         else if (method.equals(Constants.stopGame))
         {
             setIsGone(true);
-            server.disconnect();
+            server.sendDisconnect();
             server.stopGame();
         }
         else if (method.equals(Constants.doSplit))

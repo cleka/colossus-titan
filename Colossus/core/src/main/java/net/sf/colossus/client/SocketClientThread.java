@@ -675,7 +675,7 @@ final class SocketClientThread extends Thread implements IServer,
         }
         goingDown = true;
 
-        disconnect();
+        sendDisconnect();
 
         synchronized (isWaitingLock)
         {
@@ -986,7 +986,7 @@ final class SocketClientThread extends Thread implements IServer,
         sendToServer(Constants.withdrawFromGame);
     }
 
-    public void disconnect()
+    public void sendDisconnect()
     {
         LOGGER.log(Level.FINEST, "SCT " + getName() + " sending disconnect");
         sendToServer(Constants.disconnect);

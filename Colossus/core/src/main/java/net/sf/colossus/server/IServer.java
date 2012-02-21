@@ -94,7 +94,7 @@ public interface IServer
 
     public void withdrawFromGame();
 
-    public void disconnect();
+    public void sendDisconnect();
 
     public void stopGame();
 
