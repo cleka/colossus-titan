@@ -180,6 +180,7 @@ public final class MasterBoard extends JPanel
     private static final String undoAll = "Undo All";
     private static final String doneWithPhase = "Done";
     private static final String forcedDoneWithPhase = "Forced Done";
+    private static final String kickPhase = "Kick phase";
 
     private static final String takeMulligan = "Take Mulligan";
     private static final String withdrawFromGame = "Withdraw from Game";
@@ -216,6 +217,7 @@ public final class MasterBoard extends JPanel
     private AbstractAction undoAllAction;
     private AbstractAction doneWithPhaseAction;
     private AbstractAction forcedDoneWithPhaseAction;
+    private AbstractAction kickPhaseAction;
     private AbstractAction takeMulliganAction;
     private AbstractAction withdrawFromGameAction;
 
@@ -641,6 +643,14 @@ public final class MasterBoard extends JPanel
         };
         // make this always be available
         forcedDoneWithPhaseAction.setEnabled(true);
+
+        kickPhaseAction = new AbstractAction(kickPhase)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                gui.getClient().kickPhase();
+            }
+        };
 
         takeMulliganAction = new AbstractAction(takeMulligan)
         {
@@ -1277,6 +1287,13 @@ public final class MasterBoard extends JPanel
 
         mi = phaseMenu.add(forcedDoneWithPhaseAction);
         mi.setMnemonic(KeyEvent.VK_F);
+
+        boolean CLEMENS_TEST = false;
+        if (CLEMENS_TEST)
+        {
+            mi = phaseMenu.add(kickPhaseAction);
+            mi.setMnemonic(KeyEvent.VK_K);
+        }
 
         phaseMenu.addSeparator();
 
