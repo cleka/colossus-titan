@@ -772,10 +772,14 @@ final class ClientHandler implements IClient
         }
         else if (method.equals(Constants.withdrawFromGame))
         {
+            LOGGER.info("Received explicit WITHDRAW request from Client "
+                + getPlayerName() + " - calling 'withdrawIfNeeded'.");
             withdrawIfNeeded(true);
         }
         else if (method.equals(Constants.disconnect))
         {
+            LOGGER.info("Received explicit DISCONNECT request from Client "
+                + getPlayerName() + " - calling 'withdrawIfNeeded'.");
             setIsGone(true);
             withdrawIfNeeded(false);
             server.disconnect();
