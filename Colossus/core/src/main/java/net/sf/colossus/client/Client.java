@@ -461,7 +461,7 @@ public final class Client implements IClient, IOracle, IVariant,
     public void enforcedDisconnect()
     {
         LOGGER.warning("LOOK OUT! - client " + getOwningPlayer().getName()
-            + " doing fake disconnect now...");
+            + " doing 'hard' disconnect now...");
         ((SocketClientThread)connection).enforcedDisconnect();
     }
 
@@ -470,33 +470,46 @@ public final class Client implements IClient, IOracle, IVariant,
         localServer.enforcedDisconnectClient(owningPlayer.getName());
     }
 
-    public void tryReconnect()
+    /**
+     *
+     * @param automatic true if was triggered automatically e.g. by a Socket Exception,
+     * false if triggered manually (e.g. MasterBoard File menu).
+     */
+    public void tryReconnect(boolean automatic)
     {
+        String cause = automatic ? "automatically" : "manually";
         try
         {
-            appendToConnectionLog("Trying reconnect...");
+            LOGGER.info("Trying reconnect (" + cause + " triggered)");
+            appendToConnectionLog("Trying reconnect (" + cause
+                + " triggered)");
             int lastMsgNr = ((SocketClientThread)this.connection)
                 .getMessageCounter();
             IServerConnection conn = SocketClientThread
                 .recreateConnection((SocketClientThread)connection);
-            appendToConnectionLog("Connection succeeded, initiating sync...");
+            appendToConnectionLog("Connection succeeded, initiating synchronization...");
             gotDisposeAlready = false;
             this.connection = conn;
             this.server = connection.getIServer();
             connection.setClient(this);
             connection.startThread();
             connection.requestSyncDelta(lastMsgNr);
-            appendToConnectionLog("Sync completed!");
-
+            LOGGER
+                .info("Reconnect + SCT swapping completed successfully. Waiting for sync.");
         }
         catch (ConnectionInitException e)
         {
-            LOGGER
-                .warning("reconnect attempted but got ConnectionInitException "
-                + e);
-            String message = "Connection to server was interrupted; immediate automatic reconnecting failed.\n\n"
-                + "Try it again (from File Menu) after a few seconds.\n"
-                + "But if that does not succeed, well, bad luck:-(";
+            appendToConnectionLog("PROBLEM: Trying to reconnect (" + cause
+                + " triggered) failed.");
+            LOGGER.warning("Reconnect attempted (" + cause
+                + ") but got ConnectionInitException " + e);
+            String message = "Trying to reconnect (" + cause
+                + " triggered) failed." + "\n\n";
+
+            // manual re-connect not working yet, so still disabled:
+            // + "Try it again (from File Menu) after a few seconds.\n"
+            // + "But if that does not succeed, well, bad luck:-(";
+
             gui.showMessageDialogAndWait(message);
         }
     }
@@ -648,7 +661,7 @@ public final class Client implements IClient, IOracle, IVariant,
      *  connections when they want to quit in a hurry. */
     public void withdrawFromGame()
     {
-        if (!game.isGameOver())
+        if (!game.isGameOver() && !owningPlayer.isDead())
         {
             server.withdrawFromGame();
         }
@@ -770,11 +783,14 @@ public final class Client implements IClient, IOracle, IVariant,
 
         if (connection != null && !connection.isAlreadyDown())
         {
-            {
-                // SCT will then end the loop and do the dispose.
-                // So nothing else to do any more here in EDT.
-                connection.stopSocketClientThread();
-            }
+            // send withdraw, if relevant (not game over or dead already)
+            // TODO Not in use right now, Server has not enough time to
+            // handle it before Exception strikes? Need further testing...
+            // withdrawFromGame();
+
+            // SCT will then end the loop and do the dispose.
+            // So nothing else to do any more here in EDT.
+            connection.stopSocketClientThread();
         }
         else
         {
@@ -878,12 +894,13 @@ public final class Client implements IClient, IOracle, IVariant,
         }
         else
         {
-            LOGGER.warning("Network connection was unexpectedly closed. "
+            LOGGER.warning("Client " + getOwningPlayer()
+                + ": network connection was unexpectedly closed. "
                 + "Trying to reconnect after 1 second ...");
             // give it some time...
             WhatNextManager.sleepFor(1000);
             LOGGER.info("Initiating automatic reconnect!");
-            tryReconnect();
+            tryReconnect(true);
             close = false;
         }
         return close;

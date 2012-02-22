@@ -783,7 +783,7 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                LOGGER.info("Fake disconnect by client!");
+                LOGGER.info("Enforced disconnect by client (from File Menu)!");
                 client.enforcedDisconnect();
             }
         };
@@ -803,7 +803,7 @@ public final class MasterBoard extends JPanel
             public void actionPerformed(ActionEvent e)
             {
                 LOGGER.info("Menu-triggered trying reconnect!");
-                client.tryReconnect();
+                client.tryReconnect(false);
             }
         };
 
@@ -1217,6 +1217,10 @@ public final class MasterBoard extends JPanel
 
         mi = fileMenu.add(checkConnectionAction);
         mi.setMnemonic(KeyEvent.VK_K);
+
+        mi = fileMenu.add(enforcedDisconnectAction);
+        mi.setMnemonic(KeyEvent.VK_Y);
+
         fileMenu.addSeparator();
 
         mi = fileMenu.add(closeBoardAction);
@@ -1227,18 +1231,21 @@ public final class MasterBoard extends JPanel
         boolean DEBUG_CONNECTIONS = false;
         if (DEBUG_CONNECTIONS)
         {
-            mi = fileMenu.add(enforcedDisconnectAction);
-            mi.setMnemonic(KeyEvent.VK_Y);
-
-            boolean _DISCONNECT_BY_SERVER = false; // not implemented yet
+            // only for debugging/testing
+            boolean _DISCONNECT_BY_SERVER = false;
             if (!client.isRemote() && _DISCONNECT_BY_SERVER)
             {
                 mi = fileMenu.add(enforcedDisconnectByServerAction);
                 mi.setMnemonic(KeyEvent.VK_Z);
             }
 
-            mi = fileMenu.add(tryReconnectAction);
-            mi.setMnemonic(KeyEvent.VK_R);
+            // does not work, SCT stays up / pile up and all kind of issues...
+            boolean _DIRECT_RECONNECT = false;
+            if (_DIRECT_RECONNECT)
+            {
+                mi = fileMenu.add(tryReconnectAction);
+                mi.setMnemonic(KeyEvent.VK_R);
+            }
         }
 
         // Edit menu

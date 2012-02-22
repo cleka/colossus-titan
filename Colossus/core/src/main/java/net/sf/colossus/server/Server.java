@@ -555,24 +555,7 @@ public final class Server extends Thread implements IServer
                     if (key.isReadable())
                     {
                         processingCH = ch;
-                        int read = readFromChannel(key, sc);
-                        if (read > 0)
-                        {
-                            byteBuffer.flip();
-                            // NOTE that the following might cause trouble
-                            // if logging is set to FINEST for server,
-                            // and the disconnect does not properly set the
-                            // isGone flag...
-                            // No problem any more as currently "send log
-                            // stuff to remote clients" is removed.
-                            LOGGER.finest("* before ch.processInput()");
-                            ch.processInput(byteBuffer);
-                            LOGGER.finest("* after  ch.processInput()");
-                        }
-                        else
-                        {
-                            LOGGER.finest("readFromChannel: 0 bytes read.");
-                        }
+                        handleReadFromChannel(key, sc);
                         processingCH = null;
                         anythingDone = true;
                     }
@@ -725,7 +708,7 @@ public final class Server extends Thread implements IServer
     //   http://www.javafaq.nu/java-article1102.html
     // Throws IOException when closing the channel fails.
 
-    private int readFromChannel(SelectionKey key, SocketChannel sc)
+    private int handleReadFromChannel(SelectionKey key, SocketChannel sc)
         throws IOException
     {
         byteBuffer.clear();
@@ -744,12 +727,29 @@ public final class Server extends Thread implements IServer
                         processingCH.setIsGone(true);
                         LOGGER.info("EOF on channel for client "
                             + getPlayerName() + " setting isGone true");
-                        withdrawFromGameIfRelevant();
+                        if (read > 0)
+                        {
+                            LOGGER.info("Before EOF processing, calling "
+                                + "processByteBuffer to handle the " + read
+                                + " bytes that were read before.");
+                            processByteBuffer();
+                            read = 0;
+                        }
+                        withdrawFromGameIfRelevant(null, processingCH.didExplicitDisconnect());
                         disconnectChannel(sc, key);
                     }
                     break;
                 }
                 read += r;
+
+                // THIS HERE EXISTS ONLY FOR DEBUG/DEVELOPMENT PURPOSES
+                if (processingCH.wasFakeDisconnectFlagSet())
+                {
+                    processingCH.clearDisconnectClient();
+                    LOGGER.warning("After read, throwing the fake exception!");
+                    throw new IOException(
+                        "ClientTriggeredFakeServerDisconnectException");
+                }
             }
             catch (IOException e)
             {
@@ -760,43 +760,97 @@ public final class Server extends Thread implements IServer
                     + "' while reading from channel for player "
                     + getPlayerName(), e);
 
+                if (read > 0)
+                {
+                    LOGGER.warning("Before IOException handling processing, "
+                        + "calling processByteBuffer to handle the " + read
+                        + " bytes that were read before.");
+                    processByteBuffer();
+                    read = 0;
+                }
+
                 // The remote forcibly/unexpectedly closed the connection,
                 // cancel the selection key and close the channel.
-                withdrawFromGameIfRelevant();
+                withdrawFromGameIfRelevant(e, processingCH.didExplicitDisconnect());
                 disconnectChannel(sc, key);
                 return 0;
             }
         }
 
-        LOGGER.log(Level.FINEST, "Read " + read + " bytes from " + sc);
+        if (read > 0)
+        {
+            LOGGER.finest("Calling processByteBuffer to process the " + read
+                + " bytes received from channel" + sc);
+            processByteBuffer();
+        }
+        else
+        {
+            LOGGER.finest("readFromChannel: 0 bytes read.");
+        }
+
         return read;
     }
 
+    private void processByteBuffer()
+    {
+        byteBuffer.flip();
+        // NOTE that the following might cause trouble
+        // if logging is set to FINEST for server,
+        // and the disconnect does not properly set the
+        // isGone flag...
+        // No problem any more as currently "send log
+        // stuff to remote clients" is removed.
+        LOGGER.finest("* before ch.processInput()");
+        processingCH.processInput(byteBuffer);
+        LOGGER.finest("* after  ch.processInput()");
+    }
+
     /**
-     * Some problem with the connection.
+     * Something with the connection which makes perhaps Withdraw necessary.
+     *
      * If client seems to support reconnect, mark CH to be temp. disconnected,
      * otherwise take care of the proper withdrawal.
+     * @param gotException An exception, if calling this was caused by an (IO)Exception,
+     * otherwise null, i.e. it was triggered by EOF.
+     * @param didDisconnect whether an explicit dicsonnect request message had been
+     * received already from that client ( = no point to wait for reconnect attempt).
      */
-    private void withdrawFromGameIfRelevant()
+    private void withdrawFromGameIfRelevant(Exception gotException, boolean didDisconnect)
     {
         if (isWithdrawalIrrelevant())
         {
             return;
         }
 
+        String reason;
+        if (gotException != null)
+        {
+            reason = "Caught: " + gotException.getMessage();
+        }
+        else
+        {
+            reason = "EOF";
+        }
+
         try
         {
-            if (processingCH.supportsReconnect())
+            if (didDisconnect)
             {
-                LOGGER.warning("EOF on channel for client " + getPlayerName()
+                LOGGER.info(reason + " on channel for client "
+                    + getPlayerName() + " after Client explicitly requested"
+                    + " disconnect - proceeding withDraw and Disconnecting.");
+                withdrawFromGame();
+            }
+            else if (processingCH.supportsReconnect())
+            {
+                LOGGER.warning(reason + " on channel for client " + getPlayerName()
                     + " - skipping withDraw, waiting for reconnect attempt.");
                 processingCH.setTemporarilyDisconnected();
                 triggerWithdrawIfDoesNotReconnect(30000, 5);
-                return;
             }
             else
             {
-                LOGGER.warning("EOF on channel for client " + getPlayerName()
+                LOGGER.warning(reason + " on channel for client " + getPlayerName()
                     + " - can't reconnect, withDraw and Disconnecting.");
                 withdrawFromGame();
             }

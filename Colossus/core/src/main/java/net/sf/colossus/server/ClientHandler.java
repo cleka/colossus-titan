@@ -63,6 +63,7 @@ final class ClientHandler implements IClient
     private int clientVersion = 0;
 
     private boolean isGone = false;
+    private boolean didExplicitDisconnect = false;
     private boolean withdrawnAlready = false;
     private int isGoneMessageRepeated = 0;
     private boolean temporarilyDisconnected = false;
@@ -137,6 +138,11 @@ final class ClientHandler implements IClient
         this.isGone = val;
     }
 
+    public boolean didExplicitDisconnect()
+    {
+        return didExplicitDisconnect;
+    }
+
     public void setTemporarilyDisconnected()
     {
         temporarilyDisconnected = true;
@@ -165,8 +171,7 @@ final class ClientHandler implements IClient
             incompleteInput = "";
             incompleteText = "";
 
-            LOGGER
-                .log(Level.FINEST, "Decoded string is >>>>>" + msg + "<<<<<");
+            LOGGER.finest("Decoded string is >>>>>" + msg + "<<<<<");
 
             int processed = 0;
 
@@ -356,14 +361,6 @@ final class ClientHandler implements IClient
             }
         }
         commitPoint();
-    }
-
-    /**
-     * only for testing/development purposes
-     */
-    public void fakeDisconnectClient()
-    {
-        LOGGER.warning("fake disconnect by server side not implemented yet.");
     }
 
     ByteBuffer bb;
@@ -785,6 +782,7 @@ final class ClientHandler implements IClient
         {
             LOGGER.info("Received explicit 'disconnect' request from Client "
                 + getPlayerName() + " - calling 'withdrawIfNeeded'.");
+            didExplicitDisconnect = true;
             setIsGone(true);
             withdrawIfNeeded(false);
             server.sendDisconnect();
@@ -1464,4 +1462,26 @@ final class ClientHandler implements IClient
     {
         // dummy, only needed on client side
     }
+
+    /**
+     * Debug stuff,  only for testing/development purposes
+     */
+
+    public boolean fakeDisconnect = false;
+
+    public void fakeDisconnectClient()
+    {
+        this.fakeDisconnect = true;
+    }
+
+    public void clearDisconnectClient()
+    {
+        this.fakeDisconnect = false;
+    }
+
+    public boolean wasFakeDisconnectFlagSet()
+    {
+        return fakeDisconnect;
+    }
+
 }
