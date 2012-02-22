@@ -217,6 +217,12 @@ public class NullClientGUI implements IClientGUI
 
     }
 
+    public void actOnPendingBattleMoveOver()
+    {
+        // TODO Auto-generated method stub
+
+    }
+
     public void actOnDoneWithBattleMoves()
     {
         // TODO Auto-generated method stub

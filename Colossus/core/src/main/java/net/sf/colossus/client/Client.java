@@ -2384,6 +2384,7 @@ public final class Client implements IClient, IOracle, IVariant,
         {
             gui.showMessageDialogAndWait(errmsg);
         }
+        gui.actOnPendingBattleMoveOver();
     }
 
     public void tellBattleMove(int tag, BattleHex startingHex,

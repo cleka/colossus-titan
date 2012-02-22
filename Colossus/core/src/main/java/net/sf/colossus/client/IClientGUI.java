@@ -265,6 +265,8 @@ public interface IClientGUI
     public abstract void actOnTellBattleMove(BattleHex startingHex,
         BattleHex endingHex, boolean rememberForUndo);
 
+    public abstract void actOnPendingBattleMoveOver();
+
     public abstract void actOnDoneWithBattleMoves();
 
     public abstract void actOnSetupBattleRecruit();

@@ -2509,8 +2509,13 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             battleBoard.alignChits(startingHex);
             battleBoard.alignChits(endingHex);
             battleBoard.repaint();
-            battleBoard.highlightMobileCritters();
+            actOnPendingBattleMoveOver();
         }
+    }
+
+    public void actOnPendingBattleMoveOver()
+    {
+        battleBoard.actOnPendingBattleMoveOver();
     }
 
     public void actOnDoneWithBattleMoves()
@@ -2783,7 +2788,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         {
             String hexLabel = (String)popUndoStack();
             BattleHex hex = battleBoard.getBattleHexByLabel(hexLabel);
-            getClient().undoBattleMove(hex);
+            undoBattleMove(hex);
         }
     }
 

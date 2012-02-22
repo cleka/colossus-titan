@@ -442,8 +442,8 @@ public final class BattleBoard extends KFrame
                 if (isMovePhase())
                 {
                     selectedCritterTag = -1;
+                    setWaitCursor();
                     gui.undoLastBattleMove();
-                    highlightMobileCritters();
                 }
             }
         };
@@ -459,8 +459,8 @@ public final class BattleBoard extends KFrame
                 if (isMovePhase())
                 {
                     selectedCritterTag = -1;
+                    setWaitCursor();
                     gui.undoAllBattleMoves();
-                    highlightMobileCritters();
                 }
             }
         };
@@ -781,9 +781,14 @@ public final class BattleBoard extends KFrame
         repaint();
     }
 
-    public void setWaitCursor()
+    private void setWaitCursor()
     {
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+    }
+
+    private void setDefaultCursor()
+    {
+        setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     }
 
     private boolean confirmLeavingCreaturesOffboard()
@@ -836,9 +841,9 @@ public final class BattleBoard extends KFrame
         {
             if (selectedCritterTag != -1)
             {
+                setWaitCursor();
                 gui.getCallbackHandler().doBattleMove(selectedCritterTag, hex);
                 selectedCritterTag = -1;
-                highlightMobileCritters();
             }
         }
         else if (isFightPhase())
@@ -867,6 +872,12 @@ public final class BattleBoard extends KFrame
             }
             highlightCrittersWithTargets();
         }
+    }
+
+    public void actOnPendingBattleMoveOver()
+    {
+        setDefaultCursor();
+        highlightMobileCritters();
     }
 
     public void rescale()
