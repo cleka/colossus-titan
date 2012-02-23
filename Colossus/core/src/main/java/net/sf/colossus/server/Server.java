@@ -2358,20 +2358,21 @@ public final class Server extends Thread implements IServer
             client.nak(Constants.doBattleMove, "Wrong player");
             return;
         }
-        boolean moved = game.getBattleSS().doMove(tag, hex);
-        if (!moved)
+        String reasonFail = game.getBattleSS().doMove(tag, hex);
+        if (reasonFail != null)
         {
             if (processingCH.canHandleBattleMoveNak())
             {
                 LOGGER.info("Battle move failed - giving Client a nak "
                     + "doBattleMove (illegal move)");
-                client.nak(Constants.doBattleMove, "Illegal move");
+                client.nak(Constants.doBattleMove, "Illegal move: "
+                    + reasonFail);
             }
             else
             {
-                LOGGER
-                    .info("Battle move failed - skipping the nak for "
-                        + "doBattleMove (illegal move) because client can't handle it");
+                LOGGER.info("Battle move failed - skipping the nak for "
+                    + "doBattleMove (illegal move) because client can't "
+                    + "handle it");
             }
         }
     }

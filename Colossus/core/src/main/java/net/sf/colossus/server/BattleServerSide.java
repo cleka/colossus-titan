@@ -1045,31 +1045,38 @@ public final class BattleServerSide extends Battle
     }
 
     /** If legal, move critter to hex and return true. Else return false. */
-    boolean doMove(int tag, BattleHex hex)
+    String doMove(int tag, BattleHex hex)
     {
+        String reasonFail = null;
+
         CreatureServerSide critter = getActiveLegion().getCritterByTag(tag);
         if (critter == null)
         {
-            return false; // TODO shouldn't this be an error?
+            reasonFail = "No critter with tag " + tag + " found from legion "
+            + getActiveLegion().getMarkerId() + " - can't move it to hex "
+            + hex.getLabel();
+            LOGGER.severe(reasonFail);
+            return reasonFail;
         }
 
         // Allow null moves.
         if (!critter.hasMoved() && hex.equals(critter.getCurrentHex()))
         {
-            LOGGER
-                .log(Level.INFO, critter.getDescription() + " does not move");
+            // Warning, for now, because actually this should never happen, at
+            // least not for human players...
+            LOGGER.warning(critter.getDescription() + " does not move");
             // Call moveToHex() anyway to sync client.
             moveCritterToHexAndInformClients(critter, hex);
-            return true;
+            return null;
         }
         else if (battleMovement.showMoves(critter, false).contains(hex))
         {
-            LOGGER
-                .log(Level.INFO, critter.getName() + " moves from "
-                    + critter.getCurrentHex().getLabel() + " to "
-                    + hex.getLabel());
+            LOGGER.log(Level.INFO, critter.getName() + " moves from "
+                + critter.getCurrentHex().getLabel() + " to "
+                + hex.getLabel());
+            server.sleepFor(2000);
             moveCritterToHexAndInformClients(critter, hex);
-            return true;
+            return null;
         }
         else
         {
@@ -1082,7 +1089,11 @@ public final class BattleServerSide extends Battle
                 + getAttackingLegion().getMarkerId() + " attacking "
                 + getDefendingLegion().getMarkerId() + ", active: " + markerId
                 + ")");
-            return false;
+            reasonFail = critter.getName() + " in "
+                + critter.getCurrentHex().getLabel() + " can't move to "
+                + hex.getLabel() + " (Have you clicked this move "
+                + "before previous move was completed by server?)";
+            return reasonFail;
         }
     }
 
