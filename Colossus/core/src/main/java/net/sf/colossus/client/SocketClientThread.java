@@ -1056,7 +1056,7 @@ final class SocketClientThread extends Thread implements IServer,
         sendToServer(Constants.joinGame + sep + playerName);
     }
 
-    public void requestSyncDelta(int msgNr)
+    public void requestSyncDelta(int msgNr, int syncCounter)
     {
         sendToServer(Constants.requestSyncDelta + sep + msgNr);
     }

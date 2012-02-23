@@ -174,4 +174,6 @@ public interface IClient
     public void messageFromServer(String message);
 
     public void appendToConnectionLog(String s);
+
+    public void tellSyncCompleted(int syncRequestNumber);
 }

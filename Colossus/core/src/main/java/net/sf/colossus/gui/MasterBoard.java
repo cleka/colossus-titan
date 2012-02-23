@@ -1228,24 +1228,20 @@ public final class MasterBoard extends JPanel
         mi = fileMenu.add(quitGameAction);
         mi.setMnemonic(KeyEvent.VK_Q);
 
-        boolean DEBUG_CONNECTIONS = false;
-        if (DEBUG_CONNECTIONS)
+        // only for debugging/testing
+        boolean _DISCONNECT_BY_SERVER = false;
+        if (!client.isRemote() && _DISCONNECT_BY_SERVER)
         {
-            // only for debugging/testing
-            boolean _DISCONNECT_BY_SERVER = false;
-            if (!client.isRemote() && _DISCONNECT_BY_SERVER)
-            {
-                mi = fileMenu.add(enforcedDisconnectByServerAction);
-                mi.setMnemonic(KeyEvent.VK_Z);
-            }
+            mi = fileMenu.add(enforcedDisconnectByServerAction);
+            mi.setMnemonic(KeyEvent.VK_Z);
+        }
 
-            // does not work, SCT stays up / pile up and all kind of issues...
-            boolean _DIRECT_RECONNECT = false;
-            if (_DIRECT_RECONNECT)
-            {
-                mi = fileMenu.add(tryReconnectAction);
-                mi.setMnemonic(KeyEvent.VK_R);
-            }
+        // does not work, SCT stays up / pile up and all kind of issues...
+        boolean _DIRECT_RECONNECT = false;
+        if (_DIRECT_RECONNECT)
+        {
+            mi = fileMenu.add(tryReconnectAction);
+            mi.setMnemonic(KeyEvent.VK_R);
         }
 
         // Edit menu

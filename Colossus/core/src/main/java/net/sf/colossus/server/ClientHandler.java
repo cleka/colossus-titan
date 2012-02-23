@@ -329,6 +329,11 @@ final class ClientHandler implements IClient
         return clientVersion >= 4;
     }
 
+    public boolean canHandleSyncCompleted()
+    {
+        return clientVersion >= 4;
+    }
+
     public void cloneRedoQueue(ClientHandler oldCH)
     {
         // Remove the reconnect-related messages
@@ -338,13 +343,14 @@ final class ClientHandler implements IClient
     }
 
     /**
-     * Re-send all data after the message nr from which we know client got it
+     * Re-send all data after the message from which we know client got it
      *
-     * @param lastReceivedMessageNr Last messagewhich client did still receive
+     * @param lastReceivedMessageNr Last message which client did still receive
+     * @param syncRequestNumber Every request has own unique id, so we don't mix them
      */
-    public void syncAfterReconnect(int lastReceivedMessageNr)
+    public void syncAfterReconnect(int lastReceivedMessageNr, int syncRequestNumber)
     {
-        // to get client out of initial readlines loop, to get it into
+        // to get client out of initial read-lines loop, to get it into
         // normal "read from socket and parse line" loop
         setPlayerName(signonName);
 
@@ -361,6 +367,10 @@ final class ClientHandler implements IClient
             }
         }
         commitPoint();
+        if (canHandleSyncCompleted())
+        {
+            tellSyncCompleted(syncRequestNumber);
+        }
     }
 
     ByteBuffer bb;
@@ -850,7 +860,13 @@ final class ClientHandler implements IClient
         else if (method.equals(Constants.requestSyncDelta))
         {
             int lastReceivedMsgNr = Integer.parseInt(args.remove(0));
-            server.requestSyncDelta(lastReceivedMsgNr);
+            int syncRequestNr = 1;
+            // clients version 3 don't send this, only from 4 on
+            if (args.size() > 0)
+            {
+                syncRequestNr = Integer.parseInt(args.remove(0));
+            }
+            server.requestSyncDelta(lastReceivedMsgNr, syncRequestNr);
         }
 
         else if (method.equals(Constants.catchupConfirmation))
@@ -1461,6 +1477,11 @@ final class ClientHandler implements IClient
     public void appendToConnectionLog(String s)
     {
         // dummy, only needed on client side
+    }
+
+    public void tellSyncCompleted(int syncRequestNumber)
+    {
+        sendToClient(Constants.syncCompleted + sep + syncRequestNumber);
     }
 
     /**

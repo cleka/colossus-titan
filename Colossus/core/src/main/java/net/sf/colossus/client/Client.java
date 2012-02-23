@@ -217,6 +217,13 @@ public final class Client implements IClient, IOracle, IVariant,
     private boolean disposeInProgress = false;
 
     /**
+     * Everytime we request server to sync data (typically after reconnect),
+     * we pass with a request counter, so that we can distinct the
+     * syncCompleted responses.
+     */
+    private int syncRequestCounter = 0;
+
+    /**
      * Create a Client object and other related objects
      *
      * @param host The host to which SocketClientThread shall connect
@@ -483,19 +490,20 @@ public final class Client implements IClient, IOracle, IVariant,
             LOGGER.info("Trying reconnect (" + cause + " triggered)");
             appendToConnectionLog("Trying reconnect (" + cause
                 + " triggered)");
-            int lastMsgNr = ((SocketClientThread)this.connection)
-                .getMessageCounter();
+            SocketClientThread previousConn = (SocketClientThread)connection;
+            int lastMsgNr = previousConn.getMessageCounter();
             IServerConnection conn = SocketClientThread
-                .recreateConnection((SocketClientThread)connection);
-            appendToConnectionLog("Connection succeeded, initiating synchronization...");
+                .recreateConnection(previousConn);
+            appendToConnectionLog("Connection succeeded, "
+                + "initiating synchronization...");
             gotDisposeAlready = false;
             this.connection = conn;
             this.server = connection.getIServer();
             connection.setClient(this);
             connection.startThread();
-            connection.requestSyncDelta(lastMsgNr);
-            LOGGER
-                .info("Reconnect + SCT swapping completed successfully. Waiting for sync.");
+            connection.requestSyncDelta(lastMsgNr, ++syncRequestCounter);
+            LOGGER.info("Connection re-established. "
+                + "Waiting for synchronization to complete.");
         }
         catch (ConnectionInitException e)
         {
@@ -512,6 +520,13 @@ public final class Client implements IClient, IOracle, IVariant,
 
             gui.showMessageDialogAndWait(message);
         }
+    }
+
+    public void tellSyncCompleted(int syncRequestNumber)
+    {
+        LOGGER.info("Synchronization #" + syncRequestNumber + " completed!");
+        gui.appendToConnectionLog("Synchronization #" + syncRequestNumber
+            + " completed!");
     }
 
     public void doCheckServerConnection()

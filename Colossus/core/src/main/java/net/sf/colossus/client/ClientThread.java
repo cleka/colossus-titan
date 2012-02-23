@@ -693,6 +693,12 @@ public class ClientThread extends Thread
             client.messageFromServer(message);
         }
 
+        else if (method.equals(Constants.syncCompleted))
+        {
+            int syncRequestNr = Integer.parseInt(args.remove(0));
+            client.tellSyncCompleted(syncRequestNr);
+        }
+
         else if (method.equals(Constants.askConfirmCatchUp))
         {
             client.confirmWhenCaughtUp();

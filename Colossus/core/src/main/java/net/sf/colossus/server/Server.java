@@ -471,10 +471,8 @@ public final class Server extends Thread implements IServer
                 {
                     LOGGER.info("Forced withdraw for player " + name);
                     forcedWithdraws.remove(name);
-
                     String message = "You were too long disconnected - Game did automatic withdraw! Sorry.";
                     info.ch.messageFromServer(message);
-
                     game.handlePlayerWithdrawal(game.getPlayerByName(name));
                 }
             }
@@ -3522,12 +3520,12 @@ public final class Server extends Thread implements IServer
             getGame().getPreliminaryPlayerNames());
     }
 
-    public void requestSyncDelta(int lastReceivedMessageNr)
+    public void requestSyncDelta(int lastReceivedMessageNr, int syncRequestNumber)
     {
-        LOGGER
-            .info("Client requests sync for delta after reconnect, last msg nr was "
-                + lastReceivedMessageNr);
-        processingCH.syncAfterReconnect(lastReceivedMessageNr);
+        LOGGER.info("Client requests sync #" + syncRequestNumber
+            + " after reconnect, last msg nr was " + lastReceivedMessageNr);
+        processingCH.syncAfterReconnect(lastReceivedMessageNr,
+            syncRequestNumber);
     }
 
     public void joinGame(String playerName)

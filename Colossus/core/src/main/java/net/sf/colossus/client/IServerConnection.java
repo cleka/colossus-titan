@@ -34,6 +34,6 @@ public interface IServerConnection
 
     public void stopSocketClientThread();
 
-    public void requestSyncDelta(int MgrNr);
+    public void requestSyncDelta(int lastRcvdMsgNr, int syncCounter);
 
 }

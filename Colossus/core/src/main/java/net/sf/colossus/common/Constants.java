@@ -266,7 +266,6 @@ public final class Constants
     public static final String replyToPing = "replyToPing";
     public static final String requestSyncDelta = "requestSyncDelta";
     public static final String confirmCommitPoint = "confirmCommitPoint";
-    public static final String messageFromServer = "messageFromServer";
 
     public static final String reasonSplit = "Split";
     public static final String reasonSummon = "Summon";
@@ -354,6 +353,8 @@ public final class Constants
     public static final String askConfirmCatchUp = "askConfirmCatchUp";
     public static final String gameInitInfo = "gameInitInfo";
     public static final String commitPoint = "commitPoint";
+    public static final String messageFromServer = "messageFromServer";
+    public static final String syncCompleted = "syncCompleted";
 
     // engagement resolved, methods:
     public static final String erMethodFlee = "flee";
