@@ -34,6 +34,12 @@ public interface IServerConnection
 
     public void stopSocketClientThread();
 
+    public void enforcedDisconnect();
+
     public void requestSyncDelta(int lastRcvdMsgNr, int syncCounter);
+
+    public int getMessageCounter();
+
+    public int getDisposedQueueLen();
 
 }

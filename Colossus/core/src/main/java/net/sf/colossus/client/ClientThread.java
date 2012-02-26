@@ -89,6 +89,13 @@ public class ClientThread extends Thread
         queue.offer(new ServerEvent(ClientThread.getNow(), method, args));
     }
 
+    // Client checks whether still something to do from "here" before
+    // switching to new connectio (after reconnect)
+    public int getQueueLen()
+    {
+        return queue.size();
+    }
+
     public void dispose()
     {
         // Get thread out of it's "take" waiting
@@ -96,7 +103,7 @@ public class ClientThread extends Thread
         boolean success = queue.offer(END_EVENT);
         if (!success)
         {
-            System.out.println("CT " + getName()
+            LOGGER.warning("CT " + getName()
                 + ": failed to offer END signal to queue!");
         }
         client.dispose();
@@ -151,8 +158,7 @@ public class ClientThread extends Thread
             }
             else
             {
-                LOGGER
-                    .severe("event still null - bailed out with exception??");
+                LOGGER.severe("null event - bailed out with exception??");
             }
 
         }
@@ -173,6 +179,11 @@ public class ClientThread extends Thread
                     + "they will not show effect on the Board yet!");
             }
         }
+    }
+
+    public void appendToConnectionLog(String s)
+    {
+        client.appendToConnectionLog(s);
     }
 
     private void callMethod(String method, List<String> args)
@@ -687,10 +698,18 @@ public class ClientThread extends Thread
             client.tellWhatsHappening(message);
         }
 
+        // a popup message
         else if (method.equals(Constants.messageFromServer))
         {
             String message = args.remove(0);
             client.messageFromServer(message);
+        }
+
+        // just written to log (which might become visible by itself if needed)
+        else if (method.equals(Constants.appendToConnectionLog))
+        {
+            String message = args.remove(0);
+            client.appendToConnectionLog(message);
         }
 
         else if (method.equals(Constants.syncCompleted))
@@ -783,15 +802,10 @@ public class ClientThread extends Thread
         }
 
         // Peter made this assertion, I guess...
-        assert legion != null : "SocketClientThread.resolveLegion(" + markerId
+        assert legion != null : "ClientThread.resolveLegion(" + markerId
             + " in client of player " + getNameMaybe() + " returned null!";
 
         return legion;
-    }
-
-    public void appendToConnectionLog(String s)
-    {
-        client.appendToConnectionLog(s);
     }
 
     public static long getNow()

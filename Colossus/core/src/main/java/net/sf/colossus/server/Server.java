@@ -743,6 +743,9 @@ public final class Server extends Thread implements IServer
                 // THIS HERE EXISTS ONLY FOR DEBUG/DEVELOPMENT PURPOSES
                 if (processingCH.wasFakeDisconnectFlagSet())
                 {
+                    // TODO Improve: right now it needs something to be processed from
+                    // client before the exception strikes. Fix better, e.g. wakeup
+                    // Selector?
                     processingCH.clearDisconnectClient();
                     LOGGER.warning("After read, throwing the fake exception!");
                     throw new IOException(
@@ -1307,11 +1310,13 @@ public final class Server extends Thread implements IServer
             ClientHandler existingCH = (ClientHandler)playerToClientMap.get(player);
             if (existingCH != null && existingCH.getPlayerName().equals(player.getName()))
             {
+                othersTellReconnectOngoing(existingCH);
                 isReconnect = true;
                 LOGGER.info("All right, reconnection of disconnected player!");
                 ((ClientHandler)client).cloneRedoQueue(existingCH);
                 playerToClientMap.remove(player);
                 clients.remove(existingCH);
+                existingCH.declareObsolete();
                 LOGGER.info("Removing player with name " + player.getName()
                     + " from forcedWithDrawlist. Size was "
                     + forcedWithdraws.size());
@@ -1866,6 +1871,39 @@ public final class Server extends Thread implements IServer
             if (client != chInTrouble)
             {
                 client.tellWhatsHappening(message);
+            }
+        }
+    }
+
+    // TODO tellWhatsHappening and appendToConnLog are overlapping,
+    // unify/fix it to use same for all
+    // Really? tellWhatsHappening is also used for PickColor, PickMarker,
+    // but also for "temporarily in trouble".
+    void othersTellReconnectOngoing(ClientHandler chInTrouble)
+    {
+        String playerInTrouble = chInTrouble.getSignonName();
+        String message = "NOTE: Connection with player " + playerInTrouble
+            + " was interrupted, reconnect ongoing";
+        for (IClient client : clients)
+        {
+            if (client != chInTrouble)
+            {
+                client.appendToConnectionLog(message);
+            }
+        }
+    }
+
+    void othersTellReconnectCompleted(ClientHandler chInTrouble)
+    {
+        String name = chInTrouble.getPlayerName();
+        String message = "Client of player " + name
+            + " reconnect now successfully completed.";
+        for (IClient client : clients)
+        {
+            // no need to inform the troubled one itself...
+            if (client != chInTrouble)
+            {
+                client.appendToConnectionLog(message);
             }
         }
     }
@@ -3547,8 +3585,19 @@ public final class Server extends Thread implements IServer
 
     public void enforcedDisconnectClient(String name)
     {
-        Player p = game.getPlayerByName(name);
-        IClient client = playerToClientMap.get(p);
-        ((ClientHandler)client).fakeDisconnectClient();
+        try
+        {
+            Player p = game.getPlayerByName(name);
+            if (p != null)
+            {
+                IClient client = playerToClientMap.get(p);
+                ((ClientHandler)client).fakeDisconnectClient();
+            }
+        }
+        catch(Exception e)
+        {
+            // ignore it... it's for develop/debugging purpose only
+            // (at the moment, at least...;-)
+        }
     }
 }

@@ -802,8 +802,7 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                LOGGER.info("Menu-triggered trying reconnect!");
-                client.tryReconnect(false);
+                client.guiTriggeredTryReconnect();
             }
         };
 

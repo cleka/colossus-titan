@@ -48,6 +48,11 @@ final class SocketClientThread extends Thread implements IServer,
         .getLogger(SocketClientThread.class.getName());
 
     private ClientThread clientThread;
+
+    // only needed for reconnect, to check whether there's something still
+    // already received but not processed (= still in queue)
+    private ClientThread disposedClientThread = null;
+
     private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
@@ -92,7 +97,7 @@ final class SocketClientThread extends Thread implements IServer,
             LOGGER.warning("Client startup failed: " + reasonFail);
             if (!Options.isStresstest())
             {
-                String title = "Socket initialialization failed!";
+                String title = "Socket initialization failed!";
                 ErrorUtils.showErrorDialog(null, title, reasonFail);
             }
             throw new ConnectionInitException(reasonFail);
@@ -102,8 +107,9 @@ final class SocketClientThread extends Thread implements IServer,
     }
 
     public static SocketClientThread recreateConnection(
-        SocketClientThread previousConnection) throws ConnectionInitException
+        IServerConnection prevConnection) throws ConnectionInitException
     {
+        SocketClientThread previousConnection = (SocketClientThread)prevConnection;
         String host = previousConnection.host;
         int port = previousConnection.port;
         String playerName = previousConnection.playerName;
@@ -395,6 +401,20 @@ final class SocketClientThread extends Thread implements IServer,
         clientThread.start();
     }
 
+    public int getDisposedQueueLen()
+    {
+        if (disposedClientThread != null)
+        {
+            return disposedClientThread.getQueueLen();
+        }
+        else
+        {
+            LOGGER.warning("SCT for " + getNameMaybe()
+                + ": can't ask null disposedClientThread for it's queueLen!");
+            return 0;
+        }
+    }
+
     // Implements the method of the "generic" IServerConnection
     public void startThread()
     {
@@ -448,6 +468,7 @@ final class SocketClientThread extends Thread implements IServer,
 
         if (clientThread != null)
         {
+            disposedClientThread = clientThread;
             clientThread.dispose();
             clientThread = null;
         }
@@ -1058,7 +1079,8 @@ final class SocketClientThread extends Thread implements IServer,
 
     public void requestSyncDelta(int msgNr, int syncCounter)
     {
-        sendToServer(Constants.requestSyncDelta + sep + msgNr);
+        sendToServer(Constants.requestSyncDelta + sep + msgNr + sep
+            + syncCounter);
     }
 
     public void replyToPing()
@@ -1074,16 +1096,20 @@ final class SocketClientThread extends Thread implements IServer,
             LOGGER.info("Socket already null, can't fake disconnect...");
             return;
         }
-        LOGGER.fine("In SCT " + getNameMaybe() + ": doing fake disconnect!");
+        LOGGER.fine("In SCT " + getNameMaybe()
+            + ": doing enforced disconnect!");
         try
         {
-            clientThread.appendToConnectionLog("Disconnecting...");
-            LOGGER.fine("Shutting down output next...");
+            appendToConnectionLog("Disconnecting (closing socket)...");
+            LOGGER.fine("Disconnecting (closing socket)...");
             socket.close();
+            // TODO we should set it here also to null,
+            // but needs some more testing does it break anything
+            // socket = null;
+            // Other ways than close()...
             // socket.shutdownOutput();
             // socket.shutdownInput();
-            LOGGER.fine("shutdownOutput done... and still alive :)");
-            clientThread.appendToConnectionLog("Disconnected...");
+            LOGGER.warning("ShutdownOutput done... and still alive?!? :)");
         }
         catch (IOException e)
         {

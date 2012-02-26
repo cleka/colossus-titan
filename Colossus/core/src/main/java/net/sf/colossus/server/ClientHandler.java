@@ -67,6 +67,7 @@ final class ClientHandler implements IClient
     private boolean withdrawnAlready = false;
     private int isGoneMessageRepeated = 0;
     private boolean temporarilyDisconnected = false;
+    private boolean obsolete = false;
 
     private static final String sep = Constants.protocolTermSeparator;
 
@@ -329,7 +330,7 @@ final class ClientHandler implements IClient
         return clientVersion >= 4;
     }
 
-    public boolean canHandleSyncCompleted()
+    public boolean canHandleAdvancedSync()
     {
         return clientVersion >= 4;
     }
@@ -367,10 +368,11 @@ final class ClientHandler implements IClient
             }
         }
         commitPoint();
-        if (canHandleSyncCompleted())
+        if (canHandleAdvancedSync())
         {
             tellSyncCompleted(syncRequestNumber);
         }
+        server.othersTellReconnectCompleted(this);
     }
 
     ByteBuffer bb;
@@ -860,7 +862,7 @@ final class ClientHandler implements IClient
         else if (method.equals(Constants.requestSyncDelta))
         {
             int lastReceivedMsgNr = Integer.parseInt(args.remove(0));
-            int syncRequestNr = 1;
+            int syncRequestNr = -1;
             // clients version 3 don't send this, only from 4 on
             if (args.size() > 0)
             {
@@ -973,13 +975,16 @@ final class ClientHandler implements IClient
         enqueueToRedoQueue(messageCounter, message);
         messageCounter++;
 
-        if (isGone || socketChannel == null)
+        if (isGone || obsolete || socketChannel == null)
         {
             // do not send any more
             if (isGoneMessageRepeated < 3)
             {
-                LOGGER.info("Attempt to send to player " + playerName
-                    + " when client connection already gone - message: "
+                int flags = (isGone ? 1 : 0) & (obsolete ? 2 : 0)
+                    & (socketChannel == null ? 4 : 0);
+                LOGGER.warning("Attempt to send to player " + playerName
+                    + " when client connection already gone (reason: " + flags
+                    + ")- message: "
                     + message);
                 isGoneMessageRepeated++;
             }
@@ -1471,17 +1476,30 @@ final class ClientHandler implements IClient
 
     public void messageFromServer(String message)
     {
+        // appears as pop-up window with "OK" button
         sendToClient(Constants.messageFromServer + sep + message);
     }
 
-    public void appendToConnectionLog(String s)
+    public void appendToConnectionLog(String message)
     {
-        // dummy, only needed on client side
+        if (canHandleAdvancedSync())
+        {
+            sendToClient(Constants.appendToConnectionLog + sep + message);
+        }
     }
 
     public void tellSyncCompleted(int syncRequestNumber)
     {
         sendToClient(Constants.syncCompleted + sep + syncRequestNumber);
+    }
+
+    // same player re-connected with new ClientHandler, so this one here
+    // should "be gone"
+    public void declareObsolete()
+    {
+        obsolete = true;
+        LOGGER.warning("ClientHandler for " + getPlayerName()
+            + " declared obsolete.... -- but that's not fully implemented!");
     }
 
     /**

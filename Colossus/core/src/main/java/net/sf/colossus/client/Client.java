@@ -398,16 +398,12 @@ public final class Client implements IClient, IOracle, IVariant,
         options.setOption(Options.autoPlay, this.owningPlayer.isAI());
 
         this.server = connection.getIServer();
-
         server.joinGame(playerName);
 
         TerrainRecruitLoader.setCaretaker(getGame().getCaretaker());
         CustomRecruitBase.addCaretakerClientSide(getGame().getCaretaker());
-
         this.localServer = theServer;
-
         gui.setStartedByWebClient(byWebClient);
-
     }
 
     public void appendToConnectionLog(String s)
@@ -467,14 +463,13 @@ public final class Client implements IClient, IOracle, IVariant,
 
     public void enforcedDisconnect()
     {
-        LOGGER.warning("LOOK OUT! - client " + getOwningPlayer().getName()
-            + " doing 'hard' disconnect now...");
-        ((SocketClientThread)connection).enforcedDisconnect();
+        connection.enforcedDisconnect();
     }
 
     public void enforcedDisconnectByServer()
     {
         localServer.enforcedDisconnectClient(owningPlayer.getName());
+        // localServer.enforcedDisconnectClient("remote");
     }
 
     /**
@@ -490,7 +485,7 @@ public final class Client implements IClient, IOracle, IVariant,
             LOGGER.info("Trying reconnect (" + cause + " triggered)");
             appendToConnectionLog("Trying reconnect (" + cause
                 + " triggered)");
-            SocketClientThread previousConn = (SocketClientThread)connection;
+            IServerConnection previousConn = connection;
             int lastMsgNr = previousConn.getMessageCounter();
             IServerConnection conn = SocketClientThread
                 .recreateConnection(previousConn);
@@ -501,6 +496,19 @@ public final class Client implements IClient, IOracle, IVariant,
             this.server = connection.getIServer();
             connection.setClient(this);
             connection.startThread();
+
+            int oldMsgsLeft;
+            int i = 0;
+            while ((oldMsgsLeft = previousConn.getDisposedQueueLen()) > 0
+                && i < 1)
+            {
+                i++;
+                appendToConnectionLog("WARNING: Previous connection has still "
+                    + oldMsgsLeft
+                    + " items to process (handling that is not implemented yet...)!");
+                // WhatNextManager.sleepFor(1000);
+            }
+
             connection.requestSyncDelta(lastMsgNr, ++syncRequestCounter);
             LOGGER.info("Connection re-established. "
                 + "Waiting for synchronization to complete.");
@@ -520,6 +528,20 @@ public final class Client implements IClient, IOracle, IVariant,
 
             gui.showMessageDialogAndWait(message);
         }
+    }
+
+    public void guiTriggeredTryReconnect()
+    {
+        LOGGER.info("Menu-triggered trying reconnect!");
+        Runnable connectAttempt = new Runnable()
+        {
+            public void run()
+            {
+                boolean automatic = false;
+                tryReconnect(automatic);
+            }
+        };
+        new Thread(connectAttempt).start();
     }
 
     public void tellSyncCompleted(int syncRequestNumber)
@@ -912,6 +934,10 @@ public final class Client implements IClient, IOracle, IVariant,
             LOGGER.warning("Client " + getOwningPlayer()
                 + ": network connection was unexpectedly closed. "
                 + "Trying to reconnect after 1 second ...");
+            appendToConnectionLog("NOTE: Ooops? Connection with server side "
+                + "was unexpectedly closed? "
+                + "Will try to reconnect after 1 second ...");
+
             // give it some time...
             WhatNextManager.sleepFor(1000);
             LOGGER.info("Initiating automatic reconnect!");

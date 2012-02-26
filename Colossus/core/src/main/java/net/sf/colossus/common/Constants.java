@@ -355,6 +355,7 @@ public final class Constants
     public static final String commitPoint = "commitPoint";
     public static final String messageFromServer = "messageFromServer";
     public static final String syncCompleted = "syncCompleted";
+    public static final String appendToConnectionLog = "appendToConnLog";
 
     // engagement resolved, methods:
     public static final String erMethodFlee = "flee";
