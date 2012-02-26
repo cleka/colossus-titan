@@ -187,6 +187,16 @@ public class UserDB
         IColossusMail mailObject)
     {
         boolean isAdmin = false;
+
+        String usernameAllLc = username;
+        usernameAllLc = usernameAllLc.toLowerCase();
+        if (usernameAllLc.startsWith("guest")
+            || usernameAllLc.startsWith("anonym"))
+        {
+            String problem = "Usernames starting with 'guest' or 'anonym' "
+                + " are reserved for special purposes!";
+            return problem;
+        }
         User alreadyExisting = findUserByName(username);
         if (alreadyExisting != null)
         {
