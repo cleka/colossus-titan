@@ -1109,7 +1109,6 @@ final class SocketClientThread extends Thread implements IServer,
             // Other ways than close()...
             // socket.shutdownOutput();
             // socket.shutdownInput();
-            LOGGER.warning("ShutdownOutput done... and still alive?!? :)");
         }
         catch (IOException e)
         {

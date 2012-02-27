@@ -839,7 +839,7 @@ public final class Client implements IClient, IOracle, IVariant,
     }
 
     // used from server, when game is over and server closes all sockets
-    public synchronized void dispose()
+    public synchronized void disposeClientHandler()
     {
         if (gotDisposeAlready)
         {

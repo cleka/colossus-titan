@@ -134,8 +134,10 @@ final class ClientHandler implements IClient
         return this.isGone;
     }
 
-    public void setIsGone(boolean val)
+    public void setIsGone(boolean val, String reason)
     {
+        LOGGER.info("Setting isGone to true in CH for '" + getPlayerName()
+            + "' (reason: " + reason + ")");
         this.isGone = val;
     }
 
@@ -531,7 +533,7 @@ final class ClientHandler implements IClient
             }
             else
             {
-                setIsGone(true);
+                setIsGone(true, "IOException and reconnect not supported");
                 withdrawnAlready = true;
                 server.withdrawFromGame(playerName);
                 server.queueClientHandlerForChannelChanges(this);
@@ -792,17 +794,18 @@ final class ClientHandler implements IClient
         }
         else if (method.equals(Constants.disconnect))
         {
+            didExplicitDisconnect = true;
+            setIsGone(true, "received explit 'disconnect' request from client");
             LOGGER.info("Received explicit 'disconnect' request from Client "
                 + getPlayerName() + " - calling 'withdrawIfNeeded'.");
-            didExplicitDisconnect = true;
-            setIsGone(true);
             withdrawIfNeeded(false);
             server.sendDisconnect();
         }
 
         else if (method.equals(Constants.stopGame))
         {
-            setIsGone(true);
+            setIsGone(true, "received explicit 'stopGame' request from "
+                + "client" + getPlayerName());
             server.sendDisconnect();
             server.stopGame();
         }
@@ -1024,7 +1027,7 @@ final class ClientHandler implements IClient
     /**
      * Server side disposes a client (and informs it about it first)
      */
-    public void dispose()
+    public void disposeClientHandler()
     {
         // Don't do it again
         if (isGone)
@@ -1032,7 +1035,7 @@ final class ClientHandler implements IClient
             return;
         }
 
-        setIsGone(true);
+        setIsGone(true, "Server disposes client");
         sendViaChannel(Constants.dispose);
         server.queueClientHandlerForChannelChanges(this);
         server.clientWontConfirmCatchup(this,

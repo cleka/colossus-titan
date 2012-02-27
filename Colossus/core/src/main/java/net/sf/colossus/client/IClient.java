@@ -38,7 +38,7 @@ public interface IClient
 
     public void updateCreatureCount(CreatureType type, int count, int deadCount);
 
-    public void dispose();
+    public void disposeClientHandler();
 
     public void removeLegion(Legion legion);
 

@@ -428,12 +428,29 @@ public final class Server extends Thread implements IServer
     public class WithdrawInfo
     {
         public long deadline;
+        public long intervalLen;
+        public long intervals;
+        public long lastNotification;
         public ClientHandler ch;
 
-        public WithdrawInfo(long when, ClientHandler ch)
+        public WithdrawInfo(ClientHandler ch, int intervals, long intervalLen)
         {
-            this.deadline = when;
+            long now = new Date().getTime();
+            this.deadline = now + (intervals * intervalLen);
+            this.lastNotification = now;
             this.ch = ch;
+            this.intervalLen = intervalLen;
+            this.intervals = intervals;
+        }
+
+        public long getLastNotification()
+        {
+            return lastNotification;
+        }
+
+        public void setLastNotification(long when)
+        {
+            this.lastNotification = when;
         }
     }
 
@@ -464,6 +481,12 @@ public final class Server extends Thread implements IServer
                 int timeLeft = (int)((info.deadline - now) / 1000);
                 if (timeLeft > 0)
                 {
+                    long timeSinceLastNotif = now - info.getLastNotification();
+                    if (timeSinceLastNotif >= info.intervalLen)
+                    {
+                        othersTellRemainingTime(info.ch, timeLeft);
+                        info.setLastNotification(now);
+                    }
                     LOGGER.fine("forcedWithdraw for player " + name + ": "
                         + timeLeft + " seconds left.");
                 }
@@ -722,9 +745,7 @@ public final class Server extends Thread implements IServer
                     {
                         // Remote entity did shut the socket down.
                         // Do the same from our end and cancel the channel.
-                        processingCH.setIsGone(true);
-                        LOGGER.info("EOF on channel for client "
-                            + getPlayerName() + " setting isGone true");
+                        processingCH.setIsGone(true, "EOF on channel");
                         if (read > 0)
                         {
                             LOGGER.info("Before EOF processing, calling "
@@ -756,7 +777,7 @@ public final class Server extends Thread implements IServer
             {
                 // set isGone first, to prevent from sending log info to
                 // client channel - channel is gone anyway...
-                processingCH.setIsGone(true);
+                processingCH.setIsGone(true, "REASON");
                 LOGGER.log(Level.WARNING, "IOException '" + e.getMessage()
                     + "' while reading from channel for player "
                     + getPlayerName(), e);
@@ -807,7 +828,7 @@ public final class Server extends Thread implements IServer
     }
 
     /**
-     * Something with the connection which makes perhaps Withdraw necessary.
+     * Something with the connection of "processingCH" which makes perhaps Withdraw necessary.
      *
      * If client seems to support reconnect, mark CH to be temp. disconnected,
      * otherwise take care of the proper withdrawal.
@@ -847,7 +868,7 @@ public final class Server extends Thread implements IServer
                 LOGGER.warning(reason + " on channel for client " + getPlayerName()
                     + " - skipping withDraw, waiting for reconnect attempt.");
                 processingCH.setTemporarilyDisconnected();
-                triggerWithdrawIfDoesNotReconnect(30000, 5);
+                triggerWithdrawIfDoesNotReconnect(30000, 6);
             }
             else
             {
@@ -867,8 +888,7 @@ public final class Server extends Thread implements IServer
     private void triggerWithdrawIfDoesNotReconnect(final long intervalLen,
         final int intervals)
     {
-        final ClientHandler currentProcessingCH = processingCH;
-        String withdrawName = currentProcessingCH.getPlayerName();
+        String withdrawName = processingCH.getPlayerName();
 
         if (forcedWithdraws.containsKey(withdrawName))
         {
@@ -877,13 +897,15 @@ public final class Server extends Thread implements IServer
                 + "' from forcedWithdraws list.");
             forcedWithdraws.remove(withdrawName);
         }
+        long howLong = (long)(intervals * intervalLen / 1000.0);
         LOGGER.info("Initiating delayed withdraw for player " + withdrawName
-            + " intervalLen = " + intervalLen + " count " + intervals);
-        // TODO intervals x len is just a relict from earlier implementation
-        //  - now it simply waits total time. Clean up?
-        long when = new Date().getTime() + (intervals * intervalLen);
-        forcedWithdraws.put(withdrawName, new WithdrawInfo(when,
-            currentProcessingCH));
+            + " intervalLen = " + intervalLen + " count " + intervals + " (= "
+            + howLong + " seconds)");
+        appendToConnLogs(processingCH, "NOTE: Connection to client '"
+            + withdrawName + "' lost; waiting " + howLong
+            + " seconds for possible reconnect...");
+        forcedWithdraws.put(withdrawName, new WithdrawInfo(processingCH,
+            intervals, intervalLen));
     }
 
     /**
@@ -1548,7 +1570,7 @@ public final class Server extends Thread implements IServer
             // Actual removal happens after all selector-keys are processed.
             // @TODO: does that make even sense? shuttingDown is set true,
             // so the selector loop does not even reach the removal part...
-            client.dispose();
+            client.disposeClientHandler();
         }
         clients.clear();
         playerToClientMap.clear();
@@ -1851,13 +1873,7 @@ public final class Server extends Thread implements IServer
         int howLong = (int)(chInTrouble.howLongAlreadyInTrouble() / 1000L);
         String message = "Problems writing to client of player "
             + playerInTrouble + " (" + howLong + " secs) - still trying...";
-        for (IClient client : clients)
-        {
-            if (client != chInTrouble)
-            {
-                client.tellWhatsHappening(message);
-            }
-        }
+        appendToConnLogs(chInTrouble, message);
     }
 
     void othersTellOnesTroubleIsOver(ClientHandler chInTrouble)
@@ -1865,32 +1881,25 @@ public final class Server extends Thread implements IServer
         String name = chInTrouble.getPlayerName();
         String message = "It seems writing to player " + name
             + " succeeded now.";
-        for (IClient client : clients)
-        {
-            // no need to inform the troubled one itself...
-            if (client != chInTrouble)
-            {
-                client.tellWhatsHappening(message);
-            }
-        }
+        appendToConnLogs(chInTrouble, message);
     }
 
-    // TODO tellWhatsHappening and appendToConnLog are overlapping,
-    // unify/fix it to use same for all
-    // Really? tellWhatsHappening is also used for PickColor, PickMarker,
-    // but also for "temporarily in trouble".
     void othersTellReconnectOngoing(ClientHandler chInTrouble)
     {
+        // Note that we need to use getSignOnName here!!
         String playerInTrouble = chInTrouble.getSignonName();
-        String message = "NOTE: Connection with player " + playerInTrouble
-            + " was interrupted, reconnect ongoing";
-        for (IClient client : clients)
-        {
-            if (client != chInTrouble)
-            {
-                client.appendToConnectionLog(message);
-            }
-        }
+        String message = "Player " + playerInTrouble
+            + " reconnected! Data synchronization ongoing";
+        appendToConnLogs(chInTrouble, message);
+    }
+
+    void othersTellRemainingTime(ClientHandler chInTrouble, int secondsLeft)
+    {
+        // Note that we need to use getSignOnName here!!
+        String playerInTrouble = chInTrouble.getSignonName();
+        String message = "Player " + playerInTrouble + " has still "
+            + secondsLeft + " seconds left before being withdrawn";
+        appendToConnLogs(chInTrouble, message);
     }
 
     void othersTellReconnectCompleted(ClientHandler chInTrouble)
@@ -1898,15 +1907,21 @@ public final class Server extends Thread implements IServer
         String name = chInTrouble.getPlayerName();
         String message = "Client of player " + name
             + " reconnect now successfully completed.";
+        appendToConnLogs(chInTrouble, message);
+    }
+
+    void appendToConnLogs(ClientHandler chInTrouble, String message)
+    {
         for (IClient client : clients)
         {
-            // no need to inform the troubled one itself...
+            // no need/use to inform the troubled one itself...
             if (client != chInTrouble)
             {
                 client.appendToConnectionLog(message);
             }
         }
     }
+
 
     /**
      * IF last ping round is at least PING_REQUEST_INTERVAL_SEC seconds ago,

@@ -106,7 +106,7 @@ public class ClientThread extends Thread
             LOGGER.warning("CT " + getName()
                 + ": failed to offer END signal to queue!");
         }
-        client.dispose();
+        client.disposeClientHandler();
     }
 
     public void setClosedByServer()
