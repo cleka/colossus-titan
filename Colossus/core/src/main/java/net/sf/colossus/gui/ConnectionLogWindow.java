@@ -50,7 +50,7 @@ public class ConnectionLogWindow extends JTextArea
             public void windowClosing(WindowEvent e)
             {
                 ConnectionLogWindow.this.options.setOption(
-                    Options.showLogWindow, false);
+                    Options.showConnectionLogWindow, false);
             }
         });
 
@@ -114,5 +114,11 @@ public class ConnectionLogWindow extends JTextArea
     {
         saveWindow.save(logFrame);
         logFrame.dispose();
+    }
+
+    @Override
+    public void setVisible(boolean visible)
+    {
+        logFrame.setVisible(visible);
     }
 }

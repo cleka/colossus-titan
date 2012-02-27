@@ -400,6 +400,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         initPreferencesWindow();
         showOrHideAutoInspector(options.getOption(Options.showAutoInspector));
         showOrHideLogWindow(options.getOption(Options.showLogWindow));
+        showOrHideConnectionLogWindow(options
+            .getOption(Options.showConnectionLogWindow));
         showOrHideCaretaker(options.getOption(Options.showCaretaker));
 
         setupGUIOptionListeners();
@@ -2043,11 +2045,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void appendToConnectionLog(String s)
     {
-        // Create or make visible, if needed:
-        if (connectionLogWindow == null)
-        {
-            showOrHideConnectionLogWindow(true);
-        }
+        // Creates or make visible, if needed:
+        options.setOption(Options.showConnectionLogWindow, true);
         connectionLogWindow.append(s);
     }
 
