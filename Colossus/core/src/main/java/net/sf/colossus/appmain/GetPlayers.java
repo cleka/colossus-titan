@@ -810,6 +810,7 @@ public final class GetPlayers extends KFrame
         options.clearPlayerInfo();
 
         int numPlayers = 0;
+        int numAIs = 0;
         List<String> names = new ArrayList<String>();
         List<String> types = new ArrayList<String>();
         StringBuilder sb = new StringBuilder("");
@@ -821,6 +822,13 @@ public final class GetPlayers extends KFrame
             if (name.length() > 0 && !name.equals(Constants.none)
                 && !type.equals(Constants.none))
             {
+
+                if (!type.equals(Constants.network)
+                    && !type.equals(Constants.human))
+                {
+                    numAIs++;
+                }
+
                 // Force all network players to byClient.
                 if (type.equals(Constants.network))
                 {
@@ -859,6 +867,14 @@ public final class GetPlayers extends KFrame
                     + (i + 1) + "\n");
             }
 
+        }
+
+        if (numAIs >= numPlayers && options.getOption(Options.autoStop))
+        {
+            String message = "Option '" + Options.autoStop
+                + "' should be disabled when all players are AIs!";
+            JOptionPane.showMessageDialog(this, message);
+            return false;
         }
 
         // preserve the non-used ones
@@ -965,6 +981,7 @@ public final class GetPlayers extends KFrame
                 whatNextManager
                     .setWhatToDoNext(WhatToDoNext.START_GAME, false);
                 stOptions.setOption(Options.serveAtPort, serveAtPort);
+                stOptions.setOption(Options.FORCE_BOARD, true);
                 options.setOption(Options.serveAtPort, serveAtPort);
             }
             dispose();

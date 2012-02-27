@@ -41,6 +41,7 @@ public final class Options implements IOptions
     public static final String loadGameFileName = "Load game file name";
     public static final String webFlagFileName = "Web game flag file";
     public static final String serveAtPort = "Run server on port";
+    public static final String FORCE_BOARD = "Force View Board";
 
     public static final String webServerHost = "Web server name";
     public static final String webServerPort = "Web server port";

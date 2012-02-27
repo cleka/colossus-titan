@@ -59,6 +59,9 @@ public final class Start
     public Start(String[] args)
     {
         this.startOptions = new Options(Constants.OPTIONS_START);
+        // initialize it from the -D..forceViewBoard  cmdline settings,
+        // defaulting to false if no such argument given
+        startOptions.setOption(Options.FORCE_BOARD, Constants.FORCE_VIEW_BOARD);
         this.whatNextManager = new WhatNextManager(startOptions);
         commandLineProcessing(args);
     }

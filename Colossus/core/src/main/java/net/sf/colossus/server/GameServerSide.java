@@ -334,7 +334,8 @@ public class GameServerSide extends Game
 
     public void createLocalClients()
     {
-        boolean atLeastOneBoardNeeded = Constants.FORCE_VIEW_BOARD;
+        boolean atLeastOneBoardNeeded = whatNextManager.getStartOptions()
+            .getOption(Options.FORCE_BOARD);
         for (Player player : getPlayers())
         {
             String type = player.getType();
