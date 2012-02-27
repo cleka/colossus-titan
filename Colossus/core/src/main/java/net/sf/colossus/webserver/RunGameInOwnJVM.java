@@ -214,6 +214,7 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
         gi.storeToOptionsObject(gameOptions, localPlayerName, noAIs);
 
         gameOptions.setOption(Options.autoQuit, true);
+        gameOptions.setOption(Options.keepAccepting, true);
 
         gameOptions.saveOptions();
 

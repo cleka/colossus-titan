@@ -58,6 +58,7 @@ public final class Options implements IOptions
     public static final String autoQuit = "Auto quit when game over";
     public static final String goOnWithoutObserver = "Go on without observer";
     public static final String hotSeatMode = "Hot seat mode";
+    public static final String keepAccepting = "Keep accepting clients";
 
     // Rules options
     public static final String variant = "Variant";

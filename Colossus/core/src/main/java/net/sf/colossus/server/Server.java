@@ -461,8 +461,8 @@ public final class Server extends Thread implements IServer
     {
         if (stopAcceptingFlag)
         {
-            LOGGER.info("cancelDummy was set...");
-            // stopAccepting();
+            LOGGER.info("stopAccepting flag was set...");
+            stopAccepting();
             stopAcceptingFlag = false;
         }
 
@@ -876,20 +876,27 @@ public final class Server extends Thread implements IServer
             {
                 LOGGER.info(reason + " on channel for client "
                     + getPlayerName() + " after Client explicitly requested"
-                    + " disconnect - proceeding withDraw and Disconnecting.");
+                    + " disconnect - proceeding withDraw and Disconnecting");
+                withdrawFromGame();
+            }
+            else if (!game.getOption(Options.keepAccepting))
+            {
+                LOGGER.warning(reason + " on channel for client "
+                    + getPlayerName() + " - game is not configured to accept "
+                    + "reconnects, withDrawing player");
                 withdrawFromGame();
             }
             else if (processingCH.supportsReconnect())
             {
                 LOGGER.warning(reason + " on channel for client " + getPlayerName()
-                    + " - skipping withDraw, waiting for reconnect attempt.");
+                    + " - skipping withDraw, waiting for reconnect attempt");
                 processingCH.setTemporarilyDisconnected();
                 triggerWithdrawIfDoesNotReconnect(30000, 6);
             }
             else
             {
                 LOGGER.warning(reason + " on channel for client " + getPlayerName()
-                    + " - can't reconnect, withDraw and Disconnecting.");
+                    + " - can't reconnect, withDrawing player");
                 withdrawFromGame();
             }
         }
@@ -1470,7 +1477,9 @@ public final class Server extends Thread implements IServer
      */
     public void startGame()
     {
-        stopAcceptingFlag = true;
+        boolean sa = !game.getOption(Options.keepAccepting);
+        LOGGER.info("Game started, setting stopAcceptingFlag to " + sa);
+        stopAcceptingFlag = sa;
         if (game.isLoadingGame())
         {
             logToStartLog("Loading game, sending replay data to clients...");
