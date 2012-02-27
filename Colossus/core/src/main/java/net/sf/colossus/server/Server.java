@@ -844,6 +844,22 @@ public final class Server extends Thread implements IServer
             return;
         }
 
+        Player player = getPlayer();
+        if (player == null)
+        {
+            LOGGER.warning("Skipping withdrawFromGame processing for "
+                + " ClientHandler of " + getPlayerName()
+                + " - no player found for the name");
+            return;
+        }
+
+        if (player.isDead())
+        {
+            LOGGER.info("Skipping withdrawFromGame processing for "
+                + getPlayerName() + " since player is already dead");
+            return;
+        }
+
         String reason;
         if (gotException != null)
         {
@@ -2835,7 +2851,7 @@ public final class Server extends Thread implements IServer
         return (obsolete || game == null || game.isGameOver());
     }
 
-    /** Withdraw the currently active player
+    /** Withdraw the player for which data was currently processed on socket
      *  (if it is a real one, and withdrawal still makes sense).
      */
     public void withdrawFromGame()
