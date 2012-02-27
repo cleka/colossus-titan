@@ -3,13 +3,11 @@ package net.sf.colossus.gui;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Date;
 
-import javax.swing.JFrame;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -17,7 +15,7 @@ import javax.swing.text.Document;
 import javax.swing.text.PlainDocument;
 
 import net.sf.colossus.common.Options;
-import net.sf.colossus.guiutil.SaveWindow;
+import net.sf.colossus.guiutil.KFrame;
 
 
 /**
@@ -27,24 +25,21 @@ import net.sf.colossus.guiutil.SaveWindow;
  * @author David Ripton
  * @author Clemens Katzer
  */
-public class ConnectionLogWindow extends JTextArea
+public class ConnectionLogWindow extends KFrame
 {
-    private final JFrame logFrame;
+    private final static String CL_WINDOW_TITLE = "Connection Log Window";
+
     private final JScrollPane scrollPane;
     private final Options options;
-    private Point location;
-    private Dimension size;
-    private final SaveWindow saveWindow;
     private final Document document;
+    private final JTextArea textArea;
 
     public ConnectionLogWindow(Options options)
     {
+        super(CL_WINDOW_TITLE);
         this.options = options;
-        setEditable(false);
-        setBackground(Color.white);
 
-        logFrame = new JFrame("Connection Log Window");
-        logFrame.addWindowListener(new WindowAdapter()
+        addWindowListener(new WindowAdapter()
         {
             @Override
             public void windowClosing(WindowEvent e)
@@ -54,31 +49,20 @@ public class ConnectionLogWindow extends JTextArea
             }
         });
 
-        scrollPane = new JScrollPane(this);
-        logFrame.getContentPane().add(scrollPane);
-        logFrame.pack();
-
-        saveWindow = new SaveWindow(options, "ConnectionLogWindow");
-
-        size = saveWindow.loadSize();
-        if (size == null)
-        {
-            size = getMinimumSize();
-        }
-        logFrame.setSize(size);
-
-        location = saveWindow.loadLocation();
-        if (location == null)
-        {
-            Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-            int y = d.height - size.height;
-            location = new Point(0, y);
-        }
-        logFrame.setLocation(location);
-        logFrame.setVisible(true);
-
         document = new PlainDocument();
-        setDocument(document);
+        this.textArea = new JTextArea(document);
+        textArea.setEditable(false);
+        textArea.setBackground(Color.white);
+
+        scrollPane = new JScrollPane(textArea);
+        getContentPane().add(scrollPane);
+
+        setSize(getMinimumSize());
+        setPreferredSize(getMinimumSize());
+        useSaveWindow(options, CL_WINDOW_TITLE, null);
+
+        pack();
+        setVisible(true);
     }
 
     public static String getNow()
@@ -86,11 +70,10 @@ public class ConnectionLogWindow extends JTextArea
         return new Date().toString();
     }
 
-    @Override
     public void append(String s)
     {
-        super.append(getNow() + ": " + s + "\n");
-        logFrame.toFront();
+        textArea.append(getNow() + ": " + s + "\n");
+        toFront();
 
         // XXX Removed because of graphical corruption
         // scrollToEnd();
@@ -107,18 +90,7 @@ public class ConnectionLogWindow extends JTextArea
     public Dimension getMinimumSize()
     {
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        return new Dimension(Math.min(d.width, 800), 100);
+        return new Dimension(Math.min(d.width, 800), 200);
     }
 
-    public void dispose()
-    {
-        saveWindow.save(logFrame);
-        logFrame.dispose();
-    }
-
-    @Override
-    public void setVisible(boolean visible)
-    {
-        logFrame.setVisible(visible);
-    }
 }
