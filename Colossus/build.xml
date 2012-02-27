@@ -323,11 +323,28 @@
   	  <available file="${basedir}/.svn"/>
   	</condition>
   </target>
+	
+  <target name="revertjdom" description="Do svn revert for libs/jdom.jar"
+	depends="checkForSvn">
+  	<taskdef name="svn"
+  	         classname="org.tigris.subversion.svnant.SvnTask">
+      <classpath>
+        <pathelement path="${libs.dir}/build/svnant.jar"/>
+        <pathelement path="${libs.dir}/build/svnClientAdapter.jar"/>
+        <pathelement path="${libs.dir}/build/svnkit.jar"/>
+  	  </classpath>
+  	</taskdef>
+    <svn javahl="false" svnkit="true" failonerror="false">
+        <revert file="libs/jdom.jar">
+        </revert>
+    </svn>
+  </target>
+	
   <!-- Build information will only be available if we have a SVN working copy, otherwise it will
        be skipped completely. While some of that information is available without SVN we assume
        that any official build will be done from a working copy and thus not split the target. -->
   <target name="buildInfo" description="Generates property file with some information on the build such as revision and time"
-  	if="doSvnCheck" depends="checkForSvn">
+  	if="doSvnCheck" depends="checkForSvn,revertjdom">
   	<!-- This task tries to use svnkit, which is normally not there; it will then fall back to a command line svn.
   	     see libs/build/README.txt for more information -->
   	<taskdef name="svn"
