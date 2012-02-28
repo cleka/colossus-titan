@@ -4,7 +4,7 @@
 <head>
     <meta name="generator"
     content="HTML Tidy for Linux/x86 (vers 1st July 2002), see www.w3.org" />
-    <title>Colossus: Release Note for 0.13.0</title>
+    <title>Colossus: Release Note for 0.13.1pretest2</title>
 </head>
 <body>
 
@@ -28,7 +28,7 @@ Further work on reconnect functionality and other improvements
 <li>ConnectionLogWindow now show &amp; hide to work as expected and keep checkbox in sync</li>
 <li>Skip withdraw / "withdraw if didn't reconnect in time" processing if player already 
     dead (or client not a player anyway, e.g. in future spectator clients)</li>
-<li>By default, now stop accepting clients again after game is completed. 
+<li>By default, now stop accepting clients again after game start is completed/all clients have connected. 
     If configured in Colossus-server.cfg, keep accepting (and WebServer starting games sets this to true);
     (intermediately, to allow reconnect, server socket kept accepting always, which can cause trouble
     when playing locally several games after each other, and previous one keeps hogging the socket)</li>
