@@ -28,11 +28,12 @@ public final class WelcomeDialog extends KFrame
 {
     private final static String title = "Welcome to this new Colossus Release!";
 
-    private final static String CURRENT_WELCOME_KEY = "0.13.0";
+    private final static String CURRENT_WELCOME_KEY = "0.13.1";
 
-    private final static String baseUrl = "http://sourceforge.net/projects/colossus/files";
-    private final static String colossusReleaseNoteUrl = baseUrl
-        + "/Release-0.13.0";
+//    private final static String baseUrl = "http://sourceforge.net/projects/colossus/files";
+    //    private final static String colossusReleaseNoteUrl = baseUrl + "/Release-0.13.1";
+
+    private final static String colossusTestbuildRCDUrl = "http://colossus.sourceforge.net/public-testing/docs/RecentChangesDetails.html";
 
     private static WelcomeDialog showWelcome = null;
 
@@ -42,15 +43,14 @@ public final class WelcomeDialog extends KFrame
         super(title);
 
         String text = "\n"
-            + "  Welcome to this new 'Colossus Public Test Build' 0.13.0!"
+            + "  Welcome to this new 'Colossus Public Test Build' 0.13.1pretest2!"
             + "\n\n"
             + "  New features:\n"
-            + "  - Game Client be able to reconnect after short network problems.\n"
-            + "  - If client gets nak for done with strikes, after dialog highlight critters with targets.\n"
-            + "  - plus the usual amount of fixes / stability improvements.\n"
+            + "  - Further improved reconnect functionality and other improvements.\n"
             + "\n"
-            + "  For a more detailed list of changes see the Release Note document in SF download area:\n      "
-            + colossusReleaseNoteUrl
+            + "  For a more detailed list of changes see the Recent Changes Details document "
+            + "in the test build section of Colossus home page:\n      "
+            + colossusTestbuildRCDUrl
             + "\n\n"
             + "  Use button below to copy the URL to your clipboard to paste it "
             + "into your browser.\n\n"
@@ -71,7 +71,7 @@ public final class WelcomeDialog extends KFrame
         {
             public void actionPerformed(ActionEvent e)
             {
-                ErrorUtils.copyToClipboard(colossusReleaseNoteUrl);
+                ErrorUtils.copyToClipboard(colossusTestbuildRCDUrl);
 
                 JOptionPane.showMessageDialog(WelcomeDialog.this,
                     "URL has been copied to your clipboard.", "URL copied!",

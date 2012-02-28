@@ -13,6 +13,35 @@
 This describes the recent changes in some more detail than just the
 one-line-info on the main pages "News" section.
 
+<h3>February 28, 2012: Public Test Build 0.13.1pretest2 from r5109</h3>
+<p/>
+Further work on reconnect functionality and other improvements 
+<ul>
+
+<li>When user clicked Start Game, give visual feedback and disable cancel+unenroll to everybody</li>
+<li>As soon as game is activated, disable Enroll button for other players</li>
+<li>In StartGame, ignore case if passed-with user name has case difference compared to "official" user's name.</li>
+<li>In remote client, if game is already over, do not ask the "do you really want to concede" 
+    when one attempts to close the battle window</li>
+<li>Prevent/Handle accidental duplicate battle moves better (or: the delay between click and
+    actual server feedback, added visual feedback)</li>
+<li>Finetuning with the "delayed withdraw": if client did not reconnect within approx. 3 minutes withdraw him. 
+    Inform other clients (if they are new enough to  handle such information) about situation</li>
+<li>If updatePlayerInfo would re-send identical info as last time, skip it (reduces network traffic)</li>
+<li>Prevent the registration of user names guest* and anonym*</li>
+<li>Implemented FR 3494746: Show board for AI-only games also (when GUI-started)</li>
+<li>ConnectionLogWindow now show &amp; hide to work as expected and keep checkbox in sync</li>
+<li>Skip withdraw / "withdraw if didn't reconnect in time" processing if player already 
+    dead (or client not a player anyway, e.g. in future spectator clients)</li>
+<li>By default, now stop accepting clients again after game is completed. 
+    If configured in Colossus-server.cfg, keep accepting (and WebServer starting games sets this to true);
+    (intermediately, to allow reconnect, server socket kept accepting always, which can cause trouble
+    when playing locally several games after each other, and previous one keeps hogging the socket)</li>
+</ul>
+<p />
+
+<hr></hr>
+
 <h3>February 5, 2012: Release 0.13.0 from r5073</h3>
 <p/>
 Ability to reconnect after shortly interrupted network connections; two changes which hopefully prevent
@@ -43,8 +72,6 @@ plus some smaller fixes and addings.<br>
     for some players with Java 1.6 to deadlocks (GUI freezes). </li>
 </ul>
 <p />
-
-<hr></hr>
 
 <h3>March 4, 2011: Release 0.12.1 from r5003</h3>
 <p/>
