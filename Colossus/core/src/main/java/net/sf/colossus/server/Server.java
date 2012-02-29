@@ -613,19 +613,6 @@ public final class Server extends Thread implements IServer
         selectedKeys.clear();
     }
 
-    public void sleepFor(long millis)
-    {
-        try
-        {
-            Thread.sleep(millis);
-        }
-        catch (InterruptedException e)
-        {
-            LOGGER.log(Level.FINEST,
-                "sleepFor: InterruptException caught... ignoring it...");
-        }
-    }
-
     private void handleChannelChanges() throws IOException
     {
         synchronized (channelChanges)

@@ -1074,7 +1074,6 @@ public final class BattleServerSide extends Battle
             LOGGER.log(Level.INFO, critter.getName() + " moves from "
                 + critter.getCurrentHex().getLabel() + " to "
                 + hex.getLabel());
-            server.sleepFor(2000);
             moveCritterToHexAndInformClients(critter, hex);
             return null;
         }
