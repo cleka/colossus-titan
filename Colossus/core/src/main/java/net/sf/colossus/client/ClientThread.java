@@ -96,7 +96,7 @@ public class ClientThread extends Thread
         return queue.size();
     }
 
-    public void dispose()
+    public void disposeQueue()
     {
         // Get thread out of it's "take" waiting
         done = true;
@@ -106,7 +106,11 @@ public class ClientThread extends Thread
             LOGGER.warning("CT " + getName()
                 + ": failed to offer END signal to queue!");
         }
-        client.disposeClientHandler();
+    }
+
+    public void disposeClient()
+    {
+        client.disposeClient();
     }
 
     public void setClosedByServer()
@@ -179,6 +183,11 @@ public class ClientThread extends Thread
                     + "they will not show effect on the Board yet!");
             }
         }
+    }
+
+    public void notifyThatNotConnected()
+    {
+        client.notifyThatNotConnected();
     }
 
     public void appendToConnectionLog(String s)

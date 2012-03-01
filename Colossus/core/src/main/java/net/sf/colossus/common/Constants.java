@@ -181,12 +181,12 @@ public final class Constants
     public static final String newGame = "New game";
     public static final String loadGame = "Load game";
     public static final String saveGame = "Save game";
-    public static final String quitGame = "Quit Game";
-    public static final String enforcedDisconnect = "Enforced disconnect + reconnect";
-    public static final String enforcedDisconnectByServer = "Fake Disconnect (by server)";
-    public static final String tryReconnect = "Try to reconnect";
+    public static final String quitGame = "Quit Application";
     public static final String closeBoard = "Close MasterBoard";
     public static final String checkConnection = "Check connection";
+    public static final String cleanDisconnect = "Disconnect";
+    public static final String tryReconnect = "Reconnect";
+    public static final String enforcedDisconnectByServer = "Fake Disconnect (by server)";
 
     public static final String runClient = "Run network client";
     public static final String runWebClient = "Run web client";

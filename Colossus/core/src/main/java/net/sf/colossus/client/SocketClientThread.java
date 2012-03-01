@@ -106,7 +106,7 @@ final class SocketClientThread extends Thread implements IServer,
         return conn;
     }
 
-    public static SocketClientThread recreateConnection(
+    protected static SocketClientThread recreateConnection(
         IServerConnection prevConnection) throws ConnectionInitException
     {
         SocketClientThread previousConnection = (SocketClientThread)prevConnection;
@@ -120,14 +120,10 @@ final class SocketClientThread extends Thread implements IServer,
 
         SocketClientThread newConn = new SocketClientThread(host, port,
             playerName, remote);
-
         String reasonFail = newConn.getReasonFail();
         if (reasonFail != null)
         {
             LOGGER.warning("Reconnecting to server failed: " + reasonFail);
-            previousConnection
-                .appendToConnectionLog("SCT.recreateConnection failed! Reason: "
-                    + reasonFail);
             /*
             if (!Options.isStresstest())
             {
@@ -469,7 +465,11 @@ final class SocketClientThread extends Thread implements IServer,
         if (clientThread != null)
         {
             disposedClientThread = clientThread;
-            clientThread.dispose();
+            clientThread.disposeQueue();
+            if (!abandoned)
+            {
+                clientThread.disposeClient();
+            }
             clientThread = null;
         }
         else
@@ -609,9 +609,9 @@ final class SocketClientThread extends Thread implements IServer,
                 {
                     // clientThread.setClosedByServer();
                     LOGGER
-                        .log(Level.WARNING, "SCT SocketClientThread "
-                            + getName() + ": got SocketException "
-                            + ex.toString());
+                        .log(Level.WARNING,
+                            "SCT SocketClientThread " + getName()
+                                + ": got SocketException " + ex.toString());
                 }
                 goingDown = true;
             }
@@ -644,7 +644,6 @@ final class SocketClientThread extends Thread implements IServer,
             if (socket != null && !socket.isClosed())
             {
                 socket.close();
-                socket = null;
             }
             else
             {
@@ -662,13 +661,16 @@ final class SocketClientThread extends Thread implements IServer,
             LOGGER.log(Level.WARNING, "SocketClientThread " + getName()
                 + ", during socket.close(), got Whatever Exception ", e);
         }
+        finally
+        {
+            socket = null;
+        }
     }
 
     @Override
     public void interrupt()
     {
         super.interrupt();
-
         try
         {
             if (socket != null)
@@ -687,8 +689,16 @@ final class SocketClientThread extends Thread implements IServer,
         }
     }
 
-    /** Client originates the dispose: */
-    public void stopSocketClientThread()
+    /**
+     * Client originates the dispose:
+     * If done because all is over, player chose close etc, send also a
+     * disconnect so that server knows client is "gone". If done because
+     * of actually or suspected "connection dead/problems", just shut down
+     * the SCT peacefully, do not inform server, client might want to
+     * reconnect later with a new SCT / ClientThread pair.
+     * @param sendConnect  If true, sends a disconnect message to server
+     */
+    public void stopSocketClientThread(boolean sendConnect)
     {
         if (goingDown)
         {
@@ -696,7 +706,10 @@ final class SocketClientThread extends Thread implements IServer,
         }
         goingDown = true;
 
-        sendDisconnect();
+        if (sendConnect)
+        {
+            sendDisconnect();
+        }
 
         synchronized (isWaitingLock)
         {
@@ -718,8 +731,19 @@ final class SocketClientThread extends Thread implements IServer,
         // Now cleanup things go same way as if server would have send dispose.
     }
 
-    public int getMessageCounter()
+    // Client told us we are not relevant any more; must not confirm any
+    // commit point to server any more, and when SCT thread ends, do not
+    // call the "dispose whole client" functionality.
+    private boolean abandoned = false;
+
+    public int abandonAndGetMessageCounter()
     {
+        if (abandoned)
+        {
+            return -2;
+        }
+        abandoned = true;
+        stopSocketClientThread(false);
         return ownMessageCounter;
     }
 
@@ -764,14 +788,22 @@ final class SocketClientThread extends Thread implements IServer,
             else
             {
                 LOGGER.warning("Client " + getNameMaybe()
-                    + " received commit point "
-                    + commitPointNr + " msg Nr " + messageNr
-                    + " own counter " + ownMessageCounter);
+                    + " received commit point " + commitPointNr + " msg Nr "
+                    + messageNr + ", but own counter is " + ownMessageCounter
+                    + " -adjusting.");
                 ownMessageCounter = messageNr;
             }
-            sendToServer(Constants.confirmCommitPoint + sep
-                + commitPointNr);
-
+            if (abandoned)
+            {
+                LOGGER.warning("Client " + getNameMaybe() + " already "
+                    + "abandoned; suppressing confirmCommitPoint for CP# "
+                    + commitPointNr);
+            }
+            else
+            {
+                sendToServer(Constants.confirmCommitPoint + sep
+                    + commitPointNr);
+            }
         }
         else if (method.equals(Constants.gameInitInfo))
         {
@@ -819,16 +851,34 @@ final class SocketClientThread extends Thread implements IServer,
     {
         if (socket != null)
         {
-            LOGGER.finest("Message from SCT '" + getNameMaybe()
+            LOGGER.info("Message from SCT '" + getNameMaybe()
                 + "' to server:" + message);
             out.println(message);
             clientThread.notifyUserIfGameIsPaused(message);
         }
+        else if (message.startsWith(Constants.replyToPing))
+        {
+            // silently ignore
+        }
         else
         {
-            LOGGER.log(Level.SEVERE, "SCT (" + getName() + ")"
-                + ": Attempt to send message '" + message
-                + "' but the socket is closed and/or client alresady null??");
+            if (clientThread != null)
+            {
+                clientThread.notifyThatNotConnected();
+            }
+            else if (disposedClientThread != null)
+            {
+                disposedClientThread.notifyThatNotConnected();
+            }
+            else
+            {
+                LOGGER.log(Level.WARNING, "SCT (" + getName() + ")"
+                    + ": Attempt to send message '" + message
+                    + "' but the socket is closed and/or client already null"
+                    + " and cant't inform any clientThread?");
+
+            }
+
         }
     }
 
@@ -1089,7 +1139,7 @@ final class SocketClientThread extends Thread implements IServer,
         // sendToServer(Constants.replyToPing);
     }
 
-    public void enforcedDisconnect()
+    public void enforcedConnectionException()
     {
         if (socket == null)
         {

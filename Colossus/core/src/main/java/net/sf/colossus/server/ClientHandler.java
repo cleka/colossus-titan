@@ -65,7 +65,7 @@ final class ClientHandler implements IClient
     private boolean isGone = false;
     private boolean didExplicitDisconnect = false;
     private boolean withdrawnAlready = false;
-    private int isGoneMessageRepeated = 0;
+    private int cantSendMessageRepeated = 0;
     private boolean temporarilyDisconnected = false;
     private boolean obsolete = false;
 
@@ -134,11 +134,11 @@ final class ClientHandler implements IClient
         return this.isGone;
     }
 
-    public void setIsGone(boolean val, String reason)
+    public void setIsGone(String reason)
     {
         LOGGER.info("Setting isGone to true in CH for '" + getPlayerName()
             + "' (reason: " + reason + ")");
-        this.isGone = val;
+        this.isGone = true;
     }
 
     public boolean didExplicitDisconnect()
@@ -533,7 +533,7 @@ final class ClientHandler implements IClient
             }
             else
             {
-                setIsGone(true, "IOException and reconnect not supported");
+                setIsGone("IOException and reconnect not supported");
                 withdrawnAlready = true;
                 server.withdrawFromGame(playerName);
                 server.queueClientHandlerForChannelChanges(this);
@@ -795,7 +795,7 @@ final class ClientHandler implements IClient
         else if (method.equals(Constants.disconnect))
         {
             didExplicitDisconnect = true;
-            setIsGone(true, "received explit 'disconnect' request from client");
+            setIsGone("received explit 'disconnect' request from client");
             LOGGER.info("Received explicit 'disconnect' request from Client "
                 + getPlayerName() + " - calling 'withdrawIfNeeded'.");
             withdrawIfNeeded(false);
@@ -804,7 +804,7 @@ final class ClientHandler implements IClient
 
         else if (method.equals(Constants.stopGame))
         {
-            setIsGone(true, "received explicit 'stopGame' request from "
+            setIsGone("received explicit 'stopGame' request from "
                 + "client" + getPlayerName());
             server.sendDisconnect();
             server.stopGame();
@@ -978,18 +978,25 @@ final class ClientHandler implements IClient
         enqueueToRedoQueue(messageCounter, message);
         messageCounter++;
 
-        if (isGone || obsolete || socketChannel == null)
+        if (isGone())
+        {
+            LOGGER.info("No point ot send anything to player " + playerName
+                + " when client connection already gone");
+            return;
+        }
+
+        if (obsolete || socketChannel == null)
         {
             // do not send any more
-            if (isGoneMessageRepeated < 3)
+            if (cantSendMessageRepeated < 3)
             {
                 int flags = (isGone ? 1 : 0) & (obsolete ? 2 : 0)
                     & (socketChannel == null ? 4 : 0);
-                LOGGER.warning("Attempt to send to player " + playerName
+                LOGGER.info("Attempt to send to player " + playerName
                     + " when client connection already gone (reason: " + flags
                     + ")- message: "
                     + message);
-                isGoneMessageRepeated++;
+                cantSendMessageRepeated++;
             }
         }
         else
@@ -1027,7 +1034,7 @@ final class ClientHandler implements IClient
     /**
      * Server side disposes a client (and informs it about it first)
      */
-    public void disposeClientHandler()
+    public void disposeClient()
     {
         // Don't do it again
         if (isGone)
@@ -1035,7 +1042,7 @@ final class ClientHandler implements IClient
             return;
         }
 
-        setIsGone(true, "Server disposes client");
+        setIsGone("Server disposes client");
         sendViaChannel(Constants.dispose);
         server.queueClientHandlerForChannelChanges(this);
         server.clientWontConfirmCatchup(this,

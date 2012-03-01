@@ -2895,6 +2895,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
         client.cleanupBattle();
         disposeLogWindow();
+        // For now, that one shall NOT be reopened by default on next start
+        options.setOption(Options.showConnectionLogWindow, false);
         disposeConnectionLogWindow();
         disposeMovementDie();
         disposeStatusScreen();

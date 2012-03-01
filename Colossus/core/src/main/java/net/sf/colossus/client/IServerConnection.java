@@ -32,13 +32,13 @@ public interface IServerConnection
 
     public boolean isAlreadyDown();
 
-    public void stopSocketClientThread();
+    public void stopSocketClientThread(boolean sendDispose);
 
-    public void enforcedDisconnect();
+    public void enforcedConnectionException();
 
     public void requestSyncDelta(int lastRcvdMsgNr, int syncCounter);
 
-    public int getMessageCounter();
+    public int abandonAndGetMessageCounter();
 
     public int getDisposedQueueLen();
 

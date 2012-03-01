@@ -205,7 +205,7 @@ public final class MasterBoard extends JPanel
     private AbstractAction saveGameAsAction;
     private AbstractAction closeBoardAction;
     private AbstractAction quitGameAction;
-    private AbstractAction enforcedDisconnectAction;
+    private AbstractAction cleanDisconnectAction;
     private AbstractAction enforcedDisconnectByServerAction;
     private AbstractAction tryReconnectAction;
     private AbstractAction checkConnectionAction;
@@ -779,12 +779,12 @@ public final class MasterBoard extends JPanel
             }
         };
 
-        enforcedDisconnectAction = new AbstractAction(Constants.enforcedDisconnect)
+        cleanDisconnectAction = new AbstractAction(Constants.cleanDisconnect)
         {
             public void actionPerformed(ActionEvent e)
             {
-                LOGGER.info("Enforced disconnect by client (from File Menu)!");
-                client.enforcedDisconnect();
+                LOGGER.info("Pure disconnect by client (from File Menu)!");
+                client.abandonCurrentConnection();
             }
         };
 
@@ -1217,15 +1217,11 @@ public final class MasterBoard extends JPanel
         mi = fileMenu.add(checkConnectionAction);
         mi.setMnemonic(KeyEvent.VK_K);
 
-        mi = fileMenu.add(enforcedDisconnectAction);
+        mi = fileMenu.add(cleanDisconnectAction);
         mi.setMnemonic(KeyEvent.VK_Y);
 
-        fileMenu.addSeparator();
-
-        mi = fileMenu.add(closeBoardAction);
-        mi.setMnemonic(KeyEvent.VK_C);
-        mi = fileMenu.add(quitGameAction);
-        mi.setMnemonic(KeyEvent.VK_Q);
+        mi = fileMenu.add(tryReconnectAction);
+        mi.setMnemonic(KeyEvent.VK_R);
 
         // only for debugging/testing
         boolean _DISCONNECT_BY_SERVER = false;
@@ -1235,13 +1231,12 @@ public final class MasterBoard extends JPanel
             mi.setMnemonic(KeyEvent.VK_Z);
         }
 
-        // does not work, SCT stays up / pile up and all kind of issues...
-        boolean _DIRECT_RECONNECT = false;
-        if (_DIRECT_RECONNECT)
-        {
-            mi = fileMenu.add(tryReconnectAction);
-            mi.setMnemonic(KeyEvent.VK_R);
-        }
+        fileMenu.addSeparator();
+
+        mi = fileMenu.add(closeBoardAction);
+        mi.setMnemonic(KeyEvent.VK_C);
+        mi = fileMenu.add(quitGameAction);
+        mi.setMnemonic(KeyEvent.VK_Q);
 
         // Edit menu
 
@@ -2301,7 +2296,10 @@ public final class MasterBoard extends JPanel
         {
             return;
         }
-
+        if (!gui.client.ensureThatConnected())
+        {
+            return;
+        }
         Phase phase = gui.getGame().getPhase();
         if (phase == Phase.SPLIT)
         {
@@ -2338,6 +2336,11 @@ public final class MasterBoard extends JPanel
 
     private void actOnHex(MasterHex hex)
     {
+        if (!gui.client.ensureThatConnected())
+        {
+            return;
+        }
+
         Phase phase = gui.getGame().getPhase();
 
         if (relocateOngoing != null)
@@ -2476,9 +2479,12 @@ public final class MasterBoard extends JPanel
             else
             {
                 // nothing yet, ok: engage
-                gui.waitCursor();
-                engagingPendingHex = hex;
-                client.engage(hex);
+                if (gui.getClient().ensureThatConnected())
+                {
+                    gui.waitCursor();
+                    engagingPendingHex = hex;
+                    client.engage(hex);
+                }
             }
         }
         else

@@ -732,7 +732,7 @@ public final class Server extends Thread implements IServer
                     {
                         // Remote entity did shut the socket down.
                         // Do the same from our end and cancel the channel.
-                        processingCH.setIsGone(true, "EOF on channel");
+                        processingCH.setIsGone("EOF on channel");
                         if (read > 0)
                         {
                             LOGGER.info("Before EOF processing, calling "
@@ -764,7 +764,7 @@ public final class Server extends Thread implements IServer
             {
                 // set isGone first, to prevent from sending log info to
                 // client channel - channel is gone anyway...
-                processingCH.setIsGone(true, "REASON");
+                processingCH.setIsGone("REASON");
                 LOGGER.log(Level.WARNING, "IOException '" + e.getMessage()
                     + "' while reading from channel for player "
                     + getPlayerName(), e);
@@ -875,7 +875,8 @@ public final class Server extends Thread implements IServer
             }
             else if (processingCH.supportsReconnect())
             {
-                LOGGER.warning(reason + " on channel for client " + getPlayerName()
+                LOGGER.info(reason + " on channel for client "
+                    + getPlayerName()
                     + " - skipping withDraw, waiting for reconnect attempt");
                 processingCH.setTemporarilyDisconnected();
                 triggerWithdrawIfDoesNotReconnect(30000, 6);
@@ -1582,7 +1583,7 @@ public final class Server extends Thread implements IServer
             // Actual removal happens after all selector-keys are processed.
             // @TODO: does that make even sense? shuttingDown is set true,
             // so the selector loop does not even reach the removal part...
-            client.disposeClientHandler();
+            client.disposeClient();
         }
         clients.clear();
         playerToClientMap.clear();

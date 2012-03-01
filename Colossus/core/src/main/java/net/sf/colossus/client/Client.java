@@ -194,6 +194,9 @@ public final class Client implements IClient, IOracle, IVariant,
 
     private ClosedByConstant closedBy = ClosedByConstant.NOT_CLOSED;
 
+    private final static int MAX_RECONNECT_ATTEMPTS = 6;
+    private final static int RECONNECT_RETRY_INTERVAL = 10;
+
     // XXX temporary until things are synchronized
     private boolean tookMulligan;
 
@@ -451,8 +454,8 @@ public final class Client implements IClient, IOracle, IVariant,
     {
         if (isRemote())
         {
-            LOGGER
-                .warning("setPauseState should not be possible in remote client!");
+            LOGGER.warning("setPauseState should not be possible "
+                + "in remote client!");
         }
         else
         {
@@ -463,13 +466,69 @@ public final class Client implements IClient, IOracle, IVariant,
 
     public void enforcedDisconnect()
     {
-        connection.enforcedDisconnect();
+        connection.enforcedConnectionException();
     }
 
+    public boolean ensureThatConnected()
+    {
+        if (isConnected())
+        {
+            return true;
+        }
+        else
+        {
+            notifyThatNotConnected();
+            return false;
+        }
+    }
+
+    public void notifyThatNotConnected()
+    {
+        String waitText = "";
+        if (isConnectRoundOngoing())
+        {
+            waitText = "\n\nPlease wait until Reconnect is completed.";
+        }
+        showMessageDialog("NOTE: You are currently not connected "
+            + " to the server!" + waitText);
+    }
+
+    // for debugging/development purposes
     public void enforcedDisconnectByServer()
     {
         localServer.enforcedDisconnectClient(owningPlayer.getName());
         // localServer.enforcedDisconnectClient("remote");
+    }
+
+    /**
+     * is != -1 only from the point on when client abandons the connection,
+     * until sync is completed. When sync is completed, it's re-set back
+     * to -1.
+     */
+    private int lastMsgNr = -1;
+    private IServerConnection previousConn;
+
+    public boolean isConnected()
+    {
+        return previousConn == null;
+    }
+
+    public void abandonCurrentConnection()
+    {
+        if (lastMsgNr == -1)
+        {
+            previousConn = connection;
+            int got = previousConn.abandonAndGetMessageCounter();
+            if (got == -2)
+            {
+                LOGGER.warning("Connection was abandoned already "
+                    + "before, got msgCounter -2 ???");
+            }
+            else
+            {
+                lastMsgNr = got;
+            }
+        }
     }
 
     /**
@@ -480,15 +539,42 @@ public final class Client implements IClient, IOracle, IVariant,
     public void tryReconnect(boolean automatic)
     {
         String cause = automatic ? "automatically" : "manually";
-        try
+        LOGGER.info("Trying reconnect (" + cause + " triggered)");
+        appendToConnectionLog("Trying reconnect (" + cause + " triggered)");
+
+        int attempt = 1;
+        IServerConnection conn = null;
+        do
         {
-            LOGGER.info("Trying reconnect (" + cause + " triggered)");
-            appendToConnectionLog("Trying reconnect (" + cause
-                + " triggered)");
-            IServerConnection previousConn = connection;
-            int lastMsgNr = previousConn.getMessageCounter();
-            IServerConnection conn = SocketClientThread
-                .recreateConnection(previousConn);
+            try
+            {
+                conn = SocketClientThread.recreateConnection(previousConn);
+            }
+            catch (ConnectionInitException e)
+            {
+                LOGGER.warning("Reconnect #" + attempt + " attempted ("
+                    + cause + ") but got ConnectionInitException " + e);
+                if (attempt < MAX_RECONNECT_ATTEMPTS)
+                {
+                    appendToConnectionLog("PROBLEM: Reconnect attempt #"
+                        + attempt + " failed; will retry after "
+                        + RECONNECT_RETRY_INTERVAL + " seconds ("
+                        + (MAX_RECONNECT_ATTEMPTS - attempt)
+                        + " attempts left)");
+                    WhatNextManager.sleepFor(RECONNECT_RETRY_INTERVAL * 1000);
+                    attempt++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+        while (conn == null);
+
+        // Okay: Reconnect succeeded!
+        if (conn != null)
+        {
             appendToConnectionLog("Connection succeeded, "
                 + "initiating synchronization...");
             gotDisposeAlready = false;
@@ -513,40 +599,76 @@ public final class Client implements IClient, IOracle, IVariant,
             LOGGER.info("Connection re-established. "
                 + "Waiting for synchronization to complete.");
         }
-        catch (ConnectionInitException e)
+        else
         {
-            appendToConnectionLog("PROBLEM: Trying to reconnect (" + cause
-                + " triggered) failed.");
-            LOGGER.warning("Reconnect attempted (" + cause
-                + ") but got ConnectionInitException " + e);
             String message = "Trying to reconnect (" + cause
-                + " triggered) failed." + "\n\n";
-
-            // manual re-connect not working yet, so still disabled:
-            // + "Try it again (from File Menu) after a few seconds.\n"
-            // + "But if that does not succeed, well, bad luck:-(";
-
+                + " triggered) failed " + attempt + " times - giving up."
+                // Add the rest only for automatically triggered reconnects.
+                + (automatic ? "\n\n"
+                    + "You may try it again (from File Menu) after a few seconds."
+                    + "\nBut if that does not succeed, well, bad luck:-("
+                    : "");
             gui.showMessageDialogAndWait(message);
         }
     }
 
     public void guiTriggeredTryReconnect()
     {
-        LOGGER.info("Menu-triggered trying reconnect!");
-        Runnable connectAttempt = new Runnable()
+        LOGGER.info("Menu-triggered (= manual) reconnect!");
+        fireOneReconnectRunnable(false);
+    }
+
+    private final Object oneConnectAttemptsRoundMutex = new Object();
+
+    private Runnable oneConnectAttemptsRound = null;
+
+    private void setConnectAttemptsRoundCompleted()
+    {
+        synchronized (oneConnectAttemptsRoundMutex)
         {
-            public void run()
+            oneConnectAttemptsRound = null;
+        }
+    }
+
+    public boolean isConnectRoundOngoing()
+    {
+        synchronized (oneConnectAttemptsRoundMutex)
+        {
+            return (oneConnectAttemptsRound != null);
+        }
+    }
+
+    /**
+     * Creates a runnable that executes one reconnect round (several attempts)
+     */
+    private void fireOneReconnectRunnable(final boolean automatic)
+    {
+        synchronized (oneConnectAttemptsRoundMutex)
+        {
+            if (oneConnectAttemptsRound != null)
             {
-                boolean automatic = false;
-                tryReconnect(automatic);
+                appendToConnectionLog("One reconnect-attempt round already "
+                    + "ongoing - starting a new one omitted.");
+                return;
             }
-        };
-        new Thread(connectAttempt).start();
+            oneConnectAttemptsRound = new Runnable()
+            {
+                public void run()
+                {
+                    abandonCurrentConnection();
+                    tryReconnect(automatic);
+                    setConnectAttemptsRoundCompleted();
+                }
+            };
+        }
+        new Thread(oneConnectAttemptsRound).start();
     }
 
     public void tellSyncCompleted(int syncRequestNumber)
     {
         LOGGER.info("Synchronization #" + syncRequestNumber + " completed!");
+        lastMsgNr = -1;
+        previousConn = null;
         gui.appendToConnectionLog("Synchronization #" + syncRequestNumber
             + " completed!");
     }
@@ -827,7 +949,7 @@ public final class Client implements IClient, IOracle, IVariant,
 
             // SCT will then end the loop and do the dispose.
             // So nothing else to do any more here in EDT.
-            connection.stopSocketClientThread();
+            connection.stopSocketClientThread(true);
         }
         else
         {
@@ -839,7 +961,7 @@ public final class Client implements IClient, IOracle, IVariant,
     }
 
     // used from server, when game is over and server closes all sockets
-    public synchronized void disposeClientHandler()
+    public synchronized void disposeClient()
     {
         if (gotDisposeAlready)
         {
@@ -941,7 +1063,7 @@ public final class Client implements IClient, IOracle, IVariant,
             // give it some time...
             WhatNextManager.sleepFor(1000);
             LOGGER.info("Initiating automatic reconnect!");
-            tryReconnect(true);
+            fireOneReconnectRunnable(true);
             close = false;
         }
         return close;
@@ -2721,8 +2843,13 @@ public final class Client implements IClient, IOracle, IVariant,
             }
         }
 
-        gui.setMovePending(mover, mover.getCurrentHex(), hex);
-        server.doMove(mover, hex, entrySide, teleport, teleportingLord);
+        // if disconnected, prevent this one, since it would mess up things
+        // (e.g. pending move tracking)
+        if (ensureThatConnected())
+        {
+            gui.setMovePending(mover, mover.getCurrentHex(), hex);
+            server.doMove(mover, hex, entrySide, teleport, teleportingLord);
+        }
         return true;
     }
 
@@ -3313,8 +3440,7 @@ public final class Client implements IClient, IOracle, IVariant,
         // Enforce only one split on turn 1.
         if (getTurnNumber() == 1 && numSplitsThisTurn > 0)
         {
-            gui
-                .showMessageDialogAndWait("Can only split once on the first turn");
+            gui.showMessageDialogAndWait("Can only split once on the first turn");
             kickSplit();
             return;
         }
