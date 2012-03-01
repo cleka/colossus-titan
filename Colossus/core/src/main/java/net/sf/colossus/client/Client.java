@@ -669,6 +669,7 @@ public final class Client implements IClient, IOracle, IVariant,
         LOGGER.info("Synchronization #" + syncRequestNumber + " completed!");
         lastMsgNr = -1;
         previousConn = null;
+        gui.actOnReconnectCompleted();
         gui.appendToConnectionLog("Synchronization #" + syncRequestNumber
             + " completed!");
     }

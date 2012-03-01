@@ -42,6 +42,7 @@ import net.sf.colossus.game.BattleUnit;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
+import net.sf.colossus.game.Phase;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.Proposal;
@@ -2048,6 +2049,15 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         // Creates or make visible, if needed:
         options.setOption(Options.showConnectionLogWindow, true);
         connectionLogWindow.append(s);
+    }
+
+    public void actOnReconnectCompleted()
+    {
+        if (getGame().isPhase(Phase.MOVE))
+        {
+            pendingMoves.clear();
+            board.highlightUnmovedLegions();
+        }
     }
 
     // TODO why is syncCheckBoxes is called to sync *all* checkboxes in each

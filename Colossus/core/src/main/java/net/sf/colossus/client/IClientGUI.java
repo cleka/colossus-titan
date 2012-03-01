@@ -320,6 +320,8 @@ public interface IClientGUI
 
     public abstract void appendToConnectionLog(String s);
 
+    public abstract void actOnReconnectCompleted();
+
     // At least the following two are from gui package classes,
     // not from Client directly.
 
