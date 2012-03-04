@@ -961,6 +961,8 @@ public final class Server extends Thread implements IServer
      */
     void queueClientHandlerForChannelChanges(ClientHandler ch)
     {
+        LOGGER.info("Putting CH " + ch.getSignonName()
+            + " to channelChanges list");
         if (currentThread().equals(this))
         {
             // OK, activity which is originated by client, so we will
@@ -1316,9 +1318,8 @@ public final class Server extends Thread implements IServer
             player = game.getPlayerByNameIgnoreNull(playerName);
         }
 
-        LOGGER
-            .info("Trying to identify player/client for new connection which identifies itself as player "
-                + playerName);
+        LOGGER.info("Trying to identify player/client for new connection "
+            + "which identifies itself as player " + playerName);
         String name = "<undefined>";
         if (player == null && playerName.equalsIgnoreCase("spectator"))
         {
@@ -1345,10 +1346,11 @@ public final class Server extends Thread implements IServer
             {
                 othersTellReconnectOngoing(existingCH);
                 isReconnect = true;
-                LOGGER.info("All right, reconnection of disconnected player!");
+                LOGGER.info("All right, reconnection of known player!");
                 ((ClientHandler)client).cloneRedoQueue(existingCH);
                 playerToClientMap.remove(player);
                 clients.remove(existingCH);
+                queueClientHandlerForChannelChanges(existingCH);
                 existingCH.declareObsolete();
                 LOGGER.info("Removing player with name " + player.getName()
                     + " from forcedWithDrawlist. Size was "
@@ -1517,20 +1519,6 @@ public final class Server extends Thread implements IServer
         synchronized (wfptjSemaphor)
         {
             waitingForPlayersToJoin = count;
-        }
-    }
-
-    /**
-     *  Decrement the number of players we wait for to join by one in a
-     *  thread-safe way, and return the new value.
-     *
-     *  @return The number of players that still need to join
-     */
-    private int decrementWaitingForPlayersToJoin()
-    {
-        synchronized (wfptjSemaphor)
-        {
-            return --waitingForPlayersToJoin;
         }
     }
 
@@ -3598,7 +3586,19 @@ public final class Server extends Thread implements IServer
     {
         // @TODO: move to outside Select loop
         //   => notify main thread to do this?
-        int stillMissing = decrementWaitingForPlayersToJoin();
+        /**
+         *  Decrement the number of players we wait for to join by one in a
+         *  thread-safe way, and return the new value.
+         *
+         *  @return The number of players that still need to join
+         */
+        int stillMissing;
+        synchronized (wfptjSemaphor)
+        {
+            --waitingForPlayersToJoin;
+            stillMissing = waitingForPlayersToJoin;
+        }
+
         if (stillMissing == 0)
         {
             LOGGER

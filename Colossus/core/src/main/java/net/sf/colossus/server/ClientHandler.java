@@ -626,6 +626,7 @@ final class ClientHandler implements IClient
                     + "' is currently not supported!");
                 return;
             }
+            LOGGER.info("Received joinGame from client " + signonName);
             setPlayerName(signonName);
             server.joinGame(signonName);
         }
@@ -1033,6 +1034,8 @@ final class ClientHandler implements IClient
 
     /**
      * Server side disposes a client (and informs it about it first)
+     * To be used only for "disposeAllClients()", otherwise setIsGone
+     * reason is misleading.
      */
     public void disposeClient()
     {
@@ -1042,7 +1045,7 @@ final class ClientHandler implements IClient
             return;
         }
 
-        setIsGone("Server disposes client");
+        setIsGone("Server disposes client (all clients)");
         sendViaChannel(Constants.dispose);
         server.queueClientHandlerForChannelChanges(this);
         server.clientWontConfirmCatchup(this,
@@ -1508,6 +1511,7 @@ final class ClientHandler implements IClient
     public void declareObsolete()
     {
         obsolete = true;
+        setIsGone("declared obsolete by server");
         LOGGER.warning("ClientHandler for " + getPlayerName()
             + " declared obsolete.... -- but that's not fully implemented!");
     }
