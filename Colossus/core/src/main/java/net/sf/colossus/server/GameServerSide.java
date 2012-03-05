@@ -2578,6 +2578,10 @@ public class GameServerSide extends Game
     /** Used only for pre-battle attacker concession. */
     void doNotConcede(Legion legion)
     {
+        if (isGameOver())
+        {
+            return;
+        }
         engage3(legion.getCurrentHex());
     }
 
