@@ -2492,6 +2492,12 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void actOnSetupBattleMove()
     {
+        // needed/better to do here, than when finishing a battle turn,
+        // for two reasons: 1) done with moves quickly after a move (before
+        // server response received and handled) move would/might get into
+        // stack again, and worse, 2) concede during battle undoStack remained
+        // with content as well, causing "Undo battle move errors" (#3497085)
+        clearUndoStack();
         if (battleBoard != null)
         {
             battleBoard.updatePhaseAndTurn();
