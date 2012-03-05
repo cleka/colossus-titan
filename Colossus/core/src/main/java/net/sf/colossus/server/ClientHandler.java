@@ -991,8 +991,8 @@ final class ClientHandler implements IClient
             // do not send any more
             if (cantSendMessageRepeated < 3)
             {
-                int flags = (isGone ? 1 : 0) & (obsolete ? 2 : 0)
-                    & (socketChannel == null ? 4 : 0);
+                int flags = (isGone ? 1 : 0) | (obsolete ? 2 : 0)
+                    | (socketChannel == null ? 4 : 0);
                 LOGGER.info("Attempt to send to player " + playerName
                     + " when client connection already gone (reason: " + flags
                     + ")- message: "
