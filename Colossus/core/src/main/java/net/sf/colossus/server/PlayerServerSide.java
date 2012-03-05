@@ -389,7 +389,7 @@ public final class PlayerServerSide extends Player implements
         CreatureType recruit = ((LegionServerSide)legion).getRecruit();
         if (recruit == null)
         {
-            LOGGER.log(Level.SEVERE,
+            LOGGER.log(Level.WARNING,
                 "Player.undoRecruit: Nothing to unrecruit for legion "
                     + legion.getMarkerId());
             LOGGER.info(getGame().getServer().processingCH
