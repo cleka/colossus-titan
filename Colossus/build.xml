@@ -429,7 +429,7 @@
       <arg line="-a --chmod=ug=rw,o=r libs/jdom.jar ${SERVER}:${HTML_DIR}/public-build/libs/jdom.jar" />
     </exec>
     <exec executable="rsync">
-      <arg line="-a --chmod=ug=rw,o=r docs/* ${SERVER}:${HTML_DIR}/public-build/docs/" />
+      <arg line="-a --chmod=ug=rw,o=r docs/ ${SERVER}:${HTML_DIR}/public-build/docs/" />
     </exec>
     <!--- TODO how to do this for the two other builds, or do at all? 
                    Or use the download feature on SF site instead? -->
@@ -453,7 +453,7 @@
       <arg line="-a --chmod=ug=rw,o=r libs/jdom.jar ${SERVER}:${HTML_DIR}/public-testing/libs/jdom.jar" />
     </exec>
     <exec executable="rsync">
-      <arg line="-a --chmod=ug=rw,o=r docs/* ${SERVER}:${HTML_DIR}/public-testing/docs/" />
+      <arg line="-a --chmod=ug=rw,o=r docs/ ${SERVER}:${HTML_DIR}/public-testing/docs/" />
     </exec>
     <exec executable="rsync">
       <arg line="-a --chmod=ug=rw,o=r ${ZIPFILE} ${SERVER}:${HTML_DIR}/public-testing/${ZIPFILE}" />

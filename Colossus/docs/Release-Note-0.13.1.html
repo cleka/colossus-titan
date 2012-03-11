@@ -4,15 +4,19 @@
 <head>
     <meta name="generator"
     content="HTML Tidy for Linux/x86 (vers 1st July 2002), see www.w3.org" />
-    <title>Colossus: Release Note for 0.13.1pretest2b</title>
+    <title>Colossus: Release Note for 0.13.1</title>
 </head>
 <body>
 
-<h1>February 29, 2012: Public Test Build 0.13.1pretest2b from r5110M</h1>
+<h1>March 11, 2012: Release 0.13.1 from r5121</h1>
 <p/>
-Further work on reconnect functionality and other improvements 
-<i>From pretest2 to pretest2b only fixed the 2 seconds delay for battle moves (relict from debugging/development tests)</i>
+Further work on reconnect functionality and other improvements.<br>
+
+<i>(almost all of it was already in effect in the Public Test Builds)</i> 
 <ul>
+
+<li>Fixed 3497085: Undo battle move errors</li>
+<li>Implemented FR 3494746: Show board for AI-only games also (when GUI-started)</li>
 <li>When user clicked Start Game, give visual feedback and disable cancel+unenroll to everybody</li>
 <li>As soon as game is activated, disable Enroll button for other players</li>
 <li>In StartGame, ignore case if passed-with user name has case difference compared to "official" user's name.</li>
@@ -33,7 +37,7 @@ Further work on reconnect functionality and other improvements
     (intermediately, to allow reconnect, server socket kept accepting always, which can cause trouble
     when playing locally several games after each other, and previous one keeps hogging the socket)</li>
 </ul>
-<p />
 
+<p />
 </body>
 </html>

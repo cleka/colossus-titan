@@ -30,10 +30,9 @@ public final class WelcomeDialog extends KFrame
 
     private final static String CURRENT_WELCOME_KEY = "0.13.1";
 
-//    private final static String baseUrl = "http://sourceforge.net/projects/colossus/files";
-    //    private final static String colossusReleaseNoteUrl = baseUrl + "/Release-0.13.1";
-
-    private final static String colossusTestbuildRCDUrl = "http://colossus.sourceforge.net/public-testing/docs/RecentChangesDetails.html";
+    private final static String baseUrl = "http://sourceforge.net/projects/colossus/files";
+    private final static String colossusReleaseNoteUrl = baseUrl
+        + "/Release-0.13.1";
 
     private static WelcomeDialog showWelcome = null;
 
@@ -50,7 +49,7 @@ public final class WelcomeDialog extends KFrame
             + "\n"
             + "  For a more detailed list of changes see the Recent Changes Details document "
             + "in the test build section of Colossus home page:\n      "
-            + colossusTestbuildRCDUrl
+            + colossusReleaseNoteUrl
             + "\n\n"
             + "  Use button below to copy the URL to your clipboard to paste it "
             + "into your browser.\n\n"
@@ -71,7 +70,7 @@ public final class WelcomeDialog extends KFrame
         {
             public void actionPerformed(ActionEvent e)
             {
-                ErrorUtils.copyToClipboard(colossusTestbuildRCDUrl);
+                ErrorUtils.copyToClipboard(colossusReleaseNoteUrl);
 
                 JOptionPane.showMessageDialog(WelcomeDialog.this,
                     "URL has been copied to your clipboard.", "URL copied!",
