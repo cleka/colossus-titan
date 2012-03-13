@@ -31,8 +31,8 @@ import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.UIManager;
-import javax.swing.WindowConstants;
 import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -199,7 +199,10 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
         addCheckBox(playerMenu, Options.autoPlay, KeyEvent.VK_P);
         */
         JPanel apPane = new JPanel(new GridBagLayout());
-        tabbedPane.addTab("Autoplay", apPane);
+        if (!gui.getClient().isSpectator())
+        {
+            tabbedPane.addTab("Autoplay", apPane);
+        }
         addCheckBox(apPane, Options.autoPickColor);
         addCheckBox(apPane, Options.autoPickMarker);
         addCheckBox(apPane, Options.autoPickEntrySide);
@@ -304,7 +307,10 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
         windowPane.add(new JPanel(), FILL_CONSTRAINTS);
 
         JPanel nextPane = new JPanel(new GridBagLayout());
-        tabbedPane.addTab("Next key", nextPane);
+        if (!gui.getClient().isSpectator())
+        {
+            tabbedPane.addTab("Next key", nextPane);
+        }
         addCheckBox(nextPane, Options.nextMove, true, true);
         addCheckBox(nextPane, Options.nextMuster, true, true);
         addCheckBox(nextPane, Options.nextSplitAllSplitable, true, true);
@@ -323,7 +329,10 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
             Options.nextSplitRightClick, "", nextSplitCur);
 
         JPanel confirmationPane = new JPanel(new GridBagLayout());
-        tabbedPane.addTab("Confirmations", confirmationPane);
+        if (!gui.getClient().isSpectator())
+        {
+            tabbedPane.addTab("Confirmations", confirmationPane);
+        }
         addCheckBox(confirmationPane, Options.confirmNoRecruit, true, true);
         addCheckBox(confirmationPane, Options.confirmNoSplit, true, true);
         ButtonGroup moveButtonGroup = new ButtonGroup();

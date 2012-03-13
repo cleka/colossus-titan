@@ -184,6 +184,8 @@ public final class Client implements IClient, IOracle, IVariant,
 
     private final Server localServer;
 
+    private final boolean spectator;
+
     /**
      * Constants modelling the party who closed this client.
      */
@@ -243,13 +245,14 @@ public final class Client implements IClient, IOracle, IVariant,
      * @param noOptionsFile E.g. AIs should not read/save any options file
      * @param createGUI Whether to create a GUI (AI's usually not, but server
      *                  might override that e.g. in stresstest)
+     * @param spectator true to join as spectator, false as real player
      *
      */
 
     public static synchronized Client createClient(String host, int port,
         String playerName, String playerType, WhatNextManager whatNextMgr,
         Server theServer, boolean byWebClient, boolean noOptionsFile,
-        boolean createGUI) throws ConnectionInitException
+        boolean createGUI, boolean spectator) throws ConnectionInitException
     {
         /* TODO Clients on same machine could share the instance
          * (proper synchronization needed, of course).
@@ -270,7 +273,7 @@ public final class Client implements IClient, IOracle, IVariant,
         }
 
         IServerConnection conn = SocketClientThread.createConnection(host,
-            port, playerName, remote);
+            port, playerName, remote, spectator);
 
         // TODO For now, loading the variant is needed only if remote client.
         // One day in future, every client should perhaps do this to get his
@@ -288,7 +291,7 @@ public final class Client implements IClient, IOracle, IVariant,
         }
 
         return new Client(playerName, playerType, whatNextMgr, theServer,
-            byWebClient, noOptionsFile, createGUI, loader, conn, variant);
+            byWebClient, noOptionsFile, createGUI, loader, conn, variant, spectator);
     }
 
     /**
@@ -309,6 +312,7 @@ public final class Client implements IClient, IOracle, IVariant,
      *                  load images, files etc (from disk or from server)
      * @param conn      The connection to server (so far, SocketClientThread)
      * @param variant The variant instance
+     * @param spectator true to join as spectator, false as real player
      */
 
     /* TODO Now Client creates the Game (GameClientSide) instance.
@@ -329,9 +333,10 @@ public final class Client implements IClient, IOracle, IVariant,
     public Client(String playerName, String playerType,
         WhatNextManager whatNextMgr, Server theServer, boolean byWebClient,
         boolean noOptionsFile, boolean createGUI, ResourceLoader resLoader,
-        IServerConnection conn, Variant variant)
+        IServerConnection conn, Variant variant, boolean spectator)
     {
         assert playerName != null;
+        this.spectator = spectator;
 
         Collection<String> playerNamesList = conn.getPreliminaryPlayerNames();
 
@@ -401,7 +406,10 @@ public final class Client implements IClient, IOracle, IVariant,
         options.setOption(Options.autoPlay, this.owningPlayer.isAI());
 
         this.server = connection.getIServer();
-        server.joinGame(playerName);
+        if (!spectator)
+        {
+            server.joinGame(playerName);
+        }
 
         TerrainRecruitLoader.setCaretaker(getGame().getCaretaker());
         CustomRecruitBase.addCaretakerClientSide(getGame().getCaretaker());
@@ -417,6 +425,11 @@ public final class Client implements IClient, IOracle, IVariant,
     public boolean isRemote()
     {
         return (localServer == null);
+    }
+
+    public boolean isSpectator()
+    {
+        return spectator;
     }
 
     // TODO can this be replaced with "!owningPlayer.isDead()" ?
@@ -903,7 +916,14 @@ public final class Client implements IClient, IOracle, IVariant,
         if (playersNotInitialized)
         {
             String searchName = this.owningPlayer.getName();
-            this.owningPlayer = game.initPlayerInfo(infoStrings, searchName);
+            PlayerClientSide foundPlayer = game.initPlayerInfo(infoStrings,
+                searchName);
+            if (!spectator)
+            {
+                // returns null if not found, prevent the dummy player
+                // initialized to it to be overwritten with null
+                this.owningPlayer = foundPlayer;
+            }
             playersNotInitialized = false;
         }
         game.updatePlayerInfo(infoStrings);
@@ -3372,12 +3392,12 @@ public final class Client implements IClient, IOracle, IVariant,
 
     public boolean isMyLegion(Legion legion)
     {
-        return owningPlayer.equals(legion.getPlayer());
+        return !spectator && owningPlayer.equals(legion.getPlayer());
     }
 
     public boolean isMyTurn()
     {
-        return owningPlayer.equals(getActivePlayer());
+        return !spectator && owningPlayer.equals(getActivePlayer());
     }
 
     public boolean isMyBattlePhase()

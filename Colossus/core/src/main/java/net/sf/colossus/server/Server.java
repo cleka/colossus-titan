@@ -1224,6 +1224,32 @@ public final class Server extends Thread implements IServer
     }
 
     /**
+     * Might be a player or a spectator
+     * @param name Name of the player/client/spectator for
+     * which ClientHandler/IClient is needed
+     */
+    public IClient getClientByName(String name)
+    {
+        for (IClient c : clients)
+        {
+            ClientHandler ch = (ClientHandler)c;
+            if (ch.getClientName().equals(name))
+            {
+                return c;
+            }
+        }
+        for (IClient c : spectatorClients)
+        {
+            ClientHandler ch = (ClientHandler)c;
+            if (ch.getClientName().equals(name))
+            {
+                return c;
+            }
+        }
+        return null;
+    }
+
+    /**
      * returns true if the active player is the player owning the connection
      * from which data is currently processed
      */
@@ -1251,15 +1277,17 @@ public final class Server extends Thread implements IServer
      * @param playerName
      * @param remote
      * @param clientVersion
+     * @param spectator
      * @return Reason why adding Client was refused, null if all is fine.
      */
     String addClient(final IClient client, final String playerName,
-        final boolean remote, final int clientVersion, String buildInfo)
+        final boolean remote, final int clientVersion, String buildInfo, boolean spectator)
     {
         boolean isReconnect = false;
 
         LOGGER.info("Server.addClient() called with: " + "playerName: '"
-            + playerName + "', remote: '" + remote + "', client version '"
+            + playerName + "', remote: " + remote + ", spectator: "
+            + spectator + ", client version '"
             + clientVersion + "', client build info: '" + buildInfo + "'");
         if (!buildInfo.equals(BuildInfo.getFullBuildInfoString()))
         {
@@ -1301,7 +1329,7 @@ public final class Server extends Thread implements IServer
         }
 
         Player player = null;
-        if (playerName.equalsIgnoreCase("spectator"))
+        if (spectator)
         {
             LOGGER.info("addClient for a spectator.");
         }
@@ -1321,11 +1349,11 @@ public final class Server extends Thread implements IServer
         LOGGER.info("Trying to identify player/client for new connection "
             + "which identifies itself as player " + playerName);
         String name = "<undefined>";
-        if (player == null && playerName.equalsIgnoreCase("spectator"))
+        if (spectator)
         {
             ++spectators;
-            name = "spectator_" + spectators;
-            LOGGER.info("Adding spectator " + name);
+            name = playerName;
+            LOGGER.info("Adding spectator " + playerName);
         }
         else if (player == null)
         {
@@ -1341,8 +1369,8 @@ public final class Server extends Thread implements IServer
          */
         else if (isReconnectAttempt(player))
         {
-            ClientHandler existingCH = (ClientHandler)playerToClientMap.get(player);
-            if (existingCH != null && existingCH.getPlayerName().equals(player.getName()))
+            ClientHandler existingCH = (ClientHandler)getClientByName(playerName);
+            if (existingCH != null)
             {
                 othersTellReconnectOngoing(existingCH);
                 isReconnect = true;
@@ -2833,7 +2861,8 @@ public final class Server extends Thread implements IServer
 
     public boolean isWithdrawalIrrelevant()
     {
-        return (obsolete || game == null || game.isGameOver());
+        return (obsolete || game == null || game.isGameOver() || processingCH
+            .isSpectator());
     }
 
     /** Withdraw the player for which data was currently processed on socket
@@ -2841,19 +2870,31 @@ public final class Server extends Thread implements IServer
      */
     public void withdrawFromGame()
     {
+        LOGGER.info("Withdrawal for processing client "
+            + processingCH.getClientName() + " requested.");
+
         if (isWithdrawalIrrelevant())
         {
+            LOGGER.finest("No need for withdraw - game over etc.");
             return;
         }
 
-        // spectators or rejected clients:
-        if (getPlayerName() == null || getPlayerName().startsWith("spectator"))
+        // spectators or rejected clients: (can this still happen? Rejects?)
+        if (getPlayerName() == null)
         {
             return;
         }
 
         Player player = getPlayer();
-        game.handlePlayerWithdrawal(player);
+        if (player == null)
+        {
+            LOGGER.severe("Got null player for playerName '" + getPlayerName()
+                + "' - skipping handlePlayerWithdrawal.");
+        }
+        else
+        {
+            game.handlePlayerWithdrawal(player);
+        }
     }
 
     /** Withdraw a specific player of which we know only the name; e.g.
@@ -2866,14 +2907,14 @@ public final class Server extends Thread implements IServer
         LOGGER.info("Withdrawal for specific player " + playerName
             + " requested.");
 
-        if (obsolete || game == null || game.isGameOver())
+        if (isWithdrawalIrrelevant())
         {
             LOGGER.finest("No need for withdraw - game over etc.");
             return;
         }
 
-        // spectators or rejected clients:
-        if (playerName == null || playerName.startsWith("spectator"))
+        // spectators or rejected clients: (can this still happen? Rejects?)
+        if (playerName == null)
         {
             LOGGER.finest("No need for withdraw - null player or spectator.");
             return;
@@ -2889,7 +2930,7 @@ public final class Server extends Thread implements IServer
         else
         {
             LOGGER.warning("Can't do game.handlePlayerWithdrawal for "
-                + playerName + " because getPlayerName gave null player!");
+                + playerName + " because getPlayerByName gave null player!");
         }
     }
 
@@ -3298,7 +3339,7 @@ public final class Server extends Thread implements IServer
      */
     public void clientWontConfirmCatchup(ClientHandler ch, String reason)
     {
-        String playerName = ch.getPlayerName();
+        String clientName = ch.getClientName();
 
         synchronized (waitingToCatchup)
         {
@@ -3306,7 +3347,7 @@ public final class Server extends Thread implements IServer
             {
                 waitingToCatchup.remove(ch);
                 int remaining = waitingToCatchup.size();
-                LOGGER.info("Client " + playerName
+                LOGGER.info("Client " + clientName
                     + " won't confirm catch-up (" + reason + "). Remaining: "
                     + remaining);
                 if (remaining <= 0)
@@ -3320,7 +3361,7 @@ public final class Server extends Thread implements IServer
     public void clientConfirmedCatchup()
     {
         ClientHandler ch = processingCH;
-        String playerName = ch.getPlayerName();
+        String clientName = ch.getClientName();
 
         synchronized (waitingToCatchup)
         {
@@ -3330,12 +3371,12 @@ public final class Server extends Thread implements IServer
             }
             else
             {
-                LOGGER.warning("Client for " + playerName
+                LOGGER.warning("Client for " + clientName
                     + " not found from waitingForCatchup list!");
             }
 
             int remaining = waitingToCatchup.size();
-            LOGGER.info("Client " + playerName + " confirmed catch-up. "
+            LOGGER.info("Client " + clientName + " confirmed catch-up. "
                 + "Remaining: " + remaining);
             if (remaining <= 0)
             {

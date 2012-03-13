@@ -77,7 +77,9 @@ public class NetworkClientDialog extends KFrame
 
         Container panel = getContentPane();
 
-        panel.add(new JLabel("Player name"));
+        panel.add(new JLabel(
+            stOptions.getOption(Options.runSpectatorClient) ? "Spectator name"
+                : "Player name"));
         Set<String> nameChoices = new TreeSet<String>();
         nameChoices.add(playerName);
         nameChoices.add(Constants.username);

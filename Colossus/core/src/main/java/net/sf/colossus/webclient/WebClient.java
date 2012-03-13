@@ -2824,7 +2824,7 @@ public class WebClient extends KFrame implements IWebClient
             boolean noOptionsFile = false;
 
             gc = Client.createClient(hostingHost, p, username, type,
-                whatNextManager, localServer, true, noOptionsFile, true);
+                whatNextManager, localServer, true, noOptionsFile, true, false);
 
             // Right now this waitingText is probably directly overwritten by
             // updateGUI putting there again the startingText (started by player ...)

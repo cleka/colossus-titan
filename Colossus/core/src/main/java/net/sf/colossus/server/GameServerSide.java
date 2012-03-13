@@ -381,7 +381,7 @@ public class GameServerSide extends Game
         {
             Client c = Client.createClient("127.0.0.1", getPort(), playerName,
                 type,
-                whatNextManager, server, false, dontUseOptionsFile, createGUI);
+                whatNextManager, server, false, dontUseOptionsFile, createGUI, false);
             storeLocalClient(playerName, c);
         }
         catch (ConnectionInitException e)
@@ -1007,9 +1007,11 @@ public class GameServerSide extends Game
     }
 
     /**
-     * Resolve playerName into Player object.
-     * Name must not be null. If no player for given name found,
-     * it would throw IllegalArgumentException
+     * Resolve playerName into Player object. Name must not be null.
+     *
+     * If no player for given name found, it would throw IllegalArgumentException
+     * (well, did earlier, at the moment (03/2012) replace with SEVERE error;
+     * exception would totally throw server thread out of the orbit...)
      * @param playerName
      * @return Player object for given name.
      */
@@ -1024,8 +1026,12 @@ public class GameServerSide extends Game
                 return player;
             }
         }
+        LOGGER.severe("No player object found for name " + playerName + "'");
+        return null;
+        /*
         throw new IllegalArgumentException("No player object found for name '"
             + playerName + "'");
+        */
     }
 
     /**

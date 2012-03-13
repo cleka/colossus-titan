@@ -38,6 +38,8 @@ public final class Options implements IOptions
     public static final String runClientPlayer = "Network client playername";
     public static final String runClientHost = "Network client hostname";
     public static final String runClientPort = "Network client port";
+    public static final String runSpectatorClient = "Spectator client";
+
     public static final String loadGameFileName = "Load game file name";
     public static final String webFlagFileName = "Web game flag file";
     public static final String serveAtPort = "Run server on port";

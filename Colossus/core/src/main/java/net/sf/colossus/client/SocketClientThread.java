@@ -67,6 +67,7 @@ final class SocketClientThread extends Thread implements IServer,
     private int port;
     private String playerName;
     private boolean remote;
+    private boolean spectator;
 
     private final static String sep = Constants.protocolTermSeparator;
 
@@ -82,10 +83,11 @@ final class SocketClientThread extends Thread implements IServer,
     private int ownMessageCounter = -1;
 
     public static SocketClientThread createConnection(String host, int port,
-        String playerName, boolean remote) throws ConnectionInitException
+        String playerName, boolean remote, boolean spectator)
+        throws ConnectionInitException
     {
         SocketClientThread conn = new SocketClientThread(host, port,
-            playerName, remote);
+            playerName, remote, spectator);
 
         String reasonFail = conn.getReasonFail();
         if (reasonFail != null)
@@ -114,12 +116,13 @@ final class SocketClientThread extends Thread implements IServer,
         int port = previousConnection.port;
         String playerName = previousConnection.playerName;
         boolean remote = previousConnection.remote;
+        boolean spectator = previousConnection.spectator;
 
         LOGGER.info("SCT: trying recreateConnection to host " + host
             + " at port " + port + ".");
 
         SocketClientThread newConn = new SocketClientThread(host, port,
-            playerName, remote);
+            playerName, remote, spectator);
         String reasonFail = newConn.getReasonFail();
         if (reasonFail != null)
         {
@@ -138,7 +141,7 @@ final class SocketClientThread extends Thread implements IServer,
     }
 
     SocketClientThread(String host, int port, String initialName,
-        boolean isRemote)
+        boolean isRemote, boolean spectator)
     {
         super("Client " + initialName);
 
@@ -146,6 +149,7 @@ final class SocketClientThread extends Thread implements IServer,
         this.port = port;
         this.playerName = initialName;
         this.remote = isRemote;
+        this.spectator = spectator;
 
         InstanceTracker.register(this, "SCT " + initialName);
 
@@ -176,8 +180,8 @@ final class SocketClientThread extends Thread implements IServer,
 
             task = "Sending signOn message";
             LOGGER.log(Level.FINEST, "Next: " + task);
-            signOn(initialName, isRemote, IServer.CLIENT_VERSION, BuildInfo
-                .getFullBuildInfoString());
+            signOn(initialName, isRemote, IServer.CLIENT_VERSION,
+                BuildInfo.getFullBuildInfoString(), spectator);
 
             String line;
             task = "Waiting for signOn acknowledge";
@@ -884,10 +888,10 @@ final class SocketClientThread extends Thread implements IServer,
 
     // Setup method
     private void signOn(String loginName, boolean isRemote, int version,
-        String buildInfo)
+        String buildInfo, boolean spectator)
     {
         out.println(Constants.signOn + sep + loginName + sep + isRemote + sep
-            + version + sep + buildInfo);
+            + version + sep + buildInfo + sep + spectator);
     }
 
     // Setup method

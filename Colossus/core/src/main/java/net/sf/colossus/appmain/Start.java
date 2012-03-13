@@ -130,6 +130,8 @@ public final class Start
             opts.addOption('d', "delay", true, "AI delay in ms");
             opts.addOption('t', "timelimit", true, "AI time limit in s");
             opts.addOption('c', "client", false, "Run network client instead");
+            opts.addOption('C', "spectatorclient", false,
+                "Run network spectator client");
             opts.addOption('w', "webclient", false, "Run web client instead");
             opts.addOption('F', "flagfile", true,
                 "Create flagfile when socket up");
@@ -187,7 +189,7 @@ public final class Start
         {
             hostname = cl.getOptValue('s');
         }
-        else if (cl.optIsSet('g') && cl.optIsSet('c'))
+        else if (cl.optIsSet('g') && (cl.optIsSet('c') || cl.optIsSet('C')))
         {
             // Host empty means for NetworkClientDialog: no command line wish given
             //  => it will initialize host name box based on mostly LRU list.
@@ -211,6 +213,11 @@ public final class Start
         }
         startOptions.setOption(Options.runClientHost, hostname);
         startOptions.setOption(Options.webServerHost, hostname);
+
+        if (cl.optIsSet('C'))
+        {
+            startOptions.setOption(Options.runSpectatorClient, true);
+        }
 
         // Ports (both serves-at-port and client-connects-to-port):
         // take from cf file (not set: defaultPort), overridable from cmdline
@@ -283,7 +290,7 @@ public final class Start
 
         else if (cl.optIsSet('g'))
         {
-            if (cl.optIsSet('c'))
+            if (cl.optIsSet('c') || cl.optIsSet('C'))
             {
                 whatNextManager.setWhatToDoNext(WhatToDoNext.START_NET_CLIENT,
                     false);
@@ -301,7 +308,7 @@ public final class Start
         }
         else
         {
-            if (cl.optIsSet('c'))
+            if (cl.optIsSet('c') || cl.optIsSet('C'))
             {
                 whatNextManager.setWhatToDoNext(
                     WhatToDoNext.NET_CLIENT_DIALOG, false);
@@ -840,12 +847,13 @@ public final class Start
             .getStringOption(Options.runClientPlayer);
         String hostname = startOptions.getStringOption(Options.runClientHost);
         int port = startOptions.getIntOption(Options.runClientPort);
+        boolean spectator = startOptions.getOption(Options.runSpectatorClient);
 
         try
         {
             String type = Constants.aiPackage + Constants.network;
             Client.createClient(hostname, port, playerName, type,
-                whatNextManager, null, false, false, true);
+                whatNextManager, null, false, false, true, spectator);
         }
         catch (Exception e)
         {

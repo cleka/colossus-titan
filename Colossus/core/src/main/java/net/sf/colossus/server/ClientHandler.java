@@ -61,6 +61,7 @@ final class ClientHandler implements IClient
     private String playerName;
     private String signonName;
     private int clientVersion = 0;
+    private boolean spectator;
 
     private boolean isGone = false;
     private boolean didExplicitDisconnect = false;
@@ -136,9 +137,14 @@ final class ClientHandler implements IClient
 
     public void setIsGone(String reason)
     {
-        LOGGER.info("Setting isGone to true in CH for '" + getPlayerName()
+        LOGGER.info("Setting isGone to true in CH for '" + getClientName()
             + "' (reason: " + reason + ")");
         this.isGone = true;
+    }
+
+    public boolean isSpectator()
+    {
+        return spectator;
     }
 
     public boolean didExplicitDisconnect()
@@ -535,7 +541,7 @@ final class ClientHandler implements IClient
             {
                 setIsGone("IOException and reconnect not supported");
                 withdrawnAlready = true;
-                server.withdrawFromGame(playerName);
+                server.withdrawFromGame(spectator ? null : playerName);
                 server.queueClientHandlerForChannelChanges(this);
                 server.clientWontConfirmCatchup(this,
                     "IO Exception while writing to client " + playerName);
@@ -588,6 +594,7 @@ final class ClientHandler implements IClient
         {
             String signonTryName = args.remove(0);
             boolean remote = Boolean.valueOf(args.remove(0)).booleanValue();
+            this.spectator = false;
             String buildInfo;
             if (args.size() < 2)
             {
@@ -601,9 +608,15 @@ final class ClientHandler implements IClient
             {
                 clientVersion = Integer.parseInt(args.remove(0));
                 buildInfo = args.remove(0);
+                if (args.size() > 0)
+                {
+                    this.spectator = Boolean.valueOf(args.remove(0))
+                        .booleanValue();
+                }
             }
             String reasonFail = server.addClient(this, signonTryName, remote,
-                clientVersion, buildInfo);
+                clientVersion, buildInfo, spectator);
+
             if (reasonFail == null)
             {
                 sendToClient("Ack: signOn");
@@ -789,7 +802,7 @@ final class ClientHandler implements IClient
         else if (method.equals(Constants.withdrawFromGame))
         {
             LOGGER.info("Received explicit 'withdrawFromGame' request from "
-                + "Client " + getPlayerName()
+                + "Client " + getClientName()
                 + " - calling 'withdrawIfNeeded'.");
             withdrawIfNeeded(true);
         }
@@ -798,7 +811,7 @@ final class ClientHandler implements IClient
             didExplicitDisconnect = true;
             setIsGone("received explit 'disconnect' request from client");
             LOGGER.info("Received explicit 'disconnect' request from Client "
-                + getPlayerName() + " - calling 'withdrawIfNeeded'.");
+                + getClientName() + " - calling 'withdrawIfNeeded'.");
             withdrawIfNeeded(false);
             server.sendDisconnect();
         }
@@ -1194,11 +1207,19 @@ final class ClientHandler implements IClient
         return this.signonName;
     }
 
+    // silently choose whatever useful, mostly for logging
+    public String getClientName()
+    {
+        return playerName != null ? playerName
+            : (signonName != null ? signonName : "ClientNameNotSet");
+    }
+
     public String getPlayerName()
     {
         if (this.playerName == null)
         {
             LOGGER.warning("CH.playerName still null, returning signOnName '" + signonName + "'");
+            Thread.dumpStack();
             return this.signonName;
         }
         return this.playerName;

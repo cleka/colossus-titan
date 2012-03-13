@@ -664,6 +664,15 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
+                if (!client.isAlive())
+                {
+                    JOptionPane.showMessageDialog(masterFrame,
+                        "You can't withdraw, "
+                            + " because you are already dead!",
+                        "You're already dead, dummy!",
+                        JOptionPane.INFORMATION_MESSAGE);
+                    return;
+                }
                 String[] options = new String[2];
                 options[0] = "Yes";
                 options[1] = "No";
@@ -940,7 +949,8 @@ public final class MasterBoard extends JPanel
             public void actionPerformed(ActionEvent e)
             {
                 boolean closeBoard = false;
-                if (gui.getGame().isGameOver() || !client.isAlive())
+                if (gui.getGame().isGameOver() || !client.isAlive()
+                    || client.isSpectator())
                 {
                     closeBoard = true;
                 }
@@ -1300,8 +1310,11 @@ public final class MasterBoard extends JPanel
 
         phaseMenu.addSeparator();
 
-        mi = phaseMenu.add(withdrawFromGameAction);
-        mi.setMnemonic(KeyEvent.VK_W);
+        if (!client.isSpectator())
+        {
+            mi = phaseMenu.add(withdrawFromGameAction);
+            mi.setMnemonic(KeyEvent.VK_W);
+        }
 
         // Window menu: menu for the "window-related"
         // (satellite windows and graphic actions effecting whole "windows"),
