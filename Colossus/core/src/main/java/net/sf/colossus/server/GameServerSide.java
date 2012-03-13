@@ -336,6 +336,22 @@ public class GameServerSide extends Game
     {
         boolean atLeastOneBoardNeeded = whatNextManager.getStartOptions()
             .getOption(Options.FORCE_BOARD);
+
+        // if there is at least one human alive, no need to create board for
+        // an AI (makes difference if first player is set to AI and a later
+        // one as human...)
+        for (Player player : getPlayers())
+        {
+            // Note: endsWith needed, because the constant is only "Human",
+            // but the type is is the fully qualified class name!
+            if (player.getType().endsWith(Constants.human)
+                && !((PlayerServerSide)player).getDeadBeforeSave())
+            {
+                atLeastOneBoardNeeded = false;
+                break;
+            }
+        }
+
         for (Player player : getPlayers())
         {
             String type = player.getType();
