@@ -343,4 +343,6 @@ public interface IClientGUI
 
     public void setMoveCompleted(Legion mover, MasterHex current,
         MasterHex target);
+
+    public abstract void actOnHitsSet(BattleUnit targetUnit);
 }

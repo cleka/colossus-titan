@@ -2662,6 +2662,11 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         }
     }
 
+    public void actOnHitsSet(BattleUnit target)
+    {
+        battleBoard.actOnHitsSet(target.getCurrentHex());
+    }
+
     public void highlightCrittersWithTargets()
     {
         if (battleBoard != null)

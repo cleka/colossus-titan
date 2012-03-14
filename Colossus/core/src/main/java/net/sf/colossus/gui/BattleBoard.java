@@ -1066,6 +1066,21 @@ public final class BattleBoard extends KFrame
         battleMap.unselectHex(hex);
     }
 
+    public void actOnHitsSet(BattleHex battleHex)
+    {
+        // on the active client it will happen anyway due to highlight changes
+        if (!isMyBattleTurn())
+        {
+            repaintHex(battleHex);
+        }
+    }
+
+    private void repaintHex(BattleHex battleHex)
+    {
+        GUIBattleHex hex = battleMap.getGUIHexByModelHex(battleHex);
+        hex.repaint();
+    }
+
     public void addDiceResults(String strikerDesc, String targetDesc,
         int targetNumber, List<String> rolls)
     {

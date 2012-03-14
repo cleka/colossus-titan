@@ -629,6 +629,7 @@ public final class MasterBoard extends JPanel
                     // to enabled again
                     doneWithPhase();
                 }
+                focusBackToMasterboard();
             }
         };
         // will be enabled if it is player's turn
@@ -2150,8 +2151,38 @@ public final class MasterBoard extends JPanel
             });
     }
 
+    /*
+    private String getFocusOwnerText()
+    {
+        KeyboardFocusManager kfm = DefaultKeyboardFocusManager
+            .getCurrentKeyboardFocusManager();
+        if (kfm != null)
+        {
+            Component fo = kfm.getFocusOwner();
+            if (fo != null)
+            {
+                return fo.toString();
+            }
+        }
+        return "none";
+    }
+    */
+
+    public void focusBackToMasterboard()
+    {
+        /* Enforce focus back to MasterBoard. After pressing done itmight be
+         * in the bottom-panel (in particular the Pause button, it seems) and
+         *  masterboard doesn't get KeyEvents => legion flyouts don't work
+         */
+        // System.out.println("Fowcus owner WAS: " + getFocusOwnerText());
+        this.requestFocusInWindow();
+        // System.out.println("Fowcus owner NOW: " + getFocusOwnerText());
+    }
+
     void actOnMisclick()
     {
+        focusBackToMasterboard();
+
         Phase phase = gui.getGame().getPhase();
         if (phase == Phase.SPLIT)
         {
@@ -3224,6 +3255,7 @@ public final class MasterBoard extends JPanel
                 public void actionPerformed(ActionEvent e)
                 {
                     MasterBoard.this.bottomBar.toggleSuspend();
+                    focusBackToMasterboard();
                 }
             });
 

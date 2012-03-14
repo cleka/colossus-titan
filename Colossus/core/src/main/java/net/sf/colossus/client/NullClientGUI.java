@@ -846,4 +846,10 @@ public class NullClientGUI implements IClientGUI
         // TODO Auto-generated method stub
 
     }
+
+    public void actOnHitsSet(BattleUnit targetUnit)
+    {
+        // TODO Auto-generated method stub
+
+    }
 }

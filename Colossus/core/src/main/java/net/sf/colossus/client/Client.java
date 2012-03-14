@@ -1828,6 +1828,7 @@ public final class Client implements IClient, IOracle, IVariant,
                 if (damage != 0) // Can be negative if creature is being healed
                 {
                     targetCritter.setHits(targetUnit.getHits() + damage);
+                    gui.actOnHitsSet(targetUnit);
                 }
             }
         }
