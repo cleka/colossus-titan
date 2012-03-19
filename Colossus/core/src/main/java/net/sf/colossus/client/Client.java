@@ -1520,7 +1520,7 @@ public final class Client implements IClient, IOracle, IVariant,
         InstanceTracker.setId(this, "Client " + playerName);
         InstanceTracker.setId(ai, "AI: " + playerName);
 
-        connection.updateThreadName(playerName);
+        connection.updatePlayerName(playerName);
     }
 
     public void createSummonAngel(Legion legion)

@@ -83,11 +83,14 @@ final class SocketClientThread extends Thread implements IServer,
     private int ownMessageCounter = -1;
 
     public static SocketClientThread createConnection(String host, int port,
-        String playerName, boolean remote, boolean spectator)
+        String initialName, boolean remote, boolean spectator)
         throws ConnectionInitException
     {
+        LOGGER.info("SCT: trying recreateConnection to host " + host
+            + " at port " + port + " for playerName " + initialName);
+
         SocketClientThread conn = new SocketClientThread(host, port,
-            playerName, remote, spectator);
+            initialName, remote, spectator);
 
         String reasonFail = conn.getReasonFail();
         if (reasonFail != null)
@@ -114,12 +117,14 @@ final class SocketClientThread extends Thread implements IServer,
         SocketClientThread previousConnection = (SocketClientThread)prevConnection;
         String host = previousConnection.host;
         int port = previousConnection.port;
+        // Must already be the real name, not a "<bySomething>" any more
+        // - server won't recognize it.
         String playerName = previousConnection.playerName;
         boolean remote = previousConnection.remote;
         boolean spectator = previousConnection.spectator;
 
         LOGGER.info("SCT: trying recreateConnection to host " + host
-            + " at port " + port + ".");
+            + " at port " + port + " for playerName " + playerName);
 
         SocketClientThread newConn = new SocketClientThread(host, port,
             playerName, remote, spectator);
@@ -143,10 +148,13 @@ final class SocketClientThread extends Thread implements IServer,
     SocketClientThread(String host, int port, String initialName,
         boolean isRemote, boolean spectator)
     {
-        super("Client " + initialName);
+        super("SCT-" + initialName);
 
         this.host = host;
         this.port = port;
+        // Note: for a reconnect case we are given already the "real" name,
+        //       in first connect it will be replace as soon as server sends
+        //       us the setName().
         this.playerName = initialName;
         this.remote = isRemote;
         this.spectator = spectator;
@@ -245,7 +253,7 @@ final class SocketClientThread extends Thread implements IServer,
                 }
                 else
                 {
-                    LOGGER.warning("SCT " + getNameMaybe() + " got '" + line
+                    LOGGER.warning(getPrintName() + ": got '" + line
                         + "' but no use for it ...");
                 }
             }
@@ -409,7 +417,7 @@ final class SocketClientThread extends Thread implements IServer,
         }
         else
         {
-            LOGGER.warning("SCT for " + getNameMaybe()
+            LOGGER.warning(getPrintName()
                 + ": can't ask null disposedClientThread for it's queueLen!");
             return 0;
         }
@@ -528,9 +536,8 @@ final class SocketClientThread extends Thread implements IServer,
                 }
                 else
                 {
-                    LOGGER.warning("Client '"
-                        + getNameMaybe()
-                        + "' got empty message from server?");
+                    LOGGER.warning(getPrintName()
+                        + ": got empty message from server?");
                 }
             }
 
@@ -555,7 +562,7 @@ final class SocketClientThread extends Thread implements IServer,
         catch (VirtualMachineError vme)
         {
             String message = "Woooah! A Fatal JVM error was caught while "
-                + "processing in client " + getNameMaybe()
+                + "processing in " + getPrintName()
                 + " the input line:\n    === " + fromServer + " ===\n"
                 + "\nStack trace:\n" + ErrorUtils.makeStackTraceString(vme)
                 + "\n\nGame might be unstable or hang from now on...";
@@ -784,22 +791,21 @@ final class SocketClientThread extends Thread implements IServer,
             }
             if (messageNr == ownMessageCounter)
             {
-                LOGGER.finest("Client " + getNameMaybe()
-                    + " received commit point "
+                LOGGER.finest(getPrintName() + ": received commit point "
                     + commitPointNr + " msg Nr " + messageNr
                     + " own counter " + ownMessageCounter);
             }
             else
             {
-                LOGGER.warning("Client " + getNameMaybe()
-                    + " received commit point " + commitPointNr + " msg Nr "
+                LOGGER.warning(getPrintName() + ": received commit point "
+                    + commitPointNr + " msg Nr "
                     + messageNr + ", but own counter is " + ownMessageCounter
                     + " -adjusting.");
                 ownMessageCounter = messageNr;
             }
             if (abandoned)
             {
-                LOGGER.warning("Client " + getNameMaybe() + " already "
+                LOGGER.warning(getPrintName() + " already "
                     + "abandoned; suppressing confirmCommitPoint for CP# "
                     + commitPointNr);
             }
@@ -839,23 +845,19 @@ final class SocketClientThread extends Thread implements IServer,
         }
     }
 
-    private String getNameMaybe()
+    private String getPrintName()
     {
-        if (clientThread == null)
-        {
-            return getName();
-        }
-        else
-        {
-            return clientThread.getNameMaybe();
-        }
+        // at the moment, initially "SCT-<initialName>", e.g. SCT-<byName>,
+        // but as soon as server "fixed" our name it is SCT-<realPlayerName>
+        // e.g. SCT-katzer .
+        return getName();
     }
 
     private void sendToServer(String message)
     {
         if (socket != null)
         {
-            LOGGER.info("Message from SCT '" + getNameMaybe()
+            LOGGER.info("Message from '" + getPrintName()
                 + "' to server:" + message);
             out.println(message);
             clientThread.notifyUserIfGameIsPaused(message);
@@ -876,7 +878,7 @@ final class SocketClientThread extends Thread implements IServer,
             }
             else
             {
-                LOGGER.log(Level.WARNING, "SCT (" + getName() + ")"
+                LOGGER.log(Level.WARNING, getPrintName()
                     + ": Attempt to send message '" + message
                     + "' but the socket is closed and/or client already null"
                     + " and cant't inform any clientThread?");
@@ -900,12 +902,15 @@ final class SocketClientThread extends Thread implements IServer,
         out.println(Constants.requestGameInfo);
     }
 
-    /** Set the thread name to playerName */
-    public void updateThreadName(String playerName)
+    /* Server tells client changed name, Client calls us to keep in sync */
+    public void updatePlayerName(String playerName)
     {
-        setName("Client " + playerName);
-    }
+        // was initialized to initialName, which might have been "<bySomething>"
+        this.playerName = playerName;
 
+        // Set the thread name
+        setName("SCT-" + playerName);
+    }
 
     // IServer methods, called from client and sent over the
     // socket to the server.
@@ -1147,11 +1152,11 @@ final class SocketClientThread extends Thread implements IServer,
     {
         if (socket == null)
         {
-            LOGGER.info("Socket already null, can't fake disconnect...");
+            LOGGER.info(getPrintName()
+                + ": socket already null, can't fake disconnect...");
             return;
         }
-        LOGGER.fine("In SCT " + getNameMaybe()
-            + ": doing enforced disconnect!");
+        LOGGER.fine(getPrintName() + ": doing enforced disconnect!");
         try
         {
             appendToConnectionLog("Disconnecting (closing socket)...");
@@ -1166,9 +1171,8 @@ final class SocketClientThread extends Thread implements IServer,
         }
         catch (IOException e)
         {
-            LOGGER
-                .warning("Hm, did fake disconnect and this time got IOException?");
+            LOGGER.warning(getPrintName()
+                + ": hm, did fake disconnect and this time got IOException?");
         }
     }
-
 }

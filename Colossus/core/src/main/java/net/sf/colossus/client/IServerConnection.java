@@ -26,7 +26,7 @@ public interface IServerConnection
 
     public void startThread();
 
-    public void updateThreadName(String playerName);
+    public void updatePlayerName(String playerName);
 
     public IServer getIServer();
 
