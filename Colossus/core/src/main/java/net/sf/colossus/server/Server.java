@@ -274,7 +274,8 @@ public final class Server extends Thread implements IServer
     {
         // start if either we expect (alive) remote client players, or
         // there are already remote connections (e.g. spectators):
-        if (game.getNumRemoteRemaining() > 0 || !remoteClients.isEmpty())
+        if ((game.getNumRemoteRemaining() > 0 || !remoteClients.isEmpty())
+            && fileServerThread == null)
         {
             fileServerThread = new FileServerThread(this, port + 1);
             fileServerThread.start();
