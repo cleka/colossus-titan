@@ -68,13 +68,22 @@ public final class Server extends Thread implements IServer
 
     private final MessageRecorder recorder;
 
+    // A dummy/internal ClientHandler, which stores all messages sent
+    // to "all clients" => can clone from here for spectators
+    private ClientHandlerStub clientStub;
+
     /**
      *  Maybe also save things like the originating IP, in case a
      *  connection breaks and we need to authenticate reconnects.
      *  Do not share these references. */
-    private final List<IClient> clients = new ArrayList<IClient>();
+
+    /** Recipients for everything send to "each client" - including the stub */
+    private final List<IClient> iClients = new ArrayList<IClient>();
+
+    /** Only real ClientHandlers (excluding the stub) */
+    private final List<ClientHandler> realClients = new ArrayList<ClientHandler>();
+
     private final List<IClient> remoteClients = new ArrayList<IClient>();
-    private final List<IClient> spectatorClients = new ArrayList<IClient>();
     private final List<RemoteLogHandler> remoteLogHandlers = new ArrayList<RemoteLogHandler>();
 
     /** Map of players to their clients. */
@@ -176,7 +185,7 @@ public final class Server extends Thread implements IServer
     // Channels are queued into here, to be removed from selector on
     // next possible opportunity ( = when all waiting-to-be-processed keys
     // have been processed).
-    private final List<ClientHandler> channelChanges = new ArrayList<ClientHandler>();
+    private final List<ClientHandlerStub> channelChanges = new ArrayList<ClientHandlerStub>();
 
     Server(GameServerSide game, WhatNextManager whatNextMgr, int port)
     {
@@ -275,6 +284,7 @@ public final class Server extends Thread implements IServer
         // start if either we expect (alive) remote client players, or
         // there are already remote connections (e.g. spectators):
         if ((game.getNumRemoteRemaining() > 0 || !remoteClients.isEmpty())
+        // ... but not if it's already running ;-)
             && fileServerThread == null)
         {
             fileServerThread = new FileServerThread(this, port + 1);
@@ -384,6 +394,13 @@ public final class Server extends Thread implements IServer
         }
 
         return (waitingForPlayers == 0);
+    }
+
+    public void createClientHandlerStub()
+    {
+        clientStub = new ClientHandlerStub(this);
+        // it's an IClient, but not a real ClientHandler:
+        iClients.add(clientStub);
     }
 
     public void overrideProcessingCH(Player player)
@@ -628,25 +645,35 @@ public final class Server extends Thread implements IServer
             // will add more items to the channelChanges list.
             while (!channelChanges.isEmpty())
             {
-                ClientHandler nextCH = channelChanges.remove(0);
-                SocketChannel sc = nextCH.getSocketChannel();
-                SelectionKey key = nextCH.getSelectorKey();
-                if (key == null)
+                ClientHandlerStub nextCHS = channelChanges.remove(0);
+                if (ClientHandler.class.isInstance(nextCHS))
                 {
-                    LOGGER.warning("key for to-be-closed-channel is null!");
-                }
-                else if (sc.isOpen())
-                {
-                    // sending dispose and setIsGone is done by ClientHandler
-                    disconnectChannel(sc, key);
+                    ClientHandler nextCH = (ClientHandler)nextCHS;
+                    SocketChannel sc = nextCH.getSocketChannel();
+                    SelectionKey key = nextCH.getSelectorKey();
+                    if (key == null)
+                    {
+                        LOGGER
+                            .warning("key for to-be-closed-channel is null!");
+                    }
+                    else if (sc.isOpen())
+                    {
+                        // sending dispose and setIsGone is done by ClientHandler
+                        disconnectChannel(sc, key);
+                    }
+                    else
+                    {
+                        // TODO this should not happen, but it does regularly
+                        // - find out why and fix. Until then, just info
+                        // of warning
+                        LOGGER.info("to-be-closed-channel is not open!");
+                    }
                 }
                 else
                 {
-                    // TODO this should not happen, but it does regularly
-                    // - find out why and fix. Until then, just info
-                    // of warning
-                    LOGGER.info("to-be-closed-channel is not open!");
+                    // just a stub
                 }
+
             }
             channelChanges.clear();
         }
@@ -966,7 +993,7 @@ public final class Server extends Thread implements IServer
      *  Put the ClientHandler into the queue to be removed
      *  from selector on next possible opportunity
      */
-    void queueClientHandlerForChannelChanges(ClientHandler ch)
+    void queueClientHandlerForChannelChanges(ClientHandlerStub ch)
     {
         LOGGER.info("Putting CH " + ch.getSignonName()
             + " to channelChanges list");
@@ -1037,7 +1064,7 @@ public final class Server extends Thread implements IServer
         stopFileServer();
 
         // particularly to remove the loggers
-        if (!clients.isEmpty())
+        if (!iClients.isEmpty())
         {
             disposeAllClients();
         }
@@ -1231,24 +1258,15 @@ public final class Server extends Thread implements IServer
     }
 
     /**
-     * Might be a player or a spectator
+     * Might be a player or a spectator (but not a stub)
      * @param name Name of the player/client/spectator for
-     * which ClientHandler/IClient is needed
+     * which ClientHandler is needed
      */
-    public IClient getClientByName(String name)
+    public ClientHandler getClientHandlerByName(String name)
     {
-        for (IClient c : clients)
+        for (ClientHandler c : realClients)
         {
-            ClientHandler ch = (ClientHandler)c;
-            if (ch.getClientName().equals(name))
-            {
-                return c;
-            }
-        }
-        for (IClient c : spectatorClients)
-        {
-            ClientHandler ch = (ClientHandler)c;
-            if (ch.getClientName().equals(name))
+            if (c.getClientName().equals(name))
             {
                 return c;
             }
@@ -1287,7 +1305,7 @@ public final class Server extends Thread implements IServer
      * @param spectator
      * @return Reason why adding Client was refused, null if all is fine.
      */
-    String addClient(final IClient client, final String playerName,
+    String addClient(final ClientHandler client, final String playerName,
         final boolean remote, final int clientVersion, String buildInfo, boolean spectator)
     {
         boolean isReconnect = false;
@@ -1376,15 +1394,16 @@ public final class Server extends Thread implements IServer
          */
         else if (isReconnectAttempt(player))
         {
-            ClientHandler existingCH = (ClientHandler)getClientByName(playerName);
+            ClientHandler existingCH = getClientHandlerByName(playerName);
             if (existingCH != null)
             {
                 othersTellReconnectOngoing(existingCH);
                 isReconnect = true;
                 LOGGER.info("All right, reconnection of known player!");
-                ((ClientHandler)client).cloneRedoQueue(existingCH);
+                (client).cloneRedoQueue(existingCH);
                 playerToClientMap.remove(player);
-                clients.remove(existingCH);
+                iClients.remove(existingCH);
+                realClients.remove(existingCH);
                 queueClientHandlerForChannelChanges(existingCH);
                 existingCH.declareObsolete();
                 LOGGER.info("Removing player with name " + player.getName()
@@ -1412,7 +1431,8 @@ public final class Server extends Thread implements IServer
             name = playerName;
         }
 
-        clients.add(client);
+        iClients.add(client);
+        realClients.add(client);
 
         /*
         // Note, actually last joined client signonName will always be still null...
@@ -1437,10 +1457,6 @@ public final class Server extends Thread implements IServer
         if (player != null)
         {
             playerToClientMap.put(player, client);
-        }
-        else
-        {
-            spectatorClients.add(client);
         }
 
         if (remote)
@@ -1562,11 +1578,6 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    public int getClientCount()
-    {
-        return clients.size();
-    }
-
     private void addRemoteClient(final IClient client, final Player player)
     {
         RemoteLogHandler remoteLogHandler = new RemoteLogHandler(this);
@@ -1604,7 +1615,7 @@ public final class Server extends Thread implements IServer
         }
 
         LOGGER.info("BEGIN disposing all clients...");
-        for (IClient client : clients)
+        for (IClient client : iClients)
         {
             // This sends the dispose message, and queues ClientHandler's
             // channel for being removed from selector.
@@ -1613,7 +1624,8 @@ public final class Server extends Thread implements IServer
             // so the selector loop does not even reach the removal part...
             client.disposeClient();
         }
-        clients.clear();
+        iClients.clear();
+        realClients.clear();
         playerToClientMap.clear();
         remoteClients.clear();
 
@@ -1654,7 +1666,7 @@ public final class Server extends Thread implements IServer
 
     void allUpdatePlayerInfo(boolean treatDeadAsAlive)
     {
-        for (IClient client : clients)
+        for (IClient client : iClients)
         {
             client.updatePlayerInfo(getPlayerInfo(treatDeadAsAlive));
         }
@@ -1667,7 +1679,7 @@ public final class Server extends Thread implements IServer
 
     void allUpdateCreatureCount(CreatureType type, int count, int deadCount)
     {
-        for (IClient client : clients)
+        for (IClient client : iClients)
         {
             client.updateCreatureCount(type, count, deadCount);
         }
@@ -1675,7 +1687,7 @@ public final class Server extends Thread implements IServer
 
     void allTellMovementRoll(int roll)
     {
-        for (IClient client : clients)
+        for (IClient client : iClients)
         {
             client.tellMovementRoll(roll);
         }
@@ -1786,15 +1798,12 @@ public final class Server extends Thread implements IServer
                 }
             }
         }
-        for (IClient client : spectatorClients)
-        {
-            client.initBoard();
-        }
+        clientStub.initBoard();
     }
 
     void allTellReplay(boolean val, int maxTurn)
     {
-        for (IClient client : clients)
+        for (IClient client : iClients)
         {
             client.tellReplay(val, maxTurn);
         }
@@ -1802,7 +1811,7 @@ public final class Server extends Thread implements IServer
 
     void allTellRedo(boolean val)
     {
-        for (IClient client : clients)
+        for (IClient client : iClients)
         {
             client.tellRedo(val);
         }
@@ -1815,22 +1824,23 @@ public final class Server extends Thread implements IServer
         {
             caughtUpAction = action;
             waitingToCatchup.clear();
-            for (IClient client : clients)
+
+            // check both
+            for (ClientHandler client : realClients)
             {
                 boolean skip = false;
 
                 // Do not wait for clients that are already gone, e.g. when
                 // one remote disconnected this might cause a withdrawal
                 // which might cause GameOver.
-                if (((ClientHandler)client).isGone())
+                if (client.isGone())
                 {
                     skip = true;
                 }
 
                 // In some case (currently: during game dispose) do not send
                 // to clients in trouble, they won't respond probably anyway...
-                if (skipInTrouble
-                    && ((ClientHandler)client).isTemporarilyInTrouble())
+                if (skipInTrouble && client.isTemporarilyInTrouble())
                 {
                     skip = true;
                 }
@@ -1859,7 +1869,7 @@ public final class Server extends Thread implements IServer
 
     void allTellLegionLocation(Legion legion)
     {
-        for (IClient client : clients)
+        for (IClient client : iClients)
         {
             client.tellLegionLocation(legion, legion.getCurrentHex());
         }
@@ -1867,7 +1877,7 @@ public final class Server extends Thread implements IServer
 
     void allRemoveLegion(Legion legion)
     {
-        for (IClient client : clients)
+        for (IClient client : iClients)
         {
             client.removeLegion(legion);
         }
@@ -1876,7 +1886,7 @@ public final class Server extends Thread implements IServer
     void allTellPlayerElim(Player eliminatedPlayer, Player slayer,
         boolean updateHistory)
     {
-        for (IClient client : clients)
+        for (IClient client : iClients)
         {
             client.tellPlayerElim(eliminatedPlayer, slayer);
         }
@@ -1890,9 +1900,8 @@ public final class Server extends Thread implements IServer
     void repeatTellOneHasNetworkTrouble()
     {
         ArrayList<ClientHandler> troubleCHs = new ArrayList<ClientHandler>();
-        for (IClient client : clients)
+        for (ClientHandler ch : realClients)
         {
-            ClientHandler ch = (ClientHandler)client;
             if (ch.isTemporarilyInTrouble())
             {
                 troubleCHs.add(ch);
@@ -1953,7 +1962,8 @@ public final class Server extends Thread implements IServer
 
     void appendToConnLogs(ClientHandler chInTrouble, String message)
     {
-        for (IClient client : clients)
+        // only real handlers, no point to send those to the stub...
+        for (ClientHandler client : realClients)
         {
             // no need/use to inform the troubled one itself...
             if (client != chInTrouble)
@@ -1962,7 +1972,6 @@ public final class Server extends Thread implements IServer
             }
         }
     }
-
 
     /**
      * IF last ping round is at least PING_REQUEST_INTERVAL_SEC seconds ago,
@@ -1978,9 +1987,9 @@ public final class Server extends Thread implements IServer
             LOGGER.info("Last ping round is " + ago
                 + " secs ago - doing another.");
             lastPingRound = now;
-            for (IClient client : clients)
+            for (ClientHandler client : realClients)
             {
-                if (!((ClientHandler)client).isTemporarilyInTrouble())
+                if (!client.isTemporarilyInTrouble())
                 {
                     client.pingRequest();
                 }
@@ -1990,7 +1999,7 @@ public final class Server extends Thread implements IServer
 
     void allTellGameOver(String message, boolean disposeFollows)
     {
-        for (IClient client : clients)
+        for (IClient client : iClients)
         {
             client.tellGameOver(message, disposeFollows);
         }
@@ -1999,7 +2008,7 @@ public final class Server extends Thread implements IServer
     /** Needed if loading game outside the split phase. */
     void allSetupTurnState()
     {
-        for (IClient client : clients)
+        for (IClient client : iClients)
         {
             client
                 .setupTurnState(game.getActivePlayer(), game.getTurnNumber());
@@ -2008,7 +2017,7 @@ public final class Server extends Thread implements IServer
 
     void allSetupSplit()
     {
-        for (IClient client : clients)
+        for (IClient client : iClients)
         {
             client.setupSplit(game.getActivePlayer(), game.getTurnNumber());
         }
@@ -2017,7 +2026,7 @@ public final class Server extends Thread implements IServer
 
     void allSetupMove()
     {
-        for (IClient client : clients)
+        for (IClient client : iClients)
         {
             client.setupMove();
         }
@@ -2025,7 +2034,7 @@ public final class Server extends Thread implements IServer
 
     void allSetupFight()
     {
-        for (IClient client : clients)
+        for (IClient client : iClients)
         {
             client.setupFight();
         }
@@ -2033,7 +2042,7 @@ public final class Server extends Thread implements IServer
 
     void allSetupMuster()
     {
-        for (IClient client : clients)
+        for (IClient client : iClients)
         {
             client.setupMuster();
         }
@@ -2042,7 +2051,7 @@ public final class Server extends Thread implements IServer
     void kickPhase()
     {
         // XXX TODO Should do only for the active Client!
-        for (IClient client : clients)
+        for (IClient client : iClients)
         {
             client.kickPhase();
         }
@@ -2051,7 +2060,7 @@ public final class Server extends Thread implements IServer
     void allSetupBattleSummon()
     {
         BattleServerSide battle = game.getBattleSS();
-        for (IClient client : clients)
+        for (IClient client : iClients)
         {
             client.setupBattleSummon(battle.getBattleActivePlayer(), battle
                 .getBattleTurnNumber());
@@ -2061,7 +2070,7 @@ public final class Server extends Thread implements IServer
     void allSetupBattleRecruit()
     {
         BattleServerSide battle = game.getBattleSS();
-        for (IClient client : clients)
+        for (IClient client : iClients)
         {
             client.setupBattleRecruit(battle.getBattleActivePlayer(), battle
                 .getBattleTurnNumber());
@@ -2071,7 +2080,7 @@ public final class Server extends Thread implements IServer
     void allSetupBattleMove()
     {
         BattleServerSide battle = game.getBattleSS();
-        for (IClient client : clients)
+        for (IClient client : iClients)
         {
             client.setupBattleMove(battle.getBattleActivePlayer(), battle
                 .getBattleTurnNumber());
@@ -2081,7 +2090,7 @@ public final class Server extends Thread implements IServer
     void allSetupBattleFight()
     {
         BattleServerSide battle = game.getBattleSS();
-        for (IClient client : clients)
+        for (IClient client : iClients)
         {
             if (battle != null)
             {
@@ -2093,7 +2102,7 @@ public final class Server extends Thread implements IServer
 
     void allPlaceNewChit(CreatureServerSide critter)
     {
-        for (IClient client : clients)
+        for (IClient client : iClients)
         {
             client.placeNewChit(critter.getName(), critter.getLegion().equals(
                 game.getBattleSS().getDefendingLegion()), critter.getTag(),
@@ -2103,7 +2112,7 @@ public final class Server extends Thread implements IServer
 
     void allRemoveDeadBattleChits()
     {
-        for (IClient client : clients)
+        for (IClient client : iClients)
         {
             client.removeDeadBattleChits();
         }
@@ -2112,7 +2121,7 @@ public final class Server extends Thread implements IServer
     void allTellEngagementResults(Legion winner, String method, int points,
         int turns)
     {
-        for (IClient client : clients)
+        for (IClient client : iClients)
         {
             client.tellEngagementResults(winner, method, points, turns);
         }
@@ -2270,7 +2279,7 @@ public final class Server extends Thread implements IServer
             .numberOfRecruiterNeeded(recruiter, event.getAddedCreatureType(),
                 event.getLegion().getCurrentHex().getTerrain(), event
                     .getLegion().getCurrentHex()));
-        Iterator<IClient> it = clients.iterator();
+        Iterator<IClient> it = iClients.iterator();
         while (it.hasNext())
         {
             IClient client = it.next();
@@ -2296,7 +2305,7 @@ public final class Server extends Thread implements IServer
     void undidRecruit(Legion legion, CreatureType recruit, boolean reinforced)
     {
         allUpdatePlayerInfo();
-        Iterator<IClient> it = clients.iterator();
+        Iterator<IClient> it = iClients.iterator();
         while (it.hasNext())
         {
             IClient client = it.next();
@@ -2322,7 +2331,7 @@ public final class Server extends Thread implements IServer
     void allTellEngagement(MasterHex hex, Legion attacker, Legion defender)
     {
         LOGGER.finest("allTellEngagement() " + hex);
-        Iterator<IClient> it = clients.iterator();
+        Iterator<IClient> it = iClients.iterator();
         while (it.hasNext())
         {
             IClient client = it.next();
@@ -2472,7 +2481,7 @@ public final class Server extends Thread implements IServer
     void allTellBattleMove(int tag, BattleHex startingHex,
         BattleHex endingHex, boolean undo)
     {
-        Iterator<IClient> it = clients.iterator();
+        Iterator<IClient> it = iClients.iterator();
         while (it.hasNext())
         {
             IClient client = it.next();
@@ -2572,7 +2581,7 @@ public final class Server extends Thread implements IServer
         this.strikeNumber = strikeNumber;
         this.rolls = rolls;
 
-        Iterator<IClient> it = clients.iterator();
+        Iterator<IClient> it = iClients.iterator();
         while (it.hasNext())
         {
             IClient client = it.next();
@@ -2603,7 +2612,7 @@ public final class Server extends Thread implements IServer
             }
             return;
         }
-        Iterator<IClient> it = clients.iterator();
+        Iterator<IClient> it = iClients.iterator();
         while (it.hasNext())
         {
             IClient client = it.next();
@@ -2616,7 +2625,7 @@ public final class Server extends Thread implements IServer
     void allTellHexSlowResults(CreatureServerSide target, int slowValue)
     {
         this.target = target;
-        Iterator<IClient> it = clients.iterator();
+        Iterator<IClient> it = iClients.iterator();
         while (it.hasNext())
         {
             IClient client = it.next();
@@ -2628,7 +2637,7 @@ public final class Server extends Thread implements IServer
     {
         this.target = target;
 
-        Iterator<IClient> it = clients.iterator();
+        Iterator<IClient> it = iClients.iterator();
         while (it.hasNext())
         {
             IClient client = it.next();
@@ -2680,7 +2689,7 @@ public final class Server extends Thread implements IServer
     void allInitBattle(MasterHex masterHex)
     {
         BattleServerSide battle = game.getBattleSS();
-        Iterator<IClient> it = clients.iterator();
+        Iterator<IClient> it = iClients.iterator();
         while (it.hasNext())
         {
             IClient client = it.next();
@@ -2692,7 +2701,7 @@ public final class Server extends Thread implements IServer
 
     void allCleanupBattle()
     {
-        Iterator<IClient> it = clients.iterator();
+        Iterator<IClient> it = iClients.iterator();
         while (it.hasNext())
         {
             IClient client = it.next();
@@ -2724,7 +2733,7 @@ public final class Server extends Thread implements IServer
     void undidSplit(Legion splitoff, Legion survivor, boolean updateHistory,
         int turn)
     {
-        Iterator<IClient> it = clients.iterator();
+        Iterator<IClient> it = iClients.iterator();
         while (it.hasNext())
         {
             IClient client = it.next();
@@ -2749,7 +2758,7 @@ public final class Server extends Thread implements IServer
     public void allTellUndidMove(Legion legion, MasterHex formerHex,
         MasterHex currentHex, boolean splitLegionHasForcedMove)
     {
-        Iterator<IClient> it = clients.iterator();
+        Iterator<IClient> it = iClients.iterator();
         while (it.hasNext())
         {
             IClient client = it.next();
@@ -3025,7 +3034,7 @@ public final class Server extends Thread implements IServer
             splitoffs.clear();
         }
 
-        Iterator<IClient> it = clients.iterator();
+        Iterator<IClient> it = iClients.iterator();
         while (it.hasNext())
         {
             IClient client = it.next();
@@ -3072,7 +3081,7 @@ public final class Server extends Thread implements IServer
         // needed in didMove to decide whether to dis/enable button
         boolean splitLegionHasForcedMove = player.splitLegionHasForcedMove();
 
-        Iterator<IClient> it = clients.iterator();
+        Iterator<IClient> it = iClients.iterator();
         while (it.hasNext())
         {
             IClient client = it.next();
@@ -3084,7 +3093,7 @@ public final class Server extends Thread implements IServer
     void allTellDidSummon(Legion receivingLegion, Legion donorLegion,
         CreatureType summon)
     {
-        Iterator<IClient> it = clients.iterator();
+        Iterator<IClient> it = iClients.iterator();
         while (it.hasNext())
         {
             IClient client = it.next();
@@ -3095,7 +3104,7 @@ public final class Server extends Thread implements IServer
     void allTellAddCreature(AddCreatureAction event, boolean updateHistory,
         String reason)
     {
-        Iterator<IClient> it = clients.iterator();
+        Iterator<IClient> it = iClients.iterator();
         while (it.hasNext())
         {
             IClient client = it.next();
@@ -3112,7 +3121,7 @@ public final class Server extends Thread implements IServer
     void allTellRemoveCreature(Legion legion, CreatureType creature,
         boolean updateHistory, String reason)
     {
-        Iterator<IClient> it = clients.iterator();
+        Iterator<IClient> it = iClients.iterator();
         while (it.hasNext())
         {
             IClient client = it.next();
@@ -3126,7 +3135,7 @@ public final class Server extends Thread implements IServer
 
     void allRevealLegion(Legion legion, String reason)
     {
-        Iterator<IClient> it = clients.iterator();
+        Iterator<IClient> it = iClients.iterator();
         while (it.hasNext())
         {
             IClient client = it.next();
@@ -3146,7 +3155,7 @@ public final class Server extends Thread implements IServer
     void allRevealEngagedLegion(final Legion legion, final boolean isAttacker,
         String reason)
     {
-        Iterator<IClient> it = clients.iterator();
+        Iterator<IClient> it = iClients.iterator();
         while (it.hasNext())
         {
             IClient client = it.next();
@@ -3161,7 +3170,7 @@ public final class Server extends Thread implements IServer
     void allRevealLegion(Legion legion, List<CreatureType> creatures,
         String reason)
     {
-        Iterator<IClient> it = clients.iterator();
+        Iterator<IClient> it = iClients.iterator();
         while (it.hasNext())
         {
             IClient client = it.next();
@@ -3194,7 +3203,7 @@ public final class Server extends Thread implements IServer
 
     void allFullyUpdateLegionStatus()
     {
-        Iterator<IClient> it = clients.iterator();
+        Iterator<IClient> it = iClients.iterator();
         while (it.hasNext())
         {
             IClient client = it.next();
@@ -3221,7 +3230,7 @@ public final class Server extends Thread implements IServer
     void allRevealCreatures(Legion legion, List<CreatureType> creatureNames,
         String reason)
     {
-        Iterator<IClient> it = clients.iterator();
+        Iterator<IClient> it = iClients.iterator();
         while (it.hasNext())
         {
             IClient client = it.next();
@@ -3427,7 +3436,7 @@ public final class Server extends Thread implements IServer
     void askPickColor(Player player, final List<PlayerColor> colorsLeft)
     {
         IClient activeClient = getClient(player);
-        for (IClient client : clients)
+        for (IClient client : iClients)
         {
             if (client != null && client != activeClient)
             {
@@ -3464,7 +3473,7 @@ public final class Server extends Thread implements IServer
     void askPickFirstMarker(Player player)
     {
         IClient activeClient = getClient(player);
-        for (IClient client : clients)
+        for (IClient client : iClients)
         {
             if (client != null && client != activeClient)
             {
@@ -3526,7 +3535,7 @@ public final class Server extends Thread implements IServer
 
     void allSyncOption(String optname, String value)
     {
-        Iterator<IClient> it = clients.iterator();
+        Iterator<IClient> it = iClients.iterator();
         while (it.hasNext())
         {
             IClient client = it.next();
@@ -3673,11 +3682,10 @@ public final class Server extends Thread implements IServer
     {
         try
         {
-            Player p = game.getPlayerByName(name);
-            if (p != null)
+            ClientHandler handler = getClientHandlerByName(name);
+            if (handler != null)
             {
-                IClient client = playerToClientMap.get(p);
-                ((ClientHandler)client).fakeDisconnectClient();
+                handler.fakeDisconnectClient();
             }
         }
         catch(Exception e)

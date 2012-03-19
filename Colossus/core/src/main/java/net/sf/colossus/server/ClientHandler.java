@@ -11,25 +11,20 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.IClient;
 import net.sf.colossus.common.Constants;
-import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
-import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.actions.Recruitment;
 import net.sf.colossus.game.actions.Summoning;
 import net.sf.colossus.util.ErrorUtils;
-import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.InstanceTracker;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.variant.BattleHex;
@@ -50,33 +45,22 @@ import net.sf.colossus.variant.MasterHex;
  *
  *  @author David Ripton
  */
-final class ClientHandler implements IClient
+final class ClientHandler extends ClientHandlerStub implements IClient
 {
     private static final Logger LOGGER = Logger.getLogger(ClientHandler.class
         .getName());
 
-    private final Server server;
+    // server is stored in ClientHandlerStub
     private final SocketChannel socketChannel;
     private final SelectionKey selectorKey;
-    private String playerName;
-    private String signonName;
     private int clientVersion = 0;
     private boolean spectator;
 
-    private boolean isGone = false;
     private boolean didExplicitDisconnect = false;
     private boolean withdrawnAlready = false;
     private int cantSendMessageRepeated = 0;
     private boolean temporarilyDisconnected = false;
     private boolean obsolete = false;
-
-    private static final String sep = Constants.protocolTermSeparator;
-
-    // for optimization, do not re-send if exactly identical to the one sent
-    // last time.
-    private String previousInfoStringsString = "";
-
-    private static int counter = 0;
 
     private String incompleteInput = "";
     private String incompleteText = "";
@@ -109,7 +93,8 @@ final class ClientHandler implements IClient
 
     ClientHandler(Server server, SocketChannel channel, SelectionKey selKey)
     {
-        this.server = server;
+        super(server);
+
         this.socketChannel = channel;
         this.selectorKey = selKey;
 
@@ -135,11 +120,10 @@ final class ClientHandler implements IClient
         return this.isGone;
     }
 
-    public void setIsGone(String reason)
+    @Override
+    protected boolean isStub()
     {
-        LOGGER.info("Setting isGone to true in CH for '" + getClientName()
-            + "' (reason: " + reason + ")");
-        this.isGone = true;
+        return false;
     }
 
     public boolean isSpectator()
@@ -167,6 +151,33 @@ final class ClientHandler implements IClient
     public boolean isTemporarilyDisconnected()
     {
         return temporarilyDisconnected;
+    }
+
+    @Override
+    protected boolean canHandlePingRequest()
+    {
+        return clientVersion >= IServer.CLIENT_VERSION_UNDERSTANDS_PING;
+    }
+
+    /**
+     * Server side disposes a client (and informs it about it first)
+     * To be used only for "disposeAllClients()", otherwise setIsGone
+     * reason is misleading.
+     */
+    @Override
+    public void disposeClient()
+    {
+        // Don't do it again
+        if (isGone)
+        {
+            return;
+        }
+
+        setIsGone("Server disposes client (all clients)");
+        sendViaChannel(Constants.dispose);
+        server.queueClientHandlerForChannelChanges(this);
+        server.clientWontConfirmCatchup(this,
+            "Client disposed from server side.");
     }
 
     // Called by Server's select reader
@@ -282,7 +293,8 @@ final class ClientHandler implements IClient
 
     private boolean isCommitPoint = false;
 
-    private void commitPoint()
+    @Override
+    protected void commitPoint()
     {
         if (supportsReconnect())
         {
@@ -338,6 +350,7 @@ final class ClientHandler implements IClient
         return clientVersion >= 4;
     }
 
+    @Override
     public boolean canHandleAdvancedSync()
     {
         return clientVersion >= 4;
@@ -550,6 +563,54 @@ final class ClientHandler implements IClient
         Thread.yield();
     }
 
+    /**
+     * Make sure player is withdrawn from game.
+     * Explicit if via Withdraw message from client, implicit because
+     * of disconnect message or connection problems.
+     * This is just a wrapper for the both situations where for
+     * !withdrawnAlready should be checked
+     *
+     * @param explicit Whether client has requested withdraw explicitly
+     */
+    private void withdrawIfNeeded(boolean explicit)
+    {
+        if (!withdrawnAlready)
+        {
+            if (!explicit)
+            {
+                LOGGER.log(Level.FINE,
+                    "Client disconnected without explicit withdraw - "
+                        + "doing automatic withdraw (if needed) for player "
+                        + playerName);
+            }
+            withdrawnAlready = true;
+            server.withdrawFromGame();
+        }
+    }
+
+    // same player re-connected with new ClientHandler
+    // => this one here should "be gone" / inactive
+    public void declareObsolete()
+    {
+        obsolete = true;
+        setIsGone("declared obsolete by server");
+        LOGGER.warning("ClientHandler for " + getPlayerName()
+            + " declared obsolete.... -- but that's not fully implemented!");
+    }
+
+    public String dumpLastProcessedLines()
+    {
+        StringBuffer sb = new StringBuffer("## Last " + MAX_KEEP_LINES
+            + " processed lines were:");
+        int i = 0;
+        for (String rLine : recentlyProcessedLines)
+        {
+            i++;
+            sb.append("\n      #" + i + ": " + rLine);
+        }
+        return sb.toString();
+    }
+
     private void doCallMethodInTryBlock(String line, String method,
         List<String> li)
     {
@@ -576,18 +637,12 @@ final class ClientHandler implements IClient
         }
     }
 
-    public String dumpLastProcessedLines()
-    {
-        StringBuffer sb = new StringBuffer("## Last " + MAX_KEEP_LINES
-            + " processed lines were:");
-        int i = 0;
-        for (String rLine : recentlyProcessedLines)
-        {
-            i++;
-            sb.append("\n      #" + i + ": " + rLine);
-        }
-        return sb.toString();
-    }
+    /**
+     * This is the longish if-elseif-else block which deserialized all
+     * client-to-server calls back from String to actual methodCalls.
+     * @param method The method to execute
+     * @param args   A list of argument Strings
+     */
     private void callMethod(String method, List<String> args)
     {
         if (method.equals(Constants.signOn))
@@ -938,31 +993,6 @@ final class ClientHandler implements IClient
         return name.equals("null") ? null : resolveCreatureType(name);
     }
 
-    /**
-     * Make sure player is withdrawn from game.
-     * Explicit if via Withdraw message from client, implicit because
-     * of disconnect message or connection problems.
-     * This is just a wrapper for the both situations where for
-     * !withdrawnAlready should be checked
-     *
-     * @param explicit Whether client has requested withdraw explicitly
-     */
-    private void withdrawIfNeeded(boolean explicit)
-    {
-        if (!withdrawnAlready)
-        {
-            if (!explicit)
-            {
-                LOGGER.log(Level.FINE,
-                    "Client disconnected without explicit withdraw - "
-                        + "doing automatic withdraw (if needed) for player "
-                        + playerName);
-            }
-            withdrawnAlready = true;
-            server.withdrawFromGame();
-        }
-    }
-
     private MasterHex resolveMasterHex(String hexLabel)
     {
         return server.getGame().getVariant().getMasterBoard().getHexByLabel(
@@ -987,10 +1017,31 @@ final class ClientHandler implements IClient
     }
 
     // Wrapper for all the send-over-socket methods:
-    public void sendToClient(String message)
+    @Override
+    protected void sendToClient(String message)
     {
         enqueueToRedoQueue(messageCounter, message);
         messageCounter++;
+
+        /* For development purposes... remove when done:
+        List<String> li = Split.split(sep, message);
+        String method = li.get(0);
+
+        if (isSpectator())
+        {
+            if (!method.equals("Ack: " + Constants.signOn)
+                && !method.equals(Constants.gameInitInfo))
+            {
+                System.out.print("!" + method + " ");
+                return;
+            }
+            System.out.println("\n" + method);
+        }
+        else if (getClientName().equals("remote"))
+        {
+            System.out.println("=>" + method);
+        }
+        */
 
         if (isGone())
         {
@@ -1043,499 +1094,10 @@ final class ClientHandler implements IClient
         }
     }
 
-    // IClient methods to sent requests to client over socket.
-
-    /**
-     * Server side disposes a client (and informs it about it first)
-     * To be used only for "disposeAllClients()", otherwise setIsGone
-     * reason is misleading.
-     */
-    public void disposeClient()
-    {
-        // Don't do it again
-        if (isGone)
-        {
-            return;
-        }
-
-        setIsGone("Server disposes client (all clients)");
-        sendViaChannel(Constants.dispose);
-        server.queueClientHandlerForChannelChanges(this);
-        server.clientWontConfirmCatchup(this,
-            "Client disposed from server side.");
-    }
-
-    public void tellEngagement(MasterHex hex, Legion attacker, Legion defender)
-    {
-        sendToClient(Constants.tellEngagement + sep + hex.getLabel() + sep
-            + attacker.getMarkerId() + sep + defender.getMarkerId());
-    }
-
-    public void tellEngagementResults(Legion winner, String method,
-        int points, int turns)
-    {
-        sendToClient(Constants.tellEngagementResults + sep
-            + (winner != null ? winner.getMarkerId() : null) + sep + method
-            + sep + points + sep + turns);
-    }
-
-    public void tellWhatsHappening(String message)
-    {
-        sendToClient(Constants.tellWhatsHappening + sep + message);
-    }
-
-    public void tellMovementRoll(int roll)
-    {
-        sendToClient(Constants.tellMovementRoll + sep + roll);
-    }
-
-    public void syncOption(String optname, String value)
-    {
-        sendToClient(Constants.syncOption + sep + optname + sep + value);
-    }
-
-    public void updatePlayerInfo(List<String> infoStrings)
-    {
-        String infoStringsString = Glob.glob(infoStrings);
-        if (previousInfoStringsString.equals(infoStringsString))
-        {
-            LOGGER.info("Skipping the re-send of identical player infos.");
-        }
-        else
-        {
-            sendToClient(Constants.updatePlayerInfo + sep + infoStringsString);
-            previousInfoStringsString = infoStringsString;
-        }
-    }
-
-    public void setColor(PlayerColor color)
-    {
-        sendToClient(Constants.setColor + sep + color.getName());
-    }
-
-    public void updateCreatureCount(CreatureType type, int count, int deadCount)
-    {
-        sendToClient(Constants.updateCreatureCount + sep + type.getName()
-            + sep + count + sep + deadCount);
-    }
-
-    public void removeLegion(Legion legion)
-    {
-        sendToClient(Constants.removeLegion + sep + legion.getMarkerId());
-    }
-
-    public void setLegionStatus(Legion legion, boolean moved,
-        boolean teleported, EntrySide entrySide, CreatureType lastRecruit)
-    {
-        sendToClient(Constants.setLegionStatus + sep + legion.getMarkerId()
-            + sep + moved + sep + teleported + sep + entrySide.ordinal() + sep
-            + lastRecruit);
-    }
-
-    public void addCreature(Legion legion, CreatureType creature, String reason)
-    {
-        sendToClient(Constants.addCreature + sep + legion.getMarkerId() + sep
-            + creature + sep + reason);
-    }
-
-    public void removeCreature(Legion legion, CreatureType creature,
-        String reason)
-    {
-        sendToClient(Constants.removeCreature + sep + legion + sep + creature
-            + sep + reason);
-    }
-
-    public void revealCreatures(Legion legion,
-        final List<CreatureType> creatures, String reason)
-    {
-        sendToClient(Constants.revealCreatures + sep + legion.getMarkerId()
-            + sep + Glob.glob(creatures) + sep + reason);
-    }
-
-    /** print the 'revealEngagagedCreature'-message,
-     *   args: markerId, isAttacker, list of creature names
-     * @param markerId legion marker name that is currently in battle
-     * @param creatures List of creatures in this legion
-     * @param isAttacker true for attacker, false for defender
-     * @param reason why this was revealed
-     * @author Towi, copied from revealCreatures
-     */
-    public void revealEngagedCreatures(final Legion legion,
-        final List<CreatureType> creatures, final boolean isAttacker,
-        String reason)
-    {
-        sendToClient(Constants.revealEngagedCreatures + sep
-            + legion.getMarkerId() + sep + isAttacker + sep
-            + Glob.glob(creatures) + sep + reason);
-    }
-
-    public void removeDeadBattleChits()
-    {
-        sendToClient(Constants.removeDeadBattleChits);
-    }
-
-    public void placeNewChit(String imageName, boolean inverted, int tag,
-        BattleHex hex)
-    {
-        sendToClient(Constants.placeNewChit + sep + imageName + sep + inverted
-            + sep + tag + sep + hex.getLabel());
-    }
-
-    public void tellReplay(boolean val, int maxTurn)
-    {
-        sendToClient(Constants.replayOngoing + sep + val + sep + maxTurn);
-    }
-
-    public void tellRedo(boolean val)
-    {
-        sendToClient(Constants.redoOngoing + sep + val);
-    }
-
-    public void initBoard()
-    {
-        sendToClient(Constants.initBoard);
-    }
-
-    public void setPlayerName(String playerName)
-    {
-        this.playerName = playerName;
-        sendToClient(Constants.setPlayerName + sep + playerName);
-    }
-
-    public String getSignonName()
-    {
-        return this.signonName;
-    }
-
-    // silently choose whatever useful, mostly for logging
-    public String getClientName()
-    {
-        return playerName != null ? playerName
-            : (signonName != null ? signonName : "ClientNameNotSet");
-    }
-
-    public String getPlayerName()
-    {
-        if (this.playerName == null)
-        {
-            LOGGER.warning("CH.playerName still null, returning signOnName '" + signonName + "'");
-            Thread.dumpStack();
-            return this.signonName;
-        }
-        return this.playerName;
-    }
-
-    public void createSummonAngel(Legion legion)
-    {
-        sendToClient(Constants.createSummonAngel + sep + legion.getMarkerId());
-    }
-
-    public void askAcquireAngel(Legion legion, List<CreatureType> recruits)
-    {
-        sendToClient(Constants.askAcquireAngel + sep + legion.getMarkerId()
-            + sep + Glob.glob(recruits));
-    }
-
-    public void askChooseStrikePenalty(List<String> choices)
-    {
-        sendToClient(Constants.askChooseStrikePenalty + sep
-            + Glob.glob(choices));
-    }
-
-    public void tellGameOver(String message, boolean disposeFollows)
-    {
-        sendToClient(Constants.tellGameOver + sep + message + sep
-            + disposeFollows);
-    }
-
-    public void tellPlayerElim(Player player, Player slayer)
-    {
-        // slayer can be null
-        sendToClient(Constants.tellPlayerElim + sep + player.getName() + sep
-            + (slayer != null ? slayer.getName() : null));
-    }
-
-    public void askConcede(Legion ally, Legion enemy)
-    {
-        sendToClient(Constants.askConcede + sep + ally.getMarkerId() + sep
-            + enemy.getMarkerId());
-    }
-
-    public void askFlee(Legion ally, Legion enemy)
-    {
-        sendToClient(Constants.askFlee + sep + ally.getMarkerId() + sep
-            + enemy.getMarkerId());
-    }
-
-    public void askNegotiate(Legion attacker, Legion defender)
-    {
-        sendToClient(Constants.askNegotiate + sep + attacker.getMarkerId()
-            + sep + defender.getMarkerId());
-    }
-
-    public void tellProposal(String proposalString)
-    {
-        sendToClient(Constants.tellProposal + sep + proposalString);
-    }
-
-    public void tellSlowResults(int targetTag, int slowValue)
-    {
-        sendToClient(Constants.tellSlowResults + sep + targetTag + sep
-            + slowValue);
-    }
-
-    public void tellStrikeResults(int strikerTag, int targetTag,
-        int strikeNumber, List<String> rolls, int damage, boolean killed,
-        boolean wasCarry, int carryDamageLeft,
-        Set<String> carryTargetDescriptions)
-    {
-        sendToClient(Constants.tellStrikeResults + sep + strikerTag + sep
-            + targetTag + sep + strikeNumber + sep + Glob.glob(rolls) + sep
-            + damage + sep + killed + sep + wasCarry + sep + carryDamageLeft
-            + sep + Glob.glob(carryTargetDescriptions));
-    }
-
-    public void initBattle(MasterHex hex, int battleTurnNumber,
-        Player battleActivePlayer, BattlePhase battlePhase, Legion attacker,
-        Legion defender)
-    {
-        sendToClient(Constants.initBattle + sep + hex.getLabel() + sep
-            + battleTurnNumber + sep + battleActivePlayer.getName() + sep
-            + battlePhase.ordinal() + sep + attacker.getMarkerId() + sep
-            + defender.getMarkerId());
-    }
-
-    public void cleanupBattle()
-    {
-        sendToClient(Constants.cleanupBattle);
-    }
-
-    public void nextEngagement()
-    {
-        sendToClient(Constants.nextEngagement);
-    }
-
-    public void doReinforce(Legion legion)
-    {
-        sendToClient(Constants.doReinforce + sep + legion.getMarkerId());
-    }
-
-    public void didRecruit(Legion legion, CreatureType recruit,
-        CreatureType recruiter, int numRecruiters)
-    {
-        sendToClient(Constants.didRecruit + sep + legion.getMarkerId() + sep
-            + recruit + sep + recruiter + sep + numRecruiters);
-    }
-
-    public void undidRecruit(Legion legion, CreatureType recruit)
-    {
-        sendToClient(Constants.undidRecruit + sep + legion + sep + recruit);
-    }
-
-    public void setupTurnState(Player activePlayer, int turnNumber)
-    {
-        commitPoint();
-        sendToClient(Constants.setupTurnState + sep + activePlayer.getName()
-            + sep + turnNumber);
-    }
-
-    public void setupSplit(Player activePlayer, int turnNumber)
-    {
-        commitPoint();
-        sendToClient(Constants.setupSplit + sep + activePlayer.getName() + sep
-            + turnNumber);
-    }
-
-    public void setupMove()
-    {
-        commitPoint();
-        sendToClient(Constants.setupMove);
-    }
-
-    public void setupFight()
-    {
-        commitPoint();
-        sendToClient(Constants.setupFight);
-    }
-
-    public void setupMuster()
-    {
-        commitPoint();
-        sendToClient(Constants.setupMuster);
-    }
-
-    public void kickPhase()
-    {
-        sendToClient(Constants.kickPhase);
-    }
-
-    public void setupBattleSummon(Player battleActivePlayer,
-        int battleTurnNumber)
-    {
-        sendToClient(Constants.setupBattleSummon + sep
-            + battleActivePlayer.getName() + sep + battleTurnNumber);
-    }
-
-    public void setupBattleRecruit(Player battleActivePlayer,
-        int battleTurnNumber)
-    {
-        sendToClient(Constants.setupBattleRecruit + sep
-            + battleActivePlayer.getName() + sep + battleTurnNumber);
-    }
-
-    public void setupBattleMove(Player battleActivePlayer, int battleTurnNumber)
-    {
-        sendToClient(Constants.setupBattleMove + sep
-            + battleActivePlayer.getName() + sep + battleTurnNumber);
-    }
-
-    public void setupBattleFight(BattlePhase battlePhase,
-        Player battleActivePlayer)
-    {
-        sendToClient(Constants.setupBattleFight + sep + battlePhase.ordinal()
-            + sep + battleActivePlayer.getName());
-    }
-
-    public void tellLegionLocation(Legion legion, MasterHex hex)
-    {
-        sendToClient(Constants.tellLegionLocation + sep + legion.getMarkerId()
-            + sep + hex.getLabel());
-    }
-
-    public void tellBattleMove(int tag, BattleHex startingHex,
-        BattleHex endingHex, boolean undo)
-    {
-        sendToClient(Constants.tellBattleMove + sep + tag + sep
-            + startingHex.getLabel() + sep + endingHex.getLabel() + sep + undo);
-    }
-
-    public void didMove(Legion legion, MasterHex startingHex,
-        MasterHex currentHex, EntrySide entrySide, boolean teleport,
-        CreatureType teleportingLord, boolean splitLegionHasForcedMove)
-    {
-        sendToClient(Constants.didMove + sep + legion.getMarkerId() + sep
-            + startingHex.getLabel() + sep + currentHex.getLabel() + sep
-            + entrySide.getLabel() + sep + teleport + sep
-            + (teleportingLord == null ? "null" : teleportingLord) + sep
-            + splitLegionHasForcedMove);
-    }
-
-    public void undidMove(Legion legion, MasterHex formerHex,
-        MasterHex currentHex, boolean splitLegionHasForcedMove)
-    {
-        sendToClient(Constants.undidMove + sep + legion.getMarkerId() + sep
-            + formerHex.getLabel() + sep + currentHex.getLabel() + sep
-            + splitLegionHasForcedMove);
-    }
-
-    public void didSummon(Legion summoner, Legion donor, CreatureType summon)
-    {
-        sendToClient(Constants.didSummon + sep + summoner + sep + donor + sep
-            + summon);
-    }
-
-    public void undidSplit(Legion splitoff, Legion survivor, int turn)
-    {
-        sendToClient(Constants.undidSplit + sep + splitoff.getMarkerId() + sep
-            + survivor.getMarkerId() + sep + turn);
-    }
-
-    public void didSplit(MasterHex hex, Legion parent, Legion child,
-        int childHeight, List<CreatureType> splitoffs, int turn)
-    {
-        // hex can be null when loading a game
-        // TODO make sure we always have a hex
-        assert parent != null : " Split needs parent";
-        assert child != null : " Split needs child";
-        assert hex != null : "Split needs location";
-        sendToClient(Constants.didSplit + sep + hex.getLabel() + sep
-            + parent.getMarkerId() + sep + child.getMarkerId() + sep
-            + childHeight + sep + Glob.glob(splitoffs) + sep + turn);
-    }
-
-    public void askPickColor(List<PlayerColor> colorsLeft)
-    {
-        sendToClient(Constants.askPickColor + sep + Glob.glob(colorsLeft));
-    }
-
-    public void askPickFirstMarker()
-    {
-        sendToClient(Constants.askPickFirstMarker);
-    }
-
-    public void log(String message)
-    {
-        sendToClient(Constants.log + sep + message);
-    }
-
-    public void nak(String reason, String errmsg)
-    {
-        sendToClient(Constants.nak + sep + reason + sep + errmsg);
-    }
-
-    public void setBoardActive(boolean val)
-    {
-        sendToClient(Constants.boardActive + sep + val);
-    }
-
-    public void tellInitialGameInfo(String variantName,
-        Collection<String> playerNames)
-    {
-        String allPlayerNames = Glob.glob(playerNames);
-        sendToClient(Constants.gameInitInfo + sep + variantName + sep
-            + allPlayerNames);
-    }
-
-    public void confirmWhenCaughtUp()
-    {
-        LOGGER.info("Sending request to confirm catchup to client "
-            + playerName);
-        sendToClient(Constants.askConfirmCatchUp);
-    }
-
-    public void serverConfirmsConnection()
-    {
-        LOGGER.info("Sending server connection confirmation to client "
-            + playerName);
-        sendToClient(Constants.serverConnectionOK);
-    }
-
-    public void pingRequest()
-    {
-        if (clientVersion >= IServer.CLIENT_VERSION_UNDERSTANDS_PING)
-        {
-            sendToClient(Constants.pingRequest);
-        }
-    }
-
-    public void messageFromServer(String message)
-    {
-        // appears as pop-up window with "OK" button
-        sendToClient(Constants.messageFromServer + sep + message);
-    }
-
-    public void appendToConnectionLog(String message)
-    {
-        if (canHandleAdvancedSync())
-        {
-            sendToClient(Constants.appendToConnectionLog + sep + message);
-        }
-    }
-
-    public void tellSyncCompleted(int syncRequestNumber)
-    {
-        sendToClient(Constants.syncCompleted + sep + syncRequestNumber);
-    }
-
-    // same player re-connected with new ClientHandler, so this one here
-    // should "be gone"
-    public void declareObsolete()
-    {
-        obsolete = true;
-        setIsGone("declared obsolete by server");
-        LOGGER.warning("ClientHandler for " + getPlayerName()
-            + " declared obsolete.... -- but that's not fully implemented!");
-    }
+    // =======================================================================
+    // The IClient methods (which serialize the calls into sendToClient
+    // executions) are all in ClientHandlerStub.
+    // =======================================================================
 
     /**
      * Debug stuff,  only for testing/development purposes
@@ -1557,5 +1119,4 @@ final class ClientHandler implements IClient
     {
         return fakeDisconnect;
     }
-
 }

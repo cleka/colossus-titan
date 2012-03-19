@@ -309,6 +309,7 @@ public class GameServerSide extends Game
         {
             public void run()
             {
+                server.createClientHandlerStub();
                 createLocalClients();
             }
         };
