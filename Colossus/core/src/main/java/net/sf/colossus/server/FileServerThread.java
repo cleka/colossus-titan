@@ -52,6 +52,7 @@ final class FileServerThread extends Thread
             // TODO don't do a System.exit in code outside main()
             System.exit(1);
         }
+        LOGGER.info("FileServerThread started on " + server + ":" + port);
     }
 
     /*

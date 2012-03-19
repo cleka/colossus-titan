@@ -128,4 +128,5 @@ public interface IServer
 
     public void joinGame(String playerName);
 
+    public void watchGame();
 }

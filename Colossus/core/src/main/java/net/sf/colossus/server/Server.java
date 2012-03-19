@@ -267,16 +267,22 @@ public final class Server extends Thread implements IServer
     void initFileServer()
     {
         stopFileServer();
+        startFileServerIfNeeded();
+    }
 
-        if (game.getNumRemoteRemaining() > 0)
+    void startFileServerIfNeeded()
+    {
+        // start if either we expect (alive) remote client players, or
+        // there are already remote connections (e.g. spectators):
+        if (game.getNumRemoteRemaining() > 0 || !remoteClients.isEmpty())
         {
             fileServerThread = new FileServerThread(this, port + 1);
             fileServerThread.start();
         }
         else
         {
-            LOGGER
-                .finest("No alive remote client, not launching the file server.");
+            LOGGER.finest("No alive remote client or spectator"
+                + " - not launching the file server.");
         }
     }
 
@@ -1439,6 +1445,11 @@ public final class Server extends Thread implements IServer
         if (remote)
         {
             addRemoteClient(client, player);
+        }
+
+        if (spectator)
+        {
+            startFileServerIfNeeded();
         }
 
         if (player != null && isReconnect)
@@ -3650,6 +3661,11 @@ public final class Server extends Thread implements IServer
         {
             LOGGER.info("waitingForPlayersToJoin now " + stillMissing);
         }
+    }
+
+    public void watchGame()
+    {
+        LOGGER.info("CH " + processingCH.getClientName() + " sent watchGame");
     }
 
     public void enforcedDisconnectClient(String name)

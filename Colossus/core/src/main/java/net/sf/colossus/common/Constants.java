@@ -224,6 +224,8 @@ public final class Constants
     public static final String signOn = "signOn";
     public static final String requestGameInfo = "requestGameInfo";
     public static final String joinGame = "joinGame";
+    public static final String watchGame = "watchGame";
+
     public static final String fixName = "fixName";
 
     public static final String leaveCarryMode = "leaveCarryMode";
