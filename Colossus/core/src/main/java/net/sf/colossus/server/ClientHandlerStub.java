@@ -145,6 +145,24 @@ public class ClientHandlerStub implements IClient
         }
     }
 
+    /**
+     * A new way to pass changed player info to clients.
+     * Shortened info (e.g. color, dead state, ...) not sent every time;
+     * Includes a reason why sent (mostly used internally on server side
+     * for debugging/development purposes),
+     * and a flag whether this info should be redundant; idea behind it:
+     * on the long run, clients should be able to update game/player info
+     * "autonomously" (same logic implemented on client as on server)
+     * instead of server doing it and synching to all clients.
+     * So this redundant is meant to be used as safety net to detect
+     * where that new approach might miss something.
+     */
+    public void updateOnePlayersInfo(boolean redundant, String reason,
+        String ShouldBeSeveralSeparateVariablesHerePerhaps)
+    {
+        // TODO: this is not implemented yet at all...
+    }
+
     public void setColor(PlayerColor color)
     {
         sendToClient(Constants.setColor + sep + color.getName());

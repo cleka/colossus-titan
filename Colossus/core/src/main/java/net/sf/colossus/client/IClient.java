@@ -34,6 +34,9 @@ public interface IClient
 
     public void updatePlayerInfo(List<String> infoStrings);
 
+    public void updateOnePlayersInfo(boolean redundant, String reason,
+        String shortInfoString);
+
     public void setColor(PlayerColor color);
 
     public void updateCreatureCount(CreatureType type, int count, int deadCount);

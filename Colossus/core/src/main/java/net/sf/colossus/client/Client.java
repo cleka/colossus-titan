@@ -930,6 +930,12 @@ public final class Client implements IClient, IOracle, IVariant,
         gui.updateStatusScreen();
     }
 
+    public void updateOnePlayersInfo(boolean redundant, String reason,
+        String ShouldBeSeveralSeparateVariablesHerePerhaps)
+    {
+        // still to do ...
+    }
+
     public PlayerClientSide getOwningPlayer()
     {
         return owningPlayer;
