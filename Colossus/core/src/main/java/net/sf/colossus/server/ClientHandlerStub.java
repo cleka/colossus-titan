@@ -1,6 +1,7 @@
 package net.sf.colossus.server;
 
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -35,6 +36,13 @@ public class ClientHandlerStub implements IClient
     protected String playerName;
     protected String signonName;
 
+    // sync-when-disconnected stuff
+    protected int messageCounter = 0;
+    protected boolean isCommitPoint = false;
+
+    protected final ArrayList<MessageForClient> redoQueue = new ArrayList<MessageForClient>(
+        100);
+
     // for optimization, do not re-send if exactly identical to the one sent
     // last time.
     private String previousInfoStringsString = "";
@@ -63,6 +71,12 @@ public class ClientHandlerStub implements IClient
         return true;
     }
 
+    protected boolean supportsReconnect()
+    {
+        // dummy
+        return true;
+    }
+
     public void setIsGone(String reason)
     {
         LOGGER.info("Setting isGone to true in CH for '" + getClientName()
@@ -72,17 +86,23 @@ public class ClientHandlerStub implements IClient
 
     protected void sendToClient(String message)
     {
-        // TODO: needs still implementation
-        // (store selected messages so that a new spectators redo queue
-        // can be cloned from here)
-        LOGGER.info("STUB: +++ " + message + "+++");
+        // LOGGER.info("STUB: +++ " + message + "+++");
+
+        enqueueToRedoQueue(messageCounter, message);
+        messageCounter++;
+    }
+
+    private void enqueueToRedoQueue(int messageNr, String message)
+    {
+        redoQueue.add(new MessageForClient(messageNr, 0, message));
     }
 
     protected void commitPoint()
     {
-        // Nothing to do, so far...
+        // do nothing here, so far.
     }
 
+    // ======================================================================
     // IClient methods to sent requests to client over socket.
 
     /**

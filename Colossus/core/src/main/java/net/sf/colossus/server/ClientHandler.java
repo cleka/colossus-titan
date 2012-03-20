@@ -76,11 +76,7 @@ final class ClientHandler extends ClientHandlerStub implements IClient
     private final CharsetDecoder decoder = charset.newDecoder();
 
     // sync-when-disconnected stuff
-    private int messageCounter = 0;
     private int commitPointCounter = 0;
-
-    private final ArrayList<MessageForClient> redoQueue = new ArrayList<MessageForClient>(
-        50);
 
     private final static int MAX_KEEP_LINES = 5;
     private final ArrayList<String> recentlyProcessedLines = new ArrayList<String>(
@@ -250,38 +246,6 @@ final class ClientHandler extends ClientHandlerStub implements IClient
         sendViaChannelRaw(msg);
     }
 
-    /**
-     * here starts some stuff needed for the "synchronization in disconnect case"
-     */
-    private class MessageForClient
-    {
-        private final int messageNumber;
-        private final int commitNumber;
-        private final String message;
-
-        public MessageForClient(int messageNr, int commitNr, String message)
-        {
-            this.messageNumber = messageNr;
-            this.commitNumber = commitNr;
-            this.message = message;
-        }
-
-        public int getMessageNr()
-        {
-            return messageNumber;
-        }
-
-        public int getCommitNumber()
-        {
-            return commitNumber;
-        }
-
-        public String getMessage()
-        {
-            return message;
-        }
-    }
-
     private void enqueueToRedoQueue(int messageNr, String message)
     {
         if (supportsReconnect())
@@ -290,8 +254,6 @@ final class ClientHandler extends ClientHandlerStub implements IClient
                 (isCommitPoint ? commitPointCounter : 0), message));
         }
     }
-
-    private boolean isCommitPoint = false;
 
     @Override
     protected void commitPoint()
@@ -340,6 +302,7 @@ final class ClientHandler extends ClientHandlerStub implements IClient
         }
     }
 
+    @Override
     public boolean supportsReconnect()
     {
         return clientVersion >= IServer.CLIENT_VERSION_CAN_RECONNECT;
@@ -362,6 +325,14 @@ final class ClientHandler extends ClientHandlerStub implements IClient
         redoQueue.clear();
         redoQueue.addAll(oldCH.redoQueue);
         commitPointCounter = oldCH.commitPointCounter;
+    }
+
+    public void initRedoQueueFromStub(ClientHandlerStub stub)
+    {
+        redoQueue.clear();
+        redoQueue.addAll(stub.redoQueue);
+        LOGGER.fine("Initialized redoQueue from stub, contains now "
+            + redoQueue.size() + " items!");
     }
 
     /**
@@ -1030,23 +1001,18 @@ final class ClientHandler extends ClientHandlerStub implements IClient
         enqueueToRedoQueue(messageCounter, message);
         messageCounter++;
 
-        /* For development purposes... remove when done:
+        /*
+        // For development purposes... remove when done:
         List<String> li = Split.split(sep, message);
         String method = li.get(0);
 
         if (isSpectator())
         {
-            if (!method.equals("Ack: " + Constants.signOn)
-                && !method.equals(Constants.gameInitInfo))
-            {
-                System.out.print("!" + method + " ");
-                return;
-            }
-            System.out.println("\n" + method);
+            System.out.println("-->" + method);
         }
         else if (getClientName().equals("remote"))
         {
-            System.out.println("=>" + method);
+            System.out.println("==>" + method);
         }
         */
 
