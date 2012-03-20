@@ -698,6 +698,13 @@ final class ClientHandler extends ClientHandlerStub implements IClient
             setPlayerName(signonName);
             server.joinGame(signonName);
         }
+
+        else if (method.equals(Constants.watchGame))
+        {
+            LOGGER.info("Got watchGame request from client " + signonName);
+            server.watchGame();
+        }
+
         else if (method.equals(Constants.requestGameInfo))
         {
             server.replyToRequestGameInfo();

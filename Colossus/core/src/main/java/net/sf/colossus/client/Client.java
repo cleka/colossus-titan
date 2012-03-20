@@ -410,6 +410,10 @@ public final class Client implements IClient, IOracle, IVariant,
         {
             server.joinGame(playerName);
         }
+        else
+        {
+            server.watchGame();
+        }
 
         TerrainRecruitLoader.setCaretaker(getGame().getCaretaker());
         CustomRecruitBase.addCaretakerClientSide(getGame().getCaretaker());
