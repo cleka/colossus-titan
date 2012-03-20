@@ -304,6 +304,16 @@ final class SocketClientThread extends Thread implements IServer,
     private String readOneLine() throws IOException
     {
         String line = in.readLine();
+
+        // Logging/tracking of received messages for development purposes
+        // TODO: Remove when not needed any more
+        if (line != null && playerName != null
+            && (playerName.equals("remote") || spectator))
+        {
+            int len = line.length() < 120 ? line.length() : 120;
+            String shortLine = line.substring(0, len);
+            System.out.println("<<<" + shortLine);
+        }
         return line;
     }
 

@@ -998,6 +998,19 @@ final class ClientHandler extends ClientHandlerStub implements IClient
     @Override
     protected void sendToClient(String message)
     {
+        if (spectator)
+        {
+            // TODO: HACK! Fix somehow better? Perhaps on client side?
+            if (message.startsWith(Constants.initBoard))
+            {
+                int maxTurn = server.getGame().getTurnNumber();
+                String replayOn = Constants.replayOngoing + sep + true
+                    + maxTurn;
+                enqueueToRedoQueue(messageCounter, replayOn);
+                messageCounter++;
+            }
+        }
+
         enqueueToRedoQueue(messageCounter, message);
         messageCounter++;
 

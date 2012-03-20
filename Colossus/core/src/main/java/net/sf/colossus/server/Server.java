@@ -3658,6 +3658,7 @@ public final class Server extends Thread implements IServer
         LOGGER.info("Got: watchGame from CH " + processingCH.getClientName());
         processingCH.initRedoQueueFromStub(clientStub);
         iClients.add(processingCH);
+        processingCH.tellReplay(false, 0);
         processingCH.syncAfterReconnect(-1, 0);
     }
 
