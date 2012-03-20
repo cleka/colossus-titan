@@ -197,7 +197,7 @@ final class SocketClientThread extends Thread implements IServer,
             boolean signonOk = false;
             while (!signonOk)
             {
-                line = in.readLine();
+                line = readOneLine();
                 if (line.startsWith("Ack: signOn"))
                 {
                     LOGGER.fine("Got SignOn ACK: '" + line + "' - ok!");
@@ -233,7 +233,7 @@ final class SocketClientThread extends Thread implements IServer,
             boolean gotInfo = false;
             while (!gotInfo)
             {
-                line = in.readLine();
+                line = readOneLine();
 
                 if (line.startsWith(Constants.gameInitInfo))
                 {
@@ -354,6 +354,12 @@ final class SocketClientThread extends Thread implements IServer,
         }
     }
 
+    private String readOneLine() throws IOException
+    {
+        String line = in.readLine();
+        return line;
+    }
+
     public void waitForPrompt() throws SocketTimeoutException,
         SocketException, IOException
     {
@@ -361,7 +367,7 @@ final class SocketClientThread extends Thread implements IServer,
         // rather quickly... if not, probably Server has already enough
         // clients and we would hang in the queue...
         socket.setSoTimeout(5000);
-        initialLine = in.readLine();
+        initialLine = readOneLine();
         if (initialLine.startsWith("SignOn:"))
         {
             LOGGER.fine("Got prompt: '" + initialLine + "' - ok!");
@@ -603,7 +609,7 @@ final class SocketClientThread extends Thread implements IServer,
         {
             try
             {
-                line = in.readLine();
+                line = readOneLine();
             }
             catch (SocketTimeoutException ex)
             {
