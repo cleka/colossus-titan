@@ -939,8 +939,7 @@ public final class Server extends Thread implements IServer
         if (forcedWithdraws.containsKey(withdrawName))
         {
             LOGGER.warning("Removing _still_ existing entry for '"
-                + withdrawName
-                + "' from forcedWithdraws list.");
+                + withdrawName + "' from forcedWithdraws list.");
             forcedWithdraws.remove(withdrawName);
         }
         long howLong = (long)(intervals * intervalLen / 1000.0);
@@ -1375,12 +1374,12 @@ public final class Server extends Thread implements IServer
 
         LOGGER.info("Trying to identify player/client for new connection "
             + "which identifies itself as player " + playerName);
-        String name = "<undefined>";
+        ClientHandler existingCH;
         if (spectator)
         {
-            ++spectators;
-            name = playerName;
             LOGGER.info("Adding spectator " + playerName);
+            ++spectators;
+            startFileServerIfNotRunning();
         }
         else if (player == null)
         {
@@ -1391,18 +1390,23 @@ public final class Server extends Thread implements IServer
                 + " - rejected, because no such player is expected!");
             return "No player with name " + playerName + " expected.";
         }
+        else
+        {
+            // regular connect
+        }
+
         /*
          *  The special Re-Connect case starts here:
+         *  Note: not else-if any more, since also spectators might reconnect
          */
-        else if (isReconnectAttempt(player))
+        if ((existingCH = getClientHandlerByName(playerName)) != null)
         {
-            ClientHandler existingCH = getClientHandlerByName(playerName);
-            if (existingCH != null)
+            othersTellReconnectOngoing(existingCH);
+            isReconnect = true;
+            LOGGER.info("All right, reconnection of known player!");
+            (client).cloneRedoQueue(existingCH);
+            if (player != null)
             {
-                othersTellReconnectOngoing(existingCH);
-                isReconnect = true;
-                LOGGER.info("All right, reconnection of known player!");
-                (client).cloneRedoQueue(existingCH);
                 playerToClientMap.remove(player);
                 iClients.remove(existingCH);
                 realClients.remove(existingCH);
@@ -1427,34 +1431,26 @@ public final class Server extends Thread implements IServer
                     + "joined.");
                 return "Other player with same name already connected.";
             }
-        }
-        else
-        {
-            name = playerName;
+            iClients.remove(existingCH);
+            realClients.remove(existingCH);
+            queueClientHandlerForChannelChanges(existingCH);
+            existingCH.declareObsolete();
+            LOGGER.info("Removing player with name " + playerName
+                + " from forcedWithDrawlist. Size was "
+                + forcedWithdraws.size());
+            forcedWithdraws.remove(playerName);
+            LOGGER.info("Removed  player with name " + playerName
+                + " from forcedWithDrawlist. Size now "
+                + forcedWithdraws.size());
         }
 
-        iClients.add(client);
         realClients.add(client);
-
-        /*
-        // Note, actually last joined client signonName will always be still null...
-         *
-        System.out.println("\n\n******\nclients contains now "
-            + clients.size() + " clients.");
-        for (IClient c : clients)
+        if (isReconnect || !spectator)
         {
-            String displayName = "unknown";
-            if ((c != null) && ((ClientHandler)c).getPlayerName() != null)
-            {
-                displayName = ((ClientHandler)c).getPlayerName();
-            }
-            else if (c != null && ((ClientHandler)c).getSignonName() != null)
-            {
-                displayName = ((ClientHandler)c).getSignonName();
-            }
-            System.out.println("Client: " + displayName + " .");
+            // For initial spectator connects do not add yet; server would
+            // start sending data immediately.
+            iClients.add(client);
         }
-        */
 
         if (player != null)
         {
@@ -1466,21 +1462,15 @@ public final class Server extends Thread implements IServer
             addRemoteClient(client, player);
         }
 
-        if (spectator)
-        {
-            startFileServerIfNotRunning();
-        }
-
         if (player != null && isReconnect)
         {
             logToStartLog("\nPlayer " + player.getName()
                 + " reconnected, game can continue now.\n");
-
         }
         else if (player != null)
         {
-            logToStartLog((remote ? "Remote" : "Local") + " player " + name
-                + " signed on.");
+            logToStartLog((remote ? "Remote" : "Local") + " player "
+                + playerName + " signed on.");
             game.getNotifyWebServer().gotClient(player.getName(), remote);
             --waitingForPlayers;
 
@@ -1501,22 +1491,11 @@ public final class Server extends Thread implements IServer
         else
         {
             logToStartLog((remote ? "Remote" : "Local") + " spectator ("
-                + name + ") signed on.");
+                + playerName + ") signed on.");
         }
 
         // ReasonFail == null means "everything is fine.":
         return null;
-    }
-
-    private boolean isReconnectAttempt(Player player)
-    {
-        IClient client = playerToClientMap.get(player);
-
-        if (client != null)
-        {
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -2104,10 +2083,11 @@ public final class Server extends Thread implements IServer
 
     void allPlaceNewChit(CreatureServerSide critter)
     {
+        boolean inverted = critter.getLegion().equals(
+            game.getBattleSS().getDefendingLegion());
         for (IClient client : iClients)
         {
-            client.placeNewChit(critter.getName(), critter.getLegion().equals(
-                game.getBattleSS().getDefendingLegion()), critter.getTag(),
+            client.placeNewChit(critter.getName(), inverted, critter.getTag(),
                 critter.getCurrentHex());
         }
     }
@@ -2695,9 +2675,9 @@ public final class Server extends Thread implements IServer
         while (it.hasNext())
         {
             IClient client = it.next();
-            client.initBattle(masterHex, battle.getBattleTurnNumber(), battle
-                .getBattleActivePlayer(), battle.getBattlePhase(), battle
-                .getAttackingLegion(), battle.getDefendingLegion());
+            client.initBattle(masterHex, battle.getBattleTurnNumber(),
+                battle.getBattleActivePlayer(), battle.getBattlePhase(),
+                battle.getAttackingLegion(), battle.getDefendingLegion());
         }
     }
 
@@ -3143,8 +3123,7 @@ public final class Server extends Thread implements IServer
             IClient client = it.next();
             client.revealCreatures(legion, legion.getCreatureTypes(), reason);
         }
-        game
-            .revealEvent(true, null, legion, legion.getCreatureTypes(), reason);
+        game.revealEvent(true, null, legion, legion.getCreatureTypes(), reason);
     }
 
     /** pass to all clients the 'revealEngagedCreatures' message,
@@ -3164,8 +3143,7 @@ public final class Server extends Thread implements IServer
             client.revealEngagedCreatures(legion, legion.getCreatureTypes(),
                 isAttacker, reason);
         }
-        game
-            .revealEvent(true, null, legion, legion.getCreatureTypes(), reason);
+        game.revealEvent(true, null, legion, legion.getCreatureTypes(), reason);
     }
 
     /** Call from History during load game only */
@@ -3213,9 +3191,9 @@ public final class Server extends Thread implements IServer
             {
                 for (Legion legion : game.getAllLegions())
                 {
-                    client.setLegionStatus(legion, legion.hasMoved(), legion
-                        .hasTeleported(), legion.getEntrySide(), legion
-                        .getRecruit());
+                    client.setLegionStatus(legion, legion.hasMoved(),
+                        legion.hasTeleported(), legion.getEntrySide(),
+                        legion.getRecruit());
                 }
             }
         }
@@ -3677,7 +3655,10 @@ public final class Server extends Thread implements IServer
 
     public void watchGame()
     {
-        LOGGER.info("CH " + processingCH.getClientName() + " sent watchGame");
+        LOGGER.info("Got: watchGame from CH " + processingCH.getClientName());
+        processingCH.initRedoQueueFromStub(clientStub);
+        iClients.add(processingCH);
+        processingCH.syncAfterReconnect(-1, 0);
     }
 
     public void enforcedDisconnectClient(String name)
