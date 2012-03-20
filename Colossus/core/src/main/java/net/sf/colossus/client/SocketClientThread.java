@@ -310,9 +310,10 @@ final class SocketClientThread extends Thread implements IServer,
         if (line != null && playerName != null
             && (playerName.equals("remote") || spectator))
         {
-            int len = line.length() < 120 ? line.length() : 120;
-            String shortLine = line.substring(0, len);
-            System.out.println("<<<" + shortLine);
+            // int len = line.length() < 120 ? line.length() : 120;
+            // String shortLine = line.substring(0, len);
+            // System.out.println("<<<" + shortLine);
+            // System.out.println(line);
         }
         return line;
     }
