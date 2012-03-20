@@ -1206,13 +1206,14 @@ public final class Server extends Thread implements IServer
 
         for (Player player : game.getPlayers())
         {
-            if (!player.isAI() && !isClientGone(player))
+            // It's not AI, plus either not gone, or still alive ( = might reconnect)
+            if (!player.isAI() && (!isClientGone(player) || !player.isDead()))
             {
                 return true;
             }
         }
 
-        // no nonAI connected any more - return false:
+        // no nonAI connected/alive any more - return false:
         return false;
     }
 
