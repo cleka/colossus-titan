@@ -191,74 +191,20 @@ final class SocketClientThread extends Thread implements IServer,
             signOn(initialName, isRemote, IServer.CLIENT_VERSION,
                 BuildInfo.getFullBuildInfoString(), spectator);
 
-            String line;
             task = "Waiting for signOn acknowledge";
             LOGGER.log(Level.FINEST, "Next: " + task);
-            boolean signonOk = false;
-            while (!signonOk)
+            reasonFail = waitForSignonOk();
+
+            if (reasonFail == null)
             {
-                line = readOneLine();
-                if (line.startsWith("Ack: signOn"))
-                {
-                    LOGGER.fine("Got SignOn ACK: '" + line + "' - ok!");
-                    signonOk = true;
-                }
-                else if (line.startsWith(Constants.nak))
-                {
-                    reasonFail = "SignOn rejected with NAK: " + line;
-                    return;
-                }
-                else if (line.startsWith(Constants.log))
-                {
-                    // XXX TODO Handle better
-                    // Earlier/Normally this would be forwarded to Client to
-                    // give it to the logger / to LogWindow, but Client is not
-                    // up / available yet.
-                    LOGGER.info("ServerLog: " + line);
-                }
-                else
-                {
-                    LOGGER.warning("Ignoring unexpected line from server: '"
-                        + line + "'");
-                }
+                task = "Requesting GameInfo";
+                LOGGER.log(Level.FINEST, "Next: " + task);
+                requestGameInfo();
+
+                task = "Waiting for GameInfo";
+                LOGGER.log(Level.FINEST, "Next: " + task);
+                reasonFail = waitForGameInfo();
             }
-
-            task = "Requesting GameInfo";
-            LOGGER.log(Level.FINEST, "Next: " + task);
-            requestGameInfo();
-
-            task = "Waiting for GameInfo";
-            LOGGER.log(Level.FINEST, "Next: " + task);
-
-            boolean gotInfo = false;
-            while (!gotInfo)
-            {
-                line = readOneLine();
-
-                if (line.startsWith(Constants.gameInitInfo))
-                {
-                    LOGGER.fine("Got initGameInfo: '" + line + "' - ok!");
-                    parseLine(line);
-                    gotInfo = true;
-                }
-                else if (line.startsWith(Constants.nak))
-                {
-                    reasonFail = "GameInfo request got NAK: " + line;
-                    return;
-                }
-                else if (line.startsWith(Constants.log))
-                {
-                    // XXX TODO Handle better
-                    LOGGER.info("ServerLog: " + line);
-                }
-                else
-                {
-                    LOGGER.warning(getPrintName() + ": got '" + line
-                        + "' but no use for it ...");
-                }
-            }
-
-            reasonFail = null;
         }
 
         catch (UnknownHostException e)
@@ -297,9 +243,9 @@ final class SocketClientThread extends Thread implements IServer,
                     + "information what might be wrong)";
             }
 
-            LOGGER.log(Level.INFO, "ConnectException (\"" + msg + "\") "
+            LOGGER.log(Level.INFO, "ConnectException ('" + msg + "') "
                 + "in SCT during " + task);
-            reasonFail = "ConnectException (\"" + e.getMessage() + "\") "
+            reasonFail = "ConnectException ('" + e.getMessage() + "') "
                 + "during " + task + possReason;
 
             return;
@@ -309,7 +255,7 @@ final class SocketClientThread extends Thread implements IServer,
         catch (SocketTimeoutException ste)
         {
             String msg = ste.getMessage();
-            LOGGER.log(Level.INFO, "SocketTimeoutException (\"" + msg + "\") "
+            LOGGER.log(Level.INFO, "SocketTimeoutException ('" + msg + "') "
                 + "in SCT during " + task);
             reasonFail = "Server not responding (could connect, "
                 + "but didn't got any initial data within 5 seconds. "
@@ -319,11 +265,12 @@ final class SocketClientThread extends Thread implements IServer,
         }
 
         // e.g. setSoTimeout calls in tryInitialRead
-        catch (SocketException e)
+        catch (SocketException se)
         {
-            LOGGER.log(Level.SEVERE, "SocketException in SCT during " + task
-                + ": ", e);
-            reasonFail = "Exception during " + task + ": " + e.toString()
+            String msg = se.getMessage();
+            LOGGER.log(Level.SEVERE, "SocketException ('" + msg + "') "
+                + "in SCT during " + task + ": ", se);
+            reasonFail = "Exception during " + task + ": " + se.toString()
                 + "\n(No typical case is known causing this situation; "
                 + "check the exception details for any information what "
                 + "might be wrong)";
@@ -379,6 +326,76 @@ final class SocketClientThread extends Thread implements IServer,
         socket.setSoTimeout(0);
 
         return;
+    }
+
+    private String waitForSignonOk() throws IOException
+    {
+        String line;
+        boolean signonOk = false;
+        while (!signonOk)
+        {
+            line = in.readLine();
+            if (line.startsWith("Ack: signOn"))
+            {
+                LOGGER.fine("Got SignOn ACK: '" + line + "' - ok!");
+                signonOk = true;
+            }
+            else if (line.startsWith(Constants.nak))
+            {
+                return "SignOn rejected with NAK: " + line;
+            }
+            else if (line.startsWith(Constants.log))
+            {
+                // XXX TODO Handle better
+                // Earlier/Normally this would be forwarded to Client to
+                // give it to the logger / to LogWindow, but Client is not
+                // up / available yet.
+                LOGGER.info("ServerLog: " + line);
+            }
+            else
+            {
+                LOGGER.warning("Ignoring unexpected line from server: '"
+                    + line + "'");
+            }
+        }
+
+        // Everything is ok:
+        return null;
+    }
+
+    private String waitForGameInfo() throws IOException
+    {
+        String line;
+
+        boolean gotInfo = false;
+        while (!gotInfo)
+        {
+            line = in.readLine();
+
+            if (line.startsWith(Constants.gameInitInfo))
+            {
+                LOGGER.fine("Got initGameInfo: '" + line + "' - ok!");
+                parseLine(line);
+                gotInfo = true;
+            }
+            else if (line.startsWith(Constants.nak))
+            {
+                return "GameInfo request got NAK: " + line;
+            }
+            else if (line.startsWith(Constants.log))
+            {
+                // XXX TODO Handle better
+                LOGGER.info("ServerLog: " + line);
+            }
+            else
+            {
+                LOGGER.warning(getPrintName() + ": got '" + line
+                    + "' but no use for it ...");
+            }
+        }
+
+        // Everything is ok:
+        return null;
     }
 
     public String getReasonFail()
