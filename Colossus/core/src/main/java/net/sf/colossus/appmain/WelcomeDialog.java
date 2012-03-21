@@ -28,11 +28,11 @@ public final class WelcomeDialog extends KFrame
 {
     private final static String title = "Welcome to this new Colossus Release!";
 
-    private final static String CURRENT_WELCOME_KEY = "0.13.1";
+    private final static String CURRENT_WELCOME_KEY = "0.13.2";
 
     private final static String baseUrl = "http://sourceforge.net/projects/colossus/files";
     private final static String colossusReleaseNoteUrl = baseUrl
-        + "/Release-0.13.1";
+        + "/Release-0.13.2";
 
     private static WelcomeDialog showWelcome = null;
 
@@ -42,13 +42,18 @@ public final class WelcomeDialog extends KFrame
         super(title);
 
         String text = "\n"
-            + "  Welcome to this new 'Colossus Public Test Build' 0.13.1pretest2!"
+            + "  Welcome to this new Colossus Release 0.13.2!"
             + "\n\n"
-            + "  New features:\n"
+            + "  Release 0.13.1 brings:\n"
             + "  - Further improved reconnect functionality and other improvements.\n"
+            + "  Release 0.13.2 brings:\n"
+            + "  - Removed the non-working 'Disconnect' menu item\n"
+            + "  - Legion fly-out keys (Shift and Ctrl) should now \"always\" work\n"
+            + "  - Update strike damage in remote clients immediately, not only when strike turn is completed\n"
+            + "  - It identifies itself as release, not at some places as \"public test build\" ;-)\n"
             + "\n"
             + "  For a more detailed list of changes see the Recent Changes Details document "
-            + "in the test build section of Colossus home page:\n      "
+            + "in the Download area of Colossus on SourceForge:\n      "
             + colossusReleaseNoteUrl
             + "\n\n"
             + "  Use button below to copy the URL to your clipboard to paste it "

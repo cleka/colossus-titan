@@ -568,6 +568,13 @@ public final class Server extends Thread implements IServer
             SelectionKey key = readyKeys.next();
             readyKeys.remove();
 
+            int readyOps = key.readyOps();
+            LOGGER.finest("handleSelectedKyes, readyOps is " + readyOps);
+            if (key.isAcceptable() && (key.isReadable() || key.isWritable()))
+            {
+                LOGGER
+                    .warning("Oops, key is both acceptable and read-or-write?!?");
+            }
             if (key.isAcceptable())
             {
                 // Accept the new connection
@@ -675,6 +682,9 @@ public final class Server extends Thread implements IServer
                     // just a stub
                 }
 
+                LOGGER.info("Before removing CH " + nextCHS.getSignonName()
+                    + " from clients list, list size is: " + iClients.size());
+                iClients.remove(nextCHS);
             }
             channelChanges.clear();
         }
@@ -799,7 +809,7 @@ public final class Server extends Thread implements IServer
             {
                 // set isGone first, to prevent from sending log info to
                 // client channel - channel is gone anyway...
-                processingCH.setIsGone("REASON");
+                processingCH.setIsGone("IOException while reading");
                 LOGGER.log(Level.WARNING, "IOException '" + e.getMessage()
                     + "' while reading from channel for player "
                     + getPlayerName(), e);

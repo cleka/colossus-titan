@@ -375,6 +375,9 @@ public final class PlayerServerSide extends Player implements
         return false;
     }
 
+    //
+    private Legion previousUndoRecruitLegion = null;
+
     /**
      * Tell legion to do undo the recruiting and trigger needed messages
      * to be sent to clients
@@ -389,13 +392,28 @@ public final class PlayerServerSide extends Player implements
         CreatureType recruit = ((LegionServerSide)legion).getRecruit();
         if (recruit == null)
         {
-            LOGGER.log(Level.WARNING,
-                "Player.undoRecruit: Nothing to unrecruit for legion "
+            if (previousUndoRecruitLegion != null
+                && previousUndoRecruitLegion.equals(legion))
+            {
+                LOGGER
+                    .info("Player.undoRecruit: "
+                        + "Nothing to unrecruit for legion "
+                        + legion.getMarkerId()
+                        + " but that's probably just a duplicate click - ignoring it.");
+                LOGGER.info(getGame().getServer().processingCH
+                    .dumpLastProcessedLines());
+            }
+            else
+            {
+                LOGGER.log(Level.WARNING,
+                    "Player.undoRecruit: Nothing to unrecruit for legion "
                     + legion.getMarkerId());
-            LOGGER.info(getGame().getServer().processingCH
-                .dumpLastProcessedLines());
+                LOGGER.info(getGame().getServer().processingCH
+                    .dumpLastProcessedLines());
+            }
             return;
         }
+        previousUndoRecruitLegion = legion;
         ((LegionServerSide)legion).undoRecruit();
 
         // Update number of creatures in status window.

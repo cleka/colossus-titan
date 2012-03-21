@@ -1300,6 +1300,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         board.highlightPossibleRecruitLegionHexes();
         if (client.isMyLegion(legion))
         {
+            defaultCursor();
             if (!wasReinforcement)
             {
                 board.updateLegionsLeftToMusterText();
@@ -2730,6 +2731,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     {
         if (legion.hasRecruited())
         {
+            waitCursor();
             getClient().undoRecruit(legion);
         }
         else
@@ -3161,6 +3163,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void actOnMoveNak()
     {
+        defaultCursor();
         pendingMoves.clear();
         pendingMoveHexes.clear();
         recoveredFromMoveNak = true;
@@ -3204,6 +3207,13 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         PendingMove move = new PendingMove(mover, currentHex, targetHex);
         pendingMoves.add(move);
         pendingMoveHexes.add(targetHex);
+        synchronized (pendingMoves)
+        {
+            if (!pendingMoves.isEmpty())
+            {
+                waitCursor();
+            }
+        }
         updatePendingText();
     }
 
@@ -3273,6 +3283,13 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         {
             LOGGER.warning("Could not find pending move for legion " + mover
                 + " from hex " + current + " to hex " + target);
+        }
+        synchronized (pendingMoves)
+        {
+            if (pendingMoves.isEmpty())
+            {
+                defaultCursor();
+            }
         }
     }
 

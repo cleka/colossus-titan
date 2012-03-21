@@ -183,6 +183,11 @@ public class User
 
     public void updateLastLogout()
     {
+        if (sessionStarted == -1)
+        {
+            LOGGER.info("sessionStarted already -1, skip updateLogout");
+            return;
+        }
         long sessionEnded = new Date().getTime();
         long duration = (sessionEnded - sessionStarted) / 1000;
         if (duration >= 0 && sessionStarted > 0)

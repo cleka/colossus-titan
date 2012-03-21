@@ -976,6 +976,13 @@ public final class Client implements IClient, IOracle, IVariant,
             // send withdraw, if relevant (not game over or dead already)
             // TODO Not in use right now, Server has not enough time to
             // handle it before Exception strikes? Need further testing...
+            // In practice, handling the withDraw would involve writing
+            // to all clients, and that leads to BrokenPipeException.
+            // In contrast, disconnect does not send anything to the
+            // to-be-gone client.
+            // Solution approach perhaps: pass in disconnect message
+            // a mode like: withdraw / shortterm  (will disconnect soon)
+            // or longterm (=> play by email) or (CH to sever) "unknown"
             // withdrawFromGame();
 
             // SCT will then end the loop and do the dispose.

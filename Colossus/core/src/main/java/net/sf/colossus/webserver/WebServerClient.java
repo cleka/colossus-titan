@@ -158,6 +158,9 @@ public class WebServerClient implements IWebClient
         // user will still be null; skip all this here then:
         if (user != null)
         {
+            user.updateLastLogout();
+            server.writeBackUsers();
+
             if (user.getWebserverClient() == this)
             {
                 // after here, user is not in loggedInUsersList any more, i.e.
@@ -343,8 +346,6 @@ public class WebServerClient implements IWebClient
         {
             LOGGER.info("Received Logout request from user "
                 + cst.getClientInfo());
-            user.updateLastLogout();
-            server.writeBackUsers();
             ok = true;
             done = true;
         }
@@ -714,14 +715,11 @@ public class WebServerClient implements IWebClient
             server.getGeneralChat().handleUnknownCommand(msgAllLower, chatId,
                 this);
         }
-
         else
         {
             server.chatSubmit(chatId, sender, message);
         }
     }
-
-
 
     /**
      * if password is okay, check first whether same user is already

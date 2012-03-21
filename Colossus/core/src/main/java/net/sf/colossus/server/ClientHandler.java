@@ -1037,7 +1037,7 @@ final class ClientHandler extends ClientHandlerStub implements IClient
 
         if (isGone())
         {
-            LOGGER.info("No point ot send anything to player " + playerName
+            LOGGER.info("No point to send anything to player " + playerName
                 + " when client connection already gone");
             return;
         }

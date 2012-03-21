@@ -1228,8 +1228,16 @@ public final class MasterBoard extends JPanel
         mi = fileMenu.add(checkConnectionAction);
         mi.setMnemonic(KeyEvent.VK_K);
 
-        mi = fileMenu.add(cleanDisconnectAction);
-        mi.setMnemonic(KeyEvent.VK_Y);
+        /* Removed for r-0.13.2, since it does not work - it merely makes the
+         * client stop processing stuff from the queue, but ClientSocketThread
+         * keeps receiving and ack'ing lines from/to server.
+         */
+        boolean _CLEAN_DISCONNECT = false;
+        if (_CLEAN_DISCONNECT)
+        {
+            mi = fileMenu.add(cleanDisconnectAction);
+            mi.setMnemonic(KeyEvent.VK_Y);
+        }
 
         mi = fileMenu.add(tryReconnectAction);
         mi.setMnemonic(KeyEvent.VK_R);
