@@ -92,6 +92,16 @@ public class ClientHandlerStub implements IClient
         messageCounter++;
     }
 
+    /**
+     * Selector reported that client became writable again (after a prior
+     * write attempt had not written all bytes). Now start/try writing the
+     * message(s) which are still in the queue.
+     */
+    protected void flushQueuedContent()
+    {
+        // not needed here
+    }
+
     private void enqueueToRedoQueue(int messageNr, String message)
     {
         redoQueue.add(new MessageForClient(messageNr, 0, message));

@@ -616,7 +616,7 @@ public final class Server extends Thread implements IServer
 
                         // just call it to flush out what is still there
                         ch.clearTemporarilyInTrouble();
-                        ch.sendToClient(null);
+                        ch.flushQueuedContent();
 
                         anythingDone = true;
                     }
@@ -1403,20 +1403,29 @@ public final class Server extends Thread implements IServer
         {
             othersTellReconnectOngoing(existingCH);
             isReconnect = true;
-            LOGGER.info("All right, reconnection of known player!");
+            LOGGER.info("All right, reconnection of known client!");
             (client).cloneRedoQueue(existingCH);
-            if (player != null)
+            if (player != null || existingCH.isSpectator())
             {
-                playerToClientMap.remove(player);
+                String name;
+                if (player != null)
+                {
+                    name = player.getName();
+                    playerToClientMap.remove(player);
+                }
+                else
+                {
+                    name = playerName;
+                }
                 iClients.remove(existingCH);
                 realClients.remove(existingCH);
                 queueClientHandlerForChannelChanges(existingCH);
                 existingCH.declareObsolete();
-                LOGGER.info("Removing player with name " + player.getName()
+                LOGGER.info("Removing player with name " + name
                     + " from forcedWithDrawlist. Size was "
                     + forcedWithdraws.size());
-                forcedWithdraws.remove(player.getName());
-                LOGGER.info("Removed  player with name " + player.getName()
+                forcedWithdraws.remove(name);
+                LOGGER.info("Removed  client with name " + name
                     + " from forcedWithDrawlist. Size now "
                     + forcedWithdraws.size());
             }

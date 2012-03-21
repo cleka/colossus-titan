@@ -246,6 +246,12 @@ final class ClientHandler extends ClientHandlerStub implements IClient
         sendViaChannelRaw(msg);
     }
 
+    @Override
+    protected void flushQueuedContent()
+    {
+        sendViaChannelRaw(null);
+    }
+
     private void enqueueToRedoQueue(int messageNr, String message)
     {
         if (supportsReconnect())
@@ -1062,16 +1068,11 @@ final class ClientHandler extends ClientHandlerStub implements IClient
             }
             sendViaChannel(message);
 
-            if (server == null)
-            {
-                LOGGER.severe("server null");
-            }
-            else if (server.getGame() == null)
-            {
-                LOGGER.severe("game null");
-            }
-
-            else if (server.getGame().isLoadingGame())
+            // TODO: are the null checks needed? Can that ever happen?
+            // They were here as explicit if-cases, producing SEVERE log
+            // messages if null.
+            if (server != null && server.getGame() != null
+                && server.getGame().isLoadingGame())
             {
                 // Give clients some opportunity to process it
                 // (especially during replay during loading game)
