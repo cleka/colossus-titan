@@ -93,7 +93,7 @@ public final class Server extends Thread implements IServer
     private final List<SocketChannel> activeSocketChannelList = new ArrayList<SocketChannel>();
 
     /** Number of player clients we're waiting for to *connect* */
-    private int waitingForPlayers;
+    private int waitingForClients;
 
     /** Number of player clients we're waiting for to *join*
      *  - when last one has joined, then kick of newGame2() or loadGame2()
@@ -209,8 +209,9 @@ public final class Server extends Thread implements IServer
             startLog = new StartupProgress(this);
         }
 
-        waitingForPlayers = game.getNumLivingPlayers();
-        initWaitingForPlayersToJoin(waitingForPlayers);
+        int expectedPlayers = game.getNumLivingPlayers();
+        initWaitingForPlayersToJoin(expectedPlayers);
+        waitingForClients = expectedPlayers;
         InstanceTracker.register(this, "only one");
     }
 
@@ -367,7 +368,7 @@ public final class Server extends Thread implements IServer
 
     boolean waitForClients()
     {
-        logToStartLog("\nStarting up, waiting for " + waitingForPlayers
+        logToStartLog("\nStarting up, waiting for " + waitingForClients
             + " player clients at port " + port + "\n");
         StringBuilder living = new StringBuilder("");
         StringBuilder dead = new StringBuilder("");
@@ -388,13 +389,13 @@ public final class Server extends Thread implements IServer
             logToStartLog("Players already dead before save  : " + dead + "\n");
         }
         serverRunning = true;
-        while (waitingForPlayers > 0 && serverRunning && !shuttingDown)
+        while (waitingForClients > 0 && serverRunning && !shuttingDown)
         {
             LOGGER.info("Waiting for clients, before waitOnSelector()");
             waitOnSelector(timeoutDuringStart, true);
         }
 
-        return (waitingForPlayers == 0);
+        return (waitingForClients == 0);
     }
 
     public void createClientHandlerStub()
@@ -1493,15 +1494,15 @@ public final class Server extends Thread implements IServer
             logToStartLog((remote ? "Remote" : "Local") + " player "
                 + playerName + " signed on.");
             game.getNotifyWebServer().gotClient(player.getName(), remote);
-            --waitingForPlayers;
+            --waitingForClients;
 
             LOGGER.info("Decremented waitingForPlayers (to connect) to "
-                + waitingForPlayers);
+                + waitingForClients);
 
-            if (waitingForPlayers > 0)
+            if (waitingForClients > 0)
             {
-                String pluralS = (waitingForPlayers > 1 ? "s" : "");
-                logToStartLog(" ==> Waiting for " + waitingForPlayers
+                String pluralS = (waitingForClients > 1 ? "s" : "");
+                logToStartLog(" ==> Waiting for " + waitingForClients
                     + " more player client" + pluralS + " to sign on.\n");
             }
             else
