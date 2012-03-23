@@ -48,6 +48,9 @@ public final class Constants
 
     public static final boolean USE_RECORDER = false;
 
+    public static final boolean _CREATE_LOCAL_DUMMY_CLIENT = true;
+    public static final String INTERNAL_DUMMY_CLIENT_NAME = "_internal_dummy_";
+
     // Constants for savegames
 
     /** Must include trailing slash. */

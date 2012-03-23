@@ -311,6 +311,10 @@ public class GameServerSide extends Game
             {
                 server.createClientHandlerStub();
                 createLocalClients();
+                if (Constants._CREATE_LOCAL_DUMMY_CLIENT)
+                {
+                    createInternalDummyClient();
+                }
             }
         };
         Thread doCreateClientsThread = new Thread(doCreateClients);
@@ -404,6 +408,25 @@ public class GameServerSide extends Game
         catch (ConnectionInitException e)
         {
             LOGGER.warning("Creating local client for player " + playerName
+                + " failed, reason " + e.getMessage());
+        }
+    }
+
+    private void createInternalDummyClient()
+    {
+        String playerName = Constants.INTERNAL_DUMMY_CLIENT_NAME;
+        LOGGER.finest("Called Server.createLocalClient() for " + playerName);
+
+        try
+        {
+            Client c = Client.createClient("127.0.0.1", getPort(), playerName,
+                Constants.aiPackage + Constants.human, whatNextManager,
+                server, false, true, false, true);
+            storeLocalClient(playerName, c);
+        }
+        catch (ConnectionInitException e)
+        {
+            LOGGER.warning("Creating local _internal_dummy_ client"
                 + " failed, reason " + e.getMessage());
         }
     }

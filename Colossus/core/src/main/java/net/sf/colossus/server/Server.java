@@ -212,6 +212,10 @@ public final class Server extends Thread implements IServer
         int expectedPlayers = game.getNumLivingPlayers();
         initWaitingForPlayersToJoin(expectedPlayers);
         waitingForClients = expectedPlayers;
+        if (Constants._CREATE_LOCAL_DUMMY_CLIENT)
+        {
+            waitingForClients += 1;
+        }
         InstanceTracker.register(this, "only one");
     }
 
@@ -1512,8 +1516,17 @@ public final class Server extends Thread implements IServer
         }
         else
         {
-            logToStartLog((remote ? "Remote" : "Local") + " spectator ("
-                + playerName + ") signed on.");
+            if (playerName.equals(Constants.INTERNAL_DUMMY_CLIENT_NAME))
+            {
+                logToStartLog("Internal dummy spectator (" + playerName
+                    + ") signed on.");
+                --waitingForClients;
+            }
+            else
+            {
+                logToStartLog((remote ? "Remote" : "Local") + " spectator ("
+                    + playerName + ") signed on.");
+            }
         }
 
         // ReasonFail == null means "everything is fine.":

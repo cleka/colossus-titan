@@ -184,7 +184,22 @@ public final class Client implements IClient, IOracle, IVariant,
 
     private final Server localServer;
 
+    // This client is a spectator
     private final boolean spectator;
+
+    /**
+     *  This client is the very special internal spectator with the name
+     * as defined in Constants.
+     * The idea of this internal spectator is: it can run in standby in
+     * any game, e.g. also on the public server, and detect discrepancies
+     * between local state and updateCreatureCount or playerInfo from
+     * Server. This is part of the work, to replace "all details need to
+     * be broadcasted all the time" with "Client side does the bookkeeping
+     * autonomously; so for quite a while it would do bookkeeping and the
+     * updates are still sent but just for checking, and any discrepancy
+     * detected can/should be fixed.
+     */
+    private final boolean internalSpectator;
 
     /**
      * Constants modelling the party who closed this client.
@@ -337,6 +352,8 @@ public final class Client implements IClient, IOracle, IVariant,
     {
         assert playerName != null;
         this.spectator = spectator;
+        this.internalSpectator = (playerName
+            .equals(Constants.INTERNAL_DUMMY_CLIENT_NAME));
 
         Collection<String> playerNamesList = conn.getPreliminaryPlayerNames();
 
@@ -434,6 +451,11 @@ public final class Client implements IClient, IOracle, IVariant,
     public boolean isSpectator()
     {
         return spectator;
+    }
+
+    public boolean isTheInternalSpectator()
+    {
+        return internalSpectator;
     }
 
     // TODO can this be replaced with "!owningPlayer.isDead()" ?

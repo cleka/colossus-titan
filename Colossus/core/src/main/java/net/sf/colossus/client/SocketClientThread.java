@@ -68,6 +68,7 @@ final class SocketClientThread extends Thread implements IServer,
     private String playerName;
     private boolean remote;
     private boolean spectator;
+    private final boolean internalSpectator;
 
     private final static String sep = Constants.protocolTermSeparator;
 
@@ -158,6 +159,8 @@ final class SocketClientThread extends Thread implements IServer,
         this.playerName = initialName;
         this.remote = isRemote;
         this.spectator = spectator;
+        this.internalSpectator = (spectator && playerName
+            .equals(Constants.INTERNAL_DUMMY_CLIENT_NAME));
 
         InstanceTracker.register(this, "SCT " + initialName);
 
@@ -307,13 +310,21 @@ final class SocketClientThread extends Thread implements IServer,
 
         // Logging/tracking of received messages for development purposes
         // TODO: Remove when not needed any more
-        if (line != null && playerName != null
-            && (playerName.equals("remote") || spectator))
+        boolean _MSG_TRACKING = false;
+        if (line != null && internalSpectator && _MSG_TRACKING)
         {
-            // int len = line.length() < 120 ? line.length() : 120;
-            // String shortLine = line.substring(0, len);
-            // System.out.println("<<<" + shortLine);
-            // System.out.println(line);
+            int _MAXLEN = 120;
+            if (_MAXLEN != 0)
+            {
+                int len = line.length() < _MAXLEN ? line.length() : _MAXLEN;
+                String shortLine = line.substring(0, len);
+                System.out.println("<<<" + shortLine);
+                System.out.println(line);
+            }
+            else
+            {
+                System.out.println("<<<" + line);
+            }
         }
         return line;
     }
