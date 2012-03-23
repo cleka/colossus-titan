@@ -86,8 +86,6 @@ public class ClientHandlerStub implements IClient
 
     protected void sendToClient(String message)
     {
-        // LOGGER.info("STUB: +++ " + message + "+++");
-
         enqueueToRedoQueue(messageCounter, message);
         messageCounter++;
     }
