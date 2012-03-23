@@ -684,7 +684,9 @@ public final class Server extends Thread implements IServer
 
                 LOGGER.info("Before removing CH " + nextCHS.getSignonName()
                     + " from clients list, list size is: " + iClients.size());
-                iClients.remove(nextCHS);
+                // For now removed, caused ConcurrentModificationException
+                // when game is closed via GUI
+                // iClients.remove(nextCHS);
             }
             channelChanges.clear();
         }
