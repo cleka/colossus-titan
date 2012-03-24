@@ -1498,7 +1498,7 @@ public class WebClient extends KFrame implements IWebClient
         watchButton.setAlignmentX(Box.LEFT_ALIGNMENT);
         joinGamePanel.add(watchButton);
 
-        boolean IN_USE = false;
+        boolean IN_USE = true;
         if (IN_USE)
         {
             runningGamesTab.add(Box.createVerticalGlue());
@@ -1936,6 +1936,24 @@ public class WebClient extends KFrame implements IWebClient
         return id;
     }
 
+    public String getSelectedGameFromRunTableId()
+    {
+        String id = null;
+
+        int selRow = runGameTable.getSelectedRow();
+        if (selRow != -1)
+        {
+            id = (String)runGameTable.getValueAt(selRow, 0);
+            if (!gameHash.containsKey(id))
+            {
+                LOGGER.warning("Game with id " + id
+                    + " from runGame table is not in game hash any more...");
+                return null;
+            }
+        }
+        return id;
+    }
+
     private String makeWindowTitleForState(int state)
     {
         switch (state)
@@ -2026,6 +2044,29 @@ public class WebClient extends KFrame implements IWebClient
             return true;
         }
         return false;
+    }
+
+    private boolean checkIfCouldWatch(int state)
+    {
+        switch (state)
+        {
+            case NotLoggedIn:
+            case EnrolledInstantGame:
+            case Playing:
+                return false;
+
+            case LoggedIn:
+            default:
+
+                boolean watchPossible = false;
+                String id = getSelectedGameFromRunTableId();
+                if (id != null)
+                {
+                    watchPossible = true;
+                }
+                return watchPossible;
+        }
+
     }
 
     private boolean checkIfCouldStartOnServer(int state)
@@ -2199,6 +2240,7 @@ public class WebClient extends KFrame implements IWebClient
         boolean couldStartOnServer = checkIfCouldStartOnServer(state);
         // feature currently disabled (( => hardcoded to false)):
         boolean couldStartLocally = false;
+        boolean couldWatch = checkIfCouldWatch(state);
 
         // ----------------------------------------------------------------
         // ... and now actually change the GUI
@@ -2237,6 +2279,7 @@ public class WebClient extends KFrame implements IWebClient
 
         startButton.setEnabled(couldStartOnServer);
         startLocallyButton.setEnabled(couldStartLocally);
+        watchButton.setEnabled(couldWatch);
 
         // Chat tab
         generalChat.setLoginState(state != NotLoggedIn, server, username);
@@ -2903,6 +2946,111 @@ public class WebClient extends KFrame implements IWebClient
         }
     }
 
+    public void startSpectatorClient(String gameId, int port,
+        String hostingHost)
+    {
+        LOGGER.info("Starting Spectator Client for gameId " + gameId
+            + " hostingHost " + hostingHost + " port " + port);
+
+        Client gc;
+        try
+        {
+            int p = port;
+            String type;
+
+            if (hostingHost == null || hostingHost.equals(""))
+            {
+                // Game runs on WebServer
+                hostingHost = hostname;
+                type = Constants.network;
+            }
+            else
+            {
+                // Runs on a players computer
+                type = Constants.human;
+            }
+
+            boolean noOptionsFile = false;
+
+            gc = Client.createClient(hostingHost, p, username, type,
+                whatNextManager, localServer, true, noOptionsFile, true, true);
+
+            // Right now this waitingText is probably directly overwritten by
+            // updateGUI putting there again the startingText (started by player ...)
+            // but I don't want to fix even that still today...
+
+            // TODO make this behave properly...
+
+            infoTextLabel.setText(waitingText);
+
+            setGameClient(gc);
+            gc.getGUI().setWebClient(this);
+
+            Timer timeoutStartup = setupTimer();
+
+            while (!clientIsUp && !timeIsUp && !clientStartFailed)
+            {
+                synchronized (comingUpMutex)
+                {
+                    try
+                    {
+                        comingUpMutex.wait();
+                    }
+                    catch (InterruptedException e)
+                    {
+                        // ignored
+                    }
+                    catch (Exception e)
+                    {
+                        // just to be sure...
+                    }
+                }
+            }
+
+            timeoutStartup.cancel();
+            startingGame = null;
+
+            if (clientIsUp)
+            {
+                state = Playing;
+                updateGUI();
+                // onGameStartAutoAction();
+            }
+            else
+            {
+                JOptionPane.showMessageDialog(this,
+                    "Trouble when connecting to game to watch?)",
+                    "Watching game failed!", JOptionPane.ERROR_MESSAGE);
+                state = LoggedIn;
+                enrolledInstantGameId = null;
+                updateGUI();
+            }
+        }
+        catch (ConnectionInitException e)
+        {
+            gc = null;
+            JOptionPane.showMessageDialog(this,
+                "Connecting to the game server hosting the game ("
+                    + hostingHost + ") or starting own MasterBoard failed!\n"
+                    + "Reason: " + e.getMessage(), "Starting game failed!",
+                JOptionPane.ERROR_MESSAGE);
+
+            state = LoggedIn;
+            updateGUI();
+        }
+        catch (Exception e)
+        {
+            gc = null;
+            // client startup failed for some reason
+            JOptionPane.showMessageDialog(this,
+                "Unexpected exception while starting the spectator client: "
+                    + e.toString(), "Starting game failed!",
+                JOptionPane.ERROR_MESSAGE);
+            state = LoggedIn;
+            updateGUI();
+        }
+    }
+
     public void gameCancelled(String gameId, String byUser)
     {
         deletedGames.add(gameId);
@@ -2940,6 +3088,13 @@ public class WebClient extends KFrame implements IWebClient
         {
             // chat delivery to chat other than general not implemented
         }
+    }
+
+    public void watchGameInfo(String gameId, String host, int port)
+    {
+        LOGGER.info("Got watchgame info for game " + gameId + ": host="
+            + host + ", port=" + port);
+        startSpectatorClient(gameId, port, host);
     }
 
     public void requestAttention(long when, String byUser, boolean byAdmin,
@@ -3164,7 +3319,10 @@ public class WebClient extends KFrame implements IWebClient
 
     private void watchButtonAction()
     {
-        System.out.println("Watch button!");
+        String gameId = getSelectedGameFromRunTableId();
+        LOGGER.info("Watch button pressed for gameId = " + gameId
+            + " - requesting info from server");
+        server.watchGame(gameId, username);
     }
 
     private void loadGameButtonAction()
@@ -3194,8 +3352,6 @@ public class WebClient extends KFrame implements IWebClient
                 + " on LoginButton?");
         }
     }
-
-
 
     private void rereadLoginMsgButtonAction()
     {

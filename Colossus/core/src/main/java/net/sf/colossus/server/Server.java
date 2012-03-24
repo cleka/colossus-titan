@@ -1918,7 +1918,7 @@ public final class Server extends Thread implements IServer
         ArrayList<ClientHandler> troubleCHs = new ArrayList<ClientHandler>();
         for (ClientHandler ch : realClients)
         {
-            if (ch.isTemporarilyInTrouble())
+            if (ch.isTemporarilyInTrouble() && !ch.isSpectator())
             {
                 troubleCHs.add(ch);
             }

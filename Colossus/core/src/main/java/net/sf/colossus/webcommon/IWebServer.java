@@ -27,6 +27,7 @@ public interface IWebServer
     public static final String RereadLoginMessage = "rereadLoginMessage";
     public static final String RequestUserAttention = "requestUserAttention";
     public static final String PingResponse = "pingResponse";
+    public static final String WatchGame = "watchGame";
     public static final String ConfirmCommand = "confirmCommand";
 
     public static final String DumpInfo = "dumpInfo";
@@ -81,6 +82,8 @@ public interface IWebServer
     public void requestUserAttention(long when, String sender,
         boolean isAdmin, String recipient, String message, int beepCount,
         long beepInterval, boolean windows);
+
+    public void watchGame(String gameId, String username);
 
     // public void submitAnyText(String text);
 

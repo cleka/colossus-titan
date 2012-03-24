@@ -25,6 +25,7 @@ public interface IWebClient
     public static final String generalMessage = "generalMessage";
     public static final String systemMessage = "systemMessage";
     public static final String requestAttention = "requestAttention";
+    public static final String watchGameInfo = "watchGameInfo";
     public static final String pingRequest = "pingRequest";
 
     public void grantAdminStatus();
@@ -58,4 +59,6 @@ public interface IWebClient
 
     public void requestAttention(long when, String byUser, boolean byAdmin,
         String message, int beepCount, long beepInterval, boolean windows);
+
+    public void watchGameInfo(String gameId, String host, int port);
 }

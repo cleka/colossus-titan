@@ -211,4 +211,10 @@ public class CmdLineWebClient implements IWebClient
 
     }
 
+    public void watchGameInfo(String gameId, String host, int port)
+    {
+        // TODO Auto-generated method stub
+
+    }
+
 }

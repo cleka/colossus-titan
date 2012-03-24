@@ -512,6 +512,14 @@ public class WebClientSocketThread extends Thread implements IWebServer
                         beepCount, beepInterval, windows);
                 }
 
+                else if (command.equals(IWebClient.watchGameInfo))
+                {
+                    String gameId = tokens[1];
+                    String host = tokens[2];
+                    int port = Integer.parseInt(tokens[3]);
+                    webClient.watchGameInfo(gameId, host, port);
+                }
+
                 else if (command.equals(IWebClient.grantAdmin))
                 {
                     webClient.grantAdminStatus();
@@ -747,6 +755,11 @@ public class WebClientSocketThread extends Thread implements IWebServer
     public void pingResponse(String arg1, String arg2, String arg3)
     {
         send(PingResponse + sep + arg1 + sep + arg2 + sep + arg3);
+    }
+
+    public void watchGame(String gameId, String username)
+    {
+        send(WatchGame + sep + gameId + sep + username);
     }
 
     public void sleepFor(long millis)

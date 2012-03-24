@@ -739,6 +739,11 @@ public class GameInfo
         return state.equals(GameState.PROPOSED) || state.equals(GameState.DUE);
     }
 
+    public boolean isRunning()
+    {
+        return state.equals(GameState.RUNNING);
+    }
+
     public boolean wasAlreadyStarted()
     {
         return !(state.equals(GameState.PROPOSED) || state

@@ -496,6 +496,13 @@ public class WebServerClient implements IWebClient
             }
         }
 
+        else if (command.equals(IWebServer.WatchGame))
+        {
+            String gameId = tokens[1];
+            String userName = tokens[2];
+            server.watchGame(gameId, userName);
+        }
+
         else if (command.equals(IWebServer.DumpInfo))
         {
             server.dumpInfo();
@@ -863,6 +870,11 @@ public class WebServerClient implements IWebClient
         sendToClient(requestAttention + sep + when + sep + byUser + sep
             + byAdmin + sep + message + sep + beepCount + sep + beepInterval
             + sep + windows);
+    }
+
+    public void watchGameInfo(String gameId, String host, int port)
+    {
+        sendToClient(watchGameInfo + sep + gameId + sep + host + sep + port);
     }
 
     // TODO should this be rather totally in clientsocketthread?

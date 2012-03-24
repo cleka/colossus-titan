@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 
 import net.sf.colossus.webcommon.FormatWhen;
 import net.sf.colossus.webcommon.GameInfo;
+import net.sf.colossus.webcommon.GameInfo.GameState;
 import net.sf.colossus.webcommon.IColossusMail;
 import net.sf.colossus.webcommon.IGameRunner;
 import net.sf.colossus.webcommon.IPortProvider;
@@ -34,7 +35,6 @@ import net.sf.colossus.webcommon.IWebClient;
 import net.sf.colossus.webcommon.IWebServer;
 import net.sf.colossus.webcommon.User;
 import net.sf.colossus.webcommon.UserDB;
-import net.sf.colossus.webcommon.GameInfo.GameState;
 
 
 /**
@@ -573,6 +573,56 @@ public class WebServer implements IWebServer, IRunWebServer
             + " instant games stored");
         gui.setRunningGamesInfo(runningGames.size() + " running games");
         gui.setEndingGamesInfo(endingGames.size() + " games just ending");
+    }
+
+    public void watchGame(String gameId, String userName)
+    {
+        LOGGER.info("Got request from client " + userName + " to watch game "
+            + gameId);
+        GameInfo gi = findFromRunningGames(gameId);
+        if (gi != null && gi.isRunning())
+        {
+            String host = gi.getHostingHost();
+            int port = gi.getPort();
+            LOGGER.info("Sending connect info: host=" + host + ", port="
+                + port);
+            sendWatchGameInfo(userName, gameId, host, port);
+        }
+        else
+        {
+            LOGGER.warning("No running game with id " + gameId + " found!");
+        }
+    }
+
+    public void sendWatchGameInfo(String userName, String gameId, String host,
+        int port)
+    {
+        IWebClient client = null;
+        String reasonFail = null;
+
+        User user = userDB.findUserByName(userName);
+        if (user != null)
+        {
+            client = user.getWebserverClient();
+            if (client != null)
+            {
+                client.watchGameInfo(gameId, host, port);
+            }
+            else
+            {
+                reasonFail = "User " + userName + " is not online";
+            }
+        }
+        else
+        {
+            reasonFail = "Unknown user '" + userName + "'";
+        }
+
+        if (reasonFail != null)
+        {
+            LOGGER.warning("Sending watchGameInfo for game " + gameId
+                + " to user " + userName + " failed: " + reasonFail);
+        }
     }
 
     /**
