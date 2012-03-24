@@ -2054,6 +2054,10 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void actOnReconnectCompleted()
     {
+        if (isMyTurn())
+        {
+            return;
+        }
         if (getGame().isPhase(Phase.MOVE))
         {
             pendingMoves.clear();

@@ -370,7 +370,10 @@ final class ClientHandler extends ClientHandlerStub implements IClient
         {
             tellSyncCompleted(syncRequestNumber);
         }
-        server.othersTellReconnectCompleted(this);
+        if (!isSpectator())
+        {
+            server.othersTellReconnectCompleted(this);
+        }
     }
 
     ByteBuffer bb;
@@ -570,9 +573,8 @@ final class ClientHandler extends ClientHandlerStub implements IClient
     public void declareObsolete()
     {
         obsolete = true;
-        setIsGone("declared obsolete by server");
-        LOGGER.warning("ClientHandler for " + getPlayerName()
-            + " declared obsolete.... -- but that's not fully implemented!");
+        setIsGone("Declared obsolete because new client "
+            + "with same name connected");
     }
 
     public String dumpLastProcessedLines()
