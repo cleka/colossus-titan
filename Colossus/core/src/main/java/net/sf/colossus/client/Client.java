@@ -708,7 +708,10 @@ public final class Client implements IClient, IOracle, IVariant,
         LOGGER.info("Synchronization #" + syncRequestNumber + " completed!");
         lastMsgNr = -1;
         previousConn = null;
-        gui.actOnReconnectCompleted();
+        if (!isSpectator())
+        {
+            gui.actOnReconnectCompleted();
+        }
         if (isSpectator() && syncRequestNumber == -1)
         {
             // this is the initial sync during connect for watching,

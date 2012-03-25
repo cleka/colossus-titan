@@ -1418,7 +1418,10 @@ public final class Server extends Thread implements IServer
          */
         if ((existingCH = getClientHandlerByName(playerName)) != null)
         {
-            othersTellReconnectOngoing(existingCH);
+            if (!spectator)
+            {
+                othersTellReconnectOngoing(existingCH);
+            }
             isReconnect = true;
             LOGGER.info("All right, reconnection of known client!");
             (client).cloneRedoQueue(existingCH);

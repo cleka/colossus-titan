@@ -2054,7 +2054,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void actOnReconnectCompleted()
     {
-        if (isMyTurn())
+        if (!isMyTurn())
         {
             return;
         }
