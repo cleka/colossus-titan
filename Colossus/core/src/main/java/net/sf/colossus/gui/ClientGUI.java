@@ -1494,9 +1494,35 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             // Replay mode now over
             if (board != null)
             {
-                board.recreateMarkers();
+                try
+                {
+                    LOGGER.info("before invokeAndWait for recreateMarkers()");
+                    SwingUtilities.invokeAndWait(new Runnable()
+                    {
+                        public void run()
+                        {
+                            makeBoardRecreateMarkers();
+                        }
+                    });
+                }
+                catch (InvocationTargetException e)
+                {
+                    LOGGER.log(Level.SEVERE, "Failed to run makeBoard"
+                        + "RecreateMarkers() with invokeAndWait(): ", e);
+                }
+                catch (InterruptedException e2)
+                {
+                    LOGGER.log(Level.SEVERE, "Failed to run makeBoard"
+                        + "RecreateMarkers() with invokeAndWait(): ", e2);
+                }
+                LOGGER.info("after  invokeAndWait for recreateMarkers()");
             }
         }
+    }
+
+    public void makeBoardRecreateMarkers()
+    {
+        board.recreateMarkers();
     }
 
     public void actOnTellRedoChange()
