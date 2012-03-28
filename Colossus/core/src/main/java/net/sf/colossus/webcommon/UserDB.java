@@ -31,6 +31,7 @@ public class UserDB
 
     private final HashMap<String, User> pendingRegistrations = new HashMap<String, User>();
 
+    private long highestExistingId;
 
     public UserDB(String filename, int maxUsersVal)
     {
@@ -212,8 +213,9 @@ public class UserDB
         }
         else
         {
-            User u = new User(username, password, email, isAdmin, null, null,
-                null, 0);
+            highestExistingId++;
+            User u = new User(highestExistingId, username, password, email,
+                isAdmin, null, null, null, 0);
             String cCode = u.getLastConfirmationCode();
             User.LOGGER.fine("Confirmation code for user " + username
                 + " is: " + cCode);
@@ -309,6 +311,7 @@ public class UserDB
 
     private void readUsersFromFile()
     {
+        long maxId = 0;
         try
         {
             BufferedReader users = new BufferedReader(new InputStreamReader(
@@ -331,9 +334,14 @@ public class UserDB
                     if (u != null)
                     {
                         storeUser(u);
+                        if (u.getId() > maxId)
+                        {
+                            maxId = u.getId();
+                        }
                     }
                 }
             }
+            this.highestExistingId = maxId;
             users.close();
         }
         catch (FileNotFoundException e)

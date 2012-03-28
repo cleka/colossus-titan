@@ -2,7 +2,10 @@ package net.sf.colossus.webcommon;
 
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,6 +43,7 @@ public class User
 
     private IWebClient webserverClient;
 
+    private long id;
     private final String name;
     private String password;
     private String email;
@@ -59,9 +63,11 @@ public class User
         this.name = name;
     }
 
-    public User(String name, String password, String email, boolean isAdmin,
-        String created, String lastLogin, String lastLogout, long onlineSecs)
+    public User(long id, String name, String password, String email,
+        boolean isAdmin, String created, String lastLogin, String lastLogout,
+        long onlineSecs)
     {
+        this.id = id;
         this.name = name;
         this.password = password;
         this.email = email;
@@ -84,6 +90,11 @@ public class User
             this.lastSentConfirmationCode = "";
             this.onlineSecs = onlineSecs;
         }
+    }
+
+    public long getId()
+    {
+        return this.id;
     }
 
     public String getName()
@@ -209,26 +220,24 @@ public class User
 
     public static User makeUserFromUserLine(String line)
     {
-        String[] tokens = line.split(SEP);
-        if (tokens.length == 6)
-        {
-            String newLine = line + SEP + tokens[5] + SEP + "0";
-            tokens = newLine.split(SEP);
-        }
-        if (tokens.length != 8)
+        List<String> tokens = new LinkedList<String>();
+        tokens.addAll(Arrays.asList(line.split(SEP)));
+        if (tokens.size() != 9)
         {
             User.LOGGER.log(Level.WARNING, "invalid line '" + line
                 + "' in user file!");
             return null;
         }
-        String name = tokens[0].trim();
-        String password = tokens[1].trim();
-        String email = tokens[2].trim();
-        String type = tokens[3].trim();
-        String created = tokens[4].trim();
-        String lastLogin = tokens[5].trim();
-        String lastLogout = tokens[6].trim();
-        long onlineSecs = Long.parseLong(tokens[7]);
+
+        long id = Long.parseLong(tokens.remove(0));
+        String name = tokens.remove(0).trim();
+        String password = tokens.remove(0).trim();
+        String email = tokens.remove(0).trim();
+        String type = tokens.remove(0).trim();
+        String created = tokens.remove(0).trim();
+        String lastLogin = tokens.remove(0).trim();
+        String lastLogout = tokens.remove(0).trim();
+        long onlineSecs = Long.parseLong(tokens.remove(0));
 
         boolean isAdmin = false;
         if (type.equals(User.TYPE_ADMIN))
@@ -244,8 +253,8 @@ public class User
             User.LOGGER.log(Level.WARNING, "invalid type '" + type
                 + "' in user file line '" + line + "'");
         }
-        User u = new User(name, password, email, isAdmin, created, lastLogin,
-            lastLogout, onlineSecs);
+        User u = new User(id, name, password, email, isAdmin, created,
+            lastLogin, lastLogout, onlineSecs);
         return u;
     }
 
@@ -253,9 +262,9 @@ public class User
     {
         String type = (isAdmin ? TYPE_ADMIN : TYPE_USER);
 
-        String line = this.name + SEP + password + SEP + email + SEP + type
-            + SEP + created + SEP + lastLogin + SEP + lastLogout + SEP
-            + onlineSecs;
+        String line = this.id + SEP + this.name + SEP + password + SEP + email
+            + SEP + type + SEP + created + SEP + lastLogin + SEP + lastLogout
+            + SEP + onlineSecs;
         return line;
     }
 
