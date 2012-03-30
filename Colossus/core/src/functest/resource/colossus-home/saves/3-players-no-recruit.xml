@@ -7,7 +7,7 @@
     <Caretaker>
         <Creature name="Angel" remaining="15" dead="0" />
         <Creature name="Aphrodite" remaining="1" dead="0" />
-        <Creature name="Apolo" remaining="1" dead="0" />
+        <Creature name="Apollo" remaining="1" dead="0" />
         <Creature name="Archangel" remaining="6" dead="0" />
         <Creature name="Ares" remaining="1" dead="0" />
         <Creature name="Artemis" remaining="1" dead="0" />
