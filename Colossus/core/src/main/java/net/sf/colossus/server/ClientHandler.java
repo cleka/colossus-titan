@@ -252,12 +252,14 @@ final class ClientHandler extends ClientHandlerStub implements IClient
         sendViaChannelRaw(null);
     }
 
-    private void enqueueToRedoQueue(int messageNr, String message)
+    @Override
+    protected void enqueueToRedoQueue(int messageNr, String message)
     {
         if (supportsReconnect())
         {
             redoQueue.add(new MessageForClient(messageNr,
                 (isCommitPoint ? commitPointCounter : 0), message));
+            messageCounter++;
         }
     }
 
@@ -1015,12 +1017,10 @@ final class ClientHandler extends ClientHandlerStub implements IClient
                 String replayOn = Constants.replayOngoing + sep + true
                     + maxTurn;
                 enqueueToRedoQueue(messageCounter, replayOn);
-                messageCounter++;
             }
         }
 
         enqueueToRedoQueue(messageCounter, message);
-        messageCounter++;
 
         /*
         // For development purposes... remove when done:

@@ -100,9 +100,10 @@ public class ClientHandlerStub implements IClient
         // not needed here
     }
 
-    private void enqueueToRedoQueue(int messageNr, String message)
+    protected void enqueueToRedoQueue(int messageNr, String message)
     {
         redoQueue.add(new MessageForClient(messageNr, 0, message));
+        messageCounter++;
     }
 
     protected void commitPoint()
