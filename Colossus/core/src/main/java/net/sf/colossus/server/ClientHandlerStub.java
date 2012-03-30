@@ -87,7 +87,6 @@ public class ClientHandlerStub implements IClient
     protected void sendToClient(String message)
     {
         enqueueToRedoQueue(messageCounter, message);
-        messageCounter++;
     }
 
     /**
