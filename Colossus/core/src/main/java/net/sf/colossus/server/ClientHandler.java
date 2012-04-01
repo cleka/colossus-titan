@@ -406,14 +406,20 @@ final class ClientHandler extends ClientHandlerStub implements IClient
     {
         long now = new Date().getTime();
         temporarilyInTrouble = now;
-        server.othersTellOneHasNetworkTrouble(this);
+        if (!isSpectator())
+        {
+            server.othersTellOneHasNetworkTrouble(this);
+        }
         selectorKey.interestOps(SelectionKey.OP_READ | SelectionKey.OP_WRITE);
     }
 
     public void clearTemporarilyInTrouble()
     {
         temporarilyInTrouble = -1;
-        server.othersTellOnesTroubleIsOver(this);
+        if (!isSpectator())
+        {
+            server.othersTellOnesTroubleIsOver(this);
+        }
     }
 
     private void handleEncoding(String msg)
