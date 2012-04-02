@@ -89,8 +89,13 @@ public final class Server extends Thread implements IServer
     /** Map of players to their clients. */
     private final Map<Player, IClient> playerToClientMap = new HashMap<Player, IClient>();
 
-    // list of SocketChannels that are currently active
+    /** List of SocketChannels that are currently active */
     private final List<SocketChannel> activeSocketChannelList = new ArrayList<SocketChannel>();
+
+    /** ClientHandlers to be withdrawn together, with some related (timing)
+     *  data; selector thread will do it then when it's the right time for it
+     */
+    private final Map<String, WithdrawInfo> forcedWithdraws = new HashMap<String, WithdrawInfo>();
 
     /** Number of player clients we're waiting for to *connect* */
     private int waitingForClients;
@@ -454,37 +459,6 @@ public final class Server extends Thread implements IServer
                 false);
         }
     }
-
-    public class WithdrawInfo
-    {
-        public long deadline;
-        public long intervalLen;
-        public long intervals;
-        public long lastNotification;
-        public ClientHandler ch;
-
-        public WithdrawInfo(ClientHandler ch, int intervals, long intervalLen)
-        {
-            long now = new Date().getTime();
-            this.deadline = now + (intervals * intervalLen);
-            this.lastNotification = now;
-            this.ch = ch;
-            this.intervalLen = intervalLen;
-            this.intervals = intervals;
-        }
-
-        public long getLastNotification()
-        {
-            return lastNotification;
-        }
-
-        public void setLastNotification(long when)
-        {
-            this.lastNotification = when;
-        }
-    }
-
-    private final Map<String, WithdrawInfo> forcedWithdraws = new HashMap<String, WithdrawInfo>();
 
     private void handleOutsideChanges(int timeout,
         boolean stillWaitingForClients) throws IOException
@@ -3716,4 +3690,34 @@ public final class Server extends Thread implements IServer
             // (at the moment, at least...;-)
         }
     }
+
+    public class WithdrawInfo
+    {
+        public long deadline;
+        public long intervalLen;
+        public long intervals;
+        public long lastNotification;
+        public ClientHandler ch;
+
+        public WithdrawInfo(ClientHandler ch, int intervals, long intervalLen)
+        {
+            long now = new Date().getTime();
+            this.deadline = now + (intervals * intervalLen);
+            this.lastNotification = now;
+            this.ch = ch;
+            this.intervalLen = intervalLen;
+            this.intervals = intervals;
+        }
+
+        public long getLastNotification()
+        {
+            return lastNotification;
+        }
+
+        public void setLastNotification(long when)
+        {
+            this.lastNotification = when;
+        }
+    }
+
 }
