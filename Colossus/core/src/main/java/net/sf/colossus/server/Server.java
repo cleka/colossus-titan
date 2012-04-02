@@ -92,7 +92,7 @@ public final class Server extends Thread implements IServer
     /** List of SocketChannels that are currently active */
     private final List<SocketChannel> activeSocketChannelList = new ArrayList<SocketChannel>();
 
-    /** ClientHandlers to be withdrawn together, with some related (timing)
+    /** ClientHandlers to be withdrawn, together with some related (timing)
      *  data; selector thread will do it then when it's the right time for it
      */
     private final Map<String, WithdrawInfo> forcedWithdraws = new HashMap<String, WithdrawInfo>();
@@ -430,14 +430,29 @@ public final class Server extends Thread implements IServer
     {
         try
         {
-            handleOutsideChanges(timeout, stillWaitingForClients);
+            if (stopAcceptingFlag)
+            {
+                LOGGER.info("stopAccepting flag was set...");
+                stopAccepting();
+                stopAcceptingFlag = false;
+            }
+            LOGGER.log(Level.FINEST, "before select()");
+            int num = selector.select(timeout);
+            LOGGER.log(Level.FINEST, "select returned, " + num
+                + " channels are ready to be processed.");
+            handleForcedWithdraws();
+            handleOutsideChanges((num == 0), stillWaitingForClients);
+            if (forceShutDown)
+            {
+                LOGGER.log(Level.FINEST,
+                    "waitOnSelector: force shutdown now true! num=" + num);
+                stopAccepting();
+                stopServerRunning();
+            }
             handleSelectedKeys();
             handleChannelChanges();
             repeatTellOneHasNetworkTrouble();
-            if (sendPingRequests)
-            {
-                allRequestPingIfNeeded();
-            }
+            allRequestPingIfNeeded();
         }
 
         catch (ClosedChannelException cce)
@@ -460,21 +475,8 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    private void handleOutsideChanges(int timeout,
-        boolean stillWaitingForClients) throws IOException
+    private void handleForcedWithdraws()
     {
-        if (stopAcceptingFlag)
-        {
-            LOGGER.info("stopAccepting flag was set...");
-            stopAccepting();
-            stopAcceptingFlag = false;
-        }
-
-        LOGGER.log(Level.FINEST, "before select()");
-        int num = selector.select(timeout);
-        LOGGER.log(Level.FINEST, "select returned, " + num
-            + " channels are ready to be processed.");
-
         if (!forcedWithdraws.isEmpty())
         {
             Set<String> keys = forcedWithdraws.keySet();
@@ -504,12 +506,16 @@ public final class Server extends Thread implements IServer
                 }
             }
         }
+    }
 
+    private void handleOutsideChanges(boolean wasTimeout,
+        boolean stillWaitingForClients)
+    {
         if (handleGuiRequests())
         {
-            // ok, select returned due to a wakeup call
+            // OK, select returned due to a wake-up call
         }
-        else if (num == 0)
+        else if (wasTimeout)
         {
             // LOGGER.info("Server side select timeout...");
             if (stillWaitingForClients)
@@ -526,14 +532,6 @@ public final class Server extends Thread implements IServer
                     forceShutDown = true;
                 }
             }
-        }
-
-        if (forceShutDown)
-        {
-            LOGGER.log(Level.FINEST,
-                "waitOnSelector: force shutdown now true! num=" + num);
-            stopAccepting();
-            stopServerRunning();
         }
     }
 
@@ -1973,6 +1971,13 @@ public final class Server extends Thread implements IServer
      */
     void allRequestPingIfNeeded()
     {
+        // skip it totally if feature is inactive
+        // (default behavior for all-clients-local games)
+        if (!sendPingRequests)
+        {
+            return;
+        }
+
         long now = new Date().getTime();
         if (now - lastPingRound > 1000 * PING_REQUEST_INTERVAL_SEC)
         {
@@ -3295,6 +3300,10 @@ public final class Server extends Thread implements IServer
         }
     }
 
+    /**
+     * Handle GUI-initiated requests: Save and Pause
+     * @return true if it did something (saving the game)
+     */
     public boolean handleGuiRequests()
     {
         boolean didSomething = false;
