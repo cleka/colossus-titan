@@ -1819,16 +1819,19 @@ public class WebClient extends KFrame implements IWebClient
         return reason;
     }
 
-    private boolean logout()
+    private void logout()
     {
-        boolean success = false;
-
-        server.logout();
-        server = null;
-        wcst = null;
+        // When watching a game and it ended with Draw, when I did logout
+        // the server.logout() caused a NPE ... prevent it, just in case.
+        if (server != null)
+        {
+            server.logout();
+            server = null;
+            wcst = null;
+        }
 
         updateStatus("Not connected", Color.red);
-        return success;
+        return;
     }
 
     private void doQuit()
