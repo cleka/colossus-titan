@@ -134,7 +134,8 @@ public class WebClient extends KFrame implements IWebClient
     // Enrolled to an instant game
     private final static int EnrolledInstantGame = 3;
     private final static int Playing = 4;
-    // private final static int PlayingButDead = 5;
+    private final static int Watching = 5;
+    // private final static int PlayingButDead = 6;
 
     private GameInfo startingGame = null;
 
@@ -150,6 +151,7 @@ public class WebClient extends KFrame implements IWebClient
 
     private int state = NotLoggedIn;
     private String enrolledInstantGameId = null;
+    private String watchingInstantGameId = null;
     private boolean scheduledGamesMode;
 
     private int usersLoggedIn = 0;
@@ -248,6 +250,7 @@ public class WebClient extends KFrame implements IWebClient
     final static String waitingText = "Client connected successfully, waiting for all other players. Please wait...";
     final static String enrolledText = "NOTE: While enrolled to an instant game, you can't propose or enroll to other instant games.";
     final static String playingText = "While playing, you can't propose or enroll to other instant games.";
+    final static String watchingText = "While playing or watching, you can't propose or enroll to other instant games.";
 
     private ChatHandler generalChat;
 
@@ -464,10 +467,10 @@ public class WebClient extends KFrame implements IWebClient
         {
             hideButton.setEnabled(false);
             hideButtonText.setText(CantHideText);
-            if (state == Playing)
+            if (state == Playing || state == Watching)
             {
-                state = LoggedIn;
                 enrolledInstantGameId = null;
+                clearWatching();
                 updateGUI();
             }
         }
@@ -1153,6 +1156,7 @@ public class WebClient extends KFrame implements IWebClient
             public void itemStateChanged(ItemEvent e)
             {
                 reactOnScheduleRadioButtonChange(e);
+                updateGUI();
             }
         };
         addRadioButton(scheduleModes, group, TYPE_INSTANTLY, current,
@@ -1234,7 +1238,6 @@ public class WebClient extends KFrame implements IWebClient
             return;
         }
         setScheduledGamesMode(switchToScheduling);
-        updateGUI();
     }
 
     private void createPreferencesPane()
@@ -1973,6 +1976,9 @@ public class WebClient extends KFrame implements IWebClient
             case Playing:
                 return username + " (playing)";
 
+            case Watching:
+                return username + " (watching)";
+
             default:
                 return "<window title - undefined state?>";
         }
@@ -1993,6 +1999,9 @@ public class WebClient extends KFrame implements IWebClient
 
             case Playing:
                 return playingText;
+
+            case Watching:
+                return watchingText;
 
             default:
                 return "<info text - undefined state?>";
@@ -2017,6 +2026,10 @@ public class WebClient extends KFrame implements IWebClient
             case Playing:
                 return "As " + username + " - playing game "
                     + enrolledInstantGameId;
+
+            case Watching:
+                return "As " + username + " - watching game "
+                    + watchingInstantGameId;
 
             default:
                 return "<info text - undefined state?>";
@@ -2056,6 +2069,7 @@ public class WebClient extends KFrame implements IWebClient
             case NotLoggedIn:
             case EnrolledInstantGame:
             case Playing:
+            case Watching:
                 return false;
 
             case LoggedIn:
@@ -2108,6 +2122,7 @@ public class WebClient extends KFrame implements IWebClient
 
             case NotLoggedIn:
             case Playing:
+            case Watching:
             default:
                 return false;
         }
@@ -2144,6 +2159,11 @@ public class WebClient extends KFrame implements IWebClient
             return false;
         }
 
+        boolean scheduled = getScheduledGamesMode();
+        if (!scheduled && (state == Playing || state == Watching))
+        {
+            return false;
+        }
         return true;
     }
 
@@ -2167,7 +2187,7 @@ public class WebClient extends KFrame implements IWebClient
 
     private boolean checkIfCouldEnroll()
     {
-        if (state == NotLoggedIn)
+        if (state == NotLoggedIn || state == Playing || state == Watching)
         {
             return false;
         }
@@ -2452,8 +2472,9 @@ public class WebClient extends KFrame implements IWebClient
         }
         if (message == null)
         {
-            state = LoggedIn;
             enrolledInstantGameId = null;
+            watchingInstantGameId = null;
+            state = LoggedIn;
             loginField.setEnabled(false);
             updateGUI();
 
@@ -2728,13 +2749,30 @@ public class WebClient extends KFrame implements IWebClient
     {
         // do not set it back to LoggedIn if this didUnenroll is the
         // result of a automatic unenroll before logout
-        if (state != NotLoggedIn)
+        if (watchingInstantGameId != null)
+        {
+            // should never happen, in any case prevent it from setting state
+            // to plain "LoggedIn"
+        }
+        else if (state != NotLoggedIn)
         {
             state = LoggedIn;
         }
         enrolledInstantGameId = null;
 
         updateGUI();
+    }
+
+    public void setWatching(String gameId)
+    {
+            watchingInstantGameId = gameId;
+            state = Watching;
+    }
+
+    public void clearWatching()
+    {
+        watchingInstantGameId = null;
+        state = LoggedIn;
     }
 
     public void gameStartsSoon(String gameId, String startUser)
@@ -3015,17 +3053,16 @@ public class WebClient extends KFrame implements IWebClient
 
             if (clientIsUp)
             {
-                state = Playing;
+                setWatching(gameId);
                 updateGUI();
                 // onGameStartAutoAction();
             }
             else
             {
                 JOptionPane.showMessageDialog(this,
-                    "Trouble when connecting to game to watch?)",
+                    "Trouble when connecting to game to watch?",
                     "Watching game failed!", JOptionPane.ERROR_MESSAGE);
-                state = LoggedIn;
-                enrolledInstantGameId = null;
+                clearWatching();
                 updateGUI();
             }
         }
@@ -3049,6 +3086,7 @@ public class WebClient extends KFrame implements IWebClient
                 "Unexpected exception while starting the spectator client: "
                     + e.toString(), "Starting game failed!",
                 JOptionPane.ERROR_MESSAGE);
+
             state = LoggedIn;
             updateGUI();
         }
@@ -3074,8 +3112,16 @@ public class WebClient extends KFrame implements IWebClient
                     + " was cancelled by user " + byUser;
                 JOptionPane.showMessageDialog(this, message);
             }
-            state = LoggedIn;
-            enrolledInstantGameId = null;
+            if (watchingInstantGameId != null)
+            {
+                // should never happen, in any case prevent it from setting state
+                // to plain "LoggedNn"
+            }
+            else
+            {
+                state = LoggedIn;
+                enrolledInstantGameId = null;
+            }
             updateGUI();
         }
     }
@@ -3168,8 +3214,8 @@ public class WebClient extends KFrame implements IWebClient
     // Game Client tells us this when user closes the masterboard
     public void tellGameEnds()
     {
-        state = LoggedIn;
         enrolledInstantGameId = null;
+        clearWatching();
         updateGUI();
     }
 
@@ -3294,6 +3340,7 @@ public class WebClient extends KFrame implements IWebClient
         setAdmin(false);
         state = NotLoggedIn;
         enrolledInstantGameId = null;
+        watchingInstantGameId = null;
         receivedField.setText("Connection reset by server!");
         updateStatus("Not connected", Color.red);
 
