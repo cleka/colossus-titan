@@ -3052,8 +3052,10 @@ public final class Server extends Thread implements IServer
         // Check for "is it the right player", but not during replay / redo
         if (!game.isReplayOngoing() && !isActivePlayer())
         {
-            LOGGER.warning(getPlayerName() + " illegally called doMove(): "
-                + "not active player");
+            LOGGER.severe(getPlayerName()
+                + " illegally called doMove() for legion "
+                + legion.getMarkerId() + " to hex " + hex.getLabel()
+                + ": not active player");
             client.nak(Constants.doMove, "Wrong player");
             return;
         }
@@ -3068,7 +3070,11 @@ public final class Server extends Thread implements IServer
         }
         else
         {
-            LOGGER.severe("Move failed, reason " + reasonFail);
+            LOGGER.severe(getPlayerName() + " tried to move legion "
+                + legion.getMarkerId() + " from " + startingHex + " to " + hex
+                + " (entryside " + entrySide.getLabel() + ", teleport "
+                + teleport + ", lord " + teleportingLord
+                + "): move failed, reason " + reasonFail);
             client.nak(Constants.doMove, "Illegal move: " + reasonFail);
         }
     }
