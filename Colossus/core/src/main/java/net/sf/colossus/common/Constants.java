@@ -60,6 +60,9 @@ public final class Constants
     public static final String XML_SNAPSHOT_START = "snap";
     public static final String XML_SNAPSHOT_VERSION = "13";
 
+    public static final String ISC_FILE_START = "iscm";
+    public static final String ISC_FILE_EXTENTION = ".txt";
+
     public static final int BIGNUM = 99;
     public static final int OUT_OF_RANGE = 5;
 

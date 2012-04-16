@@ -1,6 +1,7 @@
 package net.sf.colossus.server;
 
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -108,6 +109,19 @@ public class GameServerSide extends Game
      * The object that handles the Game Saving procedure
      */
     private final GameSaving gameSaver;
+
+    /**
+     * From the very first autosave file name, we derive the file
+     * where to store all the messages that are sent to the internal
+     * spectator client.
+     */
+    private boolean isFirstAutoSave = true;
+
+    /**
+     * The file where to send the spectator messages.
+     * Might/will be null when autosave disabled.
+     */
+    private PrintWriter iscMessages = null;
 
     private static int gameCounter = 1;
     private final String gameId;
@@ -1536,7 +1550,17 @@ public class GameServerSide extends Game
         if (getOption(Options.autosave) && !isGameOver())
         {
             gameSaver.saveGameWithErrorHandling(null, true);
+            if (isFirstAutoSave)
+            {
+                isFirstAutoSave = false;
+                iscMessages = gameSaver.createIscmFile();
+            }
         }
+    }
+
+    public PrintWriter getIscMessageFile()
+    {
+        return iscMessages;
     }
 
     void saveGameWithErrorHandling(String filename, boolean autoSave)

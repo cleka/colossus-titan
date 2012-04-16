@@ -49,6 +49,12 @@ public class GameSaving
     private Element phaseStartSnapshot;
 
     /**
+     * Store timestamp of first created autosave file here; iscFile
+     * will be generated with same timestamp
+     */
+    private String firstAutosavefileTimestamp = null;
+
+    /**
      * List of filenames that has been created by AutoSave.
      * If option "keep max N autosave files" is set, when N+1th file was
      * created, first from this list will be deleted and so on.
@@ -364,8 +370,13 @@ public class GameSaving
                 + game.getActivePlayer() + "-" + game.getPhase();
         }
 
+        String timeStamp = "" + date.getTime();
         String name = Constants.SAVE_DIR_NAME + Constants.XML_SNAPSHOT_START
-            + date.getTime() + infoPart + Constants.XML_EXTENSION;
+            + timeStamp + infoPart + Constants.XML_EXTENSION;
+        if (firstAutosavefileTimestamp == null)
+        {
+            firstAutosavefileTimestamp = timeStamp;
+        }
         return name;
     }
 
@@ -544,4 +555,35 @@ public class GameSaving
         }
     }
 
+    private String makeIscName()
+    {
+        return Constants.ISC_FILE_START + firstAutosavefileTimestamp
+            + Constants.ISC_FILE_EXTENTION;
+    }
+
+    /**
+     * Prepare/create the file for the internal spectator client,
+     * so that later commit messages in the spectators ClientHandler
+     * upon "commit" can store messages to that file (and remove from
+     * re-send queue).
+     *
+     * @return A PrintWriter for that file, or null if creation failed
+     */
+    public PrintWriter createIscmFile()
+    {
+        PrintWriter iscFile = null;
+
+        String iscmName = Constants.SAVE_DIR_NAME + makeIscName();
+        LOGGER.info("Creating iscm file " + iscmName);
+        try
+        {
+            iscFile = new PrintWriter(new FileWriter(iscmName));
+        }
+        catch (IOException e)
+        {
+            LOGGER.log(Level.SEVERE, "Couldn't open iscm-File " + iscmName, e);
+            return null;
+        }
+        return iscFile;
+    }
 }

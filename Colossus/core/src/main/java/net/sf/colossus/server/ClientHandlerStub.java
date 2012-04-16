@@ -1,8 +1,10 @@
 package net.sf.colossus.server;
 
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -105,9 +107,26 @@ public class ClientHandlerStub implements IClient
         messageCounter++;
     }
 
+    private int alreadyHandled = 0;
+
     protected void commitPoint()
     {
-        // do nothing here, so far.
+        PrintWriter writer = server.getGame().getIscMessageFile();
+        if (writer == null)
+        {
+            return;
+        }
+        MessageForClient mfc;
+
+        Iterator<MessageForClient> it = redoQueue.listIterator(alreadyHandled);
+        while (it.hasNext())
+        {
+            mfc = it.next();
+            String msg = mfc.getMessage();
+            writer.println(msg);
+            alreadyHandled++;
+        }
+        writer.flush();
     }
 
     // ======================================================================
