@@ -204,6 +204,9 @@ final class StatusScreen extends KDialog
             gridPane.add(scoreLabel[i]);
         }
 
+        JLabel l = new JLabel("Click a player name for more info!");
+        contentPane.add(l);
+
         updateStatusScreen();
 
         pack();
