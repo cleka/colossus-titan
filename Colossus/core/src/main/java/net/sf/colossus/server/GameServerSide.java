@@ -471,7 +471,7 @@ public class GameServerSide extends Game
     /**
      * Update the dead and available counts for all creature types on all clients.
      */
-    private void updateCaretakerDisplays()
+    public void updateCaretakerDisplays()
     {
         if (replayOngoing)
         {

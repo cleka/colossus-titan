@@ -3686,8 +3686,12 @@ public final class Server extends Thread implements IServer
         LOGGER.info("Got: watchGame from CH " + processingCH.getClientName());
         processingCH.initRedoQueueFromStub(clientStub);
         iClients.add(processingCH);
-        processingCH.tellReplay(false, 0);
         processingCH.syncAfterReconnect(-1, -1);
+        processingCH.updatePlayerInfo(getPlayerInfo(false));
+        // Technically totally unnecessary to re-send it to all
+        // (only the new watcher needs it), but it's much easier this way
+        // at least at the moment...
+        game.updateCaretakerDisplays();
     }
 
     public void enforcedDisconnectClient(String name)

@@ -337,10 +337,60 @@ final class ClientHandler extends ClientHandlerStub implements IClient
 
     public void initRedoQueueFromStub(ClientHandlerStub stub)
     {
+        boolean kickPhaseSeen = false;
+
         redoQueue.clear();
-        redoQueue.addAll(stub.redoQueue);
+
+        for (MessageForClient mfc : stub.redoQueue)
+        {
+            String method = mfc.getMethod();
+            if (method.equals(Constants.kickPhase))
+            {
+                kickPhaseSeen = true;
+            }
+
+            if (method.equals(Constants.initBoard))
+            {
+                int maxTurn = server.getGame().getTurnNumber();
+                String replayOn = Constants.replayOngoing + sep + true + sep
+                    + maxTurn;
+                reEnqueue(new MessageForClient(0, 0, replayOn));
+                reEnqueue(mfc);
+            }
+
+            // skip all the later ones; the initial ones are needed.
+            else if (kickPhaseSeen
+                && method.equals(Constants.updatePlayerInfo))
+            {
+                // skip
+            }
+
+            else if (method.equals(Constants.updateCreatureCount)
+                || method.equals(Constants.tellWhatsHappening))
+            {
+                // skip
+            }
+            else
+            {
+                reEnqueue(mfc);
+            }
+        }
+
+        // Set Replay OFF
+        String replayOn = Constants.replayOngoing + sep + false + sep + 0;
+        reEnqueue(new MessageForClient(0, 0, replayOn));
+
         LOGGER.fine("Initialized redoQueue from stub, contains now "
             + redoQueue.size() + " items!");
+    }
+
+    private int newCounter = 0;
+
+    private void reEnqueue(MessageForClient mfc)
+    {
+        MessageForClient newOne = new MessageForClient(mfc, newCounter);
+        newCounter++;
+        redoQueue.add(newOne);
     }
 
     /**
@@ -1014,18 +1064,6 @@ final class ClientHandler extends ClientHandlerStub implements IClient
     @Override
     protected void sendToClient(String message)
     {
-        if (spectator)
-        {
-            // TODO: HACK! Fix somehow better? Perhaps on client side?
-            if (message.startsWith(Constants.initBoard))
-            {
-                int maxTurn = server.getGame().getTurnNumber();
-                String replayOn = Constants.replayOngoing + sep + true
-                    + maxTurn;
-                enqueueToRedoQueue(messageCounter, replayOn);
-            }
-        }
-
         enqueueToRedoQueue(messageCounter, message);
 
         /*
