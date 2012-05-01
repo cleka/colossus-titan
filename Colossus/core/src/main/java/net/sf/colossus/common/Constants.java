@@ -58,7 +58,8 @@ public final class Constants
         + File.separator + "saves" + File.separator;
     public static final String XML_EXTENSION = ".xml";
     public static final String XML_SNAPSHOT_START = "snap";
-    public static final String XML_SNAPSHOT_VERSION = "13";
+    // in version 14 the iscmName and file was added
+    public static final String XML_SNAPSHOT_VERSION = "14";
 
     public static final String ISC_FILE_START = "iscm";
     public static final String ISC_FILE_EXTENTION = ".txt";

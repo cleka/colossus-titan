@@ -54,6 +54,8 @@ public class GameSaving
      */
     private String firstAutosavefileTimestamp = null;
 
+    private String iscmName = null;
+
     /**
      * List of filenames that has been created by AutoSave.
      * If option "keep max N autosave files" is set, when N+1th file was
@@ -136,6 +138,7 @@ public class GameSaving
         root.setAttribute("version", Constants.XML_SNAPSHOT_VERSION);
         root.setAttribute("createdByRelease", BuildInfo.getReleaseVersion()
             + " (" + BuildInfo.getRevisionInfoString() + ")");
+        root.setAttribute("iscmFileName", iscmName != null ? iscmName : "");
 
         // System.out.println("- Adding snapshot data from last commit point");
         addSnapshotData(root, this.phaseStartSnapshot);
@@ -573,15 +576,17 @@ public class GameSaving
     {
         PrintWriter iscFile = null;
 
-        String iscmName = Constants.SAVE_DIR_NAME + makeIscName();
-        LOGGER.info("Creating iscm file " + iscmName);
+        iscmName = makeIscName();
+        String iscmFullName = Constants.SAVE_DIR_NAME + iscmName;
+        LOGGER.info("Creating iscm file " + iscmFullName);
         try
         {
-            iscFile = new PrintWriter(new FileWriter(iscmName));
+            iscFile = new PrintWriter(new FileWriter(iscmFullName));
         }
         catch (IOException e)
         {
-            LOGGER.log(Level.SEVERE, "Couldn't open iscm-File " + iscmName, e);
+            LOGGER.log(Level.SEVERE, "Couldn't open iscm-File " + iscmFullName, e);
+            iscmName = null;
             return null;
         }
         return iscFile;
