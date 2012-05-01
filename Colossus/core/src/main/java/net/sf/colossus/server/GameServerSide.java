@@ -864,7 +864,7 @@ public class GameServerSide extends Game
         }
         LOGGER.info(player + " chooses color " + color);
         ((PlayerServerSide)player).initMarkersAvailable();
-        server.allUpdatePlayerInfo();
+        server.allUpdatePlayerInfo("AssignColor");
         server.askPickFirstMarker(player);
     }
 
@@ -876,7 +876,7 @@ public class GameServerSide extends Game
     /** Done picking player colors; proceed to start game. */
     private void newGame3()
     {
-        server.allUpdatePlayerInfo();
+        server.allUpdatePlayerInfo("NewGame3.1");
 
         for (Player p : getPlayers())
         {
@@ -884,7 +884,7 @@ public class GameServerSide extends Game
             placeInitialLegion(player, player.getFirstMarker());
             server.allRevealLegion(player.getLegions().get(0),
                 Constants.reasonInitial);
-            server.allUpdatePlayerInfo();
+            server.allUpdatePlayerInfo("NewGame3.2-loop");
         }
 
         server.allTellAllLegionLocations();
@@ -1895,7 +1895,7 @@ public class GameServerSide extends Game
 
         syncOptions();
 
-        server.allUpdatePlayerInfo(true);
+        server.allUpdatePlayerInfo(true, "LoadGameStart");
         replayOngoing = true;
         server.allTellReplay(true, turnNumber);
         server.allInitBoard();
@@ -1922,7 +1922,7 @@ public class GameServerSide extends Game
         }
 
         server.allFullyUpdateLegionStatus();
-        server.allUpdatePlayerInfo(false);
+        server.allUpdatePlayerInfo(false, "LoadGameCompleted");
         server.allTellAllLegionLocations();
         updateCaretakerDisplays();
 
@@ -2974,7 +2974,7 @@ public class GameServerSide extends Game
 
         clearEngagementData();
 
-        server.allUpdatePlayerInfo();
+        server.allUpdatePlayerInfo("CheckEngagementDone");
 
         server.allTellEngagementResults(winner, engagementResult,
             pointsScored, turnCombatFinished);
@@ -3137,7 +3137,7 @@ public class GameServerSide extends Game
         }
         PlayerServerSide player = (PlayerServerSide)getActivePlayer();
         player.takeMulligan();
-        server.allUpdatePlayerInfo();
+        server.allUpdatePlayerInfo("Mulligan");
         setupMove();
         makeMovementRoll();
         server.kickPhase();

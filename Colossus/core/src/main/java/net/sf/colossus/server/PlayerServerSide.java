@@ -417,7 +417,7 @@ public final class PlayerServerSide extends Player implements
         ((LegionServerSide)legion).undoRecruit();
 
         // Update number of creatures in status window.
-        getGame().getServer().allUpdatePlayerInfo();
+        getGame().getServer().allUpdatePlayerInfo("UndoRecruit");
         getGame().getServer().undidRecruit(legion, recruit, false);
     }
 
@@ -450,7 +450,7 @@ public final class PlayerServerSide extends Player implements
     {
         Legion parent = ((LegionServerSide)splitoff).getParent();
         ((LegionServerSide)splitoff).recombine(parent, true);
-        getGame().getServer().allUpdatePlayerInfo();
+        getGame().getServer().allUpdatePlayerInfo("UndoSplit");
     }
 
     void recombineIllegalSplits()
@@ -469,7 +469,7 @@ public final class PlayerServerSide extends Player implements
                 it.remove();
             }
         }
-        getGame().getServer().allUpdatePlayerInfo();
+        getGame().getServer().allUpdatePlayerInfo("recombineIllegalSplits");
     }
 
     @Override
@@ -493,7 +493,7 @@ public final class PlayerServerSide extends Player implements
             score += points;
             if (getGame() != null)
             {
-                getGame().getServer().allUpdatePlayerInfo();
+                getGame().getServer().allUpdatePlayerInfo("AddPoints");
             }
 
             LOGGER.info(getName() + " earns " + points + " "
@@ -590,7 +590,7 @@ public final class PlayerServerSide extends Player implements
         // Record the slayer and give him this player's legion markers.
         handleSlaying(slayer);
 
-        getGame().getServer().allUpdatePlayerInfo();
+        getGame().getServer().allUpdatePlayerInfo("Die");
 
         LOGGER.info(getName() + " is dead, telling everyone about it");
 

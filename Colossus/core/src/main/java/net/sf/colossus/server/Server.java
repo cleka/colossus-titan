@@ -1655,17 +1655,18 @@ public final class Server extends Thread implements IServer
         game = null;
     }
 
-    void allUpdatePlayerInfo(boolean treatDeadAsAlive)
+    void allUpdatePlayerInfo(boolean treatDeadAsAlive, String reason)
     {
+        LOGGER.finest("AllUpdatePlayerInfo, reason " + reason);
         for (IClient client : iClients)
         {
             client.updatePlayerInfo(getPlayerInfo(treatDeadAsAlive));
         }
     }
 
-    void allUpdatePlayerInfo()
+    void allUpdatePlayerInfo(String reason)
     {
-        allUpdatePlayerInfo(false);
+        allUpdatePlayerInfo(false, reason);
     }
 
     void allUpdateCreatureCount(CreatureType type, int count, int deadCount)
@@ -2019,7 +2020,7 @@ public final class Server extends Thread implements IServer
         {
             client.setupSplit(game.getActivePlayer(), game.getTurnNumber());
         }
-        allUpdatePlayerInfo();
+        allUpdatePlayerInfo("AllSetupSplit");
     }
 
     void allSetupMove()
@@ -2272,7 +2273,7 @@ public final class Server extends Thread implements IServer
     // TODO should use RecruitEvent
     void didRecruit(AddCreatureAction event, CreatureType recruiter)
     {
-        allUpdatePlayerInfo();
+        allUpdatePlayerInfo("DidRecruit");
 
         int numRecruiters = (recruiter == null ? 0 : TerrainRecruitLoader
             .numberOfRecruiterNeeded(recruiter, event.getAddedCreatureType(),
@@ -2303,7 +2304,7 @@ public final class Server extends Thread implements IServer
 
     void undidRecruit(Legion legion, CreatureType recruit, boolean reinforced)
     {
-        allUpdatePlayerInfo();
+        allUpdatePlayerInfo("UndidRecruit");
         Iterator<IClient> it = iClients.iterator();
         while (it.hasNext())
         {
@@ -3016,7 +3017,7 @@ public final class Server extends Thread implements IServer
 
         LOGGER.log(Level.FINER, "Server.didSplit " + hex + " " + parent + " "
             + child + " " + childSize);
-        allUpdatePlayerInfo();
+        allUpdatePlayerInfo("DidSplit");
 
         IClient activeClient = getClient(game.getActivePlayer());
 

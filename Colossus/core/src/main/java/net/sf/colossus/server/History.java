@@ -713,7 +713,7 @@ public class History
                 ((PlayerServerSide)player).handleSlaying(slayer);
             }
             player.setDead(true);
-            server.allUpdatePlayerInfo();
+            server.allUpdatePlayerInfo("FireEvent-PlayerElim");
             server.allTellPlayerElim(player, slayer, false);
         }
         else if (eventName.equals("MovementRoll"))

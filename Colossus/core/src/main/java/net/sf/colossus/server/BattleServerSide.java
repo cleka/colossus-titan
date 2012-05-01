@@ -673,7 +673,7 @@ public final class BattleServerSide extends Battle
         }
         server.allRemoveDeadBattleChits();
         // to update number of creatures in status window:
-        server.allUpdatePlayerInfo();
+        server.allUpdatePlayerInfo("removeDeadCreatures");
     }
 
     private void removeDeadCreaturesFromLegion(LegionServerSide legion)

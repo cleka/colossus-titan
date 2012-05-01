@@ -659,7 +659,7 @@ public final class LegionServerSide extends Legion implements
 
         player.addLegion(newLegion);
 
-        game.getServer().allUpdatePlayerInfo();
+        game.getServer().allUpdatePlayerInfo("Split");
         LOGGER.log(Level.INFO, newLegion.getHeight()
             + " creatures are split off from legion " + this
             + " into new legion " + newLegion);
