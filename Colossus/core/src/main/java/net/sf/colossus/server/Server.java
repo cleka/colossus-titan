@@ -1366,8 +1366,8 @@ public final class Server extends Thread implements IServer
         ClientHandler existingCH;
         if (spectator)
         {
-            LOGGER.info("Adding spectator " + playerName);
             ++spectators;
+            LOGGER.info("Adding spectator #" + spectators + playerName);
             startFileServerIfNotRunning();
         }
         else if (player == null)
