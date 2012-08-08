@@ -148,6 +148,7 @@ public class WebClient extends KFrame implements IWebClient
     private final static String sep = IWebServer.WebProtocolSeparator;
 
     private boolean failedDueToDuplicateLogin = false;
+    private boolean failedDueToOwnCancel = false;
 
     private int state = NotLoggedIn;
     private String enrolledInstantGameId = null;
@@ -281,6 +282,7 @@ public class WebClient extends KFrame implements IWebClient
 
     private final static String LoginButtonText = "Login";
     private final static String LogoutButtonText = "Logout";
+    private final static String CancelLoginButtonText = "Cancel";
     private final static String quitButtonText = "Quit";
     private final static String HideButtonText = "Hide Web Client";
     private final static String WatchButtonText = "Join game as spectator";
@@ -1709,6 +1711,10 @@ public class WebClient extends KFrame implements IWebClient
     {
         String reason = null;
         failedDueToDuplicateLogin = false;
+        failedDueToOwnCancel = false;
+
+        updateStatus("Trying to connect...", Color.blue);
+        loginLogoutButton.setText(CancelLoginButtonText);
 
         // email is null: WCST does login
         wcst = new WebClientSocketThread(this, hostname, port, username,
@@ -1723,6 +1729,8 @@ public class WebClient extends KFrame implements IWebClient
         }
         else
         {
+            loginLogoutButton.setText(LoginButtonText);
+
             // I would have liked to let the constructor throw an exception
             // and catch this here, but then the returned pointer was null,
             // so could not do anything with it (and start() not be run),
@@ -1749,6 +1757,12 @@ public class WebClient extends KFrame implements IWebClient
             if (!force && e.failedBecauseAlreadyLoggedIn())
             {
                 failedDueToDuplicateLogin = true;
+                return reason;
+            }
+
+            if (e.wasCancelled())
+            {
+                failedDueToOwnCancel = true;
                 return reason;
             }
 
@@ -2470,6 +2484,14 @@ public class WebClient extends KFrame implements IWebClient
                 message = createLoginWebClientSocketThread(true);
             }
         }
+        else if (message != null && failedDueToOwnCancel)
+        {
+            state = NotLoggedIn;
+            loginField.setEnabled(true);
+            updateStatus("Login attempt cancelled... - Not logged in",
+                Color.BLUE);
+            updateGUI();
+        }
         if (message == null)
         {
             enrolledInstantGameId = null;
@@ -2493,6 +2515,11 @@ public class WebClient extends KFrame implements IWebClient
         {
             LOGGER.log(Level.FINEST, "connect/login failed...");
         }
+    }
+
+    public void doCancelConnect()
+    {
+        WebClientSocketThread.cancelConnectAttempt();
     }
 
     public boolean validateServerAndPort()
@@ -3386,7 +3413,21 @@ public class WebClient extends KFrame implements IWebClient
         doQuit();
     }
 
-    private void loginLogoutButtonAction(String command)
+    void loginLogoutButtonAction(final String command)
+    {
+        Runnable r = new Runnable()
+        {
+            public void run()
+            {
+                executeLoginLogoutButtonAction(command);
+            }
+        };
+
+        Thread doButtonAction = new Thread(r);
+        doButtonAction.start();
+    }
+
+    private void executeLoginLogoutButtonAction(String command)
     {
         if (command.equals(LoginButtonText))
         {
@@ -3395,6 +3436,10 @@ public class WebClient extends KFrame implements IWebClient
         else if (command.equals(LogoutButtonText))
         {
             doLogout();
+        }
+        else if (command.equals(CancelLoginButtonText))
+        {
+            doCancelConnect();
         }
         else
         {

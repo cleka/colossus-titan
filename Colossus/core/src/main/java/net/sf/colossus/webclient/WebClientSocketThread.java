@@ -8,7 +8,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.ConnectException;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.util.Date;
@@ -63,6 +65,10 @@ public class WebClientSocketThread extends Thread implements IWebServer
     private WcstException failedException = null;
 
     private static int counter = 0;
+    private static WebClientSocketThread currentAttempt = null;
+    private boolean closingForcefullyToCancel = false;
+
+    private final static Object connectOngoingMutex = new Object();
 
     // TODO also defined in webserver.WebServerConstants!
     private final Charset charset = Charset.forName("UTF-8");
@@ -91,9 +97,19 @@ public class WebClientSocketThread extends Thread implements IWebServer
 
         try
         {
+            synchronized (connectOngoingMutex)
+            {
+                WebClientSocketThread.currentAttempt = this;
+            }
+
             // connect, as well as any of the three below
             // might throw an exception if they fail:
             connect();
+
+            synchronized (connectOngoingMutex)
+            {
+                WebClientSocketThread.currentAttempt = null;
+            }
 
             // If client GUI provided a confirmation code, then in is a
             // confirmation for a previously sent registration; otherwise:
@@ -142,22 +158,69 @@ public class WebClientSocketThread extends Thread implements IWebServer
         return failedException;
     }
 
+    public static void cancelConnectAttempt()
+    {
+        synchronized (connectOngoingMutex)
+        {
+            if (currentAttempt != null)
+            {
+                currentAttempt.closeSocketForcefully();
+                currentAttempt = null;
+            }
+            else
+            {
+                LOGGER.warning("no point to cancel, currentAttempt is null.");
+            }
+        }
+    }
+
+    private void closeSocketForcefully()
+    {
+        if (socket != null)
+        {
+            try
+            {
+                closingForcefullyToCancel = true;
+                socket.close();
+            }
+            catch (IOException e)
+            {
+                // ignore any exception
+            }
+        }
+
+    }
     private void connect() throws WcstException
     {
         String info = null;
         writeLog("About to connect client socket to " + hostname + ":" + port);
         try
         {
-            socket = new Socket(hostname, port);
-            out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
-                socket.getOutputStream(), charset)), true);
+            InetSocketAddress address = new InetSocketAddress(hostname, port);
+            socket = new Socket();
+            // 10.000 = 10 seconds timeout
+            socket.connect(address, 10000);
+            if (socket != null)
+            {
+                out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
+                    socket.getOutputStream(), charset)), true);
+            }
+            else
+            {
+                LOGGER.warning("socket null - creating printWriter skipped!");
+            }
         }
         catch (UnknownHostException e)
         {
-            info = "Unknown host: " + e.getMessage() + "\" - wrong address?";
+            info = "Unknown host: " + e.getMessage()
+                + "\" - wrong address/server name?";
             writeLog(e.toString());
         }
-
+        catch (SocketTimeoutException e)
+        {
+            info = "Could not connect: '" + e.getMessage()
+                + "' - possibly a firewall blocking port " + port + "?";
+        }
         catch (ConnectException e)
         {
             info = "Could not connect: '" + e.getMessage()
@@ -166,6 +229,14 @@ public class WebClientSocketThread extends Thread implements IWebServer
         }
         catch (Exception e) // IOException, IllegalBlockingModeException
         {
+            if (closingForcefullyToCancel)
+            {
+                info = "Connect attempt interrupted/cancelled "
+                    + "(closingForcefullyToCancel flag is set): "
+                    + e.toString();
+                writeLog(e.toString());
+                throw new WcstException(info, false, true);
+            }
             info = "Exception during connect: " + e.toString();
             writeLog(e.toString());
         }
@@ -291,6 +362,8 @@ public class WebClientSocketThread extends Thread implements IWebServer
     {
         String info = null;
         boolean duplicateLogin = false;
+        boolean cancelled = false;
+
         try
         {
             this.in = new BufferedReader(new InputStreamReader(socket
@@ -340,7 +413,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
         if (info != null)
         {
             String message = "Login failed: " + info;
-            throw new WcstException(message, duplicateLogin);
+            throw new WcstException(message, duplicateLogin, cancelled);
         }
     }
 
@@ -831,11 +904,13 @@ public class WebClientSocketThread extends Thread implements IWebServer
     public class WcstException extends Exception
     {
         boolean failedBecauseAlreadyLoggedIn = false;
+        boolean wasCancelled = false;
 
-        public WcstException(String message, boolean dupl)
+        public WcstException(String message, boolean dupl, boolean cancelled)
         {
             super(message);
             failedBecauseAlreadyLoggedIn = dupl;
+            wasCancelled = cancelled;
         }
 
         public WcstException(String message)
@@ -848,5 +923,11 @@ public class WebClientSocketThread extends Thread implements IWebServer
         {
             return failedBecauseAlreadyLoggedIn;
         }
+
+        public boolean wasCancelled()
+        {
+            return wasCancelled;
+        }
+
     }
 }
