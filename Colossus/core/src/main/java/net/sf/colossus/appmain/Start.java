@@ -8,6 +8,8 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.JOptionPane;
+
 import net.sf.colossus.client.Client;
 import net.sf.colossus.cmdline.CmdLine;
 import net.sf.colossus.cmdline.Opt;
@@ -270,7 +272,8 @@ public final class Start
 
         if (cl.optIsSet('l') || cl.optIsSet('z'))
         {
-            whatNextManager.setWhatToDoNext(WhatToDoNext.LOAD_GAME, false);
+            whatNextManager.setWhatToDoNext(WhatToDoNext.LOAD_GAME, false,
+                false);
             String filename = null;
             if (cl.optIsSet('l'))
             {
@@ -675,6 +678,7 @@ public final class Start
 
             else if (getWhatToDoNext() == WhatToDoNext.LOAD_GAME)
             {
+                boolean wasInteractive = whatNextManager.isInteractive();
                 whatNextManager.decrementHowManyGamesLeft();
 
                 // TODO is this re-setting it needed?
@@ -688,8 +692,8 @@ public final class Start
                 if (loadFileName != null && loadFileName.length() > 0)
                 {
                     GameLoading loader = new GameLoading();
-                    boolean ok = loader.loadGame(loadFileName);
-                    if (ok)
+                    String reasonForFailure = loader.loadGame(loadFileName);
+                    if (reasonForFailure == null)
                     {
                         GameServerSide game = GameServerSide
                             .newGameServerSide(getWhatNextManager(),
@@ -699,7 +703,15 @@ public final class Start
                     }
                     else
                     {
-                        LOGGER.severe("GameLoading returned false!");
+                        if (wasInteractive)
+                        {
+                            JOptionPane.showMessageDialog(null,
+                                "Error loading game: " + reasonForFailure,
+                                "Loading game failed!",
+                                JOptionPane.ERROR_MESSAGE);
+                        }
+                        LOGGER.severe("GameLoading returned failure: "
+                            + reasonForFailure);
                     }
                 }
                 else

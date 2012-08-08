@@ -11,12 +11,14 @@ public class WhatNextManager
         .getLogger(WhatNextManager.class.getName());
 
     private final Options startOptions;
+    private boolean interactive;
     private WhatToDoNext whatToDoNext;
     private int howManyGamesLeft;
 
     public WhatNextManager(Options startOpts)
     {
         this.startOptions = startOpts;
+        this.interactive = false;
         this.howManyGamesLeft = Options.getHowManyStresstestRoundsProperty();
     }
 
@@ -26,22 +28,47 @@ public class WhatNextManager
     }
 
     /**
+     * Returns true if this action was caused by interactive means.
+     * If so, it makes sense to display a error message dialog box if
+     * something went wrong.
+     * @return action to do is marked as "was triggered interactively"
+     */
+    public boolean isInteractive()
+    {
+        return interactive;
+    }
+
+    /**
      * Set the action what shall be executed next.
      * Trigger also the timer for the "Timed Quit", if requested so.
      *
+     * @param whatToDoNext
+     * @param triggerQuitTimer
+     * @param interactive
+     */
+    public void setWhatToDoNext(WhatToDoNext whatToDoNext,
+        boolean triggerQuitTimer, boolean interactive)
+    {
+        this.whatToDoNext = whatToDoNext;
+        this.interactive = interactive;
+        LOGGER.log(Level.FINEST,
+            "Set what to do next to " + whatToDoNext.toString());
+        if (triggerQuitTimer)
+        {
+            triggerTimedQuit();
+        }
+    }
+
+    /**
+     * A convenient shortcut to the 3-argument-form,
+     * for the many calls where interactive is to be set to false.
      * @param whatToDoNext
      * @param triggerQuitTimer
      */
     public void setWhatToDoNext(WhatToDoNext whatToDoNext,
         boolean triggerQuitTimer)
     {
-        this.whatToDoNext = whatToDoNext;
-        LOGGER.log(Level.FINEST, "Set what to do next to "
-            + whatToDoNext.toString());
-        if (triggerQuitTimer)
-        {
-            triggerTimedQuit();
-        }
+        setWhatToDoNext(whatToDoNext, triggerQuitTimer, false);
     }
 
     /**
@@ -53,9 +80,10 @@ public class WhatNextManager
         return startOptions;
     }
 
-    public void setWhatToDoNext(WhatToDoNext whatToDoNext, String loadFile)
+    public void setWhatToDoNext(WhatToDoNext whatToDoNext, String loadFile,
+        boolean interactive)
     {
-        setWhatToDoNext(whatToDoNext, false);
+        setWhatToDoNext(whatToDoNext, false, interactive);
         startOptions.setOption(Options.loadGameFileName, loadFile);
     }
 

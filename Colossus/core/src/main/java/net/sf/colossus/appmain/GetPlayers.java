@@ -934,7 +934,8 @@ public final class GetPlayers extends KFrame
             stOptions.setOption(Options.loadGameFileName, filename);
             stOptions.setOption(Options.serveAtPort, serveAtPort);
             options.setOption(Options.serveAtPort, serveAtPort);
-            whatNextManager.setWhatToDoNext(WhatToDoNext.LOAD_GAME, false);
+            whatNextManager.setWhatToDoNext(WhatToDoNext.LOAD_GAME, false,
+                true);
             dispose();
         }
     }

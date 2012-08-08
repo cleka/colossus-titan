@@ -46,13 +46,15 @@ public class GameLoading
      *
      * If the filename is "--latest" then load the latest savegame that
      * can be found in saveDirName.
+     *
+     * @return String telling reason for failure, or null if all ok
      */
-    public boolean loadGame(String filename)
+    public String loadGame(String filename)
     {
         File file = resolveFileNameToFile(filename);
         if (file == null)
         {
-            return false;
+            return "Can't resolve filename to file: " + filename;
         }
         return loadGameFromFile(file);
     }
@@ -136,7 +138,7 @@ public class GameLoading
      * @param file The file from which to load the game
      * @return True if load was successful, otherwise false
      */
-    public boolean loadGameFromFile(File file)
+    public String loadGameFromFile(File file)
     {
         try
         {
@@ -153,7 +155,8 @@ public class GameLoading
                 // TODO not only would this fail to load quietly, it also fails
                 // to fail quietly rather noisily by causing an NPE in dispose().
 
-                return false;
+                return "Can't load this savegame version (" + ver.getValue()
+                    + ", expected: " + Constants.XML_SNAPSHOT_VERSION + ")";
             }
 
             Element el = root.getChild("Variant");
@@ -166,7 +169,7 @@ public class GameLoading
             else
             {
                 LOGGER.severe("Variant name not set in saveGame file!");
-                return false;
+                return "Variant name not set in saveGame file!";
             }
 
             this.variant = VariantSupport.loadVariantByName(varName, true);
@@ -174,9 +177,9 @@ public class GameLoading
         catch (Exception e)
         {
             LOGGER.log(Level.SEVERE, "Exception during loading Game: ", e);
-            return false;
+            return "Exception during loading game: " + e.getMessage();
         }
-        return true;
+        return null;
     }
 
     /**

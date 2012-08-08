@@ -743,7 +743,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     private void doSetWhatToDoNext(WhatToDoNext whatToDoNext, String loadFile)
     {
-        whatNextManager.setWhatToDoNext(whatToDoNext, loadFile);
+        whatNextManager.setWhatToDoNext(whatToDoNext, loadFile, true);
     }
 
     // Used by File=>Close and Window closing
