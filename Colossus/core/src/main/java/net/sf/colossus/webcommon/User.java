@@ -112,6 +112,16 @@ public class User
         return email;
     }
 
+    public String getCreated()
+    {
+        return this.created;
+    }
+
+    public long getOnlineTime()
+    {
+        return this.onlineSecs;
+    }
+
     // Make sure it is a 2 digit number, to avoid problems in
     // comparison between "56 5 12" and "56 05 12".
     private static long atLeast10(long original)

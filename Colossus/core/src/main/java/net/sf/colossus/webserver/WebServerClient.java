@@ -709,6 +709,10 @@ public class WebServerClient implements IWebClient
         {
             server.handlePingQuotedName(sender, message);
         }
+        else if (msgAllLower.startsWith("/userinfo"))
+        {
+            server.getGeneralChat().handleShowInfo(this, this.user);
+        }
         else if (msgAllLower.startsWith("/ping"))
         {
             server.handlePing(sender, message);

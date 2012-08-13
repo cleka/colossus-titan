@@ -35,7 +35,8 @@ public class ChatChannel
 
     private final static String[] chatHelp = new String[] { "Chat help:", "",
         "/help, /h, /? (show help)", "/ping (notify a certain user)",
-        "/contact (how to contact admin)", "",
+        "/contact (how to contact admin)",
+        "/userinfo (shows what info server has about you)", "",
         "Use /help <keyword> for detailed help. E.g. /help ping how to use ping." };
 
     private final static String[] pingHelp = new String[] {
@@ -164,6 +165,42 @@ public class ChatChannel
             client.chatDeliver(chatId, when, sender, "", isResent);
         }
 
+    }
+
+    // handleShowInfo(sender, message, this);
+    public void handleShowInfo(IWebClient client, User user)
+    {
+        List<String> lines = new ArrayList<String>();
+        lines.add("Server has following information about you:");
+        lines.add("      Name: " + user.getName());
+        lines.add("      Email: " + user.getEmail());
+        lines.add("      Registered: " + user.getCreated()
+            + " [SERVER TIME, i.e. Central European time]");
+        long secs = user.getOnlineTime();
+        lines.add("      Online time: " + secs + " seconds ("
+            + onlineTimeFromSeconds(secs) + ")");
+        sendLinesToClient(chatId, client, lines, true, "SYSTEM");
+    }
+
+    @SuppressWarnings("boxing")
+    private String onlineTimeFromSeconds(long totalsecs)
+    {
+        long total = totalsecs;
+        long secs = total % 60;
+        total -= secs;
+        total /= 60;
+        long mins = total % 60;
+        total -= mins;
+        total /= 60;
+        long hours = total % 24;
+        total -= hours;
+        total /= 24;
+        long days = total;
+
+        String onlineTime = String.format(
+            "%d days, %d hours, %d minutes, %d seconds", days, hours, mins,
+            secs);
+        return onlineTime;
     }
 
     // TODO is this perhaps obsolete nowadays?
