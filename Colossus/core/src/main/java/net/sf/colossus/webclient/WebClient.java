@@ -35,6 +35,8 @@ import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
+import javax.swing.AbstractButton;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -753,10 +755,29 @@ public class WebClient extends KFrame implements IWebClient
         // nameField.addActionListener(this);
         loginPane.add(loginField);
 
-        loginPane.add(new JLabel("Password"));
+        AbstractAction showPwAction = new AbstractAction("*")
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                AbstractButton abstractButton = (AbstractButton)e.getSource();
+                boolean selected = abstractButton.getModel().isSelected();
+                passwordField.setEchoChar(selected ? '*' : (char)0);
+                //System.out.println("echo char was " + c + "now is "
+                //    + passwordField.getEchoChar());
+
+            }
+        };
+
+        Box pwFieldPanel = new Box(BoxLayout.X_AXIS);
         passwordField = new JPasswordField(this.password);
+        pwFieldPanel.add(passwordField);
+        JCheckBox showPwCheckbox = new JCheckBox(showPwAction);
+        showPwCheckbox.setSelected(true);
+        pwFieldPanel.add(showPwCheckbox);
+        loginPane.add(new JLabel("Password"));
+
         // passwordField.addActionListener(this);
-        loginPane.add(passwordField);
+        loginPane.add(pwFieldPanel);
         passwordField.addFocusListener(new FocusAdapter()
         {
             @Override
