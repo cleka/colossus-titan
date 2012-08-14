@@ -2,7 +2,9 @@ package net.sf.colossus.webserver;
 
 
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -681,11 +683,41 @@ public class WebServerClient implements IWebClient
             cst.setLastWasLogin();
             // Request a Ping, so we see when client was earliest able to respond
             requestPingNow();
+
+            if (user.getName().equalsIgnoreCase(unverifiedUsername)
+                && !user.getName().equals(unverifiedUsername))
+            {
+                List<String> lines = makeCaseMismatchWarning(unverifiedUsername);
+                String message = "NOTE: Login name case (upper/lower) mismatch. See explanation in chat window!";
+                long when = new Date().getTime();
+                server.requestUserAttention(when, "SYSTEM", false,
+                    user.getName(), message, 1, 500, true);
+                server.getGeneralChat().sendLinesToClient(
+                    IWebServer.generalChatName, this, lines, true, "");
+            }
         }
 
         server.saveGamesIfNeeded();
 
         return done;
+    }
+
+    private List<String> makeCaseMismatchWarning(String name)
+    {
+        ArrayList<String> lines = new ArrayList<String>();
+        lines.add("NOTE:");
+        lines.add("Currently you are logged in as '" + name + "', ");
+        lines.add("but the official name with which you registered to "
+            + "the server is '" + user.getName() + "'"
+            + " (there is a difference in lowercase/uppercase).");
+        lines.add("Please adjust the name in 'Login id' field in the 'Server'"
+            + "  tab to use the correct name to login!");
+        lines.add("(=> Logout, correct the name, and Login once again - "
+            + "a successful login stores the name and password for future "
+            + "sessions.)");
+        lines.add("");
+        lines.add("Thanks, your friendly CPGS admin!");
+        return lines;
     }
 
     public void processChatLine(String chatId, String sender, String message)
