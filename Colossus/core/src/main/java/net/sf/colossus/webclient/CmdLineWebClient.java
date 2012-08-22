@@ -2,7 +2,11 @@ package net.sf.colossus.webclient;
 
 
 import java.awt.Color;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.webclient.WebClientSocketThread.WcstException;
@@ -54,12 +58,32 @@ public class CmdLineWebClient implements IWebClient
     public static void main(String[] args)
     {
         // TODO Auto-generated method stub
+        boolean doShutdown = false;
+        if (args.length == 1 && args[0].equals("shutdown"))
+        {
+            System.out.println("Doing shutdown...");
+            doShutdown = true;
+        }
 
         CmdLineWebClient client = new CmdLineWebClient();
 
         client.createLoginWebClientSocketThread(true);
 
-        client.logout();
+        // Give some time for receiving all the chat messages etc.
+        sleepFor(1000);
+
+        if (doShutdown)
+        {
+            client.shutdownServer();
+            client.logout();
+        }
+        else
+        {
+            client.interactiveLoop();
+            client.logout();
+            // System.exit(0);
+        }
+
     }
 
     public String createLoginWebClientSocketThread(boolean force)
@@ -67,8 +91,9 @@ public class CmdLineWebClient implements IWebClient
         String reason = null;
 
         // email is null: WCST does login
-        wcst = new WebClientSocketThread(null, hostname, port, username,
+        wcst = new WebClientSocketThread(this, hostname, port, username,
             password, force, null, null, gameHash);
+
         WcstException e = wcst.getException();
         if (e == null)
         {
@@ -117,13 +142,76 @@ public class CmdLineWebClient implements IWebClient
     {
         boolean success = false;
 
-        server.logout();
-        server = null;
-        wcst = null;
+        if (server != null)
+        {
+            server.logout();
+            server = null;
+            wcst = null;
+        }
 
-        updateStatus("Not connected", Color.red);
+        updateStatus("Not connected", Color.green);
         return success;
     }
+
+    private void shutdownServer()
+    {
+        server.shutdownServer();
+    }
+
+    private void interactiveLoop()
+    {
+        String line;
+        BufferedReader br = new BufferedReader(
+            new InputStreamReader(System.in));
+        try
+        {
+
+            while ((line = getOneLine(br)) != null)
+            {
+                System.out.println("GOT: " + line);
+                if (line.equals("shutdown"))
+                {
+                    shutdownServer();
+                }
+                else if (line.equals("exit") || line.equals("quit"))
+                {
+                    break;
+                }
+            }
+        }
+
+        catch (IOException e)
+        {
+            LOGGER.log(Level.SEVERE, "IOException while reading from sdtin??",
+                e);
+        }
+
+        System.out.println("Outside loop...");
+    }
+
+    private String getOneLine(BufferedReader br) throws IOException
+    {
+        System.out.print("cmd >");
+        return br.readLine();
+    }
+    private static void sleepFor(long millis)
+    {
+        try
+        {
+            Thread.sleep(millis);
+        }
+        catch (InterruptedException e)
+        {
+            LOGGER.log(Level.FINEST,
+                "InterruptException caught... ignoring it...");
+        }
+    }
+
+    //
+    // =======================================================================
+    // ** Here start the methods needed to satisfy the IWebClient interface **
+    //=======================================================================
+    //
 
     public void chatDeliver(String chatId, long when, String sender,
         String message, boolean resent)

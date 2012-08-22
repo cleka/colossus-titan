@@ -73,7 +73,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
     // TODO also defined in webserver.WebServerConstants!
     private final Charset charset = Charset.forName("UTF-8");
 
-    public WebClientSocketThread(WebClient wcGUI, String hostname, int port,
+    public WebClientSocketThread(IWebClient wcGUI, String hostname, int port,
         String username, String password, boolean force, String email,
         String confCode, HashMap<String, GameInfo> gameHash)
     {

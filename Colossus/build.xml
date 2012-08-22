@@ -172,6 +172,7 @@
     <mkdir dir="${build.javadoc.dir}" />
     <javadoc sourcepath="${core.src.dir}" destdir="${build.javadoc.dir}" access="private"/>
   </target>
+	
   <target name="jar" depends="init,compile,compileVariants"
   description="Make jar file">
     <pathconvert property="manifest.classpath" pathsep=" ">
@@ -202,6 +203,7 @@
     includes="**" excludes="*.java" update="true" />
     <chmod file="Colossus.jar" perm="755" />
   </target>
+
   <target name="webjar" depends="init,compile"
   description="Make WebServer jar file">
     <jar jarfile="ColossusWeb.jar" basedir="${build.classes.dir}"
@@ -215,11 +217,34 @@
     </jar>
     <chmod file="ColossusWeb.jar" perm="755" />
   </target>
+
+  <target name="ccj" depends="init,compile"
+  description="Make cmdline client jar file">
+    <pathconvert property="manifest.classpath" pathsep=" ">
+      <path refid="project.class.path" />
+      <chainedmapper>
+        <flattenmapper />
+        <globmapper from="*" to="libs/*" />
+      </chainedmapper>
+    </pathconvert>
+    <jar jarfile="CmdlineClient.jar" basedir="${build.classes.dir}"
+    includes="**/webclient/** **/webcommon/** **/util/Instance*">
+      <manifest>
+        <attribute name="Main-Class"
+        value="net.sf.colossus.webclient.CmdLineWebClient" />      	
+        <attribute name="Class-Path"
+        value="${manifest.classpath}" />
+      </manifest>
+    </jar>
+    <chmod file="CmdlineClient.jar" perm="755" />
+  </target>
+	
   <!-- Delete stale jar files before compiling -->
   <target name="cleanjars" depends=""
   description="Delete stale jar files">
     <delete verbose="yes" quiet="yes" file="Colossus.jar" />
     <delete verbose="yes" quiet="yes" file="ColossusWeb.jar" />
+    <delete verbose="yes" quiet="yes" file="CmdlineClient.jar" />
     <delete verbose="yes" quiet="yes"
     file="BattlelandsBuilder.jar" />
     <delete verbose="yes" quiet="yes"

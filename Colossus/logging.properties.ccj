@@ -1,0 +1,50 @@
+########## Global settings ##########
+#
+# logging.properties.ccj: logging properties for the CmdlineClient jar
+#
+# Specify the handlers to create in the root logger
+# (all Colossus loggers are children of the root logger)
+# we default to log to console and file
+handlers = java.util.logging.ConsoleHandler, java.util.logging.FileHandler
+
+# Set the default logging level for the Colossus root logger
+net.sf.colossus.level = FINE
+
+
+
+########## Settings for specific code parts ##########
+
+# here you can configure different log levels for different parts of the code
+# by setting a different level for the fully qualified name of a package or
+# class; e.g.:
+
+# net.sf.colossus.client.Marker.level = FINEST
+
+
+
+########## Console handler ##########
+
+# Set the default logging level for new ConsoleHandler instances
+java.util.logging.ConsoleHandler.level = WARNING
+
+# Set the default formatter for new ConsoleHandler instances
+java.util.logging.ConsoleHandler.formatter=net.sf.colossus.util.VerySimpleFormatter
+
+
+
+########## File handler ##########
+
+# Set the default logging level for new FileHandler instances
+java.util.logging.FileHandler.level=ALL
+
+# we prefer simple formatting at the moment (default is XML)
+java.util.logging.FileHandler.formatter=java.util.logging.SimpleFormatter
+
+# limit each file to 1 MB
+java.util.logging.FileHandler.limit=1048576
+
+# we use three files in rotation
+java.util.logging.FileHandler.count=3
+
+# we use a Colossus specific name for the files, placing it in the system temp directory
+java.util.logging.FileHandler.pattern=%t/CmdlineClient%g.log
