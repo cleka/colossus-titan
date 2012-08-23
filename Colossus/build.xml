@@ -294,7 +294,7 @@
     includes="**" excludes="*.java" update="true" />
     <chmod file="BattlelandsBuilder.jar" perm="755" />
   </target>
-  <target name="jars" depends="clean,jar,webjar">
+  <target name="jars" depends="clean,jar,webjar,ccj">
   </target>
   <target name="brjar" depends="init,compile,compileVariants,compileDatatools,buildInfo"
   description="Make Battlelands Randomizer jar file">
