@@ -27,13 +27,14 @@ public class CmdLineWebClient implements IWebClient
     private static final Logger LOGGER = Logger
         .getLogger(CmdLineWebClient.class.getName());
 
+    private final static String DEFAULT_USERNAME = "clemens";
+    private final static String DEFAULT_PASSWORD = "secret";
+
     private IWebServer server = null;
     private WebClientSocketThread wcst = null;
 
     private final String hostname = "localhost";
     private final int port = 26766;
-    private final String username = "clemens";
-    private final String password = "secret";
 
     /**
      * NOTE: shared with SocketThread, because WCST needs it to restore
@@ -67,29 +68,132 @@ public class CmdLineWebClient implements IWebClient
 
         CmdLineWebClient client = new CmdLineWebClient();
 
-        client.createLoginWebClientSocketThread(true);
-
-        // Give some time for receiving all the chat messages etc.
-        sleepFor(1000);
-
         if (doShutdown)
         {
+            client.login(true, DEFAULT_USERNAME,
+                DEFAULT_PASSWORD);
+            // Give some time for receiving all the chat messages etc.
+            sleepFor(1000);
+
             client.shutdownServer();
             client.logout();
         }
         else
         {
-            client.interactiveLoop();
-            client.logout();
-            // System.exit(0);
+            interactiveLoop(client);
         }
-
     }
 
-    public String createLoginWebClientSocketThread(boolean force)
+    private static void interactiveLoop(CmdLineWebClient cwClient)
+    {
+        String line;
+        BufferedReader br = new BufferedReader(
+            new InputStreamReader(System.in));
+        try
+        {
+            while ((line = getOneLineFromStdin(br)) != null)
+            {
+                if (line.equals("login") || line.startsWith("login "))
+                {
+                    String usernameToUse = DEFAULT_USERNAME;
+                    String passwordToUse = DEFAULT_PASSWORD;
+
+                    String[] tokens = line.split(" +");
+                    if (tokens.length >= 3)
+                    {
+                        passwordToUse = tokens[2];
+                    }
+                    if (tokens.length >= 2)
+                    {
+                        usernameToUse = tokens[1];
+                    }
+
+                    cwClient.login(true, usernameToUse, passwordToUse);
+                    // Give some time for receiving all the chat messages etc.
+                    sleepFor(1000);
+                }
+
+                else if (line.equals("exit") || line.equals("quit"))
+                {
+                    break;
+                }
+
+                else if (line.equals(""))
+                {
+                    // peacefully ignore empty lines
+                }
+
+                else if (!cwClient.isLoggedIn())
+                {
+                    System.out.println("<not logged in>");
+                }
+                else if (line.equals("shutdown"))
+                {
+                    cwClient.shutdownServer();
+                }
+
+                else if (line.equals("logout"))
+                {
+                    cwClient.logout();
+                }
+
+                else if (line.startsWith("chat "))
+                {
+                    cwClient.typedInChat(line.substring(5));
+                }
+
+                else
+                {
+                    System.out.println("???");
+                }
+
+            }
+        }
+
+        catch (IOException e)
+        {
+            LOGGER.log(Level.SEVERE, "IOException while reading from sdtin??",
+                e);
+        }
+
+        System.out.println("Outside loop...");
+    }
+
+    private static String getOneLineFromStdin(BufferedReader br)
+        throws IOException
+    {
+        System.out.print("cmd > ");
+        return br.readLine();
+    }
+
+    private static void sleepFor(long millis)
+    {
+        try
+        {
+            Thread.sleep(millis);
+        }
+        catch (InterruptedException e)
+        {
+            LOGGER.log(Level.FINEST,
+                "InterruptException caught... ignoring it...");
+        }
+    }
+
+    /**
+     * Create a commandline client (CmdLineWebClient) and login with given
+     * parameters
+     *
+     * @param force
+     * @param username
+     * @param password
+     * @return
+     */
+    public String login(boolean force, String username, String password)
     {
         String reason = null;
 
+        System.out.println("Loggin in with username " + username
+            + " and password " + password);
         // email is null: WCST does login
         wcst = new WebClientSocketThread(this, hostname, port, username,
             password, force, null, null, gameHash);
@@ -132,12 +236,10 @@ public class CmdLineWebClient implements IWebClient
         return reason;
     }
 
-    public void updateStatus(String text, Color color)
-    {
-        String indicator = color == Color.red ? " ! " : "   ";
-        System.out.println("STATUS " + indicator + ": " + text);
-    }
-
+    /**
+     * Logout the active CmdlineClient
+     * @return
+     */
     private boolean logout()
     {
         boolean success = false;
@@ -153,58 +255,35 @@ public class CmdLineWebClient implements IWebClient
         return success;
     }
 
+    private boolean isLoggedIn()
+    {
+        return wcst != null;
+    }
+
+    private String getUsername()
+    {
+        if (wcst != null)
+        {
+            return wcst.getUsername();
+        }
+        return null;
+    }
+
     private void shutdownServer()
     {
         server.shutdownServer();
     }
 
-    private void interactiveLoop()
+    private void typedInChat(String message)
     {
-        String line;
-        BufferedReader br = new BufferedReader(
-            new InputStreamReader(System.in));
-        try
-        {
-
-            while ((line = getOneLine(br)) != null)
-            {
-                System.out.println("GOT: " + line);
-                if (line.equals("shutdown"))
-                {
-                    shutdownServer();
-                }
-                else if (line.equals("exit") || line.equals("quit"))
-                {
-                    break;
-                }
-            }
-        }
-
-        catch (IOException e)
-        {
-            LOGGER.log(Level.SEVERE, "IOException while reading from sdtin??",
-                e);
-        }
-
-        System.out.println("Outside loop...");
+        String chatId = IWebServer.generalChatName;
+        server.chatSubmit(chatId, getUsername(), message);
     }
 
-    private String getOneLine(BufferedReader br) throws IOException
+    public void updateStatus(String text, Color color)
     {
-        System.out.print("cmd >");
-        return br.readLine();
-    }
-    private static void sleepFor(long millis)
-    {
-        try
-        {
-            Thread.sleep(millis);
-        }
-        catch (InterruptedException e)
-        {
-            LOGGER.log(Level.FINEST,
-                "InterruptException caught... ignoring it...");
-        }
+        String indicator = color == Color.red ? " ! " : "   ";
+        System.out.println("STATUS " + indicator + ": " + text);
     }
 
     //

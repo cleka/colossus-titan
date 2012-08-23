@@ -425,6 +425,11 @@ public class WebClientSocketThread extends Thread implements IWebServer
         return stillNeedsRun;
     }
 
+    public String getUsername()
+    {
+        return username;
+    }
+
     @Override
     public void run()
     {
