@@ -94,7 +94,7 @@ final class PickRecruit extends KDialog
         JPanel recruitPane = new JPanel();
         contentPane.add(recruitPane);
 
-        int i = 0;
+        // int i = 0;
         for (final CreatureType recruit : recruits)
         {
             Box vertPane = new Box(BoxLayout.Y_AXIS);
@@ -121,7 +121,7 @@ final class PickRecruit extends KDialog
             JLabel countLabel = new JLabel(Integer.toString(count));
             countLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             vertPane.add(countLabel);
-            i++;
+            // i++;
         }
 
         // Provide the "skip recruit this time for this legion" choice only

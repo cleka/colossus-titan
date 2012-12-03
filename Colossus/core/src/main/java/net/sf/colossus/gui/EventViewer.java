@@ -1351,7 +1351,7 @@ final class EventViewer extends KDialog
             LOGGER.log(Level.WARNING, "expireTurns -1 - no purging needed.");
             return;
         }
-        int purged = 0;
+        // int purged = 0;
 
         synchronized (eventList)
         {
@@ -1367,7 +1367,7 @@ final class EventViewer extends KDialog
                     - (currentPlayer.getNumber() >= oldPlayerNr ? 1 : 0))
                 {
                     it.remove();
-                    purged++;
+                    // purged++;
                 }
                 else
                 {

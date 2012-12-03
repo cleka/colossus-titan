@@ -300,10 +300,10 @@ final class ClientHandler extends ClientHandlerStub implements IClient
              * TODO: If we would subclass ArrayList, could use the more
              * efficient method removeRange (it is "protected")
              */
-            int deleted = 0;
+            // int deleted = 0;
             for (int i = 0; i <= found; i++)
             {
-                deleted++;
+                // deleted++;
                 redoQueue.get(0);
                 redoQueue.remove(0);
             }

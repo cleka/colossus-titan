@@ -266,13 +266,13 @@ public class RationalAI extends SimpleAI
 
         hasMustered = mc.mustered;
         Iterator<CreatureType> it = creatures.iterator();
-        int child_value = 0;
+        // int child_value = 0;
 
         while (it.hasNext())
         {
             CreatureType creature = it.next();
 
-            child_value += (creature).getPointValue();
+            // child_value += (creature).getPointValue();
             results.add(creature);
         }
 

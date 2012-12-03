@@ -471,7 +471,7 @@ public class OnTheFlyLegionMove implements Collection<LegionMove>
         private int[] failoverGeneration()
         {
             //LOGGER.finest("failoverGeneration start");
-            int count = 0;
+            // int count = 0;
             int[] temp = new int[dim];
             if (lastDense == null)
             {
@@ -492,7 +492,7 @@ public class OnTheFlyLegionMove implements Collection<LegionMove>
                  * In practice the then branch could be folded into the
                  * else branch, as they do the same thing for hr == 0.
                  */
-                count++;
+                // count++;
                 int hr = higherRankIncomp(temp);
                 if (hr == 0)
                 {
