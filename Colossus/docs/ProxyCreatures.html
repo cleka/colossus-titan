@@ -1,0 +1,129 @@
+<html>
+
+<head>
+</head>
+<body>
+
+<h1>Proxy Creatures</h1>
+
+Craig Lish added in a branch some code for "Proxy Creatures". Below is what he explained about it.
+<p />
+
+<p />
+Don't panic! :o) It won't hurt my feelings if these changes live on
+the branch forever, I've just gotten to the point where I wouldn't
+want to lose what I've done so made a branch. Remember I mentioned
+making an Anything creature type to simplify recruiting? Well, it's
+not like I could just stop thinking about it :oP Oh, I started writing
+this mail over a week ago, and this top bit has been written at the
+end. I'm apprehensive about your reaction, so just know that I'm not
+implying you should adopt these changes, I just wanted to show someone
+:o)
+<p />
+So, moving from the graph to recruiting subtree (while removing the
+statics) removed the natural sort order stored in the graph. The
+comparator I wrote couldn't get the warlock after the guardian in
+tower recruits :o\ To solve that I reworked custom recruiting again
+and created a ProxyCreatureType that implements
+Predicate<CreatureType>. The proxy is just defined in the terrain and
+inserted into the graph like any other creature. It can answer
+questions like matches(creature) and getCreatureTypes(hex) to return
+the creatures it represents, has a list of creatures (or a pointer to
+the main list if anonymous) but doesn't have references to anything
+(not heavy), and extends CustomCreatureType. CustomRecruitment only
+listens for game events now (to update balrog count, for example), and
+has final say on numberOfRecruiterNeeded but will default to the
+defined count in the terrain definition. The ProxyCreatureType only
+represents other creatures but can have a CustomRecruitment associated
+(any creature can).
+<p />
+For example, a BalrogProxyCreatureType represents the 6
+BalrogCreatureType instances and is "the right one" when asked for a
+specific tower. (Players don't recruit the proxy, it just sits in the
+graph to represent a set of creatures.) The BalrogCustomRecruitment is
+attached to the BalrogCreaturetype and just updates balrog counts in
+response to game events. This way we can say "Anything recruits Balrog
+for 0" in the recruit tree instead of calling out each individual
+balrog. The 'Anything' matches anything (literally checks a reference
+to TerrainRecruitLoader's allCreatureTypes for contains) just like the
+AnyNonLordOrDemiLord matches Guardian. Implementing him is when I
+discovered the AnyNonLord non-bug :oP (I was playing with logging in
+to sourceforge with my openID or whatever, so the bug was reported by
+my openID instead of clish -- not the desired effect ;o)
+<p />
+The idea with this change was to move the recruiting information back
+into the terrain definition and down into the creatures. There's no
+special handling for 'Anything'. Its recruit number is -1 so we know
+it can't be recruited, just like Titan. (There's no need for all of
+the !recruit.isTitan() checks because he'll never be offered as a
+recruit.) There is a RecruiterAndRecruit for Anything/Guardian=3 so
+you can ask that question directly. I added
+getRecruitsForRecruiter(recruiter, hex) to rst so you can ask for
+Anything or AnyNonLordOrDemiLord recruits or whatever (we should
+change that to AnyCritter or something). The proxy rar are sorted to
+the top so when there's not an exact match we can iterate rars
+checking for a match() until we run out of custom creature types.
+<p />
+I made a Titan proxy for the TitanCreatureType instance in each tower
+(ala Balrog). The TitanRecruitment updates the correct Titan's power
+on score change events. I still need hook the game events better. I
+know there's a place, I just haven't found it ;o) I haven't chased all
+of the Titan logic through the game, so it will still work without the
+proxy and the instances. I was just thinking about it as a use case
+for the proxy/recruitment split and just implemented it to see how it
+would work.
+<p />
+I made an AcquirableCreatureType that extends CreatureType (not custom
+in any way) and has an acquirable value and terrains that is defined
+on the creature, not in the terrain definition. The creature loader
+deterimines the acquirableRecruitValue that is used for the
+calculations. Everything is the same except I moved the data into the
+creature. Titan and Balrog creatures extend TowerInstanceCreatureType
+that has tower and base_name attributes. A tag <one-per-tower> will
+create one of whatever creatures are defined inside and set tower,
+name (base_name + tower), pluralName (base_name + s), and count=1. I
+bumped the terrain and creature definition versions.
+<p />
+Oh, I got tired of copying the signature of the CreatureType
+constructor around (you have to admit it was getting a bit unwieldy
+;o), and that weirdness with the HashMap vs Map parameter is... weird,
+so I wrapped the creature element (from the parser) with a
+CreatureAttributes class and pass that in the constructor. You can get
+and set values on it and it will just add or overwrite the attribute
+in the the dom element. Now custom creature types can have special
+attributes without changing the constructor signature. That's how I
+was able to easily add base_name and acquire_every without changes to
+the loader or creature types. I made an enum of creature attribute
+names cuz I'm that way :oP
+<p />
+No more special lists or handling for special creature types in rst,
+just make a proxy :o) CustomRecruitManager has a reference to the
+default proxies (initialized at the end of creature loading, just uses
+getCreatureTypeByName and holds the reference). I didn't want to add
+Anything, AnyNonLord, etc to all terrain definitions and then trust
+that they'll be there at runtime -- the game relies on them and uses
+them as code.
+<p />
+Anyway, it's funny because I was just trying to get the guardian in
+front of the warlock so the inspector looks right :oP I get that these
+are big changes. It worked out really cool and simplified the code a
+lot while making it more powerful, but now I have to go into the gui
+:o( I haven't tested this, but I'd bet SplitLegion won't split off a
+Balrog (or my Titans). The chit only knows the image name of the
+creature so that is used to load the creature to split off. Balrog100
+has an image name of Balrog. The code is resilient so the creature
+that failed to load simply stays with the main group. I just need to
+make a CreatureChit that contains the creature, but I'm sure you know
+how long that thread is :oP I'd probably refactor all of the creature
+based gui to get rid of all the strings, lol.
+<p />
+I have extensive tests on my AI recruitment code that validates
+specific recruiting for all hexes in both Default and Abyssal6
+variants that have gone back to green without my going in to fix
+them. This type of change is extremely risky, but it's localized to
+the recruiting sub tree (and the creatures and custom recruiting
+and... but it's still just creatures and rst). Just trying to put you
+at ease, it's not like I'm just trying to eyeball it.
+
+</body>
+</html>
