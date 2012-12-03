@@ -31,7 +31,10 @@ More to be added over time... perhaps...
 
 No, that is not implemented yet, and since it is definitely not "that simple" to implement, 
 it might not be one of the next things to be added.
-
+<p />
+<font color="red">Update 2012-12-03: </font>This feature is now implemented, but since 
+the sources contain also other changes which are not 100% stable it is only available in the public testing build.
+ 
 <h2><a name="LostConnection">What to do when my computer lost network connection?</a></h2>
 
 Bad luck. As soon as the server notices that it has lost connection to a player, 
@@ -52,6 +55,19 @@ e.g. 3 minutes if he hasn't connected back in that time.
 I think this is necessary, otherwise there is a risk that a player gets disconnected,
 can't reconnect at all (permanent network problems, angry wife destroyed the computer,
 house burned down, ... etc. ;-), and the game would be stuck forever for the other players.
+<P />
+<font color="red">Update 2012-12-03: </font>This feature is now implemented.</font>
+If the client notices it, it will attempt a reconnect automatically. There are cases 
+when this does not work, then try first from File menu the "Check Connection" and if that 
+does not work, try "Reconnect". There are cases (5% ?) where synchronization does not
+work completely, some messages stay stuck in the client's previous' connections' buffer.
+There is no cure to that.
+<p />Reconnect works only as long as your game client stays up and has the majority
+of info still in place, only recent messages get lost. Starting Colossus from scratch,
+there is no way to re-join and continue your game. (Basically, by then you're considered
+dead by server and automatically withdrawn; unfortunately then trying to join as 
+spectator might cause trouble as well.)   
+<p />
 
 <h2><a name="RobotPlayerJumpIn">Could a robot player jump in for a player that lost connection and he takes the control back 
 later when he reconnected?</a></h2>
@@ -174,10 +190,10 @@ is even canceled when the creator logs out). So for instant games, online will a
 One can only be enrolled to one instant game at a time.
 <p />
 
-A game can be started when enough players have enrolled to it (actual &gt; min) and they all 
+A game can be started when enough players have enrolled to it (actual &ge; min) and they all 
 are online.
 
-If not enough players ( actual >= min) enrolled <b>and</b> online, or the time scheduled 
+If not enough players ( actual &lt; min) enrolled <b>and</b> online, or the time scheduled 
 time has not been reached yet, the game can simply not even be started.
 
 <h2><a name="LocalVsServerTime">I was looking at the timestamps here in the chat window - I was assuming that it was server time</a></h2>
@@ -203,7 +219,8 @@ with the "x"-like symbol usually on upper right corner.
 
 <hr>
 <p>
-<i>Created and last updated February 22, 2010 by CleKa</i>
+<i>Created February 22, 2010 by CleKa</i><br>
+<i>Last updated (only fixed major things) December 3, 2012 by CleKa</i>
 <p>
 </body>
 </html>
