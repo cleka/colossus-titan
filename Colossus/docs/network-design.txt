@@ -35,3 +35,24 @@ a giant case statement. Yes, this is ugly and hard to maintain.  (If a remote
 method changes in Client or Server, we also need to change IClient or IServer,
 SocketClientThread, and SocketServerThread.)  But the network interface
 shouldn't need to change much.
+
+Update 2012-12-03:
+
+Things have changed quite a bit since above was written:
+
+Server side (of an actual game) uses now NIO with select(): there's only one 
+thread, which accepts new connection request and reads input from one client 
+at a time. This eliminated all the concurrency issues (like race conditions, 
+deadlocks, ConcurrentModificationException). Additionally there is (has
+always been) a FileServerThread, from which the remote clients can request
+the variant's XML files. (Besides that, there are a number of Runnables used 
+for various issues.)
+
+The (game-) client side still uses blocking I/O, but there's two threads: one that
+merely reads stuff from the socket and puts it into a queue, and another that 
+executes the actual method.
+
+There is an additional client-server pair for the Public Game Server, called
+WebServer and WebClient in the respective packages. This server still uses
+the blocking I/O with one thread for accepting new connections, and one listener
+thread for each webclient.
