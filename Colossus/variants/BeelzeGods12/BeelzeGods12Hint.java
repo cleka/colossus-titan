@@ -33,14 +33,6 @@ public class BeelzeGods12Hint extends AbstractHintProvider
 
         if (terrainId.equals("Plains"))
         {
-	    if (recruitNames.contains("Ranger")
-		&& legion.getHeight() != 6
-                && legion.numCreature("Ranger") == 2
-                && oracle.canReach("Hellmouth")
-                && oracle.creatureAvailable("Apollo") >= 1)
-            {
-                return getCreatureType("Ranger");
-            }
             if (recruitNames.contains("Centaur")
                 && !legion.contains("Warbear") && !legion.contains("Ent")
                 && !legion.contains("Unicorn") && !legion.contains("Ranger")
@@ -60,17 +52,10 @@ public class BeelzeGods12Hint extends AbstractHintProvider
             {
                 return getCreatureType("Ranger");
             }
+
         }
         else if (terrainId.equals("Marsh"))
         {
-	    if (recruitNames.contains("Ranger")
-		&& legion.getHeight() != 6
-                && legion.numCreature("Ranger") == 2
-                && oracle.canReach("Hellmouth")
-                && oracle.creatureAvailable("Apollo") >= 1)
-            {
-                return getCreatureType("Ranger");
-            }
             if (recruitNames.contains("Goblin")
                 && !legion.contains("Minotaur") && !legion.contains("Djinn")
                 && !legion.contains("Manticore") && !legion.contains("Ranger")
