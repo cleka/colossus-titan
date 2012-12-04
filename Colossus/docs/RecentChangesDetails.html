@@ -14,9 +14,40 @@ This describes the recent changes in some more detail than just the
 one-line-info on the main pages "News" section.
 
 
+<h3>December 4, 2012: Public Test Build from r523x</h3>
+<p/>
+<b>Note: </b>this public test build probably still contains the bug that some users reported,
+             that game got stuck when they conceded twice in same battle turn. 
+<p />
+Minor usability improvements, added /userinfo command, more stability improvements to spectator mode.
+<font color="red">The changes to BeelzeGods12 variant are not included yet!</font>
+<ul>
+<li>In Game status window, added at bottom a hint to click a player name for more information</li>
+<li>Stability improvements to spectator mode</li>
+<li>Added possibility to cancel WebClient's login/connect, for example when 
+    it's stuck/blocked by a firewall; now timeout after 10 seconds</li>
+<li>When user attempts to load a saved game but it fails (for example, 
+    too old format/version of file), display a Error message dialog telling so</li>
+<li>Add a toggle to make web client password displayable (show real PW instead of *****)</li>
+<li>Implemented "/userinfo" (only about oneself, so far) command in chat</li>
+<li>Notify web Client user when he logged in with case-mismatched user name.</li>
+</ul>
+<i>The following are not so visible for end users (more for developers)</i>
+<ul>
+<li>Added in some documents the note that they are really out of date! ;-)</li>
+<li>Cleaned up home page files and images, synchronized files to subversion repo</li>
+<li>For now, do not create the internal spectator client</li>
+<li>Much more informative log message when move failed</li>
+<li>Made the cmdline webclient working</li>
+<li>Make "ant jars" also build the CmdlineClient Jar</li>
+</ul>
+<p />
+
+<hr / >
+
 <h3>April 8, 2012: Public Test Build from r5178</h3>
 <p/>
-Making the spectator feature (still somewhat experimental) available for to first pilot usage
+Some stability improvements/fixes to the spectator functionality:
 <ul>
 <li>Skip the "OtherOneHasTrouble" and "TroubleIsOver" messages if the one in trouble is spectator</li>
 <li>If WebClients server is already null, do not try server.logout() again 
@@ -24,8 +55,6 @@ Making the spectator feature (still somewhat experimental) available for to firs
 <li>Some internal fix to keep proper track of whether loggedin/watching states in webclient</li>
 </ul>
 <p />
-
-<hr / >
 
 <h3>March 30, 2012: Public Test Build from r5172</h3>
 <p/>
