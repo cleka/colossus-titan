@@ -1,0 +1,170 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.2  (Win32)">
+	<META NAME="CREATED" CONTENT="20120704;12021200">
+	<META NAME="CHANGED" CONTENT="20120704;20364200">
+	<STYLE TYPE="text/css">
+	<!--
+		@page { margin: 0.79in }
+		P { margin-bottom: 0.08in }
+		A:link { so-language: zxx }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+    <a href="index.html">Home</a>
+<br>
+<P STYLE="margin-bottom: 0in">Building with Eclipse and Subversion</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<OL>
+	<LI><P STYLE="margin-bottom: 0in">Download Eclipse.  Eclipse for
+	windows comes as a zip file and there is no installation software to run. 
+        Just unzip the zip file and accept the defaults. Because there is no 
+        installation software, nothing gets added to the windows menu. You will 
+        have to create your own shortcut on the desktop to the eclipse program. 
+        For example, your shortcut might have the target 
+        "C:\Program Files\eclipse\eclipse.exe" if that is where you unzipped Eclipse.
+</P>
+</OL>
+<P STYLE="margin-bottom: 0in">  	   
+<OL START=2>
+	<P STYLE="margin-bottom: 0in">   
+	<A HREF="http://www.eclipse.org/downloads/packages/eclipse-ide-java-developers/indigor">http://www.eclipse.org/downloads/packages/eclipse-ide-java-developers/indigor</A></P>
+	<P STYLE="margin-bottom: 0in"></P>
+	<LI><P STYLE="margin-bottom: 0in">Make sure you have Java SDK
+	(version 1.5 or newer) installed and that Eclipse knows where it is.
+	 Colossus is set up for 1.5, so you will see some warnings if you
+	use a newer version, but you can ignore them.</P>
+	 <p>Java comes in many flavours. A runtime version (Java Runtime Edition, JRE) which allows you to run java programs. A Java Development Kit (JDK) which allows you to build java programs. The JDK comes in many variations that focus on providing different built-in functionality. JavaFX, NetBeans, JavaEE. Ignore everything except the Java Platform, Standard Edition JDK download.  </p>
+         <p>Java recommends removing any old versions of Java. If you need old versions of Java then you can probably skip all these instructions as you are already a programming god. Otherwise, go to the java site: http://www.java.com/en/ select Free Java Download, select Remove Older Versions and follow the instructions. After you have wiped all the older versions then you are ready to get the JDK.</p>
+	 <p>The JDK can be found at http://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html#javasejdk
+If the link doesn’t work, google Java, then search the Java site for JDK. </p>
+ 
+</OL>
+<P STYLE="margin-bottom: 0in">.</P>
+<P STYLE="margin-bottom: 0in">	To check that Eclipse knows about your
+JDK go to Window ==&gt; Preferences ==&gt; Java ==&gt; Installed JREs</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><IMG SRC="Building-pics/Building_57461ebc.jpg" NAME="graphics1" ALIGN=LEFT WIDTH=665 HEIGHT=530 BORDER=0><BR CLEAR=LEFT><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<OL START=3>
+	<LI><P STYLE="margin-bottom: 0in">Install Subversion.  First go to
+	Help ==&gt; Install New Software and then select All Available Sites
+	in the drop down menu.  Click on the Collaboration box to expand it.</P>
+</OL>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><IMG SRC="Building-pics/Building_194eda56.jpg" NAME="graphics2" ALIGN=LEFT WIDTH=665 HEIGHT=623 BORDER=0><BR CLEAR=LEFT><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in">Scroll down under Collaboration and
+check Subversive SVN Team Provider (Incubation)</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><IMG SRC="Building-pics/Building_2c7b1b2e.jpg" NAME="graphics3" ALIGN=LEFT WIDTH=665 HEIGHT=623 BORDER=0><BR CLEAR=LEFT><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in">Click on Next.</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><IMG SRC="Building-pics/Building_6b02376f.jpg" NAME="graphics4" ALIGN=LEFT WIDTH=665 HEIGHT=623 BORDER=0><BR CLEAR=LEFT><BR>
+</P>
+<P STYLE="margin-bottom: 0in">And Next again.  Accept the license and
+click on Finish.  You will need to restart Eclipse after the
+installation finishes.</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+
+<P STYLE="margin-bottom: 0in">Now open Windows ==&gt; Show View ==&gt;
+Other ==&gt; SVN  ==&gt; SVN Repositories and click OK</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><IMG SRC="Building-pics/Building_7c36265b.jpg" NAME="graphics5" ALIGN=LEFT WIDTH=311 HEIGHT=438 BORDER=0><BR CLEAR=LEFT><BR>
+</P>
+<P STYLE="margin-bottom: 0in">You will see a window asking you to
+install a Subersive Connector.  Choose SVN Kit 1.3.5</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><IMG SRC="Building-pics/Building_617142d4.jpg" NAME="graphics6" ALIGN=LEFT WIDTH=569 HEIGHT=728 BORDER=0><BR CLEAR=LEFT><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in">Click Finish.  An Install window will
+pop up.</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><IMG SRC="Building-pics/Building_67835bc9.jpg" NAME="graphics7" ALIGN=LEFT WIDTH=665 HEIGHT=455 BORDER=0><BR CLEAR=LEFT><BR>
+</P>
+<P STYLE="margin-bottom: 0in">Click Next twice, accept the license
+and click Finish.  You may see a security warning about installing
+software with unsigned content.  If so, click OK.  Once again you
+need to restart Eclipse.</P>
+<OL START=4>
+  <LI><P STYLE="margin-bottom: 0in">Set up SVN Repository for Colossus</p></LI>
+<P STYLE="margin-bottom: 0in">Select Window ==&gt; Show View ==&gt;
+SVN Repositories.  Eclipse will open a window with the title SVN
+Repositories.  Right click inside this window, click on New and then
+Repository Location.  
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><IMG SRC="Building-pics/Building_5b2e9dd1.jpg" NAME="graphics8" ALIGN=LEFT WIDTH=525 HEIGHT=549 BORDER=0><BR CLEAR=LEFT><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in">Enter the URL
+<A HREF="https://colossus.svn.sourceforge.net/svnroot/colossus" TARGET="_blank"><FONT COLOR="#234786"><FONT FACE="Arial, Helvetica, sans-serif"><FONT SIZE=3><SPAN STYLE="font-style: normal"><U><SPAN STYLE="font-weight: normal">https://colossus.svn.sourceforge.net/svnroot/colossus</SPAN></U></SPAN></FONT></FONT></FONT></A>
+.  Enter your SourceForge user name and password.  Check Save
+Authentication if you want and click on Finish.</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<OL START=5>
+  <LI><P STYLE="margin-bottom: 0in">Check out Colossus</p></LI>
+<P STYLE="margin-bottom: 0in">In the SVN Repository window of
+Eclipse, select CollosusRoot ==&gt; Trunk  and select Colossus</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><IMG SRC="Building-pics/Building_5e5d9497.jpg" NAME="graphics9" ALIGN=LEFT WIDTH=665 HEIGHT=467 BORDER=0><BR CLEAR=LEFT><BR>
+</P>
+<P STYLE="margin-bottom: 0in">Right click and choose Find Checkout
+As.</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in">After some time the Check Out As window
+will open.  You can choose Head Version to get the current version,
+or specify a specific revision to check out that revision.</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><IMG SRC="Building-pics/Building_4e16dabc.jpg" NAME="graphics10" ALIGN=LEFT WIDTH=637 HEIGHT=500 BORDER=0><BR CLEAR=LEFT><BR>
+</P>
+<P STYLE="margin-bottom: 0in">Click Finish and Eclipse will check out
+the version for you.  Eclipse will place the Colossus project in your default Workspace unless you tell it to do otherwise during checkout.  By default Eclipse will set the project to build automatically.</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><IMG SRC="Building-pics/Building_36308cdb.jpg" NAME="graphics11" ALIGN=LEFT WIDTH=665 HEIGHT=374 BORDER=0><BR CLEAR=LEFT><BR>
+</P>
+<P STYLE="margin-bottom: 0in">You can take Collosus for a test spin
+by right clicking on Start.java (in core/src/main/java
+net.sf.collossus.appmain)  and choosing either Run As then Java
+Application or Debug As and then Java Application.</P>
+</BODY>
+</HTML>

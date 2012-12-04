@@ -9,11 +9,18 @@
         "text/html;charset=ISO-8859-1">
         <link rel="icon" href="Colossus.gif" type="image/gif">
         <title>Colossus</title>
-<style type="text/css">
- h1.c1 {text-align: center}
-</style>
+        <style type="text/css">h1.c1 {text-align: center}</style>
     </head>
 
+    <frameset rows="15%,85%">
+	<frame src="ColossusBanner.html" name="banner" noresize>
+	<frameset cols="15%,85%">
+	 	 <frame src="Navigation.html" name="Navigation">
+		 <frame src="Content.html" name="Content">
+	</frameset>
+    </frameset>
+
+    <noframes>
     <body>
         <h1 class="c1">Colossus</h1>
         <p><a href="public-build/Colossus.jnlp"><img src="Colossus.gif" width= "60" height="60" alt="Start Game"></a></p>
@@ -26,6 +33,12 @@
         
         </p>
                     
+	<p align="right">Special Build for BG12 testing: 
+
+        <a href="special-build/Colossus-special-build.jnlp">Play (Java Webstart)</a>
+        <a href="special-build/Colossus.20120709.zip">Zip file</a>
+        
+        </p>
         <hr>
         <h2>News</h2>
 
@@ -252,5 +265,7 @@
          src="http://www.w3.org/Icons/valid-html401" height="31" width="88"
         alt="Valid HTML 4.01!"></a></p>
     </body>
+	</noframes>
+
 </html>
 
