@@ -14,6 +14,19 @@ This describes the recent changes in some more detail than just the
 one-line-info on the main pages "News" section.
 
 
+<h3>April 8, 2012: Public Test Build from r5178</h3>
+<p/>
+Making the spectator feature (still somewhat experimental) available for to first pilot usage
+<ul>
+<li>Skip the "OtherOneHasTrouble" and "TroubleIsOver" messages if the one in trouble is spectator</li>
+<li>If WebClients server is already null, do not try server.logout() again 
+    (could in some cases cause NPE when watching a game)</li>
+<li>Some internal fix to keep proper track of whether loggedin/watching states in webclient</li>
+</ul>
+<p />
+
+<hr / >
+
 <h3>March 30, 2012: Public Test Build from r5172</h3>
 <p/>
 Making the spectator feature (still somewhat experimental) available for to first pilot usage
@@ -22,7 +35,17 @@ Making the spectator feature (still somewhat experimental) available for to firs
 <li>In two variants Apolo renamed/corrected to Apollo</li>
 </ul>
 <p />
-<hr / >
+
+<h3>March 14, 2012: Release 0.13.2 from r5134</h3>
+<p/>
+Quick new release because the Disconnect menu item causes more harm than good
+
+<ul>
+<li>Removed the non-working 'Disconnect' menu item</li>
+<li>Legion fly-out keys (Shift and Ctrl) should now "always" work</li>
+<li>Update strike damage in remote clients immediately, not only when strike turn is completed</li>
+<li>It identifies itself as release, not at some places as "public test build" ;-)</li>
+</ul>
 <p />
 <h3>March 11, 2012: Release 0.13.1 from r5121</h3>
 <p/>
