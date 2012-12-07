@@ -23,11 +23,13 @@ public interface IServer
     public static final int CLIENT_VERSION_UNDERSTANDS_PING = 2;
     public static final int CLIENT_VERSION_CAN_RECONNECT = 3;
     public static final int CLIENT_VERSION_CAN_HANDLE_NAK = 4;
+    public static final int CLIENT_VERSION_VARIANT_XML_OK = 5;
 
     // New in version 2: replies to pingRequest
     // New in version 3: ability to reconnect (simple case only, so far)
     // New in version 4: Client can handle the NAK for an illegal battle move
-    public static final int CLIENT_VERSION = CLIENT_VERSION_CAN_HANDLE_NAK;
+    // New in version 5: Client always fetches xml files from server
+    public static final int CLIENT_VERSION = CLIENT_VERSION_VARIANT_XML_OK;
 
     // Clients that do not send version yet at all, are treated as version -1.
     // For those, even show on server side an error dialog and refuse them to

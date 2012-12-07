@@ -93,7 +93,14 @@ public class WebClient extends KFrame implements IWebClient
     private static final Logger LOGGER = Logger.getLogger(WebClient.class
         .getName());
 
-    final static int WEB_CLIENT_VERSION = 3;
+    // 1: webclient understands deliverGeneralMessage
+    // 2: webclient supports ping
+    // 3: webclient knows DinoTitan variant;
+    public final static int WC_VERSION_GENERAL_MESSAGE = 1;
+    public final static int WC_VERSION_SUPPORTS_PING = 2;
+    public final static int WC_VERSION_DINO_OK = 3;
+
+    final static int WEB_CLIENT_VERSION = WC_VERSION_DINO_OK;
 
     // TODO make this all based on Locale.getDefault()
     // Initially: use German. To make it variable, need also to set

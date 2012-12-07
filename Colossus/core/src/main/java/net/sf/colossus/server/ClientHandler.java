@@ -318,13 +318,13 @@ final class ClientHandler extends ClientHandlerStub implements IClient
 
     public boolean canHandleBattleMoveNak()
     {
-        return clientVersion >= 4;
+        return clientVersion >= IServer.CLIENT_VERSION_CAN_HANDLE_NAK;
     }
 
     @Override
     public boolean canHandleAdvancedSync()
     {
-        return clientVersion >= 4;
+        return clientVersion >= IServer.CLIENT_VERSION_CAN_HANDLE_NAK;
     }
 
     public void cloneRedoQueue(ClientHandler oldCH)

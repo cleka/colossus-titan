@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.webclient.WebClient;
 import net.sf.colossus.webcommon.IWebClient;
 
 
@@ -348,7 +349,7 @@ public class WebServerClientSocketThread extends Thread
             * 1000)
         {
             // Only clients >= 2 have this feature
-            if (theClient.getClientVersion() >= 2)
+            if (theClient.getClientVersion() >= WebClient.WC_VERSION_SUPPORTS_PING)
             {
                 // too many already done without response => assume dead
                 if (pingsTried >= PING_MAX_TRIES)

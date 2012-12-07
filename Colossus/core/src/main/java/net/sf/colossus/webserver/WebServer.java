@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.colossus.webclient.WebClient;
 import net.sf.colossus.webcommon.FormatWhen;
 import net.sf.colossus.webcommon.GameInfo;
 import net.sf.colossus.webcommon.GameInfo.GameState;
@@ -1237,7 +1238,7 @@ public class WebServer implements IWebServer, IRunWebServer
                 LOGGER.warning("Skip informing player " + u.getName()
                     + " (webclient null): " + message);
             }
-            else if (webClient.getClientVersion() >= 1)
+            else if (webClient.getClientVersion() >= WebClient.WC_VERSION_GENERAL_MESSAGE)
             {
                 LOGGER
                     .info("Informing player " + u.getName() + ": " + message);

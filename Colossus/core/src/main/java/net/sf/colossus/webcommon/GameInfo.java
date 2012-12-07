@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
+import net.sf.colossus.webclient.WebClient;
 
 
 /**
@@ -613,7 +614,7 @@ public class GameInfo
         if (variant.equals("DinoTitan"))
         {
             IWebClient client = user.getWebserverClient();
-            if (client.getClientVersion() < 3)
+            if (client.getClientVersion() < WebClient.WC_VERSION_DINO_OK)
             {
                 reason = "Client does not support this variant, please upgrade!";
                 return reason;

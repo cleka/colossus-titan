@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.webclient.WebClient;
 import net.sf.colossus.webcommon.GameInfo;
 import net.sf.colossus.webcommon.IWebClient;
 import net.sf.colossus.webcommon.IWebServer;
@@ -814,8 +815,10 @@ public class WebServerClient implements IWebClient
 
     public void systemMessage(long now, String message)
     {
-        if (getClientVersion() >= 3)
+        if (getClientVersion() >= WebClient.WC_VERSION_GENERAL_MESSAGE)
         {
+            // probably should/could use deliverGeneralMessage() here,
+            // don't dare to change it right now
             chatDeliver(IWebServer.generalChatName, now, "SYSTEM", message,
                 false);
             // sendToClient(systemMessage + sep + now + sep + message);
