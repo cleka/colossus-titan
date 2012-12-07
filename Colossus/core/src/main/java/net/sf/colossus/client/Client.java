@@ -1554,11 +1554,6 @@ public final class Client implements IClient, IOracle, IVariant,
         this.movement = new MovementClientSide(game, options);
 
         LOGGER.finest(getOwningPlayer().getName() + " Client.initBoard()");
-        if (isRemote())
-        {
-            VariantSupport.loadVariantByName(options
-                .getStringOption(Options.variant), false);
-        }
         ai.setVariant(VariantSupport.getCurrentVariant());
         gui.initBoard();
     }
