@@ -65,12 +65,18 @@ public final class VariantSupport
     private static List<String> lCreaturesName;
     private static Document varREADME = null;
     private static List<String> dependUpon = null;
+
+    /** whether or not there is currently a valid variant loaded.
+     *  TODO: perhaps superfluous - check CURRENT_VARIANT for null
+     *  instead?
+     */
     private static boolean loadedVariant = false;
+    private static Variant CURRENT_VARIANT;
+
     private static int maxPlayers;
     private static IVariantHint aihl = null;
     private static Properties markerNames;
 
-    private static Variant CURRENT_VARIANT;
 
     /**
      * Clean-up the ResourceLoader caches to make room for a variant.
