@@ -162,6 +162,10 @@ public class CmdLineWebClient implements IWebClient
     private static String getOneLineFromStdin(BufferedReader br)
         throws IOException
     {
+        // give some time to process possible reply from server, so that
+        // the "fromServer" line printed by WCST (if it prints it) and the
+        // prompt don't garble so often...
+        sleepFor(200);
         System.out.print("cmd > ");
         return br.readLine();
     }
