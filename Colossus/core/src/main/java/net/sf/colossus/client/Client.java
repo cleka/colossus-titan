@@ -291,6 +291,8 @@ public final class Client implements IClient, IOracle, IVariant,
             port, playerName, remote, spectator);
 
         // TODO For now, loading the variant is needed only if remote client.
+        // ( => theServer is null; theServer != null is the server object in
+        // same JVM).
         // One day in future, every client should perhaps do this to get his
         // own instance of the variant (instead of static access).
         // Or local clients get the Variant object passed in to here...
@@ -298,6 +300,17 @@ public final class Client implements IClient, IOracle, IVariant,
         if (theServer == null)
         {
             String variantName = conn.getVariantNameForInit();
+            // enforce loading of variant in any case, so that we get XML
+            // files and README from remote server - this way at least if
+            // changes were only to xml files, server and client see
+            // the same data.
+            // Pictures are currently loaded from own jar files in any
+            // case; but if a pic is missing, it's merely an empty chit,
+            // not data inconsistency which might cause mysterious errors.
+            LOGGER.info("Oh, we are a remote client"
+                + " - let's make sure we really get text files from server.");
+
+            VariantSupport.unloadVariant();
             variant = VariantSupport.loadVariantByName(variantName, true);
         }
         else

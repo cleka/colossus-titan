@@ -79,21 +79,17 @@ public final class VariantSupport
 
 
     /**
-     * Clean-up the ResourceLoader caches to make room for a variant.
-     * @param tempVarFilename The name of the file holding the
-     *     soon-to-be-loaded Variant definition.
-     * @param tempVarDirectory The path to the directory holding the
-     *     soon-to-be-loaded Variant.
+     * Remove all variant data, so that next variant loading attempt
+     * is guaranteed to load it freshly (e.g. to get XML data from
+     * remote server even if currently loaded was same name, but, well,
+     * from local files).
      */
-    public static void freshenVariant(String tempVarFilename,
-        String tempVarDirectory)
+    public static void unloadVariant()
     {
-        if (!(loadedVariant && varFilename.equals(tempVarFilename) && varDirectory
-            .equals(tempVarDirectory)))
-        {
-            StaticResourceLoader.purgeImageCache();
-            StaticResourceLoader.purgeFileCache();
-        }
+        StaticResourceLoader.purgeImageCache();
+        StaticResourceLoader.purgeFileCache();
+        CURRENT_VARIANT = null;
+        loadedVariant = false;
     }
 
     private static Map<String, String> rememberCustomDirs = new HashMap<String, String>();
@@ -294,8 +290,13 @@ public final class VariantSupport
         if (loadedVariant && varFilename.equals(tempVarFilename)
             && varDirectory.equals(tempVarDirectory))
         {
+            LOGGER.info("Same variant " + tempVariantName
+                + ", returning just same again.");
             return CURRENT_VARIANT;
         }
+
+        LOGGER.info("Loading variant " + tempVariantName
+            + " freshly...\n***");
 
         // As long as this is static, only server may do this, not the
         // local clients.
