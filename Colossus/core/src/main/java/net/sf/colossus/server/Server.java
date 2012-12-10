@@ -3654,6 +3654,29 @@ public final class Server extends Thread implements IServer
 
     public void joinGame(String playerName)
     {
+        if (game.getVariant().getName().equals("BeelzeGods12"))
+        {
+            if (!processingCH.canHandleNewVariantXML())
+            {
+                LOGGER.severe("Client " + processingCH.getClientName()
+                    + " is too old for new BG12!");
+                if (startLog != null)
+                {
+                    LOGGER.severe("Calling startLog to inform "
+                        + "the hosting player.");
+                    startLog.tooOldClient(processingCH.getClientName());
+                }
+                else
+                {
+                    LOGGER.severe("No startLog - aborting game "
+                        + "start right away!");
+                    startupProgressAbort();
+                }
+                return;
+            }
+        }
+
+
         // @TODO: move to outside Select loop
         //   => notify main thread to do this?
         /**

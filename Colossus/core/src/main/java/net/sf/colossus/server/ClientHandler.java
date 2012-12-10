@@ -155,6 +155,11 @@ final class ClientHandler extends ClientHandlerStub implements IClient
         return clientVersion >= IServer.CLIENT_VERSION_UNDERSTANDS_PING;
     }
 
+    protected boolean canHandleNewVariantXML()
+    {
+        return clientVersion >= IServer.CLIENT_VERSION_VARIANT_XML_OK;
+    }
+
     /**
      * Server side disposes a client (and informs it about it first)
      * To be used only for "disposeAllClients()", otherwise setIsGone

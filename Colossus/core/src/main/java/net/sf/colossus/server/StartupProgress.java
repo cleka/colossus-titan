@@ -188,4 +188,15 @@ public final class StartupProgress implements ActionListener
             this.dispose();
         }
     }
+
+    public void tooOldClient(String clientName)
+    {
+        this.append("\nERROR:\n");
+        this.append("Player  '" + clientName + "'  tried to join with "
+            + "too old version of Colossus.\n"
+            + "At least release 0.13.3 is needed to join a game with "
+            + "the changed BeelzeGods12 variant!");
+        this.append("\nGame startup can't proceed - please press the "
+            + " Abort button!\n");
+    }
 }
