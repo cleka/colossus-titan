@@ -40,13 +40,13 @@
     <terrain name="Springs" color="indigo" regular_recruit="True" >
         <recruit name="Anything" number="0" />
         <recruit name="Crocodile" number="0" />
-        <recruit name="Crocodile" number="1" />
+        <!--unnecessary: recruit name="Crocodile" number="1" -->
         <recruit name="Deinosuchus" number="1" />
         <recruit name="Serpent" number="1" />
         <recruit name="PoisonSerpent" number="1" />
         <recruit name="SpittingSerpent" number="2" />
         <recruit name="WingedSerpent" number="2" />
-        <recruit name="WingedSerpent" number="-1" />
+        <!--unnecessary and illegal in this version: recruit name="WingedSerpent" number="-1"  -->
         <recruit name="Couatl" number="2" />
     </terrain>
     <terrain name="Desert" color="orange" regular_recruit="True" >
