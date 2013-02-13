@@ -133,7 +133,7 @@ final class PickCarry extends KDialog
             gui.getCallbackHandler().applyCarries(targetHex);
         }
         saveWindow.saveLocation(getLocation());
-        dispose();
+        gui.disposePickCarryDialog();
     }
 
 }

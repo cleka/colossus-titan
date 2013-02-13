@@ -1753,7 +1753,36 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         }
     }
 
+    /** Dispose the PickCarryDialog, make sure that that is done inside the
+     *  EDT (caused GUI to hang in 1.6.0_39 whereas in 1.6.0_38 it worked )-;
+     */
     public void disposePickCarryDialog()
+    {
+        if (SwingUtilities.isEventDispatchThread())
+        {
+            actualDisposePickCarryDialog();
+        }
+        else
+        {
+            try
+            {
+                SwingUtilities.invokeAndWait(new Runnable()
+                {
+                    public void run()
+                    {
+                        actualDisposePickCarryDialog();
+                    }
+                });
+            }
+            catch (Exception e)
+            {
+                LOGGER.warning("When trying to run disposePickCarryDialog "
+                    + "in invokeAndWait, caught exception: " + e);
+            }
+        }
+    }
+
+    public void actualDisposePickCarryDialog()
     {
         if (pickCarryDialog != null)
         {
