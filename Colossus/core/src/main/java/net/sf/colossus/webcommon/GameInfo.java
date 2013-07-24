@@ -565,7 +565,7 @@ public class GameInfo
         {
             User user = it.next();
             String name = user.getName();
-            if (newName.equals(name))
+            if (newName.equalsIgnoreCase(name))
             {
                 it.remove();
                 enrolledPlayers = players.size();
@@ -580,7 +580,7 @@ public class GameInfo
         boolean found = false;
         for (User u : players)
         {
-            if (searchName.equals(u.getName()))
+            if (searchName.equalsIgnoreCase(u.getName()))
             {
                 found = true;
                 break;
@@ -704,7 +704,10 @@ public class GameInfo
                 User u = it.next();
 
                 name = u.getName();
-                if (localPlayerName != null && name.equals(localPlayerName))
+                // TODO is ignorecase necessary here?
+                // Added just in case when fixing another case where it matters ...
+                if (localPlayerName != null
+                    && name.equalsIgnoreCase(localPlayerName))
                 {
                     type = Constants.human;
                     // use user real name;
