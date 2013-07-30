@@ -14,12 +14,16 @@ This describes the recent changes in some more detail than just the
 one-line-info on the main pages "News" section.
 
 
-<h3>December 4, 2012: Public Test Build from r523x</h3>
+<h3>July 30, 2013: Public Test Build from r5317</h3>
 <p/>
-<b>Note: </b>this public test build probably still contains the bug that some users reported,
-             that game got stuck when they conceded twice in same battle turn. 
+<b>Note: </b>this public test build probably still contains the bugs that some users reported,
+             that game got stuck when they conceded twice in same battle turn, and that if 
+             some players use this test build, it may cause for other players using the "regular" 
+             release (0.13.2.1 at the moment) a crash when the battle is about to 
+             start (BattleBoard is not coming up).
+
 <p />
-Minor usability improvements, added /userinfo command, more stability improvements to spectator mode.
+Some usability improvements, added /userinfo command, more stability improvements to spectator mode.
 <font color="red">The changes to BeelzeGods12 variant are not included yet!</font>
 <ul>
 <li>In Game status window, added at bottom a hint to click a player name for more information</li>
@@ -31,6 +35,10 @@ Minor usability improvements, added /userinfo command, more stability improvemen
 <li>Add a toggle to make web client password displayable (show real PW instead of *****)</li>
 <li>Implemented "/userinfo" (only about oneself, so far) command in chat</li>
 <li>Notify web Client user when he logged in with case-mismatched user name.</li>
+<li>Fixed: 3590291 Remote client might or might not use xml files from server.</li>
+<li>Fixed: the calling of disposePickCarryDialog should be done inside EDT</li>
+<li>Fixed: #898 Can't unenroll from game</li>
+<li>Fixed: #899 End of redisplaying messages is displayed somewhere between</li>
 </ul>
 <i>The following are not so visible for end users (more for developers)</i>
 <ul>
