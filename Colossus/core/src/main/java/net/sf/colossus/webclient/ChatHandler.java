@@ -171,13 +171,13 @@ public class ChatHandler
             {
                 if (resentMode)
                 {
-                    displayArea.append(dashes
+                    chatDisplayInEDT(dashes
                         + " end of redisplaying older messages " + dashes
                         + "\n");
                 }
                 else
                 {
-                    displayArea.append(dashes + " (no messages to redisplay) "
+                    chatDisplayInEDT(dashes + " (no messages to redisplay) "
                         + dashes + "\n");
                 }
                 resentMode = false;
@@ -198,7 +198,7 @@ public class ChatHandler
             {
                 if (!resentMode)
                 {
-                    displayArea.append("\n" + dashes + " redisplaying last "
+                    chatDisplayInEDT("\n" + dashes + " redisplaying last "
                         + "(currently up to 50) messages " + dashes + "\n");
                 }
                 resentMode = true;
@@ -226,9 +226,13 @@ public class ChatHandler
                 + doubledashes + "\n";
         }
 
-        final String textToAppend = doubleDashLine + whenTime + " " + sender
+        String textToAppend = doubleDashLine + whenTime + " " + sender
             + ": " + message + "\n";
+        chatDisplayInEDT(textToAppend);
+    }
 
+    private void chatDisplayInEDT(final String textToAppend)
+    {
         if (SwingUtilities.isEventDispatchThread())
         {
             appendToDisplayArea(textToAppend);
