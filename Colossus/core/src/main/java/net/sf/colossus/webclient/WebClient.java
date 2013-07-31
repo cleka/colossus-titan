@@ -72,11 +72,11 @@ import net.sf.colossus.server.Server;
 import net.sf.colossus.util.ViableEntityManager;
 import net.sf.colossus.webclient.WebClientSocketThread.WcstException;
 import net.sf.colossus.webcommon.GameInfo;
-import net.sf.colossus.webcommon.GameInfo.GameState;
 import net.sf.colossus.webcommon.IGameRunner;
 import net.sf.colossus.webcommon.IWebClient;
 import net.sf.colossus.webcommon.IWebServer;
 import net.sf.colossus.webcommon.User;
+import net.sf.colossus.webcommon.GameInfo.GameState;
 
 
 /**
@@ -3427,6 +3427,7 @@ public class WebClient extends KFrame implements IWebClient
         String gameId = getSelectedGameFromRunTableId();
         LOGGER.info("Watch button pressed for gameId = " + gameId
             + " - requesting info from server");
+        watchButton.setEnabled(false);
         server.watchGame(gameId, username);
     }
 
