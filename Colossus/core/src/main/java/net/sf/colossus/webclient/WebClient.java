@@ -16,6 +16,7 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.InvocationTargetException;
@@ -56,6 +57,7 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -1145,7 +1147,40 @@ public class WebClient extends KFrame implements IWebClient
             BorderLayout.NORTH);
 
         proposedGameDataModel = new GameTableModel(myLocale);
-        proposedGameTable = new JTable(proposedGameDataModel);
+        proposedGameTable = new JTable(proposedGameDataModel)
+        {
+            //Implement table cell tool tips.
+            @Override
+            public String getToolTipText(MouseEvent e)
+            {
+                String tip = null;
+                java.awt.Point p = e.getPoint();
+                int rowIndex = rowAtPoint(p);
+                int colIndex = columnAtPoint(p);
+                int realColumnIndex = convertColumnIndexToModel(colIndex);
+
+                // Variant name
+                switch (realColumnIndex)
+                {
+                    case 1:
+                    case 2:
+                    case 5:
+                    case 6:
+                    case 7:
+                    case 15:
+                        tip = "" + getValueAt(rowIndex, colIndex);
+                        break;
+
+                    default:
+                        tip = super.getToolTipText(e);
+                }
+                return tip;
+            }
+        };
+
+        // Note: This affects globally!
+        ToolTipManager ttm = ToolTipManager.sharedInstance();
+        ttm.setInitialDelay(100);
 
         proposedGameTable.getSelectionModel().addListSelectionListener(
             new ListSelectionListener()
