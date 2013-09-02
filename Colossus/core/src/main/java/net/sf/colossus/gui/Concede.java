@@ -20,11 +20,13 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 
 import net.sf.colossus.client.LegionClientSide;
+import net.sf.colossus.common.Options;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.guiutil.KDialog;
@@ -172,7 +174,7 @@ final class Concede extends KDialog
         {
             public void actionPerformed(ActionEvent e)
             {
-                cleanup(true);
+             processAnswer(true);
             }
         });
 
@@ -183,7 +185,7 @@ final class Concede extends KDialog
         {
             public void actionPerformed(ActionEvent e)
             {
-                cleanup(false);
+             processAnswer(false);
             }
         });
 
@@ -303,8 +305,38 @@ final class Concede extends KDialog
         return this.attacker;
     }
 
-    private void cleanup(boolean answer)
+    private void processAnswer(boolean answer)
     {
+        // Feature Request #223, confirm before allowing the player to concede
+        // if their Titan is in the legion
+        if (!flee && ally.hasTitan() && answer == true &&
+            gui.getOptions().getOption(Options.confirmConcedeWithTitan,
+                true))
+        {
+            String message = "Are you sure you want to concede? This legion " +
+            "contains your Titan, and conceding will cause you to lose " +
+            "the game!";
+
+            String[] options = new String[] {"Yes", "No", "Don't ask again"};
+
+            int confirmAnswer = JOptionPane.showOptionDialog(this, message,
+                    "Confirm Concession With Titan", JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+
+            if (confirmAnswer == 1 || confirmAnswer == -1)
+            {
+                // answered "No", abort concede
+                return;
+            }
+            if (confirmAnswer == 2)
+            {
+                // don't ask again
+                gui.getClient().setPreferencesCheckBoxValue(
+                        Options.confirmConcedeWithTitan, false);
+
+            }
+        }
+
         location = getLocation();
         saveWindow.saveLocation(location);
         dispose();

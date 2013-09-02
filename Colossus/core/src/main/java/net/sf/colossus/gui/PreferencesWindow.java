@@ -335,6 +335,7 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
         }
         addCheckBox(confirmationPane, Options.confirmNoRecruit, true, true);
         addCheckBox(confirmationPane, Options.confirmNoSplit, true, true);
+        addCheckBox(confirmationPane, Options.confirmConcedeWithTitan, true, true);
         ButtonGroup moveButtonGroup = new ButtonGroup();
         mcModes = new Box(BoxLayout.Y_AXIS);
         mcModes.setBorder(new TitledBorder(

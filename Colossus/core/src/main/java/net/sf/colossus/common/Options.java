@@ -190,6 +190,7 @@ public final class Options implements IOptions
     public static final String confirmNoRecruit = "Confirm when not all possible recruits taken";
     public static final String confirmNoMove = "Confirm when not all possible moves made";
     public static final String confirmNoSplit = "Confirm when not all full legions split";
+    public static final String confirmConcedeWithTitan = "Confirm when you concede with your Titan";
     public static final String legionMoveConfirmationSubMenu = "Legion Movement Confirmation";
     public static final String legionMoveConfirmationNoMove = "Any legion has not moved";
     public static final String legionMoveConfirmationNoUnvisitedMove = "Unvisited legion has not moved";
