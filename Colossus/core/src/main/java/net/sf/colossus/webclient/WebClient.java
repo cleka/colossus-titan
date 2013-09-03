@@ -68,6 +68,7 @@ import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.common.WhatNextManager;
 import net.sf.colossus.common.WhatNextManager.WhatToDoNext;
+import net.sf.colossus.gui.ColumnWidthPersistingJTable;
 import net.sf.colossus.guiutil.KFrame;
 import net.sf.colossus.server.INotifyWebServer;
 import net.sf.colossus.server.Server;
@@ -1147,6 +1148,10 @@ public class WebClient extends KFrame implements IWebClient
             BorderLayout.NORTH);
 
         proposedGameDataModel = new GameTableModel(myLocale);
+
+        proposedGameTable = new ColumnWidthPersistingJTable(
+            Options.proposedGamesTableOption, options, proposedGameDataModel);
+
         proposedGameTable = new JTable(proposedGameDataModel)
         {
             //Implement table cell tool tips.

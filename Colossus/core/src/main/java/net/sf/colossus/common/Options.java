@@ -49,6 +49,8 @@ public final class Options implements IOptions
     public static final String webServerPort = "Web server port";
     public static final String webClientLogin = "Web client login";
     public static final String webClientPassword = "Web client password";
+    public static final String proposedGamesTableOption = "Proposed Games Table Column Widths";
+
 
     // Option names
 
