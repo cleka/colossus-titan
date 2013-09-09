@@ -1150,9 +1150,7 @@ public class WebClient extends KFrame implements IWebClient
         proposedGameDataModel = new GameTableModel(myLocale);
 
         proposedGameTable = new ColumnWidthPersistingJTable(
-            Options.proposedGamesTableOption, options, proposedGameDataModel);
-
-        proposedGameTable = new JTable(proposedGameDataModel)
+            Options.proposedGamesTableOption, options, proposedGameDataModel)
         {
             //Implement table cell tool tips.
             @Override
