@@ -42,7 +42,7 @@ public final class WelcomeDialog extends KFrame
         super(title);
 
         String text = "\n"
-            + "  Welcome to this new Colossus Release (0.14.0 from r5328)!"
+            + "  Welcome to this new Colossus Release 0.14.0!"
             + "\n\n"
             + "  This build:\n"
             + "  - contains all the functionality from the PTBs that has been around for very long time (since 2012-04-08)\n"
