@@ -28,11 +28,11 @@ public final class WelcomeDialog extends KFrame
 {
     private final static String title = "Welcome to this new Colossus Release!";
 
-    private final static String CURRENT_WELCOME_KEY = "PTB-20130730";
+    private final static String CURRENT_WELCOME_KEY = "Release-0.14.0";
 
     private final static String baseUrl = "http://sourceforge.net/projects/colossus/files";
-    private final static String colossusReleaseNoteUrl = baseUrl
-        + "/Release-PTB-20130730";
+    private final static String colossusReleaseNoteUrl = baseUrl + "/"
+        + CURRENT_WELCOME_KEY;
 
     private static WelcomeDialog showWelcome = null;
 
@@ -42,10 +42,10 @@ public final class WelcomeDialog extends KFrame
         super(title);
 
         String text = "\n"
-            + "  Welcome to this new Colossus Public Test Build (2013-07-30 from r5317)!"
+            + "  Welcome to this new Colossus Release (0.14.0 from r5328)!"
             + "\n\n"
             + "  This build:\n"
-            + "  - contains all the functionality from the PTB that has been around for very long time (since 2012-04-08)\n"
+            + "  - contains all the functionality from the PTBs that has been around for very long time (since 2012-04-08)\n"
             + "  - includes some additional usability improvements and bugfixes\n"
             + "\n"
             + "  For a more detailed list of changes see the Recent Changes Details document "

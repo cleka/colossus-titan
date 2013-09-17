@@ -4,24 +4,26 @@
 <head>
     <meta name="generator"
     content="HTML Tidy for Linux/x86 (vers 1st July 2002), see www.w3.org" />
-    <title>Colossus: Release Note for PTB 30.7.2013</title>
+    <title>Colossus: Release Note for Colossus 0.14.0 from</title>
 </head>
 <body>
 
 
+<h1>September 17, 2013: Release 0.14.0 from r5328</h1>
 
-<h1>July 30, 2013: Public Test Build from r5317</h1>
 <p/>
-<b>Note: </b>this public test build probably still contains the bugs that some users reported,
+<b>Note: </b>This new release probably still contains the bugs that some users reported,
              that game got stuck when they conceded twice in same battle turn, and that if 
-             some players use this test build, it may cause for other players using the "regular" 
-             release (0.13.2.1 at the moment) a crash when the battle is about to 
-             start (BattleBoard is not coming up).
-
+             some players use this new build, it may cause for other players using the 
+             previous release (0.13.2.1) a crash when the battle is about to 
+             start (BattleBoard is not coming up). One way around that is, 
+             that all start using this new release :-)
 <p />
 Some usability improvements, added /userinfo command, more stability improvements to spectator mode.
 <font color="red">The changes to BeelzeGods12 variant are not included yet!</font>
 <ul>
+<li>New feature #222: Proposed Games table remembers column widths and has tooltips for long fields</li>
+<li>New feature #223: Confirm before conceding with Titan legion</li>
 <li>In Game status window, added at bottom a hint to click a player name for more information</li>
 <li>Stability improvements to spectator mode</li>
 <li>Added possibility to cancel WebClient's login/connect, for example when 
@@ -31,10 +33,11 @@ Some usability improvements, added /userinfo command, more stability improvement
 <li>Add a toggle to make web client password displayable (show real PW instead of *****)</li>
 <li>Implemented "/userinfo" (only about oneself, so far) command in chat</li>
 <li>Notify web Client user when he logged in with case-mismatched user name.</li>
-<li>Fixed: 3590291 Remote client might or might not use xml files from server.</li>
+<li>Fixed #3590291: Remote client might or might not use xml files from server.</li>
 <li>Fixed: the calling of disposePickCarryDialog should be done inside EDT</li>
-<li>Fixed: #898 Can't unenroll from game</li>
-<li>Fixed: #899 End of redisplaying messages is displayed somewhere between</li>
+<li>Fixed #898: Can't unenroll from game</li>
+<li>Fixed #899: End of redisplaying messages is displayed somewhere between</li>
+<li>Fixed #900: Second click of Join Game as Spectator needs to be disabled</li>
 </ul>
 <i>The following are not so visible for end users (more for developers)</i>
 <ul>
@@ -46,5 +49,6 @@ Some usability improvements, added /userinfo command, more stability improvement
 <li>Make "ant jars" also build the CmdlineClient Jar</li>
 </ul>
 <p />
+
 </body>
 </html>

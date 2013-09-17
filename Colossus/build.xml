@@ -41,7 +41,7 @@
     <property name="DOWNLOAD_DIR" value="/home/pfs/project/c/co/colossus" />
     <property name="DOCS_DIR" value="${HTML_DIR}/docs" />
     <property name="LIBS_DIR" value="${HTML_DIR}/libs" />
-    <property name="ZIPFILE" value="Colossus.${DSTAMP}.zip" />
+    <property name="ZIPFILE" value="Colossus-${release.version}.zip" />
     <property name="SERVER" value="web.sourceforge.net" />
     <condition property="alias" value="${user.name}" else="ColossusTestSigner">
       <available file="${user.name}Keystore"/>
