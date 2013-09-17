@@ -63,22 +63,27 @@ public class ColumnWidthPersistingJTable extends JTable
             super();
             this.optionName = optionName;
             this.options = options;
+
             addColumnModelListener(new TableColumnModelListener()
             {
                 public void columnAdded(TableColumnModelEvent e)
                 {
+                    // just needed to satisfy the interface
                 }
 
                 public void columnRemoved(TableColumnModelEvent e)
                 {
+                    // just needed to satisfy the interface
                 }
 
                 public void columnMoved(TableColumnModelEvent e)
                 {
+                    // just needed to satisfy the interface
                 }
 
                 public void columnSelectionChanged(ListSelectionEvent e)
                 {
+                    // just needed to satisfy the interface
                 }
 
                 /**

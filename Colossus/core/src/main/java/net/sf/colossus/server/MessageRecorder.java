@@ -84,7 +84,6 @@ public class MessageRecorder
             return message;
         }
 
-        @SuppressWarnings("unused")
         public String getCommand()
         {
             return command;

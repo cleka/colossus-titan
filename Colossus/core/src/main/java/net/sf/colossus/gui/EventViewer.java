@@ -447,7 +447,7 @@ final class EventViewer extends KDialog
             alChoices.add(maxString);
         }
 
-        Object[] Choices = alChoices.toArray();
+        String[] Choices = (String[])alChoices.toArray();
 
         // read user's setting for this, but cannot exceed the Game's
         // general setting.
