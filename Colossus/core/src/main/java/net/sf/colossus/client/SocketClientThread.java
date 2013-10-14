@@ -63,11 +63,11 @@ final class SocketClientThread extends Thread implements IServer,
     /**
      * Those are stored at the moment only to be able to reconnect
      */
-    private String host;
-    private int port;
+    private final String host;
+    private final int port;
     private String playerName;
-    private boolean remote;
-    private boolean spectator;
+    private final boolean remote;
+    private final boolean spectator;
     private final boolean internalSpectator;
 
     private final static String sep = Constants.protocolTermSeparator;
@@ -819,8 +819,8 @@ final class SocketClientThread extends Thread implements IServer,
     {
         if (method.equals(Constants.pingRequest))
         {
-            LOGGER.finest("Received server ping request in SCT of client "
-                + getName());
+            LOGGER.finer("SCT " + getName()
+                + "received ping request from server");
             replyToPing();
         }
         else if (method.equals(Constants.commitPoint))
@@ -830,7 +830,8 @@ final class SocketClientThread extends Thread implements IServer,
 
             if (ownMessageCounter == -1)
             {
-                LOGGER.fine("...initializing own counter in commit point #"
+                LOGGER.finer("SCT " + getName()
+                    + ": initializing own counter in commit point #"
                     + commitPointNr);
                 ownMessageCounter = messageNr;
             }
@@ -902,8 +903,8 @@ final class SocketClientThread extends Thread implements IServer,
     {
         if (socket != null)
         {
-            LOGGER.info("Message from '" + getPrintName()
-                + "' to server:" + message);
+            LOGGER.finer("Client '" + getPrintName() + "' sends to server: "
+                + message);
             out.println(message);
             clientThread.notifyUserIfGameIsPaused(message);
         }

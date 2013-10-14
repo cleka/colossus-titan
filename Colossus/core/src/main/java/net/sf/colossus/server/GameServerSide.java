@@ -1245,7 +1245,7 @@ public class GameServerSide extends Game
         else
         {
             notifyTestCaseGameIsUpNow();
-            LOGGER.info("NOT A STARTUP TEST - kickstarting game!");
+            LOGGER.finer("NOT A STARTUP TEST - kickstarting game!");
             server.kickPhase();
         }
     }

@@ -216,7 +216,7 @@ public class ClientThread extends Thread
         }
         else
         {
-            LOGGER.finer("Client (CT) '" + getNameMaybe()
+            LOGGER.finest("Client (CT) '" + getNameMaybe()
                 + "' processing message: " + method);
         }
 
