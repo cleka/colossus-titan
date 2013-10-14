@@ -819,7 +819,7 @@ final class SocketClientThread extends Thread implements IServer,
     {
         if (method.equals(Constants.pingRequest))
         {
-            LOGGER.finer("SCT " + getName()
+            LOGGER.fine("SCT " + getName()
                 + "received ping request from server");
             replyToPing();
         }
@@ -830,7 +830,7 @@ final class SocketClientThread extends Thread implements IServer,
 
             if (ownMessageCounter == -1)
             {
-                LOGGER.finer("SCT " + getName()
+                LOGGER.fine("SCT " + getName()
                     + ": initializing own counter in commit point #"
                     + commitPointNr);
                 ownMessageCounter = messageNr;
@@ -903,7 +903,7 @@ final class SocketClientThread extends Thread implements IServer,
     {
         if (socket != null)
         {
-            LOGGER.finer("Client '" + getPrintName() + "' sends to server: "
+            LOGGER.info("Client '" + getPrintName() + "' sends to server: "
                 + message);
             out.println(message);
             clientThread.notifyUserIfGameIsPaused(message);
