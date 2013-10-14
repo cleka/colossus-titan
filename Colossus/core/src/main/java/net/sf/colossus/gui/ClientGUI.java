@@ -264,6 +264,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void initBoard()
     {
+        LOGGER.finer("CG: initBoard()");
+
         String viewModeName = options.getStringOption(Options.viewMode);
         viewMode = options.getNumberForViewMode(viewModeName);
 
@@ -329,6 +331,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void actOnGameStartingFailed()
     {
+        LOGGER.finer("CG: actOnGameStartingFailed()");
+
         if (webClient != null)
         {
             webClient.notifyComingUp(false);
@@ -340,6 +344,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
      */
     private void ensureEdtSetupClientGUI()
     {
+        LOGGER.finer("CG: ensureEdtSetupClientGUI()");
+
         if (SwingUtilities.isEventDispatchThread())
         {
             setupClientGUI();
@@ -376,6 +382,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
      */
     public void setupClientGUI()
     {
+        LOGGER.finer("CG: setupClientGUI()");
+
         /*
         disposeEventViewer();
         disposePreferencesWindow();
@@ -415,6 +423,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void setChosenDevice(GraphicsDevice chosen)
     {
+        LOGGER.finer("CG: setChosenDevice(GraphicsDevice chosen)");
+
         if (chosen != null)
         {
             secondaryParent = new JFrame(chosen.getDefaultConfiguration());
@@ -428,6 +438,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     private void ensureEdtNewBattleBoard()
     {
+        LOGGER.finer("CG: ensureEdtNewBattleBoard()");
+
         if (SwingUtilities.isEventDispatchThread())
         {
             doNewBattleBoard();
@@ -471,11 +483,15 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void actOnInitBattle()
     {
+        LOGGER.finer("CG: actOnInitBattle()");
+
         ensureEdtNewBattleBoard();
     }
 
     private void doNewBattleBoard()
     {
+        LOGGER.finer("CG: doNewBattleBoard()");
+
         if (battleBoard != null)
         {
             LOGGER.warning("Old BattleBoard still in place? Disposing it.");
@@ -487,6 +503,9 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void setStrikeNumbers(BattleUnit striker, Set<BattleHex> targetHexes)
     {
+        LOGGER.finer("CG: setStrikeNumbers(BattleUnit striker, "
+            + "Set<BattleHex> targetHexes)");
+
         for (BattleHex targetHex : targetHexes)
         {
             GUIBattleChit targetChit = getGUIBattleChit(targetHex);
@@ -500,6 +519,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     /** reset all strike numbers on chits */
     public void resetStrikeNumbers()
     {
+        LOGGER.finer("CG: resetStrikeNumbers()");
+
         for (GUIBattleChit battleChit : getGUIBattleChits())
         {
             battleChit.setStrikeNumber(0);
@@ -512,6 +533,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void updateStatusScreen()
     {
+        LOGGER.finer("CG: updateStatusScreen()");
+
         if (client.getNumPlayers() < 1)
         {
             // Called too early.
@@ -552,6 +575,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void menuCloseBoard()
     {
+        LOGGER.finer("CG: menuCloseBoard()");
+
         clearUndoStack();
         doSetWhatToDoNext(WhatToDoNext.GET_PLAYERS_DIALOG, false);
         client.disposeClientOriginated();
@@ -559,6 +584,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void menuQuitGame()
     {
+        LOGGER.finer("CG: menuQuitGame()");
+
         // Note that if this called from webclient, webclient has already
         // beforehand called client to set webclient to null :)
         if (webClient != null)
@@ -588,6 +615,9 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     // Used now only by MasterBoard
     void askNewCloseQuitCancel(JFrame frame, boolean fromBattleBoard)
     {
+        LOGGER.finer("CG: askNewCloseQuitCancel(JFrame frame, "
+            + "boolean fromBattleBoard)");
+
         String[] dialogOptions = new String[4];
         dialogOptions[0] = "New Game";
         dialogOptions[1] = "Quit";
@@ -633,6 +663,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
      */
     void checkServerConnection()
     {
+        LOGGER.finer("CG: checkServerConnection()");
+
         if (client.isSctAlreadyDown())
         {
             JOptionPane.showMessageDialog(getMapOrBoardFrame(),
@@ -659,6 +691,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     private void initiateConnectionCheck()
     {
+        LOGGER.finer("CG: initiateConnectionCheck()");
+
         connectionCheckTimer = new Timer(1000 * CONN_CHECK_TIMEOUT,
             new ActionListener()
             {
@@ -677,6 +711,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void serverConfirmsConnection()
     {
+        LOGGER.finer("CG: serverConfirmsConnection()");
+
         synchronized (connectionCheckMutex)
         {
             LOGGER.info("Client for player " + getOwningPlayer().getName()
@@ -687,6 +723,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void timeoutAbortsConnectionCheck()
     {
+        LOGGER.finer("CG: timeoutAbortsConnectionCheck()");
+
         synchronized (connectionCheckMutex)
         {
             LOGGER.info("Client for player " + getOwningPlayer().getName()
@@ -705,6 +743,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
      */
     private void finishServerConnectionCheck(boolean success)
     {
+        LOGGER.finer("CG: finishServerConnectionCheck(boolean success)");
+
         if (connectionCheckTimer == null)
         {
             // race - the other one came nearly same time, and comes now
@@ -740,17 +780,25 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     private void doSetWhatToDoNext(WhatToDoNext whatToDoNext,
         boolean triggerQuitTimer)
     {
+        LOGGER.finer("CG: doSetWhatToDoNext(WhatToDoNext whatToDoNext, "
+            + "boolean triggerQuitTimer)");
+
         whatNextManager.setWhatToDoNext(whatToDoNext, triggerQuitTimer);
     }
 
     private void doSetWhatToDoNext(WhatToDoNext whatToDoNext, String loadFile)
     {
+        LOGGER.finer("CG: doSetWhatToDoNext(WhatToDoNext whatToDoNext, "
+            + "String loadFile)");
+
         whatNextManager.setWhatToDoNext(whatToDoNext, loadFile, true);
     }
 
     // Used by File=>Close and Window closing
     private void setWhatToDoNextForClose()
     {
+        LOGGER.finer("CG: setWhatToDoNextForClose()");
+
         if (startedByWebClient)
         {
             doSetWhatToDoNext(WhatToDoNext.START_WEB_CLIENT, false);
@@ -768,6 +816,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void menuNewGame()
     {
+        LOGGER.finer("CG: menuNewGame()");
+
         if (webClient != null)
         {
             webClient.dispose();
@@ -779,6 +829,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void menuLoadGame(String filename)
     {
+        LOGGER.finer("CG: menuLoadGame(String filename)");
+
         if (webClient != null)
         {
             webClient.dispose();
@@ -813,6 +865,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     private void setupPlayerLabel()
     {
+        LOGGER.finer("CG: setupPlayerLabel()");
+
         if (board != null)
         {
             board.setupPlayerLabel();
@@ -821,6 +875,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void highlightEngagements()
     {
+        LOGGER.finer("CG: highlightEngagements()");
+
         if (isMyTurn())
         {
             board.maybeRequestFocusAndToFront();
@@ -860,6 +916,9 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     public void addPossibleRecruitChits(LegionClientSide legion,
         Set<MasterHex> hexes)
     {
+        LOGGER.finer("CG: addPossibleRecruitChits(LegionClientSide legion, "
+            + "Set<MasterHex> hexes)");
+
         if (recruitChitMode == Options.showRecruitChitsNumNone)
         {
             return;
@@ -877,6 +936,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     private void setupGUIOptionListeners()
     {
+        LOGGER.finer("CG: setupGUIOptionListeners()");
+
         GUIHex.setAntialias(options.getOption(Options.antialias));
         options.addListener(Options.antialias, new IOptions.Listener()
         {
@@ -1087,6 +1148,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
      */
     private void initEventViewer()
     {
+        LOGGER.finer("CG: initEventViewer()");
+
         if (eventViewer == null)
         {
             JFrame parent = getPreferredParent();
@@ -1096,6 +1159,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void eventViewerSetVisibleMaybe()
     {
+        LOGGER.finer("CG: eventViewerSetVisibleMaybe()");
+
         // if null: no board (not yet, or not at all) => no eventviewer
         if (eventViewer != null)
         {
@@ -1106,6 +1171,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void autoInspectorSetDubiousAsBlanks(boolean newValue)
     {
+        LOGGER.finer("CG: autoInspectorSetDubiousAsBlanks(boolean newValue)");
+
         if (autoInspector != null)
         {
             autoInspector.setDubiousAsBlanks(newValue);
@@ -1114,6 +1181,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void engagementResultsMaybeShow()
     {
+        LOGGER.finer("CG: engagementResultsMaybeShow()");
+
         // maybeShow decides by itself based on the current value
         // of the option whether to hide or show.
         // null if called too early by optionListener when loading options
@@ -1126,6 +1195,9 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void actOnTellLegionLocation(Legion legion, MasterHex hex)
     {
+        LOGGER
+            .finer("CG: actOnTellLegionLocation(Legion legion, MasterHex hex)");
+
         // @TODO: this creates it every time, not only when necessary ?
         Marker marker = new Marker(legion, 3 * Scale.get(), legion
             .getLongMarkerId(), client, (client != null));
@@ -1147,6 +1219,9 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     public void actOnDidSplit(int turn, Legion parent, Legion child,
         MasterHex hex)
     {
+        LOGGER
+            .finer("CG: actOnDidSplit(int turn, Legion parent, Legion child,");
+
         // TODO move if block to eventviewer itself?
         // Not during replay, but during redo:
         if (!isReplayOngoing() || isRedoOngoing())
@@ -1178,6 +1253,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void actOnDidSplitPart2(MasterHex hex)
     {
+        LOGGER.finer("CG: actOnDidSplitPart2(MasterHex hex)");
+
         if (client.getTurnNumber() == 1 && isMyTurn())
         {
             board.enableDoneAction();
@@ -1193,18 +1270,25 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void actOnDoneWithMoves()
     {
+        LOGGER.finer("CG: actOnDoneWithMoves()");
+
         board.clearRecruitedChits();
         board.clearPossibleRecruitChits();
     }
 
     public void actOnDoneWithSplits()
     {
+        LOGGER.finer("CG: actOnDoneWithSplits()");
+
         board.clearRecruitedChits();
     }
 
     public void actOnDidRecruit(Legion legion, CreatureType recruit,
         List<CreatureType> recruiters, String reason)
     {
+        LOGGER
+            .finer("CG: actOnDidRecruit(Legion legion, CreatureType recruit,");
+
         postRecruitStuff(legion);
 
         board.addRecruitedChit(legion);
@@ -1224,6 +1308,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
      */
     private void postRecruitStuff(Legion legion)
     {
+        LOGGER.finer("CG: postRecruitStuff(Legion legion)");
+
         if (client.isMyLegion(legion))
         {
             pushUndoStack(legion.getMarkerId());
@@ -1237,6 +1323,9 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     public void actOnRemoveCreature(Legion legion, CreatureType type,
         String reason)
     {
+        LOGGER
+            .finer("CG: actOnRemoveCreature(Legion legion, CreatureType type,");
+
         if (reason.equals(Constants.reasonUndidReinforce))
         {
             LOGGER
@@ -1256,6 +1345,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void actOnRemoveCreaturePart2(Legion legion)
     {
+        LOGGER.finer("CG: actOnRemoveCreaturePart2(Legion legion)");
+
         if (!isReplayOngoing())
         {
             GUIMasterHex hex = board.getGUIHexByMasterHex(legion
@@ -1268,6 +1359,9 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     public void actOnAddCreature(Legion legion, CreatureType creature,
         String reason)
     {
+        LOGGER
+            .finer("CG: actOnAddCreature(Legion legion, CreatureType creature,");
+
         if (!isReplayOngoing())
         {
             GUIMasterHex hex = board.getGUIHexByMasterHex(legion
@@ -1282,6 +1376,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void actOnUndidSplit(Legion survivor, int turn)
     {
+        LOGGER.finer("CG: actOnUndidSplit(Legion survivor, int turn)");
+
         if (isReplayOngoing())
         {
             replayTurnChange(turn);
@@ -1296,6 +1392,9 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     public void actOnUndidRecruitPart(Legion legion, boolean wasReinforcement,
         int turnNumber)
     {
+        LOGGER
+            .finer("CG: actOnUndidRecruitPart(Legion legion, boolean wasReinforcement,");
+
         int eventType = wasReinforcement ? RevealEvent.eventReinforce
             : RevealEvent.eventRecruit;
         board.cleanRecruitedChit((LegionClientSide)legion);
@@ -1328,6 +1427,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         MasterHex currentHex, boolean teleport, CreatureType teleportingLord,
         boolean splitLegionHasForcedMove)
     {
+        LOGGER.finer("CG: actOnDidMove(Legion legion, MasterHex startingHex,");
+
         if (teleport)
         {
             eventViewer.newCreatureRevealEvent(RevealEvent.eventTeleport,
@@ -1363,6 +1464,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         MasterHex currentHex, boolean splitLegionHasForcedMove,
         boolean didTeleport)
     {
+        LOGGER.finer("CG: actOnUndidMove(Legion legion, MasterHex formerHex,");
+
         board.clearPossibleRecruitChits();
         board.alignLegions(formerHex);
         board.alignLegions(currentHex);
@@ -1394,12 +1497,16 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void actOnNoMoreEngagements()
     {
+        LOGGER.finer("CG: actOnNoMoreEngagements()");
+
         board.setPhaseInfo("Press \"Done\" to end the engagements phase");
         board.enableDoneAction();
     }
 
     public void alignLegionsMaybe(Legion legion)
     {
+        LOGGER.finer("CG: alignLegionsMaybe(Legion legion)");
+
         if (!isReplayOngoing())
         {
             board.alignLegions(legion.getCurrentHex());
@@ -1408,17 +1515,23 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void actOnRemoveLegion(Legion legion)
     {
+        LOGGER.finer("CG: actOnRemoveLegion(Legion legion)");
+
         board.removeMarkerForLegion(legion);
     }
 
     public void actOnDoSummon()
     {
+        LOGGER.finer("CG: actOnDoSummon()");
+
         highlightEngagements();
         board.repaint();
     }
 
     public void setLookAndFeel(String lfName)
     {
+        LOGGER.finer("CG: setLookAndFeel(String lfName)");
+
         try
         {
             UIManager.setLookAndFeel(lfName);
@@ -1447,6 +1560,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void updateEverything()
     {
+        LOGGER.finer("CG: updateEverything()");
+
         board.updateComponentTreeUI();
         board.pack();
 
@@ -1458,6 +1573,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     private void updateTreeAndPack(Window window)
     {
+        LOGGER.finer("CG: updateTreeAndPack(Window window)");
+
         if (window != null)
         {
             SwingUtilities.updateComponentTreeUI(window);
@@ -1467,6 +1584,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void replayTurnChange(int nowTurn)
     {
+        LOGGER.finer("CG: replayTurnChange(int nowTurn)");
+
         assert board != null : "board is null in replayTurnChange!";
 
         if (board != null)
@@ -1481,6 +1600,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void actOnTellReplay(int maxTurn)
     {
+        LOGGER.finer("CG: actOnTellReplay(int maxTurn)");
+
         if (isReplayOngoing())
         {
             // Switching to replay mode
@@ -1524,16 +1645,22 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void makeBoardRecreateMarkers()
     {
+        LOGGER.finer("CG: makeBoardRecreateMarkers()");
+
         board.recreateMarkers();
     }
 
     public void actOnTellRedoChange()
     {
+        LOGGER.finer("CG: actOnTellRedoChange()");
+
         // Nothing to do right now (was needed temporarily)
     }
 
     private void clearUndoStack()
     {
+        LOGGER.finer("CG: clearUndoStack()");
+
         undoStack.clear();
     }
 
@@ -1673,6 +1800,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void repaintBattleBoard()
     {
+        LOGGER.finer("CG: repaintBattleBoard()");
+
         if (battleBoard != null)
         {
             battleBoard.repaint();
@@ -1681,6 +1810,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void repaintAllWindows()
     {
+        LOGGER.finer("CG: repaintAllWindows()");
+
         if (statusScreen != null)
         {
             statusScreen.repaint();
@@ -1698,6 +1829,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void rescaleAllWindows()
     {
+        LOGGER.finer("CG: rescaleAllWindows()");
+
         if (statusScreen != null)
         {
             statusScreen.rescale();
@@ -1735,6 +1868,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     private void disposeMasterBoard()
     {
+        LOGGER.finer("CG: disposeMasterBoard()");
+
         if (board != null)
         {
             board.dispose();
@@ -1748,6 +1883,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     private void disposeBattleBoard()
     {
+        LOGGER.finer("CG: disposeBattleBoard()");
+
         if (battleBoard != null)
         {
             battleBoard.dispose();
@@ -1760,6 +1897,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
      */
     public void disposePickCarryDialog()
     {
+        LOGGER.finer("CG: disposePickCarryDialog()");
+
         if (SwingUtilities.isEventDispatchThread())
         {
             actualDisposePickCarryDialog();
@@ -1786,6 +1925,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void actualDisposePickCarryDialog()
     {
+        LOGGER.finer("CG: actualDisposePickCarryDialog()");
+
         if (pickCarryDialog != null)
         {
             if (battleBoard != null)
@@ -1862,12 +2003,16 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void showNegotiate(Legion attacker, Legion defender)
     {
+        LOGGER.finer("CG: showNegotiate(Legion attacker, Legion defender)");
+
         board.clearDefenderFlee();
         negotiate = new Negotiate(this, attacker, defender);
     }
 
     public void respawnNegotiate()
     {
+        LOGGER.finer("CG: respawnNegotiate()");
+
         if (negotiate != null)
         {
             negotiate.dispose();
@@ -1878,6 +2023,9 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void showConcede(Client client, Legion ally, Legion enemy)
     {
+        LOGGER
+            .finer("CG: showConcede(Client client, Legion ally, Legion enemy)");
+
         board.clearDefenderFlee();
         Concede.concede(this, board.getFrame(), ally, enemy);
         myTurnNotificationActions(ally);
@@ -1885,12 +2033,16 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void showFlee(Client client, Legion ally, Legion enemy)
     {
+        LOGGER.finer("CG: showFlee(Client client, Legion ally, Legion enemy)");
+
         Concede.flee(this, board.getFrame(), ally, enemy);
         myTurnNotificationActions(ally);
     }
 
     private void myTurnNotificationActions(Legion ally)
     {
+        LOGGER.finer("CG: myTurnNotificationActions(Legion ally)");
+
         if (getGame().getDefender().equals(ally))
         {
             if (options.getOption(Options.turnStartBeep))
@@ -1906,6 +2058,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void initShowEngagementResults()
     {
+        LOGGER.finer("CG: initShowEngagementResults()");
+
         JFrame parent = getPreferredParent();
         // no board at all, e.g. AI - nothing to do.
         if (parent == null)
@@ -1919,6 +2073,9 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void tellEngagement(Legion attacker, Legion defender, int turnNumber)
     {
+        LOGGER
+            .finer("CG: tellEngagement(Legion attacker, Legion defender, int turnNumber)");
+
         // remember for end of battle.
         tellEngagementResultsAttackerStartingContents = client
             .getLegionImageNames(attacker);
@@ -1942,6 +2099,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     void highlightBattleSite(MasterHex battleSite)
     {
+        LOGGER.finer("CG: highlightBattleSite(MasterHex battleSite)");
+
         if (battleSite != null)
         {
             board.unselectAllHexes();
@@ -1952,6 +2111,9 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     public void actOnTellEngagementResults(Legion winner, String method,
         int points, int turns)
     {
+        LOGGER
+            .finer("CG: actOnTellEngagementResults(Legion winner, String method,");
+
         JFrame frame = getMapOrBoardFrame();
         if (frame == null)
         {
@@ -1983,21 +2145,29 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void actOnEngagementCompleted()
     {
+        LOGGER.finer("CG: actOnEngagementCompleted()");
+
         board.updateEngagementsLeftText();
     }
 
     public void setMulliganOldRoll(int movementRoll)
     {
+        LOGGER.finer("CG: setMulliganOldRoll(int movementRoll)");
+
         eventViewer.setMulliganOldRoll(movementRoll);
     }
 
     public void tellWhatsHappening(String message)
     {
+        LOGGER.finer("CG: tellWhatsHappening(String message)");
+
         board.setPhaseInfo(message);
     }
 
     public void actOnTellMovementRoll(int roll)
     {
+        LOGGER.finer("CG: actOnTellMovementRoll(int roll)");
+
         // TODO move if block to eventviewer itself?
         // Not during replay, but during redo:
         if (!isReplayOngoing() || isRedoOngoing())
@@ -2030,6 +2200,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     public void revealEngagedCreatures(Legion legion,
         final List<CreatureType> creatures, boolean isAttacker, String reason)
     {
+        LOGGER.finer("CG: revealEngagedCreatures(Legion legion,");
 
         // in engagement we need to update the remembered list, too.
         if (isAttacker)
@@ -2123,6 +2294,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     {
         if (!isMyTurn())
         {
+            LOGGER.info("");
+
             return;
         }
         if (getGame().isPhase(Phase.MOVE))
@@ -2156,18 +2329,25 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void doAcquireAngel(Legion legion, List<CreatureType> recruits)
     {
+        LOGGER
+            .finer("CG: doAcquireAngel(Legion legion, List<CreatureType> recruits)");
+
         board.deiconify();
         new AcquireAngel(board.getFrame(), this, legion, recruits);
     }
 
     public void setBoardActive(boolean val)
     {
+        LOGGER.finer("setBoardActive(boolean val)");
+
         board.setBoardActive(val);
     }
 
     public void doPickSummonAngel(Legion legion,
         List<Legion> possibleDonors)
     {
+        LOGGER.finer("CG: doPickSummonAngel(Legion legion,");
+
         new SummonAngel(this, legion, possibleDonors);
     }
 
@@ -2187,6 +2367,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     private void markLegionAsSkipSplit(Legion legion)
     {
+        LOGGER.finer("CG: markLegionAsSkipSplit(Legion legion)");
+
         legion.setSkipThisTime(true);
         pushUndoStack(legion.getMarkerId());
         board.clearPossibleRecruitChits();
@@ -2195,6 +2377,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void resetAllLegionFlags()
     {
+        LOGGER.finer("CG: resetAllLegionFlags()");
+
         for (Legion l : getOwningPlayer().getLegions())
         {
             l.setSkipThisTime(false);
@@ -2210,6 +2394,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     public void doPickCarries(Client client, int carryDamage,
         Set<String> carryTargetDescriptions)
     {
+        LOGGER.finer("CG: doPickCarries(Client client, int carryDamage,");
+
         Set<BattleHex> carryTargetHexes = new HashSet<BattleHex>();
         for (String desc : carryTargetDescriptions)
         {
@@ -2228,6 +2414,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void handlePickCarry(GUIBattleHex hex)
     {
+        LOGGER.finer("CG: handlePickCarry(GUIBattleHex hex)");
+
         String hexLabel = "";
         if (hex != null)
         {
@@ -2249,6 +2437,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     public void doPickColor(final String playerName,
         final List<PlayerColor> colorsLeft)
     {
+        LOGGER.finer("CG: doPickColor(final String playerName,");
+
         if (SwingUtilities.isEventDispatchThread())
         {
             bringUpPickColorDialog(playerName, colorsLeft);
@@ -2380,6 +2570,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void tellProposal(String proposalString)
     {
+        LOGGER.finer("CG: tellProposal(String proposalString)");
+
         Proposal proposal = Proposal.makeFromString(proposalString, client
             .getGameClientSide());
         if (replyToProposal != null)
@@ -2393,6 +2585,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void cleanupNegotiationDialogs()
     {
+        LOGGER.finer("CG: cleanupNegotiationDialogs()");
+
         if (negotiate != null)
         {
             negotiate.dispose();
@@ -2408,6 +2602,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     public void actOnTurnOrPlayerChange(Client client, int turnNr,
         Player player)
     {
+        LOGGER.finer("CG: actOnTurnOrPlayerChange(Client client, int turnNr,");
+
         cleanupNegotiationDialogs();
         if (isMyTurn())
         {
@@ -2418,6 +2614,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void actOnGameStarting()
     {
+        LOGGER.finer("CG: actOnGameStarting()");
+
         if (!client.isRemote())
         {
             board.enableSaveActions();
@@ -2426,6 +2624,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void actOnSetupSplit()
     {
+        LOGGER.finer("CG: actOnSetupSplit()");
+
         // TODO probably this can be removed?
         if (isMyTurn())
         {
@@ -2480,6 +2680,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     private void validateLegions()
     {
+        LOGGER.finer("CG: validateLegions()");
+
         boolean foundProblem = false;
 
         for (Player p : client.getGameClientSide().getPlayers())
@@ -2507,6 +2709,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void actOnSetupMuster()
     {
+        LOGGER.finer("CG: actOnSetupMuster()");
+
         clearUndoStack();
         cleanupNegotiationDialogs();
 
@@ -2521,6 +2725,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void actOnSetupMove()
     {
+        LOGGER.finer("CG: actOnSetupMove()");
+
         clearUndoStack();
         pendingMoves.clear();
         pendingMoveHexes.clear();
@@ -2538,6 +2744,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void actOnSetupFight()
     {
+        LOGGER.finer("CG: actOnSetupFight()");
+
         clearUndoStack();
         board.setupFightMenu();
         updateStatusScreen();
@@ -2545,6 +2753,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void actOnSetupBattleFight()
     {
+        LOGGER.finer("CG: actOnSetupBattleFight()");
+
         if (battleBoard != null)
         {
             battleBoard.updatePhaseAndTurn();
@@ -2564,6 +2774,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void actOnSetupBattleMove()
     {
+        LOGGER.finer("CG: actOnSetupBattleMove()");
+
         // needed/better to do here, than when finishing a battle turn,
         // for two reasons: 1) done with moves quickly after a move (before
         // server response received and handled) move would/might get into
@@ -2586,6 +2798,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     public void actOnTellBattleMove(BattleHex startingHex,
         BattleHex endingHex, boolean rememberForUndo)
     {
+        LOGGER.finer("CG: actOnTellBattleMove(BattleHex startingHex,");
+
         if (rememberForUndo)
         {
             pushUndoStack(endingHex.getLabel());
@@ -2602,16 +2816,22 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void actOnPendingBattleMoveOver()
     {
+        LOGGER.finer("CG: actOnPendingBattleMoveOver()");
+
         battleBoard.actOnPendingBattleMoveOver();
     }
 
     public void actOnDoneWithBattleMoves()
     {
+        LOGGER.finer("CG: actOnDoneWithBattleMoves()");
+
         clearUndoStack();
     }
 
     public void actOnSetupBattleRecruit()
     {
+        LOGGER.finer("CG: actOnSetupBattleRecruit()");
+
         if (battleBoard != null)
         {
             battleBoard.updatePhaseAndTurn();
@@ -2627,6 +2847,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void actOnSetupBattleSummon()
     {
+        LOGGER.finer("CG: actOnSetupBattleSummon()");
+
         if (battleBoard != null)
         {
             battleBoard.updatePhaseAndTurn();
@@ -2646,6 +2868,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     private void addBattleChit(GUIBattleChit battleChit)
     {
+        LOGGER.finer("CG: addBattleChit(GUIBattleChit battleChit)");
+
         battleChits.add(battleChit);
     }
 
@@ -2693,6 +2917,9 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     public void actOnPlaceNewChit(String imageName, BattleUnit battleUnit,
         BattleHex hex)
     {
+        LOGGER
+            .finer("CG: actOnPlaceNewChit(String imageName, BattleUnit battleUnit,");
+
         Legion legion = battleUnit.getLegion();
         PlayerColor playerColor = legion.getPlayer().getColor();
 
@@ -2723,6 +2950,9 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     public void actOnTellStrikeResults(boolean wasCarry, int strikeNumber,
         List<String> rolls, BattleCritter striker, BattleCritter target)
     {
+        LOGGER
+            .finer("CG: actOnTellStrikeResults(boolean wasCarry, int strikeNumber,");
+
         if (battleBoard != null)
         {
             if (!wasCarry)
@@ -2736,11 +2966,15 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void actOnHitsSet(BattleUnit target)
     {
+        LOGGER.finer("CG: actOnHitsSet(BattleUnit target)");
+
         battleBoard.actOnHitsSet(target.getCurrentHex());
     }
 
     public void highlightCrittersWithTargets()
     {
+        LOGGER.finer("CG: highlightCrittersWithTargets()");
+
         if (battleBoard != null)
         {
             battleBoard.highlightCrittersWithTargets();
@@ -2749,6 +2983,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void actOnApplyCarries(BattleHex hex)
     {
+        LOGGER.finer("CG: actOnApplyCarries(BattleHex hex)");
+
         if (battleBoard != null)
         {
             battleBoard.unselectHex(hex);
@@ -2758,6 +2994,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void actOnCleanupBattle()
     {
+        LOGGER.finer("CG: actOnCleanupBattle()");
+
         if (battleBoard != null)
         {
             battleBoard.dispose();
@@ -2787,6 +3025,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
      */
     public void undoRecruit(Legion legion)
     {
+        LOGGER.finer("CG: undoRecruit(Legion legion)");
+
         if (undoStack.contains(legion.getMarkerId()))
         {
             undoStack.remove(legion.getMarkerId());
@@ -2800,6 +3040,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
      */
     private void handleUndoRecruit(Legion legion)
     {
+        LOGGER.finer("CG: handleUndoRecruit(Legion legion)");
+
         if (legion.hasRecruited())
         {
             waitCursor();
@@ -2844,6 +3086,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void informSplitRequiredFirstRound()
     {
+        LOGGER.finer("CG: informSplitRequiredFirstRound()");
+
         // must split in first turn - Done not allowed now
         if (board != null && isMyTurn())
         {
@@ -2877,6 +3121,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void undoLastBattleMove()
     {
+        LOGGER.finer("CG: undoLastBattleMove()");
+
         if (!isUndoStackEmpty())
         {
             String hexLabel = (String)popUndoStack();
@@ -2887,6 +3133,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void undoAllBattleMoves()
     {
+        LOGGER.finer("CG: undoAllBattleMoves()");
+
         while (!isUndoStackEmpty())
         {
             undoLastBattleMove();
@@ -2895,6 +3143,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void undoAllMoves()
     {
+        LOGGER.finer("CG: undoAllMoves()");
+
         if (pendingMoves.size() > 0)
         {
             displayNoUndoWhilePendingMovesInfo();
@@ -2910,6 +3160,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void undoAllRecruits()
     {
+        LOGGER.finer("CG: undoAllRecruits()");
+
         while (!isUndoStackEmpty())
         {
             undoLastRecruit();
@@ -2918,6 +3170,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     private void displayNoUndoWhilePendingMovesInfo()
     {
+        LOGGER.finer("CG: displayNoUndoWhilePendingMovesInfo()");
+
         JOptionPane.showMessageDialog(getMapOrBoardFrame(),
             "For some moves is still the confirmation from server and "
                 + "screen update missing!\n"
@@ -2928,16 +3182,22 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void defaultCursor()
     {
+        LOGGER.finer("CG: defaultCursor()");
+
         board.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     }
 
     public void waitCursor()
     {
+        LOGGER.finer("CG: waitCursor()");
+
         board.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
     }
 
     public void doCleanupGUI()
     {
+        LOGGER.finer("CG: doCleanupGUI()");
+
         if (SwingUtilities.isEventDispatchThread())
         {
             cleanupGUI();
@@ -2965,6 +3225,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     private void disposeMovementDie()
     {
+        LOGGER.finer("CG: disposeMovementDie()");
+
         movementDie = null;
     }
 
@@ -2975,6 +3237,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     private void cleanupGUI()
     {
+        LOGGER.finer("CG: cleanupGUI()");
+
         try
         {
             disposeInspector();
@@ -3022,6 +3286,9 @@ public class ClientGUI implements IClientGUI, GUICallbacks
      */
     public void actOnTellGameOver(String message, boolean disposeFollows)
     {
+        LOGGER
+            .finer("CG: actOnTellGameOver(String message, boolean disposeFollows)");
+
         if (webClient != null)
         {
             webClient.tellGameEnds();
@@ -3054,6 +3321,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void showMessageDialogAndWait(String message)
     {
+        LOGGER.finer("CG: showMessageDialogAndWait(String message)");
+
         // Don't bother showing messages to AI players.
         if (getOwningPlayer().isAI())
         {
@@ -3090,6 +3359,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     void doShowMessageDialog(String message)
     {
+        LOGGER.finer("CG: doShowMessageDialog(String message)");
+
         // For humans in autoplay do not show messages...
         if (options.getOption(Options.autoPlay))
         {
@@ -3187,6 +3458,9 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     // From other GUI components:
     void negotiateCallback(Proposal proposal, boolean respawn)
     {
+        LOGGER
+            .finer("CG: negotiateCallback(Proposal proposal, boolean respawn)");
+
         getClient().negotiateCallback(proposal, respawn);
     }
 
@@ -3213,6 +3487,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void setMover(Legion legion)
     {
+        LOGGER.finer("CG: setMover(Legion legion)");
+
         this.mover = legion;
     }
 
@@ -3234,6 +3510,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void actOnMoveNak()
     {
+        LOGGER.finer("CG: actOnMoveNak()");
+
         defaultCursor();
         pendingMoves.clear();
         pendingMoveHexes.clear();
@@ -3274,6 +3552,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     public void setMovePending(Legion mover, MasterHex currentHex,
         MasterHex targetHex)
     {
+        LOGGER.finer("CG: setMovePending(Legion mover, MasterHex currentHex,");
+
         // board.visualizeMoveTarget(mover, currentHex, targetHex);
         PendingMove move = new PendingMove(mover, currentHex, targetHex);
         pendingMoves.add(move);
@@ -3290,6 +3570,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     private void updatePendingText()
     {
+        LOGGER.finer("CG: updatePendingText()");
+
         int count = pendingMoves.size();
 
         if (count > 0)
@@ -3323,6 +3605,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     public void setMoveCompleted(Legion mover, MasterHex current,
         MasterHex target)
     {
+        LOGGER.finer("CG: setMoveCompleted(Legion mover, MasterHex current,");
+
         pendingMoveHexes.remove(target);
         PendingMove foundMove = null;
         for (PendingMove move : pendingMoves)
@@ -3366,6 +3650,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void removeBattleChit(BattleUnit battleUnit)
     {
+        LOGGER.finer("CG: removeBattleChit(BattleUnit battleUnit)");
+
         for (Iterator<GUIBattleChit> iterator = battleChits.iterator(); iterator
             .hasNext();)
         {
@@ -3384,61 +3670,86 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void answerPickColor(PlayerColor color)
     {
+        LOGGER.finer("CG: answerPickColor(PlayerColor color)");
+
         getClient().answerPickColor(color);
     }
 
     public void leaveCarryMode()
     {
+        LOGGER.finer("CG: leaveCarryMode()");
+
         getClient().leaveCarryMode();
     }
 
     public void applyCarries(BattleHex hex)
     {
+        LOGGER.finer("CG: applyCarries(BattleHex hex)");
+
         getClient().applyCarries(hex);
     }
 
     public void acquireAngelCallback(Legion legion, CreatureType angelType)
     {
+        LOGGER
+            .finer("CG: acquireAngelCallback(Legion legion, CreatureType angelType)");
+
         getClient().acquireAngelCallback(legion, angelType);
     }
 
     public void answerFlee(Legion ally, boolean answer)
     {
+        LOGGER.finer("CG: answerFlee(Legion ally, boolean answer)");
+
         getClient().answerFlee(ally, answer);
     }
 
     public void answerConcede(Legion legion, boolean answer)
     {
+        LOGGER.finer("CG: answerConcede(Legion legion, boolean answer)");
+
         getClient().answerConcede(legion, answer);
     }
 
     public void doBattleMove(int tag, BattleHex hex)
     {
+        LOGGER.finer("CG: doBattleMove(int tag, BattleHex hex)");
+
         getClient().doBattleMove(tag, hex);
     }
 
     public void undoBattleMove(BattleHex hex)
     {
+        LOGGER.finer("CG: undoBattleMove(BattleHex hex)");
+
         getClient().undoBattleMove(hex);
     }
 
     public void strike(int tag, BattleHex hex)
     {
+        LOGGER.finer("CG: strike(int tag, BattleHex hex)");
+
         getClient().strike(tag, hex);
     }
 
     public void doneWithBattleMoves()
     {
+        LOGGER.finer("CG: doneWithBattleMoves()");
+
         getClient().doneWithBattleMoves();
     }
 
     public void doneWithStrikes()
     {
+        LOGGER.finer("CG: doneWithStrikes()");
+
         getClient().doneWithStrikes();
     }
 
     public void concede()
     {
+        LOGGER.finer("CG: concede()");
+
         getClient().concede();
     }
 }
