@@ -212,7 +212,7 @@ public class ClientThread extends Thread
                     allArgs = allArgs.substring(0, _MAXLEN) + "...";
                 }
             }
-            LOGGER.fine("CT, message: " + method + "(" + allArgs + ")");
+            LOGGER.finer("CT, message: " + method + "(" + allArgs + ")");
         }
         else
         {
