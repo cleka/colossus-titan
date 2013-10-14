@@ -3459,6 +3459,15 @@ public final class Client implements IClient, IOracle, IVariant,
         return !spectator && owningPlayer.equals(getActivePlayer());
     }
 
+    public boolean isFightPhase()
+    {
+        if (game != null)
+        {
+            return game.isPhase(Phase.FIGHT);
+        }
+        return false;
+    }
+
     public boolean isMyBattlePhase()
     {
         // check also for phase, because delayed callbacks could come

@@ -195,10 +195,30 @@ public class ClientThread extends Thread
         client.appendToConnectionLog(s);
     }
 
+    static int _MAXLEN = 80;
+
     private void callMethod(String method, List<String> args)
     {
-        LOGGER.finer("Client (CT) '" + getNameMaybe()
-            + "' processing message: " + method);
+        if (client != null && !client.getOwningPlayer().isAI()
+            && client.isFightPhase())
+        {
+            String allArgs = new String();
+            allArgs = Glob.glob(", ", args);
+            if (_MAXLEN != 0)
+            {
+                int len = allArgs.length();
+                if (len > _MAXLEN)
+                {
+                    allArgs = allArgs.substring(0, _MAXLEN) + "...";
+                }
+            }
+            LOGGER.fine("CT, message: " + method + "(" + allArgs + ")");
+        }
+        else
+        {
+            LOGGER.finer("Client (CT) '" + getNameMaybe()
+                + "' processing message: " + method);
+        }
 
         if (method.equals(Constants.tellMovementRoll))
         {
