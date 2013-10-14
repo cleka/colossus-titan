@@ -6,6 +6,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import javax.swing.JTextArea;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.PlainDocument;
@@ -23,10 +24,12 @@ public class SwingDocumentLogHandler extends Handler
         .getLogger(SwingDocumentLogHandler.class.getName());
 
     private Document document = new PlainDocument();
+    private final JTextArea textArea;
 
-    public SwingDocumentLogHandler()
+    public SwingDocumentLogHandler(JTextArea area)
     {
         super();
+        this.textArea = area;
     }
 
     public Document getDocument()
@@ -41,6 +44,7 @@ public class SwingDocumentLogHandler extends Handler
         {
             document.insertString(document.getLength(), record.getMessage()
                 + "\n", null);
+            textArea.setCaretPosition(document.getLength() - 1);
         }
         catch (BadLocationException e)
         {

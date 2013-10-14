@@ -400,7 +400,9 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         initShowEngagementResults();
         initPreferencesWindow();
         showOrHideAutoInspector(options.getOption(Options.showAutoInspector));
-        showOrHideLogWindow(options.getOption(Options.showLogWindow));
+        logWindow = new LogWindow(options, Logger.getLogger(""), options
+            .getOption(Options.showLogWindow));
+        // showOrHideLogWindow(options.getOption(Options.showLogWindow));
         showOrHideConnectionLogWindow(options
             .getOption(Options.showConnectionLogWindow));
         showOrHideCaretaker(options.getOption(Options.showCaretaker));
@@ -2064,14 +2066,24 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         {
             if (logWindow == null)
             {
+                // after recent changes (14.10.2013) we should never
+                // actually get here any more...
+
                 // the logger with the empty name is parent to all loggers
                 // and thus catches all messages
-                logWindow = new LogWindow(options, Logger.getLogger(""));
+                logWindow = new LogWindow(options, Logger.getLogger(""), show);
+            }
+            else
+            {
+                logWindow.setVisible(true);
             }
         }
         else
         {
-            disposeLogWindow();
+            if (logWindow != null)
+            {
+                logWindow.setVisible(false);
+            }
         }
     }
 

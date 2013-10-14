@@ -10,7 +10,6 @@ import java.awt.event.WindowEvent;
 import java.util.logging.Logger;
 
 import javax.swing.JFrame;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
@@ -35,7 +34,7 @@ public final class LogWindow extends JTextArea
     private final Logger logger;
     private final SwingDocumentLogHandler handler;
 
-    public LogWindow(Options options, Logger logger)
+    public LogWindow(Options options, Logger logger, boolean showInitially)
     {
         this.options = options;
         this.logger = logger;
@@ -48,6 +47,7 @@ public final class LogWindow extends JTextArea
             @Override
             public void windowClosing(WindowEvent e)
             {
+                clearAllText();
                 LogWindow.this.options.setOption(Options.showLogWindow, false);
             }
         });
@@ -73,28 +73,24 @@ public final class LogWindow extends JTextArea
             location = new Point(0, y);
         }
         logFrame.setLocation(location);
-
-        logFrame.setVisible(true);
-
-        handler = new SwingDocumentLogHandler();
+        handler = new SwingDocumentLogHandler(this);
         logger.addHandler(handler);
         setDocument(handler.getDocument());
+
+        logFrame.setVisible(showInitially);
     }
 
     @Override
     public void append(String s)
     {
         super.append(s);
-
-        // XXX Removed because of graphical corruption
-        // scrollToEnd();
+        this.setCaretPosition(getDocument().getLength() - 1);
     }
 
-    void scrollToEnd()
+    public void clearAllText()
     {
-        JScrollBar vert = scrollPane.getVerticalScrollBar();
-        vert.setValue(vert.getMaximum());
-        repaint();
+        this.setText("\nAll text before here was wiped out "
+            + "when LogWindow was closed.\n\n");
     }
 
     @Override
@@ -109,5 +105,11 @@ public final class LogWindow extends JTextArea
         saveWindow.save(logFrame);
         logFrame.dispose();
         logger.removeHandler(handler);
+    }
+
+    @Override
+    public void setVisible(boolean show)
+    {
+        logFrame.setVisible(show);
     }
 }
