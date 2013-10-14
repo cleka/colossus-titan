@@ -764,7 +764,7 @@ public class ClientThread extends Thread
             LOGGER.log(Level.SEVERE, "Bogus packet (Client, method: " + method
                 + ", args: " + args + ")");
         }
-        LOGGER.finer("Client '" + getNameMaybe()
+        LOGGER.finest("Client '" + getNameMaybe()
             + "' finished method processing");
     }
 
