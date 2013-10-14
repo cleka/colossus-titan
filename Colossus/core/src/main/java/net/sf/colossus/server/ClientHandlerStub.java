@@ -183,7 +183,7 @@ public class ClientHandlerStub implements IClient
         String infoStringsString = Glob.glob(infoStrings);
         if (previousInfoStringsString.equals(infoStringsString))
         {
-            LOGGER.info("Skipping the re-send of identical player infos.");
+            LOGGER.finest("Skipping the re-send of identical player infos.");
         }
         else
         {
