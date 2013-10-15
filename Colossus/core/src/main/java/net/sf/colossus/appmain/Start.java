@@ -1,6 +1,8 @@
 package net.sf.colossus.appmain;
 
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
@@ -888,9 +890,10 @@ public final class Start
      */
     public static void main(String[] args)
     {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
         LOGGER.log(Level.INFO, "Start for Colossus version '"
             + BuildInfo.getFullBuildInfoString() + "' at "
-            + new Date().getTime());
+            + dateFormat.format(new Date()));
 
         Start startObject = new Start(args);
 

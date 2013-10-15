@@ -14,6 +14,8 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -24,10 +26,10 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.colossus.util.BuildInfo;
 import net.sf.colossus.webclient.WebClient;
 import net.sf.colossus.webcommon.FormatWhen;
 import net.sf.colossus.webcommon.GameInfo;
-import net.sf.colossus.webcommon.GameInfo.GameState;
 import net.sf.colossus.webcommon.IColossusMail;
 import net.sf.colossus.webcommon.IGameRunner;
 import net.sf.colossus.webcommon.IPortProvider;
@@ -36,6 +38,7 @@ import net.sf.colossus.webcommon.IWebClient;
 import net.sf.colossus.webcommon.IWebServer;
 import net.sf.colossus.webcommon.User;
 import net.sf.colossus.webcommon.UserDB;
+import net.sf.colossus.webcommon.GameInfo.GameState;
 
 
 /**
@@ -105,6 +108,11 @@ public class WebServer implements IWebServer, IRunWebServer
 
     public static void main(String[] args)
     {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+        LOGGER.log(Level.INFO, "Start for ColossusWeb version '"
+            + BuildInfo.getFullBuildInfoString() + "' at "
+            + dateFormat.format(new Date()));
+
         String optionsFileName = WebServerConstants.defaultOptionsFilename;
 
         if (args.length > 0)
