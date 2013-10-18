@@ -1101,6 +1101,7 @@ final class ClientHandler extends ClientHandlerStub implements IClient
         }
         */
 
+        /*
         if (isGone())
         {
             String tmpString = message + "                  ";
@@ -1109,6 +1110,7 @@ final class ClientHandler extends ClientHandlerStub implements IClient
                 + "' connection already gone: " + playerName);
             return;
         }
+        */
 
         if (obsolete || socketChannel == null)
         {
