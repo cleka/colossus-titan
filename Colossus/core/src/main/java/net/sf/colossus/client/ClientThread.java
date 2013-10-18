@@ -108,6 +108,16 @@ public class ClientThread extends Thread
         }
     }
 
+    public boolean isEngagementStartupOngoing()
+    {
+        return client.isEngagementStartupOngoing();
+    }
+
+    public void clearEngagementStartupOngoing()
+    {
+        client.setEngagementStartupOngoing(false);
+    }
+
     public void disposeClient()
     {
         client.disposeClient();
@@ -211,6 +221,11 @@ public class ClientThread extends Thread
                 {
                     allArgs = allArgs.substring(0, _MAXLEN) + "...";
                 }
+            }
+            if (isEngagementStartupOngoing())
+            {
+                client.logMsgToServer("I", "CT, message: " + method + "("
+                    + allArgs + ")");
             }
             LOGGER.info("CT, message: " + method + "(" + allArgs + ")");
         }
@@ -337,6 +352,7 @@ public class ClientThread extends Thread
         }
         else if (method.equals(Constants.placeNewChit))
         {
+            clearEngagementStartupOngoing();
             String imageName = args.remove(0);
             boolean inverted = Boolean.valueOf(args.remove(0)).booleanValue();
             int tag = Integer.parseInt(args.remove(0));

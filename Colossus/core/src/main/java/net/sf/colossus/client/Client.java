@@ -836,8 +836,19 @@ public final class Client implements IClient, IOracle, IVariant,
         server.fight(hex);
     }
 
+    boolean engagementStartupOngoing = false;
+
+    public void setEngagementStartupOngoing(boolean val)
+    {
+        engagementStartupOngoing = val;
+    }
+
     public void tellEngagement(MasterHex hex, Legion attacker, Legion defender)
     {
+        if (isMyLegion(attacker) || isMyLegion(defender))
+        {
+            setEngagementStartupOngoing(true);
+        }
         game.createEngagement(hex, attacker, defender);
         gui.tellEngagement(attacker, defender, getTurnNumber());
     }
@@ -845,6 +856,7 @@ public final class Client implements IClient, IOracle, IVariant,
     public void tellEngagementResults(Legion winner, String method,
         int points, int turns)
     {
+        setEngagementStartupOngoing(false);
         gui.actOnTellEngagementResults(winner, method, points, turns);
         game.clearEngagementData();
         gui.actOnEngagementCompleted();
@@ -2542,6 +2554,11 @@ public final class Client implements IClient, IOracle, IVariant,
         return game.getEngagement();
     }
 
+    public boolean isEngagementStartupOngoing()
+    {
+        return engagementStartupOngoing;
+    }
+
     // public for IOracle
     // TODO placeholder, move at some point fully to Game ?
     public Legion getDefender()
@@ -3668,6 +3685,11 @@ public final class Client implements IClient, IOracle, IVariant,
     public void pingRequest()
     {
         // Dummy, SocketClientThread handles this already.
+    }
+
+    public void logMsgToServer(String severity, String message)
+    {
+        server.logMsgToServer(severity, message);
     }
 
     public boolean testBattleMove(BattleCritter battleUnit, BattleHex hex)

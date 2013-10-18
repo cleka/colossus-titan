@@ -39,8 +39,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -2475,6 +2475,8 @@ public final class MasterBoard extends JPanel
      */
     public void clearEngagingPending()
     {
+        client.logMsgToServer("I", "clearEngagingPending, was: "
+            + engagingPendingHex);
         engagingPendingHex = null;
         // so, right now defender might be asked whether he wants to flee
         defenderFleePhase = true;
@@ -2503,12 +2505,21 @@ public final class MasterBoard extends JPanel
             {
                 if (defenderFleePhase)
                 {
-                    JOptionPane.showMessageDialog(masterFrame,
-                        "Already engaged on " + gui.getGame().getEngagement()
-                            + ";\nprobably other player is "
-                            + "asked right now whether to flee.",
-                        "Already engaged!", JOptionPane.INFORMATION_MESSAGE);
-                    gui.getBoard().getToolkit().beep();
+                    final String msg = "Already engaged on "
+                        + gui.getGame().getEngagement()
+                        + ";\nprobably other player is "
+                        + "asked right now whether to flee.";
+                    final String title = "Already engaged!";
+                    Runnable messageDialogRunnable = new Runnable()
+                    {
+                        public void run()
+                        {
+                            JOptionPane.showMessageDialog(masterFrame, msg,
+                                title, JOptionPane.INFORMATION_MESSAGE);
+                            gui.getBoard().getToolkit().beep();
+                        }
+                    };
+                    new Thread(messageDialogRunnable).start();
                 }
                 else
                 {
@@ -2521,12 +2532,26 @@ public final class MasterBoard extends JPanel
             {
                 // server.engage() already sent but tellEngagement() not
                 // received yet
-                JOptionPane.showMessageDialog(masterFrame,
-                    "Engagement initiated already on hex "
-                        + engagingPendingHex + ";\n"
-                        + "still waiting for server reply.",
-                    "Already engaging!", JOptionPane.INFORMATION_MESSAGE);
-                gui.getBoard().getToolkit().beep();
+
+                client.logMsgToServer("W", "engagingPendingHex is "
+                    + "already set: " + engagingPendingHex);
+
+                final String msg = "Engagement initiated already on hex "
+                    + engagingPendingHex + ";\n"
+                    + "still waiting for server reply.";
+                final String title = "Already engaging!";
+
+                Runnable messageDialogRunnable = new Runnable()
+                {
+                    public void run()
+                    {
+                        JOptionPane.showMessageDialog(masterFrame,
+                            msg, title,
+                            JOptionPane.INFORMATION_MESSAGE);
+                        gui.getBoard().getToolkit().beep();
+                    }
+                };
+                new Thread(messageDialogRunnable).start();
             }
             else
             {
@@ -2542,6 +2567,7 @@ public final class MasterBoard extends JPanel
         else
         {
             // ignore all other clicks
+            LOGGER.warning("You clicked on hex " + hex + " - ignored.");
         }
     }
 

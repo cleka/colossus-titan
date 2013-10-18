@@ -1009,6 +1009,13 @@ final class ClientHandler extends ClientHandlerStub implements IClient
             confirmCommitPoint(cpNr);
         }
 
+        else if (method.equals(Constants.logMsgToServer))
+        {
+            String severity = args.remove(0);
+            String message = args.remove(0);
+            server.logMsgToServer(severity, message);
+        }
+
         else
         {
             LOGGER.log(Level.SEVERE, "Bogus packet (Server, method: " + method

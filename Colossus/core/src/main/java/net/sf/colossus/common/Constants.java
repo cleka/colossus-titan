@@ -275,6 +275,7 @@ public final class Constants
     public static final String replyToPing = "replyToPing";
     public static final String requestSyncDelta = "requestSyncDelta";
     public static final String confirmCommitPoint = "confirmCommitPoint";
+    public static final String logMsgToServer = "logMsgToServer";
 
     public static final String reasonSplit = "Split";
     public static final String reasonSummon = "Summon";

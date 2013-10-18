@@ -2094,6 +2094,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         eventViewer.tellEngagement(attacker, defender, turnNumber);
 
         board.updateEngagementsLeftText();
+        client.logMsgToServer("I", "In tellEngagement, battleSite is "
+            + client.getBattleSite());
         board.clearEngagingPending();
     }
 

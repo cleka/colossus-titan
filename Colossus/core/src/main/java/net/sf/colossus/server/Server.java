@@ -3717,6 +3717,11 @@ public final class Server extends Thread implements IServer
         game.updateCaretakerDisplays();
     }
 
+    public void logMsgToServer(String severity, String message)
+    {
+        LOGGER.info("CLIENTLOG: " + severity + ": " + message);
+    }
+
     public void enforcedDisconnectClient(String name)
     {
         try

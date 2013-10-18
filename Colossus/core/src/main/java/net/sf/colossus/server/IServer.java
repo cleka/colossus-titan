@@ -130,5 +130,7 @@ public interface IServer
 
     public void joinGame(String playerName);
 
+    public void logMsgToServer(String severity, String message);
+
     public void watchGame();
 }
