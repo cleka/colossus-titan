@@ -264,8 +264,14 @@ public final class Server extends Thread implements IServer
                     allRequestConfirmCatchup("DisposeGame", true);
                 }
                 disposeRound++;
+
+                LOGGER
+                    .info("In while !shutting down loop, initDisp true, round="
+                        + disposeRound);
             }
         }
+        LOGGER.info("While !shuttingDown loop ends, disposeRound="
+            + disposeRound);
 
         if (serverRunning && disposeRound >= 60)
         {
@@ -276,7 +282,13 @@ public final class Server extends Thread implements IServer
 
         if (shuttingDown)
         {
+            LOGGER.info("shuttingDown set, before closeSocketAndSelector()");
             closeSocketAndSelector();
+            LOGGER.info("shuttingDown set, after  closeSocketAndSelector()");
+        }
+        else
+        {
+            LOGGER.info("shuttingDown NOT set");
         }
 
         notifyThatGameFinished();
@@ -444,7 +456,7 @@ public final class Server extends Thread implements IServer
             handleOutsideChanges((num == 0), stillWaitingForClients);
             if (forceShutDown)
             {
-                LOGGER.log(Level.FINEST,
+                LOGGER.log(Level.INFO,
                     "waitOnSelector: force shutdown now true! num=" + num);
                 stopAccepting();
                 stopServerRunning();
@@ -626,6 +638,14 @@ public final class Server extends Thread implements IServer
     {
         synchronized (channelChanges)
         {
+            boolean somethingToDo = false;
+            if (!channelChanges.isEmpty())
+            {
+                LOGGER.info("in synchronized(channelChanges), cc size="
+                    + channelChanges.size());
+                somethingToDo = true;
+            }
+
             // Can't use iterator, because e.g. removal of last human/observer
             // will add more items to the channelChanges list.
             while (!channelChanges.isEmpty())
@@ -634,15 +654,18 @@ public final class Server extends Thread implements IServer
                 if (ClientHandler.class.isInstance(nextCHS))
                 {
                     ClientHandler nextCH = (ClientHandler)nextCHS;
+                    LOGGER.info("Took from channelChanges CH for "
+                        + nextCH.getClientName());
                     SocketChannel sc = nextCH.getSocketChannel();
                     SelectionKey key = nextCH.getSelectorKey();
                     if (key == null)
                     {
-                        LOGGER
-                            .warning("key for to-be-closed-channel is null!");
+                        LOGGER.warning("key for to-be-closed-channel is "
+                            + "null for CH: " + nextCH.getClientName());
                     }
                     else if (sc.isOpen())
                     {
+                        LOGGER.info("calling disconnectChannel()");
                         // sending dispose and setIsGone is done by ClientHandler
                         disconnectChannel(sc, key);
                     }
@@ -657,14 +680,20 @@ public final class Server extends Thread implements IServer
                 else
                 {
                     // just a stub
+                    LOGGER.info("Handling channel changes, stub.");
                 }
 
-                LOGGER.info("Before removing CH " + nextCHS.getSignonName()
+                LOGGER.info("NOT REMOVING: CH " + nextCHS.getSignonName()
                     + " from clients list, list size is: " + iClients.size());
                 // For now removed, caused ConcurrentModificationException
                 // when game is closed via GUI
                 // iClients.remove(nextCHS);
             }
+            if (somethingToDo)
+            {
+                LOGGER.info("after while !channelChanges.isEmpty())");
+            }
+
             channelChanges.clear();
         }
     }
@@ -1839,14 +1868,18 @@ public final class Server extends Thread implements IServer
 
                 if (!skip)
                 {
+                    LOGGER.info("Adding to list for Catchup: "
+                        + client.getPlayerName());
                     waitingToCatchup.add(client);
                 }
             }
 
+            LOGGER.info("List size: " + waitingToCatchup.size());
             for (IClient client : waitingToCatchup)
             {
                 client.confirmWhenCaughtUp();
             }
+            LOGGER.info("Finished sending");
         }
     }
 

@@ -51,7 +51,7 @@ public class WhatNextManager
     {
         this.whatToDoNext = whatToDoNext;
         this.interactive = interactive;
-        LOGGER.log(Level.FINEST,
+        LOGGER.log(Level.INFO,
             "Set what to do next to " + whatToDoNext.toString());
         if (triggerQuitTimer)
         {
@@ -150,7 +150,9 @@ public class WhatNextManager
         // (and related updateCreatureCount) messages.
         // So give them more time for a while.
         // try 30, reconnect causes server to hang (not cleanly exit itself) at the moment
-        private final long timeOutInSecs = 30;
+        // 17.10.2013: 120 again, quite many games on CPGS
+        // the QUIT hit before catch up processing completed...
+        private final long timeOutInSecs = 120;
 
         public TimedJvmQuit()
         {

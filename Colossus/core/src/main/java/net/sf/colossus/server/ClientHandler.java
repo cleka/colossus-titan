@@ -567,8 +567,16 @@ final class ClientHandler extends ClientHandlerStub implements IClient
             {
                 // Not all written
                 previousRetries += 1;
-                LOGGER.warning("trouble writing, temporarily giving up "
-                    + "writing to client " + getPlayerName());
+                if (spectator)
+                {
+                    LOGGER.info("trouble writing, temporarily giving up "
+                        + "writing to client " + getPlayerName());
+                }
+                else
+                {
+                    LOGGER.warning("trouble writing, temporarily giving up "
+                        + "writing to client " + getPlayerName());
+                }
             }
             else
             {
@@ -1095,8 +1103,10 @@ final class ClientHandler extends ClientHandlerStub implements IClient
 
         if (isGone())
         {
-            LOGGER.info("No point to send anything to player " + playerName
-                + " when client connection already gone");
+            String tmpString = message + "                  ";
+            String msgStart = tmpString.substring(0, 20);
+            LOGGER.info("No point to send '" + msgStart
+                + "' connection already gone: " + playerName);
             return;
         }
 
@@ -1122,7 +1132,8 @@ final class ClientHandler extends ClientHandlerStub implements IClient
             }
             if (server.getGame().isGameOver())
             {
-                LOGGER.info("Sending to " + playerName + ": " + message);
+                LOGGER.info("GameOver: Sending to " + playerName + ": "
+                    + message);
             }
             sendViaChannel(message);
 
