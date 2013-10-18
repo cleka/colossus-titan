@@ -776,7 +776,7 @@ public class WebServer implements IWebServer, IRunWebServer
 
     public void cancelIfNecessary(User user)
     {
-        LOGGER.info("Checking if any cancelling is needed for user "
+        LOGGER.fine("Checking if any cancelling is needed for user "
             + user.getName());
 
         ArrayList<GameInfo> games = new ArrayList<GameInfo>(proposedGames
@@ -786,7 +786,7 @@ public class WebServer implements IWebServer, IRunWebServer
             if (!gi.isScheduledGame()
                 && gi.getInitiator().equals(user.getName()))
             {
-                LOGGER.warning("Auto-cancelling instant game "
+                LOGGER.info("Auto-cancelling instant game "
                     + gi.getGameId() + " because initiator " + user.getName()
                     + " is going to be gone...");
                 cancelGame(gi.getGameId(), user.getName());

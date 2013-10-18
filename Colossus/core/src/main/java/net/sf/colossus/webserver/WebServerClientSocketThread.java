@@ -183,7 +183,7 @@ public class WebServerClientSocketThread extends Thread
                 fromClient = in.readLine();
                 if (connLostWarningLogged)
                 {
-                    LOGGER.warning("In " + this.getName()
+                    LOGGER.info("NOTE: In " + this.getName()
                             + " connLostWarningLogged was set, but received "
                             + "something from client again: " + fromClient);
                     connLostWarningLogged = false;
@@ -201,6 +201,14 @@ public class WebServerClientSocketThread extends Thread
                 if (toldToTerminate)
                 {
                     LOGGER.info("OK, toldToTerminate set and we got "
+                        + "SocketException ('" + ex.getMessage()
+                        + "') in WSCST " + getClientInfo()
+                        + " - setting done to true.");
+                }
+                else if (pingsTried > 1)
+                {
+                    LOGGER.info("Well, " + pingsTried + "pings were already "
+                        + "missing - no surprise that we got"
                         + "SocketException ('" + ex.getMessage()
                         + "') in WSCST " + getClientInfo()
                         + " - setting done to true.");
@@ -351,18 +359,22 @@ public class WebServerClientSocketThread extends Thread
             // Only clients >= 2 have this feature
             if (theClient.getClientVersion() >= WebClient.WC_VERSION_SUPPORTS_PING)
             {
-                // too many already done without response => assume dead
+                // too many already done without response => suspect dead
                 if (pingsTried >= PING_MAX_TRIES)
                 {
                     if (!connLostWarningLogged)
                     {
                         connLostWarningLogged = true;
-                        LOGGER
-                            .warning("After "
-                                + pingsTried
-                                + " pings, still no response from client "
-                                + theClient.getUsername()
-                                + " - would assume now connection lost and closing it.");
+                        LOGGER.info("NOTE: After " + pingsTried
+                            + " pings, still no response from client "
+                            + theClient.getUsername()
+                            + " - would assume now connection lost "
+                            + "and closing it.");
+                    }
+                    else
+                    {
+                        LOGGER.info("Now " + pingsTried + " pings overdue"
+                            + "for client " + theClient.getUsername());
                     }
                     /*
                     String message = "@@@ Hello " + getUsername() + ", after "
@@ -388,12 +400,20 @@ public class WebServerClientSocketThread extends Thread
                     }
                     */
                 }
+
+                // 17.10.2013
+                // Let's try what happens if we send it now every time.
+                requestPingNow();
+                pingsTried++;
+
+                /* 13.10. commented out
                 // otherwise, send another one
                 else
                 {
                     requestPingNow();
                     pingsTried++;
                 }
+                */
             }
         }
         else if (deltaMillis >= pingsTried * PING_REQUEST_INTERVAL_SECONDS

@@ -88,11 +88,16 @@ class QueuedSocketWriter extends Thread
                 long sentTime = new Date().getTime();
                 out.println(message);
                 long spentTime = new Date().getTime() - sentTime;
+                String logMsg = "NOTE: QueuedSocketWriter #" + instanceId
+                    + ": actual writing to writer took " + spentTime
+                    + " millisseonds for message: " + message;
                 if (spentTime > 500)
                 {
-                    LOGGER.warning("QueuedSocketWriter #" + instanceId
-                        + ": actual writing to writer took " + spentTime
-                        + " millisseonds for message: " + message);
+                    LOGGER.info(logMsg);
+                }
+                else
+                {
+                    LOGGER.fine(logMsg);
                 }
             }
         }
