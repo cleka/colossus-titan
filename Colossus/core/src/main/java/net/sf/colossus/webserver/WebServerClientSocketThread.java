@@ -145,7 +145,7 @@ public class WebServerClientSocketThread extends Thread
 
         String fromClient = "dummy";
 
-        LOGGER.log(Level.FINEST, "A new WSCST started running: "
+        LOGGER.log(Level.INFO, "A new WSCST started running: "
             + this.toString());
         try
         {
@@ -207,7 +207,7 @@ public class WebServerClientSocketThread extends Thread
                 }
                 else if (pingsTried > 1)
                 {
-                    LOGGER.info("Well, " + pingsTried + "pings were already "
+                    LOGGER.info("Well, " + pingsTried + " pings were already "
                         + "missing - no surprise that we got"
                         + "SocketException ('" + ex.getMessage()
                         + "') in WSCST " + getClientInfo()
@@ -257,7 +257,7 @@ public class WebServerClientSocketThread extends Thread
                 long parsingCompletedAt = new Date().getTime();
                 long parsingDuration = parsingCompletedAt - lastPacketReceived;
                 LOGGER.log((parsingDuration > 1000 ? Level.WARNING
-                    : Level.INFO), "Parsing+Processing took "
+                    : Level.FINE), "Parsing+Processing took "
                     + parsingDuration + " ms for line " + fromClient);
                 String tmpUsername = "<unknown>";
 
@@ -285,19 +285,19 @@ public class WebServerClientSocketThread extends Thread
 
                 if (done)
                 {
-                    LOGGER.finest("user " + tmpUsername + ": parseLine for '"
+                    LOGGER.fine("user " + tmpUsername + ": parseLine for '"
                         + fromClient + "' returns done = " + done);
                 }
             }
             else
             {
-                LOGGER.finest("fromClient is null; setting done = true.");
+                LOGGER.fine("fromClient is null; setting done = true.");
                 done = true;
             }
         }
 
         // Shut down the client.
-        LOGGER.log(Level.FINEST, "(Trying to) shut down the client for user "
+        LOGGER.fine("(Trying to) shut down the client for user "
             + getClientInfo());
 
         // Will close and cleanup socket, if still needed
@@ -434,10 +434,6 @@ public class WebServerClientSocketThread extends Thread
         long requestSentTime = new Date().getTime();
         theClient.requestPing(requestSentTime + "", (++pingCounter) + "",
             "dummy3");
-        long spentTime = new Date().getTime() - requestSentTime;
-        LOGGER.info("Sending ping request #" + pingCounter + " to user "
-            + theClient.getUsername() + " took " + spentTime
-            + " milliseconds.");
     }
 
     private void markForcedLogout()

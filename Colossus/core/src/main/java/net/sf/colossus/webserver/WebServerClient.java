@@ -527,7 +527,7 @@ public class WebServerClient implements IWebClient
             }
             else
             {
-                LOGGER.info(msg);
+                LOGGER.fine(msg);
             }
             cst.storeEntry(requestResponseArriveTime, roundtripTime);
         }
@@ -868,23 +868,21 @@ public class WebServerClient implements IWebClient
 
     public void gameStartsSoon(String gameId, String byUser)
     {
-        gameStartsSoonSent = new Date().getTime();
+        // gameStartsSoonSent = new Date().getTime();
         sendToClient(gameStartsSoon + sep + gameId + sep + byUser);
-        long spentTime = new Date().getTime() - gameStartsSoonSent;
-        LOGGER.info("Sending gameStartsSoon to " + getUsername() + " took "
-            + spentTime
-            + " milliseconds.");
+        // long spentTime = new Date().getTime() - gameStartsSoonSent;
+        // LOGGER.finest("Sending gameStartsSoon to " + getUsername() + " took "
+        //    + spentTime + " milliseconds.");
     }
 
     public void gameStartsNow(String gameId, int port, String hostingHost)
     {
-        gameStartsNowSent = new Date().getTime();
+        // gameStartsNowSent = new Date().getTime();
         sendToClient(gameStartsNow + sep + gameId + sep + port + sep
             + hostingHost);
-        long spentTime = new Date().getTime() - gameStartsNowSent;
-        LOGGER.info("Sending gameStartsNow to " + getUsername() + " took "
-            + spentTime
-            + " milliseconds.");
+        // long spentTime = new Date().getTime() - gameStartsNowSent;
+        // LOGGER.info("Sending gameStartsNow to " + getUsername() + " took "
+        //    + spentTime + " milliseconds.");
     }
 
     public void chatDeliver(String chatId, long when, String sender,
