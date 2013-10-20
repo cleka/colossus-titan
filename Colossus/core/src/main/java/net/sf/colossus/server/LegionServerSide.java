@@ -406,12 +406,14 @@ public final class LegionServerSide extends Legion implements
     }
 
     /** Add a creature to this legion.  If takeFromStack is true,
-     then do this only if such a creature remains in the stacks,
-     and decrement the number of this creature type remaining. */
+      * then do this only if such a creature remains in the stacks,
+      * and decrement the number of this creature type remaining.
+      */
     boolean addCreature(CreatureType creature, boolean takeFromStack)
     {
         assert getHeight() < 7
-            || (getHeight() == 7 && game.getTurnNumber() == 1) : "Tried to add to 7-high legion!";
+            || (getHeight() == 7 && game.getTurnNumber() == 1) : "Tried "
+            + "to add to 7-high legion!";
         if (takeFromStack)
         {
             Caretaker caretaker = game.getCaretaker();
@@ -419,13 +421,13 @@ public final class LegionServerSide extends Legion implements
             {
                 caretaker.takeOne(creature);
                 int count = caretaker.getAvailableCount(creature);
-                LOGGER.log(Level.INFO, "Added " + creature.toString()
-                    + " - now there are " + count + " left.");
+                LOGGER.log(Level.INFO, "Added " + creature.toString() + " to "
+                    + getMarkerId() + " - now there are " + count + " left.");
             }
             else
             {
                 LOGGER.log(Level.SEVERE, "Tried to addCreature "
-                    + creature.toString()
+                    + creature.toString() + " to legion " + getMarkerId()
                     + " when there were none of those left!");
                 return false;
             }
