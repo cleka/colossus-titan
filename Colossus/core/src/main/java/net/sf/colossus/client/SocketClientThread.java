@@ -374,6 +374,10 @@ final class SocketClientThread extends Thread implements IServer,
                 // up / available yet.
                 LOGGER.info("ServerLog: " + line);
             }
+            else if (line.startsWith(Constants.pingRequest))
+            {
+                // silently ignore
+            }
             else
             {
                 LOGGER.warning("Ignoring unexpected line from server: '"
@@ -408,6 +412,10 @@ final class SocketClientThread extends Thread implements IServer,
             {
                 // XXX TODO Handle better
                 LOGGER.info("ServerLog: " + line);
+            }
+            else if (line.startsWith(Constants.pingRequest))
+            {
+                // silently ignore
             }
             else
             {
