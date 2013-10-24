@@ -868,7 +868,7 @@ public class WebServerClient implements IWebClient
 
     public void gameStartsSoon(String gameId, String byUser)
     {
-        // gameStartsSoonSent = new Date().getTime();
+        gameStartsSoonSent = new Date().getTime();
         sendToClient(gameStartsSoon + sep + gameId + sep + byUser);
         // long spentTime = new Date().getTime() - gameStartsSoonSent;
         // LOGGER.finest("Sending gameStartsSoon to " + getUsername() + " took "
@@ -877,7 +877,7 @@ public class WebServerClient implements IWebClient
 
     public void gameStartsNow(String gameId, int port, String hostingHost)
     {
-        // gameStartsNowSent = new Date().getTime();
+        gameStartsNowSent = new Date().getTime();
         sendToClient(gameStartsNow + sep + gameId + sep + port + sep
             + hostingHost);
         // long spentTime = new Date().getTime() - gameStartsNowSent;
