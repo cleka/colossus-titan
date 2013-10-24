@@ -663,10 +663,15 @@ public class GameServerSide extends Game
     }
 
     /** Find a Player for a new remote client.
-     *  If loading a game, this is the network player with a matching
-     *  player name.  If a new game, it's the first network player whose
-     *  name is still set to <By client> */
-    Player findNetworkPlayer(final String playerName)
+     *  If loading a game then this is the network player with a matching
+     *  player name. mustAlreadyExist is set for that case.
+     *  If a new game, it's the first network player whose name is still
+     *  set to <By client> (mustAlreadyExist is given as false)
+     *  If it's spectator, it won't find anything and simply return null.
+     *
+     * @param mustAlreadyExist Do not consider <By client> matching.
+     */
+    Player findNetworkPlayer(final String playerName, boolean mustExist)
     {
         for (int i = 0; i < getNumPlayers(); i++)
         {
@@ -674,7 +679,7 @@ public class GameServerSide extends Game
 
             if (curPlayer.getType().endsWith(Constants.network))
             {
-                if (isLoadingGame())
+                if (mustExist)
                 {
                     if (curPlayer.getName().equals(playerName))
                     {

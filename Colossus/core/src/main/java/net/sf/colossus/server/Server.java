@@ -1379,7 +1379,8 @@ public final class Server extends Thread implements IServer
         }
         else if (remote)
         {
-            player = game.findNetworkPlayer(playerName);
+            boolean mustExist = game.isLoadingGame();
+            player = game.findNetworkPlayer(playerName, mustExist);
             if (player == null)
             {
                 player = game.getPlayerByNameIgnoreNull(playerName);
