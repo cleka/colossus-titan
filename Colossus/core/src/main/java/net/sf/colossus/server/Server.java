@@ -1339,60 +1339,18 @@ public final class Server extends Thread implements IServer
                 + "server build info.");
         }
 
-        if (clientVersion <= IServer.MINIMUM_CLIENT_VERSION)
+        String reasonRejected = checkClientVersion(playerName, clientVersion);
+        if (reasonRejected != null)
         {
-            String versionText = (clientVersion == -1 ? "-1 (=no Version defined)"
-                : clientVersion + "");
-            LOGGER.warning("Rejecting client " + playerName + " because it "
-                + "uses too old Client version: " + versionText
-                + " but server requires at least: "
-                + IServer.MINIMUM_CLIENT_VERSION);
-
-            // We do not disable the autoCloseStartupLog here, because since a
-            // player will be missing the startup will not reach the point
-            // where to close it automatically.
-            logToStartLog("PROBLEM: One client attempted to join with player"
-                + " name " + playerName + "\n- rejected, because client uses "
-                + "too old version: " + versionText);
-            return "You are using too old Client Version: " + versionText
-                + " - expected at least: " + IServer.MINIMUM_CLIENT_VERSION;
-        }
-        else if (clientVersion != IServer.CLIENT_VERSION)
-        {
-            String diffWhat = (clientVersion < IServer.CLIENT_VERSION ? "older"
-                : "newer");
-            logToStartLog("NOTE: Client version mismatch detected!!!\n"
-                + "One client attempted to join with player name "
-                + playerName + ", using different (" + diffWhat
-                + ") client version: " + clientVersion
-                + " - trying it anyway.");
-            disableAutoCloseStartupLog();
-            LOGGER.info("Client " + playerName + " uses Client Version: "
-                + clientVersion + " but we would expect "
-                + IServer.CLIENT_VERSION + " - trying it anyway.");
+            return reasonRejected;
         }
 
-        Player player = null;
-        if (spectator)
-        {
-            LOGGER.info("addClient for a spectator.");
-        }
-        else if (remote)
-        {
-            boolean mustExist = game.isLoadingGame();
-            player = game.findNetworkPlayer(playerName, mustExist);
-            if (player == null)
-            {
-                player = game.getPlayerByNameIgnoreNull(playerName);
-            }
-        }
-        else
-        {
-            player = game.getPlayerByNameIgnoreNull(playerName);
-        }
+        Player player = findPlayerForNewConnection(playerName, remote,
+            spectator);
 
         LOGGER.info("Trying to identify player/client for new connection "
             + "which identifies itself as player " + playerName);
+
         ClientHandler existingCH;
         if (spectator)
         {
@@ -1536,6 +1494,75 @@ public final class Server extends Thread implements IServer
 
         // ReasonFail == null means "everything is fine.":
         return null;
+    }
+
+    private Player findPlayerForNewConnection(final String playerName,
+        final boolean remote, boolean spectator)
+    {
+        Player player = null;
+
+        boolean mustExist = game.isLoadingGame();
+        if (spectator)
+        {
+            // Could also be a dead player using the watch game option.
+            LOGGER.info("addClient for " + playerName
+                + " with spectator flag set.");
+            player = game.findNetworkPlayer(playerName, mustExist);
+        }
+        else if (remote)
+        {
+            player = game.findNetworkPlayer(playerName, mustExist);
+            if (player == null)
+            {
+                player = game.getPlayerByNameIgnoreNull(playerName);
+            }
+        }
+        else
+        {
+            player = game.getPlayerByNameIgnoreNull(playerName);
+        }
+        return player;
+    }
+
+    private String checkClientVersion(final String playerName,
+        final int clientVersion)
+    {
+        String reasonRejected = null;
+
+        if (clientVersion <= IServer.MINIMUM_CLIENT_VERSION)
+        {
+            String versionText = (clientVersion == -1 ? "-1 (=no Version defined)"
+                : clientVersion + "");
+            LOGGER.warning("Rejecting client " + playerName + " because it "
+                + "uses too old Client version: " + versionText
+                + " but server requires at least: "
+                + IServer.MINIMUM_CLIENT_VERSION);
+
+            // We do not disable the autoCloseStartupLog here, because since a
+            // player will be missing the startup will not reach the point
+            // where to close it automatically.
+            logToStartLog("PROBLEM: One client attempted to join with player"
+                + " name " + playerName + "\n- rejected, because client uses "
+                + "too old version: " + versionText);
+            reasonRejected = "You are using too old Client Version: "
+                + versionText + " - expected at least: "
+                + IServer.MINIMUM_CLIENT_VERSION;
+        }
+        else if (clientVersion != IServer.CLIENT_VERSION)
+        {
+            String diffWhat = (clientVersion < IServer.CLIENT_VERSION ? "older"
+                : "newer");
+            logToStartLog("NOTE: Client version mismatch detected!!!\n"
+                + "One client attempted to join with player name "
+                + playerName + ", using different (" + diffWhat
+                + ") client version: " + clientVersion
+                + " - trying it anyway.");
+            disableAutoCloseStartupLog();
+            LOGGER.info("Client " + playerName + " uses Client Version: "
+                + clientVersion + " but we would expect "
+                + IServer.CLIENT_VERSION + " - trying it anyway.");
+        }
+        return reasonRejected;
     }
 
     /**

@@ -671,7 +671,7 @@ public class GameServerSide extends Game
      *
      * @param mustAlreadyExist Do not consider <By client> matching.
      */
-    Player findNetworkPlayer(final String playerName, boolean mustExist)
+    Player findNetworkPlayer(final String playerName, boolean mustAlreadyExist)
     {
         for (int i = 0; i < getNumPlayers(); i++)
         {
@@ -679,7 +679,8 @@ public class GameServerSide extends Game
 
             if (curPlayer.getType().endsWith(Constants.network))
             {
-                if (mustExist)
+                // during loading or reconnect, real name must already be set
+                if (mustAlreadyExist)
                 {
                     if (curPlayer.getName().equals(playerName))
                     {
