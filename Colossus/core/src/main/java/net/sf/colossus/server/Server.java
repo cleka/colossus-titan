@@ -684,11 +684,11 @@ public final class Server extends Thread implements IServer
                     LOGGER.info("Handling channel changes, stub.");
                 }
 
-                LOGGER.info("NOT REMOVING: CH " + nextCHS.getSignonName()
+                LOGGER.info("REALLY REMOVING: CH " + nextCHS.getSignonName()
                     + " from clients list, list size is: " + iClients.size());
                 // For now removed, caused ConcurrentModificationException
                 // when game is closed via GUI
-                // iClients.remove(nextCHS);
+                iClients.remove(nextCHS);
             }
             if (somethingToDo)
             {
