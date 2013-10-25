@@ -1400,8 +1400,8 @@ public final class Server extends Thread implements IServer
                 }
                 iClients.remove(existingCH);
                 realClients.remove(existingCH);
-                queueClientHandlerForChannelChanges(existingCH);
                 existingCH.declareObsolete();
+                queueClientHandlerForChannelChanges(existingCH);
                 LOGGER.info("Removing player with name " + name
                     + " from forcedWithDrawlist. Size was "
                     + forcedWithdraws.size());

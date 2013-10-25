@@ -174,8 +174,8 @@ final class ClientHandler extends ClientHandlerStub implements IClient
             return;
         }
 
-        setIsGone("Server disposes client (all clients)");
         sendViaChannel(Constants.dispose);
+        setIsGone("Server disposes client (all clients)");
         server.queueClientHandlerForChannelChanges(this);
         server.clientWontConfirmCatchup(this,
             "Client disposed from server side.");
@@ -1124,7 +1124,7 @@ final class ClientHandler extends ClientHandlerStub implements IClient
         }
         */
 
-        if (obsolete || socketChannel == null)
+        if (obsolete || socketChannel == null || isGone)
         {
             // do not send any more
             if (cantSendMessageRepeated < 3)
