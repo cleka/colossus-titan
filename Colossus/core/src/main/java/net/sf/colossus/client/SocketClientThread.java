@@ -830,7 +830,8 @@ final class SocketClientThread extends Thread implements IServer,
             LOGGER.fine("SCT " + getName()
                 + "received ping request from server");
             replyToPing();
-            if (clientThread.isEngagementStartupOngoing())
+            if (clientThread != null
+                && clientThread.isEngagementStartupOngoing())
             {
                 int len = clientThread.getQueueLen();
                 logMsgToServer("I", "ClientThread queue length is " + len);
