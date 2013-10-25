@@ -34,6 +34,7 @@ public class ClientHandlerStub implements IClient
     protected static int counter = 0;
 
     protected boolean isGone = false;
+    protected String isGoneReason = "";
 
     protected String playerName;
     protected String signonName;
@@ -84,6 +85,7 @@ public class ClientHandlerStub implements IClient
         LOGGER.info("Setting isGone to true in CH for '" + getClientName()
             + "' (reason: " + reason + ")");
         this.isGone = true;
+        this.isGoneReason = reason;
     }
 
     protected void sendToClient(String message)
