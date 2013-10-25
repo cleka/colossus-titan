@@ -3372,7 +3372,7 @@ public final class Client implements IClient, IOracle, IVariant,
              * terminate the application despite the fact that one wanted to do
              * e.g. New Game or Load Game.
              */
-            localServer.stopGame();
+            localServer.initiateQuitGame();
         }
         else
         {

@@ -129,6 +129,7 @@ public final class Server extends Thread implements IServer
     private boolean stopAcceptingFlag = false;
 
     private final Object guiRequestMutex = new Object();
+    private boolean guiRequestQuitFlag = false;
     private boolean guiRequestSaveFlag = false;
     private String guiRequestSaveFilename = null;
     private boolean inPauseState = false;
@@ -3345,6 +3346,15 @@ public final class Server extends Thread implements IServer
         }
     }
 
+    public void initiateQuitGame()
+    {
+        synchronized (guiRequestMutex)
+        {
+            guiRequestQuitFlag = true;
+            selector.wakeup();
+        }
+    }
+
     public void setPauseState(boolean newState)
     {
         synchronized (guiRequestMutex)
@@ -3385,6 +3395,15 @@ public final class Server extends Thread implements IServer
                 guiRequestSaveFilename = null;
                 didSomething = true;
             }
+            else if (guiRequestQuitFlag)
+            {
+                if (game != null)
+                {
+                    game.dispose();
+                }
+                didSomething = true;
+            }
+
             else if (inPauseState)
             {
                 while (inPauseState)
