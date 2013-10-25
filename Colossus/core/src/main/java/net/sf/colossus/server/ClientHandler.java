@@ -477,10 +477,13 @@ final class ClientHandler extends ClientHandlerStub implements IClient
         }
     }
 
+    String lastEncodedMsg = "";
+
     private void handleEncoding(String msg)
     {
         try
         {
+            lastEncodedMsg = msg;
             encodedMsg = msg;
             String dataToSend = msg + "\n";
             CharBuffer cb = CharBuffer.allocate(dataToSend.length());
@@ -554,6 +557,15 @@ final class ClientHandler extends ClientHandlerStub implements IClient
 
     private void attemptWritingToChannel()
     {
+        if (isGone())
+        {
+            LOGGER.warning("isGone already true when attempting "
+                + "to do WriteToChannel " + lastEncodedMsg + " for player"
+                + getPlayerName());
+            LOGGER.warning("Reason: " + this.isGoneReason);
+            Thread.dumpStack();
+            return;
+        }
         // Attempt to write away what is in buffer
         try
         {
