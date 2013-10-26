@@ -913,20 +913,6 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         return nextSplitClickMode;
     }
 
-    public void addPossibleRecruitChits(LegionClientSide legion,
-        Set<MasterHex> hexes)
-    {
-        LOGGER.info("CG: addPossibleRecruitChits(LegionClientSide legion, "
-            + "Set<MasterHex> hexes)");
-
-        if (recruitChitMode == Options.showRecruitChitsNumNone)
-        {
-            return;
-        }
-
-        board.addPossibleRecruitChits(legion, hexes);
-    }
-
     /*
      * Trigger side effects after changing an option value.
      *

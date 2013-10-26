@@ -72,9 +72,6 @@ public interface IClientGUI
 
     public abstract int getNextSplitClickMode();
 
-    public abstract void addPossibleRecruitChits(LegionClientSide legion,
-        Set<MasterHex> hexes);
-
     public abstract void eventViewerSetVisibleMaybe();
 
     public abstract void autoInspectorSetDubiousAsBlanks(boolean newValue);

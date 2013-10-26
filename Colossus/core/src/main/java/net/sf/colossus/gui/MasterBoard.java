@@ -1954,7 +1954,13 @@ public final class MasterBoard extends JPanel
         combo.addAll(teleport);
         combo.addAll(normal);
 
-        gui.addPossibleRecruitChits(legion, combo);
+        LOGGER.info("MB: addPossibleRecruitChits(LegionClientSide legion, "
+            + "Set<MasterHex> hexes)");
+        if (gui.getRecruitChitMode() == Options.showRecruitChitsNumNone)
+        {
+            return;
+        }
+        addPossibleRecruitChits(legion, combo);
     }
 
     void highlightEngagements()

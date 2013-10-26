@@ -294,13 +294,6 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public void addPossibleRecruitChits(LegionClientSide legion,
-        Set<MasterHex> hexes)
-    {
-        // TODO Auto-generated method stub
-
-    }
-
     public void alignLegionsMaybe(Legion legion)
     {
         // TODO Auto-generated method stub
