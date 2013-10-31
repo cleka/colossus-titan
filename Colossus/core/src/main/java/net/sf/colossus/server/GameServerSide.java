@@ -1779,16 +1779,10 @@ public class GameServerSide extends Game
             return true;
         }
 
-        catch (RuntimeException rte)
-        {
-            LOGGER.log(Level.SEVERE, "RuntimeException!! "
-                + "While trying to load (corrupt?) savegame", rte);
-            dispose();
-            return false;
-        }
         catch (Exception ex)
         {
-            LOGGER.log(Level.SEVERE, "Tried to load corrupt savegame", ex);
+            LOGGER.log(Level.SEVERE, ">>> Whoaah! Exception while "
+                + "tried to load savegame:", ex);
             dispose();
             return false;
         }
