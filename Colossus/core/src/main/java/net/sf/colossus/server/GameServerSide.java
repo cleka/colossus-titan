@@ -2185,10 +2185,16 @@ public class GameServerSide extends Game
     {
         if (server != null)
         {
+            LOGGER.info("GSS: Stop Server running");
             server.stopServerRunning();
         }
-        notifyWebServer.serverStoppedRunning();
-        notifyWebServer = null;
+
+        if (notifyWebServer != null)
+        {
+            LOGGER.info("GSS: notifyWebServer.serverStoppedRunning()");
+            notifyWebServer.serverStoppedRunning();
+            notifyWebServer = null;
+        }
     }
 
     private void placeInitialLegion(PlayerServerSide player, String markerId)
