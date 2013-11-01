@@ -1027,7 +1027,19 @@ final class ClientHandler extends ClientHandlerStub implements IClient
         else if (method.equals(Constants.replyToPing))
         {
             lastPingReplyReceived = new Date().getTime();
-            server.replyToPing(playerName);
+            long replyReceived = lastPingReplyReceived;
+            if (args.size() >= 3)
+            {
+                int requestNr = Integer.parseInt(args.remove(0));
+                long requestSent = Long.parseLong(args.remove(0));
+                long replySent = Long.parseLong(args.remove(0));
+                server.replyToPing(playerName, requestNr, requestSent,
+                    replySent, replyReceived);
+            }
+            else
+            {
+                server.replyToPing(playerName, 0, 0L, 0L, replyReceived);
+            }
         }
 
         else if (method.equals(Constants.confirmCommitPoint))

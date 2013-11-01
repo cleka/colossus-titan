@@ -3682,7 +3682,7 @@ public final class Client implements IClient, IOracle, IVariant,
         LOGGER.log(Level.INFO, message);
     }
 
-    public void pingRequest()
+    public void pingRequest(long requestTime)
     {
         // Dummy, SocketClientThread handles this already.
     }

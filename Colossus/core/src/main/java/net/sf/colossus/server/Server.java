@@ -11,6 +11,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -2058,7 +2059,7 @@ public final class Server extends Thread implements IServer
             {
                 if (!client.isTemporarilyInTrouble())
                 {
-                    client.pingRequest();
+                    client.pingRequest(now);
                 }
             }
         }
@@ -3518,10 +3519,21 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    void replyToPing(String playerName)
+    private String prettyTime(long when)
     {
-        LOGGER.fine("Client " + playerName
-            + " replied to ping request - fine!");
+        if (when == 0L)
+        {
+            return "n/a";
+        }
+        return new SimpleDateFormat("HH:mm:ss.SSS").format(new Date(when));
+    }
+
+    void replyToPing(String playerName, int requestNr, long requestSent,
+        long replySent, long replyReceived)
+    {
+        LOGGER.info("Ping Reply #" + requestNr + " from " + playerName + ": "
+            + prettyTime(requestSent) + "/" + prettyTime(replySent) + "/"
+            + prettyTime(replyReceived));
     }
 
     /** Used to change a player name after color is assigned. */

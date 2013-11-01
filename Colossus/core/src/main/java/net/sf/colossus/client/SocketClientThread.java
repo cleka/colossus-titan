@@ -12,6 +12,7 @@ import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -827,14 +828,25 @@ final class SocketClientThread extends Thread implements IServer,
     {
         if (method.equals(Constants.pingRequest))
         {
-            LOGGER.fine("SCT " + getName()
-                + "received ping request from server");
-            replyToPing();
+            long requestReceived = new Date().getTime();
+            int requestNr = -1;
+            long requestSent = -1L;
+
+            if (args.size() >= 2)
+            {
+                requestNr = Integer.parseInt(args.remove(0));
+                requestSent = Long.parseLong(args.remove(0));
+            }
+            LOGGER.fine("SCT " + getName() + " received ping request #"
+                + requestNr + " from server");
+
+            replyToPing(requestNr, requestSent, requestReceived);
             if (clientThread != null
                 && clientThread.isEngagementStartupOngoing())
             {
                 int len = clientThread.getQueueLen();
-                logMsgToServer("I", "ClientThread queue length is " + len);
+                logMsgToServer("I", "PingRequest #" + requestNr
+                    + ": ClientThread queue length is " + len);
             }
         }
         else if (method.equals(Constants.commitPoint))
@@ -924,7 +936,8 @@ final class SocketClientThread extends Thread implements IServer,
         }
         else if (message.startsWith(Constants.replyToPing))
         {
-            // silently ignore
+            // silently ignore;
+            // replyToPing method(s) write directly to socket.
         }
         else
         {
@@ -1212,9 +1225,10 @@ final class SocketClientThread extends Thread implements IServer,
             + syncCounter);
     }
 
-    public void replyToPing()
+    public void replyToPing(int requestNr, long requestSent, long requestReceived)
     {
-        out.println(Constants.replyToPing);
+        out.println(Constants.replyToPing + sep + requestNr + sep
+            + requestSent + sep + requestReceived);
         // sendToServer(Constants.replyToPing);
     }
 
