@@ -2181,17 +2181,34 @@ public class GameServerSide extends Game
 
     }
 
+    private final Object disposeMutex = new Object();
+
+    private boolean disposeOngoing = false;
+
     void dispose()
     {
+        synchronized (disposeMutex)
+        {
+            if (disposeOngoing)
+            {
+                LOGGER.warning("Thread " + Thread.currentThread().getName()
+                    + ": Trying to dispose game a 2nd time?");
+                return;
+            }
+            disposeOngoing = true;
+        }
+
+        LOGGER.info("GSS: Disposing game (thread "
+            + Thread.currentThread().getName() + ")");
         if (server != null)
         {
             LOGGER.info("GSS: Stop Server running");
             server.stopServerRunning();
         }
-
         if (notifyWebServer != null)
         {
-            LOGGER.info("GSS: notifyWebServer.serverStoppedRunning()");
+            LOGGER
+                .info("GSS: Notfifying Web Server that server stopped running.");
             notifyWebServer.serverStoppedRunning();
             notifyWebServer = null;
         }
