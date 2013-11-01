@@ -82,6 +82,8 @@ final class ClientHandler extends ClientHandlerStub implements IClient
     private final ArrayList<String> recentlyProcessedLines = new ArrayList<String>(
         MAX_KEEP_LINES);
 
+    private long lastPingReplyReceived = -1;
+
     // Note that the client (SocketClientThread) sends ack every
     // CLIENT_CTR_ACK_EVERY messages (currently 20)
     // The two values above and the client value must fit together
@@ -153,6 +155,11 @@ final class ClientHandler extends ClientHandlerStub implements IClient
     protected boolean canHandlePingRequest()
     {
         return clientVersion >= IServer.CLIENT_VERSION_UNDERSTANDS_PING;
+    }
+
+    public long getMillisSincePingReply()
+    {
+        return lastPingReplyReceived - new Date().getTime();
     }
 
     protected boolean canHandleNewVariantXML()
@@ -1019,8 +1026,8 @@ final class ClientHandler extends ClientHandlerStub implements IClient
 
         else if (method.equals(Constants.replyToPing))
         {
-            LOGGER.fine("Client " + playerName
-                + " replied to ping request - fine!");
+            lastPingReplyReceived = new Date().getTime();
+            server.replyToPing(playerName);
         }
 
         else if (method.equals(Constants.confirmCommitPoint))

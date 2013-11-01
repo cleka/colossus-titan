@@ -153,6 +153,8 @@ public final class Server extends Thread implements IServer
     private final static int WEBGAMES_STARTUP_TIMEOUT_SECS = 20;
     private final int PING_REQUEST_INTERVAL_SEC = 30;
 
+    private final long MAX_PING_OVERDUE = 50000;
+
     /**
      * How many ms ago last ping round was done.
      */
@@ -266,9 +268,8 @@ public final class Server extends Thread implements IServer
                 }
                 disposeRound++;
 
-                LOGGER
-                    .info("In while !shutting down loop, initDisp true, round="
-                        + disposeRound);
+                LOGGER.info("In while !shutting down loop, "
+                    + "initDisp true, round=" + disposeRound);
             }
         }
         LOGGER.info("While !shuttingDown loop ends, disposeRound="
@@ -283,17 +284,17 @@ public final class Server extends Thread implements IServer
 
         if (shuttingDown)
         {
-            LOGGER.info("shuttingDown set, before closeSocketAndSelector()");
+            LOGGER.fine("shuttingDown set, before closeSocketAndSelector()");
             closeSocketAndSelector();
-            LOGGER.info("shuttingDown set, after  closeSocketAndSelector()");
+            LOGGER.fine("shuttingDown set, after  closeSocketAndSelector()");
         }
         else
         {
-            LOGGER.info("shuttingDown NOT set");
+            LOGGER.fine("shuttingDown NOT set");
         }
 
         notifyThatGameFinished();
-        LOGGER.info("Server.run() ends.");
+        LOGGER.fine("Server.run() ends.");
     }
 
     void initFileServer()
@@ -1891,6 +1892,11 @@ public final class Server extends Thread implements IServer
                 // In some case (currently: during game dispose) do not send
                 // to clients in trouble, they won't respond probably anyway...
                 if (skipInTrouble && client.isTemporarilyInTrouble())
+                {
+                    skip = true;
+                }
+
+                if (client.getMillisSincePingReply() > MAX_PING_OVERDUE)
                 {
                     skip = true;
                 }
@@ -3510,6 +3516,12 @@ public final class Server extends Thread implements IServer
         {
             LOGGER.severe("All clients caught up, but no action set??");
         }
+    }
+
+    void replyToPing(String playerName)
+    {
+        LOGGER.fine("Client " + playerName
+            + " replied to ping request - fine!");
     }
 
     /** Used to change a player name after color is assigned. */
