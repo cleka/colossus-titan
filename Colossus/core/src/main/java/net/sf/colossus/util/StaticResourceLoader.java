@@ -72,11 +72,6 @@ public final class StaticResourceLoader
             super(parent);
         }
 
-        ColossusClassLoader()
-        {
-            super();
-        }
-
         @Override
         public Class<?> findClass(String className)
             throws ClassNotFoundException
