@@ -2052,7 +2052,7 @@ public final class Server extends Thread implements IServer
         if (now - lastPingRound > 1000 * PING_REQUEST_INTERVAL_SEC)
         {
             long ago = (now - lastPingRound) / 1000;
-            LOGGER.info("Last ping round is " + ago
+            LOGGER.finer("Last ping round is " + ago
                 + " secs ago - doing another.");
             lastPingRound = now;
             for (ClientHandler client : realClients)
