@@ -2356,6 +2356,8 @@ public class GameServerSide extends Game
             }
         }
         battleInProgress = false;
+        getCaretaker().resurrectImmortals();
+        updateCaretakerDisplays();
 
         setEngagementResult(Constants.erMethodFight, battleWinner, points,
             turnDone);

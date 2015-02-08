@@ -262,7 +262,9 @@ public final class LegionServerSide extends Legion implements
             game.getCaretaker().resurrectImmortals();
         }
         */
-        game.getCaretaker().resurrectImmortals();
+
+        // 8.2.2015: Moved to GameServerSide.finishBattle()
+        // game.getCaretaker().resurrectImmortals();
 
         // Let the clients clean up the legion marker, etc.
         if (updateHistory)
