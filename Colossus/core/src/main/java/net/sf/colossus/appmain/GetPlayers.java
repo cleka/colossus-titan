@@ -16,8 +16,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
@@ -172,7 +170,11 @@ public final class GetPlayers extends KFrame
         }
         serveAtPortBox = new JComboBox(sPortChoices
             .toArray(new String[sPortChoices.size()]));
-        serveAtPortBox.setEditable(true);
+        /* moved further down; when run here it hangs up for a minute or
+         * so in Java7 ?
+         */
+        // serveAtPortBox.setEditable(true);
+
         serveAtPortBox.setSelectedItem("" + stPort);
         serveAtPortBox.addActionListener(new ActionListener()
         {
@@ -545,6 +547,8 @@ public final class GetPlayers extends KFrame
         });
         setVisible(true);
 
+        serveAtPortBox.setEditable(true);
+
         WelcomeDialog.showWelcomeDialogMaybe(options);
     }
 
@@ -599,23 +603,14 @@ public final class GetPlayers extends KFrame
 
     private void setRunningOnLabel(int port)
     {
-        InetAddress ia = null;
-        String hostString = "<unknown>";
-        try
-        {
-            ia = InetAddress.getLocalHost();
-            hostString = ia.toString();
-        }
-        catch (UnknownHostException ex)
-        {
-            // In this case the UHExc. is not that a serious problem, because
-            // it's for the displaying in GUI only.
-            LOGGER.log(Level.WARNING, ex.toString(), ex);
-        }
+        /* 11.2.2015: Removed the "on host" part, because with Java 7
+         * under certain circumstances the InetAdress.getLocalHostname()
+         * might be stuck a minute or so, before it times out.
+         */
         String runningOnString = "Running Colossus Version "
             + BuildInfo.getReleaseVersion() + " (revision "
-            + BuildInfo.getRevisionInfoString() + ") on " + hostString
-            + ", port " + port;
+            + BuildInfo.getRevisionInfoString() + ")" + ", listening at port "
+            + port;
         runningOnLabel.setText(runningOnString);
     }
 
@@ -751,7 +746,8 @@ public final class GetPlayers extends KFrame
         }
 
         final JComboBox playerName = new JComboBox(nameChoices);
-        playerName.setEditable(true);
+        // setEditable moved to enablePlayers; if done here, it
+        // was hanging for 1 minutes or so.
         onePlayerPane.add(playerName);
         playerName.addActionListener(new ActionListener()
         {
@@ -786,6 +782,7 @@ public final class GetPlayers extends KFrame
         {
             playerTypes[i].setEnabled(i < maxPlayers);
             playerNames[i].setEnabled(i < maxPlayers);
+            playerNames[i].setEditable(true);
         }
     }
 
