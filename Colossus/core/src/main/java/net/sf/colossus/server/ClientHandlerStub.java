@@ -607,6 +607,34 @@ public class ClientHandlerStub implements IClient
         sendToClient(Constants.serverConnectionOK);
     }
 
+    /* One client has asked for connnection confirmation; here server
+     * relays this to each client.
+     */
+    public void relayedPeerRequest(String requestingClientName)
+    {
+        LOGGER.info("Relaying peerRequest from client "
+            + requestingClientName + " to client " + getClientName());
+        sendToClient(Constants.relayedPeerRequest + sep + requestingClientName);
+    }
+
+    /* Relay the "received" response back to requester */
+    public void peerRequestReceivedBy(String respondingClientName, int queueLen)
+    {
+        LOGGER.info("Relaying back the received message of client "
+            + getClientName() + " to " + respondingClientName);
+        sendToClient(Constants.relayBackReceivedMsg + sep
+            + respondingClientName + sep + queueLen);
+    }
+
+    /* Relay the "processed" response back to requester */
+    public void peerRequestProcessedBy(String respondingClientName)
+    {
+        LOGGER.info("Relaying back the processed message of client "
+            + getClientName() + " to " + respondingClientName);
+        sendToClient(Constants.relayBackProcessedMsg + sep
+            + respondingClientName);
+    }
+
     public void pingRequest(long requestSent)
     {
         if (canHandlePingRequest())

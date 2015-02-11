@@ -3443,6 +3443,42 @@ public final class Server extends Thread implements IServer
         }
     }
 
+    public void checkAllConnections(String requestingClientName)
+    {
+        LOGGER.info("Server received checkAllConnections request from "
+            + "client " + getPlayerName() + " - ....");
+
+        // processingCH.serverConfirmsConnection();
+        // if (Constants.USE_RECORDER)
+        // {
+        //    recorder.printMessagesToConsole(processingCH);
+        // }
+
+        Iterator<IClient> it = iClients.iterator();
+        while (it.hasNext())
+        {
+
+            IClient client = it.next();
+            ClientHandler reqCH = getClientHandlerByName(requestingClientName);
+            if (reqCH != client)
+            {
+                client.relayedPeerRequest(requestingClientName);
+            }
+        }
+    }
+
+    public void peerRequestReceived(String requestingClientName, int queueLen)
+    {
+        ClientHandler reqCH = getClientHandlerByName(requestingClientName);
+        reqCH.peerRequestReceivedBy(getPlayerName(), queueLen);
+    }
+
+    public void peerRequestProcessed(String requestingClientName)
+    {
+        ClientHandler reqCH = getClientHandlerByName(requestingClientName);
+        reqCH.peerRequestProcessedBy(getPlayerName());
+    }
+
     private final HashSet<IClient> waitingToCatchup = new HashSet<IClient>();
 
     /**

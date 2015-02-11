@@ -769,6 +769,58 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         }
     }
 
+    /** When user requests it from File menu, this method here
+     *  requests the server to send requests to all clients, and
+     *  returns their responses to us.
+     */
+    void checkAllConnections()
+    {
+        logPerhaps("checkAllServerConnections()");
+        if (client.isSctAlreadyDown())
+        {
+            JOptionPane.showMessageDialog(getMapOrBoardFrame(),
+                "No point to request 'all connections check' - we know already that "
+                    + " the socket connection is in 'down' state!",
+                "Useless attempt to check connection",
+                JOptionPane.INFORMATION_MESSAGE);
+
+            return;
+        }
+
+        Runnable checker = new Runnable()
+        {
+            public void run()
+            {
+                synchronized (connectionCheckMutex)
+                {
+                    initiateAllConnectionsCheck();
+                }
+            }
+        };
+        new Thread(checker).start();
+    }
+
+    private void initiateAllConnectionsCheck()
+    {
+        logPerhaps("initiateAllConnectionsCheck()");
+        /*
+                connectionCheckTimer = new Timer(1000 * CONN_CHECK_TIMEOUT,
+         
+                    new ActionListener()
+                    {
+                        public void actionPerformed(ActionEvent e)
+                        {
+                            timeoutAbortsConnectionCheck();
+                        }
+                    });
+                lastConnectionCheckPackageSent = new Date().getTime();
+                connectionCheckTimer.start();
+        */
+        LOGGER.info("Client for player " + getOwningPlayer().getName()
+            + " requesting response from all clients (sending request)");
+        client.doCheckAllConnections(getOwningPlayerName());
+    }
+
     private void doSetWhatToDoNext(WhatToDoNext whatToDoNext,
         boolean triggerQuitTimer)
     {

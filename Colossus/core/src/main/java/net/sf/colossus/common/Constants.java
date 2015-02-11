@@ -191,6 +191,8 @@ public final class Constants
     public static final String quitGame = "Quit Application";
     public static final String closeBoard = "Close MasterBoard";
     public static final String checkConnection = "Check connection";
+    public static final String checkAllConnections = "Check all connections";
+    public static final String peerRequestsConfirmation = "Peer requests confirmation";
     public static final String cleanDisconnect = "Disconnect";
     public static final String tryReconnect = "Reconnect";
     public static final String enforcedDisconnectByServer = "Fake Disconnect (by server)";
@@ -271,8 +273,12 @@ public final class Constants
     public static final String askPickFirstMarker = "askPickFirstMarker";
     public static final String catchupConfirmation = "catchupConfirmation";
     public static final String serverConnectionOK = "serverConnectionOK";
+    public static final String relayBackReceivedMsg = "relayBackReceivedMsg";
+    public static final String relayBackProcessedMsg = "relayBackProcessedMsg";
     public static final String pingRequest = "pingRequest";
     public static final String replyToPing = "replyToPing";
+    public static final String peerRequestReceived = "peerRequestReceived";
+    public static final String peerRequestProcessed = "peerRequestProcessed";
     public static final String requestSyncDelta = "requestSyncDelta";
     public static final String confirmCommitPoint = "confirmCommitPoint";
     public static final String logMsgToServer = "logMsgToServer";
@@ -361,6 +367,7 @@ public final class Constants
     public static final String nak = "nak";
     public static final String boardActive = "boardActive";
     public static final String askConfirmCatchUp = "askConfirmCatchUp";
+    public static final String relayedPeerRequest = "relayedPeerRequest";
     public static final String gameInitInfo = "gameInitInfo";
     public static final String commitPoint = "commitPoint";
     public static final String messageFromServer = "messageFromServer";

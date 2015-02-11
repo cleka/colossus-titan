@@ -1007,6 +1007,25 @@ final class ClientHandler extends ClientHandlerStub implements IClient
             server.checkServerConnection();
         }
 
+        else if (method.equals(Constants.peerRequestReceived))
+        {
+            String respondingClientName = args.remove(0);
+            int queueLen = Integer.parseInt(args.remove(0));
+            server.peerRequestReceived(respondingClientName, queueLen);
+        }
+
+        else if (method.equals(Constants.peerRequestProcessed))
+        {
+            String respondingClientName = args.remove(0);
+            server.peerRequestProcessed(respondingClientName);
+        }
+
+        else if (method.equals(Constants.checkAllConnections))
+        {
+            String requestingClientName = args.remove(0);
+            server.checkAllConnections(requestingClientName);
+        }
+
         else if (method.equals(Constants.requestSyncDelta))
         {
             int lastReceivedMsgNr = Integer.parseInt(args.remove(0));

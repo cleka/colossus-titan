@@ -775,6 +775,31 @@ public class ClientThread extends Thread
             client.serverConfirmsConnection();
         }
 
+        else if (method.equals(Constants.relayedPeerRequest))
+        {
+            String requestingClientName = args.remove(0);
+            client.relayedPeerRequest(requestingClientName);
+        }
+
+        else if (method.equals(Constants.relayBackReceivedMsg))
+        {
+            String respondingClientName = args.remove(0);
+            int queueLen = Integer.parseInt(args.remove(0));
+            LOGGER.info("In client " + getNameMaybe()
+                + ", got back 'Received' message from client "
+                + respondingClientName);
+            client.peerRequestReceivedBy(respondingClientName, queueLen);
+        }
+
+        else if (method.equals(Constants.relayBackProcessedMsg))
+        {
+            String respondingClientName = args.remove(0);
+            LOGGER.info("In client " + getNameMaybe()
+                + ", got back 'Processed' message from client "
+                + respondingClientName);
+            client.peerRequestProcessedBy(respondingClientName);
+        }
+
         else
         {
             LOGGER.log(Level.SEVERE, "Bogus packet (Client, method: " + method

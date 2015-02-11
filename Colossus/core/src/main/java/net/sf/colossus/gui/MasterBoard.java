@@ -39,8 +39,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -209,6 +209,7 @@ public final class MasterBoard extends JPanel
     private AbstractAction enforcedDisconnectByServerAction;
     private AbstractAction tryReconnectAction;
     private AbstractAction checkConnectionAction;
+    private AbstractAction checkAllConnectionsAction;
 
     private AbstractAction clearRecruitChitsAction;
     private AbstractAction skipLegionAction;
@@ -988,6 +989,15 @@ public final class MasterBoard extends JPanel
             }
         };
 
+        checkAllConnectionsAction = new AbstractAction(
+            Constants.checkAllConnections)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                gui.checkAllConnections();
+            }
+        };
+
         chooseScreenAction = new AbstractAction(chooseScreen)
         {
             public void actionPerformed(ActionEvent e)
@@ -1227,6 +1237,9 @@ public final class MasterBoard extends JPanel
 
         mi = fileMenu.add(checkConnectionAction);
         mi.setMnemonic(KeyEvent.VK_K);
+
+        mi = fileMenu.add(checkAllConnectionsAction);
+        mi.setMnemonic(KeyEvent.VK_X);
 
         /* Removed for r-0.13.2, since it does not work - it merely makes the
          * client stop processing stuff from the queue, but ClientSocketThread

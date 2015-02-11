@@ -73,6 +73,12 @@ public interface IClient
 
     public void serverConfirmsConnection();
 
+    public void relayedPeerRequest(String requestingClientName);
+
+    public void peerRequestReceivedBy(String respondingPlayerName, int queueLen);
+
+    public void peerRequestProcessedBy(String respondingPlayerName);
+
     public void setPlayerName(String newPlayerName);
 
     public void createSummonAngel(Legion legion);

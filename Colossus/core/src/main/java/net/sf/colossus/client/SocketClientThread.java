@@ -900,6 +900,16 @@ final class SocketClientThread extends Thread implements IServer,
             goingDown = true;
         }
 
+        else if (method.equals(Constants.relayedPeerRequest))
+        {
+            String requestingClientName = args.get(0);
+            int queueLen = clientThread.getQueueLen();
+            peerRequestReceived(requestingClientName, queueLen);
+            // in this one, both the socket reading thread and the actual
+            // client are supposed to respond.
+            clientThread.enqueue(method, args);
+        }
+
         else if (method.equals(Constants.nak) && args.size() > 0
             && args.get(0) != null && args.get(0).equals("SignOn"))
         {
@@ -1199,6 +1209,12 @@ final class SocketClientThread extends Thread implements IServer,
         sendToServer(Constants.checkConnection);
     }
 
+    public void checkAllConnections(String requestingClientName)
+    {
+        sendToServer(Constants.checkAllConnections + sep
+            + requestingClientName);
+    }
+
     public void clientConfirmedCatchup()
     {
         sendToServer(Constants.catchupConfirmation);
@@ -1223,6 +1239,18 @@ final class SocketClientThread extends Thread implements IServer,
     {
         sendToServer(Constants.requestSyncDelta + sep + msgNr + sep
             + syncCounter);
+    }
+
+    public void peerRequestReceived(String requestingClientName, int queueLen)
+    {
+        sendToServer(Constants.peerRequestReceived + sep
+            + requestingClientName + sep + queueLen);
+    }
+
+    public void peerRequestProcessed(String requestingClientName)
+    {
+        sendToServer(Constants.peerRequestProcessed + sep
+            + requestingClientName);
     }
 
     public void replyToPing(int requestNr, long requestSent, long requestReceived)

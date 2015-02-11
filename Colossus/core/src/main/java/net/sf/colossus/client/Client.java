@@ -742,12 +742,37 @@ public final class Client implements IClient, IOracle, IVariant,
         server.checkServerConnection();
     }
 
+    public void doCheckAllConnections(String requestingClientName)
+    {
+        server.checkAllConnections(requestingClientName);
+    }
+
+    public void relayedPeerRequest(String requestingClientName)
+    {
+        LOGGER.finest("In client " + this.owningPlayer.getName()
+            + " we received, that peer " + requestingClientName
+            + " requests a reply.");
+        server.peerRequestProcessed(requestingClientName);
+    }
+
     /** Upon request with checkServerConnection, server sends a confirmation.
      *  This method here processes the confirmation.
      */
     public synchronized void serverConfirmsConnection()
     {
         gui.serverConfirmsConnection();
+    }
+
+    public void peerRequestReceivedBy(String respondingPlayerName, int queueLen)
+    {
+        LOGGER.info("Got RECEIVED  confirmation from "
+            + respondingPlayerName + ", queueLen=" + queueLen);
+    }
+
+    public void peerRequestProcessedBy(String respondingPlayerName)
+    {
+        LOGGER.info("Got PROCESSED confirmation from "
+            + respondingPlayerName);
     }
 
     public void locallyInitiateSaveGame(String filename)
@@ -1562,6 +1587,11 @@ public final class Client implements IClient, IOracle, IVariant,
     public void confirmWhenCaughtUp()
     {
         server.clientConfirmedCatchup();
+    }
+
+    public void confirmRelayedPeerRequest(String requestingClientName)
+    {
+        server.peerRequestProcessed(requestingClientName);
     }
 
     public void initBoard()

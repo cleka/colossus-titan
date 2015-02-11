@@ -126,6 +126,12 @@ public interface IServer
 
     public void checkServerConnection();
 
+    public void checkAllConnections(String requestingClientName);
+
+    public void peerRequestReceived(String requestingClientName, int queueLen);
+
+    public void peerRequestProcessed(String requestingClientName);
+
     public void clientConfirmedCatchup();
 
     public void joinGame(String playerName);
