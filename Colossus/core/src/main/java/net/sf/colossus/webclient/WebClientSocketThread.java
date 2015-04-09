@@ -15,9 +15,11 @@ import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.util.Glob;
 import net.sf.colossus.webcommon.GameInfo;
 import net.sf.colossus.webcommon.IWebClient;
 import net.sf.colossus.webcommon.IWebServer;
@@ -190,6 +192,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
         }
 
     }
+
     private void connect() throws WcstException
     {
         String info = null;
@@ -202,8 +205,9 @@ public class WebClientSocketThread extends Thread implements IWebServer
             socket.connect(address, 10000);
             if (socket != null)
             {
-                out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
-                    socket.getOutputStream(), charset)), true);
+                out = new PrintWriter(
+                    new BufferedWriter(new OutputStreamWriter(
+                        socket.getOutputStream(), charset)), true);
             }
             else
             {
@@ -259,8 +263,8 @@ public class WebClientSocketThread extends Thread implements IWebServer
 
         try
         {
-            this.in = new BufferedReader(new InputStreamReader(socket
-                .getInputStream(), charset));
+            this.in = new BufferedReader(new InputStreamReader(
+                socket.getInputStream(), charset));
 
             send(RegisterUser + sep + username + sep + password + sep + email);
             String fromServer = null;
@@ -315,8 +319,8 @@ public class WebClientSocketThread extends Thread implements IWebServer
 
         try
         {
-            this.in = new BufferedReader(new InputStreamReader(socket
-                .getInputStream(), charset));
+            this.in = new BufferedReader(new InputStreamReader(
+                socket.getInputStream(), charset));
 
             send(ConfirmRegistration + sep + username + sep + confCode);
             String fromServer = null;
@@ -366,8 +370,8 @@ public class WebClientSocketThread extends Thread implements IWebServer
 
         try
         {
-            this.in = new BufferedReader(new InputStreamReader(socket
-                .getInputStream(), charset));
+            this.in = new BufferedReader(new InputStreamReader(
+                socket.getInputStream(), charset));
 
             int version = webClient.getClientVersion();
             send(Login + sep + username + sep + password + sep + force + sep
@@ -776,13 +780,14 @@ public class WebClientSocketThread extends Thread implements IWebServer
 
     public GameInfo proposeGame(String initiator, String variant,
         String viewmode, long startAt, int duration, String summary,
-        String expire, boolean unlimitedMulligans, boolean balancedTowers,
+        String expire, List<String> extraOptions, String dummy,
         int min, int target, int max)
     {
+        String optionsString = Glob.glob(extraOptions);
         send(Propose + sep + initiator + sep + variant + sep + viewmode + sep
             + startAt + sep + duration + sep + summary + sep + expire + sep
-            + unlimitedMulligans + sep + balancedTowers + sep + min + sep
-            + target + sep + max);
+            + optionsString + sep + dummy + sep + min + sep + target + sep
+            + max);
         return null;
     }
 

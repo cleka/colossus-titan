@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -30,6 +31,7 @@ import net.sf.colossus.util.BuildInfo;
 import net.sf.colossus.webclient.WebClient;
 import net.sf.colossus.webcommon.FormatWhen;
 import net.sf.colossus.webcommon.GameInfo;
+import net.sf.colossus.webcommon.GameInfo.GameState;
 import net.sf.colossus.webcommon.IColossusMail;
 import net.sf.colossus.webcommon.IGameRunner;
 import net.sf.colossus.webcommon.IPortProvider;
@@ -38,7 +40,6 @@ import net.sf.colossus.webcommon.IWebClient;
 import net.sf.colossus.webcommon.IWebServer;
 import net.sf.colossus.webcommon.User;
 import net.sf.colossus.webcommon.UserDB;
-import net.sf.colossus.webcommon.GameInfo.GameState;
 
 
 /**
@@ -732,7 +733,7 @@ public class WebServer implements IWebServer, IRunWebServer
 
     public GameInfo proposeGame(String initiator, String variant,
         String viewmode, long startAt, int duration, String summary,
-        String expire, boolean unlimitedMulligans, boolean balancedTowers,
+        String expire, List<String> extraOptions, String dummy,
         int min, int target, int max)
     {
         if (GameInfo.wouldBeInstantGame(startAt))
@@ -756,8 +757,7 @@ public class WebServer implements IWebServer, IRunWebServer
         }
 
         GameInfo gi = new GameInfo(initiator, variant, viewmode, startAt,
-            duration, summary, expire, unlimitedMulligans, balancedTowers,
-            min, target, max);
+            duration, summary, expire, extraOptions, dummy, min, target, max);
 
         String scheduleType = gi.isScheduledGame() ? "scheduled" : "instant";
         LOGGER.info("Game " + gi.getGameId() + " (" + scheduleType

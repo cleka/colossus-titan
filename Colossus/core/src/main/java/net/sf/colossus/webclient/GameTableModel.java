@@ -11,14 +11,15 @@ import java.util.Vector;
 import javax.swing.table.AbstractTableModel;
 
 import net.sf.colossus.webcommon.GameInfo;
-import net.sf.colossus.webcommon.User;
 import net.sf.colossus.webcommon.GameInfo.GameState;
+import net.sf.colossus.webcommon.User;
 
 
 public class GameTableModel extends AbstractTableModel
 {
     private final String[] columnNames = { "#", "state", "by", "when",
-        "duration", "info", "Variant", "Viewmode", "Expire", "Mull", "Towers",
+        "duration", "info", "Variant", "Viewmode", "Expire", "Options",
+        "(dummy)",
         "min", "target", "max", "actual", "players", "online" };
 
     private final Vector<GameInfo> data = new Vector<GameInfo>(17, 1);
@@ -108,11 +109,11 @@ public class GameTableModel extends AbstractTableModel
                 break;
 
             case 9:
-                o = Boolean.valueOf(gi.getUnlimitedMulligans());
+                o = gi.getOptionsFlagsString();
                 break;
 
             case 10:
-                o = Boolean.valueOf(gi.getBalancedTowers());
+                o = new String("dummy");
                 break;
 
             case 11:
@@ -163,7 +164,8 @@ public class GameTableModel extends AbstractTableModel
 
             case 9:
             case 10:
-                c = Boolean.class;
+                // c = Boolean.class;
+                c = String.class;
                 break;
 
             case 11:
@@ -275,6 +277,11 @@ public class GameTableModel extends AbstractTableModel
                 break;
         }
         fireTableCellUpdated(row, col);
+    }
+
+    public String getOptionsTooltipText(int row)
+    {
+        return data.get(row).GetOptionsTooltipText();
     }
 
     public int addGame(GameInfo gi)

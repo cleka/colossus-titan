@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.common.Options;
+import net.sf.colossus.util.Glob;
+import net.sf.colossus.util.Split;
 import net.sf.colossus.webclient.WebClient;
 import net.sf.colossus.webcommon.GameInfo;
 import net.sf.colossus.webcommon.IWebClient;
@@ -355,6 +358,7 @@ public class WebServerClient implements IWebClient
 
         else if (command.equals(IWebServer.Propose))
         {
+
             String initiator = tokens[1];
             String variant = tokens[2];
             String viewmode = tokens[3];
@@ -362,14 +366,34 @@ public class WebServerClient implements IWebClient
             int duration = Integer.parseInt(tokens[5]);
             String summary = tokens[6];
             String expire = tokens[7];
-            boolean unlMullis = Boolean.valueOf(tokens[8]).booleanValue();
-            boolean balTowers = Boolean.valueOf(tokens[9]).booleanValue();
             int nmin = Integer.parseInt(tokens[10]);
             int ntarget = Integer.parseInt(tokens[11]);
             int nmax = Integer.parseInt(tokens[12]);
 
+            List<String> extraOptions = new ArrayList<String>();
+            String dummyString = new String("");
+
+            if (getClientVersion() >= WebClient.WC_VERSION_SUPPORTS_EXTRA_OPTIONS)
+            {
+                String optionsString = tokens[8];
+                dummyString = tokens[9];
+                extraOptions.addAll(Split.split(Glob.sep, optionsString));
+            }
+            else
+            {
+                // earlier arg 8+9 were mulligans and tower options booleans
+                if (Boolean.valueOf(tokens[8]).booleanValue())
+                {
+                    extraOptions.add(Options.unlimitedMulligans);
+                }
+                if (Boolean.valueOf(tokens[9]).booleanValue())
+                {
+                    extraOptions.add(Options.balancedTowers);
+                }
+            }
+
             gi = server.proposeGame(initiator, variant, viewmode, startAt,
-                duration, summary, expire, unlMullis, balTowers, nmin,
+                duration, summary, expire, extraOptions, dummyString, nmin,
                 ntarget, nmax);
         }
 
@@ -863,7 +887,17 @@ public class WebServerClient implements IWebClient
 
     public void gameInfo(GameInfo gi)
     {
-        sendToClient(gameInfo + sep + gi.toString(sep));
+        if (getClientVersion() >= WebClient.WC_VERSION_SUPPORTS_EXTRA_OPTIONS)
+        {
+            LOGGER.info("Sending LegacyGameInfo to client " + getUsername());
+            sendToClient(gameInfo + sep + gi.toString(sep));
+        }
+        else
+        {
+            LOGGER.info("Sending GameInfo (new style) to client "
+                + getUsername());
+            sendToClient(gameInfo + sep + gi.toStringLegacy(sep));
+        }
     }
 
     public void gameStartsSoon(String gameId, String byUser)

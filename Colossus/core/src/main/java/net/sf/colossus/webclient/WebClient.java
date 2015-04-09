@@ -75,11 +75,11 @@ import net.sf.colossus.server.Server;
 import net.sf.colossus.util.ViableEntityManager;
 import net.sf.colossus.webclient.WebClientSocketThread.WcstException;
 import net.sf.colossus.webcommon.GameInfo;
+import net.sf.colossus.webcommon.GameInfo.GameState;
 import net.sf.colossus.webcommon.IGameRunner;
 import net.sf.colossus.webcommon.IWebClient;
 import net.sf.colossus.webcommon.IWebServer;
 import net.sf.colossus.webcommon.User;
-import net.sf.colossus.webcommon.GameInfo.GameState;
 
 
 /**
@@ -102,8 +102,9 @@ public class WebClient extends KFrame implements IWebClient
     public final static int WC_VERSION_GENERAL_MESSAGE = 1;
     public final static int WC_VERSION_SUPPORTS_PING = 2;
     public final static int WC_VERSION_DINO_OK = 3;
+    public final static int WC_VERSION_SUPPORTS_EXTRA_OPTIONS = 4;
 
-    final static int WEB_CLIENT_VERSION = WC_VERSION_DINO_OK;
+    final static int WEB_CLIENT_VERSION = WC_VERSION_SUPPORTS_EXTRA_OPTIONS;
 
     // TODO make this all based on Locale.getDefault()
     // Initially: use German. To make it variable, need also to set
@@ -231,6 +232,7 @@ public class WebClient extends KFrame implements IWebClient
 
     private JCheckBox unlimitedMulligansCB;
     private JCheckBox balancedTowersCB;
+    private JCheckBox lordBattleControlCB;
 
     private JLabel nowDateAndTimeLabel;
     private JTextField atDateField;
@@ -1170,6 +1172,10 @@ public class WebClient extends KFrame implements IWebClient
                     case 5:
                     case 6:
                     case 7:
+                    case 9:
+                        tip = proposedGameDataModel
+                            .getOptionsTooltipText(rowIndex);
+                        break;
                     case 15:
                         tip = "" + getValueAt(rowIndex, colIndex);
                         break;
@@ -1379,8 +1385,10 @@ public class WebClient extends KFrame implements IWebClient
         preferencesPane.add(new JLabel("Events expire after (turns):"));
         preferencesPane.add(eventExpiringBox);
 
-        // checkboxes (unlimited mulligans and balanced tower):
-        Box checkboxPane = new Box(BoxLayout.X_AXIS);
+        // checkboxes (unlimited mulligans, balanced tower,
+        //   and battlecontrol needs lord):
+        JPanel checkboxPane = new JPanel(new GridLayout(2, 2));
+
         boolean unlimitedMulligans = options
             .getOption(Options.unlimitedMulligans);
         unlimitedMulligansCB = new JCheckBox(Options.unlimitedMulligans,
@@ -1406,8 +1414,23 @@ public class WebClient extends KFrame implements IWebClient
             }
         });
 
+        boolean lordBattleControl = options
+            .getOption(Options.autoSansLordBattles);
+        lordBattleControlCB = new JCheckBox(Options.autoSansLordBattles,
+            lordBattleControl);
+        lordBattleControlCB.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                options.setOption(Options.autoSansLordBattles,
+                    lordBattleControlCB.isSelected());
+            }
+        });
+
         checkboxPane.add(unlimitedMulligansCB);
         checkboxPane.add(balancedTowersCB);
+        checkboxPane.add(lordBattleControlCB);
+
 
         preferencesPane.add(new JLabel("Various settings:"));
         preferencesPane.add(checkboxPane);
@@ -2702,11 +2725,11 @@ public class WebClient extends KFrame implements IWebClient
     }
 
     private void do_proposeGame(String variant, String viewmode, long startAt,
-        int duration, String summary, String expire, boolean unlimMulli,
-        boolean balTowers, int min, int target, int max)
+        int duration, String summary, String expire,
+        List<String> extraOptions, String dummy, int min, int target, int max)
     {
         server.proposeGame(username, variant, viewmode, startAt, duration,
-            summary, expire, unlimMulli, balTowers, min, target, max);
+            summary, expire, extraOptions, dummy, min, target, max);
     }
 
     private long getStartTime()
@@ -3716,16 +3739,31 @@ public class WebClient extends KFrame implements IWebClient
         int min = ((Integer)spinner1.getValue()).intValue();
         int target = ((Integer)spinner2.getValue()).intValue();
         int max = ((Integer)spinner3.getValue()).intValue();
+        List<String> extraOptions = new ArrayList<String>();
+        if (lordBattleControlCB.isSelected())
+        {
+            extraOptions.add(Options.autoSansLordBattles);
+        }
+        if (unlimitedMulligansCB.isSelected())
+        {
+            extraOptions.add(Options.unlimitedMulligans);
+        }
+        if (balancedTowersCB.isSelected())
+        {
+            extraOptions.add(Options.balancedTowers);
+        }
+
+        String dummy = new String("");
 
         boolean scheduled = getScheduledGamesMode();
         long startAt = scheduled ? getStartTime() : -1;
         int duration = getDuration();
         String summaryText = getSummaryText();
 
+
         do_proposeGame(variantBox.getSelectedItem().toString(), viewmodeBox
             .getSelectedItem().toString(), startAt, duration, summaryText,
-            eventExpiringBox.getSelectedItem().toString(),
-            unlimitedMulligansCB.isSelected(), balancedTowersCB.isSelected(),
-            min, target, max);
+            eventExpiringBox.getSelectedItem().toString(), extraOptions,
+            dummy, min, target, max);
     }
 }

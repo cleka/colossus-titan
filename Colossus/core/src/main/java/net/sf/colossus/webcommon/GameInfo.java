@@ -5,11 +5,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
+import net.sf.colossus.util.Glob;
+import net.sf.colossus.util.Split;
 import net.sf.colossus.webclient.WebClient;
 
 
@@ -57,6 +60,7 @@ public class GameInfo
     private String eventExpiring;
     private boolean unlimitedMulligans;
     private boolean balancedTowers;
+    private boolean autoSansLordBattles;
 
     private int min;
     private int target;
@@ -113,17 +117,18 @@ public class GameInfo
 
     public GameInfo(String initiator, String variant, String viewmode,
         long startTime, int duration, String summary, String expire,
-        boolean unlimitedMulligans, boolean balancedTowers, int min,
-        int target, int max)
+        List<String> extraOptions, String dummy, int min, int target, int max)
     {
         this(makeTypeFromStarttime(startTime));
 
+        parseExtraOptions(extraOptions);
+
+        // just to get rid of "unused" warning:
+        LOGGER.finest("Dummy: value of dummy string is '" + dummy + "'.");
         this.initiator = initiator;
         this.variant = variant;
         this.viewmode = viewmode;
         this.eventExpiring = expire;
-        this.unlimitedMulligans = unlimitedMulligans;
-        this.balancedTowers = balancedTowers;
         this.min = min;
         this.target = target;
         this.max = max;
@@ -141,6 +146,35 @@ public class GameInfo
                 + " viewmode " + viewmode);
 
         // System.out.println("NEW GameInfo server side, " + this.toString());
+    }
+
+    /*
+     * go through list containing the extraOptions, set the corresponding
+     * boolean values to true
+     */
+    private void parseExtraOptions(List<String> extraOptions)
+    {
+        for (Iterator iterator = extraOptions.iterator(); iterator.hasNext();)
+        {
+            String string = (String)iterator.next();
+            if (string.equals(Options.autoSansLordBattles))
+            {
+                this.autoSansLordBattles = true;
+            }
+            else if (string.equals(Options.unlimitedMulligans))
+            {
+                this.unlimitedMulligans = true;
+            }
+            else if (string.equals(Options.balancedTowers))
+            {
+                this.balancedTowers = true;
+            }
+            else
+            {
+                LOGGER.severe("Unexpected option string '" + string
+                    + "' when parsing extraOptions !");
+            }
+        }
     }
 
     // ================= now the stuff for the client side ===============
@@ -196,8 +230,21 @@ public class GameInfo
         gi.duration = Integer.parseInt(tokens[j++]);
         gi.summary = tokens[j++];
         gi.eventExpiring = tokens[j++];
-        gi.unlimitedMulligans = Boolean.valueOf(tokens[j++]).booleanValue();
-        gi.balancedTowers = Boolean.valueOf(tokens[j++]).booleanValue();
+        String token8 = tokens[j++];
+        String token9 = tokens[j++];
+
+        if (token8.equalsIgnoreCase("true")
+            || token8.equalsIgnoreCase("false"))
+        {
+            gi.unlimitedMulligans = Boolean.valueOf(token8).booleanValue();
+            gi.balancedTowers = Boolean.valueOf(token9).booleanValue();
+        }
+        else
+        {
+            List<String> extraOptions = Split.split(Glob.sep, token8);
+            gi.parseExtraOptions(extraOptions);
+        }
+
         gi.min = Integer.parseInt(tokens[j++]);
         gi.target = Integer.parseInt(tokens[j++]);
         gi.max = Integer.parseInt(tokens[j++]);
@@ -220,6 +267,33 @@ public class GameInfo
         return gi;
     }
 
+    public String toStringLegacy(String sep)
+    {
+        StringBuilder playerList = new StringBuilder();
+        Iterator<User> it = players.iterator();
+        while (it.hasNext())
+        {
+            playerList.append(sep);
+            User user = it.next();
+            playerList.append(user.getName());
+        }
+
+        String summary2 = summary;
+        if (this.autoSansLordBattles)
+        {
+            summary2 = "NOTE! Extra option 'Needs lord for battle control' set! | "
+                + summary;
+        }
+        String message = gameId + sep + type.toString() + sep
+            + state.toString() + sep + initiator + sep + variant + sep
+            + viewmode + sep + startTime + sep + duration + sep + summary2
+            + sep + eventExpiring + sep + unlimitedMulligans + sep
+            + balancedTowers + sep + min + sep + target + sep + max + sep
+            + onlineCount + sep + enrolledPlayers + playerList.toString();
+
+        return message;
+    }
+
     public String toString(String sep)
     {
         StringBuilder playerList = new StringBuilder();
@@ -234,11 +308,39 @@ public class GameInfo
         String message = gameId + sep + type.toString() + sep
             + state.toString() + sep + initiator + sep + variant + sep
             + viewmode + sep + startTime + sep + duration + sep + summary
-            + sep + eventExpiring + sep + unlimitedMulligans + sep
-            + balancedTowers + sep + min + sep + target + sep + max + sep
+            + sep + eventExpiring + sep + getExtraOptionsAsString() + sep
+            + new String("dummy") + sep + min + sep + target + sep + max + sep
             + onlineCount + sep + enrolledPlayers + playerList.toString();
 
         return message;
+    }
+
+    public String getExtraOptionsAsString()
+    {
+        return Glob.glob(getExtraOptions());
+    }
+
+    public List<String> getExtraOptions()
+    {
+        List<String> extraOptions = new ArrayList<String>();
+
+        if (this.autoSansLordBattles)
+        {
+            extraOptions.add(Options.autoSansLordBattles);
+        }
+
+        if (this.unlimitedMulligans)
+        {
+            this.unlimitedMulligans = true;
+            extraOptions.add(Options.unlimitedMulligans);
+        }
+
+        if (this.balancedTowers)
+        {
+            extraOptions.add(Options.balancedTowers);
+        }
+
+        return extraOptions;
     }
 
     public void setState(GameState state)
@@ -396,6 +498,38 @@ public class GameInfo
     {
         balancedTowers = val;
     }
+
+    public boolean getAutoSansLordBattles()
+    {
+        return autoSansLordBattles;
+    }
+
+    public String getOptionsFlagsString()
+    {
+        String s = (this.unlimitedMulligans ? "U" : "-")
+            + (this.balancedTowers ? "B" : "-")
+            + (this.autoSansLordBattles ? "N" : "-");
+        return s;
+    }
+
+    public String GetOptionsTooltipText()
+    {
+        String ttText = (this.unlimitedMulligans ? Options.unlimitedMulligans
+            : "-")
+            + ", "
+            + (this.balancedTowers ? Options.balancedTowers : "-")
+            + ", "
+            + (this.autoSansLordBattles ? Options.autoSansLordBattles : "-");
+        return ttText;
+
+    }
+
+    public void setAutoSansLordBattles(boolean val)
+    {
+        autoSansLordBattles = val;
+    }
+
+
 
     /**
      * Have enough players enrolled (at least "min")
@@ -685,6 +819,8 @@ public class GameInfo
         gameOptions.setOption(Options.unlimitedMulligans,
             getUnlimitedMulligans());
         gameOptions.setOption(Options.balancedTowers, getBalancedTowers());
+        gameOptions.setOption(Options.autoSansLordBattles,
+            getAutoSansLordBattles());
 
         // gameOptions.setOption(Options.autoQuit, true);
         String name;
