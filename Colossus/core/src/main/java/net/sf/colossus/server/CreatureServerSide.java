@@ -15,7 +15,6 @@ import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.Creature;
-import net.sf.colossus.game.Dice;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.variant.BattleHex;
@@ -350,30 +349,34 @@ public class CreatureServerSide extends Creature implements BattleCritter
      *  Roll the dice and apply damage.  Highlight legal carry targets. */
     private void strike2(CreatureServerSide target, int dice, int strikeNumber)
     {
-        // Roll the dice.
-        int damage = 0;
-        // Check if we roll or if we don't
-        boolean randomized = !game.getOption(Options.nonRandomBattleDice);
-
         List<String> rolls = new ArrayList<String>();
-        StringBuilder rollString = new StringBuilder(36);
 
-        for (int i = 0; i < dice; i++)
+        int damage;
+        if (game.getOption(Options.pbBattleHits))
         {
-            int roll = (randomized ? Dice.rollDie() : Dice.rollDieNonRandom());
-            rolls.add("" + roll);
-            rollString.append(roll);
+            /**
+             * Probability-based Battle Rolls:
+             *
+             * If set to true, give exactly (at least) the amount of hits as one could get
+             * according to probability. E.g. for 6 dice and strike nr 4, 3 hits,
+             * 6 dice and strike number 6 gives 1 hit.
+             * Includes "accumulated wasted luck per creature", i.e. if a centaur
+             * yields 1.5 wasted luck = 0.5, next time accumulated WL = 1
+             * => give one hit more and subtract 1.0 from AWL.
+             */
 
-            if (roll >= strikeNumber)
-            {
-                damage++;
-            }
+            damage = game.getBattleStrike().determineProbabilityBasedHits(this, target, dice, strikeNumber, rolls);
         }
+        else
+        {
+            // Whether the rolling should take random number or from the sequence
+            boolean randomized = !game
+                .getOption(Options.nonRandomBattleDice);
 
-        LOGGER.log(Level.INFO, getName() + " in " + getCurrentHex()
-            + " strikes " + target.getDescription() + " with strike number "
-            + strikeNumber + ", rolling: " + rollString + ": " + damage
-            + (damage == 1 ? " hit" : " hits"));
+            // Roll the dice:
+            damage = game.getBattleStrike().rollDice(this, target, dice,
+                strikeNumber, rolls, randomized);
+        }
 
         int carryDamage = target.adjustHits(damage);
         if (!carryPossible)

@@ -10,8 +10,8 @@ import java.util.TreeSet;
 
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.server.PlayerServerSide;
-import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.server.VariantSupport;
+import net.sf.colossus.variant.MasterHex;
 
 
 /**
@@ -497,4 +497,28 @@ public class Player
             return Constants.angel;
         }
     }
+
+    /**
+     * wasted luck per strike Number (sn), for probability based Battle Rolls.
+     * Like, Centaur for sn 4 should make 1.5 hits, first time makes 1 hit,
+     * saves 0.5 to next time.
+     * Stored per player per strike-number base.
+     */
+    private final double[] accumulatedWastedLuck = new double[] { 0.0, 0.0, 0.0,
+        0.0, 0.0, 0.0, 0.0 };
+
+    public boolean applyAccumulatedWastedLuck(int sn,
+        double wastedLuck, StringBuffer eawlString)
+    {
+        accumulatedWastedLuck[sn] += wastedLuck;
+        eawlString.append(String.format("%5.2f",
+            Double.valueOf(accumulatedWastedLuck[sn])));
+        if (accumulatedWastedLuck[sn] >= (1 - 0.0000000000000001))
+        {
+            accumulatedWastedLuck[sn] -= 1;
+            return true;
+        }
+        return false;
+    }
+
 }

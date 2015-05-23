@@ -492,5 +492,4 @@ public class Creature
         setHits(tmp_hits);
         return excess;
     }
-
 }

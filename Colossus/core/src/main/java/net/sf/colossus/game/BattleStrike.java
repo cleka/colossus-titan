@@ -1,6 +1,8 @@
 package net.sf.colossus.game;
 
 
+import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.BattleClientSide;
@@ -234,6 +236,111 @@ public class BattleStrike
         }
 
         return strikeNumber;
+    }
+
+    public int determineProbabilityBasedHits(Creature striker,
+        Creature target, int dice, int strikeNumber, List<String> rolls)
+    {
+        // for logging
+        StringBuilder rollString = new StringBuilder(36);
+
+        /*
+        sn 6:       1/6    6-6+1 = 1
+        sn 5:       2/6    6-5+1 = 2
+        sn 4:       3/6    6-4+1 = 3
+        sn 3:       4/6    6-3+1 = 4
+        sn 2:       5/6    6-2+1 = 5
+        sn 1:       6/6    6-1+1 = 6
+
+        sn N: (6-N+1)/6    6-N+1 => 7.0-N
+        */
+
+        int damage = 0;
+
+        double expected = dice * (7.0 - strikeNumber) / 6.0;
+        int calculatedMin = (int)Math.floor(expected);
+        damage = calculatedMin;
+
+        // 0 < wastedLuck < 1
+        double wastedLuck = expected - calculatedMin;
+
+        /*
+         * effective accumulated wasted luck, for logging;
+         * applyAWL() will fill in the content string.
+         */
+        StringBuffer eawlString = new StringBuffer();
+        String bonus = "no bonus";
+
+        boolean getsOne = striker.getLegion().getPlayer()
+            .applyAccumulatedWastedLuck(strikeNumber, wastedLuck, eawlString);
+        if (getsOne)
+        {
+            damage++;
+            bonus = "bonus +1";
+        }
+
+        String dispName = striker.getType().getName();
+        if (dispName.length() > 4)
+        {
+            dispName = dispName.substring(0, 4);
+        }
+
+        if (LOGGER.isLoggable(Level.FINEST))
+        {
+            String result = String.format(
+                "%-4s rolls %2d dice for %1d's, results in %2d hits "
+                    + "(exp. %5.2f =>%2d, %8s: EAWL=%s)", dispName,
+                Integer.valueOf(dice), Integer.valueOf(strikeNumber),
+                Integer.valueOf(damage), Double.valueOf(expected),
+                Integer.valueOf(calculatedMin), bonus, eawlString.toString());
+            LOGGER.log(Level.FINEST, result);
+        }
+
+        // create a fakeList, damage times strikeNumer and rest "1"s.
+        for (int i = 0; i < dice; i++)
+        {
+            int roll = (i < damage ? strikeNumber : 1);
+            rolls.add("" + roll);
+            rollString.append(roll);
+        }
+
+        LOGGER.log(Level.INFO,
+            striker.getName() + " in " + striker.getCurrentHex() + " strikes "
+                + target.getDescription() + " with strike number "
+                + strikeNumber + ", probabilityBased damage is " + damage
+                + (damage == 1 ? " hit" : " hits (fake rolls: " + rollString));
+
+        return damage;
+    }
+
+    public int rollDice(Creature striker, Creature target, int dice,
+        int strikeNumber, List<String> rolls, boolean randomized)
+    {
+        // for logging
+        StringBuilder rollString = new StringBuilder(36);
+
+        int damage = 0;
+
+        // usual rolling, OR roll according to sequence
+        for (int i = 0; i < dice; i++)
+        {
+            int roll = (randomized ? Dice.rollDie() : Dice.rollDieNonRandom());
+            rolls.add("" + roll);
+            rollString.append(roll);
+
+            if (roll >= strikeNumber)
+            {
+                damage++;
+            }
+        }
+
+        LOGGER.log(Level.INFO,
+            striker.getName() + " in " + striker.getCurrentHex() + " strikes "
+                + target.getDescription() + " with strike number "
+                + strikeNumber + ", rolling: " + rollString + ": " + damage
+                + (damage == 1 ? " hit" : " hits"));
+
+        return damage;
     }
 
     // Helper method
