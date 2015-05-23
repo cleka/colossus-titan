@@ -424,7 +424,7 @@ public final class Start
         }
         if (cl.optIsSet('N'))
         {
-            options.setOption(Options.nonRandomBattleDice, true);
+            options.setOption(Options.fixedSequenceBattleDice, true);
         }
         if (cl.optIsSet('d'))
         {

@@ -371,7 +371,7 @@ public class CreatureServerSide extends Creature implements BattleCritter
         {
             // Whether the rolling should take random number or from the sequence
             boolean randomized = !game
-                .getOption(Options.nonRandomBattleDice);
+                .getOption(Options.fixedSequenceBattleDice);
 
             // Roll the dice:
             damage = game.getBattleStrike().rollDice(this, target, dice,

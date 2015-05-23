@@ -100,7 +100,7 @@ public final class Options implements IOptions
     public static final String onlyOwnLegions = "Only own legions viewable";
     public static final String cumulativeSlow = "Slowing is cumulative";
     public static final String oneHexAllowed = "Always allows one hex";
-    public static final String nonRandomBattleDice = "Use non-random battle dice";
+    public static final String fixedSequenceBattleDice = "Fixed-sequence battle dice";
     public static final String pbBattleHits = "Probability-based battle hits";
     public static final String autoSansLordBattles = "Need lord for battle control";
 
@@ -118,7 +118,7 @@ public final class Options implements IOptions
     // not set (meaning false), but if Client has them stored from earlier synchronizations
     // (e.g. removed server.cf file, or now playing on public server)
     public static final String[] globalGameOptions = { cumulativeSlow,
-        oneHexAllowed, nonRandomBattleDice, autoSansLordBattles,
+        oneHexAllowed, fixedSequenceBattleDice, autoSansLordBattles,
         noFirstTurnT2TTeleport, noFirstTurnTeleport, towerToTowerTeleportOnly,
         noTowerTeleport, noTitanTeleport, unlimitedMulligans,
         noFirstTurnWarlockRecruit, enableEditingMode };

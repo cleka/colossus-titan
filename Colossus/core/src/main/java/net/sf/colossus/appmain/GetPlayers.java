@@ -257,7 +257,7 @@ public final class GetPlayers extends KFrame
         addCheckbox(Options.oneHexAllowed, rulesOptionsPane);
         addCheckbox(Options.unlimitedMulligans, rulesOptionsPane);
         addCheckbox(Options.autoSansLordBattles, rulesOptionsPane);
-        addCheckbox(Options.nonRandomBattleDice, rulesOptionsPane);
+        addCheckbox(Options.fixedSequenceBattleDice, rulesOptionsPane);
         addCheckbox(Options.pbBattleHits, rulesOptionsPane);
 
         JPanel aiTimePane = new JPanel(new FlowLayout());
