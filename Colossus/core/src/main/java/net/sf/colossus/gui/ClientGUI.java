@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -31,6 +32,7 @@ import net.sf.colossus.client.Client;
 import net.sf.colossus.client.GameClientSide;
 import net.sf.colossus.client.IClientGUI;
 import net.sf.colossus.client.IOracle;
+import net.sf.colossus.client.InactivityWatchdog;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.IOptions;
@@ -140,6 +142,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     private boolean gameOverMessageAlreadyShown = false;
 
     protected final Client client;
+
+    private InactivityWatchdog watchdog = null;
 
     // for things other GUI components need to inquire,
     // use the Oracle (on the long run, I guess there will be the
@@ -409,6 +413,13 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         Scale.set(scale);
 
         board = new MasterBoard(client, this);
+
+        if (client.needsWatchdog())
+        {
+            watchdog = new InactivityWatchdog(client, board);
+            watchdog.start();
+        }
+
         initEventViewer();
         initShowEngagementResults();
         initPreferencesWindow();
@@ -500,6 +511,22 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             battleBoard = null;
         }
         battleBoard = new BattleBoard(this, getGame().getEngagement());
+    }
+
+    public void registerToInactivityWatchdog(JComponent contentPane)
+    {
+        if (watchdog != null)
+        {
+            watchdog.addBattleBoardFrame(contentPane);
+        }
+    }
+
+    public void unregisterFromInactivityWatchdog()
+    {
+        if (watchdog != null)
+        {
+            watchdog.removeBattleBoardFrame();
+        }
     }
 
     public void setStrikeNumbers(BattleUnit striker, Set<BattleHex> targetHexes)
@@ -2582,7 +2609,20 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         {
             board.myTurnStartsActions();
         }
+
         eventViewer.turnOrPlayerChange(turnNr, player);
+
+        if (watchdog != null)
+        {
+            if (isMyTurn())
+            {
+                watchdog.setClockTicking();
+            }
+            else
+            {
+                watchdog.stopClockTicking();
+            }
+        }
     }
 
     public void actOnGameStarting()
@@ -2953,6 +2993,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         logPerhaps("actOnCleanupBattle()");
         if (battleBoard != null)
         {
+            unregisterFromInactivityWatchdog();
             battleBoard.dispose();
             battleBoard = null;
         }
@@ -3194,6 +3235,11 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         }
 
         client.cleanupBattle();
+        if (watchdog != null)
+        {
+            watchdog.finish();
+            watchdog = null;
+        }
         disposeLogWindow();
         // For now, that one shall NOT be reopened by default on next start
         options.setOption(Options.showConnectionLogWindow, false);
@@ -3241,6 +3287,13 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             statusScreen.repaint();
         }
         defaultCursor();
+
+        if (watchdog != null)
+        {
+            LOGGER.finer("Game over: stopping the watchdog for player: "
+                + client.getOwningPlayer().getName());
+            watchdog.finish();
+        }
         board.setGameOverState(message);
         if (disposeFollows)
         {

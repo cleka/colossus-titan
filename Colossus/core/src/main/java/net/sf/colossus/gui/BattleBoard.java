@@ -163,6 +163,8 @@ public final class BattleBoard extends KFrame
         setContentPane(contentPane);
         contentPane.setLayout(new BorderLayout());
 
+        gui.registerToInactivityWatchdog(contentPane);
+
         setupIcon();
 
         addWindowListener(new WindowAdapter()

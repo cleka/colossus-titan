@@ -160,6 +160,12 @@ public final class Client implements IClient, IOracle, IVariant,
     private PlayerClientSide owningPlayer;
     private boolean playerAlive = true;
 
+    private boolean clockIsTicking = false;
+
+    private boolean originalAutoplayValue = false;
+
+    private boolean originalAutoplayOverridden = false;
+
     /**
      * The game in progress.
      */
@@ -464,6 +470,67 @@ public final class Client implements IClient, IOracle, IVariant,
     public boolean isSpectator()
     {
         return spectator;
+    }
+
+    /*
+     * Following ones are used for the client side timeout (if player
+     * has not done anything for certain time ((left keyboard??)), then
+     * something is done in his behalf so that game is not stuck/lost
+     * for other players.
+     */
+    public boolean needsWatchdog()
+    {
+        if (getOwningPlayer().isAI())
+        {
+            return false;
+        }
+        // might be needed if loading a game?
+        // TODO: check later and remove if not needed
+        if (getOwningPlayer().isDead())
+        {
+            return false;
+        }
+
+        // For Debugging/Development only this particular one
+        // has watchdog, other's not, so that "some other" player
+        // can be active (and thus this one here does not need to be)
+        if (getOwningPlayer().getName().equals("watchdogtest"))
+        {
+            return true;
+        }
+
+        // for now, not active for any real player
+        return false;
+    }
+
+    public void setClockTicking(boolean val)
+    {
+        clockIsTicking = val;
+    }
+
+    public boolean isClockTicking()
+    {
+        return clockIsTicking;
+    }
+
+    public void inactivityWarning(int counter)
+    {
+        LOGGER.finer("ClientThread " + owningPlayer.getName() + ": timeout #"
+            + counter + "!");
+        originalAutoplayValue = options.getOption(Options.autoPlay);
+        originalAutoplayOverridden = true;
+        options.setOption(Options.autoPlay, true);
+        kickPhase();
+    }
+
+    public void inactivityTimeoutReached()
+    {
+        LOGGER.finer("ClientThread " + owningPlayer.getName()
+            + ": reached inactivity timeout! Enabling Autoplay.");
+        originalAutoplayValue = options.getOption(Options.autoPlay);
+        originalAutoplayOverridden = true;
+        options.setOption(Options.autoPlay, true);
+        kickPhase();
     }
 
     public boolean isTheInternalSpectator()
@@ -2327,6 +2394,12 @@ public final class Client implements IClient, IOracle, IVariant,
         }
         game.setActivePlayer(activePlayer);
         game.setTurnNumber(turnNumber);
+
+        if (originalAutoplayOverridden)
+        {
+            originalAutoplayOverridden = false;
+            options.setOption(Options.autoPlay, originalAutoplayValue);
+        }
 
         gui.actOnTurnOrPlayerChange(this, turnNumber, game.getActivePlayer());
     }
