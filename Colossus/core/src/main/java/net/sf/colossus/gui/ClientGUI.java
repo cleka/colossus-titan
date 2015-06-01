@@ -805,7 +805,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         logPerhaps("initiateAllConnectionsCheck()");
         /*
                 connectionCheckTimer = new Timer(1000 * CONN_CHECK_TIMEOUT,
-         
+
                     new ActionListener()
                     {
                         public void actionPerformed(ActionEvent e)
@@ -3302,7 +3302,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     {
         logPerhaps("doShowMessageDialog(String message)");
         // For humans in autoplay do not show messages...
-        if (options.getOption(Options.autoPlay))
+        if (client.isAutoplayActive())
         {
             // ... suppress any other messages than the game over message ...
             String goMessage = getClient().getGame().getGameOverMessage();

@@ -471,6 +471,11 @@ public final class Client implements IClient, IOracle, IVariant,
         return internalSpectator;
     }
 
+    public boolean isAutoplayActive()
+    {
+        return options.getOption(Options.autoPlay);
+    }
+
     // TODO can this be replaced with "!owningPlayer.isDead()" ?
     // Only critical issue AFAIS is that owningPlayer is not properly
     // initialized right away from the start (re-assigned later).
@@ -1332,7 +1337,7 @@ public final class Client implements IClient, IOracle, IVariant,
     {
         if (isMyBattlePhase())
         {
-            if (options.getOption(Options.autoPlay)
+            if (isAutoplayActive()
                 || sansLordAutoBattleApplies())
             {
                 aiPause();
@@ -1704,7 +1709,7 @@ public final class Client implements IClient, IOracle, IVariant,
      *  or higher strike number) in order to be allowed to carry. */
     public void askChooseStrikePenalty(List<String> choices)
     {
-        if (options.getOption(Options.autoPlay) || sansLordAutoBattleApplies())
+        if (isAutoplayActive() || sansLordAutoBattleApplies())
         {
             String choice = ai.pickStrikePenalty(choices);
             assignStrikePenalty(choice);
@@ -2062,7 +2067,7 @@ public final class Client implements IClient, IOracle, IVariant,
         }
         else
         {
-            if (options.getOption(Options.autoPlay)
+            if (isAutoplayActive()
                 || sansLordAutoBattleApplies())
             {
                 aiPause();
@@ -2084,7 +2089,7 @@ public final class Client implements IClient, IOracle, IVariant,
         game.initBattle(hex, battleTurnNumber, battleActivePlayer,
             battlePhase, attacker, defender);
 
-        if (options.getOption(Options.autoPlay) || sansLordAutoBattleApplies())
+        if (isAutoplayActive() || sansLordAutoBattleApplies())
         {
             ai.initBattle();
         }
@@ -2109,7 +2114,7 @@ public final class Client implements IClient, IOracle, IVariant,
 
         gui.actOnCleanupBattle();
 
-        if (options.getOption(Options.autoPlay) || sansLordAutoBattleApplies())
+        if (isAutoplayActive() || sansLordAutoBattleApplies())
         {
             ai.cleanupBattle();
         }
@@ -2458,7 +2463,7 @@ public final class Client implements IClient, IOracle, IVariant,
 
                 // For autoRecruit alone, do not automatically say we are done.
                 // Allow humans to override. But full autoPlay be done.
-                if (options.getOption(Options.autoPlay))
+                if (isAutoplayActive())
                 //|| sansLordAutoBattleApplies())
                 {
                     doneWithRecruits();
@@ -2499,7 +2504,7 @@ public final class Client implements IClient, IOracle, IVariant,
         gui.actOnSetupBattleMove();
 
         if (isMyBattlePhase()
-            && (options.getOption(Options.autoPlay) || sansLordAutoBattleApplies()))
+            && (isAutoplayActive() || sansLordAutoBattleApplies()))
         {
             bestMoveOrder = ai.battleMove();
             failedBattleMoves = new ArrayList<CritterMove>();
@@ -2653,7 +2658,7 @@ public final class Client implements IClient, IOracle, IVariant,
     {
         LOGGER.log(Level.FINEST, owningPlayer.getName()
             + "handleFailedBattleMove");
-        if (options.getOption(Options.autoPlay) || sansLordAutoBattleApplies())
+        if (isAutoplayActive() || sansLordAutoBattleApplies())
         {
             if (bestMoveOrder != null)
             {
@@ -2686,7 +2691,7 @@ public final class Client implements IClient, IOracle, IVariant,
         if (isMyCritter && !undo)
         {
             rememberForUndo = true;
-            if (options.getOption(Options.autoPlay)
+            if (isAutoplayActive()
                 || sansLordAutoBattleApplies())
             {
                 markBattleMoveSuccessful(tag, endingHex);
@@ -3830,7 +3835,7 @@ public final class Client implements IClient, IOracle, IVariant,
         // human player who just uses some autoXXX functionality,
         // and we don't want a human to have to wait after certain activities
         // the AI does for him.
-        if (!options.getOption(Options.autoPlay)
+        if (!isAutoplayActive()
             || delay < Constants.MIN_AI_DELAY)
         {
             delay = Constants.MIN_AI_DELAY;
