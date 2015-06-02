@@ -17,6 +17,12 @@ public class InactivityWatchdog extends Thread
     private static final Logger LOGGER = Logger
         .getLogger(InactivityWatchdog.class
         .getName());
+    /*
+    private static final long CHECK_INTERVAL_SECONDS = 3;
+    private static final long INACTIVITY_WARNING_INTERVAL = 6;
+    private static final long INACTIVITY_TIMEOUT = 18;
+    */
+
     private static final long CHECK_INTERVAL_SECONDS = 30;
     private static final long INACTIVITY_WARNING_INTERVAL = 60;
     private static final long INACTIVITY_TIMEOUT = 180;
@@ -135,7 +141,8 @@ public class InactivityWatchdog extends Thread
                 {
                     if (intervals != lastIntervals)
                     {
-                        client.inactivityWarning(intervals);
+                        client.inactivityWarning((int)inactiveSecs,
+                            (int)INACTIVITY_TIMEOUT);
                         LOGGER.fine("Warning: You were now already "
                             + intervals + " intervals (" + inactiveSecs
                             + " seconds) idle!");
@@ -144,12 +151,12 @@ public class InactivityWatchdog extends Thread
                     else
                     {
                         LOGGER
-                            .finest("Inactivity check: still inactive, still in same interval");
+                            .fine("Inactivity check: still inactive, still in same interval");
                     }
                 }
                 else
                 {
-                    LOGGER.finest("Inactivity timeout not reached, going on");
+                    LOGGER.fine("Inactivity timeout not reached, going on");
                     lastIntervals = 0;
                 }
             }

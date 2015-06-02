@@ -480,17 +480,6 @@ public final class Client implements IClient, IOracle, IVariant,
      */
     public boolean needsWatchdog()
     {
-        if (getOwningPlayer().isAI())
-        {
-            return false;
-        }
-        // might be needed if loading a game?
-        // TODO: check later and remove if not needed
-        if (getOwningPlayer().isDead())
-        {
-            return false;
-        }
-
         // For Debugging/Development only this particular one
         // has watchdog, other's not, so that "some other" player
         // can be active (and thus this one here does not need to be)
@@ -499,7 +488,16 @@ public final class Client implements IClient, IOracle, IVariant,
             return true;
         }
 
-        // for now, not active for any real player
+        if (getOwningPlayer().isAI() || getOwningPlayer().isDead() || !isRemote())
+        {
+            return false;
+        }
+
+        if (gui.getStartedByWebClient())
+        {
+            return true;
+        }
+
         return false;
     }
 
@@ -513,20 +511,18 @@ public final class Client implements IClient, IOracle, IVariant,
         return clockIsTicking;
     }
 
-    public void inactivityWarning(int counter)
+    public void inactivityWarning(int inactiveSeconds, int inactiveTimeout)
     {
-        LOGGER.finer("ClientThread " + owningPlayer.getName() + ": timeout #"
-            + counter + "!");
-        originalAutoplayValue = options.getOption(Options.autoPlay);
-        originalAutoplayOverridden = true;
-        options.setOption(Options.autoPlay, true);
-        kickPhase();
+        LOGGER.finer("ClientThread " + owningPlayer.getName() + ": idle for "
+            + inactiveSeconds + "seconds!");
+        gui.inactivityWarning(inactiveSeconds, inactiveTimeout);
     }
 
     public void inactivityTimeoutReached()
     {
         LOGGER.finer("ClientThread " + owningPlayer.getName()
             + ": reached inactivity timeout! Enabling Autoplay.");
+        gui.inactivityTimeoutReached();
         originalAutoplayValue = options.getOption(Options.autoPlay);
         originalAutoplayOverridden = true;
         options.setOption(Options.autoPlay, true);

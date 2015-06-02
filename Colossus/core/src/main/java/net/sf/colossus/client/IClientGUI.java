@@ -342,4 +342,10 @@ public interface IClientGUI
         MasterHex target);
 
     public abstract void actOnHitsSet(BattleUnit targetUnit);
+
+    public abstract boolean getStartedByWebClient();
+
+    public abstract void inactivityWarning(int inactiveSecs, int timeoutSecs);
+
+    public abstract void inactivityTimeoutReached();
 }

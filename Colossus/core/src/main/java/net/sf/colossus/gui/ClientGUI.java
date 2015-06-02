@@ -21,7 +21,9 @@ import java.util.logging.Logger;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIManager;
@@ -48,6 +50,7 @@ import net.sf.colossus.game.Phase;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.Proposal;
+import net.sf.colossus.guiutil.KDialog;
 import net.sf.colossus.util.CollectionHelper;
 import net.sf.colossus.util.Predicate;
 import net.sf.colossus.variant.BattleHex;
@@ -527,6 +530,100 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         {
             watchdog.removeBattleBoardFrame();
         }
+    }
+
+    private KDialog lastDialog = null;
+
+    private void disposeLastInactivityDialog()
+    {
+        if (lastDialog != null)
+        {
+            lastDialog.dispose();
+            lastDialog = null;
+        }
+    }
+
+    public void inactivityWarning(final int inactiveSecs, final int timeoutSecs)
+    {
+        disposeLastInactivityDialog();
+
+        final String title = "It's your turn (" + inactiveSecs + "/"
+            + timeoutSecs + ")!";
+        final String text = "\nHey, it's your turn, and you've been doing nothing for "
+            + inactiveSecs
+            + " seconds!\n "
+            + "\nAfter "
+            + timeoutSecs
+            + " seconds of inactivity the AI will take over this turn for you!";
+
+        if (SwingUtilities.isEventDispatchThread())
+        {
+            showInactivityDialog(title, text);
+        }
+        else
+        {
+            SwingUtilities.invokeLater(new Runnable()
+            {
+                public void run()
+                {
+                    showInactivityDialog(title, text);
+                }
+            });
+        }
+    }
+
+    private void showInactivityDialog(String title, String text)
+    {
+        getMapOrBoardFrame().requestFocus();
+        getMapOrBoardFrame().toFront();
+
+        lastDialog = new KDialog(getMapOrBoardFrame(), title, true);
+
+        JTextArea contentPanel = new JTextArea(text, 5, 30);
+        contentPanel.setEditable(false);
+
+        lastDialog.getContentPane().add(contentPanel);
+        lastDialog.pack();
+        lastDialog.centerOnScreen();
+        lastDialog.setVisible(true);
+
+        getMapOrBoardFrame().requestFocus();
+        getMapOrBoardFrame().toFront();
+    }
+
+
+    public void inactivityTimeoutReached()
+    {
+        disposeLastInactivityDialog();
+
+        final String title = "AI took over";
+        final String text = "\n"
+            + "You've been inactive for too long. AI took over for you in this round\n"
+            + "so now it's probably somebody else's turn.\n\n"
+            + "You will be back in control in your next turn.";
+
+        if (SwingUtilities.isEventDispatchThread())
+        {
+            showInactivityDialog(title, text);
+
+        }
+        else
+        {
+            SwingUtilities.invokeLater(new Runnable()
+            {
+                public void run()
+                {
+                    showInactivityDialog(title, text);
+
+                }
+            });
+        }
+
+        lastDialog = new KDialog(getMapOrBoardFrame(),
+            "Timed out, AI took over!",
+            false);
+        lastDialog.add(new JLabel("bla"));
+        lastDialog.setVisible(true);
     }
 
     public void setStrikeNumbers(BattleUnit striker, Set<BattleHex> targetHexes)
@@ -3244,6 +3341,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         // For now, that one shall NOT be reopened by default on next start
         options.setOption(Options.showConnectionLogWindow, false);
         disposeConnectionLogWindow();
+        disposeLastInactivityDialog();
         disposeMovementDie();
         disposeStatusScreen();
         disposeEventViewer();

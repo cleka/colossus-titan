@@ -845,4 +845,22 @@ public class NullClientGUI implements IClientGUI
         // TODO Auto-generated method stub
 
     }
+
+    public boolean getStartedByWebClient()
+    {
+        return false;
+    }
+
+    public void inactivityWarning(int inactiveSecs, int timeoutSecs)
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void inactivityTimeoutReached()
+    {
+        // TODO Auto-generated method stub
+
+    }
+
 }
