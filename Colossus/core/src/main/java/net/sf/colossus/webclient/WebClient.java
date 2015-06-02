@@ -1980,7 +1980,7 @@ public class WebClient extends KFrame implements IWebClient
 
         if (gameClient != null)
         {
-            gameClient.getGUI().setWebClient(null);
+            gameClient.getGUI().clearWebClient();
             gameClient = null;
         }
 
@@ -2957,7 +2957,9 @@ public class WebClient extends KFrame implements IWebClient
         }
     }
 
-    public void gameStartsNow(String gameId, int port, String hostingHost)
+    public void gameStartsNow(String gameId, int port, String hostingHost,
+        final int inactivityCheckInterval,
+        final int inactivityWarningInterval, final int inactivityTimeout)
     {
         if (hostingHost == null || hostingHost.equals("null"))
         {
@@ -2971,7 +2973,8 @@ public class WebClient extends KFrame implements IWebClient
         if (startedGameId == null && IN_USE)
         {
             // is null means: it was not this webclient that started locally
-            startOwnClient(gameId, port, hostingHost);
+            startOwnClient(gameId, port, hostingHost, inactivityCheckInterval,
+                inactivityWarningInterval, inactivityTimeout);
         }
         // This WebClient did start it...
         else
@@ -2991,14 +2994,18 @@ public class WebClient extends KFrame implements IWebClient
                     int port = WebClient.this.startedAtPort;
                     String host = WebClient.this.startedAtHost;
 
-                    startOwnClient(gameId, port, host);
+                    startOwnClient(gameId, port, host,
+                        inactivityCheckInterval, inactivityWarningInterval,
+                        inactivityTimeout);
                 }
             };
             new Thread(r).start();
         }
     }
 
-    public void startOwnClient(String gameId, int port, String hostingHost)
+    public void startOwnClient(String gameId, int port, String hostingHost,
+        int inactivityCheckInterval, int inactivityWarningInterval,
+        int inactivityTimeout)
     {
         LOGGER.info("StartingOwnClient for gameId " + gameId + " hostingHost "
             + hostingHost + " port " + port);
@@ -3035,7 +3042,8 @@ public class WebClient extends KFrame implements IWebClient
             infoTextLabel.setText(waitingText);
 
             setGameClient(gc);
-            gc.getGUI().setWebClient(this);
+            gc.getGUI().setWebClient(this, inactivityCheckInterval,
+                inactivityWarningInterval, inactivityTimeout);
 
             Timer timeoutStartup = setupTimer();
 
@@ -3141,8 +3149,7 @@ public class WebClient extends KFrame implements IWebClient
             infoTextLabel.setText(waitingText);
 
             setGameClient(gc);
-            gc.getGUI().setWebClient(this);
-
+            gc.getGUI().setWebClient(this, -1, -1, -1);
             Timer timeoutStartup = setupTimer();
 
             while (!clientIsUp && !timeIsUp && !clientStartFailed)

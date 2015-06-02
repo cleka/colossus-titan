@@ -148,6 +148,10 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     private InactivityWatchdog watchdog = null;
 
+    private int inactivityCheckInterval = -1;
+    private int inactivityWarningInterval = -1;
+    private int inactivityTimeout = -1;
+
     // for things other GUI components need to inquire,
     // use the Oracle (on the long run, I guess there will be the
     // GameClientSide class behind it...)
@@ -175,9 +179,18 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         return this.startedByWebClient;
     }
 
-    public void setWebClient(WebClient wc)
+    public void setWebClient(WebClient wc, int inactivityCheckInterval,
+        int inactivityWarningInterval, int inactivityTimeout)
     {
         this.webClient = wc;
+        this.inactivityCheckInterval = inactivityCheckInterval;
+        this.inactivityWarningInterval = inactivityWarningInterval;
+        this.inactivityTimeout = inactivityTimeout;
+    }
+
+    public void clearWebClient()
+    {
+        this.webClient = null;
     }
 
     public void setClientInWebClientNull()
@@ -417,9 +430,21 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
         board = new MasterBoard(client, this);
 
-        if (client.needsWatchdog())
+        // TODO: remove this when debug/development phase is over
+        if (getOwningPlayer().getName().equals("localwatchdogtest"))
         {
-            watchdog = new InactivityWatchdog(client, board);
+            this.inactivityCheckInterval = 5;
+            this.inactivityWarningInterval = 15;
+            this.inactivityTimeout = 45;
+        }
+
+        // by default (local game) those inactivity values are all -1,
+        // they get a value only from webclient; see setWebClient(...)
+        if (client.needsWatchdog() && this.inactivityCheckInterval > 0)
+        {
+            watchdog = new InactivityWatchdog(client, board,
+                this.inactivityCheckInterval, this.inactivityWarningInterval,
+                this.inactivityTimeout);
             watchdog.start();
         }
 

@@ -909,11 +909,14 @@ public class WebServerClient implements IWebClient
         //    + spentTime + " milliseconds.");
     }
 
-    public void gameStartsNow(String gameId, int port, String hostingHost)
+    public void gameStartsNow(String gameId, int port, String hostingHost,
+        int inactivityCheckInterval, int inactivityWarningInterval,
+        int inactivityTimeout)
     {
         gameStartsNowSent = new Date().getTime();
         sendToClient(gameStartsNow + sep + gameId + sep + port + sep
-            + hostingHost);
+            + hostingHost + sep + inactivityCheckInterval + sep
+            + inactivityWarningInterval + sep + inactivityTimeout);
         // long spentTime = new Date().getTime() - gameStartsNowSent;
         // LOGGER.info("Sending gameStartsNow to " + getUsername() + " took "
         //    + spentTime + " milliseconds.");

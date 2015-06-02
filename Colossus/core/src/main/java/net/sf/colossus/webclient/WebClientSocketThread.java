@@ -546,8 +546,19 @@ public class WebClientSocketThread extends Thread implements IWebServer
                     String gameId = tokens[1];
                     int port = Integer.parseInt(tokens[2]);
                     String host = tokens[3];
+                    int checkIV = -1;
+                    int warnIV = -1;
+                    int timeout = -1;
+                    if (tokens.length > 4)
+                    {
+                        checkIV = Integer.parseInt(tokens[4]);
+                        warnIV = Integer.parseInt(tokens[5]);
+                        timeout = Integer.parseInt(tokens[6]);
+                    }
+
                     confirmCommand(command, gameId, port + "", host);
-                    webClient.gameStartsNow(gameId, port, host);
+                    webClient.gameStartsNow(gameId, port, host, checkIV,
+                        warnIV, timeout);
                 }
 
                 else if (command.equals(IWebClient.chatDeliver))

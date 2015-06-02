@@ -483,7 +483,8 @@ public final class Client implements IClient, IOracle, IVariant,
         // For Debugging/Development only this particular one
         // has watchdog, other's not, so that "some other" player
         // can be active (and thus this one here does not need to be)
-        if (getOwningPlayer().getName().equals("watchdogtest"))
+        if (getOwningPlayer().getName().equals("watchdogtest")
+            || getOwningPlayer().getName().equals("localwatchdogtest"))
         {
             return true;
         }

@@ -357,7 +357,9 @@ public class CmdLineWebClient implements IWebClient
 
     }
 
-    public void gameStartsNow(String gameId, int port, String hostingHost)
+    public void gameStartsNow(String gameId, int port, String hostingHost,
+        int inactivityCheckInterval, int inactivityWarningInterval,
+        int inactivityTimeout)
     {
         // TODO Auto-generated method stub
 

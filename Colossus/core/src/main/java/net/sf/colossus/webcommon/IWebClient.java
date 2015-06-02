@@ -39,7 +39,9 @@ public interface IWebClient
 
     public void gameInfo(GameInfo gi);
 
-    public void gameStartsNow(String gameId, int port, String hostingHost);
+    public void gameStartsNow(String gameId, int port, String hostingHost,
+        int inactivityCheckInterval, int inactivityWarningInterval,
+        int inactivityTimeout);
 
     public void gameStartsSoon(String gameId, String startUser);
 

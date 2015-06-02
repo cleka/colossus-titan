@@ -17,17 +17,12 @@ public class InactivityWatchdog extends Thread
     private static final Logger LOGGER = Logger
         .getLogger(InactivityWatchdog.class
         .getName());
-    /*
-    private static final long CHECK_INTERVAL_SECONDS = 3;
-    private static final long INACTIVITY_WARNING_INTERVAL = 6;
-    private static final long INACTIVITY_TIMEOUT = 18;
-    */
-
-    private static final long CHECK_INTERVAL_SECONDS = 30;
-    private static final long INACTIVITY_WARNING_INTERVAL = 60;
-    private static final long INACTIVITY_TIMEOUT = 180;
 
     private final Client client;
+
+    private final int inactivityCheckInterval;
+    private final int inactivityWarningInterval;
+    private final int inactivityTimeout;
 
     private JComponent masterBoard = null;
 
@@ -45,17 +40,24 @@ public class InactivityWatchdog extends Thread
 
     private long lastActivity;
 
-    public InactivityWatchdog(Client client, JComponent masterBoard)
+    public InactivityWatchdog(Client client, JComponent masterBoard,
+        int inactivityCheckInterval, int inactivityWarningInterval,
+        int inactivityTimeout)
     {
         this.client = client;
         this.masterBoard = masterBoard;
+        this.inactivityCheckInterval = inactivityCheckInterval;
+        this.inactivityWarningInterval = inactivityWarningInterval;
+        this.inactivityTimeout = inactivityTimeout;
+
         mbmaDetector = new MouseActivityDetector(masterBoard, this);
         currentBbmaDetector = null;
 
         this.lastActivity = new Date().getTime();
         done = false;
 
-        LOGGER.fine("InactivityWatchdog instantiated");
+        LOGGER.fine("\n\nInactivityWatchdog instantiated, checkVI = "
+            + inactivityCheckInterval + "\n");
     }
 
     public void addBattleBoardFrame(JComponent battleBoardPane)
@@ -122,15 +124,14 @@ public class InactivityWatchdog extends Thread
                     wasTicking = true;
                 }
 
-
                 long now = new Date().getTime();
                 long inactiveSecs = (now - lastActivity) / 1000;
                 int intervals = (int)Math.floor(inactiveSecs
-                    / INACTIVITY_WARNING_INTERVAL);
+                    / inactivityWarningInterval);
 
-                if (inactiveSecs >= INACTIVITY_TIMEOUT)
+                if (inactiveSecs >= inactivityTimeout)
                 {
-                    LOGGER.fine("Timeout! You were " + inactiveSecs
+                    LOGGER.fine("TIMEOUT! You were " + inactiveSecs
                         + " seconds idle!");
                     client.inactivityTimeoutReached();
                     stopClockTicking();
@@ -142,7 +143,7 @@ public class InactivityWatchdog extends Thread
                     if (intervals != lastIntervals)
                     {
                         client.inactivityWarning((int)inactiveSecs,
-                            (int)INACTIVITY_TIMEOUT);
+                            inactivityTimeout);
                         LOGGER.fine("Warning: You were now already "
                             + intervals + " intervals (" + inactiveSecs
                             + " seconds) idle!");
@@ -151,12 +152,20 @@ public class InactivityWatchdog extends Thread
                     else
                     {
                         LOGGER
-                            .fine("Inactivity check: still inactive, still in same interval");
+                            .fine("Inactivity check: now for "
+                                + inactiveSecs
+                                + " seconds inactive, but still in same interval ("
+                                + intervals + ")");
                     }
                 }
                 else
                 {
-                    LOGGER.fine("Inactivity timeout not reached, going on");
+                    LOGGER
+                        .fine("So far "
+                            + inactiveSecs
+                            + " seconds ("
+                            + intervals
+                            + " intervals) inactive, but not another full interval yet");
                     lastIntervals = 0;
                 }
             }
@@ -177,7 +186,7 @@ public class InactivityWatchdog extends Thread
 
             try
             {
-                Thread.sleep(CHECK_INTERVAL_SECONDS * 1000);
+                Thread.sleep(inactivityCheckInterval * 1000);
             }
             catch (InterruptedException e)
             {
@@ -267,42 +276,34 @@ public class InactivityWatchdog extends Thread
         void somethingHappened(String what)
         {
             // dummy, just to silence eclipse warnings...
-            if (what.equals("bla"))
-            {
-                LOGGER.fine(what);
-            }
-            if (what.equals("dummy"))
-            {
-                // nothing
-            }
+            LOGGER.fine(what);
             watchdog.setLastActivity();
         }
 
         public void mousePressed(MouseEvent e)
         {
-            somethingHappened("mp");
-        }
-
-        public void mouseExited(MouseEvent e)
-        {
-            somethingHappened("dummy");
-        }
-
-        public void mouseEntered(MouseEvent e)
-        {
-            somethingHappened("dummy");
+            // somethingHappened("Mouse pressed");
         }
 
         public void mouseClicked(MouseEvent e)
         {
-            somethingHappened("mc");
+            somethingHappened("Mouse clicked");
         }
 
         public void mouseReleased(MouseEvent e)
         {
-            somethingHappened("mr");
+            // somethingHappened("Mouse released");
         }
 
+        public void mouseExited(MouseEvent e)
+        {
+            // somethingHappened("dummy");
+        }
+
+        public void mouseEntered(MouseEvent e)
+        {
+            // somethingHappened("dummy");
+        }
 
     } // END class MouseActivityDetector
 

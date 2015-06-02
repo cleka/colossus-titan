@@ -65,6 +65,10 @@ public class WebServer implements IWebServer, IRunWebServer
 
     private final static int MIN_FREE_GAME_PORTS = 5;
 
+    private final int INACTIVITY_CHECK_INTERVAL = 10;
+    private final int INACTIVITY_WARNING_INTERVAL = 60;
+    private final int INACTIVITY_TIMEOUT = 180;
+
     private final static ArrayList<String> loginMessage = new ArrayList<String>();
 
     /**
@@ -903,7 +907,9 @@ public class WebServer implements IWebServer, IRunWebServer
             if (client != null)
             {
                 client.gameInfo(gi);
-                client.gameStartsNow(gameId, port, host);
+                client.gameStartsNow(gameId, port, host,
+                    INACTIVITY_CHECK_INTERVAL, INACTIVITY_WARNING_INTERVAL,
+                    INACTIVITY_TIMEOUT);
                 ((WebServerClient)client).requestPingNow();
             }
             else
@@ -1147,6 +1153,8 @@ public class WebServer implements IWebServer, IRunWebServer
      *  A game was started by a WebClient user locally on his computer
      *  and is ready to accept the other players as remote client;
      *  so we notify them and tell them host and port to where to connect.
+     *
+     *  AT THE MOMENT THIS FUNCTIONALITY IS NOT IN USE AT ALL!
      */
     public void startGameOnPlayerHost(String gameId, String hostingPlayer,
         String playerHost, int port)
@@ -1163,7 +1171,9 @@ public class WebServer implements IWebServer, IRunWebServer
                     + " that game starts at host of hosting player "
                     + hostingPlayer);
                 IWebClient webClient = u.getWebserverClient();
-                webClient.gameStartsNow(gameId, port, playerHost);
+                webClient.gameStartsNow(gameId, port, playerHost,
+                    INACTIVITY_CHECK_INTERVAL, INACTIVITY_WARNING_INTERVAL,
+                    INACTIVITY_TIMEOUT);
             }
         }
         else
