@@ -233,6 +233,7 @@ public class WebClient extends KFrame implements IWebClient
     private JCheckBox unlimitedMulligansCB;
     private JCheckBox balancedTowersCB;
     private JCheckBox lordBattleControlCB;
+    private JCheckBox probBasedBattleHitsCB;
 
     private JLabel nowDateAndTimeLabel;
     private JTextField atDateField;
@@ -1427,10 +1428,23 @@ public class WebClient extends KFrame implements IWebClient
             }
         });
 
+        boolean probabilityBaseBattleHits = options
+            .getOption(Options.pbBattleHits);
+        probBasedBattleHitsCB = new JCheckBox(Options.pbBattleHits,
+            probabilityBaseBattleHits);
+        probBasedBattleHitsCB.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                options.setOption(Options.pbBattleHits,
+                    probBasedBattleHitsCB.isSelected());
+            }
+        });
+
         checkboxPane.add(unlimitedMulligansCB);
         checkboxPane.add(balancedTowersCB);
         checkboxPane.add(lordBattleControlCB);
-
+        checkboxPane.add(probBasedBattleHitsCB);
 
         preferencesPane.add(new JLabel("Various settings:"));
         preferencesPane.add(checkboxPane);
@@ -3758,6 +3772,10 @@ public class WebClient extends KFrame implements IWebClient
         if (balancedTowersCB.isSelected())
         {
             extraOptions.add(Options.balancedTowers);
+        }
+        if (probBasedBattleHitsCB.isSelected())
+        {
+            extraOptions.add(Options.pbBattleHits);
         }
 
         String dummy = new String("");

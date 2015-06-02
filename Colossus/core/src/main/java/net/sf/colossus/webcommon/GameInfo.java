@@ -61,6 +61,7 @@ public class GameInfo
     private boolean unlimitedMulligans;
     private boolean balancedTowers;
     private boolean autoSansLordBattles;
+    private boolean probabilityBasedBattleHits;
 
     private int min;
     private int target;
@@ -168,6 +169,10 @@ public class GameInfo
             else if (string.equals(Options.balancedTowers))
             {
                 this.balancedTowers = true;
+            }
+            else if (string.equals(Options.pbBattleHits))
+            {
+                this.probabilityBasedBattleHits = true;
             }
             else
             {
@@ -340,6 +345,11 @@ public class GameInfo
             extraOptions.add(Options.balancedTowers);
         }
 
+        if (this.probabilityBasedBattleHits)
+        {
+            extraOptions.add(Options.pbBattleHits);
+        }
+
         return extraOptions;
     }
 
@@ -504,11 +514,27 @@ public class GameInfo
         return autoSansLordBattles;
     }
 
+    public void setAutoSansLordBattles(boolean val)
+    {
+        autoSansLordBattles = val;
+    }
+
+    public boolean getProbabilityBasedBattleHits()
+    {
+        return probabilityBasedBattleHits;
+    }
+
+    public void setProbabilityBasedBattleHits(boolean val)
+    {
+        probabilityBasedBattleHits = val;
+    }
+
     public String getOptionsFlagsString()
     {
         String s = (this.unlimitedMulligans ? "U" : "-")
             + (this.balancedTowers ? "B" : "-")
-            + (this.autoSansLordBattles ? "N" : "-");
+            + (this.autoSansLordBattles ? "N" : "-")
+            + (this.probabilityBasedBattleHits ? "P" : "-");
         return s;
     }
 
@@ -519,17 +545,13 @@ public class GameInfo
             + ", "
             + (this.balancedTowers ? Options.balancedTowers : "-")
             + ", "
-            + (this.autoSansLordBattles ? Options.autoSansLordBattles : "-");
+            + (this.autoSansLordBattles ? Options.autoSansLordBattles : "-")
+            + ", "
+            + (this.probabilityBasedBattleHits ? Options.pbBattleHits : "-");
+
         return ttText;
 
     }
-
-    public void setAutoSansLordBattles(boolean val)
-    {
-        autoSansLordBattles = val;
-    }
-
-
 
     /**
      * Have enough players enrolled (at least "min")
@@ -821,6 +843,8 @@ public class GameInfo
         gameOptions.setOption(Options.balancedTowers, getBalancedTowers());
         gameOptions.setOption(Options.autoSansLordBattles,
             getAutoSansLordBattles());
+        gameOptions.setOption(Options.pbBattleHits,
+            getProbabilityBasedBattleHits());
 
         // gameOptions.setOption(Options.autoQuit, true);
         String name;

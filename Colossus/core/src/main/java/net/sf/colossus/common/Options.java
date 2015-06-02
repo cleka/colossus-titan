@@ -659,26 +659,6 @@ public final class Options implements IOptions
         return System.getProperty(propNameStresstestRounds) != null;
     }
 
-    /**
-     * Probability-based Battle Rolls:
-     *
-     * If set to true, give exactly (at least) the amount of hits as one could get
-     * according to probability. E.g. for 6 dice and strike nr 4, 3 hits,
-     * 6 dice and strike number 6 gives 1 hit.
-     * Includes "accumulated wasted luck per creature", i.e. if a centaur
-     * yields 1.5 wasted luck = 0.5, next time accumulated WL = 1
-     * => give one hit more and subtract 1.0 from AWL.
-     */
-    public static final boolean probabilityBasedBattleRolls;
-
-    private static String propNamePBBattleRolls = "pbBattleRolls";
-
-    static
-    {
-        String propVal = System.getProperty(propNamePBBattleRolls);
-        probabilityBasedBattleRolls = Boolean.parseBoolean(propVal);
-    }
-
     synchronized public static int getHowManyStresstestRoundsProperty()
     {
         String propHowMany = System.getProperty(propNameStresstestRounds);
