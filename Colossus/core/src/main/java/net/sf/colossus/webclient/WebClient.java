@@ -221,9 +221,9 @@ public class WebClient extends KFrame implements IWebClient
     private String statusText = "";
 
     // Game browsing pane:
-    private JComboBox variantBox;
-    private JComboBox viewmodeBox;
-    private JComboBox eventExpiringBox;
+    private JComboBox<String> variantBox;
+    private JComboBox<String> viewmodeBox;
+    private JComboBox<String> eventExpiringBox;
 
     private JSpinner spinner1;
     private JSpinner spinner2;
@@ -1327,7 +1327,7 @@ public class WebClient extends KFrame implements IWebClient
             variantName = Constants.variantArray[0]; // Default variant
         }
 
-        variantBox = new JComboBox(Constants.variantArray);
+        variantBox = new JComboBox<String>(Constants.variantArray);
         variantBox.setSelectedItem(variantName);
         variantBox.addActionListener(new ActionListener()
         {
@@ -1350,7 +1350,7 @@ public class WebClient extends KFrame implements IWebClient
             viewmodeName = Options.viewableAll;
         }
 
-        viewmodeBox = new JComboBox(Options.viewModeArray);
+        viewmodeBox = new JComboBox<String>(Options.viewModeArray);
         viewmodeBox.setSelectedItem(viewmodeName);
         viewmodeBox.addActionListener(new ActionListener()
         {
@@ -1372,7 +1372,7 @@ public class WebClient extends KFrame implements IWebClient
             eventExpiringVal = "5";
         }
 
-        eventExpiringBox = new JComboBox(Options.eventExpiringChoices);
+        eventExpiringBox = new JComboBox<String>(Options.eventExpiringChoices);
         eventExpiringBox.setSelectedItem(eventExpiringVal);
         eventExpiringBox.addActionListener(new ActionListener()
         {

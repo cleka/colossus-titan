@@ -155,9 +155,10 @@ public class GameInfo
      */
     private void parseExtraOptions(List<String> extraOptions)
     {
-        for (Iterator iterator = extraOptions.iterator(); iterator.hasNext();)
+        for (Iterator<String> iterator = extraOptions.iterator(); iterator
+            .hasNext();)
         {
-            String string = (String)iterator.next();
+            String string = iterator.next();
             if (string.equals(Options.autoSansLordBattles))
             {
                 this.autoSansLordBattles = true;

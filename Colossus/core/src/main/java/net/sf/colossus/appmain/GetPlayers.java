@@ -73,7 +73,7 @@ public final class GetPlayers extends KFrame
     private final Object mutex;
     private boolean mutexNotified = false;
     private final JLabel runningOnLabel;
-    private final JComboBox serveAtPortBox;
+    private final JComboBox<String> serveAtPortBox;
     private final TreeSet<String> sPortChoices;
 
     private final Vector<String> typeChoices = new Vector<String>();
@@ -83,10 +83,10 @@ public final class GetPlayers extends KFrame
     private JScrollPane readmeScrollPane;
     private final JTabbedPane tabbedPane;
 
-    private final JComboBox variantBox;
+    private final JComboBox<String> variantBox;
     private final Vector<String> variantVector;
-    private final JComboBox viewModeBox;
-    private final JComboBox eventExpiringBox;
+    private final JComboBox<String> viewModeBox;
+    private final JComboBox<String> eventExpiringBox;
 
     private int serveAtPort = -1; // server serves at that.
 
@@ -168,8 +168,8 @@ public final class GetPlayers extends KFrame
         {
             stPort = Constants.defaultPort;
         }
-        serveAtPortBox = new JComboBox(sPortChoices
-            .toArray(new String[sPortChoices.size()]));
+        serveAtPortBox = new JComboBox<String>(
+            sPortChoices.toArray(new String[sPortChoices.size()]));
         /* moved further down; when run here it hangs up for a minute or
          * so in Java7 ?
          */
@@ -208,7 +208,7 @@ public final class GetPlayers extends KFrame
             "Viewability of legion and events"));
         optionPane.add(viewModePane);
 
-        viewModeBox = new JComboBox(Options.viewModeArray);
+        viewModeBox = new JComboBox<String>(Options.viewModeArray);
         viewModeBox.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent e)
@@ -223,7 +223,7 @@ public final class GetPlayers extends KFrame
 
         String eventExpiringVal = options.getStringOption(
             Options.eventExpiring, "5");
-        eventExpiringBox = new JComboBox(Options.eventExpiringChoices);
+        eventExpiringBox = new JComboBox<String>(Options.eventExpiringChoices);
         eventExpiringBox.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent e)
@@ -375,7 +375,7 @@ public final class GetPlayers extends KFrame
             }
         }
 
-        variantBox = new JComboBox(variantVector);
+        variantBox = new JComboBox<String>(variantVector);
         variantBox.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent e)
@@ -654,7 +654,7 @@ public final class GetPlayers extends KFrame
         String s = "Player " + (i + 1);
         onePlayerPane.add(new JLabel(s));
 
-        final JComboBox playerType = new JComboBox(typeChoices);
+        final JComboBox<String> playerType = new JComboBox<String>(typeChoices);
 
         // Avoid scrolling (otherwise "Human" might not be visible directly)
         // the number is chosen to be larger then the current choices but not
@@ -746,7 +746,7 @@ public final class GetPlayers extends KFrame
             nameChoices.add(Constants.none);
         }
 
-        final JComboBox playerName = new JComboBox(nameChoices);
+        final JComboBox<String> playerName = new JComboBox<String>(nameChoices);
         // setEditable moved to enablePlayers; if done here, it
         // was hanging for 1 minutes or so.
         onePlayerPane.add(playerName);
@@ -1092,7 +1092,7 @@ public final class GetPlayers extends KFrame
         int cnt = variantBox.getItemCount();
         for (int i = 0; i < cnt; i++)
         {
-            String item = (String)variantBox.getItemAt(i);
+            String item = variantBox.getItemAt(i);
             if (item.equals(varName))
             {
                 return;

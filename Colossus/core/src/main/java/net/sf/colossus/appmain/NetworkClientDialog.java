@@ -51,9 +51,9 @@ public class NetworkClientDialog extends KFrame
     private int port;
     private final SaveWindow saveWindow;
 
-    private final JComboBox nameBox;
-    private final JComboBox hostBox;
-    private final JComboBox portBox;
+    private final JComboBox<String> nameBox;
+    private final JComboBox<String> hostBox;
+    private final JComboBox<String> portBox;
 
     public NetworkClientDialog(Object mutex, final WhatNextManager whatNextMgr)
     {
@@ -83,7 +83,7 @@ public class NetworkClientDialog extends KFrame
         Set<String> nameChoices = new TreeSet<String>();
         nameChoices.add(playerName);
         nameChoices.add(Constants.username);
-        nameBox = new JComboBox(new Vector<String>(nameChoices));
+        nameBox = new JComboBox<String>(new Vector<String>(nameChoices));
         nameBox.setEditable(true);
         nameBox.addActionListener(new ActionListener()
         {
@@ -100,7 +100,7 @@ public class NetworkClientDialog extends KFrame
         String preferred = initServerNames(hostname, hostChoices,
             netclientOptions);
         this.hostname = preferred;
-        hostBox = new JComboBox(new Vector<String>(hostChoices));
+        hostBox = new JComboBox<String>(new Vector<String>(hostChoices));
         hostBox.setEditable(true);
         hostBox.setSelectedItem(preferred);
         hostBox.addActionListener(new ActionListener()
@@ -116,8 +116,8 @@ public class NetworkClientDialog extends KFrame
         Set<String> portChoices = new TreeSet<String>();
         portChoices.add("" + port);
         portChoices.add("" + Constants.defaultPort);
-        portBox = new JComboBox(portChoices.toArray(new String[portChoices
-            .size()]));
+        portBox = new JComboBox<String>(
+            portChoices.toArray(new String[portChoices.size()]));
         portBox.setEditable(true);
         portBox.addActionListener(new ActionListener()
         {

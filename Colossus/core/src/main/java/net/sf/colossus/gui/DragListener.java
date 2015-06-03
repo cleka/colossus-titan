@@ -10,7 +10,7 @@ import java.awt.event.MouseMotionListener;
 
 /**
  * This listener can be used to make a Component draggable.
- * 
+ *
  * If subscribed as MouseListener and MouseMotionListener, the component this
  * listener subscribes to will become draggable by mouse. This subscription is
  * done by the static method #makeDraggable(Component) to make sure it is done
@@ -27,6 +27,7 @@ public class DragListener extends MouseAdapter implements MouseMotionListener
         this.component = component;
     }
 
+    @Override
     public void mouseDragged(MouseEvent e)
     {
         Point loc = component.getLocation();
@@ -45,6 +46,7 @@ public class DragListener extends MouseAdapter implements MouseMotionListener
         lastMousePos = newMousePos;
     }
 
+    @Override
     public void mouseMoved(MouseEvent e)
     {
         // nothing to do

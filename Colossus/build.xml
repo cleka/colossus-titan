@@ -75,6 +75,7 @@
   <target name="compile" depends="init"
   description="Compiles Colossus without datatools and variants">
     <javac debug="yes" deprecation="yes" target="${target.level}"
+    includeantruntime="false"
     source="${source.level}" srcdir="${core.src.dir}"
     destdir="${build.classes.dir}">
       <classpath refid="project.class.path" />
@@ -83,6 +84,7 @@
   <target name="compileVariants" depends="init"
   description="Compiles the variant code">
     <javac debug="yes" deprecation="yes" target="${target.level}"
+    includeantruntime="false"
     source="${source.level}" srcdir="${variants.dir}"
     destdir="${build.classes.dir}">
       <classpath refid="project.class.path" />
@@ -91,6 +93,7 @@
   <target name="compileDatatoolsParser" depends="init,compile"
   description="Compiles the datatools parsers using javac">
     <javac debug="yes" deprecation="yes" target="${target.level}"
+    includeantruntime="false"
     source="${source.level}" srcdir="${datatoolsparser.src.dir}"
     destdir="${build.classes.dir}" excludes="**/datatools/**">
       <classpath refid="project.class.path" />
@@ -100,6 +103,7 @@
   <target name="compileDatatools" depends="init,compile,compileDatatoolsParser"
   description="Compiles the datatools using javac">
     <javac debug="yes" deprecation="yes" target="${target.level}"
+    includeantruntime="false"
     source="${source.level}" srcdir="${datatools.src.dir}"
     destdir="${build.classes.dir}" excludes="**/datatools/**">
       <classpath refid="project.class.path" />
@@ -113,6 +117,7 @@
   <target name="compileTests" depends="compile"
 	  description="Compiles the JUnit tests">
 	    <javac debug="yes" deprecation="yes" target="${target.level}"
+	    includeantruntime="false"
 	    source="${source.level}" srcdir="${tests.src.dir}"
 	    destdir="${build.classes.dir}">
 	      <classpath refid="project.class.path" />
@@ -133,6 +138,7 @@
   <target name="compileFuncTests" depends="compile"
   description="Compiles the JUnit GUI tests">
     <javac debug="yes" deprecation="yes" target="${target.level}"
+    includeantruntime="false"
     source="${source.level}" srcdir="${functests.src.dir}"
     destdir="${build.classes.dir}">
       <classpath refid="project.class.path" />

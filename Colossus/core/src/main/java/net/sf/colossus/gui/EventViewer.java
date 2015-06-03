@@ -136,7 +136,7 @@ final class EventViewer extends KDialog
 
     private boolean autoScroll;
     private boolean hideUndoneEvents;
-    private JComboBox maxTurnsDisplayExpiringBox;
+    private JComboBox<String> maxTurnsDisplayExpiringBox;
 
     // how many back are currently displayed
     private int maxTurns = 1;
@@ -447,8 +447,6 @@ final class EventViewer extends KDialog
             alChoices.add(maxString);
         }
 
-        Object[] Choices = alChoices.toArray();
-
         // read user's setting for this, but cannot exceed the Game's
         // general setting.
         String maxTurnsOptString = options.getStringOption(evMaxTurns);
@@ -493,7 +491,8 @@ final class EventViewer extends KDialog
             }
         }
 
-        maxTurnsDisplayExpiringBox = new JComboBox(Choices);
+        String[] choicesArray = alChoices.toArray(new String[0]);
+        maxTurnsDisplayExpiringBox = new JComboBox<String>(choicesArray);
         maxTurnsDisplayExpiringBox.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent e)
