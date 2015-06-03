@@ -4,7 +4,6 @@ package net.sf.colossus.appmain;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Point;
@@ -121,7 +120,6 @@ public final class GetPlayers extends KFrame
         setupTypeChoices();
 
         setBackground(Color.lightGray);
-        pack();
 
         Container mainPane = new Box(BoxLayout.Y_AXIS);
 
@@ -1099,18 +1097,6 @@ public final class GetPlayers extends KFrame
             }
         }
         variantBox.addItem(varName);
-    }
-
-    @Override
-    public Dimension getMinimumSize()
-    {
-        return new Dimension(640, 480);
-    }
-
-    @Override
-    public Dimension getPreferredSize()
-    {
-        return new Dimension(640, 768);
     }
 
     /*
