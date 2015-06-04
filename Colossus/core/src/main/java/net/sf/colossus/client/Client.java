@@ -396,6 +396,8 @@ public final class Client implements IClient, IOracle, IVariant,
         // or create Game inside Client (then we can pass in the Client).
         game.setClient(this);
 
+        /* test some new stuff dummy */
+
         conn.startThread();
 
         this.connection = conn;
