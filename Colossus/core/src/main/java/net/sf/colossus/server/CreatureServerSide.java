@@ -375,7 +375,7 @@ public class CreatureServerSide extends Creature implements BattleCritter
 
             // Roll the dice:
             damage = game.getBattleStrike().rollDice(this, target, dice,
-                strikeNumber, rolls, randomized);
+                strikeNumber, rolls, randomized, game.getDiceStatCollector());
         }
 
         int carryDamage = target.adjustHits(damage);

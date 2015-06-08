@@ -26,6 +26,7 @@ import net.sf.colossus.game.BattlePhase;
 import net.sf.colossus.game.Caretaker;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Dice;
+import net.sf.colossus.game.DiceStatistics;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
@@ -130,6 +131,8 @@ public class GameServerSide extends Game
     // currently visible board-player (for hotSeatMode)
     private Player cvbPlayer = null;
 
+    private final DiceStatistics diceStatCollector;
+
     /** Shortcut for UnitTests,
      *  to create a Game with dummy input objects on the fly.
      */
@@ -184,6 +187,8 @@ public class GameServerSide extends Game
         this.battleStrikeSS = new BattleStrikeServerSide(this);
         this.movementSS = new MovementServerSide(this, options);
 
+        this.diceStatCollector = new DiceStatistics();
+
         InstanceTracker.register(this, "Game at port " + getPort());
 
         // The caretaker object was created by super(...)
@@ -232,6 +237,11 @@ public class GameServerSide extends Game
             port = Constants.defaultPort;
         }
         return port;
+    }
+
+    public DiceStatistics getDiceStatCollector()
+    {
+        return this.diceStatCollector;
     }
 
     private void initServer()
@@ -491,6 +501,10 @@ public class GameServerSide extends Game
     private void cleanupWhenGameOver()
     {
         server.waitUntilGameFinishes();
+        for (Player p : getPlayers())
+        {
+            diceStatCollector.printStatistics(p);
+        }
         server.doCleanup();
         server = null;
         ViableEntityManager.unregister(this);
