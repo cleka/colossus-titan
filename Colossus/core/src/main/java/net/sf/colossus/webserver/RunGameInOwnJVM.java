@@ -48,6 +48,8 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
     private final String gameId;
 
     private String workFilesBaseDir;
+    private String statisticsBaseDir;
+
     private String template;
     private String javaCommand;
     private String colossusJar;
@@ -71,6 +73,9 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
     {
         workFilesBaseDir = options
             .getStringOption(WebServerConstants.optWorkFilesBaseDir);
+        statisticsBaseDir = options
+            .getStringOption(WebServerConstants.optStatisticsBaseDir);
+
         template = options
             .getStringOption(WebServerConstants.optLogPropTemplate);
         javaCommand = options
@@ -151,6 +156,10 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
         String gameId4s = String.format("%04d", Integer.valueOf(intGameId));
         File gameDir = new File(dirPath, gameId4s);
         gameDir.mkdirs();
+
+        String statDirPath = statisticsBaseDir + File.separator + dir0099Part;
+        File statDir = new File(statDirPath, gameId4s);
+        statDir.mkdirs();
 
         String fileName = "Game." + gameId + ".running.flag";
 

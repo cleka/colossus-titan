@@ -65,8 +65,7 @@ public class DiceStatistics
         for (int i = 0; i < 6; i++)
         {
             int count = dicePerNumber[i];
-            String percent = String
-.format("%3.1f", 100 * (float)count
+            String percent = String.format("%3.1f", 100 * (float)count
                 / totalCount);
             int j = i + 1;
             System.out.println("Dice roll " + j + ": " + count + " times (= "
