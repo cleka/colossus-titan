@@ -75,7 +75,6 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
             .getStringOption(WebServerConstants.optWorkFilesBaseDir);
         statisticsBaseDir = options
             .getStringOption(WebServerConstants.optStatisticsBaseDir);
-
         template = options
             .getStringOption(WebServerConstants.optLogPropTemplate);
         javaCommand = options
@@ -160,10 +159,12 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
         String statDirPath = statisticsBaseDir + File.separator + dir0099Part;
         File statDir = new File(statDirPath, gameId4s);
         statDir.mkdirs();
+        LOGGER.finest("Creating dir " + statDir.toString());
+        File diceStatFile = new File(statDir, "dice-statistics.txt");
 
-        String fileName = "Game." + gameId + ".running.flag";
+        String flagFileName = "Game." + gameId + ".running.flag";
 
-        this.flagFile = new File(gameDir, fileName);
+        this.flagFile = new File(gameDir, flagFileName);
         if (flagFile.exists())
         {
             flagFile.delete();
@@ -176,7 +177,7 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
 
         // Stores data from GameInfo into an options object and saves
         // the options to file on disk in the special game directory.
-        createServerCfgFile(gameDir);
+        createServerCfgFile(gameDir, diceStatFile);
 
         Runtime rt = Runtime.getRuntime();
 
@@ -186,7 +187,7 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
 
         String command = javaCommand + " " + loggingFileArg + " -Duser.home="
             + gameDir + " -jar " + colossusJar + " -p " + hostingPort
-            + " -g --flagfile " + fileName;
+            + " -g --flagfile " + flagFileName;
 
         try
         {
@@ -209,7 +210,7 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
         }
     }
 
-    private boolean createServerCfgFile(File gameDir)
+    private boolean createServerCfgFile(File gameDir, File diceStatisticsFile)
     {
         boolean ok = true;
 
@@ -224,6 +225,9 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
 
         gameOptions.setOption(Options.autoQuit, true);
         gameOptions.setOption(Options.keepAccepting, true);
+        String statFileName = diceStatisticsFile.toString();
+        LOGGER.finest("Statisticsfilename: " + statFileName);
+        gameOptions.setOption(Options.diceStatisticsFile, statFileName);
 
         gameOptions.saveOptions();
 

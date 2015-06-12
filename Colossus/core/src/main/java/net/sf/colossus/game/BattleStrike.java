@@ -314,8 +314,7 @@ public class BattleStrike
     }
 
     public int rollDice(Creature striker, Creature target, int dice,
-        int strikeNumber, List<String> rolls, boolean randomized,
-        DiceStatistics diceStatCollector)
+        int strikeNumber, List<String> rolls, boolean randomized)
     {
         // for logging
         StringBuilder rollString = new StringBuilder(36);
@@ -334,16 +333,6 @@ public class BattleStrike
                 damage++;
             }
         }
-
-
-        diceStatCollector.addOneSet(striker.getPlayer(), game.getTurnNumber(),
-            game.getBattle().getBattleTurnNumber(), striker, target,
-            strikeNumber, rolls);
-
-        /*
-                diceStatCollector.addOneSet(striker.getPlayer(), 1, 2, striker,
-                    target, strikeNumber, rolls);
-        */
 
         LOGGER.log(Level.INFO,
             striker.getName() + " in " + striker.getCurrentHex() + " strikes "

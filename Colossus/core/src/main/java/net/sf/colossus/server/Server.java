@@ -2658,6 +2658,16 @@ public final class Server extends Thread implements IServer
                 strikeNumber, rolls, damage, target.isDead(), false,
                 carryDamageLeft, carryTargetDescriptions);
         }
+
+        if (game.getDiceStatCollector() != null)
+        {
+            if (!game.getOption(Options.pbBattleHits))
+            {
+                game.getDiceStatCollector().addOneSet(game.getTurnNumber(),
+                    game.getBattleTurnNumber(), striker, target, strikeNumber,
+                    rolls);
+            }
+        }
     }
 
     void allTellCarryResults(CreatureServerSide carryTarget,

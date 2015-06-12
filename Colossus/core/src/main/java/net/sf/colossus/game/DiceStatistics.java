@@ -1,8 +1,11 @@
 package net.sf.colossus.game;
 
 
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.util.Glob;
@@ -16,18 +19,46 @@ public class DiceStatistics
 
     private final List<DiceRollSet> rolls = new ArrayList<DiceRollSet>();
 
-    public DiceStatistics()
+    private PrintStream statisticsOutputStream;
+
+    public DiceStatistics(String statisticsFileName)
     {
-        // TODO Auto-generated constructor stub
+        openStatisticsFile(statisticsFileName);
     }
 
-    public void addOneSet(Player player, int turn, int battleTurn,
-        Creature striker, Creature target, int strikeNumber, List<String> rollsString)
+    private void openStatisticsFile(String statisticsFileName)
+    {
+        this.statisticsOutputStream = null;
+        if (statisticsFileName != null)
+        {
+            try
+            {
+                statisticsOutputStream = new PrintStream(statisticsFileName);
+            }
+            catch (IOException e)
+            {
+                LOGGER.log(Level.SEVERE,
+                    "Couldn't open statics file for writing?"
+                        + statisticsFileName, e);
+            }
+        }
+    }
+
+    private void writeToStatFile(String string)
+    {
+        if (statisticsOutputStream != null)
+        {
+            statisticsOutputStream.println(string);
+        }
+    }
+
+    public void addOneSet(int turn, int battleTurn, Creature striker,
+        Creature target, int strikeNumber, List<String> rollsString)
     {
         LOGGER.finer("Adding rollset for turn " + turn + " battleturn "
             + battleTurn + " Striker " + striker.getDescription());
-
-        DiceRollSet newSet = new DiceRollSet(player, turn, battleTurn,
+        DiceRollSet newSet = new DiceRollSet(striker.getPlayer(), turn,
+            battleTurn,
             striker, target, strikeNumber, rollsString);
         newSet.printRollSet();
         rolls.add(newSet);
@@ -41,7 +72,8 @@ public class DiceStatistics
 
         if (rolls.size() == 0)
         {
-            System.out.println("\nPlayer " + p.getName() + " has not done any battle rolls in this game.");
+            writeToStatFile("\nPlayer " + p.getName()
+                + " has not done any battle rolls in this game.");
             return;
         }
         for (DiceRollSet set : rolls)
@@ -59,7 +91,7 @@ public class DiceStatistics
         }
 
         String average = String.format("%3.1f", (float)totalSum / totalCount);
-        System.out.println("\nBattle roll statistics for player "
+        writeToStatFile("\nBattle roll statistics for player "
             + p.getName() + ", in total " + totalCount
             + " battle dice rolled; average of all rolls: " + average);
         for (int i = 0; i < 6; i++)
@@ -68,7 +100,7 @@ public class DiceStatistics
             String percent = String.format("%3.1f", 100 * (float)count
                 / totalCount);
             int j = i + 1;
-            System.out.println("Dice roll " + j + ": " + count + " times (= "
+            writeToStatFile("Dice roll " + j + ": " + count + " times (= "
                 + percent + "%)");
         }
 
@@ -112,7 +144,7 @@ public class DiceStatistics
                 turn, this.player.getName(), battleTurn, striker.getName(),
                 target.getName(), strikeNumber, rollsGlob);
 
-            System.out.println(result);
+            writeToStatFile(result);
         }
 
     }

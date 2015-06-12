@@ -187,7 +187,16 @@ public class GameServerSide extends Game
         this.battleStrikeSS = new BattleStrikeServerSide(this);
         this.movementSS = new MovementServerSide(this, options);
 
-        this.diceStatCollector = new DiceStatistics();
+        String statisticsFileName = options
+            .getStringOption(Options.diceStatisticsFile);
+        if (statisticsFileName != null)
+        {
+            this.diceStatCollector = new DiceStatistics(statisticsFileName);
+        }
+        else
+        {
+            this.diceStatCollector = null;
+        }
 
         InstanceTracker.register(this, "Game at port " + getPort());
 
@@ -501,9 +510,12 @@ public class GameServerSide extends Game
     private void cleanupWhenGameOver()
     {
         server.waitUntilGameFinishes();
-        for (Player p : getPlayers())
+        if (diceStatCollector != null)
         {
-            diceStatCollector.printStatistics(p);
+            for (Player p : getPlayers())
+            {
+                diceStatCollector.printStatistics(p);
+            }
         }
         server.doCleanup();
         server = null;
