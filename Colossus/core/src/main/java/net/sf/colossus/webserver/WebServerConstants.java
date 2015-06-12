@@ -35,6 +35,7 @@ public final class WebServerConstants
     public final static String optColossusJar = "ColossusJar";
     public final static String optLogPropTemplate = "LogPropTemplate";
     public final static String optWorkFilesBaseDir = "WorkFilesBaseDir";
+    public final static String optStatisticsBaseDir = "StatisticsBaseDir";
 
     // Mail sending related options / cf file entries:
     public final static String optMailServer = "MailServer";
