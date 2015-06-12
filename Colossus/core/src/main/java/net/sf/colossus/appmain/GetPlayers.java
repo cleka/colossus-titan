@@ -76,7 +76,9 @@ public final class GetPlayers extends KFrame
     private final TreeSet<String> sPortChoices;
 
     private final Vector<String> typeChoices = new Vector<String>();
+    @SuppressWarnings({ "rawtypes" })
     private final JComboBox[] playerTypes = new JComboBox[Constants.MAX_MAX_PLAYERS];
+    @SuppressWarnings({ "rawtypes" })
     private final JComboBox[] playerNames = new JComboBox[Constants.MAX_MAX_PLAYERS];
     private JEditorPane readme = new JEditorPane();
     private JScrollPane readmeScrollPane;
