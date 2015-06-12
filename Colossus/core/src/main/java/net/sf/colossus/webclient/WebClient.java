@@ -72,6 +72,7 @@ import net.sf.colossus.gui.ColumnWidthPersistingJTable;
 import net.sf.colossus.guiutil.KFrame;
 import net.sf.colossus.server.INotifyWebServer;
 import net.sf.colossus.server.Server;
+import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.util.ViableEntityManager;
 import net.sf.colossus.webclient.WebClientSocketThread.WcstException;
 import net.sf.colossus.webcommon.GameInfo;
@@ -3274,6 +3275,19 @@ public class WebClient extends KFrame implements IWebClient
         else
         {
             // chat delivery to chat other than general not implemented
+        }
+    }
+
+    public void notifyClockTicking(boolean newValue)
+    {
+        if (newValue)
+        {
+            // player's clock is ticking, he should do something
+            generalChat.setBackgroundColor(HTMLColor.orange);
+        }
+        else
+        {
+            generalChat.setBackgroundColor(HTMLColor.white);
         }
     }
 

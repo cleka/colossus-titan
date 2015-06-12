@@ -2,6 +2,7 @@ package net.sf.colossus.webclient;
 
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Date;
@@ -18,6 +19,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
+import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.webcommon.FormatWhen;
 import net.sf.colossus.webcommon.IWebServer;
 
@@ -70,6 +72,7 @@ public class ChatHandler
         displayArea.setRows(textAreaHeight);
         displayArea.setEditable(false);
         displayArea.setLineWrap(false);
+        displayArea.setBackground(HTMLColor.white);
         displayScrollPane = new JScrollPane(displayArea);
         displayScrollBar = displayScrollPane.getVerticalScrollBar();
         chatTab.add(displayScrollPane, BorderLayout.CENTER);
@@ -258,6 +261,11 @@ public class ChatHandler
         {
             displayScrollBar.setValue(displayScrollBar.getMaximum());
         }
+    }
+
+    public void setBackgroundColor(Color color)
+    {
+        displayArea.setBackground(color);
     }
 
 } // END class ChatHandler

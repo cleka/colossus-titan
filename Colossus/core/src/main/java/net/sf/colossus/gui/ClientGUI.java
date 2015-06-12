@@ -616,7 +616,6 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         getMapOrBoardFrame().toFront();
     }
 
-
     public void inactivityTimeoutReached()
     {
         disposeLastInactivityDialog();
@@ -2628,8 +2627,6 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         }
     }
 
-
-
     public CreatureType doPickRecruit(Legion legion, String hexDescription)
     {
         List<CreatureType> recruits = client.findEligibleRecruits(legion,
@@ -2734,15 +2731,35 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
         eventViewer.turnOrPlayerChange(turnNr, player);
 
+        if (isMyTurn())
+        {
+            setWatchdogClockTicking();
+        }
+        else
+        {
+            stopWatchdogClockTicking();
+        }
+    }
+
+    public void setWatchdogClockTicking()
+    {
         if (watchdog != null)
         {
-            if (isMyTurn())
+            watchdog.setClockTicking();
+            if (webClient != null)
             {
-                watchdog.setClockTicking();
+                webClient.notifyClockTicking(true);
             }
-            else
+        }
+    }
+
+    public void stopWatchdogClockTicking()
+    {
+        {
+            watchdog.stopClockTicking();
+            if (webClient != null)
             {
-                watchdog.stopClockTicking();
+                webClient.notifyClockTicking(false);
             }
         }
     }
