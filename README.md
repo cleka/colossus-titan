@@ -15,3 +15,13 @@ semi-modern times, like svn to git, ant to maven, and perhaps finally give
 releases a meaningful version number instead of the 0.x.y's which sound like
 it would be in totally alpha state. Because in practice, the game has been in
 active use, even with a public server where to meet other players.
+
+So far only the trunk was moved from Sourceforge-SVN to Github-git, but not
+much else was done, so all documentation still refers to the old situation.
+
+If you are interested in getting involved into Colossus-titan, probably the
+best way to get started is to send a mail to Colossus developers list:
+
+  colossus-developers@lists.sourceforge.net
+
+For a quick peek, take a look at BUILD.md.
