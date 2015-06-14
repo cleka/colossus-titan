@@ -2755,6 +2755,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void stopWatchdogClockTicking()
     {
+        if (watchdog != null)
         {
             watchdog.stopClockTicking();
             if (webClient != null)

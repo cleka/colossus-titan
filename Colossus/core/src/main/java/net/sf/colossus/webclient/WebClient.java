@@ -104,9 +104,8 @@ public class WebClient extends KFrame implements IWebClient
     public final static int WC_VERSION_SUPPORTS_PING = 2;
     public final static int WC_VERSION_DINO_OK = 3;
     public final static int WC_VERSION_SUPPORTS_EXTRA_OPTIONS = 4;
-    public final static int WC_VERSION_2015_FEATURES = 5;
 
-    final static int WEB_CLIENT_VERSION = WC_VERSION_2015_FEATURES;
+    final static int WEB_CLIENT_VERSION = WC_VERSION_SUPPORTS_EXTRA_OPTIONS;
 
     // TODO make this all based on Locale.getDefault()
     // Initially: use German. To make it variable, need also to set
