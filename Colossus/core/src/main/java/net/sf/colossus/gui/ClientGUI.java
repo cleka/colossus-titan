@@ -19,7 +19,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -148,9 +147,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     private InactivityWatchdog watchdog = null;
 
-    private int inactivityCheckInterval = -1;
     private int inactivityWarningInterval = -1;
-    private int inactivityTimeout = -1;
 
     // for things other GUI components need to inquire,
     // use the Oracle (on the long run, I guess there will be the
@@ -179,13 +176,10 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         return this.startedByWebClient;
     }
 
-    public void setWebClient(WebClient wc, int inactivityCheckInterval,
-        int inactivityWarningInterval, int inactivityTimeout)
+    public void setWebClient(WebClient wc, int inactivityWarningInterval)
     {
         this.webClient = wc;
-        this.inactivityCheckInterval = inactivityCheckInterval;
         this.inactivityWarningInterval = inactivityWarningInterval;
-        this.inactivityTimeout = inactivityTimeout;
     }
 
     public void clearWebClient()
@@ -431,20 +425,18 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         board = new MasterBoard(client, this);
 
         // TODO: remove this when debug/development phase is over
-        if (getOwningPlayer().getName().equals("localwatchdogtest"))
+        if (getOwningPlayer().getName().equals("localwatchdogtest")
+            && this.inactivityWarningInterval == -1)
         {
-            this.inactivityCheckInterval = 5;
             this.inactivityWarningInterval = 15;
-            this.inactivityTimeout = 45;
         }
 
         // by default (local game) those inactivity values are all -1,
         // they get a value only from webclient; see setWebClient(...)
-        if (client.needsWatchdog() && this.inactivityCheckInterval > 0)
+        if (client.needsWatchdog() && this.inactivityWarningInterval > 0)
         {
-            watchdog = new InactivityWatchdog(client, board,
-                this.inactivityCheckInterval, this.inactivityWarningInterval,
-                this.inactivityTimeout);
+            watchdog = new InactivityWatchdog(client,
+                this.inactivityWarningInterval);
             watchdog.start();
         }
 
@@ -541,22 +533,6 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         battleBoard = new BattleBoard(this, getGame().getEngagement());
     }
 
-    public void registerToInactivityWatchdog(JComponent contentPane)
-    {
-        if (watchdog != null)
-        {
-            watchdog.addBattleBoardFrame(contentPane);
-        }
-    }
-
-    public void unregisterFromInactivityWatchdog()
-    {
-        if (watchdog != null)
-        {
-            watchdog.removeBattleBoardFrame();
-        }
-    }
-
     private KDialog lastDialog = null;
 
     private void disposeLastInactivityDialog()
@@ -602,7 +578,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         getMapOrBoardFrame().requestFocus();
         getMapOrBoardFrame().toFront();
 
-        lastDialog = new KDialog(getMapOrBoardFrame(), title, true);
+        lastDialog = new KDialog(getMapOrBoardFrame(), title, false);
 
         JTextArea contentPanel = new JTextArea(text, 5, 30);
         contentPanel.setEditable(false);
@@ -2765,6 +2741,14 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         }
     }
 
+    public void markThatSomethingHappened()
+    {
+        if (watchdog != null)
+        {
+            watchdog.markThatSomethingHappened();
+        }
+    }
+
     public void actOnGameStarting()
     {
         logPerhaps("actOnGameStarting()");
@@ -3133,7 +3117,6 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         logPerhaps("actOnCleanupBattle()");
         if (battleBoard != null)
         {
-            unregisterFromInactivityWatchdog();
             battleBoard.dispose();
             battleBoard = null;
         }

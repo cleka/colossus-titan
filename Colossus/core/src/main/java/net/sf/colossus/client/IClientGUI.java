@@ -25,8 +25,7 @@ public interface IClientGUI
     public abstract void setStartedByWebClient(boolean byWebClient);
 
     public abstract void setWebClient(WebClient wc,
-        int inactivityCheckInterval, int inactivityWarningInterval,
-        int inactivityTimeout);
+        int inactivityWarningInterval);
 
     public abstract void clearWebClient();
 

@@ -682,8 +682,7 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public void setWebClient(WebClient wc, int inactivityCheckInterval,
-        int inactivityWarningInterval, int inactivityTimeout)
+    public void setWebClient(WebClient wc, int inactivityWarningInterval)
     {
         // TODO Auto-generated method stub
 

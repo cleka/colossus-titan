@@ -1,6 +1,7 @@
 package net.sf.colossus.gui;
 
 
+import java.awt.AWTEvent;
 import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -14,6 +15,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.Toolkit;
+import java.awt.event.AWTEventListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -167,6 +169,11 @@ public final class MasterBoard extends JPanel
 
     /** our own little bar implementation */
     private BottomBar bottomBar;
+
+    static Toolkit tk = Toolkit.getDefaultToolkit();
+    static long eventMask = AWTEvent.MOUSE_EVENT_MASK
+        + AWTEvent.KEY_EVENT_MASK;
+
     private boolean gameOverStateReached = false;
 
     private static final String saveGameAs = "Save game as";
@@ -391,6 +398,26 @@ public final class MasterBoard extends JPanel
         addMouseMotionListener(new MasterBoardMouseMotionHandler());
         this.iph = new InfoPopupHandler(client);
         this.addKeyListener(this.iph);
+
+        tk.addAWTEventListener(new AWTEventListener()
+        {
+            @Override
+            public void eventDispatched(AWTEvent e)
+            {
+                if (e instanceof java.awt.event.MouseEvent)
+                {
+                    // ignore window entry/exit events
+                    // (they would also occur if window is in background, but
+                    // small part of it is visible between two other windows,
+                    // and the mouse is for a short period over that visible
+                    // part)
+                    if (((MouseEvent)e).getButton() != MouseEvent.NOBUTTON)
+                    {
+                        MasterBoard.this.gui.markThatSomethingHappened();
+                    }
+                }
+            }
+        }, eventMask);
 
         setupGUIHexes();
         setupActions();

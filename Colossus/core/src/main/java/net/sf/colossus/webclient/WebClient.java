@@ -2988,8 +2988,7 @@ public class WebClient extends KFrame implements IWebClient
         if (startedGameId == null && IN_USE)
         {
             // is null means: it was not this webclient that started locally
-            startOwnClient(gameId, port, hostingHost, inactivityCheckInterval,
-                inactivityWarningInterval, inactivityTimeout);
+            startOwnClient(gameId, port, hostingHost, inactivityWarningInterval);
         }
         // This WebClient did start it...
         else
@@ -3010,8 +3009,7 @@ public class WebClient extends KFrame implements IWebClient
                     String host = WebClient.this.startedAtHost;
 
                     startOwnClient(gameId, port, host,
-                        inactivityCheckInterval, inactivityWarningInterval,
-                        inactivityTimeout);
+                        inactivityWarningInterval);
                 }
             };
             new Thread(r).start();
@@ -3019,8 +3017,7 @@ public class WebClient extends KFrame implements IWebClient
     }
 
     public void startOwnClient(String gameId, int port, String hostingHost,
-        int inactivityCheckInterval, int inactivityWarningInterval,
-        int inactivityTimeout)
+        int inactivityWarningInterval)
     {
         LOGGER.info("StartingOwnClient for gameId " + gameId + " hostingHost "
             + hostingHost + " port " + port);
@@ -3057,8 +3054,7 @@ public class WebClient extends KFrame implements IWebClient
             infoTextLabel.setText(waitingText);
 
             setGameClient(gc);
-            gc.getGUI().setWebClient(this, inactivityCheckInterval,
-                inactivityWarningInterval, inactivityTimeout);
+            gc.getGUI().setWebClient(this, inactivityWarningInterval);
 
             Timer timeoutStartup = setupTimer();
 
@@ -3164,7 +3160,7 @@ public class WebClient extends KFrame implements IWebClient
             infoTextLabel.setText(waitingText);
 
             setGameClient(gc);
-            gc.getGUI().setWebClient(this, -1, -1, -1);
+            gc.getGUI().setWebClient(this, -1);
             Timer timeoutStartup = setupTimer();
 
             while (!clientIsUp && !timeIsUp && !clientStartFailed)
