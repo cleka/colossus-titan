@@ -256,7 +256,7 @@ public final class GetPlayers extends KFrame
         addCheckbox(Options.cumulativeSlow, rulesOptionsPane);
         addCheckbox(Options.oneHexAllowed, rulesOptionsPane);
         addCheckbox(Options.unlimitedMulligans, rulesOptionsPane);
-        addCheckbox(Options.autoSansLordBattles, rulesOptionsPane);
+        addCheckbox(Options.sansLordAutoBattle, rulesOptionsPane);
         addCheckbox(Options.fixedSequenceBattleDice, rulesOptionsPane);
         addCheckbox(Options.pbBattleHits, rulesOptionsPane);
 

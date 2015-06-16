@@ -1417,14 +1417,14 @@ public class WebClient extends KFrame implements IWebClient
         });
 
         boolean lordBattleControl = options
-            .getOption(Options.autoSansLordBattles);
-        lordBattleControlCB = new JCheckBox(Options.autoSansLordBattles,
+            .getOption(Options.sansLordAutoBattle);
+        lordBattleControlCB = new JCheckBox(Options.sansLordAutoBattle,
             lordBattleControl);
         lordBattleControlCB.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent e)
             {
-                options.setOption(Options.autoSansLordBattles,
+                options.setOption(Options.sansLordAutoBattle,
                     lordBattleControlCB.isSelected());
             }
         });
@@ -3773,7 +3773,7 @@ public class WebClient extends KFrame implements IWebClient
         List<String> extraOptions = new ArrayList<String>();
         if (lordBattleControlCB.isSelected())
         {
-            extraOptions.add(Options.autoSansLordBattles);
+            extraOptions.add(Options.sansLordAutoBattle);
         }
         if (unlimitedMulligansCB.isSelected())
         {

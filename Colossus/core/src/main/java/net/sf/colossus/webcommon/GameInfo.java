@@ -159,7 +159,7 @@ public class GameInfo
             .hasNext();)
         {
             String string = iterator.next();
-            if (string.equals(Options.autoSansLordBattles))
+            if (string.equals(Options.sansLordAutoBattle))
             {
                 this.autoSansLordBattles = true;
             }
@@ -332,7 +332,7 @@ public class GameInfo
 
         if (this.autoSansLordBattles)
         {
-            extraOptions.add(Options.autoSansLordBattles);
+            extraOptions.add(Options.sansLordAutoBattle);
         }
 
         if (this.unlimitedMulligans)
@@ -546,7 +546,7 @@ public class GameInfo
             + ", "
             + (this.balancedTowers ? Options.balancedTowers : "-")
             + ", "
-            + (this.autoSansLordBattles ? Options.autoSansLordBattles : "-")
+            + (this.autoSansLordBattles ? Options.sansLordAutoBattle : "-")
             + ", "
             + (this.probabilityBasedBattleHits ? Options.pbBattleHits : "-");
 
@@ -842,7 +842,7 @@ public class GameInfo
         gameOptions.setOption(Options.unlimitedMulligans,
             getUnlimitedMulligans());
         gameOptions.setOption(Options.balancedTowers, getBalancedTowers());
-        gameOptions.setOption(Options.autoSansLordBattles,
+        gameOptions.setOption(Options.sansLordAutoBattle,
             getAutoSansLordBattles());
         gameOptions.setOption(Options.pbBattleHits,
             getProbabilityBasedBattleHits());

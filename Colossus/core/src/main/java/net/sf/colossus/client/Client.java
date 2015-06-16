@@ -1319,7 +1319,7 @@ public final class Client implements IClient, IOracle, IVariant,
             // a battle.
             return false;
         }
-        if (options.getOption(Options.autoSansLordBattles))
+        if (options.getOption(Options.sansLordAutoBattle))
         {
             // the option is on.  now check for lordly presence...
             Legion legion = game.getBattleActiveLegion();
