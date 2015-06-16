@@ -80,8 +80,8 @@ public class Autoplay
     {
         if (originalAutoplayOverridden)
         {
-            System.out.println("Restoring original autoplay value "
-                + originalAutoplayValue);
+            // System.out.println("Restoring original autoplay value "
+            //    + originalAutoplayValue);
             options.setOption(Options.autoPlay, originalAutoplayValue);
             originalAutoplayOverridden = false;
         }
