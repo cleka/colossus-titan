@@ -525,7 +525,6 @@ public final class Client implements IClient, IOracle, IVariant,
             + ": reached inactivity timeout! Enabling Autoplay.");
         gui.inactivityTimeoutReached();
         autoplay.setInactivityAutoplay();
-        options.setOption(Options.autoPlay, true);
         kickPhase();
     }
 
@@ -537,6 +536,11 @@ public final class Client implements IClient, IOracle, IVariant,
     public boolean isAutoplayActive()
     {
         return autoplay.isAutoplayActive();
+    }
+
+    public boolean getAutoSplit()
+    {
+        return autoplay.autoSplit();
     }
 
     // TODO can this be replaced with "!owningPlayer.isDead()" ?
@@ -1035,7 +1039,7 @@ public final class Client implements IClient, IOracle, IVariant,
 
     private void kickMoves()
     {
-        if (isMyTurn() && options.getOption(Options.autoMasterMove)
+        if (isMyTurn() && autoplay.autoMasterMove()
             && !game.isGameOver() && !replayOngoing)
         {
             doAutoMoves();
@@ -1355,10 +1359,9 @@ public final class Client implements IClient, IOracle, IVariant,
     /** Return true if any strikes were taken. */
     private boolean makeForcedStrikes()
     {
-        if (isMyBattlePhase() && options.getOption(Options.autoForcedStrike))
+        if (isMyBattlePhase() && autoplay.autoForcedStrike())
         {
-            return strikeMakeForcedStrikes(options
-                .getOption(Options.autoRangeSingle));
+            return strikeMakeForcedStrikes(autoplay.autoRangeSingle());
         }
         return false;
     }
@@ -1710,7 +1713,7 @@ public final class Client implements IClient, IOracle, IVariant,
         }
         else
         {
-            if (options.getOption(Options.autoSummonAngels))
+            if (autoplay.autoSummonAngels())
             {
                 summonInfo = ai.summonAngel(legion, possibleDonors);
                 doSummon(summonInfo);
@@ -1732,7 +1735,7 @@ public final class Client implements IClient, IOracle, IVariant,
      */
     public void askAcquireAngel(Legion legion, List<CreatureType> recruits)
     {
-        if (options.getOption(Options.autoAcquireAngels))
+        if (autoplay.autoAcquireAngels())
         {
             acquireAngelCallback(legion, ai.acquireAngel(legion, recruits));
         }
@@ -1751,7 +1754,7 @@ public final class Client implements IClient, IOracle, IVariant,
      *  Return true if the player chooses to teleport. */
     private boolean chooseWhetherToTeleport(MasterHex hex)
     {
-        if (options.getOption(Options.autoMasterMove))
+        if (autoplay.autoMasterMove())
         {
             return false;
         }
@@ -1838,7 +1841,7 @@ public final class Client implements IClient, IOracle, IVariant,
             LOGGER.fine("askConcede: test case auto-answers 'doNotConcede'");
             server.doNotConcede(ally);
         }
-        else if (options.getOption(Options.autoConcede))
+        else if (autoplay.autoConcede())
         {
             answerConcede(ally, ai.concede(ally, enemy));
         }
@@ -1855,7 +1858,7 @@ public final class Client implements IClient, IOracle, IVariant,
             LOGGER.fine("askFlee: test case auto-answers 'doNotFlee'");
             server.doNotFlee(ally);
         }
-        else if (options.getOption(Options.autoFlee))
+        else if (autoplay.autoFlee())
         {
             answerFlee(ally, ai.flee(ally, enemy));
         }
@@ -1905,7 +1908,7 @@ public final class Client implements IClient, IOracle, IVariant,
                 .severe("Defender in game differs from defender given in askNegotiate!");
         }
 
-        if (options.getOption(Options.autoNegotiate))
+        if (autoplay.autoNegotiate())
         {
             // XXX AI players just fight for now.
             Proposal proposal = new Proposal(getAttacker(), getDefender(),
@@ -2036,7 +2039,7 @@ public final class Client implements IClient, IOracle, IVariant,
 
             // if AI just got NAK for split, there's no point for
             // kickSplit again. Instead, let's just be DoneWithSplits.
-            if (isMyTurn() && options.getOption(Options.autoSplit)
+            if (isMyTurn() && autoplay.autoSplit()
                 && !game.isGameOver())
             {
                 // XXX This may cause advancePhance illegally messages,
@@ -2119,7 +2122,7 @@ public final class Client implements IClient, IOracle, IVariant,
             leaveCarryMode();
         }
         else if (carryTargetDescriptions.size() == 1
-            && options.getOption(Options.autoCarrySingle))
+            && autoplay.autoCarrySingle())
         {
             Iterator<String> it = carryTargetDescriptions.iterator();
             String desc = it.next();
@@ -2262,7 +2265,7 @@ public final class Client implements IClient, IOracle, IVariant,
      *  wanted, to get past the reinforcing phase. */
     public void doReinforce(Legion legion)
     {
-        if (options.getOption(Options.autoReinforce))
+        if (autoplay.autoReinforce())
         {
             ai.reinforce(legion);
         }
@@ -2342,7 +2345,7 @@ public final class Client implements IClient, IOracle, IVariant,
             // A warm body recruits in a tower.
             recruiterName = "none";
         }
-        else if (options.getOption(Options.autoPickRecruiter)
+        else if (autoplay.autoPickRecruiter()
             || numEligibleRecruiters == 1)
         {
             // If there's only one possible recruiter, or if
@@ -2412,7 +2415,7 @@ public final class Client implements IClient, IOracle, IVariant,
 
     private void kickSplit()
     {
-        if (isMyTurn() && options.getOption(Options.autoSplit)
+        if (isMyTurn() && autoplay.autoSplit()
             && !game.isGameOver())
         {
             boolean done = ai.split();
@@ -2451,7 +2454,7 @@ public final class Client implements IClient, IOracle, IVariant,
         if (isMyTurn())
         {
             gui.defaultCursor();
-            if (options.getOption(Options.autoPickEngagements))
+            if (autoplay.autoPickEngagements())
             {
                 aiPause();
                 ai.pickEngagement();
@@ -2482,7 +2485,7 @@ public final class Client implements IClient, IOracle, IVariant,
         if (isMyTurn())
         {
             // TODO search eng. first, decide then based on autoXXX
-            if (options.getOption(Options.autoPickEngagements))
+            if (autoplay.autoPickEngagements())
             {
                 aiPause();
                 MasterHex hex = ai.pickEngagement();
@@ -2519,7 +2522,7 @@ public final class Client implements IClient, IOracle, IVariant,
             {
                 doneWithRecruits();
             }
-            else if (options.getOption(Options.autoRecruit))
+            else if (autoplay.autoRecruit())
             {
                 // Note that this fires all doRecruit calls in one row,
                 // i.e. does NOT wait for callback from server.
@@ -2876,7 +2879,7 @@ public final class Client implements IClient, IOracle, IVariant,
                 return lords.get(0);
 
             default:
-                if (options.getOption(Options.autoPickLord))
+                if (autoplay.autoPickLord())
                 {
                     return lords.get(0);
                 }
@@ -3016,7 +3019,7 @@ public final class Client implements IClient, IOracle, IVariant,
             // dito: entry side does not really matter, just take one.
             entrySide = entrySides.iterator().next();
         }
-        else if (options.getOption(Options.autoPickEntrySide))
+        else if (autoplay.autoPickEntrySide())
         {
             entrySide = ai.pickEntrySide(hex, mover, entrySides);
         }
@@ -3507,7 +3510,7 @@ public final class Client implements IClient, IOracle, IVariant,
         gui.actOnUndidSplit(survivor, turn);
 
         if (isMyTurn() && game.isPhase(Phase.SPLIT) && !replayOngoing
-            && options.getOption(Options.autoSplit) && !game.isGameOver())
+            && autoplay.autoSplit() && !game.isGameOver())
         {
             boolean done = ai.splitCallback(null, null);
             if (done)
@@ -3652,7 +3655,7 @@ public final class Client implements IClient, IOracle, IVariant,
 
         String childId = null;
 
-        if (options.getOption(Options.autoPickMarker))
+        if (autoplay.autoPickMarker())
         {
             childId = ai.pickMarker(markersAvailable, getShortColor());
             doTheSplitting(parent, childId);
@@ -3715,7 +3718,7 @@ public final class Client implements IClient, IOracle, IVariant,
         // check also for phase, because delayed callbacks could come
         // after our phase is over but activePlayerName not updated yet.
         if (isMyTurn() && game.isPhase(Phase.SPLIT) && !replayOngoing
-            && options.getOption(Options.autoSplit) && !game.isGameOver())
+            && autoplay.autoSplit() && !game.isGameOver())
         {
             boolean done = ai.splitCallback(parent, child);
             if (done)
@@ -3727,7 +3730,7 @@ public final class Client implements IClient, IOracle, IVariant,
 
     public void askPickColor(List<PlayerColor> colorsLeft)
     {
-        if (options.getOption(Options.autoPickColor))
+        if (autoplay.autoPickColor())
         {
             // Convert favorite colors from a comma-separated string to a list.
             String favorites = options.getStringOption(Options.favoriteColors);
@@ -3760,7 +3763,7 @@ public final class Client implements IClient, IOracle, IVariant,
     public void askPickFirstMarker()
     {
         Set<String> markersAvailable = getOwningPlayer().getMarkersAvailable();
-        if (options.getOption(Options.autoPickMarker))
+        if (autoplay.autoPickMarker())
         {
             String markerId = ai.pickMarker(markersAvailable, getShortColor());
             assignFirstMarker(markerId);

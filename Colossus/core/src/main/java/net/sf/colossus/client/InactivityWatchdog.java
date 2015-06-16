@@ -24,9 +24,11 @@ public class InactivityWatchdog extends Thread
         .getLogger(InactivityWatchdog.class
         .getName());
 
-    private final Client client;
+    private static final int INACTIVITY_CHECK_INTERVAL = 1;
 
-    private final static int INACTIVITY_CHECK_INTERVAL = 1;
+    private static final boolean IA_DEBUG = false;
+
+    private final Client client;
 
     private final int inactivityWarningInterval;
 
@@ -59,8 +61,6 @@ public class InactivityWatchdog extends Thread
     {
         done = value;
     }
-
-    private static final boolean IA_DEBUG = false;
 
     @Override
     public void run()

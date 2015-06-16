@@ -20,7 +20,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
@@ -428,7 +427,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         if (getOwningPlayer().getName().equals("localwatchdogtest")
             && this.inactivityWarningInterval == -1)
         {
-            this.inactivityWarningInterval = 15;
+            this.inactivityWarningInterval = 30;
         }
 
         // by default (local game) those inactivity values are all -1,
@@ -546,8 +545,6 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void inactivityWarning(final int inactiveSecs, final int timeoutSecs)
     {
-        disposeLastInactivityDialog();
-
         final String title = "It's your turn (" + inactiveSecs + "/"
             + timeoutSecs + ")!";
         final String text = "\nHey, it's your turn, and you've been doing nothing for "
@@ -559,6 +556,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
         if (SwingUtilities.isEventDispatchThread())
         {
+            disposeLastInactivityDialog();
             showInactivityDialog(title, text);
         }
         else
@@ -567,6 +565,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             {
                 public void run()
                 {
+                    disposeLastInactivityDialog();
                     showInactivityDialog(title, text);
                 }
             });
@@ -594,8 +593,6 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void inactivityTimeoutReached()
     {
-        disposeLastInactivityDialog();
-
         final String title = "AI took over";
         final String text = "\n"
             + "You've been inactive for too long. AI took over for you in this round\n"
@@ -604,8 +601,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
         if (SwingUtilities.isEventDispatchThread())
         {
+            disposeLastInactivityDialog();
             showInactivityDialog(title, text);
-
         }
         else
         {
@@ -613,17 +610,11 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             {
                 public void run()
                 {
+                    disposeLastInactivityDialog();
                     showInactivityDialog(title, text);
-
                 }
             });
         }
-
-        lastDialog = new KDialog(getMapOrBoardFrame(),
-            "Timed out, AI took over!",
-            false);
-        lastDialog.add(new JLabel("bla"));
-        lastDialog.setVisible(true);
     }
 
     public void setStrikeNumbers(BattleUnit striker, Set<BattleHex> targetHexes)
@@ -2799,7 +2790,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             // "doneWithSplit()".
             if ((getOwningPlayer().getMarkersAvailable().size() < 1 || client
                 .findTallLegionHexes(4, true).isEmpty())
-                && !options.getOption(Options.autoSplit) && isUndoStackEmpty())
+                && !client.getAutoSplit() && isUndoStackEmpty())
             {
                 client.doneWithSplits();
             }

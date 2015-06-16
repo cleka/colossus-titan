@@ -426,18 +426,8 @@ public final class Options implements IOptions
 
     synchronized public boolean getOption(String optname)
     {
-        // return true for all Auto-* options if autoplay is on
-        // ... and not for autoQuit either!
-        // ... trailing space otherwise autoSave would be on always, too
-        if (optname.startsWith("Auto ") && !optname.equals(Options.autoPlay)
-            && !optname.equals(Options.autoQuit))
-        {
-            if (getOption(Options.autoPlay))
-            {
-                return true;
-            }
-        }
-
+        // the "if start with "Auto "... removed, that part is
+        // now handled by AutoPlay class.
         String value = getStringOption(optname);
         return (value != null && value.equals("true"));
     }
