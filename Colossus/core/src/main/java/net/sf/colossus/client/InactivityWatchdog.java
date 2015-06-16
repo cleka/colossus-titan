@@ -60,6 +60,8 @@ public class InactivityWatchdog extends Thread
         done = value;
     }
 
+    private static final boolean IA_DEBUG = false;
+
     @Override
     public void run()
     {
@@ -75,7 +77,10 @@ public class InactivityWatchdog extends Thread
 
             if (somethingHappened)
             {
-                // System.out.print("0");
+                if (IA_DEBUG)
+                {
+                    System.out.print("0");
+                }
                 inactiveSeconds = 0;
                 currentInterval = 0;
                 currentlyStillToleratedIntervals = INITIALLY_TOLERATED_INTERVALS;
@@ -83,7 +88,17 @@ public class InactivityWatchdog extends Thread
             }
             else
             {
-                // System.out.print(".");
+                if (IA_DEBUG)
+                {
+                    if (isClockTicking())
+                    {
+                        System.out.print(":");
+                    }
+                    else
+                    {
+                        System.out.print(".");
+                    }
+                }
             }
 
             if (isClockTicking())

@@ -162,9 +162,7 @@ public final class Client implements IClient, IOracle, IVariant,
 
     private boolean clockIsTicking = false;
 
-    private boolean originalAutoplayValue = false;
-
-    private boolean originalAutoplayOverridden = false;
+    private final Autoplay autoplay;
 
     /**
      * The game in progress.
@@ -434,6 +432,8 @@ public final class Client implements IClient, IOracle, IVariant,
         // Need to load options early so they don't overwrite server options.
         options.loadOptions();
 
+        autoplay = new Autoplay(options);
+
         // This is needed because we do not do syncAutoPlay any more,
         // and many places rely on "if (Options.getOption(... .autoXXXX)
         // returning true because autoPlay was set for AI type players.
@@ -524,8 +524,7 @@ public final class Client implements IClient, IOracle, IVariant,
         LOGGER.finer("ClientThread " + owningPlayer.getName()
             + ": reached inactivity timeout! Enabling Autoplay.");
         gui.inactivityTimeoutReached();
-        originalAutoplayValue = options.getOption(Options.autoPlay);
-        originalAutoplayOverridden = true;
+        autoplay.setInactivityAutoplay();
         options.setOption(Options.autoPlay, true);
         kickPhase();
     }
@@ -537,7 +536,7 @@ public final class Client implements IClient, IOracle, IVariant,
 
     public boolean isAutoplayActive()
     {
-        return options.getOption(Options.autoPlay);
+        return autoplay.isAutoplayActive();
     }
 
     // TODO can this be replaced with "!owningPlayer.isDead()" ?
@@ -2392,12 +2391,7 @@ public final class Client implements IClient, IOracle, IVariant,
         game.setActivePlayer(activePlayer);
         game.setTurnNumber(turnNumber);
 
-        if (originalAutoplayOverridden)
-        {
-            originalAutoplayOverridden = false;
-            options.setOption(Options.autoPlay, originalAutoplayValue);
-        }
-
+        autoplay.resetInactivityAutoplay();
         gui.actOnTurnOrPlayerChange(this, turnNumber, game.getActivePlayer());
     }
 
