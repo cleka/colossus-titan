@@ -5,7 +5,10 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.logging.Logger;
 
 import javax.swing.Box;
@@ -57,6 +60,12 @@ public class ChatHandler
     private final static String dashes = "--------------------";
     private final static String doubledashes = "=========================";
 
+    private final LinkedList<String> history = new LinkedList<String>();
+
+    private static final int MAX_HISTORY = 100;
+    private int posInHistory = -1;
+    private String unsentMessage = "";
+
     public ChatHandler(String id, String title, IWebServer server,
         String username)
     {
@@ -87,7 +96,36 @@ public class ChatHandler
                 submitText(e.getSource());
             }
         };
+
+        KeyListener keyListener = new KeyListener()
+        {
+            public void keyReleased(KeyEvent e)
+            {
+                int kc = e.getKeyCode();
+                if (kc == KeyEvent.VK_UP || kc == KeyEvent.VK_KP_UP)
+                {
+                    historyUp();
+                }
+                if (kc == KeyEvent.VK_DOWN || kc == KeyEvent.VK_KP_DOWN)
+                {
+                    historyDown();
+                }
+
+            }
+
+            public void keyTyped(KeyEvent e)
+            {
+                // not needed
+            }
+
+            public void keyPressed(KeyEvent e)
+            {
+                // not needed
+            }
+        };
+
         newMessage.addActionListener(submitListener);
+        newMessage.addKeyListener(keyListener);
         newMessage.setEnabled(false);
         chatSubmitButton = new JButton(chatSubmitButtonText);
         chatSubmitButton.addActionListener(submitListener);
@@ -97,6 +135,39 @@ public class ChatHandler
         submitPane.add(newMessage);
         submitPane.add(chatSubmitButton);
         chatTab.add(submitPane, BorderLayout.SOUTH);
+    }
+
+    private void historyUp()
+    {
+        if (posInHistory == -1)
+        {
+            unsentMessage = newMessage.getText();
+            posInHistory = history.size();
+        }
+        if (posInHistory > 0)
+        {
+            posInHistory--;
+            newMessage.setText(history.get(posInHistory));
+        }
+    }
+
+    private void historyDown()
+    {
+        if (posInHistory == -1)
+        {
+            // not in history, do nothing
+        }
+        else if (posInHistory == history.size() - 1)
+        {
+            posInHistory = -1;
+            newMessage.setText(unsentMessage);
+            unsentMessage = "";
+        }
+        else if (posInHistory < history.size() - 1)
+        {
+            posInHistory++;
+            newMessage.setText(history.get(posInHistory));
+        }
     }
 
     public String getId()
@@ -154,12 +225,27 @@ public class ChatHandler
             {
                 message = " ";
             }
-            newMessage.setText("");
             server.chatSubmit(chatId, username, message);
+            addToHistory(message);
+            posInHistory = -1;
+            newMessage.setText(unsentMessage);
+            unsentMessage = "";
         }
         else
         {
             LOGGER.warning("");
+        }
+    }
+
+    private void addToHistory(String message)
+    {
+        if (!message.trim().equals(""))
+        {
+            history.add(message);
+            if (history.size() > MAX_HISTORY)
+            {
+                history.removeFirst();
+            }
         }
     }
 
