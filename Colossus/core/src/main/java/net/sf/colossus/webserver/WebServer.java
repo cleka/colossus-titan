@@ -17,6 +17,7 @@ import java.net.Socket;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -1280,16 +1281,17 @@ public class WebServer implements IWebServer, IRunWebServer
         boolean isAdmin, String recipient, String message, int beepCount,
         long beepInterval, boolean windows)
     {
-        IWebClient client = null;
+        IWebClient recipientClient = null;
         String reasonFail = null;
 
         User user = userDB.findUserByName(recipient);
         if (user != null)
         {
-            client = user.getWebserverClient();
-            if (client != null)
+            recipientClient = user.getWebserverClient();
+            if (recipientClient != null)
             {
-                client.requestAttention(when, sender, isAdmin, message,
+                recipientClient.requestAttention(when, sender, isAdmin,
+                    message,
                     beepCount, beepInterval, windows);
             }
             else
@@ -1304,25 +1306,27 @@ public class WebServer implements IWebServer, IRunWebServer
 
         if (reasonFail != null)
         {
-            String failMessage = "Request notifying user " + recipient
-                + " failed: " + reasonFail;
-            informPingFailed(sender, failMessage);
+            informPingFailed(sender, reasonFail, message);
         }
     }
 
-    private void informPingFailed(String sender, String failMessage)
+    private void informPingFailed(String sender, String reasonFail,
+        String message)
     {
         User senderUser = userDB.findUserByName(sender);
-        IWebClient senderClient = senderUser.getWebserverClient();
-        if (senderClient != null)
+        IWebClient senderWebClient = senderUser.getWebserverClient();
+        String[] lines = new String[] {
+            "Sorry, your ping request failed, reason: " + reasonFail,
+            "Your text was: " + message };
+        ChatChannel gc = getGeneralChat();
+        if (senderWebClient != null)
         {
-            long when2 = 0;
-            senderClient.deliverGeneralMessage(when2, true,
-                "Notification request failed!", failMessage);
+            gc.sendLinesToClient(gc.getChannelId(), senderWebClient,
+                Arrays.asList(lines), true, "");
         }
         else
         {
-            LOGGER.warning("requestUserAttention failed (" + failMessage
+            LOGGER.warning("requestUserAttention failed (" + reasonFail
                 + ") but could not find client"
                 + " to send error message to sender either!");
         }
@@ -1407,7 +1411,7 @@ public class WebServer implements IWebServer, IRunWebServer
             LOGGER.warning("invalid pingCommand with quotes '" + pingCommand
                 + "' from user " + sender + "!");
             String reasonFail = "Invalid /ping syntax. Use: /ping \"RECIPIENT NAME\" [optionally some message]";
-            informPingFailed(sender, reasonFail);
+            informPingFailed(sender, reasonFail, pingCommand);
         }
         else
         {
@@ -1432,7 +1436,7 @@ public class WebServer implements IWebServer, IRunWebServer
         {
             // Just  /ping   : inform about the usage:
             String reasonFail = "Invalid /ping syntax. Use: /ping RECIPIENT [optionally some message]";
-            informPingFailed(sender, reasonFail);
+            informPingFailed(sender, reasonFail, pingCommand);
         }
         else
         {

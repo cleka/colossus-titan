@@ -781,7 +781,7 @@ public class WebServerClient implements IWebClient
         else if (msgAllLower.startsWith("/"))
         {
             server.getGeneralChat().handleUnknownCommand(msgAllLower, chatId,
-                this);
+                this, message);
         }
         else
         {

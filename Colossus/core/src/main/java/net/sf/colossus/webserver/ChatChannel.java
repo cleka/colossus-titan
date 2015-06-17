@@ -95,12 +95,15 @@ public class ChatChannel
     }
 
     public void handleUnknownCommand(String msgAllLower, String chatId,
-        IWebClient client)
+        IWebClient client, String originalMessage)
     {
         String[] lines = new String[] {
             "Sorry, '" + msgAllLower + "' is not a recognized command.",
-            "Use /help to get a list of valid commands." };
+            "Use /help to get a list of valid commands.", "",
+            "Your text was: " + originalMessage };
         sendLinesToClient(chatId, client, Arrays.asList(lines), true, "");
+        // long now = new Date().getTime();
+        // client.systemMessage(now, "Your text was: " + originalMessage);
     }
 
     public void sendHelpToClient(String msgAllLower, String chatId,
