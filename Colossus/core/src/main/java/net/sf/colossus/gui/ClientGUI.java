@@ -1426,11 +1426,11 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             board.enableDoneAction();
         }
 // After doing a split, refresh the number of markers available
-		if ( isMyTurn() )
-		{
-			board.setMarkerCount(
-						client.getOwningPlayer().getMarkersAvailable().size());
-		}
+        if ( isMyTurn() )
+        {
+            board.setMarkerCount(
+                        client.getOwningPlayer().getMarkersAvailable().size());
+        }
         if (!isReplayOngoing())
         {
             board.alignLegions(hex);
@@ -1551,11 +1551,11 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         else
         {
 // After undoing a split, refresh the number of markers available
-			if ( isMyTurn() )
-			{
-				board.setMarkerCount(
-						client.getOwningPlayer().getMarkersAvailable().size());
-			}
+            if ( isMyTurn() )
+            {
+                board.setMarkerCount(
+                        client.getOwningPlayer().getMarkersAvailable().size());
+            }
             board.alignLegions(survivor.getCurrentHex());
             board.highlightTallLegions();
         }

@@ -1701,8 +1701,10 @@ public final class MasterBoard extends JPanel
 
 // If not first turn, then add Marker Count Text to the bottom display bar
             if (client.getTurnNumber() != 1)
-				bottomBar.setMarkerCount(
-						client.getOwningPlayer().getMarkersAvailable().size());
+            {
+                bottomBar.setMarkerCount(
+                        client.getOwningPlayer().getMarkersAvailable().size());
+            }
             bottomBar.setPhase("Split stacks");
             highlightTallLegions();
         }
@@ -3308,8 +3310,8 @@ public final class MasterBoard extends JPanel
 // Add Marker Count Text to the bottom display bar
         public void setMarkerCount(int markerCount)
         {
-			countLabel.setText("(" + markerCount + " marker" +
-										((markerCount == 1) ? "" : "s") + ")");
+            countLabel.setText("(" + markerCount + " marker" +
+                                        ((markerCount == 1) ? "" : "s") + ")");
         }
 
         public BottomBar()
