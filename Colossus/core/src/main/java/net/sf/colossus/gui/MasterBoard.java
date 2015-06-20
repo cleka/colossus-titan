@@ -1726,6 +1726,12 @@ public final class MasterBoard extends JPanel
             takeMulliganAction.setEnabled(false);
             enableDoneAction();
 
+// If not first turn, then add Marker Count Text to the bottom display bar
+            if (client.getTurnNumber() != 1)
+            {
+                bottomBar.setMarkerCount(
+                        client.getOwningPlayer().getMarkersAvailable().size());
+            }
             bottomBar.setPhase("Split stacks");
             highlightTallLegions();
         }
@@ -1977,6 +1983,12 @@ public final class MasterBoard extends JPanel
     void setPendingText(String text)
     {
         bottomBar.setPendingText(text);
+    }
+
+// Add Marker Count Text to the bottom display bar
+    void setMarkerCount(int markerCount)
+    {
+        bottomBar.setMarkerCount(markerCount);
     }
 
     /** Select hexes where this legion can move. */
@@ -3320,6 +3332,13 @@ public final class MasterBoard extends JPanel
                 countLabel.setText(legionCount + " legion to move");
             else
                 countLabel.setText(legionCount + " legions to move");
+        }
+
+// Add Marker Count Text to the bottom display bar
+        public void setMarkerCount(int markerCount)
+        {
+            countLabel.setText("(" + markerCount + " marker" +
+                                        ((markerCount == 1) ? "" : "s") + ")");
         }
 
         public BottomBar()
