@@ -1726,7 +1726,7 @@ public final class MasterBoard extends JPanel
             takeMulliganAction.setEnabled(false);
             enableDoneAction();
 
-// If not first turn, then add Marker Count Text to the bottom display bar
+            // If not first turn, then add Marker Count Text to the bottom display bar
             if (client.getTurnNumber() != 1)
             {
                 bottomBar.setMarkerCount(
@@ -1985,7 +1985,7 @@ public final class MasterBoard extends JPanel
         bottomBar.setPendingText(text);
     }
 
-// Add Marker Count Text to the bottom display bar
+    // Add Marker Count Text to the bottom display bar
     void setMarkerCount(int markerCount)
     {
         bottomBar.setMarkerCount(markerCount);
@@ -3334,7 +3334,7 @@ public final class MasterBoard extends JPanel
                 countLabel.setText(legionCount + " legions to move");
         }
 
-// Add Marker Count Text to the bottom display bar
+        // Add Marker Count Text to the bottom display bar
         public void setMarkerCount(int markerCount)
         {
             countLabel.setText("(" + markerCount + " marker" +
