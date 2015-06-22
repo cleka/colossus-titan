@@ -218,7 +218,7 @@ public class InactivityWatchdog extends Thread
         }
     }
 
-    private boolean isClockTicking()
+    public boolean isClockTicking()
     {
         synchronized (this)
         {
