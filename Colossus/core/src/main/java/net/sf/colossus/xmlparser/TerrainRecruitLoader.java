@@ -147,7 +147,7 @@ public class TerrainRecruitLoader implements IVariantInitializer
             && !(name.equals(Keyword_AnyNonLord))
             && !(name.equals(Keyword_Lord))
             && !(name.equals(Keyword_DemiLord)) && !(name
-            .startsWith(Keyword_Special)));
+                .startsWith(Keyword_Special)));
     }
 
     /**
@@ -365,8 +365,8 @@ public class TerrainRecruitLoader implements IVariantInitializer
         }
 
         TerrainRecruitLoader.strToRecruits.put(terrain, rl);
-        TerrainRecruitLoader.strToBelow.put(terrain, Boolean
-            .valueOf(regularRecruit));
+        TerrainRecruitLoader.strToBelow.put(terrain,
+            Boolean.valueOf(regularRecruit));
         // XXX Random not yet supported:
         TerrainRecruitLoader.strToRnd.put(terrain, null);
 
@@ -412,32 +412,35 @@ public class TerrainRecruitLoader implements IVariantInitializer
             {
                 if (recruiter.getName().equals(Keyword_Anything))
                 {
-                    rst.addAny(creatureTypes.getCreatureTypeByName(recruit
-                        .getName()), recruit.getNumber());
+                    rst.addAny(
+                        creatureTypes.getCreatureTypeByName(recruit.getName()),
+                        recruit.getNumber());
                 }
                 else if (recruiter.getName().equals(Keyword_AnyNonLord))
                 {
-                    rst.addNonLord(creatureTypes.getCreatureTypeByName(recruit
-                        .getName()), recruit.getNumber());
+                    rst.addNonLord(
+                        creatureTypes.getCreatureTypeByName(recruit.getName()),
+                        recruit.getNumber());
                 }
                 else if (recruiter.getName().equals(Keyword_Lord))
                 {
-                    rst.addLord(creatureTypes.getCreatureTypeByName(recruit
-                        .getName()), recruit.getNumber());
+                    rst.addLord(
+                        creatureTypes.getCreatureTypeByName(recruit.getName()),
+                        recruit.getNumber());
                 }
                 else if (recruiter.getName().equals(Keyword_DemiLord))
                 {
-                    rst.addDemiLord(creatureTypes
-                        .getCreatureTypeByName(recruit.getName()), recruit
-                        .getNumber());
+                    rst.addDemiLord(
+                        creatureTypes.getCreatureTypeByName(recruit.getName()),
+                        recruit.getNumber());
                 }
                 else
                 {
-                    rst
-                        .addRegular(creatureTypes
-                            .getCreatureTypeByName(recruiter.getName()),
-                            creatureTypes.getCreatureTypeByName(recruit
-                                .getName()), recruit.getNumber());
+                    rst.addRegular(
+                        creatureTypes.getCreatureTypeByName(recruiter
+                            .getName()),
+                        creatureTypes.getCreatureTypeByName(recruit.getName()),
+                        recruit.getNumber());
                 }
             }
             recruiter = recruit;
@@ -466,10 +469,10 @@ public class TerrainRecruitLoader implements IVariantInitializer
         MasterBoardTerrain terrain = new MasterBoardTerrain(name, displayName,
             HTMLColor.stringToColor(color), true);
 
-        TerrainRecruitLoader.strToRecruits.put(terrain, strToRecruits
-            .get(source_terrain));
-        TerrainRecruitLoader.strToBelow.put(terrain, strToBelow
-            .get(source_terrain));
+        TerrainRecruitLoader.strToRecruits.put(terrain,
+            strToRecruits.get(source_terrain));
+        TerrainRecruitLoader.strToBelow.put(terrain,
+            strToBelow.get(source_terrain));
         // XXX Random not yet supported:
         TerrainRecruitLoader.strToRnd.put(terrain, null);
 
@@ -880,7 +883,7 @@ public class TerrainRecruitLoader implements IVariantInitializer
                 }
                 if (tr.getName().equals(Keyword_AnyNonLord))
                 { // anyone can recruit here...
-                    // TODO: why two cases if the same result as the last one
+                  // TODO: why two cases if the same result as the last one
                     return new ArrayList<CreatureType>(VariantSupport
                         .getCurrentVariant().getCreatureTypesAsList());
                 }
@@ -987,8 +990,8 @@ public class TerrainRecruitLoader implements IVariantInitializer
     public static boolean anonymousRecruitLegal(CreatureType recruit,
         MasterBoardTerrain terrain, MasterHex hex)
     {
-        int g_value = graph.numberOfRecruiterNeeded(Keyword_Anything, recruit
-            .getName(), terrain, hex);
+        int g_value = graph.numberOfRecruiterNeeded(Keyword_Anything,
+            recruit.getName(), terrain, hex);
         if (g_value != 0)
         { // we really should ensure the caller *has* AnyNonLord...
             g_value = graph.numberOfRecruiterNeeded(Keyword_AnyNonLord,

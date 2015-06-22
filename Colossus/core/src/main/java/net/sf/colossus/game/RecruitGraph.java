@@ -335,10 +335,11 @@ public class RecruitGraph
                     }
                     else
                     {
-                        LOGGER.log(Level.FINEST, "GRAPH: ignoring " + e
-                            + " as not enough creatures are left (a: "
-                            + already + " s: " + s.getRemaining() + " d: "
-                            + v.getRemaining() + ")");
+                        LOGGER.log(Level.FINEST,
+                            "GRAPH: ignoring " + e
+                                + " as not enough creatures are left (a: "
+                                + already + " s: " + s.getRemaining() + " d: "
+                                + v.getRemaining() + ")");
                     }
                 }
             }

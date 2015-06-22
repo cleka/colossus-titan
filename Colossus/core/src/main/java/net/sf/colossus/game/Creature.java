@@ -120,8 +120,9 @@ public class Creature
         int dice = getPower();
 
         // Dice can be modified by terrain.
-        dice += myHexTerrain.getPowerBonusStrikeFrom(myType
-            .isNativeIn(myHexTerrain), targetType.isNativeIn(myHexTerrain));
+        dice += myHexTerrain.getPowerBonusStrikeFrom(
+            myType.isNativeIn(myHexTerrain),
+            targetType.isNativeIn(myHexTerrain));
 
         // Native striking down a dune hexside: +2
         if (myHexside.equals(HazardHexside.DUNE) && myType.isNativeDune())
@@ -172,8 +173,9 @@ public class Creature
 
         // Skill can be modified by terrain.
         // striking out of possible hazard
-        attackerSkill -= myHexTerrain.getSkillPenaltyStrikeFrom(myType
-            .isNativeIn(myHexTerrain), targetType.isNativeIn(myHexTerrain));
+        attackerSkill -= myHexTerrain.getSkillPenaltyStrikeFrom(
+            myType.isNativeIn(myHexTerrain),
+            targetType.isNativeIn(myHexTerrain));
 
         if (myElevation > targetElevation)
         {
@@ -188,8 +190,7 @@ public class Creature
             // Non-native striking up slope: -1
             // Striking up across wall: -1
             if ((targetHexside.equals(HazardHexside.SLOPE) && !myType
-                .isNativeSlope())
-                || targetHexside.equals(HazardHexside.TOWER))
+                .isNativeSlope()) || targetHexside.equals(HazardHexside.TOWER))
             {
                 attackerSkill--;
             }

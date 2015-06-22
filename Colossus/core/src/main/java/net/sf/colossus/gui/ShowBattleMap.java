@@ -110,8 +110,8 @@ final class ShowBattleMap extends HexMap
                 }
                 else
                 {
-                    new BattleTerrainHazardWindow(parentFrame, gui, hex
-                        .getHexModel());
+                    new BattleTerrainHazardWindow(parentFrame, gui,
+                        hex.getHexModel());
                 }
             }
         });

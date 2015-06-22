@@ -8,16 +8,15 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.util.logging.Logger;
 
+
 public class ColossusRegistry
 {
     private static final Logger LOGGER = Logger
         .getLogger(ColossusRegistry.class.getName());
 
-
     public final static int DEFAULT_PORT = 1099;
 
     private final int port;
-
 
     public ColossusRegistry(int port)
     {
@@ -42,7 +41,6 @@ public class ColossusRegistry
         return this.port;
     }
 
-
     public static void main(String[] args)
     {
         ColossusRegistry r = new ColossusRegistry(DEFAULT_PORT);
@@ -64,5 +62,3 @@ public class ColossusRegistry
         }
     }
 }
-
-

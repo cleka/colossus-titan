@@ -56,7 +56,6 @@ final class Concede extends KDialog
 
     private final JButton showMapButton;
 
-
     private Concede(ClientGUI clientGui, JFrame parentFrame, Legion ally,
         Legion enemy, boolean flee)
     {
@@ -174,18 +173,19 @@ final class Concede extends KDialog
         {
             public void actionPerformed(ActionEvent e)
             {
-             processAnswer(true);
+                processAnswer(true);
             }
         });
 
-        JButton dontDoitButton = new JButton(flee ? "Don't Flee" : "Don't Concede");
+        JButton dontDoitButton = new JButton(flee ? "Don't Flee"
+            : "Don't Concede");
         dontDoitButton.setMnemonic(KeyEvent.VK_D);
         buttonPane.add(dontDoitButton);
         dontDoitButton.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent e)
             {
-             processAnswer(false);
+                processAnswer(false);
             }
         });
 
@@ -262,8 +262,8 @@ final class Concede extends KDialog
 
         int scale = 4 * Scale.get();
 
-        Marker marker = new Marker(legion, scale, legion.getLongMarkerId(), gui
-                .getClient(), true);
+        Marker marker = new Marker(legion, scale, legion.getLongMarkerId(),
+            gui.getClient(), true);
         pane.add(marker);
         pane.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
 
@@ -309,19 +309,21 @@ final class Concede extends KDialog
     {
         // Feature Request #223, confirm before allowing the player to concede
         // if their Titan is in the legion
-        if (!flee && ally.hasTitan() && answer == true &&
-            gui.getOptions().getOption(Options.confirmConcedeWithTitan,
+        if (!flee
+            && ally.hasTitan()
+            && answer == true
+            && gui.getOptions().getOption(Options.confirmConcedeWithTitan,
                 true))
         {
-            String message = "Are you sure you want to concede? This legion " +
-            "contains your Titan, and conceding will cause you to lose " +
-            "the game!";
+            String message = "Are you sure you want to concede? This legion "
+                + "contains your Titan, and conceding will cause you to lose "
+                + "the game!";
 
-            String[] options = new String[] {"Yes", "No", "Don't ask again"};
+            String[] options = new String[] { "Yes", "No", "Don't ask again" };
 
             int confirmAnswer = JOptionPane.showOptionDialog(this, message,
-                    "Confirm Concession With Titan", JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+                "Confirm Concession With Titan", JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 
             if (confirmAnswer == 1 || confirmAnswer == -1)
             {
@@ -332,7 +334,7 @@ final class Concede extends KDialog
             {
                 // don't ask again
                 gui.getClient().setPreferencesCheckBoxValue(
-                        Options.confirmConcedeWithTitan, false);
+                    Options.confirmConcedeWithTitan, false);
 
             }
         }

@@ -423,8 +423,8 @@ public class BattleHex extends Hex
                 }
 
                 // check whether that terrain is slowing us.
-                if (terrain.slows(creature.isNativeIn(terrain), creature
-                    .isFlier()))
+                if (terrain.slows(creature.isNativeIn(terrain),
+                    creature.isFlier()))
                 {
                     cost += SLOW_INCREMENT_COST;
                 }
@@ -479,7 +479,7 @@ public class BattleHex extends Hex
         }
         if (terrain.isHealing())
         { // Spring cures slowing (washes off tar from TarPits, alleviates effect
-            // from creature if creature that slows is added)
+          // from creature if creature that slows is added)
             return -1;
         }
         // default : no slowing !

@@ -153,8 +153,7 @@ public class GameServerSide extends Game
      * @return
      */
     static public GameServerSide newGameServerSide(
-        WhatNextManager whatNextMgr,
-        Options serverOptions, Variant variant)
+        WhatNextManager whatNextMgr, Options serverOptions, Variant variant)
     {
         if (Options.isFunctionalTest())
         {
@@ -434,8 +433,8 @@ public class GameServerSide extends Game
         try
         {
             Client c = Client.createClient("127.0.0.1", getPort(), playerName,
-                type,
-                whatNextManager, server, false, dontUseOptionsFile, createGUI, false);
+                type, whatNextManager, server, false, dontUseOptionsFile,
+                createGUI, false);
             storeLocalClient(playerName, c);
         }
         catch (ConnectionInitException e)
@@ -594,8 +593,8 @@ public class GameServerSide extends Game
         setPhase(Phase.SPLIT);
         players.clear();
 
-        VariantSupport.loadVariantByName(options
-            .getStringOption(Options.variant), true);
+        VariantSupport.loadVariantByName(
+            options.getStringOption(Options.variant), true);
 
         LOGGER.info("Starting new game");
 
@@ -753,8 +752,8 @@ public class GameServerSide extends Game
 
     private void assignColors()
     {
-        List<PlayerColor> cli = new ArrayList<PlayerColor>(Arrays
-            .asList(PlayerColor.values()));
+        List<PlayerColor> cli = new ArrayList<PlayerColor>(
+            Arrays.asList(PlayerColor.values()));
 
         colorsLeft = new ArrayList<PlayerColor>();
 
@@ -2088,8 +2087,8 @@ public class GameServerSide extends Game
             return;
         }
         // Check for recruiter legality.
-        List<CreatureType> recruiters = findEligibleRecruiters(legion, recruit
-            .getName());
+        List<CreatureType> recruiters = findEligibleRecruiters(legion,
+            recruit.getName());
 
         if (recruiter == null)
         {
@@ -2106,8 +2105,9 @@ public class GameServerSide extends Game
         }
         else if (!recruiters.contains(recruiter))
         {
-            LOGGER.log(Level.SEVERE, "Illegal recruiter "
-                + recruiter.getName() + " for recruit " + recruit.getName());
+            LOGGER.log(Level.SEVERE,
+                "Illegal recruiter " + recruiter.getName() + " for recruit "
+                    + recruit.getName());
             return;
         }
 
@@ -2150,8 +2150,7 @@ public class GameServerSide extends Game
         }
     }
 
-    public void editModeAddCreature(String markerId,
-        String creatureName)
+    public void editModeAddCreature(String markerId, String creatureName)
     {
         CreatureType creature = getVariant().getCreatureByName(creatureName);
         Player player = getPlayerByMarkerId(markerId);
@@ -2255,8 +2254,8 @@ public class GameServerSide extends Game
     public boolean hasConventionalMove(LegionServerSide legion, MasterHex hex,
         int roll, boolean ignoreFriends)
     {
-        return !movementSS.listNormalMoves(legion, hex, roll, ignoreFriends, null, false)
-            .isEmpty();
+        return !movementSS.listNormalMoves(legion, hex, roll, ignoreFriends,
+            null, false).isEmpty();
     }
 
     void createSummonAngel(Legion attacker)
@@ -2670,8 +2669,8 @@ public class GameServerSide extends Game
 
     void flee(Legion legion)
     {
-        Legion attacker = getFirstEnemyLegion(legion.getCurrentHex(), legion
-            .getPlayer());
+        Legion attacker = getFirstEnemyLegion(legion.getCurrentHex(),
+            legion.getPlayer());
 
         handleConcession(legion, attacker, true);
     }
@@ -2822,8 +2821,8 @@ public class GameServerSide extends Game
 
         String reason = fled ? Constants.reasonFled
             : Constants.reasonConcession;
-        server.allRevealEngagedLegion(loser, losingPlayer
-            .equals(getActivePlayer()), reason);
+        server.allRevealEngagedLegion(loser,
+            losingPlayer.equals(getActivePlayer()), reason);
 
         // server.allRemoveLegion(loser.getMarkerId());
 

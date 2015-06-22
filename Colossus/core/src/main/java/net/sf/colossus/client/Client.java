@@ -323,7 +323,8 @@ public final class Client implements IClient, IOracle, IVariant,
         }
 
         return new Client(playerName, playerType, whatNextMgr, theServer,
-            byWebClient, noOptionsFile, createGUI, loader, conn, variant, spectator);
+            byWebClient, noOptionsFile, createGUI, loader, conn, variant,
+            spectator);
     }
 
     /**
@@ -489,7 +490,8 @@ public final class Client implements IClient, IOracle, IVariant,
             return true;
         }
 
-        if (getOwningPlayer().isAI() || getOwningPlayer().isDead() || !isRemote())
+        if (getOwningPlayer().isAI() || getOwningPlayer().isDead()
+            || !isRemote())
         {
             return false;
         }
@@ -725,8 +727,11 @@ public final class Client implements IClient, IOracle, IVariant,
         }
         else
         {
-            String message = "Trying to reconnect (" + cause
-                + " triggered) failed " + attempt + " times - giving up."
+            String message = "Trying to reconnect ("
+                + cause
+                + " triggered) failed "
+                + attempt
+                + " times - giving up."
                 // Add the rest only for automatically triggered reconnects.
                 + (automatic ? "\n\n"
                     + "You may try it again (from File Menu) after a few seconds."
@@ -837,14 +842,13 @@ public final class Client implements IClient, IOracle, IVariant,
 
     public void peerRequestReceivedBy(String respondingPlayerName, int queueLen)
     {
-        LOGGER.info("Got RECEIVED  confirmation from "
-            + respondingPlayerName + ", queueLen=" + queueLen);
+        LOGGER.info("Got RECEIVED  confirmation from " + respondingPlayerName
+            + ", queueLen=" + queueLen);
     }
 
     public void peerRequestProcessedBy(String respondingPlayerName)
     {
-        LOGGER.info("Got PROCESSED confirmation from "
-            + respondingPlayerName);
+        LOGGER.info("Got PROCESSED confirmation from " + respondingPlayerName);
     }
 
     public void locallyInitiateSaveGame(String filename)
@@ -974,8 +978,8 @@ public final class Client implements IClient, IOracle, IVariant,
         }
         else
         {
-            Summoning event = new Summoning(summonInfo.getTarget(), summonInfo
-                .getDonor(), summonInfo.getUnit());
+            Summoning event = new Summoning(summonInfo.getTarget(),
+                summonInfo.getDonor(), summonInfo.getUnit());
             server.doSummon(event);
         }
         // Highlight engagements and repaint
@@ -1039,8 +1043,8 @@ public final class Client implements IClient, IOracle, IVariant,
 
     private void kickMoves()
     {
-        if (isMyTurn() && autoplay.autoMasterMove()
-            && !game.isGameOver() && !replayOngoing)
+        if (isMyTurn() && autoplay.autoMasterMove() && !game.isGameOver()
+            && !replayOngoing)
         {
             doAutoMoves();
         }
@@ -1197,9 +1201,9 @@ public final class Client implements IClient, IOracle, IVariant,
             // just in case, so we are sure to get the unregistering done
             catch (Exception e)
             {
-                LOGGER.log(Level.SEVERE, "During close in client "
-                    + owningPlayer.getName() + ": got Exception!!!"
-                    + e.toString(), e);
+                LOGGER.log(Level.SEVERE,
+                    "During close in client " + owningPlayer.getName()
+                        + ": got Exception!!!" + e.toString(), e);
             }
             ViableEntityManager.unregister(this);
         }
@@ -1403,8 +1407,7 @@ public final class Client implements IClient, IOracle, IVariant,
     {
         if (isMyBattlePhase())
         {
-            if (isAutoplayActive()
-                || sansLordAutoBattleApplies())
+            if (isAutoplayActive() || sansLordAutoBattleApplies())
             {
                 aiPause();
                 boolean struck = makeForcedStrikes();
@@ -2039,8 +2042,7 @@ public final class Client implements IClient, IOracle, IVariant,
 
             // if AI just got NAK for split, there's no point for
             // kickSplit again. Instead, let's just be DoneWithSplits.
-            if (isMyTurn() && autoplay.autoSplit()
-                && !game.isGameOver())
+            if (isMyTurn() && autoplay.autoSplit() && !game.isGameOver())
             {
                 // XXX This may cause advancePhance illegally messages,
                 // if e.g. SimpleAI fires two splits, both gets rejected,
@@ -2133,8 +2135,7 @@ public final class Client implements IClient, IOracle, IVariant,
         }
         else
         {
-            if (isAutoplayActive()
-                || sansLordAutoBattleApplies())
+            if (isAutoplayActive() || sansLordAutoBattleApplies())
             {
                 aiPause();
                 ai.handleCarries(carryDamage, carryTargetDescriptions);
@@ -2345,8 +2346,7 @@ public final class Client implements IClient, IOracle, IVariant,
             // A warm body recruits in a tower.
             recruiterName = "none";
         }
-        else if (autoplay.autoPickRecruiter()
-            || numEligibleRecruiters == 1)
+        else if (autoplay.autoPickRecruiter() || numEligibleRecruiters == 1)
         {
             // If there's only one possible recruiter, or if
             // the user has chosen the autoPickRecruiter option,
@@ -2415,8 +2415,7 @@ public final class Client implements IClient, IOracle, IVariant,
 
     private void kickSplit()
     {
-        if (isMyTurn() && autoplay.autoSplit()
-            && !game.isGameOver())
+        if (isMyTurn() && autoplay.autoSplit() && !game.isGameOver())
         {
             boolean done = ai.split();
             if (done)
@@ -2758,8 +2757,7 @@ public final class Client implements IClient, IOracle, IVariant,
         if (isMyCritter && !undo)
         {
             rememberForUndo = true;
-            if (isAutoplayActive()
-                || sansLordAutoBattleApplies())
+            if (isAutoplayActive() || sansLordAutoBattleApplies())
             {
                 markBattleMoveSuccessful(tag, endingHex);
             }
@@ -3275,8 +3273,8 @@ public final class Client implements IClient, IOracle, IVariant,
         MasterHex hex = legion.getCurrentHex();
         MasterBoardTerrain terrain = hex.getTerrain();
 
-        recruiters = new HashSet<CreatureType>(TerrainRecruitLoader
-            .getPossibleRecruiters(terrain, hex));
+        recruiters = new HashSet<CreatureType>(
+            TerrainRecruitLoader.getPossibleRecruiters(terrain, hex));
         Iterator<CreatureType> it = recruiters.iterator();
         while (it.hasNext())
         {
@@ -3363,8 +3361,8 @@ public final class Client implements IClient, IOracle, IVariant,
     /** Return a set of hexLabels. */
     public Set<MasterHex> listNormalMoves(Legion legion)
     {
-        return movement.listNormalMoves(legion, legion.getCurrentHex(), game
-            .getMovementRoll());
+        return movement.listNormalMoves(legion, legion.getCurrentHex(),
+            game.getMovementRoll());
     }
 
     /**
@@ -3392,7 +3390,8 @@ public final class Client implements IClient, IOracle, IVariant,
                 if (legion.hasMoved())
                 {
                     legionStatus[Constants.legionStatusMoved]++;
-                }else
+                }
+                else
                 {
                     Set<MasterHex> teleport = listTeleportMoves(legion);
                     Set<MasterHex> normal = listNormalMoves(legion);
@@ -3670,7 +3669,8 @@ public final class Client implements IClient, IOracle, IVariant,
     {
         if (childId != null)
         {
-            List<CreatureType> results = gui.doPickSplitLegion(parent, childId);
+            List<CreatureType> results = gui
+                .doPickSplitLegion(parent, childId);
 
             if (results != null)
             {
@@ -3678,7 +3678,6 @@ public final class Client implements IClient, IOracle, IVariant,
             }
         }
     }
-
 
     /** Called by AI and by doSplit() */
     public void doSplit(Legion parent, String childMarkerId,
@@ -3858,8 +3857,8 @@ public final class Client implements IClient, IOracle, IVariant,
             classArray[0] = Class.forName("net.sf.colossus.client.Client");
             Object[] objArray = new Object[1];
             objArray[0] = this;
-            createdAI = (AI)Class.forName(createType).getDeclaredConstructor(
-                classArray).newInstance(objArray);
+            createdAI = (AI)Class.forName(createType)
+                .getDeclaredConstructor(classArray).newInstance(objArray);
         }
         catch (Exception ex)
         {
@@ -3902,8 +3901,7 @@ public final class Client implements IClient, IOracle, IVariant,
         // human player who just uses some autoXXX functionality,
         // and we don't want a human to have to wait after certain activities
         // the AI does for him.
-        if (!isAutoplayActive()
-            || delay < Constants.MIN_AI_DELAY)
+        if (!isAutoplayActive() || delay < Constants.MIN_AI_DELAY)
         {
             delay = Constants.MIN_AI_DELAY;
         }
@@ -3990,8 +3988,7 @@ public final class Client implements IClient, IOracle, IVariant,
 
     public void editRemoveCreature(String markerId, String creatureType)
     {
-        localServer.getGame().editModeRemoveCreature(markerId,
-            creatureType);
+        localServer.getGame().editModeRemoveCreature(markerId, creatureType);
     }
 
     public void editRelocateLegion(String markerId, String hexLabel)

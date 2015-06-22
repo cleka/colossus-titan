@@ -28,7 +28,6 @@ import net.sf.colossus.guiutil.SaveWindow;
  * @author Clemens Katzer
  */
 
-
 final class PickMarker extends KDialog
 {
     private final ClientGUI gui;
@@ -39,7 +38,6 @@ final class PickMarker extends KDialog
 
     // if null, it's pick initial marker, otherwise it's for split legion
     private final Legion parent;
-
 
     PickMarker(ClientGUI gui, Set<String> markerIds, Legion parent)
     {

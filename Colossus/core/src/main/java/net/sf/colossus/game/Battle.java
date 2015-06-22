@@ -289,11 +289,11 @@ abstract public class Battle
         double yDist = y2 - y1;
 
         if (CompareDoubles.almostEqual(yDist, 0.0)
-            || CompareDoubles.almostEqual(Math.abs(yDist), 1.5 * Math
-                .abs(xDist)))
+            || CompareDoubles.almostEqual(Math.abs(yDist),
+                1.5 * Math.abs(xDist)))
         {
-            int strikeElevation = Math.min(hex1.getElevation(), hex2
-                .getElevation());
+            int strikeElevation = Math.min(hex1.getElevation(),
+                hex2.getElevation());
             // Hexspine; try unblocked side(s).
             if (isLOSBlockedDir(hex1, hex1, hex2, true, strikeElevation,
                 false, false, false, false, false, false, 0, 0))
@@ -443,11 +443,11 @@ abstract public class Battle
         double xDist = x2 - x1;
         double yDist = y2 - y1;
         // Creatures below the level of the strike do not block LOS.
-        int strikeElevation = Math.min(hex1.getElevation(), hex2
-            .getElevation());
+        int strikeElevation = Math.min(hex1.getElevation(),
+            hex2.getElevation());
         if (CompareDoubles.almostEqual(yDist, 0.0)
-            || CompareDoubles.almostEqual(Math.abs(yDist), 1.5 * Math
-                .abs(xDist)))
+            || CompareDoubles.almostEqual(Math.abs(yDist),
+                1.5 * Math.abs(xDist)))
         {
             return isLOSBlockedDir(hex1, hex1, hex2, true, strikeElevation,
                 false, false, false, false, false, false, 0, 0)
@@ -714,11 +714,11 @@ abstract public class Battle
         double yDist = y2 - y1;
 
         if (CompareDoubles.almostEqual(yDist, 0.0)
-            || CompareDoubles.almostEqual(Math.abs(yDist), 1.5 * Math
-                .abs(xDist)))
+            || CompareDoubles.almostEqual(Math.abs(yDist),
+                1.5 * Math.abs(xDist)))
         {
-            int strikeElevation = Math.min(hex1.getElevation(), hex2
-                .getElevation());
+            int strikeElevation = Math.min(hex1.getElevation(),
+                hex2.getElevation());
             // Hexspine; try unblocked side(s)
             if (isLOSBlockedDir(hex1, hex1, hex2, true, strikeElevation,
                 false, false, false, false, false, false, 0, 0))
@@ -734,8 +734,9 @@ abstract public class Battle
             }
             else
             {
-                return Math.min(computeSkillPenaltyRangestrikeThroughDir(hex1,
-                    hex2, c, true, 0),
+                return Math.min(
+                    computeSkillPenaltyRangestrikeThroughDir(hex1, hex2, c,
+                        true, 0),
                     computeSkillPenaltyRangestrikeThroughDir(hex1, hex2, c,
                         false, 0));
             }

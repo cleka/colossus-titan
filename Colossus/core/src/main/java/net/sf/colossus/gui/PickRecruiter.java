@@ -139,9 +139,8 @@ final class PickRecruiter extends KDialog
         return recruiterName;
     }
 
-    static String pickRecruiter(JFrame parentFrame,
-        List<String> recruiters, String hexDescription, Legion legion,
-        ClientGUI gui)
+    static String pickRecruiter(JFrame parentFrame, List<String> recruiters,
+        String hexDescription, Legion legion, ClientGUI gui)
     {
         PickRecruiter pr = new PickRecruiter(parentFrame, recruiters,
             hexDescription, legion, gui);

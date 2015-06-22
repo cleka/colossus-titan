@@ -292,8 +292,8 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
         for (LookAndFeelInfo lnfInfo : lnfInfos)
         {
             // NOTE! : event handling is based on that the RB is part of this lnfBox Box!
-            addRadioButton(lfBox, lfGroup, lnfInfo.getName(), lnfInfo
-                .getClassName(), currentLF);
+            addRadioButton(lfBox, lfGroup, lnfInfo.getName(),
+                lnfInfo.getClassName(), currentLF);
         }
 
         int oldValue = Scale.get();
@@ -335,7 +335,8 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
         }
         addCheckBox(confirmationPane, Options.confirmNoRecruit, true, true);
         addCheckBox(confirmationPane, Options.confirmNoSplit, true, true);
-        addCheckBox(confirmationPane, Options.confirmConcedeWithTitan, true, true);
+        addCheckBox(confirmationPane, Options.confirmConcedeWithTitan, true,
+            true);
         ButtonGroup moveButtonGroup = new ButtonGroup();
         mcModes = new Box(BoxLayout.Y_AXIS);
         mcModes.setBorder(new TitledBorder(

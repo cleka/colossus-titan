@@ -58,8 +58,7 @@ public class DiceStatistics
         LOGGER.finer("Adding rollset for turn " + turn + " battleturn "
             + battleTurn + " Striker " + striker.getDescription());
         DiceRollSet newSet = new DiceRollSet(striker.getPlayer(), turn,
-            battleTurn,
-            striker, target, strikeNumber, rollsString);
+            battleTurn, striker, target, strikeNumber, rollsString);
         newSet.printRollSet();
         rolls.add(newSet);
     }
@@ -91,8 +90,8 @@ public class DiceStatistics
         }
 
         String average = String.format("%3.1f", (float)totalSum / totalCount);
-        writeToStatFile("\nBattle roll statistics for player "
-            + p.getName() + ", in total " + totalCount
+        writeToStatFile("\nBattle roll statistics for player " + p.getName()
+            + ", in total " + totalCount
             + " battle dice rolled; average of all rolls: " + average);
         for (int i = 0; i < 6; i++)
         {
@@ -122,8 +121,8 @@ public class DiceStatistics
 
         private final List<String> rolls;
 
-        DiceRollSet(Player player, int turn, int battleTurn,
-            Creature striker, Creature target, int strikeNumber, List<String> rollsString)
+        DiceRollSet(Player player, int turn, int battleTurn, Creature striker,
+            Creature target, int strikeNumber, List<String> rollsString)
         {
             this.player = player;
             this.turn = turn;
@@ -133,7 +132,6 @@ public class DiceStatistics
             this.strikeNumber = strikeNumber;
             this.rolls = new ArrayList<String>(rollsString);
         }
-
 
         public void printRollSet()
         {

@@ -11,8 +11,7 @@ public class ChatMessage
     String sender;
     String message;
 
-    public ChatMessage(String chatId, long when, String sender,
-        String message)
+    public ChatMessage(String chatId, long when, String sender, String message)
     {
         this.chatId = chatId;
         this.when = when;
@@ -41,4 +40,3 @@ public class ChatMessage
     }
 
 }
-

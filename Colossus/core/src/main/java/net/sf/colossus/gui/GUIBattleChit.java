@@ -242,8 +242,8 @@ public class GUIBattleChit extends Chit
         {
             innerScale = 60;
         }
-        borderStroke = new BasicStroke((int)Math
-            .ceil((outerRect.width - innerScale) / 2.0));
+        borderStroke = new BasicStroke(
+            (int)Math.ceil((outerRect.width - innerScale) / 2.0));
         Point center = new Point(outerRect.x + outerRect.width / 2,
             outerRect.y + outerRect.height / 2);
         rect = new Rectangle(center.x - innerScale / 2, center.y - innerScale

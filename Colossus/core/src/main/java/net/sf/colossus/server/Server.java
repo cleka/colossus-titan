@@ -342,8 +342,9 @@ public final class Server extends Thread implements IServer
 
     void initSocketServer()
     {
-        LOGGER.log(Level.FINEST, "initSocketServer, expecting "
-            + game.getNumLivingPlayers() + " player clients.");
+        LOGGER.log(Level.FINEST,
+            "initSocketServer, expecting " + game.getNumLivingPlayers()
+                + " player clients.");
         LOGGER.log(Level.FINEST, "About to create server socket on port "
             + port);
 
@@ -797,7 +798,8 @@ public final class Server extends Thread implements IServer
                             processByteBuffer();
                             read = 0;
                         }
-                        withdrawFromGameIfRelevant(null, processingCH.didExplicitDisconnect());
+                        withdrawFromGameIfRelevant(null,
+                            processingCH.didExplicitDisconnect());
                         disconnectChannel(sc, key);
                     }
                     break;
@@ -836,7 +838,8 @@ public final class Server extends Thread implements IServer
 
                 // The remote forcibly/unexpectedly closed the connection,
                 // cancel the selection key and close the channel.
-                withdrawFromGameIfRelevant(e, processingCH.didExplicitDisconnect());
+                withdrawFromGameIfRelevant(e,
+                    processingCH.didExplicitDisconnect());
                 disconnectChannel(sc, key);
                 return 0;
             }
@@ -880,7 +883,8 @@ public final class Server extends Thread implements IServer
      * @param didDisconnect whether an explicit dicsonnect request message had been
      * received already from that client ( = no point to wait for reconnect attempt).
      */
-    private void withdrawFromGameIfRelevant(Exception gotException, boolean didDisconnect)
+    private void withdrawFromGameIfRelevant(Exception gotException,
+        boolean didDisconnect)
     {
         if (isWithdrawalIrrelevant())
         {
@@ -939,7 +943,8 @@ public final class Server extends Thread implements IServer
             }
             else
             {
-                LOGGER.warning(reason + " on channel for client " + getPlayerName()
+                LOGGER.warning(reason + " on channel for client "
+                    + getPlayerName()
                     + " - can't reconnect, withDrawing player");
                 withdrawFromGame();
             }
@@ -1328,14 +1333,15 @@ public final class Server extends Thread implements IServer
      * @return Reason why adding Client was refused, null if all is fine.
      */
     String addClient(final ClientHandler client, final String playerName,
-        final boolean remote, final int clientVersion, String buildInfo, boolean spectator)
+        final boolean remote, final int clientVersion, String buildInfo,
+        boolean spectator)
     {
         boolean isReconnect = false;
 
         LOGGER.info("Server.addClient() called with: " + "playerName: '"
             + playerName + "', remote: " + remote + ", spectator: "
-            + spectator + ", client version '"
-            + clientVersion + "', client build info: '" + buildInfo + "'");
+            + spectator + ", client version '" + clientVersion
+            + "', client build info: '" + buildInfo + "'");
         if (!buildInfo.equals(BuildInfo.getFullBuildInfoString()))
         {
             LOGGER.info("NOTE: client build info differs from "
@@ -2130,8 +2136,8 @@ public final class Server extends Thread implements IServer
         BattleServerSide battle = game.getBattleSS();
         for (IClient client : iClients)
         {
-            client.setupBattleSummon(battle.getBattleActivePlayer(), battle
-                .getBattleTurnNumber());
+            client.setupBattleSummon(battle.getBattleActivePlayer(),
+                battle.getBattleTurnNumber());
         }
     }
 
@@ -2140,8 +2146,8 @@ public final class Server extends Thread implements IServer
         BattleServerSide battle = game.getBattleSS();
         for (IClient client : iClients)
         {
-            client.setupBattleRecruit(battle.getBattleActivePlayer(), battle
-                .getBattleTurnNumber());
+            client.setupBattleRecruit(battle.getBattleActivePlayer(),
+                battle.getBattleTurnNumber());
         }
     }
 
@@ -2150,8 +2156,8 @@ public final class Server extends Thread implements IServer
         BattleServerSide battle = game.getBattleSS();
         for (IClient client : iClients)
         {
-            client.setupBattleMove(battle.getBattleActivePlayer(), battle
-                .getBattleTurnNumber());
+            client.setupBattleMove(battle.getBattleActivePlayer(),
+                battle.getBattleTurnNumber());
         }
     }
 
@@ -2162,8 +2168,8 @@ public final class Server extends Thread implements IServer
         {
             if (battle != null)
             {
-                client.setupBattleFight(battle.getBattlePhase(), battle
-                    .getBattleActivePlayer());
+                client.setupBattleFight(battle.getBattlePhase(),
+                    battle.getBattleActivePlayer());
             }
         }
     }
@@ -3794,7 +3800,8 @@ public final class Server extends Thread implements IServer
             getGame().getPreliminaryPlayerNames());
     }
 
-    public void requestSyncDelta(int lastReceivedMessageNr, int syncRequestNumber)
+    public void requestSyncDelta(int lastReceivedMessageNr,
+        int syncRequestNumber)
     {
         LOGGER.info("Client requests sync #" + syncRequestNumber
             + " after reconnect, last msg nr was " + lastReceivedMessageNr);
@@ -3825,7 +3832,6 @@ public final class Server extends Thread implements IServer
                 return;
             }
         }
-
 
         // @TODO: move to outside Select loop
         //   => notify main thread to do this?
@@ -3882,7 +3888,7 @@ public final class Server extends Thread implements IServer
                 handler.fakeDisconnectClient();
             }
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             // ignore it... it's for develop/debugging purpose only
             // (at the moment, at least...;-)

@@ -153,8 +153,9 @@ class CreatureCollectionView extends KDialog
             }
             chitMap.put(type, chit);
             label = new JLabel(baseString, SwingConstants.CENTER);
-            topLabel = new JLabel(htmlizeOnly(htmlColorizeOnly(Integer
-                .toString(type.getMaxCount()), "blue")), SwingConstants.CENTER);
+            topLabel = new JLabel(htmlizeOnly(htmlColorizeOnly(
+                Integer.toString(type.getMaxCount()), "blue")),
+                SwingConstants.CENTER);
             label.setFont(countFont);
             topLabel.setFont(countFont);
             countMap.put(type, label);
@@ -178,8 +179,7 @@ class CreatureCollectionView extends KDialog
                             new ShowCreatureDetails(
                                 CreatureCollectionView.this.parentFrame, type,
                                 null, CreatureCollectionView.this.scrollPane,
-                                gui
-                                .getGame().getVariant(), gui);
+                                gui.getGame().getVariant(), gui);
                         }
                     }
                 }
@@ -227,8 +227,8 @@ class CreatureCollectionView extends KDialog
             {
                 CreatureType type = entry.getKey();
                 JLabel label = entry.getValue();
-                int count = gui.getGame().getCaretaker().getAvailableCount(
-                    type);
+                int count = gui.getGame().getCaretaker()
+                    .getAvailableCount(type);
                 int maxcount = type.getMaxCount();
                 int deadCount = gui.getGame().getCaretaker()
                     .getDeadCount(type);
@@ -280,8 +280,8 @@ class CreatureCollectionView extends KDialog
                 label.setText(htmlizeOnly(htmlCount + htmlSlash
                     + htmlInGameCount + htmlSlash + htmlDeadCount));
                 JLabel topLabel = topCountMap.get(type);
-                topLabel.setText(htmlizeOnly(htmlColorizeOnly(Integer
-                    .toString(maxcount), "blue")));
+                topLabel.setText(htmlizeOnly(htmlColorizeOnly(
+                    Integer.toString(maxcount), "blue")));
             }
 
             repaint();

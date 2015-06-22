@@ -133,9 +133,10 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
             else
             {
                 // attacking titan should progressively involve itself
-                value.add(Math.round((((float)4. - turn) / (float)3.)
-                    * bec.TITAN_FORWARD_EARLY_PENALTY
-                    * ((float)6. - rangeToClosestOpponent(hex))),
+                value.add(
+                    Math.round((((float)4. - turn) / (float)3.)
+                        * bec.TITAN_FORWARD_EARLY_PENALTY
+                        * ((float)6. - rangeToClosestOpponent(hex))),
                     "Progressive TitanForwardEarlyPenalty");
                 for (int i = 0; i < 6; i++)
                 {
@@ -149,9 +150,8 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
                         // in the battle, so min is 0 point.
                         value
                             .add(
-                                Math
-                                    .round((Math.max(((float)4. - turn)
-                                        / (float)3., (float)0.) * bec.TITAN_BY_EDGE_OR_BLOCKINGHAZARD_BONUS)),
+                                Math.round((Math.max(((float)4. - turn)
+                                    / (float)3., (float)0.) * bec.TITAN_BY_EDGE_OR_BLOCKINGHAZARD_BONUS)),
                                 "Progressive TitanByEdgeOrBlockingHazard ("
                                     + i + ")");
                     }
@@ -193,8 +193,9 @@ public class ExperimentalAI extends SimpleAI // NO_UCD
             }
             if (range != preferredRange)
             {
-                value.add(bec.DEFENDER_FORWARD_EARLY_PENALTY
-                    * Math.abs(range - preferredRange),
+                value.add(
+                    bec.DEFENDER_FORWARD_EARLY_PENALTY
+                        * Math.abs(range - preferredRange),
                     "DefenderForwardEarlyPenalty");
             }
             for (int i = 0; i < 6; i++)

@@ -178,8 +178,8 @@ final class FileServerThread extends Thread
                 }
                 catch (Exception e)
                 {
-                    LOGGER.log(Level.WARNING, "FileServerThread : "
-                        + e.toString());
+                    LOGGER.log(Level.WARNING,
+                        "FileServerThread : " + e.toString());
                 }
             }
 

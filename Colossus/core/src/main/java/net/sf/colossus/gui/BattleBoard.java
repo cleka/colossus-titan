@@ -339,15 +339,13 @@ public final class BattleBoard extends KFrame
 
         // okay, either attacker or defender legion is ours.
         boolean hasMyTitan = myLegion.hasTitan();
-        String buttonText = hasMyTitan ? "Concede and Withdraw"
-            : "Concede";
+        String buttonText = hasMyTitan ? "Concede and Withdraw" : "Concede";
         String titleText = hasMyTitan ? "Really concede and withdraw?"
             : "Really concede battle?";
         String messageText = "Do you want to concede this battle?";
         if (hasMyTitan)
         {
-            messageText = messageText
-                + "\n"
+            messageText = messageText + "\n"
                 + "NOTE: Since your legion contains your Titan, conceding "
                 + "this battle means you are eliminated from the game,\n"
                 + "and attacker anyway will get same score has if he "
@@ -356,8 +354,7 @@ public final class BattleBoard extends KFrame
 
         if (!gui.getClient().isMyBattlePhase())
         {
-            messageText = messageText
-                + "\n\nNote: "
+            messageText = messageText + "\n\nNote: "
                 + "According to the rules, you can concede only during your "
                 + "own battle turn,\ntherefore the active player needs to "
                 + "finish his turn first before your concede takes effect!";
@@ -365,8 +362,7 @@ public final class BattleBoard extends KFrame
         String[] dialogOptions = new String[2];
         dialogOptions[0] = buttonText;
         dialogOptions[1] = "Cancel";
-        int answer = JOptionPane
-            .showOptionDialog(this, messageText,
+        int answer = JOptionPane.showOptionDialog(this, messageText,
             titleText, JOptionPane.OK_CANCEL_OPTION,
             JOptionPane.QUESTION_MESSAGE, null, dialogOptions,
             dialogOptions[1]);
@@ -427,8 +423,8 @@ public final class BattleBoard extends KFrame
         {
             public void actionPerformed(ActionEvent e)
             {
-                new BattleTerrainHazardWindow(BattleBoard.this, gui, battleMap
-                    .getMasterHex());
+                new BattleTerrainHazardWindow(BattleBoard.this, gui,
+                    battleMap.getMasterHex());
             }
         };
         undoLastAction = new AbstractAction(undoLast)
@@ -811,8 +807,8 @@ public final class BattleBoard extends KFrame
 
     private boolean isMyTitanOffboard()
     {
-        return gui.getGameClientSide().getBattleCS().isTitanOffboard(
-            gui.getOwningPlayer());
+        return gui.getGameClientSide().getBattleCS()
+            .isTitanOffboard(gui.getOwningPlayer());
     }
 
     private void actOnCritter(GUIBattleChit battleChit)
@@ -993,8 +989,7 @@ public final class BattleBoard extends KFrame
                 }
                 else
                 {
-                    turn
-                        .setBorder(BorderFactory.createLineBorder(Color.BLACK));
+                    turn.setBorder(BorderFactory.createLineBorder(Color.BLACK));
                 }
             }
         }

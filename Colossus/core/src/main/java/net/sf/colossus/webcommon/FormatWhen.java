@@ -3,8 +3,10 @@
  */
 package net.sf.colossus.webcommon;
 
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
 
 public class FormatWhen
 {

@@ -118,7 +118,6 @@ class Chit extends JPanel
         return new Chit(scale, id);
     }
 
-
     /**
      *           P l a i n   C o n s t r u c t o r s
      *
@@ -214,7 +213,8 @@ class Chit extends JPanel
             names[0] = "QuestionMarkMask";
             bufferedImage = getImage(names, scale);
         }
-        else if (VariantSupport.getCurrentVariant().isCreature(idPerhapsWithColor))
+        else if (VariantSupport.getCurrentVariant().isCreature(
+            idPerhapsWithColor))
         {
             CreatureType cre = VariantSupport.getCurrentVariant()
                 .getCreatureByName(idPerhapsWithColor);
@@ -291,8 +291,8 @@ class Chit extends JPanel
                 else
                 {
                     String shortColor = idPerhapsWithColor.substring(0, 2);
-                    PlayerColor playerColor =
-                        PlayerColor.getByShortName(shortColor);
+                    PlayerColor playerColor = PlayerColor
+                        .getByShortName(shortColor);
                     colorName = playerColor.getName();
                 }
                 filenames[0] = "Plain" + "-" + colorName + "Colossus";
@@ -321,11 +321,10 @@ class Chit extends JPanel
 
     public static boolean isMarkerId(String id)
     {
-        return (id.length() >= 4 &&
-                id.charAt(0) >= 'A' && id.charAt(0) <= 'Z' &&
-                id.charAt(1) >= 'a' && id.charAt(1) <= 'z' &&
-                id.charAt(2) >= '0' && id.charAt(2) <= '1' &&
-                id.charAt(3) >= '0' && id.charAt(3) <= '9');
+        return (id.length() >= 4 && id.charAt(0) >= 'A' && id.charAt(0) <= 'Z'
+            && id.charAt(1) >= 'a' && id.charAt(1) <= 'z'
+            && id.charAt(2) >= '0' && id.charAt(2) <= '1'
+            && id.charAt(3) >= '0' && id.charAt(3) <= '9');
     }
 
     public int getTitanPower()

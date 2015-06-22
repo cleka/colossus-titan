@@ -225,7 +225,8 @@ public interface IClientGUI
 
     public abstract void doPickInitialMarker(Set<String> markersAvailable);
 
-    public abstract void doPickSplitMarker(Legion parent, Set<String> markersAvailable);
+    public abstract void doPickSplitMarker(Legion parent,
+        Set<String> markersAvailable);
 
     public abstract CreatureType doPickRecruit(Legion legion,
         String hexDescription);

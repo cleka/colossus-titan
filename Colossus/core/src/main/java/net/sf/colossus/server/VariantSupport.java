@@ -77,7 +77,6 @@ public final class VariantSupport
     private static IVariantHint aihl = null;
     private static Properties markerNames;
 
-
     /**
      * Remove all variant data, so that next variant loading attempt
      * is guaranteed to load it freshly (e.g. to get XML data from
@@ -295,8 +294,7 @@ public final class VariantSupport
             return CURRENT_VARIANT;
         }
 
-        LOGGER.info("Loading variant " + tempVariantName
-            + " freshly...\n***");
+        LOGGER.info("Loading variant " + tempVariantName + " freshly...\n***");
 
         // As long as this is static, only server may do this, not the
         // local clients.
@@ -405,8 +403,8 @@ public final class VariantSupport
             }
             StrategicMapLoader sml = new StrategicMapLoader(mapIS);
 
-            MasterBoard masterBoard = new MasterBoard(sml.getHorizSize(), sml
-                .getVertSize(), sml.getShow(), sml.getHexes());
+            MasterBoard masterBoard = new MasterBoard(sml.getHorizSize(),
+                sml.getVertSize(), sml.getShow(), sml.getHexes());
 
             // varREADME seems to be used as flag for a successfully loaded
             // variant, but breaking the whole variant loading just because
@@ -685,8 +683,8 @@ public final class VariantSupport
         MasterBoardTerrain terrain, IOracleLegion legion,
         List<CreatureType> recruits, IHintOracle oracle)
     {
-        return getRecruitHint(terrain, legion, recruits, oracle, Collections
-            .singletonList(IVariantHint.AIStyle.Any));
+        return getRecruitHint(terrain, legion, recruits, oracle,
+            Collections.singletonList(IVariantHint.AIStyle.Any));
     }
 
     public synchronized static CreatureType getRecruitHint(
@@ -702,8 +700,8 @@ public final class VariantSupport
     public synchronized static List<CreatureType> getInitialSplitHint(
         MasterHex hex)
     {
-        return getInitialSplitHint(hex, Collections
-            .singletonList(IVariantHint.AIStyle.Any));
+        return getInitialSplitHint(hex,
+            Collections.singletonList(IVariantHint.AIStyle.Any));
     }
 
     public synchronized static List<CreatureType> getInitialSplitHint(
@@ -719,8 +717,8 @@ public final class VariantSupport
     public synchronized static int getHintedRecruitmentValueOffset(
         CreatureType creature)
     {
-        return getHintedRecruitmentValueOffset(creature, Collections
-            .singletonList(IVariantHint.AIStyle.Any));
+        return getHintedRecruitmentValueOffset(creature,
+            Collections.singletonList(IVariantHint.AIStyle.Any));
     }
 
     public synchronized static int getHintedRecruitmentValueOffset(

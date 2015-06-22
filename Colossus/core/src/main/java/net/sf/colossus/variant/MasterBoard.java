@@ -165,15 +165,15 @@ public class MasterBoard
         {
             assert dh.getYCoord() == j : "bad exit ; i=" + i + ", j=" + j
                 + ", k=" + k;
-            h[i][j].setExitType(2 - ((i + j + boardParity) & 1), h[i][j]
-                .getBaseExitType(k));
+            h[i][j].setExitType(2 - ((i + j + boardParity) & 1),
+                h[i][j].getBaseExitType(k));
         }
         else
         {
             assert dh.getXCoord() == (i - 1) && dh.getYCoord() == j : "bad exit ; i="
                 + i + ", j=" + j + ", k=" + k;
-            h[i][j].setExitType(4 + ((i + j + boardParity) & 1), h[i][j]
-                .getBaseExitType(k));
+            h[i][j].setExitType(4 + ((i + j + boardParity) & 1),
+                h[i][j].getBaseExitType(k));
         }
     }
 

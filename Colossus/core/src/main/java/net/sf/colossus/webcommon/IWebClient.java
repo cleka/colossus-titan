@@ -54,8 +54,8 @@ public interface IWebClient
 
     public int getClientVersion();
 
-    public void deliverGeneralMessage(long when, boolean error,
-        String title, String message);
+    public void deliverGeneralMessage(long when, boolean error, String title,
+        String message);
 
     public void systemMessage(long when, String message);
 

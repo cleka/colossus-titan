@@ -36,7 +36,6 @@ public final class WelcomeDialog extends KFrame
 
     private static WelcomeDialog showWelcome = null;
 
-
     WelcomeDialog()
     {
         super(title);
@@ -88,7 +87,6 @@ public final class WelcomeDialog extends KFrame
             }
         });
 
-
         buttonBox.add(Box.createHorizontalGlue());
         buttonBox.add(copyButton);
         buttonBox.add(Box.createRigidArea(new Dimension(10, 10)));
@@ -120,8 +118,8 @@ public final class WelcomeDialog extends KFrame
 
     public static void showWelcomeDialogMaybe(Options options)
     {
-        String toSuppress = options.getStringOption(
-            Options.suppressedWelcomeDialog);
+        String toSuppress = options
+            .getStringOption(Options.suppressedWelcomeDialog);
 
         if (toSuppress == null
             || (!toSuppress.equals("ANY") && !toSuppress

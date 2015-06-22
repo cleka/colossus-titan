@@ -142,7 +142,6 @@ public class WebClient extends KFrame implements IWebClient
     private boolean clientIsUp;
     private boolean clientStartFailed;
 
-
     private final static int NotLoggedIn = 1;
     private final static int LoggedIn = 2;
     // Enrolled to an instant game
@@ -858,8 +857,8 @@ public class WebClient extends KFrame implements IWebClient
         {
             public void actionPerformed(ActionEvent e)
             {
-                options.setOption(AutoGamePaneCBText, autoGamePaneCB
-                    .isSelected());
+                options.setOption(AutoGamePaneCBText,
+                    autoGamePaneCB.isSelected());
             }
         });
 
@@ -1357,8 +1356,8 @@ public class WebClient extends KFrame implements IWebClient
         {
             public void actionPerformed(ActionEvent e)
             {
-                options.setOption(Options.viewMode, (String)viewmodeBox
-                    .getSelectedItem());
+                options.setOption(Options.viewMode,
+                    (String)viewmodeBox.getSelectedItem());
             }
         });
 
@@ -1411,8 +1410,8 @@ public class WebClient extends KFrame implements IWebClient
         {
             public void actionPerformed(ActionEvent e)
             {
-                options.setOption(Options.balancedTowers, balancedTowersCB
-                    .isSelected());
+                options.setOption(Options.balancedTowers,
+                    balancedTowersCB.isSelected());
             }
         });
 
@@ -1766,7 +1765,6 @@ public class WebClient extends KFrame implements IWebClient
             }
         });
         adminPane.add(dumpInfoButton);
-
 
         notifyMessageField = new JTextField();
         adminPane.add(notifyMessageField);
@@ -2896,8 +2894,8 @@ public class WebClient extends KFrame implements IWebClient
 
     public void setWatching(String gameId)
     {
-            watchingInstantGameId = gameId;
-            state = Watching;
+        watchingInstantGameId = gameId;
+        state = Watching;
     }
 
     public void clearWatching()
@@ -2988,7 +2986,8 @@ public class WebClient extends KFrame implements IWebClient
         if (startedGameId == null && IN_USE)
         {
             // is null means: it was not this webclient that started locally
-            startOwnClient(gameId, port, hostingHost, inactivityWarningInterval);
+            startOwnClient(gameId, port, hostingHost,
+                inactivityWarningInterval);
         }
         // This WebClient did start it...
         else
@@ -3042,8 +3041,9 @@ public class WebClient extends KFrame implements IWebClient
 
             boolean noOptionsFile = false;
 
-            gc = Client.createClient(hostingHost, p, username, type,
-                whatNextManager, localServer, true, noOptionsFile, true, false);
+            gc = Client
+                .createClient(hostingHost, p, username, type, whatNextManager,
+                    localServer, true, noOptionsFile, true, false);
 
             // Right now this waitingText is probably directly overwritten by
             // updateGUI putting there again the startingText (started by player ...)
@@ -3113,7 +3113,8 @@ public class WebClient extends KFrame implements IWebClient
         {
             gc = null;
             // client startup failed for some reason
-            JOptionPane.showMessageDialog(this,
+            JOptionPane.showMessageDialog(
+                this,
                 "Unexpected exception while starting the game client: "
                     + e.toString(), "Starting game failed!",
                 JOptionPane.ERROR_MESSAGE);
@@ -3288,8 +3289,8 @@ public class WebClient extends KFrame implements IWebClient
 
     public void watchGameInfo(String gameId, String host, int port)
     {
-        LOGGER.info("Got watchgame info for game " + gameId + ": host="
-            + host + ", port=" + port);
+        LOGGER.info("Got watchgame info for game " + gameId + ": host=" + host
+            + ", port=" + port);
         startSpectatorClient(gameId, port, host);
     }
 
@@ -3456,7 +3457,8 @@ public class WebClient extends KFrame implements IWebClient
                                 break;
 
                             default:
-                                LOGGER.log(Level.WARNING,
+                                LOGGER.log(
+                                    Level.WARNING,
                                     "Huups, unhandled game state "
                                         + game.getStateString());
 
@@ -3759,7 +3761,8 @@ public class WebClient extends KFrame implements IWebClient
             GameInfo instantGame = null;
             if ((instantGame = ownInstantGameIfAny()) != null)
             {
-                displayOnlyOneInstantGameMessage("propose",
+                displayOnlyOneInstantGameMessage(
+                    "propose",
                     "You can only be active for one instant game at a time, "
                         + "and there is already instant game #"
                         + instantGame.getGameId() + " proposed by you!");
@@ -3794,7 +3797,6 @@ public class WebClient extends KFrame implements IWebClient
         long startAt = scheduled ? getStartTime() : -1;
         int duration = getDuration();
         String summaryText = getSummaryText();
-
 
         do_proposeGame(variantBox.getSelectedItem().toString(), viewmodeBox
             .getSelectedItem().toString(), startAt, duration, summaryText,

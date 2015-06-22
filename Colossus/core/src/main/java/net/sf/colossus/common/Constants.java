@@ -32,8 +32,7 @@ public final class Constants
      * Also used as start dir for Custom Variant loading dialog
      */
     public static final String DEFAULT_COLOSSUS_HOME = System
-        .getProperty("user.home")
-        + File.separator + ".colossus";
+        .getProperty("user.home") + File.separator + ".colossus";
 
     // Constants related to the options config files
     public static final String OPTIONS_BASE = "Colossus-";
@@ -209,10 +208,9 @@ public final class Constants
     public static final String[] variantArray = { "Default", "Abyssal3",
         "Abyssal6", "Abyssal9", "Badlands", "Badlands-JDG", "Balrog",
         "Beelzebub", "Beelzebub12", "BeelzeGods12", "DinoTitan", "ExtTitan",
-        "Infinite",
-        "Outlands", "Pantheon", "SmallTitan", "TG-ConceptI", "TG-ConceptII",
-        "TG-ConceptIII", "TG-SetII", "TG-SetIII", "TG-Wild", "TitanPlus",
-        "Undead", "Unified" };
+        "Infinite", "Outlands", "Pantheon", "SmallTitan", "TG-ConceptI",
+        "TG-ConceptII", "TG-ConceptIII", "TG-SetII", "TG-SetIII", "TG-Wild",
+        "TitanPlus", "Undead", "Unified" };
 
     public static final int numVariants = variantArray.length;
 

@@ -138,8 +138,7 @@ public class BattleStrike
                 // Striking up across wall: -1
                 // TODO Tower vs. Wall ...
                 if ((hazard == HazardHexside.SLOPE && !striker.getType()
-                    .isNativeSlope())
-                    || hazard == HazardHexside.TOWER)
+                    .isNativeSlope()) || hazard == HazardHexside.TOWER)
                 {
                     attackerSkill--;
                 }

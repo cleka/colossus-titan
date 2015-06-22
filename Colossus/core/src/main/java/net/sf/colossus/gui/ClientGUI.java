@@ -443,8 +443,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         initShowEngagementResults();
         initPreferencesWindow();
         showOrHideAutoInspector(options.getOption(Options.showAutoInspector));
-        logWindow = new LogWindow(options, Logger.getLogger(""), options
-            .getOption(Options.showLogWindow));
+        logWindow = new LogWindow(options, Logger.getLogger(""),
+            options.getOption(Options.showLogWindow));
         // showOrHideLogWindow(options.getOption(Options.showLogWindow));
         showOrHideConnectionLogWindow(options
             .getOption(Options.showConnectionLogWindow));
@@ -868,11 +868,12 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             long responseReceivedTime = new Date().getTime();
             long roundTripTime = responseReceivedTime
                 - lastConnectionCheckPackageSent;
-            JOptionPane.showMessageDialog(getMapOrBoardFrame(),
-                "Received confirmation from server after " + roundTripTime
-                        + " ms - connection to "
-                    + "server is ok!", "Connection check succeeded.",
-                JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane
+                .showMessageDialog(getMapOrBoardFrame(),
+                    "Received confirmation from server after " + roundTripTime
+                        + " ms - connection to " + "server is ok!",
+                    "Connection check succeeded.",
+                    JOptionPane.INFORMATION_MESSAGE);
         }
         else
         {
@@ -1332,8 +1333,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             .fine("CG: actOnTellLegionLocation(Legion legion, MasterHex hex)");
 
         // @TODO: this creates it every time, not only when necessary ?
-        Marker marker = new Marker(legion, 3 * Scale.get(), legion
-            .getLongMarkerId(), client, (client != null));
+        Marker marker = new Marker(legion, 3 * Scale.get(),
+            legion.getLongMarkerId(), client, (client != null));
         setMarker(legion, marker);
 
         if (!isReplayOngoing())
@@ -1363,7 +1364,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         }
 
         Marker marker = new Marker(child, 3 * Scale.get(),
-                child.getLongMarkerId(), client, (client != null));
+            child.getLongMarkerId(), client, (client != null));
         setMarker(child, marker);
 
         if (isReplayOngoing())
@@ -1394,8 +1395,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         // After doing a split, refresh the number of markers available
         if (isMyTurn())
         {
-            board.setMarkerCount(
-                        client.getOwningPlayer().getMarkersAvailable().size());
+            board.setMarkerCount(client.getOwningPlayer()
+                .getMarkersAvailable().size());
         }
         if (!isReplayOngoing())
         {
@@ -1519,8 +1520,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             // After undoing a split, refresh the number of markers available
             if (isMyTurn())
             {
-                board.setMarkerCount(
-                        client.getOwningPlayer().getMarkersAvailable().size());
+                board.setMarkerCount(client.getOwningPlayer()
+                    .getMarkersAvailable().size());
             }
             board.alignLegions(survivor.getCurrentHex());
             board.highlightTallLegions();
@@ -1856,8 +1857,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         {
             String markerId = marker.getId();
             Legion legion = client.getLegion(markerId);
-            autoInspector.showLegion((LegionClientSide)legion, client
-                .isMyLegion(legion));
+            autoInspector.showLegion((LegionClientSide)legion,
+                client.isMyLegion(legion));
         }
     }
 
@@ -1919,7 +1920,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void didSummon(Legion summoner, Legion donor, CreatureType summon)
     {
-        eventViewer.newCreatureRevealEvent(RevealEvent.eventSummon, donor, summon, summoner);
+        eventViewer.newCreatureRevealEvent(RevealEvent.eventSummon, donor,
+            summon, summoner);
     }
 
     public void repaintBattleBoard()
@@ -2133,8 +2135,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         {
             negotiate.dispose();
         }
-        negotiate = new Negotiate(this, client.getAttacker(), client
-            .getDefender());
+        negotiate = new Negotiate(this, client.getAttacker(),
+            client.getDefender());
     }
 
     public void showConcede(Client client, Legion ally, Legion enemy)
@@ -2226,8 +2228,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             return;
         }
         boolean isTicking = watchdog.isClockTicking();
-        LOGGER.finest("update clock ticking: shouldrun="
-            + shouldRun + ", isTicking=" + isTicking);
+        LOGGER.finest("update clock ticking: shouldrun=" + shouldRun
+            + ", isTicking=" + isTicking);
 
         if (isTicking && !shouldRun)
         {
@@ -2289,8 +2291,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
                 tellEngagementResultsAttackerStartingContents,
                 tellEngagementResultsDefenderStartingContents,
                 tellEngagementResultsAttackerLegionCertainities,
-                tellEngagementResultsDefenderLegionCertainities, client
-                    .isMyTurn());
+                tellEngagementResultsDefenderLegionCertainities,
+                client.isMyTurn());
     }
 
     public void actOnEngagementCompleted()
@@ -2325,8 +2327,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
         if (movementDie == null || roll != movementDie.getLastRoll())
         {
-            movementDie = new MovementDie(4 * Scale.get(), MovementDie
-                .getDieImageName(roll));
+            movementDie = new MovementDie(4 * Scale.get(),
+                MovementDie.getDieImageName(roll));
             // TODO why do we not repaint if iconified?
             if (board.getFrame().getExtendedState() != JFrame.ICONIFIED)
             {
@@ -2489,8 +2491,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         board.setBoardActive(val);
     }
 
-    public void doPickSummonAngel(Legion legion,
-        List<Legion> possibleDonors)
+    public void doPickSummonAngel(Legion legion, List<Legion> possibleDonors)
     {
         updateClockTickingPerhaps(true);
         logPerhaps("doPickSummonAngel(Legion legion,");
@@ -2500,7 +2501,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     public List<CreatureType> doPickSplitLegion(Legion parent,
         String childMarker)
     {
-        List<CreatureType> creaturesToSplit = SplitLegion.splitLegion(this, parent, childMarker);
+        List<CreatureType> creaturesToSplit = SplitLegion.splitLegion(this,
+            parent, childMarker);
         // null means cancel, empty list to signal "mark as skip".
         if (creaturesToSplit != null && creaturesToSplit.isEmpty())
         {
@@ -2712,8 +2714,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     public void tellProposal(String proposalString)
     {
         logPerhaps("tellProposal(String proposalString)");
-        Proposal proposal = Proposal.makeFromString(proposalString, client
-            .getGameClientSide());
+        Proposal proposal = Proposal.makeFromString(proposalString,
+            client.getGameClientSide());
         if (replyToProposal != null)
         {
             replyToProposal.dispose();
@@ -3498,7 +3500,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             String goMessage = getClient().getGame().getGameOverMessage();
             if ((goMessage != null && message.contains(goMessage))
             // but suppress even that if autoQuit is on
-                // (=> remote stresstest)
+            // (=> remote stresstest)
                 && !options.getOption(Options.autoQuit))
             {
                 // go on to showing

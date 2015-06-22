@@ -16,6 +16,7 @@ import net.sf.colossus.webcommon.IGameManager;
 import net.sf.colossus.webcommon.IManagedGame;
 import net.sf.colossus.webserver.GameManager;
 
+
 public class ManagedGame implements IManagedGame
 {
     private static final Logger LOGGER = Logger.getLogger(ManagedGame.class
@@ -27,10 +28,8 @@ public class ManagedGame implements IManagedGame
 
     private IGameManager gm;
 
-
     /** True if registration to registry was successful */
     private boolean bound = false;
-
 
     public ManagedGame(String id) throws RemoteException
     {
@@ -58,7 +57,6 @@ public class ManagedGame implements IManagedGame
     {
         return "ManagedGame-" + id;
     }
-
 
     private void initRegistry() throws RemoteException
     {
@@ -90,7 +88,6 @@ public class ManagedGame implements IManagedGame
             // own defined port?
             Remote stub = UnicastRemoteObject.exportObject(this, 0);
             registry.bind(getRegistryId(), stub);
-
 
             bound = true;
             LOGGER.info("OK: Registered to registry...");
@@ -196,6 +193,4 @@ public class ManagedGame implements IManagedGame
         }
     }
 
-
 }
-

@@ -253,7 +253,6 @@ public final class MasterBoard extends JPanel
     EditLegion editLegionOngoing = null;
     EditLegion relocateOngoing = null;
 
-
     private final class InfoPopupHandler extends KeyAdapter
     {
         private static final int POPUP_KEY_ALL_LEGIONS = KeyEvent.VK_SHIFT;
@@ -377,8 +376,8 @@ public final class MasterBoard extends JPanel
         this.client = client;
         this.gui = gui;
 
-        net.sf.colossus.util.InstanceTracker.register(this, gui
-            .getOwningPlayerName());
+        net.sf.colossus.util.InstanceTracker.register(this,
+            gui.getOwningPlayerName());
 
         String playerName = gui.getOwningPlayerName();
         if (playerName == null)
@@ -534,7 +533,6 @@ public final class MasterBoard extends JPanel
         }
         return Constants.ConfirmVals.DoNotAsk;
     }
-
 
     private void setupActions()
     {
@@ -1051,13 +1049,15 @@ public final class MasterBoard extends JPanel
                     + File.separator + ".colossus";
                 String logDirectory = getLogDirectory();
 
-                JOptionPane.showMessageDialog(masterFrame, ""
-                    + "Colossus Version: " + BuildInfo.getReleaseVersion()
-                    + "\n" + "Build: " + buildInfo + "\n" + "Colossus home:  "
-                    + colossusHome + "\n" + "Log directory:  " + logDirectory
-                    + "\n" + "java.version:   "
-                    + System.getProperty("java.version"), "About Colossus",
-                    JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(
+                    masterFrame,
+                    "" + "Colossus Version: " + BuildInfo.getReleaseVersion()
+                        + "\n" + "Build: " + buildInfo + "\n"
+                        + "Colossus home:  " + colossusHome + "\n"
+                        + "Log directory:  " + logDirectory + "\n"
+                        + "java.version:   "
+                        + System.getProperty("java.version"),
+                    "About Colossus", JOptionPane.INFORMATION_MESSAGE);
             }
         };
 
@@ -1201,8 +1201,8 @@ public final class MasterBoard extends JPanel
             // upper right corner
             markerPoint.setLocation(markerPoint.x + chitScale, markerPoint.y);
             new ShowLegion(masterFrame, (LegionClientSide)legion, markerPoint,
-                scrollPane, 4 * Scale.get(), viewMode, client
-                    .isMyLegion(legion), dubiousAsBlanks, showMarker);
+                scrollPane, 4 * Scale.get(), viewMode,
+                client.isMyLegion(legion), dubiousAsBlanks, showMarker);
         }
     }
 
@@ -1494,9 +1494,9 @@ public final class MasterBoard extends JPanel
                         + (3 * j
                             + ((i + getMasterBoard().getBoardParity()) & 1)
                             * (1 + 2 * (j / 2)) + ((i + 1 + getMasterBoard()
-                            .getBoardParity()) & 1)
-                            * 2 * ((j + 1) / 2)) * GUIHex.SQRT3 * scale),
-                        scale, getMasterBoard().isHexInverted(i, j), this);
+                            .getBoardParity()) & 1) * 2 * ((j + 1) / 2))
+                        * GUIHex.SQRT3 * scale), scale, getMasterBoard()
+                        .isHexInverted(i, j), this);
                     guiHexArray[i][j] = hex;
                 }
             }
@@ -1583,7 +1583,8 @@ public final class MasterBoard extends JPanel
             boolean beDone = true;
             int mcModeInt = gui.getLegionMoveConfirmationMode();
 
-            if ((mcModeInt == Options.legionMoveConfirmationNumMove) || (mcModeInt == Options.legionMoveConfirmationNumUnvisitedMove))
+            if ((mcModeInt == Options.legionMoveConfirmationNumMove)
+                || (mcModeInt == Options.legionMoveConfirmationNumUnvisitedMove))
             {
                 int legionStatus[] = { 0, 0, 0, 0 };
                 int cnt;
@@ -1609,7 +1610,7 @@ public final class MasterBoard extends JPanel
                     {
                         answer = confirmDialog(
                             (cnt == 1) ? "that has not moved"
-                        : "that have not moved", cnt);
+                                : "that have not moved", cnt);
                     }
                 }
                 beDone = true;
@@ -1729,8 +1730,8 @@ public final class MasterBoard extends JPanel
             // If not first turn, then add Marker Count Text to the bottom display bar
             if (client.getTurnNumber() != 1)
             {
-                bottomBar.setMarkerCount(
-                        client.getOwningPlayer().getMarkersAvailable().size());
+                bottomBar.setMarkerCount(client.getOwningPlayer()
+                    .getMarkersAvailable().size());
             }
             bottomBar.setPhase("Split stacks");
             highlightTallLegions();
@@ -2108,8 +2109,8 @@ public final class MasterBoard extends JPanel
             {
                 for (Legion legion : player.getLegions())
                 {
-                    Marker marker = new Marker(legion, 3 * Scale.get(), legion
-                        .getLongMarkerId(), client, true);
+                    Marker marker = new Marker(legion, 3 * Scale.get(),
+                        legion.getLongMarkerId(), client, true);
                     legionToMarkerMap.put(legion, marker);
                     hexesNeedAligning.add(legion.getCurrentHex());
                 }
@@ -2279,7 +2280,7 @@ public final class MasterBoard extends JPanel
         int modifiers = e.getModifiers();
         return (((modifiers & InputEvent.BUTTON2_MASK) != 0)
             || ((modifiers & InputEvent.BUTTON3_MASK) != 0) || e.isAltDown() || e
-            .isControlDown());
+                .isControlDown());
     }
 
     class MasterBoardMouseHandler extends MouseAdapter
@@ -2310,15 +2311,15 @@ public final class MasterBoard extends JPanel
                     if (gui.getOptions().getOption(Options.editModeActive))
                     {
                         new EditLegion(gui, masterFrame, legion, point,
-                            scrollPane, 4 * Scale.get(), viewMode, client
-                                .isMyLegion(legion), dubiousAsBlanks,
+                            scrollPane, 4 * Scale.get(), viewMode,
+                            client.isMyLegion(legion), dubiousAsBlanks,
                             showMarker);
                     }
                     else
                     {
                         new ShowLegion(masterFrame, legion, point, scrollPane,
-                            4 * Scale.get(), viewMode, client
-                                .isMyLegion(legion), dubiousAsBlanks,
+                            4 * Scale.get(), viewMode,
+                            client.isMyLegion(legion), dubiousAsBlanks,
                             showMarker);
                     }
                     return;
@@ -2456,8 +2457,7 @@ public final class MasterBoard extends JPanel
         if (relocateOngoing != null)
         {
             gui.getClient().editRelocateLegion(
-                relocateOngoing.getLegion().getMarkerId(),
-                hex.getLabel());
+                relocateOngoing.getLegion().getMarkerId(), hex.getLabel());
             relocateOngoing.dispose();
             relocateOngoing = null;
         }
@@ -2524,8 +2524,6 @@ public final class MasterBoard extends JPanel
             scrollPane, 4 * Scale.get(), viewMode, client.isMyLegion(legion),
             dubiousAsBlanks, showMarker);
     }
-
-
 
     /**
      * tellEngagement calls this, now "engaging" is not pending, instead
@@ -2603,8 +2601,7 @@ public final class MasterBoard extends JPanel
                 {
                     public void run()
                     {
-                        JOptionPane.showMessageDialog(masterFrame,
-                            msg, title,
+                        JOptionPane.showMessageDialog(masterFrame, msg, title,
                             JOptionPane.INFORMATION_MESSAGE);
                         gui.getBoard().getToolkit().beep();
                     }
@@ -2677,8 +2674,8 @@ public final class MasterBoard extends JPanel
                 .getHeight(this) == this.getSize().height)))
         {
             overlayChanged = false;
-            offScreenBuffer = this.createImage(this.getWidth(), this
-                .getHeight());
+            offScreenBuffer = this.createImage(this.getWidth(),
+                this.getHeight());
             Graphics g_im = offScreenBuffer.getGraphics();
             super.paintComponent(g_im);
 
@@ -3048,8 +3045,8 @@ public final class MasterBoard extends JPanel
         try
         {
             Robot robot = new Robot();
-            Rectangle rect = new Rectangle(point.x - 250, point.y - 250,
-                500, 500);
+            Rectangle rect = new Rectangle(point.x - 250, point.y - 250, 500,
+                500);
             scrollRectToVisible(rect);
             SwingUtilities.convertPointToScreen(point, MasterBoard.this);
             robot.mouseMove(point.x, point.y);
@@ -3078,8 +3075,8 @@ public final class MasterBoard extends JPanel
                     .getLegion(nextLegion.getMarkerId());
 
                 new ShowLegion(masterFrame, clientSideLegion, point,
-                    scrollPane, 4 * Scale.get(), viewMode, client
-                        .isMyLegion(clientSideLegion), false, true);
+                    scrollPane, 4 * Scale.get(), viewMode,
+                    client.isMyLegion(clientSideLegion), false, true);
             }
         }
         catch (AWTException exception)
@@ -3337,8 +3334,8 @@ public final class MasterBoard extends JPanel
         // Add Marker Count Text to the bottom display bar
         public void setMarkerCount(int markerCount)
         {
-            countLabel.setText("(" + markerCount + " marker" +
-                                        ((markerCount == 1) ? "" : "s") + ")");
+            countLabel.setText("(" + markerCount + " marker"
+                + ((markerCount == 1) ? "" : "s") + ")");
         }
 
         public BottomBar()

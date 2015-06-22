@@ -40,17 +40,17 @@ public final class BattleMap extends HexMap
     private final Marker defenderMarker;
 
     public BattleMap(Client client, MasterHex masterHex, Legion attacker,
-                     Legion defender, ClientGUI gui)
+        Legion defender, ClientGUI gui)
     {
         super(masterHex);
 
         this.client = client;
         this.gui = gui;
 
-        attackerMarker = new Marker(attacker,
-          3 * Scale.get(), attacker.getLongMarkerId(), false, client);
-        defenderMarker = new Marker(defender,
-          3 * Scale.get(), defender.getLongMarkerId(), true, client);
+        attackerMarker = new Marker(attacker, 3 * Scale.get(),
+            attacker.getLongMarkerId(), false, client);
+        defenderMarker = new Marker(defender, 3 * Scale.get(),
+            defender.getLongMarkerId(), true, client);
         attackerMarker.setOpaque(false);
         defenderMarker.setOpaque(false);
         attackerMarker.setToolTipText("Attacking Legion");
@@ -59,8 +59,8 @@ public final class BattleMap extends HexMap
         this.add(defenderMarker);
 
         String instanceId = client.getOwningPlayer().getName() + ": "
-            + attacker.getMarkerId() + "/" + defender.getMarkerId() +
-            " (" + count + ")";
+            + attacker.getMarkerId() + "/" + defender.getMarkerId() + " ("
+            + count + ")";
         count++;
         InstanceTracker.setId(this, instanceId);
     }

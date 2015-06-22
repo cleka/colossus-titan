@@ -17,5 +17,3 @@ public interface IGameManager extends Remote
     public void unregisterGame(String gameId) throws AccessException,
         NotBoundException, RemoteException;
 }
-
-

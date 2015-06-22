@@ -139,8 +139,9 @@ public class GUIBattleHex extends GUIHex<BattleHex>
         Point2D.Double innerCenter = new Point2D.Double(innerBounds.getX()
             + innerBounds.getWidth() / 2.0, innerBounds.getY()
             + innerBounds.getHeight() / 2.0);
-        at = AffineTransform.getTranslateInstance(center.getX()
-            - innerCenter.getX(), center.getY() - innerCenter.getY());
+        at = AffineTransform.getTranslateInstance(
+            center.getX() - innerCenter.getX(),
+            center.getY() - innerCenter.getY());
         innerHexagon.transform(at);
         return innerHexagon;
     }
@@ -227,15 +228,18 @@ public class GUIBattleHex extends GUIHex<BattleHex>
 
         FontMetrics fontMetrics = g2.getFontMetrics();
 
-        g2.drawString(name, rectBound.x
-            + ((rectBound.width - fontMetrics.stringWidth(name)) / 2),
+        g2.drawString(name,
+            rectBound.x
+                + ((rectBound.width - fontMetrics.stringWidth(name)) / 2),
             rectBound.y + ((fontMetrics.getHeight() + rectBound.height) / 2));
 
         // Show hex label in upper left corner.
-        g2.drawString(getHexModel().getLabel(), rectBound.x
-            + (rectBound.width - fontMetrics.stringWidth(getHexModel()
-                .getLabel())) / 3, rectBound.y
-            + ((fontMetrics.getHeight() + rectBound.height) / 4));
+        g2.drawString(
+            getHexModel().getLabel(),
+            rectBound.x
+                + (rectBound.width - fontMetrics.stringWidth(getHexModel()
+                    .getLabel())) / 3, rectBound.y
+                + ((fontMetrics.getHeight() + rectBound.height) / 4));
     }
 
     @Override

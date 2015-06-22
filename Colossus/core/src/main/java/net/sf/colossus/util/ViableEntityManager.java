@@ -41,8 +41,9 @@ public class ViableEntityManager
     public static synchronized void register(Object viableEntity, String name)
     {
         viableEntities.put(viableEntity, name);
-        LOGGER.log(Level.FINEST, "ViableEntityManager: now "
-            + viableEntities.size() + " entities registered.");
+        LOGGER.log(Level.FINEST,
+            "ViableEntityManager: now " + viableEntities.size()
+                + " entities registered.");
     }
 
     public static synchronized void unregister(Object viableEntity)

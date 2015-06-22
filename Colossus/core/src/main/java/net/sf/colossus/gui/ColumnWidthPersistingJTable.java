@@ -1,5 +1,6 @@
 package net.sf.colossus.gui;
 
+
 import java.util.Enumeration;
 
 import javax.swing.JTable;
@@ -12,6 +13,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
 import net.sf.colossus.common.Options;
+
 
 /**
  * This is a JTable that remembers the size of its columns between runs of the

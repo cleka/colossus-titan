@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.webcommon.ChatMessage;
 
+
 public class ChatMsgStorage
 {
     private static final Logger LOGGER = Logger.getLogger(ChatMsgStorage.class
@@ -122,7 +123,8 @@ public class ChatMsgStorage
                 .severe("Data Directory (for chat messages file) is null! Define it in cf file!");
             System.exit(1);
         }
-        String filename = "Chatmessages-" + getChannel().getChannelId()+ ".txt";
+        String filename = "Chatmessages-" + getChannel().getChannelId()
+            + ".txt";
 
         try
         {

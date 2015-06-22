@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import net.sf.colossus.client.IClient;
 import net.sf.colossus.common.Constants;
 
+
 public class MessageRecorder
 {
     private static final Logger LOGGER = Logger
@@ -57,8 +58,6 @@ public class MessageRecorder
         System.out.println("END   messages\n\n");
     }
 
-
-
     private class Message
     {
         private final IClient client;
@@ -91,6 +90,5 @@ public class MessageRecorder
         }
 
     }
-
 
 }

@@ -136,7 +136,7 @@ final class PickRecruit extends KDialog
                     // TODO Handle this better. Return a "NONE" creatureType and let
                     // caller take care of things
                     PickRecruit.this.gui
-                    .markLegionAsSkipRecruit(PickRecruit.this.legion);
+                        .markLegionAsSkipRecruit(PickRecruit.this.legion);
                     dispose();
                 }
             });

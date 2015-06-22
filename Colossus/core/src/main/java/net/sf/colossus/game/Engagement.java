@@ -30,8 +30,8 @@ public class Engagement
         this.location = hex;
         this.attacker = attacker;
         this.defender = defender;
-        LOGGER.info("A new engagement: " + location + " attacker "
-            + attacker + " defender " + defender);
+        LOGGER.info("A new engagement: " + location + " attacker " + attacker
+            + " defender " + defender);
     }
 
     public MasterHex getLocation()
@@ -57,8 +57,7 @@ public class Engagement
     @Override
     public String toString()
     {
-        return location + " attacker " + attacker
-            + " defender " + defender;
+        return location + " attacker " + attacker + " defender " + defender;
     }
 
 }

@@ -226,13 +226,13 @@ public class BattleTerrainHazardWindow extends KDialog
             hex.setNeighbor(0, neighborTop);
             GUIBattleHex neighborTopRight = new GUIBattleHex(4 * HEX_SIZE, -2
                 * HEX_SIZE, HEX_SIZE, container, 0, 0);
-            configureHexModel((HazardHexside)hazard, neighborTopRight
-                .getHexModel());
+            configureHexModel((HazardHexside)hazard,
+                neighborTopRight.getHexModel());
             hex.setNeighbor(1, neighborTopRight);
             GUIBattleHex neighborBottomRight = new GUIBattleHex(4 * HEX_SIZE,
                 2 * HEX_SIZE, HEX_SIZE, container, 0, 0);
-            configureHexModel((HazardHexside)hazard, neighborBottomRight
-                .getHexModel());
+            configureHexModel((HazardHexside)hazard,
+                neighborBottomRight.getHexModel());
             hex.setNeighbor(2, neighborBottomRight);
         }
         hex.setHexModel(model);
@@ -427,16 +427,18 @@ public class BattleTerrainHazardWindow extends KDialog
     {
         container.add(makeStrikeEffect("Defending", hazard.defenseEffect),
             GBC_NORTHEAST);
-        container.add(makeStrikeEffect("Being Rangestruck",
-            hazard.rangedDefenseEffect), GBC_NORTHWEST);
+        container.add(
+            makeStrikeEffect("Being Rangestruck", hazard.rangedDefenseEffect),
+            GBC_NORTHWEST);
     }
 
     private void addStrikeInfo(Container container, Hazards hazard)
     {
         container.add(makeStrikeEffect("Attacking", hazard.attackEffect),
             GBC_NORTHEAST);
-        container.add(makeStrikeEffect("Rangestriking",
-            hazard.rangedAttackEffect), GBC_NORTHWEST);
+        container.add(
+            makeStrikeEffect("Rangestriking", hazard.rangedAttackEffect),
+            GBC_NORTHWEST);
     }
 
     private Chit makeStrikeEffect(String strike, Hazards.CombatEffect e)

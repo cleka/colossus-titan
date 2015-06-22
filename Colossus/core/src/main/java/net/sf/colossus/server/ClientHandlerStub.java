@@ -22,6 +22,7 @@ import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
 
+
 public class ClientHandlerStub implements IClient
 {
     private static final Logger LOGGER = Logger
@@ -612,8 +613,8 @@ public class ClientHandlerStub implements IClient
      */
     public void relayedPeerRequest(String requestingClientName)
     {
-        LOGGER.info("Relaying peerRequest from client "
-            + requestingClientName + " to client " + getClientName());
+        LOGGER.info("Relaying peerRequest from client " + requestingClientName
+            + " to client " + getClientName());
         sendToClient(Constants.relayedPeerRequest + sep + requestingClientName);
     }
 

@@ -102,8 +102,8 @@ public class Caretaker
         {
             // We don't need synchronized access here, because this happens
             // only at game start, not during game
-            creatureAvailableCounts.put(type, Integer.valueOf(type
-                .getMaxCount()));
+            creatureAvailableCounts.put(type,
+                Integer.valueOf(type.getMaxCount()));
             creatureDeadCounts.put(type, Integer.valueOf(0));
         }
         triggerFullUpdate();
@@ -214,8 +214,6 @@ public class Caretaker
         }
     }
 
-
-
     private void triggerFullUpdate()
     {
         for (ChangeListener listener : listeners)
@@ -262,8 +260,8 @@ public class Caretaker
 
                     // We don't need synchronized access here, because Balrog
                     // is not immortal
-                    creatureAvailableCounts.put(type, Integer.valueOf(live
-                        + dead));
+                    creatureAvailableCounts.put(type,
+                        Integer.valueOf(live + dead));
                     creatureDeadCounts.put(type, Integer.valueOf(0));
                     triggerOneCountUpdate(type);
                 }

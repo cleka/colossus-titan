@@ -123,8 +123,7 @@ public final class LegionInfoPanel extends JPanel
         if (usePlayerColor)
         {
             Color playerColor = HTMLColor.stringToColor(legion.getPlayer()
-                .getColor()
-                + "Colossus");
+                .getColor() + "Colossus");
             setBackground(playerColor);
         }
 

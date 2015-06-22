@@ -152,9 +152,8 @@ public final class PlayerDetailsDialog extends KDialog
     {
         JPanel result = new JPanel(new GridBagLayout());
 
-        JLabel sectionLabel = new JLabel(String
-            .valueOf(player.getNumLegions())
-            + " legions:");
+        JLabel sectionLabel = new JLabel(
+            String.valueOf(player.getNumLegions()) + " legions:");
         result.add(sectionLabel, SECTION_TITLE_CONSTRAINT);
 
         result.add(new JPanel(), FIRST_LABEL_CONSTRAINT);
@@ -167,14 +166,14 @@ public final class PlayerDetailsDialog extends KDialog
 
         for (LegionClientSide legion : player.getLegions())
         {
-            result.add(new Marker(legion, 2 * Scale.get(), legion.getLongMarkerId()),
+            result.add(
+                new Marker(legion, 2 * Scale.get(), legion.getLongMarkerId()),
                 FIRST_LABEL_CONSTRAINT);
             result.add(new JLabel(legion.getCurrentHex().getLabel()),
                 LABEL_CONSTRAINT);
             result.add(new LegionInfoPanel(legion, 2 * Scale.get(), 0, 0,
                 true, gui.getViewMode(), gui.getClient().isMyLegion(legion),
-                dubiousAsBlanks, true, false),
-                LABEL_CONSTRAINT);
+                dubiousAsBlanks, true, false), LABEL_CONSTRAINT);
             result.add(new JPanel(), HORIZONTAL_FILL_CONSTRAINT);
         }
 
@@ -249,10 +248,10 @@ public final class PlayerDetailsDialog extends KDialog
         constraints.fill = GridBagConstraints.BOTH;
         if (node.getChild1() != null)
         {
-            GridBagConstraints child1Layout = calculateSplitNodeLayout(node
-                .getChild1(), y, layouts);
-            GridBagConstraints child2Layout = calculateSplitNodeLayout(node
-                .getChild2(), y + child1Layout.gridheight, layouts);
+            GridBagConstraints child1Layout = calculateSplitNodeLayout(
+                node.getChild1(), y, layouts);
+            GridBagConstraints child2Layout = calculateSplitNodeLayout(
+                node.getChild2(), y + child1Layout.gridheight, layouts);
             constraints.gridheight = child1Layout.gridheight
                 + child2Layout.gridheight;
             constraints.gridwidth = node.getChild1().getTurnCreated()

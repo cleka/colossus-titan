@@ -112,8 +112,8 @@ public class GameSaving
     {
         Element copyOfSnapshot = (Element)commitDataRoot.clone();
 
-        List<Element> kids = new LinkedList<Element>(copyOfSnapshot
-            .getChildren());
+        List<Element> kids = new LinkedList<Element>(
+            copyOfSnapshot.getChildren());
         for (Element el : kids)
         {
             el.detach();
@@ -210,8 +210,8 @@ public class GameSaving
             el.setAttribute("name", creature.getName());
             el.setAttribute("remaining", ""
                 + game.getCaretaker().getAvailableCount(creature));
-            el.setAttribute("dead", ""
-                + game.getCaretaker().getDeadCount(creature));
+            el.setAttribute("dead",
+                "" + game.getCaretaker().getDeadCount(creature));
             careTakerEl.addContent(el);
         }
         // XXX temporarily out of use to keep save games small during development / debugging
@@ -314,12 +314,11 @@ public class GameSaving
             {
                 LegionServerSide legion = it2.next();
 
-                el
-                    .addContent(dumpLegion(legion,
-                        game.isBattleInProgress()
-                            && (legion == game.getBattleSS()
-                                .getAttackingLegion() || legion == game
-                                .getBattleSS().getDefendingLegion())));
+                el.addContent(dumpLegion(
+                    legion,
+                    game.isBattleInProgress()
+                        && (legion == game.getBattleSS().getAttackingLegion() || legion == game
+                            .getBattleSS().getDefendingLegion())));
             }
             root.addContent(el);
         }
@@ -585,7 +584,8 @@ public class GameSaving
         }
         catch (IOException e)
         {
-            LOGGER.log(Level.SEVERE, "Couldn't open iscm-File " + iscmFullName, e);
+            LOGGER.log(Level.SEVERE,
+                "Couldn't open iscm-File " + iscmFullName, e);
             iscmName = null;
             return null;
         }

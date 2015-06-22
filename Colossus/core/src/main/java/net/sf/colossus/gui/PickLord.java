@@ -79,8 +79,8 @@ final class PickLord extends KDialog
         return lordType;
     }
 
-    static CreatureType pickLord(IOptions options,
-        JFrame parentFrame, List<CreatureType> choices)
+    static CreatureType pickLord(IOptions options, JFrame parentFrame,
+        List<CreatureType> choices)
     {
         PickLord pl = new PickLord(options, parentFrame, choices);
         return pl.getLordType();

@@ -81,7 +81,7 @@ public class ChatChannel
         long now = new Date().getTime();
         ChatMessage startMsg = new ChatMessage(this.chatId, now, "SYSTEM",
             "WebServer started. Welcome!!");
-        synchronized(storage)
+        synchronized (storage)
         {
             storage.storeMessage(startMsg);
         }
@@ -144,8 +144,7 @@ public class ChatChannel
      */
     public void showContactHelp(String chatId, IWebClient client)
     {
-        sendLinesToClient(chatId, client, Arrays.asList(contactHelp),
-            true, "");
+        sendLinesToClient(chatId, client, Arrays.asList(contactHelp), true, "");
     }
 
     /** Send an arraylist full of lines to one client. */
@@ -217,15 +216,13 @@ public class ChatChannel
 
         ArrayList<String> lines = new ArrayList<String>();
         lines.add("");
-        lines
-            .add("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+        lines.add("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
         lines.add("");
         lines.add(" Hello " + userName + ", please note:");
         lines
             .add(" You are using a Colossus version older than 0.10.3. See message above!");
         lines.add("");
-        lines
-            .add("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+        lines.add("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
         lines.add("");
 
         for (String line : lines)
@@ -237,8 +234,7 @@ public class ChatChannel
     public void createStoreAndDeliverMessage(String sender, String message)
     {
         long now = new Date().getTime();
-        ChatMessage msg = new ChatMessage(this.chatId,
-            now, sender, message);
+        ChatMessage msg = new ChatMessage(this.chatId, now, sender, message);
         synchronized (storage)
         {
             storage.storeMessage(msg);
@@ -309,7 +305,6 @@ public class ChatChannel
         String sender = msg.getSender();
         String message = msg.getMessage();
         long when = msg.getWhen();
-
 
         String whenTime = whenFormatter.timeAsString(when);
         String dateChange = whenFormatter.hasDateChanged();

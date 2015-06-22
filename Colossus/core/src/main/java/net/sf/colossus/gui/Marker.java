@@ -145,8 +145,7 @@ public final class Marker extends Chit
         {
             g2.setColor(Color.RED);
             Rectangle rect = getBounds();
-            g.fillRect(rect.x - 4, rect.y - 4, rect.width + 8,
-                       rect.height + 8);
+            g.fillRect(rect.x - 4, rect.y - 4, rect.width + 8, rect.height + 8);
         }
         super.paintComponent(g2);
 

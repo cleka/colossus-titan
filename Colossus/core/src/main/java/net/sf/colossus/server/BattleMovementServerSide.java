@@ -149,8 +149,9 @@ public class BattleMovementServerSide
             }
             else
             {
-                set = findMoves(critter.getCurrentHex(), critter, critter
-                    .isFlier(), critter.getSkill() - critter.getSlowed(), -1,
+                set = findMoves(critter.getCurrentHex(), critter,
+                    critter.isFlier(),
+                    critter.getSkill() - critter.getSlowed(), -1,
                     ignoreMobileAllies, true);
             }
         }

@@ -62,11 +62,11 @@ public class HazardTerrain extends Hazards
         return (attackEffect.scope.equals(ScopeOfEffectOnStrike.NATIVES)
             || defenseEffect.scope.equals(ScopeOfEffectOnStrike.NATIVES)
             || attackEffect.scope.equals(ScopeOfEffectOnStrike.PATRIOTS) || defenseEffect.scope
-            .equals(ScopeOfEffectOnStrike.PATRIOTS))
+                .equals(ScopeOfEffectOnStrike.PATRIOTS))
             && (attackEffect.effect.equals(EffectOnStrike.SKILLBONUS)
                 || attackEffect.effect.equals(EffectOnStrike.POWERBONUS)
                 || defenseEffect.effect.equals(EffectOnStrike.SKILLBONUS) || defenseEffect.effect
-                .equals(EffectOnStrike.POWERBONUS));
+                    .equals(EffectOnStrike.POWERBONUS));
     }
 
     public boolean isNonNativePenaltyTerrain()

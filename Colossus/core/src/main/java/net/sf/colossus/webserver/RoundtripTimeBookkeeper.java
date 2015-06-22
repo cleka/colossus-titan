@@ -4,6 +4,7 @@ package net.sf.colossus.webserver;
 import java.io.PrintWriter;
 import java.util.LinkedList;
 
+
 public class RoundtripTimeBookkeeper
 {
     // private static final Logger LOGGER = Logger
@@ -75,18 +76,16 @@ public class RoundtripTimeBookkeeper
                 indexForMin = index;
             }
 
-            pw.printf("i=%6d: At %20d RT-time=%10d\n",
-                index, when, time);
+            pw.printf("i=%6d: At %20d RT-time=%10d\n", index, when, time);
         }
 
         pw.println("");
-        pw.printf("MIN     : At %20d RT-time=%10d (i=%6d)\n",
-            whenForMin, min, indexForMin);
-        pw.printf("MAX     : At %20d RT-time=%10d (i=%6d)\n",
-            whenForMax, max, indexForMax);
+        pw.printf("MIN     : At %20d RT-time=%10d (i=%6d)\n", whenForMin, min,
+            indexForMin);
+        pw.printf("MAX     : At %20d RT-time=%10d (i=%6d)\n", whenForMax, max,
+            indexForMax);
 
     }
-
 
     private class RoundtripTimeEntry
     {

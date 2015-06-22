@@ -352,8 +352,8 @@ public abstract class AbstractAI implements AI
             CreatureType bestRecruit = null;
             while ((currentScore + pointValue) >= nextScore)
             {
-                List<String> ral = variant.getRecruitableAcquirableList(hex
-                    .getTerrain(), nextScore);
+                List<String> ral = variant.getRecruitableAcquirableList(
+                    hex.getTerrain(), nextScore);
                 for (String creatureName : ral)
                 {
                     CreatureType tempRecruit = variant

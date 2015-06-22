@@ -19,8 +19,7 @@ import java.util.logging.Logger;
  */
 public class User
 {
-    static final Logger LOGGER = Logger
-        .getLogger(User.class.getName());
+    static final Logger LOGGER = Logger.getLogger(User.class.getName());
 
     private final static String TYPE_USER = "user";
     private final static String TYPE_ADMIN = "admin";
@@ -56,7 +55,6 @@ public class User
 
     // Only needed during registration:
     private String lastSentConfirmationCode;
-
 
     public User(String name)
     {

@@ -363,8 +363,8 @@ public class RecruitingSubTree implements IRecruiting
         for (ICustomRecruitBase crb : allCustom)
         {
             LOGGER.finest("Checking with CRB " + crb.getClass().getName());
-            number = Math.min(number, crb.numberOfRecruiterNeeded(recruiter,
-                recruit, hex));
+            number = Math.min(number,
+                crb.numberOfRecruiterNeeded(recruiter, recruit, hex));
         }
         return number;
     }
@@ -520,8 +520,8 @@ public class RecruitingSubTree implements IRecruiting
                 .getRecruitingSubTree();
             for (RecruiterAndRecruit rar : r.regular.keySet())
             {
-                RecruiterAndRecruit backward = new RecruiterAndRecruit(rar
-                    .getRecruit(), rar.getRecruiter());
+                RecruiterAndRecruit backward = new RecruiterAndRecruit(
+                    rar.getRecruit(), rar.getRecruiter());
                 if (r.regular.keySet().contains(backward))
                 { // don't go backward ; we assume backward is the cheapest way.
                     if ((r.regular.get(rar) >= 1)

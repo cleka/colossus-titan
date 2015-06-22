@@ -45,7 +45,6 @@ public class WebServerClient implements IWebClient
     private static final Logger LOGGER = Logger
         .getLogger(WebServerClient.class.getName());
 
-
     private final static String sep = IWebServer.WebProtocolSeparator;
 
     /** The client socket thread that handled the low-level connection stuff */
@@ -75,7 +74,6 @@ public class WebServerClient implements IWebClient
 
     /** Time when last gameStartsSoonSent was sent (in ms since epoch) */
     private long gameStartsSoonSent = -1;
-
 
     public WebServerClient(WebServer server, Socket socket)
     {
@@ -543,8 +541,8 @@ public class WebServerClient implements IWebClient
             long requestResponseArriveTime = new Date().getTime();
             long roundtripTime = requestResponseArriveTime - requestSentTime;
             String msg = "Received ping response #" + counter + " from user "
-                + name
-                + ", request roundtrip time is " + roundtripTime + " ms.";
+                + name + ", request roundtrip time is " + roundtripTime
+                + " ms.";
             if (roundtripTime > 3000)
             {
                 LOGGER.warning(msg);
@@ -816,8 +814,7 @@ public class WebServerClient implements IWebClient
         {
             if (force)
             {
-                LOGGER.fine("User " + username
-                    + " already logged in ("
+                LOGGER.fine("User " + username + " already logged in ("
                     + otherCst + ") - forcing Logout");
                 otherCst.forceLogout(otherCst);
             }
@@ -849,7 +846,8 @@ public class WebServerClient implements IWebClient
         }
         else
         {
-            chatDeliver(IWebServer.generalChatName, now, "SYSTEM", message, false);
+            chatDeliver(IWebServer.generalChatName, now, "SYSTEM", message,
+                false);
         }
     }
 

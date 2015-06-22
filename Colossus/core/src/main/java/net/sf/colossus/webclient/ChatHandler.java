@@ -315,8 +315,8 @@ public class ChatHandler
                 + doubledashes + "\n";
         }
 
-        String textToAppend = doubleDashLine + whenTime + " " + sender
-            + ": " + message + "\n";
+        String textToAppend = doubleDashLine + whenTime + " " + sender + ": "
+            + message + "\n";
         chatDisplayInEDT(textToAppend);
     }
 

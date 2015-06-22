@@ -23,8 +23,7 @@ public class RelocateLegion extends LegionAction
     @Override
     public String toString()
     {
-        return String.format(
-            "Relocation of legion %s to new hex %s",
+        return String.format("Relocation of legion %s to new hex %s",
             getLegion().getMarkerId(), getDestination().getLabel());
     }
 }

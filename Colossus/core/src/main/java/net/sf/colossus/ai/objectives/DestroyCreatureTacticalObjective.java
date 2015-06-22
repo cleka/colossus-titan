@@ -102,7 +102,7 @@ class DestroyCreatureTacticalObjective extends AbstractTacticalObjective
 
     public String getDescription()
     {
-        return "Destroying " + number + " " + critter.getName() +
-                " (" + getPriority() + ")";
+        return "Destroying " + number + " " + critter.getName() + " ("
+            + getPriority() + ")";
     }
 }

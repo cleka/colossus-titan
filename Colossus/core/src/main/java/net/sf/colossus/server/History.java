@@ -367,8 +367,8 @@ public class History
         Element event = new Element("Recruit");
         event.setAttribute("markerId", legion.getMarkerId());
         event.setAttribute("recruit", recruit.getName());
-        event.setAttribute("recruiter", recruiter == null ? "null" : recruiter
-            .getName());
+        event.setAttribute("recruiter",
+            recruiter == null ? "null" : recruiter.getName());
 
         recentEvents.add(event);
     }
@@ -504,10 +504,10 @@ public class History
             {
                 // there is no create event for the startup legions,
                 // so we might need to create them for the reveal event
-                legion = new LegionServerSide(markerId, null, player
-                    .getStartingTower(), player.getStartingTower(), player,
-                    game, creatures
-                        .toArray(new CreatureType[creatures.size()]));
+                legion = new LegionServerSide(markerId, null,
+                    player.getStartingTower(), player.getStartingTower(),
+                    player, game, creatures.toArray(new CreatureType[creatures
+                        .size()]));
                 player.addLegion(legion);
             }
             else
@@ -576,9 +576,10 @@ public class History
                 childLegion.remove();
             }
 
-            childLegion = new LegionServerSide(childId, null, parentLegion
-                .getCurrentHex(), parentLegion.getCurrentHex(), player, game,
-                creatures.toArray(new CreatureType[creatures.size()]));
+            childLegion = new LegionServerSide(childId, null,
+                parentLegion.getCurrentHex(), parentLegion.getCurrentHex(),
+                player, game, creatures.toArray(new CreatureType[creatures
+                    .size()]));
 
             player.addLegion(childLegion);
 

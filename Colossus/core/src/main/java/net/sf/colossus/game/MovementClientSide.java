@@ -16,8 +16,8 @@ import net.sf.colossus.common.Options;
  */
 public final class MovementClientSide extends Movement
 {
-    private static final Logger LOGGER = Logger.getLogger(MovementClientSide.class
-        .getName());
+    private static final Logger LOGGER = Logger
+        .getLogger(MovementClientSide.class.getName());
 
     public MovementClientSide(Game game, Options options)
     {

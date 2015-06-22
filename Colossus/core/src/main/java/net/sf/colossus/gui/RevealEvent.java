@@ -360,8 +360,9 @@ public class RevealEvent
     {
         if (turnNumber != this.turnNumber)
         {
-            LOGGER.log(Level.WARNING, "removeReinforcement for "
-                + this.toString() + " -- wrong turn.");
+            LOGGER.log(Level.WARNING,
+                "removeReinforcement for " + this.toString()
+                    + " -- wrong turn.");
             return false;
         }
         Iterator<RevealedCreature> it = this.knownCreatures.iterator();
@@ -585,8 +586,8 @@ public class RevealEvent
                 LOGGER.log(Level.SEVERE, "While trying to get chit: ", e);
                 // if solid marker does not exist for this color,
                 // use as fallback the Titan chit.
-                solidMarker = Chit.newCreatureChit(scale, player
-                    .getTitanBasename());
+                solidMarker = Chit.newCreatureChit(scale,
+                    player.getTitanBasename());
             }
         }
         else
@@ -685,8 +686,8 @@ public class RevealEvent
             p.add(Box.createRigidArea(new Dimension(5, 0)));
             addLabel(getEventTypeText() + ": ");
 
-            Chit oldDie = new MovementDie(this.scale, MovementDie
-                .getDieImageName(oldRoll));
+            Chit oldDie = new MovementDie(this.scale,
+                MovementDie.getDieImageName(oldRoll));
             oldDie.setAlignmentX(Component.LEFT_ALIGNMENT);
             p.add(oldDie);
 
@@ -694,8 +695,8 @@ public class RevealEvent
             {
                 addLabel(" => ");
 
-                Chit newDie = new MovementDie(this.scale, MovementDie
-                    .getDieImageName(newRoll));
+                Chit newDie = new MovementDie(this.scale,
+                    MovementDie.getDieImageName(newRoll));
                 newDie.setAlignmentX(Component.LEFT_ALIGNMENT);
                 p.add(newDie);
             }

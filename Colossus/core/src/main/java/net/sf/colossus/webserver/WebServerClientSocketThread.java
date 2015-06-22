@@ -36,7 +36,6 @@ public class WebServerClientSocketThread extends Thread
     // if that is exceeded, a warning if written (afterwards) to the log
     private final long MAX_WRITE_BLOCKTIME_MS = 1000;
 
-
     private final WebServerClient theClient;
 
     private final RoundtripTimeBookkeeper rttBookKeeper;
@@ -58,7 +57,6 @@ public class WebServerClientSocketThread extends Thread
     private boolean toldToTerminate = false;
 
     private boolean lastWasLogin = false;
-
 
     public WebServerClientSocketThread(WebServerClient theClient, Socket socket)
     {
@@ -117,10 +115,11 @@ public class WebServerClientSocketThread extends Thread
             }
             catch (IOException e)
             {
-                LOGGER.log(Level.WARNING, "IOException while socket.close() "
-                    + " is executed by thread "
-                    + Thread.currentThread().getName()
-                    + "socket in " + this.getName(), e);
+                LOGGER.log(Level.WARNING,
+                    "IOException while socket.close() "
+                        + " is executed by thread "
+                        + Thread.currentThread().getName() + "socket in "
+                        + this.getName(), e);
             }
             finally
             {
@@ -145,12 +144,12 @@ public class WebServerClientSocketThread extends Thread
 
         String fromClient = "dummy";
 
-        LOGGER.log(Level.INFO, "A new WSCST started running: "
-            + this.toString());
+        LOGGER.log(Level.INFO,
+            "A new WSCST started running: " + this.toString());
         try
         {
-            in = new BufferedReader(new InputStreamReader(socket
-                .getInputStream()));
+            in = new BufferedReader(new InputStreamReader(
+                socket.getInputStream()));
             writer = new QueuedSocketWriter(socket);
             writer.start();
         }
@@ -184,8 +183,8 @@ public class WebServerClientSocketThread extends Thread
                 if (connLostWarningLogged)
                 {
                     LOGGER.info("NOTE: In " + this.getName()
-                            + " connLostWarningLogged was set, but received "
-                            + "something from client again: " + fromClient);
+                        + " connLostWarningLogged was set, but received "
+                        + "something from client again: " + fromClient);
                     connLostWarningLogged = false;
                 }
             }
@@ -347,7 +346,6 @@ public class WebServerClientSocketThread extends Thread
     {
         rttBookKeeper.storeEntry(requestResponseArriveTime, roundtripTime);
     }
-
 
     public void requestPingIfNeeded(long now)
     {

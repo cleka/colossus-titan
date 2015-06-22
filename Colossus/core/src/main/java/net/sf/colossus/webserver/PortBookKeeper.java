@@ -334,13 +334,11 @@ public class PortBookKeeper implements IPortProvider
         return sb.toString();
     }
 
-
     public String getStatus()
     {
         StringBuilder st = new StringBuilder();
         st.append("Ports configured/available for games: " + totalPorts + "/"
-            + gamePorts + "; still free for games: "
-                + countFreePorts() + "\n");
+            + gamePorts + "; still free for games: " + countFreePorts() + "\n");
         st.append("Port usage: " + buildPortTableReport());
         st.append("\n");
 

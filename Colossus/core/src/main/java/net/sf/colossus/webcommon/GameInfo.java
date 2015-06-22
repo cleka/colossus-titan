@@ -113,7 +113,7 @@ public class GameInfo
 
     private static GameType makeTypeFromStarttime(long startTime)
     {
-        return(startTime == -1 ? GameType.INSTANT : GameType.SCHEDULED);
+        return (startTime == -1 ? GameType.INSTANT : GameType.SCHEDULED);
     }
 
     public GameInfo(String initiator, String variant, String viewmode,

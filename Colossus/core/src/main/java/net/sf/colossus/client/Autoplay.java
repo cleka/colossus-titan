@@ -3,6 +3,7 @@
  */
 package net.sf.colossus.client;
 
+
 import java.util.logging.Logger;
 
 import net.sf.colossus.common.Options;

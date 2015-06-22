@@ -132,7 +132,6 @@ public class MasterHex extends Hex
         return -1;
     }
 
-
     public void setLabelSide(int labelSide)
     {
         this.labelSide = labelSide;

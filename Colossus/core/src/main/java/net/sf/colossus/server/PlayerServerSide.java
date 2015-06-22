@@ -167,8 +167,8 @@ public final class PlayerServerSide extends Player implements
      This is inconsistent with equals(). */
     public int compareTo(PlayerServerSide other)
     {
-        return other.getStartingTower().getLabel().compareTo(
-            this.getStartingTower().getLabel());
+        return other.getStartingTower().getLabel()
+            .compareTo(this.getStartingTower().getLabel());
     }
 
     @Override
@@ -407,7 +407,7 @@ public final class PlayerServerSide extends Player implements
             {
                 LOGGER.log(Level.WARNING,
                     "Player.undoRecruit: Nothing to unrecruit for legion "
-                    + legion.getMarkerId());
+                        + legion.getMarkerId());
                 LOGGER.info(getGame().getServer().processingCH
                     .dumpLastProcessedLines());
             }
@@ -686,8 +686,8 @@ public final class PlayerServerSide extends Player implements
         {
             Legion l = getLegionByMarkerId(bl.getMarkerId());
 
-            List<CreatureType> ourCreatures = new ArrayList<CreatureType>(l
-                .getCreatureTypes());
+            List<CreatureType> ourCreatures = new ArrayList<CreatureType>(
+                l.getCreatureTypes());
             ourCreatures.removeAll(bl.getCreatureTypes());
 
             if ((l.getHeight() != bl.getHeight()) || !ourCreatures.isEmpty())

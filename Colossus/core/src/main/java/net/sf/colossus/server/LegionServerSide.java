@@ -428,9 +428,10 @@ public final class LegionServerSide extends Legion implements
             }
             else
             {
-                LOGGER.log(Level.SEVERE, "Tried to addCreature "
-                    + creature.toString() + " to legion " + getMarkerId()
-                    + " when there were none of those left!");
+                LOGGER.log(Level.SEVERE,
+                    "Tried to addCreature " + creature.toString()
+                        + " to legion " + getMarkerId()
+                        + " when there were none of those left!");
                 return false;
             }
         }

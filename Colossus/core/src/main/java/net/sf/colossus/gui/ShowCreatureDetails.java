@@ -176,10 +176,10 @@ public final class ShowCreatureDetails extends KDialog
         // general
         //
         _section(s, "General Characteristics");
-        _trSpan(s, "Name", creature.getName() + " <i>("
-            + creature.getPluralName() + ")</i>");
-        _trSpan(s, "Power..Skill", creature.getPower() + ".."
-            + creature.getSkill());
+        _trSpan(s, "Name",
+            creature.getName() + " <i>(" + creature.getPluralName() + ")</i>");
+        _trSpan(s, "Power..Skill",
+            creature.getPower() + ".." + creature.getSkill());
         _trSpan(s, "Total count", "" + creature.getMaxCount());
         _trSpan(s, "Rangestrike", (creature.isRangestriker() ? "yes" : "no")
             + (creature.useMagicMissile() ? " <b>(magic missiles)</b>" : ""));
@@ -191,9 +191,12 @@ public final class ShowCreatureDetails extends KDialog
         _trSpan(s, "Summonable", creature.isSummonable() ? "yes" : "no");
         // TODO Instead show full list of "where and for each multiple of X
         _trSpan(s, "Acquirable", variant.isAcquirable(creature) ? "yes" : "no");
-        _trSpan(s, _low("Lord"), creature.isLordOrDemiLord() ? (creature
-            .isLord() ? "<u><b>Lord</b></u>" : "<b>Demi-Lord</b>")
-            : _low("no"));
+        _trSpan(
+            s,
+            _low("Lord"),
+            creature.isLordOrDemiLord() ? (creature.isLord() ? "<u><b>Lord</b></u>"
+                : "<b>Demi-Lord</b>")
+                : _low("no"));
         StringBuilder buf = new StringBuilder();
         String sp = "&nbsp;";
         String separator = "";
@@ -321,8 +324,8 @@ public final class ShowCreatureDetails extends KDialog
                 "" + (hazards.size() + 2), explanation, }));
         SimulatedCritter critter = new SimulatedCritter(creature,
             HazardTerrain.getDefaultTerrain());
-        SimulatedCritter other = new SimulatedCritter(creature, HazardTerrain
-            .getDefaultTerrain());
+        SimulatedCritter other = new SimulatedCritter(creature,
+            HazardTerrain.getDefaultTerrain());
 
         // =============================================================
         // hazards row 1

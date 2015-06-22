@@ -49,13 +49,12 @@ import net.sf.colossus.variant.CreatureType;
 
 final public class SummonAngel
 {
-    private static final Logger LOGGER = Logger
-        .getLogger(SummonAngel.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(SummonAngel.class
+        .getName());
 
     private final ClientGUI gui;
     private final Legion legion;
     private final List<Legion> possibleDonors;
-
 
     public SummonAngel(ClientGUI gui, Legion legion,
         List<Legion> possibleDonors)
@@ -97,7 +96,6 @@ final public class SummonAngel
     {
         gui.getClient().doSummon(summonInfo);
     }
-
 
     final class SummonAngelDialog extends KDialog
     {
@@ -157,8 +155,8 @@ final public class SummonAngel
             for (Legion donor : sortedDonors)
             {
                 Box box = new Box(BoxLayout.X_AXIS);
-                Marker marker = new Marker(legion, scale, donor
-                    .getLongMarkerId());
+                Marker marker = new Marker(legion, scale,
+                    donor.getLongMarkerId());
                 box.add(Box.createRigidArea(new Dimension(scale / 8, 0)));
                 box.add(marker);
                 box.add(Box.createRigidArea(new Dimension(scale / 4, 0)));

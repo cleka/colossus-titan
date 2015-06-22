@@ -46,9 +46,8 @@ final class EditLegion extends KDialog
     private final JLabel infoLabel;
 
     EditLegion(ClientGUI gui, JFrame parentFrame, LegionClientSide legion,
-        Point point,
-        JScrollPane pane, int scale, int viewMode, boolean isMyLegion,
-        boolean dubiousAsBlanks, boolean showMarker)
+        Point point, JScrollPane pane, int scale, int viewMode,
+        boolean isMyLegion, boolean dubiousAsBlanks, boolean showMarker)
     {
         super(parentFrame, "EDIT: " + legion.getMarkerId(), false);
 
@@ -251,8 +250,7 @@ final class EditLegion extends KDialog
             if (usePlayerColor)
             {
                 Color playerColor = HTMLColor.stringToColor(legion.getPlayer()
-                    .getColor()
-                    + "Colossus");
+                    .getColor() + "Colossus");
                 setBackground(playerColor);
             }
 
@@ -262,8 +260,8 @@ final class EditLegion extends KDialog
 
             if (showMarker)
             {
-                Marker marker = new Marker(legion, scale, legion
-                    .getLongMarkerId());
+                Marker marker = new Marker(legion, scale,
+                    legion.getLongMarkerId());
                 if (effectiveChitSize == 0)
                 {
                     // they should be all the same size

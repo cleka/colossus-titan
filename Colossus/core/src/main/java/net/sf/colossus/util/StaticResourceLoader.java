@@ -502,8 +502,8 @@ public final class StaticResourceLoader
                         }
                         else
                         {
-                            PrintWriter out = new PrintWriter(fileSocket
-                                .getOutputStream(), true);
+                            PrintWriter out = new PrintWriter(
+                                fileSocket.getOutputStream(), true);
 
                             if (ignoreFail)
                             {
@@ -521,7 +521,8 @@ public final class StaticResourceLoader
                             if (data != null && data.length == 0
                                 && !ignoreFail)
                             {
-                                LOGGER.log(Level.WARNING,
+                                LOGGER.log(
+                                    Level.WARNING,
                                     "Got empty contents for file " + filename
                                         + " directories "
                                         + directories.toString());
@@ -840,8 +841,8 @@ public final class StaticResourceLoader
 
         if (filename.startsWith("Plain-"))
         {
-            tempImage = createPlainImage(width, height, colorFromFilename(
-                filename, "Plain-"));
+            tempImage = createPlainImage(width, height,
+                colorFromFilename(filename, "Plain-"));
         }
         if (filename.startsWith("Power-"))
         {
@@ -967,8 +968,8 @@ public final class StaticResourceLoader
             sw = (int)sb.getWidth();
         }
         int offset = (width - sw) / 2;
-        biContext.drawString(name, offset, (down ? (height - 2) : (1 + fm
-            .getMaxAscent())));
+        biContext.drawString(name, offset,
+            (down ? (height - 2) : (1 + fm.getMaxAscent())));
         waitOnImage(bi);
 
         return bi;
@@ -1108,8 +1109,8 @@ public final class StaticResourceLoader
         }
         if (icon.getImageLoadStatus() != MediaTracker.COMPLETE)
         {
-            LOGGER.log(Level.SEVERE, "Image loading failed ("
-                + icon.getImageLoadStatus() + ")");
+            LOGGER.log(Level.SEVERE,
+                "Image loading failed (" + icon.getImageLoadStatus() + ")");
         }
     }
 
@@ -1169,8 +1170,8 @@ public final class StaticResourceLoader
         }
         catch (Exception e)
         {
-            LOGGER.log(Level.SEVERE, "during number extraction: "
-                + e.getMessage(), e);
+            LOGGER.log(Level.SEVERE,
+                "during number extraction: " + e.getMessage(), e);
         }
         return val;
     }

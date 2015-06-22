@@ -551,9 +551,11 @@ final class EventViewer extends KDialog
         }
         else if (hideUndoneEvents && e.wasUndone())
         {
-            LOGGER.log(Level.FINEST, "Not displaying event "
-                + e.getEventTypeText() + " " + e.getLongMarkerId()
-                + " - was undone and hideUndoneEvents is true.");
+            LOGGER.log(
+                Level.FINEST,
+                "Not displaying event " + e.getEventTypeText() + " "
+                    + e.getLongMarkerId()
+                    + " - was undone and hideUndoneEvents is true.");
             display = false;
         }
         return display;
@@ -705,8 +707,7 @@ final class EventViewer extends KDialog
                 bookmark = 0;
             }
 
-            ListIterator<RevealEvent> it = eventList
-                .listIterator(bookmark);
+            ListIterator<RevealEvent> it = eventList.listIterator(bookmark);
             while (it.hasNext())
             {
                 RevealEvent e = it.next();
@@ -734,17 +735,17 @@ final class EventViewer extends KDialog
     // shortcuts:
     private void newRollEvent(int eventType, int roll1, int roll2)
     {
-        RevealEvent e = new RevealEvent(client.getTurnNumber(), getActivePlayer(),
-            eventType, roll1, roll2);
+        RevealEvent e = new RevealEvent(client.getTurnNumber(),
+            getActivePlayer(), eventType, roll1, roll2);
         addEvent(e);
     }
 
     // creature related event:
-    private void newEvent(int eventType, Legion legion1, ArrayList<RevealedCreature> rcList,
-        Legion legion2)
+    private void newEvent(int eventType, Legion legion1,
+        ArrayList<RevealedCreature> rcList, Legion legion2)
     {
-        RevealEvent e = new RevealEvent(client.getTurnNumber(), getActivePlayer(),
-            eventType, legion1, rcList, legion2);
+        RevealEvent e = new RevealEvent(client.getTurnNumber(),
+            getActivePlayer(), eventType, legion1, rcList, legion2);
         addEvent(e);
     }
 
@@ -754,12 +755,14 @@ final class EventViewer extends KDialog
         setMulliganOldRoll(-2);
         if (turnNr != this.turnNr)
         {
-            RevealEvent e = new RevealEvent(turnNr, player, RevealEvent.eventTurnChange);
+            RevealEvent e = new RevealEvent(turnNr, player,
+                RevealEvent.eventTurnChange);
             addEvent(e);
         }
         if (player != this.currentPlayer || turnNr != this.turnNr)
         {
-            RevealEvent e = new RevealEvent(turnNr, player, RevealEvent.eventPlayerChange);
+            RevealEvent e = new RevealEvent(turnNr, player,
+                RevealEvent.eventPlayerChange);
             addEvent(e);
         }
 
@@ -939,10 +942,12 @@ final class EventViewer extends KDialog
             default:
                 String markerId1 = legion1 != null ? legion1.getMarkerId()
                     : "<null legion>";
-                LOGGER.log(Level.SEVERE, "Invalid event type "
-                    + RevealEvent.getEventTypeText(eventType)
-                    + " in newCreatureRevealEvent: markerId " + markerId1
-                    + ", creature " + creature);
+                LOGGER.log(
+                    Level.SEVERE,
+                    "Invalid event type "
+                        + RevealEvent.getEventTypeText(eventType)
+                        + " in newCreatureRevealEvent: markerId " + markerId1
+                        + ", creature " + creature);
         }
 
         ArrayList<RevealedCreature> rcList = new ArrayList<RevealedCreature>(1);
@@ -951,11 +956,11 @@ final class EventViewer extends KDialog
         newEvent(eventType, legion1, rcList, legion2);
     }
 
-    public void newSplitEvent(int turnNr, Legion legion1, ArrayList<RevealedCreature> rcList,
-        Legion legion2)
+    public void newSplitEvent(int turnNr, Legion legion1,
+        ArrayList<RevealedCreature> rcList, Legion legion2)
     {
-        RevealEvent e = new RevealEvent(turnNr, getActivePlayer(), RevealEvent.eventSplit,
-            legion1, rcList, legion2);
+        RevealEvent e = new RevealEvent(turnNr, getActivePlayer(),
+            RevealEvent.eventSplit, legion1, rcList, legion2);
         addEvent(e);
     }
 
@@ -1070,7 +1075,9 @@ final class EventViewer extends KDialog
         else
         {
             LOGGER.warning("No battle event found for legion "
-                + legion.getLongMarkerId() + " where to add creature " + type
+                + legion.getLongMarkerId()
+                + " where to add creature "
+                + type
                 + "; attacker log marker id "
                 + (attackerEventLegion == null ? "attEvLg null"
                     : attackerEventLegion.getLongMarkerId())
@@ -1103,15 +1110,19 @@ final class EventViewer extends KDialog
             if (attackerEventLegion == null || defenderEventLegion == null)
             {
                 // This should now never happen any more:
-                LOGGER.log(Level.SEVERE, "no attacker and defender "
-                    + " legion event for acquiring!!" + " turn"
-                    + client.getTurnNumber() + " player "
-                    + client.getActivePlayer().getName() + " phase "
-                    + client.getPhase() + " markerid " + legion.getMarkerId()
-                    + " marker owner" + legion.getPlayer().getName()
-                    + "last engagement were" + " attacker "
-                    + lastAttackerEventLegion.getLongMarkerId() + " defender "
-                    + lastDefenderEventLegion.getLongMarkerId());
+                LOGGER.log(
+                    Level.SEVERE,
+                    "no attacker and defender "
+                        + " legion event for acquiring!!" + " turn"
+                        + client.getTurnNumber() + " player "
+                        + client.getActivePlayer().getName() + " phase "
+                        + client.getPhase() + " markerid "
+                        + legion.getMarkerId() + " marker owner"
+                        + legion.getPlayer().getName()
+                        + "last engagement were" + " attacker "
+                        + lastAttackerEventLegion.getLongMarkerId()
+                        + " defender "
+                        + lastDefenderEventLegion.getLongMarkerId());
                 System.exit(1);
             }
         }
@@ -1120,8 +1131,8 @@ final class EventViewer extends KDialog
             // addCreature adds summoned creature back to donor:
             int turn = client.getTurnNumber();
             undoEvent(RevealEvent.eventSummon, legion, null, turn);
-            if (!attackerEventLegion.removeSummonedCreature(turn, type
-                .getName()))
+            if (!attackerEventLegion.removeSummonedCreature(turn,
+                type.getName()))
             {
                 // this should never happen...
                 LOGGER.log(Level.WARNING, "Un-Summon " + type.getName()
@@ -1233,14 +1244,14 @@ final class EventViewer extends KDialog
             synchronized (eventList)
             {
                 int last = eventList.size();
-                ListIterator<RevealEvent> it = eventList
-                    .listIterator(last);
+                ListIterator<RevealEvent> it = eventList.listIterator(last);
                 while (it.hasPrevious() && found == 0)
                 {
                     RevealEvent e = it.previous();
                     if (e.getEventType() == type && e.getTurn() == turn
                         && e.getLongMarkerId().equals(parentId)
-                        && e.getLongMarkerId2().equals(childId) && !e.wasUndone())
+                        && e.getLongMarkerId2().equals(childId)
+                        && !e.wasUndone())
                     {
                         found++;
                         e.setUndone(true);
@@ -1289,13 +1300,13 @@ final class EventViewer extends KDialog
             synchronized (eventList)
             {
                 int last = eventList.size();
-                ListIterator<RevealEvent> it = eventList
-                    .listIterator(last);
+                ListIterator<RevealEvent> it = eventList.listIterator(last);
                 while (it.hasPrevious() && found == 0)
                 {
                     RevealEvent e = it.previous();
                     if (e.getEventType() == type && e.getTurn() == turn
-                        && e.getLongMarkerId().equals(parentId) && !e.wasUndone())
+                        && e.getLongMarkerId().equals(parentId)
+                        && !e.wasUndone())
                     {
                         found++;
                         e.setUndone(true);
@@ -1326,10 +1337,10 @@ final class EventViewer extends KDialog
             }
             else
             {
-                LOGGER.log(Level.WARNING, "Requested '"
-                    + RevealEvent.getEventTypeText(type) + "' EVENT to undo ("
-                    + parentId + ", " + childId + ", turn " + turn
-                    + ") not found");
+                LOGGER.log(Level.WARNING,
+                    "Requested '" + RevealEvent.getEventTypeText(type)
+                        + "' EVENT to undo (" + parentId + ", " + childId
+                        + ", turn " + turn + ") not found");
             }
         }
 

@@ -114,8 +114,7 @@ public class RationalAI extends SimpleAI
             + child);
 
         return splitOneLegionCallback((LegionClientSide)parent,
-            (LegionClientSide)child)
-            && fireSplits();
+            (LegionClientSide)child) && fireSplits();
     }
 
     // Compute the expected value of a split legion
@@ -284,8 +283,8 @@ public class RationalAI extends SimpleAI
         }
 
         // Do the split.  If we don't like the result we will undo it.
-        String newMarkerId = pickMarker(player.getMarkersAvailable(), player
-            .getShortColor());
+        String newMarkerId = pickMarker(player.getMarkersAvailable(),
+            player.getShortColor());
 
         if (newMarkerId == null)
         {
@@ -962,8 +961,9 @@ public class RationalAI extends SimpleAI
             // pick just any legion for asking the getMovement
             Legion anyLegion = friendlyLegions.get(0);
 
-            if (!client.getMovement().listNormalMoves(anyLegion,
-                anyLegion.getCurrentHex(), roll).isEmpty())
+            if (!client.getMovement()
+                .listNormalMoves(anyLegion, anyLegion.getCurrentHex(), roll)
+                .isEmpty())
             {
                 // Easiest solution: just move the smallest of them,
                 // usually that is the one with less valuable stuff split off
@@ -1369,7 +1369,7 @@ public class RationalAI extends SimpleAI
 
             if (availableMoves.isEmpty())
             { // this is a leaf check valdity of move
-                // could be moved to a function
+              // could be moved to a function
                 List<LegionBoardMove> newBestMove = getValidMove(performedMoves);
                 if (newBestMove != null)
                 {
@@ -1403,8 +1403,9 @@ public class RationalAI extends SimpleAI
                 List<LegionBoardMove> newPerformedMoves = new ArrayList<LegionBoardMove>(
                     performedMoves);
                 newPerformedMoves.add(lm);
-                branchAndBound(newPerformedMoves, removeHeadAndConflicts(
-                    availableMoves, lm), currentValue + lm.val);
+                branchAndBound(newPerformedMoves,
+                    removeHeadAndConflicts(availableMoves, lm), currentValue
+                        + lm.val);
             }
 
         }
@@ -2028,8 +2029,8 @@ public class RationalAI extends SimpleAI
                         .listIterator();
                     double rollover_power = 0;
                     int attack_skill = 3;
-                    for (int attacks = 0; attacks < Math.max(attackerCreatures
-                        .size(), defenderCreatures.size()); attacks++)
+                    for (int attacks = 0; attacks < Math.max(
+                        attackerCreatures.size(), defenderCreatures.size()); attacks++)
                     {
                         // if we have reached the end of the attackers,
                         // roll-over
@@ -2073,8 +2074,8 @@ public class RationalAI extends SimpleAI
 
                         if (rollover_power > 0)
                         {
-                            rollover_power = Math.max(rollover_power
-                                - psd.getPowerDefend(), 0);
+                            rollover_power = Math.max(
+                                rollover_power - psd.getPowerDefend(), 0);
                             // N.B. use old attack skill & new defend skill
                             current_carry = rollover_power
                                 * Math.min(attack_skill - defend_skill + 3, 6)
@@ -2087,8 +2088,8 @@ public class RationalAI extends SimpleAI
                         attack_power = psa.getPowerAttack()
                             - psd.getPowerDefend();
 
-                        double attack_prob = Math.min(Math.max(attack_skill
-                            - defend_skill + 3, 1), 6) / 6.0;
+                        double attack_prob = Math.min(
+                            Math.max(attack_skill - defend_skill + 3, 1), 6) / 6.0;
                         double expected_damage = attack_prob * attack_power
                             + current_carry;
 
@@ -2218,8 +2219,8 @@ public class RationalAI extends SimpleAI
 
         boolean save_hate = I_HATE_HUMANS;
         I_HATE_HUMANS = false; //need true value of battle results here
-        BattleResults br = estimateBattleResults(enemy, legion, legion
-            .getCurrentHex());
+        BattleResults br = estimateBattleResults(enemy, legion,
+            legion.getCurrentHex());
         I_HATE_HUMANS = save_hate;
         int result = (int)br.getExpectedValue();
 
@@ -2229,10 +2230,10 @@ public class RationalAI extends SimpleAI
             + Glob.glob(legion.getCreatureTypes()));
         logger.log(Level.FINEST, "flee called. battle results value: "
             + result);
-        logger.log(Level.FINEST, "expected value of attacker dead = "
-            + br.getAttackerDead());
-        logger.log(Level.FINEST, "expected value of defender dead = "
-            + br.getDefenderDead());
+        logger.log(Level.FINEST,
+            "expected value of attacker dead = " + br.getAttackerDead());
+        logger.log(Level.FINEST,
+            "expected value of defender dead = " + br.getDefenderDead());
         br.log();
 
         // For the first four turns never flee
@@ -2341,20 +2342,20 @@ public class RationalAI extends SimpleAI
 
         boolean save_hate = I_HATE_HUMANS;
         I_HATE_HUMANS = false; //need true value of battle results here
-        BattleResults br = estimateBattleResults(legion, enemy, legion
-            .getCurrentHex());
+        BattleResults br = estimateBattleResults(legion, enemy,
+            legion.getCurrentHex());
         I_HATE_HUMANS = save_hate;
 
         logger.log(Level.FINEST, "concede: attacking legion = " + legion + ":"
             + Glob.glob(legion.getCreatureTypes()));
         logger.log(Level.FINEST, "concede: defending legion = " + enemy + ":"
             + Glob.glob(enemy.getCreatureTypes()));
-        logger.log(Level.FINEST, "concede called. battle results value: "
-            + br.getExpectedValue());
-        logger.log(Level.FINEST, "expected value of attacker dead = "
-            + br.getAttackerDead());
-        logger.log(Level.FINEST, "expected value of defender dead = "
-            + br.getDefenderDead());
+        logger.log(Level.FINEST,
+            "concede called. battle results value: " + br.getExpectedValue());
+        logger.log(Level.FINEST,
+            "expected value of attacker dead = " + br.getAttackerDead());
+        logger.log(Level.FINEST,
+            "expected value of defender dead = " + br.getDefenderDead());
         br.log();
 
         if (br.getDefenderDead() < ((LegionClientSide)enemy).getPointValue() * 2 / 7

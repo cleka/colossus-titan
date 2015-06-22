@@ -21,8 +21,7 @@ import java.util.logging.Logger;
 public class InactivityWatchdog extends Thread
 {
     private static final Logger LOGGER = Logger
-        .getLogger(InactivityWatchdog.class
-        .getName());
+        .getLogger(InactivityWatchdog.class.getName());
 
     private static final int INACTIVITY_CHECK_INTERVAL = 1;
 

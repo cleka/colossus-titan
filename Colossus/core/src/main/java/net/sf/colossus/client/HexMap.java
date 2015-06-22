@@ -390,8 +390,8 @@ public class HexMap extends JPanel
 
         assert false : "Could not find GUIBattleHex for "
             + battleHex.getLabel();
-        LOGGER.log(Level.SEVERE, "Could not find GUIBattleHex "
-            + battleHex.getLabel());
+        LOGGER.log(Level.SEVERE,
+            "Could not find GUIBattleHex " + battleHex.getLabel());
         return null;
     }
 

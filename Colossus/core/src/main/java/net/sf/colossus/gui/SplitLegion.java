@@ -293,8 +293,7 @@ final class SplitLegion extends KDialog
             {
                 if (showMessage)
                 {
-                    gui
-                        .showMessageDialogAndWait("Each stack must have one lord.");
+                    gui.showMessageDialogAndWait("Each stack must have one lord.");
                 }
                 return false;
             }
@@ -327,8 +326,8 @@ final class SplitLegion extends KDialog
             {
                 creatureName = Constants.titan;
             }
-            creaturesToSplit.add(gui.getGame().getVariant().getCreatureByName(
-                creatureName));
+            creaturesToSplit.add(gui.getGame().getVariant()
+                .getCreatureByName(creatureName));
         }
         dispose();
     }

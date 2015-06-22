@@ -93,7 +93,7 @@ public class BattlelandLoader
     // we need to cast since JDOM is not generified
     // deprecation because the existing Battlelands files still only have
     // the character for the hexside hazard type
-    @SuppressWarnings( { "unchecked", "deprecation" })
+    @SuppressWarnings({ "unchecked", "deprecation" })
     private void handleHex(Element el, BattleHex[][] h) throws JDOMException
     {
         int xpos = el.getAttribute("x").getIntValue();

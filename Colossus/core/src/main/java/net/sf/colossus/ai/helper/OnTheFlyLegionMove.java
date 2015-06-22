@@ -305,7 +305,7 @@ public class OnTheFlyLegionMove implements Collection<LegionMove>
         {
             if (lastone != null)
             { // the previously returned value has been evaluated now
-                // so we can put it in the byvalues set.
+              // so we can put it in the byvalues set.
                 byValues.add(lastone);
                 lastone = null;
             }
@@ -779,7 +779,7 @@ public class OnTheFlyLegionMove implements Collection<LegionMove>
         {
             if (lastone != null)
             { // the previously returned value has been evaluated now
-                // so we can put it in the byvalues set.
+              // so we can put it in the byvalues set.
                 byValues.add(lastone);
                 lastone = null;
             }

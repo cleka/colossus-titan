@@ -70,6 +70,7 @@ public class UserDB
         }
 
     }
+
     public boolean isUserOnline(User u)
     {
         synchronized (loggedInUserMap)
@@ -235,7 +236,6 @@ public class UserDB
             return reason;
         }
     }
-
 
     public String sendConfirmationMail(String username, String email,
         String confCode, IColossusMail mailObject)

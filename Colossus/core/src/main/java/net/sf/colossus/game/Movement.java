@@ -30,7 +30,6 @@ abstract public class Movement
     private static final Logger LOGGER = Logger.getLogger(Movement.class
         .getName());
 
-
     protected final Game game;
     protected final Options options;
 
@@ -231,7 +230,6 @@ abstract public class Movement
         return result;
     }
 
-
     /** Return set of hexLabels describing where this legion can teleport. */
     public Set<MasterHex> listTeleportMoves(Legion legion, MasterHex hex,
         int movementRoll)
@@ -344,8 +342,8 @@ abstract public class Movement
             String tuple = it.next();
             List<String> parts = Split.split(':', tuple);
             String hexLabel = parts.get(0);
-            result.add(game.getVariant().getMasterBoard().getHexByLabel(
-                hexLabel));
+            result.add(game.getVariant().getMasterBoard()
+                .getHexByLabel(hexLabel));
         }
         return result;
     }
@@ -450,8 +448,7 @@ abstract public class Movement
             for (int i = 0; i < 6; i++)
             {
                 if (hex.getExitType(i).ordinal() >= Constants.HexsideGates.ARCH
-                    .ordinal()
-                    && i != cameFrom)
+                    .ordinal() && i != cameFrom)
                 {
                     result.addAll(findNormalMoves(hex.getNeighbor(i), legion,
                         roll - 1, Constants.ARROWS_ONLY, (i + 3) % 6, null,
@@ -464,8 +461,7 @@ abstract public class Movement
             for (int i = 0; i < 6; i++)
             {
                 if (hex.getExitType(i).ordinal() >= Constants.HexsideGates.ARROW
-                    .ordinal()
-                    && i != cameFrom)
+                    .ordinal() && i != cameFrom)
                 {
                     result.addAll(findNormalMoves(hex.getNeighbor(i), legion,
                         roll - 1, Constants.ARROWS_ONLY, (i + 3) % 6, null,

@@ -529,8 +529,8 @@ public final class BattleServerSide extends Battle
         }
         else
         {
-            LOGGER.log(Level.SEVERE, "Undo move error: no critter in "
-                + hex.getLabel());
+            LOGGER.log(Level.SEVERE,
+                "Undo move error: no critter in " + hex.getLabel());
         }
     }
 
@@ -730,8 +730,9 @@ public final class BattleServerSide extends Battle
                 if (donor != null)
                 {
                     donor.addCreature(critter.getType(), false);
-                    server.allTellAddCreature(new SummonUndo(donor, critter
-                        .getType()), true, Constants.reasonUndoSummon);
+                    server.allTellAddCreature(
+                        new SummonUndo(donor, critter.getType()), true,
+                        Constants.reasonUndoSummon);
                     LOGGER.log(Level.INFO, "undosummon critter " + critter
                         + " back to marker " + donor + "");
                     // This summon doesn't count; the player can
@@ -1017,8 +1018,8 @@ public final class BattleServerSide extends Battle
     {
         if (!carryTargets.contains(target.getCurrentHex()))
         {
-            LOGGER.log(Level.WARNING, "Tried illegal carry to "
-                + target.getDescription());
+            LOGGER.log(Level.WARNING,
+                "Tried illegal carry to " + target.getDescription());
             return;
         }
         int dealt = carryDamage;
@@ -1026,9 +1027,9 @@ public final class BattleServerSide extends Battle
         dealt -= carryDamage;
         carryTargets.remove(target.getCurrentHex());
 
-        LOGGER.log(Level.INFO, dealt
-            + (dealt == 1 ? " hit carries to " : " hits carry to ")
-            + target.getDescription());
+        LOGGER.log(Level.INFO,
+            dealt + (dealt == 1 ? " hit carries to " : " hits carry to ")
+                + target.getDescription());
 
         if (carryDamage <= 0 || getCarryTargets().isEmpty())
         {
@@ -1053,8 +1054,8 @@ public final class BattleServerSide extends Battle
         if (critter == null)
         {
             reasonFail = "No critter with tag " + tag + " found from legion "
-            + getActiveLegion().getMarkerId() + " - can't move it to hex "
-            + hex.getLabel();
+                + getActiveLegion().getMarkerId() + " - can't move it to hex "
+                + hex.getLabel();
             LOGGER.severe(reasonFail);
             return reasonFail;
         }
@@ -1071,9 +1072,12 @@ public final class BattleServerSide extends Battle
         }
         else if (battleMovement.showMoves(critter, false).contains(hex))
         {
-            LOGGER.log(Level.INFO, critter.getName() + " moves from "
-                + critter.getCurrentHex().getLabel() + " to "
-                + hex.getLabel());
+            LOGGER
+                .log(
+                    Level.INFO,
+                    critter.getName() + " moves from "
+                        + critter.getCurrentHex().getLabel() + " to "
+                        + hex.getLabel());
             moveCritterToHexAndInformClients(critter, hex);
             return null;
         }

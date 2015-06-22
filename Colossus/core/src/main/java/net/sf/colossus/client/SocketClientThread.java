@@ -179,8 +179,8 @@ final class SocketClientThread extends Thread implements IServer,
 
             task = "Preparing BufferedReader";
             LOGGER.log(Level.FINEST, "Next: " + task);
-            in = new BufferedReader(new InputStreamReader(socket
-                .getInputStream()));
+            in = new BufferedReader(new InputStreamReader(
+                socket.getInputStream()));
 
             task = "Waiting for prompt";
             LOGGER.log(Level.FINEST, "Next: " + task);
@@ -573,7 +573,8 @@ final class SocketClientThread extends Thread implements IServer,
                     }
                     catch (Exception ex)
                     {
-                        LOGGER.log(Level.WARNING,
+                        LOGGER.log(
+                            Level.WARNING,
                             "\n++++++\nSCT SocketClientThread " + getName()
                                 + ", parseLine(): got Exception "
                                 + ex.toString() + "\n" + ex.getMessage()
@@ -864,14 +865,14 @@ final class SocketClientThread extends Thread implements IServer,
             if (messageNr == ownMessageCounter)
             {
                 LOGGER.finest(getPrintName() + ": received commit point "
-                    + commitPointNr + " msg Nr " + messageNr
-                    + " own counter " + ownMessageCounter);
+                    + commitPointNr + " msg Nr " + messageNr + " own counter "
+                    + ownMessageCounter);
             }
             else
             {
                 LOGGER.warning(getPrintName() + ": received commit point "
-                    + commitPointNr + " msg Nr "
-                    + messageNr + ", but own counter is " + ownMessageCounter
+                    + commitPointNr + " msg Nr " + messageNr
+                    + ", but own counter is " + ownMessageCounter
                     + " -adjusting.");
                 ownMessageCounter = messageNr;
             }
@@ -1253,7 +1254,8 @@ final class SocketClientThread extends Thread implements IServer,
             + requestingClientName);
     }
 
-    public void replyToPing(int requestNr, long requestSent, long requestReceived)
+    public void replyToPing(int requestNr, long requestSent,
+        long requestReceived)
     {
         out.println(Constants.replyToPing + sep + requestNr + sep
             + requestSent + sep + requestReceived);

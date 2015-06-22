@@ -379,8 +379,7 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public void doPickColor(String playerName,
-        List<PlayerColor> colorsLeft)
+    public void doPickColor(String playerName, List<PlayerColor> colorsLeft)
     {
         // TODO Auto-generated method stub
 
@@ -436,8 +435,7 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public void doPickSummonAngel(Legion legion,
-        List<Legion> possibleDonors)
+    public void doPickSummonAngel(Legion legion, List<Legion> possibleDonors)
     {
         // TODO Auto-generated method stub
 

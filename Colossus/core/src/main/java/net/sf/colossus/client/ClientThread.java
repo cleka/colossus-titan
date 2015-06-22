@@ -60,11 +60,9 @@ public class ClientThread extends Thread
     // of all threads need then to get a lock on the logger too often?)
     private final boolean LOG_PROCESSING_TIMES = false;
 
-
     // this is enqueued to get the thread out of the "take()"-waiting
     private final static ServerEvent END_EVENT = new ClientThread.ServerEvent(
         0L, "END", new ArrayList<String>());
-
 
     public ClientThread(Client client)
     {
@@ -325,8 +323,8 @@ public class ClientThread extends Thread
                 // TODO try to make this less implicit
                 assert client.getTurnNumber() == -1 : "Implicit legion creation should happen only "
                     + "before the first round";
-                legion = new LegionClientSide(player, markerId, player
-                    .getStartingTower());
+                legion = new LegionClientSide(player, markerId,
+                    player.getStartingTower());
                 player.addLegion(legion);
             }
             List<CreatureType> creatures = new ArrayList<CreatureType>();
@@ -416,7 +414,8 @@ public class ClientThread extends Thread
             String playerName = args.remove(0);
             String slayerName = args.remove(0);
             // TODO use the "noone" player instead of null if no slayer?
-            client.tellPlayerElim(client.getPlayerByName(playerName),
+            client.tellPlayerElim(
+                client.getPlayerByName(playerName),
                 slayerName.equals("null") ? null : (client.getGameClientSide()
                     .getPlayerByName(slayerName)));
         }
@@ -557,30 +556,33 @@ public class ClientThread extends Thread
         {
             String battleActivePlayerName = args.remove(0);
             int battleTurnNumber = Integer.parseInt(args.remove(0));
-            client.setupBattleSummon(client
-                .getPlayerByName(battleActivePlayerName), battleTurnNumber);
+            client.setupBattleSummon(
+                client.getPlayerByName(battleActivePlayerName),
+                battleTurnNumber);
         }
         else if (method.equals(Constants.setupBattleRecruit))
         {
             String battleActivePlayerName = args.remove(0);
             int battleTurnNumber = Integer.parseInt(args.remove(0));
-            client.setupBattleRecruit(client
-                .getPlayerByName(battleActivePlayerName), battleTurnNumber);
+            client.setupBattleRecruit(
+                client.getPlayerByName(battleActivePlayerName),
+                battleTurnNumber);
         }
         else if (method.equals(Constants.setupBattleMove))
         {
             String battleActivePlayerName = args.remove(0);
             int battleTurnNumber = Integer.parseInt(args.remove(0));
-            client.setupBattleMove(client
-                .getPlayerByName(battleActivePlayerName), battleTurnNumber);
+            client.setupBattleMove(
+                client.getPlayerByName(battleActivePlayerName),
+                battleTurnNumber);
         }
         else if (method.equals(Constants.setupBattleFight))
         {
             BattlePhase battlePhase = BattlePhase.values()[Integer
                 .parseInt(args.remove(0))];
             String battleActivePlayerName = args.remove(0);
-            client.setupBattleFight(battlePhase, client
-                .getPlayerByName(battleActivePlayerName));
+            client.setupBattleFight(battlePhase,
+                client.getPlayerByName(battleActivePlayerName));
         }
         else if (method.equals(Constants.tellLegionLocation))
         {
@@ -716,8 +718,9 @@ public class ClientThread extends Thread
         }
         else if (method.equals(Constants.tellEngagement))
         {
-            client.tellEngagement(resolveHex(args.remove(0)), client
-                .getLegion(args.remove(0)), client.getLegion(args.remove(0)));
+            client.tellEngagement(resolveHex(args.remove(0)),
+                client.getLegion(args.remove(0)),
+                client.getLegion(args.remove(0)));
         }
         else if (method.equals(Constants.tellEngagementResults))
         {
@@ -820,8 +823,8 @@ public class ClientThread extends Thread
 
     private BattleHex resolveBattleHex(String hexLabel)
     {
-        return client.getGame().getBattleSite().getTerrain().getHexByLabel(
-            hexLabel);
+        return client.getGame().getBattleSite().getTerrain()
+            .getHexByLabel(hexLabel);
     }
 
     private List<CreatureType> resolveCreatureTypes(String nameList)
@@ -949,9 +952,8 @@ public class ClientThread extends Thread
             }
             ClientThread thisThread = (ClientThread)Thread.currentThread();
             LOGGER.log(loglevel, "Event " + method + " in thread #"
-                + thisThread.getThreadNumber()
-                + " received at "
-                + received + ": overall processing took: " + processing
+                + thisThread.getThreadNumber() + " received at " + received
+                + ": overall processing took: " + processing
                 + "ms (enqueuing took " + enqueuing + "ms, inQueue " + inQueue
                 + "ms, processing took " + execution + "ms)");
         }

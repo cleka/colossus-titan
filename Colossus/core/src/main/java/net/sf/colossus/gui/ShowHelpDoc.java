@@ -50,8 +50,7 @@ public final class ShowHelpDoc extends KFrame
             + "  Some more general information about the Colossus Public Game Server "
             + "can be found from page: \n"
             + "     http://colossus.sourceforge.net/docs/"
-            + "Colossus-Public-Game-Server.html"
-            + "\n\n"
+            + "Colossus-Public-Game-Server.html" + "\n\n"
             + "  Eventually one day this may become a proper help "
             + "browsing here...\n\n\n";
 

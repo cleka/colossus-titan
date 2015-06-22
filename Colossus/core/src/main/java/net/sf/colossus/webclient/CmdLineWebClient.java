@@ -70,8 +70,7 @@ public class CmdLineWebClient implements IWebClient
 
         if (doShutdown)
         {
-            client.login(true, DEFAULT_USERNAME,
-                DEFAULT_PASSWORD);
+            client.login(true, DEFAULT_USERNAME, DEFAULT_PASSWORD);
             // Give some time for receiving all the chat messages etc.
             sleepFor(1000);
 
@@ -303,8 +302,8 @@ public class CmdLineWebClient implements IWebClient
 
     }
 
-    public void deliverGeneralMessage(long when, boolean error,
-        String title, String message)
+    public void deliverGeneralMessage(long when, boolean error, String title,
+        String message)
     {
         System.out.println((error ? "ERROR" : "INFO")
             + " general message: title '" + title + "', message text: '"

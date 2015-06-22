@@ -1,5 +1,6 @@
 package net.sf.colossus.ai.objectives;
 
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +22,8 @@ import net.sf.colossus.variant.Variant;
  * This is still mostly for testing the code.
  * @author Romain Dolbeau
  */
-public class SecondObjectiveHelper extends BasicObjectiveHelper {
+public class SecondObjectiveHelper extends BasicObjectiveHelper
+{
     private static final Logger LOGGER = Logger
         .getLogger(SecondObjectiveHelper.class.getName());
 
@@ -44,16 +46,20 @@ public class SecondObjectiveHelper extends BasicObjectiveHelper {
         for (CreatureType creature : toConsider.keySet())
         {
             Creature lcritter = toConsider.get(creature);
-                AllThereIsToKnowAboutYourCreature ac =
-                            new AllThereIsToKnowAboutYourCreature(ai, lcritter, myself);
+            AllThereIsToKnowAboutYourCreature ac = new AllThereIsToKnowAboutYourCreature(
+                ai, lcritter, myself);
             if (!lcritter.isLord()
-                && (RecruitingSubTree.isADeadEnd(variant, lcritter.getType()) ||
-                    (!ac.enoughLeftToRecruitHere)))
+                && (RecruitingSubTree.isADeadEnd(variant, lcritter.getType()) || (!ac.enoughLeftToRecruitHere)))
             {
-                if (!ac.enoughLeftToRecruitHere) {
-                    LOGGER.info("CommonObjective: " + lcritter.getName() + " has no more friends, aka Cannon Fodder");
-                } else {
-                    LOGGER.info("CommonObjective: " + lcritter.getName() + " is a dead end and non-lord, aka Cannon Fodder");
+                if (!ac.enoughLeftToRecruitHere)
+                {
+                    LOGGER.info("CommonObjective: " + lcritter.getName()
+                        + " has no more friends, aka Cannon Fodder");
+                }
+                else
+                {
+                    LOGGER.info("CommonObjective: " + lcritter.getName()
+                        + " is a dead end and non-lord, aka Cannon Fodder");
                 }
                 lListObjectives.add(new CreatureAttackTacticalObjective(
                     oec.FIRST_WAVE_ATTACK_PRIORITY, client, myself, lcritter,
@@ -61,7 +67,8 @@ public class SecondObjectiveHelper extends BasicObjectiveHelper {
             }
             else if (lcritter.isLord() && !lcritter.isTitan())
             {
-                LOGGER.info("CommonObjective: " + lcritter.getName() + " is a non-titan lord, aka Cannon Fodder");
+                LOGGER.info("CommonObjective: " + lcritter.getName()
+                    + " is a non-titan lord, aka Cannon Fodder");
                 lListObjectives.add(new CreatureAttackTacticalObjective(
                     oec.FIRST_WAVE_ATTACK_PRIORITY, client, myself, lcritter,
                     ai, ai.bec));
@@ -69,37 +76,48 @@ public class SecondObjectiveHelper extends BasicObjectiveHelper {
             else if (!lcritter.isTitan())
             {
                 float priority = oec.FIRST_WAVE_ATTACK_PRIORITY;
-                LOGGER.info("CommonObjective: " + lcritter.getName() + " matters (a bit)... doing more eval (" + priority + ")");
-                if (ac.numberNeededHere < Constants.BIGNUM) {
+                LOGGER
+                    .info("CommonObjective: " + lcritter.getName()
+                        + " matters (a bit)... doing more eval (" + priority
+                        + ")");
+                if (ac.numberNeededHere < Constants.BIGNUM)
+                {
                     priority = priority / 1.2f;
-                    LOGGER.info("CommonObjective: " + lcritter.getName() + " could recruit (" + priority + ")");
-                    if (ac.justEnoughLeftToRecruitHere) {
+                    LOGGER.info("CommonObjective: " + lcritter.getName()
+                        + " could recruit (" + priority + ")");
+                    if (ac.justEnoughLeftToRecruitHere)
+                    {
                         priority = priority / 1.2f;
-                        LOGGER.info("CommonObjective: " + lcritter.getName() + " not a single one to spare worldwide (" + priority + ")");
+                        LOGGER.info("CommonObjective: " + lcritter.getName()
+                            + " not a single one to spare worldwide ("
+                            + priority + ")");
                     }
                 }
-                if (ac.numberNeededHere == ac.stackNumber) {
+                if (ac.numberNeededHere == ac.stackNumber)
+                {
                     priority = priority / 1.2f;
-                    LOGGER.info("CommonObjective: " + lcritter.getName() + " can recruit with no spare (" + priority + ")");
+                    LOGGER.info("CommonObjective: " + lcritter.getName()
+                        + " can recruit with no spare (" + priority + ")");
                 }
-                if (ac.onlyThisStackHasIt) {
+                if (ac.onlyThisStackHasIt)
+                {
                     priority = priority / 1.2f;
-                    LOGGER.info("CommonObjective: " + lcritter.getName() + " only stack with it (" + priority + ")");
+                    LOGGER.info("CommonObjective: " + lcritter.getName()
+                        + " only stack with it (" + priority + ")");
                 }
                 boolean cs = true;
                 for (CreatureType creature2 : toConsider.keySet())
                 {
                     Creature lcritter2 = toConsider.get(creature2);
-                    AllThereIsToKnowAboutYourCreature ac2 =
-                            new AllThereIsToKnowAboutYourCreature(ai,
-                            lcritter2, myself);
+                    AllThereIsToKnowAboutYourCreature ac2 = new AllThereIsToKnowAboutYourCreature(
+                        ai, lcritter2, myself);
                     if (!creature.equals(creature2))
                     {
-                        if ((ac.bestRecruit != null) && ac.bestRecruit.equals(
-                                ac2.bestRecruit))
+                        if ((ac.bestRecruit != null)
+                            && ac.bestRecruit.equals(ac2.bestRecruit))
                         {
-                            if (RecruitingSubTree.
-                                    getAllInAllSubtreesIgnoringSpecials(variant,
+                            if (RecruitingSubTree
+                                .getAllInAllSubtreesIgnoringSpecials(variant,
                                     creature).contains(creature2))
                             {
                                 cs = false;
@@ -107,13 +125,14 @@ public class SecondObjectiveHelper extends BasicObjectiveHelper {
                         }
                     }
                 }
-                if (cs) {
+                if (cs)
+                {
                     priority = priority / 1.2f;
-                    LOGGER.info("CommonObjective: " + lcritter.getName() + " best in class (" + priority + ")");
+                    LOGGER.info("CommonObjective: " + lcritter.getName()
+                        + " best in class (" + priority + ")");
                 }
                 lListObjectives.add(new CreatureAttackTacticalObjective(
-                    priority, client, myself, lcritter,
-                    ai, ai.bec));
+                    priority, client, myself, lcritter, ai, ai.bec));
             }
         }
 

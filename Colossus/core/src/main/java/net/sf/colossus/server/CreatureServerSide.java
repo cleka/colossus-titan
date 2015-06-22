@@ -222,8 +222,7 @@ public class CreatureServerSide extends Creature implements BattleCritter
 
         // Abort if no carries are possible.
         if (game.getBattleStrikeSS().getDice(this, target) <= target
-            .getPower()
-            - target.getHits())
+            .getPower() - target.getHits())
         {
             return;
         }
@@ -365,7 +364,8 @@ public class CreatureServerSide extends Creature implements BattleCritter
              * => give one hit more and subtract 1.0 from AWL.
              */
 
-            damage = game.getBattleStrike().determineProbabilityBasedHits(this, target, dice, strikeNumber, rolls);
+            damage = game.getBattleStrike().determineProbabilityBasedHits(
+                this, target, dice, strikeNumber, rolls);
         }
         else
         {

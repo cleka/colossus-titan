@@ -137,8 +137,8 @@ public class MilvangAI extends RationalAI // NO_UCD
                 }
                 else
                 {
-                    critterMap.put(creatureType, Integer.valueOf(numCritters
-                        .intValue() + 1));
+                    critterMap.put(creatureType,
+                        Integer.valueOf(numCritters.intValue() + 1));
                 }
             }
 

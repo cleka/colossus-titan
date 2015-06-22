@@ -1,5 +1,6 @@
 package net.sf.colossus.ai.objectives;
 
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -13,21 +14,23 @@ import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.RecruitingSubTree;
 import net.sf.colossus.variant.Variant;
 
+
 /**
  *
  * @author dolbeau
  */
-public abstract class AbstractObjectiveHelper implements IObjectiveHelper {
+public abstract class AbstractObjectiveHelper implements IObjectiveHelper
+{
     protected final ObjectiveEvalConstants oec;
     protected final Client client;
     protected final AbstractAI ai;
     protected final Variant variant;
 
-    protected final Map<Creature,AllThereIsToKnowAboutYourCreature> attackerToKnowledge;
-    protected final Map<Creature,AllThereIsToKnowAboutYourCreature> defenderToKnowledge;
+    protected final Map<Creature, AllThereIsToKnowAboutYourCreature> attackerToKnowledge;
+    protected final Map<Creature, AllThereIsToKnowAboutYourCreature> defenderToKnowledge;
 
     protected AbstractObjectiveHelper(Client client, AbstractAI ai,
-            Variant variant)
+        Variant variant)
     {
 
         this.client = client;
@@ -35,10 +38,8 @@ public abstract class AbstractObjectiveHelper implements IObjectiveHelper {
         this.variant = variant;
         oec = new ObjectiveEvalConstants();
 
-        attackerToKnowledge =
-                new HashMap<Creature, AllThereIsToKnowAboutYourCreature>();
-        defenderToKnowledge =
-                new HashMap<Creature, AllThereIsToKnowAboutYourCreature>();
+        attackerToKnowledge = new HashMap<Creature, AllThereIsToKnowAboutYourCreature>();
+        defenderToKnowledge = new HashMap<Creature, AllThereIsToKnowAboutYourCreature>();
 
         Legion attacker = client.getAttacker();
         for (Creature lcritter : attacker.getCreatures())
@@ -46,7 +47,7 @@ public abstract class AbstractObjectiveHelper implements IObjectiveHelper {
             if (!lcritter.isTitan())
             {
                 attackerToKnowledge.put(lcritter,
-                        new AllThereIsToKnowAboutYourCreature(ai, lcritter,
+                    new AllThereIsToKnowAboutYourCreature(ai, lcritter,
                         attacker));
             }
         }
@@ -57,7 +58,7 @@ public abstract class AbstractObjectiveHelper implements IObjectiveHelper {
             if (!lcritter.isTitan())
             {
                 defenderToKnowledge.put(lcritter,
-                        new AllThereIsToKnowAboutYourCreature(ai, lcritter,
+                    new AllThereIsToKnowAboutYourCreature(ai, lcritter,
                         defender));
             }
         }
@@ -73,9 +74,9 @@ public abstract class AbstractObjectiveHelper implements IObjectiveHelper {
         final float SECOND_WAVE_ATTACK_PRIORITY = 0.5f;
     }
 
-/**
- * Helper class holding some knowledge about a given creature.
- */
+    /**
+     * Helper class holding some knowledge about a given creature.
+     */
     protected class AllThereIsToKnowAboutYourCreature
     {
         /** The creature this knowledged is about */
@@ -201,12 +202,15 @@ public abstract class AbstractObjectiveHelper implements IObjectiveHelper {
             }
 
             numberLeftToRecruit = ai.getCaretaker().getAvailableCount(
-                    creature.getType());
+                creature.getType());
 
-            if (numberNeededHere < Constants.BIGNUM) {
+            if (numberNeededHere < Constants.BIGNUM)
+            {
                 enoughLeftToRecruitHere = (stackNumber + numberLeftToRecruit) >= numberNeededHere;
                 justEnoughLeftToRecruitHere = (stackNumber + numberLeftToRecruit) == numberNeededHere;
-            } else {
+            }
+            else
+            {
                 enoughLeftToRecruitHere = true;
                 justEnoughLeftToRecruitHere = true;
             }

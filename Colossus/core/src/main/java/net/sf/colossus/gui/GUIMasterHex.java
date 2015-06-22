@@ -126,8 +126,9 @@ public final class GUIMasterHex extends GUIHex<MasterHex>
         Point2D.Double innerCenter = new Point2D.Double(innerBounds.getX()
             + innerBounds.getWidth() / 2.0, innerBounds.getY()
             + innerBounds.getHeight() / 2.0);
-        at = AffineTransform.getTranslateInstance(center.getX()
-            - innerCenter.getX(), center.getY() - innerCenter.getY());
+        at = AffineTransform.getTranslateInstance(
+            center.getX() - innerCenter.getX(),
+            center.getY() - innerCenter.getY());
         highlightBorder.transform(at);
 
         highlightBorder.append(hexagon, false);
@@ -281,9 +282,10 @@ public final class GUIMasterHex extends GUIHex<MasterHex>
         halfFontHeight = (fontMetrics.getMaxAscent() + fontMetrics
             .getLeading()) / 2;
         String name = this.getHexModel().getTerrainDisplayName().toUpperCase();
-        g2.drawString(name, rectBound.x
-            + ((rectBound.width - stringWidth(name, g2)) / 2), rectBound.y
-            + halfFontHeight + rectBound.height * (isInverted() ? 1 : 2) / 3);
+        g2.drawString(name,
+            rectBound.x + ((rectBound.width - stringWidth(name, g2)) / 2),
+            rectBound.y + halfFontHeight + rectBound.height
+                * (isInverted() ? 1 : 2) / 3);
     }
 
     @Override
@@ -449,9 +451,9 @@ public final class GUIMasterHex extends GUIHex<MasterHex>
     {
         Image overlay = null;
         overlay = StaticResourceLoader.getImage(this.getHexModel()
-            .getTerrainDisplayName()
-            + (!inverted ? invertedPostfix : ""), VariantSupport
-            .getImagesDirectoriesList(), rectBound.width, rectBound.height);
+            .getTerrainDisplayName() + (!inverted ? invertedPostfix : ""),
+            VariantSupport.getImagesDirectoriesList(), rectBound.width,
+            rectBound.height);
         return overlay;
     }
 

@@ -48,8 +48,6 @@ public class GameManager implements IGameManager
 
     private Registry registry;
 
-
-
     public GameManager()
     {
         games = new HashMap<String, IManagedGame>();
@@ -86,7 +84,6 @@ public class GameManager implements IGameManager
             LOGGER.log(Level.SEVERE, "registerManager: " + e);
         }
     }
-
 
     public void listRegistryContents()
     {
@@ -139,7 +136,6 @@ public class GameManager implements IGameManager
         }
     }
 
-
     // Mostly useful for main()
     public int getGameCount()
     {
@@ -180,7 +176,6 @@ public class GameManager implements IGameManager
 
         return game;
     }
-
 
     /**
      *  This is only for testing purposes.

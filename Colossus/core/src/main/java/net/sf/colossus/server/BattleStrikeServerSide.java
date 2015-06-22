@@ -278,8 +278,8 @@ public class BattleStrikeServerSide
      * @param target TODO*/
     public int getStrikeNumber(CreatureServerSide striker, Creature target)
     {
-        return getStrikeNumber(striker, target, !getBattle().isInContact(
-            striker, true));
+        return getStrikeNumber(striker, target,
+            !getBattle().isInContact(striker, true));
     }
 
     public int getStrikeNumber(Creature striker, Creature target,
@@ -295,8 +295,8 @@ public class BattleStrikeServerSide
         if (!rangestrike)
         {
             // Strike number can be modified directly by terrain.
-            strikeNumber += terrain.getSkillBonusStruckIn(striker
-                .isNativeIn(terrain), target.isNativeIn(terrain));
+            strikeNumber += terrain.getSkillBonusStruckIn(
+                striker.isNativeIn(terrain), target.isNativeIn(terrain));
         }
         else
         {

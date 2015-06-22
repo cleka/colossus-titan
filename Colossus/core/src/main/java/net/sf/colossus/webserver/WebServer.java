@@ -115,9 +115,11 @@ public class WebServer implements IWebServer, IRunWebServer
     public static void main(String[] args)
     {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
-        LOGGER.log(Level.INFO, "Start for ColossusWeb version '"
-            + BuildInfo.getFullBuildInfoString() + "' at "
-            + dateFormat.format(new Date()));
+        LOGGER.log(
+            Level.INFO,
+            "Start for ColossusWeb version '"
+                + BuildInfo.getFullBuildInfoString() + "' at "
+                + dateFormat.format(new Date()));
 
         String optionsFileName = WebServerConstants.defaultOptionsFilename;
 
@@ -241,7 +243,6 @@ public class WebServer implements IWebServer, IRunWebServer
         watchDog = new ClientWatchDog(userDB);
         watchDog.start();
 
-
         updateGUI();
         /*
          boolean runGameConsole = false;
@@ -324,8 +325,8 @@ public class WebServer implements IWebServer, IRunWebServer
         catch (IOException ex)
         {
 
-            LOGGER.log(Level.SEVERE, "Could not create socket on port " + serverPort
-                + ": " + ex.getMessage());
+            LOGGER.log(Level.SEVERE, "Could not create socket on port "
+                + serverPort + ": " + ex.getMessage());
             System.exit(1);
         }
 
@@ -445,8 +446,8 @@ public class WebServer implements IWebServer, IRunWebServer
 
             if (!rejected)
             {
-                WebServerClient client = new WebServerClient(
-                    this, clientSocket);
+                WebServerClient client = new WebServerClient(this,
+                    clientSocket);
                 client.startThread();
                 updateUserCounts();
             }
@@ -461,7 +462,8 @@ public class WebServer implements IWebServer, IRunWebServer
             else
             {
                 // does not matter
-                LOGGER.log(Level.FINEST,
+                LOGGER.log(
+                    Level.FINEST,
                     "ShutdownRequested, closing caused an exception: "
                         + ex.toString());
 
@@ -483,8 +485,8 @@ public class WebServer implements IWebServer, IRunWebServer
         try
         {
             PrintWriter rejectedClientWriter = new PrintWriter(
-                new BufferedWriter(
-                new OutputStreamWriter(socket.getOutputStream())), true);
+                new BufferedWriter(new OutputStreamWriter(
+                    socket.getOutputStream())), true);
 
             rejectedClientWriter.println(IWebClient.tooManyUsers);
             rejectedClientWriter.println(IWebClient.connectionClosed);
@@ -722,8 +724,8 @@ public class WebServer implements IWebServer, IRunWebServer
 
     private GameInfo isInvolvedInInstantGame(String initiatorName)
     {
-        ArrayList<GameInfo> games = new ArrayList<GameInfo>(proposedGames
-            .values());
+        ArrayList<GameInfo> games = new ArrayList<GameInfo>(
+            proposedGames.values());
         for (GameInfo gi : games)
         {
             if (!gi.isScheduledGame()
@@ -738,8 +740,8 @@ public class WebServer implements IWebServer, IRunWebServer
 
     public GameInfo proposeGame(String initiator, String variant,
         String viewmode, long startAt, int duration, String summary,
-        String expire, List<String> extraOptions, String dummy,
-        int min, int target, int max)
+        String expire, List<String> extraOptions, String dummy, int min,
+        int target, int max)
     {
         if (GameInfo.wouldBeInstantGame(startAt))
         {
@@ -755,8 +757,7 @@ public class WebServer implements IWebServer, IRunWebServer
             }
             else
             {
-                LOGGER
-                    .info("User " + initiator + " proposed instant game "
+                LOGGER.info("User " + initiator + " proposed instant game "
                     + "- not involved in game yet, so that's ok!");
             }
         }
@@ -784,15 +785,15 @@ public class WebServer implements IWebServer, IRunWebServer
         LOGGER.fine("Checking if any cancelling is needed for user "
             + user.getName());
 
-        ArrayList<GameInfo> games = new ArrayList<GameInfo>(proposedGames
-            .values());
+        ArrayList<GameInfo> games = new ArrayList<GameInfo>(
+            proposedGames.values());
         for (GameInfo gi : games)
         {
             if (!gi.isScheduledGame()
                 && gi.getInitiator().equals(user.getName()))
             {
-                LOGGER.info("Auto-cancelling instant game "
-                    + gi.getGameId() + " because initiator " + user.getName()
+                LOGGER.info("Auto-cancelling instant game " + gi.getGameId()
+                    + " because initiator " + user.getName()
                     + " is going to be gone...");
                 cancelGame(gi.getGameId(), user.getName());
             }
@@ -804,8 +805,8 @@ public class WebServer implements IWebServer, IRunWebServer
         IWebClient client = newclient;
         User newUser = newclient.getUser();
 
-        ArrayList<GameInfo> games = new ArrayList<GameInfo>(proposedGames
-            .values());
+        ArrayList<GameInfo> games = new ArrayList<GameInfo>(
+            proposedGames.values());
         for (GameInfo gi : games)
         {
             if (gi.reEnrollIfNecessary(newUser))
@@ -834,8 +835,8 @@ public class WebServer implements IWebServer, IRunWebServer
 
     public void tellAllProposedGamesToOne(WebServerClient client)
     {
-        ArrayList<GameInfo> list = new ArrayList<GameInfo>(proposedGames
-            .values());
+        ArrayList<GameInfo> list = new ArrayList<GameInfo>(
+            proposedGames.values());
         tellAllGamesFromListToOne(client, list);
     }
 
@@ -888,7 +889,7 @@ public class WebServer implements IWebServer, IRunWebServer
             {
                 LOGGER.warning("getThread for user " + u.getName()
                     + " (of game " + gi.getGameId()
-                        + ") returned null client!");
+                    + ") returned null client!");
             }
         }
     }
@@ -915,10 +916,9 @@ public class WebServer implements IWebServer, IRunWebServer
             }
             else
             {
-                LOGGER
-                    .warning("getThread for user " + u.getName()
-                        + " (of game " + gi.getGameId()
-                        + ") returned null client!");
+                LOGGER.warning("getThread for user " + u.getName()
+                    + " (of game " + gi.getGameId()
+                    + ") returned null client!");
             }
         }
     }
@@ -951,7 +951,7 @@ public class WebServer implements IWebServer, IRunWebServer
         GameInfo gi = findByGameId(gameId);
         if (gi != null)
         {
-            synchronized(gi)
+            synchronized (gi)
             {
                 if (!gi.isStarting())
                 {
@@ -1006,7 +1006,7 @@ public class WebServer implements IWebServer, IRunWebServer
 
         if (gi != null)
         {
-            synchronized(gi)
+            synchronized (gi)
             {
                 // TODO HACK!! don't check for now, otherwise can't unenroll
                 // from games that failed to start.
@@ -1291,8 +1291,7 @@ public class WebServer implements IWebServer, IRunWebServer
             if (recipientClient != null)
             {
                 recipientClient.requestAttention(when, sender, isAdmin,
-                    message,
-                    beepCount, beepInterval, windows);
+                    message, beepCount, beepInterval, windows);
             }
             else
             {
@@ -1345,8 +1344,8 @@ public class WebServer implements IWebServer, IRunWebServer
         int connected = userDB.getLoggedInCount();
         allTellUserCounts();
         gui.setUserInfo(connected + " users connected.");
-        ArrayList<GameInfo> games = new ArrayList<GameInfo>(proposedGames
-            .values());
+        ArrayList<GameInfo> games = new ArrayList<GameInfo>(
+            proposedGames.values());
         for (GameInfo gi : games)
         {
             // returns true if changed
@@ -1451,8 +1450,7 @@ public class WebServer implements IWebServer, IRunWebServer
         }
     }
 
-    public void tellLastChatMessagesToOne(WebServerClient client,
-        String chatId)
+    public void tellLastChatMessagesToOne(WebServerClient client, String chatId)
     {
         if (!chatId.equals(IWebServer.generalChatName))
         {
@@ -1464,8 +1462,7 @@ public class WebServer implements IWebServer, IRunWebServer
         generalChat.tellLastMessagesToOne(client);
     }
 
-    public void sendMessageOfTheDayToOne(WebServerClient client,
-        String chatId)
+    public void sendMessageOfTheDayToOne(WebServerClient client, String chatId)
     {
         if (!chatId.equals(IWebServer.generalChatName))
         {
@@ -1530,8 +1527,8 @@ public class WebServer implements IWebServer, IRunWebServer
         catch (IOException e)
         {
             LOGGER.log(Level.SEVERE,
-                "IOException while reading login message file "
-                + filename + "!", e);
+                "IOException while reading login message file " + filename
+                    + "!", e);
         }
 
     }
@@ -1692,7 +1689,7 @@ public class WebServer implements IWebServer, IRunWebServer
             {
                 LOGGER
                     .warning("Neither runningGames nor proposedGames contains game "
-                    + gi.getGameId());
+                        + gi.getGameId());
             }
         }
         synchronized (endingGames)
@@ -1704,8 +1701,8 @@ public class WebServer implements IWebServer, IRunWebServer
 
         GameThreadReaper r = new GameThreadReaper();
         r.start();
-        LOGGER.log(Level.FINEST, "GameThreadReaper started for game "
-            + gi.getGameId());
+        LOGGER.log(Level.FINEST,
+            "GameThreadReaper started for game " + gi.getGameId());
 
         updateGUI();
     }
@@ -1830,8 +1827,8 @@ public class WebServer implements IWebServer, IRunWebServer
             out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(
                 filename), WebServerConstants.charset));
 
-            ArrayList<GameInfo> games = new ArrayList<GameInfo>(proposedGames
-                .values());
+            ArrayList<GameInfo> games = new ArrayList<GameInfo>(
+                proposedGames.values());
             for (GameInfo gi : games)
             {
                 if (gi.relevantForSaving())

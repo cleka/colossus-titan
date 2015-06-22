@@ -65,7 +65,8 @@ public final class Start
         this.startOptions = new Options(Constants.OPTIONS_START);
         // initialize it from the -D..forceViewBoard  cmdline settings,
         // defaulting to false if no such argument given
-        startOptions.setOption(Options.FORCE_BOARD, Constants.FORCE_VIEW_BOARD);
+        startOptions
+            .setOption(Options.FORCE_BOARD, Constants.FORCE_VIEW_BOARD);
         this.whatNextManager = new WhatNextManager(startOptions);
         commandLineProcessing(args);
     }
@@ -123,8 +124,7 @@ public final class Start
             opts.addOption('g', "go", false, "Skip startup dialogs");
             opts.addOption('v', "variant", true, "Set variant");
             opts.addOption('u', "nhuman", true, "Number of humans");
-            opts
-                .addOption('i', "nai", true, "Number of AIs (default: random)");
+            opts.addOption('i', "nai", true, "Number of AIs (default: random)");
             opts.addOption('Z', "simpleai", true, "Number of SimpleAIs");
             opts.addOption('r', "rationalai", true, "Number of RationalAIs");
             opts.addOption('M', "milvangai", true, "Number of MilvangAIs");
@@ -891,9 +891,11 @@ public final class Start
     public static void main(String[] args)
     {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
-        LOGGER.log(Level.INFO, "Start for Colossus version '"
-            + BuildInfo.getFullBuildInfoString() + "' at "
-            + dateFormat.format(new Date()));
+        LOGGER.log(
+            Level.INFO,
+            "Start for Colossus version '"
+                + BuildInfo.getFullBuildInfoString() + "' at "
+                + dateFormat.format(new Date()));
 
         Start startObject = new Start(args);
 
@@ -906,7 +908,6 @@ public final class Start
         startObject = null;
 
         WelcomeDialog.disposeDialogIfNecessary();
-
 
         // ==================================================================
         // Application-ending related processing, mostly for debug purposes

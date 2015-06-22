@@ -297,7 +297,7 @@ final class ClientHandler extends ClientHandlerStub implements IClient
     {
         int found = -1;
         int size = redoQueue.size();
-        for(int i = 0; i < size && found == -1; i++)
+        for (int i = 0; i < size && found == -1; i++)
         {
             MessageForClient mfc = redoQueue.get(i);
             if (mfc.getCommitNumber() == confirmedNr)
@@ -411,7 +411,8 @@ final class ClientHandler extends ClientHandlerStub implements IClient
      * @param lastReceivedMessageNr Last message which client did still receive
      * @param syncRequestNumber Every request has own unique id, so we don't mix them
      */
-    public void syncAfterReconnect(int lastReceivedMessageNr, int syncRequestNumber)
+    public void syncAfterReconnect(int lastReceivedMessageNr,
+        int syncRequestNumber)
     {
         // to get client out of initial read-lines loop, to get it into
         // normal "read from socket and parse line" loop
@@ -949,8 +950,8 @@ final class ClientHandler extends ClientHandlerStub implements IClient
 
         else if (method.equals(Constants.stopGame))
         {
-            setIsGone("received explicit 'stopGame' request from "
-                + "client" + getPlayerName());
+            setIsGone("received explicit 'stopGame' request from " + "client"
+                + getPlayerName());
             server.sendDisconnect();
             server.stopGame();
         }
@@ -1109,8 +1110,8 @@ final class ClientHandler extends ClientHandlerStub implements IClient
 
     private MasterHex resolveMasterHex(String hexLabel)
     {
-        return server.getGame().getVariant().getMasterBoard().getHexByLabel(
-            hexLabel);
+        return server.getGame().getVariant().getMasterBoard()
+            .getHexByLabel(hexLabel);
     }
 
     private Legion resolveLegion(String markerId)
@@ -1171,8 +1172,7 @@ final class ClientHandler extends ClientHandlerStub implements IClient
                     | (socketChannel == null ? 4 : 0);
                 LOGGER.info("Attempt to send to player " + playerName
                     + " when client connection already gone (reason: " + flags
-                    + ")- message: "
-                    + message);
+                    + ")- message: " + message);
                 cantSendMessageRepeated++;
             }
         }

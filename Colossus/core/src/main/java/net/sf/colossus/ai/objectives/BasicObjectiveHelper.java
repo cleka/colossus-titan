@@ -45,14 +45,13 @@ public class BasicObjectiveHelper extends AbstractObjectiveHelper
             int count = ai.countCreatureAccrossAllLegionFromPlayer(lcritter);
             if (count == 0)
             {
-                LOGGER.warning("Strange, we have at least a " +
-                        lcritter.getName() + " in legion " +
-                        attacker.getMarkerId() + " yet 0 in total...");
+                LOGGER.warning("Strange, we have at least a "
+                    + lcritter.getName() + " in legion "
+                    + attacker.getMarkerId() + " yet 0 in total...");
             }
-            LOGGER.finest("Found " + count + " " + lcritter.getName() +
-                        " in all ; we have " +
-                        attacker.numCreature(lcritter.getType()) +
-                        " in here");
+            LOGGER.finest("Found " + count + " " + lcritter.getName()
+                + " in all ; we have "
+                + attacker.numCreature(lcritter.getType()) + " in here");
             if (!lcritter.isLord() && !lcritter.isDemiLord()
                 && ((creature == null) || (count < mcount)))
             {
@@ -107,21 +106,24 @@ public class BasicObjectiveHelper extends AbstractObjectiveHelper
             if (!lcritter.isLord()
                 && RecruitingSubTree.isADeadEnd(variant, lcritter.getType()))
             {
-                LOGGER.info("CommonObjective: " + lcritter.getName() + " is a dead end and non-lord, aka Cannon Fodder");
+                LOGGER.info("CommonObjective: " + lcritter.getName()
+                    + " is a dead end and non-lord, aka Cannon Fodder");
                 lListObjectives.add(new CreatureAttackTacticalObjective(
                     oec.FIRST_WAVE_ATTACK_PRIORITY, client, myself, lcritter,
                     ai, ai.bec));
             }
             else if (lcritter.isLord() && !lcritter.isTitan())
             {
-                LOGGER.info("CommonObjective: " + lcritter.getName() + " is a non-titan lord, aka Cannon Fodder");
+                LOGGER.info("CommonObjective: " + lcritter.getName()
+                    + " is a non-titan lord, aka Cannon Fodder");
                 lListObjectives.add(new CreatureAttackTacticalObjective(
                     oec.FIRST_WAVE_ATTACK_PRIORITY, client, myself, lcritter,
                     ai, ai.bec));
             }
             else if (!lcritter.isTitan())
             {
-                LOGGER.info("CommonObjective: " + lcritter.getName() + " matters (a bit)...");
+                LOGGER.info("CommonObjective: " + lcritter.getName()
+                    + " matters (a bit)...");
                 lListObjectives.add(new CreatureAttackTacticalObjective(
                     oec.SECOND_WAVE_ATTACK_PRIORITY, client, myself, lcritter,
                     ai, ai.bec));

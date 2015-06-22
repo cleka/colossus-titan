@@ -488,8 +488,8 @@ public class Player
     {
         try
         {
-            int power = VariantSupport.getCurrentVariant().getCreatureByName(
-                    "Angel").getPower();
+            int power = VariantSupport.getCurrentVariant()
+                .getCreatureByName("Angel").getPower();
             return "Angel-" + power + "-" + getColor().getName();
         }
         catch (Exception ex)
@@ -504,11 +504,11 @@ public class Player
      * saves 0.5 to next time.
      * Stored per player per strike-number base.
      */
-    private final double[] accumulatedWastedLuck = new double[] { 0.0, 0.0, 0.0,
-        0.0, 0.0, 0.0, 0.0 };
+    private final double[] accumulatedWastedLuck = new double[] { 0.0, 0.0,
+        0.0, 0.0, 0.0, 0.0, 0.0 };
 
-    public boolean applyAccumulatedWastedLuck(int sn,
-        double wastedLuck, StringBuffer eawlString)
+    public boolean applyAccumulatedWastedLuck(int sn, double wastedLuck,
+        StringBuffer eawlString)
     {
         accumulatedWastedLuck[sn] += wastedLuck;
         eawlString.append(String.format("%5.2f",

@@ -284,8 +284,7 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
         // ACTIVATED
         LOGGER.log(Level.FINEST,
             "Seems starting game process went ok, sending gameStartsSoon "
-                + "to enrolled players: "
-                + gi.getPlayerListAsString());
+                + "to enrolled players: " + gi.getPlayerListAsString());
         server.tellEnrolledGameStartsSoon(gi);
 
         int timeout = 30; // seconds
@@ -376,8 +375,7 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
             LOGGER.log(Level.WARNING, "Game " + gameId
                 + " ended but flagfile " + flagFile.toString()
                 + " does still exist...? Renaming it...");
-            flagFile.renameTo(new File(flagFile.getParent(),
-                "flagfile.away"));
+            flagFile.renameTo(new File(flagFile.getParent(), "flagfile.away"));
         }
         else
         {

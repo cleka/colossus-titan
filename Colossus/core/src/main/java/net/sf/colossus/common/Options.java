@@ -51,7 +51,6 @@ public final class Options implements IOptions
     public static final String webClientPassword = "Web client password";
     public static final String proposedGamesTableOption = "Proposed Games Table Column Widths";
 
-
     // Option names
 
     // Server administrative options
@@ -227,7 +226,6 @@ public final class Options implements IOptions
     public static final String activePreferencesTab = "Active preferences tab";
 
     public static final String editModeActive = "Edit Mode";
-
 
     private final Properties props = new Properties();
     private final String owner; // playerName, or Constants.optionsServerName
