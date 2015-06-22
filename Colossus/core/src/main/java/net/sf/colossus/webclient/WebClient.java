@@ -233,6 +233,7 @@ public class WebClient extends KFrame implements IWebClient
     private JCheckBox unlimitedMulligansCB;
     private JCheckBox balancedTowersCB;
     private JCheckBox lordBattleControlCB;
+    private JCheckBox inactivityTimeoutCB;
     private JCheckBox probBasedBattleHitsCB;
 
     private JLabel nowDateAndTimeLabel;
@@ -1388,7 +1389,7 @@ public class WebClient extends KFrame implements IWebClient
 
         // checkboxes (unlimited mulligans, balanced tower,
         //   and battlecontrol needs lord):
-        JPanel checkboxPane = new JPanel(new GridLayout(2, 2));
+        JPanel checkboxPane = new JPanel(new GridLayout(0, 2));
 
         boolean unlimitedMulligans = options
             .getOption(Options.unlimitedMulligans);
@@ -1428,6 +1429,17 @@ public class WebClient extends KFrame implements IWebClient
             }
         });
 
+        inactivityTimeoutCB = new JCheckBox(Options.inactivityTimeout,
+            options.getOption(Options.inactivityTimeout));
+        inactivityTimeoutCB.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                options.setOption(Options.inactivityTimeout,
+                    inactivityTimeoutCB.isSelected());
+            }
+        });
+
         boolean probabilityBaseBattleHits = options
             .getOption(Options.pbBattleHits);
         probBasedBattleHitsCB = new JCheckBox(Options.pbBattleHits,
@@ -1445,6 +1457,7 @@ public class WebClient extends KFrame implements IWebClient
         checkboxPane.add(balancedTowersCB);
         checkboxPane.add(lordBattleControlCB);
         checkboxPane.add(probBasedBattleHitsCB);
+        checkboxPane.add(inactivityTimeoutCB);
 
         preferencesPane.add(new JLabel("Various settings:"));
         preferencesPane.add(checkboxPane);
@@ -3789,6 +3802,10 @@ public class WebClient extends KFrame implements IWebClient
         if (probBasedBattleHitsCB.isSelected())
         {
             extraOptions.add(Options.pbBattleHits);
+        }
+        if (inactivityTimeoutCB.isSelected())
+        {
+            extraOptions.add(Options.inactivityTimeout);
         }
 
         String dummy = new String("");

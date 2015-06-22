@@ -103,6 +103,7 @@ public final class Options implements IOptions
     public static final String fixedSequenceBattleDice = "Fixed-sequence battle dice";
     public static final String pbBattleHits = "Probability-based battle hits";
     public static final String sansLordAutoBattle = "Need lord for battle control";
+    public static final String inactivityTimeout = "Inactivity timeout";
 
     public static final String noFirstTurnT2TTeleport = "No tower-to-tower Teleport on first turn";
     public static final String noFirstTurnTeleport = "No Teleport on first turn";
@@ -121,7 +122,7 @@ public final class Options implements IOptions
         oneHexAllowed, fixedSequenceBattleDice, sansLordAutoBattle,
         noFirstTurnT2TTeleport, noFirstTurnTeleport, towerToTowerTeleportOnly,
         noTowerTeleport, noTitanTeleport, unlimitedMulligans,
-        noFirstTurnWarlockRecruit, enableEditingMode };
+        noFirstTurnWarlockRecruit, enableEditingMode, inactivityTimeout };
 
     // Display options (client only)
     public static final String stealFocus = "Steal focus";

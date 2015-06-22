@@ -61,6 +61,7 @@ public class GameInfo
     private boolean unlimitedMulligans;
     private boolean balancedTowers;
     private boolean autoSansLordBattles;
+    private boolean inactivityTimeout;
     private boolean probabilityBasedBattleHits;
 
     private int min;
@@ -162,6 +163,10 @@ public class GameInfo
             if (string.equals(Options.sansLordAutoBattle))
             {
                 this.autoSansLordBattles = true;
+            }
+            else if (string.equals(Options.inactivityTimeout))
+            {
+                this.inactivityTimeout = true;
             }
             else if (string.equals(Options.unlimitedMulligans))
             {
@@ -285,9 +290,14 @@ public class GameInfo
         }
 
         String summary2 = summary;
-        if (this.autoSansLordBattles)
+        int count = 0;
+        count = (this.autoSansLordBattles ? 1 : 0)
+            + (this.inactivityTimeout ? 1 : 0)
+            + (this.probabilityBasedBattleHits ? 1 : 0);
+
+        if (count > 0)
         {
-            summary2 = "NOTE! Extra option 'Needs lord for battle control' set! | "
+            summary2 = "NOTE! " + count + " extra options are set! | "
                 + summary;
         }
         String message = gameId + sep + type.toString() + sep
@@ -333,6 +343,11 @@ public class GameInfo
         if (this.autoSansLordBattles)
         {
             extraOptions.add(Options.sansLordAutoBattle);
+        }
+
+        if (this.inactivityTimeout)
+        {
+            extraOptions.add(Options.inactivityTimeout);
         }
 
         if (this.unlimitedMulligans)
@@ -520,6 +535,16 @@ public class GameInfo
         autoSansLordBattles = val;
     }
 
+    public boolean getInactivityTimeout()
+    {
+        return inactivityTimeout;
+    }
+
+    public void setInactivityTimeout(boolean val)
+    {
+        inactivityTimeout = val;
+    }
+
     public boolean getProbabilityBasedBattleHits()
     {
         return probabilityBasedBattleHits;
@@ -535,7 +560,9 @@ public class GameInfo
         String s = (this.unlimitedMulligans ? "U" : "-")
             + (this.balancedTowers ? "B" : "-")
             + (this.autoSansLordBattles ? "N" : "-")
-            + (this.probabilityBasedBattleHits ? "P" : "-");
+            + (this.probabilityBasedBattleHits ? "P" : "-")
+            + (this.inactivityTimeout ? "I" : "-");
+
         return s;
     }
 
@@ -548,7 +575,9 @@ public class GameInfo
             + ", "
             + (this.autoSansLordBattles ? Options.sansLordAutoBattle : "-")
             + ", "
-            + (this.probabilityBasedBattleHits ? Options.pbBattleHits : "-");
+            + (this.probabilityBasedBattleHits ? Options.pbBattleHits : "-")
+            + ", "
+            + (this.inactivityTimeout ? Options.inactivityTimeout : "-");
 
         return ttText;
 

@@ -259,6 +259,7 @@ public final class GetPlayers extends KFrame
         addCheckbox(Options.sansLordAutoBattle, rulesOptionsPane);
         addCheckbox(Options.fixedSequenceBattleDice, rulesOptionsPane);
         addCheckbox(Options.pbBattleHits, rulesOptionsPane);
+        addCheckbox(Options.inactivityTimeout, rulesOptionsPane);
 
         JPanel aiTimePane = new JPanel(new FlowLayout());
         aiTimePane.setBorder(new TitledBorder("AI Timing"));
