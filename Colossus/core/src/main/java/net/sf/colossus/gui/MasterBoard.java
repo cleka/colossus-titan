@@ -675,7 +675,9 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                gui.getClient().kickPhase();
+                gui.client.getAutoplay().setInactivityAutoplay();
+                gui.client.getEventExecutor().retriggerEvent();
+                // gui.getClient().kickPhase();
             }
         };
 
@@ -1344,7 +1346,7 @@ public final class MasterBoard extends JPanel
         mi = phaseMenu.add(forcedDoneWithPhaseAction);
         mi.setMnemonic(KeyEvent.VK_F);
 
-        boolean CLEMENS_TEST = false;
+        boolean CLEMENS_TEST = true;
         if (CLEMENS_TEST)
         {
             mi = phaseMenu.add(kickPhaseAction);

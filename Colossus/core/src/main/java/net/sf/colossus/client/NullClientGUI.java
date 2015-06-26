@@ -854,16 +854,16 @@ public class NullClientGUI implements IClientGUI
         return false;
     }
 
-    public void inactivityWarning(int inactiveSecs, int timeoutSecs)
+    public void displayInactivityDialogEnsureEDT(final String title,
+        final String text)
     {
         // TODO Auto-generated method stub
 
     }
 
-    public void inactivityTimeoutReached()
+    public void inactivityAutoFleeOrConcede(boolean reply)
     {
         // TODO Auto-generated method stub
 
     }
-
 }

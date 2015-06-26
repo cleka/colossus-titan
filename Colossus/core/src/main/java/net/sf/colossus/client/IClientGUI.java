@@ -349,7 +349,8 @@ public interface IClientGUI
 
     public abstract boolean getStartedByWebClient();
 
-    public abstract void inactivityWarning(int inactiveSecs, int timeoutSecs);
+    public abstract void displayInactivityDialogEnsureEDT(final String title,
+        final String text);
 
-    public abstract void inactivityTimeoutReached();
+    public abstract void inactivityAutoFleeOrConcede(boolean reply);
 }

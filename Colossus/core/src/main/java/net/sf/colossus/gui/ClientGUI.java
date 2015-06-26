@@ -50,6 +50,7 @@ import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.Proposal;
 import net.sf.colossus.guiutil.KDialog;
 import net.sf.colossus.util.CollectionHelper;
+import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.util.Predicate;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
@@ -427,7 +428,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         if (getOwningPlayer().getName().equals("localwatchdogtest")
             && this.inactivityWarningInterval == -1)
         {
-            this.inactivityWarningInterval = 30;
+            this.inactivityWarningInterval = InactivityWatchdog.DEBUG_INTERVAL;
         }
 
         // by default (local game) those inactivity values are all -1,
@@ -543,35 +544,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         }
     }
 
-    public void inactivityWarning(final int inactiveSecs, final int timeoutSecs)
-    {
-        final String title = "It's your turn (" + inactiveSecs + "/"
-            + timeoutSecs + ")!";
-        final String text = "\nHey, it's your turn, and you've been doing nothing for "
-            + inactiveSecs
-            + " seconds!\n "
-            + "\nAfter "
-            + timeoutSecs
-            + " seconds of inactivity the AI will take over this turn for you!";
-
-        if (SwingUtilities.isEventDispatchThread())
-        {
-            disposeLastInactivityDialog();
-            showInactivityDialog(title, text);
-        }
-        else
-        {
-            SwingUtilities.invokeLater(new Runnable()
-            {
-                public void run()
-                {
-                    disposeLastInactivityDialog();
-                    showInactivityDialog(title, text);
-                }
-            });
-        }
-    }
-
+    /* must be called inside EDT */
     private void showInactivityDialog(String title, String text)
     {
         getMapOrBoardFrame().requestFocus();
@@ -579,8 +552,9 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
         lastDialog = new KDialog(getMapOrBoardFrame(), title, false);
 
-        JTextArea contentPanel = new JTextArea(text, 5, 30);
+        JTextArea contentPanel = new JTextArea(text, 7, 40);
         contentPanel.setEditable(false);
+        contentPanel.setBackground(HTMLColor.orange);
 
         lastDialog.getContentPane().add(contentPanel);
         lastDialog.pack();
@@ -591,14 +565,9 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         getMapOrBoardFrame().toFront();
     }
 
-    public void inactivityTimeoutReached()
+    public void displayInactivityDialogEnsureEDT(final String title,
+        final String text)
     {
-        final String title = "AI took over";
-        final String text = "\n"
-            + "You've been inactive for too long. AI took over for you in this round\n"
-            + "so now it's probably somebody else's turn.\n\n"
-            + "You will be back in control in your next turn.";
-
         if (SwingUtilities.isEventDispatchThread())
         {
             disposeLastInactivityDialog();
@@ -615,6 +584,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
                 }
             });
         }
+        WhatNextManager.sleepFor(2000);
     }
 
     public void setStrikeNumbers(BattleUnit striker, Set<BattleHex> targetHexes)
@@ -2021,7 +1991,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         logPerhaps("disposePickCarryDialog()");
         if (SwingUtilities.isEventDispatchThread())
         {
-            actualDisposePickCarryDialog();
+            disposePickCarryDialog();
         }
         else
         {
@@ -2031,7 +2001,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
                 {
                     public void run()
                     {
-                        actualDisposePickCarryDialog();
+                        disposePickCarryDialog();
                     }
                 });
             }
@@ -2040,20 +2010,6 @@ public class ClientGUI implements IClientGUI, GUICallbacks
                 LOGGER.warning("When trying to run disposePickCarryDialog "
                     + "in invokeAndWait, caught exception: " + e);
             }
-        }
-    }
-
-    public void actualDisposePickCarryDialog()
-    {
-        logPerhaps("actualDisposePickCarryDialog()");
-        if (pickCarryDialog != null)
-        {
-            if (battleBoard != null)
-            {
-                battleBoard.unselectAllHexes();
-            }
-            pickCarryDialog.dispose();
-            pickCarryDialog = null;
         }
     }
 
@@ -2122,7 +2078,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void showNegotiate(Legion attacker, Legion defender)
     {
-        updateClockTickingPerhaps(true);
+        updateClockTickingPerhaps(true, "showNegotiate");
         logPerhaps("showNegotiate(Legion attacker, Legion defender)");
         board.clearDefenderFlee();
         negotiate = new Negotiate(this, attacker, defender);
@@ -2141,7 +2097,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void showConcede(Client client, Legion ally, Legion enemy)
     {
-        updateClockTickingPerhaps(true);
+        updateClockTickingPerhaps(true, "showConcede");
         LOGGER
             .fine("CG: showConcede(Client client, Legion ally, Legion enemy)");
 
@@ -2152,10 +2108,15 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void showFlee(Client client, Legion ally, Legion enemy)
     {
-        updateClockTickingPerhaps(true);
+        updateClockTickingPerhaps(true, "showFlee");
         logPerhaps("showFlee(Client client, Legion ally, Legion enemy)");
         Concede.flee(this, board.getFrame(), ally, enemy);
         myTurnNotificationActions(ally);
+    }
+
+    public void inactivityAutoFleeOrConcede(boolean reply)
+    {
+        Concede.inactivityAutoFleeOrConcede(reply);
     }
 
     private void myTurnNotificationActions(Legion ally)
@@ -2216,22 +2177,36 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         board.clearEngagingPending();
     }
 
-    /* set or stop inactivityWatchdog ticking, depending on whether it's
-     * now our turn or not; and don't do anything if it was ticking already.
+    /* Starts or stops clock ticking, and informs webclient:
+     * This sets or stops inactivityWatchdog ticking, depending on whether it's
+     * now our turn or not; if the state is already as requested, does nothing.
      * Notify also WebClient (if we have one) about new state, so that it can
      * react visually (= set chat background to some color, at the moment).
      */
-    private void updateClockTickingPerhaps(boolean shouldRun)
+    private void updateClockTickingPerhaps(boolean shouldRun, String reason)
     {
         if (watchdog == null)
         {
             return;
         }
         boolean isTicking = watchdog.isClockTicking();
-        LOGGER.finest("update clock ticking: shouldrun=" + shouldRun
+        LOGGER.finest("UPDATE CLOCK (reason " + reason
+            + "): ticking: shouldrun=" + shouldRun
             + ", isTicking=" + isTicking);
 
-        if (isTicking && !shouldRun)
+        if (shouldRun
+            && client.getEventExecutor().getRetriggeredEventOngoing())
+        {
+            LOGGER
+                .finest("was asked to update clock, but this is the retriggered event.");
+        }
+        else if (shouldRun
+            && client.getAutoplay().isInactivityAutoplayActive())
+        {
+            LOGGER
+                .finest("was asked to update clock, but inactivityAutoplay is active anyway.");
+        }
+        else if (isTicking && !shouldRun)
         {
             watchdog.stopClockTicking();
             if (webClient != null)
@@ -2246,7 +2221,6 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             {
                 webClient.notifyClockTicking(shouldRun);
             }
-
         }
     }
 
@@ -2297,6 +2271,11 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void actOnEngagementCompleted()
     {
+        if (client.needsWatchdog() && watchdog.isClockTicking())
+        {
+            updateClockTickingPerhaps(isMyTurn(), "engagement over");
+        }
+
         logPerhaps("actOnEngagementCompleted()");
         board.updateEngagementsLeftText();
     }
@@ -2481,7 +2460,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
         board.deiconify();
         new AcquireAngel(board.getFrame(), this, legion, recruits);
-        updateClockTickingPerhaps(true);
+        updateClockTickingPerhaps(true, "doaquire angel");
     }
 
     public void setBoardActive(boolean val)
@@ -2493,7 +2472,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void doPickSummonAngel(Legion legion, List<Legion> possibleDonors)
     {
-        updateClockTickingPerhaps(true);
+        updateClockTickingPerhaps(true, "dopicksummonangel");
         logPerhaps("doPickSummonAngel(Legion legion,");
         new SummonAngel(this, legion, possibleDonors);
     }
@@ -2581,7 +2560,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     public void doPickColor(final String playerName,
         final List<PlayerColor> colorsLeft)
     {
-        updateClockTickingPerhaps(true);
+        updateClockTickingPerhaps(true, "dopickcolor");
         logPerhaps("doPickColor(final String playerName,");
         if (SwingUtilities.isEventDispatchThread())
         {
@@ -2624,7 +2603,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void doPickInitialMarker(Set<String> markersAvailable)
     {
-        updateClockTickingPerhaps(true);
+        updateClockTickingPerhaps(true, "dopickinitialmarker");
         board.setPhaseInfo("Pick initial marker!");
         createPickMarkerDialog(this, markersAvailable, null);
     }
@@ -2749,9 +2728,26 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         {
             board.myTurnStartsActions();
         }
-
         eventViewer.turnOrPlayerChange(turnNr, player);
-        updateClockTickingPerhaps(isMyTurn());
+        // starts or stops clock ticking, and informs webclient
+
+        if (client.needsWatchdog())
+        {
+            if (client.getEventExecutor().getRetriggeredEventOngoing())
+            {
+                client.kickPhase();
+            }
+            else
+            {
+                updateClockTickingPerhaps(isMyTurn(),
+                    "actonturnorplayerchange");
+            }
+        }
+        else
+        {
+            LOGGER.finest("(ClientGUI of client " + getOwningPlayerName()
+                + ": no watchdog needed)");
+        }
     }
 
     public void markThatSomethingHappened()
@@ -2913,7 +2909,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             battleBoard.setupFightMenu();
         }
         updateStatusScreen();
-        updateClockTickingPerhaps(client.isMyBattlePhase());
+        updateClockTickingPerhaps(client.isMyBattlePhase(), "actonbattlefight");
     }
 
     public void actOnSetupBattleMove()
@@ -2936,7 +2932,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             }
         }
         updateStatusScreen();
-        updateClockTickingPerhaps(client.isMyBattlePhase());
+        updateClockTickingPerhaps(client.isMyBattlePhase(), "actonbattlemove");
     }
 
     public void actOnTellBattleMove(BattleHex startingHex,

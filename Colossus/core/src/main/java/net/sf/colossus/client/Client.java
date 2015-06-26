@@ -107,6 +107,12 @@ public final class Client implements IClient, IOracle, IVariant,
     private IServerConnection connection;
 
     /**
+     * InactivityWatchdog needs this, to retrigger an event to make
+     * the AI kick in
+     */
+    private EventExecutor eventExecutor;
+
+    /**
      * A first start to get rid of the static-access-everywhere to
      * ResourceLoader.
      * ResourceLoader is used to "load" images, variant files, readme files
@@ -514,22 +520,6 @@ public final class Client implements IClient, IOracle, IVariant,
         return clockIsTicking;
     }
 
-    public void inactivityWarning(int inactiveSeconds, int inactiveTimeout)
-    {
-        LOGGER.finer("ClientThread " + owningPlayer.getName() + ": idle for "
-            + inactiveSeconds + "seconds!");
-        gui.inactivityWarning(inactiveSeconds, inactiveTimeout);
-    }
-
-    public void inactivityTimeoutReached()
-    {
-        LOGGER.finer("ClientThread " + owningPlayer.getName()
-            + ": reached inactivity timeout! Enabling Autoplay.");
-        gui.inactivityTimeoutReached();
-        autoplay.setInactivityAutoplay();
-        kickPhase();
-    }
-
     public boolean isTheInternalSpectator()
     {
         return internalSpectator;
@@ -538,6 +528,11 @@ public final class Client implements IClient, IOracle, IVariant,
     public boolean isAutoplayActive()
     {
         return autoplay.isAutoplayActive();
+    }
+
+    public Autoplay getAutoplay()
+    {
+        return autoplay;
     }
 
     public boolean getAutoSplit()
@@ -1687,6 +1682,16 @@ public final class Client implements IClient, IOracle, IVariant,
         gui.initBoard();
     }
 
+    public void setEventExecutor(EventExecutor eventExecutor)
+    {
+        this.eventExecutor = eventExecutor;
+    }
+
+    public EventExecutor getEventExecutor()
+    {
+        return this.eventExecutor;
+    }
+
     public void setPlayerName(String playerName)
     {
         this.owningPlayer.setName(playerName);
@@ -1863,12 +1868,32 @@ public final class Client implements IClient, IOracle, IVariant,
         }
         else if (autoplay.autoFlee())
         {
-            answerFlee(ally, ai.flee(ally, enemy));
+            if (eventExecutor.getRetriggeredEventOngoing())
+            {
+                boolean reply = ai.flee(ally, enemy);
+
+                inactivityAutoFleeOrConcede(reply);
+            }
+            else
+            {
+                answerFlee(ally, ai.flee(ally, enemy));
+            }
         }
         else
         {
             gui.showFlee(this, ally, enemy);
         }
+    }
+
+    /**
+     * Make the concede dialog reply wit the answer the AI has provided,
+     * as if the user would have selected something; so that the dialog
+     * is disposed cleanly.
+     * @param reply Whether to fleed/conced, or not.
+     */
+    public void inactivityAutoFleeOrConcede(boolean reply)
+    {
+        gui.inactivityAutoFleeOrConcede(reply);
     }
 
     public void answerFlee(Legion ally, boolean answer)
@@ -2393,8 +2418,6 @@ public final class Client implements IClient, IOracle, IVariant,
         }
         game.setActivePlayer(activePlayer);
         game.setTurnNumber(turnNumber);
-
-        autoplay.resetInactivityAutoplay();
         gui.actOnTurnOrPlayerChange(this, turnNumber, game.getActivePlayer());
     }
 

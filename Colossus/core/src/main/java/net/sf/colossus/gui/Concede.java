@@ -288,16 +288,34 @@ final class Concede extends KDialog
         return pane;
     }
 
+    private static Concede currentDialog = null;
+
     static void concede(ClientGUI gui, JFrame parentFrame, Legion ally,
         Legion enemy)
     {
-        new Concede(gui, parentFrame, ally, enemy, false);
+        currentDialog = new Concede(gui, parentFrame, ally, enemy, false);
     }
 
     static void flee(ClientGUI gui, JFrame parentFrame, Legion ally,
         Legion enemy)
     {
-        new Concede(gui, parentFrame, ally, enemy, true);
+        currentDialog = new Concede(gui, parentFrame, ally, enemy, true);
+    }
+
+    /*
+     * the argument is the yes or no; which type it is (flee or concede)
+     * is based on which type the last opened dialog was
+     */
+    static void inactivityAutoFleeOrConcede(boolean reply)
+    {
+        if (currentDialog == null)
+        {
+            LOGGER
+                .severe("inactivityAutoFleeOrConcede called, but currentDialog is null???");
+        }
+        Concede tmp = currentDialog;
+        currentDialog = null;
+        tmp.finishUp(reply);
     }
 
     public Legion getAttacker()
@@ -339,6 +357,11 @@ final class Concede extends KDialog
             }
         }
 
+        finishUp(answer);
+    }
+
+    private void finishUp(boolean answer)
+    {
         location = getLocation();
         saveWindow.saveLocation(location);
         dispose();

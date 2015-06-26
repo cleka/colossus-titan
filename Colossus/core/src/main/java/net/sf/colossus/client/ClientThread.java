@@ -4,6 +4,7 @@ package net.sf.colossus.client;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -41,7 +42,7 @@ import net.sf.colossus.variant.MasterHex;
  *  @author Clemens Katzer
  */
 
-public class ClientThread extends Thread
+public class ClientThread extends Thread implements EventExecutor
 {
     private static final Logger LOGGER = Logger.getLogger(ClientThread.class
         .getName());
@@ -138,6 +139,61 @@ public class ClientThread extends Thread
         }
     }
 
+    private ServerEvent lastInactivityRelevantEvent;
+
+    private boolean retriggeredEventOngoing;
+
+    public void retriggerEventAsThread()
+    {
+        Runnable eventRunner = new Runnable()
+        {
+            public void run()
+            {
+                //
+            }
+        };
+
+        new Thread(eventRunner).start();
+    }
+
+    public void retriggerEvent()
+    {
+        if (lastInactivityRelevantEvent == null)
+        {
+            LOGGER
+                .severe("retriggerEvent called, but lastInactivityRelevantEvent is null ???");
+            return;
+        }
+
+        if (lastInactivityRelevantEvent.getIsRetriggered())
+        {
+            LOGGER
+                .finest("\n..., ah, but this is the retriggered one. Doing nothing.");
+            return;
+        }
+        try
+        {
+            lastInactivityRelevantEvent.setIsRetriggered();
+            ServerEvent tmp = lastInactivityRelevantEvent;
+            lastInactivityRelevantEvent = null;
+            queue.put(tmp);
+        }
+        catch (InterruptedException e)
+        {
+            LOGGER.severe("queue.put() interrupted?!?!");
+        }
+    }
+
+    public boolean isThereALastEvent()
+    {
+        return lastInactivityRelevantEvent != null;
+    }
+
+    public boolean getRetriggeredEventOngoing()
+    {
+        return retriggeredEventOngoing;
+    }
+
     @Override
     public void run()
     {
@@ -153,7 +209,9 @@ public class ClientThread extends Thread
                     continue;
                 }
                 event.executionStarts(ClientThread.getNow());
-                callMethod(event.getMethod(), event.getArgs());
+                retriggeredEventOngoing = event.isRetriggered;
+                callMethod(event);
+                retriggeredEventOngoing = false;
                 event.executionCompleted(ClientThread.getNow());
             }
             catch (InterruptedException e)
@@ -205,8 +263,10 @@ public class ClientThread extends Thread
 
     static int _MAXLEN = 80;
 
-    private void callMethod(String method, List<String> args)
+    private void callMethod(ServerEvent event)
     {
+        String method = event.getMethod();
+        List<String> args = event.getArgs();
         if (client != null && !client.getOwningPlayer().isAI()
             && client.isFightPhase())
         {
@@ -376,6 +436,7 @@ public class ClientThread extends Thread
         else if (method.equals(Constants.initBoard))
         {
             client.initBoard();
+            client.setEventExecutor(this);
         }
         else if (method.equals(Constants.setPlayerName))
         {
@@ -384,17 +445,20 @@ public class ClientThread extends Thread
         }
         else if (method.equals(Constants.createSummonAngel))
         {
+            rememberEvent(event);
             String markerId = args.remove(0);
             client.createSummonAngel(resolveLegion(markerId));
         }
         else if (method.equals(Constants.askAcquireAngel))
         {
+            rememberEvent(event);
             String markerId = args.remove(0);
             List<CreatureType> recruits = resolveCreatureTypes(args.remove(0));
             client.askAcquireAngel(resolveLegion(markerId), recruits);
         }
         else if (method.equals(Constants.askChooseStrikePenalty))
         {
+            rememberEvent(event);
             List<String> choices = Split.split(Glob.sep, args.remove(0));
             client.askChooseStrikePenalty(choices);
         }
@@ -421,6 +485,7 @@ public class ClientThread extends Thread
         }
         else if (method.equals(Constants.askConcede))
         {
+            rememberEvent(event);
             String allyMarkerId = args.remove(0);
             String enemyMarkerId = args.remove(0);
             client.askConcede(resolveLegion(allyMarkerId),
@@ -428,6 +493,7 @@ public class ClientThread extends Thread
         }
         else if (method.equals(Constants.askFlee))
         {
+            rememberEvent(event);
             String allyMarkerId = args.remove(0);
             String enemyMarkerId = args.remove(0);
             client.askFlee(resolveLegion(allyMarkerId),
@@ -435,6 +501,7 @@ public class ClientThread extends Thread
         }
         else if (method.equals(Constants.askNegotiate))
         {
+            rememberEvent(event);
             String attackerId = args.remove(0);
             String defenderId = args.remove(0);
             client.askNegotiate(resolveLegion(attackerId),
@@ -497,10 +564,12 @@ public class ClientThread extends Thread
         }
         else if (method.equals(Constants.nextEngagement))
         {
+            rememberEvent(event);
             client.nextEngagement();
         }
         else if (method.equals(Constants.doReinforce))
         {
+            rememberEvent(event);
             String markerId = args.remove(0);
             client.doReinforce(resolveLegion(markerId));
         }
@@ -523,6 +592,7 @@ public class ClientThread extends Thread
         }
         else if (method.equals(Constants.setupTurnState))
         {
+            rememberEvent(event);
             String activePlayerName = args.remove(0);
             int turnNumber = Integer.parseInt(args.remove(0));
             client.setupTurnState(client.getPlayerByName(activePlayerName),
@@ -554,35 +624,41 @@ public class ClientThread extends Thread
 
         else if (method.equals(Constants.setupBattleSummon))
         {
-            String battleActivePlayerName = args.remove(0);
+            rememberEvent(event);
+            Player battleActivePlayer = client.getPlayerByName(args.remove(0));
             int battleTurnNumber = Integer.parseInt(args.remove(0));
-            client.setupBattleSummon(
-                client.getPlayerByName(battleActivePlayerName),
-                battleTurnNumber);
+            if (battleActivePlayer.equals(client.getOwningPlayer()))
+            {
+                rememberEvent(event);
+            }
+            client.setupBattleSummon(battleActivePlayer, battleTurnNumber);
         }
         else if (method.equals(Constants.setupBattleRecruit))
         {
-            String battleActivePlayerName = args.remove(0);
+            Player battleActivePlayer = client.getPlayerByName(args.remove(0));
             int battleTurnNumber = Integer.parseInt(args.remove(0));
-            client.setupBattleRecruit(
-                client.getPlayerByName(battleActivePlayerName),
-                battleTurnNumber);
+            if (battleActivePlayer.equals(client.getOwningPlayer()))
+            {
+                rememberEvent(event);
+            }
+            client.setupBattleRecruit(battleActivePlayer, battleTurnNumber);
         }
         else if (method.equals(Constants.setupBattleMove))
         {
-            String battleActivePlayerName = args.remove(0);
+            Player battleActivePlayer = client.getPlayerByName(args.remove(0));
             int battleTurnNumber = Integer.parseInt(args.remove(0));
-            client.setupBattleMove(
-                client.getPlayerByName(battleActivePlayerName),
-                battleTurnNumber);
+            client.setupBattleMove(battleActivePlayer, battleTurnNumber);
         }
         else if (method.equals(Constants.setupBattleFight))
         {
             BattlePhase battlePhase = BattlePhase.values()[Integer
                 .parseInt(args.remove(0))];
-            String battleActivePlayerName = args.remove(0);
-            client.setupBattleFight(battlePhase,
-                client.getPlayerByName(battleActivePlayerName));
+            Player battleActivePlayer = client.getPlayerByName(args.remove(0));
+            if (battleActivePlayer.equals(client.getOwningPlayer()))
+            {
+                rememberEvent(event);
+            }
+            client.setupBattleFight(battlePhase, battleActivePlayer);
         }
         else if (method.equals(Constants.tellLegionLocation))
         {
@@ -683,6 +759,7 @@ public class ClientThread extends Thread
         }
         else if (method.equals(Constants.askPickColor))
         {
+            rememberEvent(event);
             List<String> clList = Split.split(Glob.sep, args.remove(0));
             List<PlayerColor> colorsLeft = new ArrayList<PlayerColor>();
             for (String colorName : clList)
@@ -693,6 +770,7 @@ public class ClientThread extends Thread
         }
         else if (method.equals(Constants.askPickFirstMarker))
         {
+            rememberEvent(event);
             client.askPickFirstMarker();
         }
         else if (method.equals(Constants.log))
@@ -812,6 +890,28 @@ public class ClientThread extends Thread
             + "' finished method processing");
     }
 
+    private void rememberEvent(ServerEvent event)
+    {
+        if (!client.needsWatchdog())
+        {
+            return;
+        }
+
+        String argsList = Glob.glob("::", event.getArgs());
+        if (event.getIsRetriggered())
+        {
+            LOGGER.finest("NOT Storing retriggered event "
+                + event.getMethod() + "'" + argsList + "'");
+        }
+        else
+        {
+            LOGGER.finest("\n\nStoring event " + event.getMethod() + "'"
+                + argsList + "'");
+            lastInactivityRelevantEvent = event;
+        }
+
+    }
+
     private MasterHex resolveHex(String label)
     {
         MasterHex hexByLabel = client.getGame().getVariant().getMasterBoard()
@@ -896,6 +996,8 @@ public class ClientThread extends Thread
         private final String method;
         private final List<String> args;
 
+        private boolean isRetriggered = false;
+
         public ServerEvent(long received, String method, List<String> args)
         {
             this.received = received;
@@ -909,9 +1011,27 @@ public class ClientThread extends Thread
             return method;
         }
 
+        public void setIsRetriggered()
+        {
+            isRetriggered = true;
+        }
+
+        public boolean getIsRetriggered()
+        {
+            return isRetriggered;
+        }
+
+        /* Returns now a LinkedList, instead of the original list
+         * which was an ArrayList.
+         * We return a copy, so that processing the args does not
+         * leave an empty arg list, in case we need to retrigger it
+         * (too long inactivity).
+         * LinkedList suits actually better for processing, since
+         * the argument deserialisation use remove(0).
+         */
         public List<String> getArgs()
         {
-            return args;
+            return new LinkedList<String>(args);
         }
 
         public void executionStarts(long when)
