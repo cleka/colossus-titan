@@ -59,18 +59,20 @@ public class Autoplay
         // TODO: this should be changed to be handled via own boolean
         // variable, instead of temporary overriding the normal
         // autoplay option
-        return options.getOption(Options.autoPlay);
+        return originalAutoplayOverridden
+            && options.getOption(Options.autoPlay);
     }
 
     public void setInactivityAutoplay()
     {
         if (originalAutoplayOverridden)
         {
-            // System.out
-            //    .println("Requested to store autoplay value, but is already overriden! Ignored.");
+            LOGGER
+                .warning("Requested to store autoplay value, but is already overriden! Ignored.");
         }
         else
         {
+            LOGGER.fine("Activating inactivityAutoplay");
             originalAutoplayValue = options.getOption(Options.autoPlay);
             originalAutoplayOverridden = true;
             options.setOption(Options.autoPlay, true);
@@ -81,22 +83,22 @@ public class Autoplay
     {
         if (originalAutoplayOverridden)
         {
-            // System.out.println("Restoring original autoplay value "
-            //    + originalAutoplayValue);
+            LOGGER.fine("Restoring original autoplay value "
+                + originalAutoplayValue);
             options.setOption(Options.autoPlay, originalAutoplayValue);
             originalAutoplayOverridden = false;
         }
         else
         {
-            // System.out
-            //    .println("Asked to restore originalAutoplay, but is not overridden right now.");
+            LOGGER
+                .warning("Asked to restore originalAutoplay, but is not overridden right now.");
         }
 
     }
 
     public boolean autoPlay()
     {
-        return options.getOption(Options.autoPlay);
+        return isAutoplayActive();
     }
 
     public boolean autoPickColor()
