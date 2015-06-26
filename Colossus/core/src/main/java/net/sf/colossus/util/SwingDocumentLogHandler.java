@@ -42,8 +42,9 @@ public class SwingDocumentLogHandler extends Handler
     {
         try
         {
-            document.insertString(document.getLength(), record.getMessage()
-                + "\n", null);
+            String currentTime = TimeFormats.getCurrentTime24h();
+            document.insertString(document.getLength(), currentTime + ": "
+                + record.getMessage() + "\n", null);
             textArea.setCaretPosition(document.getLength() - 1);
         }
         catch (BadLocationException e)

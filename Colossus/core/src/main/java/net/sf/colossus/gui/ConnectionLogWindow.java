@@ -16,6 +16,7 @@ import javax.swing.text.PlainDocument;
 
 import net.sf.colossus.common.Options;
 import net.sf.colossus.guiutil.KFrame;
+import net.sf.colossus.util.TimeFormats;
 
 
 /**
@@ -72,7 +73,8 @@ public class ConnectionLogWindow extends KFrame
 
     public void append(String s)
     {
-        textArea.append(getNow() + ": " + s + "\n");
+        String currentTime = TimeFormats.getCurrentTime24h();
+        textArea.append(currentTime + ": " + s + "\n");
         toFront();
 
         // XXX Removed because of graphical corruption
