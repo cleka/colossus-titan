@@ -196,9 +196,9 @@ public final class GetPlayers extends KFrame
         optionPane.add(checkboxPane);
 
         addCheckbox(Options.autosave, checkboxPane);
-        addCheckbox(Options.balancedTowers, checkboxPane);
         addCheckbox(Options.autoStop, checkboxPane);
         addCheckbox(Options.autoQuit, checkboxPane);
+        addCheckbox(Options.keepAccepting, checkboxPane);
         addCheckbox(Options.hotSeatMode, checkboxPane);
 
         String viewmodeName = options.getStringOption(Options.viewMode,
@@ -256,10 +256,11 @@ public final class GetPlayers extends KFrame
         addCheckbox(Options.cumulativeSlow, rulesOptionsPane);
         addCheckbox(Options.oneHexAllowed, rulesOptionsPane);
         addCheckbox(Options.unlimitedMulligans, rulesOptionsPane);
+        addCheckbox(Options.balancedTowers, rulesOptionsPane);
         addCheckbox(Options.sansLordAutoBattle, rulesOptionsPane);
-        addCheckbox(Options.fixedSequenceBattleDice, rulesOptionsPane);
-        addCheckbox(Options.pbBattleHits, rulesOptionsPane);
         addCheckbox(Options.inactivityTimeout, rulesOptionsPane);
+        addCheckbox(Options.pbBattleHits, rulesOptionsPane);
+        addCheckbox(Options.fixedSequenceBattleDice, rulesOptionsPane);
 
         JPanel aiTimePane = new JPanel(new FlowLayout());
         aiTimePane.setBorder(new TitledBorder("AI Timing"));
