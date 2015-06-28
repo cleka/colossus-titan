@@ -7,6 +7,7 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.PlainDocument;
@@ -38,19 +39,28 @@ public class SwingDocumentLogHandler extends Handler
     }
 
     @Override
-    public void publish(LogRecord record)
+    public void publish(final LogRecord record)
     {
-        try
+        Runnable runnable = new Runnable()
         {
-            String currentTime = TimeFormats.getCurrentTime24h();
-            document.insertString(document.getLength(), currentTime + ": "
-                + record.getMessage() + "\n", null);
-            textArea.setCaretPosition(document.getLength() - 1);
-        }
-        catch (BadLocationException e)
-        {
-            LOGGER.log(Level.SEVERE, "append() call failed on document.", e);
-        }
+            public void run()
+            {
+                try
+                {
+                    final String message = TimeFormats.getCurrentTime24h()
+                        + ": " + record.getMessage() + "\n";
+
+                    document.insertString(document.getLength(), message, null);
+                    textArea.setCaretPosition(document.getLength() - 1);
+                }
+                catch (BadLocationException e)
+                {
+                    LOGGER.log(Level.SEVERE,
+                        "append() call failed on document.", e);
+                }
+            }
+        };
+        SwingUtilities.invokeLater(runnable);
     }
 
     @Override
