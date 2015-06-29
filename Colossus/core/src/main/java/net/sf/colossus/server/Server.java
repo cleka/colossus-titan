@@ -2806,6 +2806,20 @@ public final class Server extends Thread implements IServer
         LOGGER.info(getPlayerName() + " takes a mulligan and rolls " + roll);
     }
 
+    public void requestExtraRoll()
+    {
+        if (!isActivePlayer())
+        {
+            LOGGER.warning(getPlayerName()
+                + " illegally requested extra roll:  " + "not active player");
+            return;
+        }
+
+        LOGGER.info(getPlayerName() + " requests extra roll.");
+        System.out
+            .println("Rest of this extra rol stuff is not implemented yet...");
+    }
+
     public void undoSplit(Legion splitoff)
     {
         if (!isActivePlayer())

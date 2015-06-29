@@ -190,6 +190,7 @@ public final class MasterBoard extends JPanel
     private static final String kickPhase = "Kick phase";
 
     private static final String takeMulligan = "Take Mulligan";
+    private static final String requestExtraRoll = "Request extra roll";
     private static final String withdrawFromGame = "Withdraw from Game";
 
     private static final String viewWebClient = "View Web Client";
@@ -227,6 +228,7 @@ public final class MasterBoard extends JPanel
     private AbstractAction forcedDoneWithPhaseAction;
     private AbstractAction kickPhaseAction;
     private AbstractAction takeMulliganAction;
+    private AbstractAction requestExtraRollAction;
     private AbstractAction withdrawFromGameAction;
 
     private AbstractAction viewWebClientAction;
@@ -686,6 +688,14 @@ public final class MasterBoard extends JPanel
             public void actionPerformed(ActionEvent e)
             {
                 client.mulligan();
+            }
+        };
+
+        requestExtraRollAction = new AbstractAction(requestExtraRoll)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                client.requestExtraRoll();
             }
         };
 
@@ -1359,6 +1369,10 @@ public final class MasterBoard extends JPanel
         mi.setMnemonic(KeyEvent.VK_M);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, 0));
 
+        mi = phaseMenu.add(requestExtraRollAction);
+        mi.setMnemonic(KeyEvent.VK_X);
+        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, 0));
+
         phaseMenu.addSeparator();
 
         if (!client.isSpectator())
@@ -1756,6 +1770,7 @@ public final class MasterBoard extends JPanel
             forcedDoneWithPhaseAction.setEnabled(true);
             boolean mullLeft = (gui.getOwningPlayer().getMulligansLeft() > 0);
             takeMulliganAction.setEnabled(mullLeft ? true : false);
+            requestExtraRollAction.setEnabled(true);
             disableDoneAction("At least one legion must move");
 
             setMovementPhase();

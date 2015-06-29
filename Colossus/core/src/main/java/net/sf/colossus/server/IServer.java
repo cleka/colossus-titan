@@ -82,6 +82,8 @@ public interface IServer
 
     public void mulligan();
 
+    public void requestExtraRoll();
+
     public void undoSplit(Legion splitoff);
 
     public void undoMove(Legion legion);

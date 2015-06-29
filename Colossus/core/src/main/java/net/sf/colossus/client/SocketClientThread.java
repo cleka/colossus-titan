@@ -1109,6 +1109,11 @@ final class SocketClientThread extends Thread implements IServer,
         sendToServer(Constants.mulligan);
     }
 
+    public void requestExtraRoll()
+    {
+        sendToServer(Constants.requestExtraRoll);
+    }
+
     public void undoSplit(Legion splitoff)
     {
         sendToServer(Constants.undoSplit + sep + splitoff.getMarkerId());

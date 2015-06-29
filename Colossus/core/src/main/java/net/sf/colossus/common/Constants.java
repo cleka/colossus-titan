@@ -254,6 +254,7 @@ public final class Constants
     public static final String undoBattleMove = "undoBattleMove";
     public static final String assignStrikePenalty = "assignStrikePenalty";
     public static final String mulligan = "mulligan";
+    public static final String requestExtraRoll = "requestExtraRoll";
     public static final String undoSplit = "undoSplit";
     public static final String undoMove = "undoMove";
     public static final String undoRecruit = "undoRecruit";

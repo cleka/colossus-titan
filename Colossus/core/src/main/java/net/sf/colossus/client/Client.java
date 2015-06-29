@@ -882,6 +882,11 @@ public final class Client implements IClient, IOracle, IVariant,
         server.mulligan();
     }
 
+    public void requestExtraRoll()
+    {
+        server.requestExtraRoll();
+    }
+
     // XXX temp
     public boolean tookMulligan()
     {

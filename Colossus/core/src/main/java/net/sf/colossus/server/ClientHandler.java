@@ -900,6 +900,10 @@ final class ClientHandler extends ClientHandlerStub implements IClient
         {
             server.mulligan();
         }
+        else if (method.equals(Constants.requestExtraRoll))
+        {
+            server.requestExtraRoll();
+        }
         else if (method.equals(Constants.undoSplit))
         {
             String splitoffId = args.remove(0);
