@@ -1,6 +1,7 @@
 package net.sf.colossus.client;
 
 
+import java.awt.Color;
 import java.awt.GraphicsDevice;
 import java.util.List;
 import java.util.Set;
@@ -855,7 +856,7 @@ public class NullClientGUI implements IClientGUI
     }
 
     public void displayInactivityDialogEnsureEDT(final String title,
-        final String text)
+        final String text, Color color)
     {
         // TODO Auto-generated method stub
 

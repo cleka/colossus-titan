@@ -1,6 +1,9 @@
 package net.sf.colossus.gui;
 
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.GraphicsDevice;
 import java.awt.Window;
@@ -19,7 +22,9 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
@@ -50,7 +55,6 @@ import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.Proposal;
 import net.sf.colossus.guiutil.KDialog;
 import net.sf.colossus.util.CollectionHelper;
-import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.util.Predicate;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
@@ -72,6 +76,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
      * displaying a message telling so.
      */
     private final static int CONN_CHECK_TIMEOUT = 5;
+
+    private final static String IA_CLOSE_BUTTON_TEXT = "Close";
 
     private final Object connectionCheckMutex = new Object();
 
@@ -424,9 +430,13 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
         board = new MasterBoard(client, this);
 
+        if (options.getOption(Options.inactivityTimeout))
+        {
+            inactivityWarningInterval = InactivityWatchdog.DEFAULT_INTERVAL;
+        }
+
         // TODO: remove this when debug/development phase is over
-        if (getOwningPlayer().getName().equals("localwatchdogtest")
-            && this.inactivityWarningInterval == -1)
+        if (getOwningPlayer().getName().equals("localwatchdogtest"))
         {
             this.inactivityWarningInterval = InactivityWatchdog.DEBUG_INTERVAL;
         }
@@ -435,9 +445,16 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         // they get a value only from webclient; see setWebClient(...)
         if (client.needsWatchdog() && this.inactivityWarningInterval > 0)
         {
+            LOGGER.fine("Creating an inactivityWatchdog with interval "
+                + this.inactivityWarningInterval);
             watchdog = new InactivityWatchdog(client,
                 this.inactivityWarningInterval);
             watchdog.start();
+        }
+        else
+        {
+            LOGGER
+                .fine("No watchdog; interval = " + inactivityWarningInterval);
         }
 
         initEventViewer();
@@ -545,18 +562,57 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     }
 
     /* must be called inside EDT */
-    private void showInactivityDialog(String title, String text)
+    private void showInactivityDialog(String title, String text, Color color)
     {
         getMapOrBoardFrame().requestFocus();
         getMapOrBoardFrame().toFront();
 
-        lastDialog = new KDialog(getMapOrBoardFrame(), title, false);
+        lastDialog = new KDialog(getMapOrBoardFrame(), title, true);
+        Container dialogPanel = lastDialog.getContentPane();
+        dialogPanel.setLayout(new BorderLayout());
+        dialogPanel.setBackground(Color.yellow);
 
-        JTextArea contentPanel = new JTextArea(text, 7, 40);
-        contentPanel.setEditable(false);
-        contentPanel.setBackground(HTMLColor.orange);
+        final JTextArea textPanel = new JTextArea(text, 7, 40);
+        textPanel.setEditable(false);
+        textPanel.setBackground(color);
+        dialogPanel.add(textPanel, BorderLayout.CENTER);
 
-        lastDialog.getContentPane().add(contentPanel);
+        JLabel warningLabel = new JLabel(
+            "<html><font color='black' style='background-color:yellow'>"
+                + "Do <b>not</b> click anything else while "
+                + "this dialog is up!</b></b></font></html>");
+        warningLabel.setHorizontalAlignment(JLabel.CENTER);
+        dialogPanel.add(warningLabel, BorderLayout.NORTH);
+
+        final JButton inactivityOkButton = new JButton(
+            "OK, I continue playing.");
+        inactivityOkButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                // All this is relevant only for "AI took over for you" dialog
+                if (inactivityOkButton.getText().equals(IA_CLOSE_BUTTON_TEXT))
+                {
+                    disposeLastInactivityDialog();
+                }
+                else
+                {
+                    boolean canClose = watchdog.userRequestsControlBack();
+                    if (canClose)
+                    {
+                        disposeLastInactivityDialog();
+                    }
+                    else
+                    {
+                        textPanel.append("\n\nAll right. Please wait...");
+                        inactivityOkButton.setText(IA_CLOSE_BUTTON_TEXT);
+                        textPanel.setBackground(Color.gray);
+                    }
+                }
+            }
+        });
+        dialogPanel.add(inactivityOkButton, BorderLayout.SOUTH);
+
         lastDialog.pack();
         lastDialog.centerOnScreen();
         lastDialog.setVisible(true);
@@ -566,12 +622,12 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     }
 
     public void displayInactivityDialogEnsureEDT(final String title,
-        final String text)
+        final String text, final Color color)
     {
         if (SwingUtilities.isEventDispatchThread())
         {
             disposeLastInactivityDialog();
-            showInactivityDialog(title, text);
+            showInactivityDialog(title, text, color);
         }
         else
         {
@@ -580,7 +636,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
                 public void run()
                 {
                     disposeLastInactivityDialog();
-                    showInactivityDialog(title, text);
+                    showInactivityDialog(title, text, color);
                 }
             });
         }
@@ -2729,7 +2785,6 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             board.myTurnStartsActions();
         }
         eventViewer.turnOrPlayerChange(turnNr, player);
-        // starts or stops clock ticking, and informs webclient
 
         if (client.needsWatchdog())
         {
@@ -2739,6 +2794,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             }
             else
             {
+                // starts or stops clock ticking, and informs webclient
                 updateClockTickingPerhaps(isMyTurn(),
                     "actonturnorplayerchange");
             }

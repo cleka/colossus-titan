@@ -1,6 +1,7 @@
 package net.sf.colossus.client;
 
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
 import java.awt.geom.AffineTransform;
@@ -350,7 +351,7 @@ public interface IClientGUI
     public abstract boolean getStartedByWebClient();
 
     public abstract void displayInactivityDialogEnsureEDT(final String title,
-        final String text);
+        final String text, final Color color);
 
     public abstract void inactivityAutoFleeOrConcede(boolean reply);
 }

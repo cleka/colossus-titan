@@ -63,7 +63,7 @@ public class Autoplay
             && options.getOption(Options.autoPlay);
     }
 
-    public void setInactivityAutoplay()
+    public void switchOnInactivityAutoplay()
     {
         if (originalAutoplayOverridden)
         {
@@ -79,7 +79,7 @@ public class Autoplay
         }
     }
 
-    public void resetInactivityAutoplay()
+    public void switchOffInactivityAutoplay()
     {
         if (originalAutoplayOverridden)
         {

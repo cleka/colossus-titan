@@ -3292,7 +3292,7 @@ public class WebClient extends KFrame implements IWebClient
         if (newValue)
         {
             // player's clock is ticking, he should do something
-            generalChat.setBackgroundColor(HTMLColor.orange);
+            generalChat.setBackgroundColor(Color.yellow);
         }
         else
         {

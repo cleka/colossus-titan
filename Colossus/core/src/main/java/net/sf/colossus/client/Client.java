@@ -496,8 +496,7 @@ public final class Client implements IClient, IOracle, IVariant,
             return true;
         }
 
-        if (getOwningPlayer().isAI() || getOwningPlayer().isDead()
-            || !isRemote())
+        if (getOwningPlayer().isAI())
         {
             return false;
         }
@@ -507,7 +506,7 @@ public final class Client implements IClient, IOracle, IVariant,
             return true;
         }
 
-        return false;
+        return options.getOption(Options.inactivityTimeout);
     }
 
     public void setClockTicking(boolean val)

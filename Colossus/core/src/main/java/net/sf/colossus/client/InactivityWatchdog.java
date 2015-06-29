@@ -1,7 +1,10 @@
 package net.sf.colossus.client;
 
 
+import java.awt.Color;
 import java.util.logging.Logger;
+
+import net.sf.colossus.util.HTMLColor;
 
 
 /**
@@ -24,9 +27,11 @@ public class InactivityWatchdog extends Thread
 
     private static final int INACTIVITY_CHECK_INTERVAL = 5;
 
-    private static final boolean IA_DEBUG = false;
+    public static final int DEFAULT_INTERVAL = 30;
 
-    public static final int DEBUG_INTERVAL = 15;
+    public static final int DEBUG_INTERVAL = 10;
+
+    private static final boolean IA_DEBUG = false;
 
     private final Client client;
 
@@ -47,6 +52,8 @@ public class InactivityWatchdog extends Thread
     private boolean aiIsInControl = false;
 
     private boolean wasTicking = false;
+
+    private boolean userRequestsControlBack = false;
 
     private boolean somethingHappened = false;
 
@@ -74,7 +81,7 @@ public class InactivityWatchdog extends Thread
             clockIsTicking = true;
             // markThatSomethingHappened();
         }
-        if (aiWasInControl)
+        if (aiWasInControl || userRequestsControlBack)
         {
             printDebugValues("inactivityContinues");
             aiWasInControl = false;
@@ -95,7 +102,7 @@ public class InactivityWatchdog extends Thread
         if (aiIsInControl)
         {
             aiIsInControl = false;
-            autoplay.resetInactivityAutoplay();
+            autoplay.switchOffInactivityAutoplay();
             aiWasInControl = true;
             inactivityAiCompletedTurn();
         }
@@ -190,13 +197,12 @@ public class InactivityWatchdog extends Thread
                     + client.getOwningPlayer().getName()
                     + ": reached inactivity timeout! Enabling Autoplay.");
                 printDebugValues("TIMEOUT");
-                inactivityTimeoutReached();
                 aiIsInControl = true;
                 currentlyStillToleratedIntervals = 1;
                 inactiveSeconds = 0;
                 currentInterval = 0;
-                aiIsInControl = true;
-                autoplay.setInactivityAutoplay();
+                autoplay.switchOnInactivityAutoplay();
+                inactivityTimeoutReached();
                 client.getEventExecutor().retriggerEvent();
             }
             else
@@ -216,57 +222,82 @@ public class InactivityWatchdog extends Thread
     {
         LOGGER.finer("ClientThread " + client.getOwningPlayer().getName()
             + ": idle for " + inactiveSeconds + "seconds!");
-        final String title = "It's your turn (" + inactiveSecs + "/"
-            + timeoutSecs + ")!";
-        final String text = "\nHey, it's your turn #"
-            + client.getTurnNumber()
-            + ", and you've been doing nothing for "
-            + inactiveSecs
-            + " seconds!\n "
-            + "\nAfter a total of "
-            + timeoutSecs
-            + " seconds of inactivity the AI will take over this turn for you!";
-        client.getGUI().displayInactivityDialogEnsureEDT(title, text);
+        final String title = "It's your turn (" + inactiveSecs
+            + " seconds inactive of allowed " + timeoutSecs + " seconds)!";
+        String pluralS = (currentInterval == 1 ? "" : "s");
+        final String text = "\nHey, it's your turn to do something, and "
+            + "you've been doing nothing for " + currentInterval + " interval"
+            + pluralS + " à " + inactivityWarningInterval + " seconds.\n"
+            + "After a total of " + timeoutSecs
+            + " seconds of inactivity the AI will take over for you!";
+        Color color = (currentInterval == 1 ? HTMLColor.lightYellow
+            : HTMLColor.yellow);
+        client.getGUI().displayInactivityDialogEnsureEDT(title, text, color);
     }
 
     public void inactivityTimeoutReached()
     {
         LOGGER.finer("ClientThread " + client.getOwningPlayer().getName()
             + ": reached inactivity timeout! Enabling Autoplay.");
-        final String title = "AI took over your turn #"
-            + client.getTurnNumber();
+        final String title = "AI took over for you!";
         final String text = "\n"
-            + "You've been inactive for too long. AI took over for you in this round\n"
-            + "(turn #"
-            + client.getTurnNumber()
-            + ", so now it's probably somebody else's turn.\n\n"
-            + "You will be back in control in your next turn (or when attacked).";
-        client.getGUI().displayInactivityDialogEnsureEDT(title, text);
+            + "You've been inactive for too long. AI took over for you in this round, "
+            + "and can not be safely interrupted (might hang the game).\n\n"
+            + "If you click OK now, then you will be back in control at next possible occasion.";
+        client.getGUI().displayInactivityDialogEnsureEDT(title, text,
+            HTMLColor.orange);
     }
 
     public void inactivityAiCompletedTurn()
     {
-        final String title = "The AI finished your turn #"
-            + client.getTurnNumber();
-        final String text = "The AI had finished your turn #"
-            + client.getTurnNumber()
-            + ",\nso right now it's probably some other players turn.\n"
-            + "Close this dialog and/or click something in the masterboard to signal that you are back,\n"
-            + "otherwise time AI will take over again when you are next time supposed to do something\n"
+        String part2;
+        Color color;
+        if (userRequestsControlBack)
+        {
+            aiWasInControl = false;
+            markThatSomethingHappened();
+            return;
+        }
+
+        part2 = "You clicked OK, so you will be back in control next time when you are supposed to do "
+            + " something (your turn starts, or you are attacked). You can safely close this window now.";
+        color = Color.lightGray;
+
+        part2 = "Click OK to signal that you are back, otherwise time AI will take over again "
+            + "when you are next time\nsupposed to do something\n"
             + "(your turn starts, or you are attacked), but then after a shorter waiting period.\n";
-        client.getGUI().displayInactivityDialogEnsureEDT(title, text);
+        color = HTMLColor.yellow;
+
+        final String title = "The AI finished for you!";
+        final String text = "\nThe AI had finished your turn or engagement, "
+            + "so right now it's probably some other players turn.\n" + part2;
+        client.getGUI().displayInactivityDialogEnsureEDT(title, text, color);
     }
 
     public void inactivityContinues()
     {
-        final String title = "Your turn #" + client.getTurnNumber()
-            + " has started!";
-        final String text = "\n"
-            + "You have not done anything since last turn where AI took over,\n"
-            + "so this time AI will take over after a shorter waiting period.\n"
-            + "Close this dialog and/or click something in the masterboard to\n"
-            + "to signal that you are back and take back control.";
-        client.getGUI().displayInactivityDialogEnsureEDT(title, text);
+        if (userRequestsControlBack)
+        {
+            userRequestsControlBack = false;
+            printDebugText("\n\n OK, go ahead!\n\n");
+            final String title = "Your turn #" + client.getTurnNumber()
+                + " has started!";
+            final String text = "\n" + "All right, go ahead!";
+            client.getGUI().displayInactivityDialogEnsureEDT(title, text,
+                HTMLColor.lightYellow);
+        }
+        else
+        {
+            printDebugText("inactivityContinues");
+            final String title = "Your turn #" + client.getTurnNumber()
+                + " has started!";
+            final String text = "\n"
+                + "You have not done anything since last turn where AI took over,\n"
+                + "so this time AI will take over after a shorter waiting period.\n"
+                + "Click OK to signal that you are back and take back control.";
+            client.getGUI().displayInactivityDialogEnsureEDT(title, text,
+                HTMLColor.lightSalmon);
+        }
     }
 
     public boolean isClockTicking()
@@ -275,6 +306,25 @@ public class InactivityWatchdog extends Thread
         {
             return clockIsTicking;
         }
+    }
+
+    public boolean userRequestsControlBack()
+    {
+        printDebugValues("userRequestsControlBack");
+        boolean canCloseImmediately;
+        if (aiIsInControl)
+        {
+            printDebugText("ai in Control - return false");
+            canCloseImmediately = false;
+            userRequestsControlBack = true;
+        }
+        else
+        {
+            printDebugText("ai not in Control - return true");
+            canCloseImmediately = true;
+            somethingHappened = true;
+        }
+        return canCloseImmediately;
     }
 
     public void markThatSomethingHappened()

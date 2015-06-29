@@ -675,7 +675,7 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                gui.client.getAutoplay().setInactivityAutoplay();
+                gui.client.getAutoplay().switchOnInactivityAutoplay();
                 gui.client.getEventExecutor().retriggerEvent();
                 // gui.getClient().kickPhase();
             }
