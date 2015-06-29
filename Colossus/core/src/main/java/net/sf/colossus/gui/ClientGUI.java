@@ -2047,7 +2047,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         logPerhaps("disposePickCarryDialog()");
         if (SwingUtilities.isEventDispatchThread())
         {
-            disposePickCarryDialog();
+            actualDisposePickCarryDialog();
         }
         else
         {
@@ -2057,7 +2057,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
                 {
                     public void run()
                     {
-                        disposePickCarryDialog();
+                        actualDisposePickCarryDialog();
                     }
                 });
             }
@@ -2069,6 +2069,19 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         }
     }
 
+    private void actualDisposePickCarryDialog()
+    {
+        logPerhaps("actualDisposePickCarryDialog()");
+        if (pickCarryDialog != null)
+        {
+            if (battleBoard != null)
+            {
+                battleBoard.unselectAllHexes();
+            }
+            pickCarryDialog.dispose();
+            pickCarryDialog = null;
+        }
+    }
     private void disposeStatusScreen()
     {
         if (statusScreen != null)
