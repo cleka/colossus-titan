@@ -3195,13 +3195,18 @@ public final class MasterBoard extends JPanel
         {
             getFrame().toFront();
         }
+        myTurnStartsBottomBarActions();
+    }
+
+    void myTurnStartsBottomBarActions()
+    {
         if (gui.getOptions().getOption(Options.turnStartBottomBarYellow, true))
         {
             bottomBar.myTurnStartsActions();
         }
     }
 
-    void myTurnEndsActions()
+    void myTurnEndsBottomBarActions()
     {
         bottomBar.myTurnEndsActions();
     }

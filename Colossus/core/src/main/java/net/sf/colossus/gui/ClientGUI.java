@@ -2256,6 +2256,11 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     {
         if (watchdog == null)
         {
+            // if we have a watchdog, that part will be done below
+            if (webClient != null)
+            {
+                webClient.notifyClockTicking(shouldRun);
+            }
             return;
         }
         boolean isTicking = watchdog.isClockTicking();
@@ -2799,7 +2804,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         }
         else
         {
-            board.myTurnEndsActions();
+            board.myTurnEndsBottomBarActions();
         }
         eventViewer.turnOrPlayerChange(turnNr, player);
 
