@@ -128,6 +128,7 @@ public final class Options implements IOptions
     public static final String stealFocus = "Steal focus";
     public static final String turnStartBeep = "When my turns starts, beep";
     public static final String turnStartToFront = "When my turn starts, window to front";
+    public static final String turnStartBottomBarYellow = "When my turn starts, turn BottomBar yellow";
     public static final String BattleTerrainHazardWindow = "Show Terrain and Hazards";
     public static final String showCaretaker = "Show Caretaker's stacks";
     public static final String showStatusScreen = "Show game status";

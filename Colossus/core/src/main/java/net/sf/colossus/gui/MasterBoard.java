@@ -3195,6 +3195,15 @@ public final class MasterBoard extends JPanel
         {
             getFrame().toFront();
         }
+        if (gui.getOptions().getOption(Options.turnStartBottomBarYellow, true))
+        {
+            bottomBar.myTurnStartsActions();
+        }
+    }
+
+    void myTurnEndsActions()
+    {
+        bottomBar.myTurnEndsActions();
     }
 
     public void updateLegionsLeftToMusterText()
@@ -3217,6 +3226,8 @@ public final class MasterBoard extends JPanel
     class BottomBar extends JPanel
     {
         private final JLabel playerLabel;
+
+        private final Color originalBackgroundColor;
 
         /** quick access button to the doneWithPhase action.
          *  must be en- and disabled often.
@@ -3246,6 +3257,16 @@ public final class MasterBoard extends JPanel
         public void setPlayerColor(Color color)
         {
             playerLabel.setForeground(color);
+        }
+
+        public void myTurnStartsActions()
+        {
+            this.setBackground(Color.yellow);
+        }
+
+        public void myTurnEndsActions()
+        {
+            this.setBackground(originalBackgroundColor);
         }
 
         public void setPhase(String s)
@@ -3363,6 +3384,7 @@ public final class MasterBoard extends JPanel
                 add(pauseButton);
             }
 
+            originalBackgroundColor = this.getBackground();
             playerLabel = new JLabel("- player -");
             add(playerLabel);
 

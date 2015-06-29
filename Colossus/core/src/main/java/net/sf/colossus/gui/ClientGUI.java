@@ -2784,6 +2784,10 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         {
             board.myTurnStartsActions();
         }
+        else
+        {
+            board.myTurnEndsActions();
+        }
         eventViewer.turnOrPlayerChange(turnNr, player);
 
         if (client.needsWatchdog())

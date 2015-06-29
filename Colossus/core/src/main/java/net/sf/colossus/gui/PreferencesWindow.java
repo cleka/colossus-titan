@@ -277,6 +277,8 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
         notifBox.setBorder(new TitledBorder("Notifications"));
         addCheckBox(notifBox, Options.turnStartToFront);
         addCheckBox(notifBox, Options.turnStartBeep);
+        addCheckBox(notifBox, Options.turnStartBottomBarYellow, true, true);
+
         windowPane.add(notifBox, SUBPANEL_CONSTRAINTS);
 
         //   Look & Feel panel in Window tab
