@@ -83,6 +83,12 @@ public class ClientHandlerStub implements IClient
         return true;
     }
 
+    protected boolean canHandleExtraRollRequest()
+    {
+        // dummy
+        return true;
+    }
+
     public void setIsGone(String reason)
     {
         LOGGER.info("Setting isGone to true in CH for '" + getClientName()
@@ -663,6 +669,11 @@ public class ClientHandlerStub implements IClient
     public void tellSyncCompleted(int syncRequestNumber)
     {
         sendToClient(Constants.syncCompleted + sep + syncRequestNumber);
+    }
+
+    public void requestExtraRollApproval(String requestor)
+    {
+        sendToClient(Constants.requestExtraRollApproval + sep + requestor);
     }
 
 }

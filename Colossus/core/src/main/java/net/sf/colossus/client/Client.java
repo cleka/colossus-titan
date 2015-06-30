@@ -808,6 +808,41 @@ public final class Client implements IClient, IOracle, IVariant,
         }
     }
 
+    public void requestExtraRollApproval(String requestorName)
+    {
+        LOGGER.finest("Client " + getOwningPlayer().getName()
+            + " is asked to approve extra roll request... - answering true");
+
+        if (isAutoplayActive())
+        {
+            sendExtraRollRequestResponse(true);
+        }
+        else if (requestorName.equals(getOwningPlayer().getName()))
+        {
+            /*
+             * If server asks from the requestor itself, it means that no
+             * other client is able to can approve.
+             * User should now negotiate in chat and answer respond to
+             * server accordingly.
+             */
+            LOGGER.finest("Server asks me, the requestor, for approval "
+                + " - that means no other client can approve.");
+            gui.askExtraRollApproval(requestorName, true);
+        }
+        else
+        {
+            /* Ask the player/user for approval; it will send the answer back
+             * asynchronously
+             */
+            gui.askExtraRollApproval(requestorName, false);
+        }
+    }
+
+    public void sendExtraRollRequestResponse(boolean approved)
+    {
+        server.extraRollResponse(approved);
+    }
+
     public void doCheckServerConnection()
     {
         server.checkServerConnection();

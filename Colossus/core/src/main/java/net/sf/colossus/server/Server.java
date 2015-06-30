@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -2811,13 +2812,75 @@ public final class Server extends Thread implements IServer
         if (!isActivePlayer())
         {
             LOGGER.warning(getPlayerName()
-                + " illegally requested extra roll:  " + "not active player");
+                + " illegally requested extra roll: " + "not active player");
+            return;
+        }
+        if (!game.isPhase(Phase.MOVE))
+        {
+            LOGGER.warning(getPlayerName()
+                + " illegally requested extra roll: " + "not movement phase");
             return;
         }
 
+
+        LinkedList<ClientHandler> eligibleClients = new LinkedList<ClientHandler>();
         LOGGER.info(getPlayerName() + " requests extra roll.");
-        System.out
-            .println("Rest of this extra rol stuff is not implemented yet...");
+        for (ClientHandler client : realClients)
+        {
+            if (client.equals(processingCH))
+            {
+                LOGGER.finest("Skipping requesting CH "
+                    + client.getPlayerName());
+            }
+            else if (client.isSpectator())
+            {
+                LOGGER.finest("Skipping spectator CH "
+                    + client.getPlayerName());
+            }
+            else if (client.canHandleExtraRollRequest())
+            {
+                LOGGER.finest("A client to be asked: "
+                    + client.getPlayerName());
+                eligibleClients.add(client);
+            }
+            else
+            {
+                LOGGER.finest("Client can't handle the request: "
+                    + client.getPlayerName());
+            }
+        }
+        if (eligibleClients.size() == 0)
+        {
+            LOGGER.finest("No other clients can confirm...");
+            processingCH
+                .requestExtraRollApproval(processingCH.getPlayerName());
+        }
+        else
+        {
+            LOGGER.finest("There are " + eligibleClients.size()
+                + " clients that support that request");
+            for (ClientHandler client : eligibleClients)
+            {
+                LOGGER.finest("SENDING REQUEST TO "
+                    + client.getPlayerName());
+                client.requestExtraRollApproval(processingCH.getPlayerName());
+            }
+        }
+
+    }
+
+    public void extraRollResponse(boolean approved)
+    {
+        if (approved)
+        {
+            LOGGER.finest("Client " + processingCH.getPlayerName()
+                + " approved the extra roll request");
+        }
+        else
+        {
+            LOGGER.finest("Client " + processingCH.getPlayerName()
+                + " denied   the extra roll request");
+        }
     }
 
     public void undoSplit(Legion splitoff)

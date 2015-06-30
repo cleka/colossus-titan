@@ -185,4 +185,6 @@ public interface IClient
     public void appendToConnectionLog(String s);
 
     public void tellSyncCompleted(int syncRequestNumber);
+
+    public void requestExtraRollApproval(String requestorName);
 }

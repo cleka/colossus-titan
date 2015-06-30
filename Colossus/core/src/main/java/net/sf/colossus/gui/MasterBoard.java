@@ -1728,6 +1728,7 @@ public final class MasterBoard extends JPanel
         undoAllAction.setEnabled(false);
         forcedDoneWithPhaseAction.setEnabled(false);
         takeMulliganAction.setEnabled(false);
+        requestExtraRollAction.setEnabled(false);
         disableDoneActionActivePlayerDoes(text);
     }
 
@@ -1741,6 +1742,7 @@ public final class MasterBoard extends JPanel
             undoAllAction.setEnabled(true);
             forcedDoneWithPhaseAction.setEnabled(true);
             takeMulliganAction.setEnabled(false);
+            requestExtraRollAction.setEnabled(false);
             enableDoneAction();
 
             // If not first turn, then add Marker Count Text to the bottom display bar
@@ -1806,6 +1808,7 @@ public final class MasterBoard extends JPanel
             undoAllAction.setEnabled(false);
             forcedDoneWithPhaseAction.setEnabled(true);
             takeMulliganAction.setEnabled(false);
+            requestExtraRollAction.setEnabled(false);
             // if there are no engagements, we are kicked to next phase
             // automatically anyway.
             updateEngagementsLeftText();
@@ -1850,6 +1853,7 @@ public final class MasterBoard extends JPanel
             undoAllAction.setEnabled(true);
             forcedDoneWithPhaseAction.setEnabled(true);
             takeMulliganAction.setEnabled(false);
+            requestExtraRollAction.setEnabled(false);
             enableDoneAction();
 
             bottomBar.setPhase("Muster Recruits");

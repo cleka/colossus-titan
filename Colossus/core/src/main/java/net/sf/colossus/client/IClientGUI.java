@@ -354,4 +354,6 @@ public interface IClientGUI
         final String text, final Color color);
 
     public abstract void inactivityAutoFleeOrConcede(boolean reply);
+
+    public void askExtraRollApproval(String requestorName, boolean ourself);
 }

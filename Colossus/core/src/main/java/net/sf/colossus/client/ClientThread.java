@@ -844,6 +844,12 @@ public class ClientThread extends Thread implements EventExecutor
             client.tellSyncCompleted(syncRequestNr);
         }
 
+        else if (method.equals(Constants.requestExtraRollApproval))
+        {
+            String requestorName = args.remove(0);
+            client.requestExtraRollApproval(requestorName);
+        }
+
         else if (method.equals(Constants.askConfirmCatchUp))
         {
             client.confirmWhenCaughtUp();

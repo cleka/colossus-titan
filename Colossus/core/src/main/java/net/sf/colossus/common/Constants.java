@@ -255,6 +255,7 @@ public final class Constants
     public static final String assignStrikePenalty = "assignStrikePenalty";
     public static final String mulligan = "mulligan";
     public static final String requestExtraRoll = "requestExtraRoll";
+    public static final String extraRollResponse = "extraRollResponse";
     public static final String undoSplit = "undoSplit";
     public static final String undoMove = "undoMove";
     public static final String undoRecruit = "undoRecruit";
@@ -371,6 +372,7 @@ public final class Constants
     public static final String commitPoint = "commitPoint";
     public static final String messageFromServer = "messageFromServer";
     public static final String syncCompleted = "syncCompleted";
+    public static final String requestExtraRollApproval = "requestExtraRollApproval";
     public static final String appendToConnectionLog = "appendToConnLog";
 
     // engagement resolved, methods:

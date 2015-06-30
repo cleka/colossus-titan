@@ -25,13 +25,15 @@ public interface IServer
     public static final int CLIENT_VERSION_CAN_HANDLE_NAK = 4;
     public static final int CLIENT_VERSION_VARIANT_XML_OK = 5;
     public static final int CLIENT_VERSION_INACTIVITY_TIMEOUT = 6;
+    public static final int CLIENT_VERSION_REQUEST_ROLL = 7;
 
     // New in version 2: replies to pingRequest
     // New in version 3: ability to reconnect (simple case only, so far)
     // New in version 4: Client can handle the NAK for an illegal battle move
     // New in version 5: Client always fetches xml files from server
     // New in version 6: AI kicks in after too long inactivity
-    public static final int CLIENT_VERSION = CLIENT_VERSION_INACTIVITY_TIMEOUT;
+    // New in version 7: Client can ask user to approve/deny extra roll request
+    public static final int CLIENT_VERSION = CLIENT_VERSION_REQUEST_ROLL;
 
     // Clients that do not send version yet at all, are treated as version -1.
     // For those, even show on server side an error dialog and refuse them to
@@ -83,6 +85,8 @@ public interface IServer
     public void mulligan();
 
     public void requestExtraRoll();
+
+    public void extraRollResponse(boolean approved);
 
     public void undoSplit(Legion splitoff);
 

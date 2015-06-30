@@ -2188,6 +2188,53 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         Concede.inactivityAutoFleeOrConcede(reply);
     }
 
+    public void askExtraRollApproval(String requestorName, boolean ourself)
+    {
+        String tmpMessage;
+        if (ourself)
+        {
+            tmpMessage = "No other player has new enough client to handle this request;\n"
+                + "=> negotiate in chat with others and respond accordingly.";
+        }
+        else
+        {
+            tmpMessage = "Player " + requestorName
+                + " asks for an extra roll. Pleave approve or deny.";
+        }
+        final String message = tmpMessage;
+
+        SwingUtilities.invokeLater(new Runnable()
+        {
+            public void run()
+            {
+                showExtraRollApprovalDialog(message);
+            }
+        });
+    }
+
+    private void showExtraRollApprovalDialog(final String message)
+    {
+        String[] options = new String[2];
+        options[0] = new String("Approve");
+        options[1] = new String("Deny");
+        int response = JOptionPane.showOptionDialog(getMapOrBoardFrame(),
+            message,
+            "Approval for extra roll request", 0,
+            JOptionPane.INFORMATION_MESSAGE, null, options, null);
+        boolean approved = (response == 0 ? true : false);
+        if (response == 0)
+        {
+            approved = true;
+            client.sendExtraRollRequestResponse(true);
+        }
+        else
+        {
+            approved = false;
+
+        }
+        client.sendExtraRollRequestResponse(approved);
+    }
+
     private void myTurnNotificationActions(Legion ally)
     {
         logPerhaps("myTurnNotificationActions(Legion ally)");

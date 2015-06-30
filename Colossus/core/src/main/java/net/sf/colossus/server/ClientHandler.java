@@ -339,6 +339,12 @@ final class ClientHandler extends ClientHandlerStub implements IClient
         return clientVersion >= IServer.CLIENT_VERSION_CAN_HANDLE_NAK;
     }
 
+    @Override
+    public boolean canHandleExtraRollRequest()
+    {
+        return clientVersion >= IServer.CLIENT_VERSION_REQUEST_ROLL;
+    }
+
     public void cloneRedoQueue(ClientHandler oldCH)
     {
         // Remove the reconnect-related messages
@@ -903,6 +909,11 @@ final class ClientHandler extends ClientHandlerStub implements IClient
         else if (method.equals(Constants.requestExtraRoll))
         {
             server.requestExtraRoll();
+        }
+        else if (method.equals(Constants.extraRollResponse))
+        {
+            boolean approved = Boolean.valueOf(args.remove(0)).booleanValue();
+            server.extraRollResponse(approved);
         }
         else if (method.equals(Constants.undoSplit))
         {
