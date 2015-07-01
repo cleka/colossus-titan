@@ -10,10 +10,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import net.sf.colossus.ai.helper.LegionMove;
@@ -1856,6 +1856,10 @@ public class SimpleAI extends AbstractAI
 
         for (Legion legion : donors)
         {
+            // Do not summon an angel out of a small Titan stack
+            // (Late game it could be desirable, but this is a good start)
+            if (legion.hasTitan() && legion.getHeight() <= 5)
+                continue;
             for (CreatureType candidate : legion.getCreatureTypes())
             {
                 if (candidate.isSummonable())
