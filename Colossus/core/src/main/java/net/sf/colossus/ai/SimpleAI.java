@@ -1,6 +1,5 @@
 package net.sf.colossus.ai;
 
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -2090,9 +2089,14 @@ public class SimpleAI extends AbstractAI
     private int getTitanCombatValue(int power)
     {
         int val = power * variant.getCreatureByName("Titan").getSkill();
-        if (power < 9)
+        // Weak Titans do not contribute much to a stack (in fact they're a
+        // liability because they need to be protected), so reduce their value.
+        // Formula chosen to scale from 0 at power 6, to full strength (48) at
+        // power 12 for a 4 skill factor Titan.  5 skill factor Titans are not
+        // as vulnerable so just use a flat rate deduction.
+        if (power < 12)
         {
-            val -= (6 + 2 * (9 - power));
+            val -= 4 * (12 - power);
         }
         return val;
     }
