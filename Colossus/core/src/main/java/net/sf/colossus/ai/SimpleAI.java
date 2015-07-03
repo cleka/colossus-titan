@@ -1,6 +1,5 @@
 package net.sf.colossus.ai;
 
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -10,10 +9,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import net.sf.colossus.ai.helper.LegionMove;
@@ -1856,6 +1855,13 @@ public class SimpleAI extends AbstractAI
 
         for (Legion legion : donors)
         {
+            // Do not summon an angel out of a small Titan stack
+            // (Late game it could be desirable, but this is a good start)
+            if (legion.hasTitan() && legion.getHeight() <= 5)
+            {
+                continue;
+            }
+
             for (CreatureType candidate : legion.getCreatureTypes())
             {
                 if (candidate.isSummonable())
@@ -2085,10 +2091,16 @@ public class SimpleAI extends AbstractAI
 
     private int getTitanCombatValue(int power)
     {
-        int val = power * variant.getCreatureByName("Titan").getSkill();
-        if (power < 9)
+        int titan_skill = variant.getCreatureByName("Titan").getSkill();
+        int val = power * titan_skill;
+        // Weak Titans do not contribute much to a stack (in fact they're a
+        // liability because they need to be protected), so reduce their value.
+        // Formula chosen to scale from 0 at power 6, to full strength (48) at
+        // power 12 for a 4 skill factor Titan.  5 skill factor Titans are not
+        // as vulnerable so reduce them a little less.
+        if (power < 12)
         {
-            val -= (6 + 2 * (9 - power));
+            val -= (8 - titan_skill) * (12 - power);
         }
         return val;
     }
