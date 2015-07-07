@@ -696,6 +696,7 @@ public final class MasterBoard extends JPanel
             public void actionPerformed(ActionEvent e)
             {
                 client.requestExtraRoll();
+                requestExtraRollAction.setEnabled(false);
             }
         };
 

@@ -86,7 +86,7 @@ public interface IServer
 
     public void requestExtraRoll();
 
-    public void extraRollResponse(boolean approved);
+    public void extraRollResponse(boolean approved, int requestId);
 
     public void undoSplit(Legion splitoff);
 

@@ -671,9 +671,10 @@ public class ClientHandlerStub implements IClient
         sendToClient(Constants.syncCompleted + sep + syncRequestNumber);
     }
 
-    public void requestExtraRollApproval(String requestor)
+    public void requestExtraRollApproval(String requestor, int requestId)
     {
-        sendToClient(Constants.requestExtraRollApproval + sep + requestor);
+        sendToClient(Constants.requestExtraRollApproval + sep + requestor
+            + sep + requestId);
     }
 
 }

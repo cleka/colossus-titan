@@ -1114,9 +1114,9 @@ final class SocketClientThread extends Thread implements IServer,
         sendToServer(Constants.requestExtraRoll);
     }
 
-    public void extraRollResponse(boolean approved)
+    public void extraRollResponse(boolean approved, int requestId)
     {
-        sendToServer(Constants.extraRollResponse + sep + approved);
+        sendToServer(Constants.extraRollResponse + sep + approved + sep + requestId);
     }
 
     public void undoSplit(Legion splitoff)

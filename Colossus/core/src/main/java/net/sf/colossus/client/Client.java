@@ -808,14 +808,14 @@ public final class Client implements IClient, IOracle, IVariant,
         }
     }
 
-    public void requestExtraRollApproval(String requestorName)
+    public void requestExtraRollApproval(String requestorName, int requestId)
     {
         LOGGER.finest("Client " + getOwningPlayer().getName()
             + " is asked to approve extra roll request... - answering true");
 
         if (isAutoplayActive())
         {
-            sendExtraRollRequestResponse(true);
+            sendExtraRollRequestResponse(true, requestId);
         }
         else if (requestorName.equals(getOwningPlayer().getName()))
         {
@@ -827,20 +827,20 @@ public final class Client implements IClient, IOracle, IVariant,
              */
             LOGGER.finest("Server asks me, the requestor, for approval "
                 + " - that means no other client can approve.");
-            gui.askExtraRollApproval(requestorName, true);
+            gui.askExtraRollApproval(requestorName, true, requestId);
         }
         else
         {
             /* Ask the player/user for approval; it will send the answer back
              * asynchronously
              */
-            gui.askExtraRollApproval(requestorName, false);
+            gui.askExtraRollApproval(requestorName, false, requestId);
         }
     }
 
-    public void sendExtraRollRequestResponse(boolean approved)
+    public void sendExtraRollRequestResponse(boolean approved, int requestId)
     {
-        server.extraRollResponse(approved);
+        server.extraRollResponse(approved, requestId);
     }
 
     public void doCheckServerConnection()

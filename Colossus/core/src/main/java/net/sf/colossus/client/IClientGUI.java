@@ -355,5 +355,5 @@ public interface IClientGUI
 
     public abstract void inactivityAutoFleeOrConcede(boolean reply);
 
-    public void askExtraRollApproval(String requestorName, boolean ourself);
+    public void askExtraRollApproval(String requestorName, boolean ourself, int requestId);
 }

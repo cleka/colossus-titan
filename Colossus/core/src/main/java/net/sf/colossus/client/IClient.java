@@ -186,5 +186,5 @@ public interface IClient
 
     public void tellSyncCompleted(int syncRequestNumber);
 
-    public void requestExtraRollApproval(String requestorName);
+    public void requestExtraRollApproval(String requestorName, int requestId);
 }

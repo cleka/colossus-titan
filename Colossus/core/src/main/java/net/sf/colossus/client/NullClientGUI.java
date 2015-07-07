@@ -868,7 +868,7 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public void askExtraRollApproval(String requestorName, boolean ourself)
+    public void askExtraRollApproval(String requestorName, boolean ourself, int requestId)
     {
         // TODO Auto-generated method stub
 

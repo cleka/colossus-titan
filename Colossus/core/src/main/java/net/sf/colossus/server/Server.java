@@ -2807,6 +2807,12 @@ public final class Server extends Thread implements IServer
         LOGGER.info(getPlayerName() + " takes a mulligan and rolls " + roll);
     }
 
+    Object eligibleClientsMutex = new Object();
+    private LinkedList<ClientHandler> eligibleClients = null;
+    int extraRequestId = 0;
+    int extraRequestApprovals = 0;
+    int extraRequestDenials = 0;
+
     public void requestExtraRoll()
     {
         if (!isActivePlayer())
@@ -2822,64 +2828,120 @@ public final class Server extends Thread implements IServer
             return;
         }
 
-
-        LinkedList<ClientHandler> eligibleClients = new LinkedList<ClientHandler>();
-        LOGGER.info(getPlayerName() + " requests extra roll.");
-        for (ClientHandler client : realClients)
+        synchronized (eligibleClientsMutex)
         {
-            if (client.equals(processingCH))
+            extraRequestApprovals = 0;
+            extraRequestDenials = 0;
+            extraRequestId++;
+            eligibleClients = new LinkedList<ClientHandler>();
+            LOGGER.info(getPlayerName() + " requests extra roll.");
+            for (ClientHandler client : realClients)
             {
-                LOGGER.finest("Skipping requesting CH "
-                    + client.getPlayerName());
+                if (client.equals(processingCH))
+                {
+                    LOGGER.finest("Skipping requesting CH "
+                        + client.getPlayerName());
+                }
+                else if (client.isSpectator())
+                {
+                    LOGGER.finest("Skipping spectator CH "
+                        + client.getPlayerName());
+                }
+                else if (client.canHandleExtraRollRequest())
+                {
+                    LOGGER.finest("A client to be asked: "
+                        + client.getPlayerName());
+                    eligibleClients.add(client);
+                }
+                else
+                {
+                    LOGGER.finest("Client can't handle the request: "
+                        + client.getPlayerName());
+                }
             }
-            else if (client.isSpectator())
+
+            if (eligibleClients.size() == 0)
             {
-                LOGGER.finest("Skipping spectator CH "
-                    + client.getPlayerName());
-            }
-            else if (client.canHandleExtraRollRequest())
-            {
-                LOGGER.finest("A client to be asked: "
-                    + client.getPlayerName());
-                eligibleClients.add(client);
+                LOGGER.finest("No other clients can confirm...");
+                eligibleClients.add(processingCH);
+                processingCH.requestExtraRollApproval(
+                    processingCH.getPlayerName(), extraRequestId);
             }
             else
             {
-                LOGGER.finest("Client can't handle the request: "
-                    + client.getPlayerName());
+                LOGGER.finest("There are " + eligibleClients.size()
+                    + " clients that support that request");
             }
-        }
-        if (eligibleClients.size() == 0)
-        {
-            LOGGER.finest("No other clients can confirm...");
-            processingCH
-                .requestExtraRollApproval(processingCH.getPlayerName());
-        }
-        else
-        {
-            LOGGER.finest("There are " + eligibleClients.size()
-                + " clients that support that request");
+
             for (ClientHandler client : eligibleClients)
             {
                 LOGGER.finest("SENDING REQUEST TO "
                     + client.getPlayerName());
-                client.requestExtraRollApproval(processingCH.getPlayerName());
+                client.requestExtraRollApproval(processingCH.getPlayerName(),
+                    extraRequestId);
             }
-        }
-
+        } // END synchronized
     }
 
-    public void extraRollResponse(boolean approved)
+    public void extraRollResponse(boolean approved, int requestId)
     {
-        if (approved)
+        synchronized (eligibleClientsMutex)
         {
-            LOGGER.finest("Client " + processingCH.getPlayerName()
-                + " approved the extra roll request");
+            if (requestId == extraRequestId)
+            {
+                if (approved)
+                {
+                    extraRequestApprovals++;
+                    LOGGER.finest("Client " + processingCH.getPlayerName()
+                        + " approved the extra roll request");
+                }
+                else
+                {
+                    extraRequestDenials++;
+                    LOGGER.finest("Client " + processingCH.getPlayerName()
+                        + " denied   the extra roll request");
+                }
+
+                if (extraRequestApprovals + extraRequestDenials == eligibleClients
+                    .size())
+                {
+                    LOGGER.info("Got extraRollRequestResponses from all "
+                        + eligibleClients.size() + " clients - ok!");
+                    if (extraRequestDenials == 0)
+                    {
+                        int roll = game.mulligan();
+                        LOGGER.info(getPlayerName()
+                            + " takes a mulligan and rolls " + roll);
+                        String message = "Player "
+                            + getPlayerName()
+                            + " requested extra roll and nobpdy denied - player got new roll "
+                            + roll;
+                        messageFromServerToAll(message);
+                    }
+                    else
+                    {
+                        String message = "Player " + getPlayerName()
+                            + " requested extra roll but "
+                            + extraRequestDenials
+                            + " players denied it. Roll stays the same.";
+                        messageFromServerToAll(message);
+                    }
+                }
+            }
+            else
+            {
+                LOGGER.warning("Got extraRollResponse for requestId "
+                    + requestId + ", but current extraRequestId is already "
+                    + extraRequestId + " - ignored.");
+            }
         }
-        else
+    }
+
+    private void messageFromServerToAll(String message)
+    {
+        for (ClientHandler client : realClients)
         {
-            LOGGER.finest("Client " + processingCH.getPlayerName()
-                + " denied   the extra roll request");
+            client.messageFromServer(message);
         }
     }
 

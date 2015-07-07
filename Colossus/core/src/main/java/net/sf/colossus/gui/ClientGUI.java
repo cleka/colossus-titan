@@ -2188,7 +2188,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         Concede.inactivityAutoFleeOrConcede(reply);
     }
 
-    public void askExtraRollApproval(String requestorName, boolean ourself)
+    public void askExtraRollApproval(String requestorName, boolean ourself,
+        final int requestId)
     {
         String tmpMessage;
         if (ourself)
@@ -2207,12 +2208,13 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         {
             public void run()
             {
-                showExtraRollApprovalDialog(message);
+                showExtraRollApprovalDialog(message, requestId);
             }
         });
     }
 
-    private void showExtraRollApprovalDialog(final String message)
+    private void showExtraRollApprovalDialog(final String message,
+        int requestId)
     {
         String[] options = new String[2];
         options[0] = new String("Approve");
@@ -2222,17 +2224,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             "Approval for extra roll request", 0,
             JOptionPane.INFORMATION_MESSAGE, null, options, null);
         boolean approved = (response == 0 ? true : false);
-        if (response == 0)
-        {
-            approved = true;
-            client.sendExtraRollRequestResponse(true);
-        }
-        else
-        {
-            approved = false;
-
-        }
-        client.sendExtraRollRequestResponse(approved);
+        client.sendExtraRollRequestResponse(approved, requestId);
     }
 
     private void myTurnNotificationActions(Legion ally)

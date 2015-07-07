@@ -847,7 +847,8 @@ public class ClientThread extends Thread implements EventExecutor
         else if (method.equals(Constants.requestExtraRollApproval))
         {
             String requestorName = args.remove(0);
-            client.requestExtraRollApproval(requestorName);
+            int requestId = Integer.parseInt(args.remove(0));
+            client.requestExtraRollApproval(requestorName, requestId);
         }
 
         else if (method.equals(Constants.askConfirmCatchUp))

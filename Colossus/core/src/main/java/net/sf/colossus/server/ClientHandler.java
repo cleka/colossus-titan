@@ -913,7 +913,8 @@ final class ClientHandler extends ClientHandlerStub implements IClient
         else if (method.equals(Constants.extraRollResponse))
         {
             boolean approved = Boolean.valueOf(args.remove(0)).booleanValue();
-            server.extraRollResponse(approved);
+            int requestId = Integer.parseInt(args.remove(0));
+            server.extraRollResponse(approved, requestId);
         }
         else if (method.equals(Constants.undoSplit))
         {
