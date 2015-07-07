@@ -3186,8 +3186,25 @@ public class GameServerSide extends Game
             return -1;
         }
         PlayerServerSide player = (PlayerServerSide)getActivePlayer();
+        // mark mulligan as taken and set roll to 0
         player.takeMulligan();
         server.allUpdatePlayerInfo("Mulligan");
+        setupMove();
+        makeMovementRoll();
+        server.kickPhase();
+        return player.getMovementRoll();
+    }
+
+    int makeExtraRoll()
+    {
+        if (getPhase() != Phase.MOVE)
+        {
+            return -1;
+        }
+        PlayerServerSide player = (PlayerServerSide)getActivePlayer();
+        // mark mulligan as taken and set roll to 0
+        player.prepareExtraRoll();
+        server.allUpdatePlayerInfo("ExtraRoll");
         setupMove();
         makeMovementRoll();
         server.kickPhase();

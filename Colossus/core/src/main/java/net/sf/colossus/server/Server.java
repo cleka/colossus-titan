@@ -2909,13 +2909,13 @@ public final class Server extends Thread implements IServer
                         + eligibleClients.size() + " clients - ok!");
                     if (extraRequestDenials == 0)
                     {
-                        int roll = game.mulligan();
+                        int roll = game.makeExtraRoll();
                         LOGGER.info(getPlayerName()
                             + " takes a mulligan and rolls " + roll);
                         String message = "Player "
                             + getPlayerName()
-                            + " requested extra roll and nobpdy denied - player got new roll "
-                            + roll;
+                            + " requested extra roll and no player denied - player got new roll "
+                            + roll + ".";
                         messageFromServerToAll(message);
                     }
                     else
@@ -2923,7 +2923,7 @@ public final class Server extends Thread implements IServer
                         String message = "Player " + getPlayerName()
                             + " requested extra roll but "
                             + extraRequestDenials
-                            + " players denied it. Roll stays the same.";
+                            + " players denied it. Roll remains the same.";
                         messageFromServerToAll(message);
                     }
                 }

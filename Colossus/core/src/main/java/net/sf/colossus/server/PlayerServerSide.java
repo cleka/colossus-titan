@@ -48,6 +48,7 @@ public final class PlayerServerSide extends Player implements
      *      always only one per game, not per player
      */
     private int movementRoll; // 0 if movement has not been rolled.
+    private int previousMovementRoll;
 
     private boolean titanEliminated;
 
@@ -292,6 +293,7 @@ public final class PlayerServerSide extends Player implements
 
         setTeleported(false);
         movementRoll = 0;
+        previousMovementRoll = 0;
 
         // Make sure that all legions are allowed to move and recruit.
         commitMoves();
@@ -307,6 +309,12 @@ public final class PlayerServerSide extends Player implements
         else
         {
             movementRoll = Dice.rollDie();
+            while (movementRoll == previousMovementRoll)
+            {
+                LOGGER.info("Roll is " + movementRoll
+                    + ", same as previous roll! Rolling again.");
+                movementRoll = Dice.rollDie();
+            }
             LOGGER.info(getName() + " rolls a " + movementRoll
                 + " for movement");
         }
@@ -327,6 +335,14 @@ public final class PlayerServerSide extends Player implements
             }
             movementRoll = 0;
         }
+    }
+
+    void prepareExtraRoll()
+    {
+        undoAllMoves();
+        LOGGER.info(getName() + " gets an extra roll");
+        previousMovementRoll = movementRoll;
+        movementRoll = 0;
     }
 
     void undoMove(Legion legion)
