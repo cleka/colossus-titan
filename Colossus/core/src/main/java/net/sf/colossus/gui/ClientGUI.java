@@ -1825,7 +1825,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         undoStack.addFirst(object);
     }
 
-    private boolean isUndoStackEmpty()
+    public boolean isUndoStackEmpty()
     {
         return undoStack.isEmpty();
     }

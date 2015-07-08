@@ -695,8 +695,28 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                client.requestExtraRoll();
-                requestExtraRollAction.setEnabled(false);
+                /*
+                 * This is needed, because it's too difficult to orchestrate
+                 * from server side to undo all moves and clear undoStack
+                 * etc. (that problem does not arise with mulligan because
+                 * there the undo can be done when sending request).
+                 * Didn't want to add yet another 'mulligan approved' message,
+                 * and worse, there might be a timing problem (undoMoves
+                 * ongoing while new roll arives).
+                 */
+                if (gui.isUndoStackEmpty())
+                {
+                    client.requestExtraRoll();
+                    requestExtraRollAction.setEnabled(false);
+                }
+                else
+                {
+                    JOptionPane.showMessageDialog(masterFrame,
+                        "To request the extra roll, you need to undo all moves "
+                            + "first (press 'A' or multiple times 'U')!",
+                        "Undo all moves first",
+                        JOptionPane.INFORMATION_MESSAGE);
+                }
             }
         };
 
