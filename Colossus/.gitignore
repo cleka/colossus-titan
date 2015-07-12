@@ -2,3 +2,5 @@ build
 /CmdlineClient.jar
 /Colossus.jar
 /ColossusWeb.jar
+*Keystore
+local_build.properties
