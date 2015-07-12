@@ -11,6 +11,7 @@ public class ExtraRollRequest
 
     private LinkedList<ClientHandler> eligibleClients = null;
     int currentRequestId = 0;
+    ClientHandler currentRequestor = null;
     int approvals = 0;
     int denials = 0;
 
@@ -25,6 +26,7 @@ public class ExtraRollRequest
     {
         approvals = 0;
         denials = 0;
+        currentRequestor = processingCH;
         currentRequestId++;
         eligibleClients = new LinkedList<ClientHandler>();
 
@@ -105,18 +107,19 @@ public class ExtraRollRequest
                     LOGGER.info(playerName
                         + " takes a mulligan and rolls " + roll);
                     String message = "Player "
-                        + playerName
+                        + currentRequestor
                         + " requested extra roll and no player denied - player got new roll "
                         + roll + ".";
                     server.messageFromServerToAll(message);
                 }
                 else
                 {
-                    String message = "Player " + playerName
+                    String message = "Player " + currentRequestor
                         + " requested extra roll but " + denials
                         + " players denied it. Roll remains the same.";
                     server.messageFromServerToAll(message);
                 }
+                currentRequestor = null;
             }
         }
         else
