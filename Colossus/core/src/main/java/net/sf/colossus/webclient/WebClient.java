@@ -3287,17 +3287,10 @@ public class WebClient extends KFrame implements IWebClient
         }
     }
 
-    public void notifyClockTicking(boolean newValue)
+    public void notifyItsPlayersTurn(boolean shouldDoSomethingOrNot)
     {
-        if (newValue)
-        {
-            // player's clock is ticking, he should do something
-            generalChat.setBackgroundColor(Color.yellow);
-        }
-        else
-        {
-            generalChat.setBackgroundColor(HTMLColor.white);
-        }
+        Color color = shouldDoSomethingOrNot ? Color.yellow : HTMLColor.white;
+        generalChat.setBackgroundColor(color);
     }
 
     public void watchGameInfo(String gameId, String host, int port)

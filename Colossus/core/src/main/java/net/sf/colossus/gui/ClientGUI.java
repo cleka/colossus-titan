@@ -2298,7 +2298,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             // if we have a watchdog, that part will be done below
             if (webClient != null)
             {
-                webClient.notifyClockTicking(shouldRun);
+                webClient.notifyItsPlayersTurn(shouldRun);
             }
             return;
         }
@@ -2324,7 +2324,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             watchdog.stopClockTicking();
             if (webClient != null)
             {
-                webClient.notifyClockTicking(shouldRun);
+                webClient.notifyItsPlayersTurn(shouldRun);
             }
         }
         else if (!isTicking && shouldRun)
@@ -2332,7 +2332,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             watchdog.setClockTicking();
             if (webClient != null)
             {
-                webClient.notifyClockTicking(shouldRun);
+                webClient.notifyItsPlayersTurn(shouldRun);
             }
         }
     }
@@ -3531,6 +3531,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
         if (webClient != null)
         {
+            webClient.notifyItsPlayersTurn(false);
             webClient.tellGameEnds();
         }
 
