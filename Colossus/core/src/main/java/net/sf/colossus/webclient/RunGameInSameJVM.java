@@ -230,4 +230,11 @@ public class RunGameInSameJVM extends Thread implements IGameRunner,
     {
         LOGGER.info("SameJVM: Server Stopped Running.");
     }
+
+    // Not really in use right now, just for the interface
+    public void gameIsSuspended()
+    {
+        LOGGER.info("SameJVM: Game is suspended.");
+    }
+
 }

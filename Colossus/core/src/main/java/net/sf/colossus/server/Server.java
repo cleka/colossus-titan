@@ -136,6 +136,7 @@ public final class Server extends Thread implements IServer
     private boolean guiRequestSaveFlag = false;
     private String guiRequestSaveFilename = null;
     private boolean inPauseState = false;
+    private boolean suspendFlag = false;
 
     /* static so that new instance of Server can destroy a
      * previously allocated FileServerThread */
@@ -475,6 +476,7 @@ public final class Server extends Thread implements IServer
                 LOGGER.log(Level.INFO,
                     "waitOnSelector: force shutdown now true! num=" + num);
                 stopAccepting();
+                LOGGER.info("calling stopServerRunning");
                 stopServerRunning();
             }
             handleSelectedKeys();
@@ -3100,6 +3102,8 @@ public final class Server extends Thread implements IServer
 
     void triggerDispose()
     {
+
+        LOGGER.info("triggerDispose() : setting initiateDisposal flag.");
         initiateDisposal = true;
     }
 
@@ -3396,6 +3400,13 @@ public final class Server extends Thread implements IServer
         game.saveGameWithErrorHandling(filename, autoSave);
     }
 
+    public void suspendGame()
+    {
+        LOGGER.info("In server: Suspending game...");
+        game.getNotifyWebServer().gameIsSuspended();
+        initiateSuspendGame();
+    }
+
     // User has requested to save game via File=>Save Game or Save Game as...
     // Inject that into the "handle incoming messages from clients" select
     // loop, to be sure it does not run concurrently while some message
@@ -3416,6 +3427,19 @@ public final class Server extends Thread implements IServer
         synchronized (guiRequestMutex)
         {
             guiRequestQuitFlag = true;
+            selector.wakeup();
+        }
+    }
+
+    public void initiateSuspendGame()
+    {
+        LOGGER.info("In server: initiateSuspendGame");
+        synchronized (guiRequestMutex)
+        {
+            suspendFlag = true;
+            forceShutDown = true;
+            LOGGER
+                .info("In server: suspendFlag is now true, forceShutdown also");
             selector.wakeup();
         }
     }
@@ -3466,6 +3490,26 @@ public final class Server extends Thread implements IServer
                 {
                     game.dispose();
                 }
+                didSomething = true;
+            }
+
+            else if (suspendFlag)
+            {
+                LOGGER.info("The 'suspend' flag was set. OK!");
+                if (game != null)
+                {
+                    game.setGameOver(true, "Game suspended");
+                    LOGGER
+                        .fine("in handle gui requests, suspendFlag set: calling triggerdispose");
+                    getGame().suspendGame();
+                    triggerDispose();
+                }
+                else
+                {
+                    LOGGER
+                        .warning("NOT calling triggerdispose, no game ?!?!?");
+                }
+                forceShutDown = true;
                 didSomething = true;
             }
 

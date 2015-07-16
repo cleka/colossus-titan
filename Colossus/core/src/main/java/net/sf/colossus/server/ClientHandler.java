@@ -1018,6 +1018,10 @@ final class ClientHandler extends ClientHandlerStub implements IClient
             String filename = args.remove(0);
             server.saveGame(filename);
         }
+        else if (method.equals(Constants.suspendGame))
+        {
+            server.suspendGame();
+        }
 
         else if (method.equals(Constants.checkConnection))
         {

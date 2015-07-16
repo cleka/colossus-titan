@@ -31,6 +31,7 @@ public class NotifyWebServerViaFile implements INotifyWebServer
     private File flagFile = null;
     // Do we even have a web server to notify at all?
     private final boolean active;
+    private boolean suspended = false;
 
     public NotifyWebServerViaFile(String name)
     {
@@ -96,7 +97,15 @@ public class NotifyWebServerViaFile implements INotifyWebServer
     {
         if (active)
         {
-            removeFlagfile();
+            if (suspended)
+            {
+                LOGGER.finest("Server stopped running and suspended "
+                    + "set; no need to remove a file.");
+            }
+            else
+            {
+                removeFlagfile();
+            }
         }
     }
 
@@ -120,6 +129,7 @@ public class NotifyWebServerViaFile implements INotifyWebServer
 
     private void removeFlagfile()
     {
+        LOGGER.info("removeFlagFile called??");
         if (active)
         {
             try
@@ -135,4 +145,35 @@ public class NotifyWebServerViaFile implements INotifyWebServer
             }
         }
     }
+
+    public void gameIsSuspended()
+    {
+        suspended = true;
+        renameFlagfile(flagFilename + ".suspended");
+    }
+
+    private void renameFlagfile(String suspendedFilename)
+    {
+        if (active)
+        {
+            try
+            {
+                out.close();
+                flagFile.renameTo(new File(suspendedFilename));
+            }
+            catch (Exception e)
+            {
+                LOGGER.log(Level.SEVERE,
+                    "Could not rename web server flag file " + flagFilename
+                        + " to new name " + suspendedFilename + "!!"
+                        + e.toString(),
+                    (Throwable)null);
+            }
+        }
+        else
+        {
+            LOGGER.warning("renameFlagFile called, but active is false?");
+        }
+    }
+
 } // END Class NotifyWebServerViaFile

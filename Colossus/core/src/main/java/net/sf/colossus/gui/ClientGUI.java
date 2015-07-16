@@ -1044,6 +1044,11 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         }
     }
 
+    void menuSuspendGame()
+    {
+        client.initiateSuspend();
+    }
+
     private void setupPlayerLabel()
     {
         logPerhaps("setupPlayerLabel()");

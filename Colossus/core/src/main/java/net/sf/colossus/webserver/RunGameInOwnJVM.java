@@ -55,6 +55,8 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
     private String colossusJar;
 
     private File flagFile;
+    private File suspendedFlagfile;
+
     private boolean alreadyStarted;
     private String reasonStartFailed;
 
@@ -169,6 +171,8 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
         {
             flagFile.delete();
         }
+
+        this.suspendedFlagfile = new File(gameDir, flagFileName + ".suspended");
 
         File logPropFile = new File(gameDir, "logging.properties");
         File logPropTemplate = new File(template);
@@ -358,7 +362,14 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
             nderr.done();
         }
 
-        if (flagFile.exists() && reasonStartFailed != null)
+        if (this.suspendedFlagfile.exists())
+        {
+            String message = "Game " + gameId + " was suspended.";
+            LOGGER.log(Level.INFO, message);
+            // flagFile.renameTo(new File(flagFile.getParent(),
+            //     "flagfile.startFailed"));
+        }
+        else if (flagFile.exists() && reasonStartFailed != null)
         {
             String message = "Game "
                 + gameId

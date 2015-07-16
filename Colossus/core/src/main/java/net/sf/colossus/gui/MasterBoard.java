@@ -176,8 +176,6 @@ public final class MasterBoard extends JPanel
 
     private boolean gameOverStateReached = false;
 
-    private static final String saveGameAs = "Save game as";
-
     private static final String clearRecruitChits = "Clear recruit chits";
 
     private static final String skipLegion = "Skip legion this time";
@@ -211,6 +209,7 @@ public final class MasterBoard extends JPanel
     private AbstractAction loadGameAction;
     private AbstractAction saveGameAction;
     private AbstractAction saveGameAsAction;
+    private AbstractAction suspendGameAction;
     private AbstractAction closeBoardAction;
     private AbstractAction quitGameAction;
     private AbstractAction cleanDisconnectAction;
@@ -934,7 +933,7 @@ public final class MasterBoard extends JPanel
             }
         };
 
-        saveGameAsAction = new AbstractAction(saveGameAs)
+        saveGameAsAction = new AbstractAction(Constants.saveGameAs)
         {
             // TODO: Need a confirmation dialog on overwrite?
             public void actionPerformed(ActionEvent e)
@@ -996,6 +995,24 @@ public final class MasterBoard extends JPanel
                         basename += Constants.XML_EXTENSION;
                     }
                     gui.menuSaveGame(dirname + '/' + basename);
+                }
+            }
+        };
+
+        suspendGameAction = new AbstractAction(Constants.suspendGame)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                boolean proceed = true;
+                /*
+                if (gui.getGame().isEngagementOngoing())
+                {
+                    proceed = saveDuringEngagementDialog();
+                }
+                */
+                if (proceed)
+                {
+                    gui.menuSuspendGame();
                 }
             }
         };
@@ -1293,6 +1310,9 @@ public final class MasterBoard extends JPanel
             mi = fileMenu.add(saveGameAsAction);
             mi.setMnemonic(KeyEvent.VK_A);
         }
+
+        mi = fileMenu.add(suspendGameAction);
+        mi.setMnemonic(KeyEvent.VK_U);
         fileMenu.addSeparator();
 
         mi = fileMenu.add(checkConnectionAction);

@@ -1327,6 +1327,12 @@ public class GameServerSide extends Game
         }
     }
 
+    public void suspendGame()
+    {
+        setGameOver(true, "Game suspended");
+        announceGameOver(true);
+    }
+
     @Override
     public void setGameOver(boolean gameOver, String message)
     {

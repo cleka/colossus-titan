@@ -24,4 +24,6 @@ public interface INotifyWebServer
 
     public abstract void serverStoppedRunning();
 
+    public abstract void gameIsSuspended();
+
 }
