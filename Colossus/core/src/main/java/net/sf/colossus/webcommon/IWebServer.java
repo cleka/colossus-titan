@@ -20,6 +20,7 @@ public interface IWebServer
     public static final String Enroll = "enroll";
     public static final String Unenroll = "unenroll";
     public static final String Start = "start";
+    public static final String Resume = "resume";
     public static final String StartAtPlayer = "startAtPlayer";
     public static final String StartedByPlayer = "startedByPlayer";
     public static final String LocallyGameOver = "locallyGameOver";
@@ -73,6 +74,8 @@ public interface IWebServer
         String playerHost, int port);
 
     public void startGame(String gameId, User user);
+
+    public void resumeGame(String gameId, String loadGame, User user);
 
     // Game started on players computer, tell WebServer that
     // he can inform all WebClient that game started successfully

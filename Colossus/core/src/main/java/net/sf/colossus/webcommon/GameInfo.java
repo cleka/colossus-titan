@@ -69,6 +69,8 @@ public class GameInfo
     private int max;
     private int onlineCount;
 
+    private String resumeFromFilename;
+
     // next three only needed for scheduled games
     private long startTime = 0;
     private int duration = 0;
@@ -142,6 +144,7 @@ public class GameInfo
 
         this.enrolledPlayers = 0;
         this.players = new ArrayList<User>();
+        this.resumeFromFilename = null;
 
         LOGGER.log(Level.FINEST,
             "A new potential game was created!! - variant " + variant
@@ -672,6 +675,16 @@ public class GameInfo
         enrolledPlayers = val.intValue();
     }
 
+    public void setResumeFromFilename(String filename)
+    {
+        this.resumeFromFilename = filename;
+    }
+
+    public String getResumeFromFilename()
+    {
+        return this.resumeFromFilename;
+    }
+
     public ArrayList<User> getPlayers()
     {
         return this.players;
@@ -930,7 +943,8 @@ public class GameInfo
 
     public boolean isStartable()
     {
-        return state.equals(GameState.PROPOSED) || state.equals(GameState.DUE);
+        return state.equals(GameState.PROPOSED) || state.equals(GameState.DUE)
+            || state.equals(GameState.SUSPENDED);
     }
 
     public boolean isRunning()
@@ -982,7 +996,7 @@ public class GameInfo
      */
     public static enum GameState
     {
-        PROPOSED, DUE, ACTIVATED, STARTING, READY_TO_CONNECT, RUNNING, ENDING;
+        PROPOSED, DUE, ACTIVATED, STARTING, READY_TO_CONNECT, RUNNING, ENDING, SUSPENDED;
     }
 
 }

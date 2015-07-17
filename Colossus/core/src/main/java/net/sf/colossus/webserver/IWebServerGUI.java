@@ -18,5 +18,7 @@ public interface IWebServerGUI
 
     public abstract void setEndingGamesInfo(String s);
 
+    public abstract void setSuspendedGamesInfo(String string);
+
     public abstract void shutdown();
 }

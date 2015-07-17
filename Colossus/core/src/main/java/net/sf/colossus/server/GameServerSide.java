@@ -1327,7 +1327,7 @@ public class GameServerSide extends Game
         }
     }
 
-    public void suspendGame()
+    public void handleSuspend()
     {
         setGameOver(true, "Game suspended");
         announceGameOver(true);

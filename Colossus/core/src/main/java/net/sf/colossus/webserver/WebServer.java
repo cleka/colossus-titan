@@ -93,6 +93,7 @@ public class WebServer implements IWebServer, IRunWebServer
     private final HashMap<String, GameInfo> proposedGames = new HashMap<String, GameInfo>();
 
     private final ArrayList<GameInfo> runningGames = new ArrayList<GameInfo>();
+    private final ArrayList<GameInfo> suspendedGames = new ArrayList<GameInfo>();
     private final ArrayList<GameInfo> endingGames = new ArrayList<GameInfo>();
 
     // Used also as separator for storing proposed games to file:
@@ -590,6 +591,7 @@ public class WebServer implements IWebServer, IRunWebServer
             + " instant games stored");
         gui.setRunningGamesInfo(runningGames.size() + " running games");
         gui.setEndingGamesInfo(endingGames.size() + " games just ending");
+        gui.setSuspendedGamesInfo(suspendedGames.size() + " games suspended");
     }
 
     public void watchGame(String gameId, String userName)
@@ -909,6 +911,7 @@ public class WebServer implements IWebServer, IRunWebServer
             if (client != null)
             {
                 client.gameInfo(gi);
+                LOGGER.info("sending gamestartsnow to client " + u.getName());
                 client.gameStartsNow(gameId, port, host,
                     INACTIVITY_CHECK_INTERVAL, INACTIVITY_WARNING_INTERVAL,
                     INACTIVITY_TIMEOUT);
@@ -1111,6 +1114,26 @@ public class WebServer implements IWebServer, IRunWebServer
                 + " to start it on the server!");
         }
 
+    }
+
+    public void resumeGame(String gameId, String loadGame, User byUser)
+    {
+        LOGGER.info("User " + byUser.getName() + " wants to resume game "
+            + gameId + ", from file " + loadGame);
+        GameInfo gi = findFromSuspendedGames(gameId);
+        if (gi != null)
+        {
+            gi.setResumeFromFilename(loadGame);
+            synchronized (gi)
+            {
+                attemptStartOnServer(gi, byUser);
+            }
+        }
+        else
+        {
+            LOGGER.warning("Did not find a GameInfo for gameId " + gameId
+                + " to resume it on the server!");
+        }
     }
 
     private void attemptStartOnServer(GameInfo gi, User byUser)
@@ -1620,6 +1643,20 @@ public class WebServer implements IWebServer, IRunWebServer
         return foundGi;
     }
 
+    private GameInfo findFromSuspendedGames(String gameId)
+    {
+        GameInfo foundGi = null;
+        for (GameInfo gi : suspendedGames)
+        {
+            if (gi.getGameId().equals(gameId))
+            {
+                foundGi = gi;
+                break;
+            }
+        }
+        return foundGi;
+    }
+
     private IGameRunner getGameOnServer(GameInfo gi)
     {
         assert gi != null : "Cannot find GameOnServer for GameInfo that is null!";
@@ -1668,6 +1705,7 @@ public class WebServer implements IWebServer, IRunWebServer
      */
     public void unregisterGame(GameInfo gi, int port)
     {
+        boolean suspended = false;
         synchronized (runningGames)
         {
             LOGGER.log(Level.FINEST, "unregister: trying to remove...");
@@ -1676,6 +1714,10 @@ public class WebServer implements IWebServer, IRunWebServer
                 LOGGER.log(Level.FINEST, "Removing game " + gi.getGameId()
                     + " from running games list");
                 runningGames.remove(gi);
+                if (gi.getGameState().equals(GameState.SUSPENDED))
+                {
+                    suspended = true;
+                }
             }
             // If game starting did not succeed might still be in proposed list
             else if (proposedGames.containsKey(gi.getGameId()))
@@ -1692,17 +1734,28 @@ public class WebServer implements IWebServer, IRunWebServer
                         + gi.getGameId());
             }
         }
-        synchronized (endingGames)
+
+        if (suspended)
         {
-            endingGames.add(gi);
+            synchronized (suspendedGames)
+            {
+                suspendedGames.add(gi);
+            }
         }
-        gi.setState(GameState.ENDING);
+        else
+        {
+            synchronized (endingGames)
+            {
+                endingGames.add(gi);
+            }
+            gi.setState(GameState.ENDING);
+        }
         allTellGameInfo(gi);
 
         GameThreadReaper r = new GameThreadReaper();
         r.start();
-        LOGGER.log(Level.FINEST,
-            "GameThreadReaper started for game " + gi.getGameId());
+        LOGGER.log(Level.FINEST, "GameThreadReaper started for"
+            + (suspended ? " suspended" : "") + " game " + gi.getGameId());
 
         updateGUI();
     }
@@ -1862,6 +1915,11 @@ public class WebServer implements IWebServer, IRunWebServer
         }
 
         public void setEndingGamesInfo(String s)
+        {
+            // nothing
+        }
+
+        public void setSuspendedGamesInfo(String s)
         {
             // nothing
         }

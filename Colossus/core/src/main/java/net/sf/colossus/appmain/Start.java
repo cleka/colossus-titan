@@ -701,6 +701,17 @@ public final class Start
                             .newGameServerSide(getWhatNextManager(),
                                 serverOptions, loader.getVariant());
                         serverOptions.clearPlayerInfo();
+                        String webGameFlagFileName = startOptions
+                            .getStringOption(Options.webFlagFileName);
+                        startOptions.removeOption(Options.webFlagFileName);
+
+                        if (webGameFlagFileName != null
+                            && !webGameFlagFileName.equals(""))
+                        {
+                            whatNextManager.setWhatToDoNext(
+                                WhatToDoNext.QUIT_ALL, false);
+                            game.setFlagFilename(webGameFlagFileName);
+                        }
                         game.loadGameAndWaitUntilOver(loader.getRoot());
                     }
                     else

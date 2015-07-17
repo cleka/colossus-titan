@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.server.INotifyWebServer;
 import net.sf.colossus.webcommon.GameInfo;
+import net.sf.colossus.webcommon.GameInfo.GameState;
 import net.sf.colossus.webcommon.IGameRunner;
 import net.sf.colossus.webcommon.IRunWebServer;
 import net.sf.colossus.webcommon.User;
@@ -189,9 +190,17 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
             + logPropFile
             : "";
 
+
+        String loadOptionString = "";
+        String loadFilename = this.gi.getResumeFromFilename();
+        if (loadFilename != null)
+        {
+            loadOptionString = " --latest";
+        }
+
         String command = javaCommand + " " + loggingFileArg + " -Duser.home="
             + gameDir + " -jar " + colossusJar + " -p " + hostingPort
-            + " -g --flagfile " + flagFileName;
+            + " -g --flagfile " + flagFileName + loadOptionString;
 
         try
         {
@@ -366,8 +375,7 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
         {
             String message = "Game " + gameId + " was suspended.";
             LOGGER.log(Level.INFO, message);
-            // flagFile.renameTo(new File(flagFile.getParent(),
-            //     "flagfile.startFailed"));
+            gi.setState(GameState.SUSPENDED);
         }
         else if (flagFile.exists() && reasonStartFailed != null)
         {

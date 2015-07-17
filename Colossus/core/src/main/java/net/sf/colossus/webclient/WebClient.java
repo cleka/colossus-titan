@@ -252,9 +252,9 @@ public class WebClient extends KFrame implements IWebClient
     private JButton startLocallyButton;
 
     private JButton watchButton;
+    private JButton resumeButton;
     private JButton hideButton;
     private JLabel hideButtonText;
-    private JTextField gameNrField;
 
     private JRadioButton autoGSNothingRB;
     private JRadioButton autoGSHideRB;
@@ -1574,31 +1574,26 @@ public class WebClient extends KFrame implements IWebClient
 
         runningGamesTab.add(runningGamesPane);
 
-        boolean IN_USE_2 = false;
+        boolean IN_USE_2 = true;
         if (IN_USE_2)
         {
-            Box loadSaveGamePanel = new Box(BoxLayout.X_AXIS);
-            gameNrField = new JTextField();
-            gameNrField.setSize(gameNrField.getMinimumSize());
-            loadSaveGamePanel.add(gameNrField);
-            JButton loadGameButton = new JButton("Load Game");
-            loadGameButton.addActionListener(new ActionListener()
+            Box resumeGamePanel = new Box(BoxLayout.X_AXIS);
+            resumeButton = new JButton("Load Game");
+            resumeButton.addActionListener(new ActionListener()
             {
                 public void actionPerformed(ActionEvent e)
                 {
-                    loadGameButtonAction();
+                    resumeGameButtonAction();
                 }
             });
 
-            loadSaveGamePanel.add(loadGameButton);
-            loadSaveGamePanel.add(Box.createHorizontalGlue());
-            loadSaveGamePanel.setPreferredSize(loadSaveGamePanel
+            resumeGamePanel.add(resumeButton);
+            resumeGamePanel.add(Box.createHorizontalGlue());
+            resumeGamePanel.setPreferredSize(resumeGamePanel
                 .getMinimumSize());
-            loadSaveGamePanel.setSize(loadSaveGamePanel.getMinimumSize());
-            loadSaveGamePanel.setAlignmentY(Box.TOP_ALIGNMENT);
-            runningGamesTab.add(new JLabel("x"));
-            runningGamesTab.add(loadSaveGamePanel);
-            runningGamesTab.add(new JLabel("y"));
+            resumeGamePanel.setSize(resumeGamePanel.getMinimumSize());
+            resumeGamePanel.setAlignmentY(Box.TOP_ALIGNMENT);
+            runningGamesTab.add(resumeGamePanel);
             runningGamesTab.add(Box.createVerticalGlue());
         }
 
@@ -1619,12 +1614,8 @@ public class WebClient extends KFrame implements IWebClient
         watchButton.setAlignmentX(Box.LEFT_ALIGNMENT);
         joinGamePanel.add(watchButton);
 
-        boolean IN_USE = true;
-        if (IN_USE)
-        {
-            runningGamesTab.add(Box.createVerticalGlue());
-            runningGamesTab.add(joinGamePanel);
-        }
+        runningGamesTab.add(Box.createVerticalGlue());
+        runningGamesTab.add(joinGamePanel);
 
         Box hideClientPanel = new Box(BoxLayout.Y_AXIS);
         hideClientPanel.setBorder(new TitledBorder("Hiding the Web Client"));
@@ -2208,11 +2199,41 @@ public class WebClient extends KFrame implements IWebClient
                 String id = getSelectedGameFromRunTableId();
                 if (id != null)
                 {
-                    watchPossible = true;
+                    GameInfo gi = findGameById(id);
+                    if (!gi.isEnrolled(username))
+                    {
+                        watchPossible = true;
+                    }
                 }
                 return watchPossible;
         }
+    }
 
+    private boolean checkIfCouldResume(int state)
+    {
+        switch (state)
+        {
+            case NotLoggedIn:
+            case EnrolledInstantGame:
+            case Playing:
+            case Watching:
+                return false;
+
+            case LoggedIn:
+            default:
+
+                boolean resumePossible = false;
+                String id = getSelectedGameFromRunTableId();
+                if (id != null)
+                {
+                    GameInfo gi = findGameById(id);
+                    if (gi.isEnrolled(username))
+                    {
+                        resumePossible = true;
+                    }
+                }
+                return resumePossible;
+        }
     }
 
     private boolean checkIfCouldStartOnServer(int state)
@@ -2393,6 +2414,7 @@ public class WebClient extends KFrame implements IWebClient
         // feature currently disabled (( => hardcoded to false)):
         boolean couldStartLocally = false;
         boolean couldWatch = checkIfCouldWatch(state);
+        boolean couldResume = checkIfCouldResume(state);
 
         // ----------------------------------------------------------------
         // ... and now actually change the GUI
@@ -2432,6 +2454,7 @@ public class WebClient extends KFrame implements IWebClient
         startButton.setEnabled(couldStartOnServer);
         startLocallyButton.setEnabled(couldStartLocally);
         watchButton.setEnabled(couldWatch);
+        resumeButton.setEnabled(couldResume);
 
         // Chat tab
         generalChat.setLoginState(state != NotLoggedIn, server, username);
@@ -2826,6 +2849,20 @@ public class WebClient extends KFrame implements IWebClient
         return true;
     }
 
+    boolean doResume(String gameId)
+    {
+        startButton.setEnabled(false);
+        startLocallyButton.setEnabled(false);
+        cancelButton.setEnabled(false);
+        unenrollButton.setEnabled(false);
+        // TODO better handle with changing state, but not today...
+        infoTextLabel.setText(startClickedText);
+        String filename = "snap1434107620737_30-clemens-Split.xml";
+        server.resumeGame(gameId, filename, new User(username));
+
+        return true;
+    }
+
     // Called when user presses the "Start Locally" button in
     // "Create or Join" tab
     private boolean doStartLocally(String gameId)
@@ -2919,6 +2956,7 @@ public class WebClient extends KFrame implements IWebClient
 
     public void gameStartsSoon(String gameId, String startUser)
     {
+        LOGGER.fine("Game starts soon, gameid " + gameId);
         GameInfo gi = findGameById(gameId);
         if (gi != null)
         {
@@ -2987,6 +3025,7 @@ public class WebClient extends KFrame implements IWebClient
         final int inactivityCheckInterval,
         final int inactivityWarningInterval, final int inactivityTimeout)
     {
+        LOGGER.info("Game starts now, gameid " + gameId);
         if (hostingHost == null || hostingHost.equals("null"))
         {
             // Hosted on Game Server
@@ -3447,6 +3486,7 @@ public class WebClient extends KFrame implements IWebClient
                                 break;
 
                             case RUNNING:
+                            case SUSPENDED:
                                 replaceInTable(runGameTable, game);
                                 proposedGameDataModel.removeGame(game
                                     .getGameId());
@@ -3531,10 +3571,11 @@ public class WebClient extends KFrame implements IWebClient
         server.watchGame(gameId, username);
     }
 
-    private void loadGameButtonAction()
+    private void resumeGameButtonAction()
     {
-        String number = gameNrField.getText();
-        System.out.println("Load Button, game nr " + number);
+        String gameId = getSelectedGameFromRunTableId();
+        LOGGER.fine("Resume Button, game nr " + gameId);
+        doResume(gameId);
     }
 
     private void quitButtonAction()

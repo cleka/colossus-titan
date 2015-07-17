@@ -99,7 +99,7 @@ class QueuedSocketWriter extends Thread
                 }
                 else
                 {
-                    LOGGER.fine(logMsg);
+                    // LOGGER.fine(logMsg);
                 }
             }
         }

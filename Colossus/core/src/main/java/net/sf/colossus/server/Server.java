@@ -3102,7 +3102,6 @@ public final class Server extends Thread implements IServer
 
     void triggerDispose()
     {
-
         LOGGER.info("triggerDispose() : setting initiateDisposal flag.");
         initiateDisposal = true;
     }
@@ -3498,10 +3497,9 @@ public final class Server extends Thread implements IServer
                 LOGGER.info("The 'suspend' flag was set. OK!");
                 if (game != null)
                 {
-                    game.setGameOver(true, "Game suspended");
-                    LOGGER
-                        .fine("in handle gui requests, suspendFlag set: calling triggerdispose");
-                    getGame().suspendGame();
+                    LOGGER.fine("in handle gui requests, "
+                        + "suspendFlag set: calling triggerdispose");
+                    game.handleSuspend();
                     triggerDispose();
                 }
                 else

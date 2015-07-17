@@ -255,9 +255,11 @@ public class WebServerClientSocketThread extends Thread
 
                 long parsingCompletedAt = new Date().getTime();
                 long parsingDuration = parsingCompletedAt - lastPacketReceived;
+
                 LOGGER.log((parsingDuration > 1000 ? Level.WARNING
-                    : Level.FINE), "Parsing+Processing took "
+                    : Level.FINEST), "Parsing+Processing took "
                     + parsingDuration + " ms for line " + fromClient);
+
                 String tmpUsername = "<unknown>";
 
                 if (theClient.getUser() != null)

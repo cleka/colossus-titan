@@ -1,0 +1,34 @@
+
+Status of the suspend + resume functionality per 17.7., committed as:
+  "Basic functionality now working"
+
+Any player can trigger suspend from file menu. Gmae server process will handle
+it, and put game to gameover, which sends a "Game over, reason: Game Suspended"
+to each client; then it closes connections.
+It renames the flagfile to "<flagfilename>.suspended".
+Webserver, when process ended, reaping notices the filename change and puts
+the game into "suspendedGames" list, instead of "endingGames" list.
+
+Problems:
+
+- Sometimes (1 out of 4 times) the one client gets "connection unexpectedly
+  closed" instead of that message.
+
+- should server ask everybody's agreement first?
+
+- suspended games are not properly sent/handled to clients
+  (should they be in different/own table?)
+   some clients see them in run table, others not)
+
+- suspended games could be saved over web server restart?
+
+
+- Resuming, there's an argument for the filename, but it's not used,
+  instead game is always loaded with --latest.
+
+  ==> some selection mechanism in webclient?
+      or it always starts latest, but one can say "delete latest, go on more
+      back"? ==> would need to disable autosave then for as long until
+      one knows "this is the one we want to play".
+
+

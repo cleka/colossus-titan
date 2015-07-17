@@ -437,6 +437,15 @@ public class WebServerClient implements IWebClient
             }
             server.startGame(gameId, byUser);
         }
+
+        else if (command.equals(IWebServer.Resume))
+        {
+            String gameId = tokens[1];
+            String filename = tokens[2];
+            User byUser = server.findUserByName(tokens[3]);
+            server.resumeGame(gameId, filename, byUser);
+        }
+
         else if (command.equals(IWebServer.StartAtPlayer))
         {
             String gameId = tokens[1];
