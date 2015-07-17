@@ -1311,8 +1311,13 @@ public final class MasterBoard extends JPanel
             mi.setMnemonic(KeyEvent.VK_A);
         }
 
-        mi = fileMenu.add(suspendGameAction);
-        mi.setMnemonic(KeyEvent.VK_U);
+        boolean SUSPEND_IN_USE = false;
+        if (gui.getStartedByWebClient() && SUSPEND_IN_USE)
+        {
+            mi = fileMenu.add(suspendGameAction);
+            mi.setMnemonic(KeyEvent.VK_U);
+        }
+
         fileMenu.addSeparator();
 
         mi = fileMenu.add(checkConnectionAction);

@@ -1574,28 +1574,27 @@ public class WebClient extends KFrame implements IWebClient
 
         runningGamesTab.add(runningGamesPane);
 
-        boolean IN_USE_2 = true;
+        Box resumeGamePanel = new Box(BoxLayout.X_AXIS);
+        resumeButton = new JButton("Load Game");
+        resumeButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                resumeGameButtonAction();
+            }
+        });
+
+        resumeGamePanel.add(resumeButton);
+        resumeGamePanel.add(Box.createHorizontalGlue());
+        resumeGamePanel.setPreferredSize(resumeGamePanel.getMinimumSize());
+        resumeGamePanel.setSize(resumeGamePanel.getMinimumSize());
+        resumeGamePanel.setAlignmentY(Box.TOP_ALIGNMENT);
+        boolean IN_USE_2 = false;
         if (IN_USE_2)
         {
-            Box resumeGamePanel = new Box(BoxLayout.X_AXIS);
-            resumeButton = new JButton("Load Game");
-            resumeButton.addActionListener(new ActionListener()
-            {
-                public void actionPerformed(ActionEvent e)
-                {
-                    resumeGameButtonAction();
-                }
-            });
-
-            resumeGamePanel.add(resumeButton);
-            resumeGamePanel.add(Box.createHorizontalGlue());
-            resumeGamePanel.setPreferredSize(resumeGamePanel
-                .getMinimumSize());
-            resumeGamePanel.setSize(resumeGamePanel.getMinimumSize());
-            resumeGamePanel.setAlignmentY(Box.TOP_ALIGNMENT);
             runningGamesTab.add(resumeGamePanel);
-            runningGamesTab.add(Box.createVerticalGlue());
         }
+        runningGamesTab.add(Box.createVerticalGlue());
 
         // ------------------ Hide WebClient stuff ---------------
 
