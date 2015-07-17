@@ -501,11 +501,6 @@ public final class Client implements IClient, IOracle, IVariant,
             return false;
         }
 
-        if (gui.getStartedByWebClient())
-        {
-            return true;
-        }
-
         return options.getOption(Options.inactivityTimeout);
     }
 

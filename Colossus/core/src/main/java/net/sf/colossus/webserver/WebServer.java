@@ -67,8 +67,8 @@ public class WebServer implements IWebServer, IRunWebServer
     private final static int MIN_FREE_GAME_PORTS = 5;
 
     private final int INACTIVITY_CHECK_INTERVAL = 10;
-    private final int INACTIVITY_WARNING_INTERVAL = 60;
-    private final int INACTIVITY_TIMEOUT = 180;
+    private final int INACTIVITY_WARNING_INTERVAL = 30;
+    private final int INACTIVITY_TIMEOUT = 90;
 
     private final static ArrayList<String> loginMessage = new ArrayList<String>();
 
