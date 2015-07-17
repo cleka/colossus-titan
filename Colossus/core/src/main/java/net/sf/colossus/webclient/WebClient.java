@@ -960,6 +960,88 @@ public class WebClient extends KFrame implements IWebClient
         createPreferencesPane();
         createGamesTab.add(preferencesPane);
 
+        // checkboxes (unlimited mulligans, balanced tower,
+        //   and battlecontrol needs lord):
+        JPanel checkboxPane = new JPanel(new GridLayout(0, 2));
+        checkboxPane.setBorder(new TitledBorder("Game options"));
+
+        boolean unlimitedMulligans = options
+            .getOption(Options.unlimitedMulligans);
+        unlimitedMulligansCB = new JCheckBox(Options.unlimitedMulligans,
+            unlimitedMulligans);
+        unlimitedMulligansCB.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                options.setOption(Options.unlimitedMulligans,
+                    unlimitedMulligansCB.isSelected());
+            }
+        });
+
+        boolean balancedTowers = options.getOption(Options.balancedTowers);
+        balancedTowersCB = new JCheckBox(Options.balancedTowers,
+            balancedTowers);
+        balancedTowersCB.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                options.setOption(Options.balancedTowers,
+                    balancedTowersCB.isSelected());
+            }
+        });
+
+        boolean lordBattleControl = options
+            .getOption(Options.sansLordAutoBattle);
+        lordBattleControlCB = new JCheckBox(Options.sansLordAutoBattle,
+            lordBattleControl);
+        lordBattleControlCB.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                options.setOption(Options.sansLordAutoBattle,
+                    lordBattleControlCB.isSelected());
+            }
+        });
+
+        inactivityTimeoutCB = new JCheckBox(Options.inactivityTimeout,
+            options.getOption(Options.inactivityTimeout));
+        inactivityTimeoutCB.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                options.setOption(Options.inactivityTimeout,
+                    inactivityTimeoutCB.isSelected());
+            }
+        });
+
+        boolean probabilityBaseBattleHits = options
+            .getOption(Options.pbBattleHits);
+        probBasedBattleHitsCB = new JCheckBox(Options.pbBattleHits,
+            probabilityBaseBattleHits);
+        probBasedBattleHitsCB.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                options.setOption(Options.pbBattleHits,
+                    probBasedBattleHitsCB.isSelected());
+            }
+        });
+
+        checkboxPane.add(unlimitedMulligansCB);
+        checkboxPane.add(balancedTowersCB);
+        checkboxPane.add(lordBattleControlCB);
+        checkboxPane.add(probBasedBattleHitsCB);
+        checkboxPane.add(inactivityTimeoutCB);
+
+        createGamesTab.add(checkboxPane);
+        /*
+        preferencesPane.add(new JLabel("Various settings:"));
+        preferencesPane.add(checkboxPane);
+
+        preferencesPane.add(new JLabel("Various settings:"));
+        preferencesPane.add(new JLabel("Dummy label"));
+        */
+
         Box proposeGamePane = new Box(BoxLayout.Y_AXIS);
         proposeGamePane.setAlignmentX(Box.CENTER_ALIGNMENT);
         proposeGamePane.setBorder(new TitledBorder("Creating games:"));
@@ -1319,7 +1401,7 @@ public class WebClient extends KFrame implements IWebClient
     private void createPreferencesPane()
     {
         preferencesPane = new JPanel(new GridLayout(0, 2));
-        preferencesPane.setBorder(new TitledBorder("Game preferences"));
+        preferencesPane.setBorder(new TitledBorder("Game settings"));
 
         // Variant:
         String variantName = options.getStringOption(Options.variant);
@@ -1387,81 +1469,6 @@ public class WebClient extends KFrame implements IWebClient
         preferencesPane.add(new JLabel("Events expire after (turns):"));
         preferencesPane.add(eventExpiringBox);
 
-        // checkboxes (unlimited mulligans, balanced tower,
-        //   and battlecontrol needs lord):
-        JPanel checkboxPane = new JPanel(new GridLayout(0, 2));
-
-        boolean unlimitedMulligans = options
-            .getOption(Options.unlimitedMulligans);
-        unlimitedMulligansCB = new JCheckBox(Options.unlimitedMulligans,
-            unlimitedMulligans);
-        unlimitedMulligansCB.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                options.setOption(Options.unlimitedMulligans,
-                    unlimitedMulligansCB.isSelected());
-            }
-        });
-
-        boolean balancedTowers = options.getOption(Options.balancedTowers);
-        balancedTowersCB = new JCheckBox(Options.balancedTowers,
-            balancedTowers);
-        balancedTowersCB.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                options.setOption(Options.balancedTowers,
-                    balancedTowersCB.isSelected());
-            }
-        });
-
-        boolean lordBattleControl = options
-            .getOption(Options.sansLordAutoBattle);
-        lordBattleControlCB = new JCheckBox(Options.sansLordAutoBattle,
-            lordBattleControl);
-        lordBattleControlCB.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                options.setOption(Options.sansLordAutoBattle,
-                    lordBattleControlCB.isSelected());
-            }
-        });
-
-        inactivityTimeoutCB = new JCheckBox(Options.inactivityTimeout,
-            options.getOption(Options.inactivityTimeout));
-        inactivityTimeoutCB.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                options.setOption(Options.inactivityTimeout,
-                    inactivityTimeoutCB.isSelected());
-            }
-        });
-
-        boolean probabilityBaseBattleHits = options
-            .getOption(Options.pbBattleHits);
-        probBasedBattleHitsCB = new JCheckBox(Options.pbBattleHits,
-            probabilityBaseBattleHits);
-        probBasedBattleHitsCB.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                options.setOption(Options.pbBattleHits,
-                    probBasedBattleHitsCB.isSelected());
-            }
-        });
-
-        checkboxPane.add(unlimitedMulligansCB);
-        checkboxPane.add(balancedTowersCB);
-        checkboxPane.add(lordBattleControlCB);
-        checkboxPane.add(probBasedBattleHitsCB);
-        checkboxPane.add(inactivityTimeoutCB);
-
-        preferencesPane.add(new JLabel("Various settings:"));
-        preferencesPane.add(checkboxPane);
-
         // min, target and max nr. of players:
         preferencesPane.add(new JLabel("Select player count preferences:"));
         Box playerSelection = new Box(BoxLayout.X_AXIS);
@@ -1499,7 +1506,6 @@ public class WebClient extends KFrame implements IWebClient
         maxLabel = new JLabel(" max=?");
         playerSelection.add(maxLabel);
         updateMaxSpinner(variantName);
-
         preferencesPane.add(playerSelection);
     }
 
@@ -1589,7 +1595,7 @@ public class WebClient extends KFrame implements IWebClient
         resumeGamePanel.setPreferredSize(resumeGamePanel.getMinimumSize());
         resumeGamePanel.setSize(resumeGamePanel.getMinimumSize());
         resumeGamePanel.setAlignmentY(Box.TOP_ALIGNMENT);
-        boolean IN_USE_2 = false;
+        boolean IN_USE_2 = true;
         if (IN_USE_2)
         {
             runningGamesTab.add(resumeGamePanel);
