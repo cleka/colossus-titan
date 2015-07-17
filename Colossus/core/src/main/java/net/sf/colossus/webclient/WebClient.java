@@ -180,7 +180,9 @@ public class WebClient extends KFrame implements IWebClient
 
     private JTabbedPane tabbedPane;
     private Box serverTab;
-    private JPanel preferencesPane;
+    private JPanel settingsPanel;
+    private JPanel checkboxPanel;
+
     private Box createGamesTab;
     private Box runningGamesTab;
     private Box adminTab;
@@ -956,91 +958,10 @@ public class WebClient extends KFrame implements IWebClient
     private void createCreateGamesTab()
     {
         createGamesTab = new Box(BoxLayout.Y_AXIS);
-
-        createPreferencesPane();
-        createGamesTab.add(preferencesPane);
-
-        // checkboxes (unlimited mulligans, balanced tower,
-        //   and battlecontrol needs lord):
-        JPanel checkboxPane = new JPanel(new GridLayout(0, 2));
-        checkboxPane.setBorder(new TitledBorder("Game options"));
-
-        boolean unlimitedMulligans = options
-            .getOption(Options.unlimitedMulligans);
-        unlimitedMulligansCB = new JCheckBox(Options.unlimitedMulligans,
-            unlimitedMulligans);
-        unlimitedMulligansCB.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                options.setOption(Options.unlimitedMulligans,
-                    unlimitedMulligansCB.isSelected());
-            }
-        });
-
-        boolean balancedTowers = options.getOption(Options.balancedTowers);
-        balancedTowersCB = new JCheckBox(Options.balancedTowers,
-            balancedTowers);
-        balancedTowersCB.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                options.setOption(Options.balancedTowers,
-                    balancedTowersCB.isSelected());
-            }
-        });
-
-        boolean lordBattleControl = options
-            .getOption(Options.sansLordAutoBattle);
-        lordBattleControlCB = new JCheckBox(Options.sansLordAutoBattle,
-            lordBattleControl);
-        lordBattleControlCB.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                options.setOption(Options.sansLordAutoBattle,
-                    lordBattleControlCB.isSelected());
-            }
-        });
-
-        inactivityTimeoutCB = new JCheckBox(Options.inactivityTimeout,
-            options.getOption(Options.inactivityTimeout));
-        inactivityTimeoutCB.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                options.setOption(Options.inactivityTimeout,
-                    inactivityTimeoutCB.isSelected());
-            }
-        });
-
-        boolean probabilityBaseBattleHits = options
-            .getOption(Options.pbBattleHits);
-        probBasedBattleHitsCB = new JCheckBox(Options.pbBattleHits,
-            probabilityBaseBattleHits);
-        probBasedBattleHitsCB.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                options.setOption(Options.pbBattleHits,
-                    probBasedBattleHitsCB.isSelected());
-            }
-        });
-
-        checkboxPane.add(unlimitedMulligansCB);
-        checkboxPane.add(balancedTowersCB);
-        checkboxPane.add(lordBattleControlCB);
-        checkboxPane.add(probBasedBattleHitsCB);
-        checkboxPane.add(inactivityTimeoutCB);
-
-        createGamesTab.add(checkboxPane);
-        /*
-        preferencesPane.add(new JLabel("Various settings:"));
-        preferencesPane.add(checkboxPane);
-
-        preferencesPane.add(new JLabel("Various settings:"));
-        preferencesPane.add(new JLabel("Dummy label"));
-        */
+        createSettingsPanel();
+        createGamesTab.add(settingsPanel);
+        createCheckboxPanel();
+        createGamesTab.add(checkboxPanel);
 
         Box proposeGamePane = new Box(BoxLayout.Y_AXIS);
         proposeGamePane.setAlignmentX(Box.CENTER_ALIGNMENT);
@@ -1048,9 +969,9 @@ public class WebClient extends KFrame implements IWebClient
 
         // proposeGamePane.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        proposeGamePane
-            .add(makeTextBox(nonBoldLabel("Set your preferences, fill in "
-                + "the 'Summary' text, then press 'Propose' to create a game:")));
+        proposeGamePane.add(makeTextBox(nonBoldLabel("Set your preferences, "
+            + "fill in  the 'Summary' text, "
+            + "then press 'Propose' to create a game:")));
 
         summaryText = new JTextField(defaultSummaryText);
         summaryText.addFocusListener(new FocusAdapter()
@@ -1120,10 +1041,11 @@ public class WebClient extends KFrame implements IWebClient
         durationPanel.add(durationField);
         durationPanel.setAlignmentY(Box.TOP_ALIGNMENT);
 
-        durationPanel
-            .add(makeTextBox(nonBoldLabel(" (the purpose of the duration value is: "
-                + " one should only enroll to that game if one knows that one "
-                + " will be available for at least that time)")));
+        // " (the purpose of the duration value is: "
+        // + " one should only enroll to that game if one knows that one "
+        // + " will be available for at least that time)"
+
+        durationPanel.add(makeTextBox(nonBoldLabel("...")));
         durationPanel.add(Box.createHorizontalGlue());
 
         proposeGamePane.add(durationPanel);
@@ -1398,10 +1320,10 @@ public class WebClient extends KFrame implements IWebClient
         setScheduledGamesMode(switchToScheduling);
     }
 
-    private void createPreferencesPane()
+    private void createSettingsPanel()
     {
-        preferencesPane = new JPanel(new GridLayout(0, 2));
-        preferencesPane.setBorder(new TitledBorder("Game settings"));
+        settingsPanel = new JPanel(new GridLayout(0, 2));
+        settingsPanel.setBorder(new TitledBorder("Game settings"));
 
         // Variant:
         String variantName = options.getStringOption(Options.variant);
@@ -1422,8 +1344,8 @@ public class WebClient extends KFrame implements IWebClient
             }
         });
 
-        preferencesPane.add(new JLabel("Select variant:"));
-        preferencesPane.add(variantBox);
+        settingsPanel.add(new JLabel("Select variant:"));
+        settingsPanel.add(variantBox);
 
         // Viewmode:
         // String viewmodesArray[] = { "all-public", "auto-tracked", "only-own" };
@@ -1444,8 +1366,8 @@ public class WebClient extends KFrame implements IWebClient
             }
         });
 
-        preferencesPane.add(new JLabel("Select view mode:"));
-        preferencesPane.add(viewmodeBox);
+        settingsPanel.add(new JLabel("Select view mode:"));
+        settingsPanel.add(viewmodeBox);
 
         // event expiring policy:
         String eventExpiringVal = options
@@ -1466,11 +1388,11 @@ public class WebClient extends KFrame implements IWebClient
             }
         });
 
-        preferencesPane.add(new JLabel("Events expire after (turns):"));
-        preferencesPane.add(eventExpiringBox);
+        settingsPanel.add(new JLabel("Events expire after (turns):"));
+        settingsPanel.add(eventExpiringBox);
 
         // min, target and max nr. of players:
-        preferencesPane.add(new JLabel("Select player count preferences:"));
+        settingsPanel.add(new JLabel("Select player count preferences:"));
         Box playerSelection = new Box(BoxLayout.X_AXIS);
 
         int min = options.getIntOption(Options.minPlayersWeb);
@@ -1506,7 +1428,81 @@ public class WebClient extends KFrame implements IWebClient
         maxLabel = new JLabel(" max=?");
         playerSelection.add(maxLabel);
         updateMaxSpinner(variantName);
-        preferencesPane.add(playerSelection);
+        settingsPanel.add(playerSelection);
+    }
+
+    private void createCheckboxPanel()
+    {
+        checkboxPanel = new JPanel(new GridLayout(0, 2));
+        checkboxPanel.setBorder(new TitledBorder("Game options"));
+
+        boolean unlimitedMulligans = options
+            .getOption(Options.unlimitedMulligans);
+        unlimitedMulligansCB = new JCheckBox(Options.unlimitedMulligans,
+            unlimitedMulligans);
+        unlimitedMulligansCB.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                options.setOption(Options.unlimitedMulligans,
+                    unlimitedMulligansCB.isSelected());
+            }
+        });
+
+        boolean balancedTowers = options.getOption(Options.balancedTowers);
+        balancedTowersCB = new JCheckBox(Options.balancedTowers,
+            balancedTowers);
+        balancedTowersCB.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                options.setOption(Options.balancedTowers,
+                    balancedTowersCB.isSelected());
+            }
+        });
+
+        boolean lordBattleControl = options
+            .getOption(Options.sansLordAutoBattle);
+        lordBattleControlCB = new JCheckBox(Options.sansLordAutoBattle,
+            lordBattleControl);
+        lordBattleControlCB.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                options.setOption(Options.sansLordAutoBattle,
+                    lordBattleControlCB.isSelected());
+            }
+        });
+
+        inactivityTimeoutCB = new JCheckBox(Options.inactivityTimeout,
+            options.getOption(Options.inactivityTimeout));
+        inactivityTimeoutCB.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                options.setOption(Options.inactivityTimeout,
+                    inactivityTimeoutCB.isSelected());
+            }
+        });
+
+        boolean probabilityBaseBattleHits = options
+            .getOption(Options.pbBattleHits);
+        probBasedBattleHitsCB = new JCheckBox(Options.pbBattleHits,
+            probabilityBaseBattleHits);
+        probBasedBattleHitsCB.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                options.setOption(Options.pbBattleHits,
+                    probBasedBattleHitsCB.isSelected());
+            }
+        });
+
+        checkboxPanel.add(unlimitedMulligansCB);
+        checkboxPanel.add(balancedTowersCB);
+        checkboxPanel.add(lordBattleControlCB);
+        checkboxPanel.add(probBasedBattleHitsCB);
+        checkboxPanel.add(inactivityTimeoutCB);
     }
 
     private void updateMaxSpinner(String variant)
@@ -1581,7 +1577,9 @@ public class WebClient extends KFrame implements IWebClient
         runningGamesTab.add(runningGamesPane);
 
         Box resumeGamePanel = new Box(BoxLayout.X_AXIS);
-        resumeButton = new JButton("Load Game");
+        resumeGamePanel.setBorder(new TitledBorder(
+            "Resume/Load a suspended game"));
+        resumeButton = new JButton("Resume Game");
         resumeButton.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent e)
@@ -1594,8 +1592,7 @@ public class WebClient extends KFrame implements IWebClient
         resumeGamePanel.add(Box.createHorizontalGlue());
         resumeGamePanel.setPreferredSize(resumeGamePanel.getMinimumSize());
         resumeGamePanel.setSize(resumeGamePanel.getMinimumSize());
-        resumeGamePanel.setAlignmentY(Box.TOP_ALIGNMENT);
-        boolean IN_USE_2 = true;
+        boolean IN_USE_2 = false;
         if (IN_USE_2)
         {
             runningGamesTab.add(resumeGamePanel);
@@ -1604,8 +1601,8 @@ public class WebClient extends KFrame implements IWebClient
 
         // ------------------ Hide WebClient stuff ---------------
 
-        Box joinGamePanel = new Box(BoxLayout.Y_AXIS);
-        joinGamePanel.setBorder(new TitledBorder("WatchOngoingGame"));
+        Box joinGamePanel = new Box(BoxLayout.X_AXIS);
+        joinGamePanel.setBorder(new TitledBorder("Watch an ongoing game"));
 
         watchButton = new JButton(WatchButtonText);
         watchButton.addActionListener(new ActionListener()
@@ -1618,6 +1615,9 @@ public class WebClient extends KFrame implements IWebClient
         watchButton.setEnabled(false);
         watchButton.setAlignmentX(Box.LEFT_ALIGNMENT);
         joinGamePanel.add(watchButton);
+        joinGamePanel.add(Box.createHorizontalGlue());
+        joinGamePanel.setPreferredSize(joinGamePanel.getMinimumSize());
+        joinGamePanel.setSize(joinGamePanel.getMinimumSize());
 
         runningGamesTab.add(Box.createVerticalGlue());
         runningGamesTab.add(joinGamePanel);
