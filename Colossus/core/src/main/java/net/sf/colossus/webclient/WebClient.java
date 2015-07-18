@@ -23,11 +23,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -232,12 +234,6 @@ public class WebClient extends KFrame implements IWebClient
     private JSpinner spinner3;
     private JLabel maxLabel;
 
-    private JCheckBox unlimitedMulligansCB;
-    private JCheckBox balancedTowersCB;
-    private JCheckBox lordBattleControlCB;
-    private JCheckBox inactivityTimeoutCB;
-    private JCheckBox probBasedBattleHitsCB;
-
     private JLabel nowDateAndTimeLabel;
     private JTextField atDateField;
     private JTextField atTimeField;
@@ -282,6 +278,17 @@ public class WebClient extends KFrame implements IWebClient
     private final HashMap<String, GameInfo> gameHash = new HashMap<String, GameInfo>();
 
     private final HashSet<String> deletedGames = new HashSet<String>();
+
+    // so that we can for all checked checkboxes add the corresponding option
+    // to the options string
+    private final HashMap<String, JCheckBox> checkboxForOption = new HashMap<String, JCheckBox>();
+
+    // Need a list to preserve order
+    private final List<String> gameOptions = new LinkedList<String>(
+        Arrays.asList(Options.unlimitedMulligans, Options.balancedTowers,
+            Options.sansLordAutoBattle, Options.pbBattleHits,
+            Options.inactivityTimeout));
+
 
     private JPanel gamesTablesPanel;
     private JPanel gamesCards;
@@ -1436,73 +1443,25 @@ public class WebClient extends KFrame implements IWebClient
         checkboxPanel = new JPanel(new GridLayout(0, 2));
         checkboxPanel.setBorder(new TitledBorder("Game options"));
 
-        boolean unlimitedMulligans = options
-            .getOption(Options.unlimitedMulligans);
-        unlimitedMulligansCB = new JCheckBox(Options.unlimitedMulligans,
-            unlimitedMulligans);
-        unlimitedMulligansCB.addActionListener(new ActionListener()
+        for (String optionName : gameOptions)
+        {
+            createCheckbox(optionName);
+        }
+    }
+
+    private void createCheckbox(final String optionName)
+    {
+        boolean optionValue = options.getOption(optionName);
+        final JCheckBox checkbox = new JCheckBox(optionName, optionValue);
+        checkbox.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent e)
             {
-                options.setOption(Options.unlimitedMulligans,
-                    unlimitedMulligansCB.isSelected());
+                options.setOption(optionName, checkbox.isSelected());
             }
         });
-
-        boolean balancedTowers = options.getOption(Options.balancedTowers);
-        balancedTowersCB = new JCheckBox(Options.balancedTowers,
-            balancedTowers);
-        balancedTowersCB.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                options.setOption(Options.balancedTowers,
-                    balancedTowersCB.isSelected());
-            }
-        });
-
-        boolean lordBattleControl = options
-            .getOption(Options.sansLordAutoBattle);
-        lordBattleControlCB = new JCheckBox(Options.sansLordAutoBattle,
-            lordBattleControl);
-        lordBattleControlCB.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                options.setOption(Options.sansLordAutoBattle,
-                    lordBattleControlCB.isSelected());
-            }
-        });
-
-        inactivityTimeoutCB = new JCheckBox(Options.inactivityTimeout,
-            options.getOption(Options.inactivityTimeout));
-        inactivityTimeoutCB.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                options.setOption(Options.inactivityTimeout,
-                    inactivityTimeoutCB.isSelected());
-            }
-        });
-
-        boolean probabilityBaseBattleHits = options
-            .getOption(Options.pbBattleHits);
-        probBasedBattleHitsCB = new JCheckBox(Options.pbBattleHits,
-            probabilityBaseBattleHits);
-        probBasedBattleHitsCB.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                options.setOption(Options.pbBattleHits,
-                    probBasedBattleHitsCB.isSelected());
-            }
-        });
-
-        checkboxPanel.add(unlimitedMulligansCB);
-        checkboxPanel.add(balancedTowersCB);
-        checkboxPanel.add(lordBattleControlCB);
-        checkboxPanel.add(probBasedBattleHitsCB);
-        checkboxPanel.add(inactivityTimeoutCB);
+        checkboxPanel.add(checkbox);
+        checkboxForOption.put(optionName, checkbox);
     }
 
     private void updateMaxSpinner(String variant)
@@ -3826,25 +3785,13 @@ public class WebClient extends KFrame implements IWebClient
         int target = ((Integer)spinner2.getValue()).intValue();
         int max = ((Integer)spinner3.getValue()).intValue();
         List<String> extraOptions = new ArrayList<String>();
-        if (lordBattleControlCB.isSelected())
+
+        for (String optionName : gameOptions)
         {
-            extraOptions.add(Options.sansLordAutoBattle);
-        }
-        if (unlimitedMulligansCB.isSelected())
-        {
-            extraOptions.add(Options.unlimitedMulligans);
-        }
-        if (balancedTowersCB.isSelected())
-        {
-            extraOptions.add(Options.balancedTowers);
-        }
-        if (probBasedBattleHitsCB.isSelected())
-        {
-            extraOptions.add(Options.pbBattleHits);
-        }
-        if (inactivityTimeoutCB.isSelected())
-        {
-            extraOptions.add(Options.inactivityTimeout);
+            if (checkboxForOption.get(optionName).isSelected())
+            {
+                extraOptions.add(optionName);
+            }
         }
 
         String dummy = new String("");
