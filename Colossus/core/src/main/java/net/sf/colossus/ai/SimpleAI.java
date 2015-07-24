@@ -2709,6 +2709,9 @@ public class SimpleAI extends AbstractAI
                 }
             }
         }
+        // Treat damage to Titan as 4 times worse than for a normal critter
+        value.add(4 * bec.PENALTY_TERRAIN_DAMAGE
+                    * hex.damageToCreature(critter.getType());
     }
 
     /** This compute the influence of terrain */
