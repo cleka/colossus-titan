@@ -19,7 +19,7 @@ public class GameTableModel extends AbstractTableModel
 {
     private final String[] columnNames = { "#", "state", "by", "when",
         "duration", "info", "Variant", "Viewmode", "Expire", "Options",
-        "(dummy)", "min", "target", "max", "actual", "players", "online" };
+        "Teleport", "min", "target", "max", "actual", "players", "online" };
 
     private final Vector<GameInfo> data = new Vector<GameInfo>(17, 1);
     private final HashMap<String, Integer> rowIndex = new HashMap<String, Integer>();
@@ -108,11 +108,11 @@ public class GameTableModel extends AbstractTableModel
                 break;
 
             case 9:
-                o = gi.getOptionsFlagsString();
+                o = gi.getGameOptionsFlagsString();
                 break;
 
             case 10:
-                o = new String("dummy");
+                o = gi.getTeleportOptionsFlagsString();
                 break;
 
             case 11:
@@ -281,6 +281,11 @@ public class GameTableModel extends AbstractTableModel
     public String getOptionsTooltipText(int row)
     {
         return data.get(row).GetOptionsTooltipText();
+    }
+
+    public String getTeleportOptionsTooltipText(int row)
+    {
+        return data.get(row).GetTeleportOptionsTooltipText();
     }
 
     public int addGame(GameInfo gi)

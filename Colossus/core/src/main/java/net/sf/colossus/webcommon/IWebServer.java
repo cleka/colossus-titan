@@ -51,8 +51,8 @@ public interface IWebServer
     // that return value (internally) when used in server side.
     public GameInfo proposeGame(String initiator, String variant,
         String viewmode, long startAt, int duration, String summary,
-        String expire, List<String> extraOptions, String unUsed, int min,
-        int target, int max);
+        String expire, List<String> gameOptions, List<String> teleportOptions,
+        int min, int target, int max);
 
     public void enrollUserToGame(String gameId, String username);
 

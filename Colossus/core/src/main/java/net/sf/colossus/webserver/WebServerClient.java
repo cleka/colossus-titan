@@ -368,30 +368,38 @@ public class WebServerClient implements IWebClient
             int ntarget = Integer.parseInt(tokens[11]);
             int nmax = Integer.parseInt(tokens[12]);
 
-            List<String> extraOptions = new ArrayList<String>();
-            String dummyString = new String("");
+            List<String> gameOptions = new ArrayList<String>();
+            List<String> teleportOptions = new ArrayList<String>();
 
             if (getClientVersion() >= WebClient.WC_VERSION_SUPPORTS_EXTRA_OPTIONS)
             {
+                String gameOptionsString = tokens[8];
+                gameOptions.addAll(Split.split(Glob.sep, gameOptionsString));
+                String tpOptionsString = tokens[9];
+                teleportOptions.addAll(Split.split(Glob.sep, tpOptionsString));
+            }
+            else if (getClientVersion() >= WebClient.WC_VERSION_SUPPORTS_EXTRA_OPTIONS)
+            {
                 String optionsString = tokens[8];
-                dummyString = tokens[9];
-                extraOptions.addAll(Split.split(Glob.sep, optionsString));
+                @SuppressWarnings("unused")
+                String dummyString = tokens[9];
+                gameOptions.addAll(Split.split(Glob.sep, optionsString));
             }
             else
             {
                 // earlier arg 8+9 were mulligans and tower options booleans
                 if (Boolean.valueOf(tokens[8]).booleanValue())
                 {
-                    extraOptions.add(Options.unlimitedMulligans);
+                    gameOptions.add(Options.unlimitedMulligans);
                 }
                 if (Boolean.valueOf(tokens[9]).booleanValue())
                 {
-                    extraOptions.add(Options.balancedTowers);
+                    gameOptions.add(Options.balancedTowers);
                 }
             }
 
             gi = server.proposeGame(initiator, variant, viewmode, startAt,
-                duration, summary, expire, extraOptions, dummyString, nmin,
+                duration, summary, expire, gameOptions, teleportOptions, nmin,
                 ntarget, nmax);
         }
 
@@ -896,13 +904,13 @@ public class WebServerClient implements IWebClient
     {
         if (getClientVersion() >= WebClient.WC_VERSION_SUPPORTS_EXTRA_OPTIONS)
         {
-            LOGGER.info("Sending LegacyGameInfo to client " + getUsername());
+            LOGGER.info("Sending GameInfo (new style) to client "
+                + getUsername());
             sendToClient(gameInfo + sep + gi.toString(sep));
         }
         else
         {
-            LOGGER.info("Sending GameInfo (new style) to client "
-                + getUsername());
+            LOGGER.info("Sending LegacyGameInfo to client " + getUsername());
             sendToClient(gameInfo + sep + gi.toStringLegacy(sep));
         }
     }

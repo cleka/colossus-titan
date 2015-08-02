@@ -64,6 +64,13 @@ public class GameInfo
     private boolean inactivityTimeout;
     private boolean probabilityBasedBattleHits;
 
+    private boolean noFirstTurnT2TTeleportOpt;
+    private boolean noFirstTurnTeleportOpt;
+    private boolean towerToTowerTeleportOnlyOpt;
+    private boolean noTowerTeleportOpt;
+    private boolean noTitanTeleportOpt;
+    private boolean noFirstTurnWarlockRecruitOpt;
+
     private int min;
     private int target;
     private int max;
@@ -121,14 +128,14 @@ public class GameInfo
 
     public GameInfo(String initiator, String variant, String viewmode,
         long startTime, int duration, String summary, String expire,
-        List<String> extraOptions, String dummy, int min, int target, int max)
+        List<String> gameOptions, List<String> teleportOptions, int min,
+        int target, int max)
     {
         this(makeTypeFromStarttime(startTime));
 
-        parseExtraOptions(extraOptions);
+        parseExtraOptions(gameOptions);
+        parseExtraOptions(teleportOptions);
 
-        // just to get rid of "unused" warning:
-        LOGGER.finest("Dummy: value of dummy string is '" + dummy + "'.");
         this.initiator = initiator;
         this.variant = variant;
         this.viewmode = viewmode;
@@ -182,6 +189,30 @@ public class GameInfo
             else if (string.equals(Options.pbBattleHits))
             {
                 this.probabilityBasedBattleHits = true;
+            }
+            else if (string.equals(Options.noFirstTurnT2TTeleport))
+            {
+                this.noFirstTurnT2TTeleportOpt = true;
+            }
+            else if (string.equals(Options.noFirstTurnTeleport))
+            {
+                this.noFirstTurnTeleportOpt = true;
+            }
+            else if (string.equals(Options.towerToTowerTeleportOnly))
+            {
+                this.towerToTowerTeleportOnlyOpt = true;
+            }
+            else if (string.equals(Options.noTowerTeleport))
+            {
+                this.noTowerTeleportOpt = true;
+            }
+            else if (string.equals(Options.noTitanTeleport))
+            {
+                this.noTitanTeleportOpt = true;
+            }
+            else if (string.equals(Options.noFirstTurnWarlockRecruit))
+            {
+                this.noFirstTurnWarlockRecruitOpt = true;
             }
             else
             {
@@ -257,6 +288,9 @@ public class GameInfo
         {
             List<String> extraOptions = Split.split(Glob.sep, token8);
             gi.parseExtraOptions(extraOptions);
+            List<String> teleportOptions = Split.split(Glob.sep, token9);
+            gi.parseExtraOptions(teleportOptions);
+
         }
 
         gi.min = Integer.parseInt(tokens[j++]);
@@ -328,15 +362,22 @@ public class GameInfo
             + state.toString() + sep + initiator + sep + variant + sep
             + viewmode + sep + startTime + sep + duration + sep + summary
             + sep + eventExpiring + sep + getExtraOptionsAsString() + sep
-            + new String("dummy") + sep + min + sep + target + sep + max + sep
+            + getTeleportOptionsAsString() + sep + min + sep + target + sep
+            + max + sep
             + onlineCount + sep + enrolledPlayers + playerList.toString();
 
+        System.out.println("sending to client: " + message);
         return message;
     }
 
     public String getExtraOptionsAsString()
     {
         return Glob.glob(getExtraOptions());
+    }
+
+    public String getTeleportOptionsAsString()
+    {
+        return Glob.glob(getTeleportOptions());
     }
 
     public List<String> getExtraOptions()
@@ -355,7 +396,6 @@ public class GameInfo
 
         if (this.unlimitedMulligans)
         {
-            this.unlimitedMulligans = true;
             extraOptions.add(Options.unlimitedMulligans);
         }
 
@@ -370,6 +410,36 @@ public class GameInfo
         }
 
         return extraOptions;
+    }
+
+    public List<String> getTeleportOptions()
+    {
+        List<String> teleportOptions = new ArrayList<String>();
+        if (this.noFirstTurnT2TTeleportOpt)
+        {
+            teleportOptions.add(Options.noFirstTurnT2TTeleport);
+        }
+        if (this.noFirstTurnTeleportOpt)
+        {
+            teleportOptions.add(Options.noFirstTurnTeleport);
+        }
+        if (this.towerToTowerTeleportOnlyOpt)
+        {
+            teleportOptions.add(Options.towerToTowerTeleportOnly);
+        }
+        if (this.noTowerTeleportOpt)
+        {
+            teleportOptions.add(Options.noTowerTeleport);
+        }
+        if (this.noTitanTeleportOpt)
+        {
+            teleportOptions.add(Options.noTitanTeleport);
+        }
+        if (this.noFirstTurnWarlockRecruitOpt)
+        {
+            teleportOptions.add(Options.noFirstTurnWarlockRecruit);
+        }
+        return teleportOptions;
     }
 
     public void setState(GameState state)
@@ -558,14 +628,13 @@ public class GameInfo
         probabilityBasedBattleHits = val;
     }
 
-    public String getOptionsFlagsString()
+    public String getGameOptionsFlagsString()
     {
         String s = (this.unlimitedMulligans ? "U" : "-")
             + (this.balancedTowers ? "B" : "-")
             + (this.autoSansLordBattles ? "N" : "-")
             + (this.probabilityBasedBattleHits ? "P" : "-")
             + (this.inactivityTimeout ? "I" : "-");
-
         return s;
     }
 
@@ -581,9 +650,37 @@ public class GameInfo
             + (this.probabilityBasedBattleHits ? Options.pbBattleHits : "-")
             + ", "
             + (this.inactivityTimeout ? Options.inactivityTimeout : "-");
-
         return ttText;
+    }
 
+    public String getTeleportOptionsFlagsString()
+    {
+        String s = (this.noFirstTurnT2TTeleportOpt ? "2" : "-")
+            + (this.noFirstTurnTeleportOpt ? "1" : "-")
+            + (this.towerToTowerTeleportOnlyOpt ? "T" : "-")
+            + (this.noTowerTeleportOpt ? "w" : "-")
+            + (this.noTitanTeleportOpt ? "t" : "-")
+            + (this.noFirstTurnWarlockRecruitOpt ? "W" : "-");
+        return s;
+    }
+
+    public String GetTeleportOptionsTooltipText()
+    {
+        String ttText = (this.noFirstTurnT2TTeleportOpt ? Options.noFirstTurnT2TTeleport
+            : "-")
+            + ", "
+            + (this.noFirstTurnTeleportOpt ? Options.noFirstTurnTeleport : "-")
+            + ", "
+            + (this.towerToTowerTeleportOnlyOpt ? Options.towerToTowerTeleportOnly
+                : "-")
+            + ", "
+            + (this.noTowerTeleportOpt ? Options.noTowerTeleport : "-")
+            + ", "
+            + (this.noTitanTeleportOpt ? Options.noTitanTeleport : "-")
+            + ", "
+            + (this.noFirstTurnWarlockRecruitOpt ? Options.noFirstTurnWarlockRecruit
+                : "-");
+        return ttText;
     }
 
     /**
@@ -888,6 +985,19 @@ public class GameInfo
             getAutoSansLordBattles());
         gameOptions.setOption(Options.pbBattleHits,
             getProbabilityBasedBattleHits());
+
+        gameOptions.setOption(Options.noFirstTurnTeleport,
+            this.noFirstTurnTeleportOpt);
+        gameOptions.setOption(Options.noFirstTurnTeleport,
+            this.noFirstTurnTeleportOpt);
+        gameOptions.setOption(Options.towerToTowerTeleportOnly,
+            this.towerToTowerTeleportOnlyOpt);
+        gameOptions
+            .setOption(Options.noTowerTeleport, this.noTowerTeleportOpt);
+        gameOptions
+            .setOption(Options.noTitanTeleport, this.noTitanTeleportOpt);
+        gameOptions.setOption(Options.noFirstTurnWarlockRecruit,
+            this.noFirstTurnWarlockRecruitOpt);
 
         // gameOptions.setOption(Options.autoQuit, true);
         String name;

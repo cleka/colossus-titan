@@ -742,8 +742,8 @@ public class WebServer implements IWebServer, IRunWebServer
 
     public GameInfo proposeGame(String initiator, String variant,
         String viewmode, long startAt, int duration, String summary,
-        String expire, List<String> extraOptions, String dummy, int min,
-        int target, int max)
+        String expire, List<String> gameOptions, List<String> teleportOptions,
+        int min, int target, int max)
     {
         if (GameInfo.wouldBeInstantGame(startAt))
         {
@@ -765,7 +765,8 @@ public class WebServer implements IWebServer, IRunWebServer
         }
 
         GameInfo gi = new GameInfo(initiator, variant, viewmode, startAt,
-            duration, summary, expire, extraOptions, dummy, min, target, max);
+            duration, summary, expire, gameOptions, teleportOptions, min,
+            target, max);
 
         String scheduleType = gi.isScheduledGame() ? "scheduled" : "instant";
         LOGGER.info("Game " + gi.getGameId() + " (" + scheduleType

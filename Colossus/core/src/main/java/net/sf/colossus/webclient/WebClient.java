@@ -183,7 +183,7 @@ public class WebClient extends KFrame implements IWebClient
     private JTabbedPane tabbedPane;
     private Box serverTab;
     private JPanel settingsPanel;
-    private JPanel checkboxPanel;
+    private JPanel gameOptionsPanel;
 
     private Box createGamesTab;
     private Box runningGamesTab;
@@ -289,6 +289,12 @@ public class WebClient extends KFrame implements IWebClient
             Options.sansLordAutoBattle, Options.pbBattleHits,
             Options.inactivityTimeout));
 
+    // Need a list to preserve order
+    private final List<String> teleportOptions = new LinkedList<String>(
+        Arrays.asList(Options.noFirstTurnT2TTeleport,
+            Options.noFirstTurnTeleport, Options.towerToTowerTeleportOnly,
+            Options.noTowerTeleport, Options.noTitanTeleport,
+            Options.noFirstTurnWarlockRecruit));
 
     private JPanel gamesTablesPanel;
     private JPanel gamesCards;
@@ -966,9 +972,8 @@ public class WebClient extends KFrame implements IWebClient
     {
         createGamesTab = new Box(BoxLayout.Y_AXIS);
         createSettingsPanel();
-        createGamesTab.add(settingsPanel);
-        createCheckboxPanel();
-        createGamesTab.add(checkboxPanel);
+        createGameOptionsPanel();
+        createTeleportCheckboxPanel();
 
         Box proposeGamePane = new Box(BoxLayout.Y_AXIS);
         proposeGamePane.setAlignmentX(Box.CENTER_ALIGNMENT);
@@ -1185,9 +1190,14 @@ public class WebClient extends KFrame implements IWebClient
                     case 5:
                     case 6:
                     case 7:
+                        break;
                     case 9:
                         tip = proposedGameDataModel
                             .getOptionsTooltipText(rowIndex);
+                        break;
+                    case 10:
+                        tip = proposedGameDataModel
+                            .getTeleportOptionsTooltipText(rowIndex);
                         break;
                     case 15:
                         tip = "" + getValueAt(rowIndex, colIndex);
@@ -1436,20 +1446,39 @@ public class WebClient extends KFrame implements IWebClient
         playerSelection.add(maxLabel);
         updateMaxSpinner(variantName);
         settingsPanel.add(playerSelection);
+
+        createGamesTab.add(settingsPanel);
     }
 
-    private void createCheckboxPanel()
+    private void createGameOptionsPanel()
     {
-        checkboxPanel = new JPanel(new GridLayout(0, 2));
-        checkboxPanel.setBorder(new TitledBorder("Game options"));
-
+        gameOptionsPanel = new JPanel(new GridLayout(0, 3));
+        gameOptionsPanel.setBorder(new TitledBorder("Game options"));
         for (String optionName : gameOptions)
         {
-            createCheckbox(optionName);
+            createTpCheckbox(optionName, gameOptionsPanel);
         }
+        /*
+        Box noAttackBeforePanel = new Box(BoxLayout.X_AXIS);
+        noAttackBeforePanel.add(new JLabel("No attack before turn: "));
+        noAttackBeforePanel.add(new JTextField("1", 5));
+        checkboxPanel.add(noAttackBeforePanel);
+        */
+        createGamesTab.add(gameOptionsPanel);
     }
 
-    private void createCheckbox(final String optionName)
+    private void createTeleportCheckboxPanel()
+    {
+        JPanel tpPanel = new JPanel(new GridLayout(0, 3));
+        tpPanel.setBorder(new TitledBorder("Teleport options"));
+        for (String optionName : teleportOptions)
+        {
+            createTpCheckbox(optionName, tpPanel);
+        }
+        createGamesTab.add(tpPanel);
+    }
+
+    private void createTpCheckbox(final String optionName, Container cpPanel)
     {
         boolean optionValue = options.getOption(optionName);
         final JCheckBox checkbox = new JCheckBox(optionName, optionValue);
@@ -1460,7 +1489,7 @@ public class WebClient extends KFrame implements IWebClient
                 options.setOption(optionName, checkbox.isSelected());
             }
         });
-        checkboxPanel.add(checkbox);
+        cpPanel.add(checkbox);
         checkboxForOption.put(optionName, checkbox);
     }
 
@@ -2738,11 +2767,11 @@ public class WebClient extends KFrame implements IWebClient
     }
 
     private void do_proposeGame(String variant, String viewmode, long startAt,
-        int duration, String summary, String expire,
-        List<String> extraOptions, String dummy, int min, int target, int max)
+        int duration, String summary, String expire, List<String> gameOptions,
+        List<String> teleportOptions, int min, int target, int max)
     {
         server.proposeGame(username, variant, viewmode, startAt, duration,
-            summary, expire, extraOptions, dummy, min, target, max);
+            summary, expire, gameOptions, teleportOptions, min, target, max);
     }
 
     private long getStartTime()
@@ -3784,17 +3813,34 @@ public class WebClient extends KFrame implements IWebClient
         int min = ((Integer)spinner1.getValue()).intValue();
         int target = ((Integer)spinner2.getValue()).intValue();
         int max = ((Integer)spinner3.getValue()).intValue();
-        List<String> extraOptions = new ArrayList<String>();
 
+        List<String> gameOptionsList = new ArrayList<String>();
         for (String optionName : gameOptions)
         {
             if (checkboxForOption.get(optionName).isSelected())
             {
-                extraOptions.add(optionName);
+                System.out.println("adding " + optionName);
+                gameOptionsList.add(optionName);
+            }
+            else
+            {
+                System.out.println("NOT adding " + optionName);
             }
         }
 
-        String dummy = new String("");
+        List<String> teleportOptionsList = new ArrayList<String>();
+        for (String optionName : teleportOptions)
+        {
+            if (checkboxForOption.get(optionName).isSelected())
+            {
+                System.out.println("adding " + optionName);
+                teleportOptionsList.add(optionName);
+            }
+            else
+            {
+                System.out.println("NOT adding " + optionName);
+            }
+        }
 
         boolean scheduled = getScheduledGamesMode();
         long startAt = scheduled ? getStartTime() : -1;
@@ -3803,7 +3849,7 @@ public class WebClient extends KFrame implements IWebClient
 
         do_proposeGame(variantBox.getSelectedItem().toString(), viewmodeBox
             .getSelectedItem().toString(), startAt, duration, summaryText,
-            eventExpiringBox.getSelectedItem().toString(), extraOptions,
-            dummy, min, target, max);
+            eventExpiringBox.getSelectedItem().toString(), gameOptionsList,
+            teleportOptionsList, min, target, max);
     }
 }
