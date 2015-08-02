@@ -366,7 +366,6 @@ public class GameInfo
             + max + sep
             + onlineCount + sep + enrolledPlayers + playerList.toString();
 
-        System.out.println("sending to client: " + message);
         return message;
     }
 
