@@ -350,90 +350,33 @@
     <zip zipfile="${ZIPFILE}" basedir="."
     excludes="build/**, target/**, **/*.sav, **/*.zip, **/*.bak, **/*javadoc*/*, *Keystore*, *cfg, *properties*, BattlelandsRandomizer.jar, .*, **/*.ps, **/*.aux, **/*.bbl, **/*.bib, **/*.blg, **/*.log, **/*.old, tmp/**, libs/build/**"/>
   </target>
-  <!-- Internal: tests if we have a Subversion copy to avoid running the Ant task if we don't -
-       the svn task throws NullPointerExceptions if there's no ".svn" folder -->
-  <target name="checkForSvn">
-  	<condition property="doSvnCheck">
-  	  <available file="${basedir}/.svn"/>
-  	</condition>
-  </target>
 	
-  <target name="revertjdom" description="Do svn revert for libs/jdom.jar"
-	depends="checkForSvn">
-  	<taskdef name="svn"
-  	         classname="org.tigris.subversion.svnant.SvnTask">
-      <classpath>
-        <pathelement path="${libs.dir}/build/svnant.jar"/>
-        <pathelement path="${libs.dir}/build/svnClientAdapter.jar"/>
-        <pathelement path="${libs.dir}/build/svnkit.jar"/>
-  	  </classpath>
-  	</taskdef>
-    <svn javahl="false" svnkit="true" failonerror="false">
-        <revert file="libs/jdom.jar">
-        </revert>
-    </svn>
-  </target>
-	
-  <!-- Build information will only be available if we have a SVN working copy, otherwise it will
-       be skipped completely. While some of that information is available without SVN we assume
-       that any official build will be done from a working copy and thus not split the target. -->
-  <target name="buildInfo" description="Generates property file with some information on the build such as revision and time"
-  	if="doSvnCheck" depends="checkForSvn,revertjdom">
-  	<!-- This task tries to use svnkit, which is normally not there; it will then fall back to a command line svn.
-  	     see libs/build/README.txt for more information -->
-  	<taskdef name="svn"
-  	         classname="org.tigris.subversion.svnant.SvnTask">
-      <classpath>
-        <pathelement path="${libs.dir}/build/svnant.jar"/>
-        <pathelement path="${libs.dir}/build/svnClientAdapter.jar"/>
-        <pathelement path="${libs.dir}/build/svnkit.jar"/>
-  	  </classpath>
-  	</taskdef>
-    <svn javahl="false" svnkit="true" failonerror="false">
-      <!-- set @processUnversioned to "true" if new files should show up as modifications -->
-      <wcVersion path="${basedir}" prefix="buildInfo.svn." processUnversioned="false"/>
-    </svn>
-
-    <!-- set properties not set by wcVersion to something so we get nice output -->
-  	<!-- the first two are never set unless true, the others should be set unless
-  	     the svn task fails -->
-    <property name="buildInfo.svn.modified" value="false"/>
-    <property name="buildInfo.svn.mixed" value="false"/>
-    <property name="buildInfo.svn.repository.url" value="UNKNOWN"/>
-    <property name="buildInfo.svn.repository.path" value="UNKNOWN"/>
-    <property name="buildInfo.svn.revision.max" value="UNKNOWN"/>
-    <property name="buildInfo.svn.revision.max-with-flags" value="UNKNOWN"/>
-    <property name="buildInfo.svn.revision.range" value="UNKNOWN"/>
-    <property name="buildInfo.svn.committed.max" value="UNKNOWN"/>
-    <property name="buildInfo.svn.modified" value="UNKNOWN"/>
-  
-  	<mkdir dir="${build.classes.dir}/META-INF"/>
-  	<!-- we copy all information from wcVersion, even if it is redundant -->
+  <target name="buildInfo" description="Generates property file with some information on the build such as revision and time">
+    <exec executable="git" outputproperty="git.revision">
+      <arg value="log" />
+      <arg value="-1" />
+      <arg value="--pretty=format:%H"/>
+    </exec>
+    <mkdir dir="${build.classes.dir}/META-INF"/>
+    <!-- we copy all information from wcVersion, even if it is redundant -->
     <propertyfile file="${build.classes.dir}/META-INF/build.properties" comment="Build information">
-      <entry key="svn.repository.url" value="${buildInfo.svn.repository.url}"/>
-      <entry key="svn.repository.path" value="${buildInfo.svn.repository.path}"/>
-      <entry key="svn.revision.max" value="${buildInfo.svn.revision.max}"/>
-      <entry key="svn.revision.max-with-flags" value="${buildInfo.svn.revision.max-with-flags}"/>
-      <entry key="svn.revision.range" value="${buildInfo.svn.revision.range}"/>
-      <entry key="svn.committed.max" value="${buildInfo.svn.committed.max}"/>
-      <entry key="svn.committed.max-with-flags" value="${buildInfo.svn.committed.max-with-flags}"/>
-      <entry key="svn.modified" value="${buildInfo.svn.modified}"/>
-      <entry key="svn.mixed" value="${buildInfo.svn.mixed}"/>
       <entry key="build.timestamp"
              type="date"
              pattern="yyyy-MM-dd'T'HH:mm:ss"
              value="now"/>
       <entry key="ant.java.version" value="${ant.java.version}"/>
       <entry key="build.compiler" value="${build.compiler}"/>
-      <entry key="username" value="${env.USERNAME}"/>
+      <entry key="username" value="${user.name}"/>
       <entry key="java.runtime.name" value="${java.runtime.name}"/>
       <entry key="java.runtime.version" value="${java.runtime.version}"/>
       <entry key="os.name" value="${os.name}"/>
       <entry key="os.arch" value="${os.arch}"/>
       <entry key="os.version" value="${os.version}"/>
+      <entry key="git.commit" value="${git.revision}"/>
       <entry key="release.version" value="${release.version}"/>
     </propertyfile>
   </target>
+  
   <!-- Tasks from here down are only needed for installation on the web site. -->
   <target name="inst" depends="clean,init,sign,dist"
   description="Locally copy files into htdocs tree on SF">

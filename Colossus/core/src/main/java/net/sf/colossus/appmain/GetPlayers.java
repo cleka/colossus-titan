@@ -611,7 +611,7 @@ public final class GetPlayers extends KFrame
          * might be stuck a minute or so, before it times out.
          */
         String runningOnString = "Running Colossus Version "
-            + BuildInfo.getReleaseVersion() + " (revision "
+            + BuildInfo.getReleaseVersion() + " ("
             + BuildInfo.getRevisionInfoString() + ")" + ", listening at port "
             + port;
         runningOnLabel.setText(runningOnString);

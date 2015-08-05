@@ -21,7 +21,7 @@ public class BuildInfo
     {
         // first set some defaults, they get replaced if loading succeeds
         BUILD_PROPERTIES.setProperty("release.version", "unknown");
-        BUILD_PROPERTIES.setProperty("svn.revision.max-with-flags", "unknown");
+        BUILD_PROPERTIES.setProperty("git.commit", "unknown");
         BUILD_PROPERTIES.setProperty("build.timestamp", "unknown");
         BUILD_PROPERTIES.setProperty("username", "unknown");
         ClassLoader cl = BuildInfo.class.getClassLoader();
@@ -42,20 +42,23 @@ public class BuildInfo
 
     public static String getBuildInfo(boolean full)
     {
-        String revInfo = BUILD_PROPERTIES
-            .getProperty("svn.revision.max-with-flags");
+        String revInfo = BUILD_PROPERTIES.getProperty("git.commit");
+        if (revInfo.length() > 10)
+        {
+            revInfo = revInfo.substring(0, 11) + "...";
+        }
         String timeStamp = BUILD_PROPERTIES.getProperty("build.timestamp");
         String byUser = BUILD_PROPERTIES.getProperty("username");
 
         String buildInfoString;
         if (full)
         {
-            buildInfoString = timeStamp + " by " + byUser + " from revision "
+            buildInfoString = timeStamp + " by " + byUser + " from commit "
                 + revInfo;
         }
         else
         {
-            buildInfoString = revInfo;
+            buildInfoString = "commit" + revInfo;
         }
         return buildInfoString;
     }
