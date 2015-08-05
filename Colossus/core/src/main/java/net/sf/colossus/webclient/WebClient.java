@@ -3822,12 +3822,7 @@ public class WebClient extends KFrame implements IWebClient
         {
             if (checkboxForOption.get(optionName).isSelected())
             {
-                System.out.println("adding " + optionName);
                 gameOptionsList.add(optionName);
-            }
-            else
-            {
-                System.out.println("NOT adding " + optionName);
             }
         }
 
@@ -3836,12 +3831,7 @@ public class WebClient extends KFrame implements IWebClient
         {
             if (checkboxForOption.get(optionName).isSelected())
             {
-                System.out.println("adding " + optionName);
                 teleportOptionsList.add(optionName);
-            }
-            else
-            {
-                System.out.println("NOT adding " + optionName);
             }
         }
 

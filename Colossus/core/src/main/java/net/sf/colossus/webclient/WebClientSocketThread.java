@@ -796,11 +796,6 @@ public class WebClientSocketThread extends Thread implements IWebServer
     {
         String gameOptionsString = Glob.glob(gameOptions);
         String teleportOptionsString = Glob.glob(teleportOptions);
-
-        System.out.println("sending to server: " + Propose + sep + initiator
-            + sep + variant + sep + viewmode + sep + startAt + sep + duration
-            + sep + summary + sep + expire + sep + gameOptionsString + sep
-            + teleportOptionsString + sep + min + sep + target + sep + max);
         send(Propose + sep + initiator + sep + variant + sep + viewmode + sep
             + startAt + sep + duration + sep + summary + sep + expire + sep
             + gameOptionsString + sep + teleportOptionsString + sep + min
