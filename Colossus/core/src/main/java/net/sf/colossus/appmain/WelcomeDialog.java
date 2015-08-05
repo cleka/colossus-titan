@@ -28,7 +28,7 @@ public final class WelcomeDialog extends KFrame
 {
     private final static String title = "Welcome to this new Colossus Release!";
 
-    private final static String CURRENT_WELCOME_KEY = "Release-0.14.0";
+    private final static String CURRENT_WELCOME_KEY = "build 20150805-01";
 
     private final static String baseUrl = "http://sourceforge.net/projects/colossus/files";
     private final static String colossusReleaseNoteUrl = baseUrl + "/"
@@ -41,18 +41,19 @@ public final class WelcomeDialog extends KFrame
         super(title);
 
         String text = "\n"
-            + "  Welcome to this new Colossus Release 0.14.0!"
+            + "  Welcome to this new Colossus "
+            + CURRENT_WELCOME_KEY
+            + "!"
             + "\n\n"
-            + "  This build:\n"
-            + "  - contains all the functionality from the PTBs that has been around for very long time (since 2012-04-08)\n"
-            + "  - includes some additional usability improvements and bugfixes\n"
-            + "\n"
-            + "  For a more detailed list of changes see the Recent Changes Details document "
-            + "in the Download area of Colossus on SourceForge:\n      "
-            + colossusReleaseNoteUrl
-            + "\n\n"
-            + "  Use button below to copy the URL to your clipboard to paste it "
-            + "into your browser.\n\n"
+            + "  This build contains all the new features that were recently "
+            + "added:\n  - most of the options (that one could use "
+            + "earlier only for local games) can be chosen also in webclient games;\n"
+            + "  - new options: inactivity-timeout, probability based battle hits, "
+            + "need Lord for battle control;\n"
+            + "  - new feature: 'request extra roll';\n"
+            + "  - notification (turn bottombar and chat yellow) when own turn starts;\n"
+            + "  - improved webclient propose game tab layout;\n"
+            + "  - history (up/down) in chat, better handling of failed /ping commands;\n\n"
             + "  This \"Welcome Dialog\" will only be shown once for every "
             + "new release;\n"
             + "  (you can find this welcome message also from the "
