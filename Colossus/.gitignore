@@ -1,6 +1,10 @@
 build
-/CmdlineClient.jar
-/Colossus.jar
-/ColossusWeb.jar
+CmdlineClient.jar
+Colossus.jar
+ColossusWeb.jar
+Colossus*.zip
 *Keystore
 local_build.properties
+unix.jnlp
+win.jnlp
+
