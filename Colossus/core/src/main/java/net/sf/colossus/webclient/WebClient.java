@@ -1185,11 +1185,11 @@ public class WebClient extends KFrame implements IWebClient
                 // Variant name
                 switch (realColumnIndex)
                 {
-                    case 1:
-                    case 2:
                     case 5:
                     case 6:
                     case 7:
+                        tip = (String)proposedGameDataModel.getValueAt(
+                            rowIndex, realColumnIndex);
                         break;
                     case 9:
                         tip = proposedGameDataModel
@@ -1227,6 +1227,9 @@ public class WebClient extends KFrame implements IWebClient
             .setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane propScrollpane = new JScrollPane(proposedGameTable);
         propGamesCard.add(propScrollpane, BorderLayout.CENTER);
+        propGamesCard.add(nonBoldLabel("For some of the longer fields, "
+            + "hovering mouse over a column gives more information!"),
+            BorderLayout.SOUTH);
 
         JPanel dummyCard = new JPanel(new BorderLayout());
         dummyCard.add(Box.createRigidArea(new Dimension(0, 50)));
