@@ -15,7 +15,7 @@
        <resources>
          <jar href="special-build/Colossus.jar"/>
          <jar href="special-build/libs/jdom.jar"/>
-         <j2se version="1.5+" max-heap-size="256M"/>
+         <j2se version="1.7+" max-heap-size="256M"/>
        </resources>
        <security>
            <all-permissions/>
