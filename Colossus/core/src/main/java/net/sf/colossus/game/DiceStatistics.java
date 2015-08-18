@@ -89,7 +89,7 @@ public class DiceStatistics
             }
         }
 
-        String average = String.format("%3.1f", (float)totalSum / totalCount);
+        String average = String.format("%3.2f", (float)totalSum / totalCount);
         writeToStatFile("\nBattle roll statistics for player " + p.getName()
             + ", in total " + totalCount
             + " battle dice rolled; average of all rolls: " + average);
