@@ -796,6 +796,7 @@ public class WebServer implements IWebServer, IRunWebServer
         for (GameInfo gi : games)
         {
             if (!gi.isScheduledGame()
+                && !gi.getGameState().equals(GameState.SUSPENDED)
                 && gi.getInitiator().equals(user.getName()))
             {
                 LOGGER.info("Auto-cancelling instant game " + gi.getGameId()

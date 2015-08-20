@@ -2261,12 +2261,21 @@ public class WebClient extends KFrame implements IWebClient
             case LoggedIn:
             default:
 
+                if (suspGameDataModel.getRowCount() == 0)
+                {
+                    reasonWhyNot = "You don't have any suspended games.";
+                    return reasonWhyNot;
+                }
                 reasonWhyNot = "You are not enrolled into this game.";
                 String id = getSelectedGameIdFromSuspTable();
                 if (id != null)
                 {
                     GameInfo gi = findGameById(id);
-                    if (gi.isEnrolled(username))
+                    if (gi.getOnlineCount() != gi.getPlayers().size())
+                    {
+                        reasonWhyNot = "Not all players online.";
+                    }
+                    else if (gi.isEnrolled(username) || isActive())
                     {
                         reasonWhyNot = null;
                     }
@@ -3543,7 +3552,15 @@ public class WebClient extends KFrame implements IWebClient
                                 break;
 
                             case SUSPENDED:
-                                replaceInTable(suspGameTable, game);
+                                if (game.isEnrolled(username) || isAdmin())
+                                {
+                                    replaceInTable(suspGameTable, game);
+                                }
+                                else
+                                {
+                                    suspGameDataModel.removeGame(game
+                                        .getGameId());
+                                }
                                 runGameDataModel.removeGame(game.getGameId());
                                 break;
 
