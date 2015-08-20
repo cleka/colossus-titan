@@ -256,6 +256,7 @@ public class WebClient extends KFrame implements IWebClient
 
     private JButton watchButton;
     private JButton resumeButton;
+    private JLabel reasonWhyNotLabel;
     private JButton hideButton;
     private JLabel hideButtonText;
 
@@ -1740,6 +1741,9 @@ public class WebClient extends KFrame implements IWebClient
         });
 
         resumeGamePanel.add(resumeButton);
+        resumeGamePanel.add(new JLabel("    "));
+        reasonWhyNotLabel = nonBoldLabel("Not logged in");
+        resumeGamePanel.add(reasonWhyNotLabel);
         resumeGamePanel.add(Box.createHorizontalGlue());
         resumeGamePanel.setPreferredSize(resumeGamePanel.getMinimumSize());
         resumeGamePanel.setSize(resumeGamePanel.getMinimumSize());
@@ -2243,30 +2247,35 @@ public class WebClient extends KFrame implements IWebClient
         }
     }
 
-    private boolean checkIfCouldResume(int state)
+    private String checkIfCouldResume(int state)
     {
+        String reasonWhyNot = null;
         switch (state)
         {
             case NotLoggedIn:
             case EnrolledInstantGame:
             case Playing:
             case Watching:
-                return false;
+                return "Can't resume while enrolled, playing or watching another game.";
 
             case LoggedIn:
             default:
 
-                boolean resumePossible = false;
+                reasonWhyNot = "You are not enrolled into this game.";
                 String id = getSelectedGameIdFromSuspTable();
                 if (id != null)
                 {
                     GameInfo gi = findGameById(id);
                     if (gi.isEnrolled(username))
                     {
-                        resumePossible = true;
+                        reasonWhyNot = null;
                     }
                 }
-                return resumePossible;
+                else
+                {
+                    reasonWhyNot = "Select a game in the table.";
+                }
+                return reasonWhyNot;
         }
     }
 
@@ -2448,7 +2457,7 @@ public class WebClient extends KFrame implements IWebClient
         // feature currently disabled (( => hardcoded to false)):
         boolean couldStartLocally = false;
         boolean couldWatch = checkIfCouldWatch(state);
-        boolean couldResume = checkIfCouldResume(state);
+        String reasonWhyCantResume = checkIfCouldResume(state);
 
         // ----------------------------------------------------------------
         // ... and now actually change the GUI
@@ -2488,7 +2497,10 @@ public class WebClient extends KFrame implements IWebClient
         startButton.setEnabled(couldStartOnServer);
         startLocallyButton.setEnabled(couldStartLocally);
         watchButton.setEnabled(couldWatch);
-        resumeButton.setEnabled(couldResume);
+        resumeButton.setEnabled(reasonWhyCantResume == null);
+        reasonWhyNotLabel
+            .setText(reasonWhyCantResume == null ? "Click to resume the game!"
+            : reasonWhyCantResume);
 
         // Chat tab
         generalChat.setLoginState(state != NotLoggedIn, server, username);
@@ -3774,8 +3786,9 @@ public class WebClient extends KFrame implements IWebClient
             // nor old ones.
             if (!gi.isScheduledGame()
                 && gi.getInitiator().equals(username)
-                && !(gi.getGameState().equals(GameState.RUNNING) || gi
-                    .getGameState().equals(GameState.ENDING))
+                && !(gi.getGameState().equals(GameState.RUNNING)
+                    || gi.getGameState().equals(GameState.ENDING) || gi
+                    .getGameState().equals(GameState.SUSPENDED))
                 && !deletedGames.contains(gi.getGameId()))
             {
                 list.add(gi);

@@ -733,7 +733,8 @@ public class WebServer implements IWebServer, IRunWebServer
         {
             if (!gi.isScheduledGame()
                 && (gi.isEnrolled(initiatorName) || gi.getInitiator().equals(
-                    initiatorName)))
+                    initiatorName))
+                && !gi.getGameState().equals(GameState.SUSPENDED))
             {
                 return gi;
             }
