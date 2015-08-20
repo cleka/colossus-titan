@@ -251,24 +251,20 @@ public class GameInfo
         if (games.containsKey(gameId))
         {
             // use the object webclient has created earlier
+            LOGGER.finest("Found already, updating");
             gi = games.get(key);
-            // System.out.println("Found already, updating");
         }
         else
         {
             gi = new GameInfo(gameId, fromFile);
+            LOGGER.finest("Creating a new GameInfo");
             games.put(key, gi);
-            // System.out.println("Creating a new one GameInfo ");
         }
 
         int j = 2;
         gi.type = GameType.valueOf(tokens[j++]);
         gi.state = GameState.valueOf(tokens[j++]);
         gi.initiator = tokens[j++];
-
-        // System.out.println("fromString, state=" + gi.state + ")");
-        // System.out.println("tokens: " + tokens.toString());
-
         gi.variant = tokens[j++];
         gi.viewmode = tokens[j++];
         gi.startTime = Long.parseLong(tokens[j++]);
@@ -286,11 +282,16 @@ public class GameInfo
         }
         else
         {
-            List<String> extraOptions = Split.split(Glob.sep, token8);
-            gi.parseExtraOptions(extraOptions);
-            List<String> teleportOptions = Split.split(Glob.sep, token9);
-            gi.parseExtraOptions(teleportOptions);
-
+            if (token8.length() > 0)
+            {
+                List<String> extraOptions = Split.split(Glob.sep, token8);
+                gi.parseExtraOptions(extraOptions);
+            }
+            if (token9.length() > 0)
+            {
+                List<String> teleportOptions = Split.split(Glob.sep, token9);
+                gi.parseExtraOptions(teleportOptions);
+            }
         }
 
         gi.min = Integer.parseInt(tokens[j++]);
@@ -1047,7 +1048,8 @@ public class GameInfo
 
     public boolean relevantForSaving()
     {
-        return state.equals(GameState.PROPOSED) || state.equals(GameState.DUE);
+        return state.equals(GameState.PROPOSED) || state.equals(GameState.DUE)
+            || state.equals(GameState.SUSPENDED);
     }
 
     public boolean isStartable()
