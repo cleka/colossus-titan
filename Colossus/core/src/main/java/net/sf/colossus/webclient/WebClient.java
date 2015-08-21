@@ -257,6 +257,7 @@ public class WebClient extends KFrame implements IWebClient
     private JButton watchButton;
     private JButton resumeButton;
     private JLabel reasonWhyNotLabel;
+    private JButton recoverButton;
     private JButton hideButton;
     private JLabel hideButtonText;
 
@@ -927,7 +928,7 @@ public class WebClient extends KFrame implements IWebClient
         rb.setSelected(selected);
     }
 
-    private JLabel nonBoldLabel(String text)
+    protected static JLabel nonBoldLabel(String text)
     {
         JLabel l = new JLabel(text);
         l.setFont(l.getFont().deriveFont(Font.PLAIN));
@@ -1704,11 +1705,9 @@ public class WebClient extends KFrame implements IWebClient
         suspendedGamesTab = new Box(BoxLayout.Y_AXIS);
 
         // ----------------- First the table ---------------------
-
-        Box suspendedGamesPane = new Box(BoxLayout.Y_AXIS);
-        suspendedGamesPane.setAlignmentY(0);
-        suspendedGamesPane.setBorder(new TitledBorder("Suspended Games"));
-        suspendedGamesPane
+        suspendedGamesTab.setAlignmentY(0);
+        suspendedGamesTab.setBorder(new TitledBorder("Suspended Games"));
+        suspendedGamesTab
             .add(new JLabel("The following games are suspended:"));
 
         suspGameDataModel = new GameTableModel(myLocale);
@@ -1724,10 +1723,11 @@ public class WebClient extends KFrame implements IWebClient
 
         suspGameTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane susptablescrollpane = new JScrollPane(suspGameTable);
-        suspendedGamesPane.add(susptablescrollpane);
+        suspendedGamesTab.add(susptablescrollpane);
 
-        suspendedGamesTab.add(suspendedGamesPane);
+        suspendedGamesTab.add(Box.createVerticalGlue());
 
+        // ----------------- Resume button -------------------
         Box resumeGamePanel = new Box(BoxLayout.X_AXIS);
         resumeGamePanel.setBorder(new TitledBorder(
             "Resume/Load a suspended game"));
@@ -1739,7 +1739,6 @@ public class WebClient extends KFrame implements IWebClient
                 resumeGameButtonAction();
             }
         });
-
         resumeGamePanel.add(resumeButton);
         resumeGamePanel.add(new JLabel("    "));
         reasonWhyNotLabel = nonBoldLabel("Not logged in");
@@ -1747,12 +1746,52 @@ public class WebClient extends KFrame implements IWebClient
         resumeGamePanel.add(Box.createHorizontalGlue());
         resumeGamePanel.setPreferredSize(resumeGamePanel.getMinimumSize());
         resumeGamePanel.setSize(resumeGamePanel.getMinimumSize());
-        boolean IN_USE_2 = true;
-        if (IN_USE_2)
-        {
-            suspendedGamesTab.add(resumeGamePanel);
-        }
+
+        suspendedGamesTab.add(resumeGamePanel);
         suspendedGamesTab.add(Box.createVerticalGlue());
+
+        // ----------------- Recover button -------------------
+
+        Box recoverGamePanel = new Box(BoxLayout.X_AXIS);
+        recoverGamePanel.setBorder(new TitledBorder("Recover a crashed game"));
+        recoverButton = new JButton("Browse");
+        recoverButton.setEnabled(false);
+        recoverButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                recoverGame();
+            }
+        });
+        recoverGamePanel.add(recoverButton);
+
+        JLabel niLabel = new JLabel("    (not implemented yet)");
+        niLabel.setFont(niLabel.getFont().deriveFont(Font.ITALIC));
+        recoverGamePanel.add(niLabel);
+        recoverGamePanel.add(Box.createHorizontalGlue());
+        recoverGamePanel.setPreferredSize(recoverGamePanel.getMinimumSize());
+        recoverGamePanel.setSize(recoverGamePanel.getMinimumSize());
+
+        suspendedGamesTab.add(recoverGamePanel);
+        suspendedGamesTab.add(Box.createVerticalGlue());
+
+        /*
+        // ----------------- Cancel button -------------------
+
+        Box buttonBar = new Box(BoxLayout.X_AXIS);
+        cancelButton.setPreferredSize(cancelButton.getMinimumSize());
+        buttonBar.add(Box.createHorizontalGlue());
+        buttonBar.add(cancelButton);
+        buttonBar.add(Box.createHorizontalGlue());
+        suspendedGamesTab.add(buttonBar);
+        suspendedGamesTab.add(Box.createVerticalGlue());
+        */
+
+    }
+
+    private void recoverGame()
+    {
+        new RecoverGameDialog(this, options);
     }
 
     private void createAdminTab()
@@ -2249,6 +2288,12 @@ public class WebClient extends KFrame implements IWebClient
 
     private String checkIfCouldResume(int state)
     {
+        boolean DEBUG = false;
+        if (DEBUG)
+        {
+            return null;
+        }
+
         String reasonWhyNot = null;
         switch (state)
         {
@@ -2273,7 +2318,8 @@ public class WebClient extends KFrame implements IWebClient
                     GameInfo gi = findGameById(id);
                     if (gi.getOnlineCount() != gi.getPlayers().size())
                     {
-                        reasonWhyNot = "Not all players online.";
+                        reasonWhyNot = "Not all players online for game #"
+                            + gi.getGameId();
                     }
                     else if (gi.isEnrolled(username) || isActive())
                     {
@@ -2508,7 +2554,7 @@ public class WebClient extends KFrame implements IWebClient
         watchButton.setEnabled(couldWatch);
         resumeButton.setEnabled(reasonWhyCantResume == null);
         reasonWhyNotLabel
-            .setText(reasonWhyCantResume == null ? "Click to resume the game!"
+            .setText(reasonWhyCantResume == null ? "Click to resume the game selected in table above!"
             : reasonWhyCantResume);
 
         // Chat tab
