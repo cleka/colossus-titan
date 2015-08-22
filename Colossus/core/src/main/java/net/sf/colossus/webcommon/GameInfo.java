@@ -166,6 +166,10 @@ public class GameInfo
      */
     private void parseExtraOptions(List<String> extraOptions)
     {
+        if (extraOptions.size() == 1 && extraOptions.get(0).equals(""))
+        {
+            return;
+        }
         for (Iterator<String> iterator = extraOptions.iterator(); iterator
             .hasNext();)
         {

@@ -696,14 +696,14 @@ public class WebServer implements IWebServer, IRunWebServer
 
         ArrayList<String> igList = new ArrayList<String>();
         ArrayList<String> sgList = new ArrayList<String>();
-        for (GameInfo gi : allGames.values())
+        for (GameInfo gi : proposedGames)
         {
             (gi.isScheduledGame() ? sgList : igList).add(gi.getGameId());
         }
 
-        pw.println(sgList.size() + " scheduled games stored: "
+        pw.println(sgList.size() + " proposed scheduled games stored: "
             + sgList.toString());
-        pw.println(igList.size() + " instant games stored:"
+        pw.println(igList.size() + " proposed instant games stored:"
             + igList.toString());
 
         ArrayList<String> gameList = new ArrayList<String>();
@@ -713,6 +713,15 @@ public class WebServer implements IWebServer, IRunWebServer
         }
         pw.println(runningGames.size() + " running games: "
             + gameList.toString());
+
+        gameList.clear();
+        for (GameInfo gi : suspendedGames)
+        {
+            gameList.add(gi.getGameId());
+        }
+        pw.println(suspendedGames.size() + " suspended games: "
+            + gameList.toString());
+
         gameList.clear();
         for (GameInfo gi : endingGames)
         {
@@ -942,6 +951,7 @@ public class WebServer implements IWebServer, IRunWebServer
         // System.out.println("tellEnrolledGameStarted adds it to running");
 
         proposedGames.remove(gi);
+        suspendedGames.remove(gi);
         runningGames.add(gi);
         proposedGamesListModified = true;
         // System.out.println("Running: " + runningGames.toString());
@@ -1623,12 +1633,8 @@ public class WebServer implements IWebServer, IRunWebServer
     private int countProposedGames(boolean shallBeScheduled)
     {
         int count = 0;
-        for (GameInfo gi : allGames.values())
+        for (GameInfo gi : proposedGames)
         {
-            if (gi.getGameState().equals(GameState.SUSPENDED))
-            {
-                continue;
-            }
             if (gi.isScheduledGame() == shallBeScheduled)
             {
                 count++;
@@ -1914,7 +1920,6 @@ public class WebServer implements IWebServer, IRunWebServer
 
             ArrayList<GameInfo> games = new ArrayList<GameInfo>(
                 allGames.values());
-            games.addAll(suspendedGames);
             for (GameInfo gi : games)
             {
                 if (gi.relevantForSaving())

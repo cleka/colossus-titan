@@ -174,6 +174,10 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
         }
 
         this.suspendedFlagfile = new File(gameDir, flagFileName + ".suspended");
+        if (this.suspendedFlagfile.exists())
+        {
+            suspendedFlagfile.delete();
+        }
 
         File logPropFile = new File(gameDir, "logging.properties");
         File logPropTemplate = new File(template);
