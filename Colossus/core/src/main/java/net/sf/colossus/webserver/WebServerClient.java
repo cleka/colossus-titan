@@ -707,6 +707,7 @@ public class WebServerClient implements IWebClient
             }
             server.tellAllProposedGamesToOne(this);
             server.tellAllRunningGamesToOne(this);
+            server.tellAllSuspendedGamesToOne(this);
             server.tellLastChatMessagesToOne(this, IWebServer.generalChatName);
             server.sendMessageOfTheDayToOne(this, IWebServer.generalChatName);
             if (clientVersion < 2)

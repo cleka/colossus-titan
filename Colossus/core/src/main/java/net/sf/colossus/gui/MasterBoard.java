@@ -1311,7 +1311,7 @@ public final class MasterBoard extends JPanel
             mi.setMnemonic(KeyEvent.VK_A);
         }
 
-        boolean SUSPEND_IN_USE = false;
+        boolean SUSPEND_IN_USE = true;
         if (gui.getStartedByWebClient() && SUSPEND_IN_USE)
         {
             mi = fileMenu.add(suspendGameAction);
