@@ -948,15 +948,11 @@ public class WebServer implements IWebServer, IRunWebServer
     public void gameStarted(GameInfo gi)
     {
         gi.setState(GameState.RUNNING);
-        // System.out.println("tellEnrolledGameStarted adds it to running");
-
         proposedGames.remove(gi);
         suspendedGames.remove(gi);
         runningGames.add(gi);
         proposedGamesListModified = true;
-        // System.out.println("Running: " + runningGames.toString());
         updateGUI();
-
         allTellGameInfo(gi);
     }
 
@@ -1204,8 +1200,6 @@ public class WebServer implements IWebServer, IRunWebServer
     public void startGameOnPlayerHost(String gameId, String hostingPlayer,
         String playerHost, int port)
     {
-        // System.out.println("WebServer.startGameOnPlayerHost " + playerHost);
-
         GameInfo gi = findByGameId(gameId);
         if (gi != null)
         {
@@ -1640,8 +1634,6 @@ public class WebServer implements IWebServer, IRunWebServer
                 count++;
             }
         }
-        // System.out.println("proposed for shallbe " + shallBeScheduled
-        //     + " is: " + count);
         return count;
     }
 
@@ -1706,7 +1698,6 @@ public class WebServer implements IWebServer, IRunWebServer
         }
         else
         {
-            // System.out.println("starting GameRunner thread");
             gr.tryToStart();
             LOGGER.fine("Returned from starter for game " + gi.getGameId());
 
@@ -1909,8 +1900,6 @@ public class WebServer implements IWebServer, IRunWebServer
             LOGGER.log(Level.SEVERE, "filename must not be null, but it is!");
             throw new RuntimeException("gameFile filename is null!");
         }
-
-        // LOGGER.log(Level.FINE, "Storing proposed games to file " + filename);
 
         PrintWriter out = null;
         try

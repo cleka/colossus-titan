@@ -156,8 +156,6 @@ public class GameInfo
         LOGGER.log(Level.FINEST,
             "A new potential game was created!! - variant " + variant
                 + " viewmode " + viewmode);
-
-        // System.out.println("NEW GameInfo server side, " + this.toString());
     }
 
     /*
