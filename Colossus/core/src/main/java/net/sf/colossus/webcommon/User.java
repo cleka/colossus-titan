@@ -2,12 +2,15 @@ package net.sf.colossus.webcommon;
 
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import net.sf.colossus.util.Glob;
 
 
 /**
@@ -55,6 +58,8 @@ public class User
 
     // Only needed during registration:
     private String lastSentConfirmationCode;
+
+    private final List<String> ignoredUsers = new ArrayList<String>();
 
     public User(String name)
     {
@@ -274,6 +279,36 @@ public class User
             + SEP + type + SEP + created + SEP + lastLogin + SEP + lastLogout
             + SEP + onlineSecs;
         return line;
+    }
+
+    public List<String> getListOfIgnoredUsers()
+    {
+        List<String> list = new ArrayList<String>(ignoredUsers);
+        return list;
+    }
+
+    public boolean isUserInIgnoredList(String username)
+    {
+        LOGGER.finest("check is " + username + " in list: "
+            + Glob.glob(":", getListOfIgnoredUsers()));
+        return ignoredUsers.contains(username);
+    }
+
+    public void addToIgnoredUsers(String username)
+    {
+        if (!isUserInIgnoredList(username))
+        {
+            ignoredUsers.add(username);
+        }
+        LOGGER.finest("addToIgnore: "
+            + Glob.glob(":", getListOfIgnoredUsers()));
+    }
+
+    public void removeFromIgnoredUsers(String username)
+    {
+        ignoredUsers.remove(username);
+        LOGGER.finest("removeFromToIgnore: "
+            + Glob.glob(":", getListOfIgnoredUsers()));
     }
 
 }

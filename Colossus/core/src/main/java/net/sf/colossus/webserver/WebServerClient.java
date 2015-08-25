@@ -794,6 +794,17 @@ public class WebServerClient implements IWebClient
         {
             server.getGeneralChat().showContactHelp(chatId, this);
         }
+        else if (msgAllLower.startsWith("/ignore")
+            || msgAllLower.startsWith("/ingore"))
+        {
+            server.getGeneralChat().handleIgnore(msgAllLower, this.user);
+        }
+        else if (msgAllLower.startsWith("/unignore")
+            || msgAllLower.startsWith("/uningore"))
+        {
+            server.getGeneralChat().handleUnignore(msgAllLower, this.user);
+        }
+
         else if (msgAllLower.startsWith("/"))
         {
             server.getGeneralChat().handleUnknownCommand(msgAllLower, chatId,

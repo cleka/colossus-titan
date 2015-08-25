@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.util.Glob;
 import net.sf.colossus.webcommon.ChatMessage;
 import net.sf.colossus.webcommon.FormatWhen;
 import net.sf.colossus.webcommon.IWebClient;
@@ -48,6 +49,20 @@ public class ChatChannel
         "  /ping UserName Here comes the message",
         "If the user's name contains spaces, it must be within double quotes:",
         "  /ping \"Lengthy User Name\" Here comes the message" };
+
+    private final static String[] ignoreHelp = new String[] {
+        "Using /ignore and /unignore:",
+        "",
+        "If you do not wish to read anything a certain user wrote, you can add "
+            + "that user to your personal 'ignore' list:",
+        "  /ignore SomeUserName",
+        "  /ignore Some Name With Spaces",
+        "Rest of the line will be taken as one single user name; DO NOT PUT QUOTES around it!",
+        "",
+        "Ignore command without arguments displays your list of ignored users:",
+        "  /ignore",
+        "You can remove users from that list again with unignore command:",
+        "  /unignore SomeUserName", "  /unignore Some Name With Spaces", };
 
     private final static String[] contactHelp = new String[] {
         "Using /contact:",
@@ -128,6 +143,14 @@ public class ChatChannel
             {
                 showContactHelp(chatId, client);
             }
+            if (words.get(1).startsWith("/ignore")
+                || words.get(1).startsWith("ignore")
+                || words.get(1).startsWith("/unignore")
+                || words.get(1).startsWith("unignore"))
+            {
+                sendLinesToClient(chatId, client, Arrays.asList(ignoreHelp),
+                    true, "");
+            }
             else
             {
                 String[] noSuchHelp = new String[] { "Sorry, no specific help available about '"
@@ -182,6 +205,85 @@ public class ChatChannel
         lines.add("      Online time: " + secs + " seconds ("
             + onlineTimeFromSeconds(secs) + ")");
         sendLinesToClient(chatId, client, lines, true, "SYSTEM");
+    }
+
+    public void handleIgnore(String msgAllLower, User ignoringUser)
+    {
+        List<String> words = Arrays.asList(msgAllLower.split(" +", 2));
+        if (words.size() == 1)
+        {
+            tellListOfIgnoredUsers(ignoringUser, null);
+        }
+        else
+        {
+            String ignoredUserName = words.get(1);
+            User userToBeIgnored = userDB.findUserByName(ignoredUserName);
+            if (userToBeIgnored != null)
+            {
+                ignoringUser.addToIgnoredUsers(ignoredUserName);
+                tellListOfIgnoredUsers(ignoringUser, "Added to list: "
+                    + ignoredUserName);
+            }
+            else
+            {
+                List<String> lines = new ArrayList<String>();
+                lines.add("ERROR: Unknown user '" + ignoredUserName + " '!");
+                sendLinesToClient(chatId, ignoringUser.getWebserverClient(), lines,
+                    true, "SYSTEM");
+            }
+        }
+    }
+
+    public void handleUnignore(String msgAllLower, User user)
+    {
+        List<String> words = Arrays.asList(msgAllLower.split(" +", 2));
+        if (words.size() == 1)
+        {
+            List<String> lines = new ArrayList<String>();
+            lines.add("The command /unignore needs an user "
+                + "name argument (no quotes needed).");
+            sendLinesToClient(chatId, user.getWebserverClient(), lines, true,
+                "SYSTEM");
+        }
+        else
+        {
+            User userToBeUnignored = userDB.findUserByName(words.get(1));
+            if (userToBeUnignored != null)
+            {
+                user.removeFromIgnoredUsers(userToBeUnignored.getName());
+                tellListOfIgnoredUsers(user,
+ "Removed from list: "
+                    + userToBeUnignored.getName());
+            }
+            else
+            {
+                List<String> lines = new ArrayList<String>();
+                lines.add("ERROR: Unknown user '" + words.get(1) + " '!");
+                sendLinesToClient(chatId, user.getWebserverClient(), lines,
+                    true, "SYSTEM");
+            }
+        }
+    }
+
+    private void tellListOfIgnoredUsers(User user, String change)
+    {
+        List<String> lines = new ArrayList<String>();
+        if (change != null)
+        {
+            lines.add(change);
+        }
+        List<String> ignoredUsers = user.getListOfIgnoredUsers();
+        if (ignoredUsers.size() == 0)
+        {
+            lines.add("You have no users in your 'ignore' list.");
+        }
+        else
+        {
+            lines.add("The following users are in your 'ignore' list: "
+                + Glob.glob(", ", ignoredUsers));
+        }
+        sendLinesToClient(chatId, user.getWebserverClient(), lines, true,
+            "SYSTEM");
     }
 
     @SuppressWarnings("boxing")
@@ -245,11 +347,17 @@ public class ChatChannel
 
     private void deliverMessage(ChatMessage msg, UserDB userDB)
     {
+        LOGGER.fine("Delivering message " + msg
+            + " to clients; checking ignore list:");
         Collection<User> users = userDB.getLoggedInUsers();
         for (User u : users)
         {
-            IWebClient client = u.getWebserverClient();
-            deliverMessageToClient(msg, client, false);
+            String sender = msg.getSender();
+            if (!u.isUserInIgnoredList(sender))
+            {
+                IWebClient client = u.getWebserverClient();
+                deliverMessageToClient(msg, client, false);
+            }
         }
     }
 
