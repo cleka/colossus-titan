@@ -37,7 +37,8 @@ public class ChatChannel
     private final static String[] chatHelp = new String[] { "Chat help:", "",
         "/help, /h, /? (show help)", "/ping (notify a certain user)",
         "/contact (how to contact admin)",
-        "/userinfo (shows what info server has about you)", "",
+        "/userinfo (shows what info server has about you)",
+        "/ignore (hide in the chat the lines of a certain user)", "",
         "Use /help <keyword> for detailed help. E.g. /help ping how to use ping." };
 
     private final static String[] pingHelp = new String[] {
@@ -62,7 +63,9 @@ public class ChatChannel
         "Ignore command without arguments displays your list of ignored users:",
         "  /ignore",
         "You can remove users from that list again with unignore command:",
-        "  /unignore SomeUserName", "  /unignore Some Name With Spaces", };
+        "  /unignore SomeUserName", "  /unignore Some Name With Spaces", "",
+        "At least at the moment, those lists are not stored to any file ",
+        "  => when the server was restarted, they are empty again.", };
 
     private final static String[] contactHelp = new String[] {
         "Using /contact:",
