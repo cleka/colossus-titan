@@ -38,7 +38,10 @@ public class ChatChannel
         "/help, /h, /? (show help)", "/ping (notify a certain user)",
         "/contact (how to contact admin)",
         "/userinfo (shows what info server has about you)",
-        "/ignore (hide in the chat the lines of a certain user)", "",
+        "/ignore (hide in the chat the lines of a certain user)",
+        "/userinfo (shows what info server has about you)",
+        // "/ignore (hide in the chat the lines of a certain user)",
+        "",
         "Use /help <keyword> for detailed help. E.g. /help ping how to use ping." };
 
     private final static String[] pingHelp = new String[] {
