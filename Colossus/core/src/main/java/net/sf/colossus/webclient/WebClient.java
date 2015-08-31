@@ -3457,14 +3457,18 @@ public class WebClient extends KFrame implements IWebClient
         }
 
         String who = (byAdmin ? "Administrator" : "User") + " '" + byUser;
-        dialogTitle = who + "' requests your attention!";
-        dialogMessage = whenText + ", " + dialogTitle + "\n\n" + message;
+        final String dialogTitle = who + "' requests your attention!";
+        final String dialogMessage = whenText + ", " + dialogTitle + "\n\n"
+            + message;
+        final boolean toFront = options.getOption(Options.uponMessageToFront,
+            true);
 
         SwingUtilities.invokeLater(new Runnable()
         {
             public void run()
             {
-                showRequestAttentionMessage();
+                showRequestAttentionMessage(dialogTitle, dialogMessage,
+                    toFront);
             }
         });
 
@@ -3478,13 +3482,24 @@ public class WebClient extends KFrame implements IWebClient
         }
     }
 
-    private static String dialogTitle = "dummy";
-    private static String dialogMessage = "dummy2";
-
-    private void showRequestAttentionMessage()
+    /*
+     * Must be called inside EDT
+     */
+    private void showRequestAttentionMessage(String dialogTitle,
+        String dialogMessage, boolean toFront)
     {
-        JOptionPane.showMessageDialog(this, dialogMessage, dialogTitle,
-            JOptionPane.INFORMATION_MESSAGE);
+        if (toFront)
+        {
+            KFrame thisFrame = WebClient.this;
+            if (thisFrame.getState() != KFrame.NORMAL)
+            {
+                thisFrame.setState(KFrame.NORMAL);
+            }
+            thisFrame.toFront();
+            thisFrame.repaint();
+        }
+        JOptionPane.showMessageDialog(WebClient.this, dialogMessage,
+            dialogTitle, JOptionPane.INFORMATION_MESSAGE);
     }
 
     public void deliverGeneralMessage(long when, boolean error, String title,

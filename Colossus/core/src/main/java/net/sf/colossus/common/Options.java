@@ -75,6 +75,7 @@ public final class Options implements IOptions
     public static final String minPlayersWeb = "Min Players Web Client";
     public static final String targPlayersWeb = "Target Players Web Client";
     public static final String maxPlayersWeb = "Max Players Web Client";
+    public static final String uponMessageToFront = "Window to front for message";
 
     /* selections for viewable Legions */
     public static final String viewableOwn = "Only own legions";
