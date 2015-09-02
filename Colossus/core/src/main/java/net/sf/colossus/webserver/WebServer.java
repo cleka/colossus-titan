@@ -694,6 +694,13 @@ public class WebServer implements IWebServer, IRunWebServer
 
         pw.println(users.size() + " users connected: " + ul.toString());
 
+        pw.println("All games:");
+        for (GameInfo gi : allGames.values())
+        {
+            pw.println("  #" + gi.getGameId() + ", state "
+                + gi.getStateString());
+        }
+
         ArrayList<String> igList = new ArrayList<String>();
         ArrayList<String> sgList = new ArrayList<String>();
         for (GameInfo gi : proposedGames)
@@ -706,29 +713,29 @@ public class WebServer implements IWebServer, IRunWebServer
         pw.println(igList.size() + " proposed instant games stored:"
             + igList.toString());
 
-        ArrayList<String> gameList = new ArrayList<String>();
+        ArrayList<String> temporaryGameList = new ArrayList<String>();
         for (GameInfo gi : runningGames)
         {
-            gameList.add(gi.getGameId());
+            temporaryGameList.add(gi.getGameId());
         }
         pw.println(runningGames.size() + " running games: "
-            + gameList.toString());
+            + temporaryGameList.toString());
 
-        gameList.clear();
+        temporaryGameList.clear();
         for (GameInfo gi : suspendedGames)
         {
-            gameList.add(gi.getGameId());
+            temporaryGameList.add(gi.getGameId());
         }
         pw.println(suspendedGames.size() + " suspended games: "
-            + gameList.toString());
+            + temporaryGameList.toString());
 
-        gameList.clear();
+        temporaryGameList.clear();
         for (GameInfo gi : endingGames)
         {
-            gameList.add(gi.getGameId());
+            temporaryGameList.add(gi.getGameId());
         }
         pw.println(endingGames.size() + " games just ending: "
-            + gameList.toString());
+            + temporaryGameList.toString());
         pw.println(portBookKeeper.getStatus());
         pw.println("");
         pw.println("");
@@ -736,8 +743,7 @@ public class WebServer implements IWebServer, IRunWebServer
 
     private GameInfo isInvolvedInInstantGame(String initiatorName)
     {
-        ArrayList<GameInfo> games = new ArrayList<GameInfo>(
-            allGames.values());
+        ArrayList<GameInfo> games = new ArrayList<GameInfo>(allGames.values());
         for (GameInfo gi : games)
         {
             if (!gi.isScheduledGame()
@@ -800,8 +806,7 @@ public class WebServer implements IWebServer, IRunWebServer
         LOGGER.fine("Checking if any cancelling is needed for user "
             + user.getName());
 
-        ArrayList<GameInfo> games = new ArrayList<GameInfo>(
-            allGames.values());
+        ArrayList<GameInfo> games = new ArrayList<GameInfo>(allGames.values());
         for (GameInfo gi : games)
         {
             if (!gi.isScheduledGame()
@@ -821,8 +826,7 @@ public class WebServer implements IWebServer, IRunWebServer
         IWebClient client = newclient;
         User newUser = newclient.getUser();
 
-        ArrayList<GameInfo> games = new ArrayList<GameInfo>(
-            allGames.values());
+        ArrayList<GameInfo> games = new ArrayList<GameInfo>(allGames.values());
         for (GameInfo gi : games)
         {
             if (gi.reEnrollIfNecessary(newUser))
@@ -851,8 +855,7 @@ public class WebServer implements IWebServer, IRunWebServer
 
     public void tellAllProposedGamesToOne(WebServerClient client)
     {
-        ArrayList<GameInfo> list = new ArrayList<GameInfo>(
-            allGames.values());
+        ArrayList<GameInfo> list = new ArrayList<GameInfo>(allGames.values());
         tellAllGamesFromListToOne(client, list);
     }
 
@@ -1110,7 +1113,7 @@ public class WebServer implements IWebServer, IRunWebServer
         }
 
         allGames.remove(gi.getGameId());
-        proposedGames.remove(gi.getGameId());
+        proposedGames.remove(gi);
         proposedGamesListModified = true;
         updateGUI();
     }
@@ -1382,8 +1385,7 @@ public class WebServer implements IWebServer, IRunWebServer
         int connected = userDB.getLoggedInCount();
         allTellUserCounts();
         gui.setUserInfo(connected + " users connected.");
-        ArrayList<GameInfo> games = new ArrayList<GameInfo>(
-            allGames.values());
+        ArrayList<GameInfo> games = new ArrayList<GameInfo>(allGames.values());
         for (GameInfo gi : games)
         {
             // returns true if changed
@@ -1732,11 +1734,11 @@ public class WebServer implements IWebServer, IRunWebServer
                 }
             }
             // If game starting did not succeed might still be in proposed list
-            else if (proposedGames.contains(gi.getGameId()))
+            else if (proposedGames.contains(gi))
             {
                 LOGGER.log(Level.FINEST, "Removing game " + gi.getGameId()
                     + " from proposed games list");
-                proposedGames.remove(gi.getGameId());
+                proposedGames.remove(gi);
                 proposedGamesListModified = true;
             }
             else
@@ -1867,8 +1869,8 @@ public class WebServer implements IWebServer, IRunWebServer
                 }
             }
             games.close();
-            LOGGER.info("Restored " + allGames.size()
-                + " games from file " + filename);
+            LOGGER.info("Restored " + allGames.size() + " games from file "
+                + filename);
         }
         catch (FileNotFoundException e)
         {
@@ -1994,11 +1996,13 @@ public class WebServer implements IWebServer, IRunWebServer
         public void run()
         {
             boolean didSomething = false;
-
+            LOGGER.finest("GameThreadReaper started running.");
             synchronized (endingGames)
             {
                 if (!endingGames.isEmpty())
                 {
+                    LOGGER.finest("There are " + endingGames.size()
+                        + " games in endingGames.");
                     didSomething = true;
                     Iterator<GameInfo> it = endingGames.iterator();
                     while (it.hasNext())
@@ -2036,6 +2040,9 @@ public class WebServer implements IWebServer, IRunWebServer
                                 + "GameRunners of type RunGameInOwnJVM, "
                                 + "but we got something else!");
                         }
+                        LOGGER.finest("Removing " + gi.getGameId()
+                            + " from allGames.");
+                        allGames.remove(gi.getGameId());
                         it.remove();
                     }
 
@@ -2043,6 +2050,7 @@ public class WebServer implements IWebServer, IRunWebServer
                 }
                 else
                 {
+                    LOGGER.finest("endingGames list is empty.");
                     // nothing to do
                 }
 
