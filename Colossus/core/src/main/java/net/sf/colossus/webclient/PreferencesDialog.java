@@ -4,7 +4,6 @@ package net.sf.colossus.webclient;
 import java.awt.Container;
 import java.awt.Frame;
 import java.awt.GridLayout;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -18,7 +17,6 @@ import javax.swing.border.TitledBorder;
 
 import net.sf.colossus.common.Options;
 import net.sf.colossus.guiutil.KDialog;
-import net.sf.colossus.guiutil.SaveWindow;
 
 public class PreferencesDialog extends KDialog
 {
@@ -31,10 +29,6 @@ public class PreferencesDialog extends KDialog
 
     private final Options options;
 
-    private JCheckBox autoLoginCB;
-    private JCheckBox autoGamePaneCB;
-
-    private SaveWindow saveWindow;
 
     public PreferencesDialog(Frame owner, Options options)
     {
@@ -52,38 +46,28 @@ public class PreferencesDialog extends KDialog
     {
         Container contentPane = getContentPane();
 
+        ActionListener cbActionListener = new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                handleAction(e);
+            }
+        };
+
         JPanel preferencesPanel = new JPanel(new GridLayout(0, 2));
         preferencesPanel.setBorder(new TitledBorder("Preferences"));
-
-
-
         preferencesPanel.add(new JLabel("test"));
         preferencesPanel.add(new JLabel("test2"));
 
         boolean alos = this.options.getOption(AutoLoginCBText);
-        autoLoginCB = new JCheckBox(AutoLoginCBText, alos);
-        autoLoginCB.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                options.setOption(AutoLoginCBText, autoLoginCB.isSelected());
-            }
-        });
-
+        JCheckBox autoLoginCB = new JCheckBox(AutoLoginCBText, alos);
+        autoLoginCB.addActionListener(cbActionListener);
         preferencesPanel.add(autoLoginCB);
         preferencesPanel.add(new JLabel(""));
 
         boolean algp = this.options.getOption(AutoGamePaneCBText);
-        autoGamePaneCB = new JCheckBox(AutoGamePaneCBText, algp);
-        autoGamePaneCB.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                options.setOption(AutoGamePaneCBText,
-                    autoGamePaneCB.isSelected());
-            }
-        });
-
+        JCheckBox autoGamePaneCB = new JCheckBox(AutoGamePaneCBText, algp);
+        autoGamePaneCB.addActionListener(cbActionListener);
         preferencesPanel.add(autoGamePaneCB);
         preferencesPanel.add(new JLabel(""));
 
@@ -99,30 +83,29 @@ public class PreferencesDialog extends KDialog
         });
 
         pack();
-        saveWindow = new SaveWindow(options, "PickLord");
-        Point location = saveWindow.loadLocation();
-        if (location == null)
+        useSaveWindow(options, "WebClientPreferences", null);
+        setVisible(false);
+        repaint();
+    }
+
+    private void handleAction(ActionEvent e)
+    {
+        String text = e.getActionCommand();
+        Object component = e.getSource();
+        if (component instanceof JCheckBox)
         {
-            centerOnScreen();
+            JCheckBox cb = (JCheckBox)component;
+            options.setOption(text, cb.isSelected());
         }
         else
         {
-            setLocation(location);
+            LOGGER.severe("Event source with text " + text
+                + " is not a checkbox??");
         }
-        setVisible(false);
-        repaint();
     }
 
     public void toggleVisible()
     {
         setVisible(!isVisible());
     }
-
-    @Override
-    public void dispose()
-    {
-        saveWindow.saveLocation(getLocation());
-        super.dispose();
-    }
-
 }
