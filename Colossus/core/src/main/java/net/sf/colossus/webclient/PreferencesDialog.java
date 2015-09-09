@@ -27,6 +27,8 @@ public class PreferencesDialog extends KDialog
     public final static String AutoLoginCBText = "Auto-login on start";
     public final static String AutoGamePaneCBText = "After login Game pane";
 
+    public final static String ChatBgYellowCBText = "Chat-background yellow";
+
     private final Options options;
 
 
@@ -38,7 +40,6 @@ public class PreferencesDialog extends KDialog
         this.options = options;
 
         setupGUI();
-
         LOGGER.info("WebClient Preferences Dialog instantiated.");
     }
 
@@ -69,6 +70,12 @@ public class PreferencesDialog extends KDialog
         JCheckBox autoGamePaneCB = new JCheckBox(AutoGamePaneCBText, algp);
         autoGamePaneCB.addActionListener(cbActionListener);
         preferencesPanel.add(autoGamePaneCB);
+        preferencesPanel.add(new JLabel(""));
+
+        boolean cby = this.options.getOption(ChatBgYellowCBText);
+        JCheckBox ChatYellowCB = new JCheckBox(ChatBgYellowCBText, cby);
+        autoGamePaneCB.addActionListener(cbActionListener);
+        preferencesPanel.add(ChatYellowCB);
         preferencesPanel.add(new JLabel(""));
 
         contentPane.add(preferencesPanel);
