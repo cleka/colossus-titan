@@ -1,6 +1,7 @@
 package net.sf.colossus.webclient;
 
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.GridLayout;
@@ -11,6 +12,8 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.util.logging.Logger;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -18,6 +21,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
 
 import net.sf.colossus.webcommon.User;
 
@@ -59,8 +63,55 @@ class RegisterPasswordPanel extends JDialog
 
         Container rootPane = getContentPane();
 
+        Box yBox = new Box(BoxLayout.Y_AXIS);
+        yBox.setBorder(new EmptyBorder(20, 20, 20, 20));
+
         JPanel p = new JPanel(new GridLayout(0, 2));
-        rootPane.add(p);
+        p.setAlignmentX(LEFT_ALIGNMENT);
+
+        if (isRegister)
+        {
+            yBox.add(WebClient
+                .nonBoldLabel("This is useful only if you want to connect to the \"Colossus Public Game Server\""));
+            yBox.add(WebClient
+                .nonBoldLabel("to find opponents to play. If you don't know Colossus yet, it's recommended that"));
+            yBox.add(WebClient
+                .nonBoldLabel("you play a few games locally first."));
+            yBox.add(WebClient.nonBoldLabel("\n"));
+            JLabel headerLabel = new JLabel(
+                "This will not work without a valid email address!");
+            // headerLabel.setFont(headerLabel.getFont().deriveFont(Font.BOLD));
+            headerLabel.setForeground(Color.RED);
+            yBox.add(headerLabel);
+
+            yBox.add(WebClient.nonBoldLabel("\n"));
+            yBox.add(WebClient
+                .nonBoldLabel("... because later you will be asked to enter a confirmation code "));
+            yBox.add(WebClient
+                .nonBoldLabel("that is sent to the given email address."));
+            yBox.add(WebClient.nonBoldLabel("\n"));
+
+            yBox.add(p);
+
+            yBox.add(WebClient.nonBoldLabel("\n"));
+            yBox.add(new JLabel("So, please give a valid email address!"));
+            yBox.add(WebClient.nonBoldLabel("\n"));
+            yBox.add(WebClient
+                .nonBoldLabel("\nIf you don't want to reveal your email address, then please save me the"));
+            yBox.add(WebClient
+                .nonBoldLabel("bounce mail and yourself the work, and do NOT try to register."));
+            yBox.add(WebClient.nonBoldLabel("\n"));
+            yBox.add(WebClient
+                .nonBoldLabel("You do not need to register to be able to play Colossus locally on your PC. "));
+            yBox.add(WebClient.nonBoldLabel("\n"));
+            yBox.add(new JLabel("Thank You!"));
+            yBox.add(WebClient.nonBoldLabel("\n"));
+        }
+        else
+        {
+            yBox.add(p);
+            yBox.add(WebClient.nonBoldLabel("\n"));
+        }
 
         p.add(new JLabel("Login name"));
         rploginField = new JTextField(username);
@@ -131,6 +182,7 @@ class RegisterPasswordPanel extends JDialog
         });
         p.add(rpNewPW2);
 
+        p.add(new JLabel(""));
         String buttonText = isRegister ? "Create account" : "Change password";
 
         rpButton = new JButton(buttonText);
@@ -147,6 +199,32 @@ class RegisterPasswordPanel extends JDialog
 
         rpButton.setEnabled(true);
         p.add(rpButton);
+
+        final JButton cancelButton = new JButton("Cancel");
+        cancelButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                if (e.getSource() == cancelButton)
+                {
+                    dispose();
+                }
+            }
+        });
+
+        Box xBox = new Box(BoxLayout.X_AXIS);
+        xBox.add(Box.createHorizontalGlue());
+        xBox.add(cancelButton);
+        xBox.add(Box.createHorizontalGlue());
+
+        JPanel cancelPanel = new JPanel(new BorderLayout());
+        cancelPanel.setAlignmentX(LEFT_ALIGNMENT);
+        cancelPanel.add(xBox, BorderLayout.CENTER);
+        cancelPanel.add(Box.createHorizontalGlue(), BorderLayout.WEST);
+        cancelPanel.add(Box.createHorizontalGlue(), BorderLayout.EAST);
+        yBox.add(cancelPanel);
+
+        rootPane.add(yBox);
 
         this.setLocation(defaultLocation);
     }
