@@ -2162,7 +2162,9 @@ public final class Client implements IClient, IOracle, IVariant,
         }
         else if (reason.equals(Constants.doRecruit))
         {
-            // TODO why can we ignore this?
+            // TODO: earlier here was nothing, but a TODO "why can we ignore
+            //       Did/does the adding showMessageDialog cause problems?"
+            showMessageDialog(errmsg);
         }
         else if (reason.equals(Constants.doneWithRecruits))
         {

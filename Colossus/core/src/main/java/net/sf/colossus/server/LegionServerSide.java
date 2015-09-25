@@ -351,6 +351,28 @@ public final class LegionServerSide extends Legion implements
             getCurrentHex()).isEmpty()));
     }
 
+    String cantRecruitBecause()
+    {
+        CreatureType recruit = getRecruit();
+        if (recruit != null)
+        {
+            return "Has already recruited " + recruit.getName();
+        }
+        if (getHeight() > 6)
+        {
+            return "Legion already 7 high";
+        }
+        if (getPlayer().isDead())
+        {
+            return "Player is dead";
+        }
+        if (game.findEligibleRecruits(this, getCurrentHex()).isEmpty())
+        {
+            return "No eligible recruits";
+        }
+        return null;
+    }
+
     void undoRecruit()
     {
         if (hasRecruited())
@@ -361,6 +383,11 @@ public final class LegionServerSide extends Legion implements
             setRecruit(null);
             LOGGER.log(Level.INFO, "Legion " + getLongMarkerName()
                 + " undoes its recruit");
+        }
+        else
+        {
+            LOGGER.warning("Legion " + getMarkerId()
+                + " can't undoRecruit: hasRecruited() is false?");
         }
     }
 

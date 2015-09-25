@@ -2294,7 +2294,7 @@ public final class Server extends Thread implements IServer
         {
             LOGGER.warning(getPlayerName()
                 + " illegally called doRecruit(): null legion");
-            client.nak(Constants.doRecruit, "Null legion");
+            client.nak(Constants.doRecruit, "Can't recruit: Null legion");
         }
 
         else if (!getPlayer().equals(event.getLegion().getPlayer()))
@@ -2302,37 +2302,48 @@ public final class Server extends Thread implements IServer
             LOGGER.warning(getPlayerName()
                 + " illegally called doRecruit(): does not own legion "
                 + event.getLegion().getMarkerId());
-            client.nak(Constants.doRecruit, "Wrong player");
+            client.nak(Constants.doRecruit, "Can't recruit: Wrong player");
         }
         else
         {
             CreatureType recruiter = event.getRecruiter();
             String recruiterName = (recruiter == null) ? null : recruiter
                 .getName();
+            // Deny, because legion as by itself cannot recruit
             if (!((LegionServerSide)event.getLegion()).canRecruit())
             {
+                String reason = ((LegionServerSide)event.getLegion())
+                    .cantRecruitBecause();
                 int size = event.getLegion().getHeight();
                 LOGGER.warning("Illegal legion " + event.getLegion()
                     + " (height=" + size + ") for recruit: "
                     + event.getAddedCreatureType().getName()
-                    + " recruiterName " + recruiterName);
-                client.nak(Constants.doRecruit, "Illegal recruit");
+                    + " recruiterName " + recruiterName + "; reason: "
+                    + reason);
+                client.nak(Constants.doRecruit, "Illegal recruit, reason: "
+                    + reason);
             }
-
             else if (event.getLegion().hasMoved()
                 || game.getPhase() == Phase.FIGHT)
             {
-                ((LegionServerSide)event.getLegion()).sortCritters();
                 CreatureType recruit = event.getAddedCreatureType();
+                ((LegionServerSide)event.getLegion()).sortCritters();
                 if (recruit != null)
                 {
                     // TODO pass event in
                     game.doRecruit(event.getLegion(), recruit, recruiter);
                 }
 
-                if (!((LegionServerSide)event.getLegion()).canRecruit())
+                if (event.getLegion().getRecruit() != null)
                 {
+                    LOGGER.finest("OK, getRecruit() confirms we did recruit");
                     didRecruit(event, recruiter);
+                }
+                else
+                {
+                    LOGGER.warning("After doRecruit, didRecruit for legion "
+                        + event.getLegion().getMarkerId()
+                        + " still returns null?");
                 }
             }
             else
@@ -2341,7 +2352,8 @@ public final class Server extends Thread implements IServer
                     + "with legion " + event.getLegion().getMarkerId()
                     + " recruit: " + event.getAddedCreatureType().getName()
                     + " recruiterName " + recruiterName);
-                client.nak(Constants.doRecruit, "Illegal recruit");
+                client.nak(Constants.doRecruit,
+                    "Illegal recruit, reason: not moved & not in battle");
             }
         }
 
