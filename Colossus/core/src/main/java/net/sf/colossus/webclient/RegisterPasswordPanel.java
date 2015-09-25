@@ -43,6 +43,7 @@ class RegisterPasswordPanel extends JDialog
     private final WebClient webClient;
     private final boolean isRegister;
 
+    private final Box yBox;
     private final JTextField rploginField;
     private JTextField rpEmailField;
 
@@ -63,7 +64,7 @@ class RegisterPasswordPanel extends JDialog
 
         Container rootPane = getContentPane();
 
-        Box yBox = new Box(BoxLayout.Y_AXIS);
+        yBox = new Box(BoxLayout.Y_AXIS);
         yBox.setBorder(new EmptyBorder(20, 20, 20, 20));
 
         JPanel p = new JPanel(new GridLayout(0, 2));
@@ -71,46 +72,22 @@ class RegisterPasswordPanel extends JDialog
 
         if (isRegister)
         {
-            yBox.add(WebClient
-                .nonBoldLabel("This is useful only if you want to connect to the \"Colossus Public Game Server\""));
-            yBox.add(WebClient
-                .nonBoldLabel("to find opponents to play. If you don't know Colossus yet, it's recommended that"));
-            yBox.add(WebClient
-                .nonBoldLabel("you play a few games locally first."));
-            yBox.add(WebClient.nonBoldLabel("\n"));
-            JLabel headerLabel = new JLabel(
-                "This will not work without a valid email address!");
-            // headerLabel.setFont(headerLabel.getFont().deriveFont(Font.BOLD));
-            headerLabel.setForeground(Color.RED);
-            yBox.add(headerLabel);
-
-            yBox.add(WebClient.nonBoldLabel("\n"));
-            yBox.add(WebClient
-                .nonBoldLabel("... because later you will be asked to enter a confirmation code "));
-            yBox.add(WebClient
-                .nonBoldLabel("that is sent to the given email address."));
-            yBox.add(WebClient.nonBoldLabel("\n"));
-
+            addText("A registration to the \"Colossus Public Game Server\" is only needed and useful if you are ");
+            addText("familiar with Colossus, and want now to connect to the server to find opponents to play.");
+            addText("If you don't know Colossus yet, it's recommended that you first play a few games locally.");
+            addText("\n");
+            addText("You do not need to register to be able to play Colossus locally on your PC. ");
+            addText("\n");
             yBox.add(p);
-
-            yBox.add(WebClient.nonBoldLabel("\n"));
-            yBox.add(new JLabel("So, please give a valid email address!"));
-            yBox.add(WebClient.nonBoldLabel("\n"));
-            yBox.add(WebClient
-                .nonBoldLabel("\nIf you don't want to reveal your email address, then please save me the"));
-            yBox.add(WebClient
-                .nonBoldLabel("bounce mail and yourself the work, and do NOT try to register."));
-            yBox.add(WebClient.nonBoldLabel("\n"));
-            yBox.add(WebClient
-                .nonBoldLabel("You do not need to register to be able to play Colossus locally on your PC. "));
-            yBox.add(WebClient.nonBoldLabel("\n"));
-            yBox.add(new JLabel("Thank You!"));
-            yBox.add(WebClient.nonBoldLabel("\n"));
+            addText("\n");
+            addText("Fill in the values and click 'Create Account'. In the next step you will be asked ");
+            addText("for a confirmation code which is sent to that address.");
+            addText("\n");
         }
         else
         {
             yBox.add(p);
-            yBox.add(WebClient.nonBoldLabel("\n"));
+            addText("\n");
         }
 
         p.add(new JLabel("Login name"));
@@ -227,6 +204,11 @@ class RegisterPasswordPanel extends JDialog
         rootPane.add(yBox);
 
         this.setLocation(defaultLocation);
+    }
+
+    private void addText(String message)
+    {
+        yBox.add(WebClient.nonBoldLabel(message));
     }
 
     public void packAndShow()
