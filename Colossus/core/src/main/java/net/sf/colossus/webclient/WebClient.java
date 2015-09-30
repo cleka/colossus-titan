@@ -123,6 +123,10 @@ public class WebClient extends KFrame implements IWebClient
     final static String TYPE_SCHEDULED = "scheduled";
     final static String TYPE_INSTANTLY = "instantly";
 
+    // they are used both as button text and key in Options
+    public final static String AutoLoginCBText = "Auto-login on start";
+    public final static String AutoGamePaneCBText = "After login Game pane";
+
     private final WhatNextManager whatNextManager;
 
     private String hostname;
@@ -209,7 +213,6 @@ public class WebClient extends KFrame implements IWebClient
 
     private JButton loginLogoutButton;
     private JButton quitButton;
-    private JButton preferencesButton;
     private JButton contactAdminButton;
 
     private JLabel registerOrPasswordLabel;
@@ -275,8 +278,6 @@ public class WebClient extends KFrame implements IWebClient
 
     private ChatHandler generalChat;
 
-    private PreferencesDialog preferencesDialog;
-
     private final ArrayList<GameInfo> gamesUpdates = new ArrayList<GameInfo>();
 
     /**
@@ -326,7 +327,6 @@ public class WebClient extends KFrame implements IWebClient
     private final static String LogoutButtonText = "Logout";
     private final static String CancelLoginButtonText = "Cancel";
     private final static String quitButtonText = "Quit";
-    private final static String preferencesButtonText = "Preferences";
     private final static String contactAdminButtonText = "Contact the administrator";
     private final static String HideButtonText = "Hide Web Client";
     private final static String WatchButtonText = "Join game as spectator";
@@ -561,8 +561,6 @@ public class WebClient extends KFrame implements IWebClient
 
     private void setupGUI()
     {
-        preferencesDialog = new PreferencesDialog(this, options);
-
         getContentPane().setLayout(new BorderLayout());
 
         // Top of the frame: login and users status/infos:
@@ -627,7 +625,7 @@ public class WebClient extends KFrame implements IWebClient
 
     private void autoActions()
     {
-        if (options.getOption(PreferencesDialog.AutoLoginCBText))
+        if (options.getOption(WebClient.AutoLoginCBText))
         {
             String login = loginField.getText();
             String password = new String(passwordField.getPassword());
@@ -860,6 +858,26 @@ public class WebClient extends KFrame implements IWebClient
         loginPane.add(statusField);
         updateStatus("Not connected", Color.red);
 
+        ActionListener cbActionListener = new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                handleAction(e);
+            }
+        };
+
+        boolean alos = this.options.getOption(AutoLoginCBText);
+        JCheckBox autoLoginCB = new JCheckBox(AutoLoginCBText, alos);
+        autoLoginCB.addActionListener(cbActionListener);
+        loginPane.add(autoLoginCB);
+        loginPane.add(new JLabel(""));
+
+        boolean algp = this.options.getOption(AutoGamePaneCBText);
+        JCheckBox autoGamePaneCB = new JCheckBox(AutoGamePaneCBText, algp);
+        autoGamePaneCB.addActionListener(cbActionListener);
+        loginPane.add(autoGamePaneCB);
+        loginPane.add(new JLabel(""));
+
         serverTab.add(connectionPane);
 
         connectionPane.add(loginPane);
@@ -868,7 +886,6 @@ public class WebClient extends KFrame implements IWebClient
 
         serverTab.add(Box.createVerticalGlue());
         serverTab.add(Box.createHorizontalGlue());
-
 
         // Label can show: registerLabelText or chgPasswordLabelText
         registerOrPasswordLabel = new JLabel(createAccountLabelText);
@@ -885,9 +902,23 @@ public class WebClient extends KFrame implements IWebClient
         loginPane.add(registerOrPasswordLabel);
         loginPane.add(registerOrPasswordButton);
 
-        createPreferencesButton(loginPane);
-
         createContactAdminButton(loginPane);
+    }
+
+    private void handleAction(ActionEvent e)
+    {
+        String text = e.getActionCommand();
+        Object component = e.getSource();
+        if (component instanceof JCheckBox)
+        {
+            JCheckBox cb = (JCheckBox)component;
+            options.setOption(text, cb.isSelected());
+        }
+        else
+        {
+            LOGGER.severe("Event source with text " + text
+                + " is not a checkbox??");
+        }
     }
 
     private void createContactAdminButton(JPanel loginPane)
@@ -905,24 +936,6 @@ public class WebClient extends KFrame implements IWebClient
         contactAdminButton.setEnabled(true);
         loginPane.add(new JLabel("Problems, Questions, Feedback?"));
         loginPane.add(contactAdminButton);
-    }
-
-    private void createPreferencesButton(JPanel loginPane)
-    {
-        preferencesButton = new JButton(preferencesButtonText);
-        preferencesButton.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                WebClient.this.preferencesDialog.toggleVisible();
-            }
-        });
-
-        preferencesButton.setEnabled(true);
-        loginPane.add(new JLabel(""));
-        loginPane.add(new JLabel(""));
-        loginPane.add(new JLabel("Change your settings:"));
-        loginPane.add(preferencesButton);
     }
 
     private void addRadioButton(Container cont, ButtonGroup group,
@@ -2078,8 +2091,6 @@ public class WebClient extends KFrame implements IWebClient
             doLogout();
         }
 
-        preferencesDialog.dispose();
-
         super.dispose();
 
         int min = ((Integer)spinner1.getValue()).intValue();
@@ -2762,7 +2773,7 @@ public class WebClient extends KFrame implements IWebClient
             options.setOption(Options.webClientPassword, this.password);
 
             options.saveOptions();
-            if (options.getOption(PreferencesDialog.AutoGamePaneCBText))
+            if (options.getOption(WebClient.AutoGamePaneCBText))
             {
                 tabbedPane.setSelectedComponent(createGamesTab);
             }

@@ -4,28 +4,36 @@ package net.sf.colossus.webclient;
 import java.awt.Container;
 import java.awt.Frame;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.logging.Logger;
 
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
 import net.sf.colossus.common.Options;
 import net.sf.colossus.guiutil.KDialog;
 
+
+/**
+ * THIS IS NOT USED!!
+ *
+ * I started to work on this but later found it is really clumsy;
+ * moved the two checkboxes back to serverTab, and the chat yellow
+ * checkbox I instead move to the game client preferences; it's somehow
+ * more logical that way... I think.
+ *
+ * TODO:  if it really stays unused, should one day cleanup and remove
+ *        all this dead stuff.
+ *
+ * @author Clemens Katzer
+ */
+
 public class PreferencesDialog extends KDialog
 {
     private static final Logger LOGGER = Logger
         .getLogger(PreferencesDialog.class.getName());
 
-    // they are used both as button text and key in Options
-    public final static String AutoLoginCBText = "Auto-login on start";
-    public final static String AutoGamePaneCBText = "After login Game pane";
 
     public final static String ChatBgYellowCBText = "Chat-background yellow";
 
@@ -47,6 +55,7 @@ public class PreferencesDialog extends KDialog
     {
         Container contentPane = getContentPane();
 
+        /*
         ActionListener cbActionListener = new ActionListener()
         {
             public void actionPerformed(ActionEvent e)
@@ -54,30 +63,18 @@ public class PreferencesDialog extends KDialog
                 handleAction(e);
             }
         };
+        */
 
         JPanel preferencesPanel = new JPanel(new GridLayout(0, 2));
         preferencesPanel.setBorder(new TitledBorder("Preferences"));
-        preferencesPanel.add(new JLabel("test"));
-        preferencesPanel.add(new JLabel("test2"));
 
-        boolean alos = this.options.getOption(AutoLoginCBText);
-        JCheckBox autoLoginCB = new JCheckBox(AutoLoginCBText, alos);
-        autoLoginCB.addActionListener(cbActionListener);
-        preferencesPanel.add(autoLoginCB);
-        preferencesPanel.add(new JLabel(""));
-
-        boolean algp = this.options.getOption(AutoGamePaneCBText);
-        JCheckBox autoGamePaneCB = new JCheckBox(AutoGamePaneCBText, algp);
-        autoGamePaneCB.addActionListener(cbActionListener);
-        preferencesPanel.add(autoGamePaneCB);
-        preferencesPanel.add(new JLabel(""));
-
+        /*
         boolean cby = this.options.getOption(ChatBgYellowCBText);
         JCheckBox ChatYellowCB = new JCheckBox(ChatBgYellowCBText, cby);
         autoGamePaneCB.addActionListener(cbActionListener);
         preferencesPanel.add(ChatYellowCB);
         preferencesPanel.add(new JLabel(""));
-
+        */
         contentPane.add(preferencesPanel);
 
         addWindowListener(new WindowAdapter()
@@ -95,6 +92,7 @@ public class PreferencesDialog extends KDialog
         repaint();
     }
 
+    /*
     private void handleAction(ActionEvent e)
     {
         String text = e.getActionCommand();
@@ -110,6 +108,7 @@ public class PreferencesDialog extends KDialog
                 + " is not a checkbox??");
         }
     }
+    */
 
     public void toggleVisible()
     {
