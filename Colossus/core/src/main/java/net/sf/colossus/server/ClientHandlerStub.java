@@ -44,7 +44,7 @@ public class ClientHandlerStub implements IClient
     protected int messageCounter = 0;
     protected boolean isCommitPoint = false;
 
-    protected long pingRequestCounter = 1;
+    protected long pingRequestCounter = 0;
 
     protected final ArrayList<MessageForClient> redoQueue = new ArrayList<MessageForClient>(
         100);
@@ -646,10 +646,15 @@ public class ClientHandlerStub implements IClient
     {
         if (canHandlePingRequest())
         {
+            pingRequestCounter++;
             sendToClient(Constants.pingRequest + sep + pingRequestCounter
                 + sep + requestSent);
-            pingRequestCounter++;
         }
+    }
+
+    public long getLastUsedPingRequestCounter()
+    {
+        return pingRequestCounter;
     }
 
     public void messageFromServer(String message)

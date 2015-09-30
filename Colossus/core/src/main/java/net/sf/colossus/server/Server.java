@@ -2063,6 +2063,7 @@ public final class Server extends Thread implements IServer
     {
         // skip it totally if feature is inactive
         // (default behavior for all-clients-local games)
+
         if (!sendPingRequests)
         {
             return;
@@ -2080,6 +2081,26 @@ public final class Server extends Thread implements IServer
                 if (!client.isTemporarilyInTrouble())
                 {
                     client.pingRequest(now);
+                }
+                long msSinceLastReply = client.getMillisSincePingReply();
+                long secsSinceReply = (long)Math
+                    .floor((msSinceLastReply + 50) / 1000);
+                if (msSinceLastReply > MAX_PING_OVERDUE)
+                {
+                    String msg = "Looks like there's a ping overdue for client "
+                        + client.getClientName()
+                        + ": already "
+                        + secsSinceReply
+                        + " seconds ("
+                        + msSinceLastReply
+                        + " milliseconds) since last ping reply!";
+                    LOGGER.warning(msg);
+                    if (secsSinceReply >= PING_REQUEST_INTERVAL_SEC * 5)
+                    {
+                        LOGGER.severe("Long time no ping replies from client "
+                            + client.getClientName()
+                            + "; should close connection now.");
+                    }
                 }
             }
         }

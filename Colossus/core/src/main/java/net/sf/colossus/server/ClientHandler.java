@@ -159,7 +159,14 @@ final class ClientHandler extends ClientHandlerStub implements IClient
 
     public long getMillisSincePingReply()
     {
-        return lastPingReplyReceived - new Date().getTime();
+        // Should happen only the very first time this is called.
+        if (lastPingReplyReceived < 0)
+        {
+            return 0;
+        }
+
+        long now = new Date().getTime();
+        return now - lastPingReplyReceived;
     }
 
     protected boolean canHandleNewVariantXML()
@@ -1078,6 +1085,12 @@ final class ClientHandler extends ClientHandlerStub implements IClient
             }
             else
             {
+                long requestNr = getLastUsedPingRequestCounter();
+                LOGGER
+                    .warning("Ping reply from "
+                        + getClientName()
+                        + ": does not provide requestNr, faking it with lastSentNr ("
+                        + requestNr + ")");
                 server.replyToPing(playerName, 0, 0L, 0L, replyReceived);
             }
         }

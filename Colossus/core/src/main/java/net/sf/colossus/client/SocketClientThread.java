@@ -842,6 +842,25 @@ final class SocketClientThread extends Thread implements IServer,
                 + requestNr + " from server");
 
             replyToPing(requestNr, requestSent, requestReceived);
+            /*
+            if (getName().equals("SCT-clemens"))
+            {
+                if (requestNr >= 3 && requestNr < 6)
+                {
+                    System.out.println("Purposefully not sending ping reply for request #"
+                        + requestNr);
+                }
+                else
+                {
+                    replyToPing(requestNr, requestSent, requestReceived);
+                }
+            }
+            else
+            {
+                replyToPing(requestNr, requestSent, requestReceived);
+            }
+            */
+
             if (clientThread != null
                 && clientThread.isEngagementStartupOngoing())
             {
