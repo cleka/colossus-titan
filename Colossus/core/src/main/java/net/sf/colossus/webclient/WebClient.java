@@ -902,7 +902,11 @@ public class WebClient extends KFrame implements IWebClient
         loginPane.add(registerOrPasswordLabel);
         loginPane.add(registerOrPasswordButton);
 
-        createContactAdminButton(loginPane);
+        boolean SHOW_CONTACT_ADMIN_BUTTON = false;
+        if (SHOW_CONTACT_ADMIN_BUTTON)
+        {
+            createContactAdminButton(loginPane);
+        }
     }
 
     private void handleAction(ActionEvent e)
