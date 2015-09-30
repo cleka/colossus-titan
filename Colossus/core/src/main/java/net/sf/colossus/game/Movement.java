@@ -433,8 +433,13 @@ abstract public class Movement
         }
         else if (roll < 0)
         {
-            LOGGER.log(Level.SEVERE, "Movement.findNormalMoves() roll < 0");
-            return null;
+            LOGGER.log(
+                Level.SEVERE,
+                "Movement.findNormalMoves() was called with negative roll number "
+                    + roll + "; legion " + legion.getMarkerId()
+                    + ", fromHex = " + fromHex.getLabel() + ", hex="
+                    + hex.getLabel());
+            return result;
         }
 
         if (block >= 0)

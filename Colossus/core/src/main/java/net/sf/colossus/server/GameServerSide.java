@@ -2521,6 +2521,12 @@ public class GameServerSide extends Game
         String reason = null;
         Player player = legion.getPlayer();
         int roll = ((PlayerServerSide)player).getMovementRoll();
+        if (roll < 0)
+        {
+            LOGGER.severe("getMovementRoll returned negative roll number: "
+                + roll);
+            return "Internal Error!";
+        }
 
         // Verify that the move is legal.
         if (teleport)
