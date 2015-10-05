@@ -244,6 +244,13 @@ public final class Server extends Thread implements IServer
         game.actOnWaitForClientsCompleted(gotAll);
         if (!remoteClients.isEmpty())
         {
+            LOGGER.info("Remote clients => setting sendPingRequests to true");
+            sendPingRequests = true;
+        }
+        else if ("true".equals(System.getProperty("send.pings")))
+        {
+            LOGGER.info("Property 'send.pings' is true"
+                + " => setting sendPingRequests to true");
             sendPingRequests = true;
         }
 
@@ -3700,7 +3707,7 @@ public final class Server extends Thread implements IServer
     void replyToPing(String playerName, int requestNr, long requestSent,
         long replySent, long replyReceived)
     {
-        LOGGER.info("Ping Reply #" + requestNr + " from " + playerName + ": "
+        LOGGER.fine("Ping Reply #" + requestNr + " from " + playerName + ": "
             + prettyTime(requestSent) + "/" + prettyTime(replySent) + "/"
             + prettyTime(replyReceived));
     }

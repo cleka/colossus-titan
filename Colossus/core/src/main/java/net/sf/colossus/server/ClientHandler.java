@@ -229,6 +229,9 @@ final class ClientHandler extends ClientHandlerStub implements IClient
                     }
                     else
                     {
+                        String logMessage = "RECEIVD "
+                            + getTruncatedPlayerName() + " <- " + line;
+                        LOGGER.finer(logMessage);
                         doCallMethodInTryBlock(line, method, li);
                     }
                     LOGGER.finest("after  processing line '" + line + "'");
@@ -1220,6 +1223,9 @@ final class ClientHandler extends ClientHandlerStub implements IClient
                 LOGGER.info("GameOver: Sending to " + playerName + ": "
                     + message);
             }
+            String logMessage = "SENDING " + getTruncatedPlayerName() + " -> "
+                + message;
+            LOGGER.finer(logMessage);
             sendViaChannel(message);
 
             // TODO: are the null checks needed? Can that ever happen?

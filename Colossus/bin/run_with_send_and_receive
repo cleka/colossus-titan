@@ -1,0 +1,10 @@
+xset b 0 0 0
+
+unset SP
+if [ -n "$SEND_PINGS" ]
+then
+    SP="-Dsend.pings=true"
+fi
+
+java -Djava.util.logging.config.file=logging.properties $SP -Xmx256M -jar Colossus.jar $1 $2 $3 $4 $5 $6 $7 $8 $9
+xset b 100 400 100

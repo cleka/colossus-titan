@@ -30,6 +30,9 @@ public class ClientHandlerStub implements IClient
 
     protected static final String sep = Constants.protocolTermSeparator;
 
+    private static int TRUNC_LENGTH = 8;
+    private static String TRUNC_FILLER = "        ";
+
     protected Server server;
 
     protected static int counter = 0;
@@ -37,8 +40,10 @@ public class ClientHandlerStub implements IClient
     protected boolean isGone = false;
     protected String isGoneReason = "";
 
-    protected String playerName;
     protected String signonName;
+    protected String playerName;
+    // NOTE: this "default" truncated name here should be TRUNC_LENGTH chars
+    protected String truncatedPlayerName = "<notset>";
 
     // sync-when-disconnected stuff
     protected int messageCounter = 0;
@@ -55,7 +60,7 @@ public class ClientHandlerStub implements IClient
 
     public ClientHandlerStub(Server server)
     {
-        LOGGER.fine("ClientHandlerStub instantiated");
+        LOGGER.finest("ClientHandlerStub instantiated");
         this.server = server;
 
         String tempId = "<no name yet #" + (counter++) + ">";
@@ -312,6 +317,8 @@ public class ClientHandlerStub implements IClient
     public void setPlayerName(String playerName)
     {
         this.playerName = playerName;
+        this.truncatedPlayerName = (playerName + TRUNC_FILLER).substring(0,
+            TRUNC_LENGTH);
         sendToClient(Constants.setPlayerName + sep + playerName);
     }
 
@@ -337,6 +344,11 @@ public class ClientHandlerStub implements IClient
             return this.signonName;
         }
         return this.playerName;
+    }
+
+    public String getTruncatedPlayerName()
+    {
+        return this.truncatedPlayerName;
     }
 
     public void createSummonAngel(Legion legion)
