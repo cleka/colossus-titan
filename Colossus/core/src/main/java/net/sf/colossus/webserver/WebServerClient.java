@@ -378,13 +378,6 @@ public class WebServerClient implements IWebClient
                 String tpOptionsString = tokens[9];
                 teleportOptions.addAll(Split.split(Glob.sep, tpOptionsString));
             }
-            else if (getClientVersion() >= WebClient.WC_VERSION_SUPPORTS_EXTRA_OPTIONS)
-            {
-                String optionsString = tokens[8];
-                @SuppressWarnings("unused")
-                String dummyString = tokens[9];
-                gameOptions.addAll(Split.split(Glob.sep, optionsString));
-            }
             else
             {
                 // earlier arg 8+9 were mulligans and tower options booleans
