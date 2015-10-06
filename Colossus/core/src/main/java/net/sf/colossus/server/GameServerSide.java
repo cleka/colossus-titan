@@ -2135,7 +2135,7 @@ public class GameServerSide extends Game
                 + legion
                 + " in "
                 + hex.getDescription()
-                + " recruits "
+                + " recruited "
                 + recruit.getName()
                 + " with "
                 + (recruiter == null ? "nothing" : numRecruiters
