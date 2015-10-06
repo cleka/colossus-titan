@@ -164,14 +164,24 @@ public class GameInfo
      */
     private void parseExtraOptions(List<String> extraOptions)
     {
-        if (extraOptions.size() == 1 && extraOptions.get(0).equals(""))
+        if (extraOptions.size() == 0)
         {
+            LOGGER.finest("Extra options list is totally empty! '");
             return;
         }
+        if (extraOptions.size() == 1 && extraOptions.get(0).equals(""))
+        {
+            LOGGER.finest("Extra options is one empty element!");
+            return;
+        }
+
+        LOGGER.finest("Extra options size: " + extraOptions.size());
+
         for (Iterator<String> iterator = extraOptions.iterator(); iterator
             .hasNext();)
         {
             String string = iterator.next();
+            LOGGER.finest("Handling option string '" + string + "'");
             if (string.equals(Options.sansLordAutoBattle))
             {
                 this.autoSansLordBattles = true;
@@ -287,12 +297,23 @@ public class GameInfo
             if (token8.length() > 0)
             {
                 List<String> extraOptions = Split.split(Glob.sep, token8);
+                LOGGER.finest("Game extra options string is '" + token8 + "'");
                 gi.parseExtraOptions(extraOptions);
+            }
+            else
+            {
+                LOGGER.finest("Empty 'game' extra-options string - ok!");
             }
             if (token9.length() > 0)
             {
+                LOGGER.finest("Teleport extra options string is '" + token9
+                    + "'");
                 List<String> teleportOptions = Split.split(Glob.sep, token9);
                 gi.parseExtraOptions(teleportOptions);
+            }
+            else
+            {
+                LOGGER.finest("Empty 'teleport' extra-options string - ok!");
             }
         }
 
