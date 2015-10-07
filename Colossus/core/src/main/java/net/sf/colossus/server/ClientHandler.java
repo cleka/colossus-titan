@@ -84,6 +84,9 @@ final class ClientHandler extends ClientHandlerStub implements IClient
 
     private long lastPingReplyReceived = -1;
 
+    private static int MAX_FAKE_MSG_COUNT = 3;
+    private Level fakeMsgLogLevel = Level.WARNING;
+
     // Note that the client (SocketClientThread) sends ack every
     // CLIENT_CTR_ACK_EVERY messages (currently 20)
     // The two values above and the client value must fit together
@@ -1089,11 +1092,13 @@ final class ClientHandler extends ClientHandlerStub implements IClient
             else
             {
                 long requestNr = getLastUsedPingRequestCounter();
-                LOGGER
-                    .warning("Ping reply from "
-                        + getClientName()
-                        + ": does not provide requestNr, faking it with lastSentNr ("
-                        + requestNr + ")");
+                if (requestNr > MAX_FAKE_MSG_COUNT)
+                {
+                    fakeMsgLogLevel = Level.FINE;
+                }
+                LOGGER.log(fakeMsgLogLevel, "Ping reply from " //
+                    + getClientName() + ": does not provide requestNr, " //
+                    + "faking it with lastSentNr (" + requestNr + ")");
                 server.replyToPing(playerName, 0, 0L, 0L, replyReceived);
             }
         }
