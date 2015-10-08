@@ -75,6 +75,7 @@ import net.sf.colossus.guiutil.KFrame;
 import net.sf.colossus.server.INotifyWebServer;
 import net.sf.colossus.server.Server;
 import net.sf.colossus.util.HTMLColor;
+import net.sf.colossus.util.Split;
 import net.sf.colossus.util.ViableEntityManager;
 import net.sf.colossus.webclient.WebClientSocketThread.WcstException;
 import net.sf.colossus.webcommon.GameInfo;
@@ -902,7 +903,7 @@ public class WebClient extends KFrame implements IWebClient
         loginPane.add(registerOrPasswordLabel);
         loginPane.add(registerOrPasswordButton);
 
-        boolean SHOW_CONTACT_ADMIN_BUTTON = false;
+        boolean SHOW_CONTACT_ADMIN_BUTTON = true;
         if (SHOW_CONTACT_ADMIN_BUTTON)
         {
             createContactAdminButton(loginPane);
@@ -934,6 +935,7 @@ public class WebClient extends KFrame implements IWebClient
             {
                 System.out
                     .println("Now I would open the contact-admin-dialog...");
+                contactAdmin();
             }
         });
 
@@ -3820,6 +3822,20 @@ public class WebClient extends KFrame implements IWebClient
         else if (command.equals(chgPasswordButtonText))
         {
             doRegisterOrPasswordDialog(false);
+        }
+    }
+
+    private void contactAdmin()
+    {
+        String test = "This is line 1\n" + "line 2\n"
+            + "And here comes a very long line \n"
+            + " f sf df dsf ds fsd fds fsdf sd f fds\n" + "\n"
+            + "And this is the last line.\n\n";
+
+        List<String> lines = Split.split('\n', test);
+        for (String oneLine : lines)
+        {
+            System.out.println(">>LINE " + oneLine + "<<");
         }
     }
 
