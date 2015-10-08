@@ -1333,6 +1333,7 @@ public class WebServer implements IWebServer, IRunWebServer
             {
                 recipientClient.requestAttention(when, sender, isAdmin,
                     message, beepCount, beepInterval, windows);
+                informPingDone(sender, recipient, message);
             }
             else
             {
@@ -1347,6 +1348,25 @@ public class WebServer implements IWebServer, IRunWebServer
         if (reasonFail != null)
         {
             informPingFailed(sender, reasonFail, message);
+        }
+    }
+
+    private void informPingDone(String sender, String recipient, String message)
+    {
+        User senderUser = userDB.findUserByName(sender);
+        IWebClient senderWebClient = senderUser.getWebserverClient();
+        String[] lines = new String[] { "You /ping'ed to " + recipient + ": "
+            + message };
+        ChatChannel gc = getGeneralChat();
+        if (senderWebClient != null)
+        {
+            gc.sendLinesToClient(gc.getChannelId(), senderWebClient,
+                Arrays.asList(lines), false, "");
+        }
+        else
+        {
+            LOGGER.warning("requestUserAttention done, but could not find "
+                + "client to send confirmation message!");
         }
     }
 
