@@ -1787,26 +1787,29 @@ public final class Server extends Thread implements IServer
 
     public void doneWithBattleMoves()
     {
+        BattleServerSide battle = game.getBattleSS();
         if (!isBattleActivePlayer())
         {
             LOGGER
                 .warning(getPlayerName()
-                    + " illegally called doneWithBattleMoves(): not battle active player");
+                    + " illegally called doneWithBattleMoves(): battle active player is "
+                    + battle.getBattleActivePlayer());
             LOGGER.info(processingCH.dumpLastProcessedLines());
             getClient(getPlayer()).nak(Constants.doneWithBattleMoves,
-                "Illegal attempt to end phase (wrong player)");
+                "Illegal attempt to end phase battle-move: battle active player is "
+                    + battle.getBattleActivePlayer());
             return;
         }
 
-        BattleServerSide battle = game.getBattleSS();
         if (!battle.getBattlePhase().isMovePhase())
         {
             LOGGER.warning(getPlayerName()
-                + " illegally called doneWithBattleMoves(): not move phase");
+                + " illegally called doneWithBattleMoves(): current phase is "
+                + battle.getBattlePhase().toString() + ")");
             LOGGER.info(processingCH.dumpLastProcessedLines());
             getClient(getPlayer()).nak(
                 Constants.doneWithBattleMoves,
-                "Illegal attempt to end phase (wrong phase "
+                "Illegal attempt to end phase battle-move: current phase is "
                     + battle.getBattlePhase().toString() + ")");
             return;
         }
