@@ -7,4 +7,6 @@ Colossus*.zip
 local_build.properties
 unix.jnlp
 win.jnlp
+logging.properties.remote*
+stop.flag
 
