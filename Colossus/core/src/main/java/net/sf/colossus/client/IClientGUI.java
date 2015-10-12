@@ -286,6 +286,10 @@ public interface IClientGUI
 
     public abstract void highlightCrittersWithTargets();
 
+    public abstract void indicateStrikesDone(boolean auto);
+
+    public abstract void revertDoneIndicator();
+
     public abstract void actOnApplyCarries(BattleHex hex);
 
     public abstract void actOnCleanupBattle();

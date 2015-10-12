@@ -1,14 +1,14 @@
 /**
- * 
+ *
  */
 package net.sf.colossus.game;
 
 
 public enum BattlePhase
 {
-    SUMMON("Summon", true, false), RECRUIT("Recruit", true, false), MOVE(
-        "Move", true, false), FIGHT("Fight", false, true), STRIKEBACK(
-        "Strikeback", false, true);
+    SUMMON("Summon", true, false, "summons"), RECRUIT("Recruit", true, false,
+        "recruits"), MOVE("Move", true, false, "moves"), FIGHT("Fight", false,
+        true, "strikes"), STRIKEBACK("Strikeback", false, true, "strikes back");
 
     /**
      * Determine if the phase is part of the fighting.
@@ -44,14 +44,22 @@ public enum BattlePhase
         return name;
     }
 
+    public String getDoesWhat()
+    {
+        return doesWhat;
+    }
+
     private final String name;
     private final boolean isMovePhase;
     private final boolean isFightPhase;
+    private final String doesWhat;
 
-    private BattlePhase(String name, boolean isMovePhase, boolean isFightPhase)
+    private BattlePhase(String name, boolean isMovePhase,
+        boolean isFightPhase, String doesWhat)
     {
         this.name = name;
         this.isMovePhase = isMovePhase;
         this.isFightPhase = isFightPhase;
+        this.doesWhat = doesWhat;
     }
 }

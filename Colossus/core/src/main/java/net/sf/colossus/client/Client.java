@@ -1386,11 +1386,12 @@ public final class Client implements IClient, IOracle, IVariant,
     public void aiDoneWithStrikes()
     {
         aiPause();
-        doneWithStrikes();
+        doneWithStrikes(true);
     }
 
-    public void doneWithStrikes()
+    public void doneWithStrikes(boolean auto)
     {
+        gui.indicateStrikesDone(auto);
         server.doneWithStrikes();
     }
 
@@ -1458,6 +1459,12 @@ public final class Client implements IClient, IOracle, IVariant,
             {
                 boolean struck = makeForcedStrikes();
                 gui.highlightCrittersWithTargets();
+                // If there are no strikes (or strikeback) to do, be done with
+                // striking automatically.
+                // NOTE! This handles also both strike phases of turn 1
+                // of a battle! So for long delay (roundtrip time) client is
+                // for a short while "theoretically" in "is supposed to strike"
+                // status.
                 if (!struck && findCrittersWithTargets().isEmpty())
                 {
                     aiDoneWithStrikes();
@@ -2142,6 +2149,16 @@ public final class Client implements IClient, IOracle, IVariant,
         else if (reason.equals(Constants.doneWithBattleMoves))
         {
             // TODO why can we ignore this?
+            /*
+             * Clemens' guess: This can not really happen based on "user did
+             * something wrong"; when this happened, it was because user
+             * clicked twice (due to delayed response from server)
+             * => the illegal nak was because it was already different phase.
+             * So, no point to bother user with that.
+             * With recent (12.10.2015) changes (where user gets visual
+             * feedback that Done was clicked) this situation "should"
+             * not happen any more...
+             */
         }
         else if (reason.equals(Constants.assignStrikePenalty))
         {
@@ -2155,6 +2172,7 @@ public final class Client implements IClient, IOracle, IVariant,
         {
             showMessageDialog(errmsg);
             gui.highlightCrittersWithTargets();
+            gui.revertDoneIndicator();
         }
         else if (reason.equals(Constants.doneWithEngagements))
         {

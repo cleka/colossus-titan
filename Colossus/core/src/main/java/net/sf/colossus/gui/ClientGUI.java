@@ -3235,6 +3235,24 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         }
     }
 
+    public void indicateStrikesDone(boolean auto)
+    {
+        logPerhaps("markStrikesDone()");
+        if (battleBoard != null)
+        {
+            battleBoard.indicateStrikesDone(auto);
+        }
+    }
+
+    public void revertDoneIndicator()
+    {
+        logPerhaps("revertDoneIndicator()");
+        if (battleBoard != null)
+        {
+            battleBoard.revertDoneIndicator();
+        }
+    }
+
     public void actOnApplyCarries(BattleHex hex)
     {
         logPerhaps("actOnApplyCarries(BattleHex hex)");
@@ -3978,7 +3996,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     public void doneWithStrikes()
     {
         logPerhaps("doneWithStrikes()");
-        getClient().doneWithStrikes();
+        getClient().doneWithStrikes(false);
     }
 
     public void concede()

@@ -531,6 +531,18 @@ public class NullClientGUI implements IClientGUI
 
     }
 
+    public void indicateStrikesDone(boolean auto)
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void revertDoneIndicator()
+    {
+        // TODO Auto-generated method stub
+
+    }
+
     public void highlightEngagements()
     {
         // TODO Auto-generated method stub

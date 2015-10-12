@@ -24,6 +24,8 @@ import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -480,11 +482,20 @@ public final class BattleBoard extends KFrame
                     }
                     unselectAllHexes();
                     battleMap.unselectEntranceHexes();
+                    String phase = getGame().getBattlePhase().toString();
+                    infoPanel.setOwnPhaseDone(phase, false);
+                    setWaitCursor();
                     gui.getCallbackHandler().doneWithBattleMoves();
                 }
                 else if (isFightPhase())
                 {
                     unselectAllHexes();
+                    /*
+                    // now called by client's doneWithStrike method:
+                    String phase = getGame().getBattlePhase().toString();
+                    infoPanel.setOwnPhaseDone(phase);
+                    setWaitCursor();
+                    */
                     battleMap.unselectEntranceHexes();
                     gui.resetStrikeNumbers();
                     gui.getCallbackHandler().doneWithStrikes();
@@ -585,8 +596,15 @@ public final class BattleBoard extends KFrame
 
         if (isMyBattleTurn())
         {
+            enableDoneButton();
+            setDefaultCursor();
             highlightMobileCritters();
             reqFocus();
+        }
+        else
+        {
+            disableDoneButton();
+            setWaitCursor();
         }
     }
 
@@ -616,8 +634,15 @@ public final class BattleBoard extends KFrame
 
         if (isMyBattleTurn())
         {
+            enableDoneButton();
+            setDefaultCursor();
             highlightCrittersWithTargets();
             reqFocus();
+        }
+        else
+        {
+            disableDoneButton();
+            setWaitCursor();
         }
     }
 
@@ -627,12 +652,15 @@ public final class BattleBoard extends KFrame
         if (isMyBattleTurn())
         {
             enableDoneButton();
+            setDefaultCursor();
             infoPanel.setOwnPhase(newPhaseName);
         }
         else
         {
             disableDoneButton();
-            infoPanel.setForeignPhase(newPhaseName);
+            setWaitCursor();
+            String doesWhat = getGame().getBattlePhase().getDoesWhat();
+            infoPanel.setForeignPhase(doesWhat);
         }
         infoPanel.turnPanel.advTurn(getGame().getBattleTurnNumber());
     }
@@ -787,6 +815,29 @@ public final class BattleBoard extends KFrame
         setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     }
 
+    /* Update infoPanel to make it visible that "Done" was sent to server
+     * (otherwise, with long delays, users clicked the Done again, and again..
+     * This is also called by client by aiDoneWithStrikes, because that covers
+     * the case where client "automagically" makes "Done" for the cases
+     * where there is no strike or strikeback to do (in particular first
+     * battle turn, when there is no opponent yet).
+     *
+     * @auto True: triggered by "no strikes to do", false: user clicked "Done"
+     */
+    public void indicateStrikesDone(boolean auto)
+    {
+        String phase = getGame().getBattlePhase().toString();
+        infoPanel.setOwnPhaseDone(phase, auto);
+        setWaitCursor();
+    }
+
+    public void revertDoneIndicator()
+    {
+        // Re-set the phase label to be without the "(done)" part,
+        // and re-enable the done button:
+        updatePhaseAndTurn();
+    }
+
     private boolean confirmLeavingCreaturesOffboard()
     {
         String warnTitan = "";
@@ -872,7 +923,14 @@ public final class BattleBoard extends KFrame
 
     public void actOnPendingBattleMoveOver()
     {
-        setDefaultCursor();
+        if (isMyBattleTurn())
+        {
+            setDefaultCursor();
+        }
+        else
+        {
+            setWaitCursor();
+        }
         highlightMobileCritters();
     }
 
@@ -1007,11 +1065,14 @@ public final class BattleBoard extends KFrame
             super();
             setLayout(new java.awt.BorderLayout());
 
+            Box westBox = new Box(BoxLayout.X_AXIS);
             doneButton = new JButton(doneWithPhaseAction);
-            add(doneButton, BorderLayout.WEST);
-
             phaseLabel = new JLabel("- phase -");
-            add(phaseLabel, BorderLayout.EAST);
+            westBox.add(Box.createHorizontalStrut(20));
+            westBox.add(phaseLabel);
+            westBox.add(Box.createHorizontalStrut(20));
+            westBox.add(doneButton);
+            add(westBox, BorderLayout.WEST);
 
             turnPanel = new TurnPanel();
             add(turnPanel, BorderLayout.CENTER);
@@ -1023,10 +1084,16 @@ public final class BattleBoard extends KFrame
             doneButton.setEnabled(true);
         }
 
-        private void setForeignPhase(String s)
+        private void setOwnPhaseDone(String s, boolean auto)
+        {
+            phaseLabel.setText(s + " (" + (auto ? "auto-" : "") + "done)");
+            doneButton.setEnabled(false);
+        }
+
+        private void setForeignPhase(String doesWhat)
         {
             String name = getGame().getBattleActivePlayer().getName();
-            phaseLabel.setText("(" + name + ") " + s);
+            phaseLabel.setText(name + " " + doesWhat);
             doneButton.setEnabled(false);
         }
 
