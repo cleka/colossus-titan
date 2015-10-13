@@ -278,6 +278,7 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
         addCheckBox(notifBox, Options.turnStartToFront);
         addCheckBox(notifBox, Options.turnStartBeep);
         addCheckBox(notifBox, Options.turnStartBottomBarYellow, true, true);
+        addCheckBox(notifBox, Options.turnStartChatYellow, true, true);
 
         windowPane.add(notifBox, SUBPANEL_CONSTRAINTS);
 
@@ -503,6 +504,14 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
             String text = ((JCheckBox)source).getText();
             boolean selected = (e.getStateChange() == ItemEvent.SELECTED);
             options.setOption(text, selected);
+            if (text.equals(Options.turnStartBottomBarYellow) && !selected)
+            {
+                gui.getBoard().myTurnEndsBottomBarActions();
+            }
+            if (text.equals(Options.turnStartChatYellow) && !selected)
+            {
+                gui.notifyItsPlayersTurn(false);
+            }
         }
         else if (source instanceof JRadioButton)
         {

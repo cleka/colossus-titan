@@ -2844,7 +2844,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         cleanupNegotiationDialogs();
         if (isMyTurn())
         {
-            board.myTurnStartsActions();
+            myTurnStartsActions();
         }
         else
         {
@@ -2869,6 +2869,48 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         {
             LOGGER.finest("(ClientGUI of client " + getOwningPlayerName()
                 + ": no watchdog needed)");
+        }
+    }
+
+    private void myTurnStartsActions()
+    {
+        if (getOptions().getOption(Options.turnStartBeep))
+        {
+            board.getToolkit().beep();
+        }
+        if (options.getOption(Options.turnStartToFront))
+        {
+            board.getFrame().toFront();
+        }
+        if (options.getOption(Options.turnStartBottomBarYellow, true))
+        {
+            board.myTurnStartsBottomBarActions();
+        }
+        if (options.getOption(Options.turnStartChatYellow, true)
+            && webClient != null)
+        {
+            webClient.notifyItsPlayersTurn(true);
+        }
+    }
+
+    void myTurnEndsActions()
+    {
+        if (options.getOption(Options.turnStartBottomBarYellow, true))
+        {
+            board.myTurnEndsBottomBarActions();
+        }
+        if (options.getOption(Options.turnStartChatYellow, true))
+        {
+            notifyItsPlayersTurn(false);
+        }
+    }
+
+    // Need this separated because PreferencesWindow calls it
+    void notifyItsPlayersTurn(boolean isDue)
+    {
+        if (webClient != null)
+        {
+            webClient.notifyItsPlayersTurn(isDue);
         }
     }
 

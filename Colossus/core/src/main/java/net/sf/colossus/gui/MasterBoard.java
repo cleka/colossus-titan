@@ -1100,7 +1100,7 @@ public final class MasterBoard extends JPanel
                     + File.separator + ".colossus";
                 String logDirectory = getLogDirectory();
 
-                JOptionPane.showMessageDialog(masterFrame, "" 
+                JOptionPane.showMessageDialog(masterFrame, ""
                         + "Colossus Version: " + BuildInfo.getReleaseVersion()
                         + "\n" + "Build:  " + buildInfo + "\n"
                         + "Colossus home:  " + colossusHome + "\n"
@@ -3249,25 +3249,9 @@ public final class MasterBoard extends JPanel
         }
     }
 
-    void myTurnStartsActions()
-    {
-        if (gui.getOptions().getOption(Options.turnStartBeep))
-        {
-            getToolkit().beep();
-        }
-        if (gui.getOptions().getOption(Options.turnStartToFront))
-        {
-            getFrame().toFront();
-        }
-        myTurnStartsBottomBarActions();
-    }
-
     void myTurnStartsBottomBarActions()
     {
-        if (gui.getOptions().getOption(Options.turnStartBottomBarYellow, true))
-        {
-            bottomBar.myTurnStartsActions();
-        }
+        bottomBar.myTurnStartsActions();
     }
 
     void myTurnEndsBottomBarActions()
