@@ -354,6 +354,8 @@ public interface IClientGUI
 
     public abstract boolean getStartedByWebClient();
 
+    public abstract boolean hasWatchdog();
+
     public abstract void displayInactivityDialogEnsureEDT(final String title,
         final String text, final Color color);
 

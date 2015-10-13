@@ -867,6 +867,11 @@ public class NullClientGUI implements IClientGUI
         return false;
     }
 
+    public boolean hasWatchdog()
+    {
+        return false;
+    }
+
     public void displayInactivityDialogEnsureEDT(final String title,
         final String text, Color color)
     {

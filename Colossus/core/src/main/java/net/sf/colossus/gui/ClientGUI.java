@@ -2152,7 +2152,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void showNegotiate(Legion attacker, Legion defender)
     {
-        updateClockTickingPerhaps(true, "showNegotiate");
+        dueOrNotChangesActions(true, "showNegotiate");
         logPerhaps("showNegotiate(Legion attacker, Legion defender)");
         board.clearDefenderFlee();
         negotiate = new Negotiate(this, attacker, defender);
@@ -2171,7 +2171,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void showConcede(Client client, Legion ally, Legion enemy)
     {
-        updateClockTickingPerhaps(true, "showConcede");
+        dueOrNotChangesActions(true, "showConcede");
         LOGGER
             .fine("CG: showConcede(Client client, Legion ally, Legion enemy)");
 
@@ -2182,7 +2182,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void showFlee(Client client, Legion ally, Legion enemy)
     {
-        updateClockTickingPerhaps(true, "showFlee");
+        dueOrNotChangesActions(true, "showFlee");
         logPerhaps("showFlee(Client client, Legion ally, Legion enemy)");
         Concede.flee(this, board.getFrame(), ally, enemy);
         myTurnNotificationActions(ally);
@@ -2290,23 +2290,25 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         board.clearEngagingPending();
     }
 
-    /* Starts or stops clock ticking, and informs webclient:
-     * This sets or stops inactivityWatchdog ticking, depending on whether it's
-     * now our turn or not; if the state is already as requested, does nothing.
-     * Notify also WebClient (if we have one) about new state, so that it can
-     * react visually (= set chat background to some color, at the moment).
-     */
-    private void updateClockTickingPerhaps(boolean shouldRun, String reason)
+    public boolean hasWatchdog()
     {
-        if (watchdog == null)
+        return watchdog != null;
+    }
+
+    private void dueOrNotChangesActions(boolean isDue, String reason)
+    {
+        dueOrNotChangesYellowActions(isDue);
+        if (hasWatchdog())
         {
-            // if we have a watchdog, that part will be done below
-            if (webClient != null)
-            {
-                webClient.notifyItsPlayersTurn(shouldRun);
-            }
-            return;
+            updateClockTicking(isDue, reason);
         }
+    }
+
+    /* This sets or stops inactivityWatchdog ticking, based on the shouldRun
+     * argument. If the state is already as requested, does nothing.
+     */
+    private void updateClockTicking(boolean shouldRun, String reason)
+    {
         boolean isTicking = watchdog.isClockTicking();
         LOGGER.finest("UPDATE CLOCK (reason " + reason
             + "): ticking: shouldrun=" + shouldRun
@@ -2327,18 +2329,10 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         else if (isTicking && !shouldRun)
         {
             watchdog.stopClockTicking();
-            if (webClient != null)
-            {
-                webClient.notifyItsPlayersTurn(shouldRun);
-            }
         }
         else if (!isTicking && shouldRun)
         {
             watchdog.setClockTicking();
-            if (webClient != null)
-            {
-                webClient.notifyItsPlayersTurn(shouldRun);
-            }
         }
     }
 
@@ -2389,11 +2383,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void actOnEngagementCompleted()
     {
-        if (client.needsWatchdog() && watchdog.isClockTicking())
-        {
-            updateClockTickingPerhaps(isMyTurn(), "engagement over");
-        }
-
+        dueOrNotChangesActions(isMyTurn(), "engagement over");
         logPerhaps("actOnEngagementCompleted()");
         board.updateEngagementsLeftText();
     }
@@ -2578,7 +2568,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
         board.deiconify();
         new AcquireAngel(board.getFrame(), this, legion, recruits);
-        updateClockTickingPerhaps(true, "doaquire angel");
+        dueOrNotChangesActions(true, "doaquire angel");
     }
 
     public void setBoardActive(boolean val)
@@ -2590,7 +2580,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void doPickSummonAngel(Legion legion, List<Legion> possibleDonors)
     {
-        updateClockTickingPerhaps(true, "dopicksummonangel");
+        dueOrNotChangesActions(true, "dopicksummonangel");
         logPerhaps("doPickSummonAngel(Legion legion,");
         new SummonAngel(this, legion, possibleDonors);
     }
@@ -2678,7 +2668,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     public void doPickColor(final String playerName,
         final List<PlayerColor> colorsLeft)
     {
-        updateClockTickingPerhaps(true, "dopickcolor");
+        dueOrNotChangesActions(true, "dopickcolor");
         logPerhaps("doPickColor(final String playerName,");
         if (SwingUtilities.isEventDispatchThread())
         {
@@ -2721,7 +2711,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void doPickInitialMarker(Set<String> markersAvailable)
     {
-        updateClockTickingPerhaps(true, "dopickinitialmarker");
+        dueOrNotChangesActions(true, "dopickinitialmarker");
         board.setPhaseInfo("Pick initial marker!");
         createPickMarkerDialog(this, markersAvailable, null);
     }
@@ -2842,27 +2832,17 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     {
         logPerhaps("actOnTurnOrPlayerChange(Client client, int turnNr,");
         cleanupNegotiationDialogs();
-        if (isMyTurn())
-        {
-            myTurnStartsActions();
-        }
-        else
-        {
-            board.myTurnEndsBottomBarActions();
-        }
+
+        myTurnStartsWindowActions();
+        dueOrNotChangesActions(isMyTurn(), "actonturnorplayerchange");
+
         eventViewer.turnOrPlayerChange(turnNr, player);
 
-        if (client.needsWatchdog())
+        if (watchdog != null)
         {
             if (client.getEventExecutor().getRetriggeredEventOngoing())
             {
                 client.kickPhase();
-            }
-            else
-            {
-                // starts or stops clock ticking, and informs webclient
-                updateClockTickingPerhaps(isMyTurn(),
-                    "actonturnorplayerchange");
             }
         }
         else
@@ -2872,7 +2852,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         }
     }
 
-    private void myTurnStartsActions()
+    private void myTurnStartsWindowActions()
     {
         if (getOptions().getOption(Options.turnStartBeep))
         {
@@ -2882,31 +2862,22 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         {
             board.getFrame().toFront();
         }
-        if (options.getOption(Options.turnStartBottomBarYellow, true))
-        {
-            board.myTurnStartsBottomBarActions();
-        }
-        if (options.getOption(Options.turnStartChatYellow, true)
-            && webClient != null)
-        {
-            webClient.notifyItsPlayersTurn(true);
-        }
     }
 
-    void myTurnEndsActions()
+    private void dueOrNotChangesYellowActions(boolean isDue)
     {
         if (options.getOption(Options.turnStartBottomBarYellow, true))
         {
-            board.myTurnEndsBottomBarActions();
+            board.myTurnBottomBarActions(isDue);
         }
         if (options.getOption(Options.turnStartChatYellow, true))
         {
-            notifyItsPlayersTurn(false);
+            notifyWebClientItsPlayersTurn(isDue);
         }
     }
 
-    // Need this separated because PreferencesWindow calls it
-    void notifyItsPlayersTurn(boolean isDue)
+    // might also be called be PreferencesWindow
+    void notifyWebClientItsPlayersTurn(boolean isDue)
     {
         if (webClient != null)
         {
@@ -3073,7 +3044,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             battleBoard.setupFightMenu();
         }
         updateStatusScreen();
-        updateClockTickingPerhaps(client.isMyBattlePhase(), "actonbattlefight");
+        dueOrNotChangesActions(client.isMyBattlePhase(), "actonbattlefight");
     }
 
     public void actOnSetupBattleMove()
@@ -3096,7 +3067,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             }
         }
         updateStatusScreen();
-        updateClockTickingPerhaps(client.isMyBattlePhase(), "actonbattlemove");
+        dueOrNotChangesActions(client.isMyBattlePhase(), "actonbattlemove");
     }
 
     public void actOnTellBattleMove(BattleHex startingHex,

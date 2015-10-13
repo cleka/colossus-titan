@@ -506,11 +506,11 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
             options.setOption(text, selected);
             if (text.equals(Options.turnStartBottomBarYellow) && !selected)
             {
-                gui.getBoard().myTurnEndsBottomBarActions();
+                gui.getBoard().myTurnBottomBarActions(selected);
             }
             if (text.equals(Options.turnStartChatYellow) && !selected)
             {
-                gui.notifyItsPlayersTurn(false);
+                gui.notifyWebClientItsPlayersTurn(selected);
             }
         }
         else if (source instanceof JRadioButton)

@@ -3249,14 +3249,9 @@ public final class MasterBoard extends JPanel
         }
     }
 
-    void myTurnStartsBottomBarActions()
+    void myTurnBottomBarActions(boolean isDue)
     {
-        bottomBar.myTurnStartsActions();
-    }
-
-    void myTurnEndsBottomBarActions()
-    {
-        bottomBar.myTurnEndsActions();
+        bottomBar.myTurnActions(isDue);
     }
 
     public void updateLegionsLeftToMusterText()
@@ -3312,14 +3307,9 @@ public final class MasterBoard extends JPanel
             playerLabel.setForeground(color);
         }
 
-        public void myTurnStartsActions()
+        public void myTurnActions(boolean isDue)
         {
-            this.setBackground(Color.yellow);
-        }
-
-        public void myTurnEndsActions()
-        {
-            this.setBackground(originalBackgroundColor);
+            this.setBackground(isDue ? Color.yellow : originalBackgroundColor);
         }
 
         public void setPhase(String s)

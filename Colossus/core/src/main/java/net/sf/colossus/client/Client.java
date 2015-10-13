@@ -504,6 +504,11 @@ public final class Client implements IClient, IOracle, IVariant,
         return options.getOption(Options.inactivityTimeout);
     }
 
+    public boolean hasWatchdog()
+    {
+        return gui.hasWatchdog();
+    }
+
     public void setClockTicking(boolean val)
     {
         clockIsTicking = val;
