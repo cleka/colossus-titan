@@ -80,6 +80,7 @@ import net.sf.colossus.util.BuildInfo;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.util.NullCheckPredicate;
 import net.sf.colossus.util.StaticResourceLoader;
+import net.sf.colossus.util.SystemInfo;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;
@@ -1099,14 +1100,12 @@ public final class MasterBoard extends JPanel
                     + File.separator + ".colossus";
                 String logDirectory = getLogDirectory();
 
-                JOptionPane.showMessageDialog(
-                    masterFrame,
-                    "" + "Colossus Version: " + BuildInfo.getReleaseVersion()
-                        + "\n" + "Build: " + buildInfo + "\n"
+                JOptionPane.showMessageDialog(masterFrame, "" 
+                        + "Colossus Version: " + BuildInfo.getReleaseVersion()
+                        + "\n" + "Build:  " + buildInfo + "\n"
                         + "Colossus home:  " + colossusHome + "\n"
                         + "Log directory:  " + logDirectory + "\n"
-                        + "java.version:   "
-                        + System.getProperty("java.version"),
+                        + "Java Version:  " + SystemInfo.getDisplayJavaInfo(),
                     "About Colossus", JOptionPane.INFORMATION_MESSAGE);
             }
         };

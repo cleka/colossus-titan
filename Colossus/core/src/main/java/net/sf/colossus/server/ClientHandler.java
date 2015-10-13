@@ -56,6 +56,9 @@ final class ClientHandler extends ClientHandlerStub implements IClient
     private int clientVersion = 0;
     private boolean spectator;
 
+    private String javaVersion = "not-set-yet";
+    private String osInfo = "not-set-yet";
+
     private boolean didExplicitDisconnect = false;
     private boolean withdrawnAlready = false;
     private int cantSendMessageRepeated = 0;
@@ -758,9 +761,9 @@ final class ClientHandler extends ClientHandlerStub implements IClient
                         .booleanValue();
                 }
             }
+
             String reasonFail = server.addClient(this, signonTryName, remote,
                 clientVersion, buildInfo, spectator);
-
             if (reasonFail == null)
             {
                 sendToClient("Ack: signOn");
@@ -792,6 +795,16 @@ final class ClientHandler extends ClientHandlerStub implements IClient
         {
             LOGGER.info("Got watchGame request from client " + signonName);
             server.watchGame();
+        }
+
+        else if (method.equals(Constants.systemInfo))
+        {
+            this.osInfo = (args.remove(0));
+            this.javaVersion = (args.remove(0));
+            String msg = "Connecting client with signonName "
+                + getClientName() + " reports: java version="
+                + javaVersion + ", OS info=" + osInfo;
+            LOGGER.info(msg);
         }
 
         else if (method.equals(Constants.requestGameInfo))

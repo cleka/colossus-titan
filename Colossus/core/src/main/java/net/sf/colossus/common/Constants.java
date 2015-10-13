@@ -231,6 +231,7 @@ public final class Constants
 
     // From client to server
     public static final String signOn = "signOn";
+    public static final String systemInfo = "systemInfo";
     public static final String requestGameInfo = "requestGameInfo";
     public static final String joinGame = "joinGame";
     public static final String watchGame = "watchGame";

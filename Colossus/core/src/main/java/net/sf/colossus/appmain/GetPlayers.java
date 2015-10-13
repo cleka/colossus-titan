@@ -51,6 +51,7 @@ import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.server.XMLSnapshotFilter;
 import net.sf.colossus.util.BuildInfo;
 import net.sf.colossus.util.StaticResourceLoader;
+import net.sf.colossus.util.SystemInfo;
 import net.sf.colossus.variant.Variant;
 
 
@@ -553,6 +554,8 @@ public final class GetPlayers extends KFrame
         serveAtPortBox.setEditable(true);
 
         WelcomeDialog.showWelcomeDialogMaybe(options);
+
+        warnIfJava7();
     }
 
     private void actOnVariantChange(int oldMaxPlayers, String newVarName)
@@ -1139,5 +1142,24 @@ public final class GetPlayers extends KFrame
     public boolean getMutexNotified()
     {
         return mutexNotified;
+    }
+
+    private void warnIfJava7()
+    {
+        if (SystemInfo.isOracleJava7())
+        {
+            String message = "Please note:\n" + "It looks you are using Oracle Java 7 (\""
+                + SystemInfo.getDisplayJavaInfo()
+                + "\").\n\n"
+                + "There are known issues with Colossus and Oracle Java version 7, which\n"
+                + "might cause problems, in worst case crash the game.\n"
+                + "For example, the 'no battleboard comes up' problem is caused by this.\n"
+                + "\n"
+                + "If possible, use a different Java version, for example Oracle Java 5, 6, or 8,\n"
+                + "or a Java JRE from a different vendor (like OpenJDK/OpenJRE)."
+                + "\n\nYou have been warned :-)";
+            JOptionPane.showMessageDialog(this, message, "Oracle Java 7",
+                JOptionPane.WARNING_MESSAGE);
+        }
     }
 }

@@ -31,6 +31,7 @@ import net.sf.colossus.util.ErrorUtils;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.InstanceTracker;
 import net.sf.colossus.util.Split;
+import net.sf.colossus.util.SystemInfo;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
@@ -190,6 +191,7 @@ final class SocketClientThread extends Thread implements IServer,
             LOGGER.log(Level.FINEST, "Next: " + task);
             out = new PrintWriter(socket.getOutputStream(), true);
 
+
             task = "Sending signOn message";
             LOGGER.log(Level.FINEST, "Next: " + task);
             signOn(initialName, isRemote, IServer.CLIENT_VERSION,
@@ -201,6 +203,10 @@ final class SocketClientThread extends Thread implements IServer,
 
             if (reasonFail == null)
             {
+                task = "Sending System Info";
+                LOGGER.log(Level.FINEST, "Next: " + task);
+                sendSystemInfo();
+
                 task = "Requesting GameInfo";
                 LOGGER.log(Level.FINEST, "Next: " + task);
                 requestGameInfo();
@@ -997,6 +1003,12 @@ final class SocketClientThread extends Thread implements IServer,
     {
         out.println(Constants.signOn + sep + loginName + sep + isRemote + sep
             + version + sep + buildInfo + sep + spectator);
+    }
+
+    private void sendSystemInfo()
+    {
+        out.println(Constants.systemInfo + sep + SystemInfo.getOsInfo() + sep
+            + SystemInfo.getFullJavaInfo());
     }
 
     // Setup method
