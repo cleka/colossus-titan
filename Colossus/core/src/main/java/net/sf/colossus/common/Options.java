@@ -63,6 +63,7 @@ public final class Options implements IOptions
     public static final String hotSeatMode = "Hot seat mode";
     public static final String keepAccepting = "Keep accepting clients";
     public static final String diceStatisticsFile = "Dice statistics file";
+    public static final String lastJava7Warning = "Last Java 7 warning";
 
     // Rules options
     public static final String variant = "Variant";

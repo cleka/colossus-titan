@@ -16,6 +16,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.Vector;
@@ -70,6 +71,7 @@ public final class GetPlayers extends KFrame
 
     private static final String loadVariant = "Load External Variant";
 
+    private static final long REMINDER_INTERVAL_DAYS = 30;
     private final Object mutex;
     private boolean mutexNotified = false;
     private final JLabel runningOnLabel;
@@ -555,7 +557,10 @@ public final class GetPlayers extends KFrame
 
         WelcomeDialog.showWelcomeDialogMaybe(options);
 
-        warnIfJava7();
+        if (SystemInfo.isOracleJava7())
+        {
+            warnAboutJava7();
+        }
     }
 
     private void actOnVariantChange(int oldMaxPlayers, String newVarName)
@@ -1144,10 +1149,27 @@ public final class GetPlayers extends KFrame
         return mutexNotified;
     }
 
-    private void warnIfJava7()
+    /**
+     * Displays the warning if it hasn't been shown for REMINDER_INTERVAL_DAYS
+     * (or never before at all), and if yes, write back today's date.
+     * I abuse String here, because I don't really want to build the whole
+     * set of getter, setter, trigger, ... for long just for this one case.
+     */
+    private void warnAboutJava7()
     {
-        if (SystemInfo.isOracleJava7())
+        long now = new Date().getTime();
+        String lastTimeString = options
+            .getStringOption(Options.lastJava7Warning);
+        long lastTime = -1;
+        if (lastTimeString != null)
         {
+            lastTime = Long.parseLong(lastTimeString);
+        }
+
+        if (lastTime == -1
+            || (now - lastTime >= REMINDER_INTERVAL_DAYS * 24 * 60 * 60))
+        {
+            options.setOption(Options.lastJava7Warning, Long.toString(now));
             String message = "Please note:\n" + "It looks you are using Oracle Java 7 (\""
                 + SystemInfo.getDisplayJavaInfo()
                 + "\").\n\n"
