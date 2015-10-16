@@ -430,4 +430,28 @@ public class ChatChannel
         chatLog.println(whenTime + " " + sender + ": " + message);
         chatLog.flush();
     }
+
+    public void writeMessageToAdminToChatlog(String fromUser, long when,
+        List<String> lines)
+    {
+        String whenTime = whenFormatter.timeAsString(when);
+        String dateChange = whenFormatter.hasDateChanged();
+        if (dateChange != null)
+        {
+            chatLog.println(doubledashes + " " + dateChange + " "
+                + doubledashes);
+        }
+
+        chatLog.println("\n==============================");
+        chatLog.println("\n" + whenTime + ": Message from " + fromUser
+            + " to admin: \n");
+        chatLog.println("------------------------------");
+        for (String line : lines)
+        {
+            chatLog.println("  " + line);
+        }
+        chatLog.println("------------------------------\n");
+        chatLog.flush();
+    }
+
 }
