@@ -33,6 +33,7 @@ public interface IWebServer
     public static final String PingResponse = "pingResponse";
     public static final String WatchGame = "watchGame";
     public static final String ConfirmCommand = "confirmCommand";
+    public static final String MessageToAdmin = "messageToAdmin";
 
     public static final String DumpInfo = "dumpInfo";
 
@@ -103,5 +104,7 @@ public interface IWebServer
         String newPW, String email, Boolean isAdminObj);
 
     public void logout();
+
+    public void messageToAdmin(String fromUser, long when, List<String> message);
 
 }

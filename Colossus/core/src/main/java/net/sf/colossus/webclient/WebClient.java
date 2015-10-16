@@ -3828,15 +3828,15 @@ public class WebClient extends KFrame implements IWebClient
     private void contactAdmin()
     {
         String test = "This is line 1\n" + "line 2\n"
-            + "And here comes a very long line \n"
-            + " f sf df dsf ds fsd fds fsdf sd f fds\n" + "\n"
+            + "And next comes a very long line \n"
+            + " f sf df dsf ds fsd fds fsdf sd f fsf df dsf ds fsd fds fsdf sd f fsf df dsf ds fsd aaadssaddd 4 5 6 fds fsdf sd f fsf df dsf ds fsd fds fsdf sd f fsf df dsf ds fsd aaadssaddd 4 5 6 fds fsdf sd f fsf df dsf ds fsd fds fsdf sd f fsf df dsf ds fsd aaadssaddd 4 5 6 fds fsdf sd f fsf df dsf ds fsd fds fsdf sd f fsf df dsf ds fsd aaadssaddd 4 5 6 fds fsdf sd f fsf df dsf ds fsd fds fsdf sd f fsf df dsf ds fsd aaadssaddd 4 5 6 fds fsdf sd f fsf df dsf ds fsd fds fsdf sd f fsf df dsf ds fsd aaadssaddd 4 5 6 7fds fsdf sd f fsdfdsfdsfsfsfds\n"
+            + "\n"
             + "And this is the last line.\n\n";
 
-        List<String> lines = Split.split('\n', test);
-        for (String oneLine : lines)
-        {
-            System.out.println(">>LINE " + oneLine + "<<");
-        }
+        long now = new Date().getTime();
+        List<String> lines = Split.split("\n", test);
+
+        server.messageToAdmin(username, now, lines);
     }
 
     private void startLocallyButtonAction()

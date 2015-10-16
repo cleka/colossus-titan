@@ -63,6 +63,8 @@ public class WebServer implements IWebServer, IRunWebServer
     private IWebServerGUI gui = null;
 
     private final IColossusMail mailObject;
+    private final DateFormat dateFormat = new SimpleDateFormat(
+        "yyyy-MM-dd_HH:mm:ss");
 
     private final static int MIN_FREE_GAME_PORTS = 5;
 
@@ -1597,6 +1599,18 @@ public class WebServer implements IWebServer, IRunWebServer
     {
         // Handled by WebServerSocketClientThread main loop;
         // only listed here to satisfy the interface.
+    }
+
+    public void messageToAdmin(String fromUser, long when, List<String> message)
+    {
+        System.out.println("\n" + dateFormat.format(new Long(when))
+            + ": Message from " + fromUser
+            + " to admin: \n==============================");
+        for (String line : message)
+        {
+            System.out.println("  " + line);
+        }
+        System.out.println("------------------------------\n");
     }
 
     public String registerUser(String username, String password, String email)

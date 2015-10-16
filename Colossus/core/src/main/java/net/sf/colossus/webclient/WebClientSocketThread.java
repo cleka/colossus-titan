@@ -764,6 +764,12 @@ public class WebClientSocketThread extends Thread implements IWebServer
         send(Logout);
     }
 
+    public void messageToAdmin(String fromUser, long when, List<String> message)
+    {
+        String listOfLines = Glob.glob(Glob.sep, message);
+        send(MessageToAdmin + sep + fromUser + sep + when + sep + listOfLines);
+    }
+
     public String changeProperties(String username, String oldPW,
         String newPW, String email, Boolean isAdminObj)
     {

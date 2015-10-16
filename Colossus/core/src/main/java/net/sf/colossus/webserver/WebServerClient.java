@@ -631,6 +631,16 @@ public class WebServerClient implements IWebClient
                     + " used echo command - ignored.");
             }
         }
+
+        else if (command.equals(IWebServer.MessageToAdmin))
+        {
+            String fromUser = tokens[1];
+            long when = Long.parseLong(tokens[2]);
+            String globbedMessage = tokens[3];
+            List<String> message = Split.split(Glob.sep, globbedMessage);
+            server.messageToAdmin(fromUser, when, message);
+        }
+
         else
         {
             LOGGER.log(Level.WARNING, "Unexpected command '" + command
