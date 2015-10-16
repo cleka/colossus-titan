@@ -279,9 +279,9 @@ public class WebServerClientSocketThread extends Thread
                 if (caught != null)
                 {
                     LOGGER.log(Level.SEVERE, "WSCST, during parseline, "
-                        + "for user " + tmpUsername
-                        + ": caught throwable! Setting done to true.", caught);
-                    done = true;
+                        + "for user " + tmpUsername + ", message = '"
+                        + fromClient + "': caught throwable!", caught);
+                    // done = true;
                 }
 
                 if (done)
