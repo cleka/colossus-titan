@@ -58,24 +58,49 @@ public class CmdLineWebClient implements IWebClient
      */
     public static void main(String[] args)
     {
+        String useUsername = DEFAULT_USERNAME;
+        String usePassword = DEFAULT_PASSWORD;
+
         // TODO Auto-generated method stub
         boolean doShutdown = false;
-        if (args.length == 1 && args[0].equals("shutdown"))
+        boolean doLogin = false;
+
+        if (args.length >= 2)
         {
-            System.out.println("Doing shutdown...");
+            doLogin = true;
+            useUsername = args[0];
+            usePassword = args[1];
+        }
+        else
+        {
+            doLogin = true;
+        }
+
+        if (args.length == 1 && args[0].equals("shutdown") || args.length == 3
+            && args[2].equals("shutdown"))
+        {
             doShutdown = true;
         }
 
         CmdLineWebClient client = new CmdLineWebClient();
 
-        if (doShutdown)
+        if (doLogin)
         {
-            client.login(true, DEFAULT_USERNAME, DEFAULT_PASSWORD);
+            System.out.println("Logging in as '" + useUsername
+                + "', password '" + usePassword + "'");
+            client.login(true, useUsername, usePassword);
             // Give some time for receiving all the chat messages etc.
             sleepFor(1000);
-
-            client.shutdownServer();
-            client.logout();
+            if (doShutdown)
+            {
+                System.out.println(".. and initiating shutdown.");
+                client.shutdownServer();
+                client.logout();
+            }
+            else
+            {
+                interactiveLoop(client);
+            }
         }
         else
         {
@@ -114,6 +139,9 @@ public class CmdLineWebClient implements IWebClient
 
                 else if (line.equals("exit") || line.equals("quit"))
                 {
+                    // No point to quit without logout - JVM will stay alive
+                    // because thread is still alive.
+                    cwClient.logout();
                     break;
                 }
 

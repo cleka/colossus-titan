@@ -237,7 +237,7 @@
       </chainedmapper>
     </pathconvert>
     <jar jarfile="CmdlineClient.jar" basedir="${build.classes.dir}"
-    includes="**/webclient/** **/webcommon/** **/util/Instance*">
+    includes="**/webclient/** **/webcommon/** **/util/Instance* **/util/Split.class **/util/Glob.class">
       <manifest>
         <attribute name="Main-Class"
         value="net.sf.colossus.webclient.CmdLineWebClient" />      	
