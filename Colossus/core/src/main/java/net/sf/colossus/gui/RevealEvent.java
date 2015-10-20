@@ -48,8 +48,8 @@ public class RevealEvent
     private final Legion legion2;
 
     // for mulligan:
-    private int oldRoll;
-    private int newRoll;
+    private int roll1;
+    private int roll2;
     private String mulliganTitanBaseName; // for titan in place of solid marker
 
     private boolean undone = false;
@@ -145,14 +145,15 @@ public class RevealEvent
 
     // Mulligan or Movement roll
     public RevealEvent(int turnNumber, Player player, int eventType,
-        int oldRoll, int newRoll)
+        int roll1, int roll2)
     {
         this.turnNumber = turnNumber;
         this.player = player;
         this.eventType = eventType;
 
-        this.oldRoll = oldRoll;
-        this.newRoll = newRoll;
+        // Roll2 is used only for mulligan
+        this.roll1 = roll1;
+        this.roll2 = roll2;
 
         this.legion1 = null;
         this.legion2 = null;
@@ -494,13 +495,13 @@ public class RevealEvent
         {
             msg = "Revealing event: Player " + getPlayer().getName()
                 + ", Turn " + getTurn() + " took mulligan;" + " old="
-                + oldRoll + ", new=" + newRoll;
+                + roll1 + ", new=" + roll2;
         }
         else if (eventType == eventMoveRoll)
         {
             msg = "Revealing event: Player " + getPlayer().getName()
                 + ", Turn " + getTurn() + " had movement roll: " + " old="
-                + oldRoll;
+                + roll1;
         }
 
         else
@@ -687,7 +688,7 @@ public class RevealEvent
             addLabel(getEventTypeText() + ": ");
 
             Chit oldDie = new MovementDie(this.scale,
-                MovementDie.getDieImageName(oldRoll));
+                MovementDie.getDieImageName(roll1));
             oldDie.setAlignmentX(Component.LEFT_ALIGNMENT);
             p.add(oldDie);
 
@@ -696,7 +697,7 @@ public class RevealEvent
                 addLabel(" => ");
 
                 Chit newDie = new MovementDie(this.scale,
-                    MovementDie.getDieImageName(newRoll));
+                    MovementDie.getDieImageName(roll2));
                 newDie.setAlignmentX(Component.LEFT_ALIGNMENT);
                 p.add(newDie);
             }

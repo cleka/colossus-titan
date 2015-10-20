@@ -2412,7 +2412,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
         board.setupTitleForMovementRoll(roll);
 
-        if (movementDie == null || roll != movementDie.getLastRoll())
+        // No point to recreate and repaint if it's same as before
+        if (movementDie == null || roll != movementDie.getDisplayedRoll())
         {
             movementDie = new MovementDie(4 * Scale.get(),
                 MovementDie.getDieImageName(roll));

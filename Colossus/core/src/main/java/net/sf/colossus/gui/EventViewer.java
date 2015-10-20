@@ -801,13 +801,13 @@ final class EventViewer extends KDialog
         // otherwise, player took mulligan.
         if (mulliganOldRoll == -2)
         {
-            mulliganOldRoll = roll;
             newRollEvent(RevealEvent.eventMoveRoll, roll, -1);
         }
         else
         {
             newRollEvent(RevealEvent.eventMulligan, mulliganOldRoll, roll);
         }
+        mulliganOldRoll = roll;
     }
 
     public void tellEngagement(Legion attacker, Legion defender, int turnNumber)

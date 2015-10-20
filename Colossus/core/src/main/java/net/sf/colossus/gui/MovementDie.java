@@ -24,7 +24,7 @@ final class MovementDie extends Chit
         return basename.toString();
     }
 
-    int getLastRoll()
+    int getDisplayedRoll()
     {
         return lastRoll;
     }
