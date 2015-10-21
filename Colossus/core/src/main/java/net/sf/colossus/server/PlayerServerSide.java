@@ -30,6 +30,8 @@ public final class PlayerServerSide extends Player implements
     private static final Logger LOGGER = Logger
         .getLogger(PlayerServerSide.class.getName());
 
+    private static boolean REDUCE_DUPLICATE_MOVEMENT_ROLLS = false;
+
     // TODO the half-points are really used only in the die(..) method,
     // they could be summed up there and then added all in one go. That
     // would save us from storing a double and truncating things later
@@ -52,7 +54,8 @@ public final class PlayerServerSide extends Player implements
      *      involves comparing a roll to the previous one of same player.
      */
     private int movementRoll; // 0 if movement has not been rolled.
-    private int previousMovementRoll; // set ONLY for requestExtraRoll use
+    private int preExtraRollRequestMovementRoll; // set ONLY for requestExtraRoll use
+    private int previousTurnMovementRoll = 0;
 
     private final PlayerSpecificDice myDice;
 
@@ -300,13 +303,13 @@ public final class PlayerServerSide extends Player implements
 
         setTeleported(false);
         movementRoll = 0;
-        previousMovementRoll = 0;
+        preExtraRollRequestMovementRoll = 0;
 
         // Make sure that all legions are allowed to move and recruit.
         commitMoves();
     }
 
-    int rollMovement()
+    int rollMovement(boolean forExtraRequest)
     {
         // Only roll if it hasn't already been done.
         if (movementRoll != 0)
@@ -316,14 +319,39 @@ public final class PlayerServerSide extends Player implements
         else
         {
             movementRoll = makeMovementRoll();
-            while (movementRoll == previousMovementRoll)
+
+            if (forExtraRequest)
             {
-                LOGGER.info("Roll is " + movementRoll
-                    + ", same as previous roll! Rolling again.");
-                movementRoll = makeMovementRoll();
+                // for the request extra roll, explicitly prevent a duplicate roll
+                while (movementRoll == preExtraRollRequestMovementRoll)
+                {
+                    LOGGER.info("Extra roll is " + movementRoll
+                        + ", same as previous roll! Rolling again.");
+                    movementRoll = makeMovementRoll();
+                }
             }
-            LOGGER.info(getName() + " rolls a " + movementRoll
-                + " for movement");
+            else
+            {
+                // For normal rolls, reduce the likelihood of duplicates by
+                // re-rolling once; but this way it can still happen
+                if (REDUCE_DUPLICATE_MOVEMENT_ROLLS)
+                {
+                    if (movementRoll == previousTurnMovementRoll)
+                    {
+                        LOGGER.info("Normal roll is " + movementRoll
+                            + ", same as roll from previous turn! "
+                            + "Rolling again ONCE.");
+                        movementRoll = makeMovementRoll();
+                        if (movementRoll == previousTurnMovementRoll)
+                            System.out
+                                .println("He he, same roll, so it can still happen!");
+                    }
+                }
+            }
+            LOGGER.info("Player " + getName() + " rolls a " + movementRoll
+                + " for movement"
+                + (forExtraRequest ? " [extra roll request]" : ""));
+            previousTurnMovementRoll = movementRoll;
         }
         return movementRoll;
     }
@@ -347,8 +375,8 @@ public final class PlayerServerSide extends Player implements
     void prepareExtraRoll()
     {
         undoAllMoves();
-        LOGGER.info(getName() + " gets an extra roll");
-        previousMovementRoll = movementRoll;
+        LOGGER.info("Player " + getName() + " gets the requested extra roll");
+        preExtraRollRequestMovementRoll = movementRoll;
         movementRoll = 0;
     }
 

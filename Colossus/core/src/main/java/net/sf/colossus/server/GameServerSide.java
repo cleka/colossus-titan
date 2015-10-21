@@ -1057,10 +1057,10 @@ public class GameServerSide extends Game
     }
 
     // TODO store only in GameSS, not in PlayerSS
-    private void makeMovementRoll()
+    private void makeMovementRoll(boolean forExtraRequest)
     {
         Player player = getActivePlayer();
-        int roll = ((PlayerServerSide)player).rollMovement();
+        int roll = ((PlayerServerSide)player).rollMovement(forExtraRequest);
         // update in game.Game:
         setMovementRoll(roll);
         getServer().allTellMovementRoll(roll);
@@ -1410,7 +1410,7 @@ public class GameServerSide extends Game
             // Next, initial actions in that phase. So far, only for move.
             if (isPhase(Phase.MOVE))
             {
-                makeMovementRoll();
+                makeMovementRoll(false);
             }
 
             // Inform Client now it's his time to act.
@@ -3202,7 +3202,7 @@ public class GameServerSide extends Game
         player.takeMulligan();
         server.allUpdatePlayerInfo("Mulligan");
         setupMove();
-        makeMovementRoll();
+        makeMovementRoll(false);
         server.kickPhase();
         return player.getMovementRoll();
     }
@@ -3218,7 +3218,7 @@ public class GameServerSide extends Game
         player.prepareExtraRoll();
         server.allUpdatePlayerInfo("ExtraRoll");
         setupMove();
-        makeMovementRoll();
+        makeMovementRoll(true);
         server.kickPhase();
         return player.getMovementRoll();
     }

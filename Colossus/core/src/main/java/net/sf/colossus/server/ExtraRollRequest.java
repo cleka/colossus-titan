@@ -31,7 +31,7 @@ public class ExtraRollRequest
         eligibleClients = new LinkedList<ClientHandler>();
 
         String playerName = processingCH.getPlayerName();
-        LOGGER.info(playerName + " requests extra roll.");
+        LOGGER.info("Player " + playerName + " requests extra roll.");
 
         for (ClientHandler client : server.getRealClients())
         {
@@ -104,19 +104,20 @@ public class ExtraRollRequest
                 if (denials == 0)
                 {
                     int roll = server.getGame().makeExtraRoll();
-                    LOGGER.info(playerName
-                        + " takes a mulligan and rolls " + roll);
-                    String message = "Player "
-                        + currentRequestor
-                        + " requested extra roll and no player denied - player got new roll "
+                    String message = "Informing clients: Player "
+                        + currentRequestor.getPlayerName()
+                        + " requested extra roll and no player denied - player got new roll "
                         + roll + ".";
+                    LOGGER.info(message);
                     server.messageFromServerToAll(message);
                 }
                 else
                 {
-                    String message = "Player " + currentRequestor
+                    String message = "Informing clients: Player "
+                        + currentRequestor.getPlayerName()
                         + " requested extra roll but " + denials
                         + " players denied it. Roll remains the same.";
+                    LOGGER.info(message);
                     server.messageFromServerToAll(message);
                 }
                 currentRequestor = null;
