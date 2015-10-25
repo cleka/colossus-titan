@@ -851,6 +851,13 @@ public class ClientThread extends Thread implements EventExecutor
             client.requestExtraRollApproval(requestorName, requestId);
         }
 
+        else if (method.equals(Constants.askSuspendConfirmation))
+        {
+            String requestorName = args.remove(0);
+            int timeout = Integer.parseInt(args.remove(0));
+            client.askSuspendConfirmation(requestorName, timeout);
+        }
+
         else if (method.equals(Constants.askConfirmCatchUp))
         {
             client.confirmWhenCaughtUp();

@@ -362,4 +362,7 @@ public interface IClientGUI
     public abstract void inactivityAutoFleeOrConcede(boolean reply);
 
     public void askExtraRollApproval(String requestorName, boolean ourself, int requestId);
+
+    public void askSuspendConfirmation(String requestorName, int timeout);
+
 }

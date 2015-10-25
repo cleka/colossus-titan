@@ -890,4 +890,9 @@ public class NullClientGUI implements IClientGUI
         // TODO Auto-generated method stub
 
     }
+
+    public void askSuspendConfirmation(String requestorName, int timeout)
+    {
+        // TODO Auto-generated method stub
+    }
 }

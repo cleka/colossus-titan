@@ -1251,6 +1251,11 @@ final class SocketClientThread extends Thread implements IServer,
         sendToServer(Constants.suspendGame);
     }
 
+    public void suspendResponse(boolean approved)
+    {
+        sendToServer(Constants.suspendResponse + approved);
+    }
+
     public void checkServerConnection()
     {
         sendToServer(Constants.checkConnection);

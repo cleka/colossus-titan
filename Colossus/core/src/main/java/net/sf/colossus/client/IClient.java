@@ -187,4 +187,6 @@ public interface IClient
     public void tellSyncCompleted(int syncRequestNumber);
 
     public void requestExtraRollApproval(String requestorName, int requestId);
+
+    public void askSuspendConfirmation(String requestorName, int timeout);
 }

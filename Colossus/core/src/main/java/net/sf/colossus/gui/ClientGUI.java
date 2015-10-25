@@ -2224,12 +2224,28 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         String[] options = new String[2];
         options[0] = new String("Approve");
         options[1] = new String("Deny");
-        int response = JOptionPane.showOptionDialog(getMapOrBoardFrame(),
-            message,
+        int response = JOptionPane.showOptionDialog(board, message,
             "Approval for extra roll request", 0,
             JOptionPane.INFORMATION_MESSAGE, null, options, null);
         boolean approved = (response == 0 ? true : false);
         client.sendExtraRollRequestResponse(approved, requestId);
+    }
+
+    public void askSuspendConfirmation(String requestorName, int timeout)
+    {
+        String[] options = new String[2];
+        options[0] = new String("Approve");
+        options[1] = new String("Deny");
+        int response = JOptionPane.showOptionDialog(board, message, "Player "
+            + requestorName + " requested to suspend the game. OK?", 0,
+            JOptionPane.QUESTION_MESSAGE, null, options, null);
+        boolean approved = (response == 0 ? true : false);
+        suspendResponse(approved);
+    }
+
+    public void suspendResponse(boolean approve)
+    {
+        client.suspendResponse(approve);
     }
 
     private void myTurnNotificationActions(Legion ally)

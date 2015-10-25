@@ -843,6 +843,25 @@ public final class Client implements IClient, IOracle, IVariant,
         server.extraRollResponse(approved, requestId);
     }
 
+    public void askSuspendConfirmation(String requestorName, int timeout)
+    {
+        System.out.println("User " + requestorName
+            + " requests to suspend the game, timeout=" + timeout);
+        if (getOwningPlayer().isAI() || autoplay.isAutoplayActive())
+        {
+            suspendResponse(true);
+        }
+        else
+        {
+            gui.askSuspendConfirmation(requestorName, timeout);
+        }
+    }
+
+    public void suspendResponse(boolean approved)
+    {
+        server.suspendResponse(approved);
+    }
+
     public void doCheckServerConnection()
     {
         server.checkServerConnection();

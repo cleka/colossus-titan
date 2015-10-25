@@ -182,6 +182,8 @@ public final class Constants
     public static final int defaultWebPort = 26766;
 
     public static final int numSavedServerNames = 10;
+    
+    public static final int SUSPEND_APPROVE_TIMEOUT = 10;
 
     // Game actions used in several places.
     public static final String newGame = "New game";
@@ -189,6 +191,7 @@ public final class Constants
     public static final String saveGame = "Save game";
     public static final String saveGameAs = "Save game as";
     public static final String suspendGame = "Suspend game";
+    public static final String suspendResponse = "Suspend response";
     public static final String quitGame = "Quit Application";
     public static final String closeBoard = "Close MasterBoard";
     public static final String checkConnection = "Check connection";
@@ -376,6 +379,7 @@ public final class Constants
     public static final String messageFromServer = "messageFromServer";
     public static final String syncCompleted = "syncCompleted";
     public static final String requestExtraRollApproval = "requestExtraRollApproval";
+    public static final String askSuspendConfirmation = "askSuspendConfirmation";
     public static final String appendToConnectionLog = "appendToConnLog";
 
     // engagement resolved, methods:

@@ -694,4 +694,10 @@ public class ClientHandlerStub implements IClient
             + sep + requestId);
     }
 
+    public void askSuspendConfirmation(String requestorName, int timeout)
+    {
+        sendToClient(Constants.askSuspendConfirmation + sep + requestorName
+            + sep + timeout);
+    }
+
 }

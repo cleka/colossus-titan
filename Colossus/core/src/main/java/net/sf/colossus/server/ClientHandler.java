@@ -1049,6 +1049,12 @@ final class ClientHandler extends ClientHandlerStub implements IClient
             server.suspendGame();
         }
 
+        else if (method.equals(Constants.suspendResponse))
+        {
+            boolean approved = Boolean.valueOf(args.remove(0)).booleanValue();
+            server.suspendResponse(approved);
+        }
+
         else if (method.equals(Constants.checkConnection))
         {
             server.checkServerConnection();

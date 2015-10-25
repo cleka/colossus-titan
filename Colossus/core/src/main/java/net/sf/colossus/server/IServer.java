@@ -88,6 +88,8 @@ public interface IServer
 
     public void extraRollResponse(boolean approved, int requestId);
 
+    public void suspendResponse(boolean approved);
+
     public void undoSplit(Legion splitoff);
 
     public void undoMove(Legion legion);

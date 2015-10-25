@@ -3442,11 +3442,94 @@ public final class Server extends Thread implements IServer
         game.saveGameWithErrorHandling(filename, autoSave);
     }
 
+    private final HashSet<IClient> suspendRequestApprovers = new HashSet<IClient>();
+
+    private boolean suspendOK = false;
+
     public void suspendGame()
     {
-        LOGGER.info("In server: Suspending game...");
+        LOGGER.info("In server: Handling request to suspend the game...");
+
+        if (!suspendRequestApprovers.isEmpty() || suspendOK == true)
+        {
+            processingCH.nak("Another request is still in progress.",
+                "Suspend request ignored");
+            LOGGER
+                .warning("Player "
+                    + processingCH.getPlayerName()
+                    + " requested to suspend the game, but a previous request is still ongoing!");
+            return;
+        }
+
+        // otherwise, request approval from all players
+        suspendOK = true;
+        String requestorName = getPlayerName();
+
+        suspendRequestApprovers.clear();
+        Set<Player> players = playerToClientMap.keySet();
+        for (Player p : players)
+        {
+            ClientHandler client = (ClientHandler)playerToClientMap.get(p);
+
+            if (client.isTemporarilyInTrouble()
+                || client.isTemporarilyDisconnected())
+            {
+                // we skip that one
+                System.out.println("SKIPPING player " + client.getPlayerName()
+                    + " for suspend approval request.");
+            }
+            else
+            {
+                System.out.println("Asking player " + client.getPlayerName()
+                    + " for suspend approval.");
+                client.askSuspendConfirmation(requestorName,
+                    Constants.SUSPEND_APPROVE_TIMEOUT);
+            }
+        }
+    }
+
+    public void suspendResponse(boolean approved)
+    {
+        if (suspendRequestApprovers.isEmpty())
+        {
+            // silently ignore replies that come "too late", including the
+            // case that an earlier "declined" reply has decided the issue
+            return;
+        }
+
+        if (approved)
+        {
+            suspendRequestApprovers.remove(processingCH);
+        }
+        else
+        {
+            suspendOK = false;
+        }
+
+        if (suspendRequestApprovers.isEmpty())
+        {
+            if (suspendOK)
+            {
+                initiateActualSuspend();
+            }
+            else
+            {
+                suspendDenied("Player " + getPlayerName()
+                    + " declined the request to suspend.");
+            }
+        }
+    }
+
+    public void initiateActualSuspend()
+    {
+        LOGGER.info("In server: Approved trues, suspending game...");
         game.getNotifyWebServer().gameIsSuspended();
         initiateSuspendGame();
+    }
+
+    public void suspendDenied(String message)
+    {
+        System.out.println("suspend denied, reason: " + message);
     }
 
     // User has requested to save game via File=>Save Game or Save Game as...
