@@ -9,7 +9,8 @@ import net.sf.colossus.util.DevRandom;
 
 
 /**
- * Class Dice handles die-rolling
+ * Class Dice handles die-rolling, now also with the possibility of reading
+ * data from a file downloaded from random.org.
  *
  * @author David Ripton
  * @author Romain Dolbeau
