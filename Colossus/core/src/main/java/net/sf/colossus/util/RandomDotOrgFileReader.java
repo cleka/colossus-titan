@@ -32,11 +32,33 @@ public class RandomDotOrgFileReader
 
     private final Random fallbackRandom = new Random();
 
-
+    public static boolean isPropertySet()
+    {
+        boolean set = false;
+        // can throw
+        try
+        {
+            String value = System.getProperty(propertyName);
+            if (value != null)
+            {
+                set = true;
+            }
+        }
+        catch (SecurityException e)
+        {
+            LOGGER.info("Checking whether randomDotOrg property is set caused"
+                + " SecurityException - considering it as 'not set'.");
+        }
+        return set;
+    }
 
     public RandomDotOrgFileReader()
     {
-        init(System.getProperty(propertyName));
+        if (isPropertySet())
+        {
+            init(System.getProperty(propertyName));
+        }
+        // otherwise it falls back to standard Random class
     }
 
     public RandomDotOrgFileReader(String directoryPath)
@@ -82,7 +104,6 @@ public class RandomDotOrgFileReader
         if (files.size() == 0)
         {
             LOGGER.info("Directory " + files.size() + " is empty.");
-
         }
 
         LOGGER.info("Directory contains " + files.size()

@@ -188,13 +188,16 @@ public class DevRandom extends Random
             {
                 LOGGER.log(Level.WARNING, "Reading from random source "
                     + source + ", got only " + got + " bytes (but expected "
-                    + size + ")");
+                    + size + ") - falling back to standard Java PRNG.");
+                randStream = null;
+                return super.next(bits);
             }
         }
         catch (IOException ex)
         {
             LOGGER.log(Level.SEVERE, "Problem reading from random source "
-                + source);
+                + source + " - falling back to standard Java PRNG.");
+            randStream = null;
             return super.next(bits);
         }
         int result = 0;
@@ -213,4 +216,5 @@ public class DevRandom extends Random
          */
         return (result);
     }
+
 }
