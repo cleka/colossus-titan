@@ -46,9 +46,15 @@ public final class PlayerServerSide extends Player implements
     /**
      * TODO this might be better as a state in {@link Game} since there is
      *      always only one per game, not per player
+     * OR NOT TODO anymore...
+     *      Nowadays (11/2015) it's more feasible to have them player
+     *      specific, so that we can easier do "special stuff" that
+     *      involves comparing a roll to the previous one of same player.
      */
     private int movementRoll; // 0 if movement has not been rolled.
-    private int previousMovementRoll;
+    private int previousMovementRoll; // set ONLY for requestExtraRoll use
+
+    private final PlayerSpecificDice myDice;
 
     private boolean titanEliminated;
 
@@ -66,6 +72,7 @@ public final class PlayerServerSide extends Player implements
     {
         // TODO why are the players on the client side numbered but not here?
         super(game, name, 0);
+        this.myDice = new PlayerSpecificDice();
 
         // add package path to AI names and choose random type for "anyAI":
         setType(shortTypeName);
@@ -308,12 +315,12 @@ public final class PlayerServerSide extends Player implements
         }
         else
         {
-            movementRoll = Dice.rollDie();
+            movementRoll = makeMovementRoll();
             while (movementRoll == previousMovementRoll)
             {
                 LOGGER.info("Roll is " + movementRoll
                     + ", same as previous roll! Rolling again.");
-                movementRoll = Dice.rollDie();
+                movementRoll = makeMovementRoll();
             }
             LOGGER.info(getName() + " rolls a " + movementRoll
                 + " for movement");
@@ -730,4 +737,17 @@ public final class PlayerServerSide extends Player implements
         }
         return ok;
     }
+
+    @Override
+    public int makeBattleRoll()
+    {
+        return myDice.rollBattleDie();
+    }
+
+    @Override
+    public int makeMovementRoll()
+    {
+        return myDice.rollMovementDie();
+    }
+
 }

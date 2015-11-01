@@ -323,7 +323,8 @@ public class BattleStrike
         // usual rolling, OR roll according to sequence
         for (int i = 0; i < dice; i++)
         {
-            int roll = (randomized ? Dice.rollDie() : Dice.rollDieNonRandom());
+            int roll = (randomized ? rollPlayersBattleDice(striker) : Dice
+                .rollDieNonRandom());
             rolls.add("" + roll);
             rollString.append(roll);
 
@@ -340,6 +341,16 @@ public class BattleStrike
                 + (damage == 1 ? " hit" : " hits"));
 
         return damage;
+    }
+
+    /**
+     * @param striker The creature that strikes
+     * @return a battle roll
+     */
+
+    private int rollPlayersBattleDice(Creature striker)
+    {
+        return striker.getPlayer().makeBattleRoll();
     }
 
     // Helper method

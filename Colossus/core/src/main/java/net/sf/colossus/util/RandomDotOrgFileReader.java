@@ -7,6 +7,8 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
@@ -58,7 +60,7 @@ public class RandomDotOrgFileReader
         {
             init(System.getProperty(propertyName));
         }
-        // otherwise it falls back to standard Random class
+        // otherwise it falls back to standard Random class anyway
     }
 
     public RandomDotOrgFileReader(String directoryPath)
@@ -110,7 +112,9 @@ public class RandomDotOrgFileReader
             + " 'random.org'-files.");
 
         unusedFiles.addAll(files);
+        Collections.shuffle(unusedFiles);
         prepareNextFile();
+        discardSomeBytes();
     }
 
     /**
@@ -150,10 +154,6 @@ public class RandomDotOrgFileReader
                 }
 
                 currentFile = unusedFiles.remove(0);
-                System.out.println("\nOpening file " + currentFile
-                    + " for reading random data.");
-                WhatNextManager.sleepFor(500);
-
                 LOGGER.info("Opening file " + currentFile
                     + " for reading random data.");
                 randomByteStream = new FileInputStream(currentFile);
@@ -161,8 +161,6 @@ public class RandomDotOrgFileReader
                 {
                     LOGGER.warning("File " + currentFile.toString()
                         + " seems to be empty? " + "Trying next file.");
-                    WhatNextManager.sleepFor(1000);
-
                     // Totally remove from files to consider
                     files.remove(currentFile);
                     currentFile = null;
@@ -177,6 +175,23 @@ public class RandomDotOrgFileReader
                 + "files. Falling back to PRNG.");
             randomByteStream = null;
             currentFile = null;
+        }
+    }
+
+    /**
+     * Discard a random amount of bytes, so that even if we would have only
+     * a single input files and all players would happen to use same file,
+     * they get different stuff.
+     *
+     */
+    private void discardSomeBytes()
+    {
+        WhatNextManager.sleepFor(20);
+        long now = new Date().getTime();
+        long count = now % 17 + now % 7;
+        for (int i = 0; i < count; i++)
+        {
+            nextSingleByte();
         }
     }
 

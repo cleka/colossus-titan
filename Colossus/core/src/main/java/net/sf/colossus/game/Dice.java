@@ -9,8 +9,11 @@ import net.sf.colossus.util.DevRandom;
 
 
 /**
- * Class Dice handles die-rolling, now also with the possibility of reading
- * data from a file downloaded from random.org.
+ * Class Dice handles nowadays only "general" die-rolling, usually using the
+ * default "low-quality" Java PRNG or whatever is defined to use instead.
+ *
+ * Player specific rolls where we want "as good as possible" rolls moved to
+ * PlayerSpecificDice.
  *
  * @author David Ripton
  * @author Romain Dolbeau

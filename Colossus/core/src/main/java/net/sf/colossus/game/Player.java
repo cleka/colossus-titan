@@ -521,4 +521,15 @@ public class Player
         return false;
     }
 
+    // PlayerServerSide overrides this to use a better random source
+    public int makeBattleRoll()
+    {
+        return Dice.rollDie();
+    }
+
+    // PlayerServerSide overrides this to use a better random source
+    public int makeMovementRoll()
+    {
+        return Dice.rollDie();
+    }
 }
