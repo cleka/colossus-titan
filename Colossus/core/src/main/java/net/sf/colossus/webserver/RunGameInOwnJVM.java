@@ -190,10 +190,18 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
 
         Runtime rt = Runtime.getRuntime();
 
-        String loggingFileArg = propFileOk ? "-Djava.util.logging.config.file="
+        String loggingFileArg = propFileOk ? " -Djava.util.logging.config.file="
             + logPropFile
             : "";
 
+        String randomDotOrgArg = "";
+        String prop;
+        prop = System.getProperty("net.sf.colossus.randomDotOrgDirectory");
+        if (prop != null && !prop.equals(""))
+        {
+            randomDotOrgArg = " -Dnet.sf.colossus.randomDotOrgDirectory="
+                + prop;
+        }
 
         String loadOptionString = "";
         String loadFilename = this.gi.getResumeFromFilename();
@@ -202,7 +210,8 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
             loadOptionString = " --latest";
         }
 
-        String command = javaCommand + " " + loggingFileArg + " -Duser.home="
+        String command = javaCommand + loggingFileArg + randomDotOrgArg
+            + " -Duser.home="
             + gameDir + " -jar " + colossusJar + " -p " + hostingPort
             + " -g --flagfile " + flagFileName + loadOptionString;
 
