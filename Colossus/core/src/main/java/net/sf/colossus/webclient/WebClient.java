@@ -75,7 +75,6 @@ import net.sf.colossus.guiutil.KFrame;
 import net.sf.colossus.server.INotifyWebServer;
 import net.sf.colossus.server.Server;
 import net.sf.colossus.util.HTMLColor;
-import net.sf.colossus.util.Split;
 import net.sf.colossus.util.ViableEntityManager;
 import net.sf.colossus.webclient.WebClientSocketThread.WcstException;
 import net.sf.colossus.webcommon.GameInfo;
@@ -3827,6 +3826,8 @@ public class WebClient extends KFrame implements IWebClient
 
     private void contactAdmin()
     {
+        new ContactAdminDialog(this, "Contact the admin", false);
+        /*
         String test = "This is line 1\n" + "line 2\n"
             + "And next comes a very long line \n"
             + " f sf df dsf ds fsd fds fsdf sd f fsf df dsf ds fsd fds fsdf sd f fsf df dsf ds fsd aaadssaddd 4 5 6 fds fsdf sd f fsf df dsf ds fsd fds fsdf sd f fsf df dsf ds fsd aaadssaddd 4 5 6 fds fsdf sd f fsf df dsf ds fsd fds fsdf sd f fsf df dsf ds fsd aaadssaddd 4 5 6 fds fsdf sd f fsf df dsf ds fsd fds fsdf sd f fsf df dsf ds fsd aaadssaddd 4 5 6 fds fsdf sd f fsf df dsf ds fsd fds fsdf sd f fsf df dsf ds fsd aaadssaddd 4 5 6 fds fsdf sd f fsf df dsf ds fsd fds fsdf sd f fsf df dsf ds fsd aaadssaddd 4 5 6 7fds fsdf sd f fsdfdsfdsfsfsfds\n"
@@ -3837,6 +3838,7 @@ public class WebClient extends KFrame implements IWebClient
         List<String> lines = Split.split("\n", test);
 
         server.messageToAdmin(username, now, lines);
+        */
     }
 
     private void startLocallyButtonAction()
