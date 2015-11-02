@@ -675,12 +675,6 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public void setMulliganOldRoll(int movementRoll)
-    {
-        // TODO Auto-generated method stub
-
-    }
-
     public void setPreferencesWindowVisible(boolean val)
     {
         // TODO Auto-generated method stub
@@ -746,7 +740,7 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public void actOnTellMovementRoll(int roll)
+    public void actOnTellMovementRoll(int roll, String reason)
     {
         // TODO Auto-generated method stub
 

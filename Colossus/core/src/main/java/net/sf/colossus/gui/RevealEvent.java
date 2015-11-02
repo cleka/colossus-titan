@@ -73,11 +73,12 @@ public class RevealEvent
     public final static int eventMulligan = 9;
     public final static int eventMoveRoll = 10;
     public final static int eventReinforce = 12;
+    public final static int eventExtraRoll = 13;
 
     // Battle is only a temporary state, before it becomes Won or Lost
     // ( = no filter / checkbox setting for that needed, so far at least...)
     public final static int eventBattle = 11;
-    public final static int NUMBEROFEVENTS = 13;
+    public final static int NUMBEROFEVENTS = 14;
 
     private final static String eventSplitText = "Split";
     private final static String eventRecruitText = "Recruit";
@@ -92,12 +93,13 @@ public class RevealEvent
     private final static String eventMoveRollText = "Movement roll";
     private final static String eventBattleText = "Battle";
     private final static String eventReinforceText = "Reinforce";
+    private final static String eventExtraRollText = "Extra roll";
 
     private static String[] eventTypeToString = { eventSplitText,
         eventRecruitText, eventSummonText, eventTeleportText,
         eventAcquireText, eventWonText, eventLostText, eventTurnChangeText,
         eventPlayerChangeText, eventMulliganText, eventMoveRollText,
-        eventBattleText, eventReinforceText };
+        eventBattleText, eventReinforceText, eventExtraRollText };
 
     /**
      * TODO replace marker/height combos with Legion objects
@@ -491,10 +493,12 @@ public class RevealEvent
             msg = "Revealing event: Player change, now player "
                 + getPlayer().getName() + ", Turn " + getTurn();
         }
-        else if (eventType == eventMulligan)
+        else if (eventType == eventMulligan || eventType == eventExtraRoll)
         {
+            String what = (eventType == eventMulligan ? "mulligan"
+                : "extra roll");
             msg = "Revealing event: Player " + getPlayer().getName()
-                + ", Turn " + getTurn() + " took mulligan;" + " old="
+                + ", Turn " + getTurn() + " took " + what + ";" + " old="
                 + roll1 + ", new=" + roll2;
         }
         else if (eventType == eventMoveRoll)
@@ -679,7 +683,8 @@ public class RevealEvent
         p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
         p.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        if (eventType == eventMulligan || eventType == eventMoveRoll)
+        if (eventType == eventMulligan || eventType == eventMoveRoll
+            || eventType == eventExtraRoll)
         {
             Chit solidMarker = getSolidMarker();
             p.add(solidMarker);
@@ -692,7 +697,7 @@ public class RevealEvent
             oldDie.setAlignmentX(Component.LEFT_ALIGNMENT);
             p.add(oldDie);
 
-            if (eventType == eventMulligan)
+            if (eventType == eventMulligan || eventType == eventExtraRoll)
             {
                 addLabel(" => ");
 

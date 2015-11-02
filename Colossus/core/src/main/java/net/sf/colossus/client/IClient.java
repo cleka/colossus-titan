@@ -26,7 +26,7 @@ public interface IClient
     public void tellEngagementResults(Legion winner, String method,
         int points, int turns);
 
-    public void tellMovementRoll(int roll);
+    public void tellMovementRoll(int roll, String reason);
 
     public void tellWhatsHappening(String message);
 

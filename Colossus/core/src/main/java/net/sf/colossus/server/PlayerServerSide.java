@@ -309,8 +309,10 @@ public final class PlayerServerSide extends Player implements
         commitMoves();
     }
 
-    int rollMovement(boolean forExtraRequest)
+    int rollMovement(String reason)
     {
+        boolean forExtraRequest = reason.equals(Constants.reasonExtraRoll);
+
         // Only roll if it hasn't already been done.
         if (movementRoll != 0)
         {
@@ -319,13 +321,12 @@ public final class PlayerServerSide extends Player implements
         else
         {
             movementRoll = makeMovementRoll();
-
             if (forExtraRequest)
             {
                 // for the request extra roll, explicitly prevent a duplicate roll
                 while (movementRoll == preExtraRollRequestMovementRoll)
                 {
-                    LOGGER.info("Extra roll is " + movementRoll
+                    LOGGER.finer("Extra roll is " + movementRoll
                         + ", same as previous roll! Rolling again.");
                     movementRoll = makeMovementRoll();
                 }
@@ -338,19 +339,19 @@ public final class PlayerServerSide extends Player implements
                 {
                     if (movementRoll == previousTurnMovementRoll)
                     {
-                        LOGGER.info("Normal roll is " + movementRoll
+                        LOGGER.finer("Normal roll is " + movementRoll
                             + ", same as roll from previous turn! "
                             + "Rolling again ONCE.");
                         movementRoll = makeMovementRoll();
                         if (movementRoll == previousTurnMovementRoll)
-                            System.out
-                                .println("He he, same roll, so it can still happen!");
+                        {
+                            LOGGER.finest("He he, same roll, so it can still happen!");
+                        }
                     }
                 }
             }
             LOGGER.info("Player " + getName() + " rolls a " + movementRoll
-                + " for movement"
-                + (forExtraRequest ? " [extra roll request]" : ""));
+                + " for movement [" + reason + "]");
             previousTurnMovementRoll = movementRoll;
         }
         return movementRoll;
@@ -362,7 +363,7 @@ public final class PlayerServerSide extends Player implements
         if (mulligans > 0)
         {
             undoAllMoves();
-            LOGGER.info(getName() + " takes a mulligan");
+            LOGGER.finer("Player " + getName() + " takes a mulligan");
             if (!getGame().getOption(Options.unlimitedMulligans))
             {
                 mulligans--;
@@ -375,7 +376,7 @@ public final class PlayerServerSide extends Player implements
     void prepareExtraRoll()
     {
         undoAllMoves();
-        LOGGER.info("Player " + getName() + " gets the requested extra roll");
+        LOGGER.finer("Player " + getName() + " gets the requested extra roll");
         preExtraRollRequestMovementRoll = movementRoll;
         movementRoll = 0;
     }

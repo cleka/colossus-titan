@@ -2404,26 +2404,20 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         board.updateEngagementsLeftText();
     }
 
-    public void setMulliganOldRoll(int movementRoll)
-    {
-        logPerhaps("setMulliganOldRoll(int movementRoll)");
-        eventViewer.setMulliganOldRoll(movementRoll);
-    }
-
     public void tellWhatsHappening(String message)
     {
         logPerhaps("tellWhatsHappening(String message)");
         board.setPhaseInfo(message);
     }
 
-    public void actOnTellMovementRoll(int roll)
+    public void actOnTellMovementRoll(int roll, String reason)
     {
-        logPerhaps("actOnTellMovementRoll(int roll)");
+        logPerhaps("actOnTellMovementRoll(" + roll + ", " + reason + ")");
         // TODO move if block to eventviewer itself?
         // Not during replay, but during redo:
         if (!isReplayOngoing() || isRedoOngoing())
         {
-            eventViewer.tellMovementRoll(roll);
+            eventViewer.tellMovementRoll(roll, reason);
         }
 
         board.setupTitleForMovementRoll(roll);

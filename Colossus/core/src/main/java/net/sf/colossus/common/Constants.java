@@ -182,7 +182,7 @@ public final class Constants
     public static final int defaultWebPort = 26766;
 
     public static final int numSavedServerNames = 10;
-    
+
     public static final int SUSPEND_APPROVE_TIMEOUT = 10;
 
     // Game actions used in several places.
@@ -309,6 +309,10 @@ public final class Constants
     public static final String reasonConcession = "Concession";
     public static final String reasonFled = "Fled";
     public static final String reasonKilled = "Killed";
+
+    public static final String reasonNormalRoll = "NormalRoll";
+    public static final String reasonMulligan = "MulliganRoll";
+    public static final String reasonExtraRoll = "ExtraRoll";
 
     // From server to client
     public static final String tellEngagement = "tellEngagement";

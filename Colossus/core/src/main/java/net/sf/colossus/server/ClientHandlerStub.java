@@ -184,9 +184,9 @@ public class ClientHandlerStub implements IClient
         sendToClient(Constants.tellWhatsHappening + sep + message);
     }
 
-    public void tellMovementRoll(int roll)
+    public void tellMovementRoll(int roll, String reason)
     {
-        sendToClient(Constants.tellMovementRoll + sep + roll);
+        sendToClient(Constants.tellMovementRoll + sep + roll + sep + reason);
     }
 
     public void syncOption(String optname, String value)

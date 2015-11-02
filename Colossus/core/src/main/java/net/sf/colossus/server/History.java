@@ -725,7 +725,7 @@ public class History
 
             ((PlayerServerSide)player).setMovementRoll(roll);
             game.movementRollEvent(player, roll);
-            server.allTellMovementRoll(roll);
+            server.allTellMovementRoll(roll, null);
         }
         else if (eventName.equals("Move"))
         {

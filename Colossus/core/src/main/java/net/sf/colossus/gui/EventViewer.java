@@ -121,6 +121,7 @@ final class EventViewer extends KDialog
     public static final String evfWon = "Engagement won events";
     public static final String evfLoser = "Engagement lost events";
     public static final String evfMulligan = "Mulligans";
+    public static final String evfExtraRoll = "Extra rolls";
     public static final String evfMoveRoll = "Movement rolls";
 
     public static final String evfTurnChange = "Turn change info";
@@ -190,6 +191,8 @@ final class EventViewer extends KDialog
 
         showEventType[RevealEvent.eventMulligan] = getBoolOption(evfMulligan,
             true);
+        showEventType[RevealEvent.eventExtraRoll] = getBoolOption(
+            evfExtraRoll, true);
         showEventType[RevealEvent.eventMoveRoll] = getBoolOption(evfMoveRoll,
             true);
 
@@ -339,6 +342,10 @@ final class EventViewer extends KDialog
                 else if (optname.equals(evfMoveRoll))
                 {
                     showEventType[RevealEvent.eventMoveRoll] = selected;
+                }
+                else if (optname.equals(evfExtraRoll))
+                {
+                    showEventType[RevealEvent.eventExtraRoll] = selected;
                 }
                 else if (optname.equals(evfPlayerChange))
                 {
@@ -795,17 +802,27 @@ final class EventViewer extends KDialog
         mulliganOldRoll = roll;
     }
 
-    public void tellMovementRoll(int roll)
+    public void tellMovementRoll(int roll, String reason)
     {
         // if oldroll is -2, this is the first roll;
         // otherwise, player took mulligan.
-        if (mulliganOldRoll == -2)
+        if (mulliganOldRoll == -2 || reason.equals(Constants.reasonNormalRoll))
         {
             newRollEvent(RevealEvent.eventMoveRoll, roll, -1);
         }
-        else
+        else if (reason.equals(Constants.reasonExtraRoll))
+        {
+            newRollEvent(RevealEvent.eventExtraRoll, mulliganOldRoll, roll);
+        }
+        else if (reason.equals(Constants.reasonMulligan))
         {
             newRollEvent(RevealEvent.eventMulligan, mulliganOldRoll, roll);
+        }
+        else
+        {
+            LOGGER.warning("Unrecognized reason '" + reason
+                + "' for movement roll?");
+            newRollEvent(RevealEvent.eventMoveRoll, roll, -1);
         }
         mulliganOldRoll = roll;
     }

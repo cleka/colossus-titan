@@ -190,11 +190,9 @@ public interface IClientGUI
 
     public abstract void actOnEngagementCompleted();
 
-    public abstract void setMulliganOldRoll(int movementRoll);
-
     public abstract void tellWhatsHappening(String message);
 
-    public abstract void actOnTellMovementRoll(int roll);
+    public abstract void actOnTellMovementRoll(int roll, String reason);
 
     /* pass revealed info to EventViewer and
      * additionally remember the images list for later, the engagement report

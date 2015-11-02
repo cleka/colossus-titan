@@ -1764,11 +1764,11 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    void allTellMovementRoll(int roll)
+    void allTellMovementRoll(int roll, String reason)
     {
         for (IClient client : iClients)
         {
-            client.tellMovementRoll(roll);
+            client.tellMovementRoll(roll, reason);
         }
     }
 
@@ -2860,7 +2860,8 @@ public final class Server extends Thread implements IServer
             return;
         }
         int roll = game.mulligan();
-        LOGGER.info(getPlayerName() + " takes a mulligan and rolls " + roll);
+        LOGGER.finest("Player " + getPlayerName()
+            + " took a mulligan and rolled " + roll);
     }
 
     public void requestExtraRoll()

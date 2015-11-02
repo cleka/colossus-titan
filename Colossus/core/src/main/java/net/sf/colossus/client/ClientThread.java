@@ -296,7 +296,15 @@ public class ClientThread extends Thread implements EventExecutor
         if (method.equals(Constants.tellMovementRoll))
         {
             int roll = Integer.parseInt(args.remove(0));
-            client.tellMovementRoll(roll);
+            String reason = "";
+            if (args.size() > 0)
+            {
+                reason = args.remove(0);
+            }
+            LOGGER.finest("tellMovementRoll, roll=" + roll + ", reason='"
+                + reason + ".");
+            client.tellMovementRoll(roll, reason);
+
         }
         else if (method.equals(Constants.syncOption))
         {

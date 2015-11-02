@@ -1061,10 +1061,10 @@ public final class Client implements IClient, IOracle, IVariant,
         }
     }
 
-    public void tellMovementRoll(int roll)
+    public void tellMovementRoll(int roll, String reason)
     {
         game.setMovementRoll(roll);
-        gui.actOnTellMovementRoll(roll);
+        gui.actOnTellMovementRoll(roll, reason);
 
         // kickMoves() now called by kickPhase(), because the kickXXXX
         // are now done separately, not implied in the setupXXXXX

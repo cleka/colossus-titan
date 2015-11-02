@@ -965,7 +965,7 @@ final class SocketClientThread extends Thread implements IServer,
     {
         if (socket != null)
         {
-            LOGGER.info("Client '" + getPrintName() + "' sends to server: "
+            LOGGER.finer("Client '" + getPrintName() + "' sends to server: "
                 + message);
             out.println(message);
             clientThread.notifyUserIfGameIsPaused(message);
