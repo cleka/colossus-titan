@@ -1599,9 +1599,10 @@ public class WebServer implements IWebServer, IRunWebServer
         // only listed here to satisfy the interface.
     }
 
-    public void messageToAdmin(String fromUser, long when, List<String> message)
+    public void messageToAdmin(long when, String fromUser, String fromMail,
+        List<String> message)
     {
-        generalChat.writeMessageToAdminToChatlog(fromUser, when, message);
+        generalChat.writeMessageToAdminToChatlog(when, fromUser, fromMail, message);
     }
 
     public String registerUser(String username, String password, String email)

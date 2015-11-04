@@ -75,6 +75,7 @@ import net.sf.colossus.guiutil.KFrame;
 import net.sf.colossus.server.INotifyWebServer;
 import net.sf.colossus.server.Server;
 import net.sf.colossus.util.HTMLColor;
+import net.sf.colossus.util.Split;
 import net.sf.colossus.util.ViableEntityManager;
 import net.sf.colossus.webclient.WebClientSocketThread.WcstException;
 import net.sf.colossus.webcommon.GameInfo;
@@ -932,8 +933,6 @@ public class WebClient extends KFrame implements IWebClient
         {
             public void actionPerformed(ActionEvent e)
             {
-                System.out
-                    .println("Now I would open the contact-admin-dialog...");
                 contactAdmin();
             }
         });
@@ -2515,6 +2514,11 @@ public class WebClient extends KFrame implements IWebClient
         }
     }
 
+    private boolean checkIfCouldContactAdmin()
+    {
+        return (state != NotLoggedIn);
+    }
+
     // this should always be called inside a invokeLater (i.e. in EDT)!!
     public void doUpdateGUI()
     {
@@ -2546,6 +2550,7 @@ public class WebClient extends KFrame implements IWebClient
         boolean couldStartLocally = false;
         boolean couldWatch = checkIfCouldWatch(state);
         String reasonWhyCantResume = checkIfCouldResume(state);
+        boolean couldContactAdmin = checkIfCouldContactAdmin();
 
         // ----------------------------------------------------------------
         // ... and now actually change the GUI
@@ -2573,9 +2578,12 @@ public class WebClient extends KFrame implements IWebClient
         // Games tab
         updateDateTimeInfoString();
 
+
         userinfoLabel.setText("Userinfo: " + getUserinfoText());
         statusLabel.setText("Status: " + newStatusText);
         infoTextLabel.setText(newInfoText);
+
+        contactAdminButton.setEnabled(couldContactAdmin);
 
         proposeButton.setEnabled(couldPropose);
         cancelButton.setEnabled(couldCancel);
@@ -3826,19 +3834,17 @@ public class WebClient extends KFrame implements IWebClient
 
     private void contactAdmin()
     {
-        new ContactAdminDialog(this, "Contact the admin", false);
-        /*
-        String test = "This is line 1\n" + "line 2\n"
-            + "And next comes a very long line \n"
-            + " f sf df dsf ds fsd fds fsdf sd f fsf df dsf ds fsd fds fsdf sd f fsf df dsf ds fsd aaadssaddd 4 5 6 fds fsdf sd f fsf df dsf ds fsd fds fsdf sd f fsf df dsf ds fsd aaadssaddd 4 5 6 fds fsdf sd f fsf df dsf ds fsd fds fsdf sd f fsf df dsf ds fsd aaadssaddd 4 5 6 fds fsdf sd f fsf df dsf ds fsd fds fsdf sd f fsf df dsf ds fsd aaadssaddd 4 5 6 fds fsdf sd f fsf df dsf ds fsd fds fsdf sd f fsf df dsf ds fsd aaadssaddd 4 5 6 fds fsdf sd f fsf df dsf ds fsd fds fsdf sd f fsf df dsf ds fsd aaadssaddd 4 5 6 7fds fsdf sd f fsdfdsfdsfsfsfds\n"
-            + "\n"
-            + "And this is the last line.\n\n";
+        String email = wcst.getUserEmail();
+        new ContactAdminDialog(this, options, username,
+            email);
+    }
 
+    void sendTheMessageToAdmin(String senderName, String senderEmail,
+        String message)
+    {
         long now = new Date().getTime();
-        List<String> lines = Split.split("\n", test);
-
-        server.messageToAdmin(username, now, lines);
-        */
+        List<String> lines = Split.split("\n", message);
+        server.messageToAdmin(now, senderName, senderEmail, lines);
     }
 
     private void startLocallyButtonAction()

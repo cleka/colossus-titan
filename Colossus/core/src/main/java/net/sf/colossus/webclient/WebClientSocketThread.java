@@ -434,6 +434,11 @@ public class WebClientSocketThread extends Thread implements IWebServer
         return username;
     }
 
+    public String getUserEmail()
+    {
+        return email;
+    }
+
     @Override
     public void run()
     {
@@ -764,10 +769,12 @@ public class WebClientSocketThread extends Thread implements IWebServer
         send(Logout);
     }
 
-    public void messageToAdmin(String fromUser, long when, List<String> message)
+    public void messageToAdmin(long when, String senderName,
+        String senderMail, List<String> lines)
     {
-        String listOfLines = Glob.glob(Glob.sep, message);
-        send(MessageToAdmin + sep + fromUser + sep + when + sep + listOfLines);
+        String listOfLines = Glob.glob(Glob.sep, lines);
+        send(MessageToAdmin + sep + when + sep + senderName + sep + senderMail
+            + sep + listOfLines);
     }
 
     public String changeProperties(String username, String oldPW,

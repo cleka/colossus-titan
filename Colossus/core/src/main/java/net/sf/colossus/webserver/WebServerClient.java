@@ -634,11 +634,12 @@ public class WebServerClient implements IWebClient
 
         else if (command.equals(IWebServer.MessageToAdmin))
         {
-            String fromUser = tokens[1];
-            long when = Long.parseLong(tokens[2]);
-            String globbedMessage = tokens[3];
+            long when = Long.parseLong(tokens[1]);
+            String fromUser = tokens[2];
+            String fromMail = tokens[3];
+            String globbedMessage = tokens[4];
             List<String> message = Split.split(Glob.sep, globbedMessage);
-            server.messageToAdmin(fromUser, when, message);
+            server.messageToAdmin(when, fromUser, fromMail, message);
         }
 
         else

@@ -105,6 +105,6 @@ public interface IWebServer
 
     public void logout();
 
-    public void messageToAdmin(String fromUser, long when, List<String> message);
-
+    public void messageToAdmin(long when, String username, String mail,
+        List<String> message);
 }
