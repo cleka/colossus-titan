@@ -446,7 +446,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         if (client.needsWatchdog() && this.inactivityWarningInterval > 0)
         {
             LOGGER.fine("Creating an inactivityWatchdog with interval "
-                + this.inactivityWarningInterval);
+                + this.inactivityWarningInterval + " for player "
+                + getOwningPlayerName());
             watchdog = new InactivityWatchdog(client,
                 this.inactivityWarningInterval);
             watchdog.start();
@@ -2152,7 +2153,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void showNegotiate(Legion attacker, Legion defender)
     {
-        dueOrNotChangesActions(true, "showNegotiate");
+        dueOrNotChangesActions(false, "showNegotiate");
         logPerhaps("showNegotiate(Legion attacker, Legion defender)");
         board.clearDefenderFlee();
         negotiate = new Negotiate(this, attacker, defender);
@@ -2171,21 +2172,35 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void showConcede(Client client, Legion ally, Legion enemy)
     {
+        LOGGER.fine("CG: showConcede(client, ally " + ally.getMarkerId()
+            + ", enemy " + enemy.getMarkerId());
         dueOrNotChangesActions(true, "showConcede");
-        LOGGER
-            .fine("CG: showConcede(Client client, Legion ally, Legion enemy)");
-
+        if (getGame().getDefender().equals(ally))
+        {
+            myTurnStartsWindowActions();
+        }
+        else
+        {
+            LOGGER.finest("showConcede(): not-ally-case");
+        }
         board.clearDefenderFlee();
         Concede.concede(this, board.getFrame(), ally, enemy);
-        myTurnNotificationActions(ally);
     }
 
     public void showFlee(Client client, Legion ally, Legion enemy)
     {
+        LOGGER.fine("CG: showFlee(client, ally " + ally.getMarkerId()
+            + ", enemy " + enemy.getMarkerId());
         dueOrNotChangesActions(true, "showFlee");
-        logPerhaps("showFlee(Client client, Legion ally, Legion enemy)");
+        if (getGame().getDefender().equals(ally))
+        {
+            myTurnStartsWindowActions();
+        }
+        else
+        {
+            LOGGER.finest("showFlee(): not-ally-case");
+        }
         Concede.flee(this, board.getFrame(), ally, enemy);
-        myTurnNotificationActions(ally);
     }
 
     public void inactivityAutoFleeOrConcede(boolean reply)
@@ -2248,22 +2263,6 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         client.suspendResponse(approve);
     }
 
-    private void myTurnNotificationActions(Legion ally)
-    {
-        logPerhaps("myTurnNotificationActions(Legion ally)");
-        if (getGame().getDefender().equals(ally))
-        {
-            if (options.getOption(Options.turnStartBeep))
-            {
-                board.getToolkit().beep();
-            }
-            if (options.getOption(Options.turnStartToFront))
-            {
-                board.getFrame().toFront();
-            }
-        }
-    }
-
     public void initShowEngagementResults()
     {
         logPerhaps("initShowEngagementResults()");
@@ -2313,6 +2312,12 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     private void dueOrNotChangesActions(boolean isDue, String reason)
     {
+        // if (client.getOwningPlayer().getName().equals("localwatchdogtest")
+        //    || client.getOwningPlayer().getName().equals("Blue"))
+        // {
+        //    LOGGER.finest("Due: " + (isDue ? "yes" : "no ") + "; reason: "
+        //        + reason);
+        // }
         dueOrNotChangesYellowActions(isDue);
         if (hasWatchdog())
         {
@@ -2844,7 +2849,10 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         logPerhaps("actOnTurnOrPlayerChange(Client client, int turnNr,");
         cleanupNegotiationDialogs();
 
-        myTurnStartsWindowActions();
+        if (isMyTurn())
+        {
+            myTurnStartsWindowActions();
+        }
         dueOrNotChangesActions(isMyTurn(), "actonturnorplayerchange");
 
         eventViewer.turnOrPlayerChange(turnNr, player);
@@ -2872,6 +2880,10 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         if (options.getOption(Options.turnStartToFront))
         {
             board.getFrame().toFront();
+            if ((board.getFrame().getExtendedState() & JFrame.ICONIFIED) != 0)
+            {
+                board.getFrame().setExtendedState(JFrame.NORMAL);
+            }
         }
     }
 
@@ -3055,7 +3067,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             battleBoard.setupFightMenu();
         }
         updateStatusScreen();
-        dueOrNotChangesActions(client.isMyBattlePhase(), "actonbattlefight");
+        dueOrNotChangesActions(client.isMyBattlePhase(), client
+            .getBattlePhase().toString());
     }
 
     public void actOnSetupBattleMove()
@@ -3984,12 +3997,17 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     public void answerFlee(Legion ally, boolean answer)
     {
         logPerhaps("answerFlee(Legion ally, boolean answer)");
+        if (getGame().getDefender().equals(ally))
+        {
+            dueOrNotChangesActions(false, "Flee answered (" + answer + ")");
+        }
         getClient().answerFlee(ally, answer);
     }
 
     public void answerConcede(Legion legion, boolean answer)
     {
         logPerhaps("answerConcede(Legion legion, boolean answer)");
+        dueOrNotChangesActions(false, "Concede answered (" + answer + ")");
         getClient().answerConcede(legion, answer);
     }
 
