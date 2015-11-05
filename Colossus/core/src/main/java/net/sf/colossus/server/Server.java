@@ -2372,10 +2372,7 @@ public final class Server extends Thread implements IServer
                 }
                 else
                 {
-                    LOGGER.warning("After doRecruit, getRecruit() for legion "
-                        + legion.getMarkerId() + " still returns null?");
-                    client.nak(Constants.doRecruit, "Internal error: after "
-                        + "didRecruit(), getRecruit() returns null?");
+                    // happens at least then when player declined the recruit
                 }
             }
             else
