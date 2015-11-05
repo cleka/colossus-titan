@@ -329,6 +329,7 @@ public class WebClient extends KFrame implements IWebClient
     private final static String CancelLoginButtonText = "Cancel";
     private final static String quitButtonText = "Quit";
     private final static String contactAdminButtonText = "Contact the administrator";
+    private final static String contactAdminButtonDisabledText = " <dialog still open> ";
     private final static String HideButtonText = "Hide Web Client";
     private final static String WatchButtonText = "Join game as spectator";
     private final static String CantHideText = "(You can hide web client only if game client is open)";
@@ -2539,7 +2540,6 @@ public class WebClient extends KFrame implements IWebClient
         }
 
         String newStatusText = makeStatusTextForState(state);
-
         boolean couldPropose = checkIfCouldPropose();
         boolean couldDebugSubmit = (state == LoggedIn);
         boolean couldCancel = checkIfCouldCancel();
@@ -3835,8 +3835,16 @@ public class WebClient extends KFrame implements IWebClient
     private void contactAdmin()
     {
         String email = wcst.getUserEmail();
+        contactAdminButton.setText(contactAdminButtonDisabledText);
+        contactAdminButton.setEnabled(false);
         new ContactAdminDialog(this, options, username,
             email);
+    }
+
+    public void reEnableContactAdminButton()
+    {
+        contactAdminButton.setText(contactAdminButtonText);
+        contactAdminButton.setEnabled(true);
     }
 
     void sendTheMessageToAdmin(String senderName, String senderEmail,

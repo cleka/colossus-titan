@@ -19,6 +19,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.text.JTextComponent;
 
@@ -38,6 +39,7 @@ public class ContactAdminDialog extends KDialog implements ActionListener,
     private final JTextArea textArea;
 
     private final JButton submitButton;
+    private final JButton cancelButton;
 
     private final JTextField nameField;
     private final JTextField mailField;
@@ -64,7 +66,7 @@ public class ContactAdminDialog extends KDialog implements ActionListener,
 
         Box topPanel = new Box(BoxLayout.Y_AXIS);
         topPanel.add(instructionLabel);
-        String defaultName = "John";
+        String defaultName = "Jhon";
         String defaultMail = "johndoe@whateveryoulike.com";
 
         nameField = addTextField(topPanel, "Your name: ", defaultName);
@@ -79,10 +81,16 @@ public class ContactAdminDialog extends KDialog implements ActionListener,
 
         submitButton = new JButton("Submit");
         submitButton.addActionListener(this);
+        cancelButton = new JButton("Cancel");
+        cancelButton.addActionListener(this);
+
         Box bottomPanel = new Box(BoxLayout.X_AXIS);
         bottomPanel.add(Box.createHorizontalGlue());
         bottomPanel.add(submitButton);
+        bottomPanel.add(Box.createHorizontalStrut(40));
+        bottomPanel.add(cancelButton);
         bottomPanel.add(Box.createHorizontalGlue());
+        bottomPanel.setBorder(new EmptyBorder(0, 0, 10, 0));
         mainPanel.add(bottomPanel, BorderLayout.SOUTH);
 
         contentPane.add(mainPanel);
@@ -123,17 +131,26 @@ public class ContactAdminDialog extends KDialog implements ActionListener,
                     "Name, Mail and Text cannot be empty!", "Missing values!",
                     JOptionPane.ERROR_MESSAGE);
             }
+            else if (name.equals("Jhon")
+                || mail.equals("johndoe@whateveryoulike.com"))
+                JOptionPane.showMessageDialog(this,
+                    "Hey! Too lazy to change the defaults?\n"
+                        + "There's a reason why I ask for them!",
+                    "Missing values!", JOptionPane.ERROR_MESSAGE);
             else
             {
                 setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                 WhatNextManager.sleepFor(1000);
                 submitButton.setText("Close");
+                cancelButton.setEnabled(false);
                 setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 webClient.sendTheMessageToAdmin(name, mail, text);
             }
         }
-        if (e.getActionCommand().equals("Close"))
+        else if (e.getActionCommand().equals("Close")
+            || e.getActionCommand().equals("Cancel"))
         {
+            webClient.reEnableContactAdminButton();
             dispose();
         }
     }
