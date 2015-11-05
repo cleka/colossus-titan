@@ -413,6 +413,7 @@ class RegisterPasswordPanel extends JDialog
     @Override
     public void dispose()
     {
+        webClient.restoreStatusField();
         setVisible(false);
         super.dispose();
     }

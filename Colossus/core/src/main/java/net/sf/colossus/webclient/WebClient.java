@@ -681,6 +681,18 @@ public class WebClient extends KFrame implements IWebClient
         statusField.setForeground(color);
     }
 
+    public void restoreStatusField()
+    {
+        if (state == NotLoggedIn)
+        {
+            updateStatus("Not connected", Color.red);
+        }
+        else
+        {
+            updateStatus("Logged in", Color.green);
+        }
+    }
+
     private void addAdminTab()
     {
         tabbedPane.addTab("Admin", adminTab);
@@ -855,7 +867,7 @@ public class WebClient extends KFrame implements IWebClient
         quitButton.setEnabled(true);
         loginPane.add(quitButton);
 
-        loginPane.add(new JLabel("Status:"));
+        loginPane.add(new JLabel("Connection status:"));
         statusField = new JLabel(statusText);
         loginPane.add(statusField);
         updateStatus("Not connected", Color.red);
