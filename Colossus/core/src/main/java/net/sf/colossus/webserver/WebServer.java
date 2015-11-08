@@ -593,6 +593,8 @@ public class WebServer implements IWebServer, IRunWebServer
         gui.setRunningGamesInfo(runningGames.size() + " running games");
         gui.setEndingGamesInfo(endingGames.size() + " games just ending");
         gui.setSuspendedGamesInfo(suspendedGames.size() + " games suspended");
+        gui.setUsedPortsInfo(portBookKeeper.calculateUsedPorts()
+            + " ports in use");
     }
 
     public void watchGame(String gameId, String userName)
@@ -1975,6 +1977,11 @@ public class WebServer implements IWebServer, IRunWebServer
         }
 
         public void setSuspendedGamesInfo(String s)
+        {
+            // nothing
+        }
+
+        public void setUsedPortsInfo(String s)
         {
             // nothing
         }

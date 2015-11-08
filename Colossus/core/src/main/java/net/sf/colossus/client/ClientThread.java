@@ -479,7 +479,13 @@ public class ClientThread extends Thread implements EventExecutor
                 disposeFollows = Boolean.valueOf(args.remove(0))
                     .booleanValue();
             }
-            client.tellGameOver(message, disposeFollows);
+            boolean suspended = false;
+            if (!args.isEmpty())
+            {
+                suspended = Boolean.valueOf(args.remove(0)).booleanValue();
+            }
+
+            client.tellGameOver(message, disposeFollows, suspended);
         }
         else if (method.equals(Constants.tellPlayerElim))
         {

@@ -3548,8 +3548,8 @@ public final class MasterBoard extends JPanel
 
     public void setGameOverState(String message)
     {
-        setTitleInfoText("Game Over -- " + message);
-        bottomBar.setPhase("Game Over: " + message);
+        setTitleInfoText(message);
+        bottomBar.setPhase(message);
         disableDoneAction("connection closed from server side");
         if (gui.getOwningPlayerName().equals("bla"))
         {

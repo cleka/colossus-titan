@@ -243,7 +243,7 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public void actOnTellGameOver(String message, boolean disposeFollows)
+    public void actOnTellGameOver(String message, boolean disposeFollows, boolean suspended)
     {
         // TODO Auto-generated method stub
 
@@ -687,7 +687,7 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public void setWebClient(WebClient wc, int inactivityWarningInterval)
+    public void setWebClient(WebClient wc, int inactivityWarningInterval, String gameId, String username, String password)
     {
         // TODO Auto-generated method stub
 
@@ -888,5 +888,11 @@ public class NullClientGUI implements IClientGUI
     public void askSuspendConfirmation(String requestorName, int timeout)
     {
         // TODO Auto-generated method stub
+    }
+
+    public String getGameId()
+    {
+        // TODO Auto-generated method stub
+        return "Dummy";
     }
 }

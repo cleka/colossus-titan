@@ -2116,11 +2116,12 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    void allTellGameOver(String message, boolean disposeFollows)
+    void allTellGameOver(String message, boolean disposeFollows,
+        boolean suspended)
     {
         for (IClient client : iClients)
         {
-            client.tellGameOver(message, disposeFollows);
+            client.tellGameOver(message, disposeFollows, suspended);
         }
     }
 
@@ -3444,7 +3445,7 @@ public final class Server extends Thread implements IServer
 
     private boolean suspendOK = false;
 
-    public void suspendGame()
+    public void requestToSuspendGame()
     {
         LOGGER.info("In server: Handling request to suspend the game...");
 
@@ -3468,18 +3469,18 @@ public final class Server extends Thread implements IServer
         for (Player p : players)
         {
             ClientHandler client = (ClientHandler)playerToClientMap.get(p);
-
-            if (client.isTemporarilyInTrouble()
+            if (client.equals(processingCH))
+            {
+                LOGGER.finest("Skipping ourself when asking for approval");
+            }
+            else if (client.isTemporarilyInTrouble()
                 || client.isTemporarilyDisconnected())
             {
                 // we skip that one
-                System.out.println("SKIPPING player " + client.getPlayerName()
-                    + " for suspend approval request.");
             }
             else
             {
-                System.out.println("Asking player " + client.getPlayerName()
-                    + " for suspend approval.");
+                suspendRequestApprovers.add(client);
                 client.askSuspendConfirmation(requestorName,
                     Constants.SUSPEND_APPROVE_TIMEOUT);
             }
@@ -3508,7 +3509,9 @@ public final class Server extends Thread implements IServer
         {
             if (suspendOK)
             {
-                initiateActualSuspend();
+                LOGGER.info("In server: Approved trues, suspending game...");
+                game.getNotifyWebServer().gameIsSuspended();
+                initiateSuspendGame();
             }
             else
             {
@@ -3518,16 +3521,11 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    public void initiateActualSuspend()
-    {
-        LOGGER.info("In server: Approved trues, suspending game...");
-        game.getNotifyWebServer().gameIsSuspended();
-        initiateSuspendGame();
-    }
-
     public void suspendDenied(String message)
     {
-        System.out.println("suspend denied, reason: " + message);
+        LOGGER.info("suspend denied, reason: " + message);
+        System.out.println("suspend denied, reason: " + message
+            + ", should still do something here.");
     }
 
     // User has requested to save game via File=>Save Game or Save Game as...
@@ -3556,6 +3554,7 @@ public final class Server extends Thread implements IServer
 
     public void initiateSuspendGame()
     {
+        game.handleSuspend();
         LOGGER.info("In server: initiateSuspendGame");
         synchronized (guiRequestMutex)
         {

@@ -68,6 +68,8 @@ public class Game
     private boolean gameOver = false;
     private String gameOverMessage = null;
 
+    private boolean suspended;
+
     private Engagement engagement;
 
     protected Battle battle = null;
@@ -209,7 +211,17 @@ public class Game
 
     public boolean isGameOver()
     {
-        return gameOver;
+        return this.gameOver;
+    }
+
+    public void setSuspended(boolean value)
+    {
+        this.suspended = value;
+    }
+
+    public boolean isSuspended()
+    {
+        return this.suspended;
     }
 
     public String getGameOverMessage()

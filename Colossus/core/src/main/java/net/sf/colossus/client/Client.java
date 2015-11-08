@@ -845,7 +845,7 @@ public final class Client implements IClient, IOracle, IVariant,
 
     public void askSuspendConfirmation(String requestorName, int timeout)
     {
-        System.out.println("User " + requestorName
+        LOGGER.fine("User " + requestorName
             + " requests to suspend the game, timeout=" + timeout);
         if (getOwningPlayer().isAI() || autoplay.isAutoplayActive())
         {
@@ -906,7 +906,7 @@ public final class Client implements IClient, IOracle, IVariant,
 
     public void initiateSuspend()
     {
-        server.suspendGame();
+        server.requestToSuspendGame();
     }
 
     public boolean getFailed()
@@ -1288,7 +1288,14 @@ public final class Client implements IClient, IOracle, IVariant,
                 if (gui.hasBoard())
                 {
                     gui.showConnectionClosedMessage();
-                    close = false;
+                    if (game.isSuspended())
+                    {
+                        close = true;
+                    }
+                    else
+                    {
+                        close = false;
+                    }
                 }
                 else
                 {
@@ -1891,13 +1898,14 @@ public final class Client implements IClient, IOracle, IVariant,
         }
     }
 
-    public void tellGameOver(String message, boolean disposeFollows)
+    public void tellGameOver(String message, boolean disposeFollows, boolean suspended)
     {
         LOGGER.info("Client " + getOwningPlayer()
             + " received from server game over message: " + message);
         game.setGameOver(true, message);
+        game.setSuspended(true);
 
-        gui.actOnTellGameOver(message, disposeFollows);
+        gui.actOnTellGameOver(message, disposeFollows, suspended);
     }
 
     public void doFight(MasterHex hex)

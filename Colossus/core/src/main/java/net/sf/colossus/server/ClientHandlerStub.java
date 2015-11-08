@@ -368,10 +368,10 @@ public class ClientHandlerStub implements IClient
             + Glob.glob(choices));
     }
 
-    public void tellGameOver(String message, boolean disposeFollows)
+    public void tellGameOver(String message, boolean disposeFollows, boolean suspended)
     {
         sendToClient(Constants.tellGameOver + sep + message + sep
-            + disposeFollows);
+            + disposeFollows + sep + suspended);
     }
 
     public void tellPlayerElim(Player player, Player slayer)

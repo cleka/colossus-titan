@@ -1046,7 +1046,7 @@ final class ClientHandler extends ClientHandlerStub implements IClient
         }
         else if (method.equals(Constants.suspendGame))
         {
-            server.suspendGame();
+            server.requestToSuspendGame();
         }
 
         else if (method.equals(Constants.suspendResponse))
@@ -1137,8 +1137,8 @@ final class ClientHandler extends ClientHandlerStub implements IClient
 
         else
         {
-            LOGGER.log(Level.SEVERE, "Bogus packet (Server, method: " + method
-                + ", args: " + args + ")");
+            LOGGER.log(Level.SEVERE, "Bogus packet (Server, method: '"
+                + method + "', args: " + args + ")");
         }
     }
 

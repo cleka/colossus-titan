@@ -526,6 +526,15 @@ public class WebClient extends KFrame implements IWebClient
         }
     }
 
+    private String getOngoingGameId()
+    {
+        if (gameClient != null)
+        {
+            return gameClient.getGUI().getGameId();
+        }
+        return "<unknown>";
+    }
+
     private void setScheduledGamesMode(boolean scheduled)
     {
         scheduledGamesMode = scheduled;
@@ -818,8 +827,6 @@ public class WebClient extends KFrame implements IWebClient
                 AbstractButton abstractButton = (AbstractButton)e.getSource();
                 boolean selected = abstractButton.getModel().isSelected();
                 passwordField.setEchoChar(selected ? '*' : (char)0);
-                //System.out.println("echo char was " + c + "now is "
-                //    + passwordField.getEchoChar());
 
             }
         };
@@ -1648,11 +1655,11 @@ public class WebClient extends KFrame implements IWebClient
         runningGamesTab.add(Box.createVerticalGlue());
         runningGamesTab.add(joinGamePanel);
 
-        Box hideClientPanel = new Box(BoxLayout.Y_AXIS);
-        hideClientPanel.setBorder(new TitledBorder("Hiding the Web Client"));
-
         runningGamesTab.add(Box.createRigidArea(new Dimension(0, 20)));
         runningGamesTab.add(Box.createVerticalGlue());
+
+        Box hideClientPanel = new Box(BoxLayout.Y_AXIS);
+        hideClientPanel.setBorder(new TitledBorder("Hiding the Web Client"));
 
         hideClientPanel.setAlignmentX(Box.LEFT_ALIGNMENT);
 
@@ -2266,8 +2273,7 @@ public class WebClient extends KFrame implements IWebClient
                     + enrolledInstantGameId;
 
             case Playing:
-                return "As " + username + " - playing game "
-                    + enrolledInstantGameId;
+                return "As " + username + " - playing game #" + getOngoingGameId();
 
             case Watching:
                 return "As " + username + " - watching game "
@@ -2607,7 +2613,8 @@ public class WebClient extends KFrame implements IWebClient
         watchButton.setEnabled(couldWatch);
         resumeButton.setEnabled(reasonWhyCantResume == null);
         reasonWhyNotLabel
-            .setText(reasonWhyCantResume == null ? "Click to resume the game selected in table above!"
+            .setText(reasonWhyCantResume == null ? "Click to resume the game game #"
+                + getSelectedGameIdFromSuspTable() + "!"
             : reasonWhyCantResume);
 
         // Chat tab
@@ -3005,6 +3012,7 @@ public class WebClient extends KFrame implements IWebClient
 
     boolean doResume(String gameId)
     {
+        resumeButton.setEnabled(false);
         startButton.setEnabled(false);
         startLocallyButton.setEnabled(false);
         cancelButton.setEnabled(false);
@@ -3145,6 +3153,26 @@ public class WebClient extends KFrame implements IWebClient
         }
     }
 
+    public void notifyGameSuspended()
+    {
+        SwingUtilities.invokeLater(new Runnable()
+        {
+            public void run()
+            {
+                JOptionPane
+                    .showMessageDialog(
+                        WebClient.this,
+                        "Your board was closed because the game was suspended.\n\n"
+                            + "The game can be resumed in 'Suspended Games' tab,\n"
+                            + "now or also later.", "Game suspended",
+                        JOptionPane.INFORMATION_MESSAGE);
+                state = LoggedIn;
+                enrolledInstantGameId = null;
+                updateGUI();
+            }
+        });
+    }
+
     private Timer setupTimer()
     {
         // java.util.Timer, not Swing Timer
@@ -3264,7 +3292,8 @@ public class WebClient extends KFrame implements IWebClient
             infoTextLabel.setText(waitingText);
 
             setGameClient(gc);
-            gc.getGUI().setWebClient(this, inactivityWarningInterval);
+            gc.getGUI().setWebClient(this, inactivityWarningInterval, gameId,
+                username, password);
 
             Timer timeoutStartup = setupTimer();
 
@@ -3371,7 +3400,7 @@ public class WebClient extends KFrame implements IWebClient
             infoTextLabel.setText(waitingText);
 
             setGameClient(gc);
-            gc.getGUI().setWebClient(this, -1);
+            gc.getGUI().setWebClient(this, -1, null, null, null);
             Timer timeoutStartup = setupTimer();
 
             while (!clientIsUp && !timeIsUp && !clientStartFailed)
@@ -3759,6 +3788,7 @@ public class WebClient extends KFrame implements IWebClient
     private void resumeGameButtonAction()
     {
         String gameId = getSelectedGameIdFromSuspTable();
+        suspGameTable.clearSelection();
         LOGGER.fine("Resume Button, game nr " + gameId);
         doResume(gameId);
     }

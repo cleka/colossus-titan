@@ -107,6 +107,10 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     private WebClient webClient = null;
     private boolean startedByWebClient = false;
+    private String gameId = null;
+    // for the case if we have to restore the webclient
+    private String wcUsername = null;
+    private String wcPassword = null;
 
     /**
      * The object which handles what to do next when a game is going to end
@@ -182,10 +186,19 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         return this.startedByWebClient;
     }
 
-    public void setWebClient(WebClient wc, int inactivityWarningInterval)
+    public void setWebClient(WebClient wc, int inactivityWarningInterval,
+        String gameId, String username, String password)
     {
         this.webClient = wc;
         this.inactivityWarningInterval = inactivityWarningInterval;
+        this.gameId = gameId;
+        this.wcUsername = username;
+        this.wcPassword = password;
+    }
+
+    public String getGameId()
+    {
+        return this.gameId;
     }
 
     public void clearWebClient()
@@ -274,13 +287,14 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     {
         if (this.webClient == null)
         {
-            this.webClient = new WebClient(whatNextManager, null, -1, null,
-                null);
+            this.webClient = new WebClient(whatNextManager, null, -1,
+                this.wcUsername, this.wcPassword);
             this.webClient.setGameClient(client);
         }
         else
         {
             this.webClient.setVisible(true);
+            this.webClient.toFront();
         }
     }
 
@@ -2251,8 +2265,9 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         String[] options = new String[2];
         options[0] = new String("Approve");
         options[1] = new String("Deny");
-        int response = JOptionPane.showOptionDialog(board, message, "Player "
-            + requestorName + " requested to suspend the game. OK?", 0,
+        int response = JOptionPane.showOptionDialog(board, "Player "
+            + requestorName + " requested to suspend the game. OK?",
+            "Suspend Game?", 0,
             JOptionPane.QUESTION_MESSAGE, null, options, null);
         boolean approved = (response == 0 ? true : false);
         suspendResponse(approved);
@@ -3584,7 +3599,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
      *  @param message         The message ("XXXX wins", or "Draw")
      *  @param disposeFollows  If true, server will send a dispose message soon
      */
-    public void actOnTellGameOver(String message, boolean disposeFollows)
+    public void actOnTellGameOver(String message, boolean disposeFollows, boolean suspended)
     {
         LOGGER
             .fine("CG: actOnTellGameOver(String message, boolean disposeFollows)");
@@ -3610,8 +3625,10 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         board.setGameOverState(message);
         if (disposeFollows)
         {
-            // tell it later, together with the immediately following
-            // server closed connection message
+            // AutoQuit active, application will terminate immediately
+            // If this here is local client, we don't want to wait this
+            // client here to answer; if it's a remote client, it will
+            // be displayed together with the connection lost message.
         }
         else
         {
@@ -3620,14 +3637,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         }
     }
 
-    String getMessage()
-    {
-        return this.message;
-    }
-
-    String message = "";
-
-    public void showMessageDialogAndWait(String message)
+    public void showMessageDialogAndWait(final String message)
     {
         logPerhaps("showMessageDialogAndWait(String message)");
         // Don't bother showing messages to AI players.
@@ -3644,14 +3654,13 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         }
         else
         {
-            this.message = message;
             try
             {
                 SwingUtilities.invokeAndWait(new Runnable()
                 {
                     public void run()
                     {
-                        doShowMessageDialog(getMessage());
+                        doShowMessageDialog(message);
                     }
                 });
             }
@@ -3722,13 +3731,33 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
         if (client.getGame().isGameOver())
         {
-            if (!gameOverMessageAlreadyShown)
+            if (client.getGame().isSuspended())
+            {
+                if (startedByWebClient)
+                {
+                    showWebClient();
+                }
+                if (webClient != null) // should be set now!
+                {
+                    webClient.notifyGameSuspended();
+                    return;
+                }
+                else
+                {
+                    // we should not get here, but just in case...
+                    dialogMessage = "Game was suspended and server closed connection.\n"
+                        + " Your board will close soon.";
+                    dialogTitle = "Game suspended";
+                }
+
+            }
+            else if (!gameOverMessageAlreadyShown)
             {
                 // don't show again!
+                gameOverMessageAlreadyShown = true;
                 dialogMessage = "Game over: "
                     + client.getGame().getGameOverMessage() + "!\n\n"
                     + "(connection closed from server side)";
-                gameOverMessageAlreadyShown = true;
                 dialogTitle = "Game Over: Server closed connection";
             }
             else

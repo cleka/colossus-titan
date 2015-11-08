@@ -26,7 +26,7 @@ public interface IClientGUI
     public abstract void setStartedByWebClient(boolean byWebClient);
 
     public abstract void setWebClient(WebClient wc,
-        int inactivityWarningInterval);
+        int inactivityWarningInterval, String gameId, String username, String password);
 
     public abstract void clearWebClient();
 
@@ -311,7 +311,7 @@ public interface IClientGUI
     public abstract void doCleanupGUI();
 
     public abstract void actOnTellGameOver(String message,
-        boolean disposeFollows);
+        boolean disposeFollows, boolean suspended);
 
     public abstract void actOnGameStartingFailed();
 
@@ -362,5 +362,7 @@ public interface IClientGUI
     public void askExtraRollApproval(String requestorName, boolean ourself, int requestId);
 
     public void askSuspendConfirmation(String requestorName, int timeout);
+
+    public abstract String getGameId();
 
 }

@@ -36,6 +36,7 @@ public class WebServerGUI extends JFrame implements IWebServerGUI
     private final JLabel runningGamesInfo;
     private final JLabel endingGamesInfo;
     private final JLabel suspendedGamesInfo;
+    private final JLabel usedPortsInfo;
     private final JButton dumpInfoButton;
 
     public WebServerGUI(WebServer webServer)
@@ -71,6 +72,9 @@ public class WebServerGUI extends JFrame implements IWebServerGUI
 
         suspendedGamesInfo = new JLabel("No suspended games.");
         mainPane.add(suspendedGamesInfo);
+
+        usedPortsInfo = new JLabel("All ports free.");
+        mainPane.add(usedPortsInfo);
 
         dumpInfoButton = new JButton("Dump Info");
         mainPane.add(dumpInfoButton);
@@ -129,6 +133,11 @@ public class WebServerGUI extends JFrame implements IWebServerGUI
     public void setSuspendedGamesInfo(String s)
     {
         suspendedGamesInfo.setText(s);
+    }
+
+    public void setUsedPortsInfo(String s)
+    {
+        usedPortsInfo.setText(s);
     }
 
     public void dumpInfoButtonAction()

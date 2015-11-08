@@ -1238,11 +1238,12 @@ public class GameServerSide extends Game
         }
     }
 
-    private void announceGameOver(boolean disposeFollows)
+    private void announceGameOver(boolean disposeFollows, boolean suspended)
     {
         server.allFullyUpdateAllLegionContents(Constants.reasonGameOver);
         LOGGER.info("Announcing: Game over -- " + getGameOverMessage());
-        server.allTellGameOver(getGameOverMessage(), disposeFollows);
+        server
+            .allTellGameOver(getGameOverMessage(), disposeFollows, suspended);
     }
 
     boolean isLoadingGame()
@@ -1330,7 +1331,7 @@ public class GameServerSide extends Game
     public void handleSuspend()
     {
         setGameOver(true, "Game suspended");
-        announceGameOver(true);
+        announceGameOver(true, true);
     }
 
     @Override
@@ -3091,7 +3092,7 @@ public class GameServerSide extends Game
             if (getOption(Options.autoQuit))
             {
                 LOGGER.info("Reached Game Over - announce and quit");
-                announceGameOver(true);
+                announceGameOver(true, false);
                 server.doSetWhatToDoNext(WhatToDoNext.QUIT_ALL, true);
                 LOGGER
                     .info("Reached Game Over, AutoQuit - trigger Game Dispose");
@@ -3100,7 +3101,7 @@ public class GameServerSide extends Game
             else
             {
                 LOGGER.info("Reached Game Over - just announce");
-                announceGameOver(false);
+                announceGameOver(false, false);
             }
             LOGGER.info("Game is now over - returning false");
             return false;

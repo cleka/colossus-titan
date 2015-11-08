@@ -145,6 +145,11 @@ public class PortBookKeeper implements IPortProvider
         return port;
     }
 
+    public int calculateUsedPorts()
+    {
+        return totalPorts / 2 - countFreePorts();
+    }
+
     public int countFreePorts()
     {
         int free = 0;

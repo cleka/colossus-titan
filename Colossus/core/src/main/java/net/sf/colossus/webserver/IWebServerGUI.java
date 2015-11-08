@@ -20,5 +20,7 @@ public interface IWebServerGUI
 
     public abstract void setSuspendedGamesInfo(String string);
 
+    public abstract void setUsedPortsInfo(String string);
+
     public abstract void shutdown();
 }
