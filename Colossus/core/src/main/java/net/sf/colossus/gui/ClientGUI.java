@@ -2225,19 +2225,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     public void askExtraRollApproval(String requestorName, boolean ourself,
         final int requestId)
     {
-        String tmpMessage;
-        if (ourself)
-        {
-            tmpMessage = "No other player has new enough client to handle this request;\n"
-                + "=> negotiate in chat with others and respond accordingly.";
-        }
-        else
-        {
-            tmpMessage = "Player " + requestorName
-                + " asks for an extra roll. Pleave approve or deny.";
-        }
-        final String message = tmpMessage;
-
+        final String message = "Player " + requestorName
+            + " asks for an extra roll. Pleave approve or deny.";
         SwingUtilities.invokeLater(new Runnable()
         {
             public void run()
@@ -3746,7 +3735,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
                 {
                     // we should not get here, but just in case...
                     dialogMessage = "Game was suspended and server closed connection.\n"
-                        + " Your board will close soon.";
+                        + " Your board will close now.";
                     dialogTitle = "Game suspended";
                 }
 

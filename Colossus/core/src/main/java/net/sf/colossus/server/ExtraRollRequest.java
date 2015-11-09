@@ -33,6 +33,7 @@ public class ExtraRollRequest
         String playerName = processingCH.getPlayerName();
         LOGGER.finer("Player " + playerName + " requests extra roll.");
 
+        // realClients does not include the stub (local spectator)
         for (ClientHandler client : server.getRealClients())
         {
             if (client.equals(processingCH))
@@ -51,6 +52,12 @@ public class ExtraRollRequest
                     + client.getPlayerName());
                 eligibleClients.add(client);
             }
+            else if (client.isTemporarilyInTrouble()
+                || client.isTemporarilyDisconnected())
+            {
+                LOGGER.finest("Skipping in-trouble-CH "
+                    + client.getPlayerName());
+            }
             else
             {
                 LOGGER.finest("Client can't handle the request: "
@@ -60,20 +67,22 @@ public class ExtraRollRequest
 
         if (eligibleClients.size() == 0)
         {
-            LOGGER.finest("No other clients can confirm...");
+
+            LOGGER.finest("No other clients can confirm; asking requestor "
+                + " itself to have a client message to trigger the suspend "
+                + "handling");
             eligibleClients.add(processingCH);
-            processingCH
-                .requestExtraRollApproval(playerName, currentRequestId);
         }
         else
         {
             LOGGER.finest("There are " + eligibleClients.size()
-                + " clients that support that request");
+                + " (other) clients that support that request");
         }
 
         for (ClientHandler client : eligibleClients)
         {
-            LOGGER.finest("SENDING REQUEST TO " + client.getPlayerName());
+            LOGGER.finest("Sending extra-roll request to player "
+                + client.getPlayerName());
             client.requestExtraRollApproval(playerName, currentRequestId);
         }
     }

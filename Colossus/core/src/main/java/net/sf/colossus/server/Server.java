@@ -70,6 +70,7 @@ public final class Server extends Thread implements IServer
     private final MessageRecorder recorder;
 
     private final ExtraRollRequest extraRollRequest;
+    private final SuspendGameRequest suspendGameRequest;
 
     // A dummy/internal ClientHandler, which stores all messages sent
     // to "all clients" => can clone from here for spectators
@@ -83,7 +84,7 @@ public final class Server extends Thread implements IServer
     /** Recipients for everything send to "each client" - including the stub */
     private final List<IClient> iClients = new ArrayList<IClient>();
 
-    /** Only real ClientHandlers (excluding the stub) */
+    /** Only real ClientHandlers (excluding the stub/internal spectator) */
     private final List<ClientHandler> realClients = new ArrayList<ClientHandler>();
 
     private final List<IClient> remoteClients = new ArrayList<IClient>();
@@ -206,6 +207,7 @@ public final class Server extends Thread implements IServer
         this.whatNextManager = whatNextMgr;
         this.recorder = new MessageRecorder();
         this.extraRollRequest = new ExtraRollRequest(this);
+        this.suspendGameRequest = new SuspendGameRequest(this);
 
         if (startLog != null)
         {
@@ -2884,6 +2886,16 @@ public final class Server extends Thread implements IServer
         extraRollRequest.handleExtraRollResponse(requestId, processingCH, approved);
     }
 
+    public void requestToSuspendGame()
+    {
+        suspendGameRequest.requestToSuspendGame();
+    }
+
+    public void suspendResponse(boolean approved)
+    {
+        suspendGameRequest.suspendResponse(approved);
+    }
+
     public void messageFromServerToAll(String message)
     {
         for (ClientHandler client : realClients)
@@ -3439,93 +3451,6 @@ public final class Server extends Thread implements IServer
     public void saveGame(String filename, boolean autoSave)
     {
         game.saveGameWithErrorHandling(filename, autoSave);
-    }
-
-    private final HashSet<IClient> suspendRequestApprovers = new HashSet<IClient>();
-
-    private boolean suspendOK = false;
-
-    public void requestToSuspendGame()
-    {
-        LOGGER.info("In server: Handling request to suspend the game...");
-
-        if (!suspendRequestApprovers.isEmpty() || suspendOK == true)
-        {
-            processingCH.nak("Another request is still in progress.",
-                "Suspend request ignored");
-            LOGGER
-                .warning("Player "
-                    + processingCH.getPlayerName()
-                    + " requested to suspend the game, but a previous request is still ongoing!");
-            return;
-        }
-
-        // otherwise, request approval from all players
-        suspendOK = true;
-        String requestorName = getPlayerName();
-
-        suspendRequestApprovers.clear();
-        Set<Player> players = playerToClientMap.keySet();
-        for (Player p : players)
-        {
-            ClientHandler client = (ClientHandler)playerToClientMap.get(p);
-            if (client.equals(processingCH))
-            {
-                LOGGER.finest("Skipping ourself when asking for approval");
-            }
-            else if (client.isTemporarilyInTrouble()
-                || client.isTemporarilyDisconnected())
-            {
-                // we skip that one
-            }
-            else
-            {
-                suspendRequestApprovers.add(client);
-                client.askSuspendConfirmation(requestorName,
-                    Constants.SUSPEND_APPROVE_TIMEOUT);
-            }
-        }
-    }
-
-    public void suspendResponse(boolean approved)
-    {
-        if (suspendRequestApprovers.isEmpty())
-        {
-            // silently ignore replies that come "too late", including the
-            // case that an earlier "declined" reply has decided the issue
-            return;
-        }
-
-        if (approved)
-        {
-            suspendRequestApprovers.remove(processingCH);
-        }
-        else
-        {
-            suspendOK = false;
-        }
-
-        if (suspendRequestApprovers.isEmpty())
-        {
-            if (suspendOK)
-            {
-                LOGGER.info("In server: Approved trues, suspending game...");
-                game.getNotifyWebServer().gameIsSuspended();
-                initiateSuspendGame();
-            }
-            else
-            {
-                suspendDenied("Player " + getPlayerName()
-                    + " declined the request to suspend.");
-            }
-        }
-    }
-
-    public void suspendDenied(String message)
-    {
-        LOGGER.info("suspend denied, reason: " + message);
-        System.out.println("suspend denied, reason: " + message
-            + ", should still do something here.");
     }
 
     // User has requested to save game via File=>Save Game or Save Game as...

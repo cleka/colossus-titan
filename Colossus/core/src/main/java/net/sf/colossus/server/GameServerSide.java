@@ -1330,7 +1330,7 @@ public class GameServerSide extends Game
 
     public void handleSuspend()
     {
-        setGameOver(true, "Game suspended");
+        setGameOver(true, "Game suspended! Please close your board.");
         announceGameOver(true, true);
     }
 

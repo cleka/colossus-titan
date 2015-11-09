@@ -849,6 +849,15 @@ public final class Client implements IClient, IOracle, IVariant,
             + " requests to suspend the game, timeout=" + timeout);
         if (getOwningPlayer().isAI() || autoplay.isAutoplayActive())
         {
+            LOGGER.finest("Server asks us for suspend approval. Auto-yes.");
+            suspendResponse(true);
+        }
+        else if (requestorName.equals(getOwningPlayer().getName()))
+        {
+            // If server asks from the requestor itself, it means that no
+            // other client is able to can approve.
+            LOGGER.finest("Server asks me, the requestor, for approval "
+                + " - that means no other client can approve.");
             suspendResponse(true);
         }
         else

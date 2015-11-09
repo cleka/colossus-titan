@@ -94,6 +94,12 @@ public class ClientHandlerStub implements IClient
         return true;
     }
 
+    public boolean canHandleSuspendRequests()
+    {
+        // Always approves
+        return true;
+    }
+
     public void setIsGone(String reason)
     {
         LOGGER.info("Setting isGone to true in CH for '" + getClientName()
