@@ -811,11 +811,15 @@ public class WebServer implements IWebServer, IRunWebServer
         ArrayList<GameInfo> games = new ArrayList<GameInfo>(allGames.values());
         for (GameInfo gi : games)
         {
-            if (!gi.isScheduledGame()
+            if (gi.getInitiator().equals(user.getName())
+                && !gi.isScheduledGame()
+                && !gi.getGameState().equals(GameState.RUNNING)
                 && !gi.getGameState().equals(GameState.SUSPENDED)
-                && gi.getInitiator().equals(user.getName()))
+                && !gi.getGameState().equals(GameState.ENDING))
+
             {
                 LOGGER.info("Auto-cancelling instant game " + gi.getGameId()
+                    + ", state=" + gi.getGameState().toString()
                     + " because initiator " + user.getName()
                     + " is going to be gone...");
                 cancelGame(gi.getGameId(), user.getName());
@@ -1747,7 +1751,6 @@ public class WebServer implements IWebServer, IRunWebServer
      */
     public void unregisterGame(GameInfo gi, int port)
     {
-        boolean suspended = false;
         synchronized (allGames)
         {
             LOGGER.log(Level.FINEST, "unregister: trying to remove...");
@@ -1758,7 +1761,17 @@ public class WebServer implements IWebServer, IRunWebServer
                 runningGames.remove(gi);
                 if (gi.getGameState().equals(GameState.SUSPENDED))
                 {
-                    suspended = true;
+                    synchronized (suspendedGames)
+                    {
+                        LOGGER.log(Level.FINEST,
+                            "Adding game " + gi.getGameId()
+                                + " to suspended games list");
+                        suspendedGames.add(gi);
+                    }
+                }
+                else
+                {
+                    gi.setState(GameState.ENDING);
                 }
             }
             // If game starting did not succeed might still be in proposed list
@@ -1777,39 +1790,31 @@ public class WebServer implements IWebServer, IRunWebServer
             }
         }
 
-        if (suspended)
+        synchronized (endingGames)
         {
-            synchronized (suspendedGames)
-            {
-                LOGGER.log(Level.FINEST, "Adding game " + gi.getGameId()
-                    + " to suspended games list");
-                suspendedGames.add(gi);
-            }
+            LOGGER.log(Level.FINEST, "Putting game " + gi.getGameId()
+                + " to ending games list");
+            endingGames.add(gi);
+
         }
-        else
-        {
-            synchronized (endingGames)
-            {
-                LOGGER.log(Level.FINEST, "Removing game " + gi.getGameId()
-                    + " to ending games list");
-                endingGames.add(gi);
-            }
-            gi.setState(GameState.ENDING);
-        }
+
         allTellGameInfo(gi);
 
+        boolean suspended = gi.getGameState().equals(GameState.SUSPENDED);
         GameThreadReaper r = new GameThreadReaper();
         r.start();
-        LOGGER.log(Level.FINEST, "GameThreadReaper started for"
-            + (suspended ? " suspended" : "") + " game " + gi.getGameId());
+
+        LOGGER.finest("GameThreadReaper started for"
+                + (suspended ? " suspended" : " ending ") + " game "
+                + gi.getGameId());
 
         updateGUI();
     }
 
     /**
-     * unregister a game (run on player's PC) from runningGames,
-     * keep in endingGames until it's reaped
-     */
+    * unregister a game (run on player's PC) from runningGames,
+    * keep in endingGames until it's reaped
+    */
     public void unregisterGamePlayerPC(GameInfo gi)
     {
         if (gi == null)
@@ -2032,69 +2037,87 @@ public class WebServer implements IWebServer, IRunWebServer
             LOGGER.finest("GameThreadReaper started running.");
             synchronized (endingGames)
             {
-                if (!endingGames.isEmpty())
-                {
-                    LOGGER.finest("There are " + endingGames.size()
-                        + " games in endingGames.");
-                    didSomething = true;
-                    Iterator<GameInfo> it = endingGames.iterator();
-                    while (it.hasNext())
-                    {
-                        GameInfo gi = it.next();
-                        IGameRunner gos = getGameOnServer(gi);
-                        if (gos == null)
-                        {
-                            LOGGER.warning("No GameRunner found for GameInfo"
-                                + " with id " + gi.getGameId()
-                                + " to reap it's process.");
-                        }
-                        else if (gos instanceof RunGameInOwnJVM)
-                        {
-                            String name = ((RunGameInOwnJVM)gos).getName();
-                            LOGGER.log(Level.FINE, "REAPER: wait for '" + name
-                                + "' to end...");
-                            try
-                            {
-                                ((RunGameInOwnJVM)gos).join();
-                                LOGGER.log(Level.FINE,
-                                    "        ok, ended... releasing port "
-                                        + gi.getPort());
-                                portBookKeeper.releasePort(gi);
-                            }
-                            catch (InterruptedException e)
-                            {
-                                LOGGER.log(Level.WARNING,
-                                    "Ups??? Caught exception ", e);
-                            }
-                        }
-                        else
-                        {
-                            LOGGER.warning("GameThreadReaper can handle only "
-                                + "GameRunners of type RunGameInOwnJVM, "
-                                + "but we got something else!");
-                        }
-                        LOGGER.finest("Removing " + gi.getGameId()
-                            + " from allGames.");
-                        allGames.remove(gi.getGameId());
-                        it.remove();
-                    }
+                didSomething = handleGamesFromList(endingGames, "ending games");
+            }
 
-                    LOGGER.log(Level.INFO, "Reaper ended");
+            if (didSomething)
+            {
+                updateGUI();
+            }
+
+            LOGGER.log(Level.FINEST, "GameThreadReaper run() ends");
+        }
+    }
+
+    private boolean handleGamesFromList(List<GameInfo> list, String listName)
+    {
+        boolean didSomething = false;
+        if (!list.isEmpty())
+        {
+            LOGGER.finest("There are " + list.size() + " games in " + listName
+                + " list.");
+            didSomething = true;
+            Iterator<GameInfo> it = list.iterator();
+            while (it.hasNext())
+            {
+                GameInfo gi = it.next();
+                IGameRunner gos = getGameOnServer(gi);
+                if (gos == null)
+                {
+                    LOGGER.warning("No GameRunner found for GameInfo"
+                        + " with id " + gi.getGameId()
+                        + " to reap it's process.");
+                }
+                else if (gos instanceof RunGameInOwnJVM)
+                {
+                    String name = ((RunGameInOwnJVM)gos).getName();
+                    LOGGER.log(Level.FINE, "REAPER: wait for '" + name
+                        + "' to end...");
+                    try
+                    {
+                        ((RunGameInOwnJVM)gos).join();
+                        LOGGER.log(
+                            Level.FINE,
+                            "        ok, ended... releasing port "
+                                + gi.getPort());
+                        portBookKeeper.releasePort(gi);
+                    }
+                    catch (InterruptedException e)
+                    {
+                        LOGGER.log(Level.WARNING, "Ups??? Caught exception ",
+                            e);
+                    }
                 }
                 else
                 {
-                    LOGGER.finest("endingGames list is empty.");
-                    // nothing to do
+                    LOGGER.warning("GameThreadReaper can handle only "
+                        + "GameRunners of type RunGameInOwnJVM, "
+                        + "but we got something else!");
                 }
-
-                if (didSomething)
+                if (!gi.getGameState().equals(GameState.SUSPENDED))
                 {
-                    updateGUI();
+                    LOGGER.finest("Removing ending game " + gi.getGameId()
+                        + " from allGames.");
+                    allGames.remove(gi.getGameId());
                 }
-            }
+                else
+                {
+                    LOGGER.finest("NOT removing suspended game "
+                        + gi.getGameId() + " from allGames.");
 
-            LOGGER.log(Level.FINEST, "GameThreadReaper ending");
+                }
+                it.remove();
+            }
+            LOGGER.log(Level.INFO, "Reaper loop for " + listName
+                + "list ended");
         }
+        else
+        {
+            LOGGER.finest("List for " + listName + " is empty, nothing to do");
+            // nothing to do
+        }
+
+        return didSomething;
     }
 
     /**

@@ -3602,8 +3602,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
      */
     public void actOnTellGameOver(String message, boolean disposeFollows, boolean suspended)
     {
-        LOGGER
-            .fine("CG: actOnTellGameOver(String message, boolean disposeFollows)");
+        LOGGER.fine("CG: actOnTellGameOver('" + message + "', dispose="
+            + disposeFollows + ", suspended=" + suspended);
 
         if (webClient != null)
         {

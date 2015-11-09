@@ -1927,7 +1927,7 @@ public final class Client implements IClient, IOracle, IVariant,
         LOGGER.info("Client " + getOwningPlayer()
             + " received from server game over message: " + message);
         game.setGameOver(true, message);
-        game.setSuspended(true);
+        game.setSuspended(suspended);
 
         gui.actOnTellGameOver(message, disposeFollows, suspended);
     }

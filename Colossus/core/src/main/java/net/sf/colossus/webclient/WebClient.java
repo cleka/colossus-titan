@@ -3966,13 +3966,12 @@ public class WebClient extends KFrame implements IWebClient
         List<GameInfo> list = new ArrayList<GameInfo>();
         for (GameInfo gi : gameHash.values())
         {
-            // is instant, is mine, and don't bother about running or ending,
-            // nor old ones.
-            if (!gi.isScheduledGame()
-                && gi.getInitiator().equals(username)
-                && !(gi.getGameState().equals(GameState.RUNNING)
-                    || gi.getGameState().equals(GameState.ENDING) || gi
-                    .getGameState().equals(GameState.SUSPENDED))
+            // is instant, is mine, and don't bother about running, ending
+            // or suspended games, nor old ones.
+            if (gi.getInitiator().equals(username) && !gi.isScheduledGame()
+                && !gi.getGameState().equals(GameState.RUNNING)
+                && !gi.getGameState().equals(GameState.ENDING)
+                && !gi.getGameState().equals(GameState.SUSPENDED)
                 && !deletedGames.contains(gi.getGameId()))
             {
                 list.add(gi);

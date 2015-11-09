@@ -1311,7 +1311,7 @@ public final class MasterBoard extends JPanel
         }
 
         boolean showMenuItem = gui.getStartedByWebClient();
-        showMenuItem = true; // for local testing
+        // showMenuItem = true; // for local testing
         if (showMenuItem)
         {
             mi = fileMenu.add(suspendGameAction);
