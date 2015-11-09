@@ -58,7 +58,7 @@ public class BuildInfo
         }
         else
         {
-            buildInfoString = "commit" + revInfo;
+            buildInfoString = "commit " + revInfo;
         }
         return buildInfoString;
     }
