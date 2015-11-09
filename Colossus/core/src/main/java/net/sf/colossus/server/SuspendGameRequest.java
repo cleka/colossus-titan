@@ -4,6 +4,8 @@ package net.sf.colossus.server;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Logger;
 
 import net.sf.colossus.common.Constants;
@@ -23,12 +25,22 @@ public class SuspendGameRequest
 
     private ClientHandler currentRequestor;
 
+    private Timer timer;
+
     public SuspendGameRequest(Server server)
     {
         this.server = server;
     }
 
     public void requestToSuspendGame()
+    {
+        synchronized (suspendRequestApprovers)
+        {
+            sendApprovalRequest();
+        }
+    }
+
+    private void sendApprovalRequest()
     {
         currentRequestor = server.processingCH;
         String playerName = currentRequestor.getPlayerName();
@@ -46,6 +58,7 @@ public class SuspendGameRequest
 
         denyingClients.clear();
         suspendRequestApprovers.clear();
+        timer = setupTimer();
 
         // collect all eligible ones to request approval; excludes the stub
         for (ClientHandler client : server.getRealClients())
@@ -97,7 +110,7 @@ public class SuspendGameRequest
         }
     }
 
-    public void suspendResponse(boolean approved)
+    public void handleOneResponse(boolean approved)
     {
         if (suspendRequestApprovers.isEmpty())
         {
@@ -106,19 +119,32 @@ public class SuspendGameRequest
         }
         LOGGER.info("Player " + server.processingCH + " replies: " + approved);
 
-        suspendRequestApprovers.remove(server.processingCH);
-        if (!approved)
+        synchronized (suspendRequestApprovers)
         {
-            denyingClients.add(server.processingCH.getPlayerName());
-        }
+            suspendRequestApprovers.remove(server.processingCH);
+            if (!approved)
+            {
+                denyingClients.add(server.processingCH.getPlayerName());
+            }
 
-        if (suspendRequestApprovers.isEmpty())
+            if (suspendRequestApprovers.isEmpty())
+            {
+                timer.cancel();
+                timer = null;
+                handleAllResponsedReceived(false);
+            }
+        }
+    }
+
+    private void handleAllResponsedReceived(boolean timedOut)
+    {
+        if (suspendRequestApprovers.isEmpty() || timedOut)
         {
-            LOGGER.info("approvers list now empty");
+            LOGGER.info("Handling the responses");
             if (denyingClients.size() == 0)
             {
-
-                LOGGER.info("All approved, suspending game...");
+                LOGGER.info((timedOut ? "Timed out" : "All approved")
+                    + ": suspending game...");
                 server.getGame().getNotifyWebServer().gameIsSuspended();
                 server.initiateSuspendGame();
             }
@@ -145,6 +171,46 @@ public class SuspendGameRequest
             + ") denied it. Game will not be suspended.";
         LOGGER.info("Informing clients: " + message);
         server.messageFromServerToAll(message);
+    }
+
+    private Timer setupTimer()
+    {
+        // java.util.Timer, not Swing Timer
+        timer = new Timer("SuspendResponseTimeout-timer", true);
+
+        long timeout = 10; // secs
+        timer.schedule(new TriggerTimeIsUp(), timeout * 1000);
+        return timer;
+    }
+
+    class TriggerTimeIsUp extends TimerTask
+    {
+        boolean cancelled = false;
+        @Override
+        public void run()
+        {
+            synchronized (suspendRequestApprovers)
+            {
+                if (cancelled || suspendRequestApprovers.isEmpty())
+                {
+                    // Nothing to do any more
+                }
+                else
+                {
+                    handleAllResponsedReceived(true);
+                }
+                suspendRequestApprovers.notify();
+                cancel();
+                timer = null;
+            }
+        }
+
+        @Override
+        public boolean cancel()
+        {
+            cancelled = true;
+            return true;
+        }
     }
 
 }

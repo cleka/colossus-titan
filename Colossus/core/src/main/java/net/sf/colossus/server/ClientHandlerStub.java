@@ -60,8 +60,22 @@ public class ClientHandlerStub implements IClient
 
     public ClientHandlerStub(Server server)
     {
+        LOGGER.finest("ClientHandlerStub for a real client instantiated");
+        this.server = server;
+
+        String tempId = "<no name yet #" + (counter++) + ">";
+        InstanceTracker.register(this, tempId);
+    }
+
+    public ClientHandlerStub(Server server, String clientName)
+    {
         LOGGER.finest("ClientHandlerStub instantiated");
         this.server = server;
+
+        this.signonName = clientName;
+        this.playerName = clientName;
+        this.truncatedPlayerName = (playerName + TRUNC_FILLER).substring(0,
+            TRUNC_LENGTH);
 
         String tempId = "<no name yet #" + (counter++) + ">";
         InstanceTracker.register(this, tempId);

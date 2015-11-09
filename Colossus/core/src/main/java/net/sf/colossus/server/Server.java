@@ -438,7 +438,7 @@ public final class Server extends Thread implements IServer
 
     public void createClientHandlerStub()
     {
-        clientStub = new ClientHandlerStub(this);
+        clientStub = new ClientHandlerStub(this, "clientHandlerStub");
         // it's an IClient, but not a real ClientHandler:
         iClients.add(clientStub);
     }
@@ -710,7 +710,8 @@ public final class Server extends Thread implements IServer
                     LOGGER.info("Handling channel changes, stub.");
                 }
 
-                LOGGER.info("REALLY REMOVING: CH " + nextCHS.getSignonName()
+                LOGGER.info("Removing clienthandler "
+                    + nextCHS.getClientName()
                     + " from clients list, list size is: " + iClients.size());
                 // For now removed, caused ConcurrentModificationException
                 // when game is closed via GUI
@@ -2893,7 +2894,7 @@ public final class Server extends Thread implements IServer
 
     public void suspendResponse(boolean approved)
     {
-        suspendGameRequest.suspendResponse(approved);
+        suspendGameRequest.handleOneResponse(approved);
     }
 
     public void messageFromServerToAll(String message)

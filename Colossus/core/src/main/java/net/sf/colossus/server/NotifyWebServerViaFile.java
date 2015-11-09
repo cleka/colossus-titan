@@ -149,30 +149,24 @@ public class NotifyWebServerViaFile implements INotifyWebServer
     public void gameIsSuspended()
     {
         suspended = true;
-        renameFlagfile(flagFilename + ".suspended");
+        if (active)
+        {
+            renameFlagfile(flagFilename + ".suspended");
+        }
     }
 
     private void renameFlagfile(String suspendedFilename)
     {
-        if (active)
+        try
         {
-            try
-            {
-                out.close();
-                flagFile.renameTo(new File(suspendedFilename));
-            }
-            catch (Exception e)
-            {
-                LOGGER.log(Level.SEVERE,
-                    "Could not rename web server flag file " + flagFilename
-                        + " to new name " + suspendedFilename + "!!"
-                        + e.toString(),
-                    (Throwable)null);
-            }
+            out.close();
+            flagFile.renameTo(new File(suspendedFilename));
         }
-        else
+        catch (Exception e)
         {
-            LOGGER.warning("renameFlagFile called, but active is false?");
+            LOGGER.log(Level.SEVERE, "Could not rename web server flag file "
+                + flagFilename + " to new name " + suspendedFilename + "!!"
+                + e.toString(), (Throwable)null);
         }
     }
 

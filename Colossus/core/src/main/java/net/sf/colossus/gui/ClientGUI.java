@@ -2249,7 +2249,19 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         client.sendExtraRollRequestResponse(approved, requestId);
     }
 
-    public void askSuspendConfirmation(String requestorName, int timeout)
+    public void askSuspendConfirmation(final String requestorName, int timeout)
+    {
+        SwingUtilities.invokeLater(new Runnable()
+        {
+            public void run()
+            {
+                askSuspendConfirmationInEDT(requestorName);
+            }
+        });
+        LOGGER.info("askSuspendConfirmationDialog invokeLater");
+    }
+
+    public void askSuspendConfirmationInEDT(String requestorName)
     {
         String[] options = new String[2];
         options[0] = new String("Approve");

@@ -868,7 +868,22 @@ public final class Client implements IClient, IOracle, IVariant,
 
     public void suspendResponse(boolean approved)
     {
-        server.suspendResponse(approved);
+        if (game.isSuspended())
+        {
+            LOGGER.finest("Game already suspended, probably called during "
+                + "dispose()? Not sending response.");
+        }
+        else if (server == null)
+        {
+            LOGGER.warning("In client " + getOwningPlayer().getName()
+                + ": in suspendResponse(), server NULL ?");
+        }
+        else
+        {
+            LOGGER.finest("Client " + getOwningPlayer().getName()
+                + ": in suspendResponse: sending response " + approved);
+            server.suspendResponse(approved);
+        }
     }
 
     public void doCheckServerConnection()
