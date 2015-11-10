@@ -8,20 +8,27 @@ import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.ScrollPane;
 import java.awt.SystemColor;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+import javax.swing.border.EmptyBorder;
 
+import net.sf.colossus.client.GameClientSide;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.client.PlayerClientSide;
 import net.sf.colossus.client.PredictSplitNode;
@@ -29,6 +36,7 @@ import net.sf.colossus.client.PredictSplits;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.guiutil.KDialog;
+import net.sf.colossus.util.TimeFormats;
 import net.sf.colossus.variant.CreatureType;
 
 
@@ -40,6 +48,9 @@ public final class PlayerDetailsDialog extends KDialog
 {
     private final PlayerClientSide player;
     private final ClientGUI gui;
+
+    private final JPanel mainPane;
+    private final JButton refreshButton;
 
     private static final int MAX_CREATURE_COLUMNS = 6;
 
@@ -90,19 +101,31 @@ public final class PlayerDetailsDialog extends KDialog
         PlayerClientSide player, ClientGUI clientGui)
     {
         // TODO currently modal since we don't listen for updates yet --> fix
-        super(parentFrame, "Details for player " + player.getName(), true);
+        super(parentFrame, "Details for player " + player.getName(), false);
         this.player = player;
         this.gui = clientGui;
 
         useSaveWindow(gui.getOptions(), "PlayerDetails", null);
+        // int randomOffset = (int)(System.currentTimeMillis() % 5 - 10) * 10;
+        // centerOnScreen(randomOffset, randomOffset);
 
-        JPanel mainPane = new JPanel();
+        mainPane = new JPanel();
         JScrollPane scrollPane = new JScrollPane(mainPane);
+        scrollPane.setAlignmentX(ScrollPane.LEFT_ALIGNMENT);
         getContentPane().add(scrollPane);
         mainPane.setLayout(new BoxLayout(mainPane, BoxLayout.Y_AXIS));
-        mainPane.add(createSummaryTable());
-        mainPane.add(createLegionsTable());
-        mainPane.add(createCreaturesTable());
+        mainPane.setAlignmentX(LEFT_ALIGNMENT);
+
+        refreshButton = new JButton("Refresh");
+        refreshButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                refreshContent();
+            }
+        });
+
+        addContent(mainPane);
 
         mainPane.addMouseListener(new MouseAdapter()
         {
@@ -125,9 +148,50 @@ public final class PlayerDetailsDialog extends KDialog
         });
     }
 
+    private void refreshContent()
+    {
+        mainPane.removeAll();
+        addContent(mainPane);
+        pack();
+    }
+
+    private void addContent(JPanel mainPane)
+    {
+        mainPane.add(createHeader());
+        mainPane.add(createSummaryTable());
+        mainPane.add(createLegionsTable());
+        mainPane.add(createCreaturesTable());
+    }
+
+    private String getInfoText()
+    {
+        GameClientSide g = gui.getGameClientSide();
+        return "turn " + g.getTurnNumber() + ", " + g.getActivePlayer() + " "
+            + g.getPhase().getDoesWhat();
+    }
+
+    private Box createHeader()
+    {
+        Box labelBox = new Box(BoxLayout.X_AXIS);
+        labelBox.setAlignmentX(LEFT_ALIGNMENT);
+        labelBox.setBorder(new EmptyBorder(5, 5, 5, 5));
+
+        JLabel refreshedLabel = new JLabel("Generated: "
+            + TimeFormats.getCurrentTimeLocalized() + " (" + getInfoText()
+            + ")  ", JLabel.LEFT);
+        refreshedLabel.setHorizontalAlignment(JLabel.LEFT);
+        refreshedLabel.setAlignmentX(LEFT_ALIGNMENT);
+
+        labelBox.add(refreshedLabel);
+        labelBox.add(Box.createHorizontalGlue());
+        labelBox.add(refreshButton);
+        return labelBox;
+    }
+
     private JPanel createSummaryTable()
     {
         JPanel result = new JPanel(new GridBagLayout());
+        result.setAlignmentX(LEFT_ALIGNMENT);
 
         result.add(new JLabel("Player:"), FIRST_LABEL_CONSTRAINT);
         result.add(new JLabel(player.getName()), VALUE_CONSTRAINT);
@@ -151,6 +215,7 @@ public final class PlayerDetailsDialog extends KDialog
     private JPanel createLegionsTable()
     {
         JPanel result = new JPanel(new GridBagLayout());
+        result.setAlignmentX(LEFT_ALIGNMENT);
 
         JLabel sectionLabel = new JLabel(
             String.valueOf(player.getNumLegions()) + " legions:");
@@ -197,6 +262,8 @@ public final class PlayerDetailsDialog extends KDialog
     private JPanel createSplitNodesPanel()
     {
         JPanel result = new JPanel(new GridBagLayout());
+        result.setAlignmentX(LEFT_ALIGNMENT);
+
         PredictSplits ps = player.getPredictSplits();
         PredictSplitNode root = ps.getRoot();
         Map<PredictSplitNode, GridBagConstraints> layouts = new HashMap<PredictSplitNode, GridBagConstraints>();
@@ -270,6 +337,7 @@ public final class PlayerDetailsDialog extends KDialog
     private JPanel createCreaturesTable()
     {
         JPanel result = new JPanel(new GridBagLayout());
+        result.setAlignmentX(LEFT_ALIGNMENT);
 
         result.add(new JLabel(String.valueOf(player.getNumCreatures())
             + " creatures (" + player.getTotalPointValue() + " points):"),

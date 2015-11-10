@@ -11,8 +11,8 @@ package net.sf.colossus.game;
  */
 public enum Phase
 {
-    INIT("Init"), SPLIT("Split"), MOVE("Move"), FIGHT("Fight"), MUSTER(
-        "Muster");
+    INIT("Init", "initialization"), SPLIT("Split", "splits"), MOVE("Move",
+        "moves"), FIGHT("Fight", "fights"), MUSTER("Muster", "musters");
 
     /**
      * Deserialize enum from integer value.
@@ -48,10 +48,17 @@ public enum Phase
         return name;
     }
 
-    private final String name;
+    public String getDoesWhat()
+    {
+        return doesWhat;
+    }
 
-    private Phase(String name)
+    private final String name;
+    private final String doesWhat;
+
+    private Phase(String name, String doesWhat)
     {
         this.name = name;
+        this.doesWhat = doesWhat;
     }
 }
