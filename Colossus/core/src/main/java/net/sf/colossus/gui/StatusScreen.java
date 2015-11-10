@@ -12,10 +12,12 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 import net.sf.colossus.client.PlayerClientSide;
 import net.sf.colossus.common.IOptions;
@@ -90,6 +92,7 @@ final class StatusScreen extends KDialog
         turnPane.setLayout(new GridLayout(0, 3));
         turnPane.setBorder(BorderFactory.createEtchedBorder());
         contentPane.add(turnPane);
+        turnPane.setAlignmentX(SwingConstants.LEFT);
 
         turnPane.add(new JLabel(""));
         turnPane.add(new JLabel("Game"));
@@ -117,6 +120,7 @@ final class StatusScreen extends KDialog
         contentPane.add(gridPane);
         gridPane.setLayout(new GridLayout(10, 0));
         gridPane.setBorder(BorderFactory.createEtchedBorder());
+        gridPane.setAlignmentX(SwingConstants.LEFT);
 
         nameLabel = new JLabel[numPlayers];
         typeLabel = new JLabel[numPlayers];
@@ -224,8 +228,16 @@ final class StatusScreen extends KDialog
             gridPane.add(scoreLabel[i]);
         }
 
+        Box bottomPane = new Box(BoxLayout.X_AXIS);
+        bottomPane.setAlignmentX(SwingConstants.LEFT);
+
         JLabel l = new JLabel("Click a player name for more info!");
-        contentPane.add(l);
+        l.setHorizontalAlignment(SwingConstants.CENTER);
+        l.setAlignmentX(CENTER_ALIGNMENT);
+
+        bottomPane.add(l);
+        bottomPane.add(Box.createHorizontalGlue());
+        contentPane.add(bottomPane);
 
         updateStatusScreen();
 
