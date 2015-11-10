@@ -3465,6 +3465,18 @@ public final class MasterBoard extends JPanel
             String text = gui.getClient().isPaused() ? "Continue" : "Pause";
             pauseButton.setText(text);
         }
+
+        /**
+         *  Called when game is over; enable done button again and make it call
+         *  "close", which brings then the "New/Close/Quit/Cancel" dialog,
+         *  so that one does not have to pick it from menu or right upper corner.
+         */
+        private void makeDoneCloseWindow()
+        {
+            gameOverStateReached = true;
+            enableDoneAction();
+            doneButton.setText("Close");
+        }
     }
 
     public void enableDoneAction()
@@ -3496,12 +3508,6 @@ public final class MasterBoard extends JPanel
         disableDoneAction(name + " " + doesWhat);
     }
 
-    private void makeDoneCloseWindow()
-    {
-        gameOverStateReached = true;
-        enableDoneAction();
-    }
-
     public void setServerClosedMessage(boolean gameOver)
     {
         if (gameOver)
@@ -3514,7 +3520,6 @@ public final class MasterBoard extends JPanel
             bottomBar.setPhase("Unable to continue game");
             disableDoneAction("connection to server lost");
         }
-        // makeDoneCloseWindow();
     }
 
     public void setReconnectedMessage()
@@ -3552,10 +3557,7 @@ public final class MasterBoard extends JPanel
         setTitleInfoText(message);
         bottomBar.setPhase(message);
         disableDoneAction("connection closed from server side");
-        if (gui.getOwningPlayerName().equals("bla"))
-        {
-            makeDoneCloseWindow();
-        }
+        bottomBar.makeDoneCloseWindow();
     }
 
     public void setPhaseInfo(String message)
