@@ -39,11 +39,13 @@ final class StatusScreen extends KDialog
     //      via a Map<Player,PlayerPanel> -- this way things would be grouped better and
     //      the need for the index-based access to players would be gone
     private final JLabel[] nameLabel;
+    private final JLabel[] typeLabel;
     private final JLabel[] towerLabel;
     private final JLabel[] elimLabel;
     private final JLabel[] legionsLabel;
     private final JLabel[] markersLabel;
     private final JLabel[] creaturesLabel;
+    private final JLabel[] pointsLabel;
     private final JLabel[] titanLabel;
     private final JLabel[] scoreLabel;
 
@@ -113,15 +115,17 @@ final class StatusScreen extends KDialog
 
         JPanel gridPane = new JPanel();
         contentPane.add(gridPane);
-        gridPane.setLayout(new GridLayout(8, 0));
+        gridPane.setLayout(new GridLayout(10, 0));
         gridPane.setBorder(BorderFactory.createEtchedBorder());
 
         nameLabel = new JLabel[numPlayers];
+        typeLabel = new JLabel[numPlayers];
         towerLabel = new JLabel[numPlayers];
         elimLabel = new JLabel[numPlayers];
         legionsLabel = new JLabel[numPlayers];
         markersLabel = new JLabel[numPlayers];
         creaturesLabel = new JLabel[numPlayers];
+        pointsLabel = new JLabel[numPlayers];
         titanLabel = new JLabel[numPlayers];
         scoreLabel = new JLabel[numPlayers];
 
@@ -146,6 +150,14 @@ final class StatusScreen extends KDialog
             });
 
             j++;
+        }
+
+        gridPane.add(new JLabel("Type"));
+        for (int i = 0; i < numPlayers; i++)
+        {
+            typeLabel[i] = new JLabel();
+            typeLabel[i].setOpaque(true);
+            gridPane.add(typeLabel[i]);
         }
 
         gridPane.add(new JLabel("Tower"));
@@ -186,6 +198,14 @@ final class StatusScreen extends KDialog
             creaturesLabel[i] = new JLabel();
             creaturesLabel[i].setOpaque(true);
             gridPane.add(creaturesLabel[i]);
+        }
+
+        gridPane.add(new JLabel("Points"));
+        for (int i = 0; i < numPlayers; i++)
+        {
+            pointsLabel[i] = new JLabel();
+            pointsLabel[i].setOpaque(true);
+            gridPane.add(pointsLabel[i]);
         }
 
         gridPane.add(new JLabel("Titan Size"));
@@ -256,11 +276,13 @@ final class StatusScreen extends KDialog
     {
         if (towerLabel[i].getBackground() != color)
         {
+            typeLabel[i].setBackground(color);
             towerLabel[i].setBackground(color);
             elimLabel[i].setBackground(color);
             legionsLabel[i].setBackground(color);
             markersLabel[i].setBackground(color);
             creaturesLabel[i].setBackground(color);
+            pointsLabel[i].setBackground(color);
             titanLabel[i].setBackground(color);
             scoreLabel[i].setBackground(color);
         }
@@ -338,11 +360,15 @@ final class StatusScreen extends KDialog
             {
                 nameLabel[i].setText(player.getName());
             }
+            String type = player.getType();
+            type = type.substring(type.lastIndexOf('.') + 1);
+            typeLabel[i].setText("" + type);
             towerLabel[i].setText("" + player.getStartingTower().getLabel());
             elimLabel[i].setText(player.getPlayersElim());
             legionsLabel[i].setText("" + player.getNumLegions());
             markersLabel[i].setText("" + player.getNumMarkersAvailable());
             creaturesLabel[i].setText("" + player.getNumCreatures());
+            pointsLabel[i].setText("" + player.getCreaturePoints());
             titanLabel[i].setText("" + player.getTitanPower());
             scoreLabel[i].setText("" + player.getScore());
 

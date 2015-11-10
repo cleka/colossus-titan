@@ -379,6 +379,16 @@ public class Player
         return count;
     }
 
+    public int getCreaturePoints()
+    {
+        int count = 0;
+        for (Legion legion : getLegions())
+        {
+            count += legion.getHeight();
+        }
+        return count;
+    }
+
     /**
      * Overridden for debug/logging purposes.
      */
