@@ -3624,6 +3624,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             watchdog.finish();
         }
         board.setGameOverState(message);
+        dueOrNotChangesYellowActions(false);
+
         if (disposeFollows)
         {
             // AutoQuit active, application will terminate immediately

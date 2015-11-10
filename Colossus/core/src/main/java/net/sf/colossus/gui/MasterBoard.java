@@ -3556,7 +3556,6 @@ public final class MasterBoard extends JPanel
     {
         setTitleInfoText(message);
         bottomBar.setPhase(message);
-        bottomBar.myTurnActions(false);
         disableDoneAction("connection closed from server side");
         bottomBar.makeDoneCloseWindow();
     }
