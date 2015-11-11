@@ -1756,9 +1756,10 @@ public final class MasterBoard extends JPanel
         if (gui.isMyTurn())
         {
             gui.resetAllLegionFlags();
+            setTitleInfoText(titleText);
+            bottomBar.setPhase(titleText);
         }
         unselectAllHexes();
-        setTitleInfoText(titleText);
     }
 
     /**
@@ -1766,16 +1767,18 @@ public final class MasterBoard extends JPanel
      * set the actions which are allowed only for active player to inactive,
      * and update the bottomBar info why "Done" is disabled accordingly
      *
-     * @param text What the active player is doing right now
      */
-    private void setupAsInactivePlayer(String text)
+    private void setupAsInactivePlayer()
     {
         undoLastAction.setEnabled(false);
         undoAllAction.setEnabled(false);
         forcedDoneWithPhaseAction.setEnabled(false);
         takeMulliganAction.setEnabled(false);
         requestExtraRollAction.setEnabled(false);
+        String text = client.getActivePlayer() + " "
+            + client.getPhase().getDoesWhat();
         disableDoneActionActivePlayerDoes(text);
+        setTitleInfoText(text);
     }
 
     void setupSplitMenu()
@@ -1797,19 +1800,17 @@ public final class MasterBoard extends JPanel
                 bottomBar.setMarkerCount(client.getOwningPlayer()
                     .getMarkersAvailable().size());
             }
-            bottomBar.setPhase("Split stacks");
             highlightTallLegions();
         }
         else
         {
-            setupAsInactivePlayer("splits");
+            setupAsInactivePlayer();
         }
     }
 
     void setupMoveMenu()
     {
-        // tellMovementRoll comes later, so here only a text without the roll
-        setupPhasePreparations("Movement (not rolled yet)");
+        setupPhasePreparations("Move legions");
 
         if (gui.isMyTurn())
         {
@@ -1820,7 +1821,6 @@ public final class MasterBoard extends JPanel
             takeMulliganAction.setEnabled(mullLeft ? true : false);
             requestExtraRollAction.setEnabled(true);
             disableDoneAction("At least one legion must move");
-
             setMovementPhase();
             highlightUnmovedLegions();
             updateLegionsLeftToMoveText(false);
@@ -1828,25 +1828,18 @@ public final class MasterBoard extends JPanel
         }
         else
         {
-            setupAsInactivePlayer("moves");
+            setupAsInactivePlayer();
         }
     }
 
     public void setMovementPhase()
     {
-        bottomBar.setPhase("Movement");
-    }
-
-    // Needs to be updated afterwards, because during setupPhase
-    // (when the title update is done) the roll is not known yet
-    void setupTitleForMovementRoll(int roll)
-    {
-        setTitleInfoText("Movement Roll: " + roll);
+        bottomBar.setPhase("Move legions");
     }
 
     void setupFightMenu()
     {
-        setupPhasePreparations("Resolve Engagements");
+        setupPhasePreparations("Resolve engagements");
 
         if (gui.isMyTurn())
         {
@@ -1858,14 +1851,12 @@ public final class MasterBoard extends JPanel
             // if there are no engagements, we are kicked to next phase
             // automatically anyway.
             updateEngagementsLeftText();
-
-            bottomBar.setPhase("Resolve Engagements");
             highlightEngagements();
             maybeRequestFocusAndToFront();
         }
         else
         {
-            setupAsInactivePlayer("fights");
+            setupAsInactivePlayer();
         }
     }
 
@@ -1886,7 +1877,7 @@ public final class MasterBoard extends JPanel
 
     void setupMusterMenu()
     {
-        setupPhasePreparations("Muster Recruits");
+        setupPhasePreparations("Muster recruits");
 
         if (gui.isMyTurn())
         {
@@ -1902,14 +1893,13 @@ public final class MasterBoard extends JPanel
             requestExtraRollAction.setEnabled(false);
             enableDoneAction();
 
-            bottomBar.setPhase("Muster Recruits");
             updateLegionsLeftToMusterText();
             highlightPossibleRecruitLegionHexes();
             maybeRequestFocusAndToFront();
         }
         else
         {
-            setupAsInactivePlayer("musters");
+            setupAsInactivePlayer();
         }
     }
 
@@ -3504,8 +3494,8 @@ public final class MasterBoard extends JPanel
     private void disableDoneActionActivePlayerDoes(String doesWhat)
     {
         bottomBar.setPhase("");
-        String name = gui.getClient().getActivePlayer().getName();
-        disableDoneAction(name + " " + doesWhat);
+        // String name = gui.getClient().getActivePlayer().getName();
+        disableDoneAction(doesWhat);
     }
 
     public void setServerClosedMessage(boolean gameOver)
@@ -3539,10 +3529,18 @@ public final class MasterBoard extends JPanel
             + " turns processed");
     }
 
+    /**
+     * Updates the window's title. For active player, tell what to do;
+     * for inactive player, inform what active player is doing.
+     * OwningPlayer: Split stacks
+     * OwningPlayer: OtherPlayer musters
+     *
+     * @param text a string like 'Split stacks' or "player xxx moves"
+     */
     private void setTitleInfoText(String text)
     {
-        masterFrame.setTitle(client.getActivePlayer() + " Turn "
-            + client.getTurnNumber() + " : " + text);
+        masterFrame.setTitle(client.getOwningPlayer().getName() + ": Turn "
+            + client.getTurnNumber() + " - " + text);
     }
 
     public void setTempDisconnectedState(String message)

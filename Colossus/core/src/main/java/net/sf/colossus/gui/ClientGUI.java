@@ -2441,8 +2441,6 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             eventViewer.tellMovementRoll(roll, reason);
         }
 
-        board.setupTitleForMovementRoll(roll);
-
         // No point to recreate and repaint if it's same as before
         if (movementDie == null || roll != movementDie.getDisplayedRoll())
         {
