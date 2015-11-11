@@ -13,6 +13,70 @@
 This describes the recent changes in some more detail than just the
 one-line-info on the main pages "News" section.
 
+
+<h3>November 11, 2015: Public Build</h3>
+<p />
+
+<p />
+Polished the Inactivity-Autoplay and Turn-xx-yellow functionality that were added earlier, and some new ones:
+<ul>
+<li>Inactivity timeout and "turn-xx-yellow" should now work more reliably/consistently<br> 
+    Both can be disabled in Preferences. The yellow is now also reset to normal when game is over</li>
+<li>Possibility to suspend games and resume later. Main purpose for that is that one could
+    hopefully recover from crashed/stuck (no BattleBoard) situations, by restarting/resuming
+    game from last auto-save point (at the moment that means begin of each turn; begin of 
+    each phase and perhaps between engagements is almost working)</li>
+<li>Requested/suggested by Scotty: Having easier access to players creature points and player type:<br>
+	<ul>
+	<li>added player type and creature points to game status window,</li> 
+    <li>allow multiple PlayerDetails dialogs to be open and kept open at same time,</li> 
+    <li>and a refresh button added there</li>
+    </ul>
+<li>For dice rolls, using random data from random.org instead of Java's built-in PRNG 
+    (actually, this has been in effect since November 2nd).</li>
+<li>A "Contact Admin" feature</li>
+<li>Reverted/dropped the requirement Java 7. In fact Java 7 is ATM the worst choice, since it's likely that it is the 
+    culprit for game/application sometimes being stuck.<br><b>If you can, us Java 5, 6 or 8 instead!</b></li>  
+</ul>
+<p />
+
+
+<hr />
+
+<h3>August 5, 2015: Public  Build</h3>
+<p />
+Added several features, improved usability and in general some corrections.
+<p />
+Part of those were already in use since the Public Test Build from July 10.
+<ul>
+
+<li>Inactivity-timeout (or rather "inactivity-autoplay"") added: if a user does really
+    nothing for some time (while it is on him to do something, including responding to
+    flee/concede dialog when being attacked), the Client's autoplay will kick in and
+    finish his turn   
+<li>When the own turn starts, one is now also notified by that, that the bottom bar
+    of the MasterBoard and the chat background turn yellow (that they both can be disabled
+    has been added in the following release)   
+<li>Probability-based battle hits</li>
+<li>Extra-roll requests</li>
+<li>Added that /ping now sends feedback to sender that one really did send this via ping</li>
+<li>History-functionality in chat window (Cursor up-down)
+<li>Several small improvements to AI (mostly about protecting Titan) provided by BrentNZ. Thanks!</li>
+<li>Display marker count in split phase (also by BrentNZ)</li>
+<li>Writes battle dice rolls statistics to a text file (idea is that players can
+    access it via a web browser but that's not done yet)</li>
+<li>Layout changes to WebClient propose games tab (window was too tall for some wide-screens)</li>
+<li>Added tool-tip text for some more columns in proposed game table</li>
+<li>Provide the various game options (that were so far only available in local games) also in web games</li>
+<li>Improved error handling for illegal recruiting</li>
+<li>Visual feedback for Done on BattleBoard to prevent "illegally called ..." cases</li>
+<li>Removed display of hostname in GetPlayers dialog (could lead to a long delay
+    during application start if one has 2 network interfaces)</li>
+</ul>
+<p />
+
+<hr />
+
 <h3>September 17, 2013: Release 0.14.0 from r5331</h3>
 <p/>
 <b>Note: </b>This new release probably still contains the bugs that some users reported,
@@ -52,8 +116,6 @@ Some usability improvements, added /userinfo command, more stability improvement
 <li>Make "ant jars" also build the CmdlineClient Jar</li>
 </ul>
 <p />
-
-<hr / >
 
 <h3>February 14, 2013: Release 0.13.2.1 from r5310</h3>
 <p/>
