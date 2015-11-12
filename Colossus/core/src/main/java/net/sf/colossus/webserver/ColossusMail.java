@@ -5,8 +5,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 import java.util.logging.Logger;
 
+import net.sf.colossus.webcommon.FormatWhen;
 import net.sf.colossus.webcommon.IColossusMail;
 
 
@@ -20,6 +22,16 @@ public class ColossusMail implements IColossusMail
 {
     private static final Logger LOGGER = Logger.getLogger(ColossusMail.class
         .getName());
+
+    private final static FormatWhen whenFormatter = new FormatWhen();
+
+    // TODO: get from config file or something
+    // For Message-To-Admin stuff:
+    private final static String MTA_FROM_NAME = "SYSTEM";
+    private final static String MTA_FROM_MAIL = "system@play-colossus.net";
+
+    private final static String MTA_TO_NAME = "Clemens";
+    private final static String MTA_TO_MAIL = "clemens@cleka.net";
 
     // For sending the registration mail:
     private final String mailServer;
@@ -163,4 +175,83 @@ public class ColossusMail implements IColossusMail
 
         return null;
     }
+
+
+    public String sendMessageToAdminMail(long when, String fromUser,
+        String hisMail, List<String> message)
+    {
+        LOGGER.fine("ok, sending 'message-to-admin' mail to " + fromUser
+            + " <" + hisMail + ">");
+
+        StringBuffer content = new StringBuffer();
+
+        String whenTime = whenFormatter.timeAsString(when);
+
+        content.append("\nAt " + whenTime + ", user " + fromUser + " ("
+            + hisMail + ") submitted a message to administrator:\n\n");
+
+        for (String line : message)
+        {
+            content.append(line + "\n");
+        }
+        content.append("\n");
+        String messageBody = content.toString();
+
+        try
+        {
+            SmtpSimple smtp = new SmtpSimple();
+            String subject = "A message to administrator from CPGS user "
+                + fromUser;
+
+            if (reallyMail)
+            {
+                LOGGER.fine("ok, really sending 'message-to-admin' mail to "
+                    + fromUser + " <" + hisMail + ">");
+
+                smtp.sendEmail(mailServer, "system@cleka.net", "system",
+                    "clemens@cleka.net", "Clemens", subject, messageBody);
+            }
+
+            if (mailToFileFlag)
+            {
+                PrintWriter mailOut = null;
+                try
+                {
+                    mailOut = new PrintWriter(new FileOutputStream(
+                        mailToFileFile, true));
+
+                    mailOut
+                        .println("\nI WOULD NOW SEND THE FOLLOWING MAIL:\n\n"
+                            + "From: " + MTA_FROM_NAME + " <" + MTA_FROM_MAIL
+                            + ">\n"
+                            + "To: " + MTA_TO_NAME + " <" + MTA_TO_MAIL + ">\n"
+                            + "Subject: " + subject + "\n\n" + content
+                            + "\nEND OF MAIL\n\n");
+                }
+                catch (IOException e)
+                {
+                    LOGGER.warning("Exception while) trying to write "
+                        + "a mail from user '" + fromName
+                        + "' to administrator to mail file: "
+                        + e);
+                }
+                finally
+                {
+                    if (mailOut != null)
+                    {
+                        mailOut.close();
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            LOGGER.severe("Exception during message-to-admin mail sending: "
+                + ex);
+            return "Sending to-admin mail failed - see log file!";
+        }
+
+        return null;
+    }
+
 }

@@ -1609,6 +1609,7 @@ public class WebServer implements IWebServer, IRunWebServer
         List<String> message)
     {
         generalChat.writeMessageToAdminToChatlog(when, fromUser, fromMail, message);
+        mailObject.sendMessageToAdminMail(when, fromUser, fromMail, message);
     }
 
     public String registerUser(String username, String password, String email)
