@@ -380,7 +380,7 @@ final class StatusScreen extends KDialog
             legionsLabel[i].setText("" + player.getNumLegions());
             markersLabel[i].setText("" + player.getNumMarkersAvailable());
             creaturesLabel[i].setText("" + player.getNumCreatures());
-            pointsLabel[i].setText("" + player.getCreaturePoints());
+            pointsLabel[i].setText("" + player.getTotalPointValue());
             titanLabel[i].setText("" + player.getTitanPower());
             scoreLabel[i].setText("" + player.getScore());
 
