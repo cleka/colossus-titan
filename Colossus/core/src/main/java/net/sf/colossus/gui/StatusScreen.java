@@ -204,7 +204,7 @@ final class StatusScreen extends KDialog
             gridPane.add(creaturesLabel[i]);
         }
 
-        gridPane.add(new JLabel("Points"));
+        gridPane.add(new JLabel("Creature-Points"));
         for (int i = 0; i < numPlayers; i++)
         {
             pointsLabel[i] = new JLabel();
