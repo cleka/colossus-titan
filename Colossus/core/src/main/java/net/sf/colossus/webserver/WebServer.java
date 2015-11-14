@@ -835,7 +835,7 @@ public class WebServer implements IWebServer, IRunWebServer
         ArrayList<GameInfo> games = new ArrayList<GameInfo>(allGames.values());
         for (GameInfo gi : games)
         {
-            if (gi.reEnrollIfNecessary(newUser))
+            if (gi.reEnrollIfNecessary(newUser) && gi.isProposedOrDue())
             {
                 LOGGER.log(Level.FINEST, "Telling user " + newUser.getName()
                     + " that he is still enrolled in game " + gi.getGameId());

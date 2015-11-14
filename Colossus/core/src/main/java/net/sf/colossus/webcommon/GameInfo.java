@@ -1092,6 +1092,15 @@ public class GameInfo
             .equals(GameState.DUE));
     }
 
+    /** if game is proposed or due, re-enroll a player that just logs in;
+     * otherwise not
+     * @return true if game is either proposed or due
+     */
+    public boolean isProposedOrDue()
+    {
+        return state.equals(GameState.PROPOSED) || state.equals(GameState.DUE);
+    }
+
     public void markStarting(User starter)
     {
         this.startingUser = starter;

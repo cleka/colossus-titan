@@ -2327,11 +2327,7 @@ public class WebClient extends KFrame implements IWebClient
                 String id = getSelectedGameIdFromRunTable();
                 if (id != null)
                 {
-                    GameInfo gi = findGameById(id);
-                    if (!gi.isEnrolled(username))
-                    {
-                        watchPossible = true;
-                    }
+                    watchPossible = true;
                 }
                 return watchPossible;
         }
@@ -2372,7 +2368,7 @@ public class WebClient extends KFrame implements IWebClient
                         reasonWhyNot = "Not all players online for game #"
                             + gi.getGameId();
                     }
-                    else if (gi.isEnrolled(username) || isActive())
+                    else if (gi.isEnrolled(username) || isAdmin)
                     {
                         reasonWhyNot = null;
                     }
