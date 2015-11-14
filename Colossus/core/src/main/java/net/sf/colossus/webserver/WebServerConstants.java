@@ -47,6 +47,11 @@ public final class WebServerConstants
     public final static String optMailReallyMail = "MailReallyMail";
     public final static String optMailToFile = "MailToFile";
 
+    public final static String optContactAdminFromName = "ContactAdminFromName";
+    public final static String optContactAdminFromMail = "ContactAdminFromMail";
+    public final static String optContactAdminToName = "ContactAdminToName";
+    public final static String optContactAdminToMail = "ContactAdminToMail";
+
     /**
      *  How many messages does chat server cache,
      *  for redisplay to those who just log in

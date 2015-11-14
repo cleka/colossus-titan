@@ -30,3 +30,8 @@ MailFromName=Some Colossus Server Registration Service
 ThisServer=Some Colossus Server
 ContactEmail=some.user@somedomain.net
 ContactWWW=www.somedomain.net:/colossus/contact.html
+
+ContactAdminFromName=System
+ContactAdminFromMail=system@somedomain.net
+ContactAdminToName=Admin
+ContactAdminToMail=admin@somedomain.net

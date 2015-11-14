@@ -11,7 +11,6 @@ import java.util.logging.Logger;
 import net.sf.colossus.webcommon.FormatWhen;
 import net.sf.colossus.webcommon.IColossusMail;
 
-
 /**
  *  Encapsulates the way how the web server sends mail in some situations,
  *  so far only for registration procedure.
@@ -25,13 +24,11 @@ public class ColossusMail implements IColossusMail
 
     private final static FormatWhen whenFormatter = new FormatWhen();
 
-    // TODO: get from config file or something
     // For Message-To-Admin stuff:
-    private final static String MTA_FROM_NAME = "SYSTEM";
-    private final static String MTA_FROM_MAIL = "system@play-colossus.net";
-
-    private final static String MTA_TO_NAME = "Clemens";
-    private final static String MTA_TO_MAIL = "clemens@cleka.net";
+    private final String ContactAdminFromName;
+    private final String ContactAdminFromMail;
+    private final String ContactAdminToName;
+    private final String ContactAdminToMail;
 
     // For sending the registration mail:
     private final String mailServer;
@@ -50,21 +47,25 @@ public class ColossusMail implements IColossusMail
     private final File mailToFileFile;
     private final boolean mailToFileFlag;
 
+    private final WebServerOptions options;
+
     public ColossusMail(WebServerOptions options)
     {
-        mailServer = options.getStringOption(WebServerConstants.optMailServer);
-        fromAddress = options
-            .getStringOption(WebServerConstants.optMailFromAddress);
-        fromName = options.getStringOption(WebServerConstants.optMailFromName);
-        thisServer = options
-            .getStringOption(WebServerConstants.optMailThisServer);
-        contactMail = options
-            .getStringOption(WebServerConstants.optMailContactEmail);
-        contactWWW = options
-            .getStringOption(WebServerConstants.optMailContactWWW);
+        this.options = options;
+
+        mailServer = getOption(WebServerConstants.optMailServer);
+        fromAddress = getOption(WebServerConstants.optMailFromAddress);
+        fromName = getOption(WebServerConstants.optMailFromName);
+        thisServer = getOption(WebServerConstants.optMailThisServer);
+        contactMail = getOption(WebServerConstants.optMailContactEmail);
+        contactWWW = getOption(WebServerConstants.optMailContactWWW);
         reallyMail = options.getOption(WebServerConstants.optMailReallyMail);
-        mailToFileName = options
-            .getStringOption(WebServerConstants.optMailToFile);
+        mailToFileName = getOption(WebServerConstants.optMailToFile);
+
+        ContactAdminFromName = getOption(WebServerConstants.optContactAdminFromName);
+        ContactAdminFromMail = getOption(WebServerConstants.optContactAdminFromMail);
+        ContactAdminToName = getOption(WebServerConstants.optContactAdminToName);
+        ContactAdminToMail = getOption(WebServerConstants.optContactAdminToMail);
 
         boolean success = false;
 
@@ -103,6 +104,11 @@ public class ColossusMail implements IColossusMail
         }
         mailToFileFlag = success;
         mailToFileFile = testFile;
+    }
+
+    private String getOption(String optName)
+    {
+        return options.getStringOption(optName);
     }
 
     public String sendConfirmationMail(String username, String email,
@@ -222,9 +228,12 @@ public class ColossusMail implements IColossusMail
 
                     mailOut
                         .println("\nI WOULD NOW SEND THE FOLLOWING MAIL:\n\n"
-                            + "From: " + MTA_FROM_NAME + " <" + MTA_FROM_MAIL
+                            + "From: " + ContactAdminFromName + " <"
+                            + ContactAdminFromMail
                             + ">\n"
-                            + "To: " + MTA_TO_NAME + " <" + MTA_TO_MAIL + ">\n"
+ + "To: "
+                            + ContactAdminToName + " <" + ContactAdminToMail
+                            + ">\n"
                             + "Subject: " + subject + "\n\n" + content
                             + "\nEND OF MAIL\n\n");
                 }
