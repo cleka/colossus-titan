@@ -1008,6 +1008,8 @@ public class GameInfo
             getAutoSansLordBattles());
         gameOptions.setOption(Options.pbBattleHits,
             getProbabilityBasedBattleHits());
+        gameOptions.setOption(Options.inactivityTimeout,
+            getInactivityTimeout());
 
         gameOptions.setOption(Options.noFirstTurnTeleport,
             this.noFirstTurnTeleportOpt);
