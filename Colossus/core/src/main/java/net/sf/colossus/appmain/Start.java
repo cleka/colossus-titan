@@ -700,6 +700,7 @@ public final class Start
                         GameServerSide game = GameServerSide
                             .newGameServerSide(getWhatNextManager(),
                                 serverOptions, loader.getVariant());
+                        game.setWasLoaded(true);
                         serverOptions.clearPlayerInfo();
                         String webGameFlagFileName = startOptions
                             .getStringOption(Options.webFlagFileName);

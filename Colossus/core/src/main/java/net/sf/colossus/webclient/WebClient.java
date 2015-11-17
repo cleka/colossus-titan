@@ -2864,6 +2864,7 @@ public class WebClient extends KFrame implements IWebClient
 
         proposedGameDataModel.resetTable();
         runGameDataModel.resetTable();
+        suspGameDataModel.resetTable();
 
         gameHash.clear();
 

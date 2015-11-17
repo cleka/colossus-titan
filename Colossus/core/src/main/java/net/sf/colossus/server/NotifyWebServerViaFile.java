@@ -90,6 +90,7 @@ public class NotifyWebServerViaFile implements INotifyWebServer
         if (active)
         {
             out.println(GAME_STARTUP_FAILED + reason);
+            gameIsSuspended();
         }
     }
 

@@ -1775,6 +1775,27 @@ public class WebServer implements IWebServer, IRunWebServer
                     gi.setState(GameState.ENDING);
                 }
             }
+            if (suspendedGames.contains(gi))
+            {
+                LOGGER.log(Level.FINEST,
+                    "Reaper: first removing game " + gi.getGameId()
+                        + " from suspended list");
+                suspendedGames.remove(gi);
+                if (gi.getGameState().equals(GameState.SUSPENDED))
+                {
+                    LOGGER
+                        .log(Level.FINEST,
+                            "When reaping, still/again suspended; adding game "
+                                + gi.getGameId()
+                                + " back to suspended games list");
+                    suspendedGames.add(gi);
+                }
+                else
+                {
+                    gi.setState(GameState.ENDING);
+                }
+            }
+
             // If game starting did not succeed might still be in proposed list
             else if (proposedGames.contains(gi))
             {

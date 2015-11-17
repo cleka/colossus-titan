@@ -86,6 +86,8 @@ public class GameServerSide extends Game
     private boolean loadingGame;
     private boolean replayOngoing = false;
     private Server server;
+    private boolean wasLoaded = false;
+
     // Negotiation
     private final Set<Proposal> attackerProposals = new HashSet<Proposal>();
     private final Set<Proposal> defenderProposals = new HashSet<Proposal>();
@@ -230,6 +232,16 @@ public class GameServerSide extends Game
     public void setFlagFilename(String flagFilename)
     {
         this.flagFilename = flagFilename;
+    }
+
+    public void setWasLoaded(boolean value)
+    {
+        this.wasLoaded = value;
+    }
+
+    public boolean wasLoaded()
+    {
+        return this.wasLoaded;
     }
 
     public String getHostingPlayer()
