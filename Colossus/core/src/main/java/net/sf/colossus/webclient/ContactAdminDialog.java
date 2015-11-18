@@ -66,11 +66,15 @@ public class ContactAdminDialog extends KDialog implements ActionListener,
 
         Box topPanel = new Box(BoxLayout.Y_AXIS);
         topPanel.add(instructionLabel);
-        String defaultName = "Jhon";
-        String defaultMail = "johndoe@whateveryoulike.com";
 
-        nameField = addTextField(topPanel, "Your name: ", defaultName);
-        mailField = addTextField(topPanel, "Your email: ", defaultMail);
+        // Keep them here - use for the case when we allow anonymous submit
+        // String defaultName = "Jhon";
+        // String defaultMail = "johndoe@whateveryoulike.com";
+
+        nameField = addTextField(topPanel, "Your name: ", initialName);
+        // TODO: at the moment the email is usually empty; wcst has a value
+        // for it only when one has just registered.
+        mailField = addTextField(topPanel, "Your email: ", initialMail);
         mainPanel.add(topPanel, BorderLayout.NORTH);
 
         textArea = new JTextArea("Type your message here...", 10, 60);
@@ -131,12 +135,15 @@ public class ContactAdminDialog extends KDialog implements ActionListener,
                     "Name, Mail and Text cannot be empty!", "Missing values!",
                     JOptionPane.ERROR_MESSAGE);
             }
-            else if (name.equals("Jhon")
-                || mail.equals("johndoe@whateveryoulike.com"))
-                JOptionPane.showMessageDialog(this,
-                    "Hey! Too lazy to change the defaults?\n"
-                        + "There's a reason why I ask for them!",
-                    "Missing values!", JOptionPane.ERROR_MESSAGE);
+            // Keep that here - use for the case when we allow anonymous submit
+            // else if (name.equals("Jhon")
+            //    || mail.equals("johndoe@whateveryoulike.com"))
+            // {
+            //    JOptionPane.showMessageDialog(this,
+            //        "Hey! Too lazy to change the defaults?\n"
+            //            + "There's a reason why I ask for them!",
+            //        "Missing values!", JOptionPane.ERROR_MESSAGE);
+            // }
             else
             {
                 setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
