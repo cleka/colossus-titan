@@ -623,6 +623,11 @@ public class WebClientSocketThread extends Thread implements IWebServer
                     webClient.grantAdminStatus();
                 }
 
+                else if (command.equals(IWebClient.tellOwnInfo))
+                {
+                    String email = tokens[1];
+                    webClient.tellOwnInfo(email);
+                }
                 else
                 {
                     if (webClient != null)

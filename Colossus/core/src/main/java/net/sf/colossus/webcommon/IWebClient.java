@@ -17,6 +17,7 @@ public interface IWebClient
     public static final String didUnenroll = "didUnenroll";
     public static final String gameInfo = "gameInfo";
     public static final String userInfo = "userInfo";
+    public static final String tellOwnInfo = "tellOwnInfo";
     public static final String gameStarted = "gameStarted";
     public static final String gameStartsNow = "gameStartsNow";
     public static final String gameStartsSoon = "gameStartsSoon";
@@ -63,4 +64,6 @@ public interface IWebClient
         String message, int beepCount, long beepInterval, boolean windows);
 
     public void watchGameInfo(String gameId, String host, int port);
+
+    public void tellOwnInfo(String email);
 }

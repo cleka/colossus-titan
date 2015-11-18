@@ -417,4 +417,8 @@ public class CmdLineWebClient implements IWebClient
 
     }
 
+    public void tellOwnInfo(String email)
+    {
+        // TODO Auto-generated method stub
+    }
 }

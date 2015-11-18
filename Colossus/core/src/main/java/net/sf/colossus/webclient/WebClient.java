@@ -135,6 +135,7 @@ public class WebClient extends KFrame implements IWebClient
     private String login;
     private String username;
     private String password;
+    private String email;
 
     private boolean isAdmin = false;
 
@@ -3522,6 +3523,11 @@ public class WebClient extends KFrame implements IWebClient
         startSpectatorClient(gameId, port, host);
     }
 
+    public void tellOwnInfo(String email)
+    {
+        this.email = email;
+    }
+
     public void requestAttention(long when, String byUser, boolean byAdmin,
         String message, int beepCount, long beepInterval, boolean windows)
     {
@@ -3872,11 +3878,9 @@ public class WebClient extends KFrame implements IWebClient
 
     private void contactAdmin()
     {
-        String email = wcst.getUserEmail();
         contactAdminButton.setText(contactAdminButtonDisabledText);
         contactAdminButton.setEnabled(false);
-        new ContactAdminDialog(this, options, username,
-            email);
+        new ContactAdminDialog(this, options, username, email);
     }
 
     public void reEnableContactAdminButton()

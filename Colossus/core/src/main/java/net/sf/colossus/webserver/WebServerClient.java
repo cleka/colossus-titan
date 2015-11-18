@@ -712,6 +712,7 @@ public class WebServerClient implements IWebClient
             server.tellAllProposedGamesToOne(this);
             server.tellAllRunningGamesToOne(this);
             server.tellAllSuspendedGamesToOne(this);
+            tellOwnInfo(getUser().getEmail());
             server.tellLastChatMessagesToOne(this, IWebServer.generalChatName);
             server.sendMessageOfTheDayToOne(this, IWebServer.generalChatName);
             if (clientVersion < 2)
@@ -914,6 +915,11 @@ public class WebServerClient implements IWebClient
     {
         sendToClient(userInfo + sep + loggedin + sep + enrolled + sep
             + playing + sep + dead + sep + ago + sep + text);
+    }
+
+    public void tellOwnInfo(String email)
+    {
+        sendToClient(tellOwnInfo + sep + email);
     }
 
     public void gameInfo(GameInfo gi)
