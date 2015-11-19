@@ -162,6 +162,8 @@ public class WebClient extends KFrame implements IWebClient
     private final static int Watching = 5;
     // private final static int PlayingButDead = 6;
 
+    private boolean gameResumeInitiated = false;
+
     private GameInfo startingGame = null;
 
     // boundaries which port nr user may enter in the ServerPort field:
@@ -2354,10 +2356,17 @@ public class WebClient extends KFrame implements IWebClient
             case LoggedIn:
             default:
 
+                if (gameResumeInitiated)
+                {
+                    return "Resume of suspended game is ongoing";
+                }
+                if (startingGame != null)
+                {
+                    return "Resume of suspended game is ongoing";
+                }
                 if (suspGameDataModel.getRowCount() == 0)
                 {
-                    reasonWhyNot = "You don't have any suspended games.";
-                    return reasonWhyNot;
+                    return "You don't have any suspended games.";
                 }
                 reasonWhyNot = "You are not enrolled into this game.";
                 String id = getSelectedGameIdFromSuspTable();
@@ -2612,7 +2621,7 @@ public class WebClient extends KFrame implements IWebClient
         reasonWhyNotLabel
             .setText(reasonWhyCantResume == null ? "Click to resume the game game #"
                 + getSelectedGameIdFromSuspTable() + "!"
-            : reasonWhyCantResume);
+                : reasonWhyCantResume);
 
         // Chat tab
         generalChat.setLoginState(state != NotLoggedIn, server, username);
@@ -3008,7 +3017,7 @@ public class WebClient extends KFrame implements IWebClient
         return true;
     }
 
-    boolean doResume(String gameId)
+    boolean doResume(final String gameId)
     {
         resumeButton.setEnabled(false);
         startButton.setEnabled(false);
@@ -3016,10 +3025,18 @@ public class WebClient extends KFrame implements IWebClient
         cancelButton.setEnabled(false);
         unenrollButton.setEnabled(false);
         // TODO better handle with changing state, but not today...
-        infoTextLabel.setText(startClickedText);
-        String filename = "snap1434107620737_30-clemens-Split.xml";
-        server.resumeGame(gameId, filename, new User(username));
+        reasonWhyNotLabel.setText(startClickedText);
+        gameResumeInitiated = true;
 
+        SwingUtilities.invokeLater(new Runnable()
+        {
+            public void run()
+            {
+                String filename = "dummy";
+                WhatNextManager.sleepFor(2000);
+                server.resumeGame(gameId, filename, new User(username));
+            }
+        });
         return true;
     }
 
@@ -3125,6 +3142,7 @@ public class WebClient extends KFrame implements IWebClient
         if (gi != null)
         {
             gi.markStarting(new User(startUser));
+            gameResumeInitiated = false;
             startingGame = gi;
         }
         updateGUI();
@@ -3286,7 +3304,6 @@ public class WebClient extends KFrame implements IWebClient
             // but I don't want to fix even that still today...
 
             // TODO make this behave properly...
-
             infoTextLabel.setText(waitingText);
 
             setGameClient(gc);

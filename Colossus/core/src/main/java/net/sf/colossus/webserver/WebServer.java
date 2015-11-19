@@ -1775,7 +1775,7 @@ public class WebServer implements IWebServer, IRunWebServer
                     gi.setState(GameState.ENDING);
                 }
             }
-            if (suspendedGames.contains(gi))
+            else if (suspendedGames.contains(gi))
             {
                 LOGGER.log(Level.FINEST,
                     "Reaper: first removing game " + gi.getGameId()
@@ -1806,9 +1806,8 @@ public class WebServer implements IWebServer, IRunWebServer
             }
             else
             {
-                LOGGER
-                    .warning("Neither runningGames nor proposedGames contains game "
-                        + gi.getGameId());
+                LOGGER.warning("Neither proposed, running nor suspended games"
+                    + " list contains game " + gi.getGameId());
             }
         }
 
