@@ -503,12 +503,12 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         }
     }
 
-    private void ensureEdtNewBattleBoard()
+    private boolean ensureEdtNewBattleBoard()
     {
         logPerhaps("ensureEdtNewBattleBoard()");
         if (SwingUtilities.isEventDispatchThread())
         {
-            doNewBattleBoard();
+            battleBoard = doNewBattleBoard();
         }
         else
         {
@@ -517,6 +517,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             // Right now I don't dare to use invokeLater() - this way here
             // it preserves the execution order as it was without EDT,
             // but GUI stuff is one in EDT so we are safe from exceptions.
+
             Exception e = null;
             try
             {
@@ -524,7 +525,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
                 {
                     public void run()
                     {
-                        doNewBattleBoard();
+                        battleBoard = doNewBattleBoard();
                     }
 
                 });
@@ -537,23 +538,58 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             {
                 e = e2;
             }
+            catch (Exception e3)
+            {
+                client.logMsgToServer("E",
+                    "invokeAndWait caused unexpected exception "
+                        + e3.getClass().toString());
+                e = e3;
+            }
 
             if (e != null)
             {
-                String errorMessage = "Failed to run doNewBattleBoard with "
+                String errorMessage = "Caught exception for doNewBattleBoard in "
                     + "invokeAndWait(): ";
+                client.logMsgToServer("E", errorMessage);
                 LOGGER.log(Level.SEVERE, errorMessage, e);
             }
         }
+        return battleBoard != null ? true : false;
     }
 
     public void actOnInitBattle()
     {
         logPerhaps("actOnInitBattle()");
-        ensureEdtNewBattleBoard();
+        if (ensureEdtNewBattleBoard())
+        {
+            client.logMsgToServer("I", "Creating BattleBoard completed.");
+        }
+        else
+        {
+            if (ensureEdtNewBattleBoard())
+            {
+                client.logMsgToServer("W",
+                    "Creating BattleBoard completed on 2nd attempt.");
+            }
+            else
+            {
+                client.logMsgToServer("E",
+                    "Creating BattleBoard failed also in 2nd attempt.");
+                JOptionPane
+                    .showMessageDialog(
+                        board,
+                        ""
+                            + "Creating the BattleBoard failed 2 times, I am giving up! Please inform admin about this."
+                            + "\n\n"
+                            + "The application will probably not recover from this situation; try a suspend and resume,\n"
+                            + "but it would be best if you totally restart Colossus in between that.",
+                        "Bringing up BattleBoard failed!",
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
     }
 
-    private void doNewBattleBoard()
+    private BattleBoard doNewBattleBoard()
     {
         logPerhaps("doNewBattleBoard()");
         if (battleBoard != null)
@@ -562,7 +598,16 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             battleBoard.dispose();
             battleBoard = null;
         }
-        battleBoard = new BattleBoard(this, getGame().getEngagement());
+        try
+        {
+            battleBoard = new BattleBoard(this, getGame().getEngagement());
+            return battleBoard;
+        }
+        catch (Throwable e)
+        {
+            LOGGER.severe("Caught throwable " + e.getClass().toString());
+            return null;
+        }
     }
 
     private KDialog lastDialog = null;
