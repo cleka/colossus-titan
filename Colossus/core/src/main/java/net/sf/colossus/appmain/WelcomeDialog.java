@@ -28,7 +28,7 @@ public final class WelcomeDialog extends KFrame
 {
     private final static String title = "Welcome to this new Colossus Release!";
 
-    private final static String CURRENT_WELCOME_KEY = "Public-Build-20151111";
+    private final static String CURRENT_WELCOME_KEY = "Public-Test-Build-20151124";
 
     private final static String baseUrl = "http://sourceforge.net/projects/colossus/files";
     private final static String colossusReleaseNoteUrl = baseUrl + "/"
@@ -44,24 +44,21 @@ public final class WelcomeDialog extends KFrame
             + CURRENT_WELCOME_KEY
             + "!"
             + "\n\n"
-            + "  This build contains the new features that were recently added, among others:\n"
-            + "  - Inactivity Timeout/Autoplay, \n"
-            + "  - Suspend+Resume,\n"
-            + "  - Probability-based battle hits,\n"
-            + "  - Possibilty to \"Request Extra Roll\" (others must approve)\n"
-            + "  - A way to send messages to the administrator,\n"
-            + "  - Most of the options (that one could use "
-            +     "earlier only for local games) can now\n"
-            + "    also be used in webclient games;\n"
-            + "  - Notification (turn bottombar and chat yellow) when own turn starts,\n"
-            + "  - Improved webclient propose game tab layout;\n"
-            + "  - History (up/down) in chat, better handling of failed /ping commands;\n\n"
-            + ""
-            + "  A full list of all changes/improvements is in the Release Notes:\n\n     "
-            + colossusReleaseNoteUrl + "\n\n"
+            + "  Compared to last public build (20151111), some bugfixes and small improvements:\n"
+            + "  - Some changes which might prevent the no-BattleBoard-problem\n"
+            + "  - When resuming a game fails, put it back to suspended, instead of being lost\n"
+            + "  - ContactAdmin: Prefill username and mail with data from loggedin user\n"
+            + "  - Fixed: points row now really shows creature points\n"
+            + "\n"
             + "  This \"Welcome Dialog\" will only be shown once for every new release\n"
             + "  (you can find this welcome message also from the MasterBoard Help menu).\n";
 
+        /*
+            + ""
+            + "  A full list of all changes/improvements is in the Release Notes:\n\n     "
+            + colossusReleaseNoteUrl + "\n\n"
+
+         */
         JTextArea contentPanel = new JTextArea(text, 20, 60);
         contentPanel.setEditable(false);
 
