@@ -712,10 +712,13 @@ public final class Server extends Thread implements IServer
 
                 LOGGER.info("Removing clienthandler "
                     + nextCHS.getClientName()
-                    + " from clients list, list size is: " + iClients.size());
+                    + " from iClients list, list size is: " + iClients.size());
                 // For now removed, caused ConcurrentModificationException
                 // when game is closed via GUI
                 iClients.remove(nextCHS);
+                realClients.remove(nextCHS);
+                LOGGER.info("After remove, iClients size=" + iClients.size()
+                    + ", realClients size=" + realClients.size());
             }
             if (somethingToDo)
             {
