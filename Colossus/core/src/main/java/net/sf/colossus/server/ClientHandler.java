@@ -1230,13 +1230,18 @@ final class ClientHandler extends ClientHandlerStub implements IClient
         }
         */
 
-        if (obsolete || socketChannel == null || isGone)
+        if (isGone)
+        {
+            LOGGER.finest("Skipping sendToClient to player " + playerName
+                + " because isGone is already set.");
+        }
+        else if (obsolete || socketChannel == null)
         {
             // do not send any more
             if (cantSendMessageRepeated < 3)
             {
-                int flags = (isGone ? 1 : 0) | (obsolete ? 2 : 0)
-                    | (socketChannel == null ? 4 : 0);
+                int flags = (obsolete ? 1 : 0)
+                    | (socketChannel == null ? 2 : 0);
                 LOGGER.info("Attempt to send to player " + playerName
                     + " when client connection already gone (reason: " + flags
                     + ")- message: " + message);
