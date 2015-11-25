@@ -212,7 +212,8 @@ final class ClientHandler extends ClientHandlerStub implements IClient
             incompleteInput = "";
             incompleteText = "";
 
-            LOGGER.finest("Decoded string is >>>>>" + msg + "<<<<<");
+            String msg1 = msg.replaceAll("\r\n|\r|\n", "\\\\n");
+            LOGGER.finest("Decoded string is >>>>>" + msg1 + "<<<<<");
 
             int processed = 0;
 
