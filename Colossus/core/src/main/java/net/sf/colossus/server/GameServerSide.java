@@ -1415,15 +1415,15 @@ public class GameServerSide extends Game
             setupPhase();
             gameSaver.commitPointReached();
 
-            if (isAutoSavePoint())
-            {
-                autoSave();
-            }
-
             // Next, initial actions in that phase. So far, only for move.
             if (isPhase(Phase.MOVE))
             {
                 makeMovementRoll(Constants.reasonNormalRoll);
+            }
+
+            if (isAutoSavePoint())
+            {
+                autoSave();
             }
 
             // Inform Client now it's his time to act.
@@ -1582,17 +1582,13 @@ public class GameServerSide extends Game
     }
 
     /**
-     * So far, we do autosave only at begin of each players turn, i.e. when
-     * a split phase was just set up.
-     * @return Whether now is a time when autosave is due.
+     * 11/2015: Save now at begin of each phase
+     * @return Whether now is a time when autosave is due,
+     *         in practice returns ATM always true.
      */
     private boolean isAutoSavePoint()
     {
-        if (isPhase(Phase.SPLIT))
-        {
-            return true;
-        }
-        return false;
+        return true;
     }
 
     void autoSave()
@@ -3216,6 +3212,8 @@ public class GameServerSide extends Game
         server.allUpdatePlayerInfo("Mulligan");
         setupMove();
         makeMovementRoll(Constants.reasonMulligan);
+        gameSaver.commitPointReached();
+        autoSave();
         server.kickPhase();
         return player.getMovementRoll();
     }
@@ -3232,6 +3230,8 @@ public class GameServerSide extends Game
         server.allUpdatePlayerInfo("ExtraRoll");
         setupMove();
         makeMovementRoll(Constants.reasonExtraRoll);
+        gameSaver.commitPointReached();
+        autoSave();
         server.kickPhase();
         return player.getMovementRoll();
     }
