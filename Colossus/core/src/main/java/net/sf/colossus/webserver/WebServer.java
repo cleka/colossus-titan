@@ -825,6 +825,9 @@ public class WebServer implements IWebServer, IRunWebServer
                 cancelGame(gi.getGameId(), user.getName());
             }
         }
+        // if players connection broke unexpectedly, due to the exception the
+        // saveGameIsNeeded at the end of parseLine will not be done
+        saveGamesIfNeeded();
     }
 
     public void reEnrollIfNecessary(WebServerClient newclient)
