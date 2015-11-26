@@ -3085,6 +3085,7 @@ public class GameServerSide extends Game
             }
             else
             {
+                autoSave();
                 server.nextEngagement();
             }
         }

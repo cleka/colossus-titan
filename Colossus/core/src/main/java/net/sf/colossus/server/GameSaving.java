@@ -18,6 +18,7 @@ import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.EntrySide;
+import net.sf.colossus.game.Phase;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.util.BuildInfo;
 import net.sf.colossus.util.ErrorUtils;
@@ -368,8 +369,14 @@ public class GameSaving
         String infoPart = "";
         if (withInfo)
         {
+            String phaseInfo = game.getPhase().toString();
+            if (game.isPhase(Phase.FIGHT))
+            {
+                int engagementsLeft = game.findEngagements().size();
+                phaseInfo += "-" + engagementsLeft + "moreEngagements";
+            }
             infoPart = "_" + game.getTurnNumber() + "-"
-                + game.getActivePlayer() + "-" + game.getPhase();
+                + game.getActivePlayer() + "-" + phaseInfo;
         }
 
         String timeStamp = "" + date.getTime();
