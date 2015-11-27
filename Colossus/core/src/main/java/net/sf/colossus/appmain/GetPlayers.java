@@ -16,7 +16,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.Vector;
@@ -71,7 +70,7 @@ public final class GetPlayers extends KFrame
 
     private static final String loadVariant = "Load External Variant";
 
-    private static final long REMINDER_INTERVAL_DAYS = 30;
+    // private static final long REMINDER_INTERVAL_DAYS = 30;
     private final Object mutex;
     private boolean mutexNotified = false;
     private final JLabel runningOnLabel;
@@ -559,7 +558,7 @@ public final class GetPlayers extends KFrame
 
         if (SystemInfo.isOracleJava7())
         {
-            warnAboutJava7();
+            // warnAboutJava7();
         }
     }
 
@@ -1155,6 +1154,20 @@ public final class GetPlayers extends KFrame
      * I abuse String here, because I don't really want to build the whole
      * set of getter, setter, trigger, ... for long just for this one case.
      */
+
+    /*
+     * 27.11.2015: Not really relevant any more. The battleboard issue can't
+     * actually be caused by it, because there has been at least one game where
+     * both players used Java 8 and it still happened.
+     * Now retrospectively, perhaps this "fixed in java 8 but not 7" was not
+     * actually about this, but about the "do not click anything outside a
+     * modal dialog, otherwise things hang (which impacted the inactivity-
+     * autoplay warning dialog.
+     *
+     * TODO: if Options.lastJava7Warning option is found in options file,
+     * remove it.
+     */
+    /*
     private void warnAboutJava7()
     {
         long now = new Date().getTime();
@@ -1184,4 +1197,5 @@ public final class GetPlayers extends KFrame
                 JOptionPane.WARNING_MESSAGE);
         }
     }
+    */
 }
