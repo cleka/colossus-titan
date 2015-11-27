@@ -870,9 +870,16 @@ final class SocketClientThread extends Thread implements IServer,
             if (clientThread != null
                 && clientThread.isEngagementStartupOngoing())
             {
+                String itemsText = "";
                 int len = clientThread.getQueueLen();
+                if (len > 0)
+                {
+                    itemsText = "; items: "
+                        + clientThread.getQueueContentSummary();
+                }
                 logMsgToServer("I", "PingRequest #" + requestNr
-                    + ": ClientThread queue length is " + len);
+                    + ": ClientThread (" + playerName + ") queue length is "
+                    + len + itemsText);
             }
         }
         else if (method.equals(Constants.commitPoint))

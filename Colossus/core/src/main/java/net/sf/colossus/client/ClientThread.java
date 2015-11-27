@@ -95,6 +95,31 @@ public class ClientThread extends Thread implements EventExecutor
         return queue.size();
     }
 
+    /**
+     * Take the method names of all events currently in the queue, and return
+     * them as a String, separated by comma.
+     * @return String with list of method names, comma-separated
+     */
+    public String getQueueContentSummary()
+    {
+        Object items[] = queue.toArray();
+        List<String> methodNameList = new LinkedList<String>();
+        for (Object item : items)
+        {
+            if (item instanceof ServerEvent)
+            {
+                ServerEvent event = (ServerEvent)item;
+                methodNameList.add(event.getMethod());
+            }
+            else
+            {
+                methodNameList.add("<???>");
+            }
+        }
+
+        return Glob.glob(", ", methodNameList);
+    }
+
     public void disposeQueue()
     {
         // Get thread out of it's "take" waiting
