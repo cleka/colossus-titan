@@ -1101,9 +1101,9 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         }
     }
 
-    void menuSuspendGame()
+    void menuSuspendGame(boolean save)
     {
-        client.initiateSuspend();
+        client.initiateSuspend(save);
     }
 
     private void setupPlayerLabel()

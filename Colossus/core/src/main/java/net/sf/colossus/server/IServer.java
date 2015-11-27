@@ -135,7 +135,7 @@ public interface IServer
 
     public void saveGame(String filename);
 
-    public void requestToSuspendGame();
+    public void requestToSuspendGame(boolean save);
 
     public void checkServerConnection();
 

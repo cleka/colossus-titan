@@ -211,6 +211,7 @@ public final class MasterBoard extends JPanel
     private AbstractAction saveGameAction;
     private AbstractAction saveGameAsAction;
     private AbstractAction suspendGameAction;
+    private AbstractAction suspendNoSaveGameAction;
     private AbstractAction closeBoardAction;
     private AbstractAction quitGameAction;
     private AbstractAction cleanDisconnectAction;
@@ -1013,7 +1014,26 @@ public final class MasterBoard extends JPanel
                 */
                 if (proceed)
                 {
-                    gui.menuSuspendGame();
+                    gui.menuSuspendGame(true);
+                }
+            }
+        };
+
+        suspendNoSaveGameAction = new AbstractAction(
+            Constants.suspendGameNoSave)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                boolean proceed = true;
+                /*
+                if (gui.getGame().isEngagementOngoing())
+                {
+                    proceed = saveDuringEngagementDialog();
+                }
+                */
+                if (proceed)
+                {
+                    gui.menuSuspendGame(false);
                 }
             }
         };
@@ -1316,6 +1336,9 @@ public final class MasterBoard extends JPanel
         {
             mi = fileMenu.add(suspendGameAction);
             mi.setMnemonic(KeyEvent.VK_U);
+
+            mi = fileMenu.add(suspendNoSaveGameAction);
+            mi.setMnemonic(KeyEvent.VK_O);
         }
 
         fileMenu.addSeparator();

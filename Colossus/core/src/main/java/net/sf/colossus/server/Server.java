@@ -138,6 +138,7 @@ public final class Server extends Thread implements IServer
     private String guiRequestSaveFilename = null;
     private boolean inPauseState = false;
     private boolean suspendFlag = false;
+    private boolean saveBeforeSuspend = true;
 
     /* static so that new instance of Server can destroy a
      * previously allocated FileServerThread */
@@ -2890,8 +2891,9 @@ public final class Server extends Thread implements IServer
         extraRollRequest.handleExtraRollResponse(requestId, processingCH, approved);
     }
 
-    public void requestToSuspendGame()
+    public void requestToSuspendGame(boolean save)
     {
+        saveBeforeSuspend = save;
         suspendGameRequest.requestToSuspendGame();
     }
 
@@ -3483,6 +3485,11 @@ public final class Server extends Thread implements IServer
 
     public void initiateSuspendGame()
     {
+        if (saveBeforeSuspend)
+        {
+            game.saveGameWithErrorHandling("null", false);
+            saveBeforeSuspend = false;
+        }
         game.handleSuspend();
         LOGGER.info("In server: initiateSuspendGame");
         synchronized (guiRequestMutex)

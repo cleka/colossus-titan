@@ -1253,7 +1253,7 @@ final class SocketClientThread extends Thread implements IServer,
         sendToServer(Constants.saveGame + sep + filename);
     }
 
-    public void requestToSuspendGame()
+    public void requestToSuspendGame(boolean save)
     {
         sendToServer(Constants.suspendGame);
     }

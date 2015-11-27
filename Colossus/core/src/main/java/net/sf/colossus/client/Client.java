@@ -928,9 +928,9 @@ public final class Client implements IClient, IOracle, IVariant,
         localServer.initiateSaveGame(filename);
     }
 
-    public void initiateSuspend()
+    public void initiateSuspend(boolean save)
     {
-        server.requestToSuspendGame();
+        server.requestToSuspendGame(save);
     }
 
     public boolean getFailed()

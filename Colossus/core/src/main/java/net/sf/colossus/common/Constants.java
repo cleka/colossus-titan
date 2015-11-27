@@ -191,6 +191,7 @@ public final class Constants
     public static final String saveGame = "Save game";
     public static final String saveGameAs = "Save game as";
     public static final String suspendGame = "Suspend game";
+    public static final String suspendGameNoSave = "Suspend game w/o saving";
     public static final String suspendResponse = "Suspend response";
     public static final String quitGame = "Quit Application";
     public static final String closeBoard = "Close MasterBoard";
