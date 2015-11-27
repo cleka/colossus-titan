@@ -637,10 +637,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         textPanel.setBackground(color);
         dialogPanel.add(textPanel, BorderLayout.CENTER);
 
-        JLabel warningLabel = new JLabel(
-            "<html><font color='black' style='background-color:yellow'>"
-                + "Do <b>not</b> click anything else while "
-                + "this dialog is up!</b></b></font></html>");
+        JLabel warningLabel = new JLabel("");
         warningLabel.setHorizontalAlignment(JLabel.CENTER);
         dialogPanel.add(warningLabel, BorderLayout.NORTH);
 
