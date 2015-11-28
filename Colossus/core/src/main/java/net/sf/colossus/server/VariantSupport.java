@@ -294,7 +294,7 @@ public final class VariantSupport
             return CURRENT_VARIANT;
         }
 
-        LOGGER.info("Loading variant " + tempVariantName + " freshly...\n***");
+        LOGGER.info("Loading variant " + tempVariantName + " freshly...");
 
         // As long as this is static, only server may do this, not the
         // local clients.
