@@ -755,6 +755,7 @@ final class ClientHandler extends ClientHandlerStub implements IClient
             String signonTryName = args.remove(0);
             boolean remote = Boolean.valueOf(args.remove(0)).booleanValue();
             this.spectator = false;
+            int connectionId = -1;
             String buildInfo;
             if (args.size() < 2)
             {
@@ -773,10 +774,13 @@ final class ClientHandler extends ClientHandlerStub implements IClient
                     this.spectator = Boolean.valueOf(args.remove(0))
                         .booleanValue();
                 }
+                if (args.size() > 0)
+                {
+                    connectionId = Integer.parseInt(args.remove(0));
+                }
             }
-
-            String reasonFail = server.addClient(this, signonTryName, remote,
-                clientVersion, buildInfo, spectator);
+            String reasonFail = server.handleNewConnection(this, signonTryName, remote,
+                clientVersion, buildInfo, spectator, connectionId);
             if (reasonFail == null)
             {
                 sendToClient("Ack: signOn");

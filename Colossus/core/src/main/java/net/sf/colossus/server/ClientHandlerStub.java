@@ -34,6 +34,7 @@ public class ClientHandlerStub implements IClient
     private static String TRUNC_FILLER = "        ";
 
     protected Server server;
+    private int connectionId;
 
     protected static int counter = 0;
 
@@ -118,6 +119,16 @@ public class ClientHandlerStub implements IClient
     {
         // stub can, real clients depending on client version
         return true;
+    }
+
+    public int getConnectionId()
+    {
+        return this.connectionId;
+    }
+
+    public void setConnectionId(int id)
+    {
+        this.connectionId = id;
     }
 
     public void setIsGone(String reason)

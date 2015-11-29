@@ -117,6 +117,8 @@ public final class Server extends Thread implements IServer
 
     private int spectators = 0;
 
+    private int connectionIdCounter = 1;
+
     /** Server socket port. */
     private final int port;
 
@@ -1270,6 +1272,11 @@ public final class Server extends Thread implements IServer
         return false;
     }
 
+    public int getNextConnectionId()
+    {
+        return connectionIdCounter++;
+    }
+
     // Game calls this, when a new game starts and new Server is created,
     // so that old SocketServerThreads can see from this flag
     // that they shall not do anything any more
@@ -1358,17 +1365,30 @@ public final class Server extends Thread implements IServer
      * @param remote
      * @param clientVersion
      * @param spectator
+     * @param connectionId TODO
      * @return Reason why adding Client was refused, null if all is fine.
      */
-    String addClient(final ClientHandler client, final String playerName,
+    String handleNewConnection(final ClientHandler client, final String playerName,
         final boolean remote, final int clientVersion, String buildInfo,
-        boolean spectator)
+        boolean spectator, int connectionId)
     {
-        boolean isReconnect = false;
+        boolean isReconnect;
+        if (connectionId == -1)
+        {
+            connectionId = getNextConnectionId();
+            client.setConnectionId(connectionId);
+            isReconnect = false;
+        }
+        else
+        {
+            isReconnect = true;
+        }
 
-        LOGGER.info("Server.addClient() called with: " + "playerName: '"
+        LOGGER.info("Server.handleNewConnection() called with: "
+            + "playerName: '"
             + playerName + "', remote: " + remote + ", spectator: "
-            + spectator + ", client version '" + clientVersion
+            + spectator + ", reconnect: " + isReconnect + ", connectionId "
+            + connectionId + ", client version '" + clientVersion
             + "', client build info: '" + buildInfo + "'");
         if (!buildInfo.equals(BuildInfo.getFullBuildInfoString()))
         {
@@ -1381,6 +1401,32 @@ public final class Server extends Thread implements IServer
         {
             return reasonRejected;
         }
+
+        /*
+         * We can distinct several cases:
+         *   initial player (possibly dead during load?)
+         *   reconnecting alive player
+         *   fresh connecting alive player
+         *
+         *   reconnecting (now dead) player
+         *   fresh connecting (now dead) player
+         *
+         *   initial spectator
+         *   reconnecting spectator
+         *   fresh connecting spectator
+         * ------------------
+         * A different view:
+         * - initial         game start, nothing special  => joinGame
+         * - reconnect       sync data
+         * - fresh connect   re-send all data since game start
+         *
+         * - player vs. non-player
+         *      * do we need the spectator flag then?
+         *      * just based on "expected/known player name"?
+         *      * Yes: so that spectator can connect already during start?
+         *
+         * - remote vs. local     <byClient> handling? Logger?
+         */
 
         Player player = findPlayerForNewConnection(playerName, remote,
             spectator);
@@ -1406,7 +1452,8 @@ public final class Server extends Thread implements IServer
         }
         else
         {
-            // regular connect
+            LOGGER
+                .info("Regular connect for a client with name " + playerName);
         }
 
         /*
@@ -1415,6 +1462,8 @@ public final class Server extends Thread implements IServer
          */
         if ((existingCH = getClientHandlerByName(playerName)) != null)
         {
+            // A clienthandler exist: reconnect, so question is only about
+            // sync missing info.
             if (!spectator)
             {
                 othersTellReconnectOngoing(existingCH);
@@ -1469,6 +1518,11 @@ public final class Server extends Thread implements IServer
                 + " from forcedWithDrawlist. Size now "
                 + forcedWithdraws.size());
         }
+        else
+        {
+            LOGGER.info("Client connected with name " + playerName
+                + " - no CH found, creating new one.");
+        }
 
         realClients.add(client);
         if (isReconnect || !spectator)
@@ -1498,20 +1552,37 @@ public final class Server extends Thread implements IServer
             logToStartLog((remote ? "Remote" : "Local") + " player "
                 + playerName + " signed on.");
             game.getNotifyWebServer().gotClient(player.getName(), remote);
-            --waitingForClients;
-
-            LOGGER.info("Decremented waitingForPlayers (to connect) to "
-                + waitingForClients);
-
             if (waitingForClients > 0)
             {
-                String pluralS = (waitingForClients > 1 ? "s" : "");
-                logToStartLog(" ==> Waiting for " + waitingForClients
-                    + " more player client" + pluralS + " to sign on.\n");
+                --waitingForClients;
+
+                LOGGER.info("Decremented waitingForPlayers (to connect) to "
+                    + waitingForClients);
+
+                if (waitingForClients > 0)
+                {
+                    String pluralS = (waitingForClients > 1 ? "s" : "");
+                    logToStartLog(" ==> Waiting for " + waitingForClients
+                        + " more player client" + pluralS + " to sign on.\n");
+                }
+                else
+                {
+                    logToStartLog("\nGot clients for all players, game can start now.\n");
+                }
             }
             else
             {
-                logToStartLog("\nGot clients for all players, game can start now.\n");
+                if (player.isDead())
+                {
+                    LOGGER.info("Looks like dead player " + playerName
+                        + " connects 'from scratch'");
+                }
+                else
+                {
+                    LOGGER.info("Looks like alive player " + playerName
+                        + " connects 'from scratch'");
+                    System.out.println("What shall we do here... ?");
+                }
             }
         }
         else
@@ -4012,7 +4083,7 @@ public final class Server extends Thread implements IServer
             syncRequestNumber);
     }
 
-    public void joinGame(String playerName)
+    private boolean beelzeGodOk()
     {
         if (game.getVariant().getName().equals("BeelzeGods12"))
         {
@@ -4032,8 +4103,17 @@ public final class Server extends Thread implements IServer
                         + "start right away!");
                     startupProgressAbort();
                 }
-                return;
+                return false;
             }
+        }
+        return true;
+    }
+
+    public void joinGame(String playerName)
+    {
+        if (!beelzeGodOk())
+        {
+            return;
         }
 
         // @TODO: move to outside Select loop

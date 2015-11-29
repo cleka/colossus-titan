@@ -380,6 +380,7 @@ public final class Constants
     public static final String boardActive = "boardActive";
     public static final String askConfirmCatchUp = "askConfirmCatchUp";
     public static final String relayedPeerRequest = "relayedPeerRequest";
+    public static final String setConnectionId = "setConnectionId";
     public static final String gameInitInfo = "gameInitInfo";
     public static final String commitPoint = "commitPoint";
     public static final String messageFromServer = "messageFromServer";

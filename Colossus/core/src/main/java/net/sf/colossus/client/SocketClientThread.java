@@ -85,6 +85,8 @@ final class SocketClientThread extends Thread implements IServer,
 
     private int ownMessageCounter = -1;
 
+    private int connectionId = -1;
+
     public static SocketClientThread createConnection(String host, int port,
         String initialName, boolean remote, boolean spectator)
         throws ConnectionInitException
@@ -93,7 +95,7 @@ final class SocketClientThread extends Thread implements IServer,
             + " at port " + port + " for playerName " + initialName);
 
         SocketClientThread conn = new SocketClientThread(host, port,
-            initialName, remote, spectator);
+            initialName, remote, spectator, -1);
 
         String reasonFail = conn.getReasonFail();
         if (reasonFail != null)
@@ -118,6 +120,7 @@ final class SocketClientThread extends Thread implements IServer,
         IServerConnection prevConnection) throws ConnectionInitException
     {
         SocketClientThread previousConnection = (SocketClientThread)prevConnection;
+        int prevConnId = previousConnection.getConnectionId();
         String host = previousConnection.host;
         int port = previousConnection.port;
         // Must already be the real name, not a "<bySomething>" any more
@@ -130,7 +133,7 @@ final class SocketClientThread extends Thread implements IServer,
             + " at port " + port + " for playerName " + playerName);
 
         SocketClientThread newConn = new SocketClientThread(host, port,
-            playerName, remote, spectator);
+            playerName, remote, spectator, prevConnId);
         String reasonFail = newConn.getReasonFail();
         if (reasonFail != null)
         {
@@ -148,8 +151,17 @@ final class SocketClientThread extends Thread implements IServer,
         return newConn;
     }
 
+    /**
+     *
+     * @param host
+     * @param port
+     * @param initialName
+     * @param isRemote
+     * @param spectator
+     * @param prevId     Id of connection to replace, or -1 if initial
+     */
     SocketClientThread(String host, int port, String initialName,
-        boolean isRemote, boolean spectator)
+        boolean isRemote, boolean spectator, int prevId)
     {
         super("SCT-" + initialName);
 
@@ -163,6 +175,7 @@ final class SocketClientThread extends Thread implements IServer,
         this.spectator = spectator;
         this.internalSpectator = (spectator && playerName
             .equals(Constants.INTERNAL_DUMMY_CLIENT_NAME));
+        this.connectionId = prevId;
 
         InstanceTracker.register(this, "SCT " + initialName);
 
@@ -190,7 +203,6 @@ final class SocketClientThread extends Thread implements IServer,
             task = "Preparing PrintWriter";
             LOGGER.log(Level.FINEST, "Next: " + task);
             out = new PrintWriter(socket.getOutputStream(), true);
-
 
             task = "Sending signOn message";
             LOGGER.log(Level.FINEST, "Next: " + task);
@@ -385,6 +397,11 @@ final class SocketClientThread extends Thread implements IServer,
             {
                 LOGGER.fine("Got SignOn ACK: '" + line + "' - ok!");
                 signonOk = true;
+            }
+            else if (line.startsWith(Constants.setConnectionId))
+            {
+                // sets the connection id we get assigned from server.
+                parseLine(line);
             }
             else if (line.startsWith(Constants.nak))
             {
@@ -841,9 +858,7 @@ final class SocketClientThread extends Thread implements IServer,
         if (!goingDown)
         {
             List<String> li = Split.split(sep, s);
-
             String method = li.remove(0);
-
             callMethod(method, li);
         }
     }
@@ -960,6 +975,11 @@ final class SocketClientThread extends Thread implements IServer,
             clientThread.enqueue(method, args);
         }
 
+        else if (method.equals(Constants.setConnectionId))
+        {
+            this.connectionId = Integer.parseInt(args.remove(0));
+        }
+
         else if (method.equals(Constants.nak) && args.size() > 0
             && args.get(0) != null && args.get(0).equals("SignOn"))
         {
@@ -983,6 +1003,11 @@ final class SocketClientThread extends Thread implements IServer,
         // but as soon as server "fixed" our name it is SCT-<realPlayerName>
         // e.g. SCT-katzer .
         return getName();
+    }
+
+    private int getConnectionId()
+    {
+        return this.connectionId;
     }
 
     private void sendToServer(String message)
