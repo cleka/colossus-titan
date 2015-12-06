@@ -1364,7 +1364,7 @@ public final class MasterBoard extends JPanel
         mi.setMnemonic(KeyEvent.VK_R);
 
         // only for debugging/testing
-        boolean _DISCONNECT_BY_SERVER = false;
+        boolean _DISCONNECT_BY_SERVER = true;
         if (!client.isRemote() && _DISCONNECT_BY_SERVER)
         {
             mi = fileMenu.add(enforcedDisconnectByServerAction);
@@ -1425,7 +1425,7 @@ public final class MasterBoard extends JPanel
         mi = phaseMenu.add(forcedDoneWithPhaseAction);
         mi.setMnemonic(KeyEvent.VK_F);
 
-        boolean CLEMENS_TEST = true;
+        boolean CLEMENS_TEST = false;
         if (CLEMENS_TEST)
         {
             mi = phaseMenu.add(kickPhaseAction);

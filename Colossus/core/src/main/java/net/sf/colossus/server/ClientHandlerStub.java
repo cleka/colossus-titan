@@ -34,7 +34,6 @@ public class ClientHandlerStub implements IClient
     private static String TRUNC_FILLER = "        ";
 
     protected Server server;
-    private int connectionId;
 
     protected static int counter = 0;
 
@@ -121,14 +120,9 @@ public class ClientHandlerStub implements IClient
         return true;
     }
 
-    public int getConnectionId()
-    {
-        return this.connectionId;
-    }
-
     public void setConnectionId(int id)
     {
-        this.connectionId = id;
+        sendToClient(Constants.setConnectionId + sep + id);
     }
 
     public void setIsGone(String reason)

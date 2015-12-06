@@ -130,7 +130,8 @@ final class SocketClientThread extends Thread implements IServer,
         boolean spectator = previousConnection.spectator;
 
         LOGGER.info("SCT: trying recreateConnection to host " + host
-            + " at port " + port + " for playerName " + playerName);
+            + " at port " + port + " for playerName " + playerName
+            + " witgh conectionId " + prevConnId);
 
         SocketClientThread newConn = new SocketClientThread(host, port,
             playerName, remote, spectator, prevConnId);
@@ -207,7 +208,7 @@ final class SocketClientThread extends Thread implements IServer,
             task = "Sending signOn message";
             LOGGER.log(Level.FINEST, "Next: " + task);
             signOn(initialName, isRemote, IServer.CLIENT_VERSION,
-                BuildInfo.getFullBuildInfoString(), spectator);
+                BuildInfo.getFullBuildInfoString(), spectator, connectionId);
 
             task = "Waiting for signOn acknowledge";
             LOGGER.log(Level.FINEST, "Next: " + task);
@@ -978,6 +979,7 @@ final class SocketClientThread extends Thread implements IServer,
         else if (method.equals(Constants.setConnectionId))
         {
             this.connectionId = Integer.parseInt(args.remove(0));
+            LOGGER.finer("Server told me my connection id " + connectionId);
         }
 
         else if (method.equals(Constants.nak) && args.size() > 0
@@ -1048,10 +1050,10 @@ final class SocketClientThread extends Thread implements IServer,
 
     // Setup method
     private void signOn(String loginName, boolean isRemote, int version,
-        String buildInfo, boolean spectator)
+        String buildInfo, boolean spectator, int prevConnId)
     {
         out.println(Constants.signOn + sep + loginName + sep + isRemote + sep
-            + version + sep + buildInfo + sep + spectator);
+            + version + sep + buildInfo + sep + spectator + sep + prevConnId);
     }
 
     private void sendSystemInfo()

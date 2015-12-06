@@ -1124,7 +1124,7 @@ public class GameServerSide extends Game
                 return player;
             }
         }
-        LOGGER.severe("No player object found for name " + playerName + "'");
+        LOGGER.severe("No player object found for name '" + playerName + "'");
         return null;
         /*
         throw new IllegalArgumentException("No player object found for name '"

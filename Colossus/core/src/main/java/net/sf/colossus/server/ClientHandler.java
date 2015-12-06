@@ -779,8 +779,27 @@ final class ClientHandler extends ClientHandlerStub implements IClient
                     connectionId = Integer.parseInt(args.remove(0));
                 }
             }
-            String reasonFail = server.handleNewConnection(this, signonTryName, remote,
-                clientVersion, buildInfo, spectator, connectionId);
+            String reasonFail;
+            if (server.getAllInitialConnectsDone() && connectionId == -1)
+            {
+                // could also be a spectator
+                LOGGER.info("Scratch reconnect (id -1) for client "
+                    + signonTryName);
+                reasonFail = server
+                    .handleScratchReconnect(this, signonTryName, remote,
+                        clientVersion, buildInfo, spectator);
+            }
+            else
+            {
+
+                LOGGER.fine("Legacy case, connection for client "
+                    + signonTryName + ", gives connectionId " + connectionId);
+                System.out.println("Legacy case, connection for client "
+                    + signonTryName + ", gives connectionId " + connectionId);
+                reasonFail = server.handleNewConnection(this, signonTryName,
+                    remote, clientVersion, buildInfo, spectator, connectionId);
+            }
+
             if (reasonFail == null)
             {
                 sendToClient("Ack: signOn");
