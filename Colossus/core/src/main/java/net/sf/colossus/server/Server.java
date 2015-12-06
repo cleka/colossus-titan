@@ -1403,6 +1403,7 @@ public final class Server extends Thread implements IServer
         // For initial spectator connects do not add yet; server would
         // start sending data immediately.
         // RejoinGame or WatchGame do this then
+
         iClients.add(client);
 
         Player player = findPlayerForNewConnection(playerName, remote,
@@ -1422,15 +1423,15 @@ public final class Server extends Thread implements IServer
      * Add a Client.
      *
      * @param client
-     * @param playerName
+     * @param clientName
      * @param remote
      * @param clientVersion
      * @param spectator
      * @param connectionId TODO
      * @return Reason why adding Client was refused, null if all is fine.
      */
-    String handleNewConnection(final ClientHandler client, final String playerName,
-        final boolean remote, final int clientVersion, String buildInfo,
+    String handleNewConnection(ClientHandler client, String clientName,
+        boolean remote, int clientVersion, String buildInfo,
         boolean spectator, int connectionId)
     {
         boolean isReconnect;
@@ -1447,77 +1448,48 @@ public final class Server extends Thread implements IServer
 
         LOGGER.info("Server.handleNewConnection() called with: "
             + "playerName: '"
-            + playerName + "', remote: " + remote + ", spectator: "
+            + clientName + "', remote: " + remote + ", spectator: "
             + spectator + ", reconnect: " + isReconnect + ", connectionId "
             + connectionId + ", client version '" + clientVersion
             + "', client build info: '" + buildInfo + "'");
 
-        String reasonRejected = checkClientVersion(playerName, clientVersion,
+        String reasonRejected = checkClientVersion(clientName, clientVersion,
             buildInfo);
         if (reasonRejected != null)
         {
             return reasonRejected;
         }
 
-        /*
-         * We can distinct several cases:
-         *   initial player (possibly dead during load?)
-         *   reconnecting alive player
-         *   fresh connecting alive player
-         *
-         *   reconnecting (now dead) player
-         *   fresh connecting (now dead) player
-         *
-         *   initial spectator
-         *   reconnecting spectator
-         *   fresh connecting spectator
-         * ------------------
-         * A different view:
-         * - initial         game start, nothing special  => joinGame
-         * - reconnect       sync data
-         * - fresh connect   re-send all data since game start
-         *
-         * - player vs. non-player
-         *      * do we need the spectator flag then?
-         *      * just based on "expected/known player name"?
-         *      * Yes: so that spectator can connect already during start?
-         *
-         * - remote vs. local     <byClient> handling? Logger?
-         */
-
-        Player player = findPlayerForNewConnection(playerName, remote,
+        // resolves also <by......> remote connections
+        Player player = findPlayerForNewConnection(clientName, remote,
             spectator);
 
         LOGGER.info("Trying to identify player/client for new connection "
-            + "which identifies itself as player " + playerName);
+            + "which identifies itself as player " + clientName);
 
-        ClientHandler existingCH;
         if (spectator)
         {
             ++spectators;
-            LOGGER.info("Adding spectator #" + spectators + playerName);
+            LOGGER.info("Adding spectator #" + spectators + clientName);
             startFileServerIfNotRunning();
         }
         else if (player == null)
         {
             LOGGER.warning("No Player was found for non-spectator playerName "
-                + playerName + "!");
+                + clientName + "!");
             logToStartLog("NOTE: One client attempted to join with player name "
-                + playerName
+                + clientName
                 + " - rejected, because no such player is expected!");
-            return "No player with name " + playerName + " expected.";
+            return "No player with name " + clientName + " expected.";
         }
         else
         {
             LOGGER
-                .info("Regular connect for a client with name " + playerName);
+                .info("Regular connect for a client with name " + clientName);
         }
 
-        /*
-         *  The special Re-Connect case starts here:
-         *  Note: not else-if any more, since also spectators might reconnect
-         */
-        if ((existingCH = getClientHandlerByName(playerName)) != null)
+        ClientHandler existingCH = getClientHandlerByName(clientName);
+        if (existingCH != null)
         {
             // A clienthandler exist: reconnect, so question is only about
             // sync missing info.
@@ -1528,47 +1500,17 @@ public final class Server extends Thread implements IServer
             isReconnect = true;
             LOGGER.info("All right, reconnection of known client!");
             (client).cloneRedoQueue(existingCH);
-            if (player != null || existingCH.isSpectator())
-            {
-                String name;
-                if (player != null)
-                {
-                    name = player.getName();
-                    playerToClientMap.remove(player);
-                }
-                else
-                {
-                    name = playerName;
-                }
-                iClients.remove(existingCH);
-                realClients.remove(existingCH);
-                existingCH.declareObsolete();
-                queueClientHandlerForChannelChanges(existingCH);
-                removeFromForcedWithdrawsList(name);
-            }
-            else
-            {
-                LOGGER.warning("Could not add client, "
-                    + "because Player for playerName " + playerName
-                    + " had already signed on.");
-                logToStartLog("NOTE: One client attempted to join with player name "
-                    + playerName
-                    + " - rejected, because same player name already "
-                    + "joined.");
-                return "Other player with same name already connected.";
-            }
-            // TODO:  why inside if and here again? After commit compare with
-            //        and fix!
+
             iClients.remove(existingCH);
             realClients.remove(existingCH);
             queueClientHandlerForChannelChanges(existingCH);
             existingCH.declareObsolete();
-            removeFromForcedWithdrawsList(playerName);
+            removeFromForcedWithdrawsList(clientName);
         }
         else
         {
-            LOGGER.info("Client connected with name " + playerName
-                + " - no CH found, creating new one.");
+            LOGGER.info("Client with name " + clientName
+                + " connected first time; creating new ClientHandler");
         }
 
         realClients.add(client);
@@ -1597,7 +1539,7 @@ public final class Server extends Thread implements IServer
         else if (player != null)
         {
             logToStartLog((remote ? "Remote" : "Local") + " player "
-                + playerName + " signed on.");
+                + clientName + " signed on.");
             game.getNotifyWebServer().gotClient(player.getName(), remote);
             if (waitingForClients > 0)
             {
@@ -1621,12 +1563,12 @@ public final class Server extends Thread implements IServer
             {
                 if (player.isDead())
                 {
-                    LOGGER.info("Looks like dead player " + playerName
+                    LOGGER.info("Looks like dead player " + clientName
                         + " connects 'from scratch'");
                 }
                 else
                 {
-                    LOGGER.info("Looks like alive player " + playerName
+                    LOGGER.info("Looks like alive player " + clientName
                         + " connects 'from scratch'");
                     System.out.println("What shall we do here... ?");
                 }
@@ -1634,16 +1576,16 @@ public final class Server extends Thread implements IServer
         }
         else
         {
-            if (playerName.equals(Constants.INTERNAL_DUMMY_CLIENT_NAME))
+            if (clientName.equals(Constants.INTERNAL_DUMMY_CLIENT_NAME))
             {
-                logToStartLog("Internal dummy spectator (" + playerName
+                logToStartLog("Internal dummy spectator (" + clientName
                     + ") signed on.");
                 --waitingForClients;
             }
             else
             {
                 logToStartLog((remote ? "Remote" : "Local") + " spectator ("
-                    + playerName + ") signed on.");
+                    + clientName + ") signed on.");
             }
         }
 
