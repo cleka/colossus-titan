@@ -4,6 +4,7 @@ package net.sf.colossus.common;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 
@@ -388,6 +389,25 @@ public final class Constants
     public static final String requestExtraRollApproval = "requestExtraRollApproval";
     public static final String askSuspendConfirmation = "askSuspendConfirmation";
     public static final String appendToConnectionLog = "appendToConnLog";
+
+    private final static HashSet<String> skipForScratchReconnect = new HashSet<String>(
+        Arrays.asList(askPickColor, tellEngagement, tellMovementRoll, dispose,
+            removeDeadBattleChits, placeNewChit, createSummonAngel,
+            askAcquireAngel, askChooseStrikePenalty, tellGameOver, askConcede,
+            askFlee, askNegotiate, tellProposal, tellStrikeResults,
+            tellSlowResults, initBattle, cleanupBattle, nextEngagement,
+            doReinforce, setupSplit, setupMove, setupFight, setupMuster,
+            kickPhase, setupBattleSummon, setupBattleRecruit, setupBattleMove,
+            setupBattleFight, tellBattleMove, askPickFirstMarker, log, nak,
+            boardActive, askConfirmCatchUp, relayedPeerRequest,
+            setConnectionId, syncCompleted, requestExtraRollApproval,
+            askSuspendConfirmation, didMove, undidMove, "Ack: signOn",
+            pingRequest, updateCreatureCount));
+
+    public static boolean shouldSkipForScratchReconnect(String method)
+    {
+        return skipForScratchReconnect.contains(method);
+    }
 
     // engagement resolved, methods:
     public static final String erMethodFlee = "flee";

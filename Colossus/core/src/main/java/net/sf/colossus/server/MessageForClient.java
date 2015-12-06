@@ -10,6 +10,8 @@ import net.sf.colossus.common.Constants;
  */
 class MessageForClient
 {
+    private static int MAX_PRINT_LEN = 100;
+
     private final int messageNumber;
     private final int commitNumber;
     private final String message;
@@ -57,6 +59,20 @@ class MessageForClient
     public String getMessage()
     {
         return message;
+    }
+
+    public String getShortenedMessage()
+    {
+        String shortMessage;
+        if (message.length() < MAX_PRINT_LEN)
+        {
+            shortMessage = message;
+        }
+        else
+        {
+            shortMessage = message.substring(0, MAX_PRINT_LEN);
+        }
+        return shortMessage;
     }
 
     public String getMethod()
