@@ -466,6 +466,12 @@ public final class Client implements IClient, IOracle, IVariant,
 
     public void appendToConnectionLog(String s)
     {
+        // in rare cases with scratch-reconnects we might not have a gui or
+        // connection log window yet.
+        if (isReplayOngoing() || gui == null)
+        {
+            return;
+        }
         gui.appendToConnectionLog(s);
     }
 
@@ -796,7 +802,7 @@ public final class Client implements IClient, IOracle, IVariant,
         {
             gui.actOnReconnectCompleted();
         }
-        if (isSpectator() && syncRequestNumber == -1)
+        if (isSpectator() && syncRequestNumber == 0)
         {
             // this is the initial sync during connect for watching,
             // skip displaying anything

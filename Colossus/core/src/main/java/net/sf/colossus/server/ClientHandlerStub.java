@@ -4,7 +4,6 @@ package net.sf.colossus.server;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -44,6 +43,7 @@ public class ClientHandlerStub implements IClient
     protected String playerName;
     // NOTE: this "default" truncated name here should be TRUNC_LENGTH chars
     protected String truncatedPlayerName = "<notset>";
+    protected int connectionId;
 
     // sync-when-disconnected stuff
     protected int messageCounter = 0;
@@ -52,6 +52,9 @@ public class ClientHandlerStub implements IClient
     protected long pingRequestCounter = 0;
 
     protected final ArrayList<MessageForClient> redoQueue = new ArrayList<MessageForClient>(
+        100);
+
+    protected final ArrayList<MessageForClient> historyQueue = new ArrayList<MessageForClient>(
         100);
 
     // for optimization, do not re-send if exactly identical to the one sent
@@ -122,7 +125,13 @@ public class ClientHandlerStub implements IClient
 
     public void setConnectionId(int id)
     {
+        this.connectionId = id;
         sendToClient(Constants.setConnectionId + sep + id);
+    }
+
+    int getConnectionId()
+    {
+        return this.connectionId;
     }
 
     public void setIsGone(String reason)
@@ -154,7 +163,6 @@ public class ClientHandlerStub implements IClient
         messageCounter++;
     }
 
-    private int alreadyHandled = 0;
 
     protected void commitPoint()
     {
@@ -165,6 +173,13 @@ public class ClientHandlerStub implements IClient
         }
         MessageForClient mfc;
 
+        while (!redoQueue.isEmpty())
+        {
+            mfc = redoQueue.remove(0);
+            historyQueue.add(mfc);
+            writer.println(mfc.getMessage());
+        }
+        /*
         Iterator<MessageForClient> it = redoQueue.listIterator(alreadyHandled);
         while (it.hasNext())
         {
@@ -173,6 +188,7 @@ public class ClientHandlerStub implements IClient
             writer.println(msg);
             alreadyHandled++;
         }
+        */
         writer.flush();
     }
 

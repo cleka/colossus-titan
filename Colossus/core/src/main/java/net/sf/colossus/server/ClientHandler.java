@@ -19,8 +19,11 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.client.IClient;
 import net.sf.colossus.common.Constants;
+import net.sf.colossus.game.Engagement;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
+import net.sf.colossus.game.Phase;
+import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.actions.Recruitment;
 import net.sf.colossus.game.actions.Summoning;
@@ -55,6 +58,7 @@ final class ClientHandler extends ClientHandlerStub implements IClient
     private final SelectionKey selectorKey;
     private int clientVersion = 0;
     private boolean spectator;
+    private ClientHandler replacedCH = null;
 
     private String javaVersion = "not-set-yet";
     private String osInfo = "not-set-yet";
@@ -133,6 +137,34 @@ final class ClientHandler extends ClientHandlerStub implements IClient
     public boolean isSpectator()
     {
         return spectator;
+    }
+
+    /**
+     * Stores the previous clienthandler, which is now replaced by
+     * us.
+     * @param previous The clienthandler which so far held connection
+     *        to that client
+     */
+    void setReplacedCH(ClientHandler previous)
+    {
+        System.out.println("SET replaced CH: " + getConnectionId()
+            + " replaces " + previous.getConnectionId());
+        this.replacedCH = previous;
+    }
+
+    ClientHandler getReplacedCH()
+    {
+        if (replacedCH != null)
+        {
+            System.out.println("GET replaced CH for " + getConnectionId()
+                + ": id = " + replacedCH.getConnectionId());
+        }
+        else
+        {
+            System.out.println("GET replaced CH for " + getConnectionId()
+                + ": NULL? ");
+        }
+        return this.replacedCH;
     }
 
     public boolean didExplicitDisconnect()
@@ -286,6 +318,13 @@ final class ClientHandler extends ClientHandlerStub implements IClient
     {
         if (supportsReconnect())
         {
+            /*
+            if (playerName != null && playerName.equals("remote"))
+            {
+                System.out.println("client remote (id=" + getConnectionId()
+                    + ") - enqueueing: " + message);
+            }
+            */
             redoQueue.add(new MessageForClient(messageNr,
                 (isCommitPoint ? commitPointCounter : 0), message));
             messageCounter++;
@@ -329,12 +368,10 @@ final class ClientHandler extends ClientHandlerStub implements IClient
              * TODO: If we would subclass ArrayList, could use the more
              * efficient method removeRange (it is "protected")
              */
-            // int deleted = 0;
             for (int i = 0; i <= found; i++)
             {
-                // deleted++;
-                redoQueue.get(0);
-                redoQueue.remove(0);
+                MessageForClient mfc = redoQueue.remove(0);
+                historyQueue.add(mfc);
             }
         }
     }
@@ -382,7 +419,16 @@ final class ClientHandler extends ClientHandlerStub implements IClient
         commitPointCounter = oldCH.commitPointCounter;
     }
 
-    public void initRedoQueueFromStub(ClientHandlerStub stub)
+    public void cloneHistoryQueue(ClientHandler oldCH)
+    {
+        // Remove the reconnect-related messages
+        historyQueue.clear();
+        historyQueue.addAll(oldCH.historyQueue);
+        commitPointCounter = oldCH.commitPointCounter;
+    }
+
+    /*
+    public void initRedoQueueFromStub(ClientHandlerStub stub, boolean isPlayer)
     {
         boolean kickPhaseSeen = false;
 
@@ -430,13 +476,185 @@ final class ClientHandler extends ClientHandlerStub implements IClient
         LOGGER.fine("Initialized redoQueue from stub, contains now "
             + redoQueue.size() + " items!");
     }
+    */
 
-    private int newCounter = 0;
-
-    private void reEnqueue(MessageForClient mfc)
+    public void initRedoQueueFromOther(ClientHandlerStub replacedCH,
+        boolean isPlayer)
     {
-        MessageForClient newOne = new MessageForClient(mfc, newCounter);
-        newCounter++;
+        System.out
+            .println("\n______________\nInit redo queue from other, history queue has "
+                + replacedCH.historyQueue.size() + " messages!");
+
+        boolean kickPhaseSeen = false;
+
+        historyQueue.clear();
+        redoQueue.clear();
+
+        for (MessageForClient mfc : replacedCH.historyQueue)
+        {
+            String method = mfc.getMethod();
+            // System.out.println("REDO: " + method);
+            if (method.equals(Constants.kickPhase))
+            {
+                kickPhaseSeen = true;
+            }
+
+            if (method.equals(Constants.initBoard))
+            {
+                int maxTurn = server.getGame().getTurnNumber();
+                String replayOn = Constants.replayOngoing + sep + true + sep
+                    + maxTurn;
+                reEnqueueRedo(new MessageForClient(0, 0, replayOn));
+                reEnqueueRedo(mfc);
+                /*
+                if (isPlayer)
+                {
+                    String color = server.getGame()
+                        .getPlayerByName(playerName).getShortColor();
+                    String setColorMessage = Constants.setColor + sep + color;
+                    reEnqueueRedo(new MessageForClient(0, 0, setColorMessage));
+                }
+                */
+            }
+
+            // Only the first updatePlayerInfo is needed to give clients
+            // all initial data.
+            else if (kickPhaseSeen
+                && method.equals(Constants.updatePlayerInfo))
+            {
+                // skip
+            }
+            else if (Constants.shouldSkipForScratchReconnect(method))
+            {
+                // System.out.println("Clone - SKIP: " + method);
+            }
+            else
+            {
+                reEnqueueRedo(mfc);
+            }
+        }
+
+        /**
+         * Completed turns are now handled. Now the stuff to "Redo" in the
+         * current phase.
+         */
+        ArrayList<MessageForClient> leftToDoQueue = new ArrayList<MessageForClient>(
+            100);
+
+        for (MessageForClient mfc : replacedCH.redoQueue)
+        {
+            String method = mfc.getMethod();
+            if (method.equals(Constants.updateCreatureCount)
+                || method.equals(Constants.askConfirmCatchUp)
+                || method.equals(Constants.redoOngoing)
+                || method.equals(Constants.replayOngoing)
+                || method.equals(Constants.appendToConnectionLog))
+            {
+                // drop this
+            }
+            else
+            {
+                //System.out.println("PUT TO LEFT TO DO: " + mfc.getShortenedMessage());
+                leftToDoQueue.add(mfc);
+            }
+        }
+
+        if (isPlayer)
+        {
+            redoForPlayer(leftToDoQueue);
+        }
+        else
+        {
+            redoForSpectator(leftToDoQueue);
+        }
+
+        enqeueExtra(Constants.replayOngoing + sep + false + sep + 0);
+        enqeueExtra(Constants.kickPhase);
+
+        LOGGER.fine("Initialized redoQueue from previous CH, contains now "
+            + redoQueue.size() + " items!");
+    }
+
+    private void redoForPlayer(ArrayList<MessageForClient> leftToDoQueue)
+    {
+        GameServerSide game = server.getGame();
+        Player player = game.getPlayerByName(playerName);
+        Player activePlayer = game.getActivePlayer();
+
+        Engagement eng = game.getEngagement();
+
+        if (eng != null
+            && (player.equals(game.getDefender()) || player.equals(game
+                .getAttacker())))
+        {
+            System.out
+                .println("\n!!!!!!!!!!!!!!!!!\nInvolved into ongoing engagement, not implemented.");
+        }
+
+        else if (player.equals(activePlayer))
+        {
+            // System.out.println("\n******************\nNow handling current turn");
+            for (MessageForClient mfc : leftToDoQueue)
+            {
+                LOGGER.finer("LTDQ: " + mfc.getShortenedMessage());
+                // System.out.println("LTDQ: " + mfc.getShortenedMessage());
+            }
+
+            Phase phase = game.getPhase();
+            if (phase.equals(Phase.FIGHT))
+            {
+                LOGGER.warning("Scratchconnect redoQueue, redo for fightphase might not work yet.");
+                LOGGER.warning("RedoQueue contains " + redoQueue.size()
+                    + " items.");
+            }
+
+            enqeueExtra(Constants.redoOngoing + sep + true);
+            for (MessageForClient mfc : leftToDoQueue)
+            {
+                reEnqueueRedo(mfc);
+                reEnqueueHistory(mfc);
+            }
+        }
+
+        else
+        {
+            // ok, that's simple, basically same as spectator
+            enqeueExtra(Constants.redoOngoing + sep + true);
+            redoForSpectator(leftToDoQueue);
+            enqeueExtra(Constants.redoOngoing + sep + false);
+        }
+    }
+
+    private void redoForSpectator(ArrayList<MessageForClient> leftToDoQueue)
+    {
+        for (MessageForClient mfc : leftToDoQueue)
+        {
+            reEnqueueRedo(mfc);
+        }
+    }
+
+    private void enqeueExtra(String message)
+    {
+        reEnqueueRedo(new MessageForClient(0, 0, message));
+    }
+
+    private int newCounterHistory = 0;
+    private int newCounterRedo = 0;
+
+    private void reEnqueueHistory(MessageForClient mfc)
+    {
+        // System.out.println("reEnqeue: " + mfc.getShortenedMessage());
+        LOGGER.finest("Putting to historyqueue: " + mfc.getShortenedMessage());
+        MessageForClient newOne = new MessageForClient(mfc,
+            newCounterHistory++);
+        historyQueue.add(newOne);
+    }
+
+    private void reEnqueueRedo(MessageForClient mfc)
+    {
+        // System.out.println("reEnqeue: " + mfc.getShortenedMessage());
+        LOGGER.finest("Putting to redo queue: " + mfc.getShortenedMessage());
+        MessageForClient newOne = new MessageForClient(mfc, newCounterRedo++);
         redoQueue.add(newOne);
     }
 
@@ -460,9 +678,14 @@ final class ClientHandler extends ClientHandlerStub implements IClient
             int queueMsgNr = mfc.getMessageNr();
             if (queueMsgNr > lastReceivedMessageNr)
             {
+                // System.out.println(i + "");
                 String message = mfc.getMessage();
                 sendViaChannelRaw(message);
                 messageCounter = queueMsgNr;
+            }
+            else
+            {
+                // System.out.println("(" + i + ")");
             }
         }
         commitPoint();
@@ -779,6 +1002,7 @@ final class ClientHandler extends ClientHandlerStub implements IClient
                     connectionId = Integer.parseInt(args.remove(0));
                 }
             }
+
             String reasonFail;
             if (server.getAllInitialConnectsDone() && connectionId == -1)
             {
@@ -791,7 +1015,6 @@ final class ClientHandler extends ClientHandlerStub implements IClient
             }
             else
             {
-
                 LOGGER.fine("Legacy case, connection for client "
                     + signonTryName + ", gives connectionId " + connectionId);
                 System.out.println("Legacy case, connection for client "
@@ -823,7 +1046,7 @@ final class ClientHandler extends ClientHandlerStub implements IClient
                 return;
             }
             LOGGER.info("Received joinGame from client " + signonName);
-            setPlayerName(signonName);
+            this.playerName = signonName;
             server.joinGame(signonName);
         }
 
@@ -1238,21 +1461,24 @@ final class ClientHandler extends ClientHandlerStub implements IClient
     {
         enqueueToRedoQueue(messageCounter, message);
 
-        /*
+
         // For development purposes... remove when done:
+        /*
+
         List<String> li = Split.split(sep, message);
         String method = li.get(0);
-
-        if (isSpectator())
+        if (playerName != null && playerName.equals("remote"))
         {
-            System.out.println("-->" + method);
-        }
-        else if (getClientName().equals("remote"))
-        {
-            System.out.println("==>" + method);
+            if (isSpectator())
+            {
+                System.out.println("-->" + method);
+            }
+            else if (getClientName().equals("remote"))
+            {
+                System.out.println("==>" + method);
+            }
         }
         */
-
         /*
         if (isGone())
         {

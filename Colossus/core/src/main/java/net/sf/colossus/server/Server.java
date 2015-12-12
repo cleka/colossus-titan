@@ -1,5 +1,6 @@
 package net.sf.colossus.server;
 
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -456,6 +457,25 @@ public final class Server extends Thread implements IServer
         clientStub = new ClientHandlerStub(this, "clientHandlerStub");
         // it's an IClient, but not a real ClientHandler:
         iClients.add(clientStub);
+        displayIClients();
+    }
+
+    private void displayIClients()
+    {
+        System.out.println("iClients contains now " + iClients.size()
+            + " clients.");
+        for (IClient c : iClients)
+        {
+            if (c instanceof ClientHandler)
+            {
+                int id = ((ClientHandler)c).getConnectionId();
+                System.out.println("* " + id);
+            }
+            else
+            {
+                System.out.println("* Stub");
+            }
+        }
     }
 
     public ClientHandler getProcessingCH()
@@ -479,6 +499,7 @@ public final class Server extends Thread implements IServer
     {
         return realClients;
     }
+
     public void waitOnSelector(int timeout, boolean stillWaitingForClients)
     {
         try
@@ -725,8 +746,9 @@ public final class Server extends Thread implements IServer
                     LOGGER.info("Handling channel changes, stub.");
                 }
 
-                LOGGER.info("Removing clienthandler "
-                    + nextCHS.getClientName()
+                LOGGER.info("Channel Changes, removing clienthandler "
+                    + nextCHS.getClientName() + ", connectionId "
+                    + nextCHS.getConnectionId()
                     + " from iClients list, list size is: " + iClients.size());
                 // For now removed, caused ConcurrentModificationException
                 // when game is closed via GUI
@@ -1369,9 +1391,21 @@ public final class Server extends Thread implements IServer
             && getPlayer().equals(game.getBattleSS().getBattleActivePlayer());
     }
 
-    String handleScratchReconnect(ClientHandler client,
-        String playerName, boolean remote, int clientVersion, String buildInfo,
-        boolean spectator)
+    /**
+     * This is a connect-from-scratch, i.e. after all initial had already
+     * connected somebody connects with an "empty" client, needs to get
+     * all data since game start re-send.
+     *
+     * @param client
+     * @param clientName
+     * @param remote
+     * @param clientVersion
+     * @param buildInfo
+     * @param spectator
+     * @return  Reason why failed, or null if successful
+     */
+    String handleScratchReconnect(ClientHandler client, String clientName,
+        boolean remote, int clientVersion, String buildInfo, boolean spectator)
     {
         boolean isReconnect = false;
 
@@ -1379,41 +1413,44 @@ public final class Server extends Thread implements IServer
         client.setConnectionId(connectionId);
 
         LOGGER.info("Server.handlePlayerScratchReconnect() called with: "
-            + "playerName: '" + playerName + "', remote: " + remote
+            + "clientName: '" + clientName + "', remote: " + remote
             + ", spectator: " + spectator + ", reconnect: " + isReconnect
             + ", connectionId now " + connectionId + ", client version '"
             + clientVersion + "', client build info: '" + buildInfo + "'");
 
         warnIfDifferentBuild(buildInfo);
 
-        /*
-        ClientHandler existingCH = (ClientHandler)playerToClientMap
-            .get(playerName);
-        */
 
+        ClientHandler existingCH = getClientHandlerByName(clientName);
+
+        // A clienthandler exist: reconnect, so question is only about
+        // sync missing info.
         if (!spectator)
         {
-            othersTellReconnectOngoing(client);
+            othersTellReconnectOngoing(existingCH);
         }
 
-        removeFromForcedWithdrawsList(playerName);
+        detachReplacedClient(existingCH);
+        processingCH.setReplacedCH(existingCH);
+        removeFromForcedWithdrawsList(clientName);
 
         realClients.add(client);
 
-        // For initial spectator connects do not add yet; server would
-        // start sending data immediately.
+        // For initial (re-) connects during the game do not add yet;
+        // server would start sending data immediately.
         // RejoinGame or WatchGame do this then
 
-        iClients.add(client);
+        // iClients.add(client);
 
-        Player player = findPlayerForNewConnection(playerName, remote,
+        Player player = findPlayerForNewConnection(clientName, remote,
             spectator);
-
-        playerToClientMap.put(player, client);
-
-        if (remote)
+        if (player != null)
         {
-            addRemoteClient(client, player);
+            playerToClientMap.put(player, client);
+            if (remote)
+            {
+                addRemoteClient(client, player);
+            }
         }
 
         return null;
@@ -1428,30 +1465,32 @@ public final class Server extends Thread implements IServer
      * @param clientVersion
      * @param spectator
      * @param connectionId TODO
+     * @param isReconnect TODO
      * @return Reason why adding Client was refused, null if all is fine.
      */
     String handleNewConnection(ClientHandler client, String clientName,
         boolean remote, int clientVersion, String buildInfo,
         boolean spectator, int connectionId)
     {
+        System.out
+            .println("handleNewConn, called with connId " + connectionId);
         boolean isReconnect;
         if (connectionId == -1)
         {
-            connectionId = getNextConnectionId();
-            client.setConnectionId(connectionId);
             isReconnect = false;
         }
         else
         {
             isReconnect = true;
         }
+        connectionId = getNextConnectionId();
+        client.setConnectionId(connectionId);
 
         LOGGER.info("Server.handleNewConnection() called with: "
-            + "playerName: '"
-            + clientName + "', remote: " + remote + ", spectator: "
-            + spectator + ", reconnect: " + isReconnect + ", connectionId "
-            + connectionId + ", client version '" + clientVersion
-            + "', client build info: '" + buildInfo + "'");
+            + "playerName: '" + clientName + "', remote: " + remote
+            + ", spectator: " + spectator + ", reconnect: " + isReconnect
+            + ", connectionId " + connectionId + ", client version '"
+            + clientVersion + "', client build info: '" + buildInfo + "'");
 
         String reasonRejected = checkClientVersion(clientName, clientVersion,
             buildInfo);
@@ -1491,7 +1530,6 @@ public final class Server extends Thread implements IServer
         ClientHandler existingCH = getClientHandlerByName(clientName);
         if (existingCH != null)
         {
-            // A clienthandler exist: reconnect, so question is only about
             // sync missing info.
             if (!spectator)
             {
@@ -1499,12 +1537,9 @@ public final class Server extends Thread implements IServer
             }
             isReconnect = true;
             LOGGER.info("All right, reconnection of known client!");
-            (client).cloneRedoQueue(existingCH);
-
-            iClients.remove(existingCH);
-            realClients.remove(existingCH);
-            queueClientHandlerForChannelChanges(existingCH);
-            existingCH.declareObsolete();
+            // (client).cloneRedoQueue(existingCH);
+            detachReplacedClient(existingCH);
+            processingCH.setReplacedCH(existingCH);
             removeFromForcedWithdrawsList(clientName);
         }
         else
@@ -1519,6 +1554,7 @@ public final class Server extends Thread implements IServer
             // For initial spectator connects do not add yet; server would
             // start sending data immediately.
             iClients.add(client);
+            displayIClients();
         }
 
         if (player != null)
@@ -1591,6 +1627,28 @@ public final class Server extends Thread implements IServer
 
         // ReasonFail == null means "everything is fine.":
         return null;
+    }
+
+    private void detachReplacedClient(ClientHandler existingCH)
+    {
+        iClients.remove(existingCH);
+        realClients.remove(existingCH);
+        System.out.println("iClients contains now " + iClients.size()
+            + " clients.");
+        for (IClient c : iClients)
+        {
+            if (c instanceof ClientHandler)
+            {
+                int id = ((ClientHandler)c).getConnectionId();
+                System.out.println("* " + id);
+            }
+            else
+            {
+                System.out.println("* Stub");
+            }
+        }
+        queueClientHandlerForChannelChanges(existingCH);
+        existingCH.declareObsolete();
     }
 
     private void removeFromForcedWithdrawsList(String name)
@@ -1918,7 +1976,8 @@ public final class Server extends Thread implements IServer
                     + " illegally called doneWithBattleMoves(): battle active player is "
                     + battle.getBattleActivePlayer());
             LOGGER.info(processingCH.dumpLastProcessedLines());
-            getClient(getPlayer()).nak(Constants.doneWithBattleMoves,
+            getClient(getPlayer()).nak(
+                Constants.doneWithBattleMoves,
                 "Illegal attempt to end phase battle-move: battle active player is "
                     + battle.getBattleActivePlayer());
             return;
@@ -2182,7 +2241,15 @@ public final class Server extends Thread implements IServer
             // no need/use to inform the troubled one itself...
             if (client != chInTrouble)
             {
+                System.out.println("aTLC, client " + client.getClientName()
+                    + "(id=" + client.getConnectionId() + "): " + message);
                 client.appendToConnectionLog(message);
+            }
+            else
+            {
+                System.out.println("aTLC, SKIPPING client "
+                    + client.getClientName() + "(id="
+                    + client.getConnectionId() + "): " + message);
             }
         }
     }
@@ -2479,8 +2546,7 @@ public final class Server extends Thread implements IServer
                 client.nak(Constants.doRecruit, "Illegal recruit, reason: "
                     + reason);
             }
-            else if (legion.hasMoved()
-                || game.getPhase() == Phase.FIGHT)
+            else if (legion.hasMoved() || game.getPhase() == Phase.FIGHT)
             {
                 ((LegionServerSide)legion).sortCritters();
                 if (recruit != null)
@@ -3004,7 +3070,8 @@ public final class Server extends Thread implements IServer
 
     public void extraRollResponse(boolean approved, int requestId)
     {
-        extraRollRequest.handleExtraRollResponse(requestId, processingCH, approved);
+        extraRollRequest.handleExtraRollResponse(requestId, processingCH,
+            approved);
     }
 
     public void requestToSuspendGame(boolean save)
@@ -4167,13 +4234,25 @@ public final class Server extends Thread implements IServer
      */
     public void rejoinGame()
     {
-        LOGGER.info("Got: rejoinGame from CH " + processingCH.getClientName());
-        processingCH.initRedoQueueFromStub(clientStub);
+        ClientHandler replacedCH = processingCH.getReplacedCH();
+        if (replacedCH == null)
+        {
+            LOGGER.warning("Rejoining game, but replacedCH is null?");
+            System.out.println("Rejoin gamereplaced ch is null?");
+            return;
+        }
+
+        LOGGER.info("Got: rejoinGame from CH " + processingCH.getClientName()
+            + " to replace previous connection with id " + "???"
+            + " and name " + replacedCH.getPlayerName());
+        processingCH.initRedoQueueFromOther(replacedCH, true);
         iClients.add(processingCH);
-        processingCH.syncAfterReconnect(-1, -1);
+        displayIClients();
+        processingCH.syncAfterReconnect(-1, 0);
         processingCH.updatePlayerInfo(getPlayerInfo(false));
+
         // Technically totally unnecessary to re-send it to all
-        // (only the new watcher needs it), but it's much easier this way
+        // (only the new client needs it), but it's much easier this way
         // at least at the moment...
         game.updateCaretakerDisplays();
     }
@@ -4181,9 +4260,10 @@ public final class Server extends Thread implements IServer
     public void watchGame()
     {
         LOGGER.info("Got: watchGame from CH " + processingCH.getClientName());
-        processingCH.initRedoQueueFromStub(clientStub);
+        processingCH.initRedoQueueFromOther(clientStub, false);
         iClients.add(processingCH);
-        processingCH.syncAfterReconnect(-1, -1);
+        displayIClients();
+        processingCH.syncAfterReconnect(-1, 0);
         processingCH.updatePlayerInfo(getPlayerInfo(false));
         // Technically totally unnecessary to re-send it to all
         // (only the new watcher needs it), but it's much easier this way

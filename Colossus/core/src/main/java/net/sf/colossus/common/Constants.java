@@ -391,7 +391,7 @@ public final class Constants
     public static final String appendToConnectionLog = "appendToConnLog";
 
     private final static HashSet<String> skipForScratchReconnect = new HashSet<String>(
-        Arrays.asList(askPickColor, tellEngagement, tellMovementRoll, dispose,
+        Arrays.asList(askPickColor, tellEngagement, dispose,
             removeDeadBattleChits, placeNewChit, createSummonAngel,
             askAcquireAngel, askChooseStrikePenalty, tellGameOver, askConcede,
             askFlee, askNegotiate, tellProposal, tellStrikeResults,
@@ -402,7 +402,8 @@ public final class Constants
             boardActive, askConfirmCatchUp, relayedPeerRequest,
             setConnectionId, syncCompleted, requestExtraRollApproval,
             askSuspendConfirmation, didMove, undidMove, "Ack: signOn",
-            pingRequest, updateCreatureCount));
+            pingRequest, updateCreatureCount, tellWhatsHappening, commitPoint,
+            gameInitInfo, replayOngoing, redoOngoing));
 
     public static boolean shouldSkipForScratchReconnect(String method)
     {
