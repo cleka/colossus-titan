@@ -39,6 +39,7 @@ import net.sf.colossus.game.actions.AddCreatureAction;
 import net.sf.colossus.game.actions.EditAddCreature;
 import net.sf.colossus.game.actions.Summoning;
 import net.sf.colossus.server.BattleServerSide.AngelSummoningStates;
+import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.InstanceTracker;
 import net.sf.colossus.util.ViableEntityManager;
 import net.sf.colossus.variant.BattleHex;
@@ -907,7 +908,7 @@ public class GameServerSide extends Game
         }
         LOGGER.info(player + " chooses color " + color);
         ((PlayerServerSide)player).initMarkersAvailable();
-        server.allUpdatePlayerInfo("AssignColor");
+        server.allUpdatePlayerInfo(false, "AssignColor");
         server.askPickFirstMarker(player);
     }
 
@@ -2416,6 +2417,12 @@ public class GameServerSide extends Game
         {
             LOGGER.log(Level.SEVERE, "Marker " + childId
                 + " is not available.");
+            String available = Glob.glob(",", player.getMarkersAvailable());
+            String notAvail = Glob.glob(",", player.getMarkersUsed());
+
+            LOGGER.warning("Available: " + available + ": not available "
+                + notAvail);
+
             return false;
         }
 

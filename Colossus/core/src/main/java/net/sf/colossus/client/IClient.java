@@ -34,8 +34,7 @@ public interface IClient
 
     public void updatePlayerInfo(List<String> infoStrings);
 
-    public void updateOnePlayersInfo(boolean redundant, String reason,
-        String shortInfoString);
+    public void updateChangedPlayerValues(String valuesString, String reason);
 
     public void setColor(PlayerColor color);
 
@@ -189,4 +188,7 @@ public interface IClient
     public void requestExtraRollApproval(String requestorName, int requestId);
 
     public void askSuspendConfirmation(String requestorName, int timeout);
+
+    public boolean canHandleChangedValuesOnlyStyle();
+
 }

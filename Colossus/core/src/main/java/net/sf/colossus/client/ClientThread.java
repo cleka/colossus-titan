@@ -342,6 +342,12 @@ public class ClientThread extends Thread implements EventExecutor
             List<String> infoStrings = Split.split(Glob.sep, args.remove(0));
             client.updatePlayerInfo(infoStrings);
         }
+        else if (method.equals(Constants.updateChangesValues))
+        {
+            String valuesString = args.remove(0);
+            String reason = args.remove(0);
+            client.updateChangedPlayerValues(valuesString, reason);
+        }
         else if (method.equals(Constants.setColor))
         {
             String colorName = args.remove(0);

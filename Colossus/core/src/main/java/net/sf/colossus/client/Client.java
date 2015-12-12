@@ -1175,10 +1175,18 @@ public final class Client implements IClient, IOracle, IVariant,
         gui.updateStatusScreen();
     }
 
-    public void updateOnePlayersInfo(boolean redundant, String reason,
-        String ShouldBeSeveralSeparateVariablesHerePerhaps)
+    public boolean canHandleChangedValuesOnlyStyle()
     {
-        // still to do ...
+        // Dummy, only to satisfy the interface
+        return true;
+    }
+
+    public void updateChangedPlayerValues(String valuesString, String reason)
+    {
+        LOGGER.finest("Updating values: " + valuesString + "(reason: "
+            + reason + ")");
+        game.updatePlayerValues(valuesString);
+        gui.updateStatusScreen();
     }
 
     public PlayerClientSide getOwningPlayer()
@@ -2152,6 +2160,20 @@ public final class Client implements IClient, IOracle, IVariant,
     {
         LOGGER.log(Level.WARNING, owningPlayer.getName() + " got nak for "
             + reason + " " + errmsg);
+        if (reason.startsWith("doSplit"))
+        {
+            LOGGER.warning("NAK: " + reason);
+            String available = Glob.glob(",",
+                owningPlayer.getMarkersAvailable());
+            String notAvail = Glob.glob(",", owningPlayer.getMarkersUsed());
+
+            LOGGER.warning("Available: " + available + ": not available "
+                + notAvail);
+        }
+        else
+        {
+            LOGGER.warning("other NAK,reason: " + reason);
+        }
         recoverFromNak(reason, errmsg);
     }
 
@@ -3748,7 +3770,8 @@ public final class Client implements IClient, IOracle, IVariant,
      */
     public void doSplit(Legion parent)
     {
-        LOGGER.log(Level.FINER, "Client.doSplit " + parent);
+        LOGGER.log(Level.FINER,
+            "Client.doSplit, marker=" + parent.getMarkerId());
 
         if (!isMyTurn())
         {
@@ -3769,11 +3792,14 @@ public final class Client implements IClient, IOracle, IVariant,
         // Need a legion marker to split.
         if (markersAvailable.size() < 1)
         {
+            LOGGER.finer("no legion markers");
             gui.showMessageDialogAndWait("No legion markers");
             // TODO is this useful here?
             kickSplit();
             return;
         }
+        LOGGER.finest("Legion markers: " + markersAvailable.size());
+
         // Legion must be tall enough to split.
         if (parent.getHeight() < 4)
         {
@@ -3807,23 +3833,24 @@ public final class Client implements IClient, IOracle, IVariant,
     {
         if (childId != null)
         {
-            List<CreatureType> results = gui
+            List<CreatureType> crestures = gui
                 .doPickSplitLegion(parent, childId);
 
-            if (results != null)
+            if (crestures != null)
             {
-                doSplit(parent, childId, results);
+                doSplit(parent, childId, crestures);
             }
         }
     }
 
     /** Called by AI and by doSplit() */
     public void doSplit(Legion parent, String childMarkerId,
-        List<CreatureType> results)
+        List<CreatureType> creatures)
     {
-        LOGGER.log(Level.FINER, "Client.doSplit " + parent + " "
-            + childMarkerId + " " + Glob.glob(",", results));
-        server.doSplit(parent, childMarkerId, results);
+        LOGGER.log(Level.FINER,
+            "Client.doSplit: parent='" + parent.getMarkerId() + "', child='"
+                + childMarkerId + "', splitoffs=" + Glob.glob(",", creatures));
+        server.doSplit(parent, childMarkerId, creatures);
     }
 
     /**

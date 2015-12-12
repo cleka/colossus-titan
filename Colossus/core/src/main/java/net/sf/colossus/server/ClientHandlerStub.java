@@ -114,6 +114,12 @@ public class ClientHandlerStub implements IClient
         return true;
     }
 
+    public boolean canHandleChangedValuesOnlyStyle()
+    {
+        // stub can, real clients depending on client version
+        return true;
+    }
+
     public void setIsGone(String reason)
     {
         LOGGER.info("Setting isGone to true in CH for '" + getClientName()
@@ -229,21 +235,13 @@ public class ClientHandlerStub implements IClient
     }
 
     /**
-     * A new way to pass changed player info to clients.
-     * Shortened info (e.g. color, dead state, ...) not sent every time;
-     * Includes a reason why sent (mostly used internally on server side
-     * for debugging/development purposes),
-     * and a flag whether this info should be redundant; idea behind it:
-     * on the long run, clients should be able to update game/player info
-     * "autonomously" (same logic implemented on client as on server)
-     * instead of server doing it and synching to all clients.
-     * So this redundant is meant to be used as safety net to detect
-     * where that new approach might miss something.
+     * Send an update of the frequently changing values. One message for each
+     * player.
      */
-    public void updateOnePlayersInfo(boolean redundant, String reason,
-        String ShouldBeSeveralSeparateVariablesHerePerhaps)
+    public void updateChangedPlayerValues(String changedValues, String reason)
     {
-        // TODO: this is not implemented yet at all...
+        sendToClient(Constants.updateChangesValues + sep + changedValues + sep
+            + reason);
     }
 
     public void setColor(PlayerColor color)

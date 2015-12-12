@@ -100,6 +100,24 @@ public final class PlayerClientSide extends Player
         }
     }
 
+    public void updateValues(boolean isDead, String eliminatedPlayers,
+        int score, int mulligansLeft, String freeMarkers)
+    {
+        setDead(isDead);
+        setPlayersElim(eliminatedPlayers);
+        setScore(score);
+        setMulligansLeft(mulligansLeft);
+        clearMarkersAvailable();
+        List<String> markerIds = Split.split(",", freeMarkers);
+        if (!freeMarkers.equals(""))
+        {
+            for (String markerId : markerIds)
+            {
+                addMarkerAvailable(markerId);
+            }
+        }
+    }
+
     public PredictSplits getPredictSplits()
     {
         return predictSplits;

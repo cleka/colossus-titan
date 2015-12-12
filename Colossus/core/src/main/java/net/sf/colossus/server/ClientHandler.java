@@ -368,6 +368,12 @@ final class ClientHandler extends ClientHandlerStub implements IClient
         return clientVersion >= IServer.CLIENT_VERSION_CAN_SUSPEND;
     }
 
+    @Override
+    public boolean canHandleChangedValuesOnlyStyle()
+    {
+        return clientVersion >= IServer.CLIENT_VERSION_NEW_PLAYER_INFO;
+    }
+
     public void cloneRedoQueue(ClientHandler oldCH)
     {
         // Remove the reconnect-related messages

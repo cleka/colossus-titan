@@ -27,6 +27,7 @@ public interface IServer
     public static final int CLIENT_VERSION_INACTIVITY_TIMEOUT = 6;
     public static final int CLIENT_VERSION_REQUEST_ROLL = 7;
     public static final int CLIENT_VERSION_CAN_SUSPEND = 8;
+    public static final int CLIENT_VERSION_NEW_PLAYER_INFO = 9;
 
     // New in version 2: replies to pingRequest
     // New in version 3: ability to reconnect (simple case only, so far)
@@ -34,7 +35,9 @@ public interface IServer
     // New in version 5: Client always fetches xml files from server
     // New in version 6: AI kicks in after too long inactivity
     // New in version 7: Client can ask user to approve/deny extra roll request
-    public static final int CLIENT_VERSION = CLIENT_VERSION_CAN_SUSPEND;
+    // New in version 8: Client can ask user to approve/deny suspend request
+    // New in version 9: Server sends only changed information
+    public static final int CLIENT_VERSION = CLIENT_VERSION_NEW_PLAYER_INFO;
 
     // Clients that do not send version yet at all, are treated as version -1.
     // For those, even show on server side an error dialog and refuse them to

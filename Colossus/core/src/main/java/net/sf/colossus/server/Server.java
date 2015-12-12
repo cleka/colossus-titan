@@ -1758,9 +1758,44 @@ public final class Server extends Thread implements IServer
         }
     }
 
+    /**
+     * Sends changed player information/values to all clients.
+     * To new enough clients it uses the optimized form:
+     * - data for each player on it's own line (message)
+     * - only for players where actually anything has changed
+     * - the line contains only the frequently changing values like isDead,
+     *   score, free markers. See Player.getChangedPlayerValues().
+     *
+     * To older clients it sends the data in the old way, where one
+     * line contains always all information about each player.
+     *
+     * @param reason  Reason what triggered this sending
+     */
+    void allUpdateChangedPlayerValues(String reason)
+    {
+        LOGGER.finest("AllUpdateChangedPlayerValues, reason " + reason);
+        List<String> changedValuesStrings = getChangedPlayerValues();
+        List<String> fullInfo = getPlayerInfo(false);
+        for (IClient client : iClients)
+        {
+            if (client.canHandleChangedValuesOnlyStyle())
+            {
+                for (String valuesString : changedValuesStrings)
+                {
+                    client.updateChangedPlayerValues(valuesString, reason);
+                }
+            }
+            else
+            {
+                client.updatePlayerInfo(fullInfo);
+            }
+         }
+     }
+
     void allUpdatePlayerInfo(String reason)
     {
-        allUpdatePlayerInfo(false, reason);
+        allUpdateChangedPlayerValues(reason);
+        //allUpdatePlayerInfo(false, reason);
     }
 
     void allUpdateCreatureCount(CreatureType type, int count, int deadCount)
@@ -3171,10 +3206,35 @@ public final class Server extends Thread implements IServer
         List<String> info = new ArrayList<String>(game.getNumPlayers());
         for (Player player : game.getPlayers())
         {
-            info.add(((PlayerServerSide)player)
-                .getStatusInfo(treatDeadAsAlive));
+            String longString = ((PlayerServerSide)player)
+                .getStatusInfo(treatDeadAsAlive);
+            info.add(longString);
         }
         return info;
+    }
+
+    /**
+     * Returns a list with strings, one string for each player where data
+     * has changed since last request. String contains only the frequently
+     * changing values, e.g. not color, tower and player type, and others
+     * (compared to the "full" form) which were never really used for update
+     * (titanpower, legioncount, creaturecount) are omitted as well.
+     *
+     * @return List of strings, one for each player with changes
+     */
+    private List<String> getChangedPlayerValues()
+    {
+        List<String> changes = new ArrayList<String>(game.getNumPlayers());
+        for (Player player : game.getPlayers())
+        {
+            PlayerServerSide p = (PlayerServerSide)player;
+            String changedValues = p.getValuesIfChanged();
+            if (!changedValues.equals(""))
+            {
+                changes.add(changedValues);
+            }
+        }
+        return changes;
     }
 
     public void doSplit(Legion parent, String childId,

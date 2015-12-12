@@ -324,6 +324,7 @@ public final class Constants
     // server-client network compatibility next time anyway
     public static final String syncOption = "setOption";
     public static final String updatePlayerInfo = "updatePlayerInfo";
+    public static final String updateChangesValues = "updateChangedValues";
     public static final String setColor = "setColor";
     public static final String updateCreatureCount = "updateCreatureCount";
     public static final String dispose = "dispose";

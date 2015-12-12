@@ -328,6 +328,16 @@ public class Player
         markersAvailable.clear();
     }
 
+    public Set<String> getMarkersUsed()
+    {
+        SortedSet<String> used = new TreeSet<String>();
+        for (Legion l : legions)
+        {
+            used.add(l.getMarkerId());
+        }
+        return Collections.unmodifiableSortedSet(used);
+    }
+
     public Set<String> getMarkersAvailable()
     {
         return Collections.unmodifiableSortedSet(markersAvailable);

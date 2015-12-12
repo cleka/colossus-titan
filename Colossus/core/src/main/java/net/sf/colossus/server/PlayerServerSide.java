@@ -674,7 +674,8 @@ public final class PlayerServerSide extends Player implements
     }
 
     /** Return a colon-separated string with a bunch of info for
-     *  the status screen. */
+     *  the status screen.
+     */
     String getStatusInfo(boolean treatDeadAsAlive)
     {
         List<String> li = new ArrayList<String>();
@@ -691,7 +692,42 @@ public final class PlayerServerSide extends Player implements
         li.add(Integer.toString(getScore()));
         li.add(Integer.toString(getMulligansLeft()));
         li.addAll(getMarkersAvailable());
-        return Glob.glob(":", li);
+        String info = Glob.glob(":", li);
+        return info;
+    }
+
+    private String lastFetchedValues = "";
+
+    /**
+     * Return a string with current values for this player, if anything is
+     * different than the data provided on last call.
+     * String is in form:
+     *    name:isDead:eliminatedPlayers:score:mulligans:mk01,mk01,...mk12
+     * If info is identical, returns empty string "".
+     *
+     * @return New info or "" if all is same as last time
+     */
+    String getValuesIfChanged()
+    {
+        List<String> li = new ArrayList<String>();
+        li.add(getName());
+        li.add(Boolean.toString(isDead()));
+        li.add(getPlayersElim());
+        li.add(Integer.toString(getScore()));
+        li.add(Integer.toString(getMulligansLeft()));
+        String markers = Glob.glob(",", getMarkersAvailable());
+        li.add(markers);
+        li.add("dummy");
+        String values = Glob.glob(":", li);
+        if (values.equals(lastFetchedValues))
+        {
+            return "";
+        }
+        else
+        {
+            lastFetchedValues = values;
+            return values;
+        }
     }
 
     /* After legions are loaded, put them aside (legions and who owns them

@@ -81,6 +81,25 @@ public class GameClientSide extends Game implements IOracle
         }
     }
 
+    /**
+     * * String is in form:
+     *    name:isDead:eliminatedPlayers:score:mulligans:mk01,mk01,...mk12
+     * @param valuesString
+     */
+    public void updatePlayerValues(String valuesString)
+    {
+        List<String> values = Split.split(":", valuesString);
+        String playerName = values.remove(0);
+        boolean isDead = Boolean.valueOf(values.remove(0)).booleanValue();
+        String eliminatedPlayers = values.remove(0);
+        int score = Integer.parseInt(values.remove(0));
+        int mulligansLeft = Integer.parseInt(values.remove(0));
+        String freeMarkers = values.remove(0);
+        Player player = getPlayerByName(playerName);
+        ((PlayerClientSide)player).updateValues(isDead, eliminatedPlayers,
+            score, mulligansLeft, freeMarkers);
+    }
+
     // TODO not needed right now on client side - SCT compares to
     // "null" instead. Check whether to remove when pulling up?
     /**

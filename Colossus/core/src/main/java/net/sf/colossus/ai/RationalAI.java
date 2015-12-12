@@ -283,17 +283,27 @@ public class RationalAI extends SimpleAI
         }
 
         // Do the split.  If we don't like the result we will undo it.
-        String newMarkerId = pickMarker(player.getMarkersAvailable(),
-            player.getShortColor());
 
-        if (newMarkerId == null)
+        logger.log(Level.FINER, "RemainingMarkers: "
+                + Glob.glob(",", player.getMarkersAvailable())
+                + "; UsedMarkers: " + Glob.glob(",", player.getMarkersUsed()));
+
+        if (player.getMarkersAvailable().size() < 1)
         {
-            //should never happen now that we check in fireSplits
+            // should never happen now that we check in fireSplits
             logger.log(Level.FINEST, "No split.  No markers available.");
             return true;
         }
+        String newMarkerId = pickMarker(player.getMarkersAvailable(),
+            player.getShortColor());
+        if (newMarkerId == null || "".equals(newMarkerId))
+        {
+            logger.log(Level.WARNING, "No split: new marker is empty ('"
+                + newMarkerId + "') - how is that possible?");
+            return true;
+        }
 
-        logger.log(Level.FINEST, "Wait for split callback");
+        logger.log(Level.FINEST, "New marker id is '" + newMarkerId + "'");
         client.doSplit(legion, newMarkerId, results);
         return false;
     }
