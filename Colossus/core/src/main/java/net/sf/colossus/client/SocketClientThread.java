@@ -314,26 +314,43 @@ final class SocketClientThread extends Thread implements IServer,
     private String readOneLine() throws IOException
     {
         String line = in.readLine();
+        showDebugOutput(line);
+        return line;
+    }
+
+    private void showDebugOutput(String line)
+    {
+        boolean _MSG_TRACKING = true;
+        if (line == null || !_MSG_TRACKING)
+        {
+            return;
+        }
+
+        boolean show = false;
+        if (playerName.equals("clemens"))
+        {
+            show = false;
+        }
+        if (internalSpectator)
+        {
+            show = false;
+        }
 
         // Logging/tracking of received messages for development purposes
-        // TODO: Remove when not needed any more
-        boolean _MSG_TRACKING = false;
-        if (line != null && internalSpectator && _MSG_TRACKING)
+        if (show)
         {
             int _MAXLEN = 120;
             if (_MAXLEN != 0)
             {
                 int len = line.length() < _MAXLEN ? line.length() : _MAXLEN;
-                String shortLine = line.substring(0, len);
+                String shortLine = line.substring(0, len) + "...";
                 System.out.println("<<<" + shortLine);
-                System.out.println(line);
             }
             else
             {
                 System.out.println("<<<" + line);
             }
         }
-        return line;
     }
 
     public void waitForPrompt() throws SocketTimeoutException,
@@ -363,7 +380,7 @@ final class SocketClientThread extends Thread implements IServer,
         boolean signonOk = false;
         while (!signonOk)
         {
-            line = in.readLine();
+            line = readOneLine();
             if (line.startsWith("Ack: signOn"))
             {
                 LOGGER.fine("Got SignOn ACK: '" + line + "' - ok!");
@@ -403,7 +420,7 @@ final class SocketClientThread extends Thread implements IServer,
         boolean gotInfo = false;
         while (!gotInfo)
         {
-            line = in.readLine();
+            line = readOneLine();
 
             if (line.startsWith(Constants.gameInitInfo))
             {
