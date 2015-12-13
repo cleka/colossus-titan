@@ -928,7 +928,8 @@ public class GameServerSide extends Game
             placeInitialLegion(player, player.getFirstMarker());
             server.allRevealLegion(player.getLegions().get(0),
                 Constants.reasonInitial);
-            server.allUpdatePlayerInfo("NewGame3.2-loop");
+            server
+                .allUpdatePlayerInfo("NewGame3.2-loop-player-" + p.getName());
         }
 
         server.allTellAllLegionLocations();
@@ -1966,6 +1967,8 @@ public class GameServerSide extends Game
 
         server.allFullyUpdateLegionStatus();
         server.allUpdatePlayerInfo(false, "LoadGameCompleted");
+        // to initialize the 'lastFecthed' values
+        server.allUpdateChangedPlayerValues("LoadGameCompleted");
         server.allTellAllLegionLocations();
         updateCaretakerDisplays();
 

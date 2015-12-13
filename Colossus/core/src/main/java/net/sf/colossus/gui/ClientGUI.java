@@ -1470,7 +1470,6 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             board.clearPossibleRecruitChits();
             pushUndoStack(child.getMarkerId());
         }
-
     }
 
     public void actOnDidSplitPart2(MasterHex hex)
@@ -1840,6 +1839,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
                     {
                         public void run()
                         {
+                            board.clearRecruitedChits();
                             makeBoardRecreateMarkers();
                         }
                     });
@@ -4010,7 +4010,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         else
         {
             LOGGER.warning("Could not find pending move for legion " + mover
-                + " from hex " + current + " to hex " + target);
+                + " from hex " + current + " to hex " + target + "; redo="
+                + isRedoOngoing() + ", replay=" + isReplayOngoing());
         }
         synchronized (pendingMoves)
         {

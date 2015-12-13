@@ -462,18 +462,17 @@ public final class Server extends Thread implements IServer
 
     private void displayIClients()
     {
-        System.out.println("iClients contains now " + iClients.size()
-            + " clients.");
+        // System.out.println("iClients contains now " + iClients.size() + " clients.");
         for (IClient c : iClients)
         {
             if (c instanceof ClientHandler)
             {
-                int id = ((ClientHandler)c).getConnectionId();
-                System.out.println("* " + id);
+                // int id = ((ClientHandler)c).getConnectionId();
+                // System.out.println("* " + id);
             }
             else
             {
-                System.out.println("* Stub");
+                // System.out.println("* Stub");
             }
         }
     }
@@ -1430,11 +1429,11 @@ public final class Server extends Thread implements IServer
             othersTellReconnectOngoing(existingCH);
         }
 
-        detachReplacedClient(existingCH);
-        processingCH.setReplacedCH(existingCH);
-        removeFromForcedWithdrawsList(clientName);
-
-        realClients.add(client);
+        if (existingCH != null)
+        {
+            detachReplacedClient(existingCH);
+            processingCH.setReplacedCH(existingCH);
+        }
 
         // For initial (re-) connects during the game do not add yet;
         // server would start sending data immediately.
@@ -1446,12 +1445,15 @@ public final class Server extends Thread implements IServer
             spectator);
         if (player != null)
         {
+            removeFromForcedWithdrawsList(clientName);
             playerToClientMap.put(player, client);
             if (remote)
             {
                 addRemoteClient(client, player);
             }
         }
+
+        realClients.add(client);
 
         return null;
     }
@@ -1472,8 +1474,7 @@ public final class Server extends Thread implements IServer
         boolean remote, int clientVersion, String buildInfo,
         boolean spectator, int connectionId)
     {
-        System.out
-            .println("handleNewConn, called with connId " + connectionId);
+        // System.out.println("handleNewConn, called with connId " + connectionId);
         boolean isReconnect;
         if (connectionId == -1)
         {
@@ -1633,8 +1634,8 @@ public final class Server extends Thread implements IServer
     {
         iClients.remove(existingCH);
         realClients.remove(existingCH);
-        System.out.println("iClients contains now " + iClients.size()
-            + " clients.");
+        /*
+        System.out.println("iClients contains now " + iClients.size() + " clients.");
         for (IClient c : iClients)
         {
             if (c instanceof ClientHandler)
@@ -1647,6 +1648,7 @@ public final class Server extends Thread implements IServer
                 System.out.println("* Stub");
             }
         }
+        */
         queueClientHandlerForChannelChanges(existingCH);
         existingCH.declareObsolete();
     }
@@ -2131,6 +2133,15 @@ public final class Server extends Thread implements IServer
         }
     }
 
+    void oneTellAllLegionLocations(ClientHandler client)
+    {
+        List<Legion> legions = game.getAllLegions();
+        for (Legion legion : legions)
+        {
+            client.tellLegionLocation(legion, legion.getCurrentHex());
+        }
+    }
+
     void allTellAllLegionLocations()
     {
         List<Legion> legions = game.getAllLegions();
@@ -2241,15 +2252,12 @@ public final class Server extends Thread implements IServer
             // no need/use to inform the troubled one itself...
             if (client != chInTrouble)
             {
-                System.out.println("aTLC, client " + client.getClientName()
-                    + "(id=" + client.getConnectionId() + "): " + message);
+                // System.out.println("aTLC, client " + client.getClientName() + "(id=" + client.getConnectionId() + "): " + message);
                 client.appendToConnectionLog(message);
             }
             else
             {
-                System.out.println("aTLC, SKIPPING client "
-                    + client.getClientName() + "(id="
-                    + client.getConnectionId() + "): " + message);
+                // System.out.println("aTLC, SKIPPING client " + client.getClientName() + "(id=" + client.getConnectionId() + "): " + message);
             }
         }
     }
@@ -4238,7 +4246,6 @@ public final class Server extends Thread implements IServer
         if (replacedCH == null)
         {
             LOGGER.warning("Rejoining game, but replacedCH is null?");
-            System.out.println("Rejoin gamereplaced ch is null?");
             return;
         }
 
@@ -4249,6 +4256,7 @@ public final class Server extends Thread implements IServer
         iClients.add(processingCH);
         displayIClients();
         processingCH.syncAfterReconnect(-1, 0);
+        oneTellAllLegionLocations(processingCH);
         processingCH.updatePlayerInfo(getPlayerInfo(false));
 
         // Technically totally unnecessary to re-send it to all
@@ -4260,10 +4268,11 @@ public final class Server extends Thread implements IServer
     public void watchGame()
     {
         LOGGER.info("Got: watchGame from CH " + processingCH.getClientName());
-        processingCH.initRedoQueueFromOther(clientStub, false);
+        processingCH.initRedoQueueFromStub(clientStub);
         iClients.add(processingCH);
         displayIClients();
         processingCH.syncAfterReconnect(-1, 0);
+        oneTellAllLegionLocations(processingCH);
         processingCH.updatePlayerInfo(getPlayerInfo(false));
         // Technically totally unnecessary to re-send it to all
         // (only the new watcher needs it), but it's much easier this way

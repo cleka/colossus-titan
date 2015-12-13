@@ -51,9 +51,17 @@ public class ClientHandlerStub implements IClient
 
     protected long pingRequestCounter = 0;
 
+    /**
+     * Messages sent since last commit, that would need to be resent after a reconnect
+     * Should perhaps be rather called "resendQueue"
+     */
     protected final ArrayList<MessageForClient> redoQueue = new ArrayList<MessageForClient>(
         100);
 
+    /**
+     * Messages before last commitpoint. Those will be needed only if a player
+     * connects from scratch.
+     */
     protected final ArrayList<MessageForClient> historyQueue = new ArrayList<MessageForClient>(
         100);
 

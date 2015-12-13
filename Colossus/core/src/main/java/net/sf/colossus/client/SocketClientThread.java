@@ -72,6 +72,12 @@ final class SocketClientThread extends Thread implements IServer,
     private final boolean spectator;
     private final boolean internalSpectator;
 
+    // The two below are only needed for debugging:
+    // these here are related to whether replay/redo msgs were *received*;
+    // those in ClientThread relate to "messages handled" state.
+    private boolean replayReceived = false;
+    private boolean redoReceived = false;
+
     private final static String sep = Constants.protocolTermSeparator;
 
     private String reasonFail = null;
@@ -333,18 +339,44 @@ final class SocketClientThread extends Thread implements IServer,
 
     private void showDebugOutput(String line)
     {
-        boolean _MSG_TRACKING = true;
+        boolean _MSG_TRACKING = false;
         if (line == null || !_MSG_TRACKING)
         {
             return;
         }
 
+        if (line.startsWith(Constants.replayOngoing + " ~ false"))
+        {
+            replayReceived = false;
+        }
+        if (line.startsWith(Constants.redoOngoing + " ~ false"))
+        {
+            redoReceived = false;
+        }
+
         boolean show = false;
-        if (playerName.equals("clemens"))
+        if (playerName.equals("remote"))
+        {
+            show = true;
+        }
+        if (internalSpectator)
         {
             show = false;
         }
-        if (internalSpectator)
+
+        if (line.startsWith("setOption ~ ViewMode"))
+        {
+            // show this as the only one
+        }
+        else if (line.startsWith(Constants.updateCreatureCount)
+            // || line.startsWith(Constants.setLegionStatus)
+            // || line.startsWith(Constants.tellLegionLocation)
+            || line.startsWith(Constants.serverConnectionOK)
+            || line.startsWith(Constants.relayBackProcessedMsg)
+            || line.startsWith(Constants.relayBackReceivedMsg)
+            // || line.startsWith(Constants.)
+            || line.startsWith(Constants.pingRequest)
+            || line.startsWith(Constants.syncOption))
         {
             show = false;
         }
@@ -352,17 +384,31 @@ final class SocketClientThread extends Thread implements IServer,
         // Logging/tracking of received messages for development purposes
         if (show)
         {
+            if (line.startsWith(Constants.setupTurnState))
+            {
+                System.out.println("");
+            }
+
+            String indent = (redoReceived ? "  " : "")
+                + (replayReceived ? "  " : "");
+
+            String printLine = line;
             int _MAXLEN = 120;
-            if (_MAXLEN != 0)
+            int len = line.length();
+            if (len > _MAXLEN)
             {
-                int len = line.length() < _MAXLEN ? line.length() : _MAXLEN;
-                String shortLine = line.substring(0, len) + "...";
-                System.out.println("<<<" + shortLine);
+                printLine = line.substring(0, _MAXLEN) + "...";
             }
-            else
-            {
-                System.out.println("<<<" + line);
-            }
+            System.out.println(indent + "<<<" + printLine);
+        }
+
+        if (line.startsWith(Constants.replayOngoing + " ~ true"))
+        {
+            replayReceived = true;
+        }
+        if (line.startsWith(Constants.redoOngoing + " ~ true"))
+        {
+            redoReceived = true;
         }
     }
 

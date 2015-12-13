@@ -57,6 +57,8 @@ public class ClientThread extends Thread implements EventExecutor
 
     private boolean done = false;
 
+    private final boolean _DEBUG_MSGS = false;
+
     // if we enable that, things get stuck... (perhaps because logger
     // of all threads need then to get a lock on the logger too often?)
     private final boolean LOG_PROCESSING_TIMES = false;
@@ -318,6 +320,8 @@ public class ClientThread extends Thread implements EventExecutor
                 + "' processing message: " + method);
         }
 
+        showDebugOutputMaybe(method, args);
+
         if (method.equals(Constants.tellMovementRoll))
         {
             int roll = Integer.parseInt(args.remove(0));
@@ -466,6 +470,7 @@ public class ClientThread extends Thread implements EventExecutor
             String turnArgMaybe = args.isEmpty() ? "0" : args.remove(0);
             int maxTurn = Integer.parseInt(turnArgMaybe);
             client.tellReplay(val, maxTurn);
+
         }
         else if (method.equals(Constants.redoOngoing))
         {
@@ -947,6 +952,22 @@ public class ClientThread extends Thread implements EventExecutor
         }
         LOGGER.finest("Client '" + getNameMaybe()
             + "' finished method processing");
+    }
+
+    private void showDebugOutputMaybe(String method, List<String> args)
+    {
+        if (!_DEBUG_MSGS)
+        {
+            return;
+        }
+        if (client != null
+            & client.getOwningPlayer().getName().equals("remote"))
+        {
+            String allArgs = Glob.glob(", ", args);
+            String indent = (client.isReplayOngoing() ? "  " : "")
+                + (client.isRedoOngoing() ? "  " : "");
+            System.out.println(indent + "!!!" + method + ":" + allArgs);
+        }
     }
 
     private void rememberEvent(ServerEvent event)
