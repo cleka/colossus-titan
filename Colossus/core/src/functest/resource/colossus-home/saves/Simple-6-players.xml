@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ColossusSnapshot version="13">
+<ColossusSnapshot version="14">
     <Variant dir="Abyssal6" file="Abyssal6Var.xml" name="Abyssal6" ></Variant>
     <TurnNumber>7</TurnNumber>
     <CurrentPlayer>2</CurrentPlayer>

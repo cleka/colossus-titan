@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ColossusSnapshot version="13">
+<ColossusSnapshot version="14">
     <Variant dir="Pantheon" file="PantheonVar.xml" name="Pantheon" ></Variant>
     <TurnNumber>1</TurnNumber>
     <CurrentPlayer>0</CurrentPlayer>
@@ -59,7 +59,7 @@
             <Creature name="Gargoyle" />
         </Legion>
     </Player>
-    <Player name="Red" type="net.sf.colossus.ai.SimpleAI" color="Red" startingTower="400" score="0" dead="false" mulligansLeft="1" colorsElim="" movementRoll="0" teleported="false" summoned="false">
+    <Player name="Red" type="net.sf.colossus.ai.Human" color="Red" startingTower="400" score="0" dead="false" mulligansLeft="1" colorsElim="" movementRoll="0" teleported="false" summoned="false">
         <Legion name="Rd04" currentHex="400" startingHex="400" moved="false" entrySide="6" parent="null" recruitName="null" battleTally="0">
             <Creature name="Titan" />
             <Creature name="Angel" />

@@ -1285,6 +1285,8 @@ public class GameServerSide extends Game
         if (Options.isStartupTest())
         {
             LOGGER.info("IS ONLY A STARTUP TEST!");
+            LOGGER.info("Game will exit after 2 seconds again.");
+            WhatNextManager.sleepFor(2000);
             stopAllDueToFunctionalTestCompleted();
         }
         else
