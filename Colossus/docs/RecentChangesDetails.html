@@ -14,10 +14,28 @@ This describes the recent changes in some more detail than just the
 one-line-info on the main pages "News" section.
 
 
+<h3>December 15, 2015: Public Build</h3>
+
+<p />
+Beside the corrections/improvements listed below, also some "behind the scenes" changes 
+related to the "no-battleboard-problem", reconnecting, suspend-and-resume, etc., 
+including stuff that should help me to troubleshoot those issues better.
+<p />
+<ul>
+<li>Autosave begin of each phase, also after mulltigan and extra-roll, and between engagements</li>
+<li>Suspend now with and without saving possible</li>
+<li>When resuming a game fails, it is now properly put back to list of suspended games, instead of being lost</li>
+<li>Fixed: after drift damage creatures that can strike were not highlighted</li>
+<li>Fixed: now it shows really the total creature points, not same as creature count line; changed label of 'Points' to 'Creature-Points'</li>
+<li>Masterboard window title now shows as first thing the owning player</li>
+</ul>
+<p />
+
+<hr />
+
 <h3>November 11, 2015: Public Build</h3>
 <p />
 
-<p />
 Polished the Inactivity-Autoplay and Turn-xx-yellow functionality that were added earlier, and some new ones:
 <ul>
 <li>Inactivity timeout and "turn-xx-yellow" should now work more reliably/consistently<br> 
@@ -35,13 +53,9 @@ Polished the Inactivity-Autoplay and Turn-xx-yellow functionality that were adde
 <li>For dice rolls, using random data from random.org instead of Java's built-in PRNG 
     (actually, this has been in effect since November 2nd).</li>
 <li>A "Contact Admin" feature</li>
-<li>Reverted/dropped the requirement Java 7. In fact Java 7 is ATM the worst choice, since it's likely that it is the 
-    culprit for game/application sometimes being stuck.<br><b>If you can, us Java 5, 6 or 8 instead!</b></li>  
+<li>Reverted/dropped the requirement Java 7.</li>  
 </ul>
 <p />
-
-
-<hr />
 
 <h3>August 5, 2015: Public  Build</h3>
 <p />
