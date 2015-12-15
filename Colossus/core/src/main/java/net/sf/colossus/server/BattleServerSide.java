@@ -448,8 +448,8 @@ public final class BattleServerSide extends Battle
 
     private boolean setupFight()
     {
-        server.allSetupBattleFight();
         applyPreStrikeEffects();
+        server.allSetupBattleFight();
         return false;
     }
 
