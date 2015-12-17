@@ -415,8 +415,11 @@ final class ClientHandler extends ClientHandlerStub implements IClient
         boolean kickPhaseSeen = false;
 
         redoQueue.clear();
+        List<MessageForClient> tempQ = new ArrayList<MessageForClient>();
+        tempQ.addAll(stub.historyQueue);
+        tempQ.addAll(stub.redoQueue);
 
-        for (MessageForClient mfc : stub.redoQueue)
+        for (MessageForClient mfc : tempQ)
         {
             String method = mfc.getMethod();
             if (method.equals(Constants.kickPhase))
@@ -461,15 +464,13 @@ final class ClientHandler extends ClientHandlerStub implements IClient
     public void initRedoQueueFromOther(ClientHandlerStub replacedCH,
         boolean isPlayer)
     {
-        System.out
-            .println("\n______________\nInit redo queue from other, history queue has "
+        LOGGER.fine("Init redo queue from other, history queue has "
                 + replacedCH.historyQueue.size() + " messages!");
-
-        boolean kickPhaseSeen = false;
 
         historyQueue.clear();
         redoQueue.clear();
 
+        boolean kickPhaseSeen = false;
         for (MessageForClient mfc : replacedCH.historyQueue)
         {
             String method = mfc.getMethod();
@@ -564,8 +565,11 @@ final class ClientHandler extends ClientHandlerStub implements IClient
             && (player.equals(game.getDefender()) || player.equals(game
                 .getAttacker())))
         {
+            LOGGER
+                .severe("\n!!!!!!!!!!!!!!!!!\nInvolved into ongoing engagement, not implemented.");
             System.out
                 .println("\n!!!!!!!!!!!!!!!!!\nInvolved into ongoing engagement, not implemented.");
+            return;
         }
 
         else if (player.equals(activePlayer))
@@ -979,7 +983,8 @@ final class ClientHandler extends ClientHandlerStub implements IClient
             }
 
             String reasonFail;
-            if (server.getAllInitialConnectsDone() && connectionId == -1)
+            if (server.getAllInitialConnectsDone() && connectionId == -1
+                && !spectator)
             {
                 // could also be a spectator
                 LOGGER.info("Scratch reconnect (id -1) for client "
@@ -1020,7 +1025,17 @@ final class ClientHandler extends ClientHandlerStub implements IClient
             }
             LOGGER.info("Received joinGame from client " + signonName);
             this.playerName = signonName;
-            server.joinGame(signonName);
+
+            if (server.getAllInitialConnectsDone())
+            {
+                LOGGER.fine("All initial connects were already done, "
+                    + "so for this connection now doing a rejoinGame");
+                server.rejoinGame();
+            }
+            else
+            {
+                server.joinGame(signonName);
+            }
         }
 
         else if (method.equals(Constants.watchGame))
@@ -1433,7 +1448,6 @@ final class ClientHandler extends ClientHandlerStub implements IClient
     protected void sendToClient(String message)
     {
         enqueueToRedoQueue(messageCounter, message);
-
 
         // For development purposes... remove when done:
         /*

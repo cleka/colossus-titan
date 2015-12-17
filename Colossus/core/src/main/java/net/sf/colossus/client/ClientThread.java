@@ -960,8 +960,16 @@ public class ClientThread extends Thread implements EventExecutor
         {
             return;
         }
-        if (client != null
-            & client.getOwningPlayer().getName().equals("remote"))
+
+        Player p = client.getOwningPlayer();
+        if (p == null)
+        {
+            LOGGER.warning("No owning player? Skipping debug output.");
+            return;
+        }
+
+        String name = p.getName();
+        if (name.equals("remote") || name.equals("spectator"))
         {
             String allArgs = Glob.glob(", ", args);
             String indent = (client.isReplayOngoing() ? "  " : "")

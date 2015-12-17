@@ -327,7 +327,8 @@ public final class Server extends Thread implements IServer
         stopFileServer();
         // start if either we expect (alive) remote client players, or
         // there are already remote connections (e.g. spectators):
-        if (game.getNumRemoteRemaining() > 0 || !remoteClients.isEmpty())
+        if (game.getNumRemoteRemaining() > 0 || !remoteClients.isEmpty()
+            || game.getOption(Options.keepAccepting))
         {
             startFileServerIfNotRunning();
         }
@@ -456,13 +457,29 @@ public final class Server extends Thread implements IServer
     {
         clientStub = new ClientHandlerStub(this, "clientHandlerStub");
         // it's an IClient, but not a real ClientHandler:
-        iClients.add(clientStub);
+        addIClient(clientStub);
+    }
+
+    private void addIClient(ClientHandlerStub newClient)
+    {
+        //System.out.println("Adding iClient with clientId="
+        //    + newClient.getConnectionId() + ", clientName="
+        //    + newClient.getClientName());
+        LOGGER.fine("Adding iClient with clientId="
+            + newClient.getConnectionId() + ", clientName="
+            + newClient.getClientName());
+        iClients.add(newClient);
         displayIClients();
+    }
+
+    private void addRealClient(ClientHandler newClient)
+    {
+        realClients.add(newClient);
     }
 
     private void displayIClients()
     {
-        // System.out.println("iClients contains now " + iClients.size() + " clients.");
+        //System.out.println("iClients contains now " + iClients.size() + " clients.");
         for (IClient c : iClients)
         {
             if (c instanceof ClientHandler)
@@ -1419,15 +1436,7 @@ public final class Server extends Thread implements IServer
 
         warnIfDifferentBuild(buildInfo);
 
-
         ClientHandler existingCH = getClientHandlerByName(clientName);
-
-        // A clienthandler exist: reconnect, so question is only about
-        // sync missing info.
-        if (!spectator)
-        {
-            othersTellReconnectOngoing(existingCH);
-        }
 
         if (existingCH != null)
         {
@@ -1435,11 +1444,10 @@ public final class Server extends Thread implements IServer
             processingCH.setReplacedCH(existingCH);
         }
 
-        // For initial (re-) connects during the game do not add yet;
-        // server would start sending data immediately.
-        // RejoinGame or WatchGame do this then
-
-        // iClients.add(client);
+        if (!spectator)
+        {
+            othersTellReconnectOngoing(existingCH);
+        }
 
         Player player = findPlayerForNewConnection(clientName, remote,
             spectator);
@@ -1452,9 +1460,6 @@ public final class Server extends Thread implements IServer
                 addRemoteClient(client, player);
             }
         }
-
-        realClients.add(client);
-
         return null;
     }
 
@@ -1547,15 +1552,6 @@ public final class Server extends Thread implements IServer
         {
             LOGGER.info("Client with name " + clientName
                 + " connected first time; creating new ClientHandler");
-        }
-
-        realClients.add(client);
-        if (isReconnect || !spectator)
-        {
-            // For initial spectator connects do not add yet; server would
-            // start sending data immediately.
-            iClients.add(client);
-            displayIClients();
         }
 
         if (player != null)
@@ -4196,18 +4192,13 @@ public final class Server extends Thread implements IServer
 
     public void joinGame(String playerName)
     {
-        if (allInitialConnectsDone)
-        {
-            LOGGER.fine("All initial connects were already done, "
-                + "so for this connection now doing a rejoinGame");
-            rejoinGame();
-            return;
-        }
-
         if (!beelzeGodOk())
         {
             return;
         }
+
+        addIClient(processingCH);
+        addRealClient(processingCH);
 
         // @TODO: move to outside Select loop
         //   => notify main thread to do this?
@@ -4253,8 +4244,8 @@ public final class Server extends Thread implements IServer
             + " to replace previous connection with id " + "???"
             + " and name " + replacedCH.getPlayerName());
         processingCH.initRedoQueueFromOther(replacedCH, true);
-        iClients.add(processingCH);
-        displayIClients();
+        addIClient(processingCH);
+        addRealClient(processingCH);
         processingCH.syncAfterReconnect(-1, 0);
         oneTellAllLegionLocations(processingCH);
         processingCH.updatePlayerInfo(getPlayerInfo(false));
@@ -4269,8 +4260,8 @@ public final class Server extends Thread implements IServer
     {
         LOGGER.info("Got: watchGame from CH " + processingCH.getClientName());
         processingCH.initRedoQueueFromStub(clientStub);
-        iClients.add(processingCH);
-        displayIClients();
+        addIClient(processingCH);
+        addRealClient(processingCH);
         processingCH.syncAfterReconnect(-1, 0);
         oneTellAllLegionLocations(processingCH);
         processingCH.updatePlayerInfo(getPlayerInfo(false));

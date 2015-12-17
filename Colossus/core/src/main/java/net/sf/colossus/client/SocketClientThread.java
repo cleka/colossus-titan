@@ -78,6 +78,8 @@ final class SocketClientThread extends Thread implements IServer,
     private boolean replayReceived = false;
     private boolean redoReceived = false;
 
+    private final boolean _MSG_TRACKING = false;
+
     private final static String sep = Constants.protocolTermSeparator;
 
     private String reasonFail = null;
@@ -339,7 +341,6 @@ final class SocketClientThread extends Thread implements IServer,
 
     private void showDebugOutput(String line)
     {
-        boolean _MSG_TRACKING = false;
         if (line == null || !_MSG_TRACKING)
         {
             return;
@@ -355,7 +356,7 @@ final class SocketClientThread extends Thread implements IServer,
         }
 
         boolean show = false;
-        if (playerName.equals("remote"))
+        if (playerName.equals("remote") || playerName.equals("spectator"))
         {
             show = true;
         }
