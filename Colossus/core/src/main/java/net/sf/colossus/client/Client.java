@@ -180,7 +180,7 @@ public final class Client implements IClient, IOracle, IVariant,
      *
      * TODO most likely redundant with owningPlayer.getColor()
      */
-    private PlayerColor color;
+    // private PlayerColor color;
 
     // This ai is either the actual ai player for an AI player, but is also
     // used by human clients for the autoXXX actions.
@@ -1203,7 +1203,7 @@ public final class Client implements IClient, IOracle, IVariant,
     // Called by server during load, or by ai or gui when they choose it
     public void setColor(PlayerColor color)
     {
-        this.color = color;
+        // this.color = color;
     }
 
     public void updateCreatureCount(CreatureType type, int count, int deadCount)
@@ -2681,7 +2681,8 @@ public final class Client implements IClient, IOracle, IVariant,
 
     private void kickMuster()
     {
-        if (game.isPhase(Phase.MUSTER) && isMyTurn() && isAlive())
+        if (game.isPhase(Phase.MUSTER) && isMyTurn() && isAlive()
+            && !isReplayOngoing())
         {
             if (noRecruitActionPossible())
             {
@@ -2803,12 +2804,12 @@ public final class Client implements IClient, IOracle, IVariant,
 
     public PlayerColor getColor()
     {
-        return color;
+        return getOwningPlayer().getColor();
     }
 
     public String getShortColor()
     {
-        return color.getShortName();
+        return getColor().getShortName();
     }
 
     public Player getBattleActivePlayer()
@@ -3826,7 +3827,8 @@ public final class Client implements IClient, IOracle, IVariant,
 
         if (autoplay.autoPickMarker())
         {
-            childId = ai.pickMarker(markersAvailable, getShortColor());
+            childId = ai.pickMarker(markersAvailable, getOwningPlayer()
+                .getShortColor());
             doTheSplitting(parent, childId);
         }
         else
@@ -3914,7 +3916,7 @@ public final class Client implements IClient, IOracle, IVariant,
             {
                 favoriteColors = new ArrayList<PlayerColor>();
             }
-            color = ai.pickColor(colorsLeft, favoriteColors);
+            PlayerColor color = ai.pickColor(colorsLeft, favoriteColors);
             answerPickColor(color);
         }
         else
@@ -3935,7 +3937,8 @@ public final class Client implements IClient, IOracle, IVariant,
         Set<String> markersAvailable = getOwningPlayer().getMarkersAvailable();
         if (autoplay.autoPickMarker())
         {
-            String markerId = ai.pickMarker(markersAvailable, getShortColor());
+            String markerId = ai.pickMarker(markersAvailable,
+                getOwningPlayer().getShortColor());
             assignFirstMarker(markerId);
         }
         else
