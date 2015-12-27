@@ -396,6 +396,38 @@ public final class Constants
             askAcquireAngel, askChooseStrikePenalty, tellGameOver, askConcede,
             askFlee, askNegotiate, tellProposal, tellStrikeResults,
             tellSlowResults, initBattle, cleanupBattle, nextEngagement,
+            doReinforce, setupBattleSummon, setupBattleRecruit,
+            setupBattleMove,
+            setupBattleFight, tellBattleMove, askPickFirstMarker, log, nak,
+            boardActive, askConfirmCatchUp, relayedPeerRequest,
+            setConnectionId, syncCompleted, requestExtraRollApproval,
+            askSuspendConfirmation, "Ack: signOn",
+            pingRequest, updateCreatureCount, tellWhatsHappening, commitPoint,
+            gameInitInfo, replayOngoing, redoOngoing, tellLegionLocation,
+            didMove, undidMove, setupSplit, setupMove, setupMuster,
+            setLegionStatus,
+
+            // setupSplit,
+
+            setPlayerName));
+
+    public static boolean shouldSkipForScratchReconnect(String method)
+    {
+        return skipForScratchReconnect.contains(method);
+    }
+
+    private final static HashSet<String> skipForDebugPrn = new HashSet<String>(
+        Arrays.asList(syncOption, tellLegionLocation, revealCreatures,
+            tellMovementRoll, didRecruit, didSplit, didMove,
+            updateCreatureCount, pingRequest
+
+
+            /*
+            askPickColor, tellEngagement, dispose,
+            removeDeadBattleChits, placeNewChit, createSummonAngel,
+            askAcquireAngel, askChooseStrikePenalty, tellGameOver, askConcede,
+            askFlee, askNegotiate, tellProposal, tellStrikeResults,
+            tellSlowResults, initBattle, cleanupBattle, nextEngagement,
             doReinforce, setupSplit, setupMove, setupFight, setupMuster,
             kickPhase, setupBattleSummon, setupBattleRecruit, setupBattleMove,
             setupBattleFight, tellBattleMove, askPickFirstMarker, log, nak,
@@ -403,11 +435,24 @@ public final class Constants
             setConnectionId, syncCompleted, requestExtraRollApproval,
             askSuspendConfirmation, didMove, undidMove, "Ack: signOn",
             pingRequest, updateCreatureCount, tellWhatsHappening, commitPoint,
-            gameInitInfo, replayOngoing, redoOngoing));
+            gameInitInfo, replayOngoing, redoOngoing)
+            */
+            //
+            ));
 
-    public static boolean shouldSkipForScratchReconnect(String method)
+
+    public static boolean shouldSkipForDebugPrn(String method)
     {
-        return skipForScratchReconnect.contains(method);
+        return skipForDebugPrn.contains(method);
+    }
+
+    private final static HashSet<String> neededForRedo = new HashSet<String>(
+        Arrays.asList(didMove, undidMove, didRecruit, undidRecruit, didSplit,
+            undidSplit, setupSplit, setupMove, setupMuster));
+
+    public static boolean isNeededForRedo(String method)
+    {
+        return neededForRedo.contains(method);
     }
 
     // engagement resolved, methods:
@@ -422,3 +467,5 @@ public final class Constants
     public static final int legionStatusNotVisitedSkippedBlocked = 2;
     public static final int legionStatusBlocked = 3;
 }
+
+

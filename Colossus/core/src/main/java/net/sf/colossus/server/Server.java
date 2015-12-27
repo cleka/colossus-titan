@@ -3607,6 +3607,16 @@ public final class Server extends Thread implements IServer
         }
     }
 
+    void oneUpdateLegionStatus(IClient client)
+    {
+        for (Legion legion : game.getAllLegions())
+        {
+            client.setLegionStatus(legion, legion.hasMoved(),
+                legion.hasTeleported(), legion.getEntrySide(),
+                legion.getRecruit());
+        }
+    }
+
     void allFullyUpdateLegionStatus()
     {
         Iterator<IClient> it = iClients.iterator();
@@ -3615,12 +3625,7 @@ public final class Server extends Thread implements IServer
             IClient client = it.next();
             if (client != null)
             {
-                for (Legion legion : game.getAllLegions())
-                {
-                    client.setLegionStatus(legion, legion.hasMoved(),
-                        legion.hasTeleported(), legion.getEntrySide(),
-                        legion.getRecruit());
-                }
+                oneUpdateLegionStatus(client);
             }
         }
     }
@@ -4243,11 +4248,13 @@ public final class Server extends Thread implements IServer
         LOGGER.info("Got: rejoinGame from CH " + processingCH.getClientName()
             + " to replace previous connection with id " + "???"
             + " and name " + replacedCH.getPlayerName());
-        processingCH.initRedoQueueFromOther(replacedCH, true);
+        // processingCH.initResendQueueFromOther(replacedCH, true);
+        processingCH.initResendQueueFromOther(replacedCH);
         addIClient(processingCH);
         addRealClient(processingCH);
         processingCH.syncAfterReconnect(-1, 0);
         oneTellAllLegionLocations(processingCH);
+        oneUpdateLegionStatus(processingCH);
         processingCH.updatePlayerInfo(getPlayerInfo(false));
 
         // Technically totally unnecessary to re-send it to all
@@ -4259,7 +4266,7 @@ public final class Server extends Thread implements IServer
     public void watchGame()
     {
         LOGGER.info("Got: watchGame from CH " + processingCH.getClientName());
-        processingCH.initRedoQueueFromStub(clientStub);
+        processingCH.initResendQueueFromStub(clientStub);
         addIClient(processingCH);
         addRealClient(processingCH);
         processingCH.syncAfterReconnect(-1, 0);

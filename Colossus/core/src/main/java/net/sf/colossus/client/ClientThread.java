@@ -968,13 +968,59 @@ public class ClientThread extends Thread implements EventExecutor
             return;
         }
 
+        String allArgs = Glob.glob(", ", args);
+
+        boolean show = true;
+
+        if (method.startsWith("setOption") && allArgs.startsWith("ViewMode"))
+        {
+            // show this as the only one
+        }
+        else if (method.startsWith(Constants.updateCreatureCount)
+            // || method.startsWith(Constants.setLegionStatus)
+            // || method.startsWith(Constants.tellLegionLocation)
+            || method.startsWith(Constants.serverConnectionOK)
+            || method.startsWith(Constants.relayBackProcessedMsg)
+            || method.startsWith(Constants.relayBackReceivedMsg)
+            // || method.startsWith(Constants.)
+            || method.startsWith(Constants.pingRequest)
+            || method.startsWith(Constants.syncOption) // setOption
+        )
+        {
+            show = false;
+        }
+
+        if (!show)
+        {
+            return;
+        }
+
         String name = p.getName();
         if (name.equals("remote") || name.equals("spectator"))
         {
-            String allArgs = Glob.glob(", ", args);
             String indent = (client.isReplayOngoing() ? "  " : "")
                 + (client.isRedoOngoing() ? "  " : "");
-            System.out.println(indent + "!!!" + method + ":" + allArgs);
+            // System.out.println(indent + "!!!" + method + ":" + allArgs);
+
+            String printLine = allArgs;
+            int _MAXLEN = 20;
+            int len = allArgs.length();
+            if (len > _MAXLEN)
+            {
+                printLine = allArgs.substring(0, _MAXLEN) + "...";
+            }
+
+            if (method.startsWith(Constants.setupTurnState))
+            {
+                System.out.println("\n\n");
+            }
+
+            else if (client.getGame().getTurnNumber() >= 1)
+            {
+                // WhatNextManager.sleepFor(2000);
+            }
+
+            System.out.println(indent + "!!!" + method + ": " + printLine);
         }
     }
 

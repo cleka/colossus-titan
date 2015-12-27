@@ -2321,9 +2321,9 @@ public final class MasterBoard extends JPanel
          * in the bottom-panel (in particular the Pause button, it seems) and
          *  masterboard doesn't get KeyEvents => legion flyouts don't work
          */
-        // System.out.println("Fowcus owner WAS: " + getFocusOwnerText());
+        // ("Fowcus owner WAS: " + getFocusOwnerText());
         this.requestFocusInWindow();
-        // System.out.println("Fowcus owner NOW: " + getFocusOwnerText());
+        // ("Fowcus owner NOW: " + getFocusOwnerText());
     }
 
     void actOnMisclick()
@@ -2831,7 +2831,7 @@ public final class MasterBoard extends JPanel
         }
     }
 
-    private void paintRecruitedChits(Graphics g)
+    public void paintRecruitedChits(Graphics g)
     {
         for (Chit chit : recruitedChits.values())
         {
@@ -2991,7 +2991,7 @@ public final class MasterBoard extends JPanel
         if (gui.getGame().isPhase(Phase.SPLIT))
         {
             // Not implemented yet
-            // System.out.println("Mark Legion Skip Split");
+            // ("Mark Legion Skip Split");
         }
         else if (gui.getGame().isPhase(Phase.MOVE))
         {
@@ -3548,8 +3548,8 @@ public final class MasterBoard extends JPanel
 
     public void updateReplayText(int currTurn, int maxTurn)
     {
-        bottomBar.setPhase("Replay ongoing, " + currTurn + " of " + maxTurn
-            + " turns processed");
+        bottomBar.setPhase("Replay ongoing, processing turn " + currTurn
+            + " of " + maxTurn);
     }
 
     /**

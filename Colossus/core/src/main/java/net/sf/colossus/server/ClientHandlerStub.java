@@ -55,7 +55,7 @@ public class ClientHandlerStub implements IClient
      * Messages sent since last commit, that would need to be resent after a reconnect
      * Should perhaps be rather called "resendQueue"
      */
-    protected final ArrayList<MessageForClient> redoQueue = new ArrayList<MessageForClient>(
+    protected final ArrayList<MessageForClient> resendQueue = new ArrayList<MessageForClient>(
         100);
 
     /**
@@ -167,7 +167,7 @@ public class ClientHandlerStub implements IClient
 
     protected void enqueueToRedoQueue(int messageNr, String message)
     {
-        redoQueue.add(new MessageForClient(messageNr, 0, message));
+        resendQueue.add(new MessageForClient(messageNr, 0, message));
         messageCounter++;
     }
 
@@ -181,9 +181,9 @@ public class ClientHandlerStub implements IClient
         }
         MessageForClient mfc;
 
-        while (!redoQueue.isEmpty())
+        while (!resendQueue.isEmpty())
         {
-            mfc = redoQueue.remove(0);
+            mfc = resendQueue.remove(0);
             historyQueue.add(mfc);
             writer.println(mfc.getMessage());
         }
@@ -363,10 +363,15 @@ public class ClientHandlerStub implements IClient
 
     public void setPlayerName(String playerName)
     {
+        setPlayerNameNoSend(playerName);
+        sendToClient(Constants.setPlayerName + sep + playerName);
+    }
+
+    public void setPlayerNameNoSend(String playerName)
+    {
         this.playerName = playerName;
         this.truncatedPlayerName = (playerName + TRUNC_FILLER).substring(0,
             TRUNC_LENGTH);
-        sendToClient(Constants.setPlayerName + sep + playerName);
     }
 
     public String getSignonName()
@@ -375,6 +380,7 @@ public class ClientHandlerStub implements IClient
     }
 
     // silently choose whatever useful, mostly for logging
+    @Override
     public String getClientName()
     {
         return playerName != null ? playerName
@@ -745,6 +751,14 @@ public class ClientHandlerStub implements IClient
     {
         sendToClient(Constants.askSuspendConfirmation + sep + requestorName
             + sep + timeout);
+    }
+
+    void prn(String text)
+    {
+        if ("remote".equals(getClientName()))
+        {
+            System.out.println(text);
+        }
     }
 
 }

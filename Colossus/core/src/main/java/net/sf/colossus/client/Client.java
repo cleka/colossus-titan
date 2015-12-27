@@ -1768,6 +1768,11 @@ public final class Client implements IClient, IOracle, IVariant,
         return redoOngoing;
     }
 
+    public boolean isReplayBeforeRedo()
+    {
+        return replayOngoing && !redoOngoing;
+    }
+
     public void confirmWhenCaughtUp()
     {
         server.clientConfirmedCatchup();
@@ -2473,7 +2478,10 @@ public final class Client implements IClient, IOracle, IVariant,
         addCreature(legion, recruit, reason);
         legion.setRecruit(recruit);
 
-        gui.actOnDidRecruit(legion, recruit, recruiters, reason);
+        if (redoOngoing || !replayOngoing)
+        {
+            gui.actOnDidRecruit(legion, recruit, recruiters, reason);
+        }
     }
 
     public void undoRecruit(Legion legion)
@@ -2497,7 +2505,11 @@ public final class Client implements IClient, IOracle, IVariant,
         }
 
         legion.setRecruit(null);
-        gui.actOnUndidRecruitPart(legion, wasReinforcement, getTurnNumber());
+        if (!isReplayOngoing() || isRedoOngoing())
+        {
+            gui.actOnUndidRecruitPart(legion, wasReinforcement,
+                getTurnNumber());
+        }
     }
 
     /** null means cancel.  "none" means no recruiter (tower creature). */
@@ -2562,6 +2574,22 @@ public final class Client implements IClient, IOracle, IVariant,
         game.setActivePlayer(activePlayer);
         game.setTurnNumber(turnNumber);
         gui.actOnTurnOrPlayerChange(this, turnNumber, game.getActivePlayer());
+    }
+
+    /* Quick way to disable a code block; for simple "if (false)"
+     * Eclipse gives dead code warnings :-(
+     */
+    private boolean isTrue(boolean val)
+    {
+        return val;
+    }
+    public void prn(String text)
+    {
+        if (isTrue(false))
+        {
+            return;
+        }
+        System.out.println(text);
     }
 
     public void setupSplit(Player activePlayer, int turnNumber)
@@ -3221,6 +3249,10 @@ public final class Client implements IClient, IOracle, IVariant,
         MasterHex currentHex, EntrySide entrySide, boolean teleport,
         CreatureType teleportingLord, boolean splitLegionHasForcedMove)
     {
+        if (isReplayBeforeRedo())
+        {
+            return;
+        }
         legion.setCurrentHex(currentHex);
         legion.setMoved(true);
         legion.setEntrySide(entrySide);
@@ -3668,7 +3700,7 @@ public final class Client implements IClient, IOracle, IVariant,
         // do the eventViewer stuff before the board, so we are sure to get
         // a repaint.
 
-        if (!replayOngoing)
+        if (!replayOngoing || redoOngoing)
         {
             gui.eventViewerUndoEvent(splitoff, survivor, turn);
         }
@@ -3873,18 +3905,14 @@ public final class Client implements IClient, IOracle, IVariant,
             + child + " " + childHeight + " " + turn);
 
         ((LegionClientSide)parent).split(childHeight, child, turn);
-
         child.setCurrentHex(hex);
-
         gui.actOnDidSplit(turn, parent, child, hex);
-
         if (isMyLegion(child))
         {
             getOwningPlayer().removeMarkerAvailable(child.getMarkerId());
         }
 
         numSplitsThisTurn++;
-
         gui.actOnDidSplitPart2(hex);
 
         // check also for phase, because delayed callbacks could come
@@ -4098,6 +4126,18 @@ public final class Client implements IClient, IOracle, IVariant,
     public Options getOptions()
     {
         return options;
+    }
+
+    public String getClientName()
+    {
+        if (getOwningPlayer() != null)
+        {
+            return getOwningPlayer().getName();
+        }
+        else
+        {
+            return "<ownplayernotset>";
+        }
     }
 
     /** TODO get from Variant instead of static TerrainRecruitLoader access

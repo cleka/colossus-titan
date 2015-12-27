@@ -339,9 +339,14 @@ final class SocketClientThread extends Thread implements IServer,
         return line;
     }
 
+    private boolean msg_tracking()
+    {
+        return _MSG_TRACKING;
+    }
+
     private void showDebugOutput(String line)
     {
-        if (line == null || !_MSG_TRACKING)
+        if (line == null || !msg_tracking())
         {
             return;
         }

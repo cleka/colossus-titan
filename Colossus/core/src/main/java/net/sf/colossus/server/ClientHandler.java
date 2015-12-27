@@ -19,11 +19,9 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.client.IClient;
 import net.sf.colossus.common.Constants;
-import net.sf.colossus.game.Engagement;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Phase;
-import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.actions.Recruitment;
 import net.sf.colossus.game.actions.Summoning;
@@ -52,6 +50,12 @@ final class ClientHandler extends ClientHandlerStub implements IClient
 {
     private static final Logger LOGGER = Logger.getLogger(ClientHandler.class
         .getName());
+
+    // If it's a constanct, Eclipse complains so often about dead code...
+    private static boolean _DEBUG_OUTPUT()
+    {
+        return false;
+    }
 
     // server is stored in ClientHandlerStub
     private final SocketChannel socketChannel;
@@ -179,12 +183,6 @@ final class ClientHandler extends ClientHandlerStub implements IClient
         return temporarilyDisconnected;
     }
 
-    @Override
-    protected boolean canHandlePingRequest()
-    {
-        return clientVersion >= IServer.CLIENT_VERSION_UNDERSTANDS_PING;
-    }
-
     public long getMillisSincePingReply()
     {
         // Should happen only the very first time this is called.
@@ -195,11 +193,6 @@ final class ClientHandler extends ClientHandlerStub implements IClient
 
         long now = new Date().getTime();
         return now - lastPingReplyReceived;
-    }
-
-    protected boolean canHandleNewVariantXML()
-    {
-        return clientVersion >= IServer.CLIENT_VERSION_VARIANT_XML_OK;
     }
 
     /**
@@ -304,17 +297,6 @@ final class ClientHandler extends ClientHandlerStub implements IClient
     }
 
     @Override
-    protected void enqueueToRedoQueue(int messageNr, String message)
-    {
-        if (supportsReconnect())
-        {
-            redoQueue.add(new MessageForClient(messageNr,
-                (isCommitPoint ? commitPointCounter : 0), message));
-            messageCounter++;
-        }
-    }
-
-    @Override
     protected void commitPoint()
     {
         if (supportsReconnect())
@@ -335,10 +317,10 @@ final class ClientHandler extends ClientHandlerStub implements IClient
     private void confirmCommitPoint(int confirmedNr)
     {
         int found = -1;
-        int size = redoQueue.size();
+        int size = resendQueue.size();
         for (int i = 0; i < size && found == -1; i++)
         {
-            MessageForClient mfc = redoQueue.get(i);
+            MessageForClient mfc = resendQueue.get(i);
             if (mfc.getCommitNumber() == confirmedNr)
             {
                 found = i;
@@ -353,10 +335,16 @@ final class ClientHandler extends ClientHandlerStub implements IClient
              */
             for (int i = 0; i <= found; i++)
             {
-                MessageForClient mfc = redoQueue.remove(0);
+                MessageForClient mfc = resendQueue.remove(0);
                 historyQueue.add(mfc);
             }
         }
+    }
+
+    @Override
+    protected boolean canHandlePingRequest()
+    {
+        return clientVersion >= IServer.CLIENT_VERSION_UNDERSTANDS_PING;
     }
 
     @Override
@@ -374,6 +362,16 @@ final class ClientHandler extends ClientHandlerStub implements IClient
     public boolean canHandleAdvancedSync()
     {
         return clientVersion >= IServer.CLIENT_VERSION_CAN_HANDLE_NAK;
+    }
+
+    protected boolean canHandleNewVariantXML()
+    {
+        return clientVersion >= IServer.CLIENT_VERSION_VARIANT_XML_OK;
+    }
+
+    protected boolean canHandleInactivityTimeout()
+    {
+        return clientVersion >= IServer.CLIENT_VERSION_INACTIVITY_TIMEOUT;
     }
 
     @Override
@@ -397,8 +395,8 @@ final class ClientHandler extends ClientHandlerStub implements IClient
     public void cloneRedoQueue(ClientHandler oldCH)
     {
         // Remove the reconnect-related messages
-        redoQueue.clear();
-        redoQueue.addAll(oldCH.redoQueue);
+        resendQueue.clear();
+        resendQueue.addAll(oldCH.resendQueue);
         commitPointCounter = oldCH.commitPointCounter;
     }
 
@@ -410,15 +408,64 @@ final class ClientHandler extends ClientHandlerStub implements IClient
         commitPointCounter = oldCH.commitPointCounter;
     }
 
-    public void initRedoQueueFromStub(ClientHandlerStub stub)
+    @Override
+    protected void enqueueToRedoQueue(int messageNr, String message)
+    {
+        if (supportsReconnect())
+        {
+            resendQueue.add(new MessageForClient(messageNr,
+                (isCommitPoint ? commitPointCounter : 0), message));
+            messageCounter++;
+        }
+    }
+
+    /*
+    private void enqeueExtra(String message)
+    {
+        enqueueForResend(new MessageForClient(0, 0, message));
+    }
+    */
+
+    // private int newCounterHistory = 0;
+
+    private int newCounterRedo = 0;
+
+    /*
+    private void reEnqueueHistory(MessageForClient mfc)
+    {
+        prn("Putting to hist queue: " + mfc.getShortenedMessage());
+        LOGGER.finest("Putting to hist queue: " + mfc.getShortenedMessage());
+        MessageForClient newOne = new MessageForClient(mfc,
+            newCounterHistory++);
+        historyQueue.add(newOne);
+    }
+    */
+
+    private void enqueueForResend(MessageForClient mfc)
+    {
+        // System.out.println("Putting to redo queue: " + mfc.getShortenedMessage());
+        LOGGER.finest("Putting to redo queue: " + mfc.getShortenedMessage());
+        MessageForClient newOne = new MessageForClient(mfc, newCounterRedo++);
+        resendQueue.add(newOne);
+    }
+
+    public void initResendQueueFromStub(ClientHandlerStub stub)
     {
         boolean kickPhaseSeen = false;
 
-        redoQueue.clear();
+        GameServerSide game = server.getGame();
+        String expectedTurnChangeLine = Constants.setupTurnState + sep + game.getActivePlayer() + sep + game.getTurnNumber();
+        String expectedSetupPhaseLine = buildExpectedSetupPhaseLine(game);
+
+        boolean currentTurnReached = false;
+        boolean currentPhaseReached = false;
+
+        resendQueue.clear();
         List<MessageForClient> tempQ = new ArrayList<MessageForClient>();
         tempQ.addAll(stub.historyQueue);
-        tempQ.addAll(stub.redoQueue);
+        tempQ.addAll(stub.resendQueue);
 
+        prn("tempQ has " + tempQ.size() + " items.");
         for (MessageForClient mfc : tempQ)
         {
             String method = mfc.getMethod();
@@ -432,8 +479,8 @@ final class ClientHandler extends ClientHandlerStub implements IClient
                 int maxTurn = server.getGame().getTurnNumber();
                 String replayOn = Constants.replayOngoing + sep + true + sep
                     + maxTurn;
-                reEnqueueRedo(new MessageForClient(0, 0, replayOn));
-                reEnqueueRedo(mfc);
+                enqueueForResend(new MessageForClient(0, 0, replayOn));
+                enqueueForResend(mfc);
             }
 
             // skip all the later ones; the initial ones are needed.
@@ -448,27 +495,175 @@ final class ClientHandler extends ClientHandlerStub implements IClient
             {
                 // skip
             }
+
+            else if (!currentTurnReached && method.equals(Constants.setupTurnState)
+                && mfc.getMessage().equals(expectedTurnChangeLine))
+            {
+                System.out.println("Reached current turn:" + mfc.getMessage());
+                currentTurnReached = true;
+                enqueueForResend(mfc);
+            }
+            else if (currentTurnReached && !currentPhaseReached && mfc.getMessage().equals(expectedSetupPhaseLine))
+            {
+                currentPhaseReached = true;
+                String redoOn = Constants.redoOngoing + sep + false;
+                enqueueForResend(new MessageForClient(0, 0, redoOn));
+                enqueueForResend(mfc);
+            }
             else
             {
-                reEnqueueRedo(mfc);
+                enqueueForResend(mfc);
             }
         }
 
+        String redoOff = Constants.redoOngoing + sep + false;
+        enqueueForResend(new MessageForClient(0, 0, redoOff));
         String replayOff = Constants.replayOngoing + sep + false + sep + 0;
-        reEnqueueRedo(new MessageForClient(0, 0, replayOff));
+        enqueueForResend(new MessageForClient(0, 0, replayOff));
 
-        LOGGER.fine("Initialized redoQueue from stub, contains now "
-            + redoQueue.size() + " items!");
+        prn("Initialized resendQueue from other CH or stub, contains now "
+            + resendQueue.size() + " items!\n");
+
+        LOGGER
+            .fine("Initialized resendQueue from other CH or stub, contains now "
+            + resendQueue.size() + " items!");
     }
 
-    public void initRedoQueueFromOther(ClientHandlerStub replacedCH,
+    public void initResendQueueFromOther(ClientHandlerStub otherCH)
+    {
+        boolean kickPhaseSeen = false;
+
+        GameServerSide game = server.getGame();
+        String expectedTurnChangeLine = Constants.setupTurnState + sep
+            + game.getActivePlayer() + sep + game.getTurnNumber();
+        String expectedSetupPhaseLine = buildExpectedSetupPhaseLine(game);
+
+        boolean currentTurnReached = false;
+        boolean currentPhaseReached = false;
+
+        resendQueue.clear();
+        List<MessageForClient> tempQ = new ArrayList<MessageForClient>();
+        tempQ.addAll(otherCH.historyQueue);
+        tempQ.addAll(otherCH.resendQueue);
+
+        for (MessageForClient mfc : tempQ)
+        {
+            String method = mfc.getMethod();
+            if (method.equals(Constants.kickPhase))
+            {
+                kickPhaseSeen = true;
+            }
+
+            if (currentTurnReached)
+            {
+                // System.out.println("??? " + mfc.getMessage());
+            }
+            if (method.equals(Constants.initBoard))
+            {
+                int maxTurn = server.getGame().getTurnNumber();
+                String replayOn = Constants.replayOngoing + sep + true + sep
+                    + maxTurn;
+                enqueueForResend(new MessageForClient(0, 0, replayOn));
+                enqueueForResend(mfc);
+            }
+
+            // skip all the later ones; the initial ones are needed.
+            else if (kickPhaseSeen
+                && method.equals(Constants.updatePlayerInfo))
+            {
+                // skip
+            }
+
+            else if (method.equals(Constants.updateCreatureCount)
+                || method.equals(Constants.tellWhatsHappening))
+            {
+                // skip
+            }
+
+            else if (currentPhaseReached && Constants.isNeededForRedo(method))
+            {
+                enqueueForResend(mfc);
+            }
+            else if (!currentTurnReached
+                && method.equals(Constants.setupTurnState)
+                && mfc.getMessage().equals(expectedTurnChangeLine))
+            {
+                currentTurnReached = true;
+                String redoOn = Constants.redoOngoing + sep + true;
+                enqueueForResend(new MessageForClient(0, 0, redoOn));
+                enqueueForResend(mfc);
+            }
+            else if (currentTurnReached && !currentPhaseReached
+                && mfc.getMessage().equals(expectedSetupPhaseLine))
+            {
+                currentPhaseReached = true;
+                enqueueForResend(mfc);
+            }
+            else if (Constants.shouldSkipForScratchReconnect(method))
+            {
+                // Client has no use, or even can't handle those during a reconnect
+            }
+            else
+            {
+                enqueueForResend(mfc);
+            }
+        }
+
+        String redoOff = Constants.redoOngoing + sep + false;
+        enqueueForResend(new MessageForClient(0, 0, redoOff));
+        String replayOff = Constants.replayOngoing + sep + false + sep + 0;
+        enqueueForResend(new MessageForClient(0, 0, replayOff));
+
+        prn("Initialized resendQueue from other CH or stub, contains now "
+            + resendQueue.size() + " items!\n");
+
+        LOGGER
+            .fine("Initialized resendQueue from other CH or stub, contains now "
+                + resendQueue.size() + " items!");
+    }
+
+    private String buildExpectedSetupPhaseLine(GameServerSide game)
+    {
+        Phase currentPhase = game.getPhase();
+        String line;
+        if (currentPhase.equals(Phase.SPLIT))
+        {
+            line = Constants.setupSplit + sep + game.getActivePlayer() + sep
+                + game.getTurnNumber();
+        }
+        else if (currentPhase.equals(Phase.MOVE))
+        {
+            line = Constants.setupMove;
+        }
+        else if (currentPhase.equals(Phase.FIGHT))
+        {
+            line = Constants.setupFight;
+        }
+        else if (currentPhase.equals(Phase.MUSTER))
+        {
+            line = Constants.setupMuster;
+        }
+        else if (currentPhase.equals(Phase.INIT))
+        {
+            line = "dummy";
+        }
+        else
+        {
+            LOGGER.warning("bogus phase " + currentPhase.name());
+            line = "dummy2";
+        }
+
+        return line;
+    }
+
+    /*
+    public void initResendQueueFromOther(ClientHandlerStub replacedCH,
         boolean isPlayer)
     {
-        LOGGER.fine("Init redo queue from other, history queue has "
+        LOGGER.fine("Init resend queue from other; old history queue has "
                 + replacedCH.historyQueue.size() + " messages!");
 
-        historyQueue.clear();
-        redoQueue.clear();
+        resendQueue.clear();
 
         boolean kickPhaseSeen = false;
         for (MessageForClient mfc : replacedCH.historyQueue)
@@ -484,17 +679,8 @@ final class ClientHandler extends ClientHandlerStub implements IClient
                 int maxTurn = server.getGame().getTurnNumber();
                 String replayOn = Constants.replayOngoing + sep + true + sep
                     + maxTurn;
-                reEnqueueRedo(new MessageForClient(0, 0, replayOn));
-                reEnqueueRedo(mfc);
-                /*
-                if (isPlayer)
-                {
-                    String color = server.getGame()
-                        .getPlayerByName(playerName).getShortColor();
-                    String setColorMessage = Constants.setColor + sep + color;
-                    reEnqueueRedo(new MessageForClient(0, 0, setColorMessage));
-                }
-                */
+                enqueueForResend(new MessageForClient(0, 0, replayOn));
+                enqueueForResend(mfc);
             }
 
             else if (kickPhaseSeen
@@ -509,18 +695,15 @@ final class ClientHandler extends ClientHandlerStub implements IClient
             }
             else
             {
-                reEnqueueRedo(mfc);
+                enqueueForResend(mfc);
             }
         }
 
-        /**
-         * Completed turns are now handled. Now the stuff to "Redo" in the
-         * current phase.
-         */
+
         ArrayList<MessageForClient> leftToDoQueue = new ArrayList<MessageForClient>(
             100);
 
-        for (MessageForClient mfc : replacedCH.redoQueue)
+        for (MessageForClient mfc : replacedCH.resendQueue)
         {
             String method = mfc.getMethod();
             if (method.equals(Constants.updateCreatureCount)
@@ -550,7 +733,7 @@ final class ClientHandler extends ClientHandlerStub implements IClient
         enqeueExtra(Constants.kickPhase);
 
         LOGGER.fine("Initialized redoQueue from previous CH, contains now "
-            + redoQueue.size() + " items!");
+            + resendQueue.size() + " items!");
     }
 
     private void redoForPlayer(ArrayList<MessageForClient> leftToDoQueue)
@@ -598,14 +781,14 @@ final class ClientHandler extends ClientHandlerStub implements IClient
         if (phase.equals(Phase.FIGHT))
         {
             LOGGER.warning("Scratchconnect redoQueue, redo for fightphase might not work yet.");
-            LOGGER.warning("RedoQueue contains " + redoQueue.size()
+            LOGGER.warning("RedoQueue contains " + resendQueue.size()
                 + " items.");
         }
 
         enqeueExtra(Constants.redoOngoing + sep + true);
         for (MessageForClient mfc : leftToDoQueue)
         {
-            reEnqueueRedo(mfc);
+            enqueueForResend(mfc);
             reEnqueueHistory(mfc);
         }
         enqeueExtra(Constants.redoOngoing + sep + false);
@@ -615,33 +798,11 @@ final class ClientHandler extends ClientHandlerStub implements IClient
     {
         for (MessageForClient mfc : leftToDoQueue)
         {
-            reEnqueueRedo(mfc);
+            enqueueForResend(mfc);
         }
     }
 
-    private void enqeueExtra(String message)
-    {
-        reEnqueueRedo(new MessageForClient(0, 0, message));
-    }
-
-    private int newCounterHistory = 0;
-    private int newCounterRedo = 0;
-
-    private void reEnqueueHistory(MessageForClient mfc)
-    {
-        LOGGER.finest("Putting to hist queue: " + mfc.getShortenedMessage());
-        MessageForClient newOne = new MessageForClient(mfc,
-            newCounterHistory++);
-        historyQueue.add(newOne);
-    }
-
-    private void reEnqueueRedo(MessageForClient mfc)
-    {
-        LOGGER.finest("Putting to redo queue: " + mfc.getShortenedMessage());
-        MessageForClient newOne = new MessageForClient(mfc, newCounterRedo++);
-        redoQueue.add(newOne);
-    }
-
+    */
     /**
      * Re-send all data after the message from which we know client got it
      *
@@ -653,12 +814,14 @@ final class ClientHandler extends ClientHandlerStub implements IClient
     {
         // to get client out of initial read-lines loop, to get it into
         // normal "read from socket and parse line" loop
-        setPlayerName(signonName);
+        // setPlayerName(signonName);
 
-        int size = redoQueue.size();
+        System.out.println("syncAfterReconnect; resendQueue size = "
+            + resendQueue.size());
+        int size = resendQueue.size();
         for (int i = 0; i < size; i++)
         {
-            MessageForClient mfc = redoQueue.get(i);
+            MessageForClient mfc = resendQueue.get(i);
             int queueMsgNr = mfc.getMessageNr();
             if (queueMsgNr > lastReceivedMessageNr)
             {
@@ -746,7 +909,27 @@ final class ClientHandler extends ClientHandlerStub implements IClient
                 + " for writing it to" + " channel for player " + playerName
                 + "; details follow", e);
         }
+    }
 
+    private void debug_output(String msg)
+    {
+        List<String> li = Split.split(sep, msg);
+        String method = li.get(0);
+        if (Constants.shouldSkipForDebugPrn(method))
+        {
+            // skip
+        }
+        else
+        {
+            if (msg.startsWith("gameInitInfo"))
+            {
+                prn("\n--- New connection ---\n");
+            }
+            String logMessage = "SENDING " + getTruncatedPlayerName() + " -> "
+                + truncateMessage(msg);
+            prn(logMessage);
+            LOGGER.finer(logMessage);
+        }
     }
 
     /** The queue in which messages are stored, until they were really written.
@@ -757,6 +940,11 @@ final class ClientHandler extends ClientHandlerStub implements IClient
 
     private void sendViaChannelRaw(String msg)
     {
+        if (_DEBUG_OUTPUT())
+        {
+            debug_output(msg);
+        }
+
         // Something left undone last time. Postpone this here for a moment.
         // Except if it is null, then caller called us dedicatedly to give
         // us a chance to finish earlier stuff.
@@ -798,6 +986,23 @@ final class ClientHandler extends ClientHandlerStub implements IClient
             }
             temporarilyInTrouble = -1;
         }
+    }
+
+    private String truncateMessage(String message)
+    {
+        String printLine;
+
+        int _MAXLEN = 80;
+        int len = message.length();
+        if (len > _MAXLEN)
+        {
+            printLine = message.substring(0, _MAXLEN) + "...";
+        }
+        else
+        {
+            printLine = message;
+        }
+        return printLine;
     }
 
     private void attemptWritingToChannel()
@@ -1024,7 +1229,7 @@ final class ClientHandler extends ClientHandlerStub implements IClient
                 return;
             }
             LOGGER.info("Received joinGame from client " + signonName);
-            this.playerName = signonName;
+            setPlayerNameNoSend(signonName);
 
             if (server.getAllInitialConnectsDone())
             {
@@ -1059,6 +1264,7 @@ final class ClientHandler extends ClientHandlerStub implements IClient
             server.replyToRequestGameInfo();
         }
 
+        /*
         else if (method.equals(Constants.fixName))
         {
             String newName = args.remove(0);
@@ -1070,6 +1276,7 @@ final class ClientHandler extends ClientHandlerStub implements IClient
                 setPlayerName(newName);
             }
         }
+        */
         else if (method.equals(Constants.leaveCarryMode))
         {
             server.leaveCarryMode();
@@ -1506,9 +1713,12 @@ final class ClientHandler extends ClientHandlerStub implements IClient
                 LOGGER.info("GameOver: Sending to " + playerName + ": "
                     + message);
             }
-            String logMessage = "SENDING " + getTruncatedPlayerName() + " -> "
-                + message;
-            LOGGER.finer(logMessage);
+
+            // String logMessage = "SENDING " + getTruncatedPlayerName() + " -> "
+            //    + message;
+            //prn(logMessage);
+            // LOGGER.finer(logMessage);
+
             sendViaChannel(message);
 
             // TODO: are the null checks needed? Can that ever happen?
