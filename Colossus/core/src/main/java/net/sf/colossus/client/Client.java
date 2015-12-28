@@ -1046,23 +1046,6 @@ public final class Client implements IClient, IOracle, IVariant,
         return failed;
     }
 
-    // because of synchronization issues we need to
-    // be able to pass an undo split request to the server even if it is not
-    // yet in the client UndoStack
-    public void undoSplit(Legion splitoff)
-    {
-        server.undoSplit(splitoff);
-        getOwningPlayer().addMarkerAvailable(splitoff.getMarkerId());
-
-        numSplitsThisTurn--;
-
-        if (getTurnNumber() == 1 && numSplitsThisTurn == 0)
-        {
-            gui.informSplitRequiredFirstRound();
-        }
-        LOGGER.log(Level.FINEST, "called server.undoSplit");
-    }
-
     /** Resolve engagement in land. */
     public void engage(MasterHex hex)
     {
@@ -3135,6 +3118,11 @@ public final class Client implements IClient, IOracle, IVariant,
         return game.getTurnNumber();
     }
 
+    public int getNumSplitsThisTurn()
+    {
+        return numSplitsThisTurn;
+    }
+
     public void askPickColor(List<PlayerColor> colorsLeft)
     {
         if (autoplay.autoPickColor())
@@ -3238,6 +3226,24 @@ public final class Client implements IClient, IOracle, IVariant,
         }
         LOGGER.finest("Legion markers: " + markersAvailable.size());
 
+        if (parent.getSplitRequestSent())
+        {
+            LOGGER.finer("doSplit(): split request pending");
+            gui.showMessageDialogAndWait("Split request still pending\n(waiting for server response)");
+            // TODO is this useful here?
+            kickSplit();
+            return;
+        }
+
+        if (parent.getUndoSplitRequestSent())
+        {
+            LOGGER.finer("doSplit(): undo split request pending");
+            gui.showMessageDialogAndWait("Undo-split request still pending\n(waiting for server response)");
+            // TODO is this useful here?
+            kickSplit();
+            return;
+        }
+
         // Legion must be tall enough to split.
         if (parent.getHeight() < 4)
         {
@@ -3278,6 +3284,7 @@ public final class Client implements IClient, IOracle, IVariant,
             if (crestures != null)
             {
                 sendDoSplitToServer(parent, childId, crestures);
+                gui.actOnSplitRelatedRequestSent();
             }
         }
     }
@@ -3289,7 +3296,30 @@ public final class Client implements IClient, IOracle, IVariant,
         LOGGER.log(Level.FINER,
             "Client.doSplit: parent='" + parent.getMarkerId() + "', child='"
                 + childMarkerId + "', splitoffs=" + Glob.glob(",", creatures));
+        parent.setSplitRequestSent(true);
         server.doSplit(parent, childMarkerId, creatures);
+    }
+
+    public Set<MasterHex> findPendingSplitHexes()
+    {
+        Set<MasterHex> hexes = new HashSet<MasterHex>();
+        for (Legion l : getOwningPlayer().getPendingSplitLegions())
+        {
+            hexes.add(l.getCurrentHex());
+        }
+        return hexes;
+    }
+
+    public Set<MasterHex> findPendingUndoSplitHexes()
+    {
+        Set<MasterHex> hexes = new HashSet<MasterHex>();
+        HashSet<Legion> legions = getOwningPlayer()
+            .getPendingUndoSplitLegions();
+        for (Legion l : legions)
+        {
+            hexes.add(l.getCurrentHex());
+        }
+        return hexes;
     }
 
     /**
@@ -3305,14 +3335,15 @@ public final class Client implements IClient, IOracle, IVariant,
 
         ((LegionClientSide)parent).split(childHeight, child, turn);
         child.setCurrentHex(hex);
-        gui.actOnDidSplit(turn, parent, child, hex);
+
         if (isMyLegion(child))
         {
+            parent.setSplitRequestSent(false);
+            numSplitsThisTurn++;
             getOwningPlayer().removeMarkerAvailable(child.getMarkerId());
         }
 
-        numSplitsThisTurn++;
-        gui.actOnDidSplitPart2(hex);
+        gui.actOnDidSplit(turn, parent, child, hex);
 
         // check also for phase, because delayed callbacks could come
         // after our phase is over but activePlayerName not updated yet.
@@ -3327,10 +3358,21 @@ public final class Client implements IClient, IOracle, IVariant,
         }
     }
 
+    // because of synchronization issues we need to
+    // be able to pass an undo split request to the server even if it is not
+    // yet in the client UndoStack
+    public void undoSplit(Legion splitoff)
+    {
+        server.undoSplit(splitoff);
+        splitoff.setUndoSplitRequestSent(true);
+        LOGGER.log(Level.FINEST, "called server.undoSplit");
+    }
+
     public void undidSplit(Legion splitoff, Legion survivor, int turn)
     {
         ((LegionClientSide)survivor).merge(splitoff);
         removeLegion(splitoff);
+        getOwningPlayer().addMarkerAvailable(splitoff.getMarkerId());
 
         // do the eventViewer stuff before the board, so we are sure to get
         // a repaint.
@@ -3338,6 +3380,12 @@ public final class Client implements IClient, IOracle, IVariant,
         if (!replayOngoing || redoOngoing)
         {
             gui.eventViewerUndoEvent(splitoff, survivor, turn);
+        }
+
+        if (isMyTurn())
+        {
+            numSplitsThisTurn--;
+            survivor.setUndoSplitRequestSent(false);
         }
 
         gui.actOnUndidSplit(survivor, turn);
@@ -3562,11 +3610,7 @@ public final class Client implements IClient, IOracle, IVariant,
         legion.setCurrentHex(currentHex);
         legion.setMoved(true);
         legion.setEntrySide(entrySide);
-
-        if (teleport)
-        {
-            legion.setTeleported(true);
-        }
+        legion.setTeleported(teleport);
 
         gui.actOnDidMove(legion, startingHex, currentHex, teleport,
             teleportingLord, splitLegionHasForcedMove);

@@ -1785,6 +1785,12 @@ public final class MasterBoard extends JPanel
         unselectAllHexes();
     }
 
+    public void updateSplitPendingText(String titleText)
+    {
+        setTitleInfoText(titleText);
+        bottomBar.setPhase(titleText);
+    }
+
     /**
      * Do the setup needed for an inactive player:
      * set the actions which are allowed only for active player to inactive,
@@ -2050,6 +2056,10 @@ public final class MasterBoard extends JPanel
     {
         unselectAllHexes();
         selectHexes(client.findTallLegionHexes());
+        selectHexes(client.findPendingSplitHexes(), Color.blue);
+        selectHexes(client.findPendingUndoSplitHexes(), Color.blue);
+        repaint();
+        Thread.yield();
     }
 
     void highlightUnmovedLegions()
@@ -2296,6 +2306,7 @@ public final class MasterBoard extends JPanel
                     return false; // keep going
                 }
             });
+        repaint();
     }
 
     /*

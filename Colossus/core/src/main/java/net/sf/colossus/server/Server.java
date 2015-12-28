@@ -3127,7 +3127,6 @@ public final class Server extends Thread implements IServer
         {
             return;
         }
-
         game.undoMove(legion);
     }
 
