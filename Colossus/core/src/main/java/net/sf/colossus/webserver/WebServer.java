@@ -751,6 +751,14 @@ public class WebServer implements IWebServer, IRunWebServer
             if (!gi.isScheduledGame()
                 && (gi.isEnrolled(initiatorName) || gi.getInitiator().equals(
                     initiatorName))
+                // This relies on that that the client side does not allow
+                // proposing if one is actually still playing; but allow it
+                // here, because we can't distinct still playing from being
+                // dead, and thus one could never propose as long as the other
+                // game is still ongoing.
+                // TODO: fix when webserver has better knowledge of game
+                // state, i.e. which players are alive in which game...
+                && !gi.getGameState().equals(GameState.RUNNING)
                 && !gi.getGameState().equals(GameState.SUSPENDED))
             {
                 return gi;
