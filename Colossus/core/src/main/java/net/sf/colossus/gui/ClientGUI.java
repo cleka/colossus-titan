@@ -1438,6 +1438,87 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         board.setMarkerForLegion(legion, marker);
     }
 
+    /**
+      * EventViewer, Turn change actions, clear recruited chits,
+      * push to undo stack, reset to default cursor if no splits pending
+      *
+      * Update marker count text, align and highlight legions,
+      * and for first turn now enable done
+      * (for all others it was enabled at begin of the phase)
+      */
+
+    /***
+     *
+     * Those below are the two old actondidsplit methods
+    public void actOnDidSplit(int turn, Legion parent, Legion child,
+        MasterHex hex)
+    {
+        LOGGER
+            .fine("CG: actOnDidSplit(int turn, Legion parent, Legion child,");
+
+        // TODO move if block to eventviewer itself?
+        // Not during replay, but during redo:
+        if (!client.isReplayBeforeRedo())
+        {
+            eventViewerNewSplitEvent(turn, parent, child);
+        }
+
+        Marker marker = new Marker(child, 3 * Scale.get(),
+            child.getLongMarkerId(), client, (client != null));
+        setMarker(child, marker);
+
+        if (client.isReplayBeforeRedo())
+        {
+            replayTurnChange(turn);
+        }
+        else
+        {
+            board.alignLegions(hex);
+            if (client.isMyLegion(child))
+            {
+                board.clearRecruitedChits();
+                board.clearPossibleRecruitChits();
+                pushUndoStack(child.getMarkerId());
+            }
+        }
+    }
+
+    public void actOnDidSplitPart2(MasterHex hex)
+    {
+        logPerhaps("actOnDidSplitPart2(MasterHex hex)");
+        if (client.getTurnNumber() == 1 && isMyTurn())
+        {
+            board.enableDoneAction();
+        }
+        // After doing a split, refresh the number of markers available
+        if (isMyTurn())
+        {
+            board.setMarkerCount(client.getOwningPlayer()
+                .getMarkersAvailable().size());
+
+        }
+        if (!client.isReplayBeforeRedo())
+        {
+            board.alignLegions(hex);
+            board.highlightTallLegions();
+        }
+    }
+
+    ***/
+
+    /**
+     * And this is the new one
+     */
+
+    /**
+     * EventViewer, Turn change actions, clear recruited chits,
+     * push to undo stack, reset to default cursor if no splits pending
+     *
+     * Update marker count text, align and highlight legions,
+     * and for first turn now enable done
+     * (for all others it was enabled at begin of the phase)
+
+     */
     public void actOnDidSplit(int turn, Legion parent, Legion child,
         MasterHex hex)
     {
@@ -1459,39 +1540,33 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         {
             replayTurnChange(turn);
         }
-        else
-        {
-            board.alignLegions(hex);
-        }
 
-        if (client.isMyLegion(child))
+        if (isMyTurn())
         {
             board.clearRecruitedChits();
             board.clearPossibleRecruitChits();
             pushUndoStack(child.getMarkerId());
-        }
 
-    }
-
-    public void actOnDidSplitPart2(MasterHex hex)
-    {
-        logPerhaps("actOnDidSplitPart2(MasterHex hex)");
-        if (client.getTurnNumber() == 1 && isMyTurn())
-        {
-            board.enableDoneAction();
-        }
-        // After doing a split, refresh the number of markers available
-        if (isMyTurn())
-        {
+            if (client.getTurnNumber() == 1)
+            {
+                board.enableDoneAction();
+            }
+            // After doing a split, refresh the number of markers available
             board.setMarkerCount(client.getOwningPlayer()
                 .getMarkersAvailable().size());
+            updatePendingSplitsText();
+
+            if (client.getOwningPlayer().countPendingSplits() == 0)
+            {
+                defaultCursor();
+            }
         }
+
         if (!isReplayOngoing())
         {
             board.alignLegions(hex);
             board.highlightTallLegions();
         }
-
     }
 
     public void actOnDoneWithMoves()
@@ -1599,7 +1674,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     public void actOnUndidSplit(Legion survivor, int turn)
     {
         logPerhaps("actOnUndidSplit(Legion survivor, int turn)");
-        if (isReplayOngoing())
+        if (client.isReplayBeforeRedo())
         {
             replayTurnChange(turn);
         }
@@ -1608,11 +1683,17 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             // After undoing a split, refresh the number of markers available
             if (isMyTurn())
             {
+                if (survivor.getPlayer().countPendingUndoSplits() == 0)
+                {
+                    defaultCursor();
+                }
                 board.setMarkerCount(client.getOwningPlayer()
                     .getMarkersAvailable().size());
+                updatePendingSplitsText();
             }
             board.alignLegions(survivor.getCurrentHex());
             board.highlightTallLegions();
+            board.repaint();
         }
     }
 
@@ -1622,8 +1703,6 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         LOGGER
             .fine("CG: actOnUndidRecruitPart(Legion legion, boolean wasReinforcement,");
 
-        int eventType = wasReinforcement ? RevealEvent.eventReinforce
-            : RevealEvent.eventRecruit;
         board.cleanRecruitedChit((LegionClientSide)legion);
         board.highlightPossibleRecruitLegionHexes();
         if (client.isMyLegion(legion))
@@ -1634,6 +1713,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
                 board.updateLegionsLeftToMusterText();
             }
         }
+        int eventType = wasReinforcement ? RevealEvent.eventReinforce
+            : RevealEvent.eventRecruit;
         eventViewer.undoEvent(eventType, legion, null, turnNumber);
     }
 
@@ -1664,7 +1745,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         if (client.isMyLegion(legion))
         {
             setMoveCompleted(legion, startingHex, currentHex);
-            updatePendingText();
+            updatePendingMovesText();
         }
         board.clearPossibleRecruitChits();
         board.alignLegions(startingHex);
@@ -1815,11 +1896,17 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         }
     }
 
+    public void prn(String text)
+    {
+        client.prn(text);
+    }
+
     public void actOnTellReplay(int maxTurn)
     {
         logPerhaps("actOnTellReplay(int maxTurn)");
         if (isReplayOngoing())
         {
+
             // Switching to replay mode
             replayMaxTurn = maxTurn;
             if (board != null)
@@ -1830,32 +1917,37 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         }
         else
         {
-            // Replay mode now over
-            if (board != null)
+            repaintAllAfterReplay();
+        }
+    }
+
+    private void repaintAllAfterReplay()
+    {
+        // Replay mode now over
+        if (board != null)
+        {
+            try
             {
-                try
+                LOGGER.info("before invokeAndWait for recreateMarkers()");
+                SwingUtilities.invokeAndWait(new Runnable()
                 {
-                    LOGGER.info("before invokeAndWait for recreateMarkers()");
-                    SwingUtilities.invokeAndWait(new Runnable()
+                    public void run()
                     {
-                        public void run()
-                        {
-                            makeBoardRecreateMarkers();
-                        }
-                    });
-                }
-                catch (InvocationTargetException e)
-                {
-                    LOGGER.log(Level.SEVERE, "Failed to run makeBoard"
-                        + "RecreateMarkers() with invokeAndWait(): ", e);
-                }
-                catch (InterruptedException e2)
-                {
-                    LOGGER.log(Level.SEVERE, "Failed to run makeBoard"
-                        + "RecreateMarkers() with invokeAndWait(): ", e2);
-                }
-                LOGGER.info("after  invokeAndWait for recreateMarkers()");
+                        makeBoardRecreateMarkers();
+                    }
+                });
             }
+            catch (InvocationTargetException e)
+            {
+                LOGGER.log(Level.SEVERE, "Failed to run makeBoard"
+                    + "RecreateMarkers() with invokeAndWait(): ", e);
+            }
+            catch (InterruptedException e2)
+            {
+                LOGGER.log(Level.SEVERE, "Failed to run makeBoard"
+                    + "RecreateMarkers() with invokeAndWait(): ", e2);
+            }
+            LOGGER.info("after  invokeAndWait for recreateMarkers()");
         }
     }
 
@@ -1868,7 +1960,25 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     public void actOnTellRedoChange()
     {
         logPerhaps("actOnTellRedoChange()");
-        // Nothing to do right now (was needed temporarily)
+        if (isRedoOngoing())
+        {
+            // Redo switched on: make all visible.
+            //repaintAllAfterReplay();
+            //board.repaint();
+        }
+        else
+        {
+            if (client.getGame().getPhase().equals(Phase.MUSTER))
+            {
+                board.unselectAllHexes();
+                board.clearRecruitedChits();
+                board.clearPossibleRecruitChits();
+                board.alignAllLegions();
+                // board.paintRecruitedChits(g);
+                board.getFrame().repaint();
+                // repaintAfterOverlayChanged();
+            }
+        }
     }
 
     private void clearUndoStack()
@@ -2475,6 +2585,10 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     public void actOnTellMovementRoll(int roll, String reason)
     {
+        if (client.isReplayBeforeRedo())
+        {
+            return;
+        }
         logPerhaps("actOnTellMovementRoll(" + roll + ", " + reason + ")");
         // TODO move if block to eventviewer itself?
         // Not during replay, but during redo:
@@ -2566,6 +2680,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     private void showOrHideConnectionLogWindow(boolean show)
     {
+        show = false;
         if (show)
         {
             if (connectionLogWindow == null)
@@ -2592,8 +2707,9 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     public void appendToConnectionLog(String s)
     {
         // Creates or make visible, if needed:
-        options.setOption(Options.showConnectionLogWindow, true);
-        connectionLogWindow.append(s);
+
+        // options.setOption(Options.showConnectionLogWindow, true);
+        // connectionLogWindow.append(s);
     }
 
     public void actOnReconnectCompleted()
@@ -3418,6 +3534,13 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         }
     }
 
+    public void actOnSplitRelatedRequestSent()
+    {
+        board.highlightTallLegions();
+        updatePendingSplitsText();
+        waitCursor();
+    }
+
     void undoAllSplits()
     {
         while (!isUndoStackEmpty())
@@ -3428,6 +3551,13 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
     void undoLastSplit()
     {
+        if (client.getOwningPlayer().countPendingSplits() != 0)
+        {
+            LOGGER.finer("undoLastSplit(): split request pending");
+            showMessageDialogAndWait("Split request still pending\n(waiting for server response)");
+            return;
+        }
+
         if (!isUndoStackEmpty())
         {
             String splitoffId = (String)popUndoStack();
@@ -3441,6 +3571,10 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             else
             {
                 client.undoSplit(legion);
+                // to highlight the unsplitting one in blue
+                board.highlightTallLegions();
+                board.repaint();
+                updatePendingSplitsText();
             }
         }
     }
@@ -3455,6 +3589,14 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         }
     }
 
+    public void informSplitDoneFirstRound()
+    {
+        logPerhaps("informSplitDoneFirstRound()");
+        if (board != null && isMyTurn())
+        {
+            board.enableDoneAction();
+        }
+    }
     void undoLastMove()
     {
         if (pendingMoves.size() > 0)
@@ -3873,7 +4015,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
     {
         for (PendingMove pendingMove : pendingMoves)
         {
-            if (mover.equals(pendingMove.getLegion()))
+            if (pendingMove.getLegion().equals(mover))
             {
                 JOptionPane.showMessageDialog(getMapOrBoardFrame(),
                     "Legion already moved, but screen update happens only "
@@ -3931,28 +4073,29 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         logPerhaps("setMovePending(Legion mover, MasterHex currentHex,");
         // board.visualizeMoveTarget(mover, currentHex, targetHex);
         PendingMove move = new PendingMove(mover, currentHex, targetHex);
-        pendingMoves.add(move);
-        pendingMoveHexes.add(targetHex);
         synchronized (pendingMoves)
         {
-            if (!pendingMoves.isEmpty())
-            {
-                waitCursor();
-            }
+            pendingMoves.add(move);
+            pendingMoveHexes.add(targetHex);
+            waitCursor();
         }
-        updatePendingText();
+        updatePendingMovesText();
     }
 
-    private void updatePendingText()
+    private void updatePendingMovesText()
     {
         logPerhaps("updatePendingText()");
-        int count = pendingMoves.size();
+        int count;
+        synchronized (pendingMoves)
+        {
+            count = pendingMoves.size();
+        }
 
         if (count > 0)
         {
-            String morePendingText = " (" + count + " move"
+            String movesPendingText = " (" + count + " move"
                 + (count != 1 ? "s" : "") + " pending)";
-            board.setPendingText(morePendingText);
+            board.setPendingText(movesPendingText);
         }
         else
         {
@@ -3960,17 +4103,65 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         }
     }
 
+    private void updatePendingSplitsText()
+    {
+        logPerhaps("updatePendingSplitsText()");
+
+        int pendingSplits = getOwningPlayer().countPendingSplits();
+        int pendingUndos = getOwningPlayer().countPendingUndoSplits();
+
+        if (pendingUndos > 0)
+        {
+            String splitsPendingText = " (" + pendingUndos + " undo-split"
+                + (pendingUndos != 1 ? "s" : "") + " pending)";
+            board.setPendingText(splitsPendingText);
+        }
+        else if (pendingSplits > 0)
+        {
+            String splitsPendingText = " (" + pendingSplits + " split"
+                + (pendingSplits != 1 ? "s" : "") + " pending)";
+            board.setPendingText(splitsPendingText);
+        }
+        else if (getGame().getTurnNumber() == 1)
+        {
+            if (client.getNumSplitsThisTurn() == 0)
+            {
+                informSplitRequiredFirstRound();
+            }
+            else if (client.getNumSplitsThisTurn() == 1)
+            {
+                informSplitDoneFirstRound();
+            }
+            board.setPendingText("");
+        }
+        else
+        {
+            board.updateSplitPendingText("Split stacks");
+            board.setMarkerCount(client.getOwningPlayer()
+                .getMarkersAvailable().size());
+        }
+    }
+
     public Set<MasterHex> getPendingMoveHexes()
     {
-        return pendingMoveHexes;
+        Set<MasterHex> hexes = new HashSet<MasterHex>();
+        synchronized (pendingMoves)
+        {
+            hexes.addAll(pendingMoveHexes);
+
+        }
+        return hexes;
     }
 
     public Set<MasterHex> getStillToMoveHexes()
     {
         HashSet<Legion> pendingLegions = new HashSet<Legion>();
-        for (PendingMove move : pendingMoves)
+        synchronized (pendingMoves)
         {
-            pendingLegions.add(move.getLegion());
+            for (PendingMove move : pendingMoves)
+            {
+                pendingLegions.add(move.getLegion());
+            }
         }
         return client.findUnmovedLegionHexes(true, pendingLegions);
     }
@@ -3993,7 +4184,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
         if (foundMove != null)
         {
-            pendingMoves.remove(foundMove);
+            // ok, remove later
         }
         else if (isRedoOngoing())
         {
@@ -4001,19 +4192,21 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         }
         else if (recoveredFromMoveNak)
         {
-            // ok, recover from Nak wiped out wiped out pendingMoves list
-            // (because one move was sent to server but did not really happen,
-            // and it's hard to figure out which).
+            // OK, recover from Nak wiped out pendingMoves list (because one
+            // move was sent to server but did not really happen, and it's
+            // hard to figure out which).
             // This way we loose some "safety checking", but at least no
             // legal moves are prevented.
         }
         else
         {
             LOGGER.warning("Could not find pending move for legion " + mover
-                + " from hex " + current + " to hex " + target);
+                + " from hex " + current + " to hex " + target + "; redo="
+                + isRedoOngoing() + ", replay=" + isReplayOngoing());
         }
         synchronized (pendingMoves)
         {
+            pendingMoves.remove(foundMove);
             if (pendingMoves.isEmpty())
             {
                 defaultCursor();

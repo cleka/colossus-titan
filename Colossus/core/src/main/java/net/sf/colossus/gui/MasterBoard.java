@@ -1364,7 +1364,7 @@ public final class MasterBoard extends JPanel
         mi.setMnemonic(KeyEvent.VK_R);
 
         // only for debugging/testing
-        boolean _DISCONNECT_BY_SERVER = false;
+        boolean _DISCONNECT_BY_SERVER = true;
         if (!client.isRemote() && _DISCONNECT_BY_SERVER)
         {
             mi = fileMenu.add(enforcedDisconnectByServerAction);
@@ -1425,7 +1425,7 @@ public final class MasterBoard extends JPanel
         mi = phaseMenu.add(forcedDoneWithPhaseAction);
         mi.setMnemonic(KeyEvent.VK_F);
 
-        boolean CLEMENS_TEST = true;
+        boolean CLEMENS_TEST = false;
         if (CLEMENS_TEST)
         {
             mi = phaseMenu.add(kickPhaseAction);
@@ -1785,6 +1785,12 @@ public final class MasterBoard extends JPanel
         unselectAllHexes();
     }
 
+    public void updateSplitPendingText(String titleText)
+    {
+        setTitleInfoText(titleText);
+        bottomBar.setPhase(titleText);
+    }
+
     /**
      * Do the setup needed for an inactive player:
      * set the actions which are allowed only for active player to inactive,
@@ -2050,6 +2056,10 @@ public final class MasterBoard extends JPanel
     {
         unselectAllHexes();
         selectHexes(client.findTallLegionHexes());
+        selectHexes(client.findPendingSplitHexes(), Color.blue);
+        selectHexes(client.findPendingUndoSplitHexes(), Color.blue);
+        repaint();
+        Thread.yield();
     }
 
     void highlightUnmovedLegions()
@@ -2296,6 +2306,7 @@ public final class MasterBoard extends JPanel
                     return false; // keep going
                 }
             });
+        repaint();
     }
 
     /*
@@ -2321,9 +2332,9 @@ public final class MasterBoard extends JPanel
          * in the bottom-panel (in particular the Pause button, it seems) and
          *  masterboard doesn't get KeyEvents => legion flyouts don't work
          */
-        // System.out.println("Fowcus owner WAS: " + getFocusOwnerText());
+        // ("Fowcus owner WAS: " + getFocusOwnerText());
         this.requestFocusInWindow();
-        // System.out.println("Fowcus owner NOW: " + getFocusOwnerText());
+        // ("Fowcus owner NOW: " + getFocusOwnerText());
     }
 
     void actOnMisclick()
@@ -2831,7 +2842,7 @@ public final class MasterBoard extends JPanel
         }
     }
 
-    private void paintRecruitedChits(Graphics g)
+    public void paintRecruitedChits(Graphics g)
     {
         for (Chit chit : recruitedChits.values())
         {
@@ -2991,7 +3002,7 @@ public final class MasterBoard extends JPanel
         if (gui.getGame().isPhase(Phase.SPLIT))
         {
             // Not implemented yet
-            // System.out.println("Mark Legion Skip Split");
+            // ("Mark Legion Skip Split");
         }
         else if (gui.getGame().isPhase(Phase.MOVE))
         {
@@ -3548,8 +3559,8 @@ public final class MasterBoard extends JPanel
 
     public void updateReplayText(int currTurn, int maxTurn)
     {
-        bottomBar.setPhase("Replay ongoing, " + currTurn + " of " + maxTurn
-            + " turns processed");
+        bottomBar.setPhase("Replay ongoing, processing turn " + currTurn
+            + " of " + maxTurn);
     }
 
     /**

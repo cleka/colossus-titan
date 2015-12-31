@@ -3,6 +3,7 @@ package net.sf.colossus.game;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
@@ -552,4 +553,41 @@ public class Player
     {
         return Dice.rollDie();
     }
+
+    public HashSet<Legion> getPendingSplitLegions()
+    {
+        HashSet<Legion> legions = new HashSet<Legion>();
+        for (Legion l : getLegions())
+        {
+            if (l.getSplitRequestSent())
+            {
+                legions.add(l);
+            }
+        }
+        return legions;
+    }
+
+    public int countPendingSplits()
+    {
+        return getPendingSplitLegions().size();
+    }
+
+    public HashSet<Legion> getPendingUndoSplitLegions()
+    {
+        HashSet<Legion> legions = new HashSet<Legion>();
+        for (Legion l : getLegions())
+        {
+            if (l.getUndoSplitRequestSent())
+            {
+                legions.add(l);
+            }
+        }
+        return legions;
+    }
+
+    public int countPendingUndoSplits()
+    {
+        return getPendingUndoSplitLegions().size();
+    }
+
 }

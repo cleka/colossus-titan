@@ -84,12 +84,6 @@ public class NullClientGUI implements IClientGUI
 
     }
 
-    public void actOnDidSplitPart2(MasterHex hex)
-    {
-        // TODO Auto-generated method stub
-
-    }
-
     public void actOnDoSummon()
     {
         // TODO Auto-generated method stub
@@ -895,4 +889,10 @@ public class NullClientGUI implements IClientGUI
         // TODO Auto-generated method stub
         return "Dummy";
     }
+
+    public void actOnSplitRelatedRequestSent()
+    {
+        // TODO Auto-generated method stub
+    }
+
 }

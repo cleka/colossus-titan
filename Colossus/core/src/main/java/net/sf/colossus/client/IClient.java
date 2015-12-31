@@ -191,4 +191,6 @@ public interface IClient
 
     public boolean canHandleChangedValuesOnlyStyle();
 
+    public String getClientName();
+
 }

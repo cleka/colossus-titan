@@ -450,7 +450,7 @@ public class SimpleAI extends AbstractAI
         // Otherwise we might have a race situation, if callback is quicker
         // than caller incrementing the splitsDone value...
         this.splitsDone++;
-        client.doSplit(legion, newMarkerId, creatures);
+        client.sendDoSplitToServer(legion, newMarkerId, creatures);
     }
 
     /** Decide how to split this legion, and return a list of

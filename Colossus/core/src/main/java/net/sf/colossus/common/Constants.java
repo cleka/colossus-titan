@@ -4,6 +4,7 @@ package net.sf.colossus.common;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 
@@ -380,6 +381,7 @@ public final class Constants
     public static final String boardActive = "boardActive";
     public static final String askConfirmCatchUp = "askConfirmCatchUp";
     public static final String relayedPeerRequest = "relayedPeerRequest";
+    public static final String setConnectionId = "setConnectionId";
     public static final String gameInitInfo = "gameInitInfo";
     public static final String commitPoint = "commitPoint";
     public static final String messageFromServer = "messageFromServer";
@@ -387,6 +389,71 @@ public final class Constants
     public static final String requestExtraRollApproval = "requestExtraRollApproval";
     public static final String askSuspendConfirmation = "askSuspendConfirmation";
     public static final String appendToConnectionLog = "appendToConnLog";
+
+    private final static HashSet<String> skipForScratchReconnect = new HashSet<String>(
+        Arrays.asList(askPickColor, tellEngagement, dispose,
+            removeDeadBattleChits, placeNewChit, createSummonAngel,
+            askAcquireAngel, askChooseStrikePenalty, tellGameOver, askConcede,
+            askFlee, askNegotiate, tellProposal, tellStrikeResults,
+            tellSlowResults, initBattle, cleanupBattle, nextEngagement,
+            doReinforce, setupBattleSummon, setupBattleRecruit,
+            setupBattleMove,
+            setupBattleFight, tellBattleMove, askPickFirstMarker, log, nak,
+            boardActive, askConfirmCatchUp, relayedPeerRequest,
+            setConnectionId, syncCompleted, requestExtraRollApproval,
+            askSuspendConfirmation, "Ack: signOn",
+            pingRequest, updateCreatureCount, tellWhatsHappening, commitPoint,
+            gameInitInfo, replayOngoing, redoOngoing, tellLegionLocation,
+            didMove, undidMove, setupSplit, setupMove, setupMuster,
+            setLegionStatus,
+
+            // setupSplit,
+
+            setPlayerName));
+
+    public static boolean shouldSkipForScratchReconnect(String method)
+    {
+        return skipForScratchReconnect.contains(method);
+    }
+
+    private final static HashSet<String> skipForDebugPrn = new HashSet<String>(
+        Arrays.asList(syncOption, tellLegionLocation, revealCreatures,
+            tellMovementRoll, didRecruit, didSplit, didMove,
+            updateCreatureCount, pingRequest
+
+
+            /*
+            askPickColor, tellEngagement, dispose,
+            removeDeadBattleChits, placeNewChit, createSummonAngel,
+            askAcquireAngel, askChooseStrikePenalty, tellGameOver, askConcede,
+            askFlee, askNegotiate, tellProposal, tellStrikeResults,
+            tellSlowResults, initBattle, cleanupBattle, nextEngagement,
+            doReinforce, setupSplit, setupMove, setupFight, setupMuster,
+            kickPhase, setupBattleSummon, setupBattleRecruit, setupBattleMove,
+            setupBattleFight, tellBattleMove, askPickFirstMarker, log, nak,
+            boardActive, askConfirmCatchUp, relayedPeerRequest,
+            setConnectionId, syncCompleted, requestExtraRollApproval,
+            askSuspendConfirmation, didMove, undidMove, "Ack: signOn",
+            pingRequest, updateCreatureCount, tellWhatsHappening, commitPoint,
+            gameInitInfo, replayOngoing, redoOngoing)
+            */
+            //
+            ));
+
+
+    public static boolean shouldSkipForDebugPrn(String method)
+    {
+        return skipForDebugPrn.contains(method);
+    }
+
+    private final static HashSet<String> neededForRedo = new HashSet<String>(
+        Arrays.asList(didMove, undidMove, didRecruit, undidRecruit, didSplit,
+            undidSplit, setupSplit, setupMove, setupMuster));
+
+    public static boolean isNeededForRedo(String method)
+    {
+        return neededForRedo.contains(method);
+    }
 
     // engagement resolved, methods:
     public static final String erMethodFlee = "flee";
@@ -400,3 +467,5 @@ public final class Constants
     public static final int legionStatusNotVisitedSkippedBlocked = 2;
     public static final int legionStatusBlocked = 3;
 }
+
+

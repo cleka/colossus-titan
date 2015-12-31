@@ -180,7 +180,7 @@ public final class Client implements IClient, IOracle, IVariant,
      *
      * TODO most likely redundant with owningPlayer.getColor()
      */
-    private PlayerColor color;
+    // private PlayerColor color;
 
     // This ai is either the actual ai player for an AI player, but is also
     // used by human clients for the autoXXX actions.
@@ -464,9 +464,91 @@ public final class Client implements IClient, IOracle, IVariant,
         gui.setStartedByWebClient(byWebClient);
     }
 
+    /**
+     * Create the AI for this Client. If type is some (concrete) AI type,
+     * create that type of AI (then this is an AI player).
+     * Otherwise, create a SimpleAI as default (used by Human or Remote
+     * clients for the autoplay functionality).
+     *
+     * @param playerType Type of player for which to create an AI
+     * @return Some AI object, according to the situation
+     */
+    // TODO move (partly) to AI package, e.g. as static method
+    private AI createAI(String playerType)
+    {
+        LOGGER.log(Level.FINEST, "Creating the AI player type " + playerType);
+
+        AI createdAI = null;
+
+        String createType = playerType;
+        if (createType.endsWith(Constants.anyAI))
+        {
+            LOGGER.severe("Invalid player type " + createType
+                + " on client side - server is supposed to select the "
+                + "actual AI type for random choosing.");
+        }
+
+        // Non-AI (= human and remote) players use some AI for autoplay:
+        if (!createType.endsWith("AI"))
+        {
+            createType = Constants.aiPackage + Constants.autoplayAI;
+        }
+
+        // TODO Can it still happen that we get a unqualified AI class name?
+        // Or does server nowadays always send proper fully qualified name?
+        if (!createType.startsWith(Constants.aiPackage))
+        {
+            String name = getOwningPlayer().getName();
+            LOGGER.warning("Needed to add package for AI type? Type="
+                + createType + ", Player name=" + name);
+            createType = Constants.aiPackage + createType;
+        }
+
+        try
+        {
+            // TODO these seem to be classes of either AI or Client, there
+            // should be a common ancestor
+            // NOPE . The one is the "first argument of the constructor
+            //        is of type Client. The other is the Client object passed
+            //        to that constructor.
+            // TODO Anyway, this could be done better, perhaps moved to
+            // AI package, using typesafe enums that do the mapping from name
+            // to class explicitly?
+            Class<?>[] classArray = new Class<?>[1];
+            classArray[0] = Class.forName("net.sf.colossus.client.Client");
+            Object[] objArray = new Object[1];
+            objArray[0] = this;
+            createdAI = (AI)Class.forName(createType)
+                .getDeclaredConstructor(classArray).newInstance(objArray);
+        }
+        catch (Exception ex)
+        {
+            LOGGER.log(Level.SEVERE, "Failed to create for client "
+                + owningPlayer.getName() + " the to " + createType, ex);
+        }
+
+        if (createdAI == null)
+        {
+            createdAI = new SimpleAI(this);
+        }
+
+        return createdAI;
+    }
+
     public void appendToConnectionLog(String s)
     {
+        // in rare cases with scratch-reconnects we might not have a gui or
+        // connection log window yet.
+        if (isReplayOngoing() || gui == null)
+        {
+            return;
+        }
         gui.appendToConnectionLog(s);
+    }
+
+    public boolean isSctAlreadyDown()
+    {
+        return connection.isAlreadyDown();
     }
 
     public boolean isRemote()
@@ -796,7 +878,7 @@ public final class Client implements IClient, IOracle, IVariant,
         {
             gui.actOnReconnectCompleted();
         }
-        if (isSpectator() && syncRequestNumber == -1)
+        if (isSpectator() && syncRequestNumber == 0)
         {
             // this is the initial sync during connect for watching,
             // skip displaying anything
@@ -806,6 +888,27 @@ public final class Client implements IClient, IOracle, IVariant,
             gui.appendToConnectionLog("Synchronization #" + syncRequestNumber
                 + " completed!");
         }
+    }
+
+    /** Take a mulligan. */
+    public void mulligan()
+    {
+        gui.undoAllMoves(); // XXX Maybe move entirely to server
+
+        tookMulligan = true;
+
+        server.mulligan();
+    }
+
+    public void requestExtraRoll()
+    {
+        server.requestExtraRoll();
+    }
+
+    // XXX temp
+    public boolean tookMulligan()
+    {
+        return tookMulligan;
     }
 
     public void requestExtraRollApproval(String requestorName, int requestId)
@@ -838,6 +941,11 @@ public final class Client implements IClient, IOracle, IVariant,
         }
     }
 
+    /**
+     * Player or AI has answered, send the response to server
+     * @param approved
+     * @param requestId
+     */
     public void sendExtraRollRequestResponse(boolean approved, int requestId)
     {
         server.extraRollResponse(approved, requestId);
@@ -938,44 +1046,6 @@ public final class Client implements IClient, IOracle, IVariant,
         return failed;
     }
 
-    // because of synchronization issues we need to
-    // be able to pass an undo split request to the server even if it is not
-    // yet in the client UndoStack
-    public void undoSplit(Legion splitoff)
-    {
-        server.undoSplit(splitoff);
-        getOwningPlayer().addMarkerAvailable(splitoff.getMarkerId());
-
-        numSplitsThisTurn--;
-
-        if (getTurnNumber() == 1 && numSplitsThisTurn == 0)
-        {
-            gui.informSplitRequiredFirstRound();
-        }
-        LOGGER.log(Level.FINEST, "called server.undoSplit");
-    }
-
-    /** Take a mulligan. */
-    public void mulligan()
-    {
-        gui.undoAllMoves(); // XXX Maybe move entirely to server
-
-        tookMulligan = true;
-
-        server.mulligan();
-    }
-
-    public void requestExtraRoll()
-    {
-        server.requestExtraRoll();
-    }
-
-    // XXX temp
-    public boolean tookMulligan()
-    {
-        return tookMulligan;
-    }
-
     /** Resolve engagement in land. */
     public void engage(MasterHex hex)
     {
@@ -1043,35 +1113,6 @@ public final class Client implements IClient, IOracle, IVariant,
         gui.actOnTellEngagementResults(winner, method, points, turns);
         game.clearEngagementData();
         gui.actOnEngagementCompleted();
-    }
-
-    /** Legion target summons unit from Legion donor.
-     *  @param summonInfo A SummonInfo object that contains the values
-     *                    for target, donor and unit.
-     */
-    public void doSummon(SummonInfo summonInfo)
-    {
-        assert summonInfo != null : "SummonInfo object must not be null!";
-
-        if (summonInfo.noSummoningWanted())
-        {
-            // could also use getXXX from object...
-            server.doSummon(null);
-        }
-        else
-        {
-            Summoning event = new Summoning(summonInfo.getTarget(),
-                summonInfo.getDonor(), summonInfo.getUnit());
-            server.doSummon(event);
-        }
-        // Highlight engagements and repaint
-        gui.actOnDoSummon();
-    }
-
-    public void didSummon(Legion summoner, Legion donor, CreatureType summon)
-    {
-        // Create summon event
-        gui.didSummon(summoner, donor, summon);
     }
 
     /** This player quits the whole game. The server needs to always honor
@@ -1197,7 +1238,7 @@ public final class Client implements IClient, IOracle, IVariant,
     // Called by server during load, or by ai or gui when they choose it
     public void setColor(PlayerColor color)
     {
-        this.color = color;
+        // this.color = color;
     }
 
     public void updateCreatureCount(CreatureType type, int count, int deadCount)
@@ -1760,6 +1801,11 @@ public final class Client implements IClient, IOracle, IVariant,
     public boolean isRedoOngoing()
     {
         return redoOngoing;
+    }
+
+    public boolean isReplayBeforeRedo()
+    {
+        return replayOngoing && !redoOngoing;
     }
 
     public void confirmWhenCaughtUp()
@@ -2467,7 +2513,10 @@ public final class Client implements IClient, IOracle, IVariant,
         addCreature(legion, recruit, reason);
         legion.setRecruit(recruit);
 
-        gui.actOnDidRecruit(legion, recruit, recruiters, reason);
+        if (redoOngoing || !replayOngoing)
+        {
+            gui.actOnDidRecruit(legion, recruit, recruiters, reason);
+        }
     }
 
     public void undoRecruit(Legion legion)
@@ -2491,7 +2540,21 @@ public final class Client implements IClient, IOracle, IVariant,
         }
 
         legion.setRecruit(null);
-        gui.actOnUndidRecruitPart(legion, wasReinforcement, getTurnNumber());
+        if (!isReplayOngoing() || isRedoOngoing())
+        {
+            gui.actOnUndidRecruitPart(legion, wasReinforcement,
+                getTurnNumber());
+        }
+    }
+
+    public void doneWithRecruits()
+    {
+        if (!isMyTurn())
+        {
+            return;
+        }
+        aiPause();
+        server.doneWithRecruits();
     }
 
     /** null means cancel.  "none" means no recruiter (tower creature). */
@@ -2556,6 +2619,22 @@ public final class Client implements IClient, IOracle, IVariant,
         game.setActivePlayer(activePlayer);
         game.setTurnNumber(turnNumber);
         gui.actOnTurnOrPlayerChange(this, turnNumber, game.getActivePlayer());
+    }
+
+    /* Quick way to disable a code block; for simple "if (false)"
+     * Eclipse gives dead code warnings :-(
+     */
+    private boolean isTrue(boolean val)
+    {
+        return val;
+    }
+    public void prn(String text)
+    {
+        if (isTrue(false))
+        {
+            return;
+        }
+        System.out.println(text);
     }
 
     public void setupSplit(Player activePlayer, int turnNumber)
@@ -2664,6 +2743,20 @@ public final class Client implements IClient, IOracle, IVariant,
         }
     }
 
+    /* TODO the whole Done with Engagements is nowadays probably,
+     * obsolete, server does advancePhase automatically.
+     * Check also GUI classes accordingly!
+     */
+    public void doneWithEngagements()
+    {
+        if (!isMyTurn())
+        {
+            return;
+        }
+        aiPause();
+        server.doneWithEngagements();
+    }
+
     public void setupMuster()
     {
         game.setPhase(Phase.MUSTER);
@@ -2675,7 +2768,8 @@ public final class Client implements IClient, IOracle, IVariant,
 
     private void kickMuster()
     {
-        if (game.isPhase(Phase.MUSTER) && isMyTurn() && isAlive())
+        if (game.isPhase(Phase.MUSTER) && isMyTurn() && isAlive()
+            && !isReplayOngoing())
         {
             if (noRecruitActionPossible())
             {
@@ -2797,12 +2891,12 @@ public final class Client implements IClient, IOracle, IVariant,
 
     public PlayerColor getColor()
     {
-        return color;
+        return getOwningPlayer().getColor();
     }
 
     public String getShortColor()
     {
-        return color.getShortName();
+        return getColor().getShortName();
     }
 
     public Player getBattleActivePlayer()
@@ -3024,6 +3118,301 @@ public final class Client implements IClient, IOracle, IVariant,
         return game.getTurnNumber();
     }
 
+    public int getNumSplitsThisTurn()
+    {
+        return numSplitsThisTurn;
+    }
+
+    public void askPickColor(List<PlayerColor> colorsLeft)
+    {
+        if (autoplay.autoPickColor())
+        {
+            // Convert favorite colors from a comma-separated string to a list.
+            String favorites = options.getStringOption(Options.favoriteColors);
+            List<PlayerColor> favoriteColors = null;
+            if (favorites != null)
+            {
+                favoriteColors = PlayerColor.getByName(Split.split(',',
+                    favorites));
+            }
+            else
+            {
+                favoriteColors = new ArrayList<PlayerColor>();
+            }
+            PlayerColor color = ai.pickColor(colorsLeft, favoriteColors);
+            answerPickColor(color);
+        }
+        else
+        {
+            // calls answerPickColor
+            gui.doPickColor(owningPlayer.getName(), colorsLeft);
+        }
+    }
+
+    public void answerPickColor(PlayerColor color)
+    {
+        setColor(color);
+        server.assignColor(color);
+    }
+
+    public void askPickFirstMarker()
+    {
+        Set<String> markersAvailable = getOwningPlayer().getMarkersAvailable();
+        if (autoplay.autoPickMarker())
+        {
+            String markerId = ai.pickMarker(markersAvailable,
+                getOwningPlayer().getShortColor());
+            assignFirstMarker(markerId);
+        }
+        else
+        {
+            gui.doPickInitialMarker(markersAvailable);
+        }
+    }
+
+    public void assignFirstMarker(String markerId)
+    {
+        server.assignFirstMarker(markerId);
+    }
+
+    public void log(String message)
+    {
+        LOGGER.log(Level.INFO, message);
+    }
+
+    /**
+     *
+     * Called by MasterBoard.actOnLegion() when human user clicked on a
+     * legion to split it. This method here then:
+     * Verifies that splitting is legal and possible at all;
+     * Then get a child marker selected (either by dialog, or if
+     * autoPickMarker set, ask AI to pick one);
+     * If childMarkerId selection was not canceled (returned non-null),
+     * bring up the split dialog (which creatures go into which legion);
+     * and if that returns a list (not null) then call doSplit(...,...,...)
+     * which sends the request to server.
+     *
+     * @param parent The legion selected to split
+     */
+    public void doSplit(Legion parent)
+    {
+        LOGGER.log(Level.FINER,
+            "Client.doSplit, marker=" + parent.getMarkerId());
+
+        if (!isMyTurn())
+        {
+            LOGGER.log(Level.SEVERE, "Not my turn!");
+            // TODO I think this is useless here
+            kickSplit();
+            return;
+        }
+        // Can't split other players' legions.
+        if (!isMyLegion(parent))
+        {
+            LOGGER.log(Level.SEVERE, "Not my legion!");
+            // TODO is this needed here?
+            kickSplit();
+            return;
+        }
+        Set<String> markersAvailable = getOwningPlayer().getMarkersAvailable();
+        // Need a legion marker to split.
+        if (markersAvailable.size() < 1)
+        {
+            LOGGER.finer("no legion markers");
+            gui.showMessageDialogAndWait("No legion markers");
+            // TODO is this useful here?
+            kickSplit();
+            return;
+        }
+        LOGGER.finest("Legion markers: " + markersAvailable.size());
+
+        if (parent.getSplitRequestSent())
+        {
+            LOGGER.finer("doSplit(): split request pending");
+            gui.showMessageDialogAndWait("Split request still pending\n(waiting for server response)");
+            // TODO is this useful here?
+            kickSplit();
+            return;
+        }
+
+        if (parent.getUndoSplitRequestSent())
+        {
+            LOGGER.finer("doSplit(): undo split request pending");
+            gui.showMessageDialogAndWait("Undo-split request still pending\n(waiting for server response)");
+            // TODO is this useful here?
+            kickSplit();
+            return;
+        }
+
+        // Legion must be tall enough to split.
+        if (parent.getHeight() < 4)
+        {
+            gui.showMessageDialogAndWait("Legion is too short to split");
+            kickSplit();
+            return;
+        }
+
+        // Enforce only one split on turn 1.
+        if (getTurnNumber() == 1 && numSplitsThisTurn > 0)
+        {
+            gui.showMessageDialogAndWait("Can only split once on the first turn");
+            kickSplit();
+            return;
+        }
+
+        String childId = null;
+
+        if (autoplay.autoPickMarker())
+        {
+            childId = ai.pickMarker(markersAvailable, getOwningPlayer()
+                .getShortColor());
+            doTheSplitting(parent, childId);
+        }
+        else
+        {
+            gui.doPickSplitMarker(parent, markersAvailable);
+        }
+    }
+
+    public void doTheSplitting(Legion parent, String childId)
+    {
+        if (childId != null)
+        {
+            List<CreatureType> crestures = gui.doPickSplitLegion(parent,
+                childId);
+
+            if (crestures != null)
+            {
+                sendDoSplitToServer(parent, childId, crestures);
+                gui.actOnSplitRelatedRequestSent();
+            }
+        }
+    }
+
+    /** Called by AI and by doSplit() */
+    public void sendDoSplitToServer(Legion parent, String childMarkerId,
+        List<CreatureType> creatures)
+    {
+        LOGGER.log(Level.FINER,
+            "Client.doSplit: parent='" + parent.getMarkerId() + "', child='"
+                + childMarkerId + "', splitoffs=" + Glob.glob(",", creatures));
+        parent.setSplitRequestSent(true);
+        server.doSplit(parent, childMarkerId, creatures);
+    }
+
+    public Set<MasterHex> findPendingSplitHexes()
+    {
+        Set<MasterHex> hexes = new HashSet<MasterHex>();
+        for (Legion l : getOwningPlayer().getPendingSplitLegions())
+        {
+            hexes.add(l.getCurrentHex());
+        }
+        return hexes;
+    }
+
+    public Set<MasterHex> findPendingUndoSplitHexes()
+    {
+        Set<MasterHex> hexes = new HashSet<MasterHex>();
+        HashSet<Legion> legions = getOwningPlayer()
+            .getPendingUndoSplitLegions();
+        for (Legion l : legions)
+        {
+            hexes.add(l.getCurrentHex());
+        }
+        return hexes;
+    }
+
+    /**
+     * Callback from server after any successful split.
+     *
+     * TODO childHeight is probably redundant now that we pass the legion object
+     */
+    public void didSplit(MasterHex hex, Legion parent, Legion child,
+        int childHeight, List<CreatureType> splitoffs, int turn)
+    {
+        LOGGER.log(Level.FINEST, "Client.didSplit " + hex + " " + parent + " "
+            + child + " " + childHeight + " " + turn);
+
+        ((LegionClientSide)parent).split(childHeight, child, turn);
+        child.setCurrentHex(hex);
+
+        if (isMyLegion(child))
+        {
+            parent.setSplitRequestSent(false);
+            numSplitsThisTurn++;
+            getOwningPlayer().removeMarkerAvailable(child.getMarkerId());
+        }
+
+        gui.actOnDidSplit(turn, parent, child, hex);
+
+        // check also for phase, because delayed callbacks could come
+        // after our phase is over but activePlayerName not updated yet.
+        if (isMyTurn() && game.isPhase(Phase.SPLIT) && !replayOngoing
+            && autoplay.autoSplit() && !game.isGameOver())
+        {
+            boolean done = ai.splitCallback(parent, child);
+            if (done)
+            {
+                doneWithSplits();
+            }
+        }
+    }
+
+    // because of synchronization issues we need to
+    // be able to pass an undo split request to the server even if it is not
+    // yet in the client UndoStack
+    public void undoSplit(Legion splitoff)
+    {
+        server.undoSplit(splitoff);
+        splitoff.setUndoSplitRequestSent(true);
+        LOGGER.log(Level.FINEST, "called server.undoSplit");
+    }
+
+    public void undidSplit(Legion splitoff, Legion survivor, int turn)
+    {
+        ((LegionClientSide)survivor).merge(splitoff);
+        removeLegion(splitoff);
+        getOwningPlayer().addMarkerAvailable(splitoff.getMarkerId());
+
+        // do the eventViewer stuff before the board, so we are sure to get
+        // a repaint.
+
+        if (!replayOngoing || redoOngoing)
+        {
+            gui.eventViewerUndoEvent(splitoff, survivor, turn);
+        }
+
+        if (isMyTurn())
+        {
+            numSplitsThisTurn--;
+            survivor.setUndoSplitRequestSent(false);
+        }
+
+        gui.actOnUndidSplit(survivor, turn);
+
+        if (isMyTurn() && game.isPhase(Phase.SPLIT) && !replayOngoing
+            && autoplay.autoSplit() && !game.isGameOver())
+        {
+            boolean done = ai.splitCallback(null, null);
+            if (done)
+            {
+                doneWithSplits();
+            }
+        }
+    }
+
+    public void doneWithSplits()
+    {
+        if (!isMyTurn())
+        {
+            return;
+        }
+        server.doneWithSplits();
+
+        gui.actOnDoneWithSplits();
+
+    }
+
     private CreatureType figureTeleportingLord(Legion legion, MasterHex hex)
     {
         List<CreatureType> lords = listTeleportingLords(legion, hex);
@@ -3214,14 +3603,14 @@ public final class Client implements IClient, IOracle, IVariant,
         MasterHex currentHex, EntrySide entrySide, boolean teleport,
         CreatureType teleportingLord, boolean splitLegionHasForcedMove)
     {
+        if (isReplayBeforeRedo())
+        {
+            return;
+        }
         legion.setCurrentHex(currentHex);
         legion.setMoved(true);
         legion.setEntrySide(entrySide);
-
-        if (teleport)
-        {
-            legion.setTeleported(true);
-        }
+        legion.setTeleported(teleport);
 
         gui.actOnDidMove(legion, startingHex, currentHex, teleport,
             teleportingLord, splitLegionHasForcedMove);
@@ -3248,10 +3637,51 @@ public final class Client implements IClient, IOracle, IVariant,
 
     }
 
+    public void doneWithMoves()
+    {
+        if (!isMyTurn())
+        {
+            return;
+        }
+        aiPause();
+
+        gui.actOnDoneWithMoves();
+        server.doneWithMoves();
+    }
+
     public void relocateLegion(Legion legion, MasterHex destination)
     {
         localServer.getGame().editModeRelocateLegion(legion.getMarkerId(),
             destination.getLabel());
+    }
+
+    /** Legion target summons unit from Legion donor.
+     *  @param summonInfo A SummonInfo object that contains the values
+     *                    for target, donor and unit.
+     */
+    public void doSummon(SummonInfo summonInfo)
+    {
+        assert summonInfo != null : "SummonInfo object must not be null!";
+
+        if (summonInfo.noSummoningWanted())
+        {
+            // could also use getXXX from object...
+            server.doSummon(null);
+        }
+        else
+        {
+            Summoning event = new Summoning(summonInfo.getTarget(),
+                summonInfo.getDonor(), summonInfo.getUnit());
+            server.doSummon(event);
+        }
+        // Highlight engagements and repaint
+        gui.actOnDoSummon();
+    }
+
+    public void didSummon(Legion summoner, Legion donor, CreatureType summon)
+    {
+        // Create summon event
+        gui.didSummon(summoner, donor, summon);
     }
 
     /*
@@ -3648,85 +4078,6 @@ public final class Client implements IClient, IOracle, IVariant,
         disposeClientOriginated();
     }
 
-    public boolean isSctAlreadyDown()
-    {
-        return connection.isAlreadyDown();
-    }
-
-    public void undidSplit(Legion splitoff, Legion survivor, int turn)
-    {
-        ((LegionClientSide)survivor).merge(splitoff);
-        removeLegion(splitoff);
-
-        // do the eventViewer stuff before the board, so we are sure to get
-        // a repaint.
-
-        if (!replayOngoing)
-        {
-            gui.eventViewerUndoEvent(splitoff, survivor, turn);
-        }
-
-        gui.actOnUndidSplit(survivor, turn);
-
-        if (isMyTurn() && game.isPhase(Phase.SPLIT) && !replayOngoing
-            && autoplay.autoSplit() && !game.isGameOver())
-        {
-            boolean done = ai.splitCallback(null, null);
-            if (done)
-            {
-                doneWithSplits();
-            }
-        }
-    }
-
-    public void doneWithSplits()
-    {
-        if (!isMyTurn())
-        {
-            return;
-        }
-        server.doneWithSplits();
-
-        gui.actOnDoneWithSplits();
-
-    }
-
-    public void doneWithMoves()
-    {
-        if (!isMyTurn())
-        {
-            return;
-        }
-        aiPause();
-
-        gui.actOnDoneWithMoves();
-        server.doneWithMoves();
-    }
-
-    /* TODO the whole Done with Engagements is nowadays probably,
-     * obsolete, server does advancePhase automatically.
-     * Check also GUI classes accordingly!
-     */
-    public void doneWithEngagements()
-    {
-        if (!isMyTurn())
-        {
-            return;
-        }
-        aiPause();
-        server.doneWithEngagements();
-    }
-
-    public void doneWithRecruits()
-    {
-        if (!isMyTurn())
-        {
-            return;
-        }
-        aiPause();
-        server.doneWithRecruits();
-    }
-
     public boolean isMyLegion(Legion legion)
     {
         return !spectator && owningPlayer.equals(legion.getPlayer());
@@ -3754,200 +4105,6 @@ public final class Client implements IClient, IOracle, IVariant,
             && game.isPhase(Phase.FIGHT);
     }
 
-    /**
-     *
-     * Called by MasterBoard.actOnLegion() when human user clicked on a
-     * legion to split it. This method here then:
-     * Verifies that splitting is legal and possible at all;
-     * Then get a child marker selected (either by dialog, or if
-     * autoPickMarker set, ask AI to pick one);
-     * If childMarkerId selection was not canceled (returned non-null),
-     * bring up the split dialog (which creatures go into which legion);
-     * and if that returns a list (not null) then call doSplit(...,...,...)
-     * which sends the request to server.
-     *
-     * @param parent The legion selected to split
-     */
-    public void doSplit(Legion parent)
-    {
-        LOGGER.log(Level.FINER,
-            "Client.doSplit, marker=" + parent.getMarkerId());
-
-        if (!isMyTurn())
-        {
-            LOGGER.log(Level.SEVERE, "Not my turn!");
-            // TODO I think this is useless here
-            kickSplit();
-            return;
-        }
-        // Can't split other players' legions.
-        if (!isMyLegion(parent))
-        {
-            LOGGER.log(Level.SEVERE, "Not my legion!");
-            // TODO is this needed here?
-            kickSplit();
-            return;
-        }
-        Set<String> markersAvailable = getOwningPlayer().getMarkersAvailable();
-        // Need a legion marker to split.
-        if (markersAvailable.size() < 1)
-        {
-            LOGGER.finer("no legion markers");
-            gui.showMessageDialogAndWait("No legion markers");
-            // TODO is this useful here?
-            kickSplit();
-            return;
-        }
-        LOGGER.finest("Legion markers: " + markersAvailable.size());
-
-        // Legion must be tall enough to split.
-        if (parent.getHeight() < 4)
-        {
-            gui.showMessageDialogAndWait("Legion is too short to split");
-            kickSplit();
-            return;
-        }
-
-        // Enforce only one split on turn 1.
-        if (getTurnNumber() == 1 && numSplitsThisTurn > 0)
-        {
-            gui.showMessageDialogAndWait("Can only split once on the first turn");
-            kickSplit();
-            return;
-        }
-
-        String childId = null;
-
-        if (autoplay.autoPickMarker())
-        {
-            childId = ai.pickMarker(markersAvailable, getShortColor());
-            doTheSplitting(parent, childId);
-        }
-        else
-        {
-            gui.doPickSplitMarker(parent, markersAvailable);
-        }
-    }
-
-    public void doTheSplitting(Legion parent, String childId)
-    {
-        if (childId != null)
-        {
-            List<CreatureType> crestures = gui
-                .doPickSplitLegion(parent, childId);
-
-            if (crestures != null)
-            {
-                doSplit(parent, childId, crestures);
-            }
-        }
-    }
-
-    /** Called by AI and by doSplit() */
-    public void doSplit(Legion parent, String childMarkerId,
-        List<CreatureType> creatures)
-    {
-        LOGGER.log(Level.FINER,
-            "Client.doSplit: parent='" + parent.getMarkerId() + "', child='"
-                + childMarkerId + "', splitoffs=" + Glob.glob(",", creatures));
-        server.doSplit(parent, childMarkerId, creatures);
-    }
-
-    /**
-     * Callback from server after any successful split.
-     *
-     * TODO childHeight is probably redundant now that we pass the legion object
-     */
-    public void didSplit(MasterHex hex, Legion parent, Legion child,
-        int childHeight, List<CreatureType> splitoffs, int turn)
-    {
-        LOGGER.log(Level.FINEST, "Client.didSplit " + hex + " " + parent + " "
-            + child + " " + childHeight + " " + turn);
-
-        ((LegionClientSide)parent).split(childHeight, child, turn);
-
-        child.setCurrentHex(hex);
-
-        gui.actOnDidSplit(turn, parent, child, hex);
-
-        if (isMyLegion(child))
-        {
-            getOwningPlayer().removeMarkerAvailable(child.getMarkerId());
-        }
-
-        numSplitsThisTurn++;
-
-        gui.actOnDidSplitPart2(hex);
-
-        // check also for phase, because delayed callbacks could come
-        // after our phase is over but activePlayerName not updated yet.
-        if (isMyTurn() && game.isPhase(Phase.SPLIT) && !replayOngoing
-            && autoplay.autoSplit() && !game.isGameOver())
-        {
-            boolean done = ai.splitCallback(parent, child);
-            if (done)
-            {
-                doneWithSplits();
-            }
-        }
-    }
-
-    public void askPickColor(List<PlayerColor> colorsLeft)
-    {
-        if (autoplay.autoPickColor())
-        {
-            // Convert favorite colors from a comma-separated string to a list.
-            String favorites = options.getStringOption(Options.favoriteColors);
-            List<PlayerColor> favoriteColors = null;
-            if (favorites != null)
-            {
-                favoriteColors = PlayerColor.getByName(Split.split(',',
-                    favorites));
-            }
-            else
-            {
-                favoriteColors = new ArrayList<PlayerColor>();
-            }
-            color = ai.pickColor(colorsLeft, favoriteColors);
-            answerPickColor(color);
-        }
-        else
-        {
-            // calls answerPickColor
-            gui.doPickColor(owningPlayer.getName(), colorsLeft);
-        }
-    }
-
-    public void answerPickColor(PlayerColor color)
-    {
-        setColor(color);
-        server.assignColor(color);
-    }
-
-    public void askPickFirstMarker()
-    {
-        Set<String> markersAvailable = getOwningPlayer().getMarkersAvailable();
-        if (autoplay.autoPickMarker())
-        {
-            String markerId = ai.pickMarker(markersAvailable, getShortColor());
-            assignFirstMarker(markerId);
-        }
-        else
-        {
-            gui.doPickInitialMarker(markersAvailable);
-        }
-    }
-
-    public void assignFirstMarker(String markerId)
-    {
-        server.assignFirstMarker(markerId);
-    }
-
-    public void log(String message)
-    {
-        LOGGER.log(Level.INFO, message);
-    }
-
     public void pingRequest(long requestTime)
     {
         // Dummy, SocketClientThread handles this already.
@@ -3968,77 +4125,6 @@ public final class Client implements IClient, IOracle, IVariant,
         return false;
     }
 
-    /**
-     * Create the AI for this Client. If type is some (concrete) AI type,
-     * create that type of AI (then this is an AI player).
-     * Otherwise, create a SimpleAI as default (used by Human or Remote
-     * clients for the autoplay functionality).
-     *
-     * @param playerType Type of player for which to create an AI
-     * @return Some AI object, according to the situation
-     */
-    // TODO move (partly) to AI package, e.g. as static method
-    private AI createAI(String playerType)
-    {
-        LOGGER.log(Level.FINEST, "Creating the AI player type " + playerType);
-
-        AI createdAI = null;
-
-        String createType = playerType;
-        if (createType.endsWith(Constants.anyAI))
-        {
-            LOGGER.severe("Invalid player type " + createType
-                + " on client side - server is supposed to select the "
-                + "actual AI type for random choosing.");
-        }
-
-        // Non-AI (= human and remote) players use some AI for autoplay:
-        if (!createType.endsWith("AI"))
-        {
-            createType = Constants.aiPackage + Constants.autoplayAI;
-        }
-
-        // TODO Can it still happen that we get a unqualified AI class name?
-        // Or does server nowadays always send proper fully qualified name?
-        if (!createType.startsWith(Constants.aiPackage))
-        {
-            String name = getOwningPlayer().getName();
-            LOGGER.warning("Needed to add package for AI type? Type="
-                + createType + ", Player name=" + name);
-            createType = Constants.aiPackage + createType;
-        }
-
-        try
-        {
-            // TODO these seem to be classes of either AI or Client, there
-            // should be a common ancestor
-            // NOPE . The one is the "first argument of the constructor
-            //        is of type Client. The other is the Client object passed
-            //        to that constructor.
-            // TODO Anyway, this could be done better, perhaps moved to
-            // AI package, using typesafe enums that do the mapping from name
-            // to class explicitly?
-            Class<?>[] classArray = new Class<?>[1];
-            classArray[0] = Class.forName("net.sf.colossus.client.Client");
-            Object[] objArray = new Object[1];
-            objArray[0] = this;
-            createdAI = (AI)Class.forName(createType)
-                .getDeclaredConstructor(classArray).newInstance(objArray);
-        }
-        catch (Exception ex)
-        {
-            LOGGER.log(Level.SEVERE, "Failed to create for client "
-                + owningPlayer.getName() + " the to " + createType, ex);
-        }
-
-        if (createdAI == null)
-        {
-            createdAI = new SimpleAI(this);
-        }
-
-        return createdAI;
-
-    }
 
     /** Wait for aiDelay. */
     private void aiPause()
@@ -4089,6 +4175,18 @@ public final class Client implements IClient, IOracle, IVariant,
     public Options getOptions()
     {
         return options;
+    }
+
+    public String getClientName()
+    {
+        if (getOwningPlayer() != null)
+        {
+            return getOwningPlayer().getName();
+        }
+        else
+        {
+            return "<ownplayernotset>";
+        }
     }
 
     /** TODO get from Variant instead of static TerrainRecruitLoader access

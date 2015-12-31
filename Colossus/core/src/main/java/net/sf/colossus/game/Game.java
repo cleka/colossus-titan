@@ -273,12 +273,29 @@ public class Game
 
     public Legion getDefender()
     {
-        return engagement.getDefendingLegion();
+        if (engagement != null)
+        {
+            return engagement.getDefendingLegion();
+        }
+        else
+        {
+            LOGGER.warning("asking for defender but engagement is null?");
+            return null;
+        }
     }
 
     public Legion getAttacker()
     {
-        return engagement.getAttackingLegion();
+        if (engagement != null)
+        {
+            return engagement.getAttackingLegion();
+        }
+        else
+        {
+            LOGGER.warning("asking for attacker but engagement is null?");
+            return null;
+        }
+
     }
 
     /**

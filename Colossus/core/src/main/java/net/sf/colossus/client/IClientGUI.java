@@ -87,8 +87,6 @@ public interface IClientGUI
     public abstract void actOnDidSplit(int turn, Legion parent, Legion child,
         MasterHex hex);
 
-    public abstract void actOnDidSplitPart2(MasterHex hex);
-
     public abstract void actOnDoneWithMoves();
 
     public abstract void actOnDoneWithSplits();
@@ -364,5 +362,7 @@ public interface IClientGUI
     public void askSuspendConfirmation(String requestorName, int timeout);
 
     public abstract String getGameId();
+
+    public abstract void actOnSplitRelatedRequestSent();
 
 }

@@ -122,6 +122,18 @@ public abstract class Legion
     protected int angelsToAcquire;
 
     /**
+     * Has doSplit already been sent to server. Only needed on client side,
+     * but this way we avoid casting.
+     */
+    private boolean splitRequestSent = false;
+
+    /**
+     * Has undoSplit already been sent to server. Only needed on client side,
+     * but this way we avoid casting. Marked in both parent and child.
+     */
+    private boolean undoSplitRequestSent = false;
+
+    /**
      * The creature recruited in last recruit phase
      */
     private CreatureType recruit;
@@ -239,6 +251,26 @@ public abstract class Legion
     public int getHeight()
     {
         return getCreatures().size();
+    }
+
+    public void setSplitRequestSent(boolean val)
+    {
+        this.splitRequestSent = val;
+    }
+
+    public boolean getSplitRequestSent()
+    {
+        return this.splitRequestSent;
+    }
+
+    public void setUndoSplitRequestSent(boolean val)
+    {
+        this.undoSplitRequestSent = val;
+    }
+
+    public boolean getUndoSplitRequestSent()
+    {
+        return this.undoSplitRequestSent;
     }
 
     public void setMoved(boolean moved)

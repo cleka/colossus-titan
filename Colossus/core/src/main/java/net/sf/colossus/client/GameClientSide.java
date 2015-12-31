@@ -131,6 +131,14 @@ public class GameClientSide extends Game implements IOracle
     {
         assert playerName != null : "Name for player to find must not be null!";
 
+        /*
+        System.out.println("*****\nsearching player for " + playerName);
+        for (Player player : players)
+        {
+            System.out.println("compare with " + player.getName());
+        }
+        System.out.println("Now really searching player for " + playerName);
+        */
         for (Player player : players)
         {
             if (player.getName().equals(playerName))

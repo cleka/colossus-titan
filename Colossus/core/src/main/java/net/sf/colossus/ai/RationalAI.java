@@ -304,7 +304,7 @@ public class RationalAI extends SimpleAI
         }
 
         logger.log(Level.FINEST, "New marker id is '" + newMarkerId + "'");
-        client.doSplit(legion, newMarkerId, results);
+        client.sendDoSplitToServer(legion, newMarkerId, results);
         return false;
     }
 

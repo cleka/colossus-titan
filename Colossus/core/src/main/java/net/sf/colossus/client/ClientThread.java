@@ -57,6 +57,8 @@ public class ClientThread extends Thread implements EventExecutor
 
     private boolean done = false;
 
+    private final boolean _DEBUG_MSGS = false;
+
     // if we enable that, things get stuck... (perhaps because logger
     // of all threads need then to get a lock on the logger too often?)
     private final boolean LOG_PROCESSING_TIMES = false;
@@ -318,6 +320,8 @@ public class ClientThread extends Thread implements EventExecutor
                 + "' processing message: " + method);
         }
 
+        showDebugOutputMaybe(method, args);
+
         if (method.equals(Constants.tellMovementRoll))
         {
             int roll = Integer.parseInt(args.remove(0));
@@ -466,6 +470,7 @@ public class ClientThread extends Thread implements EventExecutor
             String turnArgMaybe = args.isEmpty() ? "0" : args.remove(0);
             int maxTurn = Integer.parseInt(turnArgMaybe);
             client.tellReplay(val, maxTurn);
+
         }
         else if (method.equals(Constants.redoOngoing))
         {
@@ -947,6 +952,76 @@ public class ClientThread extends Thread implements EventExecutor
         }
         LOGGER.finest("Client '" + getNameMaybe()
             + "' finished method processing");
+    }
+
+    private void showDebugOutputMaybe(String method, List<String> args)
+    {
+        if (!_DEBUG_MSGS)
+        {
+            return;
+        }
+
+        Player p = client.getOwningPlayer();
+        if (p == null)
+        {
+            LOGGER.warning("No owning player? Skipping debug output.");
+            return;
+        }
+
+        String allArgs = Glob.glob(", ", args);
+
+        boolean show = true;
+
+        if (method.startsWith("setOption") && allArgs.startsWith("ViewMode"))
+        {
+            // show this as the only one
+        }
+        else if (method.startsWith(Constants.updateCreatureCount)
+            // || method.startsWith(Constants.setLegionStatus)
+            // || method.startsWith(Constants.tellLegionLocation)
+            || method.startsWith(Constants.serverConnectionOK)
+            || method.startsWith(Constants.relayBackProcessedMsg)
+            || method.startsWith(Constants.relayBackReceivedMsg)
+            // || method.startsWith(Constants.)
+            || method.startsWith(Constants.pingRequest)
+            || method.startsWith(Constants.syncOption) // setOption
+        )
+        {
+            show = false;
+        }
+
+        if (!show)
+        {
+            return;
+        }
+
+        String name = p.getName();
+        if (name.equals("remote") || name.equals("spectator"))
+        {
+            String indent = (client.isReplayOngoing() ? "  " : "")
+                + (client.isRedoOngoing() ? "  " : "");
+            // System.out.println(indent + "!!!" + method + ":" + allArgs);
+
+            String printLine = allArgs;
+            int _MAXLEN = 20;
+            int len = allArgs.length();
+            if (len > _MAXLEN)
+            {
+                printLine = allArgs.substring(0, _MAXLEN) + "...";
+            }
+
+            if (method.startsWith(Constants.setupTurnState))
+            {
+                System.out.println("\n\n");
+            }
+
+            else if (client.getGame().getTurnNumber() >= 1)
+            {
+                // WhatNextManager.sleepFor(2000);
+            }
+
+            System.out.println(indent + "!!!" + method + ": " + printLine);
+        }
     }
 
     private void rememberEvent(ServerEvent event)
