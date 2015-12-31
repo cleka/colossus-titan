@@ -2268,9 +2268,6 @@ public class WebClient extends KFrame implements IWebClient
             case NotLoggedIn:
                 return "not logged in";
 
-            case LoggedIn:
-                return "logged in as " + username;
-
             case EnrolledInstantGame:
                 return "As " + username + " - enrolled to instant game "
                     + enrolledInstantGameId;
@@ -2279,8 +2276,11 @@ public class WebClient extends KFrame implements IWebClient
                 return "As " + username + " - playing game #" + getOngoingGameId();
 
             case Watching:
-                return "As " + username + " - watching game "
+                return "As " + username + " - watching game #"
                     + watchingInstantGameId;
+
+            case LoggedIn:
+                return "logged in as " + username;
 
             default:
                 return "<info text - undefined state?>";
@@ -3415,7 +3415,7 @@ public class WebClient extends KFrame implements IWebClient
             infoTextLabel.setText(waitingText);
 
             setGameClient(gc);
-            gc.getGUI().setWebClient(this, -1, null, null, null);
+            gc.getGUI().setWebClient(this, -1, gameId, username, password);
             Timer timeoutStartup = setupTimer();
 
             while (!clientIsUp && !timeIsUp && !clientStartFailed)
@@ -4069,6 +4069,24 @@ public class WebClient extends KFrame implements IWebClient
                     "You can only be active for one instant game at a time, "
                         + "and there is already instant game #"
                         + instantGame.getGameId() + " proposed by you!");
+                return;
+            }
+            if (gameClient != null)
+            {
+                displayOnlyOneInstantGameMessage("propose",
+                    "You can only be connected to one game at a time, "
+                        + "but you are still connected to game #"
+                        + getOngoingGameId() + "." + "\n\n"
+                        + "Close the MasterBoard of that game first.");
+                return;
+            }
+            if (watchingInstantGameId != null)
+            {
+                displayOnlyOneInstantGameMessage("propose",
+                    "You can only be connected to one game at a time, "
+                        + "but you are still connected to (watching) game #"
+                        + watchingInstantGameId + "." + "\n\n"
+                        + "Close the MasterBoard of that game first.");
                 return;
             }
         }
