@@ -28,7 +28,7 @@ public final class WelcomeDialog extends KFrame
 {
     private final static String title = "Welcome to this new Colossus Release!";
 
-    private final static String CURRENT_WELCOME_KEY = "Public-Build-20151231";
+    private final static String CURRENT_WELCOME_KEY = "Public-Build-20151231#2";
 
     private final static String baseUrl = "http://sourceforge.net/projects/colossus/files";
     private final static String colossusReleaseNoteUrl = baseUrl + "/"
@@ -44,10 +44,11 @@ public final class WelcomeDialog extends KFrame
             + CURRENT_WELCOME_KEY
             + "!"
             + "\n\n"
-            + "  Two small improvements:\n"
+            + "  Two small improvements and one bugfix:\n"
             + "  - Visual feedback when splitting und unsplitting legions (so that in case response\n"
             + "    from server takes long, people do not right away try to do it 'once again')\n"
             + "  - An option to have locally 'Only own legions' mode\n"
+            + "  - One can now propose again, even if an earlier played game is still ongoing"
             + "\n"
             + "  This \"Welcome Dialog\" will only be shown once for every new release\n"
             + "  (you can find this welcome message also from the MasterBoard Help menu).\n"
