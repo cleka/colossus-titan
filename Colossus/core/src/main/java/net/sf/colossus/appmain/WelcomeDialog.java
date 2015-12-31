@@ -28,7 +28,7 @@ public final class WelcomeDialog extends KFrame
 {
     private final static String title = "Welcome to this new Colossus Release!";
 
-    private final static String CURRENT_WELCOME_KEY = "Public-Build-20151215";
+    private final static String CURRENT_WELCOME_KEY = "Public-Build-20151231";
 
     private final static String baseUrl = "http://sourceforge.net/projects/colossus/files";
     private final static String colossusReleaseNoteUrl = baseUrl + "/"
@@ -44,14 +44,10 @@ public final class WelcomeDialog extends KFrame
             + CURRENT_WELCOME_KEY
             + "!"
             + "\n\n"
-            + "  Some corrections/bugfixes, and small improvements:\n"
-            + "  - Autosave begin of each phase, also after mulltigan and extra-roll, and between engagements\n"
-            + "  - Suspend now with and without saving possible\n"
-            + "  - When resuming a game fails, put it back to suspended, instead of being lost\n"
-            + "  - Fixed that after drift damage critters that can strike were not highlighted\n"
-            + "  - Fixed that it shows really the total creature points, not same as creature count line\n"
-            + "  - Changed label of 'Points' to 'Creature-Points'\n"
-            + "  - Masterboard window title now shows as first thing the owning player\n"
+            + "  Two small improvements:\n"
+            + "  - Visual feedback when splitting und unsplitting legions (so that in case response\n"
+            + "    from server takes long, people do not right away try to do it 'once again')\n"
+            + "  - An option to have locally 'Only own legions' mode\n"
             + "\n"
             + "  This \"Welcome Dialog\" will only be shown once for every new release\n"
             + "  (you can find this welcome message also from the MasterBoard Help menu).\n"
