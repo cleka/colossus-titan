@@ -336,7 +336,7 @@ public final class MasterBoard extends JPanel
                     Options.showMarker);
 
                 final JPanel panel = new LegionInfoPanel(legion, scale,
-                    PANEL_MARGIN, PANEL_PADDING, true, gui.getViewMode(),
+                    PANEL_MARGIN, PANEL_PADDING, true, gui.getEffectiveViewMode(),
                     client.isMyLegion(legion), dubiousAsBlanks, true,
                     showMarker);
                 add(panel);
@@ -1255,7 +1255,7 @@ public final class MasterBoard extends JPanel
             return;
         }
 
-        int viewMode = gui.getViewMode();
+        int viewMode = gui.getEffectiveViewMode();
         boolean dubiousAsBlanks = gui.getOptions().getOption(
             Options.dubiousAsBlanks);
         boolean showMarker = gui.getOptions().getOption(Options.showMarker);
@@ -2394,7 +2394,7 @@ public final class MasterBoard extends JPanel
                 // Right-click means to show the contents of the legion.
                 if (isPopupButton(e))
                 {
-                    int viewMode = gui.getViewMode();
+                    int viewMode = gui.getEffectiveViewMode();
                     boolean dubiousAsBlanks = gui.getOptions().getOption(
                         Options.dubiousAsBlanks);
                     boolean showMarker = gui.getOptions().getOption(
@@ -2604,7 +2604,7 @@ public final class MasterBoard extends JPanel
      */
     public void viewEditLegion(LegionClientSide legion)
     {
-        int viewMode = gui.getViewMode();
+        int viewMode = gui.getEffectiveViewMode();
         boolean dubiousAsBlanks = gui.getOptions().getOption(
             Options.dubiousAsBlanks);
         boolean showMarker = gui.getOptions().getOption(Options.showMarker);
@@ -3161,7 +3161,7 @@ public final class MasterBoard extends JPanel
             else if (phase == Phase.SPLIT
                 && (gui.getNextSplitClickMode() == Options.nextSplitNumRightClick))
             {
-                int viewMode = gui.getViewMode();
+                int viewMode = gui.getEffectiveViewMode();
                 LegionClientSide clientSideLegion = client
                     .getLegion(nextLegion.getMarkerId());
 

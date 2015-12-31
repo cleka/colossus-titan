@@ -507,7 +507,7 @@ public class NullClientGUI implements IClientGUI
         return 0;
     }
 
-    public int getViewMode()
+    public int getEffectiveViewMode()
     {
         // TODO Auto-generated method stub
         return 0;

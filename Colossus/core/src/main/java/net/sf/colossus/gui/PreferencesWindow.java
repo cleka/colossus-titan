@@ -261,7 +261,10 @@ class PreferencesWindow extends KFrame implements ItemListener, ActionListener
         miscPane.setAlignmentX(LEFT_ALIGNMENT);
         //  The "dubious as blanks" option makes only sense with the
         //    "view what SplitPrediction tells us" mode => otherwise inactive.
-        boolean avail = (gui.getViewMode() == Options.viewableEverNum);
+        boolean avail2 = (gui.getRawViewMode() != Options.viewableOwnNum);
+        addCheckBox(miscPane, Options.localOnlyOwn, avail2, false);
+        // , KeyEvent.VK_D);
+        boolean avail = (gui.getRawViewMode() == Options.viewableEverNum);
         addCheckBox(miscPane, Options.dubiousAsBlanks, avail, false);
         // , KeyEvent.VK_D);
         addCheckBox(miscPane, Options.showMarker);

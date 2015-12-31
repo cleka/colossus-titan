@@ -237,7 +237,7 @@ public final class PlayerDetailsDialog extends KDialog
             result.add(new JLabel(legion.getCurrentHex().getLabel()),
                 LABEL_CONSTRAINT);
             result.add(new LegionInfoPanel(legion, 2 * Scale.get(), 0, 0,
-                true, gui.getViewMode(), gui.getClient().isMyLegion(legion),
+                true, gui.getEffectiveViewMode(), gui.getClient().isMyLegion(legion),
                 dubiousAsBlanks, true, false), LABEL_CONSTRAINT);
             result.add(new JPanel(), HORIZONTAL_FILL_CONSTRAINT);
         }

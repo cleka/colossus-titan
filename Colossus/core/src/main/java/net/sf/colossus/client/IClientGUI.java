@@ -68,7 +68,7 @@ public interface IClientGUI
 
     public abstract void highlightEngagements();
 
-    public abstract int getViewMode();
+    public abstract int getEffectiveViewMode();
 
     public abstract int getRecruitChitMode();
 

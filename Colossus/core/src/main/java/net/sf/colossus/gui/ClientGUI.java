@@ -1134,8 +1134,25 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         return secondaryParent;
     }
 
-    public int getViewMode()
+    /**
+     * The view mode as set in the game options, without applying
+     * 'locally only own' client option
+     * @return
+     */
+    public int getRawViewMode()
     {
+        return viewMode;
+    }
+
+    /**
+     *  The view mode after applying the 'locally only own' setting
+     */
+    public int getEffectiveViewMode()
+    {
+        if (options.getOption(Options.localOnlyOwn))
+        {
+            return Options.viewableOwnNum;
+        }
         return viewMode;
     }
 
@@ -2098,8 +2115,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             if (autoInspector == null)
             {
                 Variant variant = getGame().getVariant();
-                autoInspector = new AutoInspector(parent, options, viewMode,
-                    options.getOption(Options.dubiousAsBlanks), variant, this);
+                autoInspector = new AutoInspector(parent, options, options.getOption(Options.dubiousAsBlanks),
+                    variant, this);
             }
         }
         else

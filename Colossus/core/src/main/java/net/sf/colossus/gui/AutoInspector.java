@@ -36,11 +36,9 @@ class AutoInspector extends KDialog
 
     private final JFrame parentFrame;
 
-    private final int viewMode;
-
     private boolean dubiousAsBlanks;
 
-    public AutoInspector(JFrame frame, IOptions options, int viewMode,
+    public AutoInspector(JFrame frame, IOptions options,
         boolean dubiousAsBlanks, Variant variant, ClientGUI clientGui)
     {
         super(frame, "Inspector", false);
@@ -49,7 +47,6 @@ class AutoInspector extends KDialog
         this.variant = variant;
         this.gui = clientGui;
         this.options = options;
-        this.viewMode = viewMode;
         this.dubiousAsBlanks = dubiousAsBlanks;
 
         setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
@@ -91,8 +88,8 @@ class AutoInspector extends KDialog
         boolean showMarker = gui.getOptions().getOption(Options.showMarker);
 
         LegionInfoPanel liPanel = new LegionInfoPanel(legion, 4 * Scale.get(),
-            5, 2, false, viewMode, isMyLegion, dubiousAsBlanks, false,
-            showMarker);
+            5, 2, false, gui.getEffectiveViewMode(), isMyLegion,
+            dubiousAsBlanks, false, showMarker);
         panel.add(liPanel);
         String valueText = liPanel.getValueText();
         String ownerText = isMyLegion ? "" : " ["
