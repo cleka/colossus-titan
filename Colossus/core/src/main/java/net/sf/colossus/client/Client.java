@@ -3372,7 +3372,7 @@ public final class Client implements IClient, IOracle, IVariant,
     {
         ((LegionClientSide)survivor).merge(splitoff);
         removeLegion(splitoff);
-        getOwningPlayer().addMarkerAvailable(splitoff.getMarkerId());
+        survivor.getPlayer().addMarkerAvailable(splitoff.getMarkerId());
 
         // do the eventViewer stuff before the board, so we are sure to get
         // a repaint.
