@@ -106,13 +106,15 @@ public class WebClient extends KFrame implements IWebClient
     // 4: now all options can be selected in webclient, also
     //    teleport options added
     // 5: can properly display suspended games
+    // 6: version from 6.1.2016. Scratch-reconnect stuff ongoing
     public final static int WC_VERSION_GENERAL_MESSAGE = 1;
     public final static int WC_VERSION_SUPPORTS_PING = 2;
     public final static int WC_VERSION_DINO_OK = 3;
     public final static int WC_VERSION_SUPPORTS_EXTRA_OPTIONS = 4;
     public final static int WC_VERSION_RESUME = 5;
+    public final static int WC_VERSION_SCRATCH_RECONN_WIP = 6;
 
-    final static int WEB_CLIENT_VERSION = WC_VERSION_RESUME;
+    final static int WEB_CLIENT_VERSION = WC_VERSION_SCRATCH_RECONN_WIP;
 
     // TODO make this all based on Locale.getDefault()
     // Initially: use German. To make it variable, need also to set
