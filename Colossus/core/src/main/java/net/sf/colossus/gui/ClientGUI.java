@@ -1464,69 +1464,6 @@ public class ClientGUI implements IClientGUI, GUICallbacks
       * (for all others it was enabled at begin of the phase)
       */
 
-    /***
-     *
-     * Those below are the two old actondidsplit methods
-    public void actOnDidSplit(int turn, Legion parent, Legion child,
-        MasterHex hex)
-    {
-        LOGGER
-            .fine("CG: actOnDidSplit(int turn, Legion parent, Legion child,");
-
-        // TODO move if block to eventviewer itself?
-        // Not during replay, but during redo:
-        if (!client.isReplayBeforeRedo())
-        {
-            eventViewerNewSplitEvent(turn, parent, child);
-        }
-
-        Marker marker = new Marker(child, 3 * Scale.get(),
-            child.getLongMarkerId(), client, (client != null));
-        setMarker(child, marker);
-
-        if (client.isReplayBeforeRedo())
-        {
-            replayTurnChange(turn);
-        }
-        else
-        {
-            board.alignLegions(hex);
-            if (client.isMyLegion(child))
-            {
-                board.clearRecruitedChits();
-                board.clearPossibleRecruitChits();
-                pushUndoStack(child.getMarkerId());
-            }
-        }
-    }
-
-    public void actOnDidSplitPart2(MasterHex hex)
-    {
-        logPerhaps("actOnDidSplitPart2(MasterHex hex)");
-        if (client.getTurnNumber() == 1 && isMyTurn())
-        {
-            board.enableDoneAction();
-        }
-        // After doing a split, refresh the number of markers available
-        if (isMyTurn())
-        {
-            board.setMarkerCount(client.getOwningPlayer()
-                .getMarkersAvailable().size());
-
-        }
-        if (!client.isReplayBeforeRedo())
-        {
-            board.alignLegions(hex);
-            board.highlightTallLegions();
-        }
-    }
-
-    ***/
-
-    /**
-     * And this is the new one
-     */
-
     /**
      * EventViewer, Turn change actions, clear recruited chits,
      * push to undo stack, reset to default cursor if no splits pending
