@@ -28,7 +28,7 @@ public final class WelcomeDialog extends KFrame
 {
     private final static String title = "Welcome to this new Colossus Release!";
 
-    private final static String CURRENT_WELCOME_KEY = "Public-Build-20160106";
+    private final static String CURRENT_WELCOME_KEY = "Public-Test-Build-20160110";
 
     private final static String baseUrl = "http://sourceforge.net/projects/colossus/files";
     private final static String colossusReleaseNoteUrl = baseUrl + "/"
@@ -44,8 +44,8 @@ public final class WelcomeDialog extends KFrame
             + CURRENT_WELCOME_KEY
             + "!"
             + "\n\n"
-            + "  Just one bugfix::\n"
-            + "  - Fixed: \"Illegal split / marker not available\" bug\n"
+            + "  Just one improvement:\n"
+            + "  - Can resume game even if not all players online (dead players)\n"
             + "\n"
             + "  This \"Welcome Dialog\" will only be shown once for every new release\n"
             + "  (you can find this welcome message also from the MasterBoard Help menu).\n"

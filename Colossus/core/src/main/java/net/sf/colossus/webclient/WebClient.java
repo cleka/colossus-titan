@@ -130,6 +130,8 @@ public class WebClient extends KFrame implements IWebClient
     public final static String AutoLoginCBText = "Auto-login on start";
     public final static String AutoGamePaneCBText = "After login Game pane";
 
+    public static final String PLAYERS_MISSING = "MissingPlayers";
+
     private final WhatNextManager whatNextManager;
 
     private String hostname;
@@ -2357,7 +2359,6 @@ public class WebClient extends KFrame implements IWebClient
 
             case LoggedIn:
             default:
-
                 if (gameResumeInitiated)
                 {
                     return "Resume of suspended game is ongoing";
@@ -2375,15 +2376,20 @@ public class WebClient extends KFrame implements IWebClient
                 if (id != null)
                 {
                     GameInfo gi = findGameById(id);
-                    if (gi.getOnlineCount() != gi.getPlayers().size())
+                    if (gi.getOnlineCount() < 2)
                     {
-                        reasonWhyNot = "Not all players online for game #"
+                        reasonWhyNot = "No other player online for game #"
                             + gi.getGameId();
+                    }
+                    else if (gi.getOnlineCount() != gi.getPlayers().size())
+                    {
+                        reasonWhyNot = PLAYERS_MISSING;
                     }
                     else if (gi.isEnrolled(username) || isAdmin)
                     {
                         reasonWhyNot = null;
                     }
+                    // else case defaults to 'you are not enrolled'
                 }
                 else
                 {
@@ -2619,11 +2625,24 @@ public class WebClient extends KFrame implements IWebClient
         startButton.setEnabled(couldStartOnServer);
         startLocallyButton.setEnabled(couldStartLocally);
         watchButton.setEnabled(couldWatch);
-        resumeButton.setEnabled(reasonWhyCantResume == null);
-        reasonWhyNotLabel
-            .setText(reasonWhyCantResume == null ? "Click to resume the game game #"
-                + getSelectedGameIdFromSuspTable() + "!"
-                : reasonWhyCantResume);
+        resumeButton.setEnabled(reasonWhyCantResume == null
+            || reasonWhyCantResume.equals(PLAYERS_MISSING));
+        String text;
+        if (reasonWhyCantResume == null)
+        {
+            text = "Click to resume the game game #"
+                + getSelectedGameIdFromSuspTable() + "!";
+        }
+        else if (reasonWhyCantResume.equals(PLAYERS_MISSING))
+        {
+            text = "NOTE: not all players online. Resume will succeed "
+                + "only if missing players are dead!";
+        }
+        else
+        {
+            text = reasonWhyCantResume;
+        }
+        reasonWhyNotLabel.setText(text);
 
         // Chat tab
         generalChat.setLoginState(state != NotLoggedIn, server, username);

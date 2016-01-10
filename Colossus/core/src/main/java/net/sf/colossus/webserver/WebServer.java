@@ -1175,15 +1175,16 @@ public class WebServer implements IWebServer, IRunWebServer
 
     private void attemptStartOnServer(GameInfo gi, User byUser)
     {
-        if (!gi.allEnrolledOnline())
-        {
-            LOGGER.warning("User " + byUser.getName()
-                + " requested to start game " + gi.getGameId()
-                + ", but not all enrolled players are online.");
-            String reason = "Not all enrolled players online!";
-            informAllEnrolledThatStartFailed(gi, reason, byUser);
-        }
-        else if (!gi.isStartable())
+        // if (!gi.allEnrolledOnline())
+        // {
+        //    LOGGER.warning("User " + byUser.getName()
+        //        + " requested to start game " + gi.getGameId()
+        //        + ", but not all enrolled players are online.");
+        //    String reason = "Not all enrolled players online!";
+        //    informAllEnrolledThatStartFailed(gi, reason, byUser);
+        //}
+        // else if (!gi.isStartable())
+        if (!gi.isStartable())
         {
             LOGGER.warning("User " + byUser.getName() + " attempted to start"
                 + " game " + gi.getGameId() + ", but it is already running or"
