@@ -113,8 +113,9 @@ public class WebClient extends KFrame implements IWebClient
     public final static int WC_VERSION_SUPPORTS_EXTRA_OPTIONS = 4;
     public final static int WC_VERSION_RESUME = 5;
     public final static int WC_VERSION_SCRATCH_RECONN_WIP = 6;
+    public final static int WC_VERSION_DELETE_SUSPENDED_GAME = 7;
 
-    final static int WEB_CLIENT_VERSION = WC_VERSION_SCRATCH_RECONN_WIP;
+    final static int WEB_CLIENT_VERSION = WC_VERSION_DELETE_SUSPENDED_GAME;
 
     // TODO make this all based on Locale.getDefault()
     // Initially: use German. To make it variable, need also to set
@@ -266,6 +267,7 @@ public class WebClient extends KFrame implements IWebClient
 
     private JButton watchButton;
     private JButton resumeButton;
+    private JButton deleteButton;
     private JLabel reasonWhyNotLabel;
     private JButton recoverButton;
     private JButton hideButton;
@@ -1809,8 +1811,43 @@ public class WebClient extends KFrame implements IWebClient
         suspendedGamesTab.add(resumeGamePanel);
         suspendedGamesTab.add(Box.createVerticalGlue());
 
-        // ----------------- Recover button -------------------
+        // ----------------- Delete button -------------------
+        Box deletePanel = new Box(BoxLayout.X_AXIS);
+        deletePanel.setBorder(new TitledBorder("Delete a suspended game"));
+        deleteButton = new JButton("Delete Game");
+        deleteButton.setEnabled(true);
+        deleteButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                deleteButtonAction();
+            }
+        });
+        deletePanel.add(deleteButton);
+        deletePanel.add(new JLabel("    "));
+        // reasonWhyNotLabel = nonBoldLabel("Not logged in");
+        // deletePanel .add(reasonWhyNotLabel);
+        deletePanel.add(Box.createHorizontalGlue());
+        deletePanel.setPreferredSize(deletePanel.getMinimumSize());
+        deletePanel.setSize(deletePanel.getMinimumSize());
 
+        /*
+         * Hardcoded clemens or admin, because at this time we don't have
+         * the "isAdmin" property set yet.
+         *
+         * TODO: do this properly
+         * (perhaps when we make this available that everybody could delete
+         * his own games, then the button would be always there and then we
+         * just need to enable/disable accordingly)
+         */
+        if (username != null
+            && (username.equals("clemens") || username.equals("admin")))
+        {
+            suspendedGamesTab.add(deletePanel);
+            suspendedGamesTab.add(Box.createVerticalGlue());
+        }
+
+        // ----------------- Recover button -------------------
         Box recoverGamePanel = new Box(BoxLayout.X_AXIS);
         recoverGamePanel.setBorder(new TitledBorder("Recover a crashed game"));
         recoverButton = new JButton("Browse");
@@ -1833,18 +1870,6 @@ public class WebClient extends KFrame implements IWebClient
 
         suspendedGamesTab.add(recoverGamePanel);
         suspendedGamesTab.add(Box.createVerticalGlue());
-
-        /*
-        // ----------------- Cancel button -------------------
-
-        Box buttonBar = new Box(BoxLayout.X_AXIS);
-        cancelButton.setPreferredSize(cancelButton.getMinimumSize());
-        buttonBar.add(Box.createHorizontalGlue());
-        buttonBar.add(cancelButton);
-        buttonBar.add(Box.createHorizontalGlue());
-        suspendedGamesTab.add(buttonBar);
-        suspendedGamesTab.add(Box.createVerticalGlue());
-        */
 
     }
 
@@ -3023,8 +3048,12 @@ public class WebClient extends KFrame implements IWebClient
         return true;
     }
 
-    // Called when user presses the "Start" button in
-    // "Create or Join" tab
+    /**
+     * Called when user presses the "Start" button in "Create or Join" tab
+     * and then sends the necessary message to server
+     * @param gameId
+     * @return if things went OK or not (ATM always true)
+     */
     boolean doStart(String gameId)
     {
         startButton.setEnabled(false);
@@ -3038,31 +3067,37 @@ public class WebClient extends KFrame implements IWebClient
         return true;
     }
 
+    /**
+     * Called when user presses the "Resume" button in "Suspended Games" tab
+     * to send the necessary message to server
+     * @param gameId
+     * @return if things went OK or not (ATM always true)
+     */
     boolean doResume(final String gameId)
     {
-        resumeButton.setEnabled(false);
-        startButton.setEnabled(false);
-        startLocallyButton.setEnabled(false);
-        cancelButton.setEnabled(false);
-        unenrollButton.setEnabled(false);
-        // TODO better handle with changing state, but not today...
-        reasonWhyNotLabel.setText(startClickedText);
-        gameResumeInitiated = true;
+        String filename = "dummy";
+        server.resumeGame(gameId, filename, new User(username));
+        return true;
+    }
 
-        SwingUtilities.invokeLater(new Runnable()
-        {
-            public void run()
-            {
-                String filename = "dummy";
-                WhatNextManager.sleepFor(2000);
-                server.resumeGame(gameId, filename, new User(username));
-            }
-        });
+    /**
+     * Called when user presses the "Delete" button in "Suspended Games" tab
+     * to send the necessary message to server
+     *
+     * TODO: minimal functionality to be used by admin, perhaps this does not
+     * completely all update GUI stuff...
+     * @param gameId
+     * @return if things went OK or not (ATM always true)
+     */
+    boolean doDeleteSuspendedGame(String gameId)
+    {
+        server.deleteSuspendedGame(gameId, new User(username));
         return true;
     }
 
     // Called when user presses the "Start Locally" button in
     // "Create or Join" tab
+    // TODO: Dead functionality!!
     private boolean doStartLocally(String gameId)
     {
         startButton.setEnabled(false);
@@ -3679,9 +3714,10 @@ public class WebClient extends KFrame implements IWebClient
         if (deletedGames.contains(gi.getGameId()))
         {
             LOGGER.info("Still GameInfo update to gameId " + gi.getGameId()
-                + " - ignoring it.");
+                + " which is already deleted - ignoring it.");
             return;
         }
+        LOGGER.finest("In WC.gameInfo() for not deleted game with id " + gi);
         handleGameInfoUpdates(gi);
     }
 
@@ -3758,6 +3794,13 @@ public class WebClient extends KFrame implements IWebClient
                                 runGameDataModel.removeGame(game.getGameId());
                                 break;
 
+                            case DELETED:
+                                proposedGameDataModel.removeGame(game
+                                    .getGameId());
+                                runGameDataModel.removeGame(game.getGameId());
+                                suspGameDataModel.removeGame(game.getGameId());
+                                break;
+
                             default:
                                 LOGGER.log(
                                     Level.WARNING,
@@ -3829,9 +3872,34 @@ public class WebClient extends KFrame implements IWebClient
     private void resumeGameButtonAction()
     {
         String gameId = getSelectedGameIdFromSuspTable();
-        suspGameTable.clearSelection();
         LOGGER.fine("Resume Button, game nr " + gameId);
+        suspGameTable.clearSelection();
+        resumeButton.setEnabled(false);
+        startButton.setEnabled(false);
+        startLocallyButton.setEnabled(false);
+        cancelButton.setEnabled(false);
+        unenrollButton.setEnabled(false);
+        // TODO better handle with changing state, but not today...
+        reasonWhyNotLabel.setText(startClickedText);
+        gameResumeInitiated = true;
+        updateGUI();
+        Thread.yield();
+        // Tell server
         doResume(gameId);
+    }
+
+    private void deleteButtonAction()
+    {
+        String gameId = getSelectedGameIdFromSuspTable();
+        if (gameId == null)
+        {
+            LOGGER
+                .fine("Delete Suspended Game Button, but no game selected in table?");
+            return;
+        }
+        suspGameTable.clearSelection();
+        LOGGER.fine("Delete Suspended Game Button, game nr " + gameId);
+        doDeleteSuspendedGame(gameId);
     }
 
     private void quitButtonAction()
@@ -4005,12 +4073,13 @@ public class WebClient extends KFrame implements IWebClient
         List<GameInfo> list = new ArrayList<GameInfo>();
         for (GameInfo gi : gameHash.values())
         {
-            // is instant, is mine, and don't bother about running, ending
-            // or suspended games, nor old ones.
+            // is instant, is mine, and don't bother about running, ending,
+            // suspended or deleted games, nor old ones.
             if (gi.getInitiator().equals(username) && !gi.isScheduledGame()
                 && !gi.getGameState().equals(GameState.RUNNING)
                 && !gi.getGameState().equals(GameState.ENDING)
                 && !gi.getGameState().equals(GameState.SUSPENDED)
+                && !gi.getGameState().equals(GameState.DELETED)
                 && !deletedGames.contains(gi.getGameId()))
             {
                 list.add(gi);

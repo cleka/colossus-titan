@@ -846,6 +846,11 @@ public class WebClientSocketThread extends Thread implements IWebServer
         send(Resume + sep + gameId + sep + loadGame + sep + byUser.getName());
     }
 
+    public void deleteSuspendedGame(String gameId, User user)
+    {
+        send(DeleteSuspendedGame + sep + gameId + sep + user.getName());
+    }
+
     public void informStartedByPlayer(String gameId)
     {
         send(StartedByPlayer + sep + gameId);

@@ -393,6 +393,37 @@ public class GameInfo
         return message;
     }
 
+    /**
+     * If webclients that cannot handle it receive a DELETED state,
+     * they throw exception and disconnect :-(
+     * So we give them ENDING instead...
+     * @param sep
+     * @return
+     */
+    public String toStringNoDelete(String sep)
+    {
+        StringBuilder playerList = new StringBuilder();
+        Iterator<User> it = players.iterator();
+        while (it.hasNext())
+        {
+            playerList.append(sep);
+            User user = it.next();
+            playerList.append(user.getName());
+        }
+
+        GameState modifiedState = state.equals(GameState.DELETED) ? GameState.ENDING
+            : state;
+        String message = gameId + sep + type.toString() + sep
+            + modifiedState.toString() + sep + initiator + sep + variant + sep
+            + viewmode + sep + startTime + sep + duration + sep + summary
+            + sep + eventExpiring + sep + getExtraOptionsAsString() + sep
+            + getTeleportOptionsAsString() + sep + min + sep + target + sep
+            + max + sep + onlineCount + sep + enrolledPlayers
+            + playerList.toString();
+
+        return message;
+    }
+
     public String getExtraOptionsAsString()
     {
         return Glob.glob(getExtraOptions());
@@ -1141,7 +1172,7 @@ public class GameInfo
      */
     public static enum GameState
     {
-        PROPOSED, DUE, ACTIVATED, STARTING, READY_TO_CONNECT, RUNNING, ENDING, SUSPENDED;
+        PROPOSED, DUE, ACTIVATED, STARTING, READY_TO_CONNECT, RUNNING, ENDING, SUSPENDED, DELETED;
     }
 
 }

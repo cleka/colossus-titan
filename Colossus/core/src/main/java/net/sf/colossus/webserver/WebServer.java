@@ -759,7 +759,8 @@ public class WebServer implements IWebServer, IRunWebServer
                 // TODO: fix when webserver has better knowledge of game
                 // state, i.e. which players are alive in which game...
                 && !gi.getGameState().equals(GameState.RUNNING)
-                && !gi.getGameState().equals(GameState.SUSPENDED))
+                && !gi.getGameState().equals(GameState.SUSPENDED)
+                && !gi.getGameState().equals(GameState.DELETED))
             {
                 return gi;
             }
@@ -1170,6 +1171,25 @@ public class WebServer implements IWebServer, IRunWebServer
         {
             LOGGER.warning("Did not find a GameInfo for gameId " + gameId
                 + " to resume it on the server!");
+        }
+    }
+
+    public void deleteSuspendedGame(String gameId, User user)
+    {
+        LOGGER.info("User " + user.getName()
+            + " wants to delete suspended game " + gameId);
+        GameInfo gi = findFromSuspendedGames(gameId);
+        {
+            if (gi != null)
+            {
+                gi.setState(GameState.DELETED);
+                allGames.remove(gi.getGameId());
+                proposedGames.remove(gi);
+                suspendedGames.remove(gi);
+                proposedGamesListModified = true;
+                allTellGameInfo(gi);
+                updateGUI();
+            }
         }
     }
 
