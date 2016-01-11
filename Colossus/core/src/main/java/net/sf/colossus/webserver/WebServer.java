@@ -1831,6 +1831,8 @@ public class WebServer implements IWebServer, IRunWebServer
 
         }
 
+        proposedGamesListModified = true;
+        saveGamesIfNeeded();
         allTellGameInfo(gi);
 
         boolean suspended = gi.getGameState().equals(GameState.SUSPENDED);
