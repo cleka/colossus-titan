@@ -490,6 +490,14 @@ final class ClientHandler extends ClientHandlerStub implements IClient
                 // skip
             }
 
+            // Versions 20151124 and before cannot handle them, but they
+            // pushed to stub's queue because stub is always new enough...
+            else if (method.equals(Constants.updateChangesValues)
+                && !canHandleChangedValuesOnlyStyle())
+            {
+                // skip
+            }
+
             else if (method.equals(Constants.updateCreatureCount)
                 || method.equals(Constants.tellWhatsHappening))
             {
