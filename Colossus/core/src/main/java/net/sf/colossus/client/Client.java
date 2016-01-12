@@ -3603,14 +3603,15 @@ public final class Client implements IClient, IOracle, IVariant,
         MasterHex currentHex, EntrySide entrySide, boolean teleport,
         CreatureType teleportingLord, boolean splitLegionHasForcedMove)
     {
-        if (isReplayBeforeRedo())
-        {
-            return;
-        }
         legion.setCurrentHex(currentHex);
         legion.setMoved(true);
         legion.setEntrySide(entrySide);
         legion.setTeleported(teleport);
+
+        if (isReplayBeforeRedo())
+        {
+            return;
+        }
 
         gui.actOnDidMove(legion, startingHex, currentHex, teleport,
             teleportingLord, splitLegionHasForcedMove);

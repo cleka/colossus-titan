@@ -947,8 +947,8 @@ public class ClientThread extends Thread implements EventExecutor
 
         else
         {
-            LOGGER.log(Level.SEVERE, "Bogus packet (Client, method: " + method
-                + ", args: " + args + ")");
+            LOGGER.log(Level.SEVERE, "Bogus packet (Client, method: '"
+                + method + "', args: " + args + ")");
         }
         LOGGER.finest("Client '" + getNameMaybe()
             + "' finished method processing");

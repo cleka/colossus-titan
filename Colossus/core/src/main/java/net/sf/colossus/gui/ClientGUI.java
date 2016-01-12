@@ -605,7 +605,8 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         }
         catch (Throwable e)
         {
-            LOGGER.severe("Caught throwable " + e.getClass().toString());
+            LOGGER.log(Level.SEVERE, "Caught throwable "
+                + e.getClass().toString(), e);
             return null;
         }
     }
