@@ -269,7 +269,7 @@ public class ClientHandlerStub implements IClient
      */
     public void updateChangedPlayerValues(String changedValues, String reason)
     {
-        sendToClient(Constants.updateChangesValues + sep + changedValues + sep
+        sendToClient(Constants.updateChangedValues + sep + changedValues + sep
             + reason);
     }
 

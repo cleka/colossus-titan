@@ -492,7 +492,7 @@ final class ClientHandler extends ClientHandlerStub implements IClient
 
             // Versions 20151124 and before cannot handle them, but they
             // pushed to stub's queue because stub is always new enough...
-            else if (method.equals(Constants.updateChangesValues)
+            else if (method.equals(Constants.updateChangedValues)
                 && !canHandleChangedValuesOnlyStyle())
             {
                 // skip
