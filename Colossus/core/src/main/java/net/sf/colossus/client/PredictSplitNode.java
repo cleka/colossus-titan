@@ -112,7 +112,27 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
     /** Return list of CreatureInfo */
     CreatureInfoList getCreatures()
     {
-        Collections.sort(creatures, cic);
+        boolean success = true;
+        CreatureInfoList copy;
+        try
+        {
+            copy = creatures.clone();
+            Collections.sort(copy, cic);
+        }
+        catch (Exception e)
+        {
+            System.err.println("Exception " + e.toString()
+                + " during getCreatures(); trying again");
+            success = false;
+            copy = creatures.clone();
+            Collections.sort(copy, cic);
+            success = true;
+            System.err.println("getCreatures() succeeded on 2nd time.");
+        }
+        if (!success)
+        {
+            System.err.println("getCreatures() failed also on 2nd time.");
+        }
         return creatures;
     }
 
