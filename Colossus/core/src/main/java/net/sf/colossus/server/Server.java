@@ -3846,13 +3846,27 @@ public final class Server extends Thread implements IServer
     public void peerRequestReceived(String requestingClientName, int queueLen)
     {
         ClientHandler reqCH = getClientHandlerByName(requestingClientName);
-        reqCH.peerRequestReceivedBy(getPlayerName(), queueLen);
+        if (reqCH != null)
+        {
+            reqCH.peerRequestReceivedBy(getPlayerName(), queueLen);
+        }
+        else
+        {
+            LOGGER.severe("peerReqReceived: reqCH is null?");
+        }
     }
 
     public void peerRequestProcessed(String requestingClientName)
     {
         ClientHandler reqCH = getClientHandlerByName(requestingClientName);
-        reqCH.peerRequestProcessedBy(getPlayerName());
+        if (reqCH != null)
+        {
+            reqCH.peerRequestProcessedBy(getPlayerName());
+        }
+        else
+        {
+            LOGGER.severe("peerReqProcessed: reqCH is null?");
+        }
     }
 
     private final HashSet<IClient> waitingToCatchup = new HashSet<IClient>();
