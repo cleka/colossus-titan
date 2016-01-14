@@ -1481,6 +1481,7 @@ public final class Server extends Thread implements IServer
     {
         // System.out.println("handleNewConn, called with connId " + connectionId);
         boolean isReconnect;
+        // cannot be -2, because for them we use legacy method
         if (connectionId == -1)
         {
             isReconnect = false;

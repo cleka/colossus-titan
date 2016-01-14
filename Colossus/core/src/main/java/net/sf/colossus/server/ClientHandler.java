@@ -1193,13 +1193,20 @@ final class ClientHandler extends ClientHandlerStub implements IClient
                 {
                     connectionId = Integer.parseInt(args.remove(0));
                 }
+                else
+                {
+                    // old client which does not send Id
+                    connectionId = -2;
+                }
             }
 
             String reasonFail;
-            if (server.getAllInitialConnectsDone() && connectionId == -1
-                && !spectator)
+            if (server.getAllInitialConnectsDone()
+                && (connectionId == -1 || connectionId == -2) && !spectator)
             {
-                // could also be a spectator
+                // we exclude spectator in the if, because they are handled
+                // in the legacy case (code works there, didn't want to
+                // change now)
                 LOGGER.info("Scratch reconnect (id -1) for client "
                     + signonTryName);
                 reasonFail = server
