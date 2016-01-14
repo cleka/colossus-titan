@@ -530,6 +530,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
 
                 });
             }
+            /*
             catch (InvocationTargetException e1)
             {
                 e = e1;
@@ -538,6 +539,7 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             {
                 e = e2;
             }
+            */
             catch (Exception e3)
             {
                 client.logMsgToServer("E",
