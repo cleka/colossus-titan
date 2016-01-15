@@ -107,6 +107,9 @@ public class WebClient extends KFrame implements IWebClient
     //    teleport options added
     // 5: can properly display suspended games
     // 6: version from 6.1.2016. Scratch-reconnect stuff ongoing
+    // 7: admin can delete suspened games via gui
+    // 8: joinToWatch should work again. Also other changes that
+    //    might help with the 'no BattleBoard' problem
     public final static int WC_VERSION_GENERAL_MESSAGE = 1;
     public final static int WC_VERSION_SUPPORTS_PING = 2;
     public final static int WC_VERSION_DINO_OK = 3;
@@ -114,8 +117,9 @@ public class WebClient extends KFrame implements IWebClient
     public final static int WC_VERSION_RESUME = 5;
     public final static int WC_VERSION_SCRATCH_RECONN_WIP = 6;
     public final static int WC_VERSION_DELETE_SUSPENDED_GAME = 7;
+    public final static int WC_VERSION_WATCH_GAME_FIXED = 8;
 
-    final static int WEB_CLIENT_VERSION = WC_VERSION_DELETE_SUSPENDED_GAME;
+    final static int WEB_CLIENT_VERSION = WC_VERSION_WATCH_GAME_FIXED;
 
     // TODO make this all based on Locale.getDefault()
     // Initially: use German. To make it variable, need also to set
