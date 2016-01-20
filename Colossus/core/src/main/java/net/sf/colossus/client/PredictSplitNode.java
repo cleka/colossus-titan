@@ -133,7 +133,7 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
         {
             System.err.println("getCreatures() failed also on 2nd time.");
         }
-        return creatures;
+        return copy;
     }
 
     void setCreatures(CreatureInfoList creatures)
