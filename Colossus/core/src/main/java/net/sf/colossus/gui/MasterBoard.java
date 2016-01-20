@@ -181,6 +181,7 @@ public final class MasterBoard extends JPanel
 
     private static final String skipLegion = "Skip legion this time";
     private static final String nextLegion = "Next legion";
+    private static final String destroyLegion = "Destroy legion";
 
     private static final String undoLast = "Undo";
     private static final String undoAll = "Undo All";
@@ -223,6 +224,7 @@ public final class MasterBoard extends JPanel
     private AbstractAction clearRecruitChitsAction;
     private AbstractAction skipLegionAction;
     private AbstractAction nextLegionAction;
+    private AbstractAction destroyLegionAction;
     private AbstractAction undoLastAction;
     private AbstractAction undoAllAction;
     private AbstractAction doneWithPhaseAction;
@@ -563,6 +565,14 @@ public final class MasterBoard extends JPanel
             public void actionPerformed(ActionEvent e)
             {
                 jumpToNextUnhandledLegion();
+            }
+        };
+
+        destroyLegionAction = new AbstractAction(destroyLegion)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                destroyThisLegion();
             }
         };
 
@@ -1407,6 +1417,14 @@ public final class MasterBoard extends JPanel
         mi = phaseMenu.add(nextLegionAction);
         mi.setMnemonic(KeyEvent.VK_N);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, 0));
+
+        boolean CLEMENS_TEST_2 = false;
+        if (CLEMENS_TEST_2)
+        {
+            mi = phaseMenu.add(destroyLegionAction);
+            mi.setMnemonic(KeyEvent.VK_R);
+            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, 0));
+        }
 
         phaseMenu.addSeparator();
 
@@ -3173,6 +3191,29 @@ public final class MasterBoard extends JPanel
         catch (AWTException exception)
         {
             LOGGER.log(Level.WARNING, "Robot creation failed");
+        }
+    }
+
+    private void destroyThisLegion()
+    {
+        if (gui.getGame().isPhase(Phase.MOVE))
+        {
+            Legion activeLegion = gui.getMover();
+            if (activeLegion != null)
+            {
+                if (activeLegion.hasTitan())
+                {
+                    LOGGER.warning("Ignored attempt to destroy Titan Legion!");
+                }
+                else
+                {
+                    gui.getClient().destroyLegion(activeLegion);
+                }
+            }
+        }
+        else
+        {
+            LOGGER.warning("destroyThisLegion called, but not move phase.");
         }
     }
 

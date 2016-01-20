@@ -4260,4 +4260,9 @@ public final class Client implements IClient, IOracle, IVariant,
         localServer.getGame().editModeRelocateLegion(markerId, hexLabel);
     }
 
+    public void destroyLegion(Legion legion)
+    {
+        server.cheatModeDestroyLegion(legion);
+    }
+
 }

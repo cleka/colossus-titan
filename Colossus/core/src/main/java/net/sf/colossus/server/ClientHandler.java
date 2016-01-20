@@ -1609,6 +1609,12 @@ final class ClientHandler extends ClientHandlerStub implements IClient
             server.logMsgToServer(severity, message);
         }
 
+        else if (method.equals(Constants.cheatModeDestroyLegion))
+        {
+            Legion legion = resolveLegion(args.remove(0));
+            server.cheatModeDestroyLegion(legion);
+        }
+
         else
         {
             LOGGER.log(Level.SEVERE, "Bogus packet (Server, method: '"

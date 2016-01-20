@@ -1380,6 +1380,12 @@ final class SocketClientThread extends Thread implements IServer,
         sendToServer(Constants.logMsgToServer + sep + severity + sep + message);
     }
 
+    public void cheatModeDestroyLegion(Legion legion)
+    {
+        sendToServer(Constants.cheatModeDestroyLegion + sep
+            + legion.getMarkerId());
+    }
+
     public void joinGame(String playerName)
     {
         sendToServer(Constants.joinGame + sep + playerName);

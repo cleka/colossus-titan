@@ -4297,6 +4297,11 @@ public final class Server extends Thread implements IServer
         LOGGER.info("CLIENTLOG: " + severity + ": " + message);
     }
 
+    public void cheatModeDestroyLegion(Legion legion)
+    {
+        ((LegionServerSide)legion).remove();
+    }
+
     public void enforcedDisconnectClient(String name)
     {
         try

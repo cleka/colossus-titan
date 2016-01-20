@@ -155,5 +155,7 @@ public interface IServer
 
     public void logMsgToServer(String severity, String message);
 
+    public void cheatModeDestroyLegion(Legion legion);
+
     public void watchGame();
 }
