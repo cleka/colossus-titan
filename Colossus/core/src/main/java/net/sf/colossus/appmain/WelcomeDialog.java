@@ -28,7 +28,7 @@ public final class WelcomeDialog extends KFrame
 {
     private final static String title = "Welcome to this new Colossus Release!";
 
-    private final static String CURRENT_WELCOME_KEY = "Public-Test-Build-20160115";
+    private final static String CURRENT_WELCOME_KEY = "Public-Build-20160121";
 
     private final static String baseUrl = "http://sourceforge.net/projects/colossus/files";
     private final static String colossusReleaseNoteUrl = baseUrl + "/"
@@ -44,10 +44,11 @@ public final class WelcomeDialog extends KFrame
             + CURRENT_WELCOME_KEY
             + "!"
             + "\n\n"
-            + "  A few improvements/corrections since last public build::\n"
+            + "  A few improvements/corrections since last public build:\n"
             + "  - Can resume game even if not all players online (dead players)\n"
             + "  - Joining to watch a game should work again\n"
             + "  - A few changes that might prevent the 'no BattleBoard' problem\n"
+            + "  - Legion list in PlayerDetailsDialog contains Marker Id\n"
             + "\n"
             + "  This \"Welcome Dialog\" will only be shown once for every new release\n"
             + "  (you can find this welcome message also from the MasterBoard Help menu).\n"
