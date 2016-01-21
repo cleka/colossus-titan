@@ -232,6 +232,7 @@ public final class Options implements IOptions
     public static final String activePreferencesTab = "Active preferences tab";
 
     public static final String editModeActive = "Edit Mode";
+    public static final String legionListByMarkerId = "Sort legion list by marker Id";
 
     private final Properties props = new Properties();
     private final String owner; // playerName, or Constants.optionsServerName

@@ -15,6 +15,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -233,7 +234,25 @@ public final class PlayerDetailsDialog extends KDialog
             Options.dubiousAsBlanks);
 
         List<LegionClientSide> legions = new ArrayList<LegionClientSide>();
-        legions.addAll(player.getLegions());
+        if (gui.getOptions().getOption(Options.legionListByMarkerId))
+        {
+            // TODO: this could probably been done much more elegant
+            // but for now I just want it to work so that I can use it...
+            List<String> markers = new ArrayList<String>();
+            for (LegionClientSide legion : player.getLegions())
+            {
+                markers.add(legion.getMarkerId());
+            }
+            Collections.sort(markers);
+            for (String markerId : markers)
+            {
+                legions.add(player.getLegionByMarkerId(markerId));
+            }
+        }
+        else
+        {
+            legions.addAll(player.getLegions());
+        }
         for (LegionClientSide legion : legions)
         {
             result.add(new JLabel(legion.getMarkerId()),
