@@ -14,7 +14,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -221,7 +223,8 @@ public final class PlayerDetailsDialog extends KDialog
             String.valueOf(player.getNumLegions()) + " legions:");
         result.add(sectionLabel, SECTION_TITLE_CONSTRAINT);
 
-        result.add(new JPanel(), FIRST_LABEL_CONSTRAINT);
+        result.add(new JLabel("Legion"), FIRST_LABEL_CONSTRAINT);
+        result.add(new JLabel(), LABEL_CONSTRAINT);
         result.add(new JLabel("Hex"), LABEL_CONSTRAINT);
         result.add(new JLabel("Content"), LABEL_CONSTRAINT);
         result.add(new JPanel(), HORIZONTAL_FILL_CONSTRAINT);
@@ -229,11 +232,15 @@ public final class PlayerDetailsDialog extends KDialog
         boolean dubiousAsBlanks = gui.getOptions().getOption(
             Options.dubiousAsBlanks);
 
-        for (LegionClientSide legion : player.getLegions())
+        List<LegionClientSide> legions = new ArrayList<LegionClientSide>();
+        legions.addAll(player.getLegions());
+        for (LegionClientSide legion : legions)
         {
+            result.add(new JLabel(legion.getMarkerId()),
+                FIRST_LABEL_CONSTRAINT);
             result.add(
                 new Marker(legion, 2 * Scale.get(), legion.getLongMarkerId()),
-                FIRST_LABEL_CONSTRAINT);
+                LABEL_CONSTRAINT);
             result.add(new JLabel(legion.getCurrentHex().getLabel()),
                 LABEL_CONSTRAINT);
             result.add(new LegionInfoPanel(legion, 2 * Scale.get(), 0, 0,
