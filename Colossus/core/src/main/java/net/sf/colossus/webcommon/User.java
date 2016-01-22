@@ -289,8 +289,6 @@ public class User
 
     public boolean isUserInIgnoredList(String username)
     {
-        LOGGER.finest("check is " + username + " in list: "
-            + Glob.glob(":", getListOfIgnoredUsers()));
         return ignoredUsers.contains(username);
     }
 

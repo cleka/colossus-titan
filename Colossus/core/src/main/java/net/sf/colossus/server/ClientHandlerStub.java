@@ -393,7 +393,6 @@ public class ClientHandlerStub implements IClient
         {
             LOGGER.warning("CH.playerName still null, returning signOnName '"
                 + signonName + "'");
-            Thread.dumpStack();
             return this.signonName;
         }
         return this.playerName;
