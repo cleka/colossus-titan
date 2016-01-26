@@ -1403,8 +1403,10 @@ public class WebServer implements IWebServer, IRunWebServer
         }
         else
         {
-            LOGGER.warning("requestUserAttention done, but could not find "
-                + "client to send confirmation message!");
+            LOGGER.warning("requestUserAttention to" + recipient
+                + " done, but could not find client for sender " + sender
+                + " to send confirmation message!");
+            LOGGER.info("Failed message was: " + message);
         }
     }
 
