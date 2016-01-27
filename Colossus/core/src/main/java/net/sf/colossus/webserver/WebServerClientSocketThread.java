@@ -214,7 +214,7 @@ public class WebServerClientSocketThread extends Thread
                 }
                 else
                 {
-                    LOGGER.warning("Strange. ToldToTerminate is not set "
+                    LOGGER.info("NOTE: ToldToTerminate is not set "
                         + "but we got " + "SocketException ('"
                         + ex.getMessage() + "') in WSCST " + getClientInfo()
                         + " - setting done to true anyway.");

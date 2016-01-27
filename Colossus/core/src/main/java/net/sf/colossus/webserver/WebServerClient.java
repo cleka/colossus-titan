@@ -162,6 +162,7 @@ public class WebServerClient implements IWebClient
         // user will still be null; skip all this here then:
         if (user != null)
         {
+            LOGGER.info("Handling logout for user " + getUsername());
             user.updateLastLogout();
             server.writeBackUsers();
 
