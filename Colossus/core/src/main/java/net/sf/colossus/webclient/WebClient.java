@@ -367,8 +367,7 @@ public class WebClient extends KFrame implements IWebClient
 
     private final static String optAutoGameStartAction = "Auto Game Start Action";
 
-    private final static String defaultSummaryText = "Type here a short "
-        + "summary what kind of game you would wish to play";
+    private final static String defaultSummaryText = "Let's play!";
 
     public WebClient(WhatNextManager whatNextManager, String hostname,
         int port, String login, String password)
