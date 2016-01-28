@@ -873,8 +873,7 @@ public class WebServer implements IWebServer, IRunWebServer
 
     public void tellAllProposedGamesToOne(WebServerClient client)
     {
-        ArrayList<GameInfo> list = new ArrayList<GameInfo>(allGames.values());
-        tellAllGamesFromListToOne(client, list);
+        tellAllGamesFromListToOne(client, proposedGames);
     }
 
     public void tellAllRunningGamesToOne(WebServerClient client)
