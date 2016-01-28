@@ -902,11 +902,10 @@ public final class Server extends Thread implements IServer
             {
                 // set isGone first, to prevent from sending log info to
                 // client channel - channel is gone anyway...
-                processingCH.setIsGone("IOException while reading");
                 LOGGER.log(Level.WARNING, "IOException '" + e.getMessage()
                     + "' while reading from channel for player "
                     + getPlayerName(), e);
-
+                processingCH.setIsGone("IOException while reading");
                 if (read > 0)
                 {
                     LOGGER.warning("Before IOException handling processing, "
