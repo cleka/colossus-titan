@@ -2773,6 +2773,12 @@ public final class Server extends Thread implements IServer
 
     public void doBattleMove(int tag, BattleHex hex)
     {
+        if (hex == null)
+        {
+            LOGGER.info("Ignoring doBattleMove for hex==null - probably a "
+                + "delayed msg related to a recently finished battle");
+            return;
+        }
         IClient client = getClient(getPlayer());
         if (!isBattleActivePlayer())
         {

@@ -316,6 +316,7 @@ final class ClientHandler extends ClientHandlerStub implements IClient
      */
     private void confirmCommitPoint(int confirmedNr)
     {
+        setBattleRecentlyFinished(false);
         int found = -1;
         int size = resendQueue.size();
         for (int i = 0; i < size && found == -1; i++)
@@ -1371,26 +1372,42 @@ final class ClientHandler extends ClientHandlerStub implements IClient
             int tag = Integer.parseInt(args.remove(0));
             String hexLabel = args.remove(0);
             BattleHex hex = resolveBattleHex(hexLabel);
-            server.doBattleMove(tag, hex);
+            // silently ignore delayed messages
+            if (!(hex == null && hasBattleRecentlyFinished()))
+            {
+                server.doBattleMove(tag, hex);
+            }
         }
         else if (method.equals(Constants.strike))
         {
             int tag = Integer.parseInt(args.remove(0));
             String hexLabel = args.remove(0);
             BattleHex hex = resolveBattleHex(hexLabel);
-            server.strike(tag, hex);
+            // silently ignore delayed messages
+            if (!(hex == null && hasBattleRecentlyFinished()))
+            {
+                server.strike(tag, hex);
+            }
         }
         else if (method.equals(Constants.applyCarries))
         {
             String hexLabel = args.remove(0);
             BattleHex hex = resolveBattleHex(hexLabel);
-            server.applyCarries(hex);
+            // silently ignore delayed messages
+            if (!(hex == null && hasBattleRecentlyFinished()))
+            {
+                server.applyCarries(hex);
+            }
         }
         else if (method.equals(Constants.undoBattleMove))
         {
             String hexLabel = args.remove(0);
             BattleHex hex = resolveBattleHex(hexLabel);
-            server.undoBattleMove(hex);
+            // silently ignore delayed messages
+            if (!(hex == null && hasBattleRecentlyFinished()))
+            {
+                server.undoBattleMove(hex);
+            }
         }
         else if (method.equals(Constants.assignStrikePenalty))
         {
@@ -1624,8 +1641,33 @@ final class ClientHandler extends ClientHandlerStub implements IClient
 
     private BattleHex resolveBattleHex(String hexLabel)
     {
-        return server.getGame().getBattleSS().getLocation().getTerrain()
-            .getHexByLabel(hexLabel);
+        BattleHex hex = null;
+        try
+        {
+            BattleServerSide battle = server.getGame().getBattleSS();
+            if (battle != null)
+            {
+                hex = server.getGame().getBattleSS().getLocation()
+                    .getTerrain().getHexByLabel(hexLabel);
+            }
+            else if (hasBattleRecentlyFinished())
+            {
+                LOGGER
+                    .info("No battle any more while trying to resolve battleHex "
+                        + hexLabel + ", but that's probably ok.");
+            }
+            else
+            {
+                LOGGER.warning("No battle while trying to resolve battleHex " + hexLabel + "?");
+            }
+        }
+        catch (Exception e)
+        {
+            LOGGER.warning("Exception " + e.getClass().getName()
+                + " while trying to resolve battleHex " + hexLabel
+                + "; ignoring it, returning null.");
+        }
+        return hex;
     }
 
     // TODO resolveX methods are on both sides of the network, they should

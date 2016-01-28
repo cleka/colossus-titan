@@ -69,6 +69,13 @@ public class ClientHandlerStub implements IClient
     // last time.
     private String previousInfoStringsString = "";
 
+    /** We might still get battle related messages from client, who
+     *  has not received/processed the battle end (concede) yet.
+     *  We use this to check whether there is a "reason" why we try to
+     *  refer to a not-existing-any-more battle (e.g. conceded).
+     */
+    private boolean battleRecentlyFinished = false;
+
     public ClientHandlerStub(Server server)
     {
         LOGGER.finest("ClientHandlerStub for a real client instantiated");
@@ -171,7 +178,6 @@ public class ClientHandlerStub implements IClient
         messageCounter++;
     }
 
-
     protected void commitPoint()
     {
         PrintWriter writer = server.getGame().getIscMessageFile();
@@ -198,6 +204,16 @@ public class ClientHandlerStub implements IClient
         }
         */
         writer.flush();
+    }
+
+    protected void setBattleRecentlyFinished(boolean value)
+    {
+        battleRecentlyFinished = value;
+    }
+
+    protected boolean hasBattleRecentlyFinished()
+    {
+        return battleRecentlyFinished;
     }
 
     // ======================================================================
@@ -229,6 +245,7 @@ public class ClientHandlerStub implements IClient
     public void tellEngagementResults(Legion winner, String method,
         int points, int turns)
     {
+        setBattleRecentlyFinished(true);
         sendToClient(Constants.tellEngagementResults + sep
             + (winner != null ? winner.getMarkerId() : null) + sep + method
             + sep + points + sep + turns);
