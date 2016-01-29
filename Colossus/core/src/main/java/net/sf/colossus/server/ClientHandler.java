@@ -466,7 +466,6 @@ final class ClientHandler extends ClientHandlerStub implements IClient
         tempQ.addAll(stub.historyQueue);
         tempQ.addAll(stub.resendQueue);
 
-        prn("tempQ has " + tempQ.size() + " items.");
         for (MessageForClient mfc : tempQ)
         {
             String method = mfc.getMethod();
@@ -529,13 +528,8 @@ final class ClientHandler extends ClientHandlerStub implements IClient
         enqueueForResend(new MessageForClient(0, 0, redoOff));
         String replayOff = Constants.replayOngoing + sep + false + sep + 0;
         enqueueForResend(new MessageForClient(0, 0, replayOff));
-
-        prn("Initialized resendQueue from other CH or stub, contains now "
-            + resendQueue.size() + " items!\n");
-
-        LOGGER
-            .fine("Initialized resendQueue from other CH or stub, contains now "
-            + resendQueue.size() + " items!");
+        LOGGER.fine("Initialized resendQueue from other CH or stub, "
+            + "contains now " + resendQueue.size() + " items!");
     }
 
     public void initResendQueueFromOther(ClientHandlerStub otherCH)
@@ -622,13 +616,8 @@ final class ClientHandler extends ClientHandlerStub implements IClient
         enqueueForResend(new MessageForClient(0, 0, redoOff));
         String replayOff = Constants.replayOngoing + sep + false + sep + 0;
         enqueueForResend(new MessageForClient(0, 0, replayOff));
-
-        prn("Initialized resendQueue from other CH or stub, contains now "
-            + resendQueue.size() + " items!\n");
-
-        LOGGER
-            .fine("Initialized resendQueue from other CH or stub, contains now "
-                + resendQueue.size() + " items!");
+        LOGGER.fine("Initialized resendQueue from other CH or stub, "
+            + "contains now " + resendQueue.size() + " items");
     }
 
     private String buildExpectedSetupPhaseLine(GameServerSide game)
@@ -821,12 +810,6 @@ final class ClientHandler extends ClientHandlerStub implements IClient
     public void syncAfterReconnect(int lastReceivedMessageNr,
         int syncRequestNumber)
     {
-        // to get client out of initial read-lines loop, to get it into
-        // normal "read from socket and parse line" loop
-        // setPlayerName(signonName);
-
-        System.out.println("syncAfterReconnect; resendQueue size = "
-            + resendQueue.size());
         int size = resendQueue.size();
         for (int i = 0; i < size; i++)
         {
@@ -1261,7 +1244,6 @@ final class ClientHandler extends ClientHandlerStub implements IClient
 
         else if (method.equals(Constants.watchGame))
         {
-            LOGGER.info("Got watchGame request from client " + signonName);
             server.watchGame();
         }
 
