@@ -1020,7 +1020,7 @@ final class ClientHandler extends ClientHandlerStub implements IClient
         {
             LOGGER.warning("isGone already true when attempting "
                 + "to do WriteToChannel " + lastEncodedMsg + " for player"
-                + getPlayerName());
+                + getClientName());
             LOGGER.warning("Reason: " + this.isGoneReason);
             Thread.dumpStack();
             return;

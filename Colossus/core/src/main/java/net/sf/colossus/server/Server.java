@@ -683,7 +683,7 @@ public final class Server extends Thread implements IServer
 
                     if (key.isValid() && key.isWritable())
                     {
-                        LOGGER.info("Channel for " + ch.getPlayerName()
+                        LOGGER.info("Channel for " + ch.getClientName()
                             + " got writable again.");
 
                         // unregister write. If next time fails, it will register again.
@@ -1611,14 +1611,18 @@ public final class Server extends Thread implements IServer
         {
             if (clientName.equals(Constants.INTERNAL_DUMMY_CLIENT_NAME))
             {
-                logToStartLog("Internal dummy spectator (" + clientName
-                    + ") signed on.");
+                String msg = "Internal dummy spectator (" + clientName
+                    + ") signed on.";
+                LOGGER.info(msg);
+                logToStartLog(msg);
                 --waitingForClients;
             }
             else
             {
-                logToStartLog((remote ? "Remote" : "Local") + " spectator ("
-                    + clientName + ") signed on.");
+                String msg = (remote ? "Remote" : "Local") + " spectator ("
+                    + clientName + ") signed on.";
+                LOGGER.info(msg);
+                logToStartLog(msg);
             }
         }
 
