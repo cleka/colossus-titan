@@ -974,7 +974,7 @@ public final class Server extends Thread implements IServer
         if (player == null)
         {
             LOGGER.warning("Skipping withdrawFromGame processing for "
-                + " ClientHandler of " + getPlayerName()
+                + " ClientHandler of " + getProcessingCH().getClientName()
                 + " - no player found for the name");
             return;
         }
@@ -2238,7 +2238,7 @@ public final class Server extends Thread implements IServer
 
     void othersTellReconnectCompleted(ClientHandler chInTrouble)
     {
-        String name = chInTrouble.getPlayerName();
+        String name = chInTrouble.getClientName();
         String message = "Client of player " + name
             + " reconnect now successfully completed.";
         appendToConnLogs(chInTrouble, message);
