@@ -446,7 +446,9 @@ public final class Server extends Thread implements IServer
         serverRunning = true;
         while (waitingForClients > 0 && serverRunning && !shuttingDown)
         {
-            LOGGER.info("Waiting for clients, before waitOnSelector()");
+            LOGGER
+                .info("Waiting for clients, before waitOnSelector(), waitingForClients="
+                    + waitingForClients + ", serverRunning=" + serverRunning);
             waitOnSelector(timeoutDuringStart, true);
         }
 
@@ -1480,8 +1482,7 @@ public final class Server extends Thread implements IServer
     {
         // System.out.println("handleNewConn, called with connId " + connectionId);
         boolean isReconnect;
-        // cannot be -2, because for them we use legacy method
-        if (connectionId == -1)
+        if (connectionId == -1 || connectionId == -2)
         {
             isReconnect = false;
         }
@@ -1603,7 +1604,7 @@ public final class Server extends Thread implements IServer
                 {
                     LOGGER.info("Looks like alive player " + clientName
                         + " connects 'from scratch'");
-                    System.out.println("What shall we do here... ?");
+                    LOGGER.warning("What shall we do here... ?");
                 }
             }
         }
