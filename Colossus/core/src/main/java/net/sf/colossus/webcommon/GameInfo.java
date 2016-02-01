@@ -339,6 +339,32 @@ public class GameInfo
         return gi;
     }
 
+    public String toStringCheckClientVersion(String username,
+        int clientVersion, String sep)
+    {
+        String giString;
+        if (clientVersion >= WebClient.WC_VERSION_DELETE_SUSPENDED_GAME)
+        {
+            LOGGER
+                .info("Sending GameInfo (can handle deleted game) to client "
+                    + username);
+            giString = toString(sep);
+        }
+        else if (clientVersion >= WebClient.WC_VERSION_SUPPORTS_EXTRA_OPTIONS)
+        {
+            LOGGER.info("Sending GameInfo (new style) to client " + username);
+            boolean noSuspend = clientVersion <= WebClient.WC_VERSION_RESUME;
+            boolean noDelete = clientVersion < WebClient.WC_VERSION_DELETE_SUSPENDED_GAME;
+            giString = toStringFixState(sep, noSuspend, noDelete);
+        }
+        else
+        {
+            LOGGER.info("Sending LegacyGameInfo to client " + username);
+            giString = toStringLegacy(sep);
+        }
+        return giString;
+    }
+
     public String toStringLegacy(String sep)
     {
         StringBuilder playerList = new StringBuilder();
@@ -361,8 +387,16 @@ public class GameInfo
             summary2 = "NOTE! " + count + " extra options are set! | "
                 + summary;
         }
+
+        GameState modifiedState = state;
+        if (modifiedState.equals(GameState.DELETED)
+            || modifiedState.equals(GameState.SUSPENDED))
+        {
+            modifiedState = GameState.ENDING;
+        }
+
         String message = gameId + sep + type.toString() + sep
-            + state.toString() + sep + initiator + sep + variant + sep
+            + modifiedState.toString() + sep + initiator + sep + variant + sep
             + viewmode + sep + startTime + sep + duration + sep + summary2
             + sep + eventExpiring + sep + unlimitedMulligans + sep
             + balancedTowers + sep + min + sep + target + sep + max + sep
@@ -394,13 +428,16 @@ public class GameInfo
     }
 
     /**
-     * If webclients that cannot handle it receive a DELETED state,
-     * they throw exception and disconnect :-(
+     * If webclients that cannot handle it receive a DELETED or
+     * SUSPENDED state, they throw exception and disconnect :-(
      * So we give them ENDING instead...
      * @param sep
+     * @param noSuspend TODO
+     * @param noDelete TODO
      * @return
      */
-    public String toStringNoDelete(String sep)
+    public String toStringFixState(String sep, boolean noSuspend,
+        boolean noDelete)
     {
         StringBuilder playerList = new StringBuilder();
         Iterator<User> it = players.iterator();
@@ -411,8 +448,15 @@ public class GameInfo
             playerList.append(user.getName());
         }
 
-        GameState modifiedState = state.equals(GameState.DELETED) ? GameState.ENDING
-            : state;
+        GameState modifiedState = state;
+        if (noDelete && state.equals(GameState.DELETED))
+        {
+            modifiedState = GameState.ENDING;
+        }
+        if (noSuspend && state.equals(GameState.SUSPENDED))
+        {
+            modifiedState = GameState.ENDING;
+        }
         String message = gameId + sep + type.toString() + sep
             + modifiedState.toString() + sep + initiator + sep + variant + sep
             + viewmode + sep + startTime + sep + duration + sep + summary

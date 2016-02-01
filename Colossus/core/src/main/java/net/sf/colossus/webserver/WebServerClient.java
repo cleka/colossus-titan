@@ -719,7 +719,10 @@ public class WebServerClient implements IWebClient
             }
             server.tellAllProposedGamesToOne(this);
             server.tellAllRunningGamesToOne(this);
-            server.tellAllSuspendedGamesToOne(this);
+            if (clientVersion >= WebClient.WC_VERSION_RESUME)
+            {
+                server.tellAllSuspendedGamesToOne(this);
+            }
             tellOwnInfo(getUser().getEmail());
             server.tellLastChatMessagesToOne(this, IWebServer.generalChatName);
             server.sendMessageOfTheDayToOne(this, IWebServer.generalChatName);
@@ -933,23 +936,9 @@ public class WebServerClient implements IWebClient
     public void gameInfo(GameInfo gi)
     {
         String giString;
-        if (getClientVersion() >= WebClient.WC_VERSION_DELETE_SUSPENDED_GAME)
-        {
-            LOGGER.info("Sending GameInfo (can handle deleted game) to "
-                + "client " + getUsername());
-            giString = gi.toString(sep);
-        }
-        else if (getClientVersion() >= WebClient.WC_VERSION_SUPPORTS_EXTRA_OPTIONS)
-        {
-            LOGGER.info("Sending GameInfo (new style) to client "
-                + getUsername());
-            giString = gi.toStringNoDelete(sep);
-        }
-        else
-        {
-            LOGGER.info("Sending LegacyGameInfo to client " + getUsername());
-            giString = gi.toStringLegacy(sep);
-        }
+        giString = gi.toStringCheckClientVersion(getUsername(),
+            getClientVersion(), sep);
+
         sendToClient(gameInfo + sep + giString);
     }
 
