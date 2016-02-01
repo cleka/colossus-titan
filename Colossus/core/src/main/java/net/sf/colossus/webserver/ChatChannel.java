@@ -327,8 +327,16 @@ public class ChatChannel
         lines.add("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
         lines.add("");
         lines.add(" Hello " + userName + ", please note:");
-        lines
-            .add(" You are using a Colossus version older than 0.10.3. See message above!");
+        lines.add("");
+        lines.add(" You are using a rather old Colossus version!");
+        lines.add(" If you can, please start using the newest version, "
+            + "for example from the Colossus homepage. Go to the page:");
+        lines.add("");
+        lines.add("    http://colossus.sourceforge.net/");
+        lines.add("");
+        lines.add(" and click on the pink icon in upper left corner!");
+        lines.add(" Or download newest zip file from SourceForge: "
+            + "https://sourceforge.net/projects/colossus/");
         lines.add("");
         lines.add("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
         lines.add("");

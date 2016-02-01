@@ -726,7 +726,7 @@ public class WebServerClient implements IWebClient
             tellOwnInfo(getUser().getEmail());
             server.tellLastChatMessagesToOne(this, IWebServer.generalChatName);
             server.sendMessageOfTheDayToOne(this, IWebServer.generalChatName);
-            if (clientVersion < 2)
+            if (clientVersion < WebClient.WC_VERSION_RESUME)
             {
                 server.sendOldVersionWarningToOne(this, getUsername(),
                     IWebServer.generalChatName);
