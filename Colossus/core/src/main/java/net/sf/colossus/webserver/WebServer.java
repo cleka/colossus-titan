@@ -1390,6 +1390,10 @@ public class WebServer implements IWebServer, IRunWebServer
 
     private void informPingDone(String sender, String recipient, String message)
     {
+        if ("SYSTEM".equals(sender))
+        {
+            return;
+        }
         User senderUser = userDB.findUserByName(sender);
         IWebClient senderWebClient = senderUser.getWebserverClient();
         String[] lines = new String[] { "You /ping'ed to " + recipient + ": "
