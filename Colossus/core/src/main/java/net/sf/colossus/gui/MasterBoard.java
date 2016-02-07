@@ -2400,6 +2400,12 @@ public final class MasterBoard extends JPanel
             Point point = e.getPoint();
             Marker marker = getMarkerAtPoint(point);
             GUIMasterHex hex = getHexContainingPoint(point);
+            if (gui.isPointSideMovementDie(point)
+                && gui.getOwningPlayer().getMulligansLeft() > 0)
+            {
+                client.mulligan();
+                return;
+            }
 
             if (marker != null)
             {

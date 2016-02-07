@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.GraphicsDevice;
+import java.awt.Point;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -2356,6 +2357,11 @@ public class ClientGUI implements IClientGUI, GUICallbacks
             JOptionPane.INFORMATION_MESSAGE, null, options, null);
         boolean approved = (response == 0 ? true : false);
         client.sendExtraRollRequestResponse(approved, requestId);
+    }
+
+    public boolean isPointSideMovementDie(Point point)
+    {
+        return movementDie != null && movementDie.getBounds().contains(point);
     }
 
     public void askSuspendConfirmation(final String requestorName, int timeout)
