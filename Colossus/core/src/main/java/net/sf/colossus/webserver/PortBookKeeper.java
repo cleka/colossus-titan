@@ -4,6 +4,7 @@ package net.sf.colossus.webserver;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -107,15 +108,24 @@ public class PortBookKeeper implements IPortProvider
         return getGameAtPort(portNr) != null;
     }
 
+    /**
+     * Get a free port number, chosen randomly; to reduce the risk
+     * that a resumed game gets same port => clients from suspended
+     * game trying to connect to this new one.
+     */
     public int getFreePort(GameInfo gi)
     {
+        Random rand = new Random();
+        int offset = rand.nextInt(totalPorts) * 2;
+
         String purpose = "game " + gi.getGameId();
         int port = -1;
         synchronized (portInUse)
         {
             for (int i = 0; i < totalPorts && port == -1; i += 2)
             {
-                int tryPort = realPortForIndex(i);
+                int j = (i + offset) % totalPorts;
+                int tryPort = realPortForIndex(j);
                 if (!isPortInUse(tryPort))
                 {
                     boolean ok = testThatPortReallyFree(tryPort);
