@@ -80,6 +80,10 @@ public class RunGameInOwnJVM extends Thread implements IGameRunner
             .getStringOption(WebServerConstants.optStatisticsBaseDir);
         template = options
             .getStringOption(WebServerConstants.optLogPropTemplate);
+        if (gi.wantsDetailedLogging())
+        {
+            template += ".finest";
+        }
         javaCommand = options
             .getStringOption(WebServerConstants.optJavaCommand);
         colossusJar = options

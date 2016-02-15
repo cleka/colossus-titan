@@ -528,10 +528,10 @@ public final class Server extends Thread implements IServer
                 stopAccepting();
                 stopAcceptingFlag = false;
             }
-            LOGGER.log(Level.FINEST, "before select()");
+            // LOGGER.log(Level.FINEST, "before select()");
             int num = selector.select(timeout);
-            LOGGER.log(Level.FINEST, "select returned, " + num
-                + " channels are ready to be processed.");
+            //LOGGER.log(Level.FINEST, "select returned, " + num
+            //    + " channels are ready to be processed.");
             handleForcedWithdraws();
             handleOutsideChanges((num == 0), stillWaitingForClients);
             if (forceShutDown)

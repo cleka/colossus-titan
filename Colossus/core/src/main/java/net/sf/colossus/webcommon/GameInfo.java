@@ -1201,6 +1201,11 @@ public class GameInfo
         return startingUser;
     }
 
+    public boolean wantsDetailedLogging()
+    {
+        return isEnrolled("Sir Volander") || isEnrolled("dlmartin");
+    }
+
     /**
      *  Enum for the possible TYPES of a game
      *  (scheduled or instant, perhaps later also template?)
