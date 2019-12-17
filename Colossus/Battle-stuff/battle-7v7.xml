@@ -1,42 +1,56 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<ColossusSnapshot version="14" createdByRelease="MakeBattle tool">
-    <Variant dir="SmallTitan" file="SmallTitanVar.xml" name="SmallTitan" />
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<ColossusSnapshot createdByRelease="MakeBattle tool" version="14">
+    <Variant dir="SmallTitan" file="SmallTitanVar.xml" name="SmallTitan"/>
     <TurnNumber>2</TurnNumber>
     <CurrentPlayer>0</CurrentPlayer>
     <CurrentPhase>1</CurrentPhase>
     <Caretaker>
-        <Creature name="Angel" remaining="18" dead="0" />
-        <Creature name="Archangel" remaining="6" dead="0" />
-        <Creature name="Behemoth" remaining="18" dead="0" />
-        <Creature name="Centaur" remaining="25" dead="0" />
-        <Creature name="Colossus" remaining="10" dead="0" />
-        <Creature name="Cyclops" remaining="28" dead="0" />
-        <Creature name="Dragon" remaining="18" dead="0" />
-        <Creature name="Gargoyle" remaining="21" dead="0" />
-        <Creature name="Giant" remaining="18" dead="0" />
-        <Creature name="Gorgon" remaining="25" dead="0" />
-        <Creature name="Griffon" remaining="18" dead="0" />
-        <Creature name="Guardian" remaining="6" dead="0" />
-        <Creature name="Hydra" remaining="10" dead="0" />
-        <Creature name="Lion" remaining="28" dead="0" />
-        <Creature name="Minotaur" remaining="21" dead="0" />
-        <Creature name="Ogre" remaining="25" dead="0" />
-        <Creature name="Ranger" remaining="28" dead="0" />
-        <Creature name="Serpent" remaining="10" dead="0" />
-        <Creature name="Titan" remaining="0" dead="0" />
-        <Creature name="Troll" remaining="28" dead="0" />
-        <Creature name="Unicorn" remaining="12" dead="0" />
-        <Creature name="Warbear" remaining="21" dead="0" />
-        <Creature name="Warlock" remaining="6" dead="0" />
-        <Creature name="Wyvern" remaining="18" dead="0" />
+        <Creature dead="0" name="Angel" remaining="16"/>
+        <Creature dead="0" name="Archangel" remaining="6"/>
+        <Creature dead="0" name="Behemoth" remaining="18"/>
+        <Creature dead="0" name="Centaur" remaining="22"/>
+        <Creature dead="0" name="Colossus" remaining="10"/>
+        <Creature dead="0" name="Cyclops" remaining="28"/>
+        <Creature dead="0" name="Dragon" remaining="18"/>
+        <Creature dead="0" name="Gargoyle" remaining="21"/>
+        <Creature dead="0" name="Giant" remaining="18"/>
+        <Creature dead="0" name="Gorgon" remaining="25"/>
+        <Creature dead="0" name="Griffon" remaining="18"/>
+        <Creature dead="0" name="Guardian" remaining="6"/>
+        <Creature dead="0" name="Hydra" remaining="10"/>
+        <Creature dead="0" name="Lion" remaining="26"/>
+        <Creature dead="0" name="Minotaur" remaining="20"/>
+        <Creature dead="0" name="Ogre" remaining="23"/>
+        <Creature dead="0" name="Ranger" remaining="28"/>
+        <Creature dead="0" name="Serpent" remaining="10"/>
+        <Creature dead="0" name="Titan" remaining="0"/>
+        <Creature dead="0" name="Troll" remaining="26"/>
+        <Creature dead="0" name="Unicorn" remaining="12"/>
+        <Creature dead="0" name="Warbear" remaining="21"/>
+        <Creature dead="0" name="Warlock" remaining="5"/>
+        <Creature dead="0" name="Wyvern" remaining="17"/>
     </Caretaker>
-    <Player name="Attacker" type="net.sf.colossus.ai.SimpleAI" color="Red" startingTower="6000" score="0" dead="false" mulligansLeft="1" colorsElim="" movementRoll="0" teleported="false" summoned="false">
-        <Legion name="Rd01" currentHex="5" startingHex="5" moved="false" entrySide="0" parent="null" recruitName="null" battleTally="0">
-        </Legion>
+    <Player color="Red" colorsElim="" dead="false" movementRoll="0" mulligansLeft="1" name="Attacker" score="0" startingTower="6000" summoned="false" teleported="false" type="net.sf.colossus.ai.SimpleAI">
+        <Legion battleTally="0" currentHex="5" entrySide="0" moved="false" name="Rd01" parent="null" recruitName="null" startingHex="5">
+        <Creature name="Troll"/>
+<Creature name="Troll"/>
+<Creature name="Wyvern"/>
+<Creature name="Ogre"/>
+<Creature name="Ogre"/>
+<Creature name="Angel"/>
+<Creature name="Warlock"/>
+</Legion>
     </Player>
-    <Player name="Defender" type="net.sf.colossus.ai.SimpleAI" color="Green" startingTower="2000" score="0" dead="false" mulligansLeft="1" colorsElim="" movementRoll="0" teleported="false" summoned="false">
-        <Legion name="Gr01" currentHex="6" startingHex="6" moved="false" entrySide="0" parent="null" recruitName="null" battleTally="0">
-        </Legion>
+    <Player color="Green" colorsElim="" dead="false" movementRoll="0" mulligansLeft="1" name="Defender" score="0" startingTower="2000" summoned="false" teleported="false" type="net.sf.colossus.ai.SimpleAI">
+        <Legion battleTally="0" currentHex="6" entrySide="0" moved="false" name="Gr01" parent="null" recruitName="null" startingHex="6">
+        <Creature name="Lion"/>
+<Creature name="Lion"/>
+<Creature name="Centaur"/>
+<Creature name="Centaur"/>
+<Creature name="Centaur"/>
+<Creature name="Minotaur"/>
+<Creature name="Angel"/>
+</Legion>
     </Player>
     <DataFile DataFileKey="Swamp.xml,SmallTitan/Battlelands,Default/Battlelands"><![CDATA[<?xml version="1.0"?>
 <battlemap terrain="Swamp" tower="False">
@@ -885,16 +899,29 @@ In12 = Sombrero
 </battlemap>
 ]]></DataFile>
     <History>
-        <Reveal markerId="Rd01" allPlayers="true" turn="1">
+        <Reveal allPlayers="true" markerId="Rd01" turn="1">
             <creatures>
-            </creatures>
+            <creature>Troll</creature>
+<creature>Troll</creature>
+<creature>Wyvern</creature>
+<creature>Ogre</creature>
+<creature>Ogre</creature>
+<creature>Angel</creature>
+<creature>Warlock</creature>
+</creatures>
         </Reveal>
-        <Reveal markerId="Gr01" allPlayers="true" turn="1">
+        <Reveal allPlayers="true" markerId="Gr01" turn="1">
             <creatures>
-            </creatures>
+            <creature>Lion</creature>
+<creature>Lion</creature>
+<creature>Centaur</creature>
+<creature>Centaur</creature>
+<creature>Centaur</creature>
+<creature>Minotaur</creature>
+<creature>Angel</creature>
+</creatures>
         </Reveal>
     </History>
     <Redo>
     </Redo>
 </ColossusSnapshot>
-

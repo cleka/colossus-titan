@@ -15,6 +15,9 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.jdom.DataConversionException;
+import org.jdom.Element;
+
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.Client.ConnectionInitException;
 import net.sf.colossus.common.Constants;
@@ -50,9 +53,6 @@ import net.sf.colossus.variant.Variant;
 import net.sf.colossus.webclient.RunGameInSameJVM;
 import net.sf.colossus.webclient.WebClient;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
-
-import org.jdom.DataConversionException;
-import org.jdom.Element;
 
 
 /**
@@ -441,6 +441,10 @@ public class GameServerSide extends Game
     {
         String playerName = player.getName();
         boolean dontUseOptionsFile = player.isAI();
+        if (Constants.END_AFTER_FIRST_BATTLE)
+        {
+            dontUseOptionsFile = false;
+        }
         LOGGER.finest("Called Server.createLocalClient() for " + playerName);
 
         try

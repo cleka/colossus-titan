@@ -203,8 +203,8 @@ public class MakeBattle
             System.err.println("Open failed (SAXException): " + se);
         }
 
-        addCreaturesToLegions(doc, "Rd01", aca, "Br01", dca);
-        replaceAIs(doc, "Red1", aAI, "Brown", dAI);
+        addCreaturesToLegions(doc, "Rd01", aca, "Gr01", dca);
+        replaceAIs(doc, "Attacker", aAI, "Defender", dAI);
 
         DOMSource domSource = new DOMSource(doc);
         StreamResult streamResult = new StreamResult(System.out);

@@ -1,0 +1,9 @@
+
+# java -Djava.util.logging.config.file=logging.properties -Xmx256M -cp build/eclipse net.sf.colossus.tools.MakeBattle --alist=Troll --dlist=Lion > ~/.colossus/saves/battle.xml
+
+
+./run-forceBoard  --load battle.xml
+
+
+ java -Djava.util.logging.config.file=logging.properties -Xmx256M -cp build/eclipse net.sf.colossus.tools.MakeBattle --alist=Troll,Troll,Wyvern,Ogre,Ogre,Angel,Warlock --dlist=Lion,Lion,Centaur,Centaur,Centaur,Minotaur,Angel >battle-7v7.xml
+
