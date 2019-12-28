@@ -907,8 +907,23 @@ public class GameServerSide extends Game
 
         if (gotName.startsWith(Constants.byColor))
         {
-            server.setPlayerName(player, color.getName());
-            player.setName(color.getName());
+            /*
+             * Something for the paranoid: I had set human player name hardcoded
+             * to "Red", then when AI choose Red as color, got player name Red,
+             * this caused some strange NullPointerException.
+             */
+            String colorName = color.getName();
+            for (Player p : getPlayers())
+            {
+                String pName = p.getName();
+                if (pName != null && pName.equals(colorName))
+                {
+                    // Ouch! Somebody has used that colors name as own player name!
+                    colorName += "1";
+                }
+            }
+            server.setPlayerName(player, colorName);
+            player.setName(colorName);
         }
         LOGGER.info(player + " chooses color " + color);
         ((PlayerServerSide)player).initMarkersAvailable();
