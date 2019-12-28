@@ -144,6 +144,8 @@ public final class Start
             opts.addOption('A', "autoplay", false, "Autoplay");
             opts.addOption('N', "non-random-battle-dice", false,
                 "Use non-random battle dice");
+            opts.addOption('P', "pbbh", false,
+                "Probability-based battle hits");
             opts.addOption('R', "resetOptions", false, "Reset options");
             opts.addOption('m', "myname", true, "My player name");
             opts.addOption('O', "noobserver", false, "Go on without observer");
@@ -425,6 +427,10 @@ public final class Start
         if (cl.optIsSet('N'))
         {
             options.setOption(Options.fixedSequenceBattleDice, true);
+        }
+        if (cl.optIsSet('P'))
+        {
+            options.setOption(Options.pbBattleHits, true);
         }
         if (cl.optIsSet('d'))
         {
