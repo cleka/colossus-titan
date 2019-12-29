@@ -230,6 +230,11 @@ public abstract class AbstractAI implements AI
             {
                 continue;
             }
+            if (critter.hasStruck())
+            {
+                continue;
+            }
+
             Set<BattleHex> set = client.findStrikes(critter.getTag());
             for (BattleHex targetHex : set)
             {
