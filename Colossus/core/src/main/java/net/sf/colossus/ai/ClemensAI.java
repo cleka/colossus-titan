@@ -30,6 +30,7 @@ import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.SummonInfo;
+import net.sf.colossus.guiutil.DebugMethods;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.InstanceTracker;
 import net.sf.colossus.util.PermutationIterator;
@@ -142,6 +143,7 @@ public class ClemensAI extends AbstractAI
         cvc.HAS_NATIVE_COMBAT_BONUS = 3;
         // initialize the creature info needed by the AI
         InstanceTracker.register(this, client.getOwningPlayer().getName());
+        DebugMethods.BattleLogEnabled(true);
     }
 
     public PlayerColor pickColor(List<PlayerColor> colors,
@@ -1888,6 +1890,7 @@ public class ClemensAI extends AbstractAI
     private BattleCritter findBestTarget()
     {
         BattleCritter bestTarget = null;
+        BattleCritter goodTarget = null;
         MasterBoardTerrain terrain = client.getBattleSite().getTerrain();
 
         // Create a map containing each target and the likely number
@@ -1900,26 +1903,43 @@ public class ClemensAI extends AbstractAI
 
             if (h + target.getHits() >= target.getPower())
             {
+                double newKillValue = getKillValue(target, terrain);
                 // We can probably kill this target.
                 if (bestTarget == null
-                    || getKillValue(target, terrain) > getKillValue(
+                    || newKillValue > getKillValue(
                         bestTarget, terrain))
                 {
                     bestTarget = target;
+                    DebugMethods.battleLog(
+                        "new bestTarget " + bestTarget.getDescription()
+                            + ", new killValue " + newKillValue);
                 }
             }
+
             else
             {
                 // We probably can't kill this target.
                 // But if it is a Titan it may be more valuable to do fractional damage
-                if (bestTarget == null
-                    || (0.5 * ((h + target.getHits()) / target.getPower())
-                        * getKillValue(target, terrain) > getKillValue(
-                            bestTarget, terrain)))
+
+                // TODO CLEMENS: We don't check whether it's Titan???
+
+                double factor = 0.5
+                    * ((h + target.getHits()) / target.getPower());
+                DebugMethods.battleLog("factor     : " + factor);
+                double newValue = factor * getKillValue(target, terrain);
+                if (goodTarget == null
+                    || (newValue > getKillValue(goodTarget, terrain)))
                 {
-                    bestTarget = target;
+                    goodTarget = target;
+                    DebugMethods.battleLog(
+                        "new goodTarget " + goodTarget.getDescription()
+                            + ", new killValue " + newValue);
                 }
             }
+        }
+        if (bestTarget == null && goodTarget != null)
+        {
+            bestTarget = goodTarget;
         }
         return bestTarget;
     }
