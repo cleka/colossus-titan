@@ -30,7 +30,7 @@
         <Creature dead="0" name="Warlock" remaining="5"/>
         <Creature dead="0" name="Wyvern" remaining="17"/>
     </Caretaker>
-    <Player color="Red" colorsElim="" dead="false" movementRoll="0" mulligansLeft="1" name="Attacker" score="0" startingTower="6000" summoned="false" teleported="false" type="net.sf.colossus.ai.SimpleAI">
+    <Player color="Red" colorsElim="" dead="false" movementRoll="0" mulligansLeft="1" name="Attacker" score="0" startingTower="6000" summoned="false" teleported="false" type="net.sf.colossus.ai.ClemensAI">
         <Legion battleTally="0" currentHex="5" entrySide="0" moved="false" name="Rd01" parent="null" recruitName="null" startingHex="5">
         <Creature name="Troll"/>
 <Creature name="Troll"/>
