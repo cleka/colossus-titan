@@ -18,6 +18,7 @@ import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.actions.SummonUndo;
+import net.sf.colossus.guiutil.DebugMethods;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.MasterHex;
 
@@ -253,6 +254,7 @@ public final class BattleServerSide extends Battle
     {
         super.setBattleTurnNumber(battleTurnNumber);
         LOGGER.log(Level.INFO, "Battle turn advances to " + battleTurnNumber);
+        DebugMethods.battleLog("\nBattle turn number now " + battleTurnNumber);
     }
 
     BattlePhase getBattlePhase()
@@ -264,6 +266,11 @@ public final class BattleServerSide extends Battle
     {
         this.phase = phase;
         LOGGER.log(Level.INFO, "Battle phase advances to " + phase);
+        if (phase == BattlePhase.FIGHT || phase == BattlePhase.STRIKEBACK)
+        {
+            DebugMethods.battleLog(
+                "Battle phase now: " + activeLegionTag + "-" + phase);
+        }
     }
 
     private boolean isOver()

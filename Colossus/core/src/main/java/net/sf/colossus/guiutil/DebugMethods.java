@@ -23,7 +23,7 @@ public class DebugMethods
      * full garbage collection/cleanup of JFrame stuff (Java 1.4.2):
      * GC and finalization, 2 dummy frames, do the SwingCleanup hack,
      * and once again GC and finalization.
-     * 
+     *
      * @param doSwingCleanup Whether to call the swingCleanup() method
      */
     public static void doCleanupStuff(boolean doSwingCleanup)
@@ -46,7 +46,7 @@ public class DebugMethods
 
     /**
      * prints out "PRESS RETURN TO CONTINUE",
-     * and after return is pressed, 
+     * and after return is pressed,
      * prints then "OK, continuing" and returns.
      */
     public static void waitReturn()
@@ -60,7 +60,7 @@ public class DebugMethods
         }
         catch (IOException e)
         {
-            //  
+            //
         }
         System.out.println("OK, continuing.");
     }
@@ -70,9 +70,9 @@ public class DebugMethods
      * Each round, does GC + finalize, and asks for input.
      * For input "s", prints statistics.
      * For input "x", exits the loop.
-     * Exits the loop also if all are gone. 
+     * Exits the loop also if all are gone.
      * If from beginning on all are gone, does not even go into the loop.
-     * 
+     *
      * @param force Go into loop even if allGone already returns true at begin
      */
     public static void waitReturnLoop(boolean force)
@@ -162,7 +162,7 @@ public class DebugMethods
             }
             catch (IOException e)
             {
-                //  
+                //
             }
             System.gc();
             System.runFinalization();
@@ -170,4 +170,20 @@ public class DebugMethods
         System.out
             .println("ok, list empty or x entered... finishing shutdown...");
     }
+
+    private static boolean battleLogEnabled = false;
+
+    public static void BattleLogEnabled(boolean value)
+    {
+        battleLogEnabled = value;
+    }
+
+    public static void battleLog(String message)
+    {
+        if (battleLogEnabled)
+        {
+            System.out.println(message);
+        }
+    }
+
 }
