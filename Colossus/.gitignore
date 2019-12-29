@@ -10,3 +10,4 @@ win.jnlp
 logging.properties.remote*
 stop.flag
 
+Battle-stuff/*.tmp.cf
