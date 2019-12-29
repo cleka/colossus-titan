@@ -74,7 +74,7 @@ public final class BattleServerSide extends Battle
 
         this.server = game.getServer();
         this.activeLegionTag = activeLegionTag;
-        this.phase = phase;
+        setBattlePhase(phase);
 
         this.battleMovement = new BattleMovementServerSide(game.getOptions(),
             getGame());
@@ -248,9 +248,22 @@ public final class BattleServerSide extends Battle
         throw new IllegalArgumentException("Parameter out of range");
     }
 
+    @Override
+    public void setBattleTurnNumber(int battleTurnNumber)
+    {
+        super.setBattleTurnNumber(battleTurnNumber);
+        LOGGER.log(Level.INFO, "Battle turn advances to " + battleTurnNumber);
+    }
+
     BattlePhase getBattlePhase()
     {
         return phase;
+    }
+
+    void setBattlePhase(BattlePhase phase)
+    {
+        this.phase = phase;
+        LOGGER.log(Level.INFO, "Battle phase advances to " + phase);
     }
 
     private boolean isOver()
@@ -280,15 +293,13 @@ public final class BattleServerSide extends Battle
         {
             if (phase == BattlePhase.SUMMON)
             {
-                phase = BattlePhase.MOVE;
-                LOGGER.log(Level.INFO, "Battle phase advances to " + phase);
+                setBattlePhase(BattlePhase.MOVE);
                 again = setupMove();
             }
 
             else if (phase == BattlePhase.RECRUIT)
             {
-                phase = BattlePhase.MOVE;
-                LOGGER.log(Level.INFO, "Battle phase advances to " + phase);
+                setBattlePhase(BattlePhase.MOVE);
                 again = setupMove();
             }
 
@@ -301,7 +312,7 @@ public final class BattleServerSide extends Battle
                 {
                     attackerEntered = true;
                 }
-                phase = BattlePhase.FIGHT;
+                setBattlePhase(BattlePhase.FIGHT);
                 LOGGER.log(Level.INFO, "Battle phase advances to " + phase);
                 if (conceded)
                 {
@@ -322,7 +333,7 @@ public final class BattleServerSide extends Battle
                 activeLegionTag = (activeLegionTag == LegionTags.ATTACKER) ? LegionTags.DEFENDER
                     : LegionTags.ATTACKER;
                 preStrikeEffectsApplied = false;
-                phase = BattlePhase.STRIKEBACK;
+                setBattlePhase(BattlePhase.STRIKEBACK);
                 LOGGER.log(Level.INFO, "Battle phase advances to " + phase);
                 if (conceded)
                 {
@@ -367,21 +378,22 @@ public final class BattleServerSide extends Battle
             // Active legion is the one that was striking back.
             if (activeLegionTag == LegionTags.ATTACKER)
             {
-                phase = BattlePhase.SUMMON;
+                setBattlePhase(BattlePhase.SUMMON);
                 LOGGER.log(Level.INFO, getBattleActivePlayer()
                     + "'s battle turn, number " + battleTurnNumber);
                 again = setupSummon();
             }
             else
             {
-                battleTurnNumber++;
+                // use the setter so that can track with println etc.
+                setBattleTurnNumber(battleTurnNumber + 1);
                 if (battleTurnNumber > 7)
                 {
                     timeLoss();
                 }
                 else
                 {
-                    phase = BattlePhase.RECRUIT;
+                    setBattlePhase(BattlePhase.RECRUIT);
                     again = setupRecruit();
                     if (getBattleActivePlayer() != null)
                     {

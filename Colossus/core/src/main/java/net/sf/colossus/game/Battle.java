@@ -34,7 +34,7 @@ abstract public class Battle
         this.attacker = attacker;
         this.defender = defender;
         this.location = location;
-        this.battleTurnNumber = 1;
+        setBattleTurnNumber(1);
     }
 
     public Game getGame()
