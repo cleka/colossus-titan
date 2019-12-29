@@ -151,7 +151,7 @@ public final class Constants
     public static final String anyAI = "A Random AI";
     public static final String defaultAI = anyAI;
     public static final String[] aiArray = { "SimpleAI", "CowardSimpleAI",
-        "RationalAI", "HumanHaterRationalAI", "MilvangAI",
+        "RationalAI", "HumanHaterRationalAI", "MilvangAI", "ClemensAI",
         // Note that ExperimentalAI must be last, as long as we want to
         // disallow ExperimentalAI as "A Random AI" for normal users.
         // See PlayerServerSide.setType().
