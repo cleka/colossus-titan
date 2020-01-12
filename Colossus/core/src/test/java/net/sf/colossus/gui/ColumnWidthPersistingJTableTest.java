@@ -5,7 +5,7 @@ import net.sf.colossus.common.Options;
 
 public class ColumnWidthPersistingJTableTest extends TestCase
 {
-    public void TestParseWidthProperty()
+    public void testParseWidthProperty()
     {
         ColumnWidthPersistingJTable.ColumnWidthPersistingTableColumnModel model = new ColumnWidthPersistingJTable.ColumnWidthPersistingTableColumnModel(
             "irrelevent", null);
