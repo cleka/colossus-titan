@@ -14,13 +14,15 @@ PortRangeFrom=26767
 AvailablePorts=20
 
 JavaCommand=/usr/bin/java
-ColossusJar=/games/colossus/Colossus.jar
-LogPropTemplate=/games/colossus/logging.properties
+ColossusJar=/opt/colossus/Colossus.jar
+LogPropTemplate=/opt/colossus/logging.properties
 
-DataDirectory=D:/katzer/stuff/web/chat
-WorkFilesBaseDir=/var/games/colossus
-UsersFile=example.users.dat
-GamesFile=games.dat
+DataDirectory=/var/colossus/data
+UsersFile=/var/colossus/data/example.users.dat
+GamesFile=/var/colossus/data/games.dat
+LoginMessageFile=/var/colossus/data/loginmessage.txt
+WorkFilesBaseDir=/var/colossus/games
+StatisticsBaseDir=/var/colossus/games
 
 MailServer=localhost
 MailReallyMail=false
