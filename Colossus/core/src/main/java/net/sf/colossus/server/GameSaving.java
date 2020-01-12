@@ -14,6 +14,11 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
+
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.game.Creature;
@@ -24,11 +29,6 @@ import net.sf.colossus.util.BuildInfo;
 import net.sf.colossus.util.ErrorUtils;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
-
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 
 
 public class GameSaving
@@ -55,6 +55,9 @@ public class GameSaving
      */
     private String firstAutosavefileTimestamp = null;
 
+    /**
+     * File for internal spectator client messages
+     */
     private String iscmName = null;
 
     /**
