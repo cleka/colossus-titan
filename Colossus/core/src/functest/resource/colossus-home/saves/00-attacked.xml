@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ColossusSnapshot version="13" createdByRelease="0.13.0-RC1 (5062)">
+<ColossusSnapshot version="14" createdByRelease="0.13.0-RC1 (5062)">
   <Variant dir="Default" file="DefaultVar.xml" name="Default" />
   <TurnNumber>2</TurnNumber>
   <CurrentPlayer>2</CurrentPlayer>
