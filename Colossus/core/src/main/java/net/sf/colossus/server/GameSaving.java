@@ -344,7 +344,7 @@ public class GameSaving
         // History first; when we restore attacker and defender, can validate
         // against state reproduced by redo history
         Element hist = new Element("BattleHistory");
-        root.addContent(hist);
+        bat.addContent(hist);
 
         Element att = new Element("Attacker");
         att.addContent(dumpLegion(bss.getAttackingLegion(), true));
