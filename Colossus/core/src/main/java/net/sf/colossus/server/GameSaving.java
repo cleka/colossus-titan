@@ -169,9 +169,8 @@ public class GameSaving
 
         if (game.isEngagementInProgress() && game.getBattleSS() != null)
         {
-            /* Disabled until it works properly */
-            boolean featureProperlyEnabled = false;
-            if (featureProperlyEnabled)
+            /* By default disabled, until it works properly */
+            if (Constants.INCLUDE_BATTLE_DATA)
             {
                 addBattleData(root);
             }

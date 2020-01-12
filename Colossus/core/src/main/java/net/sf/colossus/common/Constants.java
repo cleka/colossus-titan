@@ -28,6 +28,13 @@ public final class Constants
         System.getProperty(FORCE_VIEW_BOARD_PROPNAME, "false").toString())
         .booleanValue();
 
+    // Special feature to include battle data during saving during
+    // development of the save battle data functionality
+    private static final String INCLUDE_BATTLE_DATA_PROPNAME = "net.sf.colossus.includeBattleData";
+    public static final boolean INCLUDE_BATTLE_DATA = Boolean.valueOf(
+        System.getProperty(INCLUDE_BATTLE_DATA_PROPNAME, "false").toString())
+        .booleanValue();
+
     /**
      * Default base path for save game and cf files;
      * Also used as start dir for Custom Variant loading dialog
