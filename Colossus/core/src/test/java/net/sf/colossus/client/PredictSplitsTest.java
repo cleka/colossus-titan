@@ -63,7 +63,11 @@ public class PredictSplitsTest extends TestCase
     private static final Logger LOGGER = Logger
         .getLogger(PredictSplitsTest.class.getName());
 
-    private static final Player player = new Player(new Game(null,
+    private static Variant variant = VariantSupport
+        .loadVariantByName("Default", true);
+
+    private static final Player player = new Player(
+        new Game(variant,
         new String[] {}), "Tester", 1);
 
     private static class TestLegion extends Legion
@@ -111,8 +115,6 @@ public class PredictSplitsTest extends TestCase
     AllPredictSplits aps;
     PredictSplits ps;
     int turn = 0;
-
-    private Variant variant;
 
     public PredictSplitsTest(String name)
     {
