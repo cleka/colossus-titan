@@ -318,11 +318,10 @@ public class GameSaving
             {
                 LegionServerSide legion = it2.next();
 
-                el.addContent(dumpLegion(
-                    legion,
-                    game.isBattleInProgress()
-                        && (legion == game.getBattleSS().getAttackingLegion() || legion == game
-                            .getBattleSS().getDefendingLegion())));
+                boolean dumpBattleInfo = game.isBattleInProgress()
+                    && (legion == game.getBattleSS().getAttackingLegion() || legion == game
+                    .getBattleSS().getDefendingLegion());
+                el.addContent(dumpLegion(legion, dumpBattleInfo));
             }
             root.addContent(el);
         }
@@ -330,24 +329,20 @@ public class GameSaving
 
     private void addBattleData(Element root)
     {
+        final BattleServerSide bss = game.getBattleSS();
+
         Element bat = new Element("Battle");
+        bat.setAttribute("masterHexLabel", bss.getLocation().getLabel());
+        bat.setAttribute("turnNumber", "" + bss.getBattleTurnNumber());
+        bat.setAttribute("activePlayer",
+            "" + bss.getBattleActivePlayer().getName());
+        bat.setAttribute("phase", "" + bss.getBattlePhase().ordinal());
+        bat.setAttribute("summonState", "" + bss.getSummonState());
+        bat.setAttribute("carryDamage", "" + bss.getCarryDamage());
+        bat.setAttribute("preStrikeEffectsApplied",
+            "" + bss.arePreStrikeEffectsApplied());
 
-        bat.setAttribute("masterHexLabel", game.getBattleSS().getLocation()
-            .getLabel());
-        bat.setAttribute("turnNumber", ""
-            + game.getBattleSS().getBattleTurnNumber());
-        bat.setAttribute("activePlayer", ""
-            + game.getBattleSS().getBattleActivePlayer().getName());
-        bat.setAttribute("phase", ""
-            + game.getBattleSS().getBattlePhase().ordinal());
-        bat.setAttribute("summonState", ""
-            + game.getBattleSS().getSummonState());
-        bat.setAttribute("carryDamage", ""
-            + game.getBattleSS().getCarryDamage());
-        bat.setAttribute("preStrikeEffectsApplied", ""
-            + game.getBattleSS().arePreStrikeEffectsApplied());
-
-        for (BattleHex hex : game.getBattleSS().getCarryTargets())
+        for (BattleHex hex : bss.getCarryTargets())
         {
             Element ct = new Element("CarryTarget");
             ct.addContent(hex.getLabel());
