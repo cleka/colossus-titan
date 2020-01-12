@@ -341,6 +341,19 @@ public class GameSaving
         bat.setAttribute("preStrikeEffectsApplied",
             "" + bss.arePreStrikeEffectsApplied());
 
+        // History first; when we restore attacker and defender, can validate
+        // against state reproduced by redo history
+        Element hist = new Element("BattleHistory");
+        root.addContent(hist);
+
+        Element att = new Element("Attacker");
+        att.addContent(dumpLegion(bss.getAttackingLegion(), true));
+        bat.addContent(att);
+
+        Element def = new Element("Defender");
+        def.addContent(dumpLegion(bss.getDefendingLegion(), true));
+        bat.addContent(def);
+
         for (BattleHex hex : bss.getCarryTargets())
         {
             Element ct = new Element("CarryTarget");
