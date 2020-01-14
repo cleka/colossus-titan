@@ -15,9 +15,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
 
+import net.sf.colossus.ai.helper.CritterMove;
 import net.sf.colossus.ai.helper.LegionMove;
 import net.sf.colossus.client.Client;
-import net.sf.colossus.client.CritterMove;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.client.PlayerClientSide;
 import net.sf.colossus.common.Constants;

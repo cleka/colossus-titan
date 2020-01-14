@@ -4,7 +4,7 @@ package net.sf.colossus.ai;
 import java.util.List;
 import java.util.Set;
 
-import net.sf.colossus.client.CritterMove;
+import net.sf.colossus.ai.helper.CritterMove;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.game.Caretaker;
 import net.sf.colossus.game.EntrySide;

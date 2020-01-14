@@ -1,4 +1,4 @@
-package net.sf.colossus.client;
+package net.sf.colossus.ai.helper;
 
 
 import net.sf.colossus.game.BattleCritter;
@@ -42,7 +42,7 @@ public class CritterMove
         return critter;
     }
 
-    int getTag()
+    public int getTag()
     {
         return critter.getTag();
     }

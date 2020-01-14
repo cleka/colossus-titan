@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.ai.AI;
 import net.sf.colossus.ai.SimpleAI;
+import net.sf.colossus.ai.helper.CritterMove;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.OptionObjectProvider;
 import net.sf.colossus.common.Options;

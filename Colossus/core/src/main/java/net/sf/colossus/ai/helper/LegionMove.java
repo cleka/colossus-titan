@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.colossus.client.CritterMove;
 import net.sf.colossus.util.Glob;
 
 
