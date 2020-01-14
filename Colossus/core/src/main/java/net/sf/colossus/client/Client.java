@@ -232,10 +232,6 @@ public final class Client implements IClient, IOracle, IVariant,
 
     private int delay = -1;
 
-    /** For battle AI. */
-    private List<CritterMove> bestMoveOrder = null;
-    private List<CritterMove> failedBattleMoves = null;
-
     private final Hashtable<CreatureType, Integer> recruitReservations = new Hashtable<CreatureType, Integer>();
 
     /**
@@ -2827,29 +2823,7 @@ public final class Client implements IClient, IOracle, IVariant,
         if (isMyBattlePhase()
             && (isAutoplayActive() || sansLordAutoBattleApplies()))
         {
-            bestMoveOrder = ai.battleMove();
-            failedBattleMoves = new ArrayList<CritterMove>();
-            kickBattleMove();
-        }
-    }
-
-    private void kickBattleMove()
-    {
-        if (bestMoveOrder == null || bestMoveOrder.isEmpty())
-        {
-            if (failedBattleMoves == null || failedBattleMoves.isEmpty())
-            {
-                doneWithBattleMoves();
-            }
-            else
-            {
-                retryFailedBattleMoves();
-            }
-        }
-        else
-        {
-            CritterMove cm = bestMoveOrder.get(0);
-            tryBattleMove(cm);
+            ai.setupBattleMove();
         }
     }
 
@@ -2859,14 +2833,6 @@ public final class Client implements IClient, IOracle, IVariant,
         BattleHex hex = cm.getEndingHex();
         doBattleMove(critter.getTag(), hex);
         aiPause();
-    }
-
-    private void retryFailedBattleMoves()
-    {
-        bestMoveOrder = failedBattleMoves;
-        failedBattleMoves = null;
-        ai.retryFailedBattleMoves(bestMoveOrder);
-        kickBattleMove();
     }
 
     public BattleClientSide getBattleCS()
@@ -2956,45 +2922,13 @@ public final class Client implements IClient, IOracle, IVariant,
         server.undoBattleMove(hex);
     }
 
-    private void markBattleMoveSuccessful(int tag, BattleHex endingHex)
-    {
-        if (bestMoveOrder != null)
-        {
-            Iterator<CritterMove> it = bestMoveOrder.iterator();
-            while (it.hasNext())
-            {
-                CritterMove cm = it.next();
-                if (tag == cm.getTag() && endingHex.equals(cm.getEndingHex()))
-                {
-                    // Remove this CritterMove from the list to show
-                    // that it doesn't need to be retried.
-                    it.remove();
-                }
-            }
-        }
-        kickBattleMove();
-    }
-
     private void handleFailedBattleMove(String errmsg)
     {
         LOGGER.log(Level.FINEST, owningPlayer.getName()
             + "handleFailedBattleMove");
         if (isAutoplayActive() || sansLordAutoBattleApplies())
         {
-            if (bestMoveOrder != null)
-            {
-                Iterator<CritterMove> it = bestMoveOrder.iterator();
-                if (it.hasNext())
-                {
-                    CritterMove cm = it.next();
-                    it.remove();
-                    if (failedBattleMoves != null)
-                    {
-                        failedBattleMoves.add(cm);
-                    }
-                }
-            }
-            kickBattleMove();
+            ai.handleFailedBattleMove();
         }
         else
         {
@@ -3014,7 +2948,7 @@ public final class Client implements IClient, IOracle, IVariant,
             rememberForUndo = true;
             if (isAutoplayActive() || sansLordAutoBattleApplies())
             {
-                markBattleMoveSuccessful(tag, endingHex);
+                ai.markBattleMoveSuccessful(tag, endingHex);
             }
         }
         BattleCritter battleUnit = getBattleCS().getBattleUnit(tag);

@@ -11,6 +11,7 @@ import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.SummonInfo;
+import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;
@@ -60,12 +61,21 @@ public interface AI
     /** a Battle is finished */
     void cleanupBattle();
 
+    /** Initialize battle move related variables */
+    public void setupBattleMove();
+
+    /** Move a critter move from bestMoveOrder to failedBattleMoves */
+    public void handleFailedBattleMove();
+
     /** Try another move for creatures whose moves failed. */
     void retryFailedBattleMoves(List<CritterMove> bestMoveOrder);
 
     /** pick an entry side */
     EntrySide pickEntrySide(MasterHex hex, Legion legion,
         Set<EntrySide> entrySides);
+
+    /** Remove critter move from BestMoveOrser list */
+    public void markBattleMoveSuccessful(int tag, BattleHex endingHex);
 
     /** pick an engagement to resolve */
     MasterHex pickEngagement();

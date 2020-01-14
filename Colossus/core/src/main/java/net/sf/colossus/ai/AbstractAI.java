@@ -66,6 +66,9 @@ public abstract class AbstractAI implements AI
     final protected Client client;
     protected Variant variant;
 
+    public List<CritterMove> bestMoveOrder;
+    public List<CritterMove> failedBattleMoves;
+
     /** Our random source. */
     final protected Random random = new DevRandom();
     /**
@@ -787,5 +790,77 @@ public abstract class AbstractAI implements AI
     public Caretaker getCaretaker()
     {
         return client.getGame().getCaretaker();
+    }
+
+    public void setupBattleMove()
+    {
+        bestMoveOrder = battleMove();
+        failedBattleMoves = new ArrayList<CritterMove>();
+        kickBattleMove();
+    }
+
+    void kickBattleMove()
+    {
+        if (bestMoveOrder == null || bestMoveOrder.isEmpty())
+        {
+            if (failedBattleMoves == null || failedBattleMoves.isEmpty())
+            {
+                client.doneWithBattleMoves();
+            }
+            else
+            {
+                retryTheFailedBattleMoves();
+            }
+        }
+        else
+        {
+            CritterMove cm = bestMoveOrder.get(0);
+            client.tryBattleMove(cm);
+        }
+    }
+
+    void retryTheFailedBattleMoves()
+    {
+        bestMoveOrder = failedBattleMoves;
+        failedBattleMoves = null;
+        retryFailedBattleMoves(bestMoveOrder);
+        kickBattleMove();
+    }
+
+    public void handleFailedBattleMove()
+    {
+        if (bestMoveOrder != null)
+        {
+            Iterator<CritterMove> it = bestMoveOrder.iterator();
+            if (it.hasNext())
+            {
+                CritterMove cm = it.next();
+                it.remove();
+                if (failedBattleMoves != null)
+                {
+                    failedBattleMoves.add(cm);
+                }
+            }
+        }
+        kickBattleMove();
+    }
+
+    public void markBattleMoveSuccessful(int tag, BattleHex endingHex)
+    {
+        if (bestMoveOrder != null)
+        {
+            Iterator<CritterMove> it = bestMoveOrder.iterator();
+            while (it.hasNext())
+            {
+                CritterMove cm = it.next();
+                if (tag == cm.getTag() && endingHex.equals(cm.getEndingHex()))
+                {
+                    // Remove this CritterMove from the list to show
+                    // that it doesn't need to be retried.
+                    it.remove();
+                }
+            }
+        }
+        kickBattleMove();
     }
 }
