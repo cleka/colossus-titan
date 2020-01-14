@@ -4,6 +4,7 @@ package net.sf.colossus.ai.objectives;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
 import net.sf.colossus.ai.AbstractAI;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.common.Constants;
@@ -201,8 +202,8 @@ public abstract class AbstractObjectiveHelper implements IObjectiveHelper
                 onlyThisStackHasIt = false;
             }
 
-            numberLeftToRecruit = ai.getCaretaker().getAvailableCount(
-                creature.getType());
+            numberLeftToRecruit = client.getGame().getCaretaker()
+                .getAvailableCount(creature.getType());
 
             if (numberNeededHere < Constants.BIGNUM)
             {

@@ -6,7 +6,6 @@ import java.util.Set;
 
 import net.sf.colossus.ai.helper.CritterMove;
 import net.sf.colossus.client.LegionClientSide;
-import net.sf.colossus.game.Caretaker;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.PlayerColor;
@@ -102,5 +101,4 @@ public interface AI
     CreatureType getVariantRecruitHint(LegionClientSide legion, MasterHex hex,
         List<CreatureType> recruits);
 
-    Caretaker getCaretaker();
 }

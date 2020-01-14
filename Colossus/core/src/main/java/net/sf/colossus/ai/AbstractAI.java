@@ -23,7 +23,6 @@ import net.sf.colossus.game.Battle;
 import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.BattleStrike;
 import net.sf.colossus.game.BattleUnit;
-import net.sf.colossus.game.Caretaker;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
@@ -785,11 +784,6 @@ public abstract class AbstractAI implements AI
             }
         }
         return count;
-    }
-
-    public Caretaker getCaretaker()
-    {
-        return client.getGame().getCaretaker();
     }
 
     public void setupBattleMove()
