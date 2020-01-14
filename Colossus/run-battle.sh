@@ -32,6 +32,6 @@ echo "Starting Colossus for $BATTLE_XML"
 java -Dnet.sf.colossus.forceViewBoard=$FORCE_BOARD           \
      -Dnet.sf.colossus.endAfterFirstBattle=$END_AFTER_BATTLE \
      -Djava.util.logging.config.file=$LOG_PROPERTIES         \
+     -Duser.home=`pwd`/Battle-stuff/out                      \
      -Xmx256M -jar Colossus.jar                              \
      --load $BATTLE_XML $PROB_HITS
-
