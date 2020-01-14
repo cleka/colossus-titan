@@ -28,8 +28,12 @@ public interface AI
 
     public void setVariant(Variant variant);
 
-    /** make masterboard moves for current player in the Game */
-    boolean masterMove();
+    /** pick a color of legion markers */
+    PlayerColor pickColor(List<PlayerColor> colors,
+        List<PlayerColor> favoriteColors);
+
+    /** pick a legion marker */
+    String pickMarker(Set<String> markerIds, String preferredShortColor);
 
     /** make splits for current player.  Return true if done */
     boolean split();
@@ -37,11 +41,17 @@ public interface AI
     /** continue making splits.  Return true if done. */
     boolean splitCallback(Legion parent, Legion child);
 
+    /** make masterboard moves for current player in the Game */
+    boolean masterMove();
+
     /** make recruits for current player */
     void muster();
 
     /** pick one reinforcement for legion */
     void reinforce(Legion legion);
+
+    /** pick an engagement to resolve */
+    MasterHex pickEngagement();
 
     /** choose whether legion should flee from enemy */
     boolean flee(Legion legion, Legion enemy);
@@ -49,17 +59,15 @@ public interface AI
     /** choose whether legion should concede to enemy */
     boolean concede(Legion legion, Legion enemy);
 
-    /** make battle strikes for legion */
-    boolean strike(Legion legion);
+    /** pick an entry side */
+    EntrySide pickEntrySide(MasterHex hex, Legion legion,
+        Set<EntrySide> entrySides);
 
     /** a Battle start */
     void initBattle();
 
     /** return a list of battle moves for the active legion */
     List<CritterMove> battleMove();
-
-    /** a Battle is finished */
-    void cleanupBattle();
 
     /** Initialize battle move related variables */
     public void setupBattleMove();
@@ -70,34 +78,26 @@ public interface AI
     /** Try another move for creatures whose moves failed. */
     void retryFailedBattleMoves(List<CritterMove> bestMoveOrder);
 
-    /** pick an entry side */
-    EntrySide pickEntrySide(MasterHex hex, Legion legion,
-        Set<EntrySide> entrySides);
-
     /** Remove critter move from BestMoveOrser list */
     public void markBattleMoveSuccessful(int tag, BattleHex endingHex);
 
-    /** pick an engagement to resolve */
-    MasterHex pickEngagement();
-
-    /** choose whether to acquire an angel or archangel */
-    CreatureType acquireAngel(Legion legion, List<CreatureType> recruits);
-
-    /** choose whether to summon an angel or archangel */
-    SummonInfo summonAngel(Legion summoner, List<Legion> possibleDonors);
-
-    /** pick a color of legion markers */
-    PlayerColor pickColor(List<PlayerColor> colors,
-        List<PlayerColor> favoriteColors);
-
-    /** pick a legion marker */
-    String pickMarker(Set<String> markerIds, String preferredShortColor);
+    /** make battle strikes for legion */
+    boolean strike(Legion legion);
 
     /** choose carry target */
     void handleCarries(int carryDamage, Set<String> carryTargets);
 
     /** pick an optional strike penalty */
     String pickStrikePenalty(List<String> choices);
+
+    /** choose whether to summon an angel or archangel */
+    SummonInfo summonAngel(Legion summoner, List<Legion> possibleDonors);
+
+    /** a Battle is finished */
+    void cleanupBattle();
+
+    /** choose whether to acquire an angel or archangel */
+    CreatureType acquireAngel(Legion legion, List<CreatureType> recruits);
 
     CreatureType getVariantRecruitHint(LegionClientSide legion, MasterHex hex,
         List<CreatureType> recruits);
