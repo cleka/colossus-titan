@@ -895,4 +895,9 @@ public class NullClientGUI implements IClientGUI
         // TODO Auto-generated method stub
     }
 
+    public void evaluateLegionMove()
+    {
+        // TODO Auto-generated method stub
+    }
+
 }

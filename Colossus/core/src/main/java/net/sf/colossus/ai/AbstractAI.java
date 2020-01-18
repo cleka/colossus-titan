@@ -857,4 +857,10 @@ public abstract class AbstractAI implements AI
         }
         kickBattleMove();
     }
+
+    public void evaluateGivenLegionBattleMove(Legion activeLegion)
+    {
+        // Do-nothing dummy. Only implemented by ClemensAI at the moment.
+    }
+
 }

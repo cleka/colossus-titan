@@ -3224,6 +3224,51 @@ public class ClemensAI extends AbstractAI
         return sum;
     }
 
+    public LegionMove createLegionMove()
+    {
+        LegionMove lm = new LegionMove();
+        for (BattleCritter critter : client.getActiveBattleUnits())
+        {
+            BattleHex startHex = critter.getStartingHex();
+            BattleHex currHex = critter.getCurrentHex();
+            if (startHex == null)
+            {
+                startHex = currHex;
+            }
+            CritterMove cm = new CritterMove(critter, startHex, currHex);
+            lm.add(cm);
+        }
+        return lm;
+    }
+
+    private void printlnEval(String text)
+    {
+        // System.out.println(text);
+    }
+
+    /**
+     * Store last move we evaluated, for comparison:
+     * - On first call, print only the value.
+     * - If user requests same situation again, show verbose output
+     */
+    private LegionMove lastEvaluatedMove = null;
+
+    @Override
+    public void evaluateGivenLegionBattleMove(Legion activeLegion)
+    {
+        LegionMove lm = createLegionMove();
+        int sum = doMoveEvaluationCalculation(lm);
+        printlnEval("");
+        printlnEval(
+            "LegionMove: " + lm.toStringAsIs() + " | Evaluation=" + sum);
+        if (lm.equals(lastEvaluatedMove))
+        {
+            printlnEval("Detailed: " + lm.getStringWithEvaluation());
+            printlnEval("Evaluated value=" + sum);
+        }
+        lastEvaluatedMove = lm;
+    }
+
     protected class TriggerTimeIsUp extends TimerTask
     {
         @Override

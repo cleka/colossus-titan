@@ -4274,4 +4274,10 @@ public class ClientGUI implements IClientGUI, GUICallbacks
         logPerhaps("concede()");
         getClient().concede();
     }
+
+    public void evaluateLegionMove()
+    {
+        client.evaluateLegionMove();
+    }
+
 }

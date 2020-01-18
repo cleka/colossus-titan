@@ -87,18 +87,23 @@ public final class BattleBoard extends KFrame
     private static final String doneWithPhase = "Done";
     private static final String concedeBattle = "Concede Battle";
     private static final String showTerrainHazard = "Show Terrain";
+    private static final String evaluateLegionMove = "Evaluate Legion Move";
 
     private AbstractAction undoLastAction;
     private AbstractAction undoAllAction;
     private AbstractAction doneWithPhaseAction;
     private AbstractAction concedeBattleAction;
     private AbstractAction showTerrainHazardAction;
+    private AbstractAction evaluateLegionMoveAction;
 
     private final SaveWindow saveWindow;
 
     private final BattleMap battleMap;
 
     private boolean alreadyConceded = false;
+
+    // Used for debugging/testing the AI battle stuff
+    private final boolean addEvaluateLegionMoveAction = false;
 
     private static class DicePanel extends JPanel
     {
@@ -527,6 +532,15 @@ public final class BattleBoard extends KFrame
                 }
             }
         };
+
+        evaluateLegionMoveAction = new AbstractAction(evaluateLegionMove)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                gui.evaluateLegionMove();
+            }
+        };
+
     }
 
     private void setupTopMenu()
@@ -588,6 +602,13 @@ public final class BattleBoard extends KFrame
         mi = phaseMenu.add(doneWithPhaseAction);
         mi.setMnemonic(KeyEvent.VK_D);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
+
+        if (addEvaluateLegionMoveAction)
+        {
+            mi = phaseMenu.add(evaluateLegionMoveAction);
+            mi.setMnemonic(KeyEvent.VK_E);
+            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, 0));
+        }
 
         phaseMenu.addSeparator();
 

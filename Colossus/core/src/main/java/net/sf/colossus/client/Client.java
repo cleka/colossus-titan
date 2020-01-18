@@ -4207,4 +4207,13 @@ public final class Client implements IClient, IOracle, IVariant,
         server.cheatModeDestroyLegion(legion);
     }
 
+    /**
+     * Interactive user requested to evaluate current situation (critter
+     * locations). (So far only ClemensAI really has code to do that.)
+     */
+    public void evaluateLegionMove()
+    {
+        Legion legion = game.getBattleActiveLegion();
+        ai.evaluateGivenLegionBattleMove(legion);
+    }
 }

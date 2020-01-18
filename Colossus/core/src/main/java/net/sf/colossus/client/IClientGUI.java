@@ -365,4 +365,6 @@ public interface IClientGUI
 
     public abstract void actOnSplitRelatedRequestSent();
 
+    public void evaluateLegionMove();
+
 }

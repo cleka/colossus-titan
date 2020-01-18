@@ -72,6 +72,16 @@ public class LegionMove implements Comparable<LegionMove>
         return Glob.glob(", ", cmStrings);
     }
 
+    public String toStringAsIs()
+    {
+        List<String> cmStrings = new ArrayList<String>();
+        for (CritterMove cm : critterMoves)
+        {
+            cmStrings.add(cm.toStringAsIs());
+        }
+        return Glob.glob(", ", cmStrings);
+    }
+
     public String getStringWithEvaluation()
     {
         List<String> cmStrings = new ArrayList<String>();

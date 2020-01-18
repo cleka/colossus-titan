@@ -101,4 +101,10 @@ public interface AI
     CreatureType getVariantRecruitHint(LegionClientSide legion, MasterHex hex,
         List<CreatureType> recruits);
 
+    /** For given situation on the battle map, call the evaluate function
+     * of the current AI. At the moment, this prints something to stdout.
+     * @param activeLegion currently active battle Legion
+     */
+    public void evaluateGivenLegionBattleMove(Legion activeLegion);
+
 }
