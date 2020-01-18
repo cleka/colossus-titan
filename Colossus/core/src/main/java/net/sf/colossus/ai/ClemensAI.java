@@ -143,7 +143,7 @@ public class ClemensAI extends AbstractAI
         cvc.HAS_NATIVE_COMBAT_BONUS = 3;
         // initialize the creature info needed by the AI
         InstanceTracker.register(this, client.getOwningPlayer().getName());
-        DebugMethods.BattleLogEnabled(true);
+        // DebugMethods.BattleLogEnabled(true);
     }
 
     public PlayerColor pickColor(List<PlayerColor> colors,
