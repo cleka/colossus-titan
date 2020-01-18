@@ -3200,7 +3200,10 @@ public class ClemensAI extends AbstractAI
         {
             ValueRecorder why = new ValueRecorder();
             int val = evaluateLegionBattleMoveAsAWhole(lm, strikeMap, why);
-            lm.setEvaluate(why.toString());
+            if (!why.isEmpty())
+            {
+                lm.setEvaluate(why.toString());
+            }
             sum += val;
         }
 
