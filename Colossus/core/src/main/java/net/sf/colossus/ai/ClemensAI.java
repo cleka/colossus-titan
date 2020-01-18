@@ -3174,6 +3174,33 @@ public class ClemensAI extends AbstractAI
         return value.getValue();
     }
 
+    protected int doMoveEvaluationCalculation(LegionMove lm)
+    {
+        Map<BattleHex, Integer> strikeMap = findStrikeMap();
+
+        // Find the sum of all critter evals.
+        int sum = 0;
+        for (CritterMove cm : lm.getCritterMoves())
+        {
+            ValueRecorder why = new ValueRecorder();
+            int val = evaluateCritterMove(cm.getCritter(), strikeMap, why);
+            lm.setEvaluate(cm, why.toString());
+            sum += val;
+        }
+
+        // Additionally whole position evaluation
+        {
+            ValueRecorder why = new ValueRecorder();
+            int val = evaluateLegionBattleMoveAsAWhole(lm, strikeMap, why);
+            if (!why.isEmpty())
+            {
+                lm.setEvaluate(why.toString());
+            }
+            sum += val;
+        }
+        return sum;
+    }
+
     protected int evaluateLegionBattleMove(LegionMove lm)
     {
         lm.resetEvaluate();
@@ -3184,30 +3211,9 @@ public class ClemensAI extends AbstractAI
             cm.getCritter().moveToHex(cm.getEndingHex());
         }
 
-        Map<BattleHex, Integer> strikeMap = findStrikeMap();
+        int sum = doMoveEvaluationCalculation(lm);
 
-        // Then find the sum of all critter evals.
-        int sum = 0;
-        for (CritterMove cm : lm.getCritterMoves())
-        {
-            ValueRecorder why = new ValueRecorder();
-            int val = evaluateCritterMove(cm.getCritter(), strikeMap, why);
-            lm.setEvaluate(cm, why.toString());
-            sum += val;
-        }
-
-        // whole position evaluation
-        {
-            ValueRecorder why = new ValueRecorder();
-            int val = evaluateLegionBattleMoveAsAWhole(lm, strikeMap, why);
-            if (!why.isEmpty())
-            {
-                lm.setEvaluate(why.toString());
-            }
-            sum += val;
-        }
-
-        // Then move them all back.
+        // Finally, move them all back.
         for (CritterMove cm : lm.getCritterMoves())
         {
             cm.getCritter().moveToHex(cm.getStartingHex());
