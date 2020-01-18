@@ -304,8 +304,7 @@ public class BattleClientSide extends Battle
     {
         for (BattleCritter battleUnit : battleUnits)
         {
-            battleUnit.setMoved(false);
-            battleUnit.setStruck(false);
+            battleUnit.clearBattleStatus();
         }
     }
 

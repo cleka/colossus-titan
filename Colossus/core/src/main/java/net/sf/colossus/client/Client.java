@@ -2954,8 +2954,15 @@ public final class Client implements IClient, IOracle, IVariant,
         BattleCritter battleUnit = getBattleCS().getBattleUnit(tag);
         if (battleUnit != null)
         {
-            battleUnit.setCurrentHex(endingHex);
-            battleUnit.setMoved(!undo);
+            if (undo)
+            {
+                battleUnit.undoMove();
+            }
+            else
+            {
+                battleUnit.moveToHex(endingHex);
+                battleUnit.setMoved(true);
+            }
         }
 
         gui.actOnTellBattleMove(startingHex, endingHex, rememberForUndo);

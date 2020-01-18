@@ -129,6 +129,18 @@ public class EvaluatedBattleCritter implements BattleCritter
         currentHex = hex;
     }
 
+    public void undoMove()
+    {
+        currentHex = startingHex;
+    }
+
+    public void clearBattleStatus()
+    {
+        setMoved(false);
+        setStruck(false);
+        startingHex = null;
+    }
+
     public boolean isDead()
     {
         return parent.isDead();
