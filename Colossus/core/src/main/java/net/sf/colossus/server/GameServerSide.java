@@ -865,6 +865,10 @@ public class GameServerSide extends Game
         {
             newName = "Milvang" + number;
         }
+        else if (shortName.equals("ClemensAI"))
+        {
+            newName = "Clemens" + number;
+        }
         else if (shortName.equals("ExperimentalAI"))
         {
             newName = "Experimental" + number;
