@@ -46,10 +46,6 @@ public interface BattleCritter
 
     void moveToHex(BattleHex hex);
 
-    void undoMove();
-
-    void clearBattleStatus();
-
     boolean isDead();
 
     boolean isDefender();

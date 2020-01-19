@@ -61,6 +61,7 @@ public final class BattleUnit implements BattleCritter
         this.id = id;
         this.defender = defender;
         this.currentHex = currentHex;
+
         this.creatureType = type;
         this.legion = legion;
     }
@@ -165,15 +166,8 @@ public final class BattleUnit implements BattleCritter
 
     public void moveToHex(BattleHex hex)
     {
-        this.startingHex = currentHex;
-        this.currentHex = hex;
-    }
-
-    public void undoMove()
-    {
-        this.currentHex = startingHex;
-        this.startingHex = null;
-        this.moved = false;
+        startingHex = currentHex;
+        currentHex = hex;
     }
 
     // TODO make package private
@@ -196,13 +190,6 @@ public final class BattleUnit implements BattleCritter
     public void setStruck(boolean struck)
     {
         this.struck = struck;
-    }
-
-    public void clearBattleStatus()
-    {
-        setMoved(false);
-        setStruck(false);
-        startingHex = null;
     }
 
     public CreatureType getType()

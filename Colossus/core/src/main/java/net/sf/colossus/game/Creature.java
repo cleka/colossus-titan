@@ -282,13 +282,6 @@ public class Creature
         setCurrentHex(hex);
     }
 
-    public void clearBattleStatus()
-    {
-        setMoved(false);
-        setStruck(false);
-        startingHex = null;
-    }
-
     public void commitMove()
     {
         setStartingHex(getCurrentHex());

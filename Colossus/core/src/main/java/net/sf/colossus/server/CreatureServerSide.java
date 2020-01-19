@@ -113,7 +113,7 @@ public class CreatureServerSide extends Creature implements BattleCritter
         }
     }
 
-    public void undoMove()
+    void undoMove()
     {
         setCurrentHex(getStartingHex());
         LOGGER.log(Level.INFO, getName() + " undoes move and returns to "
