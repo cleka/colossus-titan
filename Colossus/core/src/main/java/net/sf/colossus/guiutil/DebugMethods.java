@@ -189,13 +189,13 @@ public class DebugMethods
     // Clemens testing...
     public static boolean denyAcquireAngel()
     {
-        return false;
+        return true;
     }
 
     // Clemens testing...
     public static boolean doPrintLnEval()
     {
-        return false;
+        return true;
     }
 
 }
