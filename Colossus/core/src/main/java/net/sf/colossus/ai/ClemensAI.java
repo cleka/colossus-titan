@@ -3140,18 +3140,34 @@ public class ClemensAI extends AbstractAI
                         * getKillValue(critter, terrain), "DefenderGetKilled");
                 }
             }
-            else
+            else if (hitsExpected > 0)
             {
+                double fractionalDead = hitsExpected / power;
+                System.out.println("fractDead=" + fractionalDead);
                 if (legion.equals(client.getAttacker()))
                 {
-                    value.add(bec.ATTACKER_GET_HIT_SCALE_FACTOR
+                    int frdVal = (int)fractionalDead
+                        * bec.ATTACKER_GET_HIT_SCALE_FACTOR
+                        * getKillValue(critter, terrain);
+                    System.out.println("frdVal=" + frdVal);
+                    value.add(
+                        (int)fractionalDead * bec.ATTACKER_GET_HIT_SCALE_FACTOR
                         * getKillValue(critter, terrain), "AttackerGetHit");
                 }
                 else
                 {
-                    value.add(bec.DEFENDER_GET_HIT_SCALE_FACTOR
+                    int frdVal = (int)fractionalDead
+                        * bec.DEFENDER_GET_HIT_SCALE_FACTOR
+                        * getKillValue(critter, terrain);
+                    System.out.println("frdVal=" + frdVal);
+                    value.add(
+                        (int)fractionalDead * bec.DEFENDER_GET_HIT_SCALE_FACTOR
                         * getKillValue(critter, terrain), "DefendergetHit");
                 }
+            }
+            else
+            {
+                LOGGER.warning("Nanu, hitsExpected else case?");
             }
         }
     }
