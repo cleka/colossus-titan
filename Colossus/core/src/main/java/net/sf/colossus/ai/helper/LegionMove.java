@@ -49,6 +49,11 @@ public class LegionMove implements Comparable<LegionMove>
         value = v;
     }
 
+    /**
+     * Set a value and "why"-String for one particular critter
+     * @param cm
+     * @param val
+     */
     public void setEvaluate(CritterMove cm, String val)
     {
         if (evaluation == null)
@@ -56,6 +61,11 @@ public class LegionMove implements Comparable<LegionMove>
         evaluation.put(cm, val);
     }
 
+    /**
+     * Set the value and "why"-String for this LegionMove as a whole
+     * @param cm
+     * @param val
+     */
     public void setEvaluate(String val)
     {
         lmeval = val;
