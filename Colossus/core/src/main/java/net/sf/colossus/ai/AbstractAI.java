@@ -649,6 +649,8 @@ public abstract class AbstractAI implements AI
                 {
                     it.remove();
                     changed = true;
+                    // Can remove only once
+                    break;
                 }
             }
         }
