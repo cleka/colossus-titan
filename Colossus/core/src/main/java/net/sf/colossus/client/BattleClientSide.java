@@ -569,4 +569,16 @@ public class BattleClientSide extends Battle
         return false;
     }
 
+    public boolean isOccupiedByEnemy(BattleHex hex)
+    {
+        for (BattleCritter critter : getInactiveBattleUnits())
+        {
+            if (hex.equals(critter.getCurrentHex()))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

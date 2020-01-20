@@ -46,7 +46,8 @@ final class BattleMovement
     /** Recursively find moves from this hex.  Return a set of all
      * legal destinations.  Do not double back.  */
     private Set<BattleHex> findMoves(BattleHex hex, CreatureType creature,
-        boolean flies, int movesLeft, int cameFrom, boolean first)
+        boolean flies, int movesLeft, int cameFrom, boolean first,
+        boolean ignoreAllies)
     {
         Set<BattleHex> set = new HashSet<BattleHex>();
         for (int i = 0; i < 6; i++)
@@ -59,8 +60,19 @@ final class BattleMovement
                 {
                     int reverseDir = (i + 3) % 6;
                     int entryCost;
+                    boolean occupied;
+                    if (ignoreAllies)
+                    {
+                        BattleClientSide bss = (BattleClientSide)game
+                            .getBattle();
+                        occupied = bss.isOccupiedByEnemy(neighbor);
+                    }
+                    else
+                    {
+                        occupied = game.getBattle().isOccupied(neighbor);
+                    }
 
-                    if (!game.getBattle().isOccupied(neighbor))
+                    if (!occupied)
                     {
                         entryCost = neighbor.getEntryCost(creature,
                             reverseDir, cumulativeSlow);
@@ -82,7 +94,7 @@ final class BattleMovement
                         if (!flies && movesLeft > entryCost)
                         {
                             set.addAll(findMoves(neighbor, creature, flies,
-                                movesLeft - entryCost, reverseDir, false));
+                                movesLeft - entryCost, reverseDir, false, ignoreAllies));
                         }
                     }
 
@@ -92,7 +104,7 @@ final class BattleMovement
                         && neighbor.canBeFlownOverBy(creature))
                     {
                         set.addAll(findMoves(neighbor, creature, flies,
-                            movesLeft - 1, reverseDir, false));
+                            movesLeft - 1, reverseDir, false, ignoreAllies));
                     }
                 }
             }
@@ -120,8 +132,10 @@ final class BattleMovement
         return set;
     }
 
-    /** Find all legal moves for this critter.*/
-    public Set<BattleHex> showMoves(BattleCritter critter)
+    /** Find all legal moves for this critter.
+     * @param ignoreAllies is set to true when generating potential moves
+     *                     of critter in isolation */
+    public Set<BattleHex> showMoves(BattleCritter critter, boolean ignoreAllies)
     {
         Set<BattleHex> set = new HashSet<BattleHex>();
         if (!critter.hasMoved()
@@ -140,7 +154,7 @@ final class BattleMovement
                 CreatureType type = critter.getType();
                 BattleHex hex = critter.getCurrentHex();
                 set = findMoves(hex, type, type.isFlier(), type.getSkill()
-                    - critter.getSlowed(), -1, true);
+                    - critter.getSlowed(), -1, true, ignoreAllies);
             }
         }
         return set;

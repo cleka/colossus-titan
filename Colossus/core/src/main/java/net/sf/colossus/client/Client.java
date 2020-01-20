@@ -3010,9 +3010,30 @@ public final class Client implements IClient, IOracle, IVariant,
         return set;
     }
 
+    /**
+     * This is how this method was used everywhere, before I introduced the
+     * ignoreAllies form.
+     * @param battleCritter
+     * @return Possible target hexes. Allied critters block us.
+     */
     public Set<BattleHex> showBattleMoves(BattleCritter battleCritter)
     {
-        return battleMovement.showMoves(battleCritter);
+        return showBattleMoves(battleCritter, false);
+    }
+
+    /**
+     * Improved method (since Jan 2020). In isolated move generation in
+     * ClemensAI, we ignore all own critters, to get a full set of all
+     * "what could go where" - conflicts will be filtered out later.
+     * @param battleCritter
+     * @param ignoreAllies
+     * @return Set of hexes where this critter could move to; ignores all own
+     *         critters when ignoreAllies is true.
+     */
+    public Set<BattleHex> showBattleMoves(BattleCritter battleCritter,
+        boolean ignoreAllies)
+    {
+        return battleMovement.showMoves(battleCritter, ignoreAllies);
     }
 
     // TODO move to Battle

@@ -2315,7 +2315,8 @@ public class ClemensAI extends AbstractAI
             BattleCritter critter = cm.getCritter();
 
             // LOGGER.finest(critter.getDescription() + " failed to move");
-            List<CritterMove> moveList = findBattleMovesOneCritter(critter);
+            List<CritterMove> moveList = findBattleMovesOneCritter(critter,
+                false);
             if (!moveList.isEmpty())
             {
                 CritterMove cm2 = moveList.get(0);
@@ -2436,6 +2437,14 @@ public class ClemensAI extends AbstractAI
     private int testMoveOrder(List<CritterMove> order,
         List<CritterMove> newOrder)
     {
+        if (order == null)
+        {
+            // Honestly I don't know why/when we get this; it started when I
+            // added the "ignore allies" in find possible moves.
+            // In any case, negative means "invalid move"
+            LOGGER.warning("Called with NULL move order");
+            return -1;
+        }
         boolean allOK = true;
         int val = 0;
         for (CritterMove cm : order)
@@ -2511,7 +2520,8 @@ public class ClemensAI extends AbstractAI
 
         for (BattleCritter critter : client.getActiveBattleUnits())
         {
-            List<CritterMove> moveList = findBattleMovesOneCritter(critter);
+            List<CritterMove> moveList = findBattleMovesOneCritter(critter,
+                true);
 
             // Add this critter's moves to the list.
             allCritterMoves.add(moveList);
@@ -2531,7 +2541,8 @@ public class ClemensAI extends AbstractAI
         return legionMoves;
     }
 
-    private List<CritterMove> findBattleMovesOneCritter(BattleCritter critter)
+    private List<CritterMove> findBattleMovesOneCritter(BattleCritter critter,
+        boolean ignoreAllies)
     {
         BattleHex currentHex = critter.getCurrentHex();
 
@@ -2541,8 +2552,8 @@ public class ClemensAI extends AbstractAI
         // clear a path for a more important critter.  We consider
         // moves that the critter could make, disregarding mobile allies.
 
-        // XXX Should show moves including moving through mobile allies.
-        Set<BattleHex> moves = client.showBattleMoves(critter);
+        // 20.1.2019: Includes now moves through mobile allies
+        Set<BattleHex> moves = client.showBattleMoves(critter, ignoreAllies);
 
         // TODO Make less important creatures get out of the way.
 

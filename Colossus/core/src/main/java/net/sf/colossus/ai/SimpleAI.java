@@ -2522,6 +2522,7 @@ public class SimpleAI extends AbstractAI
         // moves that the critter could make, disregarding mobile allies.
 
         // XXX Should show moves including moving through mobile allies.
+        //     New functionality that does that, in testing in ClemensAI
         Set<BattleHex> moves = client.showBattleMoves(critter);
 
         // TODO Make less important creatures get out of the way.
