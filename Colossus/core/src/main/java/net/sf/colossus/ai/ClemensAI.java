@@ -2927,7 +2927,10 @@ public class ClemensAI extends AbstractAI
             {
                 preferredRange = 2;
             }
-            if (range != preferredRange)
+	    // 20.1.19 Clemens: Changed "!=" to ">" :
+	    // I don't see a point in punishing first row; if critters
+	    // would stay offboard that would be punished heavily anyway.
+            if (range > preferredRange)
             {
                 value.add(
                     bec.DEFENDER_FORWARD_EARLY_PENALTY
