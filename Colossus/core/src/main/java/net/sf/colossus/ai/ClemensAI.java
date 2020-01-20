@@ -24,6 +24,7 @@ import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.game.Battle;
 import net.sf.colossus.game.BattleCritter;
+import net.sf.colossus.game.BattleUnit;
 import net.sf.colossus.game.Dice;
 import net.sf.colossus.game.EntrySide;
 import net.sf.colossus.game.Legion;
@@ -2684,12 +2685,59 @@ public class ClemensAI extends AbstractAI
         return generateLegionMoves(allCritterMoves, false);
     }
 
+    /**
+     * Reward for 2-on-1 or even 3-on-1 attacks.
+     * TODO: there is already a gang-up-on-bonus in critter specific evals?
+     * TODO: avoid overkill?
+     * @param contacts
+     * @return Bonus for multiple contacts
+     */
+    private int bonusForMultipleContact(int contacts)
+    {
+        // 4 is usually not better than 3, that's why we don't simply
+        // multiply.
+        // TODO ... except if it would be a super strong opponent,
+        //          specifically the Titan?
+        if (contacts >= 3)
+        {
+            return 4 * bec.GANG_UP_ON_CREATURE;
+        }
+        if (contacts >= 2)
+        {
+            return 3 * bec.GANG_UP_ON_CREATURE;
+        }
+        if (contacts >= 1)
+        {
+            // we abuse this somewhat here, rewarding simple 1x contact
+            return 2 * bec.GANG_UP_ON_CREATURE;
+        }
+        return 0;
+    }
+
     @SuppressWarnings("unused")
     protected int evaluateLegionBattleMoveAsAWhole(LegionMove lm,
         Map<BattleHex, Integer> strikeMap, ValueRecorder value)
     {
-        // This is empty, to be overidden by subclasses.
-        return 0;
+        return addGangUpOnOpponentBonus(value);
+    }
+
+    int addGangUpOnOpponentBonus(ValueRecorder value)
+    {
+        int contactBonus = 0;
+        List<BattleUnit> enemyCritters = client.getInactiveBattleUnits();
+        for (BattleUnit critter : enemyCritters)
+        {
+            int inContact = client.getBattleCS().countInContact(critter, true);
+            String msg = "Enemy " + critter.getDescription() + " attacked by "
+                + inContact + " or our critters.";
+            // System.out.println(msg);
+            contactBonus = bonusForMultipleContact(inContact);
+            if (contactBonus > 0)
+            {
+                value.add(contactBonus, msg);
+            }
+        }
+        return contactBonus;
     }
 
     /** this compute the special case of the Titan critter */
@@ -3185,6 +3233,13 @@ public class ClemensAI extends AbstractAI
         return value.getValue();
     }
 
+    /**
+     * Do the actual evaluation of a situation. Caller has put all critters
+     * into place (according to LegionMove), or we are called from GUI to
+     * evaluate actual situation on battle board.
+     * @param lm
+     * @return
+     */
     protected int doMoveEvaluationCalculation(LegionMove lm)
     {
         Map<BattleHex, Integer> strikeMap = findStrikeMap();
