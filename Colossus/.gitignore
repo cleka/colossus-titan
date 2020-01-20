@@ -9,7 +9,4 @@ unix.jnlp
 win.jnlp
 logging.properties.remote*
 stop.flag
-
-Battle-stuff/*.tmp.cf
-Battle-stuff/out/*
 out

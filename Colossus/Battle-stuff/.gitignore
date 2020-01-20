@@ -1,1 +1,3 @@
 basenr.txt
+*.tmp.cf
+out/*
