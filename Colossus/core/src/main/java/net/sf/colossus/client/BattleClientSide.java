@@ -569,13 +569,45 @@ public class BattleClientSide extends Battle
         return false;
     }
 
-    public boolean isOccupiedByEnemy(BattleHex hex)
+    public boolean isOccupiedByEnemyOrImmobileAlly(BattleHex hex)
     {
-        for (BattleCritter critter : getInactiveBattleUnits())
+        for (BattleCritter enemyCritter : getInactiveBattleUnits())
         {
-            if (hex.equals(critter.getCurrentHex()))
+            if (hex.equals(enemyCritter.getCurrentHex()))
             {
                 return true;
+            }
+        }
+        for (BattleCritter alliedCritter : getActiveBattleUnits())
+        {
+            if (hex.equals(alliedCritter.getCurrentHex())
+                && critterHasEnemyContact(alliedCritter))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    protected boolean critterHasEnemyContact(BattleCritter critter)
+    {
+        BattleHex currentHex = critter.getCurrentHex();
+        for (int i = 0; i < 6; i++)
+        {
+            // Adjacent creatures separated by a cliff are not engaged.
+            if (!currentHex.isCliff(i))
+            {
+                BattleHex targetHex = currentHex.getNeighbor(i);
+                if (targetHex != null && isOccupied(targetHex)
+                    && !targetHex.isEntrance())
+                {
+                    BattleCritter target = getBattleUnit(targetHex);
+                    if (target.isDefender() != critter.isDefender())
+                    {
+                        return true;
+                    }
+                }
             }
         }
         return false;

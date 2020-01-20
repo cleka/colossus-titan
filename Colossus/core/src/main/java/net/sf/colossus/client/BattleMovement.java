@@ -65,7 +65,7 @@ final class BattleMovement
                     {
                         BattleClientSide bss = (BattleClientSide)game
                             .getBattle();
-                        occupied = bss.isOccupiedByEnemy(neighbor);
+                        occupied = bss.isOccupiedByEnemyOrImmobileAlly(neighbor);
                     }
                     else
                     {
