@@ -613,4 +613,43 @@ public class BattleClientSide extends Battle
         return false;
     }
 
+    /**
+     * Count with how many enemy critters a given critter has contact
+     * @param critter
+     * @param countDead
+     * @return Number of enemy critters this critter is in contact with
+     */
+    public int countInContact(BattleCritter critter, boolean countDead)
+    {
+        BattleHex hex = critter.getCurrentHex();
+        int count = 0;
+
+        // Offboard creatures are not in contact.
+        if (hex.isEntrance())
+        {
+            return count;
+        }
+
+        for (int i = 0; i < 6; i++)
+        {
+            // Adjacent creatures separated by a cliff are not in contact.
+            if (!hex.isCliff(i))
+            {
+                BattleHex neighbor = hex.getNeighbor(i);
+                if (neighbor != null)
+                {
+                    BattleCritter other = getBattleUnit(neighbor);
+                    if (other != null
+                        && (other.isDefender() != critter.isDefender())
+                        && (countDead || !other.isDead()))
+                    {
+                        count++;
+                    }
+                }
+            }
+        }
+
+        return count;
+    }
+
 }
