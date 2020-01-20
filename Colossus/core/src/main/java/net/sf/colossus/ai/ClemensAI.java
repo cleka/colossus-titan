@@ -2297,6 +2297,17 @@ public class ClemensAI extends AbstractAI
         // getting stuff out of the way so that a reinforcement
         // has room to enter.
 
+        List<BattleUnit> myCritters = client.getActiveBattleUnits();
+        for (BattleCritter cr : myCritters)
+        {
+            if (cr.hasMoved())
+            {
+                LOGGER.warning("Ooops, critter still thinks it has moved? "
+                    + cr.getDescription());
+                cr.setMoved(false);
+            }
+        }
+
         Collection<LegionMove> legionMoves = findBattleMoves();
         LegionMove bestLegionMove = findBestLegionMove(legionMoves);
         List<CritterMove> bestMoveOrder = findMoveOrder(bestLegionMove);
