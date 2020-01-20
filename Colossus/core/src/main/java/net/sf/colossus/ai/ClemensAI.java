@@ -2677,10 +2677,12 @@ public class ClemensAI extends AbstractAI
             }
         }
         findBestLegionMoveTimer.cancel();
-        LOGGER.finer("Best legion move of " + count + " checked (turn "
+        String msg = "Best legion move of " + count + " checked (turn "
             + client.getBattleTurnNumber() + "): "
             + ((best == null) ? "none " : best.getStringWithEvaluation())
-            + " (" + bestScore + ")");
+            + " (" + bestScore + ")";
+        LOGGER.finer(msg);
+        // System.out.println(msg);
         return best;
     }
 
