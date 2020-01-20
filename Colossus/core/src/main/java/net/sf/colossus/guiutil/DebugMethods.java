@@ -186,4 +186,16 @@ public class DebugMethods
         }
     }
 
+    // Clemens testing...
+    public static boolean denyAcquireAngel()
+    {
+        return false;
+    }
+
+    // Clemens testing...
+    public static boolean doPrintLnEval()
+    {
+        return false;
+    }
+
 }

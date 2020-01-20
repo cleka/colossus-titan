@@ -1800,6 +1800,11 @@ public class ClemensAI extends AbstractAI
         // TODO If the legion is a tiny scooby snack that's about to get
         // smooshed, turn down the angel.
 
+        if (DebugMethods.denyAcquireAngel())
+        {
+            return null;
+        }
+
         CreatureType bestAngel = getBestCreature(angels);
         if (bestAngel == null)
         {
@@ -3341,7 +3346,10 @@ public class ClemensAI extends AbstractAI
 
     private void printlnEval(String text)
     {
-        // System.out.println(text);
+        if (DebugMethods.doPrintLnEval())
+        {
+            System.out.println(text);
+        }
     }
 
     /**
