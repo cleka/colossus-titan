@@ -2,7 +2,7 @@
 
 [ -e ~/.colossus/jre.SH ] && source ~/.colossus/jre.SH
 
-BATTLE_XML=./Battle-stuff/battle.xml
+[ -z "$BATTLE_XML" ] && BATTLE_XML=./Battle-stuff/battle.xml
 
 FORCE_BOARD=false
 END_AFTER_BATTLE=true
