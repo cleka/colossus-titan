@@ -30,6 +30,7 @@ import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.SummonInfo;
+import net.sf.colossus.guiutil.DebugMethods;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.InstanceTracker;
 import net.sf.colossus.util.PermutationIterator;
@@ -1796,6 +1797,11 @@ public class SimpleAI extends AbstractAI
     {
         // TODO If the legion is a tiny scooby snack that's about to get
         // smooshed, turn down the angel.
+
+        if (DebugMethods.denyAcquireAngel())
+        {
+            return null;
+        }
 
         CreatureType bestAngel = getBestCreature(angels);
         if (bestAngel == null)
