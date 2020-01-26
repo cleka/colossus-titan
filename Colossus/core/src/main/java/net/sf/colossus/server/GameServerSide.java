@@ -3109,7 +3109,8 @@ public class GameServerSide extends Game
                     ? "ATTACKER"
                     : "DEFENDER";
                 String survivors = Glob.glob(", ", winner.getCreatureTypes());
-                System.out.println(whowon + " wins; critters: " + survivors
+                System.out.println("RESULT: " + whowon + " wins; critters: "
+                    + survivors
                     + "; point value " + winner.getPointValue());
                 System.out.println(
                     "Attacker wasted carry points: " + attackerWastedCarries);
