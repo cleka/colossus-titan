@@ -41,6 +41,7 @@ import net.sf.colossus.game.Proposal;
 import net.sf.colossus.game.actions.AddCreatureAction;
 import net.sf.colossus.game.actions.EditAddCreature;
 import net.sf.colossus.game.actions.Summoning;
+import net.sf.colossus.guiutil.DebugMethods;
 import net.sf.colossus.server.BattleServerSide.AngelSummoningStates;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.InstanceTracker;
@@ -3099,6 +3100,23 @@ public class GameServerSide extends Game
                 + winner.getPlayer().getName() + ")";
         }
         LOGGER.info("Battle completed, result: " + result);
+        if (DebugMethods.doPrintLnEval())
+        {
+            System.out.println(result);
+            if (winner != null)
+            {
+                String whowon = (winner.getPlayer().equals(getActivePlayer()))
+                    ? "ATTACKER"
+                    : "DEFENDER";
+                String survivors = Glob.glob(", ", winner.getCreatureTypes());
+                System.out.println(whowon + " wins; critters: " + survivors
+                    + "; point value " + winner.getPointValue());
+                System.out.println(
+                    "Attacker wasted carry points: " + attackerWastedCarries);
+                System.out.println(
+                    "Defender wasted carry points: " + defenderWastedCarries);
+            }
+        }
 
         // This comes from a system property:
         if (Constants.END_AFTER_FIRST_BATTLE)
@@ -3358,4 +3376,8 @@ public class GameServerSide extends Game
     {
         return battleStrikeSS;
     }
+
+    public int attackerWastedCarries = 0;
+    public int defenderWastedCarries = 0;
+
 }
