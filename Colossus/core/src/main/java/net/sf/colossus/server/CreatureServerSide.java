@@ -344,6 +344,12 @@ public class CreatureServerSide extends Creature implements BattleCritter
         }
     }
 
+    private String getShortDescription()
+    {
+        return this.getName() + " in " + this.getCurrentHex().getLabel();
+    }
+
+
     /** Called after strike penalties are chosen.
      *  Roll the dice and apply damage.  Highlight legal carry targets. */
     private void strike2(CreatureServerSide target, int dice, int strikeNumber)
@@ -379,6 +385,32 @@ public class CreatureServerSide extends Creature implements BattleCritter
         }
 
         int carryDamage = target.adjustHits(damage);
+        if (carryDamage > 0 && !carryPossible)
+        {
+            String who;
+            if (game.getAttacker().equals(this.legion))
+            {
+                game.attackerWastedCarries += (carryDamage * strikeNumber);
+                who = "Attacker";
+            }
+            else
+            {
+                game.defenderWastedCarries += (carryDamage * strikeNumber);
+                who = "Defender";
+            }
+            int coVictims = battle.numInContact(this, false);
+            System.out.println("@@ " + who + " can't carry: " + carryDamage
+                + " hits (SN="
+                + strikeNumber + "): " + (coVictims < 2 ? "No victim nearby"
+                    : "Can't carry to coVictim?")
+                + "  [" + this.getShortDescription() + " hitting "
+                + target.getShortDescription() + "]");
+            if (coVictims >= 2)
+            {
+                System.out.println("     PO: " + penaltyOptions.toString());
+            }
+
+        }
         if (!carryPossible)
         {
             carryDamage = 0;
