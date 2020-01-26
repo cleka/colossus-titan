@@ -520,6 +520,11 @@ public final class BattleServerSide extends Battle
         {
             CreatureServerSide newCritter = defender.getCritter(defender
                 .getHeight() - 1);
+            if (DebugMethods.doPrintLnEval())
+            {
+                System.out.println("Defender has reinforced: "
+                    + newCritter.getType().getName());
+            }
             placeCritter(newCritter);
         }
         getGame().doneReinforcing();
