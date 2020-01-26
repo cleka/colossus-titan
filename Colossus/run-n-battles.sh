@@ -11,11 +11,15 @@ i=1
 while [ $i -le $N -a ! -e /tmp/stop.n.flag ]
 do
     nr=`expr $basenr + $i`
-    echo
-    echo -e "running battle nr $nr - \c"
-    ./run-battle.sh $@
     mkdir -p out/$nr
-    mv /tmp/Colossus*.log ./out/$nr/.
+    ./run-battle.sh $*
+    ec=$?
+    if [ $ec -eq 0 ]
+    then
+	mv /tmp/Colossus*.log ./out/$nr/.
+    else
+	echo "run-battle ended with exit code '$ec'?" > ./out/$nr/error.txt
+    fi
     i=`expr $i + 1`
 done
 

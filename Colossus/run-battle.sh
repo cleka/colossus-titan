@@ -24,6 +24,9 @@ then
 	echo "Sourcing battle settings '$1'..."
 	source $1
 	shift
+    else
+	echo "Given file '$1' not found???"
+	exit 1
     fi
 fi
 
