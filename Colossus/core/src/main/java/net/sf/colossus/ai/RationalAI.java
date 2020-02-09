@@ -28,6 +28,7 @@ import net.sf.colossus.util.MultiSet;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
+import net.sf.colossus.variant.PowerSkill;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 

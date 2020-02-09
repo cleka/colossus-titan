@@ -37,6 +37,8 @@ import net.sf.colossus.variant.IHintOracle;
 import net.sf.colossus.variant.IVariantHint;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
+import net.sf.colossus.variant.PowerSkill;
+import net.sf.colossus.variant.TerrainBonuses;
 import net.sf.colossus.variant.Variant;
 
 
@@ -863,6 +865,64 @@ public abstract class AbstractAI implements AI
     public void evaluateGivenLegionBattleMove(Legion activeLegion)
     {
         // Do-nothing dummy. Only implemented by ClemensAI at the moment.
+    }
+
+    /**
+     * return power and skill of a given creature given the terrain
+     * @param creature
+     * @param terrain
+     * @param defender
+     * @return A powerskill value describing this creature in this terrain
+     * TODO this "either or" is dangerous and forces us to use the label
+     *      instead of the objects
+     */
+    protected PowerSkill calcBonus(CreatureType creature, String terrain, boolean defender)
+    {
+        int power = creature.getPower();
+        int skill = creature.getSkill();
+
+        TerrainBonuses bonuses = TerrainBonuses.TERRAIN_BONUSES.get(terrain);
+        if (bonuses == null)
+        {
+            // terrain has no special bonuses
+            return new PowerSkill(creature.getName(), power, skill);
+        }
+        else if (terrain.equals("Tower") && defender == false)
+        {
+            // no attacker bonus for tower
+            return new PowerSkill(creature.getName(), power, skill);
+        }
+        else if ((terrain.equals("Mountains") || terrain.equals("Volcano"))
+            && defender == true && creature.getName().equals("Dragon"))
+        {
+            // Dragon gets an extra 3 die when attack down slope
+            // non-native loses 1 skill when attacking up slope
+            return new PowerSkill(creature.getName(), power, power + 3,
+                bonuses.getDefenderPower(), skill + bonuses.getAttackerSkill(),
+                skill + bonuses.getDefenderSkill());
+        }
+        else
+        {
+            return new PowerSkill(creature.getName(), power, power
+                + bonuses.getAttackerPower(), bonuses.getDefenderPower(),
+                skill + bonuses.getAttackerSkill(),
+                skill + bonuses.getDefenderSkill());
+        }
+    }
+
+    protected PowerSkill getNativeValue(CreatureType creature, MasterBoardTerrain terrain, boolean defender)
+    {
+        // TODO checking the tower via string is unsafe -- maybe terrain.isTower()
+        //      is meant anyway
+        if (!(terrain.hasNativeCombatBonus(creature) || (terrain.getId()
+            .equals("Tower") && defender == true)))
+        {
+            return new PowerSkill(creature.getName(), creature.getPower(),
+                creature.getSkill());
+        }
+
+        return calcBonus(creature, terrain.getId(), defender);
+
     }
 
 }
