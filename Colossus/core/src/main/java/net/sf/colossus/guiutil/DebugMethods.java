@@ -171,31 +171,43 @@ public class DebugMethods
             .println("ok, list empty or x entered... finishing shutdown...");
     }
 
-    private static boolean battleLogEnabled = false;
+    private static boolean clemensAiDevelopment = false;
 
-    public static void BattleLogEnabled(boolean value)
+    public static void setClemensAiDevelopment(boolean value)
     {
-        battleLogEnabled = value;
+        clemensAiDevelopment = value;
     }
 
+    /**
+     * Print the given message to stdout, if flag is set
+     * @param message
+     */
     public static void battleLog(String message)
     {
-        if (battleLogEnabled)
+        if (clemensAiDevelopment)
         {
             System.out.println(message);
         }
     }
 
-    // Clemens testing...
+    /**
+     * For comparing battle results from multiple runs, prevent the acquire,
+     * so that resulting legion value remains comparable
+     * @return If true, the AI should deny the acquire
+     */
     public static boolean denyAcquireAngel()
     {
-        return true;
+        return clemensAiDevelopment;
     }
 
-    // Clemens testing...
+    /**
+     * Some more printlns I want to see only whe working on the "improve
+     * the AI" work
+     * @return Whether to print the messages
+     */
     public static boolean doPrintLnEval()
     {
-        return true;
+        return clemensAiDevelopment;
     }
 
 }

@@ -17,6 +17,7 @@ import net.sf.colossus.game.BattleCritter;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
+import net.sf.colossus.guiutil.DebugMethods;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardHexside;
@@ -398,18 +399,21 @@ public class CreatureServerSide extends Creature implements BattleCritter
                 game.defenderWastedCarries += (carryDamage * strikeNumber);
                 who = "Defender";
             }
-            int coVictims = battle.numInContact(this, false);
-            System.out.println("@@ " + who + " can't carry: " + carryDamage
-                + " hits (SN="
-                + strikeNumber + "): " + (coVictims < 2 ? "No victim nearby"
-                    : "Can't carry to coVictim?")
-                + "  [" + this.getShortDescription() + " hitting "
-                + target.getShortDescription() + "]");
-            if (coVictims >= 2)
+            if (DebugMethods.doPrintLnEval())
             {
-                System.out.println("     PO: " + penaltyOptions.toString());
+                int coVictims = battle.numInContact(this, false);
+                System.out.println("@@ " + who + " can't carry: " + carryDamage
+                    + " hits (SN=" + strikeNumber + "): "
+                    + (coVictims < 2 ? "No victim nearby"
+                        : "Can't carry to coVictim?")
+                    + "  [" + this.getShortDescription() + " hitting "
+                    + target.getShortDescription() + "]");
+                if (coVictims >= 2)
+                {
+                    System.out
+                        .println("     PO: " + penaltyOptions.toString());
+                }
             }
-
         }
         if (!carryPossible)
         {
