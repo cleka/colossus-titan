@@ -732,7 +732,7 @@ public final class LegionServerSide extends Legion implements
             {
                 if (critter.isLord())
                 {
-                    if (!lords.contains(critter))
+                    if (!lords.contains(critter.getType()))
                     {
                         lords.add(critter.getType());
                     }
