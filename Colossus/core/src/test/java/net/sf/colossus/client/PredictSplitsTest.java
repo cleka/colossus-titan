@@ -124,7 +124,7 @@ public class PredictSplitsTest extends TestCase
     @Override
     protected void setUp()
     {
-        this.variant = VariantSupport.loadVariantByName("Default", true);
+        variant = VariantSupport.loadVariantByName("Default", true);
         aps = new AllPredictSplits();
 
         cnl = new ArrayList<CreatureType>();
