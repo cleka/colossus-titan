@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.game.Dice;
-
 import junit.framework.TestCase;
 
 
