@@ -76,6 +76,7 @@
   description="Compiles Colossus without datatools and variants">
     <javac debug="yes" deprecation="yes" target="${target.level}"
     includeantruntime="false"
+    bootclasspath="${boot.classpath}"
     source="${source.level}" srcdir="${core.src.dir}"
     destdir="${build.classes.dir}">
       <classpath refid="project.class.path" />
@@ -85,6 +86,7 @@
   description="Compiles the variant code">
     <javac debug="yes" deprecation="yes" target="${target.level}"
     includeantruntime="false"
+    bootclasspath="${boot.classpath}"
     source="${source.level}" srcdir="${variants.dir}"
     destdir="${build.classes.dir}">
       <classpath refid="project.class.path" />
@@ -94,6 +96,7 @@
   description="Compiles the datatools parsers using javac">
     <javac debug="yes" deprecation="yes" target="${target.level}"
     includeantruntime="false"
+    bootclasspath="${boot.classpath}"
     source="${source.level}" srcdir="${datatoolsparser.src.dir}"
     destdir="${build.classes.dir}" excludes="**/datatools/**">
       <classpath refid="project.class.path" />
@@ -104,6 +107,7 @@
   description="Compiles the datatools using javac">
     <javac debug="yes" deprecation="yes" target="${target.level}"
     includeantruntime="false"
+    bootclasspath="${boot.classpath}"
     source="${source.level}" srcdir="${datatools.src.dir}"
     destdir="${build.classes.dir}" excludes="**/datatools/**">
       <classpath refid="project.class.path" />
@@ -118,6 +122,7 @@
 	  description="Compiles the JUnit tests">
 	    <javac debug="yes" deprecation="yes" target="${target.level}"
 	    includeantruntime="false"
+	    bootclasspath="${boot.classpath}"
 	    source="${source.level}" srcdir="${tests.src.dir}"
 	    destdir="${build.classes.dir}">
 	      <classpath refid="project.class.path" />
@@ -139,6 +144,7 @@
   description="Compiles the JUnit GUI tests">
     <javac debug="yes" deprecation="yes" target="${target.level}"
     includeantruntime="false"
+    bootclasspath="${boot.classpath}"
     source="${source.level}" srcdir="${functests.src.dir}"
     destdir="${build.classes.dir}">
       <classpath refid="project.class.path" />
