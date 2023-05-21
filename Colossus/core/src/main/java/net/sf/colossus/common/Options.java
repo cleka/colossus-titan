@@ -194,6 +194,7 @@ public final class Options implements IOptions
     public static final String autoPickRecruiter = "Auto pick recruiters";
     public static final String autoReinforce = "Auto reinforce";
     public static final String autoPlay = "Auto play";
+    public static final String preferredAutoplayAI = "Preferred Autoplay AI";
 
     // Confirmations (client only)
     public static final String confirmNoRecruit = "Confirm when not all possible recruits taken";
