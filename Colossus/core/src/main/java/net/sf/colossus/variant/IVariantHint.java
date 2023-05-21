@@ -33,13 +33,17 @@ public interface IVariantHint
          * strategies.
          */
         Offensive,
-
         /**
          * Marks a defensive play, with the assumption that battles
          * are often avoided. Thus long-term recruiting strategies are
          * important.
          */
-        Defensive
+        Defensive,
+
+        /**
+         * Clemens personal choices
+         */
+        Clemens
     }
 
     /**
