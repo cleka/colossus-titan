@@ -1,3 +1,4 @@
+#! /bin/bash
 
 [ -e ~/.colossus/jre.SH ] && source ~/.colossus/jre.SH
 
