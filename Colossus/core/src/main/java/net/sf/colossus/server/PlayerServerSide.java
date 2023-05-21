@@ -61,6 +61,8 @@ public final class PlayerServerSide extends Player implements
 
     private boolean titanEliminated;
 
+    private int creaturePointsBeforeDeath = 0;
+
     /**
      * The legion which gave a summonable creature.
      */
@@ -536,6 +538,13 @@ public final class PlayerServerSide extends Player implements
         return (int)score;
     }
 
+    // How many creature points did player have just before he died?
+    // I.e. recruiting went well but unfortunately Titan was killed early...
+    public int getCreaturePointsBeforeDeath()
+    {
+        return creaturePointsBeforeDeath;
+    }
+
     /** Add points to this player's score.  Update the status window
      *  to reflect the addition. */
     void addPoints(double points, boolean halfPoints)
@@ -607,6 +616,7 @@ public final class PlayerServerSide extends Player implements
             LegionServerSide legion = itLeg.next();
             Legion enemyLegion = getGame().getFirstEnemyLegion(
                 legion.getCurrentHex(), this);
+            creaturePointsBeforeDeath += legion.getPointValue();
             double halfPoints = legion.getPointValue() / 2.0;
 
             Player scorer;
