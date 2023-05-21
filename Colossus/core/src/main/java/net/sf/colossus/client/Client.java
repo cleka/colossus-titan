@@ -417,8 +417,6 @@ public final class Client implements IClient, IOracle, IVariant,
         // (the whole player info setup needs fixing...)
         this.owningPlayer.setType(playerType);
 
-        this.ai = createAI(playerType);
-
         ViableEntityManager.register(this, "Client " + playerName);
         InstanceTracker.register(this, "Client " + playerName);
 
@@ -435,6 +433,10 @@ public final class Client implements IClient, IOracle, IVariant,
 
         // Need to load options early so they don't overwrite server options.
         options.loadOptions();
+
+        // Moved AI creation after loadOptions so that we can refer to
+        // preferredAI option.
+        this.ai = createAI(playerType);
 
         autoplay = new Autoplay(options);
 
