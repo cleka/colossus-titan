@@ -82,6 +82,10 @@ public class ClemensAI extends AbstractAI
         hintSectionUsed = new LinkedList<AIStyle>();
         hintSectionUsed.add(AIStyle.Offensive);
         hintSectionUsed.add(AIStyle.Clemens);
+
+        DebugMethods.setClemensBattleDevelopment(false);
+        DebugMethods.setClemensAiDevelopment(true);
+        DebugMethods.aiDevLog("Clemens AI initiated.\n");
     }
 
     public PlayerColor pickColor(List<PlayerColor> colors,
