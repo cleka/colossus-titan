@@ -1,6 +1,6 @@
 #! /bin/bash
 
-MEM_SIZE=256M
+MEM_SIZE=1024M
 
 [ -e ~/.colossus/jre.SH ] && source ~/.colossus/jre.SH
 
