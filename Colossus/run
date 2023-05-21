@@ -1,5 +1,7 @@
 #! /bin/bash
 
+MEM_SIZE=256M
+
 [ -e ~/.colossus/jre.SH ] && source ~/.colossus/jre.SH
 
-java $COLOSSUS_JRE_ARGS -Djava.util.logging.config.file=logging.properties -Xmx256M -jar Colossus.jar $1 $2 $3 $4 $5 $6 $7 $8 $9
+java $COLOSSUS_JRE_ARGS -Djava.util.logging.config.file=logging.properties -Xmx$MEM_SIZE -jar Colossus.jar $1 $2 $3 $4 $5 $6 $7 $8 $9
