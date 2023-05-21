@@ -171,11 +171,27 @@ public class DebugMethods
             .println("ok, list empty or x entered... finishing shutdown...");
     }
 
+    private static boolean clemensBattleDevelopment = false;
     private static boolean clemensAiDevelopment = false;
+
+    public static void setClemensBattleDevelopment(boolean value)
+    {
+        clemensBattleDevelopment = value;
+    }
+
+    public static boolean getClemensBattleDevelopment()
+    {
+        return clemensBattleDevelopment;
+    }
 
     public static void setClemensAiDevelopment(boolean value)
     {
         clemensAiDevelopment = value;
+    }
+
+    public static boolean getClemensAiDevelopment()
+    {
+        return clemensAiDevelopment;
     }
 
     /**
@@ -184,9 +200,21 @@ public class DebugMethods
      */
     public static void battleLog(String message)
     {
-        if (clemensAiDevelopment)
+        if (clemensBattleDevelopment)
         {
             System.out.println(message);
+        }
+    }
+
+    /**
+     * Newline must be added by caller!
+     * @param message
+     */
+    public static void aiDevLog(String message)
+    {
+        if (clemensAiDevelopment)
+        {
+            System.out.print(message);
         }
     }
 
@@ -207,7 +235,7 @@ public class DebugMethods
      */
     public static boolean doPrintLnEval()
     {
-        return clemensAiDevelopment;
+        return clemensBattleDevelopment;
     }
 
 }
