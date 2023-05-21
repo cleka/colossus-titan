@@ -10,3 +10,5 @@ win.jnlp
 logging.properties.remote*
 stop.flag
 out
+txt
+forceboard
