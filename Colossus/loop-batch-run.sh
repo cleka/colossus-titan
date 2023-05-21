@@ -11,7 +11,7 @@ export LOAD_FILE="00-Clemens-500.xml"
 
 echo "Loop started, doing $COUNT games."
 
-rm stop.flag
+rm -f stop.flag
 
 stop_found=0
 
