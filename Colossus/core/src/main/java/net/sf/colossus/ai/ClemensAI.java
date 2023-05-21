@@ -40,6 +40,7 @@ import net.sf.colossus.util.ValueRecorder;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardTerrain;
+import net.sf.colossus.variant.IVariantHint.AIStyle;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.PowerSkill;
@@ -76,6 +77,11 @@ public class ClemensAI extends AbstractAI
         // initialize the creature info needed by the AI
         InstanceTracker.register(this, client.getOwningPlayer().getName());
         // DebugMethods.BattleLogEnabled(true);
+        // hintSectionUsed = Collections
+        //   .singletonList(IVariantHint.AIStyle.Offensive);
+        hintSectionUsed = new LinkedList<AIStyle>();
+        hintSectionUsed.add(AIStyle.Offensive);
+        hintSectionUsed.add(AIStyle.Clemens);
     }
 
     public PlayerColor pickColor(List<PlayerColor> colors,
