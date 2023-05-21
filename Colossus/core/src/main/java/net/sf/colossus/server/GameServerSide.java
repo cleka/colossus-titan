@@ -1627,7 +1627,12 @@ public class GameServerSide extends Game
             if (isFirstAutoSave)
             {
                 isFirstAutoSave = false;
-                iscMessages = gameSaver.createIscmFile();
+                // If we don't keep accepting clients, we don't need or
+                // want the file for that either (especially local games)
+                if (options.getOption(Options.keepAccepting))
+                {
+                    iscMessages = gameSaver.createIscmFile();
+                }
             }
         }
     }
