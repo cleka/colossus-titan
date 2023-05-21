@@ -490,7 +490,22 @@ public final class Client implements IClient, IOracle, IVariant,
         // Non-AI (= human and remote) players use some AI for autoplay:
         if (!createType.endsWith("AI"))
         {
-            createType = Constants.aiPackage + Constants.autoplayAI;
+            String preferredAI = options
+                .getStringOption(Options.preferredAutoplayAI);
+            if (preferredAI != null && !preferredAI.equals(""))
+            {
+                LOGGER.info("Using preferredAI: " + preferredAI);
+                createType = Constants.aiPackage + preferredAI;
+            }
+            else
+            {
+                LOGGER.info("Using default AI: " + Constants.autoplayAI);
+                createType = Constants.aiPackage + Constants.autoplayAI;
+            }
+        }
+        else
+        {
+            LOGGER.info("Using player type for AI: " + playerType);
         }
 
         // TODO Can it still happen that we get a unqualified AI class name?
