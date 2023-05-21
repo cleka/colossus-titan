@@ -188,7 +188,11 @@ public class ClemensAI extends AbstractAI
         double scoobySnackFactor = 0.15;
         int minimumSizeToRecruit = (int)(scoobySnackFactor * client
             .getGameClientSide().getAverageLegionPointValue());
-        for (LegionClientSide legion : client.getOwningPlayer().getLegions())
+
+        // Sort markerIds in descending order of legion importance.
+        List<LegionClientSide> legions = client.getOwningPlayer().getLegions();
+        Collections.sort(legions, Legion.ORDER_TITAN_THEN_POINTS);
+        for (LegionClientSide legion : legions)
         {
             if (client.canRecruit(legion)
                 && (legion.hasTitan() || legion.getPointValue() >= minimumSizeToRecruit))
