@@ -128,6 +128,7 @@ public final class Start
             opts.addOption('Z', "simpleai", true, "Number of SimpleAIs");
             opts.addOption('r', "rationalai", true, "Number of RationalAIs");
             opts.addOption('M', "milvangai", true, "Number of MilvangAIs");
+            opts.addOption('L', "clemensai", true, "Number of ClemensAIs");
             opts.addOption('n', "nnetwork", true, "Number of network slots");
             opts.addOption('q', "quit", false, "Quit JVM when game ends");
             opts.addOption('p', "port", true, "Server port number");
@@ -384,6 +385,7 @@ public final class Start
         int numSimpleAIs = 0;
         int numRationalAIs = 0;
         int numMilvangAIs = 0;
+        int numClemensAIs = 0;
 
         options.removeOption(Options.autoPlay);
         options.removeOption(Options.goOnWithoutObserver);
@@ -475,6 +477,12 @@ public final class Start
             String buf = cl.getOptValue('M');
             numMilvangAIs = Integer.parseInt(buf);
         }
+        if (cl.optIsSet('L'))
+        {
+            options.clearPlayerInfo();
+            String buf = cl.getOptValue('L');
+            numClemensAIs = Integer.parseInt(buf);
+        }
         if (cl.optIsSet('n'))
         {
             options.clearPlayerInfo();
@@ -539,6 +547,11 @@ public final class Start
             {
                 options.setOption(Options.playerType + k, "MilvangAI");
                 numMilvangAIs--;
+            }
+            else if (numClemensAIs > 0)
+            {
+                options.setOption(Options.playerType + k, "ClemensAI");
+                numClemensAIs--;
             }
             else
             {
