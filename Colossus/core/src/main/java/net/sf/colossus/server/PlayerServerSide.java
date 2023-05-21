@@ -14,6 +14,7 @@ import net.sf.colossus.game.Dice;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
+import net.sf.colossus.guiutil.DebugMethods;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.InstanceTracker;
 import net.sf.colossus.variant.CreatureType;
@@ -640,6 +641,12 @@ public final class PlayerServerSide extends Player implements
             itLeg.remove();
         }
 
+        String debug = String.format(
+            "Turn %3d, Player %-10s dies, creatureScore=%3d\n",
+            new Integer(getGame().getTurnNumber()), getName(),
+            new Integer(creaturePointsBeforeDeath));
+        DebugMethods.aiDevLog(debug);
+
         // Truncate every player's score to an integer value.
         for (Player player : getGame().getPlayers())
         {
@@ -822,6 +829,13 @@ public final class PlayerServerSide extends Player implements
     @Override
     public int makeMovementRoll()
     {
+        if (DebugMethods.getClemensBattleDevelopment()
+            && getGame().getTurnNumber() == 1)
+        {
+            // First turn roll is 1 for everybody, fairer start
+            // (better comparable results)
+            return 1;
+        }
         return myDice.rollMovementDie();
     }
 
