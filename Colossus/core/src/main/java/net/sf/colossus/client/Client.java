@@ -424,6 +424,11 @@ public final class Client implements IClient, IOracle, IVariant,
 
         if (createGUI)
         {
+            if (Constants.FORCE_VIEW_BOARD)
+            {
+                options.setOption(Options.showStatusScreen, true);
+                options.setOption(Options.showEventViewer, true);
+            }
             this.gui = new ClientGUI(this, options, whatNextMgr);
         }
         else
