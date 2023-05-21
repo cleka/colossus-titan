@@ -1377,10 +1377,39 @@ public class GameServerSide extends Game
     @Override
     public void setGameOver(boolean gameOver, String message)
     {
+        if (gameOver && DebugMethods.getClemensAiDevelopment())
+        {
+            DebugShowGameStatistics(message);
+        }
         super.setGameOver(gameOver, message);
         if (startingWebClient != null)
         {
             startingWebClient.informLocallyGameOver();
+        }
+    }
+
+    private void DebugShowGameStatistics(String message)
+    {
+        DebugMethods.aiDevLog(message);
+        for (Player p : getPlayers())
+        {
+            int score = p.getScore();
+            int creaturePoints = 0;
+            if (p.isDead())
+            {
+                creaturePoints = ((PlayerServerSide)p)
+                    .getCreaturePointsBeforeDeath();
+            }
+            else
+            {
+                creaturePoints = p.getCreaturePoints();
+            }
+            int totalPoints = score + creaturePoints;
+            String debug = String.format(
+                "%-10s: Score=%4d, CreaturePoints=%4d, TotalPoints=%4d\n",
+                p.getName(), new Integer(score), new Integer(creaturePoints),
+                new Integer(totalPoints));
+            DebugMethods.aiDevLog(debug);
         }
     }
 
