@@ -197,7 +197,7 @@ public class DebugMethods
      */
     public static boolean denyAcquireAngel()
     {
-        return clemensAiDevelopment;
+        return false;
     }
 
     /**
