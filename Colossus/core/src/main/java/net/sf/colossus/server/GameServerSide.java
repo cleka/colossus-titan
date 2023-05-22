@@ -1379,7 +1379,7 @@ public class GameServerSide extends Game
     {
         if (gameOver && DebugMethods.getClemensAiDevelopment())
         {
-            DebugShowGameStatistics(message);
+            DebugShowGameStatistics(message + "\n");
         }
         super.setGameOver(gameOver, message);
         if (startingWebClient != null)
