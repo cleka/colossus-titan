@@ -34,20 +34,23 @@ public class Abyssal6Hint extends AbstractHintProvider
         if (terrainId.equals("Brush"))
         {
             if (recruitNames.contains("Cyclops")
-                && !legion.contains("Behemoth") && legion.getHeight() != 6
                 && legion.numCreature("Cyclops") == 2
-                && oracle.creatureAvailable("Behemoth") >= 2
-                && oracle.canReach("Jungle"))
+                && !legion.contains("Behemoth") //  Comment here and sometimes below to prevent Eclipse from wrapping
+                && legion.getHeight() != 6
+                && oracle.canReach("Jungle")
+                && oracle.creatureAvailable("Behemoth") >= 2)
             {
                 return getCreatureType("Cyclops");
             }
         }
         else if (terrainId.equals("Plains"))
         {
-            if (recruitNames.contains("Lion") && !legion.contains("Griffon")
-                && legion.getHeight() != 6 && legion.numCreature("Lion") == 2
-                && oracle.creatureAvailable("Griffon") >= 2
-                && oracle.canReach("Desert"))
+            if (recruitNames.contains("Lion")
+                && legion.numCreature("Lion") == 2
+                && !legion.contains("Griffon") //
+                && legion.getHeight() != 6
+                && oracle.canReach("Desert")
+                && oracle.creatureAvailable("Griffon") >= 2)
             {
                 return getCreatureType("Lion");
             }
@@ -55,12 +58,16 @@ public class Abyssal6Hint extends AbstractHintProvider
             {
                 if (recruitNames.contains("Centaur")
                     && legion.numCreature("Centaur") == 2
-                    && !legion.contains("Warbear") && legion.getHeight() < 6
+                    && !legion.contains("Warbear")
                     && oracle.biggestAttackerHeight() == 0
+                    && legion.getHeight() < 6
                     && oracle.canReach("Woods")
                     && !oracle.hexLabel().equals("1")
                     && !oracle.hexLabel().equals("15")
-                    && !oracle.hexLabel().equals("29"))
+                    && !oracle.hexLabel().equals("29")
+                // why no 'is available' here ?
+                )
+
                 {
                     return getCreatureType("Centaur");
                 }
@@ -69,9 +76,12 @@ public class Abyssal6Hint extends AbstractHintProvider
             {
                 if (recruitNames.contains("Centaur")
                     && legion.numCreature("Centaur") == 2
-                    && !legion.contains("Warbear") && legion.getHeight() <= 2
+                    && !legion.contains("Warbear")
                     && oracle.biggestAttackerHeight() == 0
-                    && oracle.canReach("Woods"))
+                    && legion.getHeight() <= 2
+                    && oracle.canReach("Woods")
+                // why no 'is available' here ?
+                )
                 {
                     return getCreatureType("Centaur");
                 }
@@ -79,18 +89,21 @@ public class Abyssal6Hint extends AbstractHintProvider
         }
         else if (terrainId.equals("Marsh"))
         {
-            if (recruitNames.contains("Troll") && !legion.contains("Wyvern")
-                && legion.getHeight() != 6 && legion.numCreature("Troll") == 2
-                && oracle.creatureAvailable("Wyvern") >= 2
-                && oracle.canReach("Swamp"))
+            if (recruitNames.contains("Troll")
+                && legion.numCreature("Troll") == 2
+                && !legion.contains("Wyvern")
+                && legion.getHeight() != 6
+                && oracle.canReach("Swamp")
+                && oracle.creatureAvailable("Wyvern") >= 2)
             {
                 return getCreatureType("Troll");
             }
             if (recruitNames.contains("Ranger")
-                && !legion.contains("AirElemental") && legion.getHeight() != 6
                 && legion.numCreature("Ranger") == 2
-                && oracle.creatureAvailable("AirElemental") >= 3
-                && oracle.canReach("Plains"))
+                && !legion.contains("AirElemental")
+                && legion.getHeight() != 6 //
+                && oracle.canReach("Plains") //
+                && oracle.creatureAvailable("AirElemental") >= 3)
             {
                 return getCreatureType("Ranger");
             }
@@ -98,9 +111,10 @@ public class Abyssal6Hint extends AbstractHintProvider
             {
                 if (recruitNames.contains("Ogre")
                     && legion.numCreature("Ogre") == 2
-                    && !legion.contains("Minotaur") && legion.getHeight() < 6
+                    && !legion.contains("Minotaur")
                     && oracle.biggestAttackerHeight() == 0
-                    && oracle.canReach("Hills")
+                    && legion.getHeight() < 6 //
+                    && oracle.canReach("Hills") //
                     && !oracle.hexLabel().equals("8")
                     && !oracle.hexLabel().equals("22")
                     && !oracle.hexLabel().equals("36"))
@@ -112,9 +126,12 @@ public class Abyssal6Hint extends AbstractHintProvider
             {
                 if (recruitNames.contains("Ogre")
                     && legion.numCreature("Ogre") == 2
-                    && !legion.contains("Minotaur") && legion.getHeight() <= 2
+                    && !legion.contains("Minotaur")
                     && oracle.biggestAttackerHeight() == 0
-                    && oracle.canReach("Hills"))
+                    && legion.getHeight() <= 2 //
+                    && oracle.canReach("Hills")
+                // why no 'is available' here ?
+                )
                 {
                     return getCreatureType("Ogre");
                 }
@@ -123,11 +140,12 @@ public class Abyssal6Hint extends AbstractHintProvider
         else if (terrainId.equals("Woods"))
         {
             if (recruitNames.contains("Unicorn")
+                && legion.numCreature("Unicorn") == 2
                 && !legion.contains("EarthElemental")
                 && legion.getHeight() != 6
-                && legion.numCreature("Unicorn") == 2
+                && oracle.canReach("Hills")
                 && oracle.creatureAvailable("EarthElemental") >= 3
-                && oracle.canReach("Hills"))
+            )
             {
                 return getCreatureType("Unicorn");
             }
@@ -135,10 +153,11 @@ public class Abyssal6Hint extends AbstractHintProvider
         else if (terrainId.equals("Desert"))
         {
             if (recruitNames.contains("Hydra")
+                && legion.numCreature("Hydra") == 2
                 && !legion.contains("WaterElemental")
-                && legion.getHeight() != 6 && legion.numCreature("Hydra") == 2
-                && oracle.creatureAvailable("WaterElemental") >= 3
-                && oracle.canReach("Swamp"))
+                && legion.getHeight() != 6 //
+                && oracle.canReach("Swamp")
+                && oracle.creatureAvailable("WaterElemental") >= 3)
             {
                 return getCreatureType("Hydra");
             }
@@ -146,11 +165,11 @@ public class Abyssal6Hint extends AbstractHintProvider
         else if (terrainId.equals("Tundra"))
         {
             if (recruitNames.contains("Colossus")
+                && legion.numCreature("Colossus") == 2
                 && !legion.contains("FireElemental")
                 && legion.getHeight() != 6
-                && legion.numCreature("Colossus") == 2
-                && oracle.creatureAvailable("FireElemental") >= 3
-                && oracle.canReach("Mountains"))
+                && oracle.canReach("Mountains")
+                && oracle.creatureAvailable("FireElemental") >= 3)
             {
                 return getCreatureType("Colossus");
             }
