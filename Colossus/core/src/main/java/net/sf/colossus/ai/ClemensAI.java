@@ -2268,7 +2268,7 @@ public class ClemensAI extends AbstractAI
             // Honestly I don't know why/when we get this; it started when I
             // added the "ignore allies" in find possible moves.
             // In any case, negative means "invalid move"
-            LOGGER.warning("Called with NULL move order");
+            LOGGER.finer("Called with NULL move order");
             return -1;
         }
         boolean allOK = true;
@@ -2977,7 +2977,7 @@ public class ClemensAI extends AbstractAI
             }
             else
             {
-                LOGGER.warning("Nanu, hitsExpected else case?");
+                LOGGER.finer("Nanu, hitsExpected else case?");
             }
         }
     }
