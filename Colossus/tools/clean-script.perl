@@ -27,12 +27,17 @@ foreach my $file (@ARGV)
 	    $printit = 1;
 	}
 
-	if (/^Batch loop ends/)
+	if (/^Batch loop ends/
+	    or /even if we have/
+	    or /^Content of/
+	    or /^Clemens AI initiated/
+	    or /^Building tree/
+)
 	{
-	    $printit = 0;
+	    next;
 	}
 
-	if (/^Exception in/ or /^\tat /)
+	if (/^Exception in/ or /^\tat / or /^        at /)
 	{
 	    $in_exception = 1;
 	}
@@ -43,12 +48,12 @@ foreach my $file (@ARGV)
 	
 	if ($printit and not  $in_exception)
 	{
-	    print STDERR "printit true\n";
+	    # print STDERR "printit true\n";
 	    print OUT $_, "\n";
 	}
 	else
 	{
-	    print STDERR "printit false\n";
+	    # print STDERR "printit false\n";
 	}
     }
     close OUT;
