@@ -32,6 +32,7 @@ import net.sf.colossus.game.Player;
 import net.sf.colossus.game.PlayerColor;
 import net.sf.colossus.game.SummonInfo;
 import net.sf.colossus.guiutil.DebugMethods;
+import net.sf.colossus.server.GameSaving;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.InstanceTracker;
 import net.sf.colossus.util.PermutationIterator;
@@ -210,12 +211,115 @@ public class ClemensAI extends AbstractAI
                         // Just take the first one.
                         recruiterName = recruiters.get(0);
                     }
+
+                    WarnAboutBiggerExists(legion, recruit);
+
                     client.doRecruit(legion, recruit.getName(), recruiterName);
                     client.reserveRecruit(recruit);
                 }
             }
         }
         client.resetRecruitReservations();
+    }
+
+    private void WarnAboutBiggerExists(LegionClientSide legion,
+        CreatureType recruit)
+    {
+        boolean bogus = false;
+        String recName = recruit.getName();
+
+        if (recName.equals("Centaur"))
+        {
+            if (legion.contains("Lion")
+                || legion.contains("Ranger")
+                || legion.contains("AirElemental")
+                || containsAdvanced(legion)
+                )
+            {
+                bogus = true;
+            }
+        }
+
+        if (recName.equals("Lion"))
+        {
+            if (legion.contains("Ranger")
+                || legion.contains("AirElemental")
+                || containsAdvanced(legion)
+                )
+            {
+                bogus = true;
+            }
+        }
+
+        if (recName.equals("Ogre"))
+        {
+            if (legion.contains("Troll")
+                || legion.contains("Ranger")
+                || legion.contains("AirElemental")
+                || containsAdvanced(legion)
+                )
+                {
+                bogus = true;
+                }
+        }
+
+        if (recName.equals("Troll"))
+        {
+            if (legion.contains("Ranger")
+                || legion.contains("AirElemental")
+                || containsAdvanced(legion)
+                )
+            {
+                bogus = true;
+            }
+        }
+
+        if (recName.equals("Ranger"))
+        {
+            if (legion.contains("AirElemental")
+                || containsAdvanced(legion)
+                )
+            {
+                bogus = true;
+            }
+        }
+
+        if (bogus)
+        {
+            MasterHex hex = legion.getCurrentHex();
+            String land = hex.getDescription();
+
+            DebugMethods.aiDevLog("Recruiting " + recName
+                + " even if we have already something better!\n");
+            String content = Glob.glob(", ", legion.getImageNames());
+            DebugMethods.aiDevLog("  " +
+                legion.toString() + " in " + land + " contains: " + content
+                    + "\n");
+            String saveName = GameSaving.getLastSaveGame();
+            DebugMethods.aiDevLog("  Last autosave: " + saveName + "\n");
+
+        }
+    }
+
+    private boolean containsAdvanced(LegionClientSide legion)
+    {
+        if (legion.contains("Griffon") || legion.contains("Wyvern")
+            || legion.contains("Hydra") || legion.contains("Chimera")
+            || legion.contains("Ent") || legion.contains("Salamander")
+            || legion.contains("Unicorn")
+            || legion.contains("Minotaur")
+            || legion.contains("Dragon")
+            || legion.contains("Giant")
+            || legion.contains("Colossus")
+            || legion.contains("Mammoth")
+            || legion.contains("EarthElemental")
+            || legion.contains("WaterElemental")
+            || legion.contains("FireElemental")
+            )
+        {
+            return true;
+        }
+        return false;
     }
 
     public void reinforce(Legion legion)
