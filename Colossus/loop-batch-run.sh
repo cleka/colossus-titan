@@ -7,7 +7,14 @@ then
     COUNT=$1
 fi
 
-export LOAD_FILE="00-Clemens-500.xml"
+if [ -z "$LOAD_FILE" ]
+then
+    # export LOAD_FILE="00-Clemens-500.xml"
+    export LOAD_FILE="111-ClemensAI+2SimpleAI.xml"
+else
+    echo "LOAD_FILE set in env, using: $LOAD_FILE"
+fi
+
 
 echo "Loop started, doing $COUNT games."
 
