@@ -660,6 +660,24 @@ public abstract class AbstractAI implements AI
         return changed;
     }
 
+    // Additional shortcuts; the versions below are only available via an oracle
+    // - which we sometimes don't have.
+
+    protected CreatureType getCreatureType(String creatureName)
+    {
+        return variant.getCreatureByName(creatureName);
+    }
+
+    protected int creatureAvailable(String creatureName)
+    {
+        return creatureAvailable(getCreatureType(creatureName));
+    }
+
+    protected int creatureAvailable(CreatureType type)
+    {
+        return client.getReservedRemain(type);
+    }
+
     protected class AbstractAIOracle implements IHintOracle
     {
 
