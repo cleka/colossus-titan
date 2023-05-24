@@ -3292,4 +3292,42 @@ public class ClemensAI extends AbstractAI
             timeIsUp = true;
         }
     }
+
+    /**
+     * Some memo/notes how one could enumerate/value different creatures;
+     * based mostly on Abyssal; stripped down could work for Default.
+     *
+     * 1    12        Gargoyle
+     * 2    18        Cyclops
+     * 3    18+       Gorgon
+     * 4    24        Manticore, Behemoth
+     * 5    36        Serpent
+     * 6    54        Jabberwok
+     * 7    80        Wraith
+     *
+     *
+     * 1    12        Ogre, Centaur                    0
+     * 2    15-16     Troll, Lion, Druid               2 (1)
+     * 3    16-18     Ranger, Warbear, Minotaur        4 (3)
+     * 3.5  20-21     AirElemental, Griffon, Wyvern    5 (3)
+     * 4    24        Salamander, Unicorn              6
+     * 4.5  27-28     Dragon, Giant                    6
+     * 5    30-36     EarthElemental, Hydra, Ent       9,8
+     * 6    40-44     WaterElemental, Colossus         11,8
+     * 7    52-60     FireElemental, Mammoth, (Knight) 14, 11
+     * 8    100       Balrog                           17
+     *
+     *
+     * # Which path is best? How many steps, how much 'eventually points to enemy' are generated?
+     *
+     * Lion, Lion,                        Minotaur, Minotaur,    Dragon, Dragon,     Colossus, Colossus, Colossus,                      FireElemental    10 steps
+     *     30                                     32                   54                       120
+     *
+     * Lion, Lion, Lion,                   Griffon, Griffon,                         Hydra, Hydra, Hydra, WaterElemental, Water, Water, FireElemental    12 steps
+     *       45                                   40                                        90                   44*3=132
+     *
+     * Lion, Lion, Ranger, Ranger, Ranger, AirElemental, AirElemental, AirElemental, Earth, Earth, Earth, WaterElemental, Water, Water  FireElemental    15 steps
+     *     30                48                           60                                96                   44*3=132
+     *
+     */
 }
