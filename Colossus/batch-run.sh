@@ -27,9 +27,33 @@ then
   FORCEBOARD=`cat forceboard`
 fi
 
+# have them here in a never-happens if block just for easy copy-pasting...
+if [ 1 -eq 0 ]
+then  
+    LOAD_FILE=000-Will-muster-Chimera.xml
+    LOAD_FILE=00-3-players.xml
+    LOAD_FILE=00-After.recruit-Hydra.xml
+    LOAD_FILE=00-Clemens-500.xml
+    LOAD_FILE=00-Rational-500.xml
+    LOAD_FILE=00-Rational-x3.xml
+    LOAD_FILE=111-ClemensAI+2SimpleAI.xml
+    LOAD_FILE=11-recruit-lion.xml
+    LOAD_FILE=illegal-recruit.xml
+    LOAD_FILE=keep-snap1684779979674_21-clemens-Muster.xml
+    LOAD_FILE=keep-snap1684781850102_11-clemens-Muster.xml
+    LOAD_FILE=keep-snap1684782292749_10-clemens-Muster.xml
+fi
+
+
 if [ -z "$LOAD_FILE" ]
 then
-  LOAD_FILE=00-Rational-x3.xml
+    LOAD_FILE=111-ClemensAI+2SimpleAI.xml
+    LOAD_FILE=000-Will-muster-Chimera.xml
+fi
+
+if [ -e loadfile ]
+then
+    LOAD_FILE=`cat loadfile`
 fi
 
 mkdir $TMPDIR
