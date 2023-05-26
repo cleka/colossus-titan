@@ -1464,6 +1464,12 @@ public class ClemensAI extends AbstractAI
                     + hex);
             }
 
+            /**
+             * TODO: this doesn't handle the situation well, if there is
+             * more than one attacker (would bail out on smaller number
+             * even if a different legion with higher number could do more
+             * damage to us?
+             */
             Map<MasterHex, List<Legion>>[] enemiesThatCanAttackOnA = enemyAttackMap;
             int roll;
 
