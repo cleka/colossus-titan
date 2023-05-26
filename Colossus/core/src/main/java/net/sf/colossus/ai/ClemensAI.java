@@ -1467,7 +1467,7 @@ public class ClemensAI extends AbstractAI
             Map<MasterHex, List<Legion>>[] enemiesThatCanAttackOnA = enemyAttackMap;
             int roll;
 
-            for (roll = 1; roll <= 6; roll++)
+            roll_loop: for (roll = 1; roll <= 6; roll++)
             {
                 List<Legion> enemies = enemiesThatCanAttackOnA[roll].get(hex);
 
@@ -1484,7 +1484,9 @@ public class ClemensAI extends AbstractAI
                     if (result == WIN_WITH_MINIMAL_LOSSES || result == DRAW
                         && (legion).hasTitan())
                     {
-                        break;
+                        // Need to jump out of outer loop, otherwise it would try
+                        // all other rolls and possibly roll remains then "just 6"
+                        break roll_loop;
                         // break on the lowest roll from which we can
                         // be attacked and killed
                     }
