@@ -26,6 +26,7 @@ import net.sf.colossus.game.BattleUnit;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
+import net.sf.colossus.guiutil.DebugMethods;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.DevRandom;
 import net.sf.colossus.util.Probs;
@@ -943,4 +944,104 @@ public abstract class AbstractAI implements AI
 
     }
 
+    public int getTitanInvincibleThreshold()
+    {
+        // By default 3 Colossi
+        // E.g. Abyssal might be different
+        return 120;
+    }
+
+    /**
+     * If there is only one opponent left
+     * @return
+     */
+    protected Player soleEnemyLeft()
+    {
+        if (client.getGameClientSide().getNumLivingPlayers() > 2)
+        {
+            return null;
+        }
+
+        Collection<Player> players = client.getGameClientSide().getPlayers();
+        {
+            for (Player p : players)
+            {
+                if (p.equals(client.getOwningPlayer()) || p.isDead())
+                {
+                    // That's us, or dead.
+                }
+                else
+                {
+                    return p;
+                }
+            }
+        }
+        return null;
+    }
+
+
+    private boolean invincibleTitanDetected = false;
+    private int lastMaxTitanPointValue = 0;
+
+    protected boolean checkForInvincibleTitan()
+    {
+        int threshold = getTitanInvincibleThreshold();
+        Player enemy = soleEnemyLeft();
+        if (enemy == null)
+        {
+            return false;
+        }
+        int titanPointValue = enemy.getTitanPower()
+            * variant.getCreatureByName("Titan").getSkill();
+        if (titanPointValue > lastMaxTitanPointValue)
+        {
+            DebugMethods
+                .aiDevLog("Enemy Titan point value now: " + titanPointValue + "\n");
+            lastMaxTitanPointValue = titanPointValue;
+        }
+        if (titanPointValue > threshold)
+        {
+            if (!invincibleTitanDetected)
+            {
+                DebugMethods
+                    .aiDevLog(
+                        "\n\n\nInvincible Titan (" + threshold
+                            + ") detected first time!\n\n");
+                enemy.toString();
+                invincibleTitanDetected = true;
+            }
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    protected static int INVINCIBLE_MAX_LEGIONS = 5;
+
+    protected void markAllButBestNeverRecruit(List<LegionClientSide> legions)
+    {
+        int count = 1;
+        for (LegionClientSide legion : legions)
+        {
+            if (legion.hasTitan())
+            {
+                // That one we always keep and try to improve...
+            }
+            else
+            {
+                if (count > INVINCIBLE_MAX_LEGIONS)
+                {
+                    legion.setNeverRecruitAgain(true);
+                }
+                else
+                {
+                    legion.setNeverRecruitAgain(false);
+                }
+                count++;
+            }
+        }
+
+    }
 }

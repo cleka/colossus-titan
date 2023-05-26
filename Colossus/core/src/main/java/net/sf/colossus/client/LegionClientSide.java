@@ -29,6 +29,18 @@ public final class LegionClientSide extends Legion implements IOracleLegion
 
     private PredictSplitNode myNode;
 
+    private boolean neverRecruitAgain;
+
+    public void setNeverRecruitAgain(boolean val)
+    {
+        neverRecruitAgain = val;
+    }
+
+    public boolean getNeverRecruitAgain()
+    {
+        return neverRecruitAgain;
+    }
+
     public LegionClientSide(Player player, String markerId, MasterHex hex)
     {
         super(player, markerId, hex);

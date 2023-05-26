@@ -185,18 +185,29 @@ public class ClemensAI extends AbstractAI
     {
         client.resetRecruitReservations();
 
+        // Sort markerIds in descending order of legion importance.
+        List<LegionClientSide> legions = client.getOwningPlayer().getLegions();
+        Collections.sort(legions, Legion.ORDER_TITAN_THEN_POINTS);
+
+        // If enemy has mostly only Titan legion but it is huge, then we stop
+        // recruiting to all but our best legions
+        // - they would only feed more points to enemy but not make a dent.
+        if (checkForInvincibleTitan())
+        {
+            // markAllButBestNeverRecruit(legions);
+        }
+
         // Do not recruit if this legion is a scooby snack.
         double scoobySnackFactor = 0.15;
         int minimumSizeToRecruit = (int)(scoobySnackFactor * client
             .getGameClientSide().getAverageLegionPointValue());
 
-        // Sort markerIds in descending order of legion importance.
-        List<LegionClientSide> legions = client.getOwningPlayer().getLegions();
-        Collections.sort(legions, Legion.ORDER_TITAN_THEN_POINTS);
         for (LegionClientSide legion : legions)
         {
             if (client.canRecruit(legion)
-                && (legion.hasTitan() || legion.getPointValue() >= minimumSizeToRecruit))
+                && (legion.hasTitan()
+                    || legion.getPointValue() >= minimumSizeToRecruit)
+                && !legion.getNeverRecruitAgain())
             {
                 CreatureType recruit = chooseRecruit(legion,
                     legion.getCurrentHex(), true);
@@ -935,6 +946,16 @@ public class ClemensAI extends AbstractAI
                             + " after evaluating: " + bestMove.why.toString()
                             + " is better than sitting tight: "
                             + sitStillMove.why.toString());
+                        if (legion.hasTitan()
+                            && bestHex.getTerrainName().equals("Abyss")
+                        )
+                        {
+                            DebugMethods
+                                .aiDevLog("\n!!!\nmoving Titan Legion to "
+                                    + bestHex.getDescription() + "\n");
+                            // DebugMethods.waitReturn();
+                        }
+
                     }
                     else
                     {
@@ -3330,4 +3351,19 @@ public class ClemensAI extends AbstractAI
      *     30                48                           60                                96                   44*3=132
      *
      */
+
+    /*
+
+    final Titan vs. Titan fight:
+        if nothing else on other side, go all in
+
+
+    Why do we end up so often in Abyss ?
+
+    neverRecruitAgain => also NeverSplitAgain
+                        or if "interactive": if split, reset flag?
+
+
+    */
+
 }

@@ -564,4 +564,14 @@ public class Abyssal6Hint extends AbstractHintProvider
         }
         return 0;
     }
+
+    @Override
+    public int getTitanInvincibleThreshold()
+    {
+        // In Default we use 3 Colossi = 120
+        // Abyssal has better creatures (Balrog=100, Wraith 80, FireElemental=56, Knight=45
+        // Abyssal might be different
+        return 120;
+    }
+
 }

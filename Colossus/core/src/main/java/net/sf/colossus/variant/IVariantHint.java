@@ -83,4 +83,11 @@ public interface IVariantHint
      */
     public int getHintedRecruitmentValueOffset(CreatureType creature,
         List<AIStyle> styles);
+
+    /**
+     * If only one enemy left and it's sole legion has huge Titan,
+     * we stop recruiting anything than our best 3-5 legions
+     * (anything smaller would just feed points to the Titan legion)
+     */
+    public int getTitanInvincibleThreshold();
 }

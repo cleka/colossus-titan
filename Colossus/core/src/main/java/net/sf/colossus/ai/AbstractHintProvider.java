@@ -66,4 +66,11 @@ public abstract class AbstractHintProvider implements IVariantHint
         }
         return recruits;
     }
+
+    public int getTitanInvincibleThreshold()
+    {
+        // By default 2 Colossi
+        // Abyssal might be different
+        return 80;
+    }
 }
