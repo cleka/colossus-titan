@@ -1487,8 +1487,24 @@ public class ClemensAI extends AbstractAI
                     final int result = estimateBattleResults(enemy, false,
                         legion, hex, recruit);
 
-                    if (result == WIN_WITH_MINIMAL_LOSSES || result == DRAW
-                        && (legion).hasTitan())
+                    boolean dontgo = false;
+                    if (result == WIN_WITH_MINIMAL_LOSSES
+                        || result == WIN_WITH_HEAVY_LOSSES
+                        || (result == DRAW && (legion).hasTitan())
+                        || (result == LOSE_BUT_INFLICT_HEAVY_LOSSES
+                            && (legion).hasTitan()))
+                    {
+                        dontgo = true;
+                    }
+
+                    if (hex.getTerrainName().equals("Abyss") && legion.hasTitan()
+                        && result != LOSE)
+                    {
+                        DebugMethods.aiDevLog(
+                            "Risk of TitanLegion being attacked in Abyss - not going!\n");
+                        dontgo = true;
+                    }
+                    if (dontgo)
                     {
                         // Need to jump out of outer loop, otherwise it would try
                         // all other rolls and possibly roll remains then "just 6"
