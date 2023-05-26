@@ -49,6 +49,11 @@ public final class SaveWindow
     public Point loadLocation()
     {
         int x = options.getIntOption(name + Options.locX);
+        if (DebugMethods.getClemensAiDevelopment()
+            && name.equals("BattleBoard") && x == -1)
+        {
+            return new Point(700, 25);
+        }
         if (x == -1)
         {
             return null;
