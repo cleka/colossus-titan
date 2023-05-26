@@ -62,7 +62,7 @@ echo "Running Colossus with LOAD_FILE=$LOAD_FILE"
 
 java $COLOSSUS_JRE_ARGS -Dnet.sf.colossus.forceViewBoard=$FORCEBOARD \
      -Djava.util.logging.config.file=logging.properties \
-     -Xmx16384M -jar Colossus.jar \
+     -Xmx${MEM_SIZE} -jar Colossus.jar \
      -i 3 -L 1 -Z 2               \
      --load $LOAD_FILE            \
      -g                           \
