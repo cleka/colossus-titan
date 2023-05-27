@@ -223,17 +223,24 @@ public class ClemensAI extends AbstractAI
                         recruiterName = recruiters.get(0);
                     }
 
-                    WarnAboutBiggerExists(legion, recruit);
-
-                    client.doRecruit(legion, recruit.getName(), recruiterName);
-                    client.reserveRecruit(recruit);
+                    if (Constants.AiImprovements.dontRecruitIfBetter
+                        && WarnAboutBiggerExists(legion, recruit))
+                    {
+                        // then rather don't recruit
+                    }
+                    else
+                    {
+                        client.doRecruit(legion, recruit.getName(),
+                            recruiterName);
+                        client.reserveRecruit(recruit);
+                    }
                 }
             }
         }
         client.resetRecruitReservations();
     }
 
-    private void WarnAboutBiggerExists(LegionClientSide legion,
+    private boolean WarnAboutBiggerExists(LegionClientSide legion,
         CreatureType recruit)
     {
         boolean bogus = false;
@@ -244,6 +251,7 @@ public class ClemensAI extends AbstractAI
             if (legion.contains("Lion")
                 || legion.contains("Ranger")
                 || legion.contains("AirElemental")
+                || legion.contains("Griffon") || legion.contains("Wyvern")
                 || containsAdvanced(legion)
                 )
             {
@@ -255,10 +263,20 @@ public class ClemensAI extends AbstractAI
         {
             if (legion.contains("Ranger")
                 || legion.contains("AirElemental")
+                || legion.contains("Griffon") || legion.contains("Wyvern")
                 || containsAdvanced(legion)
                 )
             {
-                bogus = true;
+                if (legion.numCreature("Lion") == 2 && legion.getHeight() < 6
+                    && !legion.contains("Griffon")
+                    && creatureAvailable("Griffon") > 2)
+                {
+                    // Allow for Griffon
+                }
+                else
+                {
+                    bogus = true;
+                }
             }
         }
 
@@ -267,6 +285,7 @@ public class ClemensAI extends AbstractAI
             if (legion.contains("Troll")
                 || legion.contains("Ranger")
                 || legion.contains("AirElemental")
+                || legion.contains("Griffon") || legion.contains("Wyvern")
                 || containsAdvanced(legion)
                 )
                 {
@@ -278,11 +297,22 @@ public class ClemensAI extends AbstractAI
         {
             if (legion.contains("Ranger")
                 || legion.contains("AirElemental")
+                || legion.contains("Griffon") || legion.contains("Wyvern")
                 || containsAdvanced(legion)
                 )
             {
-                bogus = true;
+                if (legion.numCreature("Troll") == 2 && legion.getHeight() < 6
+                    && !legion.contains("Wyvern")
+                    && creatureAvailable("Wyvern") > 2)
+                {
+                    // Allow for Wyvern
+                }
+                else
+                {
+                    bogus = true;
+                }
             }
+
         }
 
         if (recName.equals("Ranger"))
@@ -308,14 +338,14 @@ public class ClemensAI extends AbstractAI
                     + "\n");
             String saveName = GameSaving.getLastSaveGame();
             DebugMethods.aiDevLog("  Last autosave: " + saveName + "\n");
-
         }
+
+        return bogus;
     }
 
     private boolean containsAdvanced(LegionClientSide legion)
     {
-        if (legion.contains("Griffon") || legion.contains("Wyvern")
-            || legion.contains("Hydra") || legion.contains("Chimera")
+        if (legion.contains("Hydra") || legion.contains("Chimera")
             || legion.contains("Ent") || legion.contains("Salamander")
             || legion.contains("Unicorn")
             || legion.contains("Minotaur")
