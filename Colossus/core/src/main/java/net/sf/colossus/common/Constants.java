@@ -474,6 +474,14 @@ public final class Constants
     public static final int legionStatusMoved = 1;
     public static final int legionStatusNotVisitedSkippedBlocked = 2;
     public static final int legionStatusBlocked = 3;
+
+    // Controls whether certain AI improvements are active
+    public final class AiImprovements
+    {
+        public static final boolean dontRecruitIfBetter = true;
+        public static final boolean titanAbyssCautious = true;
+    }
+
 }
 
 
