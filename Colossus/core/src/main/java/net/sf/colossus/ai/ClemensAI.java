@@ -69,6 +69,8 @@ public class ClemensAI extends AbstractAI
     private int splitsAcked = 0;
     private List<String> remainingMarkers = null;
 
+    private boolean showAiDebugSomethingBetter = false;
+
     public ClemensAI(Client client)
     {
         super(client);
@@ -87,6 +89,11 @@ public class ClemensAI extends AbstractAI
         DebugMethods.setClemensBattleDevelopment(false);
         DebugMethods.setClemensAiDevelopment(true);
         DebugMethods.aiDevLog("Clemens AI initiated.\n");
+
+        if (client.getClientName().equals("blabla"))
+        {
+            showAiDebugSomethingBetter = true;
+        }
     }
 
     public PlayerColor pickColor(List<PlayerColor> colors,
@@ -325,7 +332,7 @@ public class ClemensAI extends AbstractAI
             }
         }
 
-        if (bogus)
+        if (bogus && showAiDebugSomethingBetter)
         {
             MasterHex hex = legion.getCurrentHex();
             String land = hex.getDescription();
