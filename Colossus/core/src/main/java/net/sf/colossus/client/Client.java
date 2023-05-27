@@ -35,6 +35,7 @@ import net.sf.colossus.game.SummonInfo;
 import net.sf.colossus.game.actions.Recruitment;
 import net.sf.colossus.game.actions.Summoning;
 import net.sf.colossus.gui.ClientGUI;
+import net.sf.colossus.guiutil.DebugMethods;
 import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.server.GameServerSide;
 import net.sf.colossus.server.IServer;
@@ -1115,6 +1116,8 @@ public final class Client implements IClient, IOracle, IVariant,
         engagementStartupOngoing = val;
     }
 
+    private boolean ourTitanFights = false;
+
     public void tellEngagement(MasterHex hex, Legion attacker, Legion defender)
     {
         if (isMyLegion(attacker) || isMyLegion(defender))
@@ -1123,11 +1126,40 @@ public final class Client implements IClient, IOracle, IVariant,
         }
         game.createEngagement(hex, attacker, defender);
         gui.tellEngagement(attacker, defender, getTurnNumber());
+
+        if (owningPlayer.getName().equals("clemens"))
+        {
+            String who = null;
+            if (attacker.getPlayer().getName().equals("clemens") && attacker.hasTitan())
+            {
+                who = "WE ARE ATTACKING " + defender.getPlayer().getName();
+            }
+            if (defender.getPlayer().getName().equals("clemens") && defender.hasTitan())
+            {
+                who = "ATTACKED BY " + attacker.getPlayer().getName();
+            }
+
+            if (who != null)
+            {
+                ourTitanFights = true;
+                DebugMethods.aiDevLog("\n**************\n" + who + " (turn "
+                    + game.getTurnNumber() + " in " + hex.getDescription()
+                    + ")\n  " + DebugMethods.legionInfo(attacker) + "\n  "
+                    + DebugMethods.legionInfo(defender)
+                    + "\n");
+            }
+        }
     }
 
     public void tellEngagementResults(Legion winner, String method,
         int points, int turns)
     {
+        if (ourTitanFights && owningPlayer.getName().equals("clemens"))
+        {
+            DebugMethods.aiDevLog(
+                "Winner: " + DebugMethods.legionInfo(winner) + "\n\n");
+            ourTitanFights = false;
+        }
         setEngagementStartupOngoing(false);
         gui.actOnTellEngagementResults(winner, method, points, turns);
         game.clearEngagementData();

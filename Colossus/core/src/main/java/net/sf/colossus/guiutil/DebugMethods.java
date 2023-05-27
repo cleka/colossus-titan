@@ -5,6 +5,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import net.sf.colossus.client.LegionClientSide;
+import net.sf.colossus.game.Legion;
+import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.InstanceTracker;
 
 
@@ -236,6 +239,19 @@ public class DebugMethods
     public static boolean doPrintLnEval()
     {
         return clemensBattleDevelopment;
+    }
+
+    /**
+     * Mostly used for aiDevLog
+     * @param legion
+     * @return
+     */
+    public static String legionInfo(Legion legion)
+    {
+        String content = legion.getMarkerId() + ": "
+            + Glob.glob(", ", ((LegionClientSide)legion).getImageNames())
+            + " (" + legion.getPointValue() + " points)";
+        return content;
     }
 
     public static final boolean showInvincibleTitanDebugInfo = false;
