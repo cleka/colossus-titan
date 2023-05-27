@@ -238,4 +238,6 @@ public class DebugMethods
         return clemensBattleDevelopment;
     }
 
+    public static final boolean showInvincibleTitanDebugInfo = false;
+
 }

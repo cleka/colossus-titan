@@ -995,8 +995,11 @@ public abstract class AbstractAI implements AI
             * variant.getCreatureByName("Titan").getSkill();
         if (titanPointValue > lastMaxTitanPointValue)
         {
-            DebugMethods
-                .aiDevLog("Enemy Titan point value now: " + titanPointValue + "\n");
+            if (DebugMethods.showInvincibleTitanDebugInfo)
+            {
+                DebugMethods.aiDevLog(
+                    "Enemy Titan point value now: " + titanPointValue + "\n");
+            }
             lastMaxTitanPointValue = titanPointValue;
         }
         if (titanPointValue > threshold)
