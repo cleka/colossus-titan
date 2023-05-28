@@ -988,7 +988,8 @@ public class ClemensAI extends AbstractAI
                         )
                         {
                             DebugMethods
-                                .aiDevLog("\n!!!\nmoving Titan Legion to "
+                                .aiDevLog("Turn " + client.getTurnNumber()
+                                    + ": moving Titan Legion to "
                                     + bestHex.getDescription() + "\n");
                             // DebugMethods.waitReturn();
                         }
@@ -1537,8 +1538,9 @@ public class ClemensAI extends AbstractAI
                     if (hex.getTerrainName().equals("Abyss") && legion.hasTitan()
                         && result != LOSE)
                     {
-                        DebugMethods.aiDevLog(
-                            "Risk of TitanLegion being attacked in Abyss - not going!\n");
+                        DebugMethods.aiDevLog("Turn " + client.getTurnNumber()
+                            + ": Risk of TitanLegion being attacked in Abyss "
+                            + hex.getDescription() + " - not going!\n");
                         dontgo = true;
                     }
                     if (dontgo)
