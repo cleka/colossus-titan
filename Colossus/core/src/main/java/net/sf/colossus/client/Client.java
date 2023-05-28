@@ -1153,7 +1153,7 @@ public final class Client implements IClient, IOracle, IVariant,
     public void tellEngagementResults(Legion winner, String method,
         int points, int turns)
     {
-        if (ourTitanFightsInfo != null)
+        if (ourTitanFightsInfo != null && !method.equals("flee"))
         {
             if (winner != null)
             {
