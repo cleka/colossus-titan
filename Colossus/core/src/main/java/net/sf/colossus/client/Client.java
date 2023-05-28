@@ -1116,7 +1116,7 @@ public final class Client implements IClient, IOracle, IVariant,
         engagementStartupOngoing = val;
     }
 
-    private boolean ourTitanFights = false;
+    private String ourTitanFightsInfo = null;
 
     public void tellEngagement(MasterHex hex, Legion attacker, Legion defender)
     {
@@ -1141,12 +1141,11 @@ public final class Client implements IClient, IOracle, IVariant,
 
             if (who != null)
             {
-                ourTitanFights = true;
-                DebugMethods.aiDevLog("\n**************\n" + who + " (turn "
+                ourTitanFightsInfo = "\n**************\n" + who + " (turn "
                     + game.getTurnNumber() + " in " + hex.getDescription()
                     + ")\n  " + DebugMethods.legionInfo(attacker) + "\n  "
                     + DebugMethods.legionInfo(defender)
-                    + "\n");
+                    + "\n";
             }
         }
     }
@@ -1154,12 +1153,30 @@ public final class Client implements IClient, IOracle, IVariant,
     public void tellEngagementResults(Legion winner, String method,
         int points, int turns)
     {
-        if (ourTitanFights && owningPlayer.getName().equals("clemens"))
+        if (ourTitanFightsInfo != null)
         {
-            DebugMethods.aiDevLog(
-                "Winner: " + DebugMethods.legionInfo(winner) + "\n\n");
-            ourTitanFights = false;
+            if (winner != null)
+            {
+                String result;
+                if (winner.getPlayer().equals(owningPlayer))
+                {
+                    result = "We WON - ";
+                }
+                else
+                {
+                    result = "We got DESTROYED - ";
+                }
+                ourTitanFightsInfo += result + DebugMethods.legionInfo(winner)
+                    + ", method: " + method
+                    + "\n\n";
+            }
+            else
+            {
+                ourTitanFightsInfo += "Mutual, no winner...\n";
+            }
+            DebugMethods.aiDevLog(ourTitanFightsInfo);
         }
+        ourTitanFightsInfo = null;
         setEngagementStartupOngoing(false);
         gui.actOnTellEngagementResults(winner, method, points, turns);
         game.clearEngagementData();
