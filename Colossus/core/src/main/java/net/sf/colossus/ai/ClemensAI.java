@@ -21,6 +21,7 @@ import net.sf.colossus.client.Client;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.client.PlayerClientSide;
 import net.sf.colossus.common.Constants;
+import net.sf.colossus.common.Constants.AiDevPrinting;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.game.Battle;
 import net.sf.colossus.game.BattleCritter;
@@ -94,6 +95,8 @@ public class ClemensAI extends AbstractAI
         {
             showAiDebugSomethingBetter = true;
         }
+
+        ignoreFriendsDuringBuildingEnemyAttackMap = true;
     }
 
     public PlayerColor pickColor(List<PlayerColor> colors,
@@ -937,7 +940,11 @@ public class ClemensAI extends AbstractAI
                 legion, legion.getCurrentHex(), false, enemyAttackMap, why),
                 0, why);
             moveList.add(sitStillMove);
-
+            /*
+            DebugMethods.aiDevLog(
+                "\nConsidering moves for legion " + legion.getMarkerId()
+                    + ", sitStillMove value=" + sitStillMove.value + "\n");
+            */
             // find the best move (1-ply search)
             MasterHex bestHex = null;
             MoveInfo bestMove = null;
@@ -959,11 +966,20 @@ public class ClemensAI extends AbstractAI
                 ValueRecorder whyR = new ValueRecorder();
                 final int value = evaluateMove(legion, hex, true,
                     enemyAttackMap, whyR);
-
+                if (AiDevPrinting.movingTitanLegion)
+                {
+                    DebugMethods.aiDevLog("  Moving to " + hex.getDescription()
+                        + ", value=" + value + "\n");
+                }
                 MoveInfo move = new MoveInfo(legion, hex, value, value
                     - sitStillMove.value, whyR);
                 if (value > bestValue || bestHex == null)
                 {
+                    if (AiDevPrinting.movingTitanLegion)
+                    {
+                        DebugMethods.aiDevLog("  " + hex.getDescription()
+                            + " is new best move!\n");
+                    }
                     bestValue = value;
                     bestHex = hex;
                     bestMove = move;
@@ -982,15 +998,27 @@ public class ClemensAI extends AbstractAI
                         LOGGER.finer("Moved " + legion + " to " + bestHex
                             + " after evaluating: " + bestMove.why.toString()
                             + " is better than sitting tight: "
-                            + sitStillMove.why.toString());
+                            + sitStillMove.why.toString() + "\n");
                         if (legion.hasTitan()
                             && bestHex.getTerrainName().equals("Abyss")
                         )
                         {
-                            DebugMethods
+                            if (AiDevPrinting.movingTitanLegion)
+                            {
+                                DebugMethods
                                 .aiDevLog("Turn " + client.getTurnNumber()
-                                    + ": moving Titan Legion to "
-                                    + bestHex.getDescription() + "\n");
+                                        + ": moving Titan Legion to "
+                                        + bestHex.getDescription() + "\n");
+                                DebugMethods.aiDevLog("Moved " + legion
+                                    + " to " + bestHex + " after evaluating: "
+                                    //                              + bestMove.why.toString()
+                                    + bestMove.value
+                                    + " is better than sitting tight "
+                                    + sitStillMove.value
+                                    //                                + sitStillMove.why.toString()
+                                    + "\n");
+                        }
+
                             // DebugMethods.waitReturn();
                         }
 
@@ -1524,7 +1552,13 @@ public class ClemensAI extends AbstractAI
                 {
                     final int result = estimateBattleResults(enemy, false,
                         legion, hex, recruit);
-
+                    if (AiDevPrinting.movingTitanLegion)
+                    {
+                        DebugMethods.aiDevLog("Enemy " + enemy.getMarkerId()
+                            + " (" + enemy.getPointValue()
+                            + ") could attack us - estimated result=" + result
+                            + "!\n");
+                    }
                     boolean dontgo = false;
                     if (result == WIN_WITH_MINIMAL_LOSSES
                         || result == WIN_WITH_HEAVY_LOSSES
@@ -1539,7 +1573,7 @@ public class ClemensAI extends AbstractAI
                         && result != LOSE)
                     {
                         DebugMethods.aiDevLog("Turn " + client.getTurnNumber()
-                            + ": Risk of TitanLegion being attacked in Abyss "
+                            + ": Risk of TitanLegion being attacked in "
                             + hex.getDescription() + " - not going!\n");
                         dontgo = true;
                     }

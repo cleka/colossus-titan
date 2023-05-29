@@ -310,6 +310,18 @@ abstract public class Movement
         return set;
     }
 
+    /** Return set of hexLabels describing where this legion can move.
+     *  This one with ignoreFriends possibility
+     */
+    public Set<MasterHex> listAllMoves(Legion legion, MasterHex hex,
+        int movementRoll, boolean ignoreFriends, boolean inAdvance)
+    {
+        Set<MasterHex> set = listNormalMoves(legion, hex, movementRoll,
+            ignoreFriends, null, inAdvance);
+        set.addAll(listTeleportMoves(legion, hex, movementRoll, inAdvance));
+        return set;
+    }
+
     public Set<MasterHex> listNormalMoves(Legion legion, MasterHex hex,
         int movementRoll)
     {
@@ -330,7 +342,6 @@ abstract public class Movement
         {
             return new HashSet<MasterHex>();
         }
-
         Set<String> tuples = findNormalMoves(hex, legion, movementRoll,
             findBlock(hex), Constants.NOWHERE, fromHex, ignoreFriends);
 

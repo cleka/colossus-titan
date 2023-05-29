@@ -482,6 +482,11 @@ public final class Constants
         public static final boolean titanAbyssCautious = true;
     }
 
+    public final class AiDevPrinting
+    {
+        // AiDevPrinting.movingTitanLegion
+        public static final boolean movingTitanLegion = true;
+    }
 }
 
 

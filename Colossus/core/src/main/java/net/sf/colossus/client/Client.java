@@ -15,6 +15,7 @@ import net.sf.colossus.ai.AI;
 import net.sf.colossus.ai.SimpleAI;
 import net.sf.colossus.ai.helper.CritterMove;
 import net.sf.colossus.common.Constants;
+import net.sf.colossus.common.Constants.AiDevPrinting;
 import net.sf.colossus.common.OptionObjectProvider;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.common.WhatNextManager;
@@ -3630,6 +3631,14 @@ public final class Client implements IClient, IOracle, IVariant,
         MasterHex currentHex, EntrySide entrySide, boolean teleport,
         CreatureType teleportingLord, boolean splitLegionHasForcedMove)
     {
+        if (AiDevPrinting.movingTitanLegion
+            && owningPlayer.getName().equals("clemens")
+            && legion.getPlayer().equals(owningPlayer) && legion.hasTitan())
+        {
+            DebugMethods.aiDevLog(
+                "Turn " + getTurnNumber() + ": Moved titan legion to "
+                    + currentHex.getDescription() + "\n");
+        }
         legion.setCurrentHex(currentHex);
         legion.setMoved(true);
         legion.setEntrySide(entrySide);

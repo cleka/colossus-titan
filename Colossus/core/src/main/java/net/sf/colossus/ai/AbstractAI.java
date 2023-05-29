@@ -68,6 +68,9 @@ public abstract class AbstractAI implements AI
     final protected Client client;
     protected Variant variant;
 
+    // ClemensAI overrides this
+    protected boolean ignoreFriendsDuringBuildingEnemyAttackMap = false;
+
     public List<CritterMove> bestMoveOrder;
     public List<CritterMove> failedBattleMoves;
 
@@ -112,6 +115,10 @@ public abstract class AbstractAI implements AI
         {
             enemyMap[i] = new HashMap<MasterHex, List<Legion>>();
         }
+
+        // shortcut...
+        boolean ignoreFriends = ignoreFriendsDuringBuildingEnemyAttackMap;
+
         // for each enemy player
         for (Player enemyPlayer : client.getGameClientSide().getPlayers())
         {
@@ -134,12 +141,13 @@ public abstract class AbstractAI implements AI
                         && client.getMovement().titanTeleportAllowed())
                     {
                         set = client.getMovement().listAllMoves(legion,
-                            legion.getCurrentHex(), roll);
+                            legion.getCurrentHex(), roll, ignoreFriends, false);
                     }
                     else
                     {
                         set = client.getMovement().listNormalMoves(legion,
-                            legion.getCurrentHex(), roll);
+                            legion.getCurrentHex(), roll, ignoreFriends, null,
+                            false);
                     }
                     for (MasterHex hex : set)
                     {
@@ -163,7 +171,28 @@ public abstract class AbstractAI implements AI
                 }
             }
         }
+        // displayEnemyMap(enemyMap);
         return enemyMap;
+    }
+
+    @SuppressWarnings("unused")
+    private void displayEnemyMap(Map<MasterHex, List<Legion>>[] enemyMap)
+    {
+        for (int roll = 1; roll <= 6; roll++)
+        {
+            Map<MasterHex, List<Legion>> mymap = enemyMap[roll];
+
+            Set<MasterHex> set = mymap.keySet();
+            for (MasterHex hex : set)
+            {
+                List<Legion> enemies = mymap.get(hex);
+                if (enemies == null)
+                {
+                    continue;
+                }
+            }
+        }
+        DebugMethods.waitReturn();
     }
 
     final protected int getNumberOfWaysToTerrain(Legion legion, MasterHex hex,
