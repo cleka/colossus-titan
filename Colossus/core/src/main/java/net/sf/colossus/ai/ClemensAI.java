@@ -22,6 +22,7 @@ import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.client.PlayerClientSide;
 import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Constants.AiDevPrinting;
+import net.sf.colossus.common.Constants.AiImprovements;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.game.Battle;
 import net.sf.colossus.game.BattleCritter;
@@ -1362,6 +1363,15 @@ public class ClemensAI extends AbstractAI
 
             if (recruit != null)
             {
+                // TODO: Crude hack
+                if (AiImprovements.titanAbyssNoDruid
+                    && recruit.getName().equals("Druid") && legion.hasTitan()
+                    && hex.getTerrain().getDisplayName().startsWith("Abyss"))
+                {
+                    value.add(LOSE_LEGION,
+                        "Not going with Titan to Abyss just for Druid");
+                }
+
                 int oldval = value.getValue();
 
                 if (legion.getHeight() <= 5)

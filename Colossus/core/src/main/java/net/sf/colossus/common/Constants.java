@@ -481,6 +481,7 @@ public final class Constants
         public static final boolean dontRecruitIfBetter = true;
         public static final boolean clemensOwnHints = true;
         public static final boolean titanAbyssCautious = true;
+        public static final boolean titanAbyssNoDruid = true;
     }
 
     public final class AiDevPrinting
