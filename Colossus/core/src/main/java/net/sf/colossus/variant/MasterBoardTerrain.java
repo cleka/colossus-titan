@@ -454,6 +454,8 @@ public class MasterBoardTerrain implements Comparable<MasterBoardTerrain>
                     bonusHazardCount -= count;
                 }
             }
+            LOGGER.finest("Creature " + creature.getName() + ", terrain "
+                + hTerrain.getName() + ", count " + bonusHazardCount);
         }
 
         final Collection<HazardHexside> hazardTypes = HazardHexside
@@ -475,9 +477,64 @@ public class MasterBoardTerrain implements Comparable<MasterBoardTerrain>
                     bonusHazardSideCount -= count;
                 }
             }
+            LOGGER.finest("Creature " + creature.getName() + ", hazardSide "
+                + hazard.getName() + ", count " + bonusHazardSideCount);
         }
         if (((bonusHazardCount + bonusHazardSideCount) > 0)
             && ((bonusHazardCount >= 3) || (bonusHazardSideCount >= 5)))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    // TODO get rid of dependencies into client package
+    public boolean hasNonNativePenalty(CreatureType creature)
+    {
+        int bonusHazardCount = 0;
+        int bonusHazardSideCount = 0;
+
+        for (HazardTerrain hTerrain : HazardTerrain.getAllHazardTerrains())
+        {
+            int count = this.getHazardCount(hTerrain);
+            boolean nativeToHex = creature.isNativeIn(hTerrain);
+
+            // Combat penalty terrain
+            if (!nativeToHex && hTerrain.isNonNativePenaltyTerrain())
+            {
+                bonusHazardCount -= count;
+            }
+
+            // Movement penalty terrain
+            if (!nativeToHex && (hTerrain.isGroundNativeOnly()
+                || hTerrain.slowsGround(nativeToHex)))
+            {
+                bonusHazardCount -= count;
+            }
+        }
+
+        final Collection<HazardHexside> hazardTypes = HazardHexside
+            .getAllHazardHexsides();
+
+        for (HazardHexside hazard : hazardTypes)
+        {
+            int count = this.getHazardHexsideCount(hazard);
+            boolean nativeToHexSide = hazard.isNativeBonusHexside();
+            if (!nativeToHexSide && hazard.isNonNativePenaltyHexside())
+            {
+                bonusHazardSideCount -= count;
+            }
+            if (!nativeToHexSide && hazard.slowsNonNatives())
+            {
+                bonusHazardSideCount -= count;
+            }
+
+        }
+
+        LOGGER.finest("Creature " + creature.getName() + ": bonushazardcount="
+            + bonusHazardCount + ", bonushazardsidecount="
+            + bonusHazardSideCount);
+        if ((bonusHazardCount + bonusHazardSideCount) <= -3)
         {
             return true;
         }
