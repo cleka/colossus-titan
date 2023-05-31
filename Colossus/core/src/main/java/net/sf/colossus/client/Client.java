@@ -3627,6 +3627,7 @@ public final class Client implements IClient, IOracle, IVariant,
         return true;
     }
 
+    @SuppressWarnings("unused")
     public void didMove(Legion legion, MasterHex startingHex,
         MasterHex currentHex, EntrySide entrySide, boolean teleport,
         CreatureType teleportingLord, boolean splitLegionHasForcedMove)
