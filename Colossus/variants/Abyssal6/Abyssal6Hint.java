@@ -259,15 +259,27 @@ public class Abyssal6Hint extends AbstractHintProvider
 
         if (terrainId.equals("Brush"))
         {
+            // Go for Behemoth & bigger line first
             if (recruitNames.contains("Cyclops")
-                && legion.numCreature("Cyclops") == 2
-                && !legion.contains("Behemoth") //  Comment here and sometimes below to prevent Eclipse from wrapping
-                && (clemens || legion.getHeight() != 6)
-                && (clemens || oracle.canReach("Jungle"))
-                && oracle.creatureAvailable("Behemoth") >= 2)
+                && !legion.contains("Behemoth") && !legion.contains("Serpent")
+                && !legion.contains("Jabberwok") && !legion.contains("Wraith"))
             {
-                return getCreatureType("Cyclops");
+                if (recruitNames.contains("Cyclops")
+                    && legion.numCreature("Cyclops") < 3)
+                {
+                    return getCreatureType("Cyclops");
+                }
+                if (legion.getHeight() < 6
+                    && recruitNames.contains("Manticore"))
+                {
+                    return getCreatureType("Manticore");
+                }
+                if (legion.getHeight() < 6 && recruitNames.contains("Gorgon"))
+                {
+                    return getCreatureType("Gorgon");
+                }
             }
+            // no else needed - otherwise end of method just takes best
         }
         else if (terrainId.equals("Plains"))
         {
