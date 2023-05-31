@@ -1204,6 +1204,12 @@ public class ClemensAI extends AbstractAI
             final int enemyPointValue = enemyLegion.getPointValue();
             final int result = estimateBattleResults(legion, enemyLegion, hex);
 
+            if (AiDevPrinting.movingTitanLegion)
+            {
+                DebugMethods.aiDevLog("Attacking " + enemyLegion.getMarkerId()
+                + " in hex " + hex.getDescription() + ", estimate result = "
+                + result + "\n");
+            }
             switch (result)
             {
                 case WIN_WITH_MINIMAL_LOSSES:
@@ -1360,7 +1366,6 @@ public class ClemensAI extends AbstractAI
         if (moved)
         {
             recruit = chooseRecruit(legion, hex, false);
-
             if (recruit != null)
             {
                 // TODO: Crude hack
@@ -1579,12 +1584,16 @@ public class ClemensAI extends AbstractAI
                         dontgo = true;
                     }
 
-                    if (hex.getTerrainName().equals("Abyss") && legion.hasTitan()
-                        && result != LOSE)
+                    if (Constants.AiImprovements.titanAbyssCautious
+                        && hex.getTerrainName().equals("Abyss")
+                        && legion.hasTitan() && result != LOSE)
                     {
-                        DebugMethods.aiDevLog("Turn " + client.getTurnNumber()
-                            + ": Risk of TitanLegion being attacked in "
-                            + hex.getDescription() + " - not going!\n");
+                        if (AiDevPrinting.movingTitanLegion)
+                        {
+                            DebugMethods.aiDevLog("Turn " + client.getTurnNumber()
+                                + ": Risk of TitanLegion being attacked in "
+                                + hex.getDescription() + " - not going!\n");
+                        }
                         dontgo = true;
                     }
                     if (dontgo)
@@ -1683,7 +1692,9 @@ public class ClemensAI extends AbstractAI
         CreatureType recruit)
     {
         MasterBoardTerrain terrain = hex.getTerrain();
-        double attackerPointValue = getCombatValue(attacker, terrain);
+        double attackerPointValue = getCombatValue(attacker, terrain, true);
+        LOGGER.finest("Evaluating attacking in hex " + hex.getDescription()
+            + ": attacker point value raw " + attackerPointValue);
 
         if (attackerSplitsBeforeBattle)
         {
@@ -1703,7 +1714,7 @@ public class ClemensAI extends AbstractAI
         }
         // TODO: add angel call
 
-        double defenderPointValue = getCombatValue(defender, terrain);
+        double defenderPointValue = getCombatValue(defender, terrain, false);
         // TODO: add in enemy's most likely turn 4 recruit
 
         if (hex.getTerrain().isTower())
@@ -1719,6 +1730,12 @@ public class ClemensAI extends AbstractAI
 
         // really dumb estimator
         double ratio = attackerPointValue / defenderPointValue;
+
+        LOGGER.finer("Evaluating battle for attacker " + attacker.getMarkerId()
+            + ", defender " + defender.getMarkerId());
+        LOGGER.finest("attacker point value " + attackerPointValue);
+        LOGGER.finest("defender point value " + defenderPointValue);
+        LOGGER.finest("ratio                " + ratio);
 
         if (ratio >= RATIO_WIN_MINIMAL_LOSS())
         {
@@ -1948,8 +1965,8 @@ public class ClemensAI extends AbstractAI
         // angel or good recruit.
         MasterBoardTerrain terrain = legion.getCurrentHex().getTerrain();
         int height = (enemy).getHeight();
-        if (getCombatValue(legion, terrain) < 0.5 * getCombatValue(enemy,
-            terrain) && height >= 6)
+        if (getCombatValue(legion, terrain, false) < 0.5 * getCombatValue(enemy,
+            terrain, true) && height >= 6)
         {
             int currentScore = enemy.getPlayer().getScore();
             int pointValue = ((LegionClientSide)legion).getPointValue();
@@ -2261,9 +2278,17 @@ public class ClemensAI extends AbstractAI
         return val;
     }
 
-    /** XXX Inaccurate for titans. */
     private int getCombatValue(CreatureType creature,
         MasterBoardTerrain terrain)
+    {
+        return getCombatValue(creature, terrain, false, false);
+    }
+
+    /** XXX Inaccurate for titans.
+     * @param isTitanLegion TODO*/
+    // now takes disadvantages for attacker into account
+    private int getCombatValue(CreatureType creature,
+        MasterBoardTerrain terrain, boolean isAttacker, boolean isTitanLegion)
     {
         if (creature.isTitan())
         {
@@ -2289,6 +2314,18 @@ public class ClemensAI extends AbstractAI
             val++;
         }
 
+        if (isTitanLegion && isAttacker
+            && terrain.hasNonNativePenalty(creature))
+        {
+            // System.out.println("Terrain has penalty for creature " + creature.getName());
+
+            // Penalties affect a lot harder than advantages
+            // Note that more-stupid-creatures are punished harder
+            // (which is what we want, since e.g. Cyclops is really useless
+            // in e.g. Swamp or Jungle.
+            val -= creature.getPower();
+        }
+
         return val;
     }
 
@@ -2308,18 +2345,20 @@ public class ClemensAI extends AbstractAI
         return val;
     }
 
-    private int getCombatValue(Legion legion, MasterBoardTerrain terrain)
+    private int getCombatValue(Legion legion, MasterBoardTerrain terrain, boolean isAttacker)
     {
         int val = 0;
         for (CreatureType creature : legion.getCreatureTypes())
         {
             if (creature.isTitan())
             {
-                val += getTitanCombatValue(legion.getPlayer().getTitanPower());
+                val += getTitanCombatValue(
+                    legion.getPlayer().getTitanPower());
             }
             else
             {
-                val += getCombatValue(creature, terrain);
+                val += getCombatValue(creature, terrain, isAttacker,
+                    legion.hasTitan());
             }
         }
 
