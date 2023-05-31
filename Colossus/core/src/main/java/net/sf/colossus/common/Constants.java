@@ -479,14 +479,16 @@ public final class Constants
     public final class AiImprovements
     {
         public static final boolean dontRecruitIfBetter = true;
+        public static final boolean clemensOwnHints = true;
         public static final boolean titanAbyssCautious = true;
     }
 
     public final class AiDevPrinting
     {
-        // AiDevPrinting.movingTitanLegion
-        public static final boolean movingTitanLegion = true;
+        public static final boolean movingTitanLegion = false;
+        public static final boolean invincibleTitan = false;
     }
+
 }
 
 

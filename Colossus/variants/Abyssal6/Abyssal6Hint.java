@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.colossus.ai.AbstractHintProvider;
+import net.sf.colossus.common.Constants;
 import net.sf.colossus.util.DevRandom;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.IHintOracle;
@@ -31,12 +32,13 @@ public class Abyssal6Hint extends AbstractHintProvider
         String terrainId = terrain.getId();
         List<String> recruitNames = AbstractHintProvider.creaturesToStrings(recruits);
 
-        boolean clemens = (aiStyles.contains(AIStyle.Clemens));
-        if (clemens)
+        boolean isClemens = (aiStyles.contains(AIStyle.Clemens));
+        if (Constants.AiImprovements.clemensOwnHints && isClemens)
         {
             return getRecruitHintClemens(terrain, legion, recruits, oracle,
                 aiStyles);
         }
+
         if (terrainId.equals("Brush"))
         {
             if (recruitNames.contains("Cyclops")

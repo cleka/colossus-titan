@@ -254,6 +254,4 @@ public class DebugMethods
         return content;
     }
 
-    public static final boolean showInvincibleTitanDebugInfo = false;
-
 }
