@@ -2952,7 +2952,7 @@ public class ClemensAI extends AbstractAI
                 int bonus = (native_power - 2 * power) * skill
                     + (native_skill - 2 * skill) * power;
 
-                value.add(3 * bonus, "More NonNativePenalty");
+                value.add(-3 * bonus, "More NonNativePenalty");
             }
         }
 
