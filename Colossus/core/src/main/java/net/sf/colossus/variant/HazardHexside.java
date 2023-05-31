@@ -174,4 +174,17 @@ public class HazardHexside extends Hazards
             return false;
         }
     }
+
+    public boolean slowsNonNatives()
+    {
+        if (this == HazardHexside.RIVER || this == HazardHexside.SLOPE
+            || this == HazardHexside.DUNE)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 }
