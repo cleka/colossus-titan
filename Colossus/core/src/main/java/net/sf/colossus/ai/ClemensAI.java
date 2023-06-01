@@ -1171,6 +1171,10 @@ public class ClemensAI extends AbstractAI
         return false;
     }
 
+    // Avoid using MIN_VALUE and MAX_VALUE because of possible overflow.
+    final static int WIN_GAME = Integer.MAX_VALUE / 2;
+    final static int LOSE_LEGION = -10000;
+
     private boolean doMove(Legion legion, MasterHex hex)
     {
         return client.doMove(legion, hex);
@@ -1190,10 +1194,6 @@ public class ClemensAI extends AbstractAI
         boolean moved, Map<MasterHex, List<Legion>>[] enemyAttackMap,
         ValueRecorder value)
     {
-        // Avoid using MIN_VALUE and MAX_VALUE because of possible overflow.
-        final int WIN_GAME = Integer.MAX_VALUE / 2;
-        final int LOSE_LEGION = -10000;
-
         //int value = 0;
         // consider making an attack
         final Legion enemyLegion = client.getGameClientSide()
@@ -1201,163 +1201,7 @@ public class ClemensAI extends AbstractAI
 
         if (enemyLegion != null)
         {
-            final int enemyPointValue = enemyLegion.getPointValue();
-            final int result = estimateBattleResults(legion, enemyLegion, hex);
-
-            if (AiDevPrinting.movingTitanLegion)
-            {
-                DebugMethods.aiDevLog("Attacking " + enemyLegion.getMarkerId()
-                + " in hex " + hex.getDescription() + ", estimate result = "
-                + result + "\n");
-            }
-            switch (result)
-            {
-                case WIN_WITH_MINIMAL_LOSSES:
-                    LOGGER.finest("legion " + legion + " can attack "
-                        + enemyLegion + " in " + hex
-                        + " and WIN_WITH_MINIMAL_LOSSES");
-
-                    // we score a fraction of a basic acquirable
-                    value
-                        .add(
-                            ((variant.getCreatureByName(variant
-                                .getPrimaryAcquirable())).getPointValue() * enemyPointValue)
-                                / getAcqStepValue(),
-                            "Fraction Basic Acquirable");
-                    // plus a fraction of a titan strength
-                    // TODO Should be by variant
-                    value.add(
-                        (6 * enemyPointValue)
-                            / variant.getTitanImprovementValue(),
-                        "Fraction Titan Strength");
-                    // plus some more for killing a group (this is arbitrary)
-                    value.add((10 * enemyPointValue) / 100,
-                        "Arbitrary For Killing");
-
-                    // TODO if enemy titan, we also score half points
-                    // (this may make the AI unfairly gun for your titan)
-                    break;
-
-                case WIN_WITH_HEAVY_LOSSES:
-                    LOGGER.finest("legion " + legion + " can attack "
-                        + enemyLegion + " in " + hex
-                        + " and WIN_WITH_HEAVY_LOSSES");
-                    // don't do this with our titan unless we can win the game
-                    boolean haveOtherSummonables = false;
-                    Player player = legion.getPlayer();
-                    for (Legion l : player.getLegions())
-                    {
-                        if (l.equals(legion))
-                        {
-                            continue;
-                        }
-
-                        if (!l.hasSummonable())
-                        {
-                            continue;
-                        }
-
-                        haveOtherSummonables = true;
-
-                        break;
-                    }
-
-                    if (legion.hasTitan())
-                    {
-                        // unless we can win the game with this attack
-                        if ((enemyLegion).hasTitan()
-                            && client.getGameClientSide()
-                                .getNumLivingPlayers() == 2)
-                        {
-                            // do it and win the game
-                            value.add(enemyPointValue,
-                                "Killing Last Enemy Titan");
-                        }
-                        else
-                        {
-                            // ack! we'll mess up our titan group
-                            value.add(LOSE_LEGION + 10,
-                                "<Profanity> Our Titan Group");
-                        }
-                    }
-                    // don't do this if we'll lose our only summonable group
-                    // and won't score enough points to make up for it
-                    else if (legion.hasSummonable() && !haveOtherSummonables
-                        && enemyPointValue < getAcqStepValue() * .88)
-                    {
-                        value.add(LOSE_LEGION + 5, "Lose Legion");
-                    }
-                    else
-                    {
-                        // we score a fraction of a basic acquirable
-                        value
-                            .add(
-                                ((variant.getCreatureByName(variant
-                                    .getPrimaryAcquirable())).getPointValue() * enemyPointValue)
-                                    / getAcqStepValue(),
-                                "Fraction Basic Acquirable 2");
-                        // plus a fraction of a titan strength
-                        value.add(
-                            (6 * enemyPointValue)
-                                / variant.getTitanImprovementValue(),
-                            "Fraction Titan Strength 2");
-                        // but we lose this group
-                        value.add(-(20 * legion.getPointValue()) / 100,
-                            "Lost This Group");
-                        // TODO: if we have no other angels, more penalty here
-                        // TODO: if enemy titan, we also score half points
-                        // (this may make the AI unfairly gun for your titan)
-                    }
-                    break;
-
-                case DRAW:
-                    LOGGER.finest("legion " + legion + " can attack "
-                        + enemyLegion + " in " + hex + " and DRAW");
-
-                    // If this is an unimportant group for us, but
-                    // is enemy titan, do it.  This might be an
-                    // unfair use of information for the AI
-                    if (legion.numLords() == 0 && enemyLegion.hasTitan())
-                    {
-                        // Arbitrary value for killing a player but
-                        // scoring no points: it's worth a little
-                        // If there are only 2 players, we should do this.
-                        if (client.getGameClientSide().getNumLivingPlayers() == 2)
-                        {
-                            value.resetTo(WIN_GAME, "WinGame");
-                        }
-                        else
-                        {
-                            value.add(enemyPointValue / 6,
-                                "Unfairly Assault Titan");
-                        }
-                    }
-                    else
-                    {
-                        // otherwise no thanks
-                        value.add(LOSE_LEGION + 2, "Lose Legion 2");
-                    }
-                    break;
-
-                case LOSE_BUT_INFLICT_HEAVY_LOSSES:
-                    LOGGER.finest("legion " + legion + " can attack "
-                        + enemyLegion + " in " + hex
-                        + " and LOSE_BUT_INFLICT_HEAVY_LOSSES");
-
-                    // TODO: how important is it that we damage his group?
-                    value.add(LOSE_LEGION + 1, "Lose Legion 3");
-                    break;
-
-                case LOSE:
-                    LOGGER.finest("legion " + legion + " can attack "
-                        + enemyLegion + " in " + hex + " and LOSE");
-
-                    value.add(LOSE_LEGION, "Lose Legion 4");
-                    break;
-
-                default:
-                    LOGGER.severe("Bogus battle result case");
-            }
+            evaluatePossibleEngagement(legion, hex, value, enemyLegion);
         }
 
         // consider what we can recruit
@@ -1365,119 +1209,137 @@ public class ClemensAI extends AbstractAI
 
         if (moved)
         {
-            recruit = chooseRecruit(legion, hex, false);
-            if (recruit != null)
+            recruit = evaluatePossibleRecruit(legion, hex, value, enemyLegion);
+        }
+
+        evaluteNextRoll(legion, hex, value);
+
+        // consider risk of being attacked
+        if (enemyAttackMap != null)
+        {
+            evaluateRiskBeingAttacked(legion, hex, moved, enemyAttackMap,
+                value, recruit);
+        }
+
+        // TODO: consider mobility.  e.g., penalty for suckdown
+        // squares, bonus if next to tower or under the top
+        // TODO: consider what we can attack next turn from here
+        // TODO: consider nearness to our other legions
+        // TODO: consider being a scooby snack (if so, everything
+        // changes: we want to be in a location with bad mobility, we
+        // want to be at risk of getting killed, etc)
+        // TODO: consider risk of being scooby snacked (this might be inherent)
+        // TODO: consider splitting up our good recruitment rolls
+        // (i.e. if another legion has warbears under the top that
+        // recruit on 1,3,5, and we have a behemoth with choice of 3/5
+        // to jungle or 4/6 to jungle, prefer the 4/6 location).
+        LOGGER.finest("EVAL " + legion + (moved ? " move to " : " stay in ")
+            + hex + " = " + value);
+
+        return value.getValue();
+    }
+
+    private void evaluateRiskBeingAttacked(LegionClientSide legion,
+        MasterHex hex, boolean moved,
+        Map<MasterHex, List<Legion>>[] enemyAttackMap, ValueRecorder value,
+        CreatureType recruit)
+    {
+        if (moved)
+        {
+            LOGGER
+                .finest("considering risk of moving " + legion + " to " + hex);
+        }
+        else
+        {
+            LOGGER.finest(
+                "considering risk of leaving " + legion + " in " + hex);
+        }
+
+        /**
+         * TODO: this doesn't handle the situation well, if there is
+         * more than one attacker (would bail out on smaller number
+         * even if a different legion with higher number could do more
+         * damage to us?
+         */
+        Map<MasterHex, List<Legion>>[] enemiesThatCanAttackOnA = enemyAttackMap;
+        int roll;
+
+        roll_loop: for (roll = 1; roll <= 6; roll++)
+        {
+            List<Legion> enemies = enemiesThatCanAttackOnA[roll].get(hex);
+
+            if (enemies == null)
             {
-                // TODO: Crude hack
-                if (AiImprovements.titanAbyssNoDruid
-                    && recruit.getName().equals("Druid") && legion.hasTitan()
-                    && hex.getTerrain().getDisplayName().startsWith("Abyss"))
+                continue;
+            }
+
+            for (Legion enemy : enemies)
+            {
+                final int result = estimateBattleResults(enemy, false, legion,
+                    hex, recruit);
+                if (AiDevPrinting.movingTitanLegion)
                 {
-                    value.add(LOSE_LEGION,
-                        "Not going with Titan to Abyss just for Druid");
+                    DebugMethods.aiDevLog("Enemy " + enemy.getMarkerId() + " ("
+                        + enemy.getPointValue()
+                        + ") could attack us - estimated result=" + result
+                        + "!\n");
+                }
+                boolean dontgo = false;
+                if (result == WIN_WITH_MINIMAL_LOSSES
+                    || result == WIN_WITH_HEAVY_LOSSES
+                    || (result == DRAW && (legion).hasTitan())
+                    || (result == LOSE_BUT_INFLICT_HEAVY_LOSSES
+                        && (legion).hasTitan()))
+                {
+                    dontgo = true;
                 }
 
-                int oldval = value.getValue();
-
-                if (legion.getHeight() <= 5)
+                if (Constants.AiImprovements.titanAbyssCautious
+                    && hex.getTerrainName().equals("Abyss")
+                    && legion.hasTitan() && result != LOSE)
                 {
-                    value.add(
-                        getHintedRecruitmentValue(recruit, legion,
-                            hintSectionUsed), "Hinted Recruitment Value");
-                }
-                else if (legion.getHeight() == 6)
-                {
-                    // if we're 6-high, then the value of a recruit is
-                    // equal to the improvement in the value of the
-                    // pieces that we'll have after splitting.
-                    // TODO this should call our splitting code to see
-                    // what split decision we would make
-                    // If the legion would never split, then ignore
-                    // this special case.
-
-                    // This special case was overkill.  A 6-high stack
-                    // with 3 lions, or a 6-high stack with 3 clopses,
-                    // sometimes refused to go to a safe desert/jungle,
-                    // and 6-high stacks refused to recruit colossi,
-                    // because the value of the recruit was toned down
-                    // too much. So the effect has been reduced.
-                    LOGGER.finest("--- 6-HIGH SPECIAL CASE");
-
-                    List<CreatureType> weakestTwo = findWeakestTwoCritters(legion);
-
-                    CreatureType weakest1 = weakestTwo.get(0);
-                    CreatureType weakest2 = weakestTwo.get(1);
-
-                    int minCreaturePV = Math.min(
-                        getHintedRecruitmentValue(weakest1, legion,
-                            hintSectionUsed),
-                        getHintedRecruitmentValue(weakest2, legion,
-                            hintSectionUsed));
-                    int maxCreaturePV = Math.max(
-                        getHintedRecruitmentValue(weakest1, legion,
-                            hintSectionUsed),
-                        getHintedRecruitmentValue(weakest2, legion,
-                            hintSectionUsed));
-                    // point value of my best 5 pieces right now
-                    int oldPV = legion.getPointValue() - minCreaturePV;
-                    // point value of my best 5 pieces after adding this
-                    // recruit and then splitting off my 2 weakest
-                    int newPV = legion.getPointValue()
-                        - getHintedRecruitmentValue(weakest1, legion,
-                            hintSectionUsed)
-                        - getHintedRecruitmentValue(weakest2, legion,
-                            hintSectionUsed)
-                        + Math.max(
-                            maxCreaturePV,
-                            getHintedRecruitmentValue(recruit, legion,
-                                hintSectionUsed));
-
-                    value
-                        .add(
-                            (newPV - oldPV)
-                                + getHintedRecruitmentValue(recruit, legion,
-                                    hintSectionUsed),
-                            "Hinted Recruitment Value 2");
-                }
-                else if (legion.getHeight() == 7)
-                {
-                    // Cannot recruit, unless we have an angel to summon out,
-                    // and we're not fighting, and someone else is, and that
-                    // other stack summons out our angel.
-                    // Since we don't have enough information about other
-                    // stacks to be sure that someone will summon from us,
-                    // just give a small bonus for the possible recruit, if
-                    // we're not fighting and have a summonable.
-                    if (enemyLegion == null && legion.hasSummonable())
+                    if (AiDevPrinting.movingTitanLegion)
                     {
-                        // This is total fudge.  Removing an angel may hurt
-                        // this legion, or may help it if the recruit is even
-                        // better.  But it'll help someone else.  And we don't
-                        // know which legion is more important.  So just give
-                        // a small bonus for possibly being able to summon out
-                        // an angel and recruit.
-                        double POSSIBLE_SUMMON_FACTOR = 0.1;
-                        value.add(
-                            (int)Math.round(POSSIBLE_SUMMON_FACTOR
-                                * getHintedRecruitmentValue(recruit, legion,
-                                    hintSectionUsed)),
-                            "Hinted Recruitment Value 3");
+                        DebugMethods.aiDevLog("Turn " + client.getTurnNumber()
+                            + ": Risk of TitanLegion being attacked in "
+                            + hex.getDescription() + " - not going!\n");
                     }
+                    dontgo = true;
                 }
-                else
+                if (dontgo)
                 {
-                    LOGGER.severe("Bogus legion height "
-                        + (legion).getHeight() + " in legion "
-                        + legion.getMarkerId() + "; content: "
-                        + Glob.glob(",", legion.getCreatures()));
+                    // Need to jump out of outer loop, otherwise it would try
+                    // all other rolls and possibly roll remains then "just 6"
+                    break roll_loop;
+                    // break on the lowest roll from which we can
+                    // be attacked and killed
                 }
-
-                LOGGER.finest("--- if " + legion + " moves to " + hex
-                    + " then recruit " + recruit.toString() + " (adding "
-                    + (value.getValue() - oldval) + ")");
             }
         }
 
+        // Ignore all fear of attack on turn 1.  Not perfect,
+        // but a pretty good rule of thumb.
+        if (roll < 7 && client.getTurnNumber() > 1)
+        {
+            final double chanceToAttack = (7.0 - roll) / 6.0;
+            final double risk;
+
+            if (legion.hasTitan())
+            {
+                risk = LOSE_LEGION * chanceToAttack;
+            }
+            else
+            {
+                risk = -legion.getPointValue() / 2.0 * chanceToAttack;
+            }
+
+            value.add((int)Math.round(risk), "Risk (not the trademark)");
+        }
+    }
+
+    private void evaluteNextRoll(LegionClientSide legion, MasterHex hex,
+        ValueRecorder value)
+    {
         // consider what we might be able to recruit next turn, from here
         for (int roll = 1; roll <= 6; roll++)
         {
@@ -1530,119 +1392,280 @@ public class ClemensAI extends AbstractAI
             value
                 .add(nextTurnValue, "Next Turn Value (for roll " + roll + ")");
         }
+    }
 
-        // consider risk of being attacked
-        if (enemyAttackMap != null)
+    private CreatureType evaluatePossibleRecruit(LegionClientSide legion,
+        MasterHex hex, ValueRecorder value, final Legion enemyLegion)
+    {
+        CreatureType recruit;
+        recruit = chooseRecruit(legion, hex, false);
+        if (recruit != null)
         {
-            if (moved)
+            // TODO: Crude hack
+            if (AiImprovements.titanAbyssNoDruid
+                && recruit.getName().equals("Druid") && legion.hasTitan()
+                && hex.getTerrain().getDisplayName().startsWith("Abyss"))
             {
-                LOGGER.finest("considering risk of moving " + legion + " to "
-                    + hex);
+                value.add(2 * LOSE_LEGION,
+                    "Not going with Titan to Abyss just for Druid");
+            }
+
+            int oldval = value.getValue();
+
+            if (legion.getHeight() <= 5)
+            {
+                value.add(getHintedRecruitmentValue(recruit, legion,
+                    hintSectionUsed), "Hinted Recruitment Value");
+            }
+            else if (legion.getHeight() == 6)
+            {
+                // if we're 6-high, then the value of a recruit is
+                // equal to the improvement in the value of the
+                // pieces that we'll have after splitting.
+                // TODO this should call our splitting code to see
+                // what split decision we would make
+                // If the legion would never split, then ignore
+                // this special case.
+
+                // This special case was overkill.  A 6-high stack
+                // with 3 lions, or a 6-high stack with 3 clopses,
+                // sometimes refused to go to a safe desert/jungle,
+                // and 6-high stacks refused to recruit colossi,
+                // because the value of the recruit was toned down
+                // too much. So the effect has been reduced.
+                LOGGER.finest("--- 6-HIGH SPECIAL CASE");
+
+                List<CreatureType> weakestTwo = findWeakestTwoCritters(legion);
+
+                CreatureType weakest1 = weakestTwo.get(0);
+                CreatureType weakest2 = weakestTwo.get(1);
+
+                int minCreaturePV = Math.min(
+                    getHintedRecruitmentValue(weakest1, legion,
+                        hintSectionUsed),
+                    getHintedRecruitmentValue(weakest2, legion,
+                        hintSectionUsed));
+                int maxCreaturePV = Math.max(
+                    getHintedRecruitmentValue(weakest1, legion,
+                        hintSectionUsed),
+                    getHintedRecruitmentValue(weakest2, legion,
+                        hintSectionUsed));
+                // point value of my best 5 pieces right now
+                int oldPV = legion.getPointValue() - minCreaturePV;
+                // point value of my best 5 pieces after adding this
+                // recruit and then splitting off my 2 weakest
+                int newPV = legion.getPointValue()
+                    - getHintedRecruitmentValue(weakest1, legion,
+                        hintSectionUsed)
+                    - getHintedRecruitmentValue(weakest2, legion,
+                        hintSectionUsed)
+                    + Math.max(maxCreaturePV, getHintedRecruitmentValue(
+                        recruit, legion, hintSectionUsed));
+
+                value.add(
+                    (newPV - oldPV) + getHintedRecruitmentValue(recruit,
+                        legion, hintSectionUsed),
+                    "Hinted Recruitment Value 2");
+            }
+            else if (legion.getHeight() == 7)
+            {
+                // Cannot recruit, unless we have an angel to summon out,
+                // and we're not fighting, and someone else is, and that
+                // other stack summons out our angel.
+                // Since we don't have enough information about other
+                // stacks to be sure that someone will summon from us,
+                // just give a small bonus for the possible recruit, if
+                // we're not fighting and have a summonable.
+                if (enemyLegion == null && legion.hasSummonable())
+                {
+                    // This is total fudge.  Removing an angel may hurt
+                    // this legion, or may help it if the recruit is even
+                    // better.  But it'll help someone else.  And we don't
+                    // know which legion is more important.  So just give
+                    // a small bonus for possibly being able to summon out
+                    // an angel and recruit.
+                    double POSSIBLE_SUMMON_FACTOR = 0.1;
+                    value.add(
+                        (int)Math.round(
+                            POSSIBLE_SUMMON_FACTOR * getHintedRecruitmentValue(
+                                recruit, legion, hintSectionUsed)),
+                        "Hinted Recruitment Value 3");
+                }
             }
             else
             {
-                LOGGER.finest("considering risk of leaving " + legion + " in "
-                    + hex);
+                LOGGER.severe("Bogus legion height " + (legion).getHeight()
+                    + " in legion " + legion.getMarkerId() + "; content: "
+                    + Glob.glob(",", legion.getCreatures()));
             }
 
-            /**
-             * TODO: this doesn't handle the situation well, if there is
-             * more than one attacker (would bail out on smaller number
-             * even if a different legion with higher number could do more
-             * damage to us?
-             */
-            Map<MasterHex, List<Legion>>[] enemiesThatCanAttackOnA = enemyAttackMap;
-            int roll;
+            LOGGER.finest("--- if " + legion + " moves to " + hex
+                + " then recruit " + recruit.toString() + " (adding "
+                + (value.getValue() - oldval) + ")");
+        }
+        return recruit;
+    }
 
-            roll_loop: for (roll = 1; roll <= 6; roll++)
-            {
-                List<Legion> enemies = enemiesThatCanAttackOnA[roll].get(hex);
+    private void evaluatePossibleEngagement(LegionClientSide legion,
+        MasterHex hex, ValueRecorder value, final Legion enemyLegion)
+    {
+        final int enemyPointValue = enemyLegion.getPointValue();
+        final int result = estimateBattleResults(legion, enemyLegion, hex);
 
-                if (enemies == null)
+        if (AiDevPrinting.movingTitanLegion)
+        {
+            DebugMethods.aiDevLog("Attacking " + enemyLegion.getMarkerId()
+            + " in hex " + hex.getDescription() + ", estimate result = "
+            + result + "\n");
+        }
+        switch (result)
+        {
+            case WIN_WITH_MINIMAL_LOSSES:
+                LOGGER.finest("legion " + legion + " can attack "
+                    + enemyLegion + " in " + hex
+                    + " and WIN_WITH_MINIMAL_LOSSES");
+
+                // we score a fraction of a basic acquirable
+                value
+                    .add(
+                        ((variant.getCreatureByName(variant
+                            .getPrimaryAcquirable())).getPointValue() * enemyPointValue)
+                            / getAcqStepValue(),
+                        "Fraction Basic Acquirable");
+                // plus a fraction of a titan strength
+                // TODO Should be by variant
+                value.add(
+                    (6 * enemyPointValue)
+                        / variant.getTitanImprovementValue(),
+                    "Fraction Titan Strength");
+                // plus some more for killing a group (this is arbitrary)
+                value.add((10 * enemyPointValue) / 100,
+                    "Arbitrary For Killing");
+
+                // TODO if enemy titan, we also score half points
+                // (this may make the AI unfairly gun for your titan)
+                break;
+
+            case WIN_WITH_HEAVY_LOSSES:
+                LOGGER.finest("legion " + legion + " can attack "
+                    + enemyLegion + " in " + hex
+                    + " and WIN_WITH_HEAVY_LOSSES");
+                // don't do this with our titan unless we can win the game
+                boolean haveOtherSummonables = false;
+                Player player = legion.getPlayer();
+                for (Legion l : player.getLegions())
                 {
-                    continue;
+                    if (l.equals(legion))
+                    {
+                        continue;
+                    }
+
+                    if (!l.hasSummonable())
+                    {
+                        continue;
+                    }
+
+                    haveOtherSummonables = true;
+
+                    break;
                 }
-
-                for (Legion enemy : enemies)
-                {
-                    final int result = estimateBattleResults(enemy, false,
-                        legion, hex, recruit);
-                    if (AiDevPrinting.movingTitanLegion)
-                    {
-                        DebugMethods.aiDevLog("Enemy " + enemy.getMarkerId()
-                            + " (" + enemy.getPointValue()
-                            + ") could attack us - estimated result=" + result
-                            + "!\n");
-                    }
-                    boolean dontgo = false;
-                    if (result == WIN_WITH_MINIMAL_LOSSES
-                        || result == WIN_WITH_HEAVY_LOSSES
-                        || (result == DRAW && (legion).hasTitan())
-                        || (result == LOSE_BUT_INFLICT_HEAVY_LOSSES
-                            && (legion).hasTitan()))
-                    {
-                        dontgo = true;
-                    }
-
-                    if (Constants.AiImprovements.titanAbyssCautious
-                        && hex.getTerrainName().equals("Abyss")
-                        && legion.hasTitan() && result != LOSE)
-                    {
-                        if (AiDevPrinting.movingTitanLegion)
-                        {
-                            DebugMethods.aiDevLog("Turn " + client.getTurnNumber()
-                                + ": Risk of TitanLegion being attacked in "
-                                + hex.getDescription() + " - not going!\n");
-                        }
-                        dontgo = true;
-                    }
-                    if (dontgo)
-                    {
-                        // Need to jump out of outer loop, otherwise it would try
-                        // all other rolls and possibly roll remains then "just 6"
-                        break roll_loop;
-                        // break on the lowest roll from which we can
-                        // be attacked and killed
-                    }
-                }
-            }
-
-            // Ignore all fear of attack on turn 1.  Not perfect,
-            // but a pretty good rule of thumb.
-            if (roll < 7 && client.getTurnNumber() > 1)
-            {
-                final double chanceToAttack = (7.0 - roll) / 6.0;
-                final double risk;
 
                 if (legion.hasTitan())
                 {
-                    risk = LOSE_LEGION * chanceToAttack;
+                    // unless we can win the game with this attack
+                    if ((enemyLegion).hasTitan()
+                        && client.getGameClientSide()
+                            .getNumLivingPlayers() == 2)
+                    {
+                        // do it and win the game
+                        value.add(enemyPointValue,
+                            "Killing Last Enemy Titan");
+                    }
+                    else
+                    {
+                        // ack! we'll mess up our titan group
+                        value.add(LOSE_LEGION + 10,
+                            "<Profanity> Our Titan Group");
+                    }
+                }
+                // don't do this if we'll lose our only summonable group
+                // and won't score enough points to make up for it
+                else if (legion.hasSummonable() && !haveOtherSummonables
+                    && enemyPointValue < getAcqStepValue() * .88)
+                {
+                    value.add(LOSE_LEGION + 5, "Lose Legion");
                 }
                 else
                 {
-                    risk = -legion.getPointValue() / 2.0 * chanceToAttack;
+                    // we score a fraction of a basic acquirable
+                    value
+                        .add(
+                            ((variant.getCreatureByName(variant
+                                .getPrimaryAcquirable())).getPointValue() * enemyPointValue)
+                                / getAcqStepValue(),
+                            "Fraction Basic Acquirable 2");
+                    // plus a fraction of a titan strength
+                    value.add(
+                        (6 * enemyPointValue)
+                            / variant.getTitanImprovementValue(),
+                        "Fraction Titan Strength 2");
+                    // but we lose this group
+                    value.add(-(20 * legion.getPointValue()) / 100,
+                        "Lost This Group");
+                    // TODO: if we have no other angels, more penalty here
+                    // TODO: if enemy titan, we also score half points
+                    // (this may make the AI unfairly gun for your titan)
                 }
+                break;
 
-                value.add((int)Math.round(risk), "Risk (not the trademark)");
-            }
+            case DRAW:
+                LOGGER.finest("legion " + legion + " can attack "
+                    + enemyLegion + " in " + hex + " and DRAW");
+
+                // If this is an unimportant group for us, but
+                // is enemy titan, do it.  This might be an
+                // unfair use of information for the AI
+                if (legion.numLords() == 0 && enemyLegion.hasTitan())
+                {
+                    // Arbitrary value for killing a player but
+                    // scoring no points: it's worth a little
+                    // If there are only 2 players, we should do this.
+                    if (client.getGameClientSide().getNumLivingPlayers() == 2)
+                    {
+                        value.resetTo(WIN_GAME, "WinGame");
+                    }
+                    else
+                    {
+                        value.add(enemyPointValue / 6,
+                            "Unfairly Assault Titan");
+                    }
+                }
+                else
+                {
+                    // otherwise no thanks
+                    value.add(LOSE_LEGION + 2, "Lose Legion 2");
+                }
+                break;
+
+            case LOSE_BUT_INFLICT_HEAVY_LOSSES:
+                LOGGER.finest("legion " + legion + " can attack "
+                    + enemyLegion + " in " + hex
+                    + " and LOSE_BUT_INFLICT_HEAVY_LOSSES");
+
+                // TODO: how important is it that we damage his group?
+                value.add(LOSE_LEGION + 1, "Lose Legion 3");
+                break;
+
+            case LOSE:
+                LOGGER.finest("legion " + legion + " can attack "
+                    + enemyLegion + " in " + hex + " and LOSE");
+
+                value.add(LOSE_LEGION, "Lose Legion 4");
+                break;
+
+            default:
+                LOGGER.severe("Bogus battle result case");
         }
-
-        // TODO: consider mobility.  e.g., penalty for suckdown
-        // squares, bonus if next to tower or under the top
-        // TODO: consider what we can attack next turn from here
-        // TODO: consider nearness to our other legions
-        // TODO: consider being a scooby snack (if so, everything
-        // changes: we want to be in a location with bad mobility, we
-        // want to be at risk of getting killed, etc)
-        // TODO: consider risk of being scooby snacked (this might be inherent)
-        // TODO: consider splitting up our good recruitment rolls
-        // (i.e. if another legion has warbears under the top that
-        // recruit on 1,3,5, and we have a behemoth with choice of 3/5
-        // to jungle or 4/6 to jungle, prefer the 4/6 location).
-        LOGGER.finest("EVAL " + legion + (moved ? " move to " : " stay in ")
-            + hex + " = " + value);
-
-        return value.getValue();
     }
 
     private static final int WIN_WITH_MINIMAL_LOSSES = 0;
