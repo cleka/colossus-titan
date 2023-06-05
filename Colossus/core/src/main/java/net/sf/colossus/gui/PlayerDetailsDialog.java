@@ -36,6 +36,7 @@ import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.client.PlayerClientSide;
 import net.sf.colossus.client.PredictSplitNode;
 import net.sf.colossus.client.PredictSplits;
+import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.guiutil.KDialog;
@@ -51,6 +52,7 @@ public final class PlayerDetailsDialog extends KDialog
 {
     private final PlayerClientSide player;
     private final ClientGUI gui;
+    private final StatusScreen statusScreen;
 
     private final JPanel mainPane;
     private final JButton refreshButton;
@@ -101,12 +103,13 @@ public final class PlayerDetailsDialog extends KDialog
     }
 
     public PlayerDetailsDialog(final JFrame parentFrame,
-        PlayerClientSide player, ClientGUI clientGui)
+        PlayerClientSide player, ClientGUI clientGui, StatusScreen statScreen)
     {
         // TODO currently modal since we don't listen for updates yet --> fix
         super(parentFrame, "Details for player " + player.getName(), false);
         this.player = player;
         this.gui = clientGui;
+        this.statusScreen = statScreen;
 
         useSaveWindow(gui.getOptions(), "PlayerDetails", null);
         // int randomOffset = (int)(System.currentTimeMillis() % 5 - 10) * 10;
@@ -151,7 +154,7 @@ public final class PlayerDetailsDialog extends KDialog
         });
     }
 
-    private void refreshContent()
+    public void refreshContent()
     {
         mainPane.removeAll();
         addContent(mainPane);
@@ -268,18 +271,21 @@ public final class PlayerDetailsDialog extends KDialog
             result.add(new JPanel(), HORIZONTAL_FILL_CONSTRAINT);
         }
 
-        result.add(new JLabel("Split history:"), SECTION_TITLE_CONSTRAINT);
-        if (gui.getGame().getTurnNumber() < 512)
+        if (!Constants.AiDevPrinting.dontShowSplitTree)
         {
-            JScrollPane splitNodesPanel = new JScrollPane(
-                createSplitNodesPanel());
-            result.add(splitNodesPanel, SECTION_TITLE_CONSTRAINT);
-        }
-        else
-        {
-            result.add(new JLabel(
-                " [ Too many turns! Table cannot be created. ] "),
-                SECTION_TITLE_CONSTRAINT);
+            result.add(new JLabel("Split history:"), SECTION_TITLE_CONSTRAINT);
+            if (gui.getGame().getTurnNumber() < 512)
+            {
+                JScrollPane splitNodesPanel = new JScrollPane(
+                    createSplitNodesPanel());
+                result.add(splitNodesPanel, SECTION_TITLE_CONSTRAINT);
+            }
+            else
+            {
+                result.add(new JLabel(
+                    " [ Too many turns! Table cannot be created. ] "),
+                    SECTION_TITLE_CONSTRAINT);
+            }
         }
 
         return result;
@@ -422,5 +428,15 @@ public final class PlayerDetailsDialog extends KDialog
         }
 
         return result;
+    }
+
+    @Override
+    public void dispose()
+    {
+        if (statusScreen != null)
+        {
+            statusScreen.remove(this);
+        }
+        super.dispose();
     }
 }

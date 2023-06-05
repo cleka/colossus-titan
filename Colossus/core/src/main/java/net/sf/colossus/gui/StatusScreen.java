@@ -10,6 +10,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.LinkedList;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -20,6 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import net.sf.colossus.client.PlayerClientSide;
+import net.sf.colossus.common.Constants;
 import net.sf.colossus.common.IOptions;
 import net.sf.colossus.common.Options;
 import net.sf.colossus.game.Player;
@@ -64,6 +66,8 @@ final class StatusScreen extends KDialog
     private Dimension size;
     private final SaveWindow saveWindow;
 
+    private final LinkedList<PlayerDetailsDialog> detailsDialogs;
+
     StatusScreen(final JFrame frame, ClientGUI gui, final IOptions options)
     {
         super(frame, "Game Status", false);
@@ -72,6 +76,7 @@ final class StatusScreen extends KDialog
         setFocusable(false);
 
         this.gui = gui;
+        this.detailsDialogs = new LinkedList<PlayerDetailsDialog>();
 
         // Needs to be set up before calling this.
         numPlayers = gui.getGame().getNumPlayers();
@@ -148,8 +153,9 @@ final class StatusScreen extends KDialog
                 @Override
                 public void mouseClicked(MouseEvent e)
                 {
-                    new PlayerDetailsDialog(frame, thePlayer,
-                        StatusScreen.this.gui);
+                    PlayerDetailsDialog pdd = new PlayerDetailsDialog(frame,
+                        thePlayer, StatusScreen.this.gui, StatusScreen.this);
+                    detailsDialogs.add(pdd);
                 }
             });
 
@@ -388,6 +394,14 @@ final class StatusScreen extends KDialog
         }
 
         repaint();
+
+        if (Constants.AiDevPrinting.autoRefreshDetailsDialog)
+        {
+            for (PlayerDetailsDialog pdd : detailsDialogs)
+            {
+                pdd.refreshContent();
+            }
+        }
     }
 
     @Override
@@ -398,6 +412,10 @@ final class StatusScreen extends KDialog
         saveWindow.saveSize(size);
         location = getLocation();
         saveWindow.saveLocation(location);
+        for (PlayerDetailsDialog pdd : detailsDialogs)
+        {
+            pdd.dispose();
+        }
     }
 
     @Override
@@ -425,4 +443,13 @@ final class StatusScreen extends KDialog
         setSize(getPreferredSize());
         pack();
     }
+
+    void removeDetailsDialog(PlayerDetailsDialog pdd)
+    {
+        if (pdd != null)
+        {
+            detailsDialogs.remove(pdd);
+        }
+    }
+
 }

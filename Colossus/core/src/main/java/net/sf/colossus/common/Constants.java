@@ -488,6 +488,8 @@ public final class Constants
     {
         public static final boolean movingTitanLegion = false;
         public static final boolean invincibleTitan = false;
+        public static final boolean dontShowSplitTree = true;
+        public static final boolean autoRefreshDetailsDialog = true;
     }
 
 }
