@@ -1,6 +1,7 @@
 package net.sf.colossus.server;
 
 
+import java.awt.GraphicsEnvironment;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -211,6 +212,8 @@ public final class Server extends Thread implements IServer
     // have been processed).
     private final List<ClientHandlerStub> channelChanges = new ArrayList<ClientHandlerStub>();
 
+    private final boolean isHeadless = GraphicsEnvironment.isHeadless();
+
     Server(GameServerSide game, WhatNextManager whatNextMgr, int port)
     {
         this.game = game;
@@ -226,7 +229,7 @@ public final class Server extends Thread implements IServer
             startLog = null;
         }
 
-        if (game.getNotifyWebServer().isActive())
+        if (game.getNotifyWebServer().isActive() || isHeadless)
         {
             // If started by WebServer, do not log to StartupProgressLog.
         }
