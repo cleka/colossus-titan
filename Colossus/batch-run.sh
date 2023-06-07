@@ -27,6 +27,12 @@ then
   FORCEBOARD=`cat forceboard`
 fi
 
+
+if [ -e headless ]
+then
+    HEADLESS="-Djava.awt.headless=`cat headless`"
+fi
+
 # have them here in a never-happens if block just for easy copy-pasting...
 if [ 1 -eq 0 ]
 then  
@@ -47,8 +53,9 @@ fi
 
 if [ -z "$LOAD_FILE" ]
 then
+    # For automated testing (Headless mode) we need something with
+    # AIs only:
     LOAD_FILE=111-ClemensAI+2SimpleAI.xml
-    LOAD_FILE=000-Will-muster-Chimera.xml
 fi
 
 if [ -e loadfile ]
@@ -62,6 +69,7 @@ echo "Running Colossus with LOAD_FILE=$LOAD_FILE"
 
 java $COLOSSUS_JRE_ARGS -Dnet.sf.colossus.forceViewBoard=$FORCEBOARD \
      -Djava.util.logging.config.file=logging.properties \
+     $HEADLESS                    \
      -Xmx${MEM_SIZE} -jar Colossus.jar \
      -i 3 -L 1 -Z 2               \
      --load $LOAD_FILE            \
