@@ -1379,7 +1379,7 @@ public class GameServerSide extends Game
     {
         if (gameOver && DebugMethods.getClemensAiDevelopment())
         {
-            DebugShowGameStatistics(message + "\n");
+            debugCollectGameStatistics(message + "\n");
         }
         super.setGameOver(gameOver, message);
         if (startingWebClient != null)
@@ -1388,7 +1388,10 @@ public class GameServerSide extends Game
         }
     }
 
-    private void DebugShowGameStatistics(String message)
+    private String debugGameStatistics = "\n"
+        + "===================================================\n";
+
+    private void debugCollectGameStatistics(String message)
     {
         DebugMethods.aiDevLog(message);
         for (Player p : getPlayers())
@@ -1409,8 +1412,13 @@ public class GameServerSide extends Game
                 "%-10s: Score=%4d, CreaturePoints=%4d, TotalPoints=%4d\n",
                 p.getName(), new Integer(score), new Integer(creaturePoints),
                 new Integer(totalPoints));
-            DebugMethods.aiDevLog(debug);
+            debugGameStatistics += debug;
         }
+    }
+
+    public void debugShowGameStatistics()
+    {
+        DebugMethods.aiDevLog(debugGameStatistics + "\n");
     }
 
     /** Wrap the complexity of phase advancing. */

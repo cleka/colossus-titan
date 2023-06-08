@@ -395,7 +395,7 @@ public class Player
         int count = 0;
         for (Legion legion : getLegions())
         {
-            count += legion.getHeight();
+            count += legion.getPointValue();
         }
         return count;
     }

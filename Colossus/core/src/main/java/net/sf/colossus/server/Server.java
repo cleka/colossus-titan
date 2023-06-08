@@ -1164,6 +1164,7 @@ public final class Server extends Thread implements IServer
      */
     public void stopServerRunning()
     {
+        game.debugShowGameStatistics();
         if (!game.isGameOver())
         {
             LOGGER
