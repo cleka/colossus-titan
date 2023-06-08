@@ -2897,6 +2897,14 @@ public final class Client implements IClient, IOracle, IVariant,
         {
             ai.setupBattleMove();
         }
+
+        if (AiDevPrinting.waitAfterSetupBattleMove && gui != null
+            && gui instanceof ClientGUI)
+        {
+            // System.out.println("Sleeping 10 seconds...");
+            // WhatNextManager.sleepFor(10000);
+            // DebugMethods.waitReturn();
+        }
     }
 
     public void tryBattleMove(CritterMove cm)
