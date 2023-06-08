@@ -941,11 +941,15 @@ public class ClemensAI extends AbstractAI
                 legion, legion.getCurrentHex(), false, enemyAttackMap, why),
                 0, why);
             moveList.add(sitStillMove);
-            /*
-            DebugMethods.aiDevLog(
-                "\nConsidering moves for legion " + legion.getMarkerId()
-                    + ", sitStillMove value=" + sitStillMove.value + "\n");
-            */
+
+            if (legion.getMarkerId().equals("Gr00"))
+            {
+                DebugMethods.aiDevLog(
+                    "\nConsidering moves for legion " + legion.getMarkerId()
+                    + ", sitStillMove hex " + legion.getCurrentHex() + "="
+                    + sitStillMove.value + "\n" + why.getFull(":") + "\n\n");
+            }
+
             // find the best move (1-ply search)
             MasterHex bestHex = null;
             MoveInfo bestMove = null;
@@ -967,9 +971,19 @@ public class ClemensAI extends AbstractAI
                 ValueRecorder whyR = new ValueRecorder();
                 final int value = evaluateMove(legion, hex, true,
                     enemyAttackMap, whyR);
+
+                if (legion.getMarkerId().equals("Gr00"))
+                {
+                    DebugMethods
+                        .aiDevLog("evaluate for legion " + legion.getMarkerId()
+                            + " to hex " + hex.getDescription() + " - value="
+                            + value + whyR.getFull("|") + "\n");
+                }
+
                 if (AiDevPrinting.movingTitanLegion)
                 {
-                    DebugMethods.aiDevLog("  Moving to " + hex.getDescription()
+                    DebugMethods.aiDevLog(
+                        "  Moving Titan legion to " + hex.getDescription()
                         + ", value=" + value + "\n");
                 }
                 MoveInfo move = new MoveInfo(legion, hex, value, value
@@ -1007,20 +1021,18 @@ public class ClemensAI extends AbstractAI
                             if (AiDevPrinting.movingTitanLegion)
                             {
                                 DebugMethods
-                                .aiDevLog("Turn " + client.getTurnNumber()
-                                        + ": moving Titan Legion to "
-                                        + bestHex.getDescription() + "\n");
-                                DebugMethods.aiDevLog("Moved " + legion
-                                    + " to " + bestHex + " after evaluating: "
-                                    //                              + bestMove.why.toString()
-                                    + bestMove.value
-                                    + " is better than sitting tight "
+                                    .aiDevLog("Turn " + client.getTurnNumber()
+                                        + ": Moving " + legion + " to "
+                                        + bestHex.getDescription()
+                                        + " after evaluating: "
+                                    // + bestMove.why.toString()
+                                        + bestMove.value
+                                        + " is better than sitting tight "
                                     + sitStillMove.value
-                                    //                                + sitStillMove.why.toString()
+                                    // + sitStillMove.why.toString()
                                     + "\n");
-                        }
 
-                            // DebugMethods.waitReturn();
+                            }
                         }
 
                     }
@@ -1264,6 +1276,8 @@ public class ClemensAI extends AbstractAI
         Map<MasterHex, List<Legion>>[] enemiesThatCanAttackOnA = enemyAttackMap;
         int roll;
 
+        Legion enemyThatCouldAttack = null;
+
         roll_loop: for (roll = 1; roll <= 6; roll++)
         {
             List<Legion> enemies = enemiesThatCanAttackOnA[roll].get(hex);
@@ -1310,6 +1324,7 @@ public class ClemensAI extends AbstractAI
                 {
                     // Need to jump out of outer loop, otherwise it would try
                     // all other rolls and possibly roll remains then "just 6"
+                    enemyThatCouldAttack = enemy;
                     break roll_loop;
                     // break on the lowest roll from which we can
                     // be attacked and killed
@@ -1333,7 +1348,8 @@ public class ClemensAI extends AbstractAI
                 risk = -legion.getPointValue() / 2.0 * chanceToAttack;
             }
 
-            value.add((int)Math.round(risk), "Risk (not the trademark)");
+            value.add((int)Math.round(risk),
+                "Risk of being attacked by " + enemyThatCouldAttack);
         }
     }
 
