@@ -1653,14 +1653,30 @@ public class ClemensAI extends AbstractAI
                     + " and LOSE_BUT_INFLICT_HEAVY_LOSSES");
 
                 // TODO: how important is it that we damage his group?
-                value.add(LOSE_LEGION + 1, "Lose Legion 3");
+                if (legion.hasTitan())
+                {
+                    value.add(10 * LOSE_LEGION,
+                        "Would lose Titan legion, result 3");
+                }
+                else
+                {
+                    value.add(LOSE_LEGION + 1, "Lose Legion 3");
+                }
                 break;
 
             case LOSE:
                 LOGGER.finest("legion " + legion + " can attack "
                     + enemyLegion + " in " + hex + " and LOSE");
 
-                value.add(LOSE_LEGION, "Lose Legion 4");
+                if (legion.hasTitan())
+                {
+                    value.add(12 * LOSE_LEGION,
+                        "Would lose Titan legion, result 4");
+                }
+                else
+                {
+                    value.add(LOSE_LEGION + 1, "Lose Legion 4");
+                }
                 break;
 
             default:
