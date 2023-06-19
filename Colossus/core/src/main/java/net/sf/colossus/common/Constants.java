@@ -486,7 +486,9 @@ public final class Constants
 
     public final class AiDevPrinting
     {
+        public static final boolean aiDevLog = true;
         public static final boolean movingTitanLegion = false;
+        public static final boolean movingTitanLegionEvaluations = false;
         public static final boolean invincibleTitan = false;
         public static final boolean dontShowSplitTree = true;
         public static final boolean autoRefreshDetailsDialog = true;
@@ -494,5 +496,4 @@ public final class Constants
     }
 
 }
-
 

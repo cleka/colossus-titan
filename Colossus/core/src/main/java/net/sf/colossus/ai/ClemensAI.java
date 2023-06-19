@@ -89,7 +89,6 @@ public class ClemensAI extends AbstractAI
         hintSectionUsed.add(AIStyle.Clemens);
 
         DebugMethods.setClemensBattleDevelopment(false);
-        DebugMethods.setClemensAiDevelopment(true);
         DebugMethods.aiDevLog("Clemens AI initiated.\n");
 
         if (client.getClientName().equals("blabla"))
@@ -942,7 +941,7 @@ public class ClemensAI extends AbstractAI
                 0, why);
             moveList.add(sitStillMove);
 
-            if (legion.getMarkerId().equals("Gr00"))
+            if (AiDevPrinting.movingTitanLegionEvaluations)
             {
                 DebugMethods.aiDevLog(
                     "\nConsidering moves for legion " + legion.getMarkerId()
@@ -972,7 +971,7 @@ public class ClemensAI extends AbstractAI
                 final int value = evaluateMove(legion, hex, true,
                     enemyAttackMap, whyR);
 
-                if (legion.getMarkerId().equals("Gr00"))
+                if (AiDevPrinting.movingTitanLegionEvaluations)
                 {
                     DebugMethods
                         .aiDevLog("evaluate for legion " + legion.getMarkerId()

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import net.sf.colossus.client.LegionClientSide;
+import net.sf.colossus.common.Constants;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.InstanceTracker;
@@ -175,7 +176,6 @@ public class DebugMethods
     }
 
     private static boolean clemensBattleDevelopment = false;
-    private static boolean clemensAiDevelopment = false;
 
     public static void setClemensBattleDevelopment(boolean value)
     {
@@ -187,14 +187,9 @@ public class DebugMethods
         return clemensBattleDevelopment;
     }
 
-    public static void setClemensAiDevelopment(boolean value)
-    {
-        clemensAiDevelopment = value;
-    }
-
     public static boolean getClemensAiDevelopment()
     {
-        return clemensAiDevelopment;
+        return Constants.AiDevPrinting.aiDevLog;
     }
 
     /**
@@ -215,7 +210,7 @@ public class DebugMethods
      */
     public static void aiDevLog(String message)
     {
-        if (clemensAiDevelopment)
+        if (Constants.AiDevPrinting.aiDevLog)
         {
             System.out.print(message);
         }
