@@ -2095,6 +2095,11 @@ public class WebClient extends KFrame implements IWebClient
                 LOGGER.info("As expected, server asks us now for "
                     + "the confirmation code for user " + username);
             }
+            else if (reason.equals(User.NO_CONFCODE_NEEDED))
+            {
+                LOGGER.info("Gmail address, registering user " + username
+                    + " without confirmation code");
+            }
             else
             {
                 LOGGER.info("Failed to create account for user " + username

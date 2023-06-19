@@ -214,6 +214,8 @@ public class UserDB
         }
         else
         {
+            boolean gmail = false;
+
             highestExistingId++;
             User u = new User(highestExistingId, username, password, email,
                 isAdmin, null, null, null, 0);
@@ -221,20 +223,45 @@ public class UserDB
             User.LOGGER.fine("Confirmation code for user " + username
                 + " is: " + cCode);
 
-            String reason = sendConfirmationMail(username, email, cCode,
-                mailObject);
-            if (reason != null)
+            if (isGmail(email))
             {
-                // mail sending failed, for some reason. Let user know it.
-                return reason;
+                gmail = true;
+            }
+            else
+            {
+                String reason = sendConfirmationMail(username, email, cCode,
+                    mailObject);
+                if (reason != null)
+                {
+                    // mail sending failed, for some reason. Let user know it.
+                    return reason;
+                }
             }
 
             pendingRegistrations.put(username, u);
             // so far everything fine. Now client shall request the conf. code
 
-            reason = User.PROVIDE_CONFCODE;
+            if (gmail)
+            {
+                LOGGER.fine("Gmail - confirming user " + username
+                    + " without confirmation code.");
+                confirmIfCorrectCode(username, cCode);
+                return User.NO_CONFCODE_NEEDED;
+            }
+            String reason = User.PROVIDE_CONFCODE;
             return reason;
         }
+    }
+
+    private boolean isGmail(String email)
+    {
+        if (email.endsWith("gmail.com"))
+        {
+            LOGGER.fine("Email " + email + " ends with gmail.com");
+            return true;
+        }
+        LOGGER.fine("Email " + email + " is not gmail");
+        return false;
     }
 
     public String sendConfirmationMail(String username, String email,

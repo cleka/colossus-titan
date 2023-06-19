@@ -39,6 +39,7 @@ public class User
     private final static int MAX_RANDOM = 99;
 
     public final static String PROVIDE_CONFCODE = "Provide the confirmation code";
+    public final static String NO_CONFCODE_NEEDED = "Registered without confirmation code";
     public final static String WRONG_CONFCODE = "Wrong confirmation code!";
     public final static String TEMPLATE_CONFCODE = "10 20 30";
     public final static String TEMPLATE_CONFCODE_REPLACEMENT = "11 21 31";
