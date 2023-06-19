@@ -1086,6 +1086,19 @@ public final class Client implements IClient, IOracle, IVariant,
         return null;
     }
 
+    public Legion getEngagedEnemyLegion()
+    {
+        if (isMyLegion(getAttacker()))
+        {
+            return getDefender();
+        }
+        else if (isMyLegion(getDefender()))
+        {
+            return getAttacker();
+        }
+        return null;
+    }
+
     public void concede()
     {
         concede(getMyEngagedLegion());
