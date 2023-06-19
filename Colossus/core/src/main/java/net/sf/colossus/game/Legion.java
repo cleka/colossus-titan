@@ -404,6 +404,19 @@ public abstract class Legion
         return count;
     }
 
+    public int numDemiLords()
+    {
+        int count = 0;
+        for (Creature critter : getCreatures())
+        {
+            if (critter.getType().isDemiLord())
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
     public int numRangestrikers()
     {
         int count = 0;
